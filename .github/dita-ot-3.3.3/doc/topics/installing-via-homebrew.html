@@ -1,0 +1,63 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="An alternative installation method can be used to install DITA-OT on macOS via Homebrew, the platform’s most popular open-source package manager."><meta name="DC.subject" content="macOS, command, dita, Homebrew, installing"><meta name="keywords" content="macOS, command, dita, Homebrew, installing"><meta name="DC.relation" scheme="URI" content="../topics/installing-client.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="installing-via-homebrew"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Installing on macOS via Homebrew</title></head><body id="installing-via-homebrew"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a><ul><li><a href="../topics/prerequisite-software.html">Prerequisite software</a></li><li><a href="../topics/determining-version-of-ditaot.html">Checking the version</a></li><li><a href="../topics/first-build-using-dita-command.html">Building output</a></li><li class="active"><a href="../topics/installing-via-homebrew.html">Installing via Homebrew</a></li></ul></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Installing on macOS via Homebrew</h1>
+  
+  
+  
+  <div class="body taskbody"><p class="shortdesc">An alternative installation method can be used to install DITA-OT on macOS via <a class="xref" href="https://brew.sh" target="_blank">Homebrew</a>,
+    the platform’s most popular open-source package manager.</p>
+    <section class="section prereq"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Before you begin</h2></div>
+      <p class="p">The steps below assume you have already installed <a class="xref" href="https://brew.sh" target="_blank">Homebrew</a> according to the instructions at
+          <a class="xref" href="https://brew.sh" target="_blank">brew.sh</a>.</p>
+      <div class="note tip note_tip"><span class="note__title">Tip:</span> Verify that your <var class="keyword varname">PATH</var> environment begins with
+          <span class="ph filepath">/usr/local/bin</span> to ensure that Homebrew-installed software takes precedence over any
+        programs of the same name elsewhere on the system.</div>
+    </section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">Update Homebrew to make sure the latest package formulas are available on your system:</span>
+        <div class="itemgroup stepxmp"><pre class="pre codeblock"><code>$ <span class="keyword cmdname">brew update</span>
+Already up-to-date.</code></pre></div>
+        <div class="itemgroup stepresult">
+          <p class="p">Homebrew responds with a list of any new or updated formulæ.</p></div>
+      </li><li class="li step stepexpand"><strong>Optional: </strong>
+        <span class="ph cmd">Check the version of DITA-OT that is available from Homebrew:</span>
+        <div class="itemgroup stepxmp"><pre class="pre codeblock"><code>$ <span class="keyword cmdname">brew info dita-ot</span>
+<samp class="ph systemoutput sysout">dita-ot: stable <span class="keyword">3.3.3</span>
+DITA Open Toolkit is an implementation of the OASIS DITA specification
+https://www.dita-ot.org/
+/usr/local/Cellar/dita-ot/<span class="keyword">3.3.3</span> (<var class="keyword varname">number of files</var>, <var class="keyword varname">package size</var>) *
+  Built from source on <var class="keyword varname">YYYY-MM-DD</var> at <var class="keyword varname">hh:mm:ss</var>
+From: https://github.com/Homebrew/homebrew-core/blob/master/Formula/dita-ot.rb
+==&gt; Requirements
+Required: java &gt;= 1.8 ✔</samp>
+</code></pre></div>
+        <div class="itemgroup stepresult">
+          <p class="p">The version of the DITA-OT formula is shown, along with basic information on the package.</p></div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Install the <code class="ph codeph">dita-ot</code> package:</span>
+        <div class="itemgroup stepxmp"><pre class="pre codeblock"><code>$ <span class="keyword cmdname">brew install dita-ot</span>
+<samp class="ph systemoutput sysout">Downloading…</samp></code></pre></div>
+        <div class="itemgroup stepresult">
+          <p class="p">Homebrew will automatically download the latest version of the toolkit, install it in a subfolder of the
+            local package Cellar and symlink the <span class="keyword cmdname">dita</span> command to
+              <span class="ph filepath">/usr/local/bin/dita</span>.</p></div>
+      </li><li class="li step stepexpand"><strong>Optional: </strong>
+        <span class="ph cmd">Verify the installation:</span>
+        <div class="itemgroup stepxmp"><pre class="pre codeblock"><code>$ <span class="keyword cmdname">which dita</span>
+<samp class="ph systemoutput sysout">/usr/local/bin/dita</samp></code></pre></div>
+        <div class="itemgroup stepresult">
+          <p class="p">The response confirms that the system will use the Homebrew-installed version of DITA-OT.</p></div>
+      </li><li class="li step stepexpand"><strong>Optional: </strong>
+        <span class="ph cmd">Check the DITA-OT version number:</span>
+        <div class="itemgroup stepxmp"><pre class="pre codeblock"><code>$ <span class="keyword cmdname">dita</span> <span class="keyword parmname">--version</span>
+<samp class="ph systemoutput sysout">DITA-OT version <span class="keyword">3.3.3</span></samp></code></pre></div>
+        <div class="itemgroup stepresult">The DITA-OT version number appears on the console.</div>
+      </li></ol></section>
+    <section class="section result"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Results</h2></div>
+      <p class="p">You can now run the <span class="keyword cmdname">dita</span> command to transform DITA content.</p></section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/installing-client.html" title="The DITA-OT distribution package can be installed on Linux, macOS, and Windows. It contains everything that you need to run the toolkit except for Java.">Installing DITA Open Toolkit</a></div></div></nav></article></main></body></html>

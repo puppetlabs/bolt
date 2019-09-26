@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.3" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.3</title><refbody><section id="section_qhs_zdj_nc">
+        <title>OASIS DITA 1.1 support</title>
+        <p>Things to know about OASIS DITA 1.1 support in this release:</p>
+        <ol><li>DITA-OT 1.3 provides preliminary processing support for the upcoming OASIS DITA 1.1
+            specification (see <xref format="html" href="http://wiki.oasis-open.org/dita/Roadmap_for_DITA_development" scope="external">http://wiki.oasis-open.org/dita/Roadmap_for_DITA_development</xref>). Because the
+            proposed OASIS DITA 1.1 DTDs and Schemas are fully backwards compatible with the latest
+            DITA 1.0.1 DTDs and Schemas, the 1.3 Toolkit provides the proposed 1.1 materials as the
+            default DTDs for processing. The XML Catalog resolution maps any references for DITA 1.0
+            doctypes to the 1.1 DTDs, for example. All processing ordinarily dependent on the 1.0
+            definition continues to work as usual, and any documents that make use of the newer
+            1.1-based elements or attributes will be supported with specific new processing function
+            (such as base support for the new &lt;data&gt; element). <i>Documents created with the
+              proposed OASIS DITA 1.1 DTDs are the only ones ever likely to have features that
+              invoke the specific new 1.1-based processing support</i>.<note type="important">Because this support is based on a yet-to-be-approved version of the proposed OASIS
+              DITA 1.1 specification, if you choose to investigate any1.1-based function, be aware
+              that the 1.1 implementation in this version of the Toolkit is preliminary and very
+              much forward-looking. Upon final approval of the DITA 1.1 standard, Toolkit developers
+              will, of course, review our implementation to make certain that it conforms to the
+              defined level of reference implementation.</note></li><li>Related to the DITA 1.1 preliminary implementation, the much-discussed bookmap updates
+            for DITA 1.1 will be provided as override capabilities for the FO plugin (Idiom's
+            donation). Note that:<ul><li>The FO demo transform code at the 1.2.2 level is still included in the DITA 1.3
+                package, but is now deprecated.</li><li>To get the FO updates for 1.3, grab the FO plug-in at its next update, which
+                should be shortly after the 1.3 core Toolkit code is released. </li><li>The updated FO plug-in will be usable with FOP as well as with XEP. </li></ul></li></ol>
+      </section><section id="section_mdb_aej_nc">
+        <title>Changes</title>
+        <p>The DITA Open Toolkit team understands the need for stability in essential APIs in the
+          Toolit. This verson of the toolkit provides some strategic updates that correct some
+          long-overdue faults in the original implementation. Necessarily, there are some changes to
+          note: </p>
+        <ol><li><u>Change to build.xml: </u>To make the DITA processing environment more like other
+            Ant-driven build environments, the original build.xml has been renamed as
+            build_demo.xml. The current build.xml in this release is now the normal ANT script
+            entrance for starting a transformation. If you have created Ant tasks that tried to work
+            around the former build.xml architecture, those might need to be revised to take
+            advantage of the separated function.</li><li><u>Change to command line invocations: </u>The "Ant refactoring" exercise
+            for this release has changed some previously documented Ant calls for running demos.
+            This change enables better use of the Ant modules for power users who need to integrate
+            the Toolkit into programming build environments such as Eclipse, but the change affects
+            some documentation. This is a permanent change that should remain stable from now on.
+            Wherever you see an older instruction like "c:\dita-ot&gt;ant all", you now
+            need to indicate the component that contains the demos, so you would type
+            "c:\dita-ot&gt;ant all -f build_demo.xml". </li><li><u>Separation of demo targets from formal component targets: </u>Another effect of the
+            Ant refactoring is that the internal programming targets will now be displayed when you
+            type "ant -p". To see both those programmings targets and the demos that are
+            part of this component, type "c:\dita-ot&gt;ant -p -f build_demo.xml". To run
+            just one of the demos that you see in the resulting list, dita.faq for example, type
+            "c:\dita-ot&gt;ant dita.faq -f build_demo.xml". </li><li><u>Classpath update to enable catalog resolver: </u>This release now includes the
+            Apache catalog resolver for improved lookup of DTDs by any of the Toolkit components.
+            The fullpackage version of the Toolkit sets up these variables for each session. For the
+            regular (smaller) version of the Toolkit, you need to include lib and
+            lib\resource\resolver.jar into your classpath. For example if your CLASSPATH is like:
+              <pre xml:space="preserve">c:\dita-ot\lib\dost.jar</pre><p>you need to change it to:
+              </p><pre xml:space="preserve">c:\dita-ot\lib;c:\dita-ot\lib\dost.jar;c:\dita-ot\lib\resolver.jar</pre><p>At
+              any time, the full version can be used like a normal installation as long as you
+              update the system variables either in the evironment settings or in a batch file that
+              sets up the shell environment. </p></li><li><u>License bundling: </u>To reduce the duplication of builds on Sourceforge in which
+            the only difference was the license provided in each, both the Apache and CPL licenses
+            are included in root directory of the Toolkit. Use the one that applies to your
+            situation.</li><li><u>Two install options: </u>Two download versions are now offered. The smaller one is
+            for updating existing installations or for reuse in embedded applications that already
+            provide the other processing components--business as usual. A new package with
+            "fullpackage" in the name now incorporates the essential processing modules to
+            create a processing environment for new users and evaluators that requires nothing more
+            than to unzip the file into an appropriate directory and then click on a
+            "start" batch file. A new document in its root directory (an output of
+            doc/EvaluateOT.dita, <q>Evaluating the DITA Open Toolkit (fullpackage version)</q>)
+            informs new users how to install and use the Toolkit for the first time.</li><li><u>Other enhancements: </u>The public design discussions that fed into the final
+            selection and architectures for this release are documented at the DITA Focus Area in a
+            topic called <q>DITA OT 1.3 Issues tracking</q> (<xref format="html" href="http://dita.xml.org/node/1282" scope="external">http://dita.xml.org/node/1282</xref>).</li></ol>
+      </section><section id="section_rci_aej_nc">
+        <title>7 Improvements</title>
+        <ol><li>Preliminary support for OASIS DITA 1.1 </li><li>Support ICU in index sorting </li><li>Integrate with Eclipse </li><li>Refactor Ant script for easy override </li><li>Topicmerge reimplementation in JAVA </li><li>Enable XML Catalog Resolver </li><li>Full package distribution (was GUI/usability)</li></ol>
+      </section><section id="section_pyo_aej_nc">
+        <title>21 SourceForge Bugs Fixed</title>
+        <ol><li>SF Bug 1582506 Docbook cannot handle &lt;author&gt; </li><li>SF Bug 1548189 Sections should not jump to &lt;h4&gt; for Accessibility reasons </li><li>SF Bug 1548180 Spaces dropped from index terms </li><li>SF Bug 1548154 XHTML index links should go to the topic </li><li>SF Bug 1545038 CommandLineInvoker is unfriendly towards spaces </li><li>SF Bug 1541055 topicref @id incorrectly uses NMTOKEN type </li><li>SF Bug 1530443 dost.jar relies on the incorrect behavior of Xerces </li><li>SF Bug 1473029 Syntax code makes overrides difficult </li><li>SF Bug 1470101 Metadata in topics is left out of XHTML headers </li><li>SF Bug 1470077 Choicetable headers create attribute inside attribute </li><li>SF Bug 1470057 Step template creates attributes after creating tags </li><li>SF Bug 1465947 &lt;topichead&gt; without children the whole branch to disappear </li><li>SF Bug 1465941 Keywords defined in map are ignored if &lt;topicref&gt; contains t </li><li>SF Bug 1465866 Problems in catalog-dita.txt </li><li>SF Bug 1460447 &lt;morerows&gt; not well supported in pdf tranformation. </li><li>SF Bug 1457187 'copy-to' doesn't actually copy files </li><li>SF Bug 1454835 OT renders files referenced via conref only </li><li>SF Bug 1427808 Should be easier to modify link attributes in XHTML </li><li>SF Bug 1422182 @colname renaming needs to apply to @namest and @nameend </li><li>SF Bug 1417820 fo and docbook outputs can\'t handle deep topic dirs </li><li>SF Bug 1368997 PDF Vertical list of author redundancy </li></ol>
+      </section><section id="section_eqv_aej_nc">
+        <title>1 SourceForge Patch Added</title>
+        <ol><li>SF Patch 1503296 Refactor of HTMLHelp inifiles creation</li></ol>
+      </section><section id="section_zbd_bej_nc">
+        <title>1 SourceForge RFE Added</title>
+        <ol><li>SF RFE 1160960 Enh: Toolkit should work with both both *.dita and *.xml</li></ol>
+      </section></refbody><related-links><linklist><desc>SourceForge bugs, patches, and RFEs listed above can be found in SourceForge Bugs,
+            Patches, and RFE tracker pages</desc><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725074" scope="external"><linktext>Bugs tracker</linktext></link><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725076" scope="external"><linktext>Patches tracker</linktext></link><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725077" scope="external"><linktext>RFE tracker</linktext></link></linklist></related-links></reference>

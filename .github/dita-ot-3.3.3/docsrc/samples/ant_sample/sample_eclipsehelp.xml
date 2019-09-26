@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<project name="sample_eclipsehelp" default="samples.eclipse" basedir=".">
+
+  <property name="dita.dir" location="${basedir}/../../.."/>
+
+  <target name="samples.eclipse" description="build the samples for Eclipse" depends="clean.samples.eclipse">
+    <ant antfile="${dita.dir}/build.xml">
+      <property name="args.input" location="${dita.dir}/docsrc/samples/hierarchy.ditamap"/>
+      <property name="output.dir" location="${dita.dir}/out/samples/org.dita.sample.doc"/>
+      <property name="transtype" value="eclipsehelp"/>
+    </ant>
+  </target>
+
+  <target name="clean.samples.eclipse" description="remove the sample Eclipse output">
+    <delete dir="${dita.dir}/out/samples/org.dita.sample.doc"/>
+  </target>
+
+</project>

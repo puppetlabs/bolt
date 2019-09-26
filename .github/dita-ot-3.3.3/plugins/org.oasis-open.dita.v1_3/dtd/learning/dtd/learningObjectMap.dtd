@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!-- Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02     -->
+<!-- OASIS Standard                                           -->
+<!-- 16 January 2018                                           -->
+<!-- Copyright (c) OASIS Open 2018. All rights reserved.           -->
+<!-- Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html                                -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA learningObjectMap                            -->
+<!--  VERSION:   1.3                                               -->
+<!--  DATE:      March 2014                                        -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    DTD to describe DITA Learning Map                 -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2014                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2014                     -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!-- =============================================================   -->
+
+<!-- ============================================================= -->
+<!--                MAP ENTITY DECLARATIONS                        -->
+<!-- ============================================================= -->
+
+<!ENTITY % learningObjectMap-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Learning Object Map//EN"
+         "learningObjectMap.ent"
+>%learningObjectMap-dec;
+
+<!-- ============================================================= -->
+<!--             DOMAIN CONSTRAINT INTEGRATION                     -->
+<!-- ============================================================= -->
+
+<!ENTITY % learningAggregationsTopicref-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning Aggregations Topicref Constraint//EN"
+         "learningAggregationsTopicrefConstraint.mod"
+>%learningAggregationsTopicref-def;
+
+<!-- ============================================================= -->
+<!--             DOMAIN ENTITY DECLARATIONS                        -->
+<!-- ============================================================= -->
+
+<!ENTITY % mapgroup-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Map Group Domain//EN"
+         "../../base/dtd/mapGroup.ent"
+>%mapgroup-d-dec;
+
+<!ENTITY % delay-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Delayed Resolution Domain//EN"
+         "../../base/dtd/delayResolutionDomain.ent"
+>%delay-d-dec;
+
+<!ENTITY % ditavalref-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 DITAVAL Ref Domain//EN"
+         "../../base/dtd/ditavalrefDomain.ent"
+>%ditavalref-d-dec;
+
+<!ENTITY % hazard-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Hazard Statement Domain//EN"
+         "../../base/dtd/hazardstatementDomain.ent"
+>%hazard-d-dec;
+
+<!ENTITY % hi-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Highlight Domain//EN"
+         "../../base/dtd/highlightDomain.ent"
+>%hi-d-dec;
+
+<!ENTITY % indexing-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Indexing Domain//EN"
+         "../../base/dtd/indexingDomain.ent"
+>%indexing-d-dec;
+
+<!ENTITY % learningmap-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Learning Map Domain//EN"
+         "learningMapDomain.ent"
+>%learningmap-d-dec;
+
+<!ENTITY % learningmeta-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Learning Metadata Domain//EN"
+         "learningMetadataDomain.ent"
+>%learningmeta-d-dec;
+
+<!ENTITY % relmgmt-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Release Management Domain//EN"
+         "../../technicalContent/dtd/releaseManagementDomain.ent"
+>%relmgmt-d-dec;
+
+<!ENTITY % ut-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Utilities Domain//EN"
+         "../../base/dtd/utilitiesDomain.ent"
+>%ut-d-dec;
+
+<!-- ============================================================= -->
+<!--             DOMAIN ATTRIBUTES DECLARATIONS                    -->
+<!-- ============================================================= -->
+
+<!ENTITY % deliveryTargetAtt-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Delivery Target Attribute Domain//EN"
+         "../../base/dtd/deliveryTargetAttDomain.ent"
+>%deliveryTargetAtt-d-dec;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN EXTENSIONS                          -->
+<!-- ============================================================= -->
+<!--                    One for each extended base element, with
+                        the name of the domain(s) in which the
+                        extension was declared                     -->
+
+<!-- NOTE: The learningAggregationsTopicref-c constraint also requires
+           omitting topicref from the %topicref group.
+  -->
+<!ENTITY % topicref     "%mapgroup-d-topicref; |
+                         %ditavalref-d-topicref; |
+                         %learningmap-d-topicref;
+                        ">
+<!ENTITY % keywords     "keywords |
+                         %delay-d-keywords;
+                        ">
+<!ENTITY % index-base   "index-base |
+                         %indexing-d-index-base;
+                        ">
+<!ENTITY % note         "note |
+                         %hazard-d-note;
+                        ">
+<!ENTITY % ph           "ph |
+                         %hi-d-ph;
+                        ">
+<!ENTITY % fig          "fig |
+                         %ut-d-fig;
+                        ">
+<!ENTITY % data         "data |
+                         %ut-d-data;
+                        ">
+<!ENTITY % metadata     "metadata |
+                         %relmgmt-d-metadata; |
+                         %learningmeta-d-metadata;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE EXTENSIONS                -->
+<!-- ============================================================= -->
+
+<!ENTITY % props-attribute-extensions
+  "%deliveryTargetAtt-d-attribute;"
+>
+<!ENTITY % base-attribute-extensions
+  ""
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAINS ATTRIBUTE OVERRIDE                 -->
+<!-- ============================================================= -->
+
+<!ENTITY included-domains
+                          "&mapgroup-d-att;
+                           &learningObjectMap-att;
+                           &delay-d-att;
+                           &deliveryTargetAtt-d-att;
+                           &ditavalref-d-att;
+                           &hazard-d-att;
+                           &hi-d-att;
+                           &indexing-d-att;
+                           &learningmap-d-att;
+                           &learningmeta-d-att;
+                           &relmgmt-d-att;
+                           &ut-d-att;
+                           &learningAggregationsTopicref-constraints;
+  "
+>
+
+<!-- ============================================================= -->
+<!--                    CONTENT CONSTRAINT INTEGRATION             -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                      MAP ELEMENT INTEGRATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY % map-type
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Map//EN"
+         "../../base/dtd/map.mod"
+>%map-type;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ELEMENT INTEGRATION                 -->
+<!-- ============================================================= -->
+
+<!ENTITY % mapgroup-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Map Group Domain//EN"
+         "../../base/dtd/mapGroup.mod"
+>%mapgroup-d-def;
+
+<!ENTITY % delay-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Delayed Resolution Domain//EN"
+         "../../base/dtd/delayResolutionDomain.mod"
+>%delay-d-def;
+
+<!ENTITY % ditavalref-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 DITAVAL Ref Domain//EN"
+         "../../base/dtd/ditavalrefDomain.mod"
+>%ditavalref-d-def;
+
+<!ENTITY % hazard-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Hazard Statement Domain//EN"
+         "../../base/dtd/hazardstatementDomain.mod"
+>%hazard-d-def;
+
+<!ENTITY % hi-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Highlight Domain//EN"
+         "../../base/dtd/highlightDomain.mod"
+>%hi-d-def;
+
+<!ENTITY % indexing-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Indexing Domain//EN"
+         "../../base/dtd/indexingDomain.mod"
+>%indexing-d-def;
+
+<!ENTITY % learningmap-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning Map Domain//EN"
+         "learningMapDomain.mod"
+>%learningmap-d-def;
+
+<!ENTITY % learningmeta-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning Metadata Domain//EN"
+         "learningMetadataDomain.mod"
+>%learningmeta-d-def;
+
+<!ENTITY % relmgmt-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Release Management Domain//EN"
+         "../../technicalContent/dtd/releaseManagementDomain.mod"
+>%relmgmt-d-def;
+
+<!ENTITY % ut-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Utilities Domain//EN"
+         "../../base/dtd/utilitiesDomain.mod"
+>%ut-d-def;
+
+<!-- ============================================================= -->
+<!--                        ELEMENT INTEGRATION                    -->
+<!-- ============================================================= -->
+
+<!ENTITY % learningObjectMap-type
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning Object Map//EN"
+         "learningObjectMap.mod"
+>%learningObjectMap-type;
+
+<!-- ================= End of DITA learningObjectMap Shell ================= -->

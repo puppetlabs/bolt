@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="xhtmlchm" xml:lang="en-US">
+  <title>HTML Help processing</title>
+  <shortdesc>The <option>htmlhelp</option> transformation creates HTML Help control files. If the
+    build runs on a system that has the HTML Help compiler installed, the control files are compiled
+    into a CHM file.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>HTML<indexterm>CHM</indexterm></indexterm>
+        <indexterm>dita.map.htmlhelp</indexterm>
+        <indexterm>targets<indexterm>HTML Help</indexterm></indexterm>
+        <indexterm><filepath>.hhp</filepath></indexterm>
+        <indexterm><filepath>.hhc</filepath></indexterm>
+        <indexterm><filepath>.hhk</filepath></indexterm>
+        <indexterm>HTML Help</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <p>Once the pre-processing and XHTML processes are completed, most of the HTML Help processing is handled
+        by the following targets:</p>
+      <dl>
+        <dlentry>
+          <dt><codeph>dita.map.htmlhelp</codeph></dt>
+          <dd>Create the HHP, HHC, and HHK files. The HHK file is sorted based on the language of the map.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><codeph>dita.htmlhelp.convertlang</codeph></dt>
+          <dd>Ensures that the content can be processed correctly by the compiler, and that the appropriate code pages
+            and languages are used.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><codeph>compile.HTML.Help</codeph></dt>
+          <dd>Attempts to detect the HTML Help compiler. If the compiler is found, the full project is compiled into a
+            single CHM file.</dd>
+        </dlentry>
+      </dl>
+    </section>
+  </conbody>
+</concept>

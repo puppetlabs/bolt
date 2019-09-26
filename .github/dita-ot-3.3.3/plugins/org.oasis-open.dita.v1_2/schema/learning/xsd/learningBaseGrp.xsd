@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file is part of the DITA learning and training content 
+     specialization working design. It is a work-in-progress by
+     the OASIS DITA learning and training content specialization 
+     sub-committee.-->
+<!--             (C) Copyright OASIS Open 2007, 2009                    -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA learningBase XSD Group Definition            -->
+<!--  VERSION:   0.1                                               -->
+<!--  DATE:      May 2007                                          -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA Learning Base     -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             May 2007                                          -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+  <xs:group name="learningBase">
+  	<xs:sequence>
+  	  <xs:element ref="learningBase" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="learningBasebody">
+  	<xs:sequence>
+  	  <xs:element ref="learningBasebody" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcIntro">
+  	<xs:sequence>
+  	  <xs:element ref="lcIntro" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcObjectives">
+  	<xs:sequence>
+  	  <xs:element ref="lcObjectives" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcObjectivesStem">
+  	<xs:sequence>
+  	  <xs:element ref="lcObjectivesStem" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcObjectivesGroup">
+  	<xs:sequence>
+  	  <xs:element ref="lcObjectivesGroup" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcObjective">
+  	<xs:sequence>
+  	  <xs:element ref="lcObjective" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcAudience">
+  	<xs:sequence>
+  	  <xs:element ref="lcAudience" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcDuration">
+  	<xs:sequence>
+  	  <xs:element ref="lcDuration" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcTime">
+  	<xs:sequence>
+  	  <xs:element ref="lcTime" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcPrereqs">
+  	<xs:sequence>
+  	  <xs:element ref="lcPrereqs" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcSubject">
+  	<xs:sequence>
+  	  <xs:element ref="lcSubject" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcAuthorInfo">
+  	<xs:sequence>
+  	  <xs:element ref="lcAuthorInfo" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcSummary">
+  	<xs:sequence>
+  	  <xs:element ref="lcSummary" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcNextSteps">
+  	<xs:sequence>
+  	  <xs:element ref="lcNextSteps" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcReview">
+  	<xs:sequence>
+  	  <xs:element ref="lcReview" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="lcResources">
+  	<xs:sequence>
+  	  <xs:element ref="lcResources" />
+  	</xs:sequence>
+  </xs:group>
+
+     <xs:group name="lcChallenge">
+          <xs:sequence>
+               <xs:element ref="lcChallenge" />
+          </xs:sequence>
+     </xs:group>
+     
+     <xs:group name="lcInstruction">
+          <xs:sequence>
+               <xs:element ref="lcInstruction" />
+          </xs:sequence>
+     </xs:group>
+     
+      <xs:group name="lcInteraction">
+          <xs:sequence>
+               <xs:element ref="lcInteraction" />
+          </xs:sequence>
+     </xs:group>
+     
+     
+</xs:schema>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="sv-se">        <!-- Swedish -->
+  <str name="Figure">Figur</str>
+  <str name="Table">Tabell</str>
+  <str name="Next topic">Nästa avsnitt</str>
+  <str name="Previous topic">Föregående avsnitt</str>
+  <str name="Parent topic">Överordnat ämne</str>
+  <str name="Required cleanup">Korrigering krävs</str>
+  <str name="Draft comment">Kommentar till utkast</str>
+  <str name="Option">Alternativ</str>
+  <str name="Description">Beskrivning</str>
+  <str name="Optional">Valfritt</str>
+  <str name="Required">Krävs</str>
+  <str name="Skip visual syntax diagram">Hoppa över syntaxdiagram</str>
+  <str name="Read syntax diagram">Läs syntaxdiagram</str>
+  <str name="Start of change">Ändring startar</str>
+  <str name="End of change">Ändring slutar</str>
+  <str name="Index">Index</str>
+  <str name="Special characters">Specialtecken</str>
+  <str name="Numerics">Siffror</str>
+  <str name="End notes">Noter</str>
+  <str name="Artwork">Bild</str>
+  <str name="Syntax">Syntax</str>
+  <str name="Type">Typ</str>
+  <str name="Value">Värde</str>
+  <str name="Note">Anm</str>
+  <str name="Notes">Anm</str>
+  <str name="Tip">Tips</str>
+  <str name="Fastpath">Genväg</str>
+  <str name="Important">Viktigt</str>
+  <str name="Attention">Varning</str>
+  <str name="Caution">Varning - risk för personskada</str>
+  <str name="Danger">Varning - livsfara</str>
+  <str name="Remember">Glöm inte</str>
+  <str name="Restriction">Begränsning</str>
+  <str name="Trouble">Problem</str>
+  <str name="Warning">Varning - risk för maskinskada</str>
+  <str name="Contents">Innehåll</str>
+  <str name="Related concepts">Närliggande begrepp</str>
+  <str name="Related tasks">Närliggande uppgifter</str>
+  <str name="Related reference">Närliggande referens</str>
+  <str name="Related information">Närliggande information</str>
+  <str name="Prerequisite">Läs detta först</str>
+  <str name="Prerequisites">Läs detta först</str>
+  <str name="or">or</str>
+  <str name="task_context">Den här uppgiften</str>
+  <str name="task_example">Exempel</str>
+  <str name="task_postreq">Och sedan då?</str>
+  <str name="task_prereq">Innan du börjar</str>
+  <str name="task_procedure">Arbetsordning</str>
+  <str name="task_procedure_unordered">Arbetsordning</str>
+  <str name="task_results">Resultat</str>
+  <str name="Copyright">Copyright</str>
+  <str name="OpenQuote">”</str>
+  <str name="a11y.and-then"></str>
+</strings>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  xmlns="http://relaxng.org/ns/structure/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Learning Interaction Base 2 Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Learning Interaction Base 2 Domain            
+ VERSION:   1.3
+ DATE:      March 2014                                        
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identfier or an 
+      appropriate system identifier 
+
+PUBLIC "-//OASIS//ELEMENTS DITA Learning Interaction Base 2 Domain//EN"
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for Learning Domain                   
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2014                                        
+                                                             
+            (C) Copyright OASIS Open 2014.                   
+            All Rights Reserved.                             
+                                                             
+=============================================================
+  </headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>learningInteractionBase2-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Learning Interaction Base 2 Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Learning Interaction Base 2 Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:spec:learning:xsd:learningInteractionBase2Domain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:spec:learning:rnc:learningInteractionBase2Domain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:spec:learning:rng:learningInteractionBase2Domain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic learningInteractionBase2-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="learningInteractionBase2-d-div">
+      <ref name="lcInteractionBase2.element"/>
+    </define>
+    <define name="div" combine="choice">
+      <ref name="learningInteractionBase2-d-div"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="lcInteractionBase2">
+      <ref name="lcInteractionBase2.element"/>
+    </define>
+    <define name="lcInteractionLabel2">
+      <ref name="lcInteractionLabel2.element"/>
+    </define>
+    <define name="lcQuestionBase2">
+      <ref name="lcQuestionBase2.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation>Long Name: Learning interaction base 2</a:documentation>
+      <define name="lcInteractionBase2.content">
+        <optional>
+          <ref name="lcInteractionLabel2"/>
+        </optional>
+        <ref name="lcQuestionBase2"/>
+        <zeroOrMore>
+          <choice>
+            <ref name="basic.block"/>
+            <ref name="basic.ph"/>
+            <ref name="data.elements.incl"/>
+            <ref name="foreign.unknown.incl"/>
+            <ref name="txt.incl"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="lcInteractionBase2.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcInteractionBase2.element">
+        <element name="lcInteractionBase2" dita:longName="Learning interaction base 2"
+          dita:since="1.3">
+          <ref name="lcInteractionBase2.attlist"/>
+          <ref name="lcInteractionBase2.content"/>
+        </element>
+      </define>
+      <define name="lcInteractionBase2.attlist" combine="interleave">
+        <ref name="lcInteractionBase2.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>Long Name: Learning interaction label 2</a:documentation>
+      <define name="lcInteractionLabel2.content">
+        <zeroOrMore>
+          <ref name="title.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcInteractionLabel2.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcInteractionLabel2.element">
+        <element name="lcInteractionLabel2" dita:longName="Learning interaction question base"
+          dita:since="1.3">
+          <ref name="lcInteractionLabel2.attlist"/>
+          <ref name="lcInteractionLabel2.content"/>
+        </element>
+      </define>
+      <define name="lcInteractionLabel2.attlist" combine="interleave">
+        <ref name="lcInteractionLabel2.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>Long Name: Learning question base 2</a:documentation>
+      <define name="lcQuestionBase2.content">
+        <zeroOrMore>
+          <ref name="div.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcQuestionBase2.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcQuestionBase2.element">
+        <element name="lcQuestionBase2" dita:longName="Learning interaction question base 2"
+          dita:since="1.3">
+          <ref name="lcQuestionBase2.attlist"/>
+          <ref name="lcQuestionBase2.content"/>
+        </element>
+      </define>
+      <define name="lcQuestionBase2.attlist" combine="interleave">
+        <ref name="lcQuestionBase2.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="lcInteractionBase2.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class"
+          a:defaultValue="+ topic/div learningInteractionBase2-d/lcInteractionBase2 "/>
+      </optional>
+    </define>
+    <define name="lcInteractionLabel2.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class"
+          a:defaultValue="+ topic/p   learningInteractionBase2-d/lcInteractionLabel2 "/>
+      </optional>
+    </define>
+    <define name="lcQuestionBase2.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class"
+          a:defaultValue="+ topic/div   learningInteractionBase2-d/lcQuestionBase2 "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

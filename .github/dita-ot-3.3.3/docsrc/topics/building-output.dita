@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="tranforming-dita-content">
+  <title>Building output</title>
+  <shortdesc>You can use the <cmdname>dita</cmdname> command-line tool, Ant, or the Java API to transform DITA content
+    to the various output formats that DITA Open Toolkit supports.</shortdesc>
+</task>

@@ -1,0 +1,879 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  xmlns="http://relaxng.org/ns/structure/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Learning Metadata Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Learning Metadata Domain                    
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identfier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Learning Metadata Domain//EN"
+      Delivered as file "learningMetadataDomain.mod"              
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for Learning Metadata                 
+                                                             
+ORIGINAL CREATION DATE:                                      
+            May 2007                                         
+                                                             
+            (C) Copyright OASIS Open 2007, 2009.             
+            All Rights Reserved.                             
+=============================================================
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- LOM Metadata
+- Based on IEEE LOM. Scott Hudson
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+</headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>learningmeta-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Learning Metadata Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Learning Metadata Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:spec:learning:xsd:learningMetadataDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:spec:learning:rnc:learningMetadataDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:spec:learning:rng:learningMetadataDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic learningmeta-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="learningmeta-d-metadata">
+      <ref name="lcLom.element"/>
+    </define>
+    <define name="metadata" combine="choice">
+      <ref name="learningmeta-d-metadata"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="lomStructure">
+      <ref name="lomStructure.element"/>
+    </define>
+    <define name="lomCoverage">
+      <ref name="lomCoverage.element"/>
+    </define>
+    <define name="lomAggregationLevel">
+      <ref name="lomAggregationLevel.element"/>
+    </define>
+    <define name="lomTechRequirement">
+      <ref name="lomTechRequirement.element"/>
+    </define>
+    <define name="lomInstallationRemarks">
+      <ref name="lomInstallationRemarks.element"/>
+    </define>
+    <define name="lomOtherPlatformRequirements">
+      <ref name="lomOtherPlatformRequirements.element"/>
+    </define>
+    <define name="lomInteractivityType">
+      <ref name="lomInteractivityType.element"/>
+    </define>
+    <define name="lomLearningResourceType">
+      <ref name="lomLearningResourceType.element"/>
+    </define>
+    <define name="lomInteractivityLevel">
+      <ref name="lomInteractivityLevel.element"/>
+    </define>
+    <define name="lomSemanticDensity">
+      <ref name="lomSemanticDensity.element"/>
+    </define>
+    <define name="lomIntendedUserRole">
+      <ref name="lomIntendedUserRole.element"/>
+    </define>
+    <define name="lomContext">
+      <ref name="lomContext.element"/>
+    </define>
+    <define name="lomTypicalAgeRange">
+      <ref name="lomTypicalAgeRange.element"/>
+    </define>
+    <define name="lomDifficulty">
+      <ref name="lomDifficulty.element"/>
+    </define>
+    <define name="lomTypicalLearningTime">
+      <ref name="lomTypicalLearningTime.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation>LONG NAME: Learning object metadata</a:documentation>
+      <define name="lcLom.content">
+        <group>
+          <optional>
+            <ref name="lomStructure"/>
+          </optional>
+          <optional>
+            <ref name="lomCoverage"/>
+          </optional>
+          <optional>
+            <ref name="lomAggregationLevel"/>
+          </optional>
+          <optional>
+            <ref name="lomTechRequirement"/>
+          </optional>
+          <optional>
+            <ref name="lomInstallationRemarks"/>
+          </optional>
+          <optional>
+            <ref name="lomOtherPlatformRequirements"/>
+          </optional>
+          <optional>
+            <ref name="lomInteractivityType"/>
+          </optional>
+          <optional>
+            <ref name="lomLearningResourceType"/>
+          </optional>
+          <optional>
+            <ref name="lomInteractivityLevel"/>
+          </optional>
+          <optional>
+            <ref name="lomSemanticDensity"/>
+          </optional>
+          <optional>
+            <ref name="lomIntendedUserRole"/>
+          </optional>
+          <optional>
+            <ref name="lomContext"/>
+          </optional>
+          <optional>
+            <ref name="lomTypicalAgeRange"/>
+          </optional>
+          <optional>
+            <ref name="lomDifficulty"/>
+          </optional>
+          <optional>
+            <ref name="lomTypicalLearningTime"/>
+          </optional>
+        </group>
+        <zeroOrMore>
+          <ref name="data"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcLom.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="mapkeyref"/>
+        </optional>
+      </define>
+      <define name="lcLom.element">
+        <element name="lcLom">
+          <a:documentation><![CDATA[The <lcLom> provides a set of specialized data elements to use to specify metadata in the learning topics and learning map domain. ]]></a:documentation>
+          <ref name="lcLom.attlist"/>
+          <ref name="lcLom.content"/>
+        </element>
+      </define>
+      <define name="lcLom.attlist" combine="interleave">
+        <ref name="lcLom.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Resource organizational structure</a:documentation>
+      <define name="lomStructure.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="lomStructure.attributes">
+        <optional>
+          <attribute name="name" a:defaultValue="lomStructure"/>
+        </optional>
+        <optional>
+          <attribute name="datatype" a:defaultValue=""/>
+        </optional>
+        <ref name="univ-atts"/>
+        <attribute name="value">
+          <choice>
+            <value>atomic</value>
+            <value>branched</value>
+            <value>collection</value>
+            <value>hierarchical</value>
+            <value>linear</value>
+            <value>mixed</value>
+            <value>networked</value>
+            <value>parceled</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </define>
+      <define name="lomStructure.element">
+        <element name="lomStructure">
+          <a:documentation><![CDATA[The <lomStructure> provides learning metadata about the underlying organizational structure of the resource. ]]></a:documentation>
+          <ref name="lomStructure.attlist"/>
+          <ref name="lomStructure.content"/>
+        </element>
+      </define>
+      <define name="lomStructure.attlist" combine="interleave">
+        <ref name="lomStructure.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> IMS LOM metadata </a:documentation>
+      <div>
+        <a:documentation>LONG NAME: Coverage</a:documentation>
+        <define name="lomCoverage.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomCoverage.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomCoverage"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="value" a:defaultValue=""/>
+          </optional>
+        </define>
+        <define name="lomCoverage.element">
+          <element name="lomCoverage">
+            <a:documentation><![CDATA[The <lomCoverage> provides learning metadata about the temporal or spatial characteristics of the content, such as historical context. ]]></a:documentation>
+            <ref name="lomCoverage.attlist"/>
+            <ref name="lomCoverage.content"/>
+          </element>
+        </define>
+        <define name="lomCoverage.attlist" combine="interleave">
+          <ref name="lomCoverage.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Aggregation level</a:documentation>
+        <define name="lomAggregationLevel.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomAggregationLevel.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomAggregationLevel"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+          <attribute name="value">
+            <choice>
+              <value>1</value>
+              <value>2</value>
+              <value>3</value>
+              <value>4</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </define>
+        <define name="lomAggregationLevel.element">
+          <element name="lomAggregationLevel">
+            <a:documentation><![CDATA[The <lomAggregationLevel> describes the functional size of the learning resource. ]]></a:documentation>
+            <ref name="lomAggregationLevel.attlist"/>
+            <ref name="lomAggregationLevel.content"/>
+          </element>
+        </define>
+        <define name="lomAggregationLevel.attlist" combine="interleave">
+          <ref name="lomAggregationLevel.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Technology requirements</a:documentation>
+        <define name="lomTechRequirement.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomTechRequirement.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomTechRequirement"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+          <attribute name="value">
+            <choice>
+              <value>pc-dos</value>
+              <value>ms-windows</value>
+              <value>macos</value>
+              <value>unix</value>
+              <value>multi-os</value>
+              <value>none</value>
+              <value>any</value>
+              <value>netscapecommunicator</value>
+              <value>ms-internetexplorer</value>
+              <value>opera</value>
+              <value>amaya</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </define>
+        <define name="lomTechRequirement.element">
+          <element name="lomTechRequirement">
+            <a:documentation><![CDATA[The <lomTechRequirement> provides learning metadata about the operating system(s) under which the learning resource can run. ]]></a:documentation>
+            <ref name="lomTechRequirement.attlist"/>
+            <ref name="lomTechRequirement.content"/>
+          </element>
+        </define>
+        <define name="lomTechRequirement.attlist" combine="interleave">
+          <ref name="lomTechRequirement.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Installation remarks</a:documentation>
+        <define name="lomInstallationRemarks.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomInstallationRemarks.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomInstallationRemarks"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="value" a:defaultValue=""/>
+          </optional>
+        </define>
+        <define name="lomInstallationRemarks.element">
+          <element name="lomInstallationRemarks">
+            <a:documentation><![CDATA[The <lomInstallationRemarks> provides learning metadata about how to install and needed resources. ]]></a:documentation>
+            <ref name="lomInstallationRemarks.attlist"/>
+            <ref name="lomInstallationRemarks.content"/>
+          </element>
+        </define>
+        <define name="lomInstallationRemarks.attlist" combine="interleave">
+          <ref name="lomInstallationRemarks.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Platform requirements</a:documentation>
+        <define name="lomOtherPlatformRequirements.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomOtherPlatformRequirements.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomOtherPlatformRequirements"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="value" a:defaultValue=""/>
+          </optional>
+        </define>
+        <define name="lomOtherPlatformRequirements.element">
+          <element name="lomOtherPlatformRequirements">
+            <a:documentation><![CDATA[The <lomOtherPlatformRequirements> provides learning metadata information about other software and hardware requirements. ]]></a:documentation>
+            <ref name="lomOtherPlatformRequirements.attlist"/>
+            <ref name="lomOtherPlatformRequirements.content"/>
+          </element>
+        </define>
+        <define name="lomOtherPlatformRequirements.attlist" combine="interleave">
+          <ref name="lomOtherPlatformRequirements.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Interactivity type</a:documentation>
+        <define name="lomInteractivityType.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomInteractivityType.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomInteractivityType"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <attribute name="value">
+            <choice>
+              <value>active</value>
+              <value>expositive</value>
+              <value>mixed</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </define>
+        <define name="lomInteractivityType.element">
+          <element name="lomInteractivityType">
+            <a:documentation><![CDATA[The <lomInteractivityType> provides learning metadata about the the type of interactivity supported by the resource. ]]></a:documentation>
+            <ref name="lomInteractivityType.attlist"/>
+            <ref name="lomInteractivityType.content"/>
+          </element>
+        </define>
+        <define name="lomInteractivityType.attlist" combine="interleave">
+          <ref name="lomInteractivityType.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Learning resource type</a:documentation>
+        <define name="lomLearningResourceType.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomLearningResourceType.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomLearningResourceType"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <attribute name="value">
+            <choice>
+              <value>exercise</value>
+              <value>simulation</value>
+              <value>questionnaire</value>
+              <value>diagram</value>
+              <value>figure</value>
+              <value>graph</value>
+              <value>index</value>
+              <value>slide</value>
+              <value>table</value>
+              <value>narrativetext</value>
+              <value>exam</value>
+              <value>experiment</value>
+              <value>problemstatement</value>
+              <value>selfassessment</value>
+              <value>lecture</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </define>
+        <define name="lomLearningResourceType.element">
+          <element name="lomLearningResourceType">
+            <a:documentation><![CDATA[The <lomLearningResourceType> provides learning metadata about the specific kind of resource used, most dominant kind first. ]]></a:documentation>
+            <ref name="lomLearningResourceType.attlist"/>
+            <ref name="lomLearningResourceType.content"/>
+          </element>
+        </define>
+        <define name="lomLearningResourceType.attlist" combine="interleave">
+          <ref name="lomLearningResourceType.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Interactivity level</a:documentation>
+        <define name="lomInteractivityLevel.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomInteractivityLevel.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomInteractivityLevel"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <attribute name="value">
+            <choice>
+              <value>verylow</value>
+              <value>low</value>
+              <value>medium</value>
+              <value>high</value>
+              <value>veryhigh</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </define>
+        <define name="lomInteractivityLevel.element">
+          <element name="lomInteractivityLevel">
+            <a:documentation><![CDATA[The <lomInteractivityLevel> provides learning metadata about the level of interactivity between an end user and the learning object. ]]></a:documentation>
+            <ref name="lomInteractivityLevel.attlist"/>
+            <ref name="lomInteractivityLevel.content"/>
+          </element>
+        </define>
+        <define name="lomInteractivityLevel.attlist" combine="interleave">
+          <ref name="lomInteractivityLevel.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Semantic density</a:documentation>
+        <define name="lomSemanticDensity.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomSemanticDensity.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomSemanticDensity"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <attribute name="value">
+            <choice>
+              <value>verylow</value>
+              <value>low</value>
+              <value>medium</value>
+              <value>high</value>
+              <value>veryhigh</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </define>
+        <define name="lomSemanticDensity.element">
+          <element name="lomSemanticDensity">
+            <a:documentation><![CDATA[The <lomSemanticDensity> provides learning metadata about a subjective measure of the learning object's usefulness as compared to its size or duration. ]]></a:documentation>
+            <ref name="lomSemanticDensity.attlist"/>
+            <ref name="lomSemanticDensity.content"/>
+          </element>
+        </define>
+        <define name="lomSemanticDensity.attlist" combine="interleave">
+          <ref name="lomSemanticDensity.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Intended user role</a:documentation>
+        <define name="lomIntendedUserRole.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomIntendedUserRole.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomIntendedUserRole"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <attribute name="value">
+            <choice>
+              <value>teacher</value>
+              <value>author</value>
+              <value>learner</value>
+              <value>manager</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </define>
+        <define name="lomIntendedUserRole.element">
+          <element name="lomIntendedUserRole">
+            <a:documentation><![CDATA[The <lomIntendedUserRole> provides learning metadata about the normal user of the resource, most dominant first. ]]></a:documentation>
+            <ref name="lomIntendedUserRole.attlist"/>
+            <ref name="lomIntendedUserRole.content"/>
+          </element>
+        </define>
+        <define name="lomIntendedUserRole.attlist" combine="interleave">
+          <ref name="lomIntendedUserRole.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Learning environment context</a:documentation>
+        <define name="lomContext.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomContext.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomContext"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <attribute name="value">
+            <choice>
+              <value>school</value>
+              <value>highereducation</value>
+              <value>training</value>
+              <value>other</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </define>
+        <define name="lomContext.element">
+          <element name="lomContext">
+            <a:documentation><![CDATA[The <lomContext> provides learning metadata about the typical learning environment where use of learning object is intended to take place. ]]></a:documentation>
+            <ref name="lomContext.attlist"/>
+            <ref name="lomContext.content"/>
+          </element>
+        </define>
+        <define name="lomContext.attlist" combine="interleave">
+          <ref name="lomContext.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Typical age range</a:documentation>
+        <define name="lomTypicalAgeRange.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomTypicalAgeRange.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomTypicalAgeRange"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <attribute name="value"/>
+        </define>
+        <define name="lomTypicalAgeRange.element">
+          <element name="lomTypicalAgeRange">
+            <a:documentation><![CDATA[The <lomTypicalAgeRange> provides learning metadata about the age of the typical intended user. ]]></a:documentation>
+            <ref name="lomTypicalAgeRange.attlist"/>
+            <ref name="lomTypicalAgeRange.content"/>
+          </element>
+        </define>
+        <define name="lomTypicalAgeRange.attlist" combine="interleave">
+          <ref name="lomTypicalAgeRange.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Difficulty</a:documentation>
+        <define name="lomDifficulty.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomDifficulty.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomDifficulty"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <attribute name="value">
+            <choice>
+              <value>veryeasy</value>
+              <value>easy</value>
+              <value>medium</value>
+              <value>difficult</value>
+              <value>verydifficult</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </define>
+        <define name="lomDifficulty.element">
+          <element name="lomDifficulty">
+            <a:documentation><![CDATA[The <lomDifficulty> provides learning metadata about how hard it is to work through the resource for the typical target audience. ]]></a:documentation>
+            <ref name="lomDifficulty.attlist"/>
+            <ref name="lomDifficulty.content"/>
+          </element>
+        </define>
+        <define name="lomDifficulty.attlist" combine="interleave">
+          <ref name="lomDifficulty.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Typical learning time</a:documentation>
+        <define name="lomTypicalLearningTime.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="lomTypicalLearningTime.attributes">
+          <optional>
+            <attribute name="name" a:defaultValue="lomTypicalLearningTime"/>
+          </optional>
+          <optional>
+            <attribute name="datatype" a:defaultValue=""/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="value" a:defaultValue=""/>
+          </optional>
+        </define>
+        <define name="lomTypicalLearningTime.element">
+          <element name="lomTypicalLearningTime">
+            <a:documentation><![CDATA[The <lomTypicalLearningTime> provides learning metadata about the approximate or typical time it takes to work with the resource. ]]></a:documentation>
+            <ref name="lomTypicalLearningTime.attlist"/>
+            <ref name="lomTypicalLearningTime.content"/>
+          </element>
+        </define>
+        <define name="lomTypicalLearningTime.attlist" combine="interleave">
+          <ref name="lomTypicalLearningTime.attributes"/>
+        </define>
+      </div>
+    </div>
+  </div>
+  <div>
+    <a:documentation> SPECIALIZATION ATTRIBUTE DECLARATIONS </a:documentation>
+    <define name="lcLom.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/metadata learningmeta-d/lcLom "/>
+      </optional>
+    </define>
+    <define name="lomCoverage.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomCoverage "/>
+      </optional>
+    </define>
+    <define name="lomStructure.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomStructure "/>
+      </optional>
+    </define>
+    <define name="lomAggregationLevel.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomAggregationLevel "/>
+      </optional>
+    </define>
+    <define name="lomTechRequirement.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomTechRequirement "/>
+      </optional>
+    </define>
+    <define name="lomInstallationRemarks.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomInstallationRemarks "
+        />
+      </optional>
+    </define>
+    <define name="lomOtherPlatformRequirements.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class"
+          a:defaultValue="+ topic/data learningmeta-d/lomOtherPlatformRequirements "/>
+      </optional>
+    </define>
+    <define name="lomInteractivityType.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomInteractivityType "/>
+      </optional>
+    </define>
+    <define name="lomLearningResourceType.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class"
+          a:defaultValue="+ topic/data learningmeta-d/lomLearningResourceType "/>
+      </optional>
+    </define>
+    <define name="lomInteractivityLevel.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomInteractivityLevel "
+        />
+      </optional>
+    </define>
+    <define name="lomSemanticDensity.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomSemanticDensity "/>
+      </optional>
+    </define>
+    <define name="lomIntendedUserRole.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomIntendedUserRole "/>
+      </optional>
+    </define>
+    <define name="lomContext.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomContext "/>
+      </optional>
+    </define>
+    <define name="lomTypicalAgeRange.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomTypicalAgeRange "/>
+      </optional>
+    </define>
+    <define name="lomDifficulty.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomDifficulty "/>
+      </optional>
+    </define>
+    <define name="lomTypicalLearningTime.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data learningmeta-d/lomTypicalLearningTime "
+        />
+      </optional>
+    </define>
+  </div>
+</grammar>

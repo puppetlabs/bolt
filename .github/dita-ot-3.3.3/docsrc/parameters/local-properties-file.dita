@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="local.properties">
+  <title>The <filepath>local.properties</filepath> file</title>
+  <titlealts>
+    <navtitle><filepath>local.properties</filepath></navtitle>
+  </titlealts>
+  <shortdesc>A <filepath>local.properties</filepath> file in the root directory of the DITA-OT installation can be used
+    to override the default values of various DITA-OT parameters.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>files<indexterm>local.properties</indexterm></indexterm>
+        <indexterm>local.properties file</indexterm>
+        <indexterm>Windows</indexterm>
+        <indexterm>RenderX<indexterm><filepath>local.properties</filepath></indexterm></indexterm>
+        <indexterm>Antenna House<indexterm><filepath>local.properties</filepath></indexterm></indexterm>
+        <indexterm>command line<indexterm><filepath>local.properties</filepath> file</indexterm></indexterm>
+        <indexterm>Java<indexterm>local.properties file</indexterm></indexterm>
+        <indexterm>PDF<indexterm>formatter</indexterm></indexterm>
+        <indexterm>formatter<index-see-also>Apache FOP</index-see-also><index-see-also>Antenna
+          House</index-see-also><index-see-also>RenderX</index-see-also></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <example>
+      <p>For example, if you always use the same rendering engine to produce PDF output for all of your projects, you
+        could create a <filepath>local.properties</filepath> file in the root directory of your DITA-OT installation to
+        set the <parmname>pdf.formatter</parmname> parameter and additional options for the XSL processor:</p>
+      <codeblock outputclass="language-properties normalize-space show-line-numbers show-whitespace"># Use RenderX XEP Engine for PDF output
+pdf.formatter = xep
+
+# Specify the user configuration file for RenderX
+custom.xep.config = /path/to/custom.config</codeblock>
+      <p>Backslash “\” characters in .properties files must be escaped with a second backslash as “\\”. If you use
+        Antenna House Formatter on a Windows system, for example, you would set the path to the command using a
+        properties file entry like this:</p>
+      <codeblock outputclass="language-properties normalize-space show-line-numbers show-whitespace"># Use Antenna House Formatter for PDF output
+pdf.formatter = ah
+
+# Specify the path to the Antenna House Formatter command
+axf.cmd=C:\\Program Files\\Antenna House\\AHFormatterV62</codeblock>
+    </example>
+    <section>
+      <note>This file can only be used to set Ant property values that can be passed as argument parameters to the
+        command line. The DITA-OT Java code does not read this file.</note>
+    </section>
+  </refbody>
+</reference>

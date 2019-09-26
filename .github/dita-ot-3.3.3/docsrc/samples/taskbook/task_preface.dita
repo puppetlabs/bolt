@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<topic id="task_preface" xml:lang="en-us">
+  <title>Sample Preface</title>
+  <shortdesc>This book explains each tasks separately. You can jump in anywhere, get the information you need, and
+    complete your work. </shortdesc>
+  <body>
+    <p>You can use this book to master tasks if you wish or just keep it handy as a resource so you can focus on other
+      issues. </p>
+  </body>
+</topic>

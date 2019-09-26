@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="custom-html-plugin-bundle-css">
+  <title>Bundling CSS in a custom HTML plug-in</title>
+  <titlealts>
+    <navtitle>Bundling custom CSS</navtitle>
+  </titlealts>
+  <shortdesc>You can create a DITA-OT plug-in that provides a custom stylesheet with the typography and colors that
+    define your corporate identity. Coworkers can install this plug-in to ensure consistent HTML output across projects
+    without having to copy the stylesheet to each project.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>require</xmlelement></indexterm>
+        <indexterm>HTML<indexterm>custom plug-in</indexterm></indexterm>
+        <indexterm>HTML<indexterm>CSS</indexterm></indexterm>
+        <indexterm>CSS<indexterm>HTML transforms</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>This scenario walks through the process of creating a very simple plug-in
+          (<codeph>com.example.html5-custom-css</codeph>) that creates a new transformation type:
+          <option>html5-custom-css</option>. </p>
+      <p>The <option>html5-custom-css</option> transformation includes a custom CSS file and sets four parameters to
+        integrate the custom stylesheet in the generated HTML5 output. These parameter settings make the following
+        changes:</p>
+      <ul>
+        <li>
+          <p>Specify the <filepath>css</filepath> subfolder of the plug-in as the source directory for custom CSS with
+              <parmname>args.cssroot</parmname>.</p></li>
+        <li>
+          <p>Specify the name of the custom CSS file with <parmname>args.css</parmname>.</p>
+          <p>The value of this parameter tells DITA-OT to use the <filepath>custom.css</filepath> file provided by the
+            plug-in.</p></li>
+        <li>
+          <p>Ensure that the CSS file is copied to the output directory by setting <parmname>args.copycss</parmname> to
+              <option>yes</option>.</p></li>
+        <li>
+          <p>Set the destination path for CSS files in the output folder with <parmname>args.csspath</parmname>.</p>
+          <p>CSS files are copied to the root level of the output folder by default. Setting this parameter places CSS
+            files in a dedicated <filepath>css</filepath> subfolder.</p></li>
+      </ul>
+      <p>All four parameters are set in the Ant script (<filepath>build_html5-custom-css.xml</filepath>).</p>
+    </context>
+    <steps>
+      <step>
+        <cmd>In the <filepath>plugins</filepath> directory, create a directory named
+            <filepath>com.example.html5-custom-css</filepath>.</cmd>
+      </step>
+      <step>
+        <cmd>In the new <filepath>com.example.html5-custom-css</filepath> directory, create a plug-in configuration file
+            (<filepath>plugin.xml</filepath>) that declares the new <option>html5-custom-css</option> transformation and
+          its dependencies.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample <filepath>plugin.xml</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.html5-custom-css/plugin.xml"/></codeblock>
+          </fig>
+          <note>This plug-in will extend the default HTML5 transformation, so the <xmlelement>require</xmlelement>
+            element explicitly defines <filepath>org.dita.html5</filepath> as a dependency.</note>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>In the <filepath>com.example.html5-custom-css</filepath> directory, create a subdirectory named
+            <filepath>css</filepath>.</cmd>
+      </step>
+      <step>
+        <cmd>In the new <filepath>css</filepath> subdirectory, create a file named <filepath>custom.css</filepath> with
+          your custom CSS rules.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample <filepath>custom.css</filepath> file</title>
+            <codeblock outputclass="language-css normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.html5-custom-css/css/custom.css"/></codeblock>
+          </fig>
+          <note type="tip">When you first create the plug-in, you may want to include a rule in your custom stylesheet
+            that makes it readily apparent when the custom styles are applied (the example above will change body text
+            to “red”). Once you have verified that the plug-in works as intended, replace the placeholder rule with your
+            own custom styles.</note>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>In the <filepath>com.example.html5-custom-css</filepath> root directory, add an Ant script
+            (<filepath>build_html5-custom-css.xml</filepath>) to define the transformation type.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample build file: <filepath>build_html5-custom-css.xml</filepath></title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.html5-custom-css/build_html5-custom-css.xml"/></codeblock>
+          </fig>
+        </stepxmp>
+      </step>
+    </steps>
+    <result>
+      <note type="tip">The files for this sample plug-in are included in the DITA-OT installation directory under
+          <filepath>docsrc/samples/plugins/com.example.html5-custom-css/</filepath> and on
+        <xref href="https://github.com/dita-ot/docs/tree/develop/samples/plugins/com.example.html5-custom-css"
+          format="html" scope="external">GitHub</xref>.</note>
+      <p>The plug-in directory has the following layout and files:</p>
+      <codeblock>com.example.html5-custom-css
+├── build_html5-custom-css.xml
+├── css
+│   └── custom.css
+└── plugin.xml</codeblock>
+    </result>
+    <postreq>
+      <ol>
+        <li>Run <filepath conref="../resources/conref-task.dita#ID/dita-cmd"/>
+          <parmname>--install</parmname> to install the plug-in and make the <option>html5-custom-css</option>
+          transformation available.</li>
+        <li>Build output with the new transformation type to verify that the plug-in works as intended.
+          <codeblock><filepath conref="../resources/conref-task.dita#ID/dita-cmd"/> <parmname>--input</parmname>=<varname>my.ditamap</varname> <parmname>--format</parmname>=<option>html5-custom-css</option></codeblock>
+        </li>
+        <li>Refine the styles in your <filepath>custom.css</filepath> file as necessary.</li>
+      </ol>
+    </postreq>
+  </taskbody>
+</task>

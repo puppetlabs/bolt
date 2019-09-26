@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+ 
+ Copyright 2007 Shawn McKenzie
+ *-->
+<?xml-stylesheet href="../../../../xsl/ditaview_shell.xsl" type="text/xsl"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN"
+ "../../../../dtd/concept.dtd">
+<concept id="tocjs_basefiles" xml:lang="en-us">
+ <title>The <filepath>basefiles</filepath> directories</title>
+ <conbody>
+  <p>When you set up a project to build tocjs output, you will likely want to pull source files from
+   two separate locations. The tocjs plugin has a <filepath>basefiles</filepath> directory that
+   includes HTML, JavaScript, image and CSS files necessary for the tocjs plugin to work. The tocjs
+   transtype itself generates a JavaScript file (<filepath>toctree.js</filepath>) that is used in
+   conjunction with the files in this <filepath>basefiles</filepath> directory. As you can see in
+   the sample ant tasks in <filepath>demo/tocjs/buildsample.xml</filepath>.</p>
+  <p>You will likely want to maintain another <filepath>basefiles</filepath> directory along with
+   your DITA source files and copy these into your output as well. If you look in the
+   tocjs <filepath>sample</filepath> project there is a different <filepath>basefiles</filepath>
+   directory. This contains the CSS file related to the DITA content and the
+   <filepath>frameset.html</filepath> file. These are specific to the project, while the files in
+   <filepath>demo/tocjs/basefiles</filepath> are for any project using the tocjs plugin.</p>
+
+ </conbody>
+</concept>

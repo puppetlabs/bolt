@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- Generated from plugin source, do not edit! -->
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="com.sophos.tocjs-ext"><title outputclass="generated">Extension points in <codeph>com.sophos.tocjs</codeph></title><titlealts><navtitle id="navtitle">TocJS</navtitle></titlealts><shortdesc id="shortdesc">The <codeph>com.sophos.tocjs</codeph> plug-in provides extension points
+            to modify TocJS processing.</shortdesc><refbody><section><dl/></section></refbody></reference>

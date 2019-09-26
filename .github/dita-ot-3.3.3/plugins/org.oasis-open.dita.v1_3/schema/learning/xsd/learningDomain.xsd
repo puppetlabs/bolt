@@ -1,0 +1,1281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Learning Domain                             -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identfier or an  -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Learning Domain//EN"         -->
+<!--      Delivered as file "learningDomain.mod"                     -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for Learning Domain                   -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            May 2007                                         -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2007, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- CHANGE LOG:                                                 -->
+<!--                                                             -->
+<!--   Sept 2009: WEK: added lcMatchingItemFeedback per          -->
+<!--   TC decision.                                              -->
+<!--=============================================================  -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic learningInteractionBase-d learning-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="lcInstructornote">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcInstructornote"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcTrueFalse">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcTrueFalse"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcSingleSelect">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcSingleSelect"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcMultipleSelect">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcMultipleSelect"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcSequencing">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcSequencing"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcMatching">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcMatching"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcHotspot">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcHotspot"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcOpenQuestion">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcOpenQuestion"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcQuestion">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcQuestion"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcOpenAnswer">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcOpenAnswer"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcAnswerOptionGroup">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcAnswerOptionGroup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcSequenceOptionGroup">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcSequenceOptionGroup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcAsset">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcAsset"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcSequenceOption">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcSequenceOption"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcFeedback">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcFeedback"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcFeedbackCorrect">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcFeedbackCorrect"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcFeedbackIncorrect">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcFeedbackIncorrect"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcAnswerOption">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcAnswerOption"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcAnswerContent">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcAnswerContent"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcMatchTable">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcMatchTable"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcMatchingHeader">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcMatchingHeader"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcMatchingPair">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcMatchingPair"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcItem">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcItem"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcMatchingItem">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcMatchingItem"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcMatchingItemFeedback">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcMatchingItemFeedback"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcHotspotMap">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcHotspotMap"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcArea">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcArea"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcAreaShape">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcAreaShape"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcAreaCoords">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcAreaCoords"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcCorrectResponse">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcCorrectResponse"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcSequence">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcSequence"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="learning-d-note">
+      <xs:choice>
+         <xs:element ref="lcInstructornote"/>
+      </xs:choice>
+   </xs:group>
+   <xs:group name="learning-d-fig">
+      <xs:choice>
+         <xs:element ref="lcTrueFalse"/>
+         <xs:element ref="lcSingleSelect"/>
+         <xs:element ref="lcMultipleSelect"/>
+         <xs:element ref="lcSequencing"/>
+         <xs:element ref="lcMatching"/>
+         <xs:element ref="lcHotspot"/>
+         <xs:element ref="lcOpenQuestion"/>
+      </xs:choice>
+   </xs:group>
+   <xs:group name="learning-d-lcInteractionBase">
+      <xs:choice>
+         <xs:element ref="lcTrueFalse"/>
+         <xs:element ref="lcSingleSelect"/>
+         <xs:element ref="lcMultipleSelect"/>
+         <xs:element ref="lcSequencing"/>
+         <xs:element ref="lcMatching"/>
+         <xs:element ref="lcHotspot"/>
+         <xs:element ref="lcOpenQuestion"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="lcInstructornote">
+      <xs:annotation>
+         <xs:documentation>Use the &lt;lcInstructornote&gt; element to provide information or notes you want to provide to the course instructor. These notes can be conditionnalized out of content you intend to deliver to the learner. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcInstructornote.class">
+               <xs:attribute ref="class"
+                             default="+ topic/note learningInteractionBase-d/note learning-d/lcInstructornote "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcInstructornote.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcInstructornote.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcInstructornote.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcInstructornote.content">
+      <xs:sequence>
+         <xs:group ref="note.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcInstructornote.attributes">
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcTrueFalse">
+      <xs:annotation>
+         <xs:documentation>A lcTrueFalse interaction presents the learner with two choices, one correct, the other incorrect, often presented as true/false or yes/no responses. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcTrueFalse.class">
+               <xs:attribute ref="class"
+                             default="+ topic/fig learningInteractionBase-d/lcInteractionBase learning-d/lcTrueFalse "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcTrueFalse.class">
+      <xs:sequence>
+         <xs:group ref="lcTrueFalse.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcTrueFalse.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcTrueFalse.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcQuestion"/>
+         <xs:group ref="lcAsset" minOccurs="0"/>
+         <xs:group ref="lcAnswerOptionGroup"/>
+         <xs:group ref="lcFeedbackIncorrect" minOccurs="0"/>
+         <xs:group ref="lcFeedbackCorrect" minOccurs="0"/>
+         <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcTrueFalse.attributes">
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcSingleSelect">
+      <xs:annotation>
+         <xs:documentation>An lcSingleSelect interaction presents three or more choices, only one of which is correct. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcSingleSelect.class">
+               <xs:attribute ref="class"
+                             default="+ topic/fig learningInteractionBase-d/lcInteractionBase learning-d/lcSingleSelect "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcSingleSelect.class">
+      <xs:sequence>
+         <xs:group ref="lcSingleSelect.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcSingleSelect.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcSingleSelect.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcQuestion"/>
+         <xs:group ref="lcAsset" minOccurs="0"/>
+         <xs:group ref="lcAnswerOptionGroup"/>
+         <xs:group ref="lcFeedbackIncorrect" minOccurs="0"/>
+         <xs:group ref="lcFeedbackCorrect" minOccurs="0"/>
+         <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcSingleSelect.attributes">
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcMultipleSelect">
+      <xs:annotation>
+         <xs:documentation>In an lcMultipleSelect interaction, the learner must indicate two or more correct answers from a list of choices. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcMultipleSelect.class">
+               <xs:attribute ref="class"
+                             default="+ topic/fig learningInteractionBase-d/lcInteractionBase learning-d/lcMultipleSelect "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcMultipleSelect.class">
+      <xs:sequence>
+         <xs:group ref="lcMultipleSelect.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcMultipleSelect.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcMultipleSelect.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcQuestion"/>
+         <xs:group ref="lcAsset" minOccurs="0"/>
+         <xs:group ref="lcAnswerOptionGroup"/>
+         <xs:group ref="lcFeedbackIncorrect" minOccurs="0"/>
+         <xs:group ref="lcFeedbackCorrect" minOccurs="0"/>
+         <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcMultipleSelect.attributes">
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcSequencing">
+      <xs:annotation>
+         <xs:documentation>An lcSequencing interaction asks the learner to arrange a list of choices into a predefined order, such as small to large. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcSequencing.class">
+               <xs:attribute ref="class"
+                             default="+ topic/fig learningInteractionBase-d/lcInteractionBase learning-d/lcSequencing "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcSequencing.class">
+      <xs:sequence>
+         <xs:group ref="lcSequencing.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcSequencing.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcSequencing.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcQuestion"/>
+         <xs:group ref="lcAsset" minOccurs="0"/>
+         <xs:group ref="lcSequenceOptionGroup"/>
+         <xs:group ref="lcFeedbackIncorrect" minOccurs="0"/>
+         <xs:group ref="lcFeedbackCorrect" minOccurs="0"/>
+         <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcSequencing.attributes">
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcMatching">
+      <xs:annotation>
+         <xs:documentation>In an lcMatching interaction, the learner identifies the correct choice that matches another choice. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcMatching.class">
+               <xs:attribute ref="class"
+                             default="+ topic/fig learningInteractionBase-d/lcInteractionBase learning-d/lcMatching "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcMatching.class">
+      <xs:sequence>
+         <xs:group ref="lcMatching.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcMatching.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcMatching.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcQuestion"/>
+         <xs:group ref="lcAsset" minOccurs="0"/>
+         <xs:group ref="lcMatchTable"/>
+         <xs:group ref="lcFeedbackIncorrect" minOccurs="0"/>
+         <xs:group ref="lcFeedbackCorrect" minOccurs="0"/>
+         <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcMatching.attributes">
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcHotspot">
+      <xs:annotation>
+         <xs:documentation>In a lcHotspot interaction, the learner clicks on a region of the screen to indicate a choice. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcHotspot.class">
+               <xs:attribute ref="class"
+                             default="+ topic/fig learningInteractionBase-d/lcInteractionBase learning-d/lcHotspot "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcHotspot.class">
+      <xs:sequence>
+         <xs:group ref="lcHotspot.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcHotspot.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcHotspot.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcQuestion"/>
+         <xs:group ref="lcHotspotMap"/>
+         <xs:group ref="lcFeedbackIncorrect" minOccurs="0"/>
+         <xs:group ref="lcFeedbackCorrect" minOccurs="0"/>
+         <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcHotspot.attributes">
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcOpenQuestion">
+      <xs:annotation>
+         <xs:documentation>Use &lt;lcOpenQuestion&gt; to pose an open-ended question in an assessment interaction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcOpenQuestion.class">
+               <xs:attribute ref="class"
+                             default="+ topic/fig learningInteractionBase-d/lcInteractionBase learning-d/lcOpenQuestion "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcOpenQuestion.class">
+      <xs:sequence>
+         <xs:group ref="lcOpenQuestion.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcOpenQuestion.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcOpenQuestion.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcQuestion"/>
+         <xs:group ref="lcAsset" minOccurs="0"/>
+         <xs:group ref="lcOpenAnswer" minOccurs="0"/>
+         <xs:group ref="lcFeedbackIncorrect" minOccurs="0"/>
+         <xs:group ref="lcFeedbackCorrect" minOccurs="0"/>
+         <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcOpenQuestion.attributes">
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcQuestion">
+      <xs:annotation>
+         <xs:documentation>Use the &lt;lcQuestion&gt; element in an interaction to ask the question. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcQuestion.class">
+               <xs:attribute ref="class"
+                             default="+ topic/p learningInteractionBase-d/lcQuestionBase learning-d/lcQuestion "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcQuestion.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcQuestion.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcQuestion.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcQuestion.content">
+      <xs:sequence>
+         <xs:group ref="ph.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcQuestion.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcOpenAnswer">
+      <xs:annotation>
+         <xs:documentation>Use &lt;lcOpenAnswer&gt; to provide a suggested answer for an &lt;lcOpenQuestion&gt; interaction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcOpenAnswer.class">
+               <xs:attribute ref="class"
+                             default="+ topic/p learningInteractionBase-d/p learning-d/lcOpenAnswer "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcOpenAnswer.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcOpenAnswer.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcOpenAnswer.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcOpenAnswer.content">
+      <xs:sequence>
+         <xs:group ref="ph.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcOpenAnswer.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcAnswerOptionGroup">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcAnswerOptionGroup.class">
+               <xs:attribute ref="class"
+                             default="+ topic/ul learningInteractionBase-d/ul learning-d/lcAnswerOptionGroup "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcAnswerOptionGroup.class">
+      <xs:sequence>
+         <xs:group ref="lcAnswerOptionGroup.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcAnswerOptionGroup.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcAnswerOptionGroup.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+         <xs:group ref="lcAnswerOption" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcAnswerOptionGroup.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcSequenceOptionGroup">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcSequenceOptionGroup&gt; element provides the options for an assessment sequence interaction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcSequenceOptionGroup.class">
+               <xs:attribute ref="class"
+                             default="+ topic/ol learningInteractionBase-d/ol learning-d/lcSequenceOptionGroup "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcSequenceOptionGroup.class">
+      <xs:sequence>
+         <xs:group ref="lcSequenceOptionGroup.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcSequenceOptionGroup.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcSequenceOptionGroup.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+         <xs:group ref="lcSequenceOption" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcSequenceOptionGroup.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcAsset">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcAsset&gt; element in an assessment interaction provides the images or other graphic assets to support the interaction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcAsset.class">
+               <xs:attribute ref="class"
+                             default="+ topic/p learningInteractionBase-d/p learning-d/lcAsset "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcAsset.class">
+      <xs:sequence>
+         <xs:group ref="lcAsset.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcAsset.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcAsset.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="imagemap"/>
+            <xs:group ref="image"/>
+            <xs:group ref="object"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcAsset.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcSequenceOption">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcSequenceOption&gt; element in an assessment interaction provides the contents of an item in a sequence interaction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcSequenceOption.class">
+               <xs:attribute ref="class"
+                             default="+ topic/li learningInteractionBase-d/li learning-d/lcSequenceOption "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcSequenceOption.class">
+      <xs:sequence>
+         <xs:group ref="lcSequenceOption.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcSequenceOption.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcSequenceOption.content">
+      <xs:sequence>
+         <xs:group ref="lcAnswerContent"/>
+         <xs:group ref="lcSequence"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcSequenceOption.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcFeedback">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcFeedback&gt; element in an assessment interaction provides information to the learner about a correct or incorrect response. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcFeedback.class">
+               <xs:attribute ref="class"
+                             default="+ topic/p learningInteractionBase-d/p learning-d/lcFeedback "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcFeedback.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcFeedback.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcFeedback.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcFeedback.content">
+      <xs:sequence>
+         <xs:group ref="ph.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcFeedback.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcFeedbackCorrect">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcFeedbackCorrect&gt; element in an assessment interaction provides feedback to the learner about a correct response. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcFeedbackCorrect.class">
+               <xs:attribute ref="class"
+                             default="+ topic/p learningInteractionBase-d/p learning-d/lcFeedbackCorrect "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcFeedbackCorrect.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcFeedbackCorrect.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcFeedbackCorrect.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcFeedbackCorrect.content">
+      <xs:sequence>
+         <xs:group ref="ph.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcFeedbackCorrect.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcFeedbackIncorrect">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcFeedbackIncorrect&gt; element in an assessment interaction provides feedback about incorrect response. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcFeedbackIncorrect.class">
+               <xs:attribute ref="class"
+                             default="+ topic/p learningInteractionBase-d/p learning-d/lcFeedbackIncorrect "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcFeedbackIncorrect.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcFeedbackIncorrect.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcFeedbackIncorrect.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcFeedbackIncorrect.content">
+      <xs:sequence>
+         <xs:group ref="ph.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcFeedbackIncorrect.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcAnswerOption">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcAnswerOption&gt; element in an assessment interaction provides the content and feedback for a question option, and can indicate the correct option. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcAnswerOption.class">
+               <xs:attribute ref="class"
+                             default="+ topic/li learningInteractionBase-d/li learning-d/lcAnswerOption "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcAnswerOption.class">
+      <xs:sequence>
+         <xs:group ref="lcAnswerOption.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcAnswerOption.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcAnswerOption.content">
+      <xs:sequence>
+         <xs:group ref="lcAnswerContent"/>
+         <xs:group ref="lcCorrectResponse" minOccurs="0"/>
+         <xs:group ref="lcFeedback" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcAnswerOption.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcAnswerContent">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcAnswerContent&gt; element in a learning assessment interaction provides the content for an answer option, which the learner can select as correct or incorrect. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcAnswerContent.class">
+               <xs:attribute ref="class"
+                             default="+ topic/p learningInteractionBase-d/p learning-d/lcAnswerContent "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcAnswerContent.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcAnswerContent.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcAnswerContent.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcAnswerContent.content">
+      <xs:sequence>
+         <xs:group ref="ph.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcAnswerContent.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcMatchTable">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcMatchTable&gt; element in an assessment interaction provides a format for matching items. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcMatchTable.class">
+               <xs:attribute ref="class"
+                             default="+ topic/simpletable learningInteractionBase-d/simpletable learning-d/lcMatchTable "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcMatchTable.class">
+      <xs:sequence>
+         <xs:group ref="lcMatchTable.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcMatchTable.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcMatchTable.content">
+      <xs:sequence>
+         <xs:group ref="lcMatchingHeader" minOccurs="0"/>
+         <xs:group ref="lcMatchingPair" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcMatchTable.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcMatchingHeader">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcMatchingHeader&gt; element in an assessment interaction provides column headings for items to present in a matching table. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcMatchingHeader.class">
+               <xs:attribute ref="class"
+                             default="+ topic/sthead learningInteractionBase-d/sthead learning-d/lcMatchingHeader "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcMatchingHeader.class">
+      <xs:sequence>
+         <xs:group ref="lcMatchingHeader.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcMatchingHeader.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcMatchingHeader.content">
+      <xs:sequence>
+         <xs:group ref="lcItem"/>
+         <xs:group ref="lcMatchingItem"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcMatchingHeader.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcMatchingPair">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcMatchingPair&gt; element in an assessment interaction provides a table row with the pair of items that comprise a correct match in a matching interaction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcMatchingPair.class">
+               <xs:attribute ref="class"
+                             default="+ topic/strow learningInteractionBase-d/strow learning-d/lcMatchingPair "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcMatchingPair.class">
+      <xs:sequence>
+         <xs:group ref="lcMatchingPair.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcMatchingPair.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcMatchingPair.content">
+      <xs:sequence>
+         <xs:group ref="lcItem"/>
+         <xs:group ref="lcMatchingItem"/>
+         <xs:group ref="lcMatchingItemFeedback" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcMatchingPair.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcItem">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcItem&gt; element in an assessment interaction provides the content for an item that matches the match item in a match table. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcItem.class">
+               <xs:attribute ref="class"
+                             default="+ topic/stentry learningInteractionBase-d/stentry learning-d/lcItem "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcItem.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcItem.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcItem.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcItem.content">
+      <xs:sequence>
+         <xs:group ref="ph.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcItem.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcMatchingItem">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcMatchingItem&gt; element in an assessment interaction provides the content for the matching side of a matching pair of items in a match table interaction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcMatchingItem.class">
+               <xs:attribute ref="class"
+                             default="+ topic/stentry learningInteractionBase-d/stentry learning-d/lcMatchingItem "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcMatchingItem.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcMatchingItem.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcMatchingItem.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcMatchingItem.content">
+      <xs:sequence>
+         <xs:group ref="ph.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcMatchingItem.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcMatchingItemFeedback">
+      <xs:annotation>
+         <xs:documentation>???</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcMatchingItemFeedback.class">
+               <xs:attribute ref="class"
+                             default="+ topic/stentry learningInteractionBase-d/stentry learning-d/lcMatchingItemFeedback "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcMatchingItemFeedback.class">
+      <xs:sequence>
+         <xs:group ref="lcMatchingItemFeedback.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcMatchingItemFeedback.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcMatchingItemFeedback.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="lcFeedback"/>
+            <xs:group ref="lcFeedbackCorrect"/>
+            <xs:group ref="lcFeedbackIncorrect"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcMatchingItemFeedback.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcHotspotMap">
+      <xs:annotation>
+         <xs:documentation>A lcHotspotMap interaction lets you designate an action area or region over an image, allowing a click in that region to get scored as correct or incorrect in respoinse to an interaction question. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcHotspotMap.class">
+               <xs:attribute ref="class"
+                             default="+ topic/fig learningInteractionBase-d/figgroup learning-d/lcHotspotMap "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcHotspotMap.class">
+      <xs:sequence>
+         <xs:group ref="lcHotspotMap.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcHotspotMap.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcHotspotMap.content">
+      <xs:sequence>
+         <xs:group ref="image"/>
+         <xs:group ref="lcArea" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcHotspotMap.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcArea">
+      <xs:annotation>
+         <xs:documentation>A lcArea defines an area of a hotspot image that contains a correct or incorrect choice in a hotspot assessment interaction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcArea.class">
+               <xs:attribute ref="class"
+                             default="+ topic/figgroup learningInteractionBase-d/figgroup learning-d/lcArea "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcArea.class">
+      <xs:sequence>
+         <xs:group ref="lcArea.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcArea.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcArea.content">
+      <xs:sequence>
+         <xs:group ref="lcAreaShape"/>
+         <xs:group ref="lcAreaCoords"/>
+         <xs:group ref="xref" minOccurs="0"/>
+         <xs:group ref="lcCorrectResponse" minOccurs="0"/>
+         <xs:group ref="lcFeedback" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcArea.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcAreaShape">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcAreaShape.class">
+               <xs:attribute ref="class"
+                             default="+ topic/keyword learningInteractionBase-d/keyword learning-d/lcAreaShape "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcAreaShape.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcAreaShape.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcAreaShape.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcAreaShape.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcAreaShape.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts-translate-no"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcAreaCoords">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcAreaCoords.class">
+               <xs:attribute ref="class"
+                             default="+ topic/ph learningInteractionBase-d/ph learning-d/lcAreaCoords "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcAreaCoords.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcAreaCoords.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcAreaCoords.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcAreaCoords.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcAreaCoords.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts-translate-no"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcCorrectResponse">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcCorrectResponse&gt; element in an assessment interaction indicates a correct response. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcCorrectResponse.class">
+               <xs:attribute ref="class"
+                             default="+ topic/data learningInteractionBase-d/data learning-d/lcCorrectResponse "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcCorrectResponse.class">
+      <xs:sequence>
+         <xs:group ref="lcCorrectResponse.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcCorrectResponse.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcCorrectResponse.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="lcCorrectResponse.attributes">
+      <xs:attribute name="name" type="xs:string" default="lcCorrectResponse"/>
+      <xs:attribute name="value" type="xs:string" default="lcCorrectResponse"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcSequence">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcSequence&gt; element in an assessment interaction provides the position of a sequence option in a sequence. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcSequence.class">
+               <xs:attribute ref="class"
+                             default="+ topic/data learningInteractionBase-d/data learning-d/lcSequence "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcSequence.class">
+      <xs:sequence>
+         <xs:group ref="lcSequence.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcSequence.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcSequence.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="lcSequence.attributes">
+      <xs:attribute name="name" type="xs:string" default="lcSequence"/>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

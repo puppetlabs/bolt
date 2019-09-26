@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+      This is the Mathematical Markup Language (MathML) 3.0, an XML
+      application for describing mathematical notation and capturing
+      both its structure and content.
+  
+      Copyright 1998-2008 W3C (MIT, ERCIM, Keio)
+  
+      Use and distribution of this code are permitted under the terms
+      W3C Software Notice and License
+      http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+  
+  
+      Revision:   $Id: mathml3-deprecated.rng,v 1.3 2008/11/15 22:00:48 dcarlis Exp $
+  
+     Update to MathML3 and Relax NG: David Carlisle and Michael Kohlhase
+-->
+<grammar ns="http://www.w3.org/1998/Math/MathML" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <define name="Token-style.attrib" combine="interleave">
+    <optional>
+      <attribute name="fontsize">
+        <data type="string"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="fontstyle">
+        <data type="string"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="fontweight">
+        <data type="string"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="color">
+        <data type="string"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="fontfamily">
+        <data type="string"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="fontweight">
+        <data type="string"/>
+      </attribute>
+    </optional>
+  </define>
+  <!-- Deprecated Content Elements -->
+  <define name="dep-content">
+    <choice>
+      <element name="reln">
+        <zeroOrMore>
+          <ref name="ContExp"/>
+        </zeroOrMore>
+      </element>
+      <element name="fn">
+        <ref name="ContExp"/>
+      </element>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="dep-content"/>
+  </define>
+  <define name="apply-head" combine="choice">
+    <ref name="dep-content"/>
+  </define>
+  <define name="declare">
+    <element name="declare">
+      <optional>
+        <attribute name="type">
+          <data type="string"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="scope">
+          <data type="string"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="nargs">
+          <data type="nonNegativeInteger"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="occurrence">
+          <choice>
+            <value>prefix</value>
+            <value>infix</value>
+            <value>function-model</value>
+          </choice>
+        </attribute>
+      </optional>
+      <ref name="Definition.attrib"/>
+      <optional>
+        <ref name="cdbase.attrib"/>
+      </optional>
+      <oneOrMore>
+        <ref name="ContExp"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="declare"/>
+  </define>
+  <define name="mtr.content" combine="choice">
+    <ref name="ContInPres"/>
+  </define>
+</grammar>

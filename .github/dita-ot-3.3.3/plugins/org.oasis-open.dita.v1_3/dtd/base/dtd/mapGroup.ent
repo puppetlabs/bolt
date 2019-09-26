@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Map Group Domain                             -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an  -->
+<!--       appropriate system identifier                           -->
+<!-- PUBLIC "-//OASIS//ELEMENTS DITA Map Group Domain//EN"         -->
+<!--       Delivered as file "mapGroup.mod"                             -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization attributes     -->
+<!--             for Map Group Domain                              -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2005, 2009.              -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    2005.11.15 RDA: Corrected the "Delivered as" system ID     -->
+<!--    2006.06.07 RDA: Make universal attributes universal        -->
+<!--                      (DITA 1.1 proposal #12)                  -->
+<!--    2007.12.01 EK:  Reformatted DTD modules for DITA 1.2        -->
+<!--    2008.02.01 RDA: Added keydef element, keys attributes      -->
+<!--    2008.02.12 RDA: Navtitle no longer required on topichead   -->
+<!--    2008.02.13 RDA: Create .content and .attributes entities   -->
+<!--    2010.09.20 RDA: Add copy-to to topichead                   -->
+<!-- ============================================================= -->
+<!--                                                               -->
+<!--                                                               -->
+
+<!-- ============================================================= -->
+<!--                    ELEMENT EXTENSION ENTITY DECLARATIONS      -->
+<!-- ============================================================= -->
+
+<!ENTITY % mapgroup-d-topicref
+  "anchorref |
+   keydef |
+   mapref |
+   topicgroup |
+   topichead |
+   topicset |
+   topicsetref"
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY mapgroup-d-att
+  "(map mapgroup-d)"
+>
+
+<!-- ================ End DITA Map Group Domain ================== -->
+ 

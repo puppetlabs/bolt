@@ -1,0 +1,98 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="The HTML5 transformation shares common parameters with other HTML-based transformations and provides additional parameters that are specific to HTML5 output."><meta name="DC.relation" scheme="URI" content="../parameters/parameters_intro.html"><meta name="DC.relation" scheme="URI" content="../topics/dita2html5.html"><meta name="DC.relation" scheme="URI" content="../topics/html-customization-parameters.html"><meta name="DC.relation" scheme="URI" content="../parameters/parameters-base-html.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="html5"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>HTML5 parameters</title></head><body id="html5"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a><ul><li><a href="../parameters/dita-command-arguments.html">DITA command arguments</a></li><li><a href="../parameters/parameters_intro.html">DITA-OT parameters</a><ul><li><a href="../parameters/parameters-base.html">Common</a></li><li><a href="../parameters/parameters-pdf.html">PDF</a></li><li><a href="../parameters/parameters-base-html.html">HTML-based output</a></li><li class="active"><a href="../parameters/parameters-html5.html">HTML5</a></li><li><a href="../parameters/parameters-xhtml.html">XHTML</a></li><li><a href="../parameters/parameters-htmlhelp.html">HTML Help</a></li><li><a href="../parameters/parameters-eclipsehelp.html">Eclipse Help</a></li><li><a href="../parameters/parameters-other.html">Other</a></li></ul></li><li><a href="../parameters/configuration-properties.html">Configuration properties</a></li></ul></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1"><h1 class="title topictitle1 generated" id="ariaid-title1">HTML5 parameters</h1><div class="body refbody"><p class="shortdesc">The HTML5 transformation shares
+      common parameters with other HTML-based transformations and provides additional parameters that are specific to
+      HTML5 output.
+      <span class="ph"></span>
+    </p><section class="section"><dl class="dl parml"><dt class="dt pt dlterm" id="html5__args.artlbl"><span class="keyword parmname">args.artlbl</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.artlbl.desc">Specifies whether to generate a label for each image; the label will contain the image file name. The allowed values are <span class="keyword option">yes</span> and <span class="keyword option">no</span>; the default value is <span class="keyword option">no</span>.</dd><dt class="dt pt dlterm" id="html5__args.copycss"><span class="keyword parmname">args.copycss</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.copycss.desc">Specifies whether to copy the custom .css file to the output directory. The allowed values are <span class="keyword option">yes</span> and <span class="keyword option">no</span>; the default value is <span class="keyword option">no</span>.</dd><dd class="dd pd ddexpand">
+              <div class="div">If an external process will copy your custom .css file to the output
+                directory, leave this parameter unset (or set it to <span class="keyword option">no</span>). If DITA-OT should copy the
+                file when generating output, set it to <span class="keyword option">yes</span>.</div></dd><dt class="dt pt dlterm" id="html5__args.css"><span class="keyword parmname">args.css</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.css.desc">Specifies the name of a custom .css file.</dd><dd class="dd pd ddexpand">
+              <div class="div">The value of this parameter should be only the file name (or an absolute path
+                to the file). A relative path can be specified with <span class="keyword parmname">args.cssroot</span>.</div></dd><dt class="dt pt dlterm" id="html5__args.csspath"><span class="keyword parmname">args.csspath</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.csspath.desc">
+              <div class="div">Specifies the <strong class="ph b">destination</strong> directory to which .css files are copied
+                (relative to the output directory).</div>
+            </dd><dd class="dd pd ddexpand">
+              <div class="div">
+                <p class="p">Corresponds to the XSLT parameter <span class="keyword parmname">CSSPATH</span>.</p>
+                <p class="p">DITA-OT will copy the file <strong class="ph b">to</strong> this location.</p>
+                <div class="note tip note_tip"><span class="note__title">Tip:</span> If <span class="keyword parmname">args.csspath</span> is not set, the custom CSS file (and the default
+                  CSS files) will be copied to the root level of the output folder. To copy CSS files to an output
+                  subfolder named <span class="ph filepath">css</span>, set <span class="keyword parmname">args.csspath</span> to
+                    <span class="keyword option">css</span>.
+                  
+                </div></div>
+            </dd><dt class="dt pt dlterm" id="html5__args.cssroot"><span class="keyword parmname">args.cssroot</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.cssroot.desc">
+              <div class="div">Specifies the <strong class="ph b">source</strong> directory that contains the custom .css
+                file.</div></dd><dd class="dd pd ddexpand">
+              <div class="div">
+                <p class="p">DITA-OT will copy the file <strong class="ph b">from</strong> this location.</p>
+                <div class="note tip note_tip"><span class="note__title">Tip:</span> The value you enter here will be interpreted relative to the location of the input map
+                  file. If your map is stored at the root level of your project folder and the CSS file is stored in a
+                  subfolder named <span class="ph filepath">resources</span>, set <span class="keyword parmname">args.cssroot</span> to
+                    <span class="keyword option">resources</span>.</div>
+              </div></dd><dt class="dt pt dlterm" id="html5__args.dita.locale"><span class="keyword parmname">args.dita.locale</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.dita.locale.desc">Specifies the language locale file to use for sorting index entries.</dd><dt class="dt pt dlterm" id="html5__args.ftr"><span class="keyword parmname">args.ftr</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.ftr.desc">Specifies an XML file that contains content for a running footer.</dd><dd class="dd pd ddexpand">
+              <div class="div">
+                <span class="ph">Corresponds to the XSLT parameter <span class="keyword parmname">FTR</span>.</span>
+                <div class="note note note_note"><span class="note__title">Note:</span> The footer file should be specified using an absolute path and must contain valid XML. A common
+                  practice is to place all content into a <code class="keyword markupname xmlelement">&lt;div&gt;</code> element. In HTML5 output, the
+                  footer file contents will be wrapped in an HTML5 <code class="keyword markupname xmlelement">&lt;footer&gt;</code> element with the
+                    <code class="keyword markupname xmlatt">@role</code> attribute set to <span class="keyword option">contentinfo</span>.
+                  
+                  
+                  
+                </div>
+              </div></dd><dt class="dt pt dlterm" id="html5__args.gen.default.meta"><span class="keyword parmname">args.gen.default.meta</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.gen.default.meta.desc">Specifies whether to generate extra metadata that targets parental control scanners, meta elements with name="security" and name="Robots". The allowed values are <span class="keyword option">yes</span> and <span class="keyword option">no</span>; the default value is <span class="keyword option">no</span>.</dd><dd class="dd pd ddexpand">
+              <div class="div">Corresponds to the XSLT parameter <span class="keyword parmname">genDefMeta</span>.
+              </div>
+            </dd><dt class="dt pt dlterm" id="html5__args.hdf"><span class="keyword parmname">args.hdf</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.hdf.desc">Specifies an XML file that contains content to be placed in the document head.</dd><dd class="dd pd ddexpand">
+              <div class="div">
+                <p class="p">The contents of the header file will be inserted in the <code class="keyword markupname xmlelement">&lt;head&gt;</code> element of the
+                  generated HTML files.</p>
+                <div class="note tip note_tip"><span class="note__title">Tip:</span> The header file should be specified using an absolute path and must contain valid XML.
+                  If you need to insert more than one element into the HTML page head, wrap the content in a
+                    <code class="keyword markupname xmlelement">&lt;div&gt;</code> element. The division wrapper in the header file will be discarded when
+                  generating HTML files, and the contents will be inserted into each page head.
+                  
+                </div></div></dd><dt class="dt pt dlterm" id="html5__args.hdr"><span class="keyword parmname">args.hdr</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.hdr.desc">Specifies an XML file that contains content for a running header.</dd><dd class="dd pd ddexpand">
+              <div class="div">
+                <span class="ph">Corresponds to the XSLT parameter <span class="keyword parmname">HDR</span>.</span>
+                <div class="note note note_note"><span class="note__title">Note:</span> The header file should be specified using an absolute path and must contain valid XML. A common
+                  practice is to place all content into a <code class="keyword markupname xmlelement">&lt;div&gt;</code> element. In HTML5 output, the
+                  contents of the header file will be wrapped in an HTML5 <code class="keyword markupname xmlelement">&lt;header&gt;</code> element with
+                  the <code class="keyword markupname xmlatt">@role</code> attribute set to <span class="keyword option">banner</span>.
+                  
+                  
+                  
+                  
+                </div>
+              </div></dd><dt class="dt pt dlterm" id="html5__args.hide.parent.link"><span class="keyword parmname">args.hide.parent.link</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.hide.parent.link.desc">Specifies whether to hide links to parent topics in the HTML5 output. The allowed values are <span class="keyword option">yes</span> and <span class="keyword option">no</span>; the default value is <span class="keyword option">no</span>.</dd><dd class="dd pd ddexpand">
+              <div class="div">
+                <span class="ph">Corresponds to the XSLT parameter <span class="keyword parmname">NOPARENTLINK</span>.</span>
+                <div class="note note note_note"><span class="note__title">Note:</span> This parameter is deprecated in favor of the <span class="keyword parmname">args.rellinks</span>
+                  parameter.</div>
+              </div></dd><dt class="dt pt dlterm" id="html5__args.html5.classattr"><span class="keyword parmname">args.html5.classattr</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.html5.classattr.desc">Specifies whether to include the DITA class ancestry inside the HTML5 elements. The allowed values are <span class="keyword option">yes</span> and <span class="keyword option">no</span>; the default value is <span class="keyword option">yes</span>.</dd><dt class="dt pt dlterm" id="html5__args.html5.contenttarget"><span class="keyword parmname">args.html5.contenttarget</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.html5.contenttarget.desc">Specifies the value of the @target attribute on the &lt;base&gt; element in the TOC file.</dd><dt class="dt pt dlterm" id="html5__args.html5.toc"><span class="keyword parmname">args.html5.toc</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.html5.toc.desc">Specifies the base name of the TOC file.</dd><dt class="dt pt dlterm" id="html5__args.html5.toc.class"><span class="keyword parmname">args.html5.toc.class</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.html5.toc.class.desc">Specifies the value of the @class attribute on the &lt;body&gt; element in the TOC file.</dd><dt class="dt pt dlterm" id="html5__args.html5.toc.xsl"><span class="keyword parmname">args.html5.toc.xsl</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.html5.toc.xsl.desc">Specifies a custom XSL file to be used for TOC generation.</dd><dt class="dt pt dlterm" id="html5__args.indexshow"><span class="keyword parmname">args.indexshow</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.indexshow.desc">Specifies whether the content of &lt;indexterm&gt; elements are rendered in the output. The allowed values are <span class="keyword option">yes</span> and <span class="keyword option">no</span>; the default value is <span class="keyword option">no</span>.</dd><dt class="dt pt dlterm" id="html5__args.outext"><span class="keyword parmname">args.outext</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.outext.desc">Specifies the file extension for HTML5 output.</dd><dd class="dd pd ddexpand">
+              <div class="div">
+                <span class="ph">Corresponds to the XSLT parameter <span class="keyword parmname">OUTEXT</span>.</span>
+              </div></dd><dt class="dt pt dlterm" id="html5__args.xsl"><span class="keyword parmname">args.xsl</span><span class="ph"></span></dt><dd class="dd pd" id="html5__args.xsl.desc">Specifies a custom XSL file to be used instead of the default XSL transformation.</dd><dd class="dd pd ddexpand">
+              <div class="div">The parameter must specify a fully qualified file name.</div></dd><dt class="dt pt dlterm" id="html5__nav-toc"><span class="keyword parmname">nav-toc</span><span class="ph"></span></dt><dd class="dd pd" id="html5__nav-toc.desc">
+              <p class="p">Specifies whether to generate a table of contents (ToC) in the HTML5 <code class="keyword markupname xmlelement">&lt;nav&gt;</code>
+                element of each page. The navigation can then be rendered in a sidebar or menu via CSS. 
+                
+              </p>
+              <div class="p">The following values are supported:
+                <ul class="ul">
+                  <li class="li"><span class="keyword option">none</span> (default) – No table of contents will be generated</li>
+                  <li class="li"><span class="keyword option">partial</span> – Include the current topic in the ToC along with its parents, siblings
+                    and children</li>
+                  <li class="li"><span class="keyword option">full</span> – Generate a complete ToC for the entire map</li>
+                </ul>
+                <div class="div div-index">
+                  
+                  
+                </div>
+              </div>
+            </dd></dl></section></div><nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../parameters/parameters_intro.html" title="Certain parameters apply to all DITA-OT transformations. Other parameters are common to the HTML-based transformations. Some parameters apply only to specific transformation types. These parameters can be passed as options to the dita command using the --parameter=value syntax or included in build scripts as Ant properties.">DITA-OT parameters</a></div></div><div class="linklist relinfo relconcepts"><strong>Related concepts</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/dita2html5.html" title="The html5 transformation generates HTML5 output and a table of contents (TOC) file.">HTML5 transformation</a></li></ul></div><div class="linklist relinfo reltasks"><strong>Related tasks</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/html-customization-parameters.html" title="For simple branded HTML pages, you can adjust the look and feel of the default output to match your company style by setting parameters to include custom CSS, header branding, or table-of-contents navigation in topics. (These changes do not require a custom plug-in.)">Setting parameters for custom HTML</a></li></ul></div><div class="linklist relinfo relref"><strong>Related reference</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../parameters/parameters-base-html.html" title="Certain parameters apply to all HTML-based transformation types: HTML5, XHTML, HTML&nbsp;Help, Eclipse help, and TocJS.">HTML-based output parameters</a></li></ul></div></nav></article></main></body></html>

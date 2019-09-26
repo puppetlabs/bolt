@@ -1,0 +1,53 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="concept"><meta name="description" content="There are two common types of plug-ins: A plug-in that simply sets the DITA-OT parameters to be used when a PDF is generated, and a plug-in that overrides aspects of the base DITA-OT PDF transformation. A plug-in can, of course, do both of these things."><meta name="DC.subject" content=", property, PDF, plug-in, draft comments, draft"><meta name="keywords" content=", property, PDF, plug-in, draft comments, draft"><meta name="DC.relation" scheme="URI" content="../topics/pdf-customization.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="types-pdf-customization-plugins"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Types of custom PDF plug-ins</title></head><body id="types-pdf-customization-plugins"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a><ul><li><a href="../topics/pdf-customization-approaches.html">PDF customization approaches</a></li><li class="active"><a href="../topics/pdf-customization-plugin-types.html">Types of custom PDF plug-ins</a></li><li><a href="../topics/pdf-plugin-structure.html">PDF plug-in structure</a></li><li><a href="../topics/pdf-customization-example.html">Simple PDF plug-in example</a></li><li><a href="../topics/pdf-customization-resources.html">Custom PDF plug-in resources</a></li><li><a href="../topics/pdf2-creating-change-bars.html">Generating revision bars</a></li></ul></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Types of custom PDF plug-ins</h1>
+  
+  
+  <div class="body conbody"><p class="shortdesc">There are two common types of plug-ins: A plug-in that simply sets the DITA-OT parameters to be used when a
+    PDF is generated, and a plug-in that overrides aspects of the base DITA-OT PDF transformation. A plug-in can, of
+    course, do both of these things.</p>
+    <section class="section"><h2 class="title sectiontitle">Plug-in that only provides DITA-OT parameters</h2>
+      
+      <p class="p">You might want to build a transformation type that uses a transformation as-is; however, you might want ensure
+        that certain DITA-OT parameters are used. For example, consider the following scenario:</p>
+      <p class="p">You want to ensure that PDFs generated for internal review have the following characteristics:</p>
+      <ul class="ul">
+        <li class="li">Use company style sheets</li>
+        <li class="li">Make draft comments visible to the reviewers, as they contain queries from the information developers</li>
+        <li class="li">Print the file names of the graphics underneath figures, so that graphic artists can more quickly respond to
+          requested changes</li>
+      </ul>
+      <p class="p">To accomplish this, you can create a new plug-in. In the Ant script that defines the transformation type,
+        specify the DITA-OT parameters. For example, to render draft comments and art labels, add
+          <code class="keyword markupname xmlelement">&lt;property&gt;</code> elements to specify the DITA-OT parameters:</p>
+      <div class="p">
+        <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;project name="com.example.draft.pdf"&gt;
+  &lt;target name="dita2draft.pdf.init"&gt;
+    &lt;property name="customization.dir"
+              location="${dita.plugin.com.example.draft.pdf.dir}/cfg"/&gt;
+    <strong class="ph b">&lt;property name="args.draft" value="yes"/&gt;</strong>
+    <strong class="ph b">&lt;property name="args.artlbl" value="yes"/&gt;</strong>
+  &lt;/target&gt;
+  &lt;target name="dita2draft.pdf"
+          depends="dita2draft.pdf.init, dita2production.pdf,dita2pdf2"/&gt;
+&lt;/project&gt;</code></pre>
+      </div>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Plug-in that overrides the base PDF transformation</h2>
+      
+      <p class="p">Production uses of DITA-OT typically rely on a custom PDF plug-in to render PDFs that are styled to match
+        corporate or organizational guidelines. Such customization plug-ins often override the following aspects of
+        DITA-OT default output:</p>
+      <ul class="ul">
+        <li class="li">Generated text strings</li>
+        <li class="li">XSL templates</li>
+        <li class="li">XSL-FO attribute sets</li>
+      </ul>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/pdf-customization.html" title="You can create custom DITA-OT plug-ins that build on the default DITA to PDF transformation. Plug-ins can customize covers and page layouts, modify formatting, override logic of the default PDF plug-in, and much more.">Customizing PDF output</a></div></div></nav></article></main></body></html>

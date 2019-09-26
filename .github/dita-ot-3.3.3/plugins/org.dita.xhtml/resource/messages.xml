@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2014 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<messages>
+  <message id="DOTA006W" type="WARN">
+    <reason>Absolute paths on the local file system are not supported for the CSSPATH parameter.</reason>
+    <response>Please use a relative path or full URI instead.</response>
+  </message>
+  <message id="DOTA007E" type="ERROR">
+    <reason>Cannot find the running-footer file "%1".</reason>
+    <response>Please double check the value to ensure it is specified correctly.</response>
+  </message>
+  <message id="DOTA008E" type="ERROR">
+    <reason>Cannot find the running-header file "%1".</reason>
+    <response>Please double check the value to ensure it is specified correctly.</response>
+  </message>
+  <message id="DOTA009E" type="ERROR">
+    <reason>Cannot find the specified heading file "%1".</reason>
+    <response>Please double check the value to ensure it is specified correctly.</response>
+  </message>
+  <message id="DOTA069W" type="WARN">
+    <reason>Target "%1" is deprecated.</reason>
+    <response>Remove references to this target from your custom XSLT or plug-ins.</response>
+  </message>
+</messages>

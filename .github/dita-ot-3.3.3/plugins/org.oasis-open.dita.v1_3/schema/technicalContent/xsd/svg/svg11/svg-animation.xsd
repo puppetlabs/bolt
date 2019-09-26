@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:attributeGroup name="SVG.Animation.attrib">
+    <xs:attributeGroup ref="xlink:SVG.XLink.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.AnimationAttribute.attrib">
+    <xs:attribute name="attributeName" use="required"/>
+    <xs:attribute name="attributeType"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.AnimationTiming.attrib">
+    <xs:attribute name="begin"/>
+    <xs:attribute name="dur"/>
+    <xs:attribute name="end"/>
+    <xs:attribute name="min"/>
+    <xs:attribute name="max"/>
+    <xs:attribute name="restart" default="always">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="always"/>
+          <xs:enumeration value="never"/>
+          <xs:enumeration value="whenNotActive"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="repeatCount"/>
+    <xs:attribute name="repeatDur"/>
+    <xs:attribute name="fill" default="remove">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="remove"/>
+          <xs:enumeration value="freeze"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.AnimationValue.attrib">
+    <xs:attribute name="calcMode" default="linear">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="discrete"/>
+          <xs:enumeration value="linear"/>
+          <xs:enumeration value="paced"/>
+          <xs:enumeration value="spline"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="values"/>
+    <xs:attribute name="keyTimes"/>
+    <xs:attribute name="keySplines"/>
+    <xs:attribute name="from"/>
+    <xs:attribute name="to"/>
+    <xs:attribute name="by"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.AnimationAddtion.attrib">
+    <xs:attribute name="additive" default="replace">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="replace"/>
+          <xs:enumeration value="sum"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="accumulate" default="none">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="none"/>
+          <xs:enumeration value="sum"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.animate.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="animate" substitutionGroup="svg:SVG.Animation.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.animate.content">
+          <xs:attributeGroup ref="svg:attlist.animate"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.animate">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="SVG.AnimationEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Animation.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationAttribute.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationTiming.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationValue.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationAddtion.attrib"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.set.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="set" substitutionGroup="svg:SVG.Animation.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.set.content">
+          <xs:attributeGroup ref="svg:attlist.set"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.set">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="SVG.AnimationEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Animation.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationAttribute.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationTiming.attrib"/>
+    <xs:attribute name="to"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.animateMotion.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+      <xs:element minOccurs="0" ref="svg:mpath"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="animateMotion" substitutionGroup="svg:SVG.Animation.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.animateMotion.content">
+          <xs:attributeGroup ref="svg:attlist.animateMotion"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.animateMotion">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="SVG.AnimationEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Animation.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationTiming.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationAddtion.attrib"/>
+    <xs:attribute name="calcMode" default="paced">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="discrete"/>
+          <xs:enumeration value="linear"/>
+          <xs:enumeration value="paced"/>
+          <xs:enumeration value="spline"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="values"/>
+    <xs:attribute name="keyTimes"/>
+    <xs:attribute name="keySplines"/>
+    <xs:attribute name="from"/>
+    <xs:attribute name="to"/>
+    <xs:attribute name="by"/>
+    <xs:attribute name="path"/>
+    <xs:attribute name="keyPoints"/>
+    <xs:attribute name="rotate"/>
+    <xs:attribute name="origin"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.animateColor.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="animateColor" substitutionGroup="svg:SVG.Animation.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.animateColor.content">
+          <xs:attributeGroup ref="svg:attlist.animateColor"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.animateColor">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="SVG.AnimationEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Animation.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationAttribute.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationTiming.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationValue.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationAddtion.attrib"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.animateTransform.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="animateTransform" substitutionGroup="svg:SVG.Animation.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.animateTransform.content">
+          <xs:attributeGroup ref="svg:attlist.animateTransform"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.animateTransform">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="SVG.AnimationEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Animation.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationAttribute.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationTiming.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationValue.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.AnimationAddtion.attrib"/>
+    <xs:attribute name="type" default="translate">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="translate"/>
+          <xs:enumeration value="scale"/>
+          <xs:enumeration value="rotate"/>
+          <xs:enumeration value="skewX"/>
+          <xs:enumeration value="skewY"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.mpath.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="mpath">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.mpath.content">
+          <xs:attributeGroup ref="svg:attlist.mpath"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.mpath">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="xlink:SVG.XLinkRequired.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+  </xs:attributeGroup>
+</xs:schema>

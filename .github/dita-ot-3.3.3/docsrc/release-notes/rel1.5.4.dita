@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.5.4" ditaarch:DITAArchVersion="1.2"><title>DITA Open Toolkit Release 1.5.4</title><reference id="general-enhancements-and-changes" ditaarch:DITAArchVersion="1.2"><title>General Enhancements and Changes</title><refbody><section id="section_vc5_gld_g2">
+          <title>Configuration file for defaults</title>
+          <p>In previous versions, <filepath>lib/configuration.properties</filepath> was generated
+            by integration process. Integration has been changed to generate
+              <filepath>lib/org.dita.dost.platform/plugin.properties</filepath> and the role of the
+            old <filepath>lib/configuration.properties</filepath> has been changed to contain
+            defaults and configuration options, such as default language.</p>
+        </section><section>
+        <title>Plug-in extension point for file extension configuration</title>
+          <p>New plug-in extension points have been added allow configuring DITA-OT behaviour based
+            on file extensions.</p>
+          <simpletable id="simpletable_xym_ryi_uc"><sthead><stentry>Extension point</stentry><stentry>Description</stentry><stentry>Default values</stentry></sthead><strow><stentry><codeph>dita.topic.extension</codeph></stentry><stentry>DITA topic</stentry><stentry><filepath>.dita</filepath>, <filepath>.xml</filepath></stentry></strow><strow><stentry><codeph>dita.map.extensions</codeph></stentry><stentry>DITA map</stentry><stentry><filepath>.ditamap</filepath></stentry></strow><strow><stentry><codeph>dita.html.extensions</codeph></stentry><stentry>HTML file</stentry><stentry><filepath>.html</filepath>, <filepath>.htm</filepath></stentry></strow><strow><stentry><codeph>dita.resource.extensions</codeph></stentry><stentry>Resource file</stentry><stentry><filepath>.pdf</filepath>, <filepath>.swf</filepath></stentry></strow></simpletable><p>Both HTML and resource file extensions are used to determine if a
+          file in source is copied to output.</p>
+        <p>New plug-in extension point has been added to allow declaring transtypes as print types.</p>
+        <simpletable><sthead><stentry>Extension point</stentry><stentry>Description</stentry></sthead><strow><stentry><codeph>dita.transtype.print</codeph></stentry><stentry>Declare transtype as a print type.</stentry></strow></simpletable>
+      </section><section>
+          <title>Strict integration mode</title>
+          <p>Two modes have been added to integration process: lax and strict. In strict mode the
+            processing will fail if any errors are encountered. In lax mode an error message may be
+            thrown for an error and the integration process will try to run to the end, even if
+            there are errors that were unrecoverable. The default mode is lax.</p>
+          <note>In lax mode, even if the process runs to the end and reports a successful result,
+            DITA-OT may not be able to function correctly because of e.g. corrupted plug-in files or
+            unprocessed template files.</note>
+        </section><section id="section_dcd_yhr_wc">
+          <title>Code reference charset support</title>
+          <p>Encoding of the code reference target file can be set using the <codeph>format</codeph>
+            attribute, for example </p>
+          <codeblock xml:space="preserve">&lt;coderef href="unicode.txt" format="txt; charset=UTF-8"/&gt; </codeblock>
+        </section><section>
+          <title>Plugin URI scheme</title>
+          <p>Support for <keyword>plugin</keyword> URI scheme has been added to XSLT stylesheets.
+            Plug-ins can refer to files in other plug-ins without hard coding relative paths, for
+            example </p>
+          <codeblock xml:space="preserve">&lt;xsl:import href="plugin:org.dita.pdf2:xsl/fo/topic2fo_1.0.xsl"/&gt;</codeblock>
+        </section><section id="section_mdj_zcw_td">
+          <title>PDF</title>
+          <p>Support for mirrored page layout has been added. The default is the unmirrored
+            layout.</p>
+          <p>The <codeph>args.bookmap-order</codeph> property has been added to control how front
+            and back matter are processed in bookmaps. The default is to reorder the frontmatter
+            content as in previous releases.</p>
+          <p>A new extension point has been added to add mappings to the PDF configuration catalog
+            file.</p>
+          <simpletable><sthead><stentry>Extension point</stentry><stentry>Description</stentry></sthead><strow><stentry><codeph>org.dita.pdf2.catalog.relative</codeph></stentry><stentry>Configuration catalog includes.</stentry></strow></simpletable>
+          <p>Support for the following languages has been added:</p>
+          <ul><li>Finnish</li><li>Hebrew</li><li>Romanian</li><li>Russian</li><li>Swedish</li></ul>
+          <p>PDF processing no longer copies images or generates XSL FO to output directory.
+          Instead, the temporary directory is used for all temporary files and source images are
+          read directly from source directory. The legacy processing model can be enabled by setting
+            <codeph>org.dita.pdf2.use-out-temp</codeph> to <codeph>true</codeph> in configuration
+          properties; support for the legacy processing model may be removed in future releases.</p>
+          <p>Support for FrameMaker index syntax has been disabled by default. To enable FrameMaker
+            index syntax, set <codeph>org.dita.pdf2.index.frame-markup</codeph> to <codeph>true</codeph> in
+            configuration properties.</p>
+          <p>A configuration option has been added to disable I18N font processing and use
+            stylesheet defined fonts. To disable I18N font processing, set
+              <codeph>org.dita.pdf2.i18n.enabled</codeph> to <codeph>false</codeph> in configuration
+            properties</p>
+        </section><section id="section_cnx_gmd_g2">
+          <title>XHTML</title>
+          <p>Support for the following languages has been added:</p>
+          <ul><li>Indonesian</li><li>Kazakh</li><li>Malay</li></ul>
+        </section></refbody></reference><reference id="reference_yvj_ttj_bd" ditaarch:DITAArchVersion="1.2"><title>Migration from previous releases</title><refbody><section>
+        <p>To allow access to configuration files, the <filepath>lib</filepath> directory needs to
+          be added to Java classpath.</p>
+          <p>The <codeph>print_transtypes</codeph> property in <filepath>integrator.properties</filepath> has been deprecated in favor of <codeph>dita.transtype.print</codeph> plug-in extension point.</p>
+          <p>The <codeph>dita.plugin.org.dita.*.dir</codeph> properties have been changed to point
+            to DITA-OT base directory.</p>
+        </section><section><title>PDF</title><p>Support for mirrored page layout was added and the following
+            XSLT configuration variables have been
+            deprecated:</p><ul id="ul_hkv_oyj_bd"><li><codeph>page-margin-left</codeph></li><li><codeph>page-margin-right</codeph></li></ul>
+          <p>The following variables should be used instead to control page margins:</p>
+          <ul id="ul_yda_wyj_bd"><li><codeph>page-margin-outside</codeph></li><li><codeph>page-margin-inside</codeph></li></ul>
+          <p>XSLT Parameters <codeph>customizationDir</codeph> and
+              <codeph>fileProfilePrefix</codeph> have been removed in favor of
+              <codeph>customizationDir.url</codeph> parameter.</p>
+          <p>A new shell stylesheet has been added for FOP and other shell stylesheets have also
+            been revised. Plug-ins which have their own shell stylesheets for PDF processing should
+            make sure all required stylesheets are imported.</p>
+          <p>Font family definitions in stylesheets have been changed from Sans, Serif, and
+          Monospaced to sans-serif, serif, and monospace, respectively. The I18N font processing
+          still uses the old logical names and aliases are used to map the new names to old ones. </p></section></refbody></reference>
+<reference id="reference_r2v_pdv_j2">
+    <title>SourceForge trackers</title>
+  <refbody>
+    <section>
+      <title>Feature requests</title>
+<ul>
+<li>3333697 Add strict mode processing (Milestone 1)</li>
+<li>3336630 Add resource file extension configuration (Milestone 1)</li>
+<li>3323776 Base HTML stylesheets (Milestone 1)</li>
+<li>3355860 Enable defining code ref target encoding (Milestone 1)</li>
+<li>3393969 Make default TocJS output more usable (Milestone 3)</li>
+<li>3394708 cfg/catalog.xml should be an extension point (Milestone 4)</li>
+<li>3411030 Add args.fo.userconfig to PDF2 (Milestone 5)</li>
+<li>3411961 Change margin-* to space-* property (Milestone 5)</li>
+<li>3412144 Add FOP specific shell to PDF2 (Milestone 5)</li>
+<li>3413215 Add schemas for PDF2 configuration files (Milestone 5)</li>
+<li>3414416 Support bookmap order in PDF2 front and back matter (Milestone 5)</li>
+<li>3413933 Fix inconsistencies in PDF2 page headers (Milestone 5)</li>
+<li>3418877 Mechanism to refer to other plug-ins in XSLT (Milestone 5)</li>
+<li>3411476 Add extension point for print type declaration (Milestone 6)</li>
+<li>3392891 Copy the graphic files to the temporary folder (Milestone 6)</li>
+<li>3429290 Remove unused Apache Commons Logging JAR (Milestone 6)</li>
+<li>3434640 Add XHTML NLS support for Indonesian, Malay, Kazakh (Milestone 6) </li>
+<li>3435528 Add base configuration file (Milestone 7)</li>
+<li>3432219 Refector dita.list read and write (Milestone 7)</li>
+<li>3401849 PDF2: runtime switch for localization post-processing (Milestone 7)</li>
+          <li>3438361 Add "tocjs" transform to demo script (Milestone 7)</li>
+<li>3341648 Clean HTML and XHTML stylesheets (Milestone 8)</li>
+<li>3343562 Java clean-up (Milestone 8)</li>
+<li>3346094 Improve test coverage (Milestone 8)</li>
+<li>3372147 Improve logging (Milestone 8)</li>
+<li>3373416 Refactor PDF attribute sets (Milestone 8)</li>
+<li>3376114 Improve PDF page layout configuration (Milestone 8)</li>
+<li>3415269 Support for more languages in the PDF transform (Milestone 8)</li>
+<li>3412211 Refactor PDF index stylesheet for XSL 1.1 support (Milestone 8)</li>
+<li>3425838 General PDF2 improvements (Milestone 8)</li>
+<li>3428152 General I18N improvements (Milestone 8)</li>
+<li>3429390 General XHTML improvements (Milestone 8)</li>
+<li>3438790 Clean up build_demo script (Milestone 8)</li>
+          <li>3440826 Dutch patch for feature request 3415269 (Milestone 8)</li>
+          <li>1785391 Make Java code thread-safe (in progress)</li>
+</ul>
+    </section>
+    <section>
+      <title>Patches</title>
+    <ul>
+<li>2963037 PDF changes to fix index rendering of colon (bug 2879196) (Milestone 7)</li>
+</ul>
+ </section>
+    <section>
+      <title>Bugs</title>
+    <ul>
+<li>2714699 FO plug-in doesn't support specialized index elements (Milestone 1)</li>
+<li>2848636 Duplicate key definitions should produce info messages (Milestone 1)</li>
+<li>3353955 Frontmatter child order is not retained in PDF2 (Milestone 1)</li>
+<li>3354301 XRef with conreffed phrases not properly generate HTML link (Milestone 1)</li>
+<li>3281074 Bad attribute being applied to fo:bookmark-title element (Milestone 2)</li>
+<li>3344142 Conref Push order of validation (Milestone 2)</li>
+<li>3358377 Cryptic error message when DITA Map has "bookmap" extension (Milestone 3)</li>
+<li>3384673 ODF transtype no longer embeds images in output (OT 1.5.3) (Milestone 3)</li>
+<li>3394000 TocJS needs cleanup for several minor bugs (Milestone 3)</li>
+<li>3392718 TOCJS sample should not require ant target (Milestone 3)</li>
+<li>3389277 DocBook transform redundantly nests Related Links (Milestone 3)</li>
+<li>3105339 '&lt;' and '>' characters in a title cause tocjs trouble (Milestone 3)</li>
+<li>3104497 tocjs JavaScripts don't work in Japanese environment (Milestone 3)</li>
+<li>3394130 Remove outdated developer documentation (Milestone 3)</li>
+<li>3397165 chunk on topichead not honored (Milestone 4)</li>
+<li>3397501 Custom reltable column headers are reversed (Milestone 4)</li>
+<li>3397495 Relcolspec with &lt;title> does not generate link group headers (Milestone 4)</li>
+<li>3399030 &lt;ph> Elements not flagged with alt-text in HTML output (Milestone 4)</li>
+<li>3396884 NPE in EclipseIndexWriter.java&lt;Merges,setLogger for AbstractIndexWriters (Milestone 4)</li>
+<li>3398004 -d64 flag to JVM not allowed for Windows JVMs (Milestone 4)</li>
+<li>3401323 Fix PDF nested variable handling (Milestone 4)</li>
+<li>3401721 Processing broken for &lt;topicsetref> elements (Milestone 4)</li>
+<li>3404049 Setting of clean_temp is backwards (Milestone 4)</li>
+<li>3386590 Product name repeated hundreds of times in PDF (Milestone 4)</li>
+<li>3405417 Shortdesc output twice when using abstract (Milestone 4)</li>
+<li>3402165 wrong image output dir if using generate.copy.outer=2 (Milestone 4)</li>
+<li>2837095 Positions of index and TOC in bookmaps are ignored (Milestone 5)</li>
+<li>3414826 DITA OT not handling image path with chunking turned on (Milestone 5)</li>
+<li>3411767 Not so meaningful messages given by ImgUtils (Milestone 5)</li>
+<li>3405851 Incorrect entry@colname in merged XML with row and colspan (Milestone 5)</li>
+<li>3406357 Custom profiling issue (Milestone 5)</li>
+<li>3413203 Remove references to OpenTopic in PDF2 (Milestone 5)</li>
+<li>3414270 @props specialization not used in map (Milestone 5)</li>
+<li>3383618 Attribute 'link-back' cannot occur at element 'fo:index-key (Milestone 5)</li>
+<li>3418953 Scale computation for XHTML uncorrectly looks up images (Milestone 6)</li>
+<li>3413229 onlytopic.in.map &amp; symlink (Milestone 6)</li>
+<li>3423537 Additional line breaks in &lt;menucascade> should be ignored (Milestone 6)</li>
+<li>3423672 Problems with refs to images outside the DITA Map directory (Milestone 6)</li>
+<li>2879663 indexterm/keyword causees NullPointerException (Milestone 7)</li>
+<li>2879196 Colon character in &lt;indexterm> causes nesting in output (Milestone 7)</li>
+<li>3179018 Indexterm with only nested subelement results in NPE (Milestone 7)</li>
+<li>3432267 Task example title processing incorrect for PDF (Milestone 7)</li>
+<li>3430302 Unitless images sizes in throw errors (Milestone 7)</li>
+<li>3429845 No variables for Warning (Milestone 7)</li>
+<li>3428871 topicmerge gives incomplete topicref when reference or topic (Milestone 7)</li>
+<li>3132976 Duplicate index text in index page (Milestone 7)</li>
+<li>2795649 Java topicmerge ignores xml:lang (Milestone 7)</li>
+<li>3431798 Relative CSS paths incorrectly computed for @copy-of (Milestone 7)</li>
+<li>3438421 Remove transtype default (Milestone 7)</li>
+<li>2866342 Nested see also is ignored (Milestone 8)</li>
+<li>1844429 PDF2: Non-DITA link broken unless marked external (Milestone 8)</li>
+<li>3270616 "lcTime" not displayed in PDF output (Milestone 8)</li>
+<li>3388668 Data in figure captions not suppressed in xrefs (Milestone 8)</li>
+<li>3429824 topicmerge gives wrong topicref with nested topics (Milestone 8)</li>
+<li>3414332 PDF2 variable string translations missing (Milestone 8)</li>
+<li>3323806 Improve Java logging and exception handling (Milestone 8)</li>
+<li>3426920 Image files not copied or referenced correctly for eclipse (Milestone 8)</li>
+<li>3445159 entry/@colname has been removed! (Milestone 8)</li>
+<li>3447732 Bug in handling of longdescref (Milestone 8)</li>
+<li>3452510  Ant parameter customization.dir not documented anywhere (Milestone 8)</li>
+<li>3451621 Revisions on &lt;plentry&gt; use wrong image for nested &lt;pd&gt; (Milestone 8)</li>
+</ul>
+</section>
+  </refbody>
+  </reference></reference>

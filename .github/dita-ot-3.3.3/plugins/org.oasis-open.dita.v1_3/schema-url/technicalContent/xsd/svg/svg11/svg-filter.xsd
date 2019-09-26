@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:include schemaLocation="svg-basic-filter.xsd"/>
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:complexType name="SVG.feConvolveMatrix.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feConvolveMatrix" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feConvolveMatrix.content">
+          <xs:attributeGroup ref="svg:attlist.feConvolveMatrix"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feConvolveMatrix">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="order" use="required" type="svg:NumberOptionalNumber.datatype"/>
+    <xs:attribute name="kernelMatrix" use="required"/>
+    <xs:attribute name="divisor" type="svg:Number.datatype"/>
+    <xs:attribute name="bias" type="svg:Number.datatype"/>
+    <xs:attribute name="targetX" type="svg:Integer.datatype"/>
+    <xs:attribute name="targetY" type="svg:Integer.datatype"/>
+    <xs:attribute name="edgeMode" default="duplicate">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="duplicate"/>
+          <xs:enumeration value="wrap"/>
+          <xs:enumeration value="none"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="kernelUnitLength" type="svg:NumberOptionalNumber.datatype"/>
+    <xs:attribute name="preserveAlpha" type="svg:Boolean.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feDiffuseLighting.content">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element ref="svg:feDistantLight"/>
+        <xs:element ref="svg:fePointLight"/>
+        <xs:element ref="svg:feSpotLight"/>
+      </xs:choice>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="svg:animate"/>
+        <xs:element ref="svg:set"/>
+        <xs:element ref="svg:animateColor"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="feDiffuseLighting" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feDiffuseLighting.content">
+          <xs:attributeGroup ref="svg:attlist.feDiffuseLighting"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feDiffuseLighting">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="SVG.Color.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="lighting-color" type="svg:SVGColor.datatype"/>
+    <xs:attribute name="surfaceScale" type="svg:Number.datatype"/>
+    <xs:attribute name="diffuseConstant" type="svg:Number.datatype"/>
+    <xs:attribute name="kernelUnitLength" type="svg:NumberOptionalNumber.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feDisplacementMap.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feDisplacementMap" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feDisplacementMap.content">
+          <xs:attributeGroup ref="svg:attlist.feDisplacementMap"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feDisplacementMap">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="in2" use="required"/>
+    <xs:attribute name="scale" type="svg:Number.datatype"/>
+    <xs:attribute name="xChannelSelector" default="A">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="R"/>
+          <xs:enumeration value="G"/>
+          <xs:enumeration value="B"/>
+          <xs:enumeration value="A"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="yChannelSelector" default="A">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="R"/>
+          <xs:enumeration value="G"/>
+          <xs:enumeration value="B"/>
+          <xs:enumeration value="A"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feMorphology.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feMorphology" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feMorphology.content">
+          <xs:attributeGroup ref="svg:attlist.feMorphology"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feMorphology">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="operator" default="erode">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="erode"/>
+          <xs:enumeration value="dilate"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="radius" type="svg:NumberOptionalNumber.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feSpecularLighting.content">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element ref="svg:feDistantLight"/>
+        <xs:element ref="svg:fePointLight"/>
+        <xs:element ref="svg:feSpotLight"/>
+      </xs:choice>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="svg:animate"/>
+        <xs:element ref="svg:set"/>
+        <xs:element ref="svg:animateColor"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="feSpecularLighting" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feSpecularLighting.content">
+          <xs:attributeGroup ref="svg:attlist.feSpecularLighting"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feSpecularLighting">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="SVG.Color.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="lighting-color" type="svg:SVGColor.datatype"/>
+    <xs:attribute name="surfaceScale" type="svg:Number.datatype"/>
+    <xs:attribute name="specularConstant" type="svg:Number.datatype"/>
+    <xs:attribute name="specularExponent" type="svg:Number.datatype"/>
+    <xs:attribute name="kernelUnitLength" type="svg:NumberOptionalNumber.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feTurbulence.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feTurbulence" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feTurbulence.content">
+          <xs:attributeGroup ref="svg:attlist.feTurbulence"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feTurbulence">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitive.attrib"/>
+    <xs:attribute name="baseFrequency" type="svg:NumberOptionalNumber.datatype"/>
+    <xs:attribute name="numOctaves" type="svg:Integer.datatype"/>
+    <xs:attribute name="seed" type="svg:Number.datatype"/>
+    <xs:attribute name="stitchTiles" default="noStitch">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="stitch"/>
+          <xs:enumeration value="noStitch"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" default="turbulence">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="fractalNoise"/>
+          <xs:enumeration value="turbulence"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feDistantLight.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feDistantLight">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feDistantLight.content">
+          <xs:attributeGroup ref="svg:attlist.feDistantLight"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feDistantLight">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attribute name="azimuth" type="svg:Number.datatype"/>
+    <xs:attribute name="elevation" type="svg:Number.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.fePointLight.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="fePointLight">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.fePointLight.content">
+          <xs:attributeGroup ref="svg:attlist.fePointLight"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.fePointLight">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attribute name="x" type="svg:Number.datatype"/>
+    <xs:attribute name="y" type="svg:Number.datatype"/>
+    <xs:attribute name="z" type="svg:Number.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feSpotLight.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feSpotLight">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feSpotLight.content">
+          <xs:attributeGroup ref="svg:attlist.feSpotLight"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feSpotLight">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attribute name="x" type="svg:Number.datatype"/>
+    <xs:attribute name="y" type="svg:Number.datatype"/>
+    <xs:attribute name="z" type="svg:Number.datatype"/>
+    <xs:attribute name="pointsAtX" type="svg:Number.datatype"/>
+    <xs:attribute name="pointsAtY" type="svg:Number.datatype"/>
+    <xs:attribute name="pointsAtZ" type="svg:Number.datatype"/>
+    <xs:attribute name="specularExponent" type="svg:Number.datatype"/>
+    <xs:attribute name="limitingConeAngle" type="svg:Number.datatype"/>
+  </xs:attributeGroup>
+</xs:schema>

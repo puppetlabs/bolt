@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:include schemaLocation="svg-basic-font.xsd"/>
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:element name="font-face-format">
+    <xs:complexType>
+      <xs:attributeGroup ref="svg:attlist.font-face-format"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.font-face-format">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attribute name="string"/>
+  </xs:attributeGroup>
+  <xs:element name="definition-src">
+    <xs:complexType>
+      <xs:attributeGroup ref="svg:attlist.definition-src"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.definition-src">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="xlink:SVG.XLinkRequired.attrib"/>
+  </xs:attributeGroup>
+</xs:schema>

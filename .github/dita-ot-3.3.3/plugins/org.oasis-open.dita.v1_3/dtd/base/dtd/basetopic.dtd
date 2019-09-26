@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!-- Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02     -->
+<!-- OASIS Standard                                           -->
+<!-- 16 January 2018                                           -->
+<!-- Copyright (c) OASIS Open 2018. All rights reserved.           -->
+<!-- Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html                                -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Topic Base (only base domains)               -->
+<!--  VERSION:   1.3                                               -->
+<!--  DATE:      March 2014                                        -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!-- Refer to this file by the following public identifier or an   -->
+<!--       appropriate system identifier                           -->
+<!--                                                               -->
+<!-- PUBLIC "-//OASIS//DTD DITA Base Topic//EN"                    -->
+<!-- The public ID above refers to the latest version of this DTD. -->
+<!--      To refer to this specific version, you may use this value: -->
+<!--                                                               -->
+<!-- PUBLIC "-//OASIS//DTD DITA 1.3 Base Topic//EN"                -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!-- PURPOSE:    DTD to describe Base DITA Topics                  -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             April 2010                                        -->
+<!--             (C) Copyright OASIS Open 2010, 2014               -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!-- UPDATES:                                                      -->
+<!--    2014.03.13 WEK: Updated for DITA 1.3, reimplemented as RNG -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--              TOPIC ENTITY DECLARATIONS                        -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--             DOMAIN CONSTRAINT INTEGRATION                     -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--             DOMAIN ENTITY DECLARATIONS                        -->
+<!-- ============================================================= -->
+
+<!ENTITY % hazard-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Hazard Statement Domain//EN"
+         "hazardstatementDomain.ent"
+>%hazard-d-dec;
+
+<!ENTITY % hi-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Highlight Domain//EN"
+         "highlightDomain.ent"
+>%hi-d-dec;
+
+<!ENTITY % indexing-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Indexing Domain//EN"
+         "indexingDomain.ent"
+>%indexing-d-dec;
+
+<!ENTITY % ut-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Utilities Domain//EN"
+         "utilitiesDomain.ent"
+>%ut-d-dec;
+
+<!-- ============================================================= -->
+<!--             DOMAIN ATTRIBUTES DECLARATIONS                    -->
+<!-- ============================================================= -->
+
+<!ENTITY % deliveryTargetAtt-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Delivery Target Attribute Domain//EN"
+         "deliveryTargetAttDomain.ent"
+>%deliveryTargetAtt-d-dec;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN EXTENSIONS                          -->
+<!-- ============================================================= -->
+<!--                    One for each extended base element, with
+                        the name of the domain(s) in which the
+                        extension was declared                     -->
+
+<!ENTITY % index-base   "index-base |
+                         %indexing-d-index-base;
+                        ">
+<!ENTITY % note         "note |
+                         %hazard-d-note;
+                        ">
+<!ENTITY % ph           "ph |
+                         %hi-d-ph;
+                        ">
+<!ENTITY % fig          "fig |
+                         %ut-d-fig;
+                        ">
+<!ENTITY % data         "data |
+                         %ut-d-data;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE EXTENSIONS                -->
+<!-- ============================================================= -->
+
+<!ENTITY % props-attribute-extensions
+  "%deliveryTargetAtt-d-attribute;"
+>
+<!ENTITY % base-attribute-extensions
+  ""
+>
+
+<!-- ============================================================= -->
+<!--                    TOPIC NESTING OVERRIDE                     -->
+<!-- ============================================================= -->
+
+<!ENTITY % topic-info-types
+              "topic"
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAINS ATTRIBUTE OVERRIDE                 -->
+<!-- ============================================================= -->
+
+<!ENTITY included-domains
+                          "&deliveryTargetAtt-d-att;
+                           &hazard-d-att;
+                           &hi-d-att;
+                           &indexing-d-att;
+                           &ut-d-att;
+  "
+>
+
+<!-- ============================================================= -->
+<!--                    CONTENT CONSTRAINT INTEGRATION             -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    TOPIC ELEMENT INTEGRATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY % topic-type
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Topic//EN"
+         "topic.mod"
+>%topic-type;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ELEMENT INTEGRATION                 -->
+<!-- ============================================================= -->
+
+<!ENTITY % hazard-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Hazard Statement Domain//EN"
+         "hazardstatementDomain.mod"
+>%hazard-d-def;
+
+<!ENTITY % hi-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Highlight Domain//EN"
+         "highlightDomain.mod"
+>%hi-d-def;
+
+<!ENTITY % indexing-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Indexing Domain//EN"
+         "indexingDomain.mod"
+>%indexing-d-def;
+
+<!ENTITY % ut-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Utilities Domain//EN"
+         "utilitiesDomain.mod"
+>%ut-d-def;
+
+<!-- ================= End of DITA Topic Base Shell (only base domains) ================= -->

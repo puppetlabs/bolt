@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+ 
+ Copyright 2007 Shawn McKenzie
+ *-->
+<?xml-stylesheet href="../../../../xsl/ditaview_shell.xsl" type="text/xsl"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN"
+ "../../../../dtd/concept.dtd">
+<concept id="tocjs_knownissues" xml:lang="en-us">
+ <title>Known Issues</title>
+ <conbody>
+  <p>The <filepath>topicref.xsl</filepath> file hard codes <codeph>contentwin</codeph> into the code
+  to display content. This matches the supplied <filepath>frameset.html</filepath> file, but does
+   not support passing in a <codeph>contenttarget</codeph> parameter from the ant task.</p>
+  
+ </conbody>
+</concept>

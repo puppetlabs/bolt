@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="plugin-dependencies" xml:lang="en-US">
+  <title>Plug-in dependencies</title>
+  <shortdesc>A DITA-OT plug-in can be dependent on other plug-ins. Prerequisite plug-ins are installed first, which
+    ensures that DITA-OT handles XSLT overrides correctly.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>require</xmlelement></indexterm>
+        <indexterm>plug-ins<indexterm>prerequisites</indexterm><indexterm>dependencies</indexterm><indexterm>order</indexterm><indexterm><xmlelement>require</xmlelement></indexterm></indexterm>
+        <indexterm>XSLT<index-see-also>plug-ins</index-see-also></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <draft-comment author="Kristen Eberlein" time="24 February 2016">
+      <p>I'm not entirely happy with this topic as it currently is, but want to move forward with the overall
+        rework.</p>
+      <p>The original topic was quite a mixture of task, concept, and reference. While it could have been reworked as a
+        task topic, it really was about working with a <filepath>plugin.xml</filepath> file, not using an extension
+        point.</p>
+      <p>I still wonder whether this topic would be better of as a reference topic in the reference section for the
+        topic cluster.</p>
+    </draft-comment>
+    <section>
+      <p>The <xmlelement>require</xmlelement> element in the <filepath>plugin.xml</filepath> file specifies whether the
+        plug-in has dependencies. Use <xmlelement>require</xmlelement> elements to specify prerequisite plug-ins, in
+        order from most general to most specific.</p>
+      <p>If a prerequisite plug-in is missing, DITA-OT prints a warning during installation. To suppress the warning but
+        keep the installation order if both plug-ins are present, add <codeph>importance="optional"</codeph> to the
+          <xmlelement>require</xmlelement> element. </p>
+      <!--<p>If the current plug-in requires a plug-in with <codeph>id="plugin-id"</codeph> before it can be installed, it would include the following: </p><codeblock>&lt;require plugin="<i>plugin-id</i>"></codeblock>-->
+      <p>If a plug-in can depend on any one of several optional plug-ins, separate the plug-in IDs with a vertical bar.
+        This is most useful when combined with <codeph>importance="optional"</codeph>.</p>
+    </section>
+    <example>
+      <title>Example: Plug-in with a prerequisite plug-in</title>
+      <p>The following plug-in will only be installed if the plug-in with the ID <codeph>com.example.primary</codeph> is
+        available. If that plug-in is not available, a warning is generated and the installation operation fails.</p>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="com.example.builds-on-primary">
+  &lt;!-- ... Extensions here -->
+  &lt;require plugin="com.example.primary"/>
+&lt;/plugin></codeblock>
+    </example>
+    <example>
+      <title>Example: Plug-in that has optional plug-ins</title>
+      <p>The following plug-in will only be installed if either the plug-in with the ID <codeph>pluginA</codeph> or the
+        plug-in with the ID <codeph>pluginB</codeph> is available. If neither of those plug-ins are installed, a warning
+        is generated but the installation operation is completed.</p>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="pluginC">
+  &lt;!-- ...extensions here -->
+  &lt;require plugin="pluginA|pluginB" importance="optional"/>
+&lt;/plugin></codeblock>
+      <draft-comment author="Kristen Eberlein" time="24 February 2016">
+        <p>We need to check this example against the toolkit. Text in the original topic was wrong, but I have not
+          tested this.</p>
+      </draft-comment>
+    </example>
+  </conbody>
+</concept>

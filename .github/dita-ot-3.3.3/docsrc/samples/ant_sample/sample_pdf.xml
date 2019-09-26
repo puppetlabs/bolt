@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<project name="sample_pdf" default="samples.pdf" basedir=".">
+
+  <property name="dita.dir" location="${basedir}/../../.."/>
+
+  <target name="samples.pdf" description="build the samples as PDF" depends="clean.samples.pdf">
+    <ant antfile="${dita.dir}/build.xml">
+      <property name="args.input" location="${dita.dir}/docsrc/samples/sequence.ditamap"/>
+      <property name="output.dir" location="${dita.dir}/out/samples/pdf"/>
+      <property name="transtype" value="pdf"/>
+    </ant>
+  </target>
+
+  <target name="clean.samples.pdf" description="remove the sample PDF output">
+    <delete dir="${dita.dir}/out/samples/pdf"/>
+  </target>
+
+</project>

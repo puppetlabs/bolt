@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Abbreviated Form Domain                      -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      October 2009                                         -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the elements and specialization         -->
+<!--             attributes for the Abbreviated Form Domain        -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             September 2009                                         -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2009.                    -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  
+  <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic abbrev-d)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation>
+      
+    </xs:documentation>
+  </xs:annotation>
+  
+  <xs:group name="abbrev-d-term">
+    <xs:choice>
+      <xs:element ref="abbreviated-form"/>
+    </xs:choice>
+  </xs:group>
+
+ <xs:group name="abbreviated-form">
+   <xs:sequence>
+     <xs:choice>
+       <xs:element ref="abbreviated-form"/>
+     </xs:choice>
+   </xs:sequence>
+ </xs:group>
+
+<xs:element name="abbreviated-form">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="abbreviated-form.class">
+          <xs:attribute ref="class" default="+ topic/term abbrev-d/abbreviated-form "/>          
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="abbreviated-form.class">
+    <xs:sequence>
+      <xs:group ref="abbreviated-form.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="abbreviated-form.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="abbreviated-form.content">
+    <xs:sequence></xs:sequence>
+    </xs:group>
+  
+  <xs:attributeGroup name="abbreviated-form.attributes">
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+
+
+
+</xs:schema>

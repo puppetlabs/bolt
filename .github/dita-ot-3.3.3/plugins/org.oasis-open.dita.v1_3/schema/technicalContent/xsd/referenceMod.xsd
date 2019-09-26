@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Reference                                   -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Reference//EN"               -->
+<!--      Delivered as file "reference.mod"                           -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for Reference                         -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2001                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2001, 2004.        -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2005.11.15 RDA: Removed old declaration for               -->
+<!--                   referenceClasses entity                   -->
+<!--   2005.11.15 RDA: Corrected LONG NAME for propdeschd        -->
+<!--   2006.06.07 RDA: Added <abstract> element                  -->
+<!--   2006.06.07 RDA: Make universal attributes universal       -->
+<!--                     (DITA 1.1 proposal #12)                 -->
+<!--   2006.11.30 RDA: Remove #FIXED from DITAArchVersion        -->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       -->
+<!--   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--   2008.05.06 RDA: Added refbodydiv                          -->
+<!--=============================================================-->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/"
+              schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.3"/>
+
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic reference)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+
+   <xs:group name="reference-info-types">
+      <xs:choice>
+         <xs:group ref="reference"/>
+         <xs:group ref="info-types"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="reference">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;reference&gt; element defines a top-level container for a reference topic. Reference topics document programming constructs or facts about a product. Examples of reference topics include language elements, class descriptions, commands, functions, statements, protocols, types, declarators, operands, and API information, which provide quick access to facts, but no explanation of concepts or procedures. Reference topics have the same high-level structure as any other topic type, with a title, short description, and body. Within the body, reference topics are typically organized into one or more sections, property lists, and tables. The reference topic type provides general rules that apply to all kinds of reference information, using elements like &lt;refsyn&gt; for syntax or signatures, and &lt;properties&gt; for lists of properties and values.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="reference.class">
+               <xs:attribute ref="class" default="- topic/topic       reference/reference "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="reference.class">
+      <xs:sequence>
+         <xs:group ref="reference.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="reference.attributes"/>
+   </xs:complexType>
+   <xs:group name="reference.content">
+      <xs:sequence>
+         <xs:group ref="title"/>
+         <xs:group ref="titlealts" minOccurs="0"/>
+         <xs:choice minOccurs="0">
+            <xs:group ref="abstract"/>
+            <xs:group ref="shortdesc"/>
+         </xs:choice>
+         <xs:group ref="prolog" minOccurs="0"/>
+         <xs:group ref="refbody" minOccurs="0"/>
+         <xs:group ref="related-links" minOccurs="0"/>
+         <xs:group ref="reference-info-types" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="reference.attributes">
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="refbody">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;refbody&gt; element is a container for the main content of the reference topic. Reference topics limit the body structure to tables (both simple and standard), property lists, syntax sections, and generic sections and examples, in any sequence or number.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="refbody.class">
+               <xs:attribute ref="class" default="- topic/body        reference/refbody "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="refbody.class">
+      <xs:sequence>
+         <xs:group ref="refbody.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="refbody.attributes"/>
+   </xs:complexType>
+   <xs:group name="refbody.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="example"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="refbodydiv"/>
+            <xs:group ref="refsyn"/>
+            <xs:group ref="properties"/>
+            <xs:group ref="section"/>
+            <xs:group ref="simpletable"/>
+            <xs:group ref="table"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="refbody.attributes">
+      <xs:attributeGroup ref="id-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="base" type="xs:string"/>
+      <xs:attributeGroup ref="base-attribute-extensions"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="refbodydiv">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;refbodydiv&gt; element is similar to the &lt;bodydiv&gt; element in that it provides an informal container for content that may be grouped within a reference. Reference topics place many restrictions on their content compared to generic topics; the &lt;refbodydiv&gt; element maintains these restrictions by only allowing elements that are already available within the body of a reference. There are no additional semantics attached to the &lt;refbodydiv&gt; element; it is purely a grouping element provided to help organize content. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="refbodydiv.class">
+               <xs:attribute ref="class" default="- topic/bodydiv     reference/refbodydiv "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="refbodydiv.class">
+      <xs:sequence>
+         <xs:group ref="refbodydiv.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="refbodydiv.attributes"/>
+   </xs:complexType>
+   <xs:group name="refbodydiv.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="example"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="refbodydiv"/>
+            <xs:group ref="refsyn"/>
+            <xs:group ref="properties"/>
+            <xs:group ref="section"/>
+            <xs:group ref="simpletable"/>
+            <xs:group ref="table"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="refbodydiv.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="refsyn">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;refsyn&gt; element is a special section inside a reference topic. The section often contains syntax or signature content (for example, a command-line utility's calling syntax, or an API's signature). The &lt;refsyn&gt; contains a brief, possibly diagrammatic description of the subject's interface or high-level structure.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="refsyn.class">
+               <xs:attribute ref="class" default="- topic/section     reference/refsyn "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="refsyn.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="refsyn.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="refsyn.attributes"/>
+   </xs:complexType>
+   <xs:group name="refsyn.content">
+      <xs:sequence>
+         <xs:group ref="section.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="refsyn.attributes">
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="properties">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;properties&gt; element gives a list of properties for the subject of the current topic, for example whether a class is public or protected. Each property can include the type, value, and a description. The typical rendering is usually in a table-like format. To represent multiple values for a type, just create additional property elements and use only the &lt;propvalue&gt; element (and &lt;propdesc&gt; when needed) for each successive value.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="properties.class">
+               <xs:attribute ref="class" default="- topic/simpletable reference/properties "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="properties.class">
+      <xs:sequence>
+         <xs:group ref="properties.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="properties.attributes"/>
+   </xs:complexType>
+   <xs:group name="properties.content">
+      <xs:sequence>
+         <xs:group ref="prophead" minOccurs="0"/>
+         <xs:group ref="property" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="properties.attributes">
+      <xs:attribute name="relcolwidth" type="xs:string"/>
+      <xs:attribute name="keycol" type="xs:NMTOKEN"/>
+      <xs:attribute name="refcols" type="xs:string"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="prophead">
+      <xs:annotation>
+         <xs:documentation>
+            The prophead element supports regular headings for the properties element.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="prophead.class">
+               <xs:attribute ref="class" default="- topic/sthead      reference/prophead "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="prophead.class">
+      <xs:sequence>
+         <xs:group ref="prophead.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="prophead.attributes"/>
+   </xs:complexType>
+   <xs:group name="prophead.content">
+      <xs:sequence>
+         <xs:group ref="proptypehd" minOccurs="0"/>
+         <xs:group ref="propvaluehd" minOccurs="0"/>
+         <xs:group ref="propdeschd" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="prophead.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="proptypehd">
+      <xs:annotation>
+         <xs:documentation>
+            The proptypehd element supports regular headings for the type column of a properties table.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="proptypehd.class">
+               <xs:attribute ref="class" default="- topic/stentry     reference/proptypehd "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="proptypehd.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="proptypehd.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="proptypehd.attributes"/>
+   </xs:complexType>
+   <xs:group name="proptypehd.content">
+      <xs:sequence>
+         <xs:group ref="tblcell.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="proptypehd.attributes">
+      <xs:attribute name="specentry" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="propvaluehd">
+      <xs:annotation>
+         <xs:documentation>
+            The propvaluehd element supports regular headings for the value column of a properties table.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="propvaluehd.class">
+               <xs:attribute ref="class" default="- topic/stentry     reference/propvaluehd "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="propvaluehd.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="propvaluehd.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="propvaluehd.attributes"/>
+   </xs:complexType>
+   <xs:group name="propvaluehd.content">
+      <xs:sequence>
+         <xs:group ref="tblcell.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="propvaluehd.attributes">
+      <xs:attribute name="specentry" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="propdeschd">
+      <xs:annotation>
+         <xs:documentation>
+            The propdeschd element supports regular headings for the description column of a properties table.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="propdeschd.class">
+               <xs:attribute ref="class" default="- topic/stentry     reference/propdeschd "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="propdeschd.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="propdeschd.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="propdeschd.attributes"/>
+   </xs:complexType>
+   <xs:group name="propdeschd.content">
+      <xs:sequence>
+         <xs:group ref="tblcell.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="propdeschd.attributes">
+      <xs:attribute name="specentry" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="property">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;property&gt; element represents a property of the current topic's subject. For example, if the current topic is a class, the property might show that the class is protected rather than public. It contains three optional elements: type, value, and description.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="property.class">
+               <xs:attribute ref="class" default="- topic/strow       reference/property "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="property.class">
+      <xs:sequence>
+         <xs:group ref="property.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="property.attributes"/>
+   </xs:complexType>
+   <xs:group name="property.content">
+      <xs:sequence>
+         <xs:group ref="proptype" minOccurs="0"/>
+         <xs:group ref="propvalue" minOccurs="0"/>
+         <xs:group ref="propdesc" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="property.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="proptype">
+      <xs:annotation>
+         <xs:documentation>
+            The proptype element describes the type of property.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="proptype.class">
+               <xs:attribute ref="class" default="- topic/stentry     reference/proptype "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="proptype.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="proptype.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="proptype.attributes"/>
+   </xs:complexType>
+   <xs:group name="proptype.content">
+      <xs:sequence>
+         <xs:group ref="ph.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="proptype.attributes">
+      <xs:attribute name="specentry" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="propvalue">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;propvalue&gt; element indicates the value or values for the current property type. You can put values in separate rows if they need separate descriptions, and just leave the &lt;proptype&gt; element blank.
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="propvalue.class">
+               <xs:attribute ref="class" default="- topic/stentry     reference/propvalue "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="propvalue.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="propvalue.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="propvalue.attributes"/>
+   </xs:complexType>
+   <xs:group name="propvalue.content">
+      <xs:sequence>
+         <xs:group ref="ph.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="propvalue.attributes">
+      <xs:attribute name="specentry" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="propdesc">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;propdesc&gt; element is used to provide a short description of the property type and its listed values (or just the value).
+    Category: Reference elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="propdesc.class">
+               <xs:attribute ref="class" default="- topic/stentry     reference/propdesc "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="propdesc.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="propdesc.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="propdesc.attributes"/>
+   </xs:complexType>
+   <xs:group name="propdesc.content">
+      <xs:sequence>
+         <xs:group ref="desc.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="propdesc.attributes">
+      <xs:attribute name="specentry" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

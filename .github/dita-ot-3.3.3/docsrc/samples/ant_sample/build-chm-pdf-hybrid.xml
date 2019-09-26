@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="build-chm-pdf-hybrid" default="all" basedir=".">
+  <description>An Ant build that calls the dita command</description>
+  <include file="dita-cmd.xml"/><!-- defines the <dita-cmd> macro -->
+  <target name="all" depends="pre,main,post"/>
+  <target name="pre">
+    <description>Preprocessing steps</description>
+  </target>
+  <target name="main">
+    <description>Build the CHM and PDF with the dita command</description>
+    <property name="absolute.path.base" location="../"/>
+    <dita-cmd input="${absolute.path.base}/sequence.ditamap" format="htmlhelp"
+              propertyfile="${absolute.path.base}/properties/chm.properties"/>
+    <dita-cmd input="${absolute.path.base}/taskbook.ditamap" format="pdf"
+              propertyfile="${absolute.path.base}/properties/pdf.properties"/>
+  </target>
+  <target name="post">
+    <description>Postprocessing steps</description>
+  </target>
+</project>

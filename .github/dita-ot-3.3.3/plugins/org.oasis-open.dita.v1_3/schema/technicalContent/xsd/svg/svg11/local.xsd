@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:include schemaLocation="svg-container-attrib.xsd"/>
+  <xs:include schemaLocation="svg-viewport-attrib.xsd"/>
+  <xs:include schemaLocation="svg-paint-attrib.xsd"/>
+  <xs:include schemaLocation="svg-opacity-attrib.xsd"/>
+  <xs:include schemaLocation="svg-graphics-attrib.xsd"/>
+  <xs:include schemaLocation="svg-docevents-attrib.xsd"/>
+  <xs:include schemaLocation="svg-graphevents-attrib.xsd"/>
+  <xs:include schemaLocation="svg-animevents-attrib.xsd"/>
+  <xs:include schemaLocation="svg-extresources-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg11.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+</xs:schema>

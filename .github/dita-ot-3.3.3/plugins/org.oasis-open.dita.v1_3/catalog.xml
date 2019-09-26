@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+   <nextCatalog catalog="dtd/catalog.xml"/>
+   <nextCatalog catalog="rng/catalog.xml"/>
+   <nextCatalog catalog="schema/catalog.xml"/>
+   <nextCatalog catalog="schema-url/catalog.xml"/>
+</catalog>

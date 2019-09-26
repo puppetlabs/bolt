@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<plugin id="org.dita.troff">
+  <extension-point id="dita.xsl.troff-ast" name="Troff AST XSLT import"/>
+  <extension-point id="dita.xsl.troff" name="Troff XSLT import"/>
+  <feature extension="dita.conductor.transtype.check" value="troff"/>
+  <feature extension="ant.import" file="build_dita2troff.xml"/>
+  <template file="xsl/dita2troff-ast-shell_template.xsl"/>
+  <template file="xsl/dita2troff-step2-shell_template.xsl"/>
+  <require plugin="org.dita.base" />
+</plugin>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="preprocess-conref" xml:lang="en-US">
+  <title>Resolve content references (conref)</title>
+  <shortdesc>The <codeph>conref</codeph> step resolves content references, processing only the DITA maps or topics that
+    use the <xmlatt>conref</xmlatt> attribute. This step is implemented in XSLT.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>fig</xmlelement></indexterm>
+        <indexterm><xmlelement>xref</xmlelement></indexterm>
+        <indexterm><xmlelement>section</xmlelement></indexterm>
+        <indexterm><xmlatt>conref</xmlatt><indexterm>resolving</indexterm></indexterm>
+        <indexterm><xmlatt>id</xmlatt><indexterm><xmlatt>conref</xmlatt> resolution</indexterm></indexterm>
+        <indexterm><xmlatt>xref</xmlatt></indexterm>
+        <indexterm>preprocessing<indexterm><codeph>conref</codeph></indexterm></indexterm>
+        <indexterm><codeph>conref</codeph></indexterm>
+        <indexterm>XSLT<indexterm><codeph>conref</codeph> step</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <p>The values of the <xmlatt>id</xmlatt> attribute on referenced content are changed as the elements are pulled
+        into the new locations. This ensures that the values of the <xmlatt>id</xmlatt> attribute within the referencing
+        topic remain unique.</p>
+      <p>If an element is pulled into a new context along with a cross reference that references the target, both the
+        values of the <xmlatt>id</xmlatt> and <xmlatt>xref</xmlatt> attributes are updated so that they remain valid in
+        the new location. For example, a referenced topic might include a section as in the following example: <fig>
+          <title>Referenced topic that contains a section and cross reference</title>
+          <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;topic id="referenced_topic">
+  &lt;title>...&lt;/title>
+  &lt;body>
+    &lt;section id="sect">
+      &lt;title>Sample section&lt;/title>
+      &lt;p>Figure &lt;xref href="#referenced_topic/fig"/> 
+        contains a code sample that demonstrates ... .&lt;/p>
+      &lt;fig id="fig">
+        &lt;title>Code sample&lt;/title>
+        &lt;codeblock>....&lt;/codeblock>
+      &lt;/fig>
+    &lt;/section>
+  &lt;/body>
+&lt;/topic></codeblock>
+        </fig></p>
+      <p>When the section is referenced using a <xmlatt>conref</xmlatt> attribute, the value of the <xmlatt>id</xmlatt>
+        attribute on the <xmlelement>fig</xmlelement> element is modified to ensure that it remains unique in the new
+        context. At the same time, the <xmlelement>xref</xmlelement> element is also modified so that it remains valid
+        as a local reference. For example, if the referencing topic has an <xmlatt>id</xmlatt> set to "new_topic", then
+        the conrefed element may look like this in the intermediate document <xmlelement>section</xmlelement>. <fig>
+          <title>Resolved conrefed <xmlelement>section</xmlelement> element after the conref step</title>
+          <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;section id="sect">
+  &lt;title>Sample section&lt;/title>
+  &lt;p>Figure &lt;xref href="#new_topic/d1e25"/> contains a code sample
+    that demonstrates ... .&lt;/p>
+  &lt;fig id="d1e25">
+    &lt;title>Code sample&lt;/title>
+    &lt;codeblock>....&lt;/codeblock>
+  &lt;/fig>
+&lt;/section></codeblock>
+        </fig></p>
+      <p>In this case, the value of the <xmlatt>id</xmlatt> attribute on the <xmlelement>fig</xmlelement> element has
+        been changed to a generated value of "d1e25". At the same time, the <xmlelement>xref</xmlelement> element has
+        been updated to use that new generated ID, so that the cross reference remains valid.</p>
+    </section>
+  </conbody>
+</concept>

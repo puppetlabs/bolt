@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file is part of the DITA learning and training content 
+     specialization working design. It is a work-in-progress by
+     the OASIS DITA learning and training content specialization 
+     sub-committee.-->
+<!--             (C) Copyright OASIS Open 2007, 2009                    -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA learningSummary XSD Group Definition         -->
+<!--  VERSION:   0.1                                               -->
+<!--  DATE:      May 2007                                          -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA Learning Base     -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             May 2007                                          -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+  <xs:group name="learningSummary">
+  	<xs:sequence>
+  	  <xs:element ref="learningSummary" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="learningSummarybody">
+  	<xs:sequence>
+  	  <xs:element ref="learningSummarybody" />
+  	</xs:sequence>
+  </xs:group>
+
+</xs:schema>

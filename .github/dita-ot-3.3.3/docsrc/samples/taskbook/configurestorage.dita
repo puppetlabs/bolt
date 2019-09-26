@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="configurestorage" xml:lang="en-us">
+  <title>Configuring hard storage devices</title>
+  <shortdesc>Most hard disks do not need any configuring. If they do, the instructions are relatively
+    simple.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>hard drive</indexterm>
+        <indexterm>configure</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>First check the documentation that came with your storage device. If the device requires configuring,
+      follow the steps below.</context>
+    <steps>
+      <step>
+        <cmd>If your system recognizes the device, it may be able to configure it without help. If so, do not try and
+          stop it.</cmd>
+      </step>
+      <step>
+        <cmd>Otherwise, your drive should come with software. Use this software to format and partition your
+          drive.</cmd>
+      </step>
+      <step>
+        <cmd>Once your drive is configured, restart the system. Just for fun. But be sure to remove any vendor software
+          from your system before doing so.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

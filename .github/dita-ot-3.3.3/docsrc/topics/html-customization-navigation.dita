@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="custom-html-navigation">
+  <title>Adding navigation to topics</title>
+  <titlealts>
+    <navtitle>Adding navigation</navtitle>
+  </titlealts>
+  <shortdesc>In HTML5 output, you can set a parameter to include table-of-contents navigation in the
+      <xmlelement>nav</xmlelement> element of each page. The navigation can be rendered in a sidebar or menu via
+    CSS.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>nav</xmlelement></indexterm>
+        <indexterm>HTML5<indexterm>navigation, adding</indexterm></indexterm>
+        <indexterm>transformations<indexterm>HTML5</indexterm></indexterm>
+        <indexterm>CSS<indexterm>adding custom</indexterm></indexterm>
+        <indexterm>nav-toc</indexterm>
+        <indexterm>HTML5<indexterm>nav-toc</indexterm></indexterm>
+        <indexterm>table of contents<indexterm>HTML5</indexterm></indexterm>
+        <indexterm>table of contents<indexterm>nav-toc</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>Earlier versions of DITA-OT used the TocJS transformation to render a JavaScript-based table of contents in an
+        XHTML frameset for topic navigation. While this approach is still supported for XHTML output, recent toolkit
+        versions provide a modern HTML5 navigation alternative.</p>
+      <p>As of DITA-OT 2.2, the <parmname>nav-toc</parmname> parameter can be used in HTML5 transformations to embed
+        navigation directly in topics using native HTML5 elements without JavaScript or framesets.</p></context>
+    <steps>
+      <step>
+        <cmd>Set the <parmname>nav-toc</parmname> parameter to one of the following options:</cmd>
+        <choices>
+          <choice>The <option>partial</option> option creates a table of contents with the portion of the navigation
+            hierarchy that contains the current topic (along with its parents, siblings and children).</choice>
+          <choice>The <option>full</option> option embeds the complete navigation for the entire map in each
+            topic.</choice>
+        </choices>
+      </step>
+      <step importance="optional">
+        <cmd>Add custom CSS rules to style the navigation.</cmd>
+        <info>
+          <p>For example, the DITA-OT documentation stylesheet includes the following rules to place the table of
+            contents on the left side of the browser viewport and highlight the current topic in bold:</p>
+          <p>
+            <codeblock outputclass="language-css normalize-space show-line-numbers show-whitespace"><coderef href="../resources/dita-ot-doc.css#token=nav-coderef,end-nav-ref"/></codeblock>
+          </p>
+        </info>
+      </step>
+    </steps>
+    <result>
+      <note type="tip">For an example of HTML output generated using this method, see the HTML5 version of the DITA-OT
+        documentation included in the installation folder under <filepath>doc/index.html</filepath>.</note>
+    </result>
+  </taskbody>
+</task>

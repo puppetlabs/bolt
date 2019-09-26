@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:complexType name="SVG.foreignObject.content" mixed="true">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:svg"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="foreignObject" substitutionGroup="svg:SVG.Extensibility.class"/>
+  <xs:attributeGroup name="attlist.foreignObject">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attributeGroup ref="SVG.GraphicalEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="x" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="y" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="width" use="required" type="svg:Length.datatype"/>
+    <xs:attribute name="height" use="required" type="svg:Length.datatype"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+  </xs:attributeGroup>
+  <xs:group name="foreignElement">
+    <xs:annotation>
+      <xs:documentation>
+      any element in foreign namespace
+    </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:any namespace="##other" processContents="strict"/>
+      <xs:any namespace="##local" processContents="strict"/>
+    </xs:choice>
+  </xs:group>
+</xs:schema>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2019 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<!-- Deprecated since 3.3: legacy support for catalog file in the root directory -->
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+
+  <nextCatalog catalog="plugins/org.dita.base/catalog-dita.xml"/>
+
+</catalog>

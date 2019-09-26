@@ -1,0 +1,1099 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" 
+  xmlns="http://relaxng.org/ns/structure/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Topic Module</moduleTitle>
+    <headerComment><![CDATA[
+=============================================================
+                   HEADER                                    
+=============================================================
+Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02
+OASIS Standard
+16 January 2018 
+Copyright (c) OASIS Open 2018. All rights reserved. 
+Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html
+
+============================================================
+ MODULE:    DITA DITA Topic                                  
+ VERSION:   1.3                                              
+ DATE:      March 2014                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Topic//EN"
+      Delivered as file "topic.mod"                               
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for the base Topic type               
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2001                                       
+                                                             
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2005.11.15 RDA: Corrected the public ID for tblDecl.mod   
+   2005.11.15 RDA: Removed old declaration for topicreftypes 
+                   entity                                    
+   2005.11.15 RDA: Corrected the PURPOSE in this comment     
+   2005.11.15 RDA: Corrected Long Names for alt, indextermref
+   2006.06.06 RDA: Bug fixes:                                
+                   Added xref and fn to fig.cnt              
+                   Remove xmlns="" from global-atts          
+   2006.06.06 RDA: Moved shared items to commonElements file 
+   2006.06.07 RDA: Added abstract> element                  
+   2006.06.07 RDA: Make universal attributes universal       
+                     (DITA 1.1 proposal #12)                 
+   2006.06.14 RDA: Add dir attribute to localization-atts    
+   2006.06.20 RDA: defn.cnt now explicitly sets its content  
+   2006.07.06 RDA: Moved class attributes in from topicAttr  
+   2006.11.30 RDA: Add -dita-use-conref-target to enumerated 
+                     attributes                              
+   2006.11.30 RDA: Remove #FIXED from DITAArchVersion        
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.01.28 RDA: Add draft-comment to body.cnt             
+   2008.01.28 RDA: Moved <metadata> defn. to metaDecl.mod    
+   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  
+   2008.02.12 RDA: Add ph to linktext, navtitle, searchtitle 
+   2008.02.12 RDA: Modify imbeds to use specific 1.2 version 
+   2008.02.12 RDA: Move navtitle to commonElements.mod       
+   2008.02.13 RDA: Add bodydiv and sectiondiv                
+   2008.02.13 RDA: Create .content and .attributes entities  
+   2008.05.06 RDA: Moved sectiondiv to section.cnt; created  
+                   example.cnt for use by example element    
+=============================================================
+]]></headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>topic</moduleShortName>
+      <modulePublicIds>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Topic//EN</dtdEnt>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Topic//EN</dtdMod>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:topicMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:xsd:topicGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:rnc:topicMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:topicMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>ARCHITECTURE ATTRIBUTES</a:documentation>
+    <define name="arch-atts">
+      <optional>
+        <attribute name="dita:DITAArchVersion" a:defaultValue="1.3"/>
+      </optional>
+    </define>
+  </div>
+  <div>
+    <a:documentation>INFO TYPES PATTERNS</a:documentation>
+    <define name="topic-info-types">
+      <ref name="info-types"/>
+    </define>
+    <define name="info-types">
+      <ref name="topic.element"/>
+    </define>         
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+
+    <define name="abstract">
+      <ref name="abstract.element"/>
+    </define>
+    <define name="body">
+      <ref name="body.element"/>
+    </define>
+    <define name="bodydiv">
+      <ref name="bodydiv.element"/>
+    </define>
+    <define name="example">
+      <ref name="example.element"/>
+    </define>
+    <define name="link">
+      <ref name="link.element"/>
+    </define>
+    <define name="linkinfo">
+      <ref name="linkinfo.element"/>
+    </define>
+    <define name="linklist">
+      <ref name="linklist.element"/>
+    </define>
+    <define name="linkpool">
+      <ref name="linkpool.element"/>
+    </define>
+    <define name="linktext">
+      <ref name="linktext.element"/>
+    </define>
+    <define name="prolog">
+      <ref name="prolog.element"/>
+    </define>
+    <define name="related-links">
+      <ref name="related-links.element"/>
+    </define>
+    <define name="searchtitle">
+      <ref name="searchtitle.element"/>
+    </define>
+    <define name="section">
+      <ref name="section.element"/>
+    </define>
+    <define name="sectiondiv">
+      <ref name="sectiondiv.element"/>
+    </define>
+    <define name="shortdesc">
+      <ref name="shortdesc.element"/>
+    </define>
+    <define name="titlealts">
+      <ref name="titlealts.element"/>
+    </define>
+
+
+  </div>
+  <div>
+    <a:documentation>COMMON CONTENT MODEL PATTERNS</a:documentation>
+
+    <include href="commonElementsMod.rng">
+      <a:documentation>Content elements common to map and topic</a:documentation>
+    </include>
+    <include href="metaDeclMod.rng">
+      <a:documentation>MetaData Elements, plus indexterm</a:documentation>
+    </include>
+
+    <define name="abstract.cnt">
+      <choice>
+        <text/>
+        <ref name="basic.block"/>
+        <ref name="basic.ph"/>
+        <ref name="data.elements.incl"/>
+        <ref name="foreign.unknown.incl"/>
+        <ref name="shortdesc"/>
+        <ref name="txt.incl"/>
+      </choice>
+    </define>
+    <define name="body.cnt">
+      <choice>
+        <ref name="basic.block"/>
+        <ref name="data.elements.incl"/>
+        <ref name="draft-comment"/>
+        <ref name="foreign.unknown.incl"/>
+        <ref name="required-cleanup"/>
+      </choice>
+    </define>
+    <define name="bodydiv.cnt">
+      <a:documentation>bodydiv also includes bodydiv and section</a:documentation>
+      <choice>
+        <text/>
+        <ref name="basic.block"/>
+        <ref name="basic.ph"/>
+        <ref name="data.elements.incl"/>
+        <ref name="foreign.unknown.incl"/>
+        <ref name="txt.incl"/>
+      </choice>
+    </define>
+    <define name="example.cnt">
+      <choice>
+        <text/>
+        <ref name="basic.block"/>
+        <ref name="basic.ph"/>
+        <ref name="data.elements.incl"/>
+        <ref name="foreign.unknown.incl"/>
+        <ref name="title"/>
+        <ref name="txt.incl"/>
+      </choice>
+    </define>
+    <define name="section.cnt">
+      <choice>
+        <text/>
+        <ref name="basic.block"/>
+        <ref name="basic.ph"/>
+        <ref name="data.elements.incl"/>
+        <ref name="foreign.unknown.incl"/>
+        <ref name="sectiondiv"/>
+        <ref name="title"/>
+        <ref name="txt.incl"/>
+      </choice>
+    </define>
+    <define name="section.notitle.cnt">
+      <choice>
+        <text/>
+        <ref name="basic.block"/>
+        <ref name="basic.ph"/>
+        <ref name="data.elements.incl"/>
+        <ref name="foreign.unknown.incl"/>
+        <ref name="sectiondiv"/>
+        <ref name="txt.incl"/>
+      </choice>
+    </define>
+    <define name="sectiondiv.cnt">
+      <a:documentation>sectiondiv also includes sectiondiv</a:documentation>
+      <choice>
+        <text/>
+        <ref name="basic.block"/>
+        <ref name="basic.ph"/>
+        <ref name="data.elements.incl"/>
+        <ref name="foreign.unknown.incl"/>
+        <ref name="txt.incl"/>
+      </choice>
+    </define>
+    <define name="relational-atts">
+      <optional>
+        <attribute name="type"/>
+      </optional>
+      <optional>
+        <attribute name="cascade" dita:since="1.3"/>
+      </optional>
+      <optional>
+        <attribute name="format"/>
+      </optional>
+      <optional>
+        <attribute name="scope">
+          <choice>
+            <value>external</value>
+            <value>local</value>
+            <value>peer</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="role">
+          <choice>
+            <value>ancestor</value>
+            <value>child</value>
+            <value>cousin</value>
+            <value>descendant</value>
+            <value>external</value>
+            <value>friend</value>
+            <value>next</value>
+            <value>other</value>
+            <value>parent</value>
+            <value>previous</value>
+            <value>sample</value>
+            <value>sibling</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="otherrole"/>
+      </optional>
+    </define>
+    <define name="rel-atts">
+      <a:documentation>rel-atts is deprecated as of DITA 1.2, retained for backward compatibility.</a:documentation>
+      <optional>
+        <attribute name="type"/>
+      </optional>
+      <optional>
+        <attribute name="role">
+          <choice>
+            <value>ancestor</value>
+            <value>child</value>
+            <value>cousin</value>
+            <value>descendant</value>
+            <value>external</value>
+            <value>friend</value>
+            <value>next</value>
+            <value>other</value>
+            <value>parent</value>
+            <value>previous</value>
+            <value>sample</value>
+            <value>sibling</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="otherrole"/>
+      </optional>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation>LONG NAME: Topic</a:documentation>
+      <define name="topic.content">
+        <ref name="title"/>
+        <optional>
+          <ref name="titlealts"/>
+        </optional>
+        <optional>
+          <choice>
+            <ref name="shortdesc"/>
+            <ref name="abstract"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <optional>
+          <ref name="body"/>
+        </optional>
+        <optional>
+          <ref name="related-links"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="topic-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="topic.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="topic.element">
+        <element name="topic" dita:longName="Topic">
+          <a:documentation>The &lt;topic> element is the top-level DITA element for a single-subject topic or article. Other top-level DITA elements that are more content-specific are &lt;concept>,
+            &lt;task>, &lt;reference>, and &lt;glossary>. Category: Topic elements</a:documentation>
+          <ref name="topic.attlist"/>
+          <ref name="topic.content"/>
+        </element>
+      </define>
+      <define name="topic.attlist" combine="interleave">
+        <ref name="topic.attributes"/>
+        <ref name="arch-atts"/>
+        <ref name="domains-att"/>
+      </define>
+      <define name="idElements" combine="choice">
+        <ref name="topic.element"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Title Alternatives</a:documentation>
+
+      <define name="titlealts.content">
+        <optional>
+          <ref name="navtitle"/>
+        </optional>
+        <optional>
+          <ref name="searchtitle"/>
+        </optional>
+      </define>
+      <define name="titlealts.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="titlealts.element">
+        <element name="titlealts" dita:longName="Title Alternatives">
+          <a:documentation>The alternate title element (&lt;titlealts>) is optional, but can occur after the topic title. Two elements can be inserted as sub-elements of &lt;titlealts>: navigation
+            title &lt;navtitle> and search title &lt;searchtitle>. Category: Topic elements</a:documentation>
+          <ref name="titlealts.attlist"/>
+          <ref name="titlealts.content"/>
+        </element>
+      </define>
+      <define name="titlealts.attlist" combine="interleave">
+        <ref name="titlealts.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Search Title</a:documentation>
+
+      <define name="searchtitle.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="words.cnt"/>
+            <ref name="ph"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="searchtitle.attributes">
+        <optional dita:since="DITA 1.3">
+          <attribute name="outputclass"/>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <define name="searchtitle.element">
+        <element name="searchtitle" dita:longName="Search Title">
+          <a:documentation>When your DITA topic is transformed to XHTML, the &lt;searchtitle> element is used to create a title element at the top of the resulting HTML file. This title is normally
+            used in search result summaries by some search engines, such as that in Eclipse (http://eclipse.org); if not set, the XHTML's title element defaults to the source topic's title content
+            (which may not be as well optimized for search summaries) Category: Topic elements</a:documentation>
+          <ref name="searchtitle.attlist"/>
+          <ref name="searchtitle.content"/>
+        </element>
+      </define>
+      <define name="searchtitle.attlist" combine="interleave">
+        <ref name="searchtitle.attributes"/>
+      </define>
+
+    </div>
+      <div>
+        <a:documentation>LONG NAME: Short Description</a:documentation>
+        <define name="shortdesc.content">
+          <zeroOrMore>
+            <choice>
+              <ref name="title.cnt"/>
+              <ref name="xref" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="shortdesc.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="shortdesc.element">
+          <element name="shortdesc" dita:longName="Short Description">
+            <a:documentation>The short description (&lt;shortdesc>) element occurs between the topic title and the topic body, as the initial paragraph-like content of a topic, or it can be embedded
+              in an abstract element. The short description, which represents the purpose or theme of the topic, is also intended to be used as a link preview and for searching. When used within a
+              DITA map, the short description of the &lt;topicref> can be used to override the short description in the topic. Category: Topic elements</a:documentation>
+            <ref name="shortdesc.attlist"/>
+            <ref name="shortdesc.content"/>
+          </element>
+        </define>
+        <define name="shortdesc.attlist" combine="interleave">
+          <ref name="shortdesc.attributes"/>
+        </define>
+
+      </div>
+    <div>
+      <a:documentation>LONG NAME: Abstract</a:documentation>
+
+      <define name="abstract.content">
+        <zeroOrMore>
+          <ref name="abstract.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="abstract.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="abstract.element">
+        <element name="abstract" dita:longName="Abstract">
+          <a:documentation>The abstract element occurs between the topic title and the topic body, as the initial content of a topic. It can contain paragraph-level content as well as one or more
+            shortdesc elements which can be used for providing link previews or summaries. The &lt;abstract> element cannot be overridden by maps, but its contained &lt;shortdesc> elements can be, for
+            the purpose of creating link summaries or previews. Category: Topic elements</a:documentation>
+          <ref name="abstract.attlist"/>
+          <ref name="abstract.content"/>
+        </element>
+      </define>
+      <define name="abstract.attlist" combine="interleave">
+        <ref name="abstract.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Body</a:documentation>
+
+      <define name="body.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="body.cnt"/>
+            <ref name="bodydiv"/>
+            <ref name="example"/>
+            <ref name="section"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="body.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="body.element">
+        <element name="body" dita:longName="Body">
+          <a:documentation>The &lt;body> element is the container for the main content of a &lt;topic>. Category: Topic elements</a:documentation>
+          <ref name="body.attlist"/>
+          <ref name="body.content"/>
+        </element>
+      </define>
+      <define name="body.attlist" combine="interleave">
+        <ref name="body.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Body division</a:documentation>
+
+      <define name="bodydiv.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="bodydiv.cnt"/>
+            <ref name="bodydiv"/>
+            <ref name="section"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="bodydiv.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="bodydiv.element">
+        <element name="bodydiv" dita:longName="Body division">
+          <a:documentation>The &lt;bodydiv> element is used to contain informal blocks of information within the body of a topic. The bodydiv element is specifically designed to be a grouping element,
+            without any explicit semantics, other than to organize subsets of content into logical groups that are not intended or should not be contained as a topic. As such, it does not contain an
+            explicit title to avoid enabling the creation of deeply nested content that would otherwise be written as separate topics. Content that requires a title should use a section element or a
+            nested topic.</a:documentation>
+          <ref name="bodydiv.attlist"/>
+          <ref name="bodydiv.content"/>
+        </element>
+      </define>
+      <define name="bodydiv.attlist" combine="interleave">
+        <ref name="bodydiv.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: No Topic nesting</a:documentation>
+
+      <define name="no-topic-nesting.content">
+        <empty/>
+      </define>
+      <define name="no-topic-nesting.attributes">
+        <empty/>
+      </define>
+      <define name="no-topic-nesting.element">
+        <element name="no-topic-nesting" dita:longName="No Topic nesting">
+          <a:documentation>The &lt;no-topic-nesting> element is a placeholder in the DITA architecture. It is not actually used by the default DITA document types; it is for use only when creating a
+            validly customized document type where the information designer wants to eliminate the ability to nest topics. Not intended for use by authors, and has no associated output processing.
+            Category: Specialization elements</a:documentation>
+          <ref name="no-topic-nesting.attlist"/>
+          <ref name="no-topic-nesting.content"/>
+        </element>
+      </define>
+      <define name="no-topic-nesting.attlist" combine="interleave">
+        <ref name="no-topic-nesting.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Section</a:documentation>
+
+      <define name="section.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="section.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="section.element">
+        <element name="section" dita:longName="Section">
+          <a:documentation>The &lt;section> element represents an organizational division in a topic. Sections are used to organize subsets of information that are directly related to the topic. For
+            example, the titles Reference Syntax, Example and Properties might represent section-level discourse within a topic about a command-line process—the content in each section relates
+            uniquely to the subject of that topic. Multiple sections within a single topic do not represent a hierarchy, but rather peer divisions of that topic. Sections cannot be nested. A section
+            may have an optional title. Category: Topic elements</a:documentation>
+          <ref name="section.attlist"/>
+          <ref name="section.content"/>
+        </element>
+      </define>
+      <define name="section.attlist" combine="interleave">
+        <ref name="section.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Section division</a:documentation>
+
+      <define name="sectiondiv.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="sectiondiv.cnt"/>
+            <ref name="sectiondiv"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="sectiondiv.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="sectiondiv.element">
+        <element name="sectiondiv" dita:longName="Section division">
+          <a:documentation>The &lt;sectiondiv> element allows logical grouping of content within a section. There is no additional semantic associated with the sectiondiv element, aside from its
+            function as a container for other content. The sectiondiv element does not contain a title; the lowest level of titled content within a topic is the section itself. If additional hierarchy
+            is required, nested topics should be used in place of the section.</a:documentation>
+          <ref name="sectiondiv.attlist"/>
+          <ref name="sectiondiv.content"/>
+        </element>
+      </define>
+      <define name="sectiondiv.attlist" combine="interleave">
+        <ref name="sectiondiv.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Example</a:documentation>
+
+      <define name="example.content">
+        <zeroOrMore>
+          <ref name="example.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="example.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="example.element">
+        <element name="example" dita:longName="Example">
+          <a:documentation>The &lt;example> element is a section with the specific role of containing examples that illustrate or support the current topic. The &lt;example> element has the same
+            content model as &lt;section>. Category: Topic elements</a:documentation>
+          <ref name="example.attlist"/>
+          <ref name="example.content"/>
+        </element>
+      </define>
+      <define name="example.attlist" combine="interleave">
+        <ref name="example.attributes"/>
+      </define>
+
+
+    </div>
+    <div>
+      <a:documentation>PROLOG (METADATA FOR TOPICS)</a:documentation>
+      <div>
+        <a:documentation>LONG NAME: Prolog</a:documentation>
+
+        <define name="prolog.content">
+          <zeroOrMore>
+            <ref name="author"/>
+          </zeroOrMore>
+          <optional>
+            <ref name="source"/>
+          </optional>
+          <optional>
+            <ref name="publisher"/>
+          </optional>
+          <zeroOrMore>
+            <ref name="copyright"/>
+          </zeroOrMore>
+          <optional>
+            <ref name="critdates"/>
+          </optional>
+          <optional>
+            <ref name="permissions"/>
+          </optional>
+          <zeroOrMore>
+            <ref name="metadata"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <ref name="resourceid"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <choice>
+              <ref name="data.elements.incl"/>
+              <ref name="foreign.unknown.incl"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="prolog.attributes">
+          <ref name="univ-atts"/>
+        </define>
+        <define name="prolog.element">
+          <element name="prolog" dita:longName="prolog">
+            <a:documentation>The &lt;prolog> element contains information about the topic as an whole (for example, author information or subject category) that is either entered by the author or
+              machine-maintained. Much of the metadata inside the &lt;prolog> will not be displayed with the topic on output, but may be used by processes that generate search indexes or customize
+              navigation. Category: Prolog elements</a:documentation>
+            <ref name="prolog.attlist"/>
+            <ref name="prolog.content"/>
+          </element>
+        </define>
+        <define name="prolog.attlist" combine="interleave">
+          <ref name="prolog.attributes"/>
+        </define>
+      </div>
+    </div>
+    <div>
+      <a:documentation>LINKING GROUPING</a:documentation>
+      <div>
+        <a:documentation>LONG NAME: Related Links</a:documentation>
+
+        <define name="related-links.content">
+          <zeroOrMore>
+            <choice>
+              <ref name="link"/>
+              <ref name="linklist"/>
+              <ref name="linkpool"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="related-links.attributes">
+          <ref name="relational-atts"/>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="related-links.element">
+          <element name="related-links" dita:longName="related-links">
+            <a:documentation>The related information links of a topic (&lt;related-links> element) are stored in a special section following the body of the topic. After a topic is processed into it
+              final output form, the related links are usually displayed at the end of the topic, although some Web-based help systems might display them in a separate navigation frame. Category:
+              Topic elements</a:documentation>
+            <ref name="related-links.attlist"/>
+            <ref name="related-links.content"/>
+          </element>
+        </define>
+        <define name="related-links.attlist" combine="interleave">
+          <ref name="related-links.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Link</a:documentation>
+
+        <define name="link.content">
+          <optional>
+            <ref name="linktext"/>
+          </optional>
+          <optional>
+            <ref name="desc"/>
+          </optional>
+        </define>
+        <define name="link.attributes">
+          <optional>
+            <attribute name="href"/>
+          </optional>
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <optional>
+            <attribute name="query"/>
+          </optional>
+          <ref name="relational-atts"/>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="link.element">
+          <element name="link" dita:longName="link">
+            <a:documentation>The &lt;link> element defines a relationship to another topic. Links represent the types and roles of topics in a web of information, and therefore represent navigational
+              links within that web. Links are typically sorted on output based on their attributes. The optional container elements for link (&lt;linkpool> and &lt;linklist>) allow authors to define
+              groups with common attributes, or to preserve the authored sequence of links on output. Links placed in a &lt;linkpool> may be rearranged for display purposes (combined with other local
+              or map-based links); links in a &lt;linklist> should be displayed in the order they are defined. Refer to those elements for additional explanation. Category: Related Links
+              elements</a:documentation>
+            <ref name="link.attlist"/>
+            <ref name="link.content"/>
+          </element>
+        </define>
+        <define name="link.attlist" combine="interleave">
+          <ref name="link.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Link Text</a:documentation>
+
+        <define name="linktext.content">
+          <zeroOrMore>
+            <choice>
+              <ref name="words.cnt"/>
+              <ref name="ph"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="linktext.attributes">
+          <ref name="univ-atts"/>
+        </define>
+        <define name="linktext.element">
+          <element name="linktext" dita:longName="linktext">
+            <a:documentation>The &lt;linktext> element provides the literal label or line of text for a link. In most cases, the text of a link can be resolved during processing by cross reference
+              with the target resource. Use the &lt;linktext> element only when the target cannot be reached, such as when it is a peer or external link, or the target is local but not in DITA format.
+              When used inside a topic, it will be used as the text for the specified link; when used within a map, it will be used as the text for generated links that point to the specified topic.
+              Category: Related Links elements</a:documentation>
+            <ref name="linktext.attlist"/>
+            <ref name="linktext.content"/>
+          </element>
+        </define>
+        <define name="linktext.attlist" combine="interleave">
+          <ref name="linktext.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Link List</a:documentation>
+
+        <define name="linklist.content">
+          <optional>
+            <ref name="title"/>
+          </optional>
+          <optional>
+            <ref name="desc"/>
+          </optional>
+          <zeroOrMore>
+            <choice>
+              <ref name="linklist"/>
+              <ref name="link"/>
+            </choice>
+          </zeroOrMore>
+          <optional>
+            <ref name="linkinfo"/>
+          </optional>
+        </define>
+        <define name="linklist.attributes">
+          <optional>
+            <attribute name="collection-type">
+              <choice>
+                <value>choice</value>
+                <value>family</value>
+                <value>sequence</value>
+                <value>unordered</value>
+                <value>-dita-use-conref-target</value>
+                <a:documentation>NOTE: The TC is maintaining the value "tree", which was
+                  in the 1.2 DTDs but never defined for documented, only in the DTD version
+                  of linklist.</a:documentation>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="duplicates">
+              <choice>
+                <value>no</value>
+                <value>yes</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="mapkeyref"/>
+          </optional>
+          <ref name="relational-atts"/>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="spectitle"/>
+          </optional>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="linklist.element">
+          <element name="linklist" dita:longName="linklist">
+            <a:documentation>The &lt;linklist> element defines an author-arranged group of links. Within &lt;linklist>, the organization of links on final output is in the same order as originally
+              authored in the DITA topic. Category: Related Links elements</a:documentation>
+            <ref name="linklist.attlist"/>
+            <ref name="linklist.content"/>
+          </element>
+        </define>
+        <define name="linklist.attlist" combine="interleave">
+          <ref name="linklist.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Link Information</a:documentation>
+
+        <define name="linkinfo.content">
+          <zeroOrMore>
+            <ref name="desc.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="linkinfo.attributes">
+          <ref name="univ-atts"/>
+        </define>
+        <define name="linkinfo.element">
+          <element name="linkinfo" dita:longName="linkinfo">
+            <a:documentation>The &lt;linkinfo> element allows you to place a descriptive paragraph following a list of links in a &lt;linklist> element. Category: Related Links
+              elements</a:documentation>
+            <ref name="linkinfo.attlist"/>
+            <ref name="linkinfo.content"/>
+          </element>
+        </define>
+        <define name="linkinfo.attlist" combine="interleave">
+          <ref name="linkinfo.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Link Pool</a:documentation>
+
+        <define name="linkpool.content">
+          <zeroOrMore>
+            <choice>
+              <ref name="linkpool"/>
+              <ref name="link"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="linkpool.attributes">
+          <optional>
+            <attribute name="collection-type">
+              <choice>
+                <value>choice</value>
+                <value>family</value>
+                <value>sequence</value>
+                <value>unordered</value>
+                <value>-dita-use-conref-target</value>
+                <a:documentation>NOTE: The TC is maintaining the value "tree", which was
+                  in the 1.2 DTDs but never defined for documented, only in the DTD version
+                  of linkpool.</a:documentation>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="duplicates">
+              <choice>
+                <value>no</value>
+                <value>yes</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="mapkeyref"/>
+          </optional>
+          <ref name="relational-atts"/>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="linkpool.element">
+          <element name="linkpool" dita:longName="linkpool">
+            <a:documentation>The &lt;linkpool> element defines a group of links that have common characteristics, such as type or audience or source. When links are not in a &lt;linklist> (that is,
+              they are in &lt;related-links> or &lt;linkpool> elements), the organization of links on final output is determined by the output process, not by the order that the links actually occur
+              in the DITA topic. Category: Related Links elements</a:documentation>
+            <ref name="linkpool.attlist"/>
+            <ref name="linkpool.content"/>
+          </element>
+        </define>
+        <define name="linkpool.attlist" combine="interleave">
+          <ref name="linkpool.attributes"/>
+        </define>
+      </div>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTES</a:documentation>
+    <define name="abstract.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/abstract "/>
+      </optional>
+    </define>
+    <define name="body.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/body "/>
+      </optional>
+    </define>
+    <define name="bodydiv.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/bodydiv "/>
+      </optional>
+    </define>
+    <define name="example.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/example "/>
+      </optional>
+    </define>
+    <define name="link.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/link "/>
+      </optional>
+    </define>
+    <define name="linkinfo.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/linkinfo "/>
+      </optional>
+    </define>
+    <define name="linklist.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/linklist "/>
+      </optional>
+    </define>
+    <define name="linkpool.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/linkpool "/>
+      </optional>
+    </define>
+    <define name="linktext.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/linktext "/>
+      </optional>
+    </define>
+    <define name="no-topic-nesting.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/no-topic-nesting "/>
+      </optional>
+    </define>
+    <define name="prolog.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/prolog "/>
+      </optional>
+    </define>
+    <define name="related-links.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/related-links "/>
+      </optional>
+    </define>
+    <define name="searchtitle.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/searchtitle "/>
+      </optional>
+    </define>
+    <define name="section.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section "/>
+      </optional>
+    </define>
+    <define name="sectiondiv.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/sectiondiv "/>
+      </optional>
+    </define>
+    <define name="titlealts.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/titlealts "/>
+      </optional>
+    </define>
+    <define name="topic.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic "/>
+      </optional>
+    </define>
+    <define name="shortdesc.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/shortdesc "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

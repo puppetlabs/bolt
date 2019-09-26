@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="plugin-configfile" xml:lang="en-US">
+  <title>Plug-in descriptor file</title>
+  <shortdesc>The plug-in descriptor file (<filepath>plugin.xml</filepath>) controls all aspects of a plug-in, making
+    each extension visible to the rest of the toolkit. The file uses pre-defined extension points to locate changes, and
+    then integrates those changes into the core DITA-OT code.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins<indexterm>identfiers</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm><filepath>plugin.xml</filepath></indexterm></indexterm>
+        <indexterm>metadata<indexterm>plug-in</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section conkeyref="reusable-components/validating-plugins"/>
+    <section>
+      <title>Plug-in identifiers</title>
+      <div outputclass="div-index">
+        <indexterm><xmlatt>id</xmlatt><indexterm>plug-in</indexterm></indexterm>
+      </div>
+      <p>Every DITA-OT plug-in must have a unique identifier composed of one or more dot-delimited tokens, for example,
+          <codeph>com.example.rss</codeph>. This identifier is used to identify the plug-in to the toolkit for
+        installation, processing, and when determining plug-in dependencies.</p>
+      <note>The default DITA-OT plug-ins use a reverse domain naming convention, as in <codeph>org.dita.html5</codeph>;
+        this is strongly recommended to avoid plug-in naming conflicts.</note>
+      <p id="tokendef">Each token can include only the following characters:
+        <ul>
+          <li>Lower-case letters (a-z)</li>
+          <li>Upper-case letters (A-Z)</li>
+          <li>Numerals (0-9)</li>
+          <li>Underscores (_)</li>
+          <li>Hyphens (-)</li>
+        </ul></p>
+    </section>
+    <section>
+      <title><xmlelement>plugin</xmlelement></title>
+      <p>The root element of the <filepath>plugin.xml</filepath> file is <xmlelement>plugin</xmlelement>, which has a
+        required <xmlatt>id</xmlatt> attribute set to the unique plug-in identifier.</p>
+      <fig>
+        <title>Sample <xmlelement>plugin</xmlelement> element</title>
+        <codeblock outputclass="language-xml"><coderef href="../samples/plugins/com.example.html5-javascript/plugin.xml#line=3,4"/></codeblock>
+      </fig>
+    </section>
+    <section>
+      <title>Plug-in elements</title>
+      <div outputclass="div-index">
+        <indexterm><xmlelement>plugin</xmlelement></indexterm>
+      </div>
+      <draft-comment author="Kristen Eberlein" time="13 May 2013">Perhaps all the following tables should have a Data
+        type column? That would match with the DITA spec; also, it seems as if some attributes must take a predefined
+        set of values.</draft-comment>
+      <p>The <xmlelement>plugin</xmlelement> element can contain the following child elements: </p>
+      <parml>
+        <plentry>
+          <pt><xmlelement>extension-point</xmlelement></pt>
+          <pd>
+            <indexterm><xmlelement>extension-point</xmlelement></indexterm>
+            <p>An optional element that defines a new extension point that can be used by other DITA-OT plug-ins.</p>
+            <p>The following attributes are supported:</p>
+            <simpletable keycol="1">
+              <sthead>
+                <stentry>Attribute</stentry>
+                <stentry>Description</stentry>
+                <stentry>Required?</stentry>
+              </sthead>
+              <strow>
+                <stentry>id</stentry>
+                <stentry>Extension point identifier</stentry>
+                <stentry>Yes</stentry>
+              </strow>
+              <strow>
+                <stentry>name</stentry>
+                <stentry>Extension point description</stentry>
+                <stentry>No</stentry>
+              </strow>
+            </simpletable>
+            <p id="extension-point-ids">Like plug-in identifiers, extension point identifiers are composed of one or
+              more dot-delimited tokens.</p>
+            <note id="entension-point-ids-note">Extension point identifiers should begin with the identifier of the
+              defining plug-in and append one or more tokens, for example, <codeph>org.dita.example.pre</codeph>.</note>
+            <fig>
+              <title>Sample <xmlelement>extension-point</xmlelement> element</title>
+              <codeblock outputclass="language-xml">&lt;extension-point id="dita.xsl.html5" name="HTML5 XSLT import"/></codeblock>
+            </fig>
+          </pd>
+        </plentry>
+        <plentry>
+          <pt><xmlelement>feature</xmlelement></pt>
+          <pd>
+            <indexterm><xmlelement>feature</xmlelement></indexterm>
+            <indexterm><xmlatt>value</xmlatt></indexterm>
+            <indexterm><xmlatt>file</xmlatt></indexterm>
+            <p>An optional element that supplies values to a DITA-OT extension point.</p>
+            <p>The following attributes are supported:</p>
+            <simpletable keycol="1">
+              <sthead>
+                <stentry>Attribute</stentry>
+                <stentry>Description</stentry>
+                <stentry>Required?</stentry>
+              </sthead>
+              <strow>
+                <stentry>extension</stentry>
+                <stentry>Identifier of the DITA-OT extension point</stentry>
+                <stentry>Yes</stentry>
+              </strow>
+              <strow>
+                <stentry>value</stentry>
+                <stentry>Comma separated string value of the extension</stentry>
+                <stentry>Either the <xmlatt>value</xmlatt> or <xmlatt>file</xmlatt> attribute must be
+                  specified</stentry>
+              </strow>
+              <strow>
+                <stentry>file</stentry>
+                <stentry>Name and path of a file containing data for the extension point.
+                  <p>Depending on the extension point, this might be specified as an absolute path, a path relative to
+                    the <filepath>plugin.xml</filepath> file, or a path relative to the DITA-OT root.</p></stentry>
+                <stentry>Either the <xmlatt>value</xmlatt> or <xmlatt>file</xmlatt> attribute must be
+                  specified</stentry>
+              </strow>
+              <strow>
+                <stentry>type</stentry>
+                <stentry>Type of the <xmlatt>value</xmlatt> attribute</stentry>
+                <stentry>No</stentry>
+              </strow>
+            </simpletable>
+            <fig>
+              <title>Sample <xmlelement>feature</xmlelement> elements</title>
+              <p>If more than one <xmlelement>feature</xmlelement> element supplies values to the same extension point,
+                the values are additive. For example, the following are equivalent:</p>
+              <codeblock outputclass="language-xml">&lt;feature extension="org.dita.example.extension-point" value="a,b,c"/></codeblock>
+              <codeblock outputclass="language-xml">&lt;feature extension="org.dita.example.extension-point" value="a"/>
+&lt;feature extension="org.dita.example.extension-point" value="b"/>
+&lt;feature extension="org.dita.example.extension-point" value="c"/></codeblock>
+            </fig>
+          </pd>
+        </plentry>
+        <plentry>
+          <pt><xmlelement>meta</xmlelement></pt>
+          <pd>
+            <indexterm><xmlelement>meta</xmlelement></indexterm>
+            <p>An optional element that defines metadata.</p>
+            <p>The following attributes are supported:</p>
+            <simpletable keycol="1">
+              <sthead>
+                <stentry>Attribute</stentry>
+                <stentry>Description</stentry>
+                <stentry>Required?</stentry>
+              </sthead>
+              <strow>
+                <stentry>type</stentry>
+                <stentry>Metadata name </stentry>
+                <stentry>Yes</stentry>
+              </strow>
+              <strow>
+                <stentry>value</stentry>
+                <stentry>Metadata value</stentry>
+                <stentry>Yes</stentry>
+              </strow>
+            </simpletable>
+            <fig>
+              <title>Sample <xmlelement>meta</xmlelement> element</title>
+              <codeblock outputclass="language-xml">&lt;meta type="foo" value="bar"/></codeblock>
+            </fig>
+          </pd>
+        </plentry>
+        <plentry>
+          <pt><xmlelement>require</xmlelement></pt>
+          <pd>
+            <indexterm><xmlelement>require</xmlelement></indexterm>
+            <p>An optional element that defines plug-in dependencies.</p>
+            <p>The following attributes are supported:</p>
+            <simpletable keycol="1">
+              <sthead>
+                <stentry>Attribute</stentry>
+                <stentry>Description</stentry>
+                <stentry>Required?</stentry>
+              </sthead>
+              <strow>
+                <stentry>plugin</stentry>
+                <stentry>The identifier of the required plug-in.
+                  <p>To specify alternative requirements, separate plug-in identifiers with a vertical
+                  bar.</p></stentry>
+                <stentry>Yes</stentry>
+              </strow>
+              <strow>
+                <stentry>importance</stentry>
+                <stentry>Identifies whether the plug-in is <codeph>required</codeph> (default) or
+                    <codeph>optional</codeph>. DITA-OT provides a warning if a required plug-in is not
+                  available.</stentry>
+                <stentry>No</stentry>
+              </strow>
+            </simpletable>
+            <fig>
+              <title>Sample <xmlelement>require</xmlelement> element</title>
+              <codeblock outputclass="language-xml normalize-space"><coderef href="../samples/plugins/com.example.html5-javascript/plugin.xml#line=4,5"/></codeblock>
+            </fig>
+          </pd>
+        </plentry>
+        <plentry>
+          <pt><xmlelement>template</xmlelement></pt>
+          <pd>
+            <indexterm><xmlelement>template</xmlelement></indexterm>
+            <indexterm><xmlelement>dita:extension</xmlelement></indexterm>
+            <p>An optional element that defines files that should be treated as templates.</p>
+            <p>Template files can be used to integrate DITA-OT extensions. Templates typically extend the default
+              transformation-type-specific build files via <xmlelement>dita:extension</xmlelement> elements. When the
+              plug-in installation process runs, template files are used to recreate build files, and the specified
+              extension points are replaced with references to the appropriate plug-ins.</p>
+            <p>The following attributes are supported:</p>
+            <simpletable keycol="1">
+              <sthead>
+                <stentry>Attribute</stentry>
+                <stentry>Description</stentry>
+                <stentry>Required?</stentry>
+              </sthead>
+              <strow>
+                <stentry>file</stentry>
+                <stentry>Name and path to the template file, relative to the <filepath>plugin.xml</filepath>
+                  file</stentry>
+                <stentry>Yes</stentry>
+              </strow>
+            </simpletable>
+            <fig>
+              <title>Sample <xmlelement>template</xmlelement> element</title>
+              <codeblock outputclass="language-xml">&lt;template file="build_dita2html5_template.xml"/></codeblock>
+            </fig>
+          </pd>
+        </plentry>
+        <plentry>
+          <pt><xmlelement>transtype</xmlelement></pt>
+          <pd>
+            <indexterm><xmlelement>transtype</xmlelement><indexterm><filepath>plugin.xml</filepath></indexterm></indexterm>
+            <p>An optional element that defines a new output format (transformation type).</p>
+            <p>The following attributes are supported:</p>
+            <simpletable keycol="1">
+              <sthead>
+                <stentry>Attribute</stentry>
+                <stentry>Description</stentry>
+                <stentry>Required?</stentry>
+              </sthead>
+              <strow>
+                <stentry>name</stentry>
+                <stentry>Transformation name</stentry>
+                <stentry>Yes</stentry>
+              </strow>
+              <strow>
+                <stentry>desc</stentry>
+                <stentry>Transformation type description</stentry>
+                <stentry>No</stentry>
+              </strow>
+              <strow>
+                <stentry>abstract</stentry>
+                <stentry>When <option>true</option>, sets the transformation type as <q>abstract</q>, meaning it can be
+                  extended by other plug-ins, but cannot be used directly.
+                  <p>For example, the <codeph>org.dita.base</codeph> plug-in defines an abstract <q>base</q>
+                    transformation type that is extended by other DITA-OT plug-ins.</p></stentry>
+                <stentry>No</stentry>
+              </strow>
+              <strow>
+                <stentry>extends</stentry>
+                <stentry>Specifies the name of the transformation type being extended</stentry>
+                <stentry>No</stentry>
+              </strow>
+            </simpletable>
+            <fig>
+              <title>Sample <xmlelement>transtype</xmlelement> element</title>
+              <codeblock outputclass="language-xml">&lt;transtype name="base" abstract="true" desc="Common">
+  &lt;!-- ⋮ -->
+  &lt;param name="link-crawl" 
+         desc="Specifies whether to crawl only topic links found in maps, or all discovered topic links."
+         type="enum">
+    &lt;val>map&lt;/val>
+    &lt;val default="true">topic&lt;/val>
+  &lt;/param>
+  &lt;!-- ⋮ -->
+&lt;/transtype>
+</codeblock>
+            </fig>
+            <p>The <xmlelement>transtype</xmlelement> element may define additional parameters for the transformation
+              type using the following child elements.</p>
+            <parml>
+              <plentry>
+                <pt><xmlelement>param</xmlelement></pt>
+                <pd>
+                  <indexterm><xmlelement>param</xmlelement></indexterm>
+                  <p>An optional element that specifies a parameter for the transformation type.</p>
+                  <p>The following parameter attributes are supported:</p>
+                  <simpletable keycol="1">
+                    <sthead>
+                      <stentry>Attribute</stentry>
+                      <stentry>Description</stentry>
+                      <stentry>Required?</stentry>
+                    </sthead>
+                    <strow>
+                      <stentry>name</stentry>
+                      <stentry>Parameter name</stentry>
+                      <stentry>Yes</stentry>
+                    </strow>
+                    <strow>
+                      <stentry>desc</stentry>
+                      <stentry>Parameter description</stentry>
+                      <stentry>No</stentry>
+                    </strow>
+                    <strow>
+                      <stentry>type</stentry>
+                      <stentry>Parameter type (<option>enum</option>, <option>file</option>,
+                        <option>string</option>)</stentry>
+                      <stentry>Yes</stentry>
+                    </strow>
+                    <strow>
+                      <stentry>deprecated</stentry>
+                      <stentry>When <option>true</option>, identifies this parameter as deprecated</stentry>
+                      <stentry>No</stentry>
+                    </strow>
+                    <strow>
+                      <stentry>required</stentry>
+                      <stentry>When <option>true</option>, identifies this parameter as required</stentry>
+                      <stentry>No</stentry>
+                    </strow>
+                  </simpletable></pd>
+              </plentry>
+              <plentry>
+                <pt><xmlelement>val</xmlelement></pt>
+                <pd>
+                  <indexterm><xmlelement>val</xmlelement></indexterm>
+                  <p>A child of <xmlelement>param</xmlelement> (when <xmlatt>type</xmlatt>=<option>enum</option>) that
+                    specifies an enumeration value.</p>
+                  <p>The following attributes are supported:</p>
+                  <simpletable keycol="1">
+                    <sthead>
+                      <stentry>Attribute</stentry>
+                      <stentry>Description</stentry>
+                      <stentry>Required?</stentry>
+                    </sthead>
+                    <strow>
+                      <stentry>default</stentry>
+                      <stentry>When <option>true</option>, sets the enumeration value as the default value of the parent
+                          <xmlelement>param</xmlelement></stentry>
+                      <stentry>Only for the default <xmlelement>val</xmlelement></stentry>
+                    </strow>
+                  </simpletable></pd>
+              </plentry>
+            </parml>
+          </pd>
+        </plentry>
+      </parml>
+      <p>Any extension that is not recognized by DITA-OT is ignored. Since DITA-OT version 1.5.3, you can combine
+        multiple extension definitions within a single <filepath>plugin.xml</filepath> file; in older versions, only the
+        last extension definition was used.</p>
+    </section>
+  </refbody>
+</reference>

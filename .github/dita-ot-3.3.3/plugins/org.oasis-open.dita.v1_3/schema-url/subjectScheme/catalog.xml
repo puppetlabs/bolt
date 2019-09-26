@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<!--DITA Subject Classification Domain-->
+
+   <group><!-- System ID (URL) catalog entries -->
+      <system systemId="urn:oasis:names:tc:dita:spec:classification:xsd:classifyDomain.xsd:1.3"
+              uri="xsd/classifyDomain.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:classification:xsd:classifyDomain.xsd:1.x"
+              uri="xsd/classifyDomain.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:classification:xsd:classifyDomain.xsd"
+              uri="xsd/classifyDomain.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:classification:xsd:classifyMap.xsd:1.3"
+              uri="xsd/classifyMap.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:classification:xsd:classifyMap.xsd:1.x"
+              uri="xsd/classifyMap.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:classification:xsd:classifyMap.xsd"
+              uri="xsd/classifyMap.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:subjectScheme.xsd:1.3"
+              uri="xsd/subjectScheme.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:subjectScheme.xsd"
+              uri="xsd/subjectScheme.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:subjectSchemeGrp.xsd:1.3"
+              uri="xsd/subjectSchemeGrp.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:subjectSchemeGrp.xsd"
+              uri="xsd/subjectSchemeGrp.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:subjectSchemeMod.xsd:1.3"
+              uri="xsd/subjectSchemeMod.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:subjectSchemeMod.xsd"
+              uri="xsd/subjectSchemeMod.xsd"/>
+   </group>
+   <group><!-- Public ID (URN) catalog entries -->
+      <uri name="urn:oasis:names:tc:dita:spec:classification:xsd:classifyDomain.xsd:1.3"
+           uri="xsd/classifyDomain.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:spec:classification:xsd:classifyDomain.xsd:1.x"
+           uri="xsd/classifyDomain.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:spec:classification:xsd:classifyDomain.xsd"
+           uri="xsd/classifyDomain.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:spec:classification:xsd:classifyMap.xsd:1.3"
+           uri="xsd/classifyMap.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:spec:classification:xsd:classifyMap.xsd:1.x"
+           uri="xsd/classifyMap.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:spec:classification:xsd:classifyMap.xsd"
+           uri="xsd/classifyMap.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:subjectScheme.xsd:1.3"
+           uri="xsd/subjectScheme.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:subjectScheme.xsd"
+           uri="xsd/subjectScheme.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:subjectSchemeGrp.xsd:1.3"
+           uri="xsd/subjectSchemeGrp.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:subjectSchemeGrp.xsd"
+           uri="xsd/subjectSchemeGrp.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:subjectSchemeMod.xsd:1.3"
+           uri="xsd/subjectSchemeMod.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:subjectSchemeMod.xsd"
+           uri="xsd/subjectSchemeMod.xsd"/>
+   </group>
+</catalog>

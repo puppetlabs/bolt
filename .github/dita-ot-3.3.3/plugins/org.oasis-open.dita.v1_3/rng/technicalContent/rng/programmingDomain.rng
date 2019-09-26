@@ -1,0 +1,1371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Programming Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Programming Domain                     
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Programming Domain//EN"
+      Delivered as file "programmingDomain.mod"                   
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for the Programming Domain            
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2001                                       
+                                                             
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2005.11.15 RDA: Updated these comments to match template  
+   2005.11.15 RDA: Corrected Long Names for syntax groups,   
+                   codeph, and kwd                           
+   2005.11.15 RDA: Corrected the "Delivered as" system ID    
+   2006.06.07 RDA: Make universal attributes universal       
+                     (DITA 1.1 proposal #12)                 
+   2006.11.30 RDA: Add -dita-use-conref-target to enumerated 
+                     attributes                              
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.02.12 RDA: Add text to synph, items with only #PCDATA
+   2008.02.12 RDA: Add coderef element                       
+   2008.02.13 RDA: Create .content and .attributes entities  
+=============================================================
+</headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>pr-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Programming Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Programming Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:programmingDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:programmingDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:programmingDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic pr-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="pr-d-ph">
+      <choice>
+        <ref name="codeph.element"/>
+        <ref name="synph.element"/>
+      </choice>
+    </define>
+    <define name="pr-d-pre">
+      <ref name="codeblock.element"/>
+    </define>
+    <define name="pr-d-keyword">
+      <choice>
+        <ref name="apiname.element"/>
+        <ref name="option.element"/>
+        <ref name="parmname.element"/>
+      </choice>
+    </define>
+    <define name="pr-d-fig">
+      <ref name="syntaxdiagram.element"/>
+    </define>
+    <define name="pr-d-dl">
+      <ref name="parml.element"/>
+    </define>
+
+    <define name="ph" combine="choice">
+      <ref name="pr-d-ph"/>
+    </define>
+    <define name="pre" combine="choice">
+      <ref name="pr-d-pre"/>
+    </define>
+    <define name="keyword" combine="choice">
+      <ref name="pr-d-keyword"/>
+    </define>
+    <define name="fig" combine="choice">
+      <ref name="pr-d-fig"/>
+    </define>
+    <define name="dl" combine="choice">
+      <ref name="pr-d-dl"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+
+    <define name="codeph">
+      <ref name="codeph.element"/>
+    </define>
+    <define name="coderef">
+      <ref name="coderef.element"/>
+    </define>
+    <define name="delim">
+      <ref name="delim.element"/>
+    </define>
+    <define name="kwd">
+      <ref name="kwd.element"/>
+    </define>
+    <define name="oper">
+      <ref name="oper.element"/>
+    </define>
+    <define name="option">
+      <ref name="option.element"/>
+    </define>
+    <define name="parmname">
+      <ref name="parmname.element"/>
+    </define>
+    <define name="sep">
+      <ref name="sep.element"/>
+    </define>
+    <define name="synph">
+      <ref name="synph.element"/>
+    </define>
+    <define name="var">
+      <ref name="var.element"/>
+    </define>
+    <define name="pd">
+      <ref name="pd.element"/>
+    </define>
+    <define name="plentry">
+      <ref name="plentry.element"/>
+    </define>
+    <define name="pt">
+      <ref name="pt.element"/>
+    </define>
+    <define name="fragment">
+      <ref name="fragment.element"/>
+    </define>
+    <define name="fragref">
+      <ref name="fragref.element"/>
+    </define>
+    <define name="groupchoice">
+      <ref name="groupchoice.element"/>
+    </define>
+    <define name="groupcomp">
+      <ref name="groupcomp.element"/>
+    </define>
+    <define name="groupseq">
+      <ref name="groupseq.element"/>
+    </define>
+    <define name="repsep">
+      <ref name="repsep.element"/>
+    </define>
+    <define name="synblk">
+      <ref name="synblk.element"/>
+    </define>
+    <define name="synnote">
+      <ref name="synnote.element"/>
+    </define>
+    <define name="synnoteref">
+      <ref name="synnoteref.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>COMMON ATTRIBUTE SETS</a:documentation>
+    <div>
+      <a:documentation> LONG NAME: Universal Attributes Local Importance </a:documentation>
+      <a:documentation> Provide an alternative set of univ-atts that allows importance to be redefined locally </a:documentation>
+      <define name="univ-atts-no-importance">
+        <optional>
+          <attribute name="base"/>
+        </optional>
+        <ref name="base-attribute-extensions"/>
+        <ref name="id-atts"/>
+        <ref name="filter-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="rev"/>
+        </optional>
+        <optional>
+          <attribute name="status">
+            <choice>
+              <value>new</value>
+              <value>changed</value>
+              <value>deleted</value>
+              <value>unchanged</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation> LONG NAME: Code Phrase </a:documentation>
+      <define name="codeph.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="basic.ph.notm"/>
+            <ref name="data.elements.incl"/>
+            <ref name="draft-comment" dita:since="1.3"/>
+            <ref name="foreign.unknown.incl"/>
+            <ref name="required-cleanup" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="codeph.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="codeph.element">
+        <element name="codeph" dita:longName="Code Phrase">
+          <a:documentation>
+            <![CDATA[The code phrase (<codeph>) element represents a snippet of code within the main flow of text. The code phrase is displayed in a monospaced font for emphasis. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="codeph.attlist"/>
+          <ref name="codeph.content"/>
+        </element>
+      </define>
+      <define name="codeph.attlist" combine="interleave">
+        <ref name="codeph.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Code Block </a:documentation>
+      <define name="codeblock.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="basic.ph.notm"/>
+            <ref name="coderef"/>
+            <ref name="data.elements.incl"/>
+            <ref name="foreign.unknown.incl"/>
+            <ref name="txt.incl"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="codeblock.attributes">
+        <ref name="display-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <optional>
+          <attribute name="xml:space" a:defaultValue="preserve">
+            <value>preserve</value>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="codeblock.element">
+        <element name="codeblock" dita:longName="Code Block">
+          <a:documentation>
+            <![CDATA[The <codeblock> element represents lines of program code. Like the <pre> element, content of this element has preserved line endings and is output in a monospaced font. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="codeblock.attlist"/>
+          <ref name="codeblock.content"/>
+        </element>
+      </define>
+      <define name="codeblock.attlist" combine="interleave">
+        <ref name="codeblock.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Literal code reference </a:documentation>
+      <define name="coderef.content">
+        <empty/>
+      </define>
+      <define name="coderef.attributes">
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="coderef.element">
+        <element name="coderef" dita:longName="Literal code reference">
+          <a:documentation>
+            <![CDATA[The codref element allows a reference to an external file that contains literal code. When evaluated the coderef element should cause the target code to be displayed inline. If the target contains non-XML characters such as < and &amp;, those will need to be handled in a way that they may be displayed correctly by the final rendering engine.]]>
+          </a:documentation>
+          <ref name="coderef.attlist"/>
+          <ref name="coderef.content"/>
+        </element>
+      </define>
+      <define name="coderef.attlist" combine="interleave">
+        <ref name="coderef.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Option </a:documentation>
+      <define name="option.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="option.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="option.element">
+        <element name="option" dita:longName="Option">
+          <a:documentation>
+            <![CDATA[The <option> element describes an option that can be used to modify a command (or something else, like a configuration). This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="option.attlist"/>
+          <ref name="option.content"/>
+        </element>
+      </define>
+      <define name="option.attlist" combine="interleave">
+        <ref name="option.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Variable </a:documentation>
+      <define name="var.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="var.attributes">
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>default</value>
+              <value>optional</value>
+              <value>required</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="var.element">
+        <element name="var" dita:longName="Variable">
+          <a:documentation>
+            <![CDATA[Within a syntax diagram, the <var> element defines a variable for which the user must supply content, such as their user name or password. It is represented in output in an italic font. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="var.attlist"/>
+          <ref name="var.content"/>
+        </element>
+      </define>
+      <define name="var.attlist" combine="interleave">
+        <ref name="var.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Parameter Name </a:documentation>
+      <define name="parmname.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="parmname.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="parmname.element">
+        <element name="parmname" dita:longName="Parameter Name">
+          <a:documentation>
+            <![CDATA[When referencing the name of an application programming interface parameter within the text flow of your topic, use the parameter name (<parmname>) element to markup the parameter. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="parmname.attlist"/>
+          <ref name="parmname.content"/>
+        </element>
+      </define>
+      <define name="parmname.attlist" combine="interleave">
+        <ref name="parmname.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Syntax Phrase </a:documentation>
+      <define name="synph.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="codeph"/>
+            <ref name="delim"/>
+            <ref name="kwd"/>
+            <ref name="oper"/>
+            <ref name="option"/>
+            <ref name="parmname"/>
+            <ref name="sep"/>
+            <ref name="synph"/>
+            <ref name="text"/>
+            <ref name="var"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="synph.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="synph.element">
+        <element name="synph" dita:longName="Syntax Phrase">
+          <a:documentation>
+            <![CDATA[The syntax phrase (<synph>) element is a container for syntax definition elements. It is used when a complete syntax diagram is not needed, but some of the syntax elements, such as kwd, oper, delim, are used within the text flow of the topic content. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="synph.attlist"/>
+          <ref name="synph.content"/>
+        </element>
+      </define>
+      <define name="synph.attlist" combine="interleave">
+        <ref name="synph.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Operator </a:documentation>
+      <define name="oper.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="oper.attributes">
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>default</value>
+              <value>optional</value>
+              <value>required</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="oper.element">
+        <element name="oper" dita:longName="Operator">
+          <a:documentation>
+            <![CDATA[The operator (<oper>) element defines an operator within a syntax definition. Typical operators are equals (=), plus (+) or multiply (*). This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="oper.attlist"/>
+          <ref name="oper.content"/>
+        </element>
+      </define>
+      <define name="oper.attlist" combine="interleave">
+        <ref name="oper.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Delimiter </a:documentation>
+      <define name="delim.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="delim.attributes">
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>optional</value>
+              <value>required</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="delim.element">
+        <element name="delim" dita:longName="Delimiter">
+          <a:documentation>
+            <![CDATA[Within a syntax diagram, the delimiter (<delim>) element defines a character marking the beginning or end of a section or part of the complete syntax. Typical delimiter characters are the parenthesis, comma, tab, vertical bar or other special characters. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="delim.attlist"/>
+          <ref name="delim.content"/>
+        </element>
+      </define>
+      <define name="delim.attlist" combine="interleave">
+        <ref name="delim.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Separator </a:documentation>
+      <define name="sep.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="sep.attributes">
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>optional</value>
+              <value>required</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="sep.element">
+        <element name="sep" dita:longName="Separator">
+          <a:documentation>
+            <![CDATA[The separator (<sep>) element defines a separator character that is inline with the content of a syntax diagram. The separator occurs between keywords, operators or groups in a syntax definition. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="sep.attlist"/>
+          <ref name="sep.content"/>
+        </element>
+      </define>
+      <define name="sep.attlist" combine="interleave">
+        <ref name="sep.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: API Name </a:documentation>
+      <define name="apiname.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="apiname.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="apiname.element">
+        <element name="apiname" dita:longName="API Name">
+          <a:documentation>
+            <![CDATA[The <apiname> element provides the name of an application programming interface (API) such as a Java class name or method name. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="apiname.attlist"/>
+          <ref name="apiname.content"/>
+        </element>
+      </define>
+      <define name="apiname.attlist" combine="interleave">
+        <ref name="apiname.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Parameter List </a:documentation>
+      <define name="parml.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="plentry"/>
+        </oneOrMore>
+      </define>
+      <define name="parml.attributes">
+        <optional>
+          <attribute name="compact">
+            <choice>
+              <value>yes</value>
+              <value>no</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="parml.element">
+        <element name="parml" dita:longName="Parameter List">
+          <a:documentation>
+            <![CDATA[The parameter list (<parml>) element contains a list of terms and definitions that describes the parameters in an application programming interface. This is a special kind of definition list that is designed for documenting programming parameters. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="parml.attlist"/>
+          <ref name="parml.content"/>
+        </element>
+      </define>
+      <define name="parml.attlist" combine="interleave">
+        <ref name="parml.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Parameter List Entry </a:documentation>
+      <define name="plentry.content">
+        <oneOrMore>
+          <ref name="pt"/>
+        </oneOrMore>
+        <oneOrMore>
+          <ref name="pd"/>
+        </oneOrMore>
+      </define>
+      <define name="plentry.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="plentry.element">
+        <element name="plentry" dita:longName="Parameter List Entry">
+          <a:documentation>
+            <![CDATA[The parameter list entry element (<plentry>) contains one or more parameter terms and definitions (pd and pt). This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="plentry.attlist"/>
+          <ref name="plentry.content"/>
+        </element>
+      </define>
+      <define name="plentry.attlist" combine="interleave">
+        <ref name="plentry.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Parameter Term </a:documentation>
+      <define name="pt.content">
+        <zeroOrMore>
+          <ref name="term.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="pt.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="pt.element">
+        <element name="pt" dita:longName="Parameter Term">
+          <a:documentation>
+            <![CDATA[A parameter term, within a parameter list entry, is enclosed by the <pt> element. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="pt.attlist"/>
+          <ref name="pt.content"/>
+        </element>
+      </define>
+      <define name="pt.attlist" combine="interleave">
+        <ref name="pt.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Parameter Description </a:documentation>
+      <define name="pd.content">
+        <zeroOrMore>
+          <ref name="defn.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="pd.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="pd.element">
+        <element name="pd" dita:longName="Parameter Description">
+          <a:documentation>
+            <![CDATA[A parameter definition, within a parameter list entry, is enclosed by the <pd> element. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="pd.attlist"/>
+          <ref name="pd.content"/>
+        </element>
+      </define>
+      <define name="pd.attlist" combine="interleave">
+        <ref name="pd.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Syntax Diagram </a:documentation>
+      <define name="syntaxdiagram.content">
+        <optional>
+          <ref name="title"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="fragment"/>
+            <ref name="fragref"/>
+            <ref name="groupchoice"/>
+            <ref name="groupcomp"/>
+            <ref name="groupseq"/>
+            <ref name="synblk"/>
+            <ref name="synnote"/>
+            <ref name="synnoteref"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="syntaxdiagram.attributes">
+        <ref name="display-atts"/>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="syntaxdiagram.element">
+        <element name="syntaxdiagram" dita:longName="Syntax Diagram">
+          <a:documentation>
+            <![CDATA[The syntax diagram (<syntaxdiagram>) element is the main container for all the syntax elements that make up a syntax definition. The syntax diagram represents the syntax of a statement from a computer language, or a command, function call or programming language statement. Traditionally, the syntax diagram is formatted with railroad tracks that connect the units of the syntax together, but this presentation may differ depending on the output media. The syntax diagram element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="syntaxdiagram.attlist"/>
+          <ref name="syntaxdiagram.content"/>
+        </element>
+      </define>
+      <define name="syntaxdiagram.attlist" combine="interleave">
+        <ref name="syntaxdiagram.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Syntax Block </a:documentation>
+      <define name="synblk.content">
+        <optional>
+          <ref name="title"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="fragment"/>
+            <ref name="fragref"/>
+            <ref name="groupchoice"/>
+            <ref name="groupcomp"/>
+            <ref name="groupseq"/>
+            <ref name="synnote"/>
+            <ref name="synnoteref"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="synblk.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="synblk.element">
+        <element name="synblk" dita:longName="Syntax Block">
+          <a:documentation>
+            <![CDATA[The syntax block (<synblk>) element organizes small pieces of a syntax definition into a larger piece. The syntax block element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="synblk.attlist"/>
+          <ref name="synblk.content"/>
+        </element>
+      </define>
+      <define name="synblk.attlist" combine="interleave">
+        <ref name="synblk.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Sequence Group </a:documentation>
+      <define name="groupseq.content">
+        <optional>
+          <ref name="title"/>
+        </optional>
+        <optional>
+          <ref name="repsep"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="delim"/>
+            <ref name="fragref"/>
+            <ref name="groupchoice"/>
+            <ref name="groupcomp"/>
+            <ref name="groupseq"/>
+            <ref name="kwd"/>
+            <ref name="oper"/>
+            <ref name="sep"/>
+            <ref name="synnote"/>
+            <ref name="synnoteref"/>
+            <ref name="var"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="groupseq.attributes">
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>default</value>
+              <value>required</value>
+              <value>optional</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="groupseq.element">
+        <element name="groupseq" dita:longName="Sequence Group">
+          <a:documentation>
+            <![CDATA[The <groupseq> element is part of the subset of elements that define syntax diagrams in DITA. A group is a logical set of pieces of syntax that go together. Within the syntax definition, groups of keywords, delimiters and other syntax units act as a combined unit, and they occur in a specific sequence, as delimited by the <groupseq> element. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="groupseq.attlist"/>
+          <ref name="groupseq.content"/>
+        </element>
+      </define>
+      <define name="groupseq.attlist" combine="interleave">
+        <ref name="groupseq.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Choice Group </a:documentation>
+      <define name="groupchoice.content">
+        <optional>
+          <ref name="title"/>
+        </optional>
+        <optional>
+          <ref name="repsep"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="delim"/>
+            <ref name="fragref"/>
+            <ref name="groupchoice"/>
+            <ref name="groupcomp"/>
+            <ref name="groupseq"/>
+            <ref name="kwd"/>
+            <ref name="oper"/>
+            <ref name="sep"/>
+            <ref name="synnote"/>
+            <ref name="synnoteref"/>
+            <ref name="var"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="groupchoice.attributes">
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>default</value>
+              <value>required</value>
+              <value>optional</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="groupchoice.element">
+        <element name="groupchoice" dita:longName="Choice Group">
+          <a:documentation>
+            <![CDATA[The <groupchoice> element is part of the subset of elements that define syntax diagrams in DITA. A group is a logical set of pieces of syntax that go together. A group choice specifies that the user must make a choice about which part of the syntax to use. Groups are often nested. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="groupchoice.attlist"/>
+          <ref name="groupchoice.content"/>
+        </element>
+      </define>
+      <define name="groupchoice.attlist" combine="interleave">
+        <ref name="groupchoice.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Composite group </a:documentation>
+      <define name="groupcomp.content">
+        <optional>
+          <ref name="title"/>
+        </optional>
+        <optional>
+          <ref name="repsep"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="delim"/>
+            <ref name="fragref"/>
+            <ref name="groupchoice"/>
+            <ref name="groupcomp"/>
+            <ref name="groupseq"/>
+            <ref name="kwd"/>
+            <ref name="oper"/>
+            <ref name="sep"/>
+            <ref name="synnote"/>
+            <ref name="synnoteref"/>
+            <ref name="var"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="groupcomp.attributes">
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>default</value>
+              <value>required</value>
+              <value>optional</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="groupcomp.element">
+        <element name="groupcomp" dita:longName="Composite group">
+          <a:documentation>
+            <![CDATA[The <groupcomp> element is part of the subset of elements that define syntax diagrams in DITA. A group is a logical set of pieces of syntax that go together. The group composite means that the items that make up the syntax diagram will be formatted close together rather than being separated by a horizontal or vertical line, which is the usual formatting method. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="groupcomp.attlist"/>
+          <ref name="groupcomp.content"/>
+        </element>
+      </define>
+      <define name="groupcomp.attlist" combine="interleave">
+        <ref name="groupcomp.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Fragment </a:documentation>
+      <define name="fragment.content">
+        <optional>
+          <ref name="title"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="fragref"/>
+            <ref name="groupchoice"/>
+            <ref name="groupcomp"/>
+            <ref name="groupseq"/>
+            <ref name="synnote"/>
+            <ref name="synnoteref"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="fragment.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="fragment.element">
+        <element name="fragment" dita:longName="Fragment">
+          <a:documentation>
+            <![CDATA[Within a syntax definition, a <fragment> is a labeled subpart of the syntax. The <fragment> element allows breaking out logical chunks of a large syntax diagram into named fragments. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="fragment.attlist"/>
+          <ref name="fragment.content"/>
+        </element>
+      </define>
+      <define name="fragment.attlist" combine="interleave">
+        <ref name="fragment.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Fragment Reference </a:documentation>
+      <define name="fragref.content">
+        <zeroOrMore>
+          <ref name="xrefph.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="fragref.attributes">
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>optional</value>
+              <value>required</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="fragref.element">
+        <element name="fragref" dita:longName="Fragment Reference">
+          <a:documentation>
+            <![CDATA[The fragment reference (<fragref>) element provides a logical reference to a syntax definition fragment so that you can reference a syntax fragment multiple times, or pull a large section of syntax out of line for easier reading. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="fragref.attlist"/>
+          <ref name="fragref.content"/>
+        </element>
+      </define>
+      <define name="fragref.attlist" combine="interleave">
+        <ref name="fragref.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Syntax Diagram Note </a:documentation>
+      <define name="synnote.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="basic.ph"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="synnote.attributes">
+        <optional>
+          <attribute name="callout"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="synnote.element">
+        <element name="synnote" dita:longName="Syntax Diagram Note">
+          <a:documentation>
+            <![CDATA[The syntax note (<synnote>) element contains a note (similar to a footnote) within a syntax definition group or fragment. The syntax note explains aspects of the syntax that cannot be expressed in the markup itself. The note will appear at the bottom of the syntax diagram instead of at the bottom of the page. The syntax block element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="synnote.attlist"/>
+          <ref name="synnote.content"/>
+        </element>
+      </define>
+      <define name="synnote.attlist" combine="interleave">
+        <ref name="synnote.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Syntax Note Reference </a:documentation>
+      <define name="synnoteref.content">
+        <empty/>
+      </define>
+      <define name="synnoteref.attributes">
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="synnoteref.element">
+        <element name="synnoteref" dita:longName="Syntax Note Reference">
+          <a:documentation>
+            <![CDATA[The syntax note (<synnoteref>) reference element references a syntax note element (<synnote>) that has already been defined elsewhere in the syntax diagram. The same notation can be used in more than one syntax definition. The syntax note reference element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="synnoteref.attlist"/>
+          <ref name="synnoteref.content"/>
+        </element>
+      </define>
+      <define name="synnoteref.attlist" combine="interleave">
+        <ref name="synnoteref.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Repeat Separator </a:documentation>
+      <define name="repsep.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="repsep.attributes">
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>optional</value>
+              <value>required</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="repsep.element" >
+        <element name="repsep" dita:longName="Repeat Separator">
+          <a:documentation>
+            <![CDATA[The repeat separator (<repsep>) element in a syntax diagram defines a group of syntax elements that can (or should) be repeated. If the <repsep> element contains a separator character, such as a plus (+), this indicates that the character must be used between repetitions of the syntax elements. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="repsep.attlist"/>
+          <ref name="repsep.content"/>
+        </element>
+      </define>
+      <define name="repsep.attlist" combine="interleave">
+        <ref name="repsep.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Syntax Keyword </a:documentation>
+      <define name="kwd.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="kwd.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>default</value>
+              <value>required</value>
+              <value>optional</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="kwd.element">
+        <element name="kwd" dita:longName="Syntax Keyword">
+          <a:documentation>
+            <![CDATA[The <kwd> element defines a keyword within a syntax diagram. A keyword must be typed or output, either by the user or application, exactly as specified in the syntax definition. This element is part of the DITA programming domain, a special set of DITA elements designed to document programming tasks, concepts and reference information.
+    Category: Programming elements
+  ]]></a:documentation>
+          <ref name="kwd.attlist"/>
+          <ref name="kwd.content"/>
+        </element>
+      </define>
+      <define name="kwd.attlist" combine="interleave">
+        <ref name="kwd.attributes"/>
+      </define>
+
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+
+    <define name="apiname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword pr-d/apiname "/>
+      </optional>
+    </define>
+    <define name="codeblock.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/pre pr-d/codeblock "/>
+      </optional>
+    </define>
+    <define name="codeph.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph pr-d/codeph "/>
+      </optional>
+    </define>
+    <define name="coderef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/xref pr-d/coderef "/>
+      </optional>
+    </define>
+    <define name="delim.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph pr-d/delim "/>
+      </optional>
+    </define>
+    <define name="fragment.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/figgroup pr-d/fragment "/>
+      </optional>
+    </define>
+    <define name="fragref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/xref pr-d/fragref "/>
+      </optional>
+    </define>
+    <define name="groupchoice.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/figgroup pr-d/groupchoice "/>
+      </optional>
+    </define>
+    <define name="groupcomp.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/figgroup pr-d/groupcomp "/>
+      </optional>
+    </define>
+    <define name="groupseq.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/figgroup pr-d/groupseq "/>
+      </optional>
+    </define>
+    <define name="kwd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword pr-d/kwd "/>
+      </optional>
+    </define>
+    <define name="oper.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph pr-d/oper "/>
+      </optional>
+    </define>
+    <define name="option.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword pr-d/option "/>
+      </optional>
+    </define>
+    <define name="parml.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/dl pr-d/parml "/>
+      </optional>
+    </define>
+    <define name="parmname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword pr-d/parmname "/>
+      </optional>
+    </define>
+    <define name="pd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/dd pr-d/pd "/>
+      </optional>
+    </define>
+    <define name="plentry.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/dlentry pr-d/plentry "/>
+      </optional>
+    </define>
+    <define name="pt.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/dt pr-d/pt "/>
+      </optional>
+    </define>
+    <define name="repsep.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph pr-d/repsep "/>
+      </optional>
+    </define>
+    <define name="sep.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph pr-d/sep "/>
+      </optional>
+    </define>
+    <define name="synblk.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/figgroup pr-d/synblk "/>
+      </optional>
+    </define>
+    <define name="synnote.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/fn pr-d/synnote "/>
+      </optional>
+    </define>
+    <define name="synnoteref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/xref pr-d/synnoteref "/>
+      </optional>
+    </define>
+    <define name="synph.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph pr-d/synph "/>
+      </optional>
+    </define>
+    <define name="syntaxdiagram.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/fig pr-d/syntaxdiagram "/>
+      </optional>
+    </define>
+    <define name="var.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph pr-d/var "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

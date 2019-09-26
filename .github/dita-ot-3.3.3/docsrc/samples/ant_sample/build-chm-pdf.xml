@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="build-chm-pdf" default="all" basedir=".">
+  <property name="dita.dir" location="${basedir}/../../.."/>
+  <target name="all" description="build CHM and PDF" depends="chm,pdf"/>
+  <target name="chm" description="build CHM">
+    <ant antfile="${dita.dir}/build.xml">
+      <property name="args.input" location="../sequence.ditamap"/>
+      <property name="transtype" value="htmlhelp"/>
+      <property name="output.dir" location="../out/chm"/>
+      <property name="args.gen.task.lbl" value="YES"/>
+    </ant>
+  </target>
+  <target name="pdf" description="build PDF">
+    <ant antfile="${dita.dir}/build.xml">
+      <property name="args.input" location="../taskbook.ditamap"/>
+      <property name="transtype" value="pdf"/>
+      <property name="output.dir" location="../out/pdf"/>
+      <property name="args.gen.task.lbl" value="YES"/>
+      <property name="args.rellinks" value="nofamily"/>
+    </ant>
+  </target>
+</project>

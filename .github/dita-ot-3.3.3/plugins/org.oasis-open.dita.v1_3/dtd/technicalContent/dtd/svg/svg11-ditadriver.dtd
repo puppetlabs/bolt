@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ===============================================
+     SVG driver for use with DITA.
+     
+     Sets the namespace prefix to "svg"
+     
+     Date: March 2014
+     
+     =============================================== -->
+     
+<!ENTITY % NS.prefixed "INCLUDE" >
+<!ENTITY % SVG.prefix "svg" >
+     
+<!ENTITY % svg11
+   PUBLIC "-//OASIS//ELEMENTS DITA 1.3 SVG 1.1//EN"
+          "svg11/svg11-flat-20110816.dtd"
+>%svg11;
+
+<!-- ============ End of DITA SVG driver =========== -->

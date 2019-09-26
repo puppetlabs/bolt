@@ -1,0 +1,818 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Task XSD Module                              -->
+<!--  VERSION:   1.1                                             -->
+<!--  DATE:      November 2006                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA Tasks             -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2006                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+  <!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="urn:oasis:names:tc:dita:xsd:xml.xsd:1.1"/>
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/" schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.1"/>
+
+  <!-- Base type: univ-atts -->
+  <xs:attributeGroup name="univ-atts-no-importance-task">
+    <xs:attributeGroup ref="id-atts"/>
+    <xs:attribute name="base" type="xs:string" />
+    <xs:attributeGroup ref="base-attribute-extensions"/>
+    <xs:attributeGroup ref="filter-atts"/>
+    <xs:attribute name="rev" type="xs:string"/>
+    <xs:attribute name="status" type="status-atts.class"/>
+    <xs:attributeGroup ref="localization-atts" />
+  </xs:attributeGroup>
+   
+  <!-- Base type: importance-atts.class -->
+  <xs:simpleType name="importance-att-nodefault-task.class">
+    <xs:restriction base="importance-atts.class">
+      <xs:enumeration value="optional"/>
+      <xs:enumeration value="required"/>
+      <xs:enumeration value="-dita-use-conref-target"/>
+    </xs:restriction>
+  </xs:simpleType>
+   
+  <!-- Element declarations for task.mod -->
+  <xs:element name="task">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>task</keyword>> element is the top-level element
+        for a task topic. Tasks are the main building blocks for task-oriented user
+        assistance. They generally provide step-by-step instructions that will enable
+        a user to perform a task. A task answers the question of "how to?" by telling
+        the user precisely what to do and the order in which to do it. Tasks have
+        the same high-level structure as other topics, with a title, short description
+        and body.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="task.class">
+          <xs:attribute ref="class" default="- topic/topic task/task "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="taskbody">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>taskbody</keyword>> element is the main body-level
+        element inside a task topic. A task body has a very specific structure, with
+        the following elements in this order: &lt;<keyword>prereq</keyword>>, &lt;<keyword>context</keyword>>,
+        &lt;<keyword>steps</keyword>>, &lt;<keyword>result</keyword>, &lt;<keyword>example</keyword>>
+        and &lt;<keyword>postreq</keyword>>. Each of the body sections are optional.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="taskbody.class">
+          <xs:attribute ref="class" default="- topic/body  task/taskbody "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="prereq">
+    <xs:annotation>
+      <xs:documentation>
+        The pre-requisite (&lt;<keyword>prereq</keyword>>) section of a
+        task should document things the user needs to know or do before starting the
+        current task. Prerequisite links will be placed in a list after the related-links
+        section; on output the &lt;<keyword>prereq</keyword>> links from the related-links
+        section are added to the &lt;<keyword>prereq</keyword>> section.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="prereq.class">
+          <xs:attribute ref="class" default="- topic/section  task/prereq "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="context">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>context</keyword>> section of a task provides
+        background information for the task. This information helps the user understand
+        what the purpose of the task is and what they will gain by completing the
+        task. This section should be brief and does not replace or recreate a concept
+        topic on the same subject, although the context section may include some conceptual
+        information
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="context.class">
+          <xs:attribute ref="class" default="- topic/section  task/context "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="result">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>result</keyword>> element describes the expected
+        outcome for the task as a whole. 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="result.class">
+          <xs:attribute ref="class" default="- topic/section     task/result "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="postreq">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>postreq</keyword>> element describes steps or
+        tasks that the user should do after the successful completion of the current
+        task. It is often supported by links to the next task or tasks in the &lt;<keyword>related-links</keyword>>
+        section.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="postreq.class">
+          <xs:attribute ref="class" default="- topic/section task/postreq "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="choice">
+    <xs:annotation>
+      <xs:documentation>
+        Each &lt;<keyword>choice</keyword>> element describes one way that
+        the user could accomplish the current step.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="choice.class">
+          <xs:attribute ref="class" default="- topic/li     task/choice "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="step">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>step</keyword>> element represents an action that
+        a user must follow to accomplish a task. Each step in a task must contain
+        a command &lt;<keyword>cmd</keyword>> element which describes the particular
+        action the user must do to accomplish the overall task. The step element can
+        also contain information &lt;<keyword>info</keyword>>, substeps &lt;<keyword>substeps</keyword>>,
+        tutorial information &lt;<keyword>tutorialinfo</keyword>>, a step example
+        &lt;<keyword>stepxmp</keyword>>, choices &lt;<keyword>choices</keyword>> or
+        a stepresult &lt;<keyword>stepresult</keyword>>, although these are optional.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="step.class">
+          <xs:attribute ref="class" default="- topic/li     task/step "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="substep">
+    <xs:annotation>
+      <xs:documentation>
+        A &lt;<keyword>substep</keyword>> element has the same structure
+        as a &lt;<keyword>step</keyword>>, except that it does not allow lists of
+        choices or substeps within it, in order to prevent unlimited nesting of steps.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="substep.class">
+          <xs:attribute ref="class" default="- topic/li     task/substep "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+   <xs:element name="steps-unordered">
+     <xs:annotation>
+       <xs:documentation>
+         Like the &lt;<keyword>steps</keyword>> element, the &lt;<keyword>steps-unordered</keyword>>
+         section of a task provides the main content of the task topic, but particularly
+         for cases in which the order of steps may vary from one situation to another.
+         For example, fields of a form can be filled in without particular regard
+         to order as long as the required ones are filled in before submitting the
+         form. One or more steps is required inside the &lt;<keyword>steps-unordered</keyword>>
+         section.
+       </xs:documentation>
+     </xs:annotation>
+     <xs:complexType>
+       <xs:complexContent>
+         <xs:extension base="steps-unordered.class">
+           <xs:attribute ref="class" default="- topic/ul     task/steps-unordered "/>
+         </xs:extension>
+       </xs:complexContent>
+     </xs:complexType>
+  </xs:element>
+  
+   <xs:element name="choices">
+     <xs:annotation>
+       <xs:documentation>
+         The &lt;<keyword>choices</keyword>> element contains a list of
+         &lt;<keyword>choice</keyword>> elements. It is used when the user will need
+         to choose one of several actions while performing the steps of a task.
+       </xs:documentation>
+     </xs:annotation>
+     <xs:complexType>
+       <xs:complexContent>
+         <xs:extension base="choices.class">
+           <xs:attribute ref="class" default="- topic/ul     task/choices "/>
+         </xs:extension>
+       </xs:complexContent>
+     </xs:complexType>
+   </xs:element>
+   
+  <xs:element name="steps">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>steps</keyword>> section of a task provides the
+        main content of the task topic. The task is described as a series of steps
+        that the user must follow to accomplish the task. One or more &lt;<keyword>steps</keyword>>
+        elements is required inside the &lt;<keyword>steps</keyword>> section.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="steps.class">
+          <xs:attribute ref="class" default="- topic/ol  task/steps "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="substeps">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>substeps</keyword>> element allows you to break
+        a step down into a series of separate actions, and should be used only if
+        necessary. Try to describe the steps of a task in a single level of steps.
+        If you need to use more than one level of substep nesting, you should probably
+        rewrite the task to simplify it.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="substeps.class">
+          <xs:attribute ref="class" default="- topic/ol     task/substeps "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="cmd">
+    <xs:annotation>
+      <xs:documentation>
+        The command (&lt;<keyword>cmd</keyword>>) element is required as
+        the first element inside a &lt;<keyword>step</keyword>>. It provides the active
+        voice instruction to the user for completing the step, and should not be more
+        than one sentence. If the step needs additional explanation, this can follow
+        the &lt;<keyword>cmd</keyword>> element inside an <ph><xref href="info.xml">info</xref></ph> element.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="cmd.class">
+          <xs:attribute ref="class" default="- topic/ph     task/cmd "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="info">
+    <xs:annotation>
+      <xs:documentation>
+        The information element (&lt;<keyword>info</keyword>>) occurs inside
+        a &lt;<keyword>step</keyword>> element to provide additional information about
+        the step.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="info.class">
+          <xs:attribute ref="class" default="- topic/itemgroup     task/info "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="tutorialinfo">
+    <xs:annotation>
+      <xs:documentation>
+        The tutorial info (&lt;<keyword>tutorialinfo</keyword>>) element
+        contains information that is included in a step when a task is part of a tutorial.
+        The &lt;<keyword>tutorialinfo</keyword>> element allows you to turn a task
+        into a learning exercise by including explanatory content about methods for
+        completing the current step. This information is currently included in all
+        output processing results, not just tutorials. It is not for use in tasks
+        that are being used outside of tutorials.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="tutorialinfo.class">
+          <xs:attribute ref="class" default="- topic/itemgroup task/tutorialinfo "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="stepxmp">
+    <xs:annotation>
+      <xs:documentation>
+        The step example (&lt;<keyword>stepxmp</keyword>>) element is used
+        to illustrate a step of a task. The example can be a couple of words, or an
+        entire paragraph.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="stepxmp.class">
+          <xs:attribute ref="class" default="- topic/itemgroup     task/stepxmp "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="stepresult">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>stepresult</keyword>> element provides information
+        on the expected outcome of a step. If a user interface is being documented,
+        the outcome could describe a dialog box opening, or the appearance of a progress
+        indicator. Step results are useful to assure a user that they are on track,
+        but should not be used for every step, as this quickly becomes tedious.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="stepresult.class">
+          <xs:attribute ref="class" default="- topic/itemgroup task/stepresult "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="choicetable">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>choicetable</keyword>> element contains a series
+        of optional choices available within a step of a task.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="choicetable.class">
+          <xs:attribute ref="class" default="- topic/simpletable task/choicetable "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+   <xs:element name="chhead">
+     <xs:annotation>
+       <xs:documentation>
+         The &lt;<keyword>chhead</keyword>> element is a container inside
+         the &lt;<keyword>choicetable</keyword>> element that provides specific heading
+         text to override the default <b>Options</b> and <b>Description</b> headings.
+         The &lt;<keyword>chhead</keyword>> element contains both a <ph><xref href="choptionhd.xml">choptionhd</xref></ph> and <ph><xref
+           href="chdeschd.xml">chdeschd</xref></ph> element as a pair.
+       </xs:documentation>
+     </xs:annotation>
+     <xs:complexType>
+       <xs:complexContent>
+         <xs:extension base="chhead.class">
+           <xs:attribute ref="class" default="- topic/sthead task/chhead "/>
+         </xs:extension>
+       </xs:complexContent>
+     </xs:complexType>
+  </xs:element>
+  
+   <xs:element name="chrow">
+     <xs:annotation>
+       <xs:documentation>
+         The &lt;<keyword>chrow</keyword>> element is a container inside
+         the &lt;<keyword>choicetable</keyword>> element. The &lt;<keyword>chrow</keyword>>
+         element contains both a &lt;<keyword>choption</keyword>> and &lt;<keyword>chdesc</keyword>>
+         element as a pair.
+       </xs:documentation>
+     </xs:annotation>
+     <xs:complexType>
+       <xs:complexContent>
+         <xs:extension base="chrow.class">
+           <xs:attribute ref="class" default="- topic/chrow "/>
+         </xs:extension>
+       </xs:complexContent>
+     </xs:complexType>
+  </xs:element>
+  
+   <xs:element name="choptionhd">
+     <xs:annotation>
+       <xs:documentation>
+         The &lt;<keyword>choptionhd</keyword>> element provides a specific
+         label for the list of options that a user chooses from to accomplish a step.
+         The default label for options is <b>Option</b>.
+       </xs:documentation>
+     </xs:annotation>
+     <xs:complexType mixed="true">
+       <xs:complexContent>
+         <xs:extension base="choptionhd.class">
+           <xs:attribute ref="class" default="- topic/stentry task/choptionhd "/>
+         </xs:extension>
+       </xs:complexContent>
+     </xs:complexType>
+   </xs:element>
+   
+  <xs:element name="chdeschd">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>chdeschd</keyword>> option provides a specific
+        label for the list of descriptions of options that a user must choose to accomplish
+        a step of a task. The default label overridden by &lt;<keyword>chdeschd</keyword>>
+        is <b>Description</b>.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="chdeschd.class">
+          <xs:attribute ref="class" default="- topic/stentry task/chdeschd "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="choption">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>choption</keyword>> element describes an option
+        that a user could choose to accomplish a step of a task. In a user interface,
+        for example, this might be the name of radio button.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="choption.class">
+          <xs:attribute ref="class" default="- topic/stentry task/choption "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+   <xs:element name="chdesc">
+     <xs:annotation>
+       <xs:documentation>
+         The &lt;<keyword>chdesc</keyword>> element is a description of
+         an option that a user chooses while performing a step to accomplish a task.
+         It explains why the user would choose that option, and might explain the result
+         of the choice when it is not immediately obvious.
+       </xs:documentation>
+     </xs:annotation>
+     <xs:complexType mixed="true">
+       <xs:complexContent>
+         <xs:extension base="chdesc.class">
+           <xs:attribute ref="class" default="- topic/stentry task/chdesc "/>
+         </xs:extension>
+       </xs:complexContent>
+     </xs:complexType>
+   </xs:element>
+
+  <!-- Element declarations for task.mod -->
+  <xs:group name="task-info-types">
+    <xs:choice>
+      <xs:group ref="task"/>
+      <xs:group ref="info-types"/>
+    </xs:choice>
+  </xs:group>
+
+   <!-- Base type: topic.class -->
+  <xs:complexType name="task.class">
+    <xs:sequence>
+      <xs:group ref="title"/>
+      <xs:group ref="titlealts" minOccurs="0"/>
+      <xs:choice minOccurs="0">
+        <xs:group ref="shortdesc" minOccurs="0"/>
+        <xs:group ref="abstract" minOccurs="0"/>
+      </xs:choice>
+      <xs:group ref="prolog" minOccurs="0"/>
+      <xs:group ref="taskbody" minOccurs="0"/>
+      <xs:group ref="related-links" minOccurs="0"/>
+      <xs:group ref="task-info-types" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attribute name="conref" type="xs:string"/>
+    <xs:attributeGroup ref="select-atts"/>
+    <xs:attribute ref="ditaarch:DITAArchVersion"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="localization-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: body.class -->
+  <xs:complexType name="taskbody.class">
+    <xs:sequence>
+      <xs:group ref="prereq" minOccurs="0"/>
+      <xs:group ref="context" minOccurs="0"/>
+      <xs:choice minOccurs="0" maxOccurs="1">
+        <xs:group ref="steps" />
+        <xs:group ref="steps-unordered" />
+      </xs:choice>
+      <xs:group ref="result" minOccurs="0"/>
+      <xs:group ref="example" minOccurs="0"/>
+      <xs:group ref="postreq" minOccurs="0"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="data.element.incl"/>
+        <xs:group ref="foreign.unknown.incl"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attribute name="base" type="xs:string" />
+    <xs:attributeGroup ref="base-attribute-extensions"/>
+    <xs:attributeGroup ref="id-atts"/>
+    <xs:attributeGroup ref="localization-atts" />
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <!-- Base type: section.class -->
+  <xs:complexType name="prereq.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="section.notitle.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: section.class -->
+  <xs:complexType name="context.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="section.notitle.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: ol.class -->
+  <xs:complexType name="steps.class">
+    <xs:choice>
+      <xs:group ref="step" maxOccurs="unbounded"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: ul.class -->
+  <xs:complexType name="steps-unordered.class">
+    <xs:choice minOccurs="1" maxOccurs="unbounded">
+      <xs:group ref="step" />
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: li.class -->
+  <xs:complexType name="step.class">
+    <xs:sequence>
+      <xs:group ref="cmd"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="info"/>
+        <xs:group ref="substeps"/>
+        <xs:group ref="tutorialinfo"/>
+        <xs:group ref="stepxmp"/>
+        <xs:group ref="choicetable"/>
+        <xs:group ref="choices"/>
+      </xs:choice>
+      <xs:group ref="stepresult" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts-no-importance-task"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: ph.class -->
+  <xs:complexType name="cmd.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="ph.cnt"/>
+    </xs:choice>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: itemgroup.class -->
+  <xs:complexType name="info.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="itemgroup.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: ol.class -->
+  <xs:complexType name="substeps.class">
+    <xs:choice maxOccurs="unbounded">
+      <xs:group ref="substep" />
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: li.class -->
+  <xs:complexType name="substep.class">
+    <xs:sequence>
+      <xs:group ref="cmd"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="info" />
+        <xs:group ref="tutorialinfo" />
+        <xs:group ref="stepxmp" />
+      </xs:choice>
+      <xs:group ref="stepresult"  minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts-no-importance-task"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: itemgroup.class -->
+  <xs:complexType name="tutorialinfo.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="itemgroup.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: itemgroup.class -->
+  <xs:complexType name="stepxmp.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="itemgroup.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: ul.class -->
+  <xs:complexType name="choices.class">
+    <xs:choice maxOccurs="unbounded">
+      <xs:group ref="choice" />
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <xs:complexType name="choice.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="listitem.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+
+  <!-- Base type: itemgroup.class -->
+  <xs:complexType name="stepresult.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="itemgroup.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <!-- Base type: section.class -->
+  <xs:complexType name="result.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="section.notitle.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <!-- Base type: section.class -->
+  <xs:complexType name="postreq.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="section.notitle.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <!-- Base type: simpletable.class -->
+  <xs:complexType name="choicetable.class">
+    <xs:sequence>
+      <xs:group ref="chhead" minOccurs="0"/>
+      <xs:group ref="chrow" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="relcolwidth" type="xs:string"/>
+    <xs:attribute name="keycol" type="xs:NMTOKEN"/>
+    <xs:attribute name="refcols" type="xs:NMTOKENS"/>
+    <xs:attributeGroup ref="display-atts"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attribute name="spectitle" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <!-- Base type: sthead.class -->
+  <xs:complexType name="chhead.class">
+    <xs:sequence>
+      <xs:group ref="choptionhd"/>
+      <xs:group ref="chdeschd"/>
+    </xs:sequence>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <xs:complexType name="choptionhd.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="tblcell.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attribute name="specentry" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <xs:complexType name="chdeschd.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="tblcell.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attribute name="specentry" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+
+   <xs:complexType name="chrow.class">
+    <xs:sequence>
+      <xs:group ref="choption" />
+      <xs:group ref="chdesc" />
+    </xs:sequence>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+
+   <xs:complexType name="choption.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="tblcell.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attribute name="specentry" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <xs:complexType name="chdesc.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="tblcell.cnt"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attribute name="specentry" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+</xs:schema>

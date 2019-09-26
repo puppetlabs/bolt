@@ -1,0 +1,32 @@
+# This file is part of the DITA Open Toolkit project.
+#
+# Copyright 2011 Jarno Elovirta
+#
+# See the accompanying LICENSE file for applicable license.
+default namespace = "http://www.idiominc.com/opentopic/vars"
+
+vars =
+  ## Static string variables
+  element vars {
+    variable*
+  }
+param =
+  ## Parameter reference
+  element param {
+    ## Parameter name
+    attribute ref-name { text }
+  }
+variable =
+  # Static string variable
+  element variable {
+    ## Variable name
+    attribute id { text },
+    mixed { (variable-ref | param)* }
+  }
+variable-ref =
+  ## Variable reference
+  element variable {
+    ## Variable reference name
+    attribute id { text }
+  }
+start = vars

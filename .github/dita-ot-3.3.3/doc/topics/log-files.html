@@ -1,0 +1,83 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="concept"><meta name="description" content="When you run DITA-OT, key information is logged on the screen. This information can also be written to a log file. If you encounter a problem, you can analyze this information to determine the source of the problem and then take action to resolve it."><meta name="DC.subject" content="Apache FOP, log files, command, dita, logging, Ant, debugging, Java"><meta name="keywords" content="Apache FOP, log files, command, dita, logging, Ant, debugging, Java"><meta name="DC.relation" scheme="URI" content="../topics/troubleshooting-overview.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="loghandling"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Log files</title></head><body id="loghandling"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a><ul><li class="active"><a href="../topics/log-files.html">Log files</a></li><li><a href="../topics/DITA-messages.html">DITA-OT error messages</a></li><li><a href="../topics/other-errors.html">Other error messages</a></li><li><a href="../topics/dita-command-help.html">Accessing help for the dita command</a></li><li><a href="../topics/enabling-debug-mode.html">Enabling debug mode</a></li><li><a href="../topics/increasing-the-jvm.html">Increasing Java memory</a></li><li><a href="../topics/reducing-processing-time.html">Reducing processing time</a></li></ul></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Log files</h1>
+  
+  
+  <div class="body conbody"><p class="shortdesc">When you run DITA-OT, key information is logged on the screen. This information can also be written to a
+    log file. If you encounter a problem, you can analyze this information to determine the source of the problem and
+    then take action to resolve it.</p>
+    <p class="p">The logging behavior varies depending on whether you use the <span class="keyword cmdname">dita</span> command or Ant to invoke a
+      toolkit build.</p>
+    <dl class="dl">
+      
+        <dt class="dt dlterm"><span class="keyword cmdname">dita</span> command</dt>
+        <dd class="dd">By default, only warning and error messages are written to the screen. If you use the
+            <span class="keyword parmname">-v</span> option, logging will be more verbose and informative messages are also written out.
+          The <span class="keyword parmname">-l</span> option can be used to write the log messages into a file.</dd>
+      
+      
+        <dt class="dt dlterm">Ant</dt>
+        <dd class="dd">By default, status information is written to the screen. If you issue the <span class="keyword parmname">-l</span> parameter,
+          the build runs silently and the information is written to a log file with the name and location that you
+          specified.</dd>
+      
+    </dl>
+    <section class="section"><h2 class="title sectiontitle">Using other Ant loggers</h2>
+      
+      <p class="p">You also can use other Ant loggers; see
+        <a class="xref" href="https://ant.apache.org/manual/listeners.html" target="_blank">Listeners &amp;
+          Loggers</a> in the Ant documentation for more information.</p>
+      <p class="p">For example, you can use the <strong class="ph b">AnsiColorLogger</strong> to colorize the messages written on the screen.</p>
+      <dl class="dl">
+        
+          <dt class="dt dlterm"><span class="keyword cmdname">dita</span> command</dt>
+          <dd class="dd">
+            <p class="p">To use a custom Ant logger with the <span class="keyword cmdname">dita</span> command, add the logger to the
+                <code class="ph codeph">ANT_ARGS</code> environment variable by calling the following command before calling the
+                <span class="keyword cmdname">dita</span> command:</p>
+            <pre class="pre codeblock"><code>export ANT_ARGS="-logger org.apache.tools.ant.listener.AnsiColorLogger"</code></pre>
+            <p class="p">Now you will get colorized messages when the <span class="keyword cmdname">dita</span> command runs.</p>
+            <div class="note tip note_tip"><span class="note__title">Tip:</span> Environment variables can also be set permanently. See
+              <a class="xref" href="https://www.java.com/en/download/help/path.xml" target="_blank">How do I set or
+                change the PATH system variable?</a> for information on how to set the <code class="ph codeph">PATH</code>
+              environment variable. You can set the <code class="ph codeph">ANT_ARGS</code> environment variable in the same
+              way.</div>
+          </dd>
+        
+        
+          <dt class="dt dlterm">Ant</dt>
+          <dd class="dd">
+            <p class="p">If you prefer to launch DITA-OT directly from Ant, you can also add the logger to the
+                <code class="ph codeph">ANT_ARGS</code> environment variable, as explained above. You can also set the logger with the
+                <code class="ph codeph">-logger</code> parameter when calling Ant.</p>
+            <pre class="pre codeblock"><code>ant -logger org.apache.tools.ant.listener.AnsiColorLogger</code></pre>
+          </dd>
+        
+      </dl>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">FOP debug logging</h2>
+      
+      <div class="div div-index">
+        
+        
+      </div>
+      <p class="p">In PDF processing with Apache™ FOP, DITA-OT 3.1 now uses the Simple
+        Logging Facade for Java (SLF4J), allowing for better control and formatting of FOP log messages. To reduce noise
+        on the console, all FOP messages are set to the Info level and hidden by default.</p>
+      <p class="p">To enable debug logging, modify the <span class="ph filepath">config/logback.xml</span> file or add your own
+          <span class="ph filepath">logback.xml</span> to the classpath with a higher priority to override the default settings. For
+        more information, see the
+        <a class="xref" href="https://logback.qos.ch/manual/configuration.html" target="_blank">Logback
+          configuration documentation</a>.</p>
+      <div class="note attention note_attention"><span class="note__title">Attention:</span> Enabling FOP debug logging will dramatically increase the size of generated log
+        files.</div>
+    </section>
+    
+    
+    
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/troubleshooting-overview.html" title="This section contains information about problems that you might encounter and how to resolve them.">Error messages and troubleshooting</a></div></div></nav></article></main></body></html>

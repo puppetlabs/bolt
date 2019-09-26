@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!-- HEADER -->
+<!-- ============================================================= -->
+<!-- MODULE:    DITA Classification Map XSD -->
+<!-- VERSION:   1.2 -->
+<!-- DATE:      November 2006 -->
+<!---->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA) -->
+<!---->
+<!-- PURPOSE:    XSD to describe DITA Classification maps -->
+<!---->
+<!-- ORIGINAL CREATION DATE: -->
+<!-- March 2001 -->
+<!---->
+<!-- (C) Copyright OASIS Open 2005,  2009. -->
+<!-- (C) Copyright IBM Corporation 2001, 2004. -->
+<!-- All Rights Reserved. -->
+<!---->
+<!-- UPDATES: -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+  <!-- Map domains -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:mapGroupMod.xsd:1.2" />
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:indexingDomain.xsd:1.2" />
+ <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:delayResolutionDomain.xsd:1.2" />
+  
+  <!-- base domains -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:highlightDomain.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:utilitiesDomain.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:hazardstatementDomain.xsd:1.2"/>
+  
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:tblDeclGrp.xsd:1.2"/>
+ 
+ <!-- =================  MODULE INLCUDE DEFINITION  ==================  -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:commonElementMod.xsd:1.2"/>
+ <!-- ======== Table elements ======== -->
+ <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:tblDeclMod.xsd:1.2"/>    
+ <!-- ======= MetaData elements, plus keyword and indexterm ======= -->
+ <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:metaDeclMod.xsd:1.2"/>
+  
+  <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:mapGrp.xsd:1.2">
+  <xs:group name="topicref">
+   <xs:choice>
+    <xs:group ref="topicref"/>
+    <xs:group ref="mapgroup-d-topicref"/>
+    <xs:group ref="classify-d-topicref"/>
+   </xs:choice>
+  </xs:group>
+    
+    <xs:group name="reltable">
+    <xs:choice>
+      <xs:group ref="reltable"/>
+      <xs:group ref="classify-d-reltable"/>
+    </xs:choice>
+    </xs:group>
+    
+ </xs:redefine>
+ 
+ <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:commonElementGrp.xsd:1.2">
+  <xs:group name="index-base">
+   <xs:choice>
+    <xs:group ref="index-base"/>
+    <xs:group ref="indexing-d-index-base"/>
+   </xs:choice>
+  </xs:group>
+   
+   <xs:group name="ph">
+      <xs:choice>
+        <xs:group ref="ph"/>
+        <xs:group ref="hi-d-ph" />
+      </xs:choice>
+    </xs:group>
+
+    
+    <xs:group name="fig">
+      <xs:choice>
+        <xs:group ref="fig"/>
+        <xs:group ref="ut-d-fig" />
+      </xs:choice>
+    </xs:group >
+    
+    <xs:group name="note">
+      <xs:choice>
+        <xs:group ref="note"/>
+        <xs:group ref="hazard-d-note"/>
+      </xs:choice>
+    </xs:group >
+   
+ </xs:redefine>
+  
+  <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:metaDeclGrp.xsd:1.2">
+       <xs:group name="keywords">
+      <xs:choice>
+        <xs:group ref="keywords"/>
+        <xs:group ref="delay-d-keywords" />
+      </xs:choice>
+    </xs:group>
+  </xs:redefine>
+  
+ 
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:mapMod.xsd:1.2" />
+  
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:spec:classification:xsd:classifyDomain.xsd:1.2" />
+  
+  <xs:attributeGroup name="domains-att">
+    <xs:attribute name="domains" type="xs:string" 
+                           default="(map classify-d)
+                                           (map mapgroup-d) 
+                                           (topic delay-d)
+                                           (topic hazard-d)
+                                           (topic hi-d) 
+                                           (topic indexing-d) 
+                                           (topic ut-d)"/>
+  </xs:attributeGroup>
+  
+</xs:schema>
+<!-- ================== End DITA Classification Map XSD  ========= -->

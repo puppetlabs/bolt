@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<topic id="installing" xml:lang="en-us">
+  <title>Installing</title>
+  <shortdesc>You install components to make them available for your solution.</shortdesc>
+  <body>
+    <p>Usually, you can install the components once and then forget about the details of this task. Before installing
+      the components, you should make a plan for what you need to accomplish and the components that will support these
+      goals. After installing the components, you will probably want to perform some preliminary configuration. </p>
+  </body>
+</topic>

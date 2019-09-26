@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<!--DITA XNAL Domain-->
+
+   <public publicId="-//OASIS//ELEMENTS DITA 1.3 XNAL Domain//EN"
+           uri="dtd/xnalDomain.mod"/>
+
+   <public publicId="-//OASIS//ELEMENTS DITA 1.x XNAL Domain//EN"
+           uri="dtd/xnalDomain.mod"/>
+   <public publicId="-//OASIS//ELEMENTS DITA XNAL Domain//EN"
+           uri="dtd/xnalDomain.mod"/>
+   <public publicId="-//OASIS//ENTITIES DITA 1.3 XNAL Domain//EN"
+           uri="dtd/xnalDomain.ent"/>
+   <public publicId="-//OASIS//ENTITIES DITA 1.x XNAL Domain//EN"
+           uri="dtd/xnalDomain.ent"/>
+   <public publicId="-//OASIS//ENTITIES DITA XNAL Domain//EN"
+           uri="dtd/xnalDomain.ent"/>
+</catalog>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2007 Shawn McKenzie
+
+See the accompanying LICENSE file for applicable license.
+-->
+<!--
+    UPDATES:
+    August 2011: Updated by Robert D Anderson for SF Bug 3392718
+    *-->
+<project name="docondoc" default="sample2tocjs">
+    <import file="..${file.separator}..${file.separator}build.xml"/>
+    <property name="content.frame" value="contentwin"/>
+   
+    <target name="sample2html" depends="use-init">
+        <antcall target="dita2xhtml">
+            <param name="args.input"
+                value="sample${file.separator}tocjs.ditamap"/>
+            <param name="output.dir" value="out${file.separator}sample"/>
+            <param name="args.css"
+                value="sample${file.separator}basefiles${file.separator}sample.css"/>
+            <param name="args.copycss" value="yes"/>
+        </antcall>
+        
+        <copy
+            file="sample${file.separator}basefiles${file.separator}frameset.html"
+            tofile="out${file.separator}sample${file.separator}frameset.html"/>
+        <!--<antcall target="sample2tocjs"/>-->
+    </target>
+  
+    
+    <target name="sample2tocjs" description="Generate tocjs javascript file" depends="sample2html">
+        <!-- Update August 2011: Calling dita2tocjs will repeat the entire HTML build, ending with
+             a process to create toctree.js. "sample2html" has already run, so the map and HTML
+             will always exist in the temp directory. Rather than calling a new build to repeat
+             that HTML conversion, just run the XSLT process to create toctree.js. -->
+        <xslt in="${dita.temp.dir}${file.separator}tocjs.ditamap" out="out${file.separator}sample${file.separator}toctree.js" style="${dita.plugin.com.sophos.tocjs.dir}/xsl/tocjs.xsl">
+            <param name="contentwin" expression="${content.frame}" if="content.frame" />  
+            <param name="htmlext" expression="${out.ext}" /> 
+        </xslt>
+        <!--<antcall target="dita2tocjs">
+            <param name="transtype" value="tocjs"/>
+            <param name="args.input"
+                value="sample${file.separator}tocjs.ditamap"/>
+            <param name="output.file"
+                value="out${file.separator}sample${file.separator}toctree.js"/>
+        </antcall>-->
+        <copy todir="out${file.separator}sample"><fileset
+            dir="${dita.plugin.com.sophos.tocjs.dir}${file.separator}basefiles"><include name="**/*"/></fileset></copy>
+    </target>
+    
+    <target name="sampleclean" description="clean tocjs sample output">
+        <delete dir="${dita.plugin.com.sophos.tocjs.dir}${file.separator}out"/>
+    </target>
+
+</project>

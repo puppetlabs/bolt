@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Glossary Entry</moduleTitle>
+    <headerComment xml:space="preserve" fileType="dtdEnt">
+=============================================================
+                   HEADER
+=============================================================
+ MODULE:    DITA Glossary Entity
+ VERSION:   1.2
+ DATE:      November 2009
+                                                              
+=============================================================
+ 
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION
+                   TYPICAL INVOCATION
+                                                             
+Refer to this file by the following public identifier or an 
+appropriate system identifier 
+ 
+PUBLIC "-//OASIS//ENTITIES DITA Glossary//EN"
+ 
+Delivered as file "glossary.ent"
+ 
+</headerComment>
+<headerComment xml:space="preserve" fileType="dtdMod">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Glossary
+ VERSION:   1.2
+ DATE:      November 2009
+                                                             
+=============================================================
+ 
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION
+                   TYPICAL INVOCATION
+                                                             
+Refer to this file by the following public identifier or an 
+appropriate system identifier
+
+PUBLIC "-//OASIS//ELEMENTS DITA Glossary//EN"
+ 
+Delivered as file "glossary.mod"
+</headerComment>
+<headerComment xml:space="preserve" fileType="xsdGrp">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Glossary XSD Group Declaration
+ VERSION:   1.2
+ DATE:      July 2007
+                                                             
+=============================================================
+
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)
+                                                             
+PURPOSE:    W3C XML Schema to describe DITA concepts
+                                                             
+ORIGINAL CREATION DATE:                                      
+            June 2006
+                                                             
+            (C) Copyright OASIS-Open.org 2006, 2009               
+            All Rights Reserved.
+=============================================================
+</headerComment>
+    <headerComment xml:space="preserve" fileType="xsdMod">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Glossary XSD Module                          
+ VERSION:   1.2                                            
+ DATE:      July 2007                                    
+                                                             
+=============================================================
+ 
+ 
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Define elements and specialization attributes   
+            for Glossary topics                              
+ORIGINAL CREATION DATE:                                      
+            July 2007                                       
+                                                             
+            (C) Copyright OASIS-Open.org 2007, 2009               
+            All Rights Reserved.                             
+=============================================================
+</headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>glossary</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Glossary//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Glossary//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:glossaryMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:xsd:glossaryGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:rnc:glossaryMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:glossaryMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic concept glossentry)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+    
+  <include href="glossentryMod.rng">
+    <a:documentation>Redirect to the correctly-named module.</a:documentation>
+  </include>
+</grammar>

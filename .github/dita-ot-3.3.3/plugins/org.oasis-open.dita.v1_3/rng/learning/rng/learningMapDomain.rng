@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Learning Map Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Learning Map Domain                         
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identfier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Learning Map Domain//EN"
+      Delivered as file "learningMapDomain.mod"                   
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for Learning Map Domain               
+                                                             
+ORIGINAL CREATION DATE:                                      
+            May 2007                                         
+                                                             
+            (C) Copyright OASIS Open 2007, 2009              
+            All Rights Reserved.                             
+                                                             
+                                                             
+ 16 Aug 2009: WEK Added learningContentComponentRef per TC   
+ 07 Dec 2009: RDA combined @id, conref-atts, select-atts, and
+              localization-atts into a single ref to univ-atts
+                                                             
+                                                             
+============================================================= 
+</headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>learningmap-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Learning Map Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Learning Map Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:spec:learning:xsd:learningMapDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:spec:learning:rnc:learningMapDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:spec:learning:rng:learningMapDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(map learningmap-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+
+    <define name="learningmap-d-topicref">
+      <choice>
+        <ref name="learningObject.element"/>
+        <ref name="learningGroup.element"/>
+        <ref name="learningObjectMapRef.element" dita:since="1.3"/>
+        <ref name="learningGroupMapRef.element" dita:since="1.3"/>
+      </choice>
+    </define>
+    <define name="topicref" combine="choice">
+      <ref name="learningmap-d-topicref"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="learningObject">
+      <ref name="learningObject.element"/>
+    </define>
+    <define name="learningObjectMapRef">
+      <ref name="learningObjectMapRef.element"/>
+    </define>
+    <define name="learningGroupMapRef">
+      <ref name="learningGroupMapRef.element"/>
+    </define>
+    <define name="learningOverviewRef">
+      <ref name="learningOverviewRef.element"/>
+    </define>
+    <define name="learningPlanRef">
+      <ref name="learningPlanRef.element"/>
+    </define>
+    <define name="learningContentRef">
+      <ref name="learningContentRef.element"/>
+    </define>
+    <define name="learningContentComponentRef">
+      <ref name="learningContentComponentRef.element"/>
+    </define>
+    <define name="learningSummaryRef">
+      <ref name="learningSummaryRef.element"/>
+    </define>
+    <define name="learningPreAssessmentRef">
+      <ref name="learningPreAssessmentRef.element"/>
+    </define>
+    <define name="learningPostAssessmentRef">
+      <ref name="learningPostAssessmentRef.element"/>
+    </define>
+    <define name="learningGroup">
+      <ref name="learningGroup.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>COMMONT ATTRIBUTE GROUPS</a:documentation>
+    <define name="learningDomain-topicref-atts-no-chunk">
+      <optional>
+        <attribute name="navtitle"/>
+      </optional>
+      <optional>
+        <attribute name="href"/>
+      </optional>
+      <optional>
+        <attribute name="keyref"/>
+      </optional>
+      <optional>
+        <attribute name="keys"/>
+      </optional>
+      <optional>
+        <attribute name="keyscope" dita:since="1.3"/>
+      </optional>
+      <optional>
+        <attribute name="query"/>
+      </optional>
+      <optional>
+        <attribute name="copy-to"/>
+      </optional>
+      <optional>
+        <attribute name="outputclass"/>
+      </optional>
+      <optional>
+        <attribute name="cascade" dita:since="1.3"/>
+      </optional>
+      <optional>
+        <attribute name="scope">
+          <choice>
+            <value>external</value>
+            <value>local</value>
+            <value>peer</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="processing-role">
+          <choice>
+            <value>normal</value>
+            <value>resource-only</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="linking">
+          <choice>
+            <value>targetonly</value>
+            <value>sourceonly</value>
+            <value>normal</value>
+            <value>none</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="locktitle">
+          <choice>
+            <value>yes</value>
+            <value>no</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="toc">
+          <choice>
+            <value>yes</value>
+            <value>no</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="print">
+          <choice>
+            <value>yes</value>
+            <value>no</value>
+            <value>printonly</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="search">
+          <choice>
+            <value>yes</value>
+            <value>no</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <ref name="univ-atts"/>
+    </define>
+    <define name="learningDomain-topicref-atts">
+      <ref name="learningDomain-topicref-atts-no-chunk"/>
+      <optional>
+        <attribute name="chunk"/>
+      </optional>
+    </define>
+    <define name="learningDomain-mapref-atts" dita:since="1.3">
+      <ref name="learningDomain-topicref-atts-no-chunk"/>
+      <optional>
+        <attribute name="format"/>
+      </optional>
+    </define>
+    <define name="learningObjectComponent-topicref-atts">
+      <ref name="learningDomain-topicref-atts-no-chunk"/>
+      <optional>
+        <attribute name="chunk" a:defaultValue="to-content"/>
+      </optional>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation>LONG NAME: Learning group</a:documentation>
+      <define name="learningGroup.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+        <optional>
+          <ref name="learningPlanRef"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="learningOverviewRef"/>
+            <ref name="learningPreAssessmentRef"/>
+          </choice>
+        </zeroOrMore>
+        <zeroOrMore>
+          <choice>
+            <ref name="learningObject"/>
+            <ref name="learningObjectMapRef" dita:since="1.3"/>
+            <ref name="learningGroup"/>
+            <ref name="learningGroupMapRef" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+        <zeroOrMore>
+          <choice>
+            <ref name="learningPostAssessmentRef"/>
+            <ref name="learningSummaryRef"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="learningGroup.attributes">
+        <ref name="learningDomain-topicref-atts"/>
+        <optional>
+          <attribute name="collection-type">
+            <choice>
+              <value>choice</value>
+              <value>unordered</value>
+              <value>sequence</value>
+              <value>family</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+      </define>
+      <define name="learningGroup.element">
+        <element name="learningGroup" dita:longName="Learning group">
+          <a:documentation>learningGroup introduces and groups learning objects into higher-level organizations, such as course-level, module-level, or lesson-level. </a:documentation>
+          <ref name="learningGroup.attlist"/>
+          <ref name="learningGroup.content"/>
+        </element>
+      </define>
+      <define name="learningGroup.attlist" combine="interleave">
+        <ref name="learningGroup.attributes"/>
+      </define>
+    </div>
+
+    <div>
+      <a:documentation>LONG NAME: Learning object</a:documentation>
+      <define name="learningObject.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+        <optional>
+          <ref name="learningPlanRef"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="learningOverviewRef"/>
+            <ref name="learningPreAssessmentRef"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="learningContentRef"/>
+        </oneOrMore>
+        <zeroOrMore>
+          <choice>
+            <ref name="learningPostAssessmentRef"/>
+            <ref name="learningSummaryRef"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="learningObject.attributes">
+        <ref name="learningDomain-topicref-atts"/>
+        <optional>
+          <attribute name="collection-type">
+            <choice>
+              <value>choice</value>
+              <value>unordered</value>
+              <value>sequence</value>
+              <value>family</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+      </define>
+      <define name="learningObject.element">
+        <element name="learningObject" dita:longName="Learning object">
+          <a:documentation>learningObject organizes topic references to DITA learning topics as a learning object. </a:documentation>
+          <ref name="learningObject.attlist"/>
+          <ref name="learningObject.content"/>
+        </element>
+      </define>
+      <define name="learningObject.attlist" combine="interleave">
+        <ref name="learningObject.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Learning plan reference</a:documentation>
+      <define name="learningPlanRef.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+      </define>
+      <define name="learningPlanRef.attributes">
+        <ref name="learningObjectComponent-topicref-atts"/>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+      </define>
+      <define name="learningPlanRef.element">
+        <element name="learningPlanRef" dita:longName="Learning plan reference">
+          <a:documentation>Use a learningPlanRef element to include a topic reference to a learning plan topic as part of a learningObject. </a:documentation>
+          <ref name="learningPlanRef.attlist"/>
+          <ref name="learningPlanRef.content"/>
+        </element>
+      </define>
+      <define name="learningPlanRef.attlist" combine="interleave">
+        <ref name="learningPlanRef.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Learning overview reference</a:documentation>
+      <define name="learningOverviewRef.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+      </define>
+      <define name="learningOverviewRef.attributes">
+        <ref name="learningObjectComponent-topicref-atts"/>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+      </define>
+      <define name="learningOverviewRef.element">
+        <element name="learningOverviewRef" dita:longName="Learning overview reference">
+          <a:documentation>Use a learningOverviewRef element to include a topic reference to a learning overview topic as part of a learningObject. </a:documentation>
+          <ref name="learningOverviewRef.attlist"/>
+          <ref name="learningOverviewRef.content"/>
+        </element>
+      </define>
+      <define name="learningOverviewRef.attlist" combine="interleave">
+        <ref name="learningOverviewRef.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Learning summary reference</a:documentation>
+      <define name="learningSummaryRef.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+      </define>
+      <define name="learningSummaryRef.attributes">
+        <ref name="learningObjectComponent-topicref-atts"/>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+      </define>
+      <define name="learningSummaryRef.element">
+        <element name="learningSummaryRef" dita:longName="Learning summary reference">
+          <a:documentation>Use a learningSummaryRef to include topic reference to a learning summary topic in a DITA learning object. </a:documentation>
+          <ref name="learningSummaryRef.attlist"/>
+          <ref name="learningSummaryRef.content"/>
+        </element>
+      </define>
+      <define name="learningSummaryRef.attlist" combine="interleave">
+        <ref name="learningSummaryRef.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Learning content reference</a:documentation>
+      <define name="learningContentRef.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="learningContentComponentRef"/>
+        </zeroOrMore>
+      </define>
+      <define name="learningContentRef.attributes">
+        <ref name="learningDomain-topicref-atts-no-chunk"/>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="chunk" a:defaultValue="to-content"/>
+        </optional>
+      </define>
+      <define name="learningContentRef.element">
+        <element name="learningContentRef" dita:longName="Learning content reference">
+          <a:documentation>Use a learningContentRef element to include a topic reference to a learning content topic as part of a DITA learningObject. </a:documentation>
+          <ref name="learningContentRef.attlist"/>
+          <ref name="learningContentRef.content"/>
+        </element>
+      </define>
+      <define name="learningContentRef.attlist" combine="interleave">
+        <ref name="learningContentRef.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Learning content component reference</a:documentation>
+      <define name="learningContentComponentRef.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="learningContentComponentRef"/>
+        </zeroOrMore>
+      </define>
+      <define name="learningContentComponentRef.attributes">
+        <ref name="learningDomain-topicref-atts"/>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+      </define>
+      <define name="learningContentComponentRef.element">
+        <element name="learningContentComponentRef" dita:longName="Learning content component reference">
+          <ref name="learningContentComponentRef.attlist"/>
+          <ref name="learningContentComponentRef.content"/>
+        </element>
+      </define>
+      <define name="learningContentComponentRef.attlist" combine="interleave">
+        <ref name="learningContentComponentRef.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Learning pre-assessment reference</a:documentation>
+      <define name="learningPreAssessmentRef.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+      </define>
+      <define name="learningPreAssessmentRef.attributes">
+        <ref name="learningObjectComponent-topicref-atts"/>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+      </define>
+      <define name="learningPreAssessmentRef.element">
+        <element name="learningPreAssessmentRef" dita:longName="Learning pre-assessment reference">
+          <a:documentation>Use a learningPreAssessmentRef element to include a topic reference to a learning assessment topic as part of a DITA learningObject. </a:documentation>
+          <ref name="learningPreAssessmentRef.attlist"/>
+          <ref name="learningPreAssessmentRef.content"/>
+        </element>
+      </define>
+      <define name="learningPreAssessmentRef.attlist" combine="interleave">
+        <ref name="learningPreAssessmentRef.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Learning post-assessment reference</a:documentation>
+      <define name="learningPostAssessmentRef.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+      </define>
+      <define name="learningPostAssessmentRef.attributes">
+        <ref name="learningObjectComponent-topicref-atts"/>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+      </define>
+      <define name="learningPostAssessmentRef.element">
+        <element name="learningPostAssessmentRef" dita:longName="Learning post-assessment reference">
+          <a:documentation>Use a learningPostAssessmentRef element to include a topic reference to a learning assessment topic as part of a DITA learningObject. </a:documentation>
+          <ref name="learningPostAssessmentRef.attlist"/>
+          <ref name="learningPostAssessmentRef.content"/>
+        </element>
+      </define>
+      <define name="learningPostAssessmentRef.attlist" combine="interleave">
+        <ref name="learningPostAssessmentRef.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Learning group map reference</a:documentation>
+      <define name="learningGroupMapRef.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+      </define>
+      <define name="learningGroupMapRef.attributes">
+        <ref name="learningDomain-mapref-atts"/>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+      </define>
+      <define name="learningGroupMapRef.element">
+        <element name="learningGroupMapRef" dita:longName="Learning group map reference" dita:since="1.3">
+          <a:documentation> </a:documentation>
+          <ref name="learningGroupMapRef.attlist"/>
+          <ref name="learningGroupMapRef.content"/>
+        </element>
+      </define>
+      <define name="learningGroupMapRef.attlist" combine="interleave">
+        <ref name="learningGroupMapRef.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Learning object map reference</a:documentation>
+      <define name="learningObjectMapRef.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+      </define>
+      <define name="learningObjectMapRef.attributes">
+        <ref name="learningDomain-mapref-atts"/>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+      </define>
+      <define name="learningObjectMapRef.element">
+        <element name="learningObjectMapRef" dita:longName="Learning object map reference" dita:since="1.3">
+          <a:documentation> </a:documentation>
+          <ref name="learningObjectMapRef.attlist"/>
+          <ref name="learningObjectMapRef.content"/>
+        </element>
+      </define>
+      <define name="learningObjectMapRef.attlist" combine="interleave">
+        <ref name="learningObjectMapRef.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="learningObject.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningObject "/>
+      </optional>
+    </define>
+    <define name="learningGroup.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningGroup "/>
+      </optional>
+    </define>
+    <define name="learningGroupMapRef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningGroupMapRef "/>
+      </optional>
+    </define>
+    <define name="learningObjectMapRef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningObjectMapRef "/>
+      </optional>
+    </define>
+    <define name="learningPlanRef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningPlanRef "/>
+      </optional>
+    </define>
+    <define name="learningOverviewRef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningOverviewRef "/>
+      </optional>
+    </define>
+    <define name="learningContentRef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningContentRef "/>
+      </optional>
+    </define>
+    <define name="learningContentComponentRef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningContentComponentRef "/>
+      </optional>
+    </define>
+    <define name="learningSummaryRef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningSummaryRef "/>
+      </optional>
+    </define>
+    <define name="learningPreAssessmentRef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningPreAssessmentRef "/>
+      </optional>
+    </define>
+    <define name="learningPostAssessmentRef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref learningmap-d/learningPostAssessmentRef "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

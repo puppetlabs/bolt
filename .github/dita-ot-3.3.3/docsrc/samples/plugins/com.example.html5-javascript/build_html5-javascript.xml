@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<project>
+  <target name="dita2html5-javascript"
+       depends="dita2html5-javascript.init,
+                dita2html5"/>
+  <target name="dita2html5-javascript.init">
+    <property name="args.ftr"
+          location="${dita.plugin.com.example.html5-javascript.dir}/include/javascript.ftr.xml"/>
+  </target>
+</project>

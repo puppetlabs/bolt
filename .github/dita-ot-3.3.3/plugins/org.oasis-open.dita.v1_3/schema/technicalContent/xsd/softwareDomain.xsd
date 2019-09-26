@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Software Domain                             -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Software Domain//EN"         -->
+<!--      Delivered as file "softwareDomain.mod"                      -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for the Software Domain               -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2001                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2001, 2004.        -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2005.11.15 RDA: Corrected the PURPOSE in this comment     -->
+<!--   2005.11.15 RDA: Corrected the "Delivered as" system ID    -->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       -->
+<!--   2008.02.12 RDA: Add text to msgnum, cmdname, varname      -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--=============================================================  -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://www.w3.org/XML/1998/namespace"
+              schemaLocation="urn:oasis:names:tc:dita:xsd:xml.xsd:1.3"/>
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic sw-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="msgph">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="msgph"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="msgblock">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="msgblock"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="msgnum">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="msgnum"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="cmdname">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="cmdname"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="varname">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="varname"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="filepath">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="filepath"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="userinput">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="userinput"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="systemoutput">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="systemoutput"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="sw-d-pre">
+      <xs:choice>
+         <xs:element ref="msgblock"/>
+      </xs:choice>
+   </xs:group>
+   <xs:group name="sw-d-ph">
+      <xs:choice>
+         <xs:element ref="filepath"/>
+         <xs:element ref="msgph"/>
+         <xs:element ref="systemoutput"/>
+         <xs:element ref="userinput"/>
+      </xs:choice>
+   </xs:group>
+   <xs:group name="sw-d-keyword">
+      <xs:choice>
+         <xs:element ref="cmdname"/>
+         <xs:element ref="msgnum"/>
+         <xs:element ref="varname"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="msgph">
+      <xs:annotation>
+         <xs:documentation>
+            The message phrase (&lt;msgph&gt;) element contains the text content of a message produced by an application or program. It can also contain the variable name (varname) element to illustrate where variable text content can occur in the message. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="msgph.class">
+               <xs:attribute ref="class" default="+ topic/ph sw-d/msgph "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="msgph.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="msgph.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="msgph.attributes"/>
+   </xs:complexType>
+   <xs:group name="msgph.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="msgph.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="msgblock">
+      <xs:annotation>
+         <xs:documentation>
+            The message block (&lt;msgblock&gt;) element contains a multi-line message or set of messages. The message block can contain multiple message numbers and message descriptions, each enclosed in a &lt;msgnum&gt; and &lt;msgph&gt; element. It can also contain the message content directly. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="msgblock.class">
+               <xs:attribute ref="class" default="+ topic/pre sw-d/msgblock "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="msgblock.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="msgblock.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="msgblock.attributes"/>
+   </xs:complexType>
+   <xs:group name="msgblock.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt"/>
+            <xs:group ref="msgph"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="msgblock.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute ref="xml:space" default="preserve"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="msgnum">
+      <xs:annotation>
+         <xs:documentation>
+            The message number (&lt;msgnum&gt;) element contains the number of a message produced by an application or program. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="msgnum.class">
+               <xs:attribute ref="class" default="+ topic/keyword sw-d/msgnum "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="msgnum.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="msgnum.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="msgnum.attributes"/>
+   </xs:complexType>
+   <xs:group name="msgnum.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="msgnum.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="cmdname">
+      <xs:annotation>
+         <xs:documentation>
+            The command name (&lt;cmdname&gt;) element specifies the name of a command when it is part of a software discussion. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="cmdname.class">
+               <xs:attribute ref="class" default="+ topic/keyword sw-d/cmdname "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="cmdname.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="cmdname.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="cmdname.attributes"/>
+   </xs:complexType>
+   <xs:group name="cmdname.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="cmdname.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="varname">
+      <xs:annotation>
+         <xs:documentation>
+            The variable name (&lt;varname&gt;) element defines a variable that must be supplied to a software application. The variable name element is very similar to the variable (var) element, but variable name is used outside of syntax diagrams. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="varname.class">
+               <xs:attribute ref="class" default="+ topic/keyword sw-d/varname "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="varname.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="varname.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="varname.attributes"/>
+   </xs:complexType>
+   <xs:group name="varname.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="varname.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="filepath">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;filepath&gt; element indicates the name and optionally the location of a referenced file by specifying the directory containing the file, and other directories that may precede it in the system hierarchy. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="filepath.class">
+               <xs:attribute ref="class" default="+ topic/ph sw-d/filepath "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="filepath.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="filepath.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="filepath.attributes"/>
+   </xs:complexType>
+   <xs:group name="filepath.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="filepath.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="userinput">
+      <xs:annotation>
+         <xs:documentation>
+            The user input (&lt;userinput&gt;) element represens the text a user should input in response to a program or system prompt. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="userinput.class">
+               <xs:attribute ref="class" default="+ topic/ph sw-d/userinput "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="userinput.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="userinput.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="userinput.attributes"/>
+   </xs:complexType>
+   <xs:group name="userinput.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="userinput.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="systemoutput">
+      <xs:annotation>
+         <xs:documentation>
+            The system output (&lt;systemoutput&gt;) element represents computer output or responses to a command or situation. A generalized element, it represents any kind of output from the computer, so the author may wish to choose more specific markup, such as msgph, for messages from the application. The system output element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="systemoutput.class">
+               <xs:attribute ref="class" default="+ topic/ph sw-d/systemoutput "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="systemoutput.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="systemoutput.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="systemoutput.attributes"/>
+   </xs:complexType>
+   <xs:group name="systemoutput.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="systemoutput.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

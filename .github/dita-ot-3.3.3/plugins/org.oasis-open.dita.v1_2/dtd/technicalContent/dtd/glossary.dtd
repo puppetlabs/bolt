@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Glossary DTD                                 -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//DTD DITA Glossary//EN"
+      Delivered as file "glossary.dtd"                             -->
+
+<!-- The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+PUBLIC "-//OASIS//DTD DITA 1.2 Glossary//EN"                       -->
+
+<!-- NOTE: The glossary.dtd file was misnamed in DITA 1.1. As of 
+     DITA 1.2, this file simply redirects to the correctly-named
+     file.
+  -->
+
+<!ENTITY % glossentryDtd
+  PUBLIC "-//OASIS//DTD DITA Glossary Entry//EN" 
+         "glossentry.dtd"
+>%glossentryDtd;
+
+<!-- ================== End DITA Glossary DTD  =================== -->

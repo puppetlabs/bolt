@@ -1,0 +1,1045 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  xmlns="http://relaxng.org/ns/structure/1.0" 
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Metadata</moduleTitle>
+    <headerComment><![CDATA[
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Metadata                                    
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Metadata//EN"
+      Delivered as file "metaDecl.mod"                            
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for the DITA XML Metadata             
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2001                                       
+                                                             
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2005.11.15 RDA: Corrected the "Delivered as" system ID    
+   2006.06.06 RDA: Move indexterm into commonElements        
+   2006.06.07 RDA: Make universal attributes universal       
+                     (DITA 1.1 proposal #12)                 
+   2006.11.30 RDA: Add -dita-use-conref-target to enumerated 
+                     attributes                              
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.01.28 RDA: Removed enumerations for attributes:      
+                   author/@type, copyright/@type,            
+                   permissions/@view, audience/@type,        
+                   audience/@job, audience/@experiencelevel  
+   2008.01.28 RDA: Moved <metadata> defn. here from topic.mod
+   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  
+   2008.02.12 RDA: Add ph to source                          
+   2008.02.12 RDA: Add @format, @scope, and @type to         
+                   publisher, source                         
+   2008.02.12 RDA: Add @format, @scope, to author            
+   2008.02.13 RDA: Create .content and .attributes entities  
+   2009.03.09 RDA: Corrected public ID in comments to use    
+                   ELEMENTS instead of ENTITIES              
+=============================================================
+   
+ ]]></headerComment>
+    <moduleMetadata>
+      <moduleType>base</moduleType>
+      <moduleShortName>metaDecl</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Metadata//EN</dtdMod>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:metaDeclMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:xsd:metaDeclGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:rnc:metaDeclMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:metaDeclMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution/>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>Define type patterns</a:documentation>
+    <define name="date-format">
+      <data type="string"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation>LONG NAME: Author</a:documentation>
+      <define name="author.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="author.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+      </define>
+      <define name="author.element">
+        <element name="author" dita:longName="Author">
+          <a:documentation>The &lt;author> metadata element contains the name of the topic's author. Category: Prolog elements</a:documentation>
+          <ref name="author.attlist"/>
+          <ref name="author.content"/>
+        </element>
+      </define>
+      <define name="author.attlist" combine="interleave">
+        <ref name="author.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Source</a:documentation>
+      <define name="source.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="words.cnt"/>
+            <ref name="ph"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="source.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+      </define>
+      <define name="source.element">
+        <element name="source" dita:longName="Source">
+          <a:documentation>The &lt;source> element contains a reference to a resource from which the present topic is derived, either completely or in part. The element can contain a description of
+            the resource; the href reference can be a string or a URL that points to it. Category: Prolog elements</a:documentation>
+          <ref name="source.attlist"/>
+          <ref name="source.content"/>
+        </element>
+      </define>
+      <define name="source.attlist" combine="interleave">
+        <ref name="source.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Publisher</a:documentation>
+      <define name="publisher.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="publisher.attributes">
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <define name="publisher.element">
+        <element name="publisher" dita:longName="Publisher">
+          <a:documentation>The &lt;publisher> metadata element contains the name of the person, company, or organization responsible for making the content or subject of the topic available. Category:
+            Prolog elements</a:documentation>
+          <ref name="publisher.attlist"/>
+          <ref name="publisher.content"/>
+        </element>
+      </define>
+      <define name="publisher.attlist" combine="interleave">
+        <ref name="publisher.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Copyright</a:documentation>
+      <define name="copyright.content">
+        <oneOrMore>
+          <ref name="copyryear"/>
+        </oneOrMore>
+        <ref name="copyrholder"/>
+      </define>
+      <define name="copyright.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+      </define>
+      <define name="copyright.element">
+        <element name="copyright" dita:longName="Copyright">
+          <a:documentation>The &lt;copyright> element is used for a single copyright entry. It includes the copyright years and the copyright holder. Multiple &lt;copyright> statements are allowed.
+            Category: Prolog elements</a:documentation>
+          <ref name="copyright.attlist"/>
+          <ref name="copyright.content"/>
+        </element>
+      </define>
+      <define name="copyright.attlist" combine="interleave">
+        <ref name="copyright.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Copyright Year</a:documentation>
+      <define name="copyryear.content">
+        <empty/>
+      </define>
+      <define name="copyryear.attributes">
+        <attribute name="year">
+          <ref name="date-format"/>
+        </attribute>
+        <ref name="univ-atts"/>
+      </define>
+      <define name="copyryear.element">
+        <element name="copyryear" dita:longName="Copyright Year">
+          <a:documentation>The &lt;copyryear> element contains the copyright year as specified by the year attribute. Category: Prolog elements</a:documentation>
+          <ref name="copyryear.attlist"/>
+          <ref name="copyryear.content"/>
+        </element>
+      </define>
+      <define name="copyryear.attlist" combine="interleave">
+        <ref name="copyryear.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Copyright Holder</a:documentation>
+      <define name="copyrholder.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="copyrholder.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="copyrholder.element">
+        <element name="copyrholder" dita:longName="Copyright Holder">
+          <a:documentation>The copyright holder (&lt;copyrholder>) element names the entity that holds legal rights to the material contained in the topic. Category: Prolog elements</a:documentation>
+          <ref name="copyrholder.attlist"/>
+          <ref name="copyrholder.content"/>
+        </element>
+      </define>
+      <define name="copyrholder.attlist" combine="interleave">
+        <ref name="copyrholder.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Critical Dates</a:documentation>
+      <define name="critdates.content">
+        <optional>
+          <ref name="created"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="revised"/>
+        </zeroOrMore>
+      </define>
+      <define name="critdates.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="critdates.element">
+        <element name="critdates" dita:longName="Critical Dates">
+          <a:documentation>The &lt;critdates> element contains the critical dates in a document life cycle, such as the creation date and multiple revision dates. Category: Prolog
+            elements</a:documentation>
+          <ref name="critdates.attlist"/>
+          <ref name="critdates.content"/>
+        </element>
+      </define>
+      <define name="critdates.attlist" combine="interleave">
+        <ref name="critdates.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Created Date</a:documentation>
+      <define name="created.content">
+        <empty/>
+      </define>
+      <define name="created.attributes">
+        <attribute name="date">
+          <ref name="date-format"/>
+        </attribute>
+        <optional>
+          <attribute name="golive">
+            <ref name="date-format"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="expiry">
+            <ref name="date-format"/>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <define name="created.element">
+        <element name="created" dita:longName="Created Date">
+          <a:documentation>The &lt;created> element specifies the document creation date using the date attribute. Category: Prolog elements</a:documentation>
+          <ref name="created.attlist"/>
+          <ref name="created.content"/>
+        </element>
+      </define>
+      <define name="created.attlist" combine="interleave">
+        <ref name="created.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Revised Date</a:documentation>
+      <define name="revised.content">
+        <empty/>
+      </define>
+      <define name="revised.attributes">
+        <attribute name="modified">
+          <ref name="date-format"/>
+        </attribute>
+        <optional>
+          <attribute name="golive">
+            <ref name="date-format"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="expiry">
+            <ref name="date-format"/>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <define name="revised.element">
+        <element name="revised" dita:longName="Revised Date">
+          <a:documentation>The &lt;revised> element in the prolog is used to maintain tracking dates that are important in a topic development cycle, such as the last modification date, the original
+            availability date, and the expiration date. Category: Prolog elements</a:documentation>
+          <ref name="revised.attlist"/>
+          <ref name="revised.content"/>
+        </element>
+      </define>
+      <define name="revised.attlist" combine="interleave">
+        <ref name="revised.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Permissions</a:documentation>
+      <define name="permissions.content">
+        <empty/>
+      </define>
+      <define name="permissions.attributes">
+        <ref name="univ-atts"/>
+        <attribute name="view"/>
+      </define>
+      <define name="permissions.element">
+        <element name="permissions" dita:longName="Permissions">
+          <a:documentation>The &lt;permissions> prolog element can indicate any preferred controls for access to a topic. Topics can be filtered based on the permissions element. This capability
+            depends on your output formatting process. Category: Prolog elements</a:documentation>
+          <ref name="permissions.attlist"/>
+          <ref name="permissions.content"/>
+        </element>
+      </define>
+      <define name="permissions.attlist" combine="interleave">
+        <ref name="permissions.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Category</a:documentation>
+      <define name="category.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="category.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="category.element">
+        <element name="category" dita:longName="Category">
+          <a:documentation>The &lt;category> element can represent any category by which a topic might be classified for retrieval or navigation; for example, the categories could be used to group
+            topics in a generated navigation bar. Topics can belong to multiple categories. Category: Prolog elements</a:documentation>
+          <ref name="category.attlist"/>
+          <ref name="category.content"/>
+        </element>
+      </define>
+      <define name="category.attlist" combine="interleave">
+        <ref name="category.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Metadata</a:documentation>
+      <define name="metadata.content">
+        <zeroOrMore>
+          <ref name="audience"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="category"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="keywords"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="prodinfo"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="othermeta"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <choice>
+            <ref name="data.elements.incl"/>
+            <ref name="foreign.unknown.incl"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="metadata.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="mapkeyref"/>
+        </optional>
+      </define>
+      <define name="metadata.element">
+        <element name="metadata" dita:longName="Metadata">
+          <a:documentation>The &lt;metadata> section of the prolog contains information about a topic such as audience and product information. Metadata can be used by computational processes to
+            select particular topics or to prepare search indexes or to customize navigation. Elements inside of &lt;metadata> provide information about the content and subject of a topic; prolog
+            elements outside of &lt;metadata> provide lifecycle information for the content unit (such as the author or copyright), which are unrelated to the subject. Category: Prolog
+            elements</a:documentation>
+          <ref name="metadata.attlist"/>
+          <ref name="metadata.content"/>
+        </element>
+      </define>
+      <define name="metadata.attlist" combine="interleave">
+        <ref name="metadata.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Audience</a:documentation>
+      <define name="audience.content">
+        <empty/>
+      </define>
+      <define name="audience.attributes">
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="othertype"/>
+        </optional>
+        <optional>
+          <attribute name="job"/>
+        </optional>
+        <optional>
+          <attribute name="otherjob"/>
+        </optional>
+        <optional>
+          <attribute name="experiencelevel"/>
+        </optional>
+        <optional>
+          <attribute name="name">
+            <data type="NMTOKEN"/>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <define name="audience.element">
+        <element name="audience" dita:longName="Audience">
+          <a:documentation>The &lt;audience> metadata element indicates, through the value of its type attribute, the intended audience for a topic. Since a topic can have multiple audiences, you can
+            include multiple audience elements. For each audience you specify, you can identify the high-level task (job) they are trying to accomplish and the level of experience (experiencelevel)
+            expected. The audience element may be used to provide a more detailed definition of values used throughout the map or topic on the audience attribute. Category: Prolog
+            elements</a:documentation>
+          <ref name="audience.attlist"/>
+          <ref name="audience.content"/>
+        </element>
+      </define>
+      <define name="audience.attlist" combine="interleave">
+        <ref name="audience.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Keywords</a:documentation>
+      <define name="keywords.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="indexterm"/>
+            <ref name="keyword"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="keywords.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="keywords.element">
+        <element name="keywords" dita:longName="Keywords">
+          <a:documentation>The &lt;keywords> element contains a list of key words (using &lt;indexterm> or &lt;keyword> markup) that can be used by a search engine. Category: Prolog
+            elements</a:documentation>
+          <ref name="keywords.attlist"/>
+          <ref name="keywords.content"/>
+        </element>
+      </define>
+      <define name="keywords.attlist" combine="interleave">
+        <ref name="keywords.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Product Information</a:documentation>
+      <define name="prodinfo.content">
+        <ref name="prodname"/>
+        <optional dita:since="DITA 1.3">
+          <ref name="vrmlist"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="brand"/>
+            <ref name="component"/>
+            <ref name="featnum"/>
+            <ref name="platform"/>
+            <ref name="prognum"/>
+            <ref name="series"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="prodinfo.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="prodinfo.element">
+        <element name="prodinfo" dita:longName="Product Information">
+          <a:documentation>The &lt;prodinfo> metadata element in the prolog contains information about the product or products that are the subject matter of the current topic. The prodinfo element
+            may be used to provide a more detailed definition of values used throughout the map or topic on the product attribute. Category: Prolog elements</a:documentation>
+          <ref name="prodinfo.attlist"/>
+          <ref name="prodinfo.content"/>
+        </element>
+      </define>
+      <define name="prodinfo.attlist" combine="interleave">
+        <ref name="prodinfo.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Product Name</a:documentation>
+      <define name="prodname.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="prodname.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="prodname.element">
+        <element name="prodname" dita:longName="Product Name">
+          <a:documentation>The &lt;prodname> metadata element contains the name of the product that is supported by the information in this topic. Category: Prolog elements</a:documentation>
+          <ref name="prodname.attlist"/>
+          <ref name="prodname.content"/>
+        </element>
+      </define>
+      <define name="prodname.attlist" combine="interleave">
+        <ref name="prodname.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Version Release and Modification List</a:documentation>
+      <define name="vrmlist.content">
+        <oneOrMore>
+          <ref name="vrm"/>
+        </oneOrMore>
+      </define>
+      <define name="vrmlist.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="vrmlist.element">
+        <element name="vrmlist" dita:longName="Version Release and Modification List">
+          <a:documentation>The &lt;vrmlist> element contains a set of &lt;vrm> elements for logging the version, release, and modification information for multiple products or versions of products to
+            which the topic applies. Category: Prolog elements</a:documentation>
+          <ref name="vrmlist.attlist"/>
+          <ref name="vrmlist.content"/>
+        </element>
+      </define>
+      <define name="vrmlist.attlist" combine="interleave">
+        <ref name="vrmlist.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Version Release and Modification</a:documentation>
+      <define name="vrm.content">
+        <empty/>
+      </define>
+      <define name="vrm.attributes">
+        <attribute name="version"/>
+        <optional>
+          <attribute name="release"/>
+        </optional>
+        <optional>
+          <attribute name="modification"/>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <define name="vrm.element">
+        <element name="vrm" dita:longName="Version Release and Modification">
+          <a:documentation>The vrm empty element contains information about a single product's version, modification, and release, to which the current topic applies. Category: Prolog
+            elements</a:documentation>
+          <ref name="vrm.attlist"/>
+          <ref name="vrm.content"/>
+        </element>
+      </define>
+      <define name="vrm.attlist" combine="interleave">
+        <ref name="vrm.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Brand</a:documentation>
+      <define name="brand.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="brand.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="brand.element">
+        <element name="brand" dita:longName="Brand">
+          <a:documentation>The &lt;brand> element indicates the manufacturer or brand associated with the product described by the parent &lt;prodinfo> element. Category: Prolog
+            elements</a:documentation>
+          <ref name="brand.attlist"/>
+          <ref name="brand.content"/>
+        </element>
+      </define>
+      <define name="brand.attlist" combine="interleave">
+        <ref name="brand.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Series</a:documentation>
+      <define name="series.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="series.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="series.element">
+        <element name="series" dita:longName="Series">
+          <a:documentation>The &lt;series> metadata element contains information about the product series that the topic supports. Category: Prolog elements</a:documentation>
+          <ref name="series.attlist"/>
+          <ref name="series.content"/>
+        </element>
+      </define>
+      <define name="series.attlist" combine="interleave">
+        <ref name="series.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Platform</a:documentation>
+      <define name="platform.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="platform.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="platform.element">
+        <element name="platform" dita:longName="Platform">
+          <a:documentation>The &lt;platform> metadata element contains a description of the operating system and/or hardware related to the product being described by the &lt;prodinfo> element. The
+            platform element may be used to provide a more detailed definition of values used throughout the map or topic on the platform attribute. Category: Prolog elements</a:documentation>
+          <ref name="platform.attlist"/>
+          <ref name="platform.content"/>
+        </element>
+      </define>
+      <define name="platform.attlist" combine="interleave">
+        <ref name="platform.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Program Number</a:documentation>
+      <define name="prognum.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="prognum.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="prognum.element">
+        <element name="prognum" dita:longName="Program Number">
+          <a:documentation>The &lt;prognum> metadata element identifies the program number of the associated program product. This is typically an order number or a product tracking code that could be
+            replaced by an order number when a product completes development. Category: Prolog elements</a:documentation>
+          <ref name="prognum.attlist"/>
+          <ref name="prognum.content"/>
+        </element>
+      </define>
+      <define name="prognum.attlist" combine="interleave">
+        <ref name="prognum.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Feature Number</a:documentation>
+      <define name="featnum.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="featnum.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="featnum.element">
+        <element name="featnum" dita:longName="Feature Number">
+          <a:documentation>The &lt;featnum> element contains the feature number of a product in the metadata. Category: Prolog elements</a:documentation>
+          <ref name="featnum.attlist"/>
+          <ref name="featnum.content"/>
+        </element>
+      </define>
+      <define name="featnum.attlist" combine="interleave">
+        <ref name="featnum.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Component</a:documentation>
+      <define name="component.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="component.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="component.element">
+        <element name="component" dita:longName="Component">
+          <a:documentation>The &lt;component> element describes the component of the product that this topic is concerned with. For example, a product might be made up of many components, each of
+            which is installable separately. Components might also be shared by several products so that the same component is available for installation with many products. An implementation may (but
+            need not) use this identification to check cross-component dependencies when some components are installed, but not others. An implementation may also (but need not) use the identification
+            make sure that topics are hidden, removed, or flagged in some way when the component they describe isn't installed. Category: Prolog elements</a:documentation>
+          <ref name="component.attlist"/>
+          <ref name="component.content"/>
+        </element>
+      </define>
+      <define name="component.attlist" combine="interleave">
+        <ref name="component.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Other Metadata NOTE: needs to be HTML-equiv, at least </a:documentation>
+      <define name="othermeta.content">
+        <empty/>
+      </define>
+      <define name="othermeta.attributes">
+        <attribute name="name"/>
+        <attribute name="content"/>
+        <optional>
+          <attribute name="translate-content">
+            <choice>
+              <value>no</value>
+              <value>yes</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <define name="othermeta.element">
+        <element name="othermeta" dita:longName="Other Metadata">
+          <a:documentation>The &lt;othermeta> element can be used to identify properties not otherwise included in &lt;metadata> and assign name/content values to those properties. The name attribute
+            identifies the property and the content attribute specifies the property's value. The values in this attribute are output as HTML metadata elements, and have no defined meaning for other
+            possible outputs such as PDF. Category: Prolog elements</a:documentation>
+          <ref name="othermeta.attlist"/>
+          <ref name="othermeta.content"/>
+        </element>
+      </define>
+      <define name="othermeta.attlist" combine="interleave">
+        <ref name="othermeta.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Resource Identifier</a:documentation>
+      <define name="resourceid.content">
+        <zeroOrMore dita:since="1.3">
+          <ref name="data.elements.incl"/>
+        </zeroOrMore>
+      </define>
+      <define name="resourceid.attributes">
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional dita:since="1.3">
+          <attribute name="id"/>
+        </optional>
+        <ref name="conref-atts"/>
+        <optional>
+          <attribute name="appname"/>
+        </optional>
+        <optional>
+          <attribute name="appid" dita:since="1.3"/>
+        </optional>
+        <optional>
+          <attribute name="ux-context-string" dita:since="1.3"/>
+        </optional>
+        <optional>
+          <attribute name="ux-source-priority" dita:since="1.3"
+                     a:defaultValue="topic-and-map"
+            >
+            <choice>
+              <value>topic-and-map</value>
+              <value>topic-only</value>
+              <value>map-only</value>
+              <value>map-takes-priority</value>
+              <value>topic-takes-priority</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="ux-windowref" dita:since="1.3"/>
+        </optional>
+      </define>
+      <define name="resourceid.element">
+        <element name="resourceid" dita:longName="Resource Identifier">
+          <a:documentation>The &lt;resourceid> element provides an identifier for applications that require them in a particular format, when the normal id attribute of the topic can't be used. Each
+            resourceid entry should be unique. It is one of the metadata elements that can be included within the prolog of a topic, along with document tracking and product information, etc. The
+            element has no content, but takes an id attribute, an appname attribute, and an appid attribute. Category: Prolog elements</a:documentation>
+          <ref name="resourceid.attlist"/>
+          <ref name="resourceid.content"/>
+        </element>
+      </define>
+      <define name="resourceid.attlist" combine="interleave">
+        <ref name="resourceid.attributes"/>
+      </define>
+
+    </div>
+  </div>
+  <div>
+    <a:documentation>Specialization attributes. Global attributes and class defaults</a:documentation>
+
+    <define name="author.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/author "/>
+      </optional>
+    </define>
+    <define name="source.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/source "/>
+      </optional>
+    </define>
+    <define name="publisher.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/publisher "/>
+      </optional>
+    </define>
+    <define name="copyright.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/copyright "/>
+      </optional>
+    </define>
+    <define name="copyryear.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/copyryear "/>
+      </optional>
+    </define>
+    <define name="copyrholder.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/copyrholder "/>
+      </optional>
+    </define>
+    <define name="critdates.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/critdates "/>
+      </optional>
+    </define>
+    <define name="created.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/created "/>
+      </optional>
+    </define>
+    <define name="revised.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/revised "/>
+      </optional>
+    </define>
+    <define name="permissions.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/permissions "/>
+      </optional>
+    </define>
+    <define name="category.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/category "/>
+      </optional>
+    </define>
+    <define name="metadata.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/metadata "/>
+      </optional>
+    </define>
+    <define name="audience.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/audience "/>
+      </optional>
+    </define>
+    <define name="keywords.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/keywords "/>
+      </optional>
+    </define>
+    <define name="prodinfo.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/prodinfo "/>
+      </optional>
+    </define>
+    <define name="prodname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/prodname "/>
+      </optional>
+    </define>
+    <define name="vrmlist.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/vrmlist "/>
+      </optional>
+    </define>
+    <define name="vrm.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/vrm "/>
+      </optional>
+    </define>
+    <define name="brand.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/brand "/>
+      </optional>
+    </define>
+    <define name="series.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/series "/>
+      </optional>
+    </define>
+    <define name="platform.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/platform "/>
+      </optional>
+    </define>
+    <define name="prognum.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/prognum "/>
+      </optional>
+    </define>
+    <define name="featnum.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/featnum "/>
+      </optional>
+    </define>
+    <define name="component.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/component "/>
+      </optional>
+    </define>
+    <define name="othermeta.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/othermeta "/>
+      </optional>
+    </define>
+    <define name="resourceid.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/resourceid "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

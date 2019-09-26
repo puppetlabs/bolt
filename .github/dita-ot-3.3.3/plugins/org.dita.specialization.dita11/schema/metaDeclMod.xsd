@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Metadata                                     -->
+<!--  VERSION:   1.1                                             -->
+<!--  DATE:      November 2006                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the elements and specialization         -->
+<!--             attributes for the DITA XML Metadata              -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2006                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+  
+  <xs:element name="author">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>author</keyword>> metadata element contains the
+        name of the topic's author. The currently unsupported keyref attribute can
+        point to another location where the author information is defined.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType  mixed="true">
+      <xs:complexContent>
+        <xs:extension base="author.class">
+          <xs:attribute ref="class" default="- topic/author "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="author.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attribute name="href" type="xs:string"/>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="type" type="author-type-atts.class"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <xs:simpleType name="author-type-atts.class">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="creator"/>
+      <xs:enumeration value="contributor"/>
+      <xs:enumeration value="-dita-use-conref-target"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  
+  <xs:element name="source">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>source</keyword>> element contains a reference
+        to a resource from which the present topic is derived, either completely or
+        in part. The element can contain a description of the resource; the <keyword>href</keyword> reference
+        can be a string or a URL that points to it.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="source.class">
+          <xs:attribute ref="class" default="- topic/source "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="source.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attribute name="href" type="xs:string" />
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="publisher">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>publisher</keyword>> metadata element contains
+        the name of the person, company, or organization responsible for making the
+        content or subject of the topic available.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="publisher.class">
+          <xs:attribute ref="class" default="- topic/publisher "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="publisher.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attribute name="href" type="xs:string" />
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="copyright">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>copyright</keyword>> element is used for a single
+        copyright entry. It includes the copyright years and the copyright holder.
+        Multiple &lt;<keyword>copyright</keyword>> statements are allowed.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="copyright.class">
+          <xs:attribute ref="class" default="- topic/copyright "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="copyright.class">
+    <xs:sequence>
+      <xs:group ref="copyryear" maxOccurs="unbounded"/>
+      <xs:group ref="copyrholder"/>
+    </xs:sequence>
+    <xs:attribute name="type" type="copyright-type-att.class"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <xs:simpleType name="copyright-type-att.class">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="primary"/>
+      <xs:enumeration value="secondary"/>
+      <xs:enumeration value="-dita-use-conref-target"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  
+  <xs:element name="copyryear">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>copyryear</keyword>> element contains the copyright
+        year as specified by the <keyword>year</keyword> attribute.   
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="copyryear.class">
+          <xs:attribute ref="class" default="- topic/copyryear "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="copyryear.class">
+    <xs:attribute name="year" type="xs:gYear" use="required"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="copyrholder">
+    <xs:annotation>
+      <xs:documentation>The copyright holder (&lt;<keyword>copyrholder</keyword>>) element
+        names the entity that holds legal rights to the material contained in the
+        topic.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="copyrholder.class">
+          <xs:attribute ref="class" default="- topic/copyrholder "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="copyrholder.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="critdates">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>critdates</keyword>> element contains the critical
+        dates in a document life cycle, such as the creation date and multiple revision
+        dates.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="critdates.class">
+          <xs:attribute ref="class" default="- topic/critdates "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="critdates.class">
+    <xs:sequence>
+      <xs:group ref="created"/>
+      <xs:group ref="revised" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="revised">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>revised</keyword>> element in the prolog is used
+        to maintain tracking dates that are important in a topic development cycle,
+        such as the last modification date, the original availability date, and the
+        expiration date.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="revised.class">
+          <xs:attribute ref="class" default="- topic/revised "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="revised.class">
+    <xs:attribute name="modified" type="xs:string" use="required"/>
+    <xs:attribute name="golive" type="xs:string"/>
+    <xs:attribute name="expiry" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="created">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>created</keyword>> element specifies the document
+        creation date using the <keyword>date</keyword> attribute.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="created.class">
+          <xs:attribute ref="class" default="- topic/created "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="created.class">
+    <xs:attribute name="date" type="xs:string" use="required"/>
+    <xs:attribute name="golive" type="xs:string"/>
+    <xs:attribute name="expiry" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="resourceid">
+    <xs:annotation>
+      <xs:documentation> The &lt;<keyword>resourceid</keyword>> element provides an identifier
+        for applications that require them in a particular format, when the normal
+        id attribute of the topic can't be used. Each resourceid entry should be unique.
+        It is one of the metadata elements that can be included within the prolog
+        of a topic, along with document tracking and product information, etc. The
+        element has no content, but takes an <keyword>id</keyword> attribute
+        or an <keyword>appname</keyword> attribute.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="resourceid.class">
+          <xs:attribute ref="class" default="- topic/resourceid "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="resourceid.class">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="appname" type="xs:string"/>
+    <xs:attribute name="conref" type="xs:string"/>
+    <xs:attributeGroup ref="select-atts"/>
+    <xs:attributeGroup ref="localization-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="audience">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>audience</keyword>&gt; metadata element indicates,
+        through the value of its type attribute, the intended audience for a topic.
+        Since a topic can have multiple audiences, you can include multiple audience
+        elements. For each audience you specify, you can identify the high-level task
+        (<keyword>job</keyword>) they are trying to accomplish and the level
+        of experience (<keyword>experiencelevel</keyword>) expected.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="audience.class">
+          <xs:attribute ref="class" default="- topic/audience "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="audience.class">
+    <xs:attribute name="type" type="audience-type-att.class"/>
+    <xs:attribute name="othertype" type="xs:string"/>
+    <xs:attribute name="job" type="job-att.class"/>
+    <xs:attribute name="otherjob" type="xs:string"/>
+    <xs:attribute name="experiencelevel" type="experiencelevel-att.class"/>
+    <xs:attribute name="name" type="xs:NMTOKEN"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="category">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>category</keyword>> element can represent any
+        category by which a topic might be classified for retrieval or navigation;
+        for example, the categories could be used to group topics in a generated navigation
+        bar. Topics can belong to multiple categories.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="category.class">
+          <xs:attribute ref="class" default="- topic/category "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="category.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+
+
+  <xs:element name="keywords">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>keywords</keyword>> element contains a list of
+        keyword entries (using <ph><xref href="indexterm.xml">indexterm</xref></ph> or <ph><xref
+          href="keyword.xml">keyword</xref></ph> markup) that can be used by a search
+        engine. 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="keywords.class">
+          <xs:attribute ref="class" default="- topic/keywords "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="keywords.class">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="indexterm"/>
+      <xs:group ref="keyword"/>
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+
+  
+  <xs:element name="othermeta">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>othermeta</keyword>> element can be used to identify
+        properties not otherwise included in &lt;<keyword>metadata</keyword>> and
+        assign  name/content values to those properties. The name attribute identifies
+        the property and the content attribute specifies the property's value. The
+        values in this attribute are output as HTML metadata elements, and have no
+        defined meaning for other possible outputs such as PDF.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="othermeta.class">
+          <xs:attribute ref="class" default="- topic/othermeta "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="othermeta.class">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="content" type="xs:string" use="required"/>
+    <xs:attribute name="translate-content" type="yesno-att.class"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="permissions">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>permissions</keyword>> empty prolog element can
+        indicate any preferred controls for access to a topic. Topics can be filtered
+        based on the permissions element. This capability depends on your output formatting
+        process.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="permissions.class">
+          <xs:attribute ref="class" default="- topic/permissions "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="permissions.class">
+    <xs:attribute name="view" type="view-att.class" use="required"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attributeGroup ref="univ-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="prodinfo">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>prodinfo</keyword>> metadata element in the prolog
+        contains information about the product or products that are the subject matter
+        of the current topic.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="prodinfo.class">
+          <xs:attribute ref="class" default="- topic/prodinfo "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="prodinfo.class">
+    <xs:sequence>
+      <xs:group ref="prodname"/>
+      <xs:group ref="vrmlist"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="prodinfo.cnt"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="brand">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>brand</keyword>> element indicates the manufacturer
+        or brand associated with the product described by the parent  <ph><xref href="prodinfo.xml">&lt;<keyword>prodinfo</keyword>></xref></ph> element.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="brand.class">
+          <xs:attribute ref="class" default="- topic/brand "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="brand.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="series">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>series</keyword>> metadata element contains information
+        about the product series that the topic supports.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="series.class">
+          <xs:attribute ref="class" default="- topic/series "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="series.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  
+  <xs:element name="platform">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>platform</keyword>> metadata element contains
+        a description of the operating system and/or hardware related to the product
+        being described by the &lt;<keyword>prodinfo</keyword>> element.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="platform.class">
+          <xs:attribute ref="class" default="- topic/platform "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="platform.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+
+  <xs:element name="prognum">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>prognum</keyword>> metadata element identifies
+        the program number of the associated program product.  This is typically an
+        order number or a product tracking code that could be replaced by an order
+        number when a product completes development.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="prognum.class">
+          <xs:attribute ref="class" default="- topic/prognum "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="prognum.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+ 
+  <xs:element name="featnum">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>featnum</keyword>> element contains the feature
+        number of a product in the document metadata.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="featnum.class">
+          <xs:attribute ref="class" default="- topic/featnum "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="featnum.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+
+  <xs:element name="component">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>component</keyword>> element describes the component
+        of the product that this topic is concerned with. For example, a product might
+        be made up of many components, each of which is installable separately. Components
+        might also be shared by several products so that the same component is available
+        for installation with many products. This identification can be used to check
+        cross-component dependencies when some components are installed, but not others.
+        It could also be used to make sure that topics are hidden, removed, or flagged
+        in some way when the component they describe isn't installed. Such process-control
+        logic is not currently supported in DITA processing.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="component.class">
+          <xs:attribute ref="class" default="- topic/component "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="component.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+ 
+  <xs:element name="prodname">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>prodname</keyword>> metadata element contains
+        the name of the product that is supported by the information in this topic.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="prodname.class">
+          <xs:attribute ref="class" default="- topic/prodname "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="prodname.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="words.cnt"/>
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <xs:group name="prodinfo.cnt">
+    <xs:choice>
+      <xs:group ref="brand"/>
+      <xs:group ref="series"/>
+      <xs:group ref="platform"/>
+      <xs:group ref="prognum"/>
+      <xs:group ref="featnum"/>
+      <xs:group ref="component"/>
+    </xs:choice>
+  </xs:group>
+
+  
+  <xs:element name="vrmlist">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>vrmlist</keyword>> element contains a set of &lt;<keyword>vrm</keyword>>
+        elements for logging the version, release, and modification information for
+        multiple products or versions of products to which the topic applies.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="vrmlist.class">
+          <xs:attribute ref="class" default="- topic/vrmlist "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="vrmlist.class">
+    <xs:choice maxOccurs="unbounded">
+      <xs:group ref="vrm" />
+    </xs:choice>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+ 
+  <xs:element name="vrm">
+    <xs:annotation>
+      <xs:documentation>The empty &lt;<keyword>vrm</keyword>>  element contains information about a single product's
+        version, modification, and release, to which the current topic applies.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="vrm.class">
+          <xs:attribute ref="class" default="- topic/vrm "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="vrm.class">
+    <xs:attribute name="version" type="xs:string" use="required"/>
+    <xs:attribute name="release" type="xs:string"/>
+    <xs:attribute name="modification" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <xs:simpleType name="audience-type-att.class">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="user"/>
+      <xs:enumeration value="purchaser"/>
+      <xs:enumeration value="administrator"/>
+      <xs:enumeration value="programmer"/>
+      <xs:enumeration value="executive"/>
+      <xs:enumeration value="services"/>
+      <xs:enumeration value="other"/>
+      <xs:enumeration value="-dita-use-conref-target"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | 서문 | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | 서문 | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">목차</variable>
+  <variable id="Index Continued String">계속</variable>
+  <variable id="Index See String">, 참고: </variable>
+  <variable id="Index See Also String">참조: </variable>
+  <variable id="Table of Contents Chapter">제 <param ref-name="number"/> 장 </variable>
+  <variable id="Table of Contents Appendix">부록 <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">제 <param ref-name="number"/> 부 </variable>
+  <variable id="Table of Contents Preface">서문: </variable>
+  <variable id="Preface title">서문</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">목차: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">그림 <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">그림 <param ref-name="number"/></variable>
+  <variable id="Table.title">표 <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">표 <param ref-name="number"/></variable>
+  <variable id="Related Links">관련 정보</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">제 <param ref-name="number"/> 장 </variable>
+  <variable id="Appendix with number">부록 <param ref-name="number"/></variable>
+  <variable id="Part with number">제 <param ref-name="number"/> 부</variable>
+  <variable id="Required-Cleanup">[수정 필요]</variable>
+  <variable id="On the page"> 페이지 <param ref-name="pagenum"/></variable>
+  <variable id="Page"> 페이지 <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">옵션:</variable>
+  <variable id="Required Step">필수:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">용어</variable>
+  <variable id="List of Tables">표</variable>
+  <variable id="List of Figures">그림</variable>
+</vars>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE bookmap PUBLIC "-//OASIS//DTD DITA BookMap//EN" "bookmap.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2007 All Rights Reserved. -->
+
+<bookmap id="taskbook">
+  <booktitle>
+    <booklibrary>Retro Tools</booklibrary>
+    <mainbooktitle>Product tasks</mainbooktitle>
+    <booktitlealt>Tasks and what they can do</booktitlealt>
+  </booktitle>
+  <bookmeta>
+    <author>Howe Tuduit</author>
+    <bookid>
+      <isbn>071271271X</isbn>
+      <booknumber>SG99-9999-00</booknumber>
+      <maintainer>
+        <organization>Retro Tools</organization>
+        <person/>
+      </maintainer>
+    </bookid>
+    <bookrights>
+      <copyrfirst>
+        <year>2004</year>
+      </copyrfirst>
+      <copyrlast>
+        <year>2007</year>
+      </copyrlast>
+      <bookowner>
+        <organization>Retro Tools, Inc.</organization>
+      </bookowner>
+    </bookrights>
+  </bookmeta>
+  <frontmatter>
+    <booklists>
+      <toc/>
+    </booklists>
+    <bookabstract href="taskbook/taskbook-abstract.dita"/>
+    <notices href="taskbook/notices.dita">
+      <topicref href="taskbook/trademarks.dita"/>
+    </notices>
+    <preface href="taskbook/task_preface.dita"/>
+  </frontmatter>
+  <chapter href="taskbook/installing.dita">
+    <topicref href="taskbook/installstorage.dita">
+      <topicref href="taskbook/unscrewcover.dita"/>
+      <topicref href="taskbook/insertdrive.dita"/>
+      <topicref href="taskbook/replacecover.dita"/>
+    </topicref>
+    <topicref href="taskbook/installwebserver.dita">
+      <topicref href="taskbook/closeprograms.dita"/>
+      <topicref href="taskbook/runsetup.dita"/>
+      <topicref href="taskbook/restart.dita"/>
+    </topicref>
+    <topicref href="taskbook/installdb.dita"/>
+  </chapter>
+  <chapter href="taskbook/configuring.dita">
+    <topicref href="taskbook/configurestorage.dita"/>
+    <topicref href="taskbook/configurewebserver.dita"/>
+    <topicref href="taskbook/configuredatabase.dita"/>
+  </chapter>
+  <chapter href="taskbook/maintaining.dita">
+    <topicref href="taskbook/maintainstorage.dita"/>
+    <topicref href="taskbook/maintainserver.dita"/>
+    <topicref href="taskbook/maintaindatabase.dita"/>
+  </chapter>
+  <chapter href="taskbook/troubleshooting.dita">
+    <topicref href="taskbook/drivetrouble.dita"/>
+    <topicref href="taskbook/webtrouble.dita"/>
+    <topicref href="taskbook/databasetrouble.dita"/>
+  </chapter>
+  <appendix href="taskbook/task_appendix.dita"/>
+  <backmatter>
+    <booklists>
+      <indexlist/>
+    </booklists>
+  </backmatter>
+</bookmap>

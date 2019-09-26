@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2007 All Rights Reserved. -->
+
+<topic id="trademarks" xml:lang="en-us">
+  <title>Trademarks</title>
+  <shortdesc>The following terms are trademarks of the Retro Tools in the United States, other countries, or
+    both:</shortdesc>
+  <body>
+    <sl>
+      <sli><tm trademark="Retro" tmtype="reg" tmclass="RetroTools">RetroWrench</tm></sli>
+    </sl>
+    <p>The following terms are trademarks of other companies:</p>
+    <p>Red, Orange, Yellow, Green, Blue, Indigo, and Violot are registered trademarks of Rainbow Corporation and/or its
+      affiliates.</p>
+    <p>Linux is a trademark of Linus Torvalds in the United States, other countries, or both. </p>
+    <p>Other company, product, or service names may be trademarks or service marks of others. </p>
+  </body>
+</topic>

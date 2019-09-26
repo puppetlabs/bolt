@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="preprocess-keyref" xml:lang="en-US">
+  <title>Resolve key references (keyref)</title>
+  <shortdesc>The <codeph>keyref</codeph> step examines all the keys that are defined in the DITA source and resolves the
+    key references. Links that make use of keys are updated so that any <xmlatt>href </xmlatt>value is replaced by the
+    appropriate target; key-based text replacement is also performed, and the key definition list file is written to the
+    temporary directory. This step is implemented in Java.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlatt>href</xmlatt></indexterm>
+        <indexterm>preprocessing<indexterm><codeph>keyref</codeph></indexterm></indexterm>
+        <indexterm><codeph>keyref</codeph></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+</concept>

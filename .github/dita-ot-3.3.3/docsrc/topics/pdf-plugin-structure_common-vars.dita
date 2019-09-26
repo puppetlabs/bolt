@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<topic id="variable_overrides_the_common_vars_folder">
+  <title>Variable overrides</title>
+  <shortdesc>The <filepath>common/vars</filepath> folder houses custom variable definitions that override the standard
+    definitions in <filepath>org.dita.pdf2/cfg/common/vars</filepath>. </shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>variable</xmlelement></indexterm>
+        <indexterm><xmlelement>param</xmlelement></indexterm>
+        <indexterm><xmlatt>id</xmlatt><indexterm>variables, overriding</indexterm></indexterm>
+        <indexterm>languages<indexterm>adding support for</indexterm></indexterm>
+        <indexterm>languages<indexterm>ISO 639-1</indexterm></indexterm>
+        <indexterm>ISO 639-1</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <body>
+    <p>As with index configuration, each file contains data for a single language, and should take that language’s ISO
+      639-1 language designator as its name.</p>
+    <p>Variable files contain a set of <xmlelement>variable</xmlelement> elements, identified by their
+        <xmlatt>id</xmlatt> attribute. The variable definitions are used to store static text that is used as part of
+      the published outputs. For example, page headers, hyperlinks, etc. The id attribute for each variable should make
+      it clear how the variable text is being used.</p>
+    <p>Some variables contain <xmlelement>param</xmlelement> elements which indicate parameter values that are
+      substituted at publish time by the XSL. For example, a page number that is being generated as part of the
+      publishing process might be identified by &amp;lt;param ref-name="number"/&amp;gt; When editing or translating a
+      variable file, these should be included in the translation, though they can be moved and rearranged within the
+        <xmlelement>variable</xmlelement> content as needed.</p>
+    <p>The best way to start editing a custom variables file is by making a copy of the original from
+        <filepath>org.dita.pdf2/cfg/common/vars</filepath> and making changes as desired. When adding a new language,
+      start from an existing language’s list of variables and translate each entry as needed.</p>
+    <p>Note that unchanged <xmlelement>variable</xmlelement> elements can be omitted: the custom variables file need
+      only include those <xmlelement>variable</xmlelement> elements which you have modified. Variables not found in the
+      custom file will are taken from the standard variable files.</p>
+    <p>Applying a custom variable does not require modifying the <filepath>catalog.xml</filepath> file. The publishing
+      process will automatically use any custom variables definitions in place of the original ones.</p>
+  </body>
+</topic>

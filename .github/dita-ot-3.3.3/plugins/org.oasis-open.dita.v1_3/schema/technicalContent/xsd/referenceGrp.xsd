@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Reference                                   -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Reference//EN"               -->
+<!--      Delivered as file "reference.mod"                           -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for Reference                         -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2001                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2001, 2004.        -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2005.11.15 RDA: Removed old declaration for               -->
+<!--                   referenceClasses entity                   -->
+<!--   2005.11.15 RDA: Corrected LONG NAME for propdeschd        -->
+<!--   2006.06.07 RDA: Added <abstract> element                  -->
+<!--   2006.06.07 RDA: Make universal attributes universal       -->
+<!--                     (DITA 1.1 proposal #12)                 -->
+<!--   2006.11.30 RDA: Remove #FIXED from DITAArchVersion        -->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       -->
+<!--   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--   2008.05.06 RDA: Added refbodydiv                          -->
+<!--=============================================================-->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:group name="reference">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="reference"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="refbody">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="refbody"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="refbodydiv">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="refbodydiv"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="refsyn">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="refsyn"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="properties">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="properties"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="prophead">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="prophead"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="proptypehd">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="proptypehd"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="propvaluehd">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="propvaluehd"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="propdeschd">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="propdeschd"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="property">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="property"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="proptype">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="proptype"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="propvalue">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="propvalue"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="propdesc">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="propdesc"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+</xs:schema>

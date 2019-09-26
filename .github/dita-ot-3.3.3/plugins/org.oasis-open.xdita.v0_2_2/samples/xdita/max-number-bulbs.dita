@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD LIGHTWEIGHT DITA Topic//EN" "lw-topic.dtd">
+<topic id="max-number-bulbs">
+  <title>Maximum Number of Network Light Bulbs</title>
+  <shortdesc>Testing shows you should network no more than 250 light bulbs to maintain reliable performance.</shortdesc>
+  <body>
+  <p>There is a limit to the number of light bulbs at which the performance of the <ph keyref="product-name" /> begins to decrease. For example, the time it takes a light bulb to respond may start to increase if too many light bulbs are installed on the lighting network. Testing has shown that the lighting network should be limited to a maximum of 250 light bulbs to maintain reliability in performance.</p>
+    <section>
+      <title>Example</title>
+      <p>The following video demonstrates a recommended installation for a supported number of light bulbs:</p>
+      <video>
+        <desc>Installation video</desc>
+        <media-source value="https://www.youtube.com/embed/B7NNYE-G6x0" />
+      
+        </video>
+    </section>
+  </body>
+</topic>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Abbreviated Form Domain                     -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Abbreviated Form Domain//EN" -->
+<!--      Delivered as file "abbreviateDomain.mod"                    -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for the Abbreviated Form Domain       -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            June 2008                                        -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2008, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic abbrev-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="abbreviated-form">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="abbreviated-form"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="abbrev-d-term">
+      <xs:choice>
+         <xs:element ref="abbreviated-form"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="abbreviated-form">
+      <xs:annotation>
+         <xs:documentation>The &lt;abbreviated-form&gt; element represents a reference to a term that may appear in an abbreviated form (often an acronym). The long and short forms of the term are
+            generally defined in a &lt;glossentry&gt; topic. Processors should display the referenced term when rendering an &lt;abbreviated-form&gt; element.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="abbreviated-form.class">
+               <xs:attribute ref="class" default="+ topic/term abbrev-d/abbreviated-form "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="abbreviated-form.class">
+      <xs:sequence>
+         <xs:group ref="abbreviated-form.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="abbreviated-form.attributes"/>
+   </xs:complexType>
+   <xs:group name="abbreviated-form.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="abbreviated-form.attributes">
+      <xs:attribute name="keyref" use="required" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA learningOverview</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA learningOverview                            
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identfier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Learning Overview//EN"
+      Delivered as file "learningOverview.mod                     
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for Learning Overview                 
+                                                             
+ORIGINAL CREATION DATE:                                      
+            May 2007                                         
+                                                             
+            (C) Copyright OASIS Open 2007, 2009.             
+            All Rights Reserved.                             
+=============================================================
+</headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>learningOverview</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Learning Overview//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Learning Overview//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:spec:learning:xsd:learningOverviewMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:spec:learning:xsd:learningOverviewGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:spec:learning:rnc:learningOverviewMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:spec:learning:rng:learningOverviewMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic learningBase learningOverview)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>TOPIC NESTING OVERRIDES</a:documentation>
+
+    <define name="learningOverview-info-types" combine="choice">
+      <empty/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <div>
+      <define name="learningOverview">
+        <ref name="learningOverview.element"/>
+      </define>
+      <define name="learningOverviewbody">
+        <ref name="learningOverviewbody.element"/>
+      </define>
+      <define name="learningOverview.content">
+        <ref name="title"/>
+        <optional>
+          <ref name="titlealts"/>
+        </optional>
+        <optional>
+          <choice>
+            <ref name="shortdesc"/>
+            <ref name="abstract"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <ref name="learningOverviewbody"/>
+        <optional>
+          <ref name="related-links"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="learningOverview-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="learningOverview.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="learningOverview.element">
+        <element name="learningOverview">
+          <a:documentation><![CDATA[A Learning Overview topic identifies the learning objectives, includes other information helpful to the learner, such as prerequisites, duration, intended audience, and can include information and strategies that seeks to gain attention and stimulate recall of prior learning. ]]></a:documentation>
+          <ref name="learningOverview.attlist"/>
+          <ref name="learningOverview.content"/>
+        </element>
+      </define>
+      <define name="idElements" combine="choice">
+        <ref name="learningOverview.element"/>
+      </define>
+      <define name="learningOverview.attlist" combine="interleave">
+        <ref name="learningOverview.attributes"/>
+        <ref name="arch-atts"/>
+        <ref name="domains-att"/>
+      </define>
+    </div>
+    <div>
+      <define name="learningOverviewbody.content">
+        <optional>
+          <ref name="lcIntro"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="lcAudience"/>
+        </zeroOrMore>
+        <optional>
+          <ref name="lcDuration"/>
+        </optional>
+        <optional>
+          <ref name="lcPrereqs"/>
+        </optional>
+        <optional>
+          <ref name="lcObjectives"/>
+        </optional>
+        <optional>
+          <ref name="lcResources"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="section"/>
+        </zeroOrMore>
+      </define>
+      <define name="learningOverviewbody.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="learningOverviewbody.element">
+        <element name="learningOverviewbody">
+          <a:documentation><![CDATA[The <learningOverviewbody> element is the main body-level element in a learningOverview topic. A learningOverviewbody has a very specific structure, with the following elements in this order: <lcIntro>, <lcAudience>, <lcDuration>, <lcPrereqs>, <lcObjectives>, <lcResources>, followed by one or more <section> elements. Each of the learningOverviewbody sections are optional. ]]></a:documentation>
+          <ref name="learningOverviewbody.attlist"/>
+          <ref name="learningOverviewbody.content"/>
+        </element>
+      </define>
+      <define name="learningOverviewbody.attlist" combine="interleave">
+        <ref name="learningOverviewbody.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="learningOverview.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic learningBase/learningBase     learningOverview/learningOverview "/>
+      </optional>
+    </define>
+    <define name="learningOverviewbody.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/body  learningBase/learningBasebody learningOverview/learningOverviewbody "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

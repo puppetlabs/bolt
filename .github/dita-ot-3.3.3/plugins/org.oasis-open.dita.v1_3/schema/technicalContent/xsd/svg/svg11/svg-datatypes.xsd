@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:simpleType name="Boolean.datatype">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="false"/>
+      <xs:enumeration value="true"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ClipFillRule.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      'clip-rule' or 'fill-rule' property/attribute value
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="nonzero"/>
+      <xs:enumeration value="evenodd"/>
+      <xs:enumeration value="inherit"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ContentType.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      media type, as per [RFC2045]
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="Coordinate.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a &lt;coordinate&gt;
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="Coordinates.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a list of &lt;coordinate&gt;s
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="Color.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a &lt;color&gt; value
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="Integer.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a &lt;integer&gt;
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="LanguageCode.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a language code, as per [RFC3066]
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:language"/>
+  </xs:simpleType>
+  <xs:simpleType name="LanguageCodes.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      comma-separated list of language codes, as per [RFC3066]
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="Length.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a &lt;ength&gt;
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="Lengths.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a list of &lt;length&gt;s
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="Number.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a &lt;number&gt;
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="Numbers.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a list of &lt;number&gt;s
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="OpacityValue.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      opacity value (e.g., &lt;number&gt;)
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="PathData.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a path data specification
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="PreserveAspectRatioSpec.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      'preserveAspectRatio' attribute specification
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*(none|xMinYMin|xMidYMin|xMaxYMin|xMinYMid|xMidYMid|xMaxYMid|xMinYMax|xMidYMax|xMaxYMax)\s+(meet|slice)?\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Script.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      script expression
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="SVGColor.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      An SVG color value (RGB plus optional ICC)
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="Text.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      arbitrary text string
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="TransformList.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      list of transforms
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="URI.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a Uniform Resource Identifier, see [URI]
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:anyURI"/>
+  </xs:simpleType>
+  <xs:simpleType name="ViewBoxSpec.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      'viewBox' attribute specification
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+</xs:schema>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="t-increasing-the-JVM">
+  <title>Increasing Java memory allocation</title>
+  <titlealts>
+    <navtitle>Increasing Java memory</navtitle>
+  </titlealts>
+  <shortdesc>If you are working with large documents with extensive metadata or key references, you will need to
+    increase the memory allocation for the Java process. You can do this from the command-line prompt for a specific
+    session, or you can increase the value of the <codeph>ANT_OPTS</codeph> environment variable.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>macOS<indexterm>increase Java memory</indexterm></indexterm>
+        <indexterm>Linux<indexterm>increase Java memory</indexterm></indexterm>
+        <indexterm>Windows<indexterm>increase Java memory</indexterm></indexterm>
+        <indexterm>command line<indexterm>increase Java memory</indexterm></indexterm>
+        <indexterm>operating system<index-see>Linux</index-see><index-see>macOS</index-see><index-see>Windows</index-see></indexterm>
+        <indexterm>Java<indexterm>memory</indexterm></indexterm>
+        <indexterm><codeph>ANT_OPTS</codeph></indexterm>
+        <indexterm>Java<indexterm><codeph>ANT_OPTS</codeph></indexterm></indexterm>
+        <indexterm>metadata<indexterm>processing time, effect on</indexterm></indexterm>
+        <indexterm>memory</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps-unordered>
+      <step>
+        <cmd>To change the value for a specific session, from the command prompt, issue the following command:</cmd>
+        <choicetable>
+          <chhead>
+            <choptionhd>Platform</choptionhd>
+            <chdeschd>Command</chdeschd>
+          </chhead>
+          <chrow platform="unix">
+            <choption>Linux or macOS&#xA0;</choption>
+            <chdesc><codeph>export ANT_OPTS=$ANT_OPTS -Xmx<varname>1024</varname>M</codeph></chdesc>
+          </chrow>
+          <chrow platform="windows">
+            <choption>Windows</choption>
+            <chdesc><codeph>set ANT_OPTS=%ANT_OPTS% -Xmx<varname>1024</varname>M</codeph></chdesc>
+          </chrow>
+        </choicetable>
+        <info>
+          <p>This increases the JVM memory allocation to 1024 megabytes. The amount of memory which can be allocated is
+            limited by available system memory and the operating system.</p></info>
+      </step>
+      <step>
+        <cmd>To persistently change the value, change the value allocated to the <codeph>ANT_OPTS</codeph> environment
+          variable on your system.</cmd>
+      </step>
+    </steps-unordered>
+  </taskbody>
+</task>

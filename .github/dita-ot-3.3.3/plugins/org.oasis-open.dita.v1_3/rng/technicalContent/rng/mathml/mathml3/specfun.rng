@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <!--
+        This is the Mathematical Markup Language (MathML) 3.0, an XML
+        application for describing mathematical notation and capturing
+        both its structure and content.
+    
+        Copyright 1998-2007 World Wide Web Consortium
+           (Massachusetts Institute of Technology, Institut National de
+            Recherche en Informatique et en Automatique, Keio University).
+            All Rights Reserved.
+    
+        Permission to use, copy, modify and distribute the RelaxNG schema for MathML3
+        and its accompanying documentation for any purpose and without fee is
+        hereby granted in perpetuity, provided that the above copyright notice
+        and this paragraph appear in all copies.  The copyright holders make
+        no representation about the suitability of the Schema for any purpose.
+    
+        This file contains the arity checking rules for the symbols
+        from the content dictionary 
+        It is provided "as is" without expressed or implied warranty.
+    
+        Revision:   $Id: specfun.rng,v 1.1 2007/12/11 15:59:28 dcarlis Exp $
+  -->
+  <define name="cd.token.unary.class" combine="choice">
+    <choice>
+      <ref name="ln.token"/>
+      <ref name="sin.token"/>
+      <ref name="cos.token"/>
+      <ref name="tan.token"/>
+      <ref name="sec.token"/>
+      <ref name="csc.token"/>
+      <ref name="cot.token"/>
+      <ref name="sinh.token"/>
+      <ref name="cosh.token"/>
+      <ref name="tanh.token"/>
+      <ref name="sech.token"/>
+      <ref name="csch.token"/>
+      <ref name="coth.token"/>
+      <ref name="arcsin.token"/>
+      <ref name="arccos.token"/>
+      <ref name="arctan.token"/>
+      <ref name="arccosh.token"/>
+      <ref name="arccot.token"/>
+      <ref name="arccoth.token"/>
+      <ref name="arccsc.token"/>
+      <ref name="arccsch.token"/>
+      <ref name="arcsec.token"/>
+      <ref name="arcsech.token"/>
+      <ref name="arcsinh.token"/>
+      <ref name="arctanh.token"/>
+      <ref name="exp.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.binary.class" combine="choice">
+    <ref name="log.token"/>
+  </define>
+  <!-- the element definitions for the token elements -->
+  <define name="exp.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="exp.token">
+    <element name="exp">
+      <ref name="exp.content"/>
+    </element>
+  </define>
+  <define name="ln.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="ln.token">
+    <element name="ln">
+      <ref name="ln.content"/>
+    </element>
+  </define>
+  <define name="log.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="log.token">
+    <element name="log">
+      <ref name="log.content"/>
+    </element>
+  </define>
+  <define name="sin.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="sin.token">
+    <element name="sin">
+      <ref name="sin.content"/>
+    </element>
+  </define>
+  <define name="cos.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="cos.token">
+    <element name="cos">
+      <ref name="cos.content"/>
+    </element>
+  </define>
+  <define name="tan.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="tan.token">
+    <element name="tan">
+      <ref name="tan.content"/>
+    </element>
+  </define>
+  <define name="sec.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="sec.token">
+    <element name="sec">
+      <ref name="sec.content"/>
+    </element>
+  </define>
+  <define name="csc.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="csc.token">
+    <element name="csc">
+      <ref name="csc.content"/>
+    </element>
+  </define>
+  <define name="cot.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="cot.token">
+    <element name="cot">
+      <ref name="cot.content"/>
+    </element>
+  </define>
+  <define name="sinh.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="sinh.token">
+    <element name="sinh">
+      <ref name="sinh.content"/>
+    </element>
+  </define>
+  <define name="cosh.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="cosh.token">
+    <element name="cosh">
+      <ref name="cosh.content"/>
+    </element>
+  </define>
+  <define name="tanh.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="tanh.token">
+    <element name="tanh">
+      <ref name="tanh.content"/>
+    </element>
+  </define>
+  <define name="sech.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="sech.token">
+    <element name="sech">
+      <ref name="sech.content"/>
+    </element>
+  </define>
+  <define name="csch.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="csch.token">
+    <element name="csch">
+      <ref name="csch.content"/>
+    </element>
+  </define>
+  <define name="coth.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="coth.token">
+    <element name="coth">
+      <ref name="coth.content"/>
+    </element>
+  </define>
+  <define name="arcsin.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arcsin.token">
+    <element name="arcsin">
+      <ref name="arcsin.content"/>
+    </element>
+  </define>
+  <define name="arccos.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arccos.token">
+    <element name="arccos">
+      <ref name="arccos.content"/>
+    </element>
+  </define>
+  <define name="arctan.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arctan.token">
+    <element name="arctan">
+      <ref name="arctan.content"/>
+    </element>
+  </define>
+  <define name="arccosh.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arccosh.token">
+    <element name="arccosh">
+      <ref name="arccosh.content"/>
+    </element>
+  </define>
+  <define name="arccot.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arccot.token">
+    <element name="arccot">
+      <ref name="arccot.content"/>
+    </element>
+  </define>
+  <define name="arccoth.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arccoth.token">
+    <element name="arccoth">
+      <ref name="arccoth.content"/>
+    </element>
+  </define>
+  <define name="arccsc.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arccsc.token">
+    <element name="arccsc">
+      <ref name="arccsc.content"/>
+    </element>
+  </define>
+  <define name="arccsch.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arccsch.token">
+    <element name="arccsch">
+      <ref name="arccsch.content"/>
+    </element>
+  </define>
+  <define name="arcsec.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arcsec.token">
+    <element name="arcsec">
+      <ref name="arcsec.content"/>
+    </element>
+  </define>
+  <define name="arcsech.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arcsech.token">
+    <element name="arcsech">
+      <ref name="arcsech.content"/>
+    </element>
+  </define>
+  <define name="arcsinh.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arcsinh.token">
+    <element name="arcsinh">
+      <ref name="arcsinh.content"/>
+    </element>
+  </define>
+  <define name="arctanh.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="arctanh.token">
+    <element name="arctanh">
+      <ref name="arctanh.content"/>
+    </element>
+  </define>
+</grammar>

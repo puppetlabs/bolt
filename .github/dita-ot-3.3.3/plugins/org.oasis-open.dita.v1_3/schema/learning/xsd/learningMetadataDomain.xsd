@@ -1,0 +1,815 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Learning Metadata Domain                    -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identfier or an  -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Learning Metadata Domain//EN"-->
+<!--      Delivered as file "learningMetadataDomain.mod"              -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for Learning Metadata                 -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            May 2007                                         -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2007, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!--=============================================================-->
+<!--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!--- LOM Metadata                                               -->
+<!--- Based on IEEE LOM. Scott Hudson                            -->
+<!--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic learningmeta-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="lcLom">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcLom"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomStructure">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomStructure"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomCoverage">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomCoverage"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomAggregationLevel">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomAggregationLevel"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomTechRequirement">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomTechRequirement"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomInstallationRemarks">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomInstallationRemarks"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomOtherPlatformRequirements">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomOtherPlatformRequirements"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomInteractivityType">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomInteractivityType"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomLearningResourceType">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomLearningResourceType"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomInteractivityLevel">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomInteractivityLevel"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomSemanticDensity">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomSemanticDensity"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomIntendedUserRole">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomIntendedUserRole"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomContext">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomContext"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomTypicalAgeRange">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomTypicalAgeRange"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomDifficulty">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomDifficulty"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lomTypicalLearningTime">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lomTypicalLearningTime"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="learningmeta-d-metadata">
+      <xs:choice>
+         <xs:element ref="lcLom"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="lcLom">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcLom&gt; provides a set of specialized data elements to use to specify metadata in the learning topics and learning map domain. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcLom.class">
+               <xs:attribute ref="class" default="+ topic/metadata learningmeta-d/lcLom "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcLom.class">
+      <xs:sequence>
+         <xs:group ref="lcLom.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcLom.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcLom.content">
+      <xs:sequence>
+         <xs:sequence>
+            <xs:group ref="lomStructure" minOccurs="0"/>
+            <xs:group ref="lomCoverage" minOccurs="0"/>
+            <xs:group ref="lomAggregationLevel" minOccurs="0"/>
+            <xs:group ref="lomTechRequirement" minOccurs="0"/>
+            <xs:group ref="lomInstallationRemarks" minOccurs="0"/>
+            <xs:group ref="lomOtherPlatformRequirements" minOccurs="0"/>
+            <xs:group ref="lomInteractivityType" minOccurs="0"/>
+            <xs:group ref="lomLearningResourceType" minOccurs="0"/>
+            <xs:group ref="lomInteractivityLevel" minOccurs="0"/>
+            <xs:group ref="lomSemanticDensity" minOccurs="0"/>
+            <xs:group ref="lomIntendedUserRole" minOccurs="0"/>
+            <xs:group ref="lomContext" minOccurs="0"/>
+            <xs:group ref="lomTypicalAgeRange" minOccurs="0"/>
+            <xs:group ref="lomDifficulty" minOccurs="0"/>
+            <xs:group ref="lomTypicalLearningTime" minOccurs="0"/>
+         </xs:sequence>
+         <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcLom.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="mapkeyref" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomStructure">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomStructure&gt; provides learning metadata about the underlying organizational structure of the resource. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomStructure.class">
+               <xs:attribute ref="class" default="+ topic/data learningmeta-d/lomStructure "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomStructure.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomStructure.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomStructure.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomStructure.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomStructure.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomStructure"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" use="required">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="atomic"/>
+              <xs:enumeration value="branched"/>
+              <xs:enumeration value="collection"/>
+              <xs:enumeration value="hierarchical"/>
+              <xs:enumeration value="linear"/>
+              <xs:enumeration value="mixed"/>
+              <xs:enumeration value="networked"/>
+              <xs:enumeration value="parceled"/>
+              <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomCoverage">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomCoverage&gt; provides learning metadata about the temporal or spatial characteristics of the content, such as historical context. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomCoverage.class">
+               <xs:attribute ref="class" default="+ topic/data learningmeta-d/lomCoverage "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomCoverage.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomCoverage.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomCoverage.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomCoverage.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomCoverage.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomCoverage"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" type="xs:string" default=""/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomAggregationLevel">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomAggregationLevel&gt; describes the functional size of the learning resource. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomAggregationLevel.class">
+               <xs:attribute ref="class" default="+ topic/data learningmeta-d/lomAggregationLevel "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomAggregationLevel.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomAggregationLevel.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomAggregationLevel.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomAggregationLevel.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomAggregationLevel.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomAggregationLevel"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute name="value" use="required">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="1"/>
+               <xs:enumeration value="2"/>
+               <xs:enumeration value="3"/>
+               <xs:enumeration value="4"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomTechRequirement">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomTechRequirement&gt; provides learning metadata about the operating system(s) under which the learning resource can run. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomTechRequirement.class">
+               <xs:attribute ref="class" default="+ topic/data learningmeta-d/lomTechRequirement "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomTechRequirement.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomTechRequirement.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomTechRequirement.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomTechRequirement.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomTechRequirement.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomTechRequirement"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute name="value" use="required">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="pc-dos"/>
+               <xs:enumeration value="ms-windows"/>
+               <xs:enumeration value="macos"/>
+               <xs:enumeration value="unix"/>
+               <xs:enumeration value="multi-os"/>
+               <xs:enumeration value="none"/>
+               <xs:enumeration value="any"/>
+               <xs:enumeration value="netscapecommunicator"/>
+               <xs:enumeration value="ms-internetexplorer"/>
+               <xs:enumeration value="opera"/>
+               <xs:enumeration value="amaya"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomInstallationRemarks">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomInstallationRemarks&gt; provides learning metadata about how to install and needed resources. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomInstallationRemarks.class">
+               <xs:attribute ref="class"
+                             default="+ topic/data learningmeta-d/lomInstallationRemarks "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomInstallationRemarks.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomInstallationRemarks.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomInstallationRemarks.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomInstallationRemarks.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomInstallationRemarks.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomInstallationRemarks"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" type="xs:string" default=""/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomOtherPlatformRequirements">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomOtherPlatformRequirements&gt; provides learning metadata information about other software and hardware requirements. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomOtherPlatformRequirements.class">
+               <xs:attribute ref="class"
+                             default="+ topic/data learningmeta-d/lomOtherPlatformRequirements "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomOtherPlatformRequirements.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomOtherPlatformRequirements.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomOtherPlatformRequirements.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomOtherPlatformRequirements.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomOtherPlatformRequirements.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomOtherPlatformRequirements"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" type="xs:string" default=""/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomInteractivityType">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomInteractivityType&gt; provides learning metadata about the the type of interactivity supported by the resource. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomInteractivityType.class">
+               <xs:attribute ref="class" default="+ topic/data learningmeta-d/lomInteractivityType "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomInteractivityType.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomInteractivityType.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomInteractivityType.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomInteractivityType.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomInteractivityType.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomInteractivityType"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" use="required">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="active"/>
+               <xs:enumeration value="expositive"/>
+               <xs:enumeration value="mixed"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomLearningResourceType">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomLearningResourceType&gt; provides learning metadata about the specific kind of resource used, most dominant kind first. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomLearningResourceType.class">
+               <xs:attribute ref="class"
+                             default="+ topic/data learningmeta-d/lomLearningResourceType "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomLearningResourceType.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomLearningResourceType.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomLearningResourceType.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomLearningResourceType.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomLearningResourceType.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomLearningResourceType"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" use="required">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="exercise"/>
+               <xs:enumeration value="simulation"/>
+               <xs:enumeration value="questionnaire"/>
+               <xs:enumeration value="diagram"/>
+               <xs:enumeration value="figure"/>
+               <xs:enumeration value="graph"/>
+               <xs:enumeration value="index"/>
+               <xs:enumeration value="slide"/>
+               <xs:enumeration value="table"/>
+               <xs:enumeration value="narrativetext"/>
+               <xs:enumeration value="exam"/>
+               <xs:enumeration value="experiment"/>
+               <xs:enumeration value="problemstatement"/>
+               <xs:enumeration value="selfassessment"/>
+               <xs:enumeration value="lecture"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomInteractivityLevel">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomInteractivityLevel&gt; provides learning metadata about the level of interactivity between an end user and the learning object. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomInteractivityLevel.class">
+               <xs:attribute ref="class"
+                             default="+ topic/data learningmeta-d/lomInteractivityLevel "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomInteractivityLevel.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomInteractivityLevel.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomInteractivityLevel.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomInteractivityLevel.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomInteractivityLevel.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomInteractivityLevel"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" use="required">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="verylow"/>
+               <xs:enumeration value="low"/>
+               <xs:enumeration value="medium"/>
+               <xs:enumeration value="high"/>
+               <xs:enumeration value="veryhigh"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomSemanticDensity">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomSemanticDensity&gt; provides learning metadata about a subjective measure of the learning object's usefulness as compared to its size or duration. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomSemanticDensity.class">
+               <xs:attribute ref="class" default="+ topic/data learningmeta-d/lomSemanticDensity "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomSemanticDensity.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomSemanticDensity.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomSemanticDensity.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomSemanticDensity.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomSemanticDensity.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomSemanticDensity"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" use="required">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="verylow"/>
+               <xs:enumeration value="low"/>
+               <xs:enumeration value="medium"/>
+               <xs:enumeration value="high"/>
+               <xs:enumeration value="veryhigh"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomIntendedUserRole">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomIntendedUserRole&gt; provides learning metadata about the normal user of the resource, most dominant first. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomIntendedUserRole.class">
+               <xs:attribute ref="class" default="+ topic/data learningmeta-d/lomIntendedUserRole "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomIntendedUserRole.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomIntendedUserRole.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomIntendedUserRole.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomIntendedUserRole.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomIntendedUserRole.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomIntendedUserRole"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" use="required">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="teacher"/>
+               <xs:enumeration value="author"/>
+               <xs:enumeration value="learner"/>
+               <xs:enumeration value="manager"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomContext">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomContext&gt; provides learning metadata about the typical learning environment where use of learning object is intended to take place. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomContext.class">
+               <xs:attribute ref="class" default="+ topic/data learningmeta-d/lomContext "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomContext.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomContext.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomContext.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomContext.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomContext.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomContext"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" use="required">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="school"/>
+               <xs:enumeration value="highereducation"/>
+               <xs:enumeration value="training"/>
+               <xs:enumeration value="other"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomTypicalAgeRange">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomTypicalAgeRange&gt; provides learning metadata about the age of the typical intended user. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomTypicalAgeRange.class">
+               <xs:attribute ref="class" default="+ topic/data learningmeta-d/lomTypicalAgeRange "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomTypicalAgeRange.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomTypicalAgeRange.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomTypicalAgeRange.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomTypicalAgeRange.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomTypicalAgeRange.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomTypicalAgeRange"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomDifficulty">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomDifficulty&gt; provides learning metadata about how hard it is to work through the resource for the typical target audience. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomDifficulty.class">
+               <xs:attribute ref="class" default="+ topic/data learningmeta-d/lomDifficulty "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomDifficulty.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomDifficulty.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomDifficulty.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomDifficulty.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomDifficulty.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomDifficulty"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" use="required">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="veryeasy"/>
+               <xs:enumeration value="easy"/>
+               <xs:enumeration value="medium"/>
+               <xs:enumeration value="difficult"/>
+               <xs:enumeration value="verydifficult"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lomTypicalLearningTime">
+      <xs:annotation>
+         <xs:documentation>The &lt;lomTypicalLearningTime&gt; provides learning metadata about the approximate or typical time it takes to work with the resource. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lomTypicalLearningTime.class">
+               <xs:attribute ref="class"
+                             default="+ topic/data learningmeta-d/lomTypicalLearningTime "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lomTypicalLearningTime.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lomTypicalLearningTime.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lomTypicalLearningTime.attributes"/>
+   </xs:complexType>
+   <xs:group name="lomTypicalLearningTime.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lomTypicalLearningTime.attributes">
+      <xs:attribute name="name" type="xs:string" default="lomTypicalLearningTime"/>
+      <xs:attribute name="datatype" type="xs:string" default=""/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="value" type="xs:string" default=""/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

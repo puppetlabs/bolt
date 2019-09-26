@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" 
+  xmlns:dita="http://dita.oasis-open.org/architecture/2005/" 
+  xmlns="http://relaxng.org/ns/structure/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA XML Construct Domain</moduleTitle>
+    <headerComment xml:space="preserve"><![CDATA[
+============================================================= 
+                    HEADER                                     
+ ============================================================= 
+  MODULE:    DITA XML Mention Domain                             
+  VERSION:   1.3                                                
+  DATE:      November 2013                                      
+                                                               
+ ============================================================= 
+
+ =============================================================      
+ ]]></headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>xml-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> XML Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> XML Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:xmlDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:xmlDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:xmlDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic markup-d xml-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="xml-d-keyword">
+      <choice>
+        <ref name="numcharref.element"/>
+        <ref name="parameterentity.element"/>
+        <ref name="textentity.element"/>
+        <ref name="xmlatt.element"/>
+        <ref name="xmlelement.element"/>
+        <ref name="xmlnsname.element"/>
+        <ref name="xmlpi.element"/>
+      </choice>
+    </define>
+    <define name="keyword" combine="choice">
+      <ref name="xml-d-keyword"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation> LONG NAME: Numeric character reference (&#10;, &#x0a;) </a:documentation>
+      <define name="numcharref.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="draft-comment"/>
+            <ref name="required-cleanup"/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="numcharref.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="numcharref.element">
+        <element name="numcharref" dita:longName="Numeric character reference (&amp;#10;, &amp;#x0a;)" dita:since="1.3">
+          <ref name="numcharref.attlist"/>
+          <ref name="numcharref.content"/>
+        </element>
+      </define>
+      <define name="numcharref.attlist" combine="interleave">
+        <ref name="numcharref.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Parameter entity reference (%p.content;) </a:documentation>
+      <define name="parameterentity.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="draft-comment"/>
+            <ref name="required-cleanup"/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="parameterentity.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="parameterentity.element">
+        <element name="parameterentity" dita:longName="Parameter entity reference (%p.content;)" dita:since="1.3">
+          <a:documentation>The parameterentity (&lt;parameterentity&gt;) element is used to identify mentions of XML DTD parameter entities. Category: Mention elements</a:documentation>
+          <ref name="parameterentity.attlist"/>
+          <ref name="parameterentity.content"/>
+        </element>
+      </define>
+      <define name="parameterentity.attlist" combine="interleave">
+        <ref name="parameterentity.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Text entity (&amp;prodname;) </a:documentation>
+      <define name="textentity.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="draft-comment"/>
+            <ref name="required-cleanup"/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="textentity.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="textentity.element">
+        <element name="textentity" dita:longName="Text entity (&amp;prodname;)"
+           dita:since="1.3">
+          <a:documentation>The textentity (&lt;textentity&gt;) element is used to identify mentions of XML text entities. Category: Mention elements</a:documentation>
+          <ref name="textentity.attlist"/>
+          <ref name="textentity.content"/>
+        </element>
+      </define>
+      <define name="textentity.attlist" combine="interleave">
+        <ref name="textentity.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: XML attribute </a:documentation>
+      <define name="xmlatt.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="draft-comment"/>
+            <ref name="required-cleanup"/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="xmlatt.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="xmlatt.element">
+        <element name="xmlatt" dita:longName="XML attribute" dita:since="1.3">
+          <a:documentation>The xmlatt (&lt;xmlatt&gt;) element is used to identify mentions of XML attributes. Category: Mention elements</a:documentation>
+          <ref name="xmlatt.attlist"/>
+          <ref name="xmlatt.content"/>
+        </element>
+      </define>
+      <define name="xmlatt.attlist" combine="interleave">
+        <ref name="xmlatt.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: XML element </a:documentation>
+      <define name="xmlelement.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="draft-comment"/>
+            <ref name="required-cleanup"/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="xmlelement.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="xmlelement.element">
+        <element name="xmlelement" dita:longName="XML element" dita:since="1.3">
+          <a:documentation>The xmlelement (&lt;xmlelement&gt;) element is used to identity mentions of XML element types. Category: Mention elements</a:documentation>
+          <ref name="xmlelement.attlist"/>
+          <ref name="xmlelement.content"/>
+        </element>
+      </define>
+      <define name="xmlelement.attlist" combine="interleave">
+        <ref name="xmlelement.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: XML namespace name (aka "namespace URI") </a:documentation>
+      <define name="xmlnsname.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="draft-comment"/>
+            <ref name="required-cleanup"/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="xmlnsname.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="xmlnsname.element">
+        <element name="xmlnsname" dita:longName="XML namespace name (aka &quot;namespace URI&quot;)" dita:since="1.3">
+          <a:documentation>The xmlnsname (&lt;xmlnsname&gt;) element is used to identify mentions of XML namespace names, e.g. the value used in @xmlns attributes. Category: Mention
+            elements</a:documentation>
+          <ref name="xmlnsname.attlist"/>
+          <ref name="xmlnsname.content"/>
+        </element>
+      </define>
+      <define name="xmlnsname.attlist" combine="interleave">
+        <ref name="xmlnsname.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: XML processing instruction (PI) </a:documentation>
+      <define name="xmlpi.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="draft-comment"/>
+            <ref name="required-cleanup"/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="xmlpi.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="xmlpi.element">
+        <element name="xmlpi" dita:longName="XML processing instruction (PI)" dita:since="1.3">
+          <a:documentation>The xmlpi (&lt;xmlpi&gt;) element is used to identify mentions of XML processing instruction names (e.g., &lt;?piname the PI value?>). Category: Mention
+            elements</a:documentation>
+          <ref name="xmlpi.attlist"/>
+          <ref name="xmlpi.content"/>
+        </element>
+      </define>
+      <define name="xmlpi.attlist" combine="interleave">
+        <ref name="xmlpi.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation> Specialization attributes. Global attributes and class defaults </a:documentation>
+    <define name="numcharref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword markup-d/markupname xml-d/numcharref "/>
+      </optional>
+    </define>
+    <define name="parameterentity.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword markup-d/markupname xml-d/parameterentity "/>
+      </optional>
+    </define>
+    <define name="textentity.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword markup-d/markupname xml-d/textentity "/>
+      </optional>
+    </define>
+    <define name="xmlatt.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword markup-d/markupname xml-d/xmlatt "/>
+      </optional>
+    </define>
+    <define name="xmlelement.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword markup-d/markupname xml-d/xmlelement "/>
+      </optional>
+    </define>
+    <define name="xmlnsname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword markup-d/markupname xml-d/xmlnsname "/>
+      </optional>
+    </define>
+    <define name="xmlpi.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword markup-d/markupname xml-d/xmlpi "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

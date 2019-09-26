@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="nl-be">        <!-- Belgian Dutch -->
+  <str name="Figure">Figuur</str>
+  <str name="Table">Tabel</str>
+  <str name="Next topic">Volgend onderwerp</str>
+  <str name="Previous topic">Vorig onderwerp</str>
+  <str name="Parent topic">Hoofdonderwerp</str>
+  <str name="Required cleanup">Opschonen vereist</str>
+  <str name="Draft comment">Opmerking over concept</str>
+  <str name="Option">Optie</str>
+  <str name="Description">Beschrijving</str>
+  <str name="Optional">Optioneel</str>
+  <str name="Required">Vereist</str>
+  <str name="Skip visual syntax diagram">Syntaxisdiagram overslaan</str>
+  <str name="Read syntax diagram">Syntaxisdiagram lezen</str>
+  <str name="Start of change">Begin wijziging</str>
+  <str name="End of change">Einde wijziging</str>
+  <str name="Index">Index</str>
+  <str name="Special characters">Speciale tekens</str>
+  <str name="Numerics">Numerieke tekens</str>
+  <str name="End notes">Eindnoten</str>
+  <str name="Artwork">Artwork</str>
+  <str name="Syntax">Syntaxis</str>
+  <str name="Type">Type</str>
+  <str name="Value">Waarde</str>
+  <str name="Note">Opmerking</str>
+  <str name="Notes">Opmerkingen</str>
+  <str name="Tip">Tip</str>
+  <str name="Fastpath">Versnelde keuze</str>
+  <str name="Important">Belangrijk</str>
+  <str name="Attention">Waarschuwing</str>
+  <str name="Caution">LET OP!</str>
+  <str name="Danger">GEVAAR!</str>
+  <str name="Remember">Let op</str>
+  <str name="Restriction">Beperking</str>
+  <str name="Trouble">Probleem</str>
+  <str name="Warning">Waarschuwing</str>
+  <str name="Contents">Inhoudsopgave</str>
+  <str name="Related concepts">Verwante concepten</str>
+  <str name="Related tasks">Verwante taken</str>
+  <str name="Related reference">Verwante verwijzing</str>
+  <str name="Related information">Verwante informatie</str>
+  <str name="Prerequisite">Vereiste</str>
+  <str name="Prerequisites">Vereisten</str>
+  <str name="or">of</str>
+  <str name="task_context">Over deze taak</str>
+  <str name="task_example">Voorbeeld</str>
+  <str name="task_postreq">Volgende stappen</str>
+  <str name="task_prereq">Voordat u begint</str>
+  <str name="task_procedure">Procedure</str>
+  <str name="task_procedure_unordered">Procedure</str>
+  <str name="task_results">Resultaten</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

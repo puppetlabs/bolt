@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="dita-ot/plugin.rnc" type="application/relax-ng-compact-syntax"?>
+
+<plugin id="com.example.html5-custom-css">
+  <require plugin="org.dita.html5"/>
+  <transtype name="html5-custom-css" extends="html5" desc="HTML5 with custom CSS"/>
+  <feature extension="ant.import" file="build_html5-custom-css.xml"/>
+</plugin>

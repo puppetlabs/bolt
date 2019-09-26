@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+
+
+<!-- 
+Copyright © 2004-2005 by Idiom Technologies, Inc. All rights reserved. 
+IDIOM is a registered trademark of Idiom Technologies, Inc. and WORLDSERVER
+and WORLDSTART are trademarks of Idiom Technologies, Inc. All other 
+trademarks are the property of their respective owners. 
+
+IDIOM TECHNOLOGIES, INC. IS DELIVERING THE SOFTWARE "AS IS," WITH 
+ABSOLUTELY NO WARRANTIES WHATSOEVER, WHETHER EXPRESS OR IMPLIED,  AND IDIOM
+TECHNOLOGIES, INC. DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+PURPOSE AND WARRANTY OF NON-INFRINGEMENT. IDIOM TECHNOLOGIES, INC. SHALL NOT
+BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, COVER, PUNITIVE, EXEMPLARY,
+RELIANCE, OR CONSEQUENTIAL DAMAGES (INCLUDING BUT NOT LIMITED TO LOSS OF 
+ANTICIPATED PROFIT), ARISING FROM ANY CAUSE UNDER OR RELATED TO  OR ARISING 
+OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF IDIOM
+TECHNOLOGIES, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
+
+Idiom Technologies, Inc. and its licensors shall not be liable for any
+damages suffered by any person as a result of using and/or modifying the
+Software or its derivatives. In no event shall Idiom Technologies, Inc.'s
+liability for any damages hereunder exceed the amounts received by Idiom
+Technologies, Inc. as a result of this transaction.
+
+These terms and conditions supersede the terms and conditions in any
+licensing agreement to the extent that such terms and conditions conflict
+with those set forth herein.
+-->
+
+
+<index.configuration.set>
+  <metadata>
+    <revision.history>
+      <revision>
+        <date>26 Mar 2004 4:08PM</date>
+        <author>Ivan Luzyanin</author>
+        <description>
+          Created
+        </description>
+      </revision>
+    </revision.history>
+  </metadata>
+  <index.configuration>
+    <language>zh-CN</language>
+    <description></description>
+    <collation.sequence></collation.sequence>
+    <index.groups>
+      <index.group>
+        <group.key>Specials</group.key>
+        <group.label>符號</group.label>
+        <group.members>
+          <char.set>`</char.set>
+          <char.set>~</char.set>
+          <char.set>!</char.set>
+          <char.set>@</char.set>
+          <char.set>#</char.set>
+          <char.set>$</char.set>
+          <char.set>%</char.set>
+          <char.set>^</char.set>
+          <char.set>&amp;</char.set>
+          <char.set>*</char.set>
+          <char.set>(</char.set>
+          <char.set>)</char.set>
+          <char.set>_</char.set>
+          <char.set>-</char.set>
+          <char.set>=</char.set>
+          <char.set>+</char.set>
+          <char.set>'</char.set>
+          <char.set>&#x201c;</char.set>  <!--TODO ARGH-->
+          <char.set>&quot;</char.set>
+          <char.set>;</char.set>
+          <char.set>:</char.set>
+          <char.set>&lt;</char.set>
+          <char.set>&gt;</char.set>
+          <char.set>.</char.set>
+          <char.set>/</char.set>
+          <char.set>?</char.set>
+          <char.set>[</char.set>
+          <char.set>]</char.set>
+          <char.set>{</char.set>
+          <char.set>}</char.set>
+          <char.set>|</char.set>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>0</group.key>
+        <group.label>數字</group.label>
+        <group.members>
+          <char.set>0</char.set>
+          <char.set>０</char.set>
+          <char.set>1</char.set>
+          <char.set>１</char.set>
+          <char.set>2</char.set>
+          <char.set>２</char.set>
+          <char.set>3</char.set>
+          <char.set>３</char.set>
+          <char.set>4</char.set>
+          <char.set>４</char.set>
+          <char.set>5</char.set>
+          <char.set>５</char.set>
+          <char.set>6</char.set>
+          <char.set>６</char.set>
+          <char.set>7</char.set>
+          <char.set>７</char.set>
+          <char.set>8</char.set>
+          <char.set>８</char.set>
+          <char.set>9</char.set>
+          <char.set>９</char.set>
+        </group.members>
+      </index.group>
+<!--
+      <index.group>
+        <group.key>A</group.key>
+        <group.label>字母</group.label>
+      </index.group>
+-->
+      <index.group>
+        <group.key>吖</group.key>
+        <group.label>A</group.label>
+        <group.members>
+          <char.set>a</char.set>
+          <char.set>A</char.set>
+          <char.set start-range="吖" end-range="仈"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>八</group.key>
+        <group.label>B</group.label>
+        <group.members>
+          <char.set>b</char.set>
+          <char.set>B</char.set>
+          <char.set start-range="八" end-range="嚓"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>嚓</group.key>
+        <group.label>C</group.label>
+        <group.members>
+          <char.set>C</char.set>
+          <char.set>c</char.set>
+          <char.set start-range="嚓" end-range="咑"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>咑</group.key>
+        <group.label>D</group.label>
+        <group.members>
+          <char.set>D</char.set>
+          <char.set>d</char.set>
+          <char.set start-range="咑" end-range="妸"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>妸</group.key>
+        <group.label>E</group.label>
+        <group.members>
+          <char.set>E</char.set>
+          <char.set>e</char.set>
+          <char.set start-range="妸" end-range="发"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>发</group.key>
+        <group.label>F</group.label>
+        <group.members>
+          <char.set>F</char.set>
+          <char.set>f</char.set>
+          <char.set start-range="发" end-range="嘎"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>旮</group.key>
+        <group.label>G</group.label>
+        <group.members>
+          <char.set>G</char.set>
+          <char.set>g</char.set>
+          <char.set start-range="旮" end-range="铪"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>铪</group.key>
+        <group.label>H</group.label>
+        <group.members>
+          <char.set>H</char.set>
+          <char.set>h</char.set>
+          <char.set start-range="铪" end-range="丌"/>
+        </group.members>
+      </index.group>
+            <index.group>
+                <group.key>I</group.key>
+                <group.label>I</group.label>
+                <group.members>
+                    <char.set>I</char.set>
+                    <char.set>i</char.set>
+                </group.members>
+            </index.group>
+      <index.group>
+        <group.key>丌</group.key>
+        <group.label>J</group.label>
+        <group.members>
+          <char.set>J</char.set>
+          <char.set>j</char.set>
+          <char.set start-range="丌" end-range="咔"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>咔</group.key>
+        <group.label>K</group.label>
+        <group.members>
+          <char.set>K</char.set>
+          <char.set>k</char.set>
+          <char.set start-range="咔" end-range="垃"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>垃</group.key>
+        <group.label>L</group.label>
+        <group.members>
+          <char.set>L</char.set>
+          <char.set>l</char.set>
+          <char.set start-range="垃" end-range="妈"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>妈</group.key>
+        <group.label>M</group.label>
+        <group.members>
+          <char.set>M</char.set>
+          <char.set>m</char.set>
+          <char.set start-range="妈" end-range="拏"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>拏</group.key>
+        <group.label>N</group.label>
+        <group.members>
+          <char.set>N</char.set>
+          <char.set>n</char.set>
+          <char.set start-range="拏" end-range="噢"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>噢</group.key>
+        <group.label>O</group.label>
+        <group.members>
+          <char.set>O</char.set>
+          <char.set>o</char.set>
+          <char.set start-range="噢" end-range="妑"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>妑</group.key>
+        <group.label>P</group.label>
+        <group.members>
+          <char.set>P</char.set>
+          <char.set>p</char.set>
+          <char.set start-range="妑" end-range="七"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>七</group.key>
+        <group.label>Q</group.label>
+        <group.members>
+          <char.set>Q</char.set>
+          <char.set>q</char.set>
+          <char.set start-range="七" end-range="呥"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>呥</group.key>
+        <group.label>R</group.label>
+        <group.members>
+          <char.set>R</char.set>
+          <char.set>r</char.set>
+          <char.set start-range="呥" end-range="仨"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>仨</group.key>
+        <group.label>S</group.label>
+        <group.members>
+          <char.set>S</char.set>
+          <char.set>s</char.set>
+          <char.set start-range="仨" end-range="他"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>他</group.key>
+        <group.label>T</group.label>
+        <group.members>
+          <char.set>T</char.set>
+          <char.set>t</char.set>
+          <char.set start-range="他" end-range="屲"/>
+        </group.members>
+      </index.group>
+            <index.group>
+                <group.key>U</group.key>
+                <group.label>U</group.label>
+                <group.members>
+                    <char.set>U</char.set>
+                    <char.set>u</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>V</group.key>
+                <group.label>V</group.label>
+                <group.members>
+                    <char.set>V</char.set>
+                    <char.set>v</char.set>
+                </group.members>
+            </index.group>
+      <index.group>
+        <group.key>屲</group.key>
+        <group.label>W</group.label>
+        <group.members>
+          <char.set>W</char.set>
+          <char.set>w</char.set>
+          <char.set start-range="屲" end-range="夕"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>夕</group.key>
+        <group.label>X</group.label>
+        <group.members>
+          <char.set>X</char.set>
+          <char.set>x</char.set>
+          <char.set start-range="夕" end-range="丫"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>丫</group.key>
+        <group.label>Y</group.label>
+        <group.members>
+          <char.set>Y</char.set>
+          <char.set>y</char.set>
+          <char.set start-range="丫" end-range="帀"/>
+        </group.members>
+      </index.group>
+      <index.group>
+        <group.key>匝</group.key>
+        <group.label>Z</group.label>
+        <group.members>
+          <char.set>Z</char.set>
+          <char.set>z</char.set>
+          <char.set start-range="帀" end-range="阼"/>
+        </group.members>
+      </index.group>
+    </index.groups>
+  </index.configuration>
+</index.configuration.set>

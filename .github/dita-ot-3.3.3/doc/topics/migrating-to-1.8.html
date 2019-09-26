@@ -1,0 +1,104 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="In DITA-OT 1.8, certain stylesheets were moved to plug-in specific folders and various deprecated Ant properties, XSLT stylesheets, parameters and modes were removed from the XHTML, PDF and ODT transformations."><meta name="DC.subject" content="deprecated features, dita.script.dir, dita.resource.dir, dita.empty, args.message.file, ImgUtils, artwork-preprocessor.xsl, otdita2fo_frontend.xsl, insertVariable.old, XSLT mode,, layout-masters-processing, toc-prefix-text, toc-topic-text, args.fo.include.rellinks, Legacy PDF, args.odt.include.rellinks, disableRelatedLinks"><meta name="keywords" content="deprecated features, dita.script.dir, dita.resource.dir, dita.empty, args.message.file, ImgUtils, artwork-preprocessor.xsl, otdita2fo_frontend.xsl, insertVariable.old, XSLT mode,, layout-masters-processing, toc-prefix-text, toc-topic-text, args.fo.include.rellinks, Legacy PDF, args.odt.include.rellinks, disableRelatedLinks"><meta name="DC.relation" scheme="URI" content="../topics/migration.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="ID"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Migrating to release 1.8</title></head><body id="ID"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a><ul><li><a href="../topics/migrating-to-3.3.html">To 3.3</a></li><li><a href="../topics/migrating-to-3.2.html">To 3.2</a></li><li><a href="../topics/migrating-to-3.1.html">To 3.1</a></li><li><a href="../topics/migrating-to-3.0.html">To 3.0</a></li><li><a href="../topics/migrating-to-2.5.html">To 2.5</a></li><li><a href="../topics/migrating-to-2.4.html">To 2.4</a></li><li><a href="../topics/migrating-to-2.3.html">To 2.3</a></li><li><a href="../topics/migrating-to-2.2.html">To 2.2</a></li><li><a href="../topics/migrating-to-2.1.html">To 2.1</a></li><li><a href="../topics/migrating-to-2.0.html">To 2.0</a></li><li class="active"><a href="../topics/migrating-to-1.8.html">To 1.8</a></li><li><a href="../topics/migrating-to-1.7.html">To 1.7</a></li><li><a href="../topics/migrating-to-1.6.html">To 1.6</a></li><li><a href="../topics/migrating-to-1.5.4.html">To 1.5.4</a></li></ul></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+
+  <h1 class="title topictitle1" id="ariaid-title1">Migrating to release 1.8</h1>
+  
+
+  
+  
+  
+
+  <div class="body refbody"><p class="shortdesc">In DITA-OT 1.8, certain stylesheets were moved to plug-in specific folders and various deprecated Ant
+    properties, XSLT stylesheets, parameters and modes were removed from the XHTML, PDF and ODT
+    transformations.</p>
+    <section class="section">
+      <p class="p">Stylesheets for the following transformation types have moved to plug-in specific folders:</p>
+      <ul class="ul">
+        <li class="li"><span class="keyword option">eclipsehelp</span></li>
+        <li class="li"><span class="keyword option">htmlhelp</span></li>
+        <li class="li"><span class="keyword option">javahelp</span></li>
+        <li class="li"><span class="keyword option">odt</span></li>
+        <li class="li"><span class="keyword option">xhtml</span></li>
+      </ul>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Preprocessing</h2>
+      
+      <p class="p">The following deprecated Ant properties have been removed:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">dita.script.dir</code>, use <code class="ph codeph">${dita.plugin.<var class="keyword varname">id</var>.dir}</code> instead</li>
+        <li class="li"><code class="ph codeph">dita.resource.dir</code>, use <code class="ph codeph">${dita.plugin.org.dita.base.dir}/resource</code>
+          instead</li>
+        <li class="li"><code class="ph codeph">dita.empty</code></li>
+        <li class="li"><code class="ph codeph">args.message.file</code></li>
+      </ul>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">XHTML</h2>
+      
+      <p class="p">XSLT Java extension <code class="ph codeph">ImgUtils</code> has been removed from stylesheets and been replaced with
+        preprocessing module <code class="ph codeph">ImageMetadataModule</code>. The old <code class="ph codeph">ImgUtils</code> Java classes are
+        still included in the build.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">PDF</h2>
+      
+      <div class="div div-index">
+        
+        
+      </div>
+      <p class="p">The following deprecated XSLT stylesheets have been removed:</p>
+      <ul class="ul">
+        <li class="li"><span class="ph filepath">artwork-preprocessor.xsl</span></li>
+        <li class="li"><span class="ph filepath">otdita2fo_frontend.xsl</span></li>
+      </ul>
+      <p class="p">The following deprecated XSLT templates have been removed:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">insertVariable.old</code></li>
+      </ul>
+      <p class="p">The following deprecated XSLT modes have been removed:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">layout-masters-processing</code></li>
+        <li class="li"><code class="ph codeph">toc-prefix-text</code>, use <code class="ph codeph">tocPrefix</code> mode instead</li>
+        <li class="li"><code class="ph codeph">toc-topic-text</code>, use <code class="ph codeph">tocText</code> mode instead</li>
+      </ul>
+      <p class="p">Link generation has been simplified by removing deprecated arguments in favor of
+        <code class="ph codeph">args.rellinks</code>. The following deprecated Ant properties have been removed:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">args.fo.include.rellinks</code></li>
+      </ul>
+      <p class="p">The following XSLT parameters have been removed:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">antArgsIncludeRelatedLinks</code></li>
+        <li class="li"><code class="ph codeph">disableRelatedLinks</code></li>
+      </ul>
+      <p class="p">A call to a named template <code class="ph codeph">pullPrologIndexTerms.end-range</code> has been added to
+          <code class="ph codeph">processTopic*</code> templates to handle topic wide index ranges.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Legacy PDF</h2>
+      
+      <p class="p">The following deprecated XSLT stylesheets have been removed:</p>
+      <ul class="ul">
+        <li class="li"><span class="ph filepath">dita2fo-shell_template.xsl</span></li>
+        <li class="li"><span class="ph filepath">topic2fo-shell.xsl</span></li>
+      </ul>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">ODT</h2>
+      
+      <p class="p">Link generation has been simplified by removing deprecated arguments in favor of
+        <code class="ph codeph">args.rellinks</code>. The following deprecated Ant properties have been removed:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">args.odt.include.rellinks</code></li>
+      </ul>
+      <p class="p">The following XSLT parameters have been added:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">include.rellinks</code></li>
+      </ul>
+      <p class="p">The following XSLT parameters have been removed:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">disableRelatedLinks</code></li>
+      </ul>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/migration.html" title="If you have XSL transformation overrides, plug-ins or other customizations written prior to DITA-OT 3.3, you may need to make changes to ensure your overrides work properly with the latest toolkit versions.">Migrating customizations</a></div></div></nav></article></main></body></html>

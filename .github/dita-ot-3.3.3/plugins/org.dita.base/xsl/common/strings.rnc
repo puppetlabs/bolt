@@ -1,0 +1,66 @@
+# This file is part of the DITA Open Toolkit project.
+#
+# Copyright 2017 Jarno Elovirta
+#
+# See the accompanying LICENSE file for applicable license.
+namespace pdf2 = "http://www.idiominc.com/opentopic/vars"
+
+# New
+variables =
+  element variables {
+    variable*
+  }
+variable =
+  element variable {
+    attribute id { text }?,
+    (text | param | variableref)*
+  }
+param =
+  element param {
+    attribute ref-name { text }
+  }
+variableref =
+  element variableref {
+    attribute refid { text }
+  }
+  
+# Common
+strings =
+  element strings {
+    attribute xml:lang { xsd:language },
+    str*
+  }
+str =
+  element str {
+    attribute name { text },
+    text
+  }
+
+# PDF2
+vars =
+  element vars {
+    pdf2variable*
+  }
+pdf2variable =
+  element pdf2:variable {
+    attribute id { text },
+    (text | pdf2param)*
+  }
+pdf2param =
+  element pdf2:param {
+    attribute ref-name { text },
+    text
+  }
+
+# list
+langlist =
+  element langlist {
+    lang*
+  }
+lang =
+  element lang {
+    attribute filename { xsd:anyURI },
+    attribute xml:lang { xsd:language }
+  }
+
+start = variables | strings | pdf2variable | langlist

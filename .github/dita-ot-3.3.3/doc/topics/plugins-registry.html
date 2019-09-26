@@ -1,0 +1,216 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="topic"><meta name="description" content="DITA-OT 3.2 supports a new plug-in registry that makes it easier to discover and install new plug-ins. The registry provides a searchable list of plug-ins at dita-ot.org/plugins."><meta name="DC.subject" content="PDF, plug-in, command, dita, plug-in registry, plug-ins, registry, installing, GitHub, URL"><meta name="keywords" content="PDF, plug-in, command, dita, plug-in registry, plug-ins, registry, installing, GitHub, URL"><meta name="DC.relation" scheme="URI" content="../topics/custom-plugins.html"><meta name="DC.relation" scheme="URI" content="../topics/plugins-installing.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="plugin-registry"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Adding plug-ins via the registry</title></head><body id="plugin-registry"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a><ul><li><a href="../topics/plugins-installing.html">Installing plug-ins</a></li><li><a href="../topics/plugins-removing.html">Removing plug-ins</a></li><li class="active"><a href="../topics/plugins-registry.html">Plug-in registry</a></li><li><a href="../topics/plugin-configfile.html">Plug-in descriptor file</a></li><li><a href="../topics/plugin-dependencies.html">Plug-in dependencies</a></li><li><a href="../topics/plugin-applications.html">Plug-in applications</a></li><li><a href="../topics/plugin-sample.html">Example plugin.xml file</a></li><li><a href="../topics/plugin-best-practices.html">Best practices</a></li><li><a href="../topics/plugin-coding-conventions.html">Coding conventions</a></li></ul></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Adding plug-ins via the registry</h1>
+  
+  
+  
+  <div class="body"><p class="shortdesc"><span class="ph" id="plugin-registry__registry-summary">DITA-OT 3.2 supports a new plug-in registry that makes it easier to discover and
+      install new plug-ins. The registry provides a searchable list of plug-ins at <a class="xref" href="https://www.dita-ot.org/plugins" target="_blank">dita-ot.org/plugins</a>.</span></p>
+    <section class="section" id="plugin-registry__background">
+      <p class="p">In the past, installing plug-ins required you to either download a plug-in to your computer and provide the
+        path to the plug-in archive (.zip file) or pass the URL of the plug-in distribution file to the
+          <span class="keyword cmdname">dita</span> command and let DITA-OT download the file. This required that you know the URL of the
+        plug-in distribution package.</p>
+    </section>
+    <section class="section" id="plugin-registry__using-the-registry"><h2 class="title sectiontitle">Installing plug-ins from the registry</h2>
+      
+      <p class="p">With the registry, you can now search the list of available plug-ins at <a class="xref" href="https://www.dita-ot.org/plugins" target="_blank">dita-ot.org/plugins</a>
+        and install new plug-ins by name and optional version.</p>
+      <p class="p">Search the registry for a plug-in and install it by providing the plug-in name to the <span class="keyword cmdname">dita</span>
+        command.</p>
+      <pre class="pre codeblock"><code><span class="keyword cmdname">dita</span> <span class="keyword parmname">--install</span>=<var class="keyword varname">&lt;plugin-name&gt;</var></code></pre>
+      <p class="p">If the registry includes multiple versions of the same plug-in, you can specify the version to install as
+        follows:</p>
+      <pre class="pre codeblock"><code><span class="keyword cmdname">dita</span> <span class="keyword parmname">--install</span>=<var class="keyword varname">&lt;plugin-name&gt;@&lt;plugin-version&gt;</var></code></pre>
+      <p class="p">If the plug-in requires other plug-ins, those are also installed recursively.</p>
+      <p class="p">For example, to revert PDF output to the legacy PDF2 layout that was the default in DITA-OT before 2.5, install
+        the <span class="ph filepath">org.dita.pdf2.legacy</span> plug-in as follows:</p>
+      <pre class="pre codeblock"><code><span class="keyword cmdname">dita</span> <span class="keyword parmname">--install</span>=org.dita.pdf2.legacy</code></pre>
+      <p class="p">If a matching plug-in cannot be found, an error message will appear. Possible reasons for failure include:</p>
+      <ul class="ul">
+        <li class="li">A plug-in with the specified name was not found in the registry</li>
+        <li class="li">A plug-in with the specified version was not found in the registry</li>
+        <li class="li">The specified plug-in version is not compatible with the installed DITA-OT version</li>
+        <li class="li">None of the available plug-in versions are compatible with the installed DITA-OT version</li>
+      </ul>
+    </section>
+    <section class="section" id="plugin-registry__publishing-to-registry"><h2 class="title sectiontitle">Publishing plug-ins to the registry</h2>
+      <p class="p">The contents of the DITA Open Toolkit plug-in registry are stored in a Git repository at <a class="xref" href="https://github.com/dita-ot/registry" target="_blank">github.com/dita-ot/registry</a>. New plug-ins or new versions can be added by sending a <a class="xref" href="https://help.github.com/articles/about-pull-requests/" target="_blank">pull request</a>
+        that includes a single new plug-in entry in JavaScript Object Notation (JSON) format.</p>
+      <div class="note note note_note"><span class="note__title">Note:</span> As for all other contributions to the project, pull requests to the registry must be signed off by passing
+        the <code class="ph codeph">--signoff</code> option to the <span class="keyword cmdname">git commit</span> command to certify that you have the
+        rights to submit this contribution. For more information on this process, see <a class="xref" href="https://www.dita-ot.org/DCO" target="_blank">signing your work</a>.</div>
+      <p class="p">The version entries for each plug-in are stored in a file that is named after the plug-in ID as
+          <code class="ph codeph">&lt;plugin-name&gt;.json</code>. The file contains an array of entries with a pre-defined structure.
+        You should have one entry for each supported version of the plug-in.</p>
+      <table class="table table-hover frame-none"><caption><span class="table--title-label">Table 1. </span><span class="title">Plug-in version entry structure</span></caption><colgroup><col style="width:20%"><col style="width:20%"><col style="width:60%"></colgroup><thead class="thead">
+            <tr class="row">
+              <th class="entry colsep-0 rowsep-1" id="plugin-registry__publishing-to-registry__entry__1">Key</th>
+              <th class="entry colsep-0 rowsep-1" id="plugin-registry__publishing-to-registry__entry__2">Mandatory</th>
+              <th class="entry colsep-0 rowsep-1" id="plugin-registry__publishing-to-registry__entry__3">Description</th>
+            </tr>
+          </thead><tbody class="tbody">
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__1"><code class="ph codeph">name</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__2">yes</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__3">Plug-in name</td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__1"><code class="ph codeph">vers</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__2">yes</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__3">Plug-in version in <a class="xref" href="https://semver.org" target="_blank">Semantic Versioning 2.0.0</a> format</td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__1"><code class="ph codeph">deps</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__2">yes</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__3">Array of dependency entries. The only mandatory plug-in dependency is
+                  <code class="ph codeph">org.dita.base</code>, which defines the supported DITA-OT platform.</td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__1"><code class="ph codeph">url</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__2">yes</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__3">Absolute URL to plug-in distribution file</td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__1"><code class="ph codeph">cksum</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__2">no</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__3">SHA-256 hash of the plug-in distribution file</td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__1"><code class="ph codeph">description</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__2">no</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__3">Description of the plug-in</td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__1"><code class="ph codeph">keywords</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__2">no</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__3">Array of keywords</td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__1"><code class="ph codeph">homepage</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__2">no</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__3">Plug-in homepage URL</td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__1"><code class="ph codeph">license</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__2">no</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__3">License in <a class="xref" href="https://spdx.org/licenses/" target="_blank">SPDX</a>
+                format</td>
+            </tr>
+          </tbody></table>
+      <div class="note tip note_tip"><span class="note__title">Tip:</span> To calculate the SHA-256 checksum for the <code class="ph codeph">cksum</code> key, use <code class="ph codeph">shasum&nbsp;-a&nbsp;256
+            <var class="keyword varname">&lt;plugin-file&gt;</var></code> on macOS or Linux. With&nbsp;Windows&nbsp;PowerShell, use
+            <code class="ph codeph"><a class="xref" href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-filehash?view=powershell-6" target="_blank">Get-FileHash</a>&nbsp;<var class="keyword varname">&lt;plugin-file&gt;</var> |
+          Format-List</code>.
+        
+        
+        
+      </div>
+      <table class="table table-hover frame-none"><caption><span class="table--title-label">Table 2. </span><span class="title">Structure for dependency entries</span></caption><colgroup><col style="width:20%"><col style="width:20%"><col style="width:60%"></colgroup><thead class="thead">
+            <tr class="row">
+              <th class="entry colsep-0 rowsep-1" id="plugin-registry__publishing-to-registry__entry__31">Key</th>
+              <th class="entry colsep-0 rowsep-1" id="plugin-registry__publishing-to-registry__entry__32">Mandatory</th>
+              <th class="entry colsep-0 rowsep-1" id="plugin-registry__publishing-to-registry__entry__33">Description</th>
+            </tr>
+          </thead><tbody class="tbody">
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__31"><code class="ph codeph">name</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__32">yes</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__33">Plug-in name</td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__31"><code class="ph codeph">req</code></td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__32">yes</td>
+              <td class="entry colsep-0 rowsep-1" headers="plugin-registry__publishing-to-registry__entry__33">Required plug-in version in <a class="xref" href="https://semver.org" target="_blank">Semantic Versioning 2.0.0</a> format that may contain <a class="xref" href="https://docs.npmjs.com/misc/semver#ranges" target="_blank">ranges</a>.</td>
+            </tr>
+          </tbody></table>
+      <div class="note note note_note"><span class="note__title">Note:</span> Version numbers in the <code class="ph codeph">vers</code> and <code class="ph codeph">req</code> keys use the three-digit format
+        specified by <a class="xref" href="https://semver.org" target="_blank">Semantic Versioning 2.0.0</a>. An initial development release of a plug-in might start at version 0.1.0,
+        and an initial production release at 1.0.0. If your plug-in requires DITA-OT 3.1 or later, set the
+          <code class="ph codeph">req</code> key to <code class="ph codeph">&gt;=3.1.0</code>. Using the greater-than sign allows your plug-in to
+        work with compatible maintenance releases, such as 3.1.3. If the requirement is set to <code class="ph codeph">=3.1.0</code>,
+        the registry will only offer it for installation on that exact version.</div>
+    </section>
+    <section class="section" id="plugin-registry__example-1"><h2 class="title sectiontitle">Sample plug-in entry file</h2>
+      
+      <div class="div div-index">
+        
+      </div>
+      <p class="p">The example below shows an entry for the <code class="ph codeph">DocBook</code> plug-in. The complete file is available in
+        the registry as <a class="xref" href="https://github.com/dita-ot/registry/blob/master/org.dita.docbook.json" target="_blank">org.dita.docbook.json</a>.</p>
+      <pre class="pre codeblock language-json"><code>[
+  {
+    "name": "org.dita.docbook",
+    "description": "Convert DITA to DocBook.",
+    "keywords": ["DocBook"],
+    "homepage": "https://github.com/dita-ot/org.dita.docbook/",
+    "vers": "2.3.0",
+    "license": "Apache-2.0",
+    "deps": [
+      {
+        "name": "org.dita.base",
+        "req": "&gt;=2.3.0"
+      }
+    ],
+    "url": "https://github.com/dita-ot/org.dita.docbook/archive/2.3.zip",
+    "cksum": "eaf06b0dca8d942bd4152615e39ee8cfb73a624b96d70e10ab269ed6f8a13e21"
+  }
+]</code></pre>
+    </section>
+    <section class="section" id="plugin-registry__multiple-versions"><h2 class="title sectiontitle">Maintaining multiple plug-in versions</h2>
+      
+      <p class="p">When you have multiple versions of a plug-in, include an entry for each version, separated by a comma:</p>
+      <pre class="pre codeblock language-json"><code>[
+  {
+    "name": "org.example.myplugin",
+     ⋮
+    "vers": "1.0.1",
+     ⋮
+  }<strong class="ph b">,</strong>
+  {
+    "name": "org.example.myplugin",
+     ⋮
+    "vers": "2.1.0",
+     ⋮
+  }
+]</code></pre>
+      <div class="note tip note_tip"><span class="note__title">Tip:</span> To publish a new version of your plug-in to the registry, add a new entry to the array in the
+        existing plug-in entry file rather than overwriting an existing entry. This allows users to install the previous
+        version of the plug-in if they are using an older version of DITA-OT.</div>
+    </section>
+    <section class="section" id="plugin-registry__adding-custom-registries"><h2 class="title sectiontitle">Adding custom registries</h2>
+      
+      <p class="p">In addition to the main plug-in registry at <a class="xref" href="https://www.dita-ot.org/plugins" target="_blank">dita-ot.org/plugins</a>, you can create a registry of
+        your own to store the custom plug-ins for your company or organization.</p>
+      <p class="p">A registry is just a directory that contains JSON files like the one above; each JSON file represents one entry
+        in the registry. To add a custom registry location, edit the
+          <span class="ph filepath">config/configuration.properties</span> file in the DITA-OT installation directory and add the
+        URL for your custom registry directory to the <code class="ph codeph">registry</code> key value, separating each entry with a
+        space.</p>
+      <div class="note tip note_tip"><span class="note__title">Tip:</span> Custom registry entries are a simple way to test your own plug-in entry file before submitting to
+        a common registry.</div>
+    </section>
+    <section class="section" id="plugin-registry__testing-custom-registry"><h2 class="title sectiontitle">Testing with a custom registry</h2>
+      <p class="p">To test your plug-in entry with a custom registry:</p>
+      <ol class="ol">
+        <li class="li">Fork the plug-in registry, which creates a new repository under your GitHub username — for example,
+            <code class="ph codeph">https://github.com/USERNAME/registry.git</code>.</li>
+        <li class="li">Create a new branch for your plug-in entry, and add the JSON file to the branch — for example, create
+            <span class="ph filepath">org.example.newPlugin.json</span> in the branch <code class="ph codeph">addPlugin</code>.</li>
+        <li class="li">As long as your repository is accessible, that branch now represents a working “custom registry” that can be
+          added to the <span class="ph filepath">config/configuration.properties</span> file. Edit the <code class="ph codeph">registry</code> key
+          and add the raw GitHub URL for the branch that contains the JSON file. With the example username and branch
+          name above, you can add your registry
+          with:<pre class="pre codeblock language-properties"><code>registry=https://raw.githubusercontent.com/USERNAME/registry/addPlugin/ http://plugins.dita-ot.org/</code></pre></li>
+        <li class="li">You can now test the plug-in installation with:
+          <pre class="pre codeblock"><code><span class="keyword cmdname">dita</span> <span class="keyword parmname">--install</span>=org.example.newPlugin</code></pre></li>
+        <li class="li">Once you’ve confirmed that the entry works, you can submit a pull request to have your entry added to the
+          common registry.</li>
+      </ol>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/custom-plugins.html" title="You can install or create DITA-OT plug-ins to change the default output types in various ways, add entirely new kinds of output formats, or implement DITA topic specializations.">Working with plug-ins</a></div></div><div class="linklist relinfo reltasks"><strong>Related tasks</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/plugins-installing.html" title="Use the dita command to install a plug-in.">Installing plug-ins</a></li></ul></div></nav></article></main></body></html>

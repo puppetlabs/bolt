@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+ 
+ Copyright 2007 Shawn McKenzie
+ *-->
+<?xml-stylesheet href="../../../../xsl/ditaview_shell.xsl" type="text/xsl"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN"
+ "../../../../dtd/concept.dtd">
+<concept id="tocjs_ant" xml:lang="en-us">
+ <title>Ant tasks</title>
+ <conbody>
+  <p>The tocjs extension is meant to work with a project that generates HTML. For instance, assume you have an existing ant task:
+   <codeblock>
+&lt;target name=&quot;myproj2html&quot; depends=&quot;use-init&quot;&gt;
+ &lt;antcall target=&quot;dita2xhtml&quot;&gt;
+  &lt;param name=&quot;args.input&quot;
+   value=&quot;projects${file.separator}myproject${file.separator}GettingStartedGuide.ditamap&quot;/&gt;
+  &lt;param name=&quot;output.dir&quot; value=&quot;output${file.separator}myproject&quot;/&gt;
+  &lt;param name=&quot;args.css&quot; value=&quot;testvalue.css&quot;/&gt;
+ &lt;/antcall&gt;
+&lt;/target&gt;    
+   </codeblock>
+To create tocjs JavaScript output and copy related topics into place, you could create the following
+  ant target.
+  <codeblock>
+&lt;target name=&quot;myproj2tocjs&quot; description=&quot;Generate tocjs javascript file&quot;&gt;
+ &lt;antcall target=&quot;dita2tocjs&quot;&gt;
+  &lt;param name=&quot;transtype&quot; value=&quot;tocjs&quot;/&gt;
+  &lt;param name=&quot;args.input&quot;
+   value=&quot;projects${file.separator}myproject${file.separator}GettingStartedGuide.ditamap&quot;/&gt;
+  &lt;param name=&quot;output.file&quot;
+   value=&quot;output${file.separator}myproject${file.separator}myproject${file.separator}toctree.js&quot;/&gt;
+ &lt;/antcall&gt;
+ &lt;copy todir=&quot;output${file.separator}myproject${file.separator}myproject&quot;&gt;
+   &lt;fileset dir=&quot;${dita.dir}${file.separator}demo${file.separator}tocjs${file.separator}basefiles&quot;&gt;
+   &lt;include name=&quot;**/*&quot;/&gt;&lt;/fileset&gt;
+ &lt;/copy&gt;
+&lt;/target&gt;   
+  </codeblock>
+  The above task generates tocjs output and copies the related files from the tocjs
+   <filepath>basefiles</filepath> directory. You will also need to maitan and copy into place a
+   frameset file. For an exaple of how this is done, take a look at the ant tasks in
+   <filepath>demo/tocjs/buildsample.xml</filepath> and the related <filepath>basefiles</filepath>
+   directories</p>
+  <note type="tip">For more examples of working ant tasks, check the
+   <filepath>buildsample.xml</filepath>file in the <filepath>demo/tocjs</filepath> directory.</note>
+ </conbody>
+ <related-links>
+  <link href="basefiles.xml"/>
+  <link href="paths.xml"/>
+ </related-links>
+</concept>

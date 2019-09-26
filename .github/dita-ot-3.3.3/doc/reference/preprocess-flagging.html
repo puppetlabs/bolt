@@ -1,0 +1,218 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="Beginning with DITA-OT 1.7, flagging support is implemented as a common flag-module preprocessing step. The module evaluates the DITAVAL against all flagging attributes, and adds DITA-OT–specific hints to the topic when flags are active. Any extended transformation type may use these hints to support flagging without adding logic to interpret the DITAVAL."><meta name="DC.subject" content=", foreign, ditaval-startprop, prop, revprop, startflag, endflag, ditaval-endprop, ditaval-prop, p, ol, li, outputclass, xtrf, xtrc, rev, DITAVAL, preprocess step, flag-module, DITA, specializations, preprocessing, flagging, XSLT, CSS, images"><meta name="keywords" content=", foreign, ditaval-startprop, prop, revprop, startflag, endflag, ditaval-endprop, ditaval-prop, p, ol, li, outputclass, xtrf, xtrc, rev, DITAVAL, preprocess step, flag-module, DITA, specializations, preprocessing, flagging, XSLT, CSS, images"><meta name="DC.relation" scheme="URI" content="../reference/preprocessing.html"><meta name="DC.relation" scheme="URI" content="../reference/preprocess-topicpull.html"><meta name="DC.relation" scheme="URI" content="../reference/preprocess-clean-map.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="flagging"><meta name="DC.language" content="en-US"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Flagging (flag-module)</title></head><body id="flagging"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a><ul><li><a href="../reference/architecture.html">DITA-OT architecture</a><ul><li><a href="../reference/processing-structure.html">Processing structure</a></li><li><a href="../reference/map-first-preprocessing.html">Map-first preprocessing</a></li><li><a href="../reference/processing-pipeline-modules.html">Processing modules</a></li><li><a href="../reference/processing-order.html">Processing order</a></li><li><a href="../reference/preprocessing.html">Pre-processing modules</a><ul><li><a href="../reference/preprocess-genlist.html">Generate lists (gen-list)</a></li><li><a href="../reference/preprocess-debugfilter.html">Debug and filter (debug-filter)</a></li><li><a href="../reference/preprocess-mapref.html">Resolve map references (mapref)</a></li><li><a href="../reference/preprocess-branch-filter.html">Branch filtering (branch-filter)</a></li><li><a href="../reference/preprocess-keyref.html">Resolve key references (keyref)</a></li><li><a href="../reference/preprocess-copy-to.html">Copy topics (copy-to)</a></li><li><a href="../reference/preprocess-conrefpush.html">Conref push (conrefpush)</a></li><li><a href="../reference/preprocess-conref.html">Resolve content references (conref)</a></li><li><a href="../reference/preprocess-profile.html">Filter conditional content (profile)</a></li><li><a href="../reference/preprocess-topic-fragment.html">Resolve topic fragments and code references (topic-fragment)</a></li><li><a href="../reference/preprocess-chunk.html">Chunk topics (chunk)</a></li><li><a href="../reference/preprocess-metadata.html">Move metadata (move-meta-entries) and pull content into maps (mappull) </a></li><li><a href="../reference/preprocess-maplink.html">Map based linking (maplink)</a></li><li><a href="../reference/preprocess-topicpull.html">Pull content into topics (topicpull)</a></li><li class="active"><a href="../reference/preprocess-flagging.html">Flagging (flag-module)</a></li><li><a href="../reference/preprocess-clean-map.html">Map cleanup (clean-map)</a></li><li><a href="../reference/preprocess-copyfiles.html">Copy related files (copy-files)</a></li></ul></li><li><a href="../reference/XhtmlWithNavigation.html">HTML-based processing modules</a></li><li><a href="../reference/pdf-transform.html">PDF processing modules</a></li></ul></li><li><a href="../reference/DITA_spec-support.html">DITA specification support</a></li><li><a href="../reference/license.html">License</a></li></ul></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Flagging (flag-module)</h1>
+  
+  
+  <div class="body refbody"><p class="shortdesc">Beginning with DITA-OT 1.7, flagging support is implemented as a common <code class="ph codeph">flag-module</code>
+    preprocessing step. The module evaluates the DITAVAL against all flagging attributes, and adds DITA-OT–specific
+    hints to the topic when flags are active. Any extended transformation type may use these hints to support flagging
+    without adding logic to interpret the DITAVAL.</p>
+    <section class="section"><h2 class="title sectiontitle">Evaluating the DITAVAL flags</h2>
+      
+      <p class="p">Flagging is implemented as a reusable module during the preprocess stage. If a DITAVAL file is not used with a
+        build, this step is skipped with no change to the file.</p>
+      <p class="p">When a flag is active, relevant sections of the DITAVAL itself are copied into the topic as a sub-element of
+        the current topic. The active flags are enclosed in a pseudo-specialization of the
+          <code class="keyword markupname xmlelement">&lt;foreign&gt;</code> element (referred to as a pseudo-specialization because it is used only under
+        the covers, with all topic types; it is not integrated into any shipped document types).</p>
+      <dl class="dl parml">
+        
+          <dt class="dt pt dlterm"><code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code></dt>
+          <dd class="dd pd">
+            <p class="p">When any flag is active on an element, a <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code> element will be
+              created as the first child of the flagged element:</p>
+            <pre class="pre codeblock language-xml"><code>&lt;ditaval-startprop class="+ topic/foreign ditaot-d/ditaval-startprop "&gt;</code></pre>
+            <div class="p">The <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code> element will contain the following:
+              <ul class="ul">
+                <li class="li">If the active flags should create a new style, that style is included using standard CSS markup on
+                  the <code class="keyword markupname xmlatt">@outputclass</code> attribute. Output types that make use of CSS, such as XHTML, can use
+                  this value as-is.</li>
+                <li class="li">If styles conflict, and a <code class="keyword markupname xmlelement">&lt;style-conflict&gt;</code> element exists in the DITAVAL, it
+                  will be copied as a child of <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code>.</li>
+                <li class="li">Any <code class="keyword markupname xmlelement">&lt;prop&gt;</code> or <code class="keyword markupname xmlelement">&lt;revprop&gt;</code> elements that define active
+                  flags will be copied in as children of the <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code> element. Any
+                    <code class="keyword markupname xmlelement">&lt;startflag&gt;</code> children of the properties will be included, but
+                    <code class="keyword markupname xmlelement">&lt;endflag&gt;</code> children will not.</li>
+              </ul>
+            </div>
+          </dd>
+        
+        
+          <dt class="dt pt dlterm"><code class="keyword markupname xmlelement">&lt;ditaval-endprop&gt;</code></dt>
+          <dd class="dd pd">
+            <p class="p">When any flag is active on an element, a <code class="keyword markupname xmlelement">&lt;ditaval-endprop&gt;</code> element will be created
+              as the last child of the flagged element:</p>
+            <pre class="pre codeblock language-xml"><code>&lt;ditaval-endprop class="+ topic/foreign ditaot-d/ditaval-endprop "&gt;</code></pre>
+            <p class="p">CSS values and <code class="keyword markupname xmlelement">&lt;style-conflict&gt;</code> elements are not included on this element.</p>
+            <p class="p">Any <code class="keyword markupname xmlelement">&lt;prop&gt;</code> or <code class="keyword markupname xmlelement">&lt;revprop&gt;</code> elements that define active flags
+              will be copied in as children of <code class="keyword markupname xmlelement">&lt;ditaval-prop&gt;</code>. Any
+                <code class="keyword markupname xmlelement">&lt;startflag&gt;</code> children of the properties will be included, but
+                <code class="keyword markupname xmlelement">&lt;endflag&gt;</code> children will not.</p>
+          </dd>
+        
+      </dl>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Supporting flags in overrides or custom transformation types</h2>
+      
+      <p class="p">For most transformation types, the <code class="keyword markupname xmlelement">&lt;foreign&gt;</code> element should be ignored by default,
+        because arbitrary non-DITA content may not mix well unless coded for ahead of time. If the
+          <code class="keyword markupname xmlelement">&lt;foreign&gt;</code> element is ignored by default, or if a rule is added to specifically ignore
+          <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code> and <code class="keyword markupname xmlelement">&lt;ditaval-endprop&gt;</code>, then the added
+        elements will have no impact on a transform. If desired, flagging support may be integrated at any time in the
+        future.</p>
+      <p class="p">The processing described above runs as part of the common preprocess, so any transform that uses the default
+        preprocess will get the topic updates. To support generating flags as images, XSLT based transforms can use
+        default fallthrough processing in most cases. For example, if a paragraph is flagged, the first child of
+          <code class="keyword markupname xmlelement">&lt;p&gt;</code> will contain the start flag information; adding a rule to handle images in
+          <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code> will cause the image to appear at the start of the paragraph
+        content.</p>
+      <p class="p">In some cases fallthrough processing will not result in valid output; for those cases, the flags must be
+        explicitly processed. This is done in the XHTML transform for elements like <code class="keyword markupname xmlelement">&lt;ol&gt;</code>, because
+        fallthrough processing would place images in between <code class="keyword markupname xmlelement">&lt;ol&gt;</code> and
+        <code class="keyword markupname xmlelement">&lt;li&gt;</code>. To handle this, the code processes <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code>
+        before starting the element, and <code class="keyword markupname xmlelement">&lt;ditaval-endprop&gt;</code> at the end. Fallthrough processing is
+        then disabled for those elements as children of <code class="keyword markupname xmlelement">&lt;ol&gt;</code>.</p></section>
+    <div class="example"><h2 class="title sectiontitle">Example DITAVAL</h2>
+      
+      <p class="p">Assume the following DITAVAL file is in use during a build. This DITAVAL will be used for each of the following
+        content examples.</p>
+      <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;val&gt;
+  <em class="ph i">&lt;!-- Define what happens in the case of conflicting styles --&gt;</em>
+  &lt;style-conflict background-conflict-color="red"/&gt;
+
+  <em class="ph i">&lt;!-- Define two flagging properties that give styles (no image) --&gt;</em>
+  &lt;prop action="flag" att="audience" style="underline" val="user"
+        backcolor="green"/&gt;
+  &lt;prop action="flag" att="platform" style="overline" val="win"
+        backcolor="blue"/&gt;
+
+  <em class="ph i">&lt;!-- Define a property that includes start and end image flags --&gt;</em>
+  &lt;prop action="flag" att="platform" val="linux" style="overline"
+        backcolor="blue"&gt;
+    &lt;startflag imageref="startlin.png"&gt;
+      &lt;alt-text&gt;Start linux&lt;/alt-text&gt;&lt;/startflag&gt;
+    &lt;endflag imageref="endlin.png"&gt;
+      &lt;alt-text&gt;End linux&lt;/alt-text&gt;&lt;/endflag&gt;
+  &lt;/prop&gt;
+
+  <em class="ph i">&lt;!-- Define a revision that includes start and end image flags --&gt;</em>
+  &lt;revprop action="flag" style="double-underline" val="rev2"&gt;
+    &lt;startflag imageref="start_rev.gif"&gt;
+      &lt;alt-text&gt;START&lt;/alt-text&gt;&lt;/startflag&gt;
+    &lt;endflag imageref="end_rev.gif"&gt;&lt;alt-text&gt;END&lt;/alt-text&gt;&lt;/endflag&gt;
+  &lt;/revprop&gt;
+&lt;/val&gt;</code></pre>
+    </div>
+    <div class="example"><h2 class="title sectiontitle">Content example 1: Adding style</h2>
+      
+      <p class="p">Now assume the following paragraph exists in a topic. Class attributes are included, as they would normally be
+        in the middle of the preprocess routine; <code class="keyword markupname xmlatt">@xtrf</code> and <code class="keyword markupname xmlatt">@xtrc</code> are left off for
+        clarity.</p>
+      <pre class="pre codeblock language-xml"><code>&lt;p audience="user"&gt;Simple user; includes style but no images&lt;/p&gt;</code></pre>
+      <p class="p">Based on the DITAVAL above, audience="user" results in a style with underlining and with a green background.
+        The interpreted CSS value is added to <code class="keyword markupname xmlatt">@outputclass</code> on
+        <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code>, and the actual property definition is included at the start and end
+        of the element. The output from the flagging step looks like this (with newlines added for clarity, and class
+        attributes added as they would appear in the temporary file):</p>
+      <p class="p">The resulting file after the flagging step looks like this; for clarity, newlines are added, while
+          <code class="keyword markupname xmlatt">@xtrf</code> and <code class="keyword markupname xmlatt">@xtrc</code> are removed:</p>
+      <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;p audience="user" class="- topic/p "&gt;
+  <strong class="ph b">&lt;ditaval-startprop</strong>
+      <strong class="ph b">class="+ topic/foreign ditaot-d/ditaval-startprop "</strong>
+      <strong class="ph b">outputclass="background-color:green;text-decoration:underline;"&gt;</strong>
+    <strong class="ph b">&lt;prop action="flag" att="audience" style="underline" val="user"
+          backcolor="green"/&gt;</strong>
+  <strong class="ph b">&lt;/ditaval-startprop&gt;</strong>
+  Simple user; includes style but no images
+  <strong class="ph b">&lt;ditaval-endprop</strong>
+      <strong class="ph b">class="+ topic/foreign ditaot-d/ditaval-endprop "&gt;</strong>
+    <strong class="ph b">&lt;prop action="flag" att="audience" style="underline" val="user"
+          backcolor="green"/&gt;</strong>
+  <strong class="ph b">&lt;/ditaval-endprop&gt;</strong>
+&lt;/p&gt;</code></pre>
+    </div>
+    <div class="example"><h2 class="title sectiontitle">Content example 2: Conflicting styles</h2>
+      
+      <p class="p">This example includes a paragraph with conflicting styles. When the audience and platform attributes are both
+        evaluated, the DITAVAL indicates that the background color is both green and blue. In this situation, the
+          <code class="keyword markupname xmlelement">&lt;style-conflict&gt;</code> element is evaluated to determine how to style the content.</p>
+      <pre class="pre codeblock language-xml"><code>&lt;p audience="user" platform="win"&gt;Conflicting styles (still no images)&lt;/p&gt;</code></pre>
+      <p class="p">The <code class="keyword markupname xmlelement">&lt;style-conflict&gt;</code> element results in a background color of red, so this value is
+        added to <code class="keyword markupname xmlatt">@outputclass</code> on <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code>. As above, active properties
+        are copied into the generated elements; the <code class="keyword markupname xmlelement">&lt;style-conflict&gt;</code> element itself is also
+        copied into the generated <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code> element.</p>
+      <p class="p">The resulting file after the flagging step looks like this; for clarity, newlines are added, while
+          <code class="keyword markupname xmlatt">@xtrf</code> and <code class="keyword markupname xmlatt">@xtrc</code> are removed:</p>
+      <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;p audience="user" platform="win" class="- topic/p "&gt;
+  <strong class="ph b">&lt;ditaval-startprop</strong>
+           <strong class="ph b">class="+ topic/foreign ditaot-d/ditaval-startprop "</strong>
+           <strong class="ph b">outputclass="background-color:red;"&gt;</strong>
+    <strong class="ph b">&lt;style-conflict background-conflict-color="red"/&gt;</strong>
+    <strong class="ph b">&lt;prop action="flag" att="audience" style="underline" val="user"
+          backcolor="green"/&gt;</strong>
+    <strong class="ph b">&lt;prop action="flag" att="platform" style="overline" val="win"
+          backcolor="blue"/&gt;</strong>
+  <strong class="ph b">&lt;/ditaval-startprop&gt;</strong>
+
+  Conflicting styles (still no images)
+
+  <strong class="ph b">&lt;ditaval-endprop</strong>
+           <strong class="ph b">class="+ topic/foreign ditaot-d/ditaval-endprop "&gt;</strong>
+    <strong class="ph b">&lt;prop action="flag" att="platform" style="overline" val="win"
+          backcolor="blue"/&gt;</strong>
+    <strong class="ph b">&lt;prop action="flag" att="audience" style="underline" val="user"
+          backcolor="green"/&gt;</strong><strong class="ph b">
+  &lt;/ditaval-endprop&gt;</strong>
+&lt;/p&gt;</code></pre>
+    </div>
+    <div class="example"><h2 class="title sectiontitle">Content example 3: Adding image flags</h2>
+      
+      <p class="p">This example includes image flags for both <code class="keyword markupname xmlatt">@platform</code> and <code class="keyword markupname xmlatt">@rev</code>, which are
+        defined in DITAVAL <code class="keyword markupname xmlelement">&lt;prop&gt;</code> and <code class="keyword markupname xmlelement">&lt;revprop&gt;</code> elements.</p>
+      <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;ol platform="linux" rev="rev2"&gt;
+  &lt;li&gt;Generate images for platform="linux" and rev="2"&lt;/li&gt;
+&lt;/ol&gt;</code></pre>
+      <p class="p">As above, the <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code> and <code class="keyword markupname xmlelement">&lt;ditaval-endprop&gt;</code> nest the
+        active property definitions, with the calculated CSS value on <code class="keyword markupname xmlatt">@outputclass</code>. The
+          <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code> drops the ending image, and
+          <code class="keyword markupname xmlelement">&lt;ditaval-endprop&gt;</code> drops the starting image. To make document-order processing more
+        consistent, property flags are always included before revisions in <code class="keyword markupname xmlelement">&lt;ditaval-startprop&gt;</code>,
+        and the order is reversed for <code class="keyword markupname xmlelement">&lt;ditaval-endprop&gt;</code>.</p>
+      <p class="p">The resulting file after the flagging step looks like this; for clarity, newlines are added, while
+          <code class="keyword markupname xmlatt">@xtrf</code> and <code class="keyword markupname xmlatt">@xtrc</code> are removed:</p>
+      <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;ol platform="linux" rev="rev2" class="- topic/ol "&gt;
+  <strong class="ph b">&lt;ditaval-startprop</strong>
+           <strong class="ph b">class="+ topic/foreign ditaot-d/ditaval-startprop "</strong>
+           <strong class="ph b">outputclass="background-color:blue;</strong>
+                        <strong class="ph b">text-decoration:underline;</strong>
+                        <strong class="ph b">text-decoration:overline;"&gt;</strong>
+    <strong class="ph b">&lt;prop action="flag" att="platform" val="linux" style="overline"
+          backcolor="blue"&gt;</strong>
+      <strong class="ph b">&lt;startflag imageref="startlin.png"&gt;</strong>
+        <strong class="ph b">&lt;alt-text&gt;Start linux&lt;/alt-text&gt;&lt;/startflag&gt;&lt;/prop&gt;</strong>
+    <strong class="ph b">&lt;revprop action="flag" style="double-underline" val="rev2"&gt;</strong>
+      <strong class="ph b">&lt;startflag imageref="start_rev.gif"&gt;</strong>
+        <strong class="ph b">&lt;alt-text&gt; &lt;/alt-text&gt;&lt;/startflag&gt;&lt;/revprop&gt;</strong>
+  <strong class="ph b">&lt;/ditaval-startprop&gt;</strong>
+  &lt;li class="- topic/li "&gt;
+    Generate images for platform="linux" and rev="2"
+  &lt;/li&gt;
+  <strong class="ph b">&lt;ditaval-endprop</strong>
+           <strong class="ph b">class="+ topic/foreign ditaot-d/ditaval-endprop "&gt;</strong>
+    <strong class="ph b">&lt;revprop action="flag" style="double-underline" val="rev2"&gt;</strong>
+      <strong class="ph b">&lt;endflag imageref="end_rev.gif"&gt;</strong>
+        <strong class="ph b">&lt;alt-text&gt;END&lt;/alt-text&gt;&lt;/endflag&gt;&lt;/revprop&gt;</strong>
+    <strong class="ph b">&lt;prop action="flag" att="platform" val="linux" style="overline"</strong>
+                                                   <strong class="ph b">backcolor="blue"&gt;</strong>
+      <strong class="ph b">&lt;endflag imageref="endlin.png"&gt;</strong>
+        <strong class="ph b">&lt;alt-text&gt;End linux&lt;/alt-text&gt;&lt;/endflag&gt;&lt;/prop&gt;</strong>
+  <strong class="ph b">&lt;/ditaval-endprop&gt;</strong>
+&lt;/ol&gt;</code></pre>
+    </div>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../reference/preprocessing.html" title="The pre-processing operation is a set of steps that typically runs at the beginning of every DITA-OT transformation. Each step or stage corresponds to an Ant target in the build pipeline; the preprocess target calls the entire set of steps.">Pre-processing modules</a></div><div class="previouslink"><strong>Previous topic:</strong> <a class="link" href="../reference/preprocess-topicpull.html" title="The topicpull step pulls content into xref and link elements. This step is implemented in XSLT.">Pull content into topics (topicpull)</a></div><div class="nextlink"><strong>Next topic:</strong> <a class="link" href="../reference/preprocess-clean-map.html" title="The clean-map step removes any elements and attributes that were added to files to support preprocessing.">Map cleanup (clean-map)</a></div></div></nav></article></main></body></html>

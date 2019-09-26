@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Glossary Entity                              -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ENTITIES DITA Glossary Entry//EN"
+      Delivered as file "glossentry.ent"                             -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the domain entity for glossary topics   -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             February 2008                                     -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2008, 2009.              -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    2009.09.21 WEK: Renamed glossentry.mod                     -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!--                    GLOSSARY ENTITIES                          -->
+<!-- ============================================================= -->
+
+<!ENTITY glossentry-att     
+  "(topic concept glossentry)"
+>
+
+
+<!-- ================== End Glossary Entities ==================== -->

@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN"
+ "reference.dtd">
+<reference id="rel1.7" xml:lang="en">
+<title>DITA Open Toolkit Release 1.7</title>
+<!--reference id="releasehighlights" xml:lang="en-US">
+    <title>Release highlights</title>
+    <refbody>
+      <section/>
+    </refbody>
+  </reference-->
+<reference id="general-enhancements-and-changes" xml:lang="en-US">
+<title>General Enhancements and Changes</title>
+<refbody>
+<section>         <p>The minimum Java version has changed from 5.0
+to 6.</p><p>Added support for abbreviated-form processing in PDF.</p><p>X/HTML
+processing code has been streamlined to make it faster and easier
+to read.</p><p>Ant proprocessing dependencies have been cleaned up
+to make tasks easier to use independently.</p><p>Numerous internal
+improvements not directly visible to most end users; see feature and
+patch list for details.</p>       </section>
+<section>         <title>Preprocessing</title>         <p>By default,
+DITA-OT no longer normalizes file extensions to <codeph>.xml</codeph>.
+Temporary files will retain the original           file extensions,
+unless <parmname>dita.ext</parmname> parameter is used to force file
+extension normalization to a given value.</p>         <p>Key name
+validation has been added. If an invalid key name is found, <msgnum>DOTJ055E</msgnum> error
+is thrown.</p>       </section>
+</refbody>
+</reference>
+<reference id="reference_yvj_ttj_bd">
+<title>Migration from previous releases</title>
+<refbody>
+<section>         <p>A new job status file <filepath>.job.xml</filepath> has
+been introduced and replaces <filepath>dita.list</filepath> and  
+        <filepath>dita.xml.properties</filepath> as the normative
+source for job status. If you have custom processing which modifies
+          the job properties, you should change your code to modify <filepath>.job.xml</filepath> instead.</p> 
+       <p>Support for the following deprecated properties have been
+removed:</p>         <ul>
+<li><codeph>dita.input</codeph></li>
+<li><codeph>dita.input.dirname</codeph></li>
+<li><codeph>dita.extname</codeph></li>
+</ul>         <p>Stylesheets for the following transtypes have moved
+to plug-in specific folders:</p>         <ul>
+<li>docbook</li>
+<li>eclipsecontent</li>
+<li>troff</li>
+<li>wordrtf</li>
+</ul>         <p>If custom plug-ins have hard coded paths to these
+stylesheets, update references to use either <codeph>plugin</codeph> 
+         URIs in <codeph>xsl:import</codeph> instructions or use <codeph>dita.plugin.*</codeph> Ant
+properties.</p>         <p>The integration process has been changed
+to use strict mode by default. For old plug-ins which are not valid,
+          <keyword>lax</keyword> processing mode can still be used.</p> 
+       <p>Plug-ins that use the <codeph>MessageUtils</codeph> Java
+class must use <codeph>getInstance</codeph> method to           access
+the <codeph>MessageUtils</codeph> instance, as <codeph>getMessage</codeph> methods
+have been changed to instance methods.</p>       </section>
+<section>         <title>Preprocessing</title>         <p>The preprocessing
+Ant dependency chain has been cleaned up. Tasks no longer depend on
+the previous task in the default chain, but           rather the whole
+preprocess dependency chain is defined by the <codeph>preprocess</codeph> task.</p> 
+     </section>
+<section>         <title>HTML</title>         <p>Core TOC generation
+has been moved to a separate XSLT stylesheet <filepath>xsl/map2htmtoc/map2htmlImpl.xsl</filepath> 
+         and the new templates use the mode <codeph>toc</codeph>.
+Plug-ins which override HTML TOC processing should change        
+  the map processing templates to <codeph>toc</codeph> mode.</p> 
+     </section>
+<section>         <title>HTML and extended transform types</title> 
+       <p>Flagging logic has been pulled out of the core X/HTML code
+and moved to a preprocess step. This significantly simplifies    
+      and optimizes the X/HTML code, while making flagging logic available
+to any other transform type. The new preprocess step          implements
+all flagging logic; for each active flag, it adds a DITA-OT specific
+hint into the intermediate topics           (implemented as a specialization
+of the DITA &lt;foreign&gt; element). As part of this change, all
+flagging related           templates in the XHTML code (such as start-flagit
+and gen-style) are deprecated.</p>         <p>If you override the
+X/HTML transforms, you may need to update your overrides to use the
+new flagging logic. In           most cases this just means deleting
+calls to the deprecated templates; in some cases, the calls can be
+replaced           with 2 lines to process flags in new places. You
+should compare your override to the updated XHTML code and update
+          as needed. See "XHTML migration for flagging updates in
+DITA-OT 1.7" in the <xref href="../../reference/preprocessing.dita"></xref> section
+for details.</p>         <p>Plug-ins that provide support for new
+transforms need to ensure that they properly support the DITA &lt;foreign&gt;
+          element, which should be ignored by default; if so, this
+change will have no immediate impact. Support for flagging       
+   new transform types may be more easily added based on this update,
+because there is no need to re-implement flagging logic,         
+ but this is not required. See "Flagging in the toolkit" in the <xref
+href="../../reference/preprocessing.dita"></xref> section for details
+on how to add flagging support.</p>       </section>
+<section>         <title>PDF</title>         <p>The following deprecated
+XSLT variables have been removed:</p>         <ul>
+<li><codeph>page-margin-left</codeph></li>
+<li><codeph>page-margin-right</codeph></li>
+</ul>         <p>XSLT stylesheets have been split to separate specialization
+topic code and new <codeph>xsl:import</codeph> instructions have been
+          added to <filepath>topic2fo.xsl</filepath>. Plug-ins which
+define their own shell stylesheet should be revised to import all
+the           required stylesheet modules.</p>         <p>PDF processing
+used to replace topic <codeph>shortdesc</codeph> with map <codeph>shortdesc</codeph>,
+but this behaviour         was incorrect and was removed to comply
+with the DITA specification.</p>         <p>The following variable
+strings have been added:</p>         <ul>
+<li><codeph>#note-separator</codeph></li>
+</ul>       </section>
+</refbody>
+</reference>
+<reference id="rel1.7.issues">
+<title>Issues</title>
+<shortdesc>The following items are included in DITA Open Toolkit Release
+1.7. Issue numbers       correspond to the tracking number in the <ph><xref keyref="dita-ot-issues">GitHub issues tracker</xref></ph>.</shortdesc>
+<refbody>
+<section>         <title>Feature requests</title>         <ul>
+<li>#1144 Produce HTML5 output (milestone 1)</li>
+<li>#1319 Remove deprecated code (milestone 1)</li>
+<li>#1339 PDF, flagged image : change use-attribute-sets="image" (milestone
+1)</li>
+<li>#1141 XHTML: ability to include TOC in every topic (milestone
+2)</li>
+<li>#1331 Possibility to customize &lt;stepresult> in HTML output
+(milestone 2)</li>
+<li>#1366 pdf index entries have too many keep-with-previous (milestone
+2)</li>
+<li>#1379 Use format attribute to identity DITA topics (milestone
+2)</li>
+<li>#1384 Validate key names (milestone 2)</li>
+<li>#1388 Remove temporary file file-extension normalization (milestone
+2)</li>
+<li>#1288 Use strict integration by default (milestone 3)</li>
+<li>#1327 Change minimum Java version to 6 (milestone 3)</li>
+<li>#1391 Add new job status file format (milestone 3)</li>
+<li>#1398 Allow defining source input base directory (milestone 3)</li>
+<li>#1403 Refactor XEP index processing to extend base index processing
+(milestone 4)</li>
+<li>#1405 Provide catalog URL rewrite for common XSL files (milestone
+4)</li>
+<li>#1313 Separate flagging logic from XHTML code (milestone 4)</li>
+<li>#1312 Refactor preprocessing to use SAX filters (release candidate)</li>
+<li>#1317 General XHTML improvements (release candidate)</li>
+<li>#1324 Avoid strings where other types are more appropriate (release
+candidate)</li>
+<li>#1338 Add named error messages (release candidate)</li>
+<li>#1345 Add source location to error messages (release candidate)</li>
+<li>#1389 Move stylesheets and resource files to plug-in folder (release
+candidate)</li>
+</ul>       </section>
+<section>         <title>Patches</title>         <ul>
+<li>#1350 Move table specializations into separate stylesheets (milestone
+1)</li>
+<li>#1359 Fix text overflow issue in PDF ToC entries with long titles.
+(milestone 1)</li>
+<li>#1352 Wrap itemgroup task elements into &lt;div> elements #1331
+(milestone 2)</li>
+<li>#1400 Updates on the build instructions plus a fix in one of the
+dost classes that made the build fail (milestone 4)</li>
+<li>#1401 Disable XSD Grammar caching (milestone 4)</li>
+</ul>       </section>
+<section>         <title>Bugs</title>         <ul>
+<li>#1316 Conref error message missing the @conref value (milestone
+1)</li>
+<li>#1321 Fix path2project separator clean-up (milestone 1)</li>
+<li>#1322 Xref to table cell does not properly navigate to it (milestone
+1)</li>
+<li>#1323 @relcolwidth attribute not taken into account when transforming &lt;choicetable>
+            to PDF using Apache FOP (milestone 1)</li>
+<li>#1325 Variable "Index See Also String" missing from Hebrew (milestone
+1)</li>
+<li>#1329 PDF2 indexing fails for ranges (milestone 1)</li>
+<li>#1330 Spaces in Filenames in 1.6 (milestone 1)</li>
+<li>#1332 output-deprecated-msg deleted; still referenced (milestone
+1)</li>
+<li>#1335 Link to see/see also in index is broken (milestone 1)</li>
+<li>#1340 The "DitaWriter" class does not properly resolve entities
+when catalogs are referenced with             &lt;nextCatalog> in
+the catalog-dita.xml (milestone 1)</li>
+<li>#1343 Topics with spaces in file name appear twice (milestone
+1)</li>
+<li>#1346 Cannot determine the title of a xreffed topic (milestone
+1)</li>
+<li>#1348 Topics copied using "copy-to" become not wellformed (DITA
+OT 1.6.1) (milestone 1)</li>
+<li>#1349 "Ambiguous rule match" in PDF processing XSLT when &lt;choicetable>
+is used in topic (milestone             1)</li>
+<li>#1351 'Unexpected Text' root-processing_axf.xsl bug (milestone
+1)</li>
+<li>#1353 dita2htmlImpl.xsl/add-br-for-empty-cmd ... content match
+(milestone 1)</li>
+<li>#1354 xml comment not being stripped correctly in preprocessing
+(milestone 1)</li>
+<li>#1357 NPE when image is incorrectly referenced when publishing
+to HTML (milestone 1)</li>
+<li>#1358 Cannot cross reference definition list items (dlentry, dt,
+dd) in PDF (milestone 1)</li>
+<li>#1365 pdf duplicate see-also entries in Index (milestone 2)</li>
+<li>#1369 prodinfo seems to lead to "(file) does not exist", where
+file has spaces in name (milestone 2)</li>
+<li>#1370 Links to files with spaces in name broken (milestone 2)</li>
+<li>#1371 build_demo uses deprecated Ant property (milestone 2)</li>
+<li>#1377 htmlhelp ampersand (&amp;amp;) entity in indexterm does
+not convert (milestone 2)</li>
+<li>#1378 dita.out.map.htmlhelp.hhk: target doesn't allow topic with
+empty indexterm (milestone 2)</li>
+<li>#1382 Merging uses system path separator when rewriting URIs (milestone
+2)</li>
+<li>#1393 shortdesc in map overrides topic shortdesc (milestone 5)</li>
+<li>#1398 Genlist processes file multiple times (milestone 3)</li>
+<li>#1402 Foreign and Unknown elements not ignored in PDF (milestone
+4)</li>
+<li>#1404 buildsample file in TocJS plug-in hard codes old demo path
+(milestone 4)</li>
+<li>#1237 abbreviated-form is not rendered as link to glossentry (milestone
+4)</li>
+<li>#1193 abbreviated-form not handled at all in PDF output (release
+candidate)</li>
+<li>#1409 Stylesheet imported multiple times in the hierarchy (reloaded)
+(release candidate)</li>
+<li>#1413 Mapref resolution cascades role (release candidate)</li>
+<li>#1416 German translation update (release candidate)</li>
+<li>#1197 Handling of @href on a &lt;glossarylist> (final release)</li>
+<li>#1362 href attribute in appendices element breaks PDF conversion
+(final release)</li>
+<li>#1411 Files with ".orig" extension missing from distribution (final
+release)</li>
+<li>#1418 PDF2 transtype breaks when bookmap has parts (final release)</li>
+<li>#1425 XHTML flagging included before imports (maintenance 1)</li>
+<li>#1428 Topic level calculated incorrectly for appendices (maintenance 1)</li>
+<li>#1427 Fix text overflow issue in lot/lof entries with long titles (maintenance 1)</li>
+<li>#1430 PDF transformation: Problems with index in OT 1.7 (maintenance 1)</li>
+<li>#1432 startcmd.sh broken in 1.7 (maintenance 1)</li>
+<li>#1433 Profiling filter included multiple times (maintenance 1)</li>
+<li>#1437 Fatal UTF-8 error in .job.xml (maintenance 2)</li>
+<li>#1456 XHTML Build failed when referencing subject scheme in different file path (maintenance 3)</li>
+<li>#1423 Formatting glitch in PDF index (maintenance 4)</li>
+<li>#1468 Reference to remote image does not appear in PDF (maintenance 4)</li>
+<li>#1469 @outputclass and @class values not passed from &lt;chhead> to &lt;tr> in XHTML output (maintenance 4)</li>
+<li>#1472 PDF output: whitespace not preserved in msgblock element (maintenance 4)</li>
+<li>#1475 Error received in console does not point correctly to location of published DITA Map (maintenance 4)</li>
+<li>#1477 Tables: using percentage in colwidth values [PDF2 plugin] (maintenance 4)</li>
+<li>#1484 Enable default revision markers using active xml:lang value (maintenance 5)</li>
+<li>#1489 External keys are lost if using onlytopic.in.map (maintenance 5)</li>
+<li>#1491 TopicMerge generates invalid xref/@href if it contains Ideographic character (maintenance 5)</li>
+</ul>       </section>
+</refbody>
+</reference>
+</reference>

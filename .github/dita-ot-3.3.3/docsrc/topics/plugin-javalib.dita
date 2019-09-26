@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="plugin-javalib" xml:lang="en-US">
+  <title>Adding a Java library to the DITA-OT <parmname>classpath</parmname></title>
+  <titlealts>
+    <navtitle>Adding a Java library to the <parmname>classpath</parmname></navtitle>
+  </titlealts>
+  <shortdesc>You can use the <codeph>dita.conductor.lib.import</codeph> extension point to add an additional Java
+    library to the DITA-OT <parmname>classpath</parmname> parameter.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>deprecated features<indexterm><codeph>dost.class.path</codeph> property</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>Java</indexterm></indexterm>
+        <indexterm>Java<indexterm>classpath</indexterm></indexterm>
+        <indexterm>classpath<indexterm>Java</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>Java</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>As of DITA-OT 3.1, the Java class path is managed automatically, meaning you do not (and should not) use
+        explicit references to Java class paths in your build scripts. In particular, the old
+          <codeph>dost.class.path</codeph> property has been deprecated and should not be used. If you are migrating
+        older plug-ins that manage their class path directly, you should remove any explicit class path configuration.
+        If your plug-in was not already using the <codeph>dita.conductor.lib.import</codeph> extension point to
+        integrate its JAR dependencies you must add it.</p>
+      <p>The effective DITA-OT class path is the combination of the JAR files in the main <filepath>lib/</filepath>
+        directory and the plug-in-contributed JARs, which are listed in <filepath>config/env.sh</filepath>. The
+          <filepath>env.sh</filepath> file is updated automatically when plug-ins are installed or removed.</p>
+    </context>
+    <steps>
+      <step>
+        <cmd>If necessary, compile the Java code into a JAR file.</cmd>
+      </step>
+      <step>
+        <cmd>Create a <filepath>plugin.xml</filepath> file that contains the following code:</cmd>
+        <info><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="<varname>plugin-id</varname>">
+  &lt;feature extension="dita.conductor.lib.import" file="<varname>file</varname>"/>
+&lt;/plugin></codeblock>where:
+          <ul>
+            <li><varname>plugin-id</varname> is the plug-in identifier, for example,
+              <codeph>com.example.addjar</codeph>.</li>
+            <li><varname>file</varname> is the name of the JAR file, for example,
+              <filepath>myJavaLibrary.jar</filepath>. </li>
+          </ul></info>
+      </step>
+      <step>
+        <cmd>Install the plug-in.</cmd>
+      </step>
+    </steps>
+    <result>The Ant or XSLT code now can make use of the Java code.</result>
+    <example>
+      <p>In the following extended example, the <filepath>myJavaLibrary.jar</filepath> file performs a validation step
+        during processing, and you want it to run immediately before the <codeph>conref </codeph>step.</p>
+      <p>To accomplish this, you will need to use several features:</p>
+      <ul>
+        <li>The JAR file must be added to the classpath.</li>
+        <li>The Ant target must be added to the dependency chain for conref.</li>
+        <li>An Ant target must be created that uses this class, and integrated into the code.</li>
+      </ul>
+      <p>The files might look like the following:</p>
+      <fig>
+        <title><filepath>plugin.xml</filepath> file</title>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;plugin id="com.example.samplejava">
+  <i>&lt;!-- Add the JAR file to the DITA-OT CLASSPATH --></i>
+  <b>&lt;feature extension="dita.conductor.lib.import" 
+           file="com.example.sampleValidation.jar"/></b>
+  <i>&lt;!-- Integrate the Ant code --></i>
+  &lt;feature extension="ant.import" file="calljava-antcode.xml"/>
+  <i>&lt;!-- Define the Ant target to call, and when (before conref) --></i>
+  &lt;feature extension="depend.preprocess.conref.pre" 
+           value="validateWithJava"/>
+&lt;/plugin></codeblock>
+      </fig>
+      <fig>
+        <title><filepath>calljava-antcode.xml</filepath> file</title>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;project default="validateWithJava">
+  &lt;target name="validateWithJava">
+    &lt;java classname="com.example.sampleValidation">
+      &lt;!-- The class was added to the DITA-OT classpath -->
+    &lt;/java>
+  &lt;/target>
+&lt;/project></codeblock>
+      </fig>
+    </example>
+  </taskbody>
+</task>

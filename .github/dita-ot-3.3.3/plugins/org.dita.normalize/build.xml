@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This file is part of the DITA Open Toolkit project.
+  See the accompanying license.txt file for applicable licenses.
+-->
+<project name="dita2normalize">
+
+  <target name="dita2dita"
+          depends="build-init,
+                   preprocess">
+    <makeurl property="output.dir.uri" file="${output.dir}"/>
+    <!--pipeline message="Normalize DITA files" taskname="normalize"-->
+      <xslt in="${dita.temp.dir}/.job.xml" out="${dita.temp.dir}/.job.xml.temp"
+            style="${dita.plugin.org.dita.normalize.dir}/xsl/normalize.xsl"
+            taskname="normalize">
+        <param name="output.dir.uri" expression="${output.dir.uri}"/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+    <!--/pipeline-->
+    <delete file="${dita.temp.dir}/.job.xml.temp"/>
+  </target>
+  
+</project>

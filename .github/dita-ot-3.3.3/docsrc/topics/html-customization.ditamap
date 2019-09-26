@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>Customizing HTML output</title>
+  <topicref keyref="html-customization" collection-type="family">
+    <topicref keyref="html-customization-parameters" collection-type="family">
+      <topicref keyref="html-customization-navigation"/>
+      <topicref keyref="html-customization-css"/>
+      <topicref keyref="html-customization-header"/>
+      <topicref keyref="generate-copy-outer"/>
+    </topicref>
+    <topicref keyref="html-customization-properties-file"/>
+    <topicref keyref="html-customization-plugins">
+      <topicref keyref="html-customization-plugin-bundle-css"/>
+      <topicref keyref="html-customization-plugin-webfont"/>
+      <topicref keyref="html-customization-plugin-javascript"/>
+    </topicref>
+  </topicref>
+</map>

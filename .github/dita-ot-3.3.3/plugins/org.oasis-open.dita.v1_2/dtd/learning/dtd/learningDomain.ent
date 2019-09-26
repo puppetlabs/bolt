@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Learning Domain                              -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ENTITIES DITA Learning Domain//EN"
+      Delivered as file "learningDomain.ent"                      -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the substitution context and domain     -->
+<!--             entity declarations for the learning domain       -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             May 2007                                          -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2007, 2009.              -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    LEARNING DOMAIN ENTITIES                   -->
+<!-- ============================================================= -->
+
+<!ENTITY learning-d-att "(topic learningInteractionBase-d learning-d)">
+<!ENTITY % learning-d-note 
+                       "lcInstructornote"
+>
+
+<!-- The following elements are specializations of lcInteractionBase, 
+     which is a specialization of fig. So, they are available as 
+     replacements for each of those elements. -->
+<!ENTITY % learning-d-fig 
+                       "lcTrueFalse |
+                        lcSingleSelect |
+                        lcMultipleSelect |
+                        lcSequencing |
+                        lcMatching |
+                        lcHotspot |
+                        lcOpenQuestion"
+>
+
+<!ENTITY % learning-d-lcInteractionBase 
+                       "lcTrueFalse |
+                        lcSingleSelect |
+                        lcMultipleSelect |
+                        lcSequencing |
+                        lcMatching |
+                        lcHotspot |
+                        lcOpenQuestion"
+>
+
+<!-- ================== End Learning Domain Entities ============= -->
+
+
+
+
+

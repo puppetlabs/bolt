@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="preprocess-profile" xml:lang="en-US">
+  <title>Filter conditional content (profile)</title>
+  <shortdesc>The <codeph>profile</codeph> step removes content from topics and maps based on the rules in DITAVAL files
+    or the <xmlatt>print</xmlatt> attribute setting. Output can differ based on when filtering is done.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlatt>print</xmlatt></indexterm>
+        <indexterm>DITAVAL<indexterm><codeph>profile</codeph> preprocess step</indexterm></indexterm>
+        <indexterm>profiling</indexterm>
+        <indexterm>preprocessing<indexterm><codeph>profile</codeph></indexterm></indexterm>
+        <indexterm><codeph>profile</codeph></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+</concept>

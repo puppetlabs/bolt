@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="hu-hu">        <!-- Hungarian -->
+  <str name="Figure">Ábra</str>
+  <str name="Table">Táblázat</str>
+  <str name="Next topic">Következő téma</str>
+  <str name="Previous topic">Előző téma</str>
+  <str name="Parent topic">Szülőtéma</str>
+  <str name="Required cleanup">Tisztázandó</str>
+  <str name="Draft comment">Szerkesztői megjegyzés</str>
+  <str name="Option">Beállítás</str>
+  <str name="Description">Leírás</str>
+  <str name="Optional">Választható</str>
+  <str name="Required">Kötelező</str>
+  <str name="Skip visual syntax diagram">Szerkezeti ábra kihagyása</str>
+  <str name="Read syntax diagram">Szerkezeti ábra felolvasása</str>
+  <str name="Start of change">Módosítás kezdete</str>
+  <str name="End of change">Módosítás vége</str>
+  <str name="Index">Tárgymutató</str>
+  <str name="Special characters">Különleges jelek</str>
+  <str name="Numerics">Számok</str>
+  <str name="End notes">Végjegyzetek</str>
+  <str name="Artwork">Illusztráció</str>
+  <str name="Syntax">Szintaxis</str>
+  <str name="Type">Típus</str>
+  <str name="Value">Érték</str>
+  <str name="Note">Megjegyzés</str>
+  <str name="Notes">Megjegyzések</str>
+  <str name="Tip">Tipp</str>
+  <str name="Fastpath">Közvetlen almenüre lépés</str>
+  <str name="Important">Fontos</str>
+  <str name="Attention">Figyelem</str>
+  <str name="Caution">FIGYELMEZTETÉS</str>
+  <str name="Danger">VESZÉLY!</str>
+  <str name="Remember">Ne feledje</str>
+  <str name="Restriction">Korlátozás</str>
+  <str name="Trouble">Hiba</str>
+  <str name="Warning">Figyelmeztetés</str>
+  <str name="Contents">Tartalom</str>
+  <str name="Related concepts">Kapcsolódó fogalmak</str>
+  <str name="Related tasks">Kapcsolódó feladatok</str>
+  <str name="Related reference">Kapcsolódó hivatkozás</str>
+  <str name="Related information">Kapcsolódó tájékoztatás</str>
+  <str name="Prerequisite">Előfeltétel</str>
+  <str name="Prerequisites">Előfeltételek</str>
+  <str name="or">vagy</str>
+  <str name="figure-number-separator">. </str>
+  <str name="task_context">Erről a feladatról</str>
+  <str name="task_example">Példa</str>
+  <str name="task_postreq">Mi a következő lépés?</str>
+  <str name="task_prereq">Mielőtt elkezdené</str>
+  <str name="task_procedure">Eljárás</str>
+  <str name="task_procedure_unordered">Eljárás</str>
+  <str name="task_results">Eredmények</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

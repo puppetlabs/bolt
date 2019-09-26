@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+      This is the Mathematical Markup Language (MathML) 3.0, an XML
+      application for describing mathematical notation and capturing
+      both its structure and content.
+  
+      Copyright 1998-2010 W3C (MIT, ERCIM, Keio)
+  
+      Use and distribution of this code are permitted under the terms
+      W3C Software Notice and License
+      http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+-->
+<grammar ns="http://www.w3.org/1998/Math/MathML" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <ref name="math"/>
+  </start>
+  <define name="math">
+    <element name="math">
+      <ref name="math.attributes"/>
+      <zeroOrMore>
+        <ref name="MathExpression"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="MathExpression">
+    <ref name="semantics"/>
+  </define>
+  <define name="NonMathMLAtt">
+    <attribute>
+      <anyName>
+        <except>
+          <nsName ns=""/>
+          <nsName/>
+        </except>
+      </anyName>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="CommonDeprecatedAtt">
+    <optional>
+      <attribute name="other"/>
+    </optional>
+  </define>
+  <define name="CommonAtt">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xref"/>
+    </optional>
+    <optional>
+      <attribute name="class">
+        <data type="NMTOKENS"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="style">
+        <data type="string"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="href">
+        <data type="anyURI"/>
+      </attribute>
+    </optional>
+    <ref name="CommonDeprecatedAtt"/>
+    <zeroOrMore>
+      <ref name="NonMathMLAtt"/>
+    </zeroOrMore>
+  </define>
+  <define name="math.attributes">
+    <ref name="CommonAtt"/>
+    <optional>
+      <attribute name="display">
+        <choice>
+          <value>block</value>
+          <value>inline</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="maxwidth">
+        <ref name="length"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="overflow">
+        <choice>
+          <value>linebreak</value>
+          <value>scroll</value>
+          <value>elide</value>
+          <value>truncate</value>
+          <value>scale</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="altimg">
+        <data type="anyURI"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="altimg-width">
+        <ref name="length"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="altimg-height">
+        <ref name="length"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="altimg-valign">
+        <choice>
+          <ref name="length"/>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="alttext"/>
+    </optional>
+    <optional>
+      <attribute name="cdgroup">
+        <data type="anyURI"/>
+      </attribute>
+    </optional>
+    <ref name="math.deprecatedattributes"/>
+  </define>
+  <!--
+    the mathml3-presentation schema  adds additional attributes
+    to the math element, all those valid on mstyle
+  -->
+  <define name="math.deprecatedattributes">
+    <optional>
+      <attribute name="mode">
+        <data type="string"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="macros">
+        <data type="string"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="name">
+    <attribute name="name">
+      <data type="NCName"/>
+    </attribute>
+  </define>
+  <define name="cd">
+    <attribute name="cd">
+      <data type="NCName"/>
+    </attribute>
+  </define>
+  <define name="src">
+    <optional>
+      <attribute name="src">
+        <data type="anyURI"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="annotation">
+    <element name="annotation">
+      <ref name="annotation.attributes"/>
+      <text/>
+    </element>
+  </define>
+  <define name="annotation-xml.model">
+    <zeroOrMore>
+      <choice>
+        <ref name="MathExpression"/>
+        <ref name="anyElement"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="anyElement">
+    <element>
+      <anyName>
+        <except>
+          <nsName/>
+        </except>
+      </anyName>
+      <zeroOrMore>
+        <choice>
+          <attribute>
+            <anyName/>
+          </attribute>
+          <text/>
+          <ref name="anyElement"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="annotation-xml">
+    <element name="annotation-xml">
+      <ref name="annotation.attributes"/>
+      <ref name="annotation-xml.model"/>
+    </element>
+  </define>
+  <define name="annotation.attributes">
+    <ref name="CommonAtt"/>
+    <optional>
+      <ref name="cd"/>
+    </optional>
+    <optional>
+      <ref name="name"/>
+    </optional>
+    <ref name="DefEncAtt"/>
+    <optional>
+      <ref name="src"/>
+    </optional>
+  </define>
+  <define name="DefEncAtt">
+    <optional>
+      <attribute name="encoding">
+        <data type="string"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="definitionURL">
+        <data type="anyURI"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="semantics">
+    <element name="semantics">
+      <ref name="semantics.attributes"/>
+      <ref name="MathExpression"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="annotation"/>
+          <ref name="annotation-xml"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="semantics.attributes">
+    <ref name="CommonAtt"/>
+    <ref name="DefEncAtt"/>
+    <optional>
+      <ref name="cd"/>
+    </optional>
+    <optional>
+      <ref name="name"/>
+    </optional>
+  </define>
+  <define name="length">
+    <data type="string">
+      <param name="pattern">\s*((-?[0-9]*([0-9]\.?|\.[0-9])[0-9]*(e[mx]|in|cm|mm|p[xtc]|%)?)|(negative)?((very){0,2}thi(n|ck)|medium)mathspace)\s*</param>
+    </data>
+  </define>
+</grammar>

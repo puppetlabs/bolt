@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <!--
+        This is the Mathematical Markup Language (MathML) 3.0, an XML
+        application for describing mathematical notation and capturing
+        both its structure and content.
+    
+        Copyright 1998-2007 World Wide Web Consortium
+           (Massachusetts Institute of Technology, Institut National de
+            Recherche en Informatique et en Automatique, Keio University).
+            All Rights Reserved.
+    
+        Permission to use, copy, modify and distribute the RelaxNG schema for MathML3
+        and its accompanying documentation for any purpose and without fee is
+        hereby granted in perpetuity, provided that the above copyright notice
+        and this paragraph appear in all copies.  The copyright holders make
+        no representation about the suitability of the Schema for any purpose.
+    
+        This file contains the arity checking rules for the symbols
+        from the content dictionary 
+        It is provided "as is" without expressed or implied warranty.
+    
+        Revision:   $Id: basic-content-elements.rng,v 1.1 2007/12/11 15:59:27 dcarlis Exp $
+  -->
+  <define name="cd.token.unary.class" combine="choice">
+    <choice>
+      <ref name="inverse.token"/>
+      <ref name="ident.token"/>
+      <ref name="domain.token"/>
+      <ref name="codomain.token"/>
+      <ref name="image.token"/>
+      <ref name="otherwise.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.binary.class" combine="choice">
+    <choice>
+      <ref name="interval.token"/>
+      <ref name="piece.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.nary.class" combine="choice">
+    <choice>
+      <ref name="compose.token"/>
+      <ref name="piecewise.token"/>
+    </choice>
+  </define>
+  <define name="cd.binder.class" combine="choice">
+    <ref name="lambda.token"/>
+  </define>
+  <!-- the element definitions for the token elements -->
+  <define name="interval.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="closure">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="interval.token">
+    <element name="interval">
+      <ref name="interval.content"/>
+    </element>
+  </define>
+  <define name="inverse.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="inverse.token">
+    <element name="inverse">
+      <ref name="inverse.content"/>
+    </element>
+  </define>
+  <define name="lambda.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="lambda.token">
+    <element name="lambda">
+      <ref name="lambda.content"/>
+    </element>
+  </define>
+  <define name="compose.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="compose.token">
+    <element name="compose">
+      <ref name="compose.content"/>
+    </element>
+  </define>
+  <define name="ident.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="ident.token">
+    <element name="ident">
+      <ref name="ident.content"/>
+    </element>
+  </define>
+  <define name="domain.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="domain.token">
+    <element name="domain">
+      <ref name="domain.content"/>
+    </element>
+  </define>
+  <define name="codomain.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="codomain.token">
+    <element name="codomain">
+      <ref name="codomain.content"/>
+    </element>
+  </define>
+  <define name="image.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="image.token">
+    <element name="image">
+      <ref name="image.content"/>
+    </element>
+  </define>
+  <define name="piecewise.content">
+    <ref name="Token.type"/>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="piecewise.token">
+    <element name="piecewise">
+      <ref name="piecewise.content"/>
+    </element>
+  </define>
+  <define name="piece.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="piece.token">
+    <element name="piece">
+      <ref name="piece.content"/>
+    </element>
+  </define>
+  <define name="otherwise.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="otherwise.token">
+    <element name="otherwise">
+      <ref name="otherwise.content"/>
+    </element>
+  </define>
+</grammar>

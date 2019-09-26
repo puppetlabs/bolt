@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Learning Bookmap                            -->
+<!-- VERSION:   1.3                                              -->
+<!-- DATE:      March 2014                                       -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--                                                             -->
+<!--PUBLIC "-//OASIS//DTD DITA Learning BookMap//EN"             -->
+<!--The public ID above refers to the latest version of this DTD.-->
+<!--     To refer to this specific version, you may use this value:-->
+<!--PUBLIC "-//OASIS//DTD DITA 1.3 Learning BookMap//EN"              -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    DTD to describe DITA Learning Book Maps          -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            April 2008                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2008, 2014.             -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2010.09.21 RDA: Added base topic domains                  -->
+<!--   2014.03.13 WEK: Updated for DITA 1.3, reimplemented as RNG-->
+<!--=============================================================-->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:include schemaLocation="../../base/xsd/mapGroupMod.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/delayResolutionDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/deliveryTargetAttDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/ditavalrefDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/hazardstatementDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/highlightDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/indexingDomain.xsd"/>
+   <xs:include schemaLocation="./learningMapDomain.xsd"/>
+   <xs:include schemaLocation="./learningMetadataDomain.xsd"/>
+   <xs:include schemaLocation="../../technicalContent/xsd/releaseManagementDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/utilitiesDomain.xsd"/>
+   <xs:include schemaLocation="../../xnal/xsd/xnalDomain.xsd"/>
+
+   <!-- ================ GROUP DEFINITIONS ===================== -->
+   <xs:include schemaLocation="../../base/xsd/tblDeclGrp.xsd"/>
+   <xs:include schemaLocation="../../bookmap/xsd/bookmapGrp.xsd"/>
+
+   <!-- =================  MODULE INCLUDE DEFINITION  ================== -->
+   <xs:include schemaLocation="../../base/xsd/commonElementMod.xsd"/>
+
+   <!-- ======== Table elements ======== -->
+   <xs:include schemaLocation="../../base/xsd/tblDeclMod.xsd"/>
+
+   <!-- ======= MetaData elements, plus keyword and indexterm ======= -->
+   <xs:include schemaLocation="../../base/xsd/metaDeclMod.xsd"/>
+
+  <xs:redefine schemaLocation="../../base/xsd/mapGrp.xsd">
+    <xs:group name="topicref">
+      <xs:choice>
+        <xs:group ref="topicref"/>
+        <xs:group ref="mapgroup-d-topicref"/>
+        <xs:group ref="ditavalref-d-topicref"/>
+        <xs:group ref="learningmap-d-topicref"/>
+      </xs:choice>
+    </xs:group>
+  </xs:redefine>
+  <xs:redefine schemaLocation="../../base/xsd/commonElementGrp.xsd">
+      <xs:group name="data">
+         <xs:choice>
+            <xs:group ref="data"/>
+            <xs:group ref="ut-d-data"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="note">
+         <xs:choice>
+            <xs:group ref="note"/>
+            <xs:group ref="hazard-d-note"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="fig">
+         <xs:choice>
+            <xs:group ref="fig"/>
+            <xs:group ref="ut-d-fig"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="ph">
+         <xs:choice>
+            <xs:group ref="ph"/>
+            <xs:group ref="hi-d-ph"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="index-base">
+         <xs:choice>
+            <xs:group ref="index-base"/>
+            <xs:group ref="indexing-d-index-base"/>
+         </xs:choice>
+      </xs:group>
+      <xs:attributeGroup name="props-attribute-extensions">
+         <xs:attributeGroup ref="props-attribute-extensions"/>
+         <xs:attributeGroup ref="deliveryTargetAtt-d-attribute"/>
+      </xs:attributeGroup>
+   </xs:redefine>
+   <xs:redefine schemaLocation="../../base/xsd/metaDeclGrp.xsd">
+      <xs:group name="author">
+         <xs:choice>
+            <xs:group ref="author"/>
+            <xs:group ref="xnal-d-author"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="metadata">
+         <xs:choice>
+            <xs:group ref="metadata"/>
+            <xs:group ref="learningmeta-d-metadata"/>
+            <xs:group ref="relmgmt-d-metadata"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="keywords">
+         <xs:choice>
+            <xs:group ref="keywords"/>
+            <xs:group ref="delay-d-keywords"/>
+         </xs:choice>
+      </xs:group>
+   </xs:redefine>
+
+   <xs:include schemaLocation="../../base/xsd/mapMod.xsd"/>
+   <xs:include schemaLocation="../../bookmap/xsd/bookmapMod.xsd"/>
+
+   <xs:attributeGroup name="domains-att">
+      <xs:attribute name="domains"
+                    type="xs:string"
+                    default="(map bookmap) (topic delay-d) (map ditavalref-d) (topic hazard-d) (topic hi-d) (topic indexing-d) (map learningmap-d) (topic learningmeta-d) (map mapgroup-d) (topic relmgmt-d) (topic ut-d) (topic xnal-d) a(props deliveryTarget)"/>
+   </xs:attributeGroup>
+</xs:schema>

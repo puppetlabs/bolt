@@ -1,0 +1,141 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="concept"><meta name="description" content="DITA Open Toolkit uses various recent DITA features in the project documentation."><meta name="DC.subject" content=", audience, orient, profiling, branch filters, Antenna House, DITA XML mention domain, DITA 1.3, XML mention domain"><meta name="keywords" content=", audience, orient, profiling, branch filters, Antenna House, DITA XML mention domain, DITA 1.3, XML mention domain"><meta name="DC.relation" scheme="URI" content="../reference/DITA_spec-support.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="ID"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>DITA features in the documentation</title></head><body id="ID"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a><ul><li><a href="../reference/architecture.html">DITA-OT architecture</a></li><li><a href="../reference/DITA_spec-support.html">DITA specification support</a><ul><li><a href="../reference/DITA_v1-2-support.html">DITA 1.2 support</a></li><li><a href="../reference/DITA_v1-3-support.html">DITA 1.3 support</a></li><li><a href="../reference/implementation-dependent-features.html">Implementation-dependent features</a></li><li><a href="../reference/extended-functionality.html">Codeblock extensions</a></li><li class="active"><a href="../reference/DITA-features-in-docs.html">DITA features in docs</a></li></ul></li><li><a href="../reference/license.html">License</a></li></ul></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">DITA features in the documentation</h1>
+  
+  
+  
+  <div class="body conbody"><p class="shortdesc">DITA Open Toolkit uses various recent DITA features in the project documentation.</p>
+    <p class="p">The
+      <a class="xref" href="https://github.com/dita-ot/docs" target="_blank">source files</a> for the DITA-OT
+      documentation include examples of the following DITA features (among others):</p>
+    <ul class="ul">
+      <li class="li">subjectScheme classification for controlling available attributes</li>
+      <li class="li">profiling and branch filtering (novice/expert content)</li>
+      <li class="li">extending topics with conref push</li>
+      <li class="li">keys and key references</li>
+      <li class="li">XML mention domain</li>
+    </ul>
+
+    <section class="section"><h2 class="title sectiontitle">Subject schemes </h2>
+      
+      <p class="p">Various topics, sections and elements in the docs are profiled by audience:</p>
+      <div class="p"><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;li id="novice-variables-last" audience="novice"&gt;
+  &lt;p id="common-format-info"&gt;
+    &lt;varname&gt;format&lt;/varname&gt; is the output format (transformation type).
+    This argument corresponds to the common parameter
+    &lt;parmname&gt;transtype&lt;/parmname&gt;.
+    Use the same values as for the &lt;parmname&gt;transtype&lt;/parmname&gt; build
+    parameter, for example &lt;option&gt;html5&lt;/option&gt; or &lt;option&gt;pdf&lt;/option&gt;.
+  &lt;/p&gt;
+&lt;/li&gt;</code></pre></div>
+      <p class="p">An “audience” subject scheme controls the values that are available for the <code class="keyword markupname xmlatt">@audience</code>
+        attribute:</p>
+      <div class="p"><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;subjectdef keys="audience"&gt;
+  &lt;subjectdef keys="novice"/&gt;
+  &lt;subjectdef keys="expert"/&gt;
+  &lt;subjectdef keys="xslt-customizer"/&gt;
+&lt;/subjectdef&gt;</code></pre></div>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">Branch filtering: re-using profiled content</h2>
+      
+    </section>
+    <section class="section">
+      <p class="p"><cite class="cite">Installing DITA-OT</cite> pulls a subset of the build description from <cite class="cite">using the
+            <span class="keyword cmdname">dita</span> command</cite>, filtered to display only content deemed suitable for novice users
+        under
+        <a class="xref" href="../topics/first-build-using-dita-command.html" title="You can generate output using the dita command-line tool. Build parameters can be specified on the command line or with .properties files.">Building output</a>:</p>
+      <div class="p"><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;topicref href="using-dita-command.dita"
+          keys="first-build-using-dita-command" locktitle="yes"&gt;
+  &lt;topicmeta&gt;
+    &lt;navtitle&gt;Building output&lt;/navtitle&gt;
+  &lt;/topicmeta&gt;
+  &lt;ditavalref href="../resources/novice.ditaval"&gt;
+    &lt;ditavalmeta&gt;
+      &lt;dvrResourcePrefix&gt;first-build-&lt;/dvrResourcePrefix&gt;
+    &lt;/ditavalmeta&gt;
+  &lt;/ditavalref&gt;
+&lt;/topicref&gt;</code></pre></div>
+      <p class="p">The same content appears later in
+        <a class="xref" href="../topics/build-using-dita-command.html" title="You can generate output using the dita command-line tool. Build parameters can be specified on the command line or with .properties files.">Using the dita command</a> with additional information on arguments, options and examples.</p>
+      <div class="p"><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;topicref href="using-dita-command.dita"
+          keys="build-using-dita-command" locktitle="yes"&gt;
+  &lt;topicmeta&gt;
+    &lt;navtitle&gt;Using the &lt;cmdname&gt;dita&lt;/cmdname&gt; command&lt;/navtitle&gt;
+  &lt;/topicmeta&gt;
+  &lt;ditavalref href="../resources/expert.ditaval"&gt;
+    &lt;ditavalmeta&gt;
+      &lt;dvrResourcePrefix&gt;build-&lt;/dvrResourcePrefix&gt;
+    &lt;/ditavalmeta&gt;
+  &lt;/ditavalref&gt;</code></pre></div>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">Conref push</h2>
+      
+    </section>
+    <section class="section">
+      <p class="p">The docs build uses the conref push mechanism (with the <code class="ph codeph">pushreplace</code>, <code class="ph codeph">mark</code>,
+        and <code class="ph codeph">pushafter</code>
+        <a class="xref" href="http://docs.oasis-open.org/dita/dita/v1.3/errata01/os/complete/part1-base/langRef/attributes/theconactionattribute.html" target="_blank">conactions</a>) to extend the parameter descriptions embedded in the
+        default plug-ins:</p>
+      <div class="p"><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;plentry id="args.csspath"&gt;
+  &lt;pt&gt;
+    &lt;parmname&gt;args.csspath&lt;/parmname&gt;
+  &lt;/pt&gt;
+  &lt;pd conaction="pushreplace"
+      conref="parameters-html5.dita#html5/args.csspath.desc"&gt;
+    &lt;div conref="./ant-parameters-details.dita#base-html/args.csspath.desc"/&gt;
+  &lt;/pd&gt;
+  &lt;pd conaction="mark" conref="parameters-html5.dita#html5/args.csspath.desc"/&gt;
+  &lt;pd conaction="pushafter"&gt;
+    &lt;div conref="./ant-parameters-details.dita#base-html/args.csspath.details"/&gt;
+  &lt;/pd&gt;
+&lt;/plentry&gt;</code></pre></div>
+      <p class="p">The pushed content appears in the output after the default description. (See
+        <a class="xref" href="../parameters/parameters-base-html.html" title="Certain parameters apply to all HTML-based transformation types: HTML5, XHTML, HTML&nbsp;Help, Eclipse help, and TocJS.">HTML-based output parameters</a>.)</p>
+      <div class="note tip note_tip"><span class="note__title">Tip:</span> You could also use the same mechanism to extend the documentation with custom information that
+        applies only to your company’s toolkit distribution.</div>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">Keys and key references</h2>
+      
+    </section>
+    <section class="section">
+      <p class="p">The <code class="ph codeph">key-definitions.ditamap</code> defines keys for version references, re-usable links, etc.</p>
+      <p class="p">This key definition defines the maintenance release version:</p>
+      <div class="p"><pre class="pre codeblock language-xml normalize-space"><code>&lt;keydef keys="maintenance-version"&gt;
+  &lt;topicmeta&gt;
+    &lt;keywords&gt;
+      &lt;keyword&gt;3.3.3&lt;/keyword&gt;
+    &lt;/keywords&gt;
+  &lt;/topicmeta&gt;
+&lt;/keydef&gt;</code></pre></div>
+      <p class="p">In topics, the keyword is used in place of hard-coded version references:</p>
+      <pre class="pre codeblock language-xml"><code>&lt;title&gt;DITA Open Toolkit &lt;keyword keyref="maintenance-version"/&gt; Release Notes&lt;/title&gt;</code></pre>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">XML mention domain</h2>
+      
+    </section>
+    <section class="section">
+      <p class="p">The docs use the
+        <a class="xref" href="http://docs.oasis-open.org/dita/dita/v1.3/os/part3-all-inclusive/langRef/containers/xml-mention-domain.html#xml-mention-domain" target="_blank">XML mention domain</a> to mark up XML elements and attributes:</p>
+      <pre class="pre codeblock language-xml"><code>&lt;li id="1777"&gt;
+  DITA 1.3: Initial support has been added for the &lt;xmlatt&gt;orient&lt;/xmlatt&gt;
+  attribute on &lt;xmlelement&gt;table&lt;/xmlelement&gt; elements. These changes allow
+  Antenna House Formatter to render tables in landscape mode when the
+  &lt;xmlatt&gt;orient&lt;/xmlatt&gt; attribute is set to &lt;option&gt;land&lt;/option&gt;. […]
+&lt;/li&gt;</code></pre>
+      <p class="p">When the toolkit generates output for the sample above:</p>
+      <ul class="ul">
+        <li class="li">the XML element name is wrapped in angle brackets as <code class="keyword markupname xmlelement">&lt;table&gt;</code>
+        </li>
+        <li class="li">the attribute name is prefixed with an “at” sign as <code class="keyword markupname xmlatt">@orient</code></li>
+      </ul>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../reference/DITA_spec-support.html" title="DITA Open Toolkit 3.3 supports all versions of the OASIS DITA specification, including 1.0, 1.1, 1.2, and 1.3.">DITA specification support</a></div></div></nav></article></main></body></html>

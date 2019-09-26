@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<!--DITA Machinery Task Shell-->
+
+   <group><!-- System ID (URL) catalog entries -->
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:rng:machinerytask.rng:1.3"
+              uri="rng/machineryTask.rng"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:rng:machinerytask.rng:1.x"
+              uri="rng/machineryTask.rng"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:rng:machinerytask.rng"
+              uri="rng/machineryTask.rng"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:rng:machineryTaskbodyConstraintMod.rng:1.3"
+              uri="rng/machineryTaskbodyConstraintMod.rng"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:rng:machineryTaskbodyConstraintMod.rng:1.x"
+              uri="rng/machineryTaskbodyConstraintMod.rng"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:rng:machineryTaskbodyConstraintMod.rng"
+              uri="rng/machineryTaskbodyConstraintMod.rng"/>
+   </group>
+   <group><!-- Public ID (URN) catalog entries -->
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:rng:machinerytask.rng:1.3"
+           uri="rng/machineryTask.rng"/>
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:rng:machinerytask.rng:1.x"
+           uri="rng/machineryTask.rng"/>
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:rng:machinerytask.rng"
+           uri="rng/machineryTask.rng"/>
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:rng:machineryTaskbodyConstraintMod.rng:1.3"
+           uri="rng/machineryTaskbodyConstraintMod.rng"/>
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:rng:machineryTaskbodyConstraintMod.rng:1.x"
+           uri="rng/machineryTaskbodyConstraintMod.rng"/>
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:rng:machineryTaskbodyConstraintMod.rng"
+           uri="rng/machineryTaskbodyConstraintMod.rng"/>
+   </group>
+</catalog>

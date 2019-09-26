@@ -1,0 +1,45 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="DITA-OT 3.2 includes new command-line options, support for RELAX NG parsing and validation, preliminary processing for the XDITA authoring format proposed for Lightweight DITA, and a plug-in registry that makes it easier to discover and install new plug-ins."><meta name="DC.subject" content="deprecated features, Ant target, configuration-jar, Lightweight DITA, command line, RELAX NG parsing, security, TLS, registry, targets, deprecated, classpath"><meta name="keywords" content="deprecated features, Ant target, configuration-jar, Lightweight DITA, command line, RELAX NG parsing, security, TLS, registry, targets, deprecated, classpath"><meta name="DC.relation" scheme="URI" content="../topics/migration.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="migrating-to-3.2"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Migrating to release 3.2</title></head><body id="migrating-to-3.2"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a><ul><li><a href="../topics/migrating-to-3.3.html">To 3.3</a></li><li class="active"><a href="../topics/migrating-to-3.2.html">To 3.2</a></li><li><a href="../topics/migrating-to-3.1.html">To 3.1</a></li><li><a href="../topics/migrating-to-3.0.html">To 3.0</a></li><li><a href="../topics/migrating-to-2.5.html">To 2.5</a></li><li><a href="../topics/migrating-to-2.4.html">To 2.4</a></li><li><a href="../topics/migrating-to-2.3.html">To 2.3</a></li><li><a href="../topics/migrating-to-2.2.html">To 2.2</a></li><li><a href="../topics/migrating-to-2.1.html">To 2.1</a></li><li><a href="../topics/migrating-to-2.0.html">To 2.0</a></li><li><a href="../topics/migrating-to-1.8.html">To 1.8</a></li><li><a href="../topics/migrating-to-1.7.html">To 1.7</a></li><li><a href="../topics/migrating-to-1.6.html">To 1.6</a></li><li><a href="../topics/migrating-to-1.5.4.html">To 1.5.4</a></li></ul></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+
+  <h1 class="title topictitle1" id="ariaid-title1">Migrating to release 3.2</h1>
+  
+
+  
+  
+  
+
+  <div class="body refbody"><p class="shortdesc">DITA-OT 3.2 includes <span class="ph" id="migrating-to-3.2__summary">new command-line options, support for RELAX NG parsing and
+      validation, preliminary processing for the XDITA authoring format proposed for Lightweight DITA, and a plug-in
+      registry that makes it easier to discover and install new plug-ins</span>.</p>
+    <section class="section">
+      <div class="note note note_note"><span class="note__title">Note:</span> This topic provides a summary of changes in DITA-OT 3.2 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the
+        <a class="xref" href="https://www.dita-ot.org/3.2/release-notes/" target="_blank">DITA-OT 3.2 Release Notes</a>.</div>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">Deprecated targets</h2>
+      
+      <p class="p">The <span class="keyword parmname">configuration-jar</span> Ant target used during the plug-in integration process has been
+        deprecated and may be removed in an upcoming release. This was previously used to package additional
+        configuration files and properties into <span class="ph filepath">lib/dost-configuration.jar</span>, but recent versions of
+        DITA-OT include the <span class="ph filepath">config</span> directory in the classpath for this purpose, so the
+        configuration JAR is no longer necessary.</p>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">Secure connections to the plug-in registry</h2>
+      
+      <div class="note attention note_attention"><span class="note__title">Attention:</span> To ensure data integrity during the plug-in installation process, Transport Layer Security
+        (TLS) will soon be required to access the plug-in registry. If you are using DITA-OT 3.2 or 3.2.1 and are unable
+        to upgrade to the latest version, modify the <code class="ph codeph">registry</code> key in the
+          <span class="ph filepath">config/configuration.properties</span> file to switch the URI schema to
+          <code class="ph codeph">http<strong class="ph b">s</strong>://</code>, so the entry reads <code class="ph codeph">https://plugins.dita-ot.org/</code>.</div>
+      <p class="p">For more information, see
+        <a class="xref" href="plugins-registry.html" title="DITA-OT 3.2 supports a new plug-in registry that makes it easier to discover and install new plug-ins. The registry provides a searchable list of plug-ins at dita-ot.org/plugins.">Adding plug-ins via the registry</a>.</p>
+    </section>
+
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/migration.html" title="If you have XSL transformation overrides, plug-ins or other customizations written prior to DITA-OT 3.3, you may need to make changes to ensure your overrides work properly with the latest toolkit versions.">Migrating customizations</a></div></div></nav></article></main></body></html>

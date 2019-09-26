@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="ko-kr">        <!-- Korean -->
+  <str name="Figure">그림</str>
+  <str name="Table">표</str>
+  <str name="Next topic">다음 주제</str>
+  <str name="Previous topic">이전 주제</str>
+  <str name="Parent topic">상위 주제</str>
+  <str name="Required cleanup">수정 필요</str>
+  <str name="Draft comment">드래프트 설명</str>
+  <str name="Option">옵션</str>
+  <str name="Description">설명</str>
+  <str name="Optional">옵션</str>
+  <str name="Required">필수</str>
+  <str name="Skip visual syntax diagram">시각적 구문 도표 생략</str>
+  <str name="Read syntax diagram">구문 도표 읽기</str>
+  <str name="Start of change">변경 시작</str>
+  <str name="End of change">변경 끝</str>
+  <str name="Index">색인</str>
+  <str name="Special characters">특수 문자</str>
+  <str name="Numerics">숫자</str>
+  <str name="End notes">미주</str>
+  <str name="Artwork">그림</str>
+  <str name="Syntax">구문</str>
+  <str name="Type">유형</str>
+  <str name="Value">값</str>
+  <str name="Note">주</str>
+  <str name="Notes">주</str>
+  <str name="Tip">팁</str>
+  <str name="Fastpath">빠른경로</str>
+  <str name="Important">중요사항</str>
+  <str name="Attention">주의</str>
+  <str name="Caution">경고</str>
+  <str name="Danger">위험</str>
+  <str name="Remember">알아두기</str>
+  <str name="Restriction">제한사항</str>
+  <str name="Trouble">문제점</str>
+  <str name="Warning">경고</str>
+  <str name="Contents">목차</str>
+  <str name="Related concepts">관련 개념</str>
+  <str name="Related tasks">관련 태스크</str>
+  <str name="Related reference">관련 참조</str>
+  <str name="Related information">관련 정보</str>
+  <str name="Prerequisite">선행 정보</str>
+  <str name="Prerequisites">선행 정보</str>
+  <str name="or">또는</str>
+  <str name="task_context">이 태스크 정보</str>
+  <str name="task_example">예</str>
+  <str name="task_prereq">시작하기 전에</str>
+  <str name="task_postreq">다음에 수행할 작업</str>
+  <str name="task_procedure">프로시저</str>
+  <str name="task_procedure_unordered">프로시저</str>
+  <str name="task_results">결과</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

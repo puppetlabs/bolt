@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="plugin-xsltparams" xml:lang="en-US">
+  <title>Adding parameters to existing XSLT steps</title>
+  <shortdesc>You can pass parameters from the Ant build to existing XSLT steps in both the pre-processing pipeline and
+    certain DITA-OT transformations. This can be useful if you want to make the parameters available as global
+      <xmlelement>xsl:param</xmlelement> values within XSLT overrides.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>xsl:param</xmlelement></indexterm>
+        <indexterm><xmlelement>param</xmlelement></indexterm>
+        <indexterm><xmlelement>dummy</xmlelement></indexterm>
+        <indexterm>plug-ins<indexterm>parameters</indexterm></indexterm>
+        <indexterm>parameters<indexterm>adding</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>XSLT</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>parameters</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step id="create-xml-file">
+        <cmd>Create an XML file that contains one or more Ant <xmlelement>param</xmlelement> elements nested within a
+            <xmlelement>dummy</xmlelement> wrapper element.</cmd>
+        <stepxmp>
+          <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;dummy>
+  <i>&lt;!-- Any Ant code allowed in xslt task is possible. Example: --></i>
+  &lt;param name="paramNameinXSLT" expression="${antProperty}" 
+         if="antProperty"/>
+&lt;/dummy></codeblock>
+          <draft-comment author="Kristen Eberlein" time="31 March 2013">Need a better example here, or replace the
+              <xmlelement>stepxmp</xmlelement> with a generic code sample in an <xmlelement>info</xmlelement>
+            element.</draft-comment>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Construct a <filepath>plugin.xml</filepath> file that contains the following content:</cmd>
+        <info><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="<varname>plugin-id</varname>">
+  &lt;feature extension="<varname>extension-point</varname>" file="<varname>file</varname>"/>
+&lt;/plugin></codeblock>where:
+          <ul>
+            <li><varname>plugin-id</varname> is the plug-in identifier, for example,
+                <codeph>com.example.newparam</codeph>.</li>
+            <li><varname>extension-point</varname> is the DITA-OT extension point, for example,<codeph>
+                dita.conductor.xhtml.param</codeph>. This indicates the DITA-OT processing step where the parameters
+              will be available.</li>
+            <li><varname>file</varname> is the name of the XML file that you created in step
+              <xref href="#./create-xml-file" format="dita"/>, for example, <filepath>insertParameters.xml</filepath>.
+            </li>
+          </ul></info>
+      </step>
+      <step>
+        <cmd>Install the plug-in.</cmd>
+      </step>
+    </steps>
+    <result>The <filepath>plugin.xml</filepath> file passes the parameters to the specified transformation or
+      pre-processing module.</result>
+    <example>
+      <title>Example</title>
+      <p>The following plug-in passes the parameters defined in the <filepath>insertParameters.xml</filepath> file as
+        input to the XHTML process. Generally, an additional XSLT override will make use of the parameters to do
+        something new with the generated content.</p>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="com.example.newparam">
+  &lt;feature extension="dita.conductor.xhtml.param" 
+           file="insertParameters.xml"/>
+&lt;/plugin></codeblock>
+    </example>
+  </taskbody>
+</task>

@@ -1,0 +1,2909 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns="http://relaxng.org/ns/structure/1.0">
+  <define name="opel.application" combine="choice">
+    <ref name="lcm_arith1_elt"/>
+  </define>
+  <define name="lcm_arith1_elt" combine="choice">
+    <element name="m:lcm">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="lcm_arith1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="gcd_arith1_elt"/>
+  </define>
+  <define name="gcd_arith1_elt" combine="choice">
+    <element name="m:gcd">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="gcd_arith1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="plus_arith1_elt"/>
+  </define>
+  <define name="plus_arith1_elt" combine="choice">
+    <element name="m:plus">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="minus_arith1_elt"/>
+  </define>
+  <define name="minus_arith1_elt" combine="choice">
+    <element name="m:minus">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="times_arith1_elt"/>
+  </define>
+  <define name="times_arith1_elt" combine="choice">
+    <element name="m:times">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="divide_arith1_elt"/>
+  </define>
+  <define name="divide_arith1_elt" combine="choice">
+    <element name="m:divide">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="power_arith1_elt"/>
+  </define>
+  <define name="power_arith1_elt" combine="choice">
+    <element name="m:power">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="abs_arith1_elt"/>
+  </define>
+  <define name="abs_arith1_elt" combine="choice">
+    <element name="m:abs">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="root_arith1_elt"/>
+  </define>
+  <define name="root_arith1_elt" combine="choice">
+    <element name="m:root">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>real</value>
+            <value>complex</value>
+            <value>principal_branch</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="sum_arith1_elt"/>
+  </define>
+  <define name="sum_arith1_elt" combine="choice">
+    <element name="m:sum">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="sum_arith1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="product_arith1_elt"/>
+  </define>
+  <define name="product_arith1_elt" combine="choice">
+    <element name="m:product">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="product_arith1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="diff_calculus1_elt"/>
+  </define>
+  <define name="diff_calculus1_elt" combine="choice">
+    <element name="m:diff">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>function</value>
+            <value>algebraic</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="diff_calculus1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="partialdiff_calculus1_elt"/>
+  </define>
+  <define name="partialdiff_calculus1_elt" combine="choice">
+    <element name="m:partialdiff">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>function</value>
+            <value>algebraic</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="int_calculus1_elt"/>
+  </define>
+  <define name="int_calculus1_elt" combine="choice">
+    <element name="m:int">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="defint_calculus1_elt"/>
+  </define>
+  <define name="defint_calculus1_elt" combine="choice">
+    <element name="m:defint">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="diff_calculus3_elt"/>
+  </define>
+  <define name="diff_calculus3_elt" combine="choice">
+    <element name="m:diff">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>function</value>
+            <value>algebraic</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="diff_calculus3_elt"/>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="partialdiff_calculus3_elt"/>
+  </define>
+  <define name="partialdiff_calculus3_elt" combine="choice">
+    <element name="m:partialdiff">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>function</value>
+            <value>algebraic</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="int_calculus3_elt"/>
+  </define>
+  <define name="int_calculus3_elt" combine="choice">
+    <element name="m:int">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="defint_calculus3_elt"/>
+  </define>
+  <define name="defint_calculus3_elt" combine="choice">
+    <element name="m:defint">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="real_complex1_elt"/>
+  </define>
+  <define name="real_complex1_elt" combine="choice">
+    <element name="m:real">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="imaginary_complex1_elt"/>
+  </define>
+  <define name="imaginary_complex1_elt" combine="choice">
+    <element name="m:imaginary">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="argument_complex1_elt"/>
+  </define>
+  <define name="argument_complex1_elt" combine="choice">
+    <element name="m:arg">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="conjugate_complex1_elt"/>
+  </define>
+  <define name="conjugate_complex1_elt" combine="choice">
+    <element name="m:conjugate">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="domain_fns1_elt"/>
+  </define>
+  <define name="domain_fns1_elt" combine="choice">
+    <element name="m:domain">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="range_fns1_elt"/>
+  </define>
+  <define name="range_fns1_elt" combine="choice">
+    <element name="m:codomain">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="image_fns1_elt"/>
+  </define>
+  <define name="image_fns1_elt" combine="choice">
+    <element name="m:image">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="identity_fns1_elt"/>
+  </define>
+  <define name="identity_fns1_elt" combine="choice">
+    <element name="m:ident">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="inverse_fns1_elt"/>
+  </define>
+  <define name="inverse_fns1_elt" combine="choice">
+    <element name="m:inverse">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="left_compose_fns1_elt"/>
+  </define>
+  <define name="left_compose_fns1_elt" combine="choice">
+    <element name="m:compose">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="compose_fns1_elt"/>
+  </define>
+  <define name="compose_fns1_elt" combine="choice">
+    <element name="m:compose">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="lambda_fns1_elt"/>
+  </define>
+  <define name="lambda_fns1_elt" combine="choice">
+    <element name="m:lambda">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="lambda_fns1_elt" combine="choice">
+    <element name="m:lambda">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="lambda_fns1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="condition_fns1_elt"/>
+  </define>
+  <define name="condition_fns1_elt" combine="choice">
+    <element name="m:lambda">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="condition_fns1_elt" combine="choice">
+    <element name="m:lambda">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="condition_fns1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="factorof_integer1_elt"/>
+  </define>
+  <define name="factorof_integer1_elt" combine="choice">
+    <element name="m:factorof">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="factorial_integer1_elt"/>
+  </define>
+  <define name="factorial_integer1_elt" combine="choice">
+    <element name="m:factorial">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="quotient_integer1_elt"/>
+  </define>
+  <define name="quotient_integer1_elt" combine="choice">
+    <element name="m:quotient">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="remainder_integer1_elt"/>
+  </define>
+  <define name="remainder_integer1_elt" combine="choice">
+    <element name="m:rem">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="interval_interval1_elt"/>
+  </define>
+  <define name="interval_interval1_elt" combine="choice">
+    <element name="m:interval">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>closed</value>
+            <value>open</value>
+            <value>open-closed</value>
+            <value>closed-open</value>
+            <value>integer</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="interval_interval1_elt" combine="choice">
+    <element name="m:interval">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>closed</value>
+            <value>open</value>
+            <value>open-closed</value>
+            <value>closed-open</value>
+            <value>integer</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="interval_interval1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="interval_oo_interval1_elt"/>
+  </define>
+  <define name="interval_oo_interval1_elt" combine="choice">
+    <element name="m:interval">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="closure">
+        <value>open</value>
+      </attribute>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="interval_cc_interval1_elt"/>
+  </define>
+  <define name="interval_cc_interval1_elt" combine="choice">
+    <element name="m:interval">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="closure">
+        <value>closed</value>
+      </attribute>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="interval_oc_interval1_elt"/>
+  </define>
+  <define name="interval_oc_interval1_elt" combine="choice">
+    <element name="m:interval">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="closure">
+        <value>open-closed</value>
+      </attribute>
+      <ref name="ContExp"/>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="interval_co_interval1_elt"/>
+  </define>
+  <define name="interval_co_interval1_elt" combine="choice">
+    <element name="m:interval">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="closure">
+        <value>closed-open</value>
+      </attribute>
+      <ref name="ContExp"/>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="limit_limit1_elt"/>
+  </define>
+  <define name="limit_limit1_elt" combine="choice">
+    <element name="m:limit">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="limit_limit1_elt"/>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="above_limit1_elt"/>
+  </define>
+  <define name="above_limit1_elt" combine="choice">
+    <element name="m:above">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="below_limit1_elt"/>
+  </define>
+  <define name="below_limit1_elt" combine="choice">
+    <element name="m:below">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="null_limit1_elt"/>
+  </define>
+  <define name="null_limit1_elt" combine="choice">
+    <element name="m:null">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="tendsto_limit1_elt"/>
+  </define>
+  <define name="tendsto_limit1_elt" combine="choice">
+    <element name="m:tendsto">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>above</value>
+            <value>below</value>
+            <value>two-sided</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="vectorproduct_linalg1_elt"/>
+  </define>
+  <define name="vectorproduct_linalg1_elt" combine="choice">
+    <element name="m:vectorproduct">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="scalarproduct_linalg1_elt"/>
+  </define>
+  <define name="scalarproduct_linalg1_elt" combine="choice">
+    <element name="m:scalarproduct">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="scalarproduct_linalg1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="outerproduct_linalg1_elt"/>
+  </define>
+  <define name="outerproduct_linalg1_elt" combine="choice">
+    <element name="m:outerproduct">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="outerproduct_linalg1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="transpose_linalg1_elt"/>
+  </define>
+  <define name="transpose_linalg1_elt" combine="choice">
+    <element name="m:transpose">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="determinant_linalg1_elt"/>
+  </define>
+  <define name="determinant_linalg1_elt" combine="choice">
+    <element name="m:determinant">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="vector_selector_linalg1_elt"/>
+  </define>
+  <define name="vector_selector_linalg1_elt" combine="choice">
+    <element name="m:selector">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="vector_linalg2_elt"/>
+  </define>
+  <define name="vector_linalg2_elt" combine="choice">
+    <element name="m:vector">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>row</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="vector_linalg2_elt" combine="choice">
+    <element name="m:vector">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>row</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="vector_linalg2_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="matrixrow_linalg2_elt"/>
+  </define>
+  <define name="matrixrow_linalg2_elt" combine="choice">
+    <element name="m:matrixrow">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="matrixrow_linalg2_elt" combine="choice">
+    <element name="m:matrixrow">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="matrixrow_linalg2_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="matrix_linalg2_elt"/>
+  </define>
+  <define name="matrix_linalg2_elt" combine="choice">
+    <element name="m:matrix">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>real</value>
+            <value>complex</value>
+            <value>integer</value>
+            <value>symbolic</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="matrix_linalg2_elt" combine="choice">
+    <element name="m:matrix">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>real</value>
+            <value>complex</value>
+            <value>integer</value>
+            <value>symbolic</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="matrix_linalg2_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="vector_linalg3_elt"/>
+  </define>
+  <define name="vector_linalg3_elt" combine="choice">
+    <element name="m:vector">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>column</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="vector_linalg3_elt" combine="choice">
+    <element name="m:vector">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>column</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="vector_linalg3_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="matrixcolumn_linalg3_elt"/>
+  </define>
+  <define name="matrixcolumn_linalg3_elt" combine="choice">
+    <element name="m:matrixcolumn">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="matrix_linalg3_elt"/>
+  </define>
+  <define name="matrix_linalg3_elt" combine="choice">
+    <element name="m:matrix">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="vector_linalg6_elt"/>
+  </define>
+  <define name="vector_linalg6_elt" combine="choice">
+    <element name="m:vector">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>row</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="vector_linalg6_elt" combine="choice">
+    <element name="m:vector">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>row</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="vector_linalg6_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="matrix_linalg6_elt"/>
+  </define>
+  <define name="matrix_linalg6_elt" combine="choice">
+    <element name="m:matrix">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>real</value>
+            <value>complex</value>
+            <value>integer</value>
+            <value>symbolic</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="matrix_linalg6_elt" combine="choice">
+    <element name="m:matrix">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>real</value>
+            <value>complex</value>
+            <value>integer</value>
+            <value>symbolic</value>
+            <ref name="MathMLType"/>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="matrix_linalg6_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="list_list1_elt"/>
+  </define>
+  <define name="list_list1_elt" combine="choice">
+    <element name="m:list">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="order">
+          <choice>
+            <value>lexicographic</value>
+            <value>numeric</value>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="list_list1_elt" combine="choice">
+    <element name="m:list">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="order">
+          <choice>
+            <value>lexicographic</value>
+            <value>numeric</value>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="list_list1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="list_selector_list2_elt"/>
+  </define>
+  <define name="list_selector_list2_elt" combine="choice">
+    <element name="m:selector">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="equivalent_logic1_elt"/>
+  </define>
+  <define name="equivalent_logic1_elt" combine="choice">
+    <element name="m:equivalent">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="equivalent_logic1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="not_logic1_elt"/>
+  </define>
+  <define name="not_logic1_elt" combine="choice">
+    <element name="m:not">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="and_logic1_elt"/>
+  </define>
+  <define name="and_logic1_elt" combine="choice">
+    <element name="m:and">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="and_logic1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="xor_logic1_elt"/>
+  </define>
+  <define name="xor_logic1_elt" combine="choice">
+    <element name="m:xor">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="xor_logic1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="or_logic1_elt"/>
+  </define>
+  <define name="or_logic1_elt" combine="choice">
+    <element name="m:or">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="or_logic1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="implies_logic1_elt"/>
+  </define>
+  <define name="implies_logic1_elt" combine="choice">
+    <element name="m:implies">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="true_logic1_elt"/>
+  </define>
+  <define name="true_logic1_elt" combine="choice">
+    <element name="m:true">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="false_logic1_elt"/>
+  </define>
+  <define name="false_logic1_elt" combine="choice">
+    <element name="m:false">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.semantic-attribution" combine="choice">
+    <ref name="type_mathmltypes_elt"/>
+  </define>
+  <define name="type_mathmltypes_elt" combine="choice">
+    <element name="m:type">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="min_minmax1_elt"/>
+  </define>
+  <define name="min_minmax1_elt" combine="choice">
+    <element name="m:min">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="min_minmax1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="max_minmax1_elt"/>
+  </define>
+  <define name="max_minmax1_elt" combine="choice">
+    <element name="m:max">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="max_minmax1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="cartesian_product_multiset1_elt"/>
+  </define>
+  <define name="cartesian_product_multiset1_elt" combine="choice">
+    <element name="m:cartesianproduct">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="cartesian_product_multiset1_elt"/>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="emptyset_multiset1_elt"/>
+  </define>
+  <define name="emptyset_multiset1_elt" combine="choice">
+    <element name="m:emptyset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="map_multiset1_elt"/>
+  </define>
+  <define name="map_multiset1_elt" combine="choice">
+    <element name="m:map">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="size_multiset1_elt"/>
+  </define>
+  <define name="size_multiset1_elt" combine="choice">
+    <element name="m:card">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="suchthat_multiset1_elt"/>
+  </define>
+  <define name="suchthat_multiset1_elt" combine="choice">
+    <element name="m:suchthat">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="multiset_multiset1_elt"/>
+  </define>
+  <define name="multiset_multiset1_elt" combine="choice">
+    <element name="m:multiset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="multiset_multiset1_elt" combine="choice">
+    <element name="m:multiset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="multiset_multiset1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="intersect_multiset1_elt"/>
+  </define>
+  <define name="intersect_multiset1_elt" combine="choice">
+    <element name="m:intersect">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="intersect_multiset1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="union_multiset1_elt"/>
+  </define>
+  <define name="union_multiset1_elt" combine="choice">
+    <element name="m:union">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="union_multiset1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="setdiff_multiset1_elt"/>
+  </define>
+  <define name="setdiff_multiset1_elt" combine="choice">
+    <element name="m:setdiff">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="subset_multiset1_elt"/>
+  </define>
+  <define name="subset_multiset1_elt" combine="choice">
+    <element name="m:subset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="subset_multiset1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="in_multiset1_elt"/>
+  </define>
+  <define name="in_multiset1_elt" combine="choice">
+    <element name="m:in">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="notin_multiset1_elt"/>
+  </define>
+  <define name="notin_multiset1_elt" combine="choice">
+    <element name="m:notin">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="prsubset_multiset1_elt"/>
+  </define>
+  <define name="prsubset_multiset1_elt" combine="choice">
+    <element name="m:prsubset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="prsubset_multiset1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="notsubset_multiset1_elt"/>
+  </define>
+  <define name="notsubset_multiset1_elt" combine="choice">
+    <element name="m:notsubset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="notprsubset_multiset1_elt"/>
+  </define>
+  <define name="notprsubset_multiset1_elt" combine="choice">
+    <element name="m:notprsubset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <attribute name="type">
+        <value>multiset</value>
+      </attribute>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="rational_nums1_elt"/>
+  </define>
+  <define name="rational_nums1_elt" combine="choice">
+    <element name="m:rational">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="infinity_nums1_elt"/>
+  </define>
+  <define name="infinity_nums1_elt" combine="choice">
+    <element name="m:infinity">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="e_nums1_elt"/>
+  </define>
+  <define name="e_nums1_elt" combine="choice">
+    <element name="m:exponentiale">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="i_nums1_elt"/>
+  </define>
+  <define name="i_nums1_elt" combine="choice">
+    <element name="m:imaginaryi">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="pi_nums1_elt"/>
+  </define>
+  <define name="pi_nums1_elt" combine="choice">
+    <element name="m:pi">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="gamma_nums1_elt"/>
+  </define>
+  <define name="gamma_nums1_elt" combine="choice">
+    <element name="m:eulergamma">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="NaN_nums1_elt"/>
+  </define>
+  <define name="NaN_nums1_elt" combine="choice">
+    <element name="m:notanumber">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="omtype_omtypes_elt"/>
+  </define>
+  <define name="omtype_omtypes_elt" combine="choice">
+    <element name="m:omtype">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="integer_omtypes_elt"/>
+  </define>
+  <define name="integer_omtypes_elt" combine="choice">
+    <element name="m:integer">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="float_omtypes_elt"/>
+  </define>
+  <define name="float_omtypes_elt" combine="choice">
+    <element name="m:float">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="string_omtypes_elt"/>
+  </define>
+  <define name="string_omtypes_elt" combine="choice">
+    <element name="m:string">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="bytearray_omtypes_elt"/>
+  </define>
+  <define name="bytearray_omtypes_elt" combine="choice">
+    <element name="m:bytearray">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="piecewise_piece1_elt"/>
+  </define>
+  <define name="piecewise_piece1_elt" combine="choice">
+    <element name="m:piecewise">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="piecewise_piece1_elt" combine="choice">
+    <element name="m:piecewise">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="piecewise_piece1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="piece_piece1_elt"/>
+  </define>
+  <define name="piece_piece1_elt" combine="choice">
+    <element name="m:piece">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="piece_piece1_elt" combine="choice">
+    <element name="m:piece">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="piece_piece1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="otherwise_piece1_elt"/>
+  </define>
+  <define name="otherwise_piece1_elt" combine="choice">
+    <element name="m:otherwise">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="otherwise_piece1_elt" combine="choice">
+    <element name="m:otherwise">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="otherwise_piece1_elt"/>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="forall_quant1_elt"/>
+  </define>
+  <define name="forall_quant1_elt" combine="choice">
+    <element name="m:forall">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="exists_quant1_elt"/>
+  </define>
+  <define name="exists_quant1_elt" combine="choice">
+    <element name="m:exists">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="eq_relation1_elt"/>
+  </define>
+  <define name="eq_relation1_elt" combine="choice">
+    <element name="m:eq">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="eq_relation1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="lt_relation1_elt"/>
+  </define>
+  <define name="lt_relation1_elt" combine="choice">
+    <element name="m:lt">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="lt_relation1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="gt_relation1_elt"/>
+  </define>
+  <define name="gt_relation1_elt" combine="choice">
+    <element name="m:gt">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="gt_relation1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="neq_relation1_elt"/>
+  </define>
+  <define name="neq_relation1_elt" combine="choice">
+    <element name="m:neq">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="leq_relation1_elt"/>
+  </define>
+  <define name="leq_relation1_elt" combine="choice">
+    <element name="m:leq">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="leq_relation1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="geq_relation1_elt"/>
+  </define>
+  <define name="geq_relation1_elt" combine="choice">
+    <element name="m:geq">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="geq_relation1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="approx_relation1_elt"/>
+  </define>
+  <define name="approx_relation1_elt" combine="choice">
+    <element name="m:approx">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="approx_relation1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="ceiling_rounding1_elt"/>
+  </define>
+  <define name="ceiling_rounding1_elt" combine="choice">
+    <element name="m:ceiling">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="floor_rounding1_elt"/>
+  </define>
+  <define name="floor_rounding1_elt" combine="choice">
+    <element name="m:floor">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="MathMLType"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="trunc_rounding1_elt"/>
+  </define>
+  <define name="trunc_rounding1_elt" combine="choice">
+    <element name="m:trunc">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="round_rounding1_elt"/>
+  </define>
+  <define name="round_rounding1_elt" combine="choice">
+    <element name="m:round">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="mean_s_data1_elt"/>
+  </define>
+  <define name="mean_s_data1_elt" combine="choice">
+    <element name="m:mean">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="sdev_s_data1_elt"/>
+  </define>
+  <define name="sdev_s_data1_elt" combine="choice">
+    <element name="m:sdev">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="variance_s_data1_elt"/>
+  </define>
+  <define name="variance_s_data1_elt" combine="choice">
+    <element name="m:variance">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="mode_s_data1_elt"/>
+  </define>
+  <define name="mode_s_data1_elt" combine="choice">
+    <element name="m:mode">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="median_s_data1_elt"/>
+  </define>
+  <define name="median_s_data1_elt" combine="choice">
+    <element name="m:median">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="moment_s_data1_elt"/>
+  </define>
+  <define name="moment_s_data1_elt" combine="choice">
+    <element name="m:moment">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="mean_s_dist1_elt"/>
+  </define>
+  <define name="mean_s_dist1_elt" combine="choice">
+    <element name="m:mean">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="sdev_s_dist1_elt"/>
+  </define>
+  <define name="sdev_s_dist1_elt" combine="choice">
+    <element name="m:sdev">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="variance_s_dist1_elt"/>
+  </define>
+  <define name="variance_s_dist1_elt" combine="choice">
+    <element name="m:variance">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="moment_s_dist1_elt"/>
+  </define>
+  <define name="moment_s_dist1_elt" combine="choice">
+    <element name="m:moment">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="cartesian_product_set1_elt"/>
+  </define>
+  <define name="cartesian_product_set1_elt" combine="choice">
+    <element name="m:cartesianproduct">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="cartesian_product_set1_elt"/>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="emptyset_set1_elt"/>
+  </define>
+  <define name="emptyset_set1_elt" combine="choice">
+    <element name="m:emptyset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="map_set1_elt"/>
+  </define>
+  <define name="map_set1_elt" combine="choice">
+    <element name="m:map">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="size_set1_elt"/>
+  </define>
+  <define name="size_set1_elt" combine="choice">
+    <element name="m:card">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="suchthat_set1_elt"/>
+  </define>
+  <define name="suchthat_set1_elt" combine="choice">
+    <element name="m:suchthat">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="set_set1_elt"/>
+  </define>
+  <define name="set_set1_elt" combine="choice">
+    <element name="m:set">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="set_set1_elt" combine="choice">
+    <element name="m:set">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <ref name="bvar"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="qualifier"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="container" combine="choice">
+    <ref name="set_set1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="intersect_set1_elt"/>
+  </define>
+  <define name="intersect_set1_elt" combine="choice">
+    <element name="m:intersect">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="intersect_set1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="union_set1_elt"/>
+  </define>
+  <define name="union_set1_elt" combine="choice">
+    <element name="m:union">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="union_set1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="setdiff_set1_elt"/>
+  </define>
+  <define name="setdiff_set1_elt" combine="choice">
+    <element name="m:setdiff">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="subset_set1_elt"/>
+  </define>
+  <define name="subset_set1_elt" combine="choice">
+    <element name="m:subset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="subset_set1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="in_set1_elt"/>
+  </define>
+  <define name="in_set1_elt" combine="choice">
+    <element name="m:in">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="notin_set1_elt"/>
+  </define>
+  <define name="notin_set1_elt" combine="choice">
+    <element name="m:notin">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="prsubset_set1_elt"/>
+  </define>
+  <define name="prsubset_set1_elt" combine="choice">
+    <element name="m:prsubset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.binder" combine="choice">
+    <ref name="prsubset_set1_elt"/>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="notsubset_set1_elt"/>
+  </define>
+  <define name="notsubset_set1_elt" combine="choice">
+    <element name="m:notsubset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="notprsubset_set1_elt"/>
+  </define>
+  <define name="notprsubset_set1_elt" combine="choice">
+    <element name="m:notprsubset">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>normal</value>
+            <value>multiset</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="P_setname1_elt"/>
+  </define>
+  <define name="P_setname1_elt" combine="choice">
+    <element name="m:primes">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="N_setname1_elt"/>
+  </define>
+  <define name="N_setname1_elt" combine="choice">
+    <element name="m:naturalnumbers">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="Z_setname1_elt"/>
+  </define>
+  <define name="Z_setname1_elt" combine="choice">
+    <element name="m:integers">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="rationials_setname1_elt"/>
+  </define>
+  <define name="rationials_setname1_elt" combine="choice">
+    <element name="m:rationals">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="R_setname1_elt"/>
+  </define>
+  <define name="R_setname1_elt" combine="choice">
+    <element name="m:reals">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.constant" combine="choice">
+    <ref name="complexes_setname1_elt"/>
+  </define>
+  <define name="complexes_setname1_elt" combine="choice">
+    <element name="m:complexes">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="log_transc1_elt"/>
+  </define>
+  <define name="log_transc1_elt" combine="choice">
+    <element name="m:log">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="ln_transc1_elt"/>
+  </define>
+  <define name="ln_transc1_elt" combine="choice">
+    <element name="m:ln">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="exp_transc1_elt"/>
+  </define>
+  <define name="exp_transc1_elt" combine="choice">
+    <element name="m:exp">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="sin_transc1_elt"/>
+  </define>
+  <define name="sin_transc1_elt" combine="choice">
+    <element name="m:sin">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="cos_transc1_elt"/>
+  </define>
+  <define name="cos_transc1_elt" combine="choice">
+    <element name="m:cos">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="tan_transc1_elt"/>
+  </define>
+  <define name="tan_transc1_elt" combine="choice">
+    <element name="m:tan">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="sec_transc1_elt"/>
+  </define>
+  <define name="sec_transc1_elt" combine="choice">
+    <element name="m:sec">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="csc_transc1_elt"/>
+  </define>
+  <define name="csc_transc1_elt" combine="choice">
+    <element name="m:csc">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="cot_transc1_elt"/>
+  </define>
+  <define name="cot_transc1_elt" combine="choice">
+    <element name="m:cot">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="sinh_transc1_elt"/>
+  </define>
+  <define name="sinh_transc1_elt" combine="choice">
+    <element name="m:sinh">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="cosh_transc1_elt"/>
+  </define>
+  <define name="cosh_transc1_elt" combine="choice">
+    <element name="m:cosh">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="tanh_transc1_elt"/>
+  </define>
+  <define name="tanh_transc1_elt" combine="choice">
+    <element name="m:tanh">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="sech_transc1_elt"/>
+  </define>
+  <define name="sech_transc1_elt" combine="choice">
+    <element name="m:sech">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="csch_transc1_elt"/>
+  </define>
+  <define name="csch_transc1_elt" combine="choice">
+    <element name="m:csch">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="coth_transc1_elt"/>
+  </define>
+  <define name="coth_transc1_elt" combine="choice">
+    <element name="m:coth">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arcsin_transc1_elt"/>
+  </define>
+  <define name="arcsin_transc1_elt" combine="choice">
+    <element name="m:arcsin">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arccos_transc1_elt"/>
+  </define>
+  <define name="arccos_transc1_elt" combine="choice">
+    <element name="m:arccos">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arctan_transc1_elt"/>
+  </define>
+  <define name="arctan_transc1_elt" combine="choice">
+    <element name="m:arctan">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arcsec_transc1_elt"/>
+  </define>
+  <define name="arcsec_transc1_elt" combine="choice">
+    <element name="m:arcsec">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arccsc_transc1_elt"/>
+  </define>
+  <define name="arccsc_transc1_elt" combine="choice">
+    <element name="m:arccsc">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arccot_transc1_elt"/>
+  </define>
+  <define name="arccot_transc1_elt" combine="choice">
+    <element name="m:arccot">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arcsinh_transc1_elt"/>
+  </define>
+  <define name="arcsinh_transc1_elt" combine="choice">
+    <element name="m:arcsinh">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arccosh_transc1_elt"/>
+  </define>
+  <define name="arccosh_transc1_elt" combine="choice">
+    <element name="m:arccosh">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arctanh_transc1_elt"/>
+  </define>
+  <define name="arctanh_transc1_elt" combine="choice">
+    <element name="m:arctanh">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arcsech_transc1_elt"/>
+  </define>
+  <define name="arcsech_transc1_elt" combine="choice">
+    <element name="m:arcsech">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arccsch_transc1_elt"/>
+  </define>
+  <define name="arccsch_transc1_elt" combine="choice">
+    <element name="m:arccsch">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="arccoth_transc1_elt"/>
+  </define>
+  <define name="arccoth_transc1_elt" combine="choice">
+    <element name="m:arccoth">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="divergence_veccalc1_elt"/>
+  </define>
+  <define name="divergence_veccalc1_elt" combine="choice">
+    <element name="m:divergence">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="grad_veccalc1_elt"/>
+  </define>
+  <define name="grad_veccalc1_elt" combine="choice">
+    <element name="m:grad">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="curl_veccalc1_elt"/>
+  </define>
+  <define name="curl_veccalc1_elt" combine="choice">
+    <element name="m:curl">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="opel.application" combine="choice">
+    <ref name="Laplacian_veccalc1_elt"/>
+  </define>
+  <define name="Laplacian_veccalc1_elt" combine="choice">
+    <element name="m:laplacian">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="Definition.attrib"/>
+      </optional>
+    </element>
+  </define>
+</grammar>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg11.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:attributeGroup name="SVG.onunload.attrib">
+    <xs:attribute name="onunload" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onabort.attrib">
+    <xs:attribute name="onabort" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onerror.attrib">
+    <xs:attribute name="onerror" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onresize.attrib">
+    <xs:attribute name="onresize" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onscroll.attrib">
+    <xs:attribute name="onscroll" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onzoom.attrib">
+    <xs:attribute name="onzoom" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.DocumentEvents.attrib">
+    <xs:attributeGroup ref="SVG.onunload.attrib"/>
+    <xs:attributeGroup ref="SVG.onabort.attrib"/>
+    <xs:attributeGroup ref="SVG.onerror.attrib"/>
+    <xs:attributeGroup ref="SVG.onresize.attrib"/>
+    <xs:attributeGroup ref="SVG.onscroll.attrib"/>
+    <xs:attributeGroup ref="SVG.onzoom.attrib"/>
+  </xs:attributeGroup>
+</xs:schema>

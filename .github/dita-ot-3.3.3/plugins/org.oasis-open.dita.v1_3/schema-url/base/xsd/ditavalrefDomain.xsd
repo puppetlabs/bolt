@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= DITAVAL Reference-->
+<!--      Domain ============================================================= -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(map ditavalref-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="ditavalref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="ditavalref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="ditavalmeta">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="ditavalmeta"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="dvrResourcePrefix">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="dvrResourcePrefix"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="dvrResourceSuffix">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="dvrResourceSuffix"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="dvrKeyscopePrefix">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="dvrKeyscopePrefix"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="dvrKeyscopeSuffix">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="dvrKeyscopeSuffix"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="ditavalref-d-topicref">
+      <xs:choice>
+         <xs:element ref="ditavalref"/>
+      </xs:choice>
+   </xs:group>
+   <xs:attributeGroup name="ditavalref-univ-atts">
+      <xs:annotation>
+         <xs:documentation>Omits @conkeyref from univ-atts pattern</xs:documentation>
+      </xs:annotation>
+      <xs:attribute name="id" type="xs:NMTOKEN"/>
+      <xs:attribute name="conref" type="xs:string"/>
+      <xs:attribute name="conrefend" type="xs:string"/>
+      <xs:attribute name="conaction">
+         <xs:annotation>
+            <xs:documentation>This attribute enables users to push content into a new location.</xs:documentation>
+         </xs:annotation>
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="mark">
+                  <xs:annotation>
+                     <xs:documentation>Marks the reference position.</xs:documentation>
+                  </xs:annotation>
+               </xs:enumeration>
+               <xs:enumeration value="pushafter">
+                  <xs:annotation>
+                     <xs:documentation>Push after the marked position.</xs:documentation>
+                  </xs:annotation>
+               </xs:enumeration>
+               <xs:enumeration value="pushbefore">
+                  <xs:annotation>
+                     <xs:documentation>Push before the marked position.</xs:documentation>
+                  </xs:annotation>
+               </xs:enumeration>
+               <xs:enumeration value="pushreplace">
+                  <xs:annotation>
+                     <xs:documentation>Push and replace content.</xs:documentation>
+                  </xs:annotation>
+               </xs:enumeration>
+               <xs:enumeration value="-dita-use-conref-target">
+                  <xs:annotation>
+                     <xs:documentation>Use the value from the conref target.</xs:documentation>
+                  </xs:annotation>
+               </xs:enumeration>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="ditavalref">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="ditavalref.class">
+               <xs:attribute ref="class" default="+ map/topicref ditavalref-d/ditavalref "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="ditavalref.class">
+      <xs:sequence>
+         <xs:group ref="ditavalref.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="ditavalref.attributes"/>
+   </xs:complexType>
+   <xs:group name="ditavalref.content">
+     <xs:sequence>
+       <xs:group ref="ditavalmeta" minOccurs="0"/>
+     </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="ditavalref.attributes">
+      <xs:attribute name="navtitle" type="xs:string"/>
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="local"/>
+               <xs:enumeration value="peer"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="format" type="xs:string" default="ditaval"/>
+      <xs:attribute name="processing-role" type="xs:string" default="resource-only"/>
+      <xs:attributeGroup ref="ditavalref-univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="ditavalmeta">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="ditavalmeta.class">
+               <xs:attribute ref="class" default="+ map/topicmeta ditavalref-d/ditavalmeta "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="ditavalmeta.class">
+      <xs:sequence>
+         <xs:group ref="ditavalmeta.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="ditavalmeta.attributes"/>
+   </xs:complexType>
+   <xs:group name="ditavalmeta.content">
+      <xs:sequence>
+         <xs:sequence>
+            <xs:group ref="navtitle" minOccurs="0"/>
+            <xs:sequence>
+               <xs:group ref="dvrResourcePrefix" minOccurs="0"/>
+               <xs:group ref="dvrResourceSuffix" minOccurs="0"/>
+               <xs:group ref="dvrKeyscopePrefix" minOccurs="0"/>
+               <xs:group ref="dvrKeyscopeSuffix" minOccurs="0"/>
+            </xs:sequence>
+         </xs:sequence>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="ditavalmeta.attributes">
+      <xs:attribute name="lockmeta">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="ditavalref-univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="dvrResourcePrefix">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="dvrResourcePrefix.class">
+               <xs:attribute ref="class" default="+ topic/data ditavalref-d/dvrResourcePrefix "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="dvrResourcePrefix.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="dvrResourcePrefix.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="dvrResourcePrefix.attributes"/>
+   </xs:complexType>
+   <xs:group name="dvrResourcePrefix.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="dvrResourcePrefix.attributes">
+      <xs:attribute name="name" default="dvrResourcePrefix">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="dvrResourcePrefix"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="ditavalref-univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="dvrResourceSuffix">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="dvrResourceSuffix.class">
+               <xs:attribute ref="class" default="+ topic/data ditavalref-d/dvrResourceSuffix "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="dvrResourceSuffix.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="dvrResourceSuffix.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="dvrResourceSuffix.attributes"/>
+   </xs:complexType>
+   <xs:group name="dvrResourceSuffix.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="dvrResourceSuffix.attributes">
+      <xs:attribute name="name" default="dvrResourceSuffix">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="dvrResourceSuffix"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="ditavalref-univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="dvrKeyscopePrefix">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="dvrKeyscopePrefix.class">
+               <xs:attribute ref="class" default="+ topic/data ditavalref-d/dvrKeyscopePrefix "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="dvrKeyscopePrefix.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="dvrKeyscopePrefix.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="dvrKeyscopePrefix.attributes"/>
+   </xs:complexType>
+   <xs:group name="dvrKeyscopePrefix.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="dvrKeyscopePrefix.attributes">
+      <xs:attribute name="name" default="dvrKeyscopePrefix">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="dvrKeyscopePrefix"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="ditavalref-univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="dvrKeyscopeSuffix">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="dvrKeyscopeSuffix.class">
+               <xs:attribute ref="class" default="+ topic/data ditavalref-d/dvrKeyscopeSuffix "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="dvrKeyscopeSuffix.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="dvrKeyscopeSuffix.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="dvrKeyscopeSuffix.attributes"/>
+   </xs:complexType>
+   <xs:group name="dvrKeyscopeSuffix.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="dvrKeyscopeSuffix.attributes">
+      <xs:attribute name="name" default="dvrKeyscopeSuffix">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="dvrKeyscopeSuffix"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="ditavalref-univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

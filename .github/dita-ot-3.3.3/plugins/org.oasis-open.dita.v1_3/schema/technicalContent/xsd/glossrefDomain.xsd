@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Glossary Reference Domain                   -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Glossary Reference Domain//EN"-->
+<!--      Delivered as file "glossrefDomain.mod"                      -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Define elements and specialization attributes    -->
+<!--            for Glossary Reference Domain                    -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            June 2008                                        -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2008, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(map glossref-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="glossref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="glossref-d-topicref">
+      <xs:choice>
+         <xs:element ref="glossref"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="glossref">
+      <xs:annotation>
+         <xs:documentation>The &lt;glossref&gt; element is a convenience element for creating a reference to a glossary topic. It has a required keys attribute, which forces the author to create a key by
+            which inline terms may reference their definition. For example, when glossentry topics are used to define acronyms, this will remind authors to create a key which &lt;abbreviated-form&gt;
+            elements may use to reference the short and expanded versions of that acronym.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="glossref.class">
+               <xs:attribute ref="class" default="+ map/topicref glossref-d/glossref "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="glossref.class">
+      <xs:sequence>
+         <xs:group ref="glossref.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="glossref.attributes"/>
+   </xs:complexType>
+   <xs:group name="glossref.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="glossref.attributes">
+      <xs:attribute name="navtitle" type="xs:string"/>
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attribute name="keys" use="required" type="xs:string"/>
+      <xs:attribute name="query" type="xs:string"/>
+      <xs:attribute name="copy-to" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute name="collection-type">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="choice"/>
+               <xs:enumeration value="family"/>
+               <xs:enumeration value="sequence"/>
+               <xs:enumeration value="unordered"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="local"/>
+               <xs:enumeration value="peer"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="locktitle">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attribute name="linking" default="none">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="none"/>
+               <xs:enumeration value="normal"/>
+               <xs:enumeration value="sourceonly"/>
+               <xs:enumeration value="targetonly"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="toc" default="no">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="print" default="no">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="printonly"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="search" default="no">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="chunk" type="xs:string"/>
+      <xs:attribute name="processing-role">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="normal"/>
+               <xs:enumeration value="resource-only"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

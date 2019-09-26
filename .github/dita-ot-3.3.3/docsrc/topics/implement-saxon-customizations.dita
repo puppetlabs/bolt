@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<topic id="implement-saxon-customizations">
+  <title>Adding Saxon customizations</title>
+  <shortdesc>Plug-ins can contribute XSLT extension functions and collation URI resolvers. These customizations are
+    automatically configured to work with Saxon when transformations are run using the DITA-OT
+      <xmlelement>pipeline</xmlelement> task with custom XSLT.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Saxon<indexterm><xmlelement>service</xmlelement></indexterm></indexterm>
+        <indexterm>Ant<indexterm><xmlelement>jar</xmlelement></indexterm></indexterm>
+        <indexterm>Ant<indexterm><xmlelement>pipeline</xmlelement></indexterm></indexterm>
+        <indexterm>Ant<indexterm><xmlelement>xslt</xmlelement></indexterm></indexterm>
+        <indexterm>Saxon<index-see-also>Ant</index-see-also></indexterm>
+        <indexterm>Ant<index-see-also>Saxon</index-see-also></indexterm>
+        <indexterm>I18N<indexterm>plug-in</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm start="plugins-saxon">Saxon</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>Saxon</indexterm></indexterm>
+        <indexterm>preprocessing<indexterm>extension points, Saxon</indexterm></indexterm>
+        <indexterm>Java<indexterm>ServiceLoader</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <body>
+    <p>Plug-ins can provide the following Saxon extensions:
+      <ul>
+        <li>Extension functions</li>
+        <li>Collation URI resolvers</li>
+      </ul></p>
+    <p>Extensions are declared in plug-in-provided JAR files using the Java ServiceLoader feature that looks for
+      service-declaring files in JAR files and loads classes. This requires adding one or more files in the
+        <filepath>META-INF/services</filepath> directory in plug-in-provided JAR files.</p>
+    <p>You can create the file manually or generate it dynamically using <xmlelement>service</xmlelement> elements in
+      Ant <xmlelement>jar</xmlelement> tasks. See the topics for the different extension types for details.</p>
+    <p>These extensions use the DITA Open Toolkit Ant <xmlelement>pipeline</xmlelement> element to wrap
+        <xmlelement>xslt</xmlelement> elements. You can do this in plug-ins as shown in this excerpt from the DITA
+      Community I18N plugin’s <filepath>build.xml</filepath>
+      file:<codeblock outputclass="language-xml">&lt;target name="org.dita-community.i18n-saxon-extension-test">
+  &lt;pipeline message="Test the DITA Community i18n Saxon extension functions"
+            taskname="i18n-extension-function-test">
+    &lt;xslt
+      in="${dita.plugin.org.dita-community.i18n.dir}/test/xsl/data/test-data.xml"
+      style="${dita.plugin.org.dita-community.i18n.dir}/test/xsl/test-extension-functions.xsl"
+      out="${basedir}/out/extension-function-test-results.xml"
+      >
+
+    &lt;/xslt>
+  &lt;/pipeline>
+&lt;/target></codeblock></p>
+    <p>Normal XSLT extensions to built-in transformation types will automatically have the extensions available to
+      them.</p>
+    <p>The dynamic Saxon configuration is implemented in the class <codeph>org.dita.dost.module.XsltModule</codeph>,
+      which backs the <xmlelement>pipeline</xmlelement>/<xmlelement>xslt</xmlelement> element.</p>
+    <p> </p>
+  </body>
+</topic>

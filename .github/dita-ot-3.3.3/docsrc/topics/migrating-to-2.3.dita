@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="migrating-to-2.3">
+
+  <title>Migrating to release 2.3</title>
+  <titlealts>
+    <navtitle>To 2.3</navtitle>
+  </titlealts>
+
+  <shortdesc>In DITA-OT 2.3, <option>HTML5</option> table processing has been refactored to use HTML5 best practices and
+    improved CSS properties. In PDF output, table heads and key columns no longer include shading, and unused
+    localization variables have been deprecated. The template for generated error messages has been updated to use a
+    single <codeph>id</codeph> variable that contains the entire message ID.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>languages<indexterm>supported</indexterm></indexterm>
+        <indexterm>Chinese</indexterm>
+        <indexterm>English</indexterm>
+        <indexterm>Indonesian</indexterm>
+        <indexterm>Korean</indexterm>
+        <indexterm>I18N<indexterm>PDF processing</indexterm></indexterm>
+        <indexterm>metadata<indexterm>chunking, effect of</indexterm></indexterm>
+        <indexterm>tables<indexterm>HTML5</indexterm></indexterm>
+        <indexterm>tables<indexterm>PDF</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <note>This topic provides a summary of changes in DITA-OT 2.3 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the <xref keyref="2.3-release-notes"/>.</note>
+    </section>
+    <section>
+      <title>HTML5</title>
+      <p>The <option>HTML5</option> table processing has been refactored to use valid HTML5 markup, HTML5 best
+        practices, and better CSS properties for styling. <xref href="https://en.bem.info/methodology/" format="html"
+          scope="external">BEM</xref>-style CSS classes are now generated with the name of the containing element, the
+        name of the attribute, and the value of the attribute. </p>
+      <p>Common CSS files are now generated using separate modules for each DITA domain, implemented as <xref
+          keyref="sass-lang"/> partials to better support extensions with CSS frameworks, custom plug-ins and future
+        toolkit versions.</p>
+    </section>
+    <section>
+      <title>HTML-based formats</title>
+      <div outputclass="div-index">
+        <indexterm><xmlelement>div</xmlelement><indexterm><codeph>div.shortdesc</codeph></indexterm></indexterm>
+        <indexterm><xmlelement>p</xmlelement></indexterm>
+        <indexterm><xmlelement>abstract</xmlelement></indexterm>
+        <indexterm><xmlelement>simpletable</xmlelement></indexterm>
+        <indexterm><xmlelement>properties</xmlelement></indexterm>
+        <indexterm><xmlelement>choicetable</xmlelement></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>tm-area</codeph> named template</indexterm></indexterm>
+      </div>
+      <p>The XSLT <codeph>tm-area</codeph> named template, which used to toggle rendering of trademark symbols in US
+        English and Asian languages (Japanese, Korean, and both Chinese) but ignore them in all other languages, has
+        been deprecated. Trademark symbols are now rendered uniformly for all languages and the template will be removed
+        in an upcoming release.</p>
+      <p id="2191">In previous releases, short descriptions in <xmlelement>abstract</xmlelement> elements were rendered
+        as division elements (<xmlelement>div</xmlelement>), rather than paragraphs (<xmlelement>p</xmlelement>).
+        Processing has been revised to ensure that short descriptions are consistently rendered as paragraphs,
+        regardless of whether they appear in <xmlelement>abstract</xmlelement> elements. Users who have previously
+        implemented custom CSS rules to style <codeph>div.shortdesc</codeph> like paragraphs should be able to remove
+        these rules.</p>
+    </section>
+    <section>
+      <title>PDF</title>
+      <div outputclass="div-index">
+        <indexterm>deprecated features<indexterm><codeph>tm-area</codeph> named template</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>PDF localization variables</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><parmname>conreffile</parmname></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><parmname>conref-check</parmname> target</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><parmname>coderef</parmname> target</indexterm></indexterm>
+      </div>
+      <p>The <codeph>antiquewhite</codeph> background color has been removed from table heads and key column contents in
+          <xmlelement>simpletable</xmlelement> and <xmlelement>properties</xmlelement> tables to synchronize
+        presentation with <xmlelement>choicetable</xmlelement> and provide a more uniform customization baseline between
+        PDF output and HTML-based formats.</p>
+      <p id="2179">PDF: The I18N Java and XSLT processing code has been merged into single task. This eliminated the
+        need for a <filepath>stage3.fo</filepath> file in the temporary directory; instead,
+          <filepath>topic.fo</filepath> is generated directly from <filepath>stage2.fo</filepath>. If custom plug-ins
+        were implemented to handle <filepath>stage3.fo</filepath>, they would need to be updated. </p>
+      <p>Localization variables that are no longer used in PDF processing have been deprecated and will be removed in an
+        upcoming release. PDF customization plug-ins that make use of these variables should plan to refactor
+        accordingly:
+        <ul>
+          <li>Back button title</li>
+          <li>Contents button title</li>
+          <li>Forward button title</li>
+          <li>Index button title</li>
+          <li>Index multiple entries separator</li>
+          <li>Main page button title</li>
+          <li>Next page button title</li>
+          <li>Online help prefix</li>
+          <li>Online Help Search Method And</li>
+          <li>Online Help Search Method Field</li>
+          <li>Online Help Search Method Or</li>
+          <li>Previous page button title</li>
+          <li>Search button title</li>
+          <li>Search Case Sensitive Switch</li>
+          <li>Search Excluded Stop Words Message</li>
+          <li>Search Highlight Switch</li>
+          <li>Search index button title</li>
+          <li>Search index field title</li>
+          <li>Search index next button title</li>
+          <li>Search Search Give No Results Message</li>
+          <li>Search Search in Progress Message</li>
+          <li>Search Stopped Message</li>
+          <li>Search text button title</li>
+          <li>Search text field title</li>
+          <li>Search title</li>
+          <li>Search Whole Words Switch</li>
+          <li>Untitled section</li>
+        </ul>
+      </p>
+      <note>Most of these variables were never used by the PDF process, and most were not supported (or localized) for
+        any language other than English.</note>
+    </section>
+    <section>
+      <title>Deprecated properties and targets</title>
+      <p>The following Ant properties have been deprecated:
+        <ul>
+          <li><parmname>conreffile</parmname></li>
+        </ul>
+      </p>
+      <p>The following preprocessing targets have been deprecated:
+        <ul>
+          <li><parmname>conref-check</parmname></li>
+          <li><parmname>coderef</parmname></li>
+        </ul>
+      </p>
+    </section>
+    <section>
+      <title>Pre-processing</title>
+      <p id="2207">The order of the <codeph>chunk</codeph> and <codeph>move-meta-entries</codeph> pre-processing stages
+        has been switched so that <codeph>chunk</codeph> comes first. This ensures that metadata is properly pulled or
+        pushed into the chunked version of DITA topics. </p>
+    </section>
+    <section>
+      <title>Generating error messages</title>
+      <p>Previously, the XSLT <codeph>output-message</codeph> named template for generating error messages combined a
+        global variable and two parameters to determine the actual message ID. This function has been updated to use a
+        single <codeph>id</codeph> variable that contains the entire message ID.</p>
+      <p>Plug-ins that make use of the <codeph>output-message</codeph> function should be updated to use the single
+          <codeph>id</codeph> variable, as
+        in:<codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;xsl:call-template name="output-message">
+  &lt;xsl:with-param name="id" select="'FULLMESSAGENUMBER'"/>
+  &lt;xsl:with-param name="msgparams">optional-message-parameters&lt;/xsl:with-param>
+&lt;/xsl:call-template></codeblock>
+      </p>
+    </section>
+  </refbody>
+</reference>

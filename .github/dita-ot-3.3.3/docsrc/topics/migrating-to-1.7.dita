@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="ID" rev="1.7">
+
+  <title>Migrating to release 1.7</title>
+  <titlealts>
+    <navtitle>To 1.7</navtitle>
+  </titlealts>
+
+  <shortdesc>In DITA-OT 1.7, a new preprocessing step implements flagging for HTML-based output formats. PDF processing
+    was corrected with regard to <codeph>shortdesc</codeph> handling, and a new XSLT template mode was introduced for
+    HTML TOC processing. Several stylesheets were moved to plug-in specific folders and deprecated properties and XSLT
+    variables were removed. </shortdesc>
+  
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>deprecated features<indexterm><codeph>dita.input</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>dita.input.dirname</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>dita.extname</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>XHTML, flagging-related templates</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>page-margin-left</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>page-margin-right</codeph></indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section>
+      <p>A new job status file <filepath>.job.xml</filepath> has been introduced and replaces
+          <filepath>dita.list</filepath> and <filepath>dita.xml.properties</filepath> as the normative source for job
+        status. If you have custom processing which modifies the job properties, you should change your code to modify
+          <filepath>.job.xml</filepath> instead.</p>
+      <p>Support for the following deprecated properties has been removed:</p>
+      <ul>
+        <li><codeph>dita.input</codeph></li>
+        <li><codeph>dita.input.dirname</codeph></li>
+        <li><codeph>dita.extname</codeph></li>
+      </ul>
+      <p>Stylesheets for the following transformation types have moved to plug-in specific folders:</p>
+      <ul>
+        <li><option>docbook</option></li>
+        <li><option>eclipsecontent</option></li>
+        <li><option>troff</option></li>
+        <li><option>wordrtf</option></li>
+      </ul>
+      <p>If custom plug-ins have hard coded paths to these stylesheets, update references to use either
+          <codeph>plugin</codeph> URIs in <codeph>xsl:import</codeph> instructions or use <codeph>dita.plugin.*</codeph>
+        Ant properties.</p>
+      <p>The integration process has been changed to use strict mode by default. For old plug-ins which are not valid,
+          <keyword>lax</keyword> processing mode can still be used.</p>
+      <p>Plug-ins that use the <codeph>MessageUtils</codeph> Java class must use <codeph>getInstance</codeph> method to
+        access the <codeph>MessageUtils</codeph> instance, as <codeph>getMessage</codeph> methods have been changed to
+        instance methods.</p>
+    </section>
+    <section>
+      <title>Preprocessing</title>
+      <p>The preprocessing Ant dependency chain has been cleaned up. Tasks no longer depend on the previous task in the
+        default chain, but rather the whole preprocess dependency chain is defined by the <codeph>preprocess</codeph>
+        task.</p>
+    </section>
+    <section>
+      <title>HTML</title>
+      <p>Core TOC generation has been moved to a separate XSLT stylesheet
+          <filepath>xsl/map2htmtoc/map2htmlImpl.xsl</filepath> and the new templates use the mode <codeph>toc</codeph>.
+        Plug-ins which override HTML TOC processing should change the map processing templates to <codeph>toc</codeph>
+        mode.</p>
+    </section>
+    <section>
+      <title>HTML and extended transformation types</title>
+      <p>Flagging logic has been pulled out of the core X/HTML code and moved to a preprocess step. This significantly
+        simplifies and optimizes the X/HTML code, while making flagging logic available to any other transformation
+        type. The new preprocess step implements all flagging logic; for each active flag, it adds a DITA-OT specific
+        hint into the intermediate topics (implemented as a specialization of the DITA &lt;foreign&gt; element). As part
+        of this change, all flagging-related templates in the XHTML code (such as start-flagit and gen-style) are
+        deprecated.</p>
+      <p>If you override the X/HTML transforms, you may need to update your overrides to use the new flagging logic. In
+        most cases this just means deleting calls to the deprecated templates; in some cases, the calls can be replaced
+        with 2 lines to process flags in new places. You should compare your override to the updated XHTML code and
+        update as needed. See <xref keyref="flagging-migration"/> for details.</p>
+      <p>Plug-ins that provide support for new transforms need to ensure that they properly support the DITA
+        &lt;foreign&gt; element, which should be ignored by default; if so, this change will have no immediate impact.
+        Support for flagging new transformation types may be more easily added based on this update, because there is no
+        need to re-implement flagging logic, but this is not required. See <xref keyref="preprocess-flagging"/> for
+        details on how to add flagging support.</p>
+    </section>
+    <section>
+      <title>PDF</title>
+      <p>The following deprecated XSLT variables have been removed:</p>
+      <ul>
+        <li><codeph>page-margin-left</codeph></li>
+        <li><codeph>page-margin-right</codeph></li>
+      </ul>
+      <p>XSLT stylesheets have been split to separate specialization topic code and new <codeph>xsl:import</codeph>
+        instructions have been added to <filepath>topic2fo.xsl</filepath>. Plug-ins which define their own shell
+        stylesheet should be revised to import all the required stylesheet modules.</p>
+      <p>PDF processing used to replace topic <codeph>shortdesc</codeph> with map <codeph>shortdesc</codeph>, but this
+        behavior was incorrect and was removed to comply with the DITA specification.</p>
+      <p>A new <codeph>#note-separator</codeph> variable string was added to facilitate customization.</p>
+    </section>
+  </refbody>
+</reference>

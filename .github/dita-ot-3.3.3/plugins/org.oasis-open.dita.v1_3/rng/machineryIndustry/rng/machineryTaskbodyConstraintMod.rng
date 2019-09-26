@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+  xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  >
+<moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+  <moduleTitle>DITA Machine Industry Taskbody Constraint</moduleTitle>
+  <headerComment>
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Machine Industry Taskbody Constraint        
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Machinery Taskbody Constraint//EN"
+      Delivered as file "machineryTaskbodyConstraint.mod"         
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the domain entity for the strict task  
+            constraint module                                
+                                                             
+ORIGINAL CREATION DATE:                                      
+            April 2008                                       
+                                                             
+            (C) Copyright OASIS Open 2008, 2009.             
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+=============================================================
+  </headerComment>
+  <moduleMetadata>
+    <moduleType>constraint</moduleType>
+    <moduleShortName>taskbody</moduleShortName>
+    <modulePublicIds>
+      <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Taskbody Constraint//EN</dtdMod>
+      <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Taskbody Constraint//EN</dtdEnt>
+      <xsdMod>urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+      <rncMod>urn:oasis:names:tc:dita:spec:machinery:rnc:machineryTaskbodyConstraintMod.rnc<var presep=":" name="ditaver"/></rncMod>
+      <rngMod>urn:oasis:names:tc:dita:spec:machinery:rng:machineryTaskbodyConstraintMod.rng<var presep=":" name="ditaver"/></rngMod>
+    </modulePublicIds>
+    <domainsContribution>(topic task+taskreq-d machineryTaskbody-c)</domainsContribution>
+  </moduleMetadata>
+</moduleDesc>  
+  
+  <include href="../../technicalContent/rng/taskMod.rng">
+    <a:documentation>Use prelreqs in place of prereqs,
+    use closereqs in place of postreq.</a:documentation>
+    <define name="taskbody.content">
+      <zeroOrMore>
+        <choice>
+          <ref name="prelreqs"/>
+          <ref name="context"/>
+          <ref name="section"/>
+        </choice>
+      </zeroOrMore>
+      <optional>
+        <choice>
+          <ref name="steps"/>
+          <ref name="steps-unordered"/>
+          <ref name="steps-informal"/>
+        </choice>
+      </optional>
+      <optional>
+        <ref name="result"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="example"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="closereqs"/>
+      </optional>
+    </define>
+  </include>
+  
+</grammar>

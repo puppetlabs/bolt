@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="ID">
+  <title>Re-usable components</title>
+  <shortdesc>Warehouse topic used to store re-usable content for concept topics or other constructs that would not be
+    valid in the existing warehouse task <filepath>conref-task.dita</filepath>.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><!-- This file contains reusable content. Index entries are in each <section>.  --></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section id="use-xslt2">
+      <title>Upgrade stylesheets to XSLT 2.0</title>
+      <indexterm>upgrading</indexterm>
+      <indexterm>Saxon</indexterm>
+      <indexterm>XSLT<indexterm>1.0</indexterm></indexterm>
+      <indexterm>XSLT<indexterm>2.0</indexterm></indexterm>
+      <indexterm>plug-ins<indexterm>upgrading</indexterm></indexterm>
+      <p>The Saxon project has announced plans to remove XSLT 1.0 support from the Saxon-HE library that ships with
+        DITA-OT:</p>
+      <lq href="https://www.xml.com/news/release-saxon-98/" format="html" scope="external">…we’re dropping XSLT 1.0
+        backwards compatibility mode from Saxon-HE, and hope to eliminate it entirely in due course.</lq>
+      <p>DITA-OT 3.0 and 3.0.1 included Saxon-HE 9.8.0.5, which rejects XSLT stylesheets that specify
+          <codeph>version="1.0"</codeph>. Plug-ins with XSLT templates specifying version 1.0 will fail with the message
+          “<msgph>XSLT 1.0 compatibility mode is not available in this configuration</msgph>.”</p>
+      <p>To resolve this issue, change any occurrences of <codeph>&lt;xsl:stylesheet version="1.0"></codeph> in custom
+        plug-in stylesheets to at least <codeph>&lt;xsl:stylesheet version="2.0"></codeph>.</p>
+      <note type="tip">DITA-OT 3.0.2 includes Saxon-HE 9.8.0.7, which restores XSLT 1.0 backwards-compatibility mode,
+        but the DITA Open Toolkit project recommends upgrading all stylesheets to XSLT 2.0 to ensure plug-ins remain
+        compatible with future versions of DITA-OT and Saxon-HE.</note>
+    </section>
+
+    <section id="validating-plugins">
+      <title>Validating plug-ins</title>
+      <div id="plugin.rnc">
+        <p>DITA-OT includes a RELAX NG schema file that can be used to validate the <filepath>plugin.xml</filepath>
+          files that define the capabilities of each plug-in.
+        <indexterm>schema<indexterm>RELAX NG</indexterm></indexterm>
+        <indexterm>validate</indexterm>
+        </p>
+        <p>To ensure the syntax of your custom plug-in is correct, include an <xmlpi>xml-model</xmlpi> processing
+          instruction at the beginning of the <filepath>plugin.xml</filepath> file, immediately after the XML
+          prolog:</p>
+        <p><xmlpi>xml-model href="dita-ot/plugin.rnc" type="application/relax-ng-compact-syntax"</xmlpi></p>
+        <p>If your authoring environment does not apply this schema automatically, point your editor to <filepath
+            id="samples-dir"><varname>dita-ot-dir</varname>/resources/plugin.rnc</filepath> to associate the schema with
+          your plug-in file.</p>
+      </div>
+    </section>
+
+    <section id="dita-for-print">
+      <title><cite>DITA for Print: A DITA Open Toolkit Workbook</cite> (Second Edition, 2017)</title>
+      <indexterm>Leigh White</indexterm>
+      <indexterm>DITA for Print</indexterm>
+      <p>Authored by Leigh W. White, DITA Specialist at IXIASOFT, and published by XML Press, <cite>DITA for
+          Print</cite> walks readers through developing a PDF customization from scratch. </p>
+      <p>Here is an excerpt from the back cover:</p>
+      <lq><cite>DITA for Print</cite> is for anyone who wants to learn how to create PDFs using the DITA Open Toolkit
+        without learning everything there is to know about XSL-FO, XSLT, or XPath, or even about the DITA Open Toolkit
+        itself. <cite>DITA for Print</cite> is written for non-programmers, by a non-programmer, and although it is
+        written for people who have a good understanding of the DITA standard, you don’t need a technical background to
+        get custom PDFs up and running quickly.</lq>
+      <p>This is an excellent, long-needed resource that was initially developed in 2013 for DITA-OT 1.8.</p>
+      <p>The second edition has been revised to cover DITA Open Toolkit Version 2, including customizing the DITA 1.3
+        troubleshooting topic type, localization strings, bookmarks, and the new back-cover functionality.</p>
+      <note type="important">
+        <p>The first edition of <cite>DITA for Print</cite> recommended copying entire files from the PDF2 plug-in to
+          your custom plug-in. The DITA-OT project — and the second edition of the book — do not recommend this
+          practice.</p>
+        <p>Instead, you should copy only the specific attribute sets and templates that you want to override. Following
+          this practice will more cleanly isolate your customizations from the DITA-OT code, which will make it easier
+          for you to update your plug-ins to work with future versions of DITA-OT.</p></note>
+    </section>
+
+    <section id="dita-for-practitioners">
+      <title><cite>DITA for Practitioners: Volume 1, Architecture and Technology</cite> (2012)</title>
+      <indexterm>Eliot Kimber</indexterm>
+      <indexterm>DITA for Practitioners: Volume 1, Architecture and Technology</indexterm>
+      <p>Authored by Eliot Kimber and published by XML Press, this seminal resource contains a chapter dedicated to DITA
+        Open Toolkit: “Running, Configuring, and Customizing the Open Toolkit”. In addition to a robust overview of
+        DITA-OT customization and extension, the chapter contains a detailed example of customizing a PDF plug-in to
+        specify 7" × 10" paper size and custom fonts for body text and headers.</p>
+      <p>The DITA-OT chapter in <cite>DITA for Practitioners: Volume 1</cite> was written for DITA-OT 1.5.4, which was
+        the latest stable version at the time it was written.</p>
+    </section>
+
+    <section id="java">
+      <title>Supported Java versions</title>
+      <p id="java-clients">DITA-OT is designed to run on Java version <keyword keyref="tool.java.version"/> or later.
+        Compatible Java distributions are available from multiple sources:
+        <div outputclass="div-index">
+          <indexterm>Java<indexterm>versions</indexterm></indexterm>
+          <indexterm>Amazon Corretto</indexterm>
+          <indexterm>OpenJDK</indexterm>
+        </div>
+        <ul>
+          <li>You can download the Oracle JRE or JDK from
+            <xref keyref="download.oracle-jdk"/>.</li>
+          <li>OpenJDK is an open-source implementation of Java available from
+            <xref keyref="download.openjdk"/>.</li>
+          <li>Amazon Corretto is an OpenJDK distribution with no-cost long-term support from
+            <xref keyref="download.openjdk.corretto"/>.</li>
+        </ul>
+      </p>
+    </section>
+
+    <section id="preprocess2">
+      <title>Limitations of map-first pre-processing</title>
+      <p id="no-internal-preprocess2-ext">The internal extension points that run before or after individual steps in the
+        original <codeph>preprocess</codeph> pipeline (<codeph>preprocess.*.pre/preprocess.*.post</codeph>) are not
+        available in the newer map-first preprocessing pipeline (<codeph>preprocess2</codeph>), which is used in the 
+        PDF and HTML Help transformations as of DITA-OT 3.0.</p>
+    </section>
+  </conbody>
+</concept>

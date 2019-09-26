@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+Copyright © 2004-2006 by Idiom Technologies, Inc. All rights reserved. 
+IDIOM is a registered trademark of Idiom Technologies, Inc. and WORLDSERVER
+and WORLDSTART are trademarks of Idiom Technologies, Inc. All other 
+trademarks are the property of their respective owners. 
+
+IDIOM TECHNOLOGIES, INC. IS DELIVERING THE SOFTWARE "AS IS," WITH 
+ABSOLUTELY NO WARRANTIES WHATSOEVER, WHETHER EXPRESS OR IMPLIED,  AND IDIOM
+TECHNOLOGIES, INC. DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+PURPOSE AND WARRANTY OF NON-INFRINGEMENT. IDIOM TECHNOLOGIES, INC. SHALL NOT
+BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, COVER, PUNITIVE, EXEMPLARY,
+RELIANCE, OR CONSEQUENTIAL DAMAGES (INCLUDING BUT NOT LIMITED TO LOSS OF 
+ANTICIPATED PROFIT), ARISING FROM ANY CAUSE UNDER OR RELATED TO  OR ARISING 
+OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF IDIOM
+TECHNOLOGIES, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
+
+Idiom Technologies, Inc. and its licensors shall not be liable for any
+damages suffered by any person as a result of using and/or modifying the
+Software or its derivatives. In no event shall Idiom Technologies, Inc.'s
+liability for any damages hereunder exceed the amounts received by Idiom
+Technologies, Inc. as a result of this transaction.
+
+These terms and conditions supersede the terms and conditions in any
+licensing agreement to the extent that such terms and conditions conflict
+with those set forth herein.
+
+This file is part of the DITA Open Toolkit project. 
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Introduzione | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Introduzione | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Sommario</variable>
+  <variable id="Index Continued String">continuato</variable>
+  <variable id="Index See String">, Vedi </variable>
+  <variable id="Index See Also String">Vedi anche </variable>
+  <variable id="Table of Contents Chapter">Capitolo <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">Appendice <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">Parte <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">Introduzione </variable>
+  <variable id="Preface title">Introduzione</variable>
+  <variable id="Notices title"><!--TODO:Notices title--></variable>
+  <variable id="Mini Toc">Argomenti: </variable>
+  <variable id="Notice"><!--TODO:Notice--></variable>
+  <variable id="Figure.title"> Figura <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number"> Figura <param ref-name="number"/></variable>
+  <variable id="Table.title">Tabella <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Tabella <param ref-name="number"/></variable>
+  <variable id="Related Links">Collegamenti correlati</variable>
+  <variable id="Cross-Reference">Riferimento incrociato a: </variable><!--UNUSED-->
+  <variable id="Content-Reference">Riferimento di contenuto a: </variable><!--UNUSED-->
+  <variable id="List item">Voce di elenco.</variable>
+  <variable id="Foot note">Piè di pagina.</variable>
+  <variable id="Navigation title">Titolo navigazione</variable>
+  <variable id="Search title">Titolo di ricerca</variable>
+  <variable id="Chapter with number">Capitolo <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Appendice <param ref-name="number"/></variable>
+  <variable id="Part with number">Parte <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[Cleanup richiesto]</variable>
+  <variable id="On the page"> alla pagina <param ref-name="pagenum"/></variable>
+  <variable id="Page"> pagina <param ref-name="pagenum"/></variable>
+  <variable id="This link">questo collegamento</variable><!--UNUSED-->
+  <variable id="Optional Step">Opzionale:</variable>
+  <variable id="Required Step">Richiesto:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Glossario</variable>
+  <variable id="List of Tables">Lista delle tabelle</variable>
+  <variable id="List of Figures">Lista delle figure</variable>
+</vars>

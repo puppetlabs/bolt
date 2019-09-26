@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.1.2" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.1.2</title><shortdesc>Release 1.1.2 is a maintenance release to fix defects and make patches based on
+      release 1.1.1.</shortdesc><refbody><section id="section_itw_oej_nc">
+        <p>But there are certain limitations and unfixed bugs in this release, such as, <ul><li>Bug 1343963 Blank index.html generated for ditamap contains only reltabe</li><li>Bug 1344486 java.io.EOFException thrown out when reading ditaval file</li></ul> Please check the current 'open' bugs on the SourceForge bugs tracker. </p>
+      </section><section id="section_qjq_pej_nc">
+        <title>Changes</title>
+        <ol><li>SF Bug 1297355: Multilevel HTML Help popup shows filenames</li><li>SF Bug 1297657: Update for Supported Parameters page</li><li>SF Bug 1304859: Toolkit disallows repetition of topic ID within map</li><li>SF Bug 1306361: Fatal error in published ditamap example</li><li>SF Bug 1306363: common.css not compiled with htmlhelp</li><li>SF Bug 1311788: DTD references not resolved</li><li>SF Bug 1314081: Fix catalog entries in catalag-ant.xml for OASIS DTDs</li><li>SF Bug 1323435: wrong system id for html output used in validation</li><li>SF Bug 1323486: HTML Help subterm indexes not sorted</li><li>SF Bug 1325290: JavaHelp output does not work for Russian</li><li>SF Bug 1325277: File missing from the map causes abend</li><li>SF Patch 1253783: dita2fo-links relative hrefs</li><li>SF Patch 1324387: In xslfo, groupchoice var prints extra | delimiter</li><li>SF RFE 1324990: Installation Guide</li></ol>
+      </section><section id="section_scb_qej_nc">
+        <title>Parameter Changes</title>
+        <p>
+          <ol><li>The original parameter "args.eclipse.toc" in "Ant tasks and
+              script" was separated to "args.eclipsehelp.toc" for dita2eclipsehelp
+              transformation, and "args.eclipsecontent.toc" for dita2eclipsecontent
+              transformation.</li><li>Several parameters were added to the java command line interface, including
+              "/javahelptoc","/javahelpmap","/eclipsehelptoc","/eclipsecontenttoc","/xhtmltoc".</li></ol>
+        </p>
+      </section><section id="section_vwh_qej_nc">
+        <title>Other Changes</title>
+        <p> Change to the "doc" directory, except "doc\langref" directory: <ol><li>The source dita files and the generated HTML, CHM, and PDF files were separated into
+              separate downloads.</li><li>The source package contains the source dita files.</li><li>The binary package contains the generated HTML, CHM, and PDF files.</li></ol></p>
+      </section></refbody></reference>

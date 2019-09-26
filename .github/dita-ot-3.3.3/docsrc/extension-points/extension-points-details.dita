@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="extension-points-details">
+  <title>Extension points details</title>
+  <shortdesc>This file provides additional details that are pushed to the generated topics to replace the navigation
+    titles and short descriptions embedded in the plug-in source code. Descriptions for individual extension points are
+    pushed from the manually authored topics as necessary.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <!-- This is a resource-only topic. Place index entries in the content below. -->
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <reference id="base">
+    <title>All transformations</title>
+    <titlealts>
+      <navtitle conaction="pushreplace"
+        conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/navtitle">Common processing</navtitle>
+    </titlealts>
+    <shortdesc conaction="pushreplace"
+      conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/shortdesc">The
+        <codeph>org.dita.base</codeph> plug-in provides common extension points that are available to extend processing
+      in all transformations that DITA Open Toolkit supports.
+      <ph>
+        <indexterm><codeph>org.dita.base</codeph></indexterm>
+        <indexterm>extension points<indexterm>common</indexterm></indexterm>
+      </ph>
+    </shortdesc>
+    <refbody/>
+  </reference>
+
+  <reference id="xhtml">
+    <title>HTML-based output formats</title>
+    <titlealts>
+      <navtitle>HTML-based output</navtitle>
+    </titlealts>
+    <shortdesc conaction="pushreplace"
+      conref="extension-points-in-org.dita.xhtml.dita#org.dita.xhtml-ext/shortdesc">The
+        <codeph>org.dita.xhtml</codeph> plug-in provides shared extension points that can be used to modify processing
+      in HTML-based transformation types such as Eclipse help, HTML Help, TocJS, and XHTML.
+      <ph>
+        <indexterm><codeph>org.dita.xhtml</codeph></indexterm>
+        <indexterm>extension points<indexterm>HTML</indexterm></indexterm>
+        <indexterm>extension points<indexterm>HTML5</indexterm></indexterm>
+        <indexterm>extension points<indexterm>HTML Help</indexterm></indexterm>
+        <indexterm>extension points<indexterm>Eclipse Help</indexterm></indexterm>
+        <indexterm>extension points<indexterm>TocJS</indexterm></indexterm>
+        <indexterm>extension points<indexterm>XHTML</indexterm></indexterm>
+        <indexterm>HTML</indexterm>
+        <indexterm>HTML5<indexterm>extension points</indexterm></indexterm>
+        <indexterm>HTML Help</indexterm>
+        <indexterm>Eclipse Help</indexterm>
+        <indexterm>TocJS</indexterm>
+        <indexterm>XHTML</indexterm>
+      </ph>
+    </shortdesc>
+    <refbody/>
+  </reference>
+
+  <reference id="html5">
+    <title>HTML5 extension points </title>
+    <titlealts>
+      <navtitle>HTML5</navtitle>
+    </titlealts>
+    <shortdesc conaction="pushreplace"
+      conref="extension-points-in-org.dita.html5.dita#org.dita.html5-ext/shortdesc">In addition to the
+      extension points provided by common processing and those shared by with other HTML-based transformations, the
+        <codeph>org.dita.html5</codeph> plug-in provides extension points that are specific to the HTML5
+      transformation.
+      <ph>
+        <indexterm><codeph>org.dita.html5</codeph></indexterm>
+        <indexterm>extension points<indexterm><codeph>org.dita.html5</codeph></indexterm></indexterm>
+      </ph>
+    </shortdesc>
+    <refbody/>
+  </reference>
+
+  <reference id="eclipsehelp">
+    <title>Eclipse Help</title>
+    <titlealts>
+      <navtitle>Eclipse Help (<codeph>org.dita.eclipsehelp</codeph>) </navtitle>
+    </titlealts>
+    <shortdesc conaction="pushreplace"
+      conref="extension-points-in-org.dita.eclipsehelp.dita#org.dita.eclipsehelp-ext/shortdesc">Certain
+      extension points are specific to the Eclipse Help transformation.
+      <ph>
+        <indexterm><codeph>org.dita.eclipsehelp</codeph></indexterm>
+        <indexterm>extension points<indexterm><codeph>org.dita.eclipsehelp</codeph></indexterm></indexterm>
+        <indexterm>Eclipse Help</indexterm>
+      </ph>
+    </shortdesc>
+    <refbody/>
+  </reference>
+
+  <reference id="htmlhelp">
+    <title>HTML Help</title>
+    <titlealts>
+      <navtitle conaction="pushreplace"
+        conref="extension-points-in-org.dita.htmlhelp.dita#org.dita.htmlhelp-ext/navtitle">HTML Help</navtitle>
+    </titlealts>
+    <shortdesc conaction="pushreplace"
+      conref="extension-points-in-org.dita.htmlhelp.dita#org.dita.htmlhelp-ext/shortdesc">Certain extension
+      points are specific to the HTML Help transformation.
+      <ph>
+        <indexterm><codeph>org.dita.htmlhelp</codeph></indexterm>
+        <indexterm>extension points<indexterm><codeph>org.dita.htmlhelp</codeph></indexterm></indexterm>
+        <indexterm>HTML Help</indexterm>
+      </ph>
+    </shortdesc>
+    <refbody/>
+  </reference>
+
+  <reference id="pdf">
+    <title>PDF</title>
+    <titlealts>
+      <navtitle>PDF (<codeph>org.dita.pdf2</codeph>) </navtitle>
+    </titlealts>
+    <shortdesc conaction="pushreplace"
+      conref="extension-points-in-org.dita.pdf2.dita#org.dita.pdf2-ext/shortdesc">Certain extension points are
+      specific to the PDF transformation (formerly known as “PDF2”).
+      <ph>
+        <indexterm>PDF<indexterm><codeph>org.dita.pdf2</codeph></indexterm></indexterm>
+        <indexterm><codeph>org.dita.pdf2</codeph></indexterm>
+        <indexterm>extension points<indexterm><codeph>org.dita.pdf2</codeph></indexterm></indexterm>
+      </ph>
+    </shortdesc>
+    <refbody/>
+  </reference>
+
+  <reference id="troff">
+    <title>troff</title>
+    <titlealts>
+      <navtitle conaction="pushreplace"
+        conref="extension-points-in-org.dita.troff.dita#org.dita.troff-ext/navtitle">troff</navtitle>
+    </titlealts>
+    <shortdesc conaction="pushreplace"
+      conref="extension-points-in-org.dita.troff.dita#org.dita.troff-ext/shortdesc">Certain extension points
+      are specific to the troff transformation, which produces output for use with the troff viewer on Unix-style
+      platforms, particularly for programs such as the man page viewer.
+      <ph>
+        <indexterm>UNIX<index-see-also>Linux</index-see-also></indexterm>
+        <indexterm><codeph>org.dita.troff</codeph></indexterm>
+        <indexterm>extension points<indexterm><codeph>org.dita.troff</codeph></indexterm></indexterm>
+      </ph>
+    </shortdesc>
+    <refbody/>
+  </reference>
+
+</reference>

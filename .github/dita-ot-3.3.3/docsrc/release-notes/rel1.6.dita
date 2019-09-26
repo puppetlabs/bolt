@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="rel1.5.4" xml:lang="en">
+  <title>DITA Open Toolkit Release 1.6</title>
+  <reference id="releasehighlights" xml:lang="en-US">
+  <title>Release highlights</title>
+  <refbody>
+  <section><dl><dlentry><dt>Performance improvements</dt><dd>DITA-OT 1.6 contains
+  several updates that combine for significant performance improvements
+  for large documents. For example, building the DITA 1.2 Language Specification
+  to XHTML takes just over 1/3 of the time as with the previous release
+  (tests show an improvement of 288%).</dd></dlentry>
+  <dlentry><dt>Error message overhaul</dt><dd>In the recent DITA-OT
+  usage survey, we asked for specific problems encountered when running
+  the DITA-OT. The most frequent response was difficulty understanding
+  and responding to error messages. The latest release addresses this
+  in two ways:<ol>
+  <li>Every message has been reviewed, and nearly every message has
+  been revised for clarification.</li>
+  <li>Messages are now documented in the DITA-OT User Guide. The new
+  documentation contains additional details about nearly every message,
+  including potential remedies and links to helpful information.</li>
+  </ol></dd></dlentry>
+  <dlentry><dt>Code cleanup</dt><dd>Of particular interest to developers,
+  much of the deprecated code in the toolkit (some of it unused for
+  5+ years) has been removed. As a result, much of the code is cleaner,
+  faster, and easier to customize. For example, the cleanup of PDF code
+  allowed us to remove the alternate *_1.0.xsl stylesheets.</dd></dlentry></dl></section>
+  </refbody>
+  </reference>
+  <reference id="general-enhancements-and-changes">
+    <title>General Enhancements and Changes</title>
+    <refbody>
+      <section id="section_h5q_3nt_q2">
+        <p>New arguments have been added:</p>
+        <ul>
+          <li><codeph>args.rellinks</codeph> controls which related links will be output.</li>
+          <li><codeph>args.filter</codeph> defines the filter file to be used.</li>
+        </ul>
+        <p>New configuration options have been added:</p>
+        <ul id="ul_vzj_f5m_zf">
+          <li><codeph>generate-debug-attributes</codeph> controls debug attribute generation and can
+            be used to reduce memory consumption.</li>
+          <li><codeph>processing-mode</codeph> controls error recovery behavior.</li>
+        </ul>
+        <p>Support for the old DITAVAL format (used before OASIS
+added DITAVAL to the standard in 2007) has been removed.</p>
+        <p>Source distribution package has been removed in favor or Git and GitHub source
+          downloads.</p>
+        <p>The <filepath>demo</filepath> folder has been deprecated and the following plug-ins have
+          been moved to <filepath>plugins</filepath> folder:</p>
+        <simpletable id="simpletable_gst_mcz_gg">
+          <sthead>
+            <stentry>old path</stentry>
+            <stentry>new path</stentry>
+          </sthead>
+          <strow>
+            <stentry><filepath>demo/dita11</filepath></stentry>
+            <stentry><filepath>plugins/org.dita.specialization.dita11</filepath></stentry>
+          </strow>
+          <strow>
+            <stentry><filepath>demo/dita132</filepath></stentry>
+            <stentry><filepath>plugins/org.dita.specialization.dita132</filepath></stentry>
+          </strow>
+          <strow>
+            <stentry><filepath>demo/eclipsemap</filepath></stentry>
+            <stentry><filepath>plugins/org.dita.specialization.eclipsemap</filepath></stentry>
+          </strow>
+          <strow>
+            <stentry><filepath>demo/fo</filepath></stentry>
+            <stentry><filepath>plugins/org.dita.pdf2</filepath></stentry>
+          </strow>
+          <strow>
+            <stentry><filepath>demo/tocjs</filepath></stentry>
+            <stentry><filepath>plugins/com.sophos.tocjs</filepath></stentry>
+          </strow>
+          <!-- These plugins are pulled from ext-plugins during build -->
+          <strow>
+            <stentry><filepath>demo/h2d</filepath></stentry>
+            <stentry><filepath>plugins/h2d</filepath></stentry>
+          </strow>
+          <strow>
+            <stentry><filepath>demo/legacypdf</filepath></stentry>
+            <stentry><filepath>plugins/legacypdf</filepath></stentry>
+          </strow>
+        </simpletable>
+        <p>The following plug-ins in the demo folder have been moved to a <xref href="https://github.com/dita-ot/ext-plugins" scope="external" format="html">separate plug-ins
+            Git repository</xref>:</p>
+        <ul>
+          <li><filepath>FrameMaker_adapter</filepath></li>
+          <li><filepath>apiref</filepath></li>
+          <li><filepath>authorinfo</filepath></li>
+          <li><filepath>book</filepath></li>
+          <li><filepath>elementref</filepath></li>
+          <li><filepath>enote</filepath></li>
+          <li><filepath>faq</filepath></li>
+          <!-- The commented out plugins are still shipped with DITA-OT -->
+          <!--li><filepath>h2d</filepath></li-->
+          <li><filepath>java</filepath></li>
+          <li><filepath>javaapiref</filepath></li>
+          <!--li><filepath>legacypdf</filepath></li-->
+          <li><filepath>music</filepath></li>
+          <li><filepath>thesaurus</filepath></li>
+          <li><filepath>tutorial</filepath></li>
+          <li><filepath>video</filepath></li>
+        </ul>
+      </section>
+      <section id="section_cr5_5fh_mg">
+        <p>The following bundled libraries have been updated:</p>
+        <ul>
+          <li>Ant <keyword keyref="tool.ant.version"/></li>
+          <li>ICU4J <keyword keyref="tool.icu4j.version"/></li>
+          <li>Apache Xerces <keyword keyref="tool.xerces.version"/></li>
+        </ul>
+      </section>
+      <section><title>PDF2</title><p>The following deprecated items are no longer supported in the PDF transform:</p><ul>
+		<li>Support for the beta version of DITA, available from IBM before the OASIS standard was created in 2005.</li>
+		<li>Support for the "bkinfo" demo plug-in, used to support book metadata before OASIS created the BookMap format in 2007.</li>
+          <li>Support for <filepath>layout-masters.xml</filepath> configuration.</li>
+		</ul>
+        <p>The following extension-points have been added:</p>
+        <ul id="ul_lhx_1jk_rf">
+          <li><codeph>dita.conductor.pdf2.param</codeph> to add XSLT parameters to XSL FO
+            transformation.</li>
+        </ul>
+	  </section>
+    </refbody>
+  </reference>
+  <reference id="reference_yvj_ttj_bd">
+    <title>Migration from previous releases</title>
+    <refbody>
+      <section>
+        <p>The deprecated property <codeph>dita.input.valfile</codeph> should be replaced with the
+          new argument property <codeph>args.filter</codeph>.</p>
+        <p>Target <codeph>dita-preprocess</codeph> has been removed and dependencies should be
+          replaced with a target sequence <codeph>build-init, preprocess</codeph>.</p>
+        <p>Support for argument <codeph>args.message.file</codeph> has been removed as message
+          configuration has become static configuration.</p>
+        <p>Processing instruction <codeph>workdir</codeph> has been deprecated in favor of
+          processing instruction <codeph>workdir-uri</codeph>. The only difference between the two processing instructions is that <codeph>workdir-uri</codeph> contains
+        a URI instead of a system path.</p>
+      </section>
+      <section id="section_gvw_5xn_2g">
+        <title>Preprocessing</title>
+        <p>The following deprecated templates and modes have been removed in topic pull
+          stylesheets:</p>
+        <ul>
+          <li>inherit</li>
+          <li>get-stuff</li>
+          <li>verify-type-attribute</li>
+          <li>classval</li>
+          <li>getshortdesc</li>
+          <li>getlinktext</li>
+          <li>blocktext</li>
+          <li>figtext</li>
+          <li>tabletext</li>
+          <li>litext</li>
+          <li>fntext</li>
+          <li>dlentrytext</li>
+          <li>firstclass</li>
+          <li>invalid-list-item</li>
+          <li>xref</li>
+        </ul>
+      </section>
+      <section>
+        <title>XHTML</title>
+        <p>The following named templates have been deprecated:</p>
+        <ul id="ul_rrg_2wd_3g">
+          <li>make-index-ref</li>
+        </ul>
+        <p>The following deprecated templates have been removed:</p>
+        <ul id="ul_ywp_gsc_ff">
+          <li>revblock-deprecated</li>
+          <li>revstyle-deprecated</li>
+          <li>start-revision-flag-deprecated</li>
+          <li>end-revision-flag-deprecated</li>
+          <li>concept-links</li>
+          <li>task-links</li>
+          <li>reference-links</li>
+          <li>relinfo-links</li>
+          <li>sort-links-by-role</li>
+          <li>create-links</li>
+          <li>add-linking-attributes</li>
+          <li>add-link-target-attribute</li>
+          <li>add-user-link-attributes</li>
+        </ul>
+        <p>The removed templates have been replaced by other templates in earlier releases and
+          plug-ins should be changed to use the new templates.</p>
+      </section>
+      <section>
+        <title>ODT</title>
+        <p>The following deprecated templates have been removed:</p>
+        <ul id="ul_ywp_gsc_ff2">
+          <li>revblock-deprecated</li>
+          <li>revstyle-deprecated</li>
+          <li>start-revision-flag-deprecated</li>
+          <li>end-revision-flag-deprecated</li>
+        </ul>
+        <p>The removed templates have been replaced by other templates in earlier releases and
+          plug-ins should be changed to use the new templates.</p>
+      </section>
+      <section id="section_tqw_bnt_q2"><title>PDF2</title><p>Custom PDF2 shell stylesheets need to
+          be revised to not include separate IBM and OASIS DITA stylesheets. The
+              <filepath><varname>*</varname>_1.0.xsl</filepath> stylesheets have been removed and
+          their imports must be removed from shell stylesheets.</p><p>The following template modes
+          have been deprecated:</p><ul id="ul_hxz_ks2_gf">
+          <li>toc-prefix-text</li>
+          <li>toc-topic-text</li>
+        </ul><p>The following named templates have been removed:</p>
+        <ul>
+          <li>processTopic</li>
+          <li>createMiniToc</li>
+          <li>processTopicTitle</li>
+          <li>createTopicAttrsName</li>
+          <li>processConcept</li>
+          <li>processReference</li>
+          <li>getTitle</li>
+          <li>placeNoteContent</li>
+          <li>placeImage</li>
+          <li>processUnknowType</li>
+          <li>insertReferenceTitle</li>
+          <li>buildRelationships</li>
+          <li>processTask</li>
+        </ul>
+        <p>Main
+          FO generation now relies on merging process to rewrite duplicate IDs. The default merging
+          has done this already in previous releses, but now also custom merging needs to fulfill
+          the duplicate ID rewrite requirement.</p>
+        <p>Support for <filepath>layout-masters.xml</filepath> configuration has been removed,
+          plug-ins should use <codeph>createDefaultLayoutMasters</codeph> template instead.</p></section>
+    </refbody>
+  </reference>
+  <reference id="rel1.6">
+    <title>Issues</title>
+    <shortdesc>The following items are included in DITA Open Toolkit Release
+1.6. Issue numbers correspond to the tracking number in the <ph><xref keyref="dita-ot-issues">GitHub issues tracker</xref></ph>.</shortdesc>
+    <refbody>
+      <section>
+        <title>Feature requests</title>
+        <ul>
+          <li>#1057 Deprecate logException and add logError(String, Throwable) (milestone 1)</li>
+          <li>#1059 PDF2 should fully support core default language (milestone 1)</li>
+          <li>#1058 Add switch to ignore links in XHTML (milestone 1)</li>
+          <li>#1158 Refactor log messages and tasks (milestone 1)</li>
+          <li>#1060 Reduce topic merge memory consumption (milestone 1)</li>
+          <li>#1062 Remove IBM DITA and BookMap demo support from PDF2 (milestone 1)</li>
+          <li>#1063 Move OT version number to configuration (milestone 2)</li>
+          <li>#1061 Remove obsolete dita-preprocess target (milestone 2)</li>
+          <li>#1065 Add index file to PDF2 variables (milestone 3)</li>
+          <li>#1067 Move Ant scripts to plug-in folders (milestone 3)</li>
+          <li>#1066 Run XSLT with Ant task in PDF2 (milestone 3)</li>
+          <li>#762 bookmap.dtd and map.dtd are out of sync with OASIS (milestone 3)</li>
+          <li>#1068 Add XSLT param extension point to PDF2 (milestone 4)</li>
+          <li>#948 For PDF output, xml:lang does not work at the element level (milestone 4)</li>
+          <li>#1064 Support localization of quotation marks in quote (milestone 4)</li>
+          <li>#1070 Remove support for args.message.file (milestone 4)</li>
+          <li>#1071 Add automatic font detection to PDF2 (milestone 4)</li>
+          <li>#1182 Need extension for determining topic level (milestone 4)</li>
+          <li>#1236 &lt;span&gt; tags added around step when DRAFT on (milestone 4)</li>
+          <li>#1262 css support for codeph in HTML output (milestone 4)</li>
+          <li>#1198 Generate PDF metadata from bookmeta (milestone 5)</li>
+          <li>#1273 Remove source distribution builds (milestone 5)</li>
+          <li>#1203 ditaval flag action screws strow rendering (milestone 5)</li>
+          <li>#1104 DitaWriter workdir PI not a URL (milestone 5)</li>
+          <li>#1252 Document error messages in user guide (milestone 5)</li>
+          <li>#1278 Separate core and extra plug-ins (milestone 5)</li>
+          <li>#1249 Add Files from Distribution Packages to Git Repo (milestone 5)</li>
+          <li>#1283 xref with desc and no href not handled in XHTML (milestone 5)</li>
+          <li>#1137 Consistent coding conventions for Java code (final release)</li>
+          <li>#1153 Remove deprecated Ant files (final release)</li>
+          <li>#1300 Add a hook to set @summary on table in XHTML (final release)</li>
+          <li>#1302 Add a way for cross-references to pick up generated text for sections (final
+            release)</li>
+          <li>#1266 Honor the map top level processing instruction (final release)</li>
+          <li>#1156 Refactor preprocessing to use SAX filters (final release)</li>
+          <li>#1159 Remove Content object (final release)</li>
+          <li>#1155 Use Job to read/write job configuration files (final release)</li>
+          <li>#1160 Improve filtering (final release)</li>
+          <li>#1124 Make Java code thread-safe (final release)</li>
+          <li>#1157 Clean Ant scripts (final release)</li>
+          <li>#1149 Consistent Ant property names (final release)</li>
+          <li>#1161 Remove deprecated code (final release)</li>
+          <li>#1162 Improve title numbering in PDF2 (final release)</li>
+          <li>#1163 Clean PDF2 ID processing (final release)</li>
+          <li>#1165 Improve PDF2 table customization (final release)</li>
+          <li>#1166 Improve pipeline module processing (final release)</li>
+          <li>#1164 Avoid strings where other types are more appropriate (final release)</li>
+          <li>#1168 Add ability to disable debug attribute generation (final release)</li>
+          <li>#1249 Add Files from Distribution Packages to Git Repo (final release)</li>
+          <li>#1243 Support for some kind of die_on_error property (final release)</li>
+          <li>#1257 Simplify common XHTML code for flag/revision (final release)</li>
+        </ul>
+      </section>
+      <section>
+        <title>Patches</title>
+        <ul>
+          <li>#849 Map references with root fragment are not processed (milestone 1)</li>
+          <li>#743 Key-based mapref results in preprocessing error (milestone 1)</li>
+        </ul>
+      </section>
+      <section>
+        <title>Bugs</title>
+        <ul>
+          <li>#732 Temp dir with non-ASCII character crashes (milestone 1)</li>
+          <li>#729 v 1.5.4 fails to create PDF with external topic ref (milestone 1)</li>
+          <li>#747 [1.5.4]Glosslist no longer visible in Bookmarks (PDF output) (milestone 1)</li>
+          <li>#733 Incorrect image reference does not checked (milestone 1)</li>
+          <li>#725 Deprecated property breaks Plus plugins (milestone 1)</li>
+          <li>#740 Info message about inline flagging not displayed (milestone 1)</li>
+          <li>#738 NullPointerException when absolute path to image (milestone 1)</li>
+          <li>#739 PDF2 image references broken with uplevels (milestone 1)</li>
+          <li>#734 1.5.4 looks for lib dir at current dir instead a ${dita.dir} (milestone 1)</li>
+          <li>#735 Apache FOP: TOCs with uneven right margin (milestone 1)</li>
+          <li>#744 Possible collision in File Extension detection mechanism (milestone 1)</li>
+          <li>#743 Key-based mapref results in preprocessing error (milestone 1)</li>
+          <li>#753 Choicetable headings not localized in PDF (milestone 2)</li>
+          <li>#754 Check all places where output streams are used in dost.jar (milestone 2)</li>
+          <li>#755 Property noCoderef not declared (milestone 2)</li>
+          <li>#745 HTML handling of *div does not generate @outputclass (milestone 2)</li>
+          <li>#750 Stylesheet imported multiple times in the hierarchy (milestone 2)</li>          
+          <li>#752 Warning when using @copy-to in reltable (milestone 2)</li>
+          <li>#722 Revisions on &lt;plentry> use wrong image for nested &lt;pd> (milestone 2)</li>
+          <li>#721 Bug in handling of longdescref (milestone 2)</li>
+          <li>#709 Image files not copied or referenced correctly for eclipse (milestone 2)</li>
+          <li>#758 Keydefs in non-base folder fails (milestone 3) </li>
+          <li>#757 Deprecated metadata PICS-Label in XHTML output (milestone 3)</li>
+          <li>#719 Glossentry makes FO file invalid in PDF output (milestone 3)</li>
+          <li>#677 Warning given by Saxon EE when processing flag-rules.xsl (milestone 3)</li>
+          <li>#759 PDF2: preface titles does not pull indexterms. (milestone 3)</li>
+          <li>#760 startcmd.bat adds dost.jar twice to the CLASSPATH (milestone 3)</li>
+          <li>#765 XSL for Warning uses wrong attribute set (milestone 4)</li>
+          <li>#764 steps-unordered doesn't generate heading (milestone 4)</li>
+          <li>#763 choicetable/@product value output in fo:table (milestone 4)</li>
+          <li>#1229 Typos in domains_(un)classed.css (in progress)</li>
+          <li>#1284 Fix broken references in catalog file for PDF publishing (milestone 5)</li>
+          <li>#1216 Customizing PDF layout-masters in 1.5.3 (milestone 5)</li>
+          <li>#1177 Extension Point @behavior Not Documented (milestone 5)</li>
+          <li>#1207 Table colwidth attribute always treated as proportional (milestone 5)</li>
+          <li>#1101 zh-CN file for PDF puts English strings in output (final release)</li>
+          <li>#1289 Improve error messages (final release)</li>
+          <li>#1295 Various errors when using term with keyref in XHTML (final release)</li>
+          <li>#1294 Use dita.ext instead of dita.extname (final release)</li>
+          <li>#1297 Mappull doesn't recognize &lt;navtitle> when checking for navtitle for non-DITA
+            resources (final release)</li>
+          <li>#1191 Text only mode outputs desc content in links (final release)</li>
+          <li>#1303 Add Java properties file DTD to catalog (final release)</li>
+          <li>#1308 XHTML flag support missing for linklist, linkinfo, linklist/desc (final
+            release)</li>
+          <li>#1307 M5 reports "illegal character" for xref that uses space in directory name (final
+            release)</li>
+          <li>#1152 UNC paths are not supported in input argument (final release)</li>
+          <li>#1072 URLs not decoded by dost.jar (final release)</li>
+          <li>#1306 Typo in XSLT mode results in extra fallthrough text for step (final
+            release)</li>
+          <li>#1321 Fix path2project separator clean-up (maintenance 1)</li>
+          <li>#1322 Xref to table cell does not properly navigate to it (maintenance 1)</li>
+          <li>#1323 @relcolwidth attribute not taken into account when transforming &lt;choicetable>
+            to PDF using Apache FOP (maintenance 1)</li>
+          <li>#1325 Variable "Index See Also String" missing from Hebrew (maintenance 1)</li>
+          <li>#1329 PDF2 indexing fails for ranges (maintenance 1)</li>
+          <li>#1330 Spaces in Filenames in 1.6 (maintenance 1)</li>
+          <li>#1335 Link to see/see also in index is broken (maintenance 2)</li>
+          <li>#1340 The "DitaWriter" class does not properly resolve entities when catalogs are referenced with &lt;nextCatalog> in the catalog-dita.xml (maintenance 2)</li>
+          <li>#1343 Topics with spaces in file name appear twice (maintenance 2)</li>
+          <li>#1346 Cannot determine the title of a xreffed topic (maintenance 2)</li>
+          <li>#1348 Topics copied using "copy-to" become not wellformed (DITA OT 1.6.1) (maintenance 2)</li>
+          <li>#1351 'Unexpected Text' root-processing_axf.xsl bug (maintenance 2)</li>
+          <li>#1353 dita2htmlImpl.xsl/add-br-for-empty-cmd ... content match (maintenance 2)</li>
+          <li>#1354 xml comment not being stripped correctly in preprocessing (maintenance 2)</li>
+          <li>#1357 NPE when image is incorrectly referenced when publishing to HTML (maintenance 2)</li>
+          <li>#1358 Cannot cross reference definition list items (dlentry, dt, dd) in PDF (maintenance 2)</li>
+          <li>#1365 pdf duplicate see-also entries in Index (maintenance 3)</li>
+          <li>#1369 prodinfo seems to lead to "(file) does not exist", where file has spaces in name (maintenance 3)</li>
+          <li>#1370 Links to files with spaces in name broken (maintenance 3)</li>
+          <li>#1371 build_demo uses deprecated Ant property (maintenance 3)</li>
+          <li>#1377 htmlhelp ampersand (&amp;amp;) entity in indexterm does not convert (maintenance 3)</li>
+          <li>#1378 dita.out.map.htmlhelp.hhk: target doesn't allow topic with empty indexterm (maintenance 3)</li>
+          <li>#1382 Merging uses system path separator when rewriting URIs (maintenance 3)</li>
+        </ul>
+      </section>
+    </refbody>
+  </reference>
+</reference>

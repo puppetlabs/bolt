@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+
+  <!-- Custom attributes entry -->
+  <!--uri name="cfg:fo/attrs/custom.xsl" uri="fo/attrs/custom.xsl"/-->
+  
+  <!-- Custom XSL code entry.-->
+  <!--uri name="cfg:fo/xsl/custom.xsl" uri="fo/xsl/custom.xsl"/-->
+
+  <!-- FontMapper configuration override entry.-->
+  <!--uri name="cfg:fo/font-mappings.xml" uri="fo/font-mappings.xml"/-->
+
+  <!-- I18N configuration override entries.-->
+  <!--uri name="cfg:fo/i18n/de_DE.xml" uri="fo/i18n/de.xml"/-->
+  <!--uri name="cfg:fo/i18n/de.xml" uri="fo/i18n/de.xml"/-->
+  <!--uri name="cfg:fo/i18n/en_US.xml" uri="fo/i18n/en.xml"/-->
+  <!--uri name="cfg:fo/i18n/en.xml" uri="fo/i18n/en.xml"/-->
+  <!--uri name="cfg:fo/i18n/es_ES.xml" uri="fo/i18n/es.xml"/-->
+  <!--uri name="cfg:fo/i18n/es.xml" uri="fo/i18n/es.xml"/-->
+  <!--uri name="cfg:fo/i18n/fi_FI.xml" uri="fo/i18n/fi.xml"/-->
+  <!--uri name="cfg:fo/i18n/fi.xml" uri="fo/i18n/fi.xml"/-->
+  <!--uri name="cfg:fo/i18n/fr_FR.xml" uri="fo/i18n/fr.xml"/-->
+  <!--uri name="cfg:fo/i18n/fr.xml" uri="fo/i18n/fr.xml"/-->
+  <!--uri name="cfg:fo/i18n/he_IL.xml" uri="fo/i18n/he.xml"/-->
+  <!--uri name="cfg:fo/i18n/he.xml" uri="fo/i18n/he.xml"/-->
+  <!--uri name="cfg:fo/i18n/it_IT.xml" uri="fo/i18n/it.xml"/-->
+  <!--uri name="cfg:fo/i18n/it.xml" uri="fo/i18n/it.xml"/-->
+  <!--uri name="cfg:fo/i18n/ja_JP.xml" uri="fo/i18n/ja.xml"/-->
+  <!--uri name="cfg:fo/i18n/ja.xml" uri="fo/i18n/ja.xml"/-->
+  <!--uri name="cfg:fo/i18n/nl_NL.xml" uri="fo/i18n/nl.xml"/-->
+  <!--uri name="cfg:fo/i18n/nl.xml" uri="fo/i18n/nl.xml"/-->
+  <!--uri name="cfg:fo/i18n/ro_RO.xml" uri="fo/i18n/ro.xml"/-->
+  <!--uri name="cfg:fo/i18n/ro.xml" uri="fo/i18n/ro.xml"/-->
+  <!--uri name="cfg:fo/i18n/ru_RU.xml" uri="fo/i18n/ru.xml"/-->
+  <!--uri name="cfg:fo/i18n/ru.xml" uri="fo/i18n/ru.xml"/-->
+  <!--uri name="cfg:fo/i18n/sv_SE.xml" uri="fo/i18n/sv.xml"/-->
+  <!--uri name="cfg:fo/i18n/sv.xml" uri="fo/i18n/sv.xml"/-->
+  <!--uri name="cfg:fo/i18n/zh_CN.xml" uri="fo/i18n/zh.xml"/-->
+  
+  <!-- Index configuration override entries.-->
+  <!--uri name="cfg:common/index/de_DE.xml" uri="common/index/de.xml"/-->
+  <!--uri name="cfg:common/index/de.xml" uri="common/index/de.xml"/-->
+  <!--uri name="cfg:common/index/en_US.xml" uri="common/index/en.xml"/-->
+  <!--uri name="cfg:common/index/en.xml" uri="common/index/en.xml"/-->
+  <!--uri name="cfg:common/index/es_ES.xml" uri="common/index/es.xml"/-->
+  <!--uri name="cfg:common/index/es.xml" uri="common/index/es.xml"/-->
+  <!--uri name="cfg:common/index/fi_FI.xml" uri="common/index/fi.xml"/-->
+  <!--uri name="cfg:common/index/fi.xml" uri="common/index/fi.xml"/-->
+  <!--uri name="cfg:common/index/fr_FR.xml" uri="common/index/fr.xml"/-->
+  <!--uri name="cfg:common/index/fr.xml" uri="common/index/fr.xml"/-->
+  <!--uri name="cfg:common/index/he_IL.xml" uri="common/index/he.xml"/-->
+  <!--uri name="cfg:common/index/he.xml" uri="common/index/he.xml"/-->
+  <!--uri name="cfg:common/index/it_IT.xml" uri="common/index/it.xml"/-->
+  <!--uri name="cfg:common/index/it.xml" uri="common/index/it.xml"/-->
+  <!--uri name="cfg:common/index/ja_JP.xml" uri="common/index/ja.xml"/-->
+  <!--uri name="cfg:common/index/ja.xml" uri="common/index/ja.xml"/-->
+  <!--uri name="cfg:common/index/nl_NL.xml" uri="common/index/nl.xml"/-->
+  <!--uri name="cfg:common/index/nl.xml" uri="common/index/nl.xml"/-->
+  <!--uri name="cfg:common/index/ro_RO.xml" uri="common/index/ro.xml"/-->
+  <!--uri name="cfg:common/index/ro.xml" uri="common/index/ro.xml"/-->
+  <!--uri name="cfg:common/index/ru_RU.xml" uri="common/index/ru.xml"/-->
+  <!--uri name="cfg:common/index/ru.xml" uri="common/index/ru.xml"/-->
+  <!--uri name="cfg:common/index/sv_SE.xml" uri="common/index/sv.xml"/-->
+  <!--uri name="cfg:common/index/sv.xml" uri="common/index/sv.xml"/-->
+  <!--uri name="cfg:common/index/zh_CN.xml" uri="common/index/zh.xml"/-->
+
+</catalog>

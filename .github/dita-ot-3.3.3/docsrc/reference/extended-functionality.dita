@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="code-reference">
+
+  <title>Extended codeblock processing</title>
+
+  <titlealts>
+    <navtitle>Codeblock extensions</navtitle>
+  </titlealts>
+
+  <shortdesc>DITA-OT provides additional processing support beyond that which is mandated by the DITA specification.
+    These extensions can be used to define character encodings or line ranges for code references, normalize
+    indendation, add line numbers or display whitespace characters in code blocks.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>coderef</xmlelement></indexterm>
+        <indexterm><xmlelement>codeblock</xmlelement></indexterm>
+        <indexterm><xmlatt>format</xmlatt></indexterm>
+        <indexterm><xmlatt>outputclass</xmlatt></indexterm>
+        <indexterm>encoding</indexterm>
+        <indexterm><msgnum>DOTJ052E</msgnum></indexterm>
+        <indexterm>character set</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section id="coderef-charset">
+      <title>Character set definition</title>
+      <p>For <xmlelement>coderef</xmlelement> elements, DITA-OT supports defining the code reference target file
+        encoding using the <xmlatt>format</xmlatt> attribute. The supported format is:</p>
+      <codeblock>format (";" space* "charset=" charset)?</codeblock>
+      <p>If a character set is not defined, the system default character set will be used. If the character set is not
+        recognized or supported, the <msgnum>DOTJ052E</msgnum> error is thrown and the system default character set is
+        used as a fallback.</p>
+      <codeblock outputclass="language-xml">&lt;coderef href="unicode.txt" format="txt; charset=UTF-8"/></codeblock>
+      <p>As of DITA-OT 3.3, the default character set for code references can be changed by adding the
+          <parmname>default.coderef-charset</parmname> key to the
+        <xref keyref="configuration-properties-file">configuration.properties</xref> file:</p>
+      <codeblock outputclass="language-properties">default.coderef-charset = ISO-8859-1</codeblock>
+      <p>The character set values are those supported by the Java
+        <xref format="html" href="https://docs.oracle.com/javase/8/docs/api/java/nio/charset/Charset.html"
+          scope="external">Charset</xref> class.</p>
+    </section>
+
+    <section>
+      <title>Line range extraction</title>
+      <p>Code references can be limited to extract only a specified line range by defining the
+          <codeph>line-range</codeph> pointer in the URI fragment. The format is:</p>
+      <codeblock>uri ("#line-range(" start ("," end)? ")" )?</codeblock>
+      <p>Start and end line numbers start from 1 and are inclusive. If the end range is omitted, the range ends on the
+        last line of the file.</p>
+    </section>
+    <example>
+      <codeblock outputclass="language-xml">&lt;coderef href="Parser.scala#line-range(5, 10)" format="scala"/></codeblock>
+      <p>Only lines from 5 to 10 will be included in the output.</p>
+    </example>
+    <section>
+      <title>RFC 5147</title>
+      <indexterm>RFC 5147</indexterm>
+      <p>DITA-OT also supports the line position and range syntax from
+        <xref keyref="rfc5147"/>. The format for line range is:</p>
+      <codeblock>uri ("#line=" start? "," end? )?</codeblock>
+      <p>Start and end line numbers start from 0 and are inclusive and exclusive, respectively. If the start range is
+        omitted, the range starts from the first line; if the end range is omitted, the range ends on the last line of
+        the file. The format for line position is:</p>
+      <codeblock>uri ("#line=" position )?</codeblock>
+      <p>The position line number starts from 0.</p>
+    </section>
+    <example>
+      <codeblock outputclass="language-xml">&lt;coderef href="Parser.scala#line=4,10" format="scala"/></codeblock>
+      <p>Only lines from 5 to 10 will be included in the output.</p>
+    </example>
+    <section>
+      <title>Line range by content</title>
+      <p>Instead of specifying line numbers, you can also select lines to include in the code reference by specifying
+        keywords (or “<term>tokens</term>”) that appear in the referenced file.</p>
+      <div id="coderef-by-content">
+        <p>DITA-OT supports the <codeph>token</codeph> pointer in the URI fragment to extract a line range based on the
+          file content. The format for referencing a range of lines by content is:</p>
+        <codeblock>uri ("#token=" start? ("," end)? )?</codeblock>
+        <p>Lines identified using start and end tokens are exclusive: the lines that contain the start token and end
+          token will be not be included. If the start token is omitted, the range starts from the first line in the
+          file; if the end token is omitted, the range ends on the last line of the file. </p>
+      </div>
+    </section>
+    <example>
+      <p>Given a Haskell source file named <filepath>fact.hs</filepath> with the following content,</p>
+      <codeblock outputclass="language-haskell normalize-space show-line-numbers show-whitespace"><coderef href="../resources/fact.hs"/></codeblock>
+      <p>a range of lines can be referenced as:</p>
+      <codeblock outputclass="language-xml">&lt;coderef href="fact.hs#token=START-FACT,END-FACT"/></codeblock>
+      <p>to include the range of lines that follows the <codeph>START-FACT</codeph> token on Line 1, up to (but not
+        including) the line that contains the <codeph>END-FACT</codeph> token (Line 5). The resulting
+          <xmlelement>codeblock</xmlelement> would contain lines 2–4:</p>
+      <codeblock outputclass="language-haskell"><coderef href="../resources/fact.hs#token=START-FACT,END-FACT"/></codeblock>
+      <note type="tip" id="coderef-by-content-tip">This approach can be used to reference code samples that are
+        frequently edited. In these cases, referencing line ranges by line number can be error-prone, as the target line
+        range for the reference may shift if preceding lines are added or removed. Specifying ranges by line content
+        makes references more robust, as long as the <codeph>token</codeph> keywords are preserved when the referenced
+        resource is modified.</note></example>
+    <refbodydiv id="normalize-codeblock-whitespace">
+      <section>
+        <title>Whitespace normalization</title>
+        <indexterm>whitespace handling</indexterm>
+        <p>DITA-OT can adjust the leading whitespace in code blocks to remove excess indentation and keep lines short.
+          Given an XML snippet in a codeblock with lines that all begin with spaces (indicated here as dots “·”),</p>
+      </section>
+      <example>
+        <p><codeblock outputclass="language-xml">··&lt;subjectdef keys="audience">
+····&lt;subjectdef keys="novice"/>
+····&lt;subjectdef keys="expert"/>
+··&lt;/subjectdef></codeblock></p>
+        <p>DITA-OT can remove the leading whitespace that is common to all lines in the code block. To trim the excess
+          space, set the <xmlatt>outputclass</xmlatt> attribute on the <xmlelement>codeblock</xmlelement> element to
+          include the <codeph>normalize-space</codeph> keyword.</p>
+        <p>In this case, two spaces (“··”) would be removed from the beginning of each line, shifting content to the
+          left by two characters, while preserving the indentation of lines that contain additional whitespace (beyond
+          the common indent):</p>
+        <p><codeblock outputclass="language-xml">&lt;subjectdef keys="audience">
+··&lt;subjectdef keys="novice"/>
+··&lt;subjectdef keys="expert"/>
+&lt;/subjectdef></codeblock></p>
+      </example>
+    </refbodydiv>
+    <refbodydiv id="visualize-codeblock-whitespace">
+      <section>
+        <title>Whitespace visualization (PDF)</title>
+        <p>DITA-OT can be set to display the whitespace characters in code blocks to visualize indentation in PDF
+          output.</p>
+        <p>To enable this feature, set the <xmlatt>outputclass</xmlatt> attribute on the
+            <xmlelement>codeblock</xmlelement> element to include the <codeph>show-whitespace</codeph> keyword.</p>
+        <p>When PDF output is generated, space characters in the code will be replaced with a middle dot or “interpunct”
+          character ( <codeph>·</codeph> ); tab characters are replaced with a rightwards arrow and three spaces
+            ( <codeph>→   </codeph> ).</p>
+      </section>
+      <example deliveryTarget="pdf">
+        <fig>
+          <title>Sample Java code with visible whitespace characters <i>(PDF only)</i></title>
+          <codeblock outputclass="language-java show-whitespace">	for i in 0..10 {
+		println(i)
+	}</codeblock>
+        </fig>
+      </example>
+    </refbodydiv>
+    <refbodydiv id="codeblock-line-numbers">
+      <section>
+        <title>Line numbering (PDF)</title>
+        <indexterm>line numbering</indexterm>
+        <p>DITA-OT can be set to add line numbers to code blocks to make it easier to distinguish specific lines.</p>
+        <p>To enable this feature, set the <xmlatt>outputclass</xmlatt> attribute on the
+            <xmlelement>codeblock</xmlelement> element to include the <codeph>show-line-numbers</codeph> keyword.</p>
+      </section>
+      <example deliveryTarget="pdf">
+        <fig>
+          <title>Sample Java code with line numbers and visible whitespace characters <i>(PDF only)</i></title>
+          <codeblock outputclass="language-java show-line-numbers show-whitespace">	for i in 0..10 {
+		println(i)
+	}</codeblock>
+        </fig>
+      </example>
+    </refbodydiv>
+  </refbody>
+</reference>

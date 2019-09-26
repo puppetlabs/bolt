@@ -1,0 +1,45 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="topic"><meta name="description" content="Several configuration changes can significantly reduce DITA-OT processing time."><meta name="DC.subject" content=", xtrf, xtrc, processing time, Java, required version, debugging, generate-debug-attributes"><meta name="keywords" content=", xtrf, xtrc, processing time, Java, required version, debugging, generate-debug-attributes"><meta name="DC.relation" scheme="URI" content="../topics/troubleshooting-overview.html"><meta name="DC.relation" scheme="URI" content="http://en.wikipedia.org/wiki/Solid-state_drive"><meta name="DC.relation" scheme="URI" content="http://en.wikipedia.org/wiki/RAM_drive"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="reducing-processing-time"><meta name="DC.language" content="en-US"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Reducing processing time</title></head><body id="reducing-processing-time"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a><ul><li><a href="../topics/log-files.html">Log files</a></li><li><a href="../topics/DITA-messages.html">DITA-OT error messages</a></li><li><a href="../topics/other-errors.html">Other error messages</a></li><li><a href="../topics/dita-command-help.html">Accessing help for the dita command</a></li><li><a href="../topics/enabling-debug-mode.html">Enabling debug mode</a></li><li><a href="../topics/increasing-the-jvm.html">Increasing Java memory</a></li><li class="active"><a href="../topics/reducing-processing-time.html">Reducing processing time</a></li></ul></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+   <h1 class="title topictitle1" id="ariaid-title1">Reducing processing time</h1>
+   
+   
+   <div class="body"><p class="shortdesc">Several configuration changes can significantly reduce DITA-OT processing time.</p>
+      <section class="section"><h2 class="title sectiontitle">Disable debug attribute generation</h2>
+         
+         <p class="p">The <span class="keyword parmname">generate-debug-attributes</span> parameter determines whether debugging attributes are
+            generated in the temporary files. By changing the value to <code class="ph codeph">false</code>, DITA-OT will no longer
+            generate the <code class="keyword markupname xmlatt">@xtrf</code> and <code class="keyword markupname xmlatt">@xtrc</code> debug attributes. This will make it more
+            difficult to track down the source file location from which a given issue may have originated, but it will
+            reduce the size of the temporary files. As a result, XML parsing will take less time and overall processing
+            time will be reduced.</p>
+      </section>
+      <section class="section"><h2 class="title sectiontitle">Use a fast disk for the temporary directory</h2>
+         
+         <p class="p">DITA-OT keeps topic and map files as separate files and processes each file multiple times during
+            preprocessing. Thus reading from disk, parsing XML, serializing XML, and writing to disk makes processing
+            quite I/O intensive. Use either an
+            <a class="xref" href="http://en.wikipedia.org/wiki/Solid-state_drive" target="_blank">SSD</a> or a
+            <a class="xref" href="http://en.wikipedia.org/wiki/RAM_drive" target="_blank">RAM disk</a> for
+            temporary files, and never use a temporary directory that is not located on the same machine as where the
+            processing takes place.</p>
+      </section>
+      <section class="section"><h2 class="title sectiontitle">Reuse the JVM instance</h2>
+         
+         <p class="p">For all but extremely large source sets, the JVM will not have enough time to warm-up. By reusing the same
+            JVM instance, the first few DITA-OT conversions will be “normal”, but when the JIT starts to kick in, the
+            performance increase may be 2-10 fold. This is especially noticeable with smaller source sets, as much of
+            the DITA-OT processing is I/O intensive.</p>
+      </section>
+      <section class="section"><h2 class="title sectiontitle">Use the latest Java version</h2>
+         
+         <p class="p">DITA-OT 2.0 to 2.3 require Java 7, and DITA-OT 2.4 and newer require Java 8. However, using a newer version
+            of Java can further reduce processing time.</p>
+      </section>
+   </div>
+
+   <nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/troubleshooting-overview.html" title="This section contains information about problems that you might encounter and how to resolve them.">Error messages and troubleshooting</a></div></div><div class="linklist"><strong>Collected links</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="http://en.wikipedia.org/wiki/Solid-state_drive" target="_blank">SSD</a></li><li class="linklist"><a class="link" href="http://en.wikipedia.org/wiki/RAM_drive" target="_blank">RAM disk</a></li></ul></div></nav>
+</article></main></body></html>

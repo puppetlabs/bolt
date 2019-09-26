@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:simpleType name="MarkerValue.datatype">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="SVG.marker.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:SVG.Description.class"/>
+      <xs:element ref="svg:SVG.Animation.class"/>
+      <xs:element ref="svg:SVG.Structure.class"/>
+      <xs:element ref="svg:SVG.Conditional.class"/>
+      <xs:element ref="svg:SVG.Image.class"/>
+      <xs:element ref="svg:SVG.Style.class"/>
+      <xs:element ref="svg:SVG.Shape.class"/>
+      <xs:element ref="svg:SVG.Text.class"/>
+      <xs:element ref="svg:SVG.Marker.class"/>
+      <xs:element ref="svg:SVG.Profile.class"/>
+      <xs:element ref="svg:SVG.Gradient.class"/>
+      <xs:element ref="svg:SVG.Pattern.class"/>
+      <xs:element ref="svg:SVG.Clip.class"/>
+      <xs:element ref="svg:SVG.Mask.class"/>
+      <xs:element ref="svg:SVG.Filter.class"/>
+      <xs:element ref="svg:SVG.Cursor.class"/>
+      <xs:element ref="svg:SVG.Hyperlink.class"/>
+      <xs:element ref="svg:SVG.View.class"/>
+      <xs:element ref="svg:SVG.Script.class"/>
+      <xs:element ref="svg:SVG.Font.class"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="marker" substitutionGroup="svg:SVG.Marker.class"/>
+  <xs:attributeGroup name="attlist.marker">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="refX" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="refY" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="markerUnits">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="strokeWidth"/>
+          <xs:enumeration value="userSpaceOnUse"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="markerWidth" type="svg:Length.datatype"/>
+    <xs:attribute name="markerHeight" type="svg:Length.datatype"/>
+    <xs:attribute name="orient"/>
+    <xs:attribute name="viewBox" type="svg:ViewBoxSpec.datatype"/>
+    <xs:attribute name="preserveAspectRatio" default="xMidYMid meet" type="svg:PreserveAspectRatioSpec.datatype"/>
+  </xs:attributeGroup>
+</xs:schema>

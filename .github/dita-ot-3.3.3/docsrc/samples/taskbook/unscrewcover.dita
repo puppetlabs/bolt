@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="unscrewcover" xml:lang="en-us">
+  <title>Remove the cover of your system</title>
+  <shortdesc>This is a simple task requiring a screwdriver.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>hard drive</indexterm>
+        <indexterm>Computer cover</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <prereq>First be sure you are grounded.</prereq>
+    <context>Perform the operation in a well ventilated room.</context>
+    <steps>
+      <step>
+        <cmd>Unscrew the screws that hold the cover to your system.</cmd>
+      </step>
+      <step>
+        <cmd>Store them in a safe place.</cmd>
+      </step>
+      <step>
+        <cmd>Remove the cover and place it in a safe place as well.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

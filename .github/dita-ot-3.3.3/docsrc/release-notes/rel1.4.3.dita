@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.4.3" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.4.3</title><shortdesc>Release 1.4.3 is a maintenance release and is intended to be the last released based
+      fully on DITA 1.1.</shortdesc><refbody><section id="section_mdo_sdj_nc">
+        <p>It contains a significant amount of preview function for the upcoming DITA 1.2 standard,
+          but the DITA 1.2 document types must be specifically referenced in order to use this
+          capability. </p>
+      </section><section id="section_qeu_mhj_nc">
+        <title>Major Updates</title>
+        <ol><li>The PDF codebase switched from the older deprecated code to the plugin previously
+            known as PDF2. Running a build with the transform type PDF or PDF2 will now run the new
+            code. To continue using the older code, set your transform type to "legacypdf".</li><li>The PDF plugin now runs with FOP, as well as with the latest version of Saxon.</li><li>The Full Easy Install package now ships with Saxon 9B instead of with Xalan, and code
+            in the DITA-OT package has been updated to work with Saxon 9B.</li><li>The Full Easy Install package updates the versions of many open source libraries
+            (including Ant and FOP)</li><li>RFE 1982567 Allow spaces in DITA file names</li><li>Preview function for the majority of the upcoming OASIS DITA 1.2 standard, including
+            everything from milestone builds one through twelve of DITA-OT 1.5 </li></ol>
+      </section><section id="section_vaz_sdj_nc">
+        <title>10 SF Enhancements Added</title>
+        <ol><li>1982567 Allow spaces in DITA file names</li><li>2631145 dita2htmlImpl.xsl should not define doctype</li><li>2562718 Rename the ant directory to avoid naming collisions with ant</li><li>2314086 Let maplink generate &lt;linklist&gt; elements</li><li>2258659 Extend integrator to allow addition of messages.</li><li>2117337 Customize Integrator to integrate custom directories</li><li>2074933 Make index output for new transtypes more extensible</li><li>1995667 Add plugin extension points to preprocess pipeline</li><li>1972537 Let users specify reloadstylesheet on xslt tasks</li><li>1803199 Allow ability to include class ancestry in XHTML class attribute</li></ol>
+      </section><section id="section_cbi_tdj_nc">
+        <title>4 SourceForge Patches Added</title>
+        <ol><li>1996733 Structure Ant &lt;pipeline&gt; better</li><li>1796007 Refactor of related links HTML for specialized processing</li><li>1947566 pdf2: allow XEP to be installed elsewhere</li><li>2477370 Refactor of conrefImpl.xsl</li></ol>
+      </section><section id="section_ytu_tdj_nc">
+        <title>31 SF Bugs Fixed</title>
+        <ol><li>2008294 End flag does not work in ditaval</li><li>2078563 Keyref not working for external links</li><li>2027170 maprefImpl.xsl removes part of class attr from topichead</li><li>2027058 Topichead element stops map processing in ChunkMapReader</li><li>2001268 DITA-OT documentation wants JDK 1.4</li><li>2008317 Chunking one topic from a large file hogs memory</li><li>2219479 &lt;prodinfo&gt; subelement associations are lost in HTML output</li><li>2340727 No link in TOC to topics in ditabase</li><li>2317627 Chunking map to create one file should use map file name</li><li>2143078 Relcolwidth not respected in choicetable</li><li>1995223 bookmap: bookmeta-&gt;bookrights information is not generated</li><li>1990167 reltable doesn't generate external links correctly</li><li>1953553 FO 1.4.2 plugin: Inconsistent display of "on page" in xref</li><li>1951879 Link generation is disabled for bookmaps</li><li>1997171 topic body suppressed in chapter topics</li><li>2417980 Toolkit should support both versions of Serbian lang code</li><li>1947817 Extra topics appear in PDF output when using reltables</li><li>2004588 Image alt text needs space normalized</li><li>1954463 Conditional processing multiple PDFs in the same JVM</li><li>2061301 Useless import of xslt4j stops dost.jar being built</li><li>2317659 Chunking "by-topic" does not work</li><li>1955211 Footnotes-by-reference rendered naively</li><li>2010062 Spaces dropped in indexterm that has keyword</li><li>2607496 USEINDEX=no breaks HTML Help HHP</li><li>2570118 &lt;xref&gt; without href drops content</li><li>2414891 Map contains wrong reference after chunking</li><li>2010092 example or section title can be orphaned in PDF2</li><li>1999117 Ubuntu 8.04 | startcmd.sh doesn't work</li><li>2020317 Many duplicated id in xxx_MERGED.xml in PDF2 output.</li><li>2614006 Conref processing ignores -dita-use-conref-target</li><li>1727863 &lt;groupchoice&gt; has an extra "|" character</li></ol>
+      </section></refbody><related-links><linklist><desc>SourceForge bugs, patches, and RFEs listed above can be found in SourceForge Bugs,
+            Patches, and RFE tracker pages</desc><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725074" scope="external"><linktext>Bugs tracker</linktext></link><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725076" scope="external"><linktext>Patches tracker</linktext></link><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725077" scope="external"><linktext>RFE tracker</linktext></link></linklist></related-links></reference>

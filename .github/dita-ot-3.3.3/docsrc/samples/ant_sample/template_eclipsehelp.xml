@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<!-- revise @PLACEHOLDER@ names and values-->
+
+<!--
+  | basedir can be specified to other places base on your need.
+  |
+  | Note: input, output, and temp directories will base on the basedir if
+  | they are relative paths.
+  * -->
+
+<project name="@PROJECT.NAME@_eclipsehelp" default="@DELIVERABLE.NAME@2eclipsehelp" basedir=".">
+
+  <!-- dita.dir should point to the toolkit's root directory -->
+  <property name="dita.dir" location="${basedir}${file.separator}..${file.separator}..${file.separator}.."/>
+
+  <target name="@DELIVERABLE.NAME@2eclipsehelp">
+    <ant antfile="${dita.dir}${file.separator}build.xml">
+      <!-- please refer to the toolkit's document for supported parameters, and
+           specify them base on your needs -->
+      <property name="args.input" location="@DITA.INPUT@"/>
+      <property name="output.dir" location="@OUTPUT.DIR@"/>
+      <property name="transtype" value="eclipsehelp"/>
+    </ant>
+  </target>
+</project>

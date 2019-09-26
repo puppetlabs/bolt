@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Glossary XSD Group Decleration                -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      July 2007                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA concepts          -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             June 2006                                       -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2006, 2009                -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- NOTE: The glossaryGrp.xsd file was misnamed in DITA 1.1. For DITA 1.2, it simply
+    redirects to the correctly-named glossentryGrp.xsd file.
+  -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:glossentryGrp.xsd:1.2"/>  
+  
+</xs:schema>

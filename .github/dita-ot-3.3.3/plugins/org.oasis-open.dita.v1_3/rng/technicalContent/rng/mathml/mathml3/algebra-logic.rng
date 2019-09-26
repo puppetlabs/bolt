@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <!--
+        This is the Mathematical Markup Language (MathML) 3.0, an XML
+        application for describing mathematical notation and capturing
+        both its structure and content.
+    
+        Copyright 1998-2007 World Wide Web Consortium
+           (Massachusetts Institute of Technology, Institut National de
+            Recherche en Informatique et en Automatique, Keio University).
+            All Rights Reserved.
+    
+        Permission to use, copy, modify and distribute the RelaxNG schema for MathML3
+        and its accompanying documentation for any purpose and without fee is
+        hereby granted in perpetuity, provided that the above copyright notice
+        and this paragraph appear in all copies.  The copyright holders make
+        no representation about the suitability of the Schema for any purpose.
+    
+        This file contains the arity checking rules for the symbols
+        from the content dictionary algebra-logic
+        It is provided "as is" without expressed or implied warranty.
+    
+        Revision:   $Id: algebra-logic.rng,v 1.1 2007/12/11 15:59:27 dcarlis Exp $
+  -->
+  <define name="cd.token.unary.class" combine="choice">
+    <choice>
+      <ref name="factorial.token"/>
+      <ref name="unary_minus.token"/>
+      <ref name="not.token"/>
+      <ref name="abs.token"/>
+      <ref name="conjugate.token"/>
+      <ref name="arg.token"/>
+      <ref name="real.token"/>
+      <ref name="imaginary.token"/>
+      <ref name="floor.token"/>
+      <ref name="ceiling.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.binary.class" combine="choice">
+    <choice>
+      <ref name="quotient.token"/>
+      <ref name="divide.token"/>
+      <ref name="minus.token"/>
+      <ref name="power.token"/>
+      <ref name="rem.token"/>
+      <ref name="root.token"/>
+      <ref name="implies.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.nary.class" combine="choice">
+    <choice>
+      <ref name="max.token"/>
+      <ref name="min.token"/>
+      <ref name="plus.token"/>
+      <ref name="times.token"/>
+      <ref name="gcd.token"/>
+      <ref name="and.token"/>
+      <ref name="or.token"/>
+      <ref name="xor.token"/>
+      <ref name="lcm.token"/>
+    </choice>
+  </define>
+  <define name="cd.binder.class" combine="choice">
+    <choice>
+      <ref name="forall.token"/>
+      <ref name="exists.token"/>
+    </choice>
+  </define>
+  <!-- the element definitions for the token elements -->
+  <define name="quotient.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="quotient.token">
+    <element name="quotient">
+      <ref name="quotient.content"/>
+    </element>
+  </define>
+  <define name="factorial.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="factorial.token">
+    <element name="factorial">
+      <ref name="factorial.content"/>
+    </element>
+  </define>
+  <define name="divide.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="divide.token">
+    <element name="divide">
+      <ref name="divide.content"/>
+    </element>
+  </define>
+  <define name="max.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="max.token">
+    <element name="max">
+      <ref name="max.content"/>
+    </element>
+  </define>
+  <define name="min.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="min.token">
+    <element name="min">
+      <ref name="min.content"/>
+    </element>
+  </define>
+  <define name="minus.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="minus.token">
+    <element name="minus">
+      <ref name="minus.content"/>
+    </element>
+  </define>
+  <define name="unary_minus.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="unary_minus.token">
+    <element name="minus">
+      <ref name="unary_minus.content"/>
+    </element>
+  </define>
+  <!-- ednote(rnc:unary_minus) rename minus to unary_minus -->
+  <define name="plus.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="plus.token">
+    <element name="plus">
+      <ref name="plus.content"/>
+    </element>
+  </define>
+  <define name="power.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="power.token">
+    <element name="power">
+      <ref name="power.content"/>
+    </element>
+  </define>
+  <define name="rem.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="rem.token">
+    <element name="rem">
+      <ref name="rem.content"/>
+    </element>
+  </define>
+  <define name="times.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="times.token">
+    <element name="times">
+      <ref name="times.content"/>
+    </element>
+  </define>
+  <define name="root.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="root.token">
+    <element name="root">
+      <ref name="root.content"/>
+    </element>
+  </define>
+  <define name="gcd.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="gcd.token">
+    <element name="gcd">
+      <ref name="gcd.content"/>
+    </element>
+  </define>
+  <define name="and.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="and.token">
+    <element name="and">
+      <ref name="and.content"/>
+    </element>
+  </define>
+  <define name="or.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="or.token">
+    <element name="or">
+      <ref name="or.content"/>
+    </element>
+  </define>
+  <define name="xor.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xor.token">
+    <element name="xor">
+      <ref name="xor.content"/>
+    </element>
+  </define>
+  <define name="not.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="not.token">
+    <element name="not">
+      <ref name="not.content"/>
+    </element>
+  </define>
+  <define name="implies.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="implies.token">
+    <element name="implies">
+      <ref name="implies.content"/>
+    </element>
+  </define>
+  <define name="forall.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="forall.token">
+    <element name="forall">
+      <ref name="forall.content"/>
+    </element>
+  </define>
+  <define name="exists.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="exists.token">
+    <element name="exists">
+      <ref name="exists.content"/>
+    </element>
+  </define>
+  <define name="abs.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="abs.token">
+    <element name="abs">
+      <ref name="abs.content"/>
+    </element>
+  </define>
+  <define name="conjugate.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="conjugate.token">
+    <element name="conjugate">
+      <ref name="conjugate.content"/>
+    </element>
+  </define>
+  <define name="arg.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="arg.token">
+    <element name="arg">
+      <ref name="arg.content"/>
+    </element>
+  </define>
+  <define name="real.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="real.token">
+    <element name="real">
+      <ref name="real.content"/>
+    </element>
+  </define>
+  <define name="imaginary.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="imaginary.token">
+    <element name="imaginary">
+      <ref name="imaginary.content"/>
+    </element>
+  </define>
+  <define name="lcm.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="lcm.token">
+    <element name="lcm">
+      <ref name="lcm.content"/>
+    </element>
+  </define>
+  <define name="floor.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="floor.token">
+    <element name="floor">
+      <ref name="floor.content"/>
+    </element>
+  </define>
+  <define name="ceiling.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="ceiling.token">
+    <element name="ceiling">
+      <ref name="ceiling.content"/>
+    </element>
+  </define>
+</grammar>

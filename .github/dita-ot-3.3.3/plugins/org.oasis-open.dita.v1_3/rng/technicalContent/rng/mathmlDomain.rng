@@ -1,0 +1,236 @@
+<!-- ============================================================= 
+     MODULE:    DITA MathML Domain - RNG              
+     VERSION:   1.3                                                
+     DATE:      May 2013                                       
+     ============================================================= -->
+<!--
+     Refer to the latest version of this file by the following URI:
+     urn:dita-ng:dita:rng:mathmlDomain.mod.rng
+     To refer to this specific version, you may use this value:
+     urn:dita-ng:dita:rng:mathmlDomain.mod.rng:1.3
+-->
+<!-- ============================================================= 
+     SYSTEM:     Darwin Information Typing Architecture (DITA)     
+     PURPOSE:    Provides elements for including MathML Markup
+                 in DITA documents.
+     ORIGINAL CREATION DATE:  
+     May 2013                                                
+     (C) Copyright OASIS Open 2013                                
+     All Rights Reserved.                                          
+     ============================================================= -->
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:m="http://www.w3.org/1998/Math/MathML"
+  xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA MathML Domain</moduleTitle>
+    <headerComment> 
+============================================================= 
+MODULE:    DITA MathML Domain - RNG              
+VERSION:   1.3                                                
+DATE:      May 2013                                       
+============================================================= 
+
+
+============================================================= 
+SYSTEM:     Darwin Information Typing Architecture (DITA)     
+PURPOSE:    Provides elements for including MathML Markup
+           in DITA documents.
+ORIGINAL CREATION DATE:  
+May 2013                                                
+(C) Copyright OASIS Open 2013                                
+All Rights Reserved.                                          
+=============================================================    
+    </headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>mathml-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> MathML Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> MathML Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:mathmlDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:mathmlDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:mathmlDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic mathml-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="mathml-d-foreign">
+      <ref name="mathml.element"/>
+    </define>
+
+    <define name="foreign" combine="choice">
+      <ref name="mathml-d-foreign"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="mathml">
+      <ref name="mathml.element"/>
+    </define>
+    <define name="mathmlref">
+      <ref name="mathmlref.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation>FULL NAME: MathML reference</a:documentation>
+      <define name="mathmlref.content">
+        <empty/>
+      </define>
+      <define name="mathmlref.attributes">
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format" a:defaultValue="mml"/>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+
+      <define name="mathmlref.element">
+        <element name="mathmlref" dita:longName="MathML reference"
+          dita:since="1.3"
+          >
+          <a:documentation>
+The MathML reference (&lt;mathmlref>) element is used to refer to a
+non-DITA XML document containing MathML markup in order to use the
+markup by reference. The reference must be to a MathML &lt;math&gt;
+element. The reference may be a URI that addresses an XML document
+whose root element is a MathML &lt;math&gt; element or a URI that
+addresses and XML document and a fragment identifier that is the XML
+
+ID of a &lt;math&gt; element within the document.
+NOTE: To reuse MathML markup stored within a DITA topic, use a normal
+content reference from the &lt;mathml&gt; element.
+
+The reference may be direct, via the @href attribute, or indirect,
+via the @keyref attribute. For key references, only the key name
+should be specified. Any fragment identifier for specifying the ID of
+the &lt;mathml&gt; element to use must be specified as part of the key
+definition's @href value.
+
+Example: For example, to refer to the &lt;math&gt; element
+with the @id value "equation-02" within a larger document using a key
+reference, you would define the key like
+so:
+
+&lt;keydef keys="mathml-equation-02" href="math/mathml-equations.xml#equation-02" format="mathml"/>
+
+You would refer to this key using just the key name:
+
+&lt;mathml>
+  &lt;mathmlref keyref="mathml-equation-02"/>
+&lt;/mathml>
+
+The MathML should be processed and rendered as though the
+&lt;m:math&gt; element had occurred directly in the content of the
+containing &lt;mathml&gt; element.
+
+This element is part of the DITA MathML domain. Category: XRef
+elements
+      </a:documentation>
+          <ref name="mathmlref.attlist"/>
+          <ref name="mathmlref.content"/>
+        </element>
+      </define>
+      <define name="mathmlref.attlist" combine="interleave">
+        <ref name="mathmlref.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: MathML container</a:documentation>
+      <define name="mathml.content">
+        <zeroOrMore>
+          <choice>
+            <externalRef href="mathmlDomainProxy.rng"
+              dita:namespacePrefix="m"
+              dita:dtdPublicId="-//OASIS//ELEMENTS DITA 1.3 Mathml3 Driver//EN"
+              dita:dtdSystemId="mathml/mathml3-ditadriver.dtd"
+              dita:xsdURI="mathml/mathml3/mathml3.xsd"
+              dita:xsdTargetNamespace="http://www.w3.org/1998/Math/MathML"
+            />
+            <ref name="mathmlref"/>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+
+      <define name="mathml.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+
+      <define name="mathml.element">
+        <element name="mathml" dita:longName="MathML container"
+          dita:since="1.3"
+          >
+        <a:documentation>
+The MathML container (&lt;mathml>) element contains inline MathML markup or
+references to MathML elements stored in a separate non-DITA XML
+document.
+
+The purpose of this element is simply to contain MathML markup. It is
+not intended, by itself, to convey the semantic of "equation". Rather,
+it simply serves to hold one of many possible ways that the content of
+an equation may be represented. The companion equation domain provides
+elements for representing equations semantically, independent of the
+format of the equation content.
+
+The MathML markup must have a root element of "math" within the MathML
+namespace "http://www.w3.org/1998/Math/MathML".
+This element is part of the DITA MathML domain. Category: Foreign
+elements
+    </a:documentation>
+          <ref name="mathml.attlist"/>
+          <ref name="mathml.content"/>
+        </element>
+      </define>
+      <define name="mathml.attlist" combine="interleave">
+        <ref name="mathml.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+
+    <define name="mathml.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/foreign mathml-d/mathml "/>
+      </optional>
+    </define>
+
+    <define name="mathmlref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/xref mathml-d/mathmlref "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

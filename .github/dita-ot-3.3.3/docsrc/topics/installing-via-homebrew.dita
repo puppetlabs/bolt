@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="installing-via-homebrew">
+  <title>Installing on macOS via Homebrew</title>
+  <titlealts>
+    <navtitle>Installing via Homebrew</navtitle>
+  </titlealts>
+  <shortdesc>An alternative installation method can be used to install DITA-OT on macOS via <xref keyref="homebrew"/>,
+    the platform’s most popular open-source package manager.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>macOS</indexterm>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>Homebrew</indexterm></indexterm>
+        <indexterm>installing<indexterm>Homebrew</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <prereq>
+      <p>The steps below assume you have already installed <xref keyref="homebrew"/> according to the instructions at
+          <xref keyref="homebrew">brew.sh</xref>.</p>
+      <note type="tip">Verify that your <varname>PATH</varname> environment begins with
+          <filepath>/usr/local/bin</filepath> to ensure that Homebrew-installed software takes precedence over any
+        programs of the same name elsewhere on the system.</note>
+    </prereq>
+    <steps>
+      <step>
+        <cmd>Update Homebrew to make sure the latest package formulas are available on your system:</cmd>
+        <stepxmp><codeblock>$ <cmdname>brew update</cmdname>
+Already up-to-date.</codeblock></stepxmp>
+        <stepresult>
+          <p>Homebrew responds with a list of any new or updated formulæ.</p></stepresult>
+      </step>
+      <step importance="optional">
+        <cmd>Check the version of DITA-OT that is available from Homebrew:</cmd>
+        <stepxmp><codeblock>$ <cmdname>brew info dita-ot</cmdname>
+<systemoutput>dita-ot: stable <keyword keyref="maintenance-version"/>
+DITA Open Toolkit is an implementation of the OASIS DITA specification
+https://www.dita-ot.org/
+/usr/local/Cellar/dita-ot/<keyword keyref="maintenance-version"/> (<varname>number of files</varname>, <varname>package size</varname>) *
+  Built from source on <varname>YYYY-MM-DD</varname> at <varname>hh:mm:ss</varname>
+From: https://github.com/Homebrew/homebrew-core/blob/master/Formula/dita-ot.rb
+==> Requirements
+Required: java >= 1.8 ✔</systemoutput>
+</codeblock></stepxmp>
+        <stepresult>
+          <p>The version of the DITA-OT formula is shown, along with basic information on the package.</p></stepresult>
+      </step>
+      <step>
+        <cmd>Install the <codeph>dita-ot</codeph> package:</cmd>
+        <stepxmp><codeblock>$ <cmdname>brew install dita-ot</cmdname>
+<systemoutput>Downloading…</systemoutput></codeblock></stepxmp>
+        <stepresult>
+          <p>Homebrew will automatically download the latest version of the toolkit, install it in a subfolder of the
+            local package Cellar and symlink the <cmdname>dita</cmdname> command to
+              <filepath>/usr/local/bin/dita</filepath>.</p></stepresult>
+      </step>
+      <step importance="optional">
+        <cmd>Verify the installation:</cmd>
+        <stepxmp><codeblock>$ <cmdname>which dita</cmdname>
+<systemoutput>/usr/local/bin/dita</systemoutput></codeblock></stepxmp>
+        <stepresult>
+          <p>The response confirms that the system will use the Homebrew-installed version of DITA-OT.</p></stepresult>
+      </step>
+      <step importance="optional">
+        <cmd>Check the DITA-OT version number:</cmd>
+        <stepxmp><codeblock>$ <cmdname>dita</cmdname> <parmname>--version</parmname>
+<systemoutput>DITA-OT version <keyword keyref="maintenance-version"/></systemoutput></codeblock></stepxmp>
+        <stepresult>The DITA-OT version number appears on the console.</stepresult>
+      </step>
+    </steps>
+    <result>
+      <p>You can now run the <cmdname>dita</cmdname> command to transform DITA content.</p></result>
+  </taskbody>
+</task>

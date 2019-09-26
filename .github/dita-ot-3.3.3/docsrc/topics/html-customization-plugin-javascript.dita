@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="custom-html-plugin-webfont">
+  <title>Inserting JavaScript in generated HTML</title>
+  <titlealts>
+    <navtitle>Inserting JavaScript</navtitle>
+  </titlealts>
+  <shortdesc>JavaScript code can be bundled in a custom plug-in and automatically inserted into the generated HTML pages
+    to enable web analytics or dynamic content delivery.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>footer</xmlelement></indexterm>
+        <indexterm><xmlelement>require</xmlelement></indexterm>
+        <indexterm><xmlelement>head</xmlelement></indexterm>
+        <indexterm>transformations<indexterm end="html"/></indexterm> <!-- LE: This range is not appearing in the FOP index. -->
+        <indexterm>HTML5<indexterm>JavaScript, adding</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>This scenario walks through the process of creating a very simple plug-in
+          (<codeph>com.example.html5-javascript</codeph>) that creates a new transformation type:
+          <option>html5-javascript</option>. </p>
+      <p>The <option>html5-javascript</option> transformation includes a custom page footer file with a JavaScript
+        tracking snippet and sets the <parmname>args.ftr</parmname> parameter to integrate the script content in the
+        HTML5 <xmlelement>footer</xmlelement> element of the generated pages.</p>
+      <note>This example inserts a tracking snippet for Google Analytics, but the basic approach is the same for other
+        analytics platforms or similar use cases that require custom JavaScript.</note>
+    </context>
+    <steps>
+      <step>
+        <cmd>In the <filepath>plugins</filepath> directory, create a directory named
+            <filepath>com.example.html5-javascript</filepath>.</cmd>
+      </step>
+      <step>
+        <cmd>In the new <filepath>com.example.html5-javascript</filepath> directory, create a plug-in configuration file
+            (<filepath>plugin.xml</filepath>) that declares the new <option>html5-javascript</option> transformation and
+          its dependencies.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample <filepath>plugin.xml</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.html5-javascript/plugin.xml"/></codeblock>
+          </fig>
+          <note>This plug-in will extend the default HTML5 transformation, so the <xmlelement>require</xmlelement>
+            element explicitly defines <filepath>org.dita.html5</filepath> as a dependency.</note>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>In the <filepath>com.example.html5-javascript</filepath> directory, create a subdirectory named
+            <filepath>include</filepath>.</cmd>
+      </step>
+      <step>
+        <cmd>In the new <filepath>include</filepath> subdirectory, create a file named
+            <filepath>javascript.ftr.xml</filepath> with your custom JavaScript code.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample <filepath>javascript.ftr.xml</filepath> file</title>
+            <codeblock outputclass="language-javascript normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.html5-javascript/include/javascript.ftr.xml"/></codeblock>
+          </fig>
+          <p>The division wrapper will be discarded when generating HTML files, and the contents will be inserted into
+            the <xmlelement>footer</xmlelement> element of each page.</p>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>In the <filepath>com.example.html5-javascript</filepath> root directory, add an Ant script
+            (<filepath>build_html5-javascript.xml</filepath>) to define the transformation type and set the path to the
+          JavaScript footer file created in the previous step.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample build file: <filepath>build_html5-javascript.xml</filepath></title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.html5-javascript/build_html5-javascript.xml"/></codeblock>
+          </fig>
+        </stepxmp>
+      </step>
+    </steps>
+    <result>
+      <note type="tip">The files for this sample plug-in are included in the DITA-OT installation directory under
+          <filepath>docsrc/samples/plugins/com.example.html5-javascript/</filepath> and on <xref
+          href="https://github.com/dita-ot/docs/tree/develop/samples/plugins/com.example.html5-javascript" format="html"
+          scope="external">GitHub</xref>.</note>
+      <p>The plug-in directory has the following layout and files:</p>
+      <codeblock>com.example.html5-javascript
+├── build_html5-javascript.xml
+├── include
+│   └── javascript.ftr.xml
+└── plugin.xml</codeblock>
+    </result>
+    <postreq>
+      <ol>
+        <li>Run <filepath conref="../resources/conref-task.dita#ID/dita-cmd"/>
+          <parmname>--install</parmname> to install the plug-in and make the <option>html5-javascript</option>
+          transformation available.</li>
+        <li>Build output with the new transformation type to verify that the plug-in works as intended.
+          <codeblock><filepath conref="../resources/conref-task.dita#ID/dita-cmd"/> <parmname>--input</parmname>=<varname>my.ditamap</varname> <parmname>--format</parmname>=<option>html5-javascript</option></codeblock></li>
+        <li>Open one of the generated HTML topic files in a modern web browser and check the JavaScript
+            <uicontrol>Console</uicontrol>. When the page is loaded, <msgph>Adding Google Analytics tracker</msgph> will
+          appear on the console to verify that the sample script is loaded.</li>
+        <li>Remove the <codeph>console.log</codeph> debugging message from the sample JavaScript code, and replace the
+            <codeph>'UA-XXXXX-Y'</codeph> placeholder string with the tracking ID of the Google Analytics property you
+          wish to track.</li>
+      </ol>
+      <note type="tip">This example places the JavaScript code in the page footer to ensure that page display is not
+        delayed while the script is loaded. If your JavaScript code supports pre-loading and your application targets
+        modern browsers that recognize the <codeph>async</codeph> script attribute, you may prefer to insert the
+        JavaScript snippet in the <xmlelement>head</xmlelement> element of the generated HTML files using the
+          <parmname>args.hdf</parmname> parameter intead.</note>
+    </postreq>
+  </taskbody>
+</task>

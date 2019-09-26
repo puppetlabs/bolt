@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="dita-ot-ant-properties" xml:lang="en-US">
+  <title>DITA-OT parameters</title>
+
+  <shortdesc>Certain parameters apply to all DITA-OT transformations. Other parameters are common to the HTML-based
+    transformations. Some parameters apply only to specific transformation types. These parameters can be passed as
+    options to the <cmdname>dita</cmdname> command using the <parmname>--parameter</parmname>=<varname>value</varname> syntax or included
+    in build scripts as Ant properties.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>parameters</indexterm></indexterm>
+        <indexterm>parameters</indexterm>
+        <indexterm>transformations<indexterm>parameters</indexterm></indexterm>
+        <indexterm>transformations<indexterm>HTML</indexterm></indexterm>
+        <indexterm>Ant<indexterm>properties</indexterm><indexterm>parameters</indexterm></indexterm>
+        <indexterm>Ant<indexterm>build script</indexterm><indexterm>script</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section>
+      <p>If your toolkit installation includes custom plug-ins that define additional parameters, you can add entries to
+        the following topics by rebuilding the DITA-OT documentation.</p>
+    </section>
+  </refbody>
+</reference>

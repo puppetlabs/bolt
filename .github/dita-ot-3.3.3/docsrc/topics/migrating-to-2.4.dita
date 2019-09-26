@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="migrating-to-2.4">
+
+  <title>Migrating to release 2.4</title>
+  <titlealts>
+    <navtitle>To 2.4</navtitle>
+  </titlealts>
+
+  <shortdesc>In DITA-OT 2.4, the <option>HTML5</option> transformation was refactored as an independent plug-in that no
+    longer depends on the <option>XHTML</option> plug-in. </shortdesc>
+  
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>deprecated features<indexterm><codeph>.notetitle</codeph> classes</indexterm></indexterm>
+        <indexterm>GitHub</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section>
+      <note>This topic provides a summary of changes in DITA-OT 2.4 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the
+        <xref keyref="2.4-release-notes"/>.</note>
+    </section>
+    <section>
+      <title>HTML5</title>
+      <ul>
+        <li>
+          <div id="24-html5-split">
+            <p>The <option>HTML5</option> transformation introduced in release 2.0 as part of the <option>XHTML</option>
+              plug-in was moved to a separate <option>HTML5</option> plug-in in release 2.2, but that version of the
+                <option>HTML5</option> transformation still depended on the <option>XHTML</option> plug-in for certain
+              common processing.</p>
+            <p>In release 2.4, all dependencies between <option>HTML5</option> and <option>XHTML</option> have been
+              removed to ensure that HTML5 processing can be further refactored in the future without affecting XHTML
+              output, or other HTML-based transformations such as <option>eclipsehelp</option>,
+                <option>htmlhelp</option> or <option>javahelp</option>.</p>
+          </div>
+          <p>Customizations that extended the previous HTML5 output under the <option>XHTML</option> plug-in (as
+            provided in releases 2.0 and 2.1) or the <option>HTML5</option> plug-in that shipped with release 2.2 will
+            need to be refactored to build on the new HTML5 plug-in.</p></li>
+        <li>
+          <p>Note title processing was revised in release 2.2 to include a common <codeph>note__title</codeph> class for
+            note elements of all types. The legacy <codeph><varname>{$type}</varname>title</codeph> classes (such as
+              <codeph>.notetitle</codeph>, <codeph>.cautiontitle</codeph>, <codeph>.tiptitle</codeph>, etc.) were
+            included in release 2.2 for backwards compatibility, but have now been removed in release 2.4.</p>
+          <p>Stylesheets that apply formatting overrides to note titles should be revised to replace the deprecated
+            class selectors with the equivalent descendant selectors, for example:</p>
+          <ul>
+            <li><codeph>.note_note .note__title</codeph></li>
+            <li><codeph>.note_caution .note__title</codeph></li>
+            <li><codeph>.note_tip .note__title</codeph></li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+    <section id="24-legacy-plugin-removal">
+      <title>Legacy plug-ins removed</title>
+      <div outputclass="div-index">
+        <indexterm>DocBook</indexterm>
+        <indexterm>Eclipse Content</indexterm>
+        <indexterm>OpenDocument Text</indexterm>
+        <indexterm>RTF</indexterm>
+        <indexterm>plug-ins<indexterm>DocBook</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>Eclipse Content</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>OpenDocument Text</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>RTF</indexterm></indexterm>        
+      </div>
+      <p>DITA-OT 2.4 no longer includes the following legacy transformation plug-ins in the default distribution:</p>
+      <table outputclass="table-hover" frame="none" colsep="0" rowsep="1">
+        <title>Legacy plug-ins</title>
+        <tgroup cols="2">
+          <colspec colwidth="1*"/>
+          <colspec colwidth="1*"/>
+          <thead>
+            <row>
+              <entry>Plug-in </entry>
+              <entry>Source code location</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>DocBook</entry>
+              <entry>
+                <xref href="https://github.com/dita-ot/org.dita.docbook" format="html" scope="external"/></entry>
+            </row>
+            <row>
+              <entry>Eclipse Content</entry>
+              <entry>
+                <xref href="https://github.com/dita-ot/org.dita.eclipsecontent" format="html" scope="external"/></entry>
+            </row>
+            <row>
+              <entry>OpenDocument Text</entry>
+              <entry>
+                <xref href="https://github.com/dita-ot/org.dita.odt" format="odt" scope="external"/></entry>
+            </row>
+            <row>
+              <entry>Word RTF</entry>
+              <entry>
+                <xref href="https://github.com/dita-ot/org.dita.wordrtf" format="html" scope="external"/></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <note>If necessary, legacy plug-ins may be re-installed from earlier DITA-OT distributions, but they are no longer
+        actively maintained or supported by the core toolkit committers. The source code is available on GitHub for
+        anyone interested in maintaining the plug-ins for use with future toolkit versions.</note>
+    </section>
+
+  </refbody>
+</reference>

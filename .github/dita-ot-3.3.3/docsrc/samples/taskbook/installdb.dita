@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="installdb" xml:lang="en-us">
+  <title>Installing your own Database</title>
+  <shortdesc>Installing a Database may sound tricky, but it is quite simple if you follow our instructions.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Overview</indexterm>
+        <indexterm>database</indexterm>
+        <indexterm>install</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody/>
+</task>

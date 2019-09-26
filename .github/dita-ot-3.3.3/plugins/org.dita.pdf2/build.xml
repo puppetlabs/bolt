@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- 
+Copyright © 2005 by Idiom Technologies, Inc. All rights reserved. 
+IDIOM is a registered trademark of Idiom Technologies, Inc. and WORLDSERVER
+and WORLDSTART are trademarks of Idiom Technologies, Inc. All other 
+trademarks are the property of their respective owners. 
+
+IDIOM TECHNOLOGIES, INC. IS DELIVERING THE SOFTWARE "AS IS," WITH 
+ABSOLUTELY NO WARRANTIES WHATSOEVER, WHETHER EXPRESS OR IMPLIED,  AND IDIOM
+TECHNOLOGIES, INC. DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+PURPOSE AND WARRANTY OF NON-INFRINGEMENT. IDIOM TECHNOLOGIES, INC. SHALL NOT
+BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, COVER, PUNITIVE, EXEMPLARY,
+RELIANCE, OR CONSEQUENTIAL DAMAGES (INCLUDING BUT NOT LIMITED TO LOSS OF 
+ANTICIPATED PROFIT), ARISING FROM ANY CAUSE UNDER OR RELATED TO  OR ARISING 
+OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF IDIOM
+TECHNOLOGIES, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
+
+Idiom Technologies, Inc. and its licensors shall not be liable for any
+damages suffered by any person as a result of using and/or modifying the
+Software or its derivatives. In no event shall Idiom Technologies, Inc.'s
+liability for any damages hereunder exceed the amounts received by Idiom
+Technologies, Inc. as a result of this transaction.
+
+These terms and conditions supersede the terms and conditions in any
+licensing agreement to the extent that such terms and conditions conflict
+with those set forth herein.
+--><project xmlns:dita="http://dita-ot.sourceforge.net" xmlns:if="ant:if" xmlns:unless="ant:unless" name="dita.build" basedir=".">
+  
+  <target name="dita2pdf2.init">
+    <dita-ot-fail id="PDFX012F">
+      <condition>
+        <and>
+          <isset property="pdf.formatter"/>
+          <not><equals arg1="${pdf.formatter}" arg2="ah" casesensitive="false"/></not><not><equals arg1="${pdf.formatter}" arg2="ah" casesensitive="false"/></not><not><equals arg1="${pdf.formatter}" arg2="fop" casesensitive="false"/></not><not><equals arg1="${pdf.formatter}" arg2="xep" casesensitive="false"/></not>
+        </and>
+      </condition>
+      <param name="1" value="${pdf.formatter}"/>
+    </dita-ot-fail>
+    <dita-ot-fail id="DOTA066F">
+      <condition>
+        <and>
+          <isset property="args.xsl.pdf"/>
+          <not>
+            <available file="${args.xsl.pdf}" type="file"/>
+          </not>
+        </and>
+      </condition>
+      <param name="1" location="${args.xsl.pdf}"/>
+    </dita-ot-fail>
+    
+    <property name="preprocess.copy-image.skip" value="true"/>
+    <property name="preprocess.copy-flag.skip" value="true"/>
+    <property name="clean-preprocess.use-result-filename" value="false"/>
+    <condition property="preprocess.chunk.skip" value="true">
+      <isfalse value="${org.dita.pdf2.chunk.enabled}"/>
+    </condition>
+    
+    <condition property="args.rellinks" value="nofamily">
+      <not><isset property="args.rellinks"/></not>
+    </condition>
+  </target>
+
+  <target name="dita2pdf" depends="dita2pdf2"/>
+  <target name="dita2pdf2" depends="dita2pdf2.init, build-init, preprocess2, map2pdf2, topic2pdf2"/>
+
+  <target name="transform.topic2pdf.init">
+    <property name="pdf2.temp.dir" value="${dita.temp.dir}"/>
+    
+    <property name="customization.dir" value="${dita.plugin.org.dita.pdf2.dir}/Customization"/>
+    <property file="${customization.dir}/build.properties"/>
+    
+    <condition property="pdf2.i18n.skip" value="true">
+      <and>
+        <isset property="org.dita.pdf2.i18n.enabled"/>
+        <isfalse value="${org.dita.pdf2.i18n.enabled}"/>
+      </and>
+    </condition>
+    
+    <loadfile property="default.locale">
+      <string>${default.language}</string>
+      <filterchain>
+        <tokenfilter>
+          <replaceregex pattern="-" replace="_" flags="gi"/>
+        </tokenfilter>
+      </filterchain>
+    </loadfile>
+    
+    <property name="lib.dir" value="${dita.dir}/lib"/>
+    <property name="fo.lib.dir" value="${dita.plugin.org.dita.pdf2.dir}/lib"/>
+    <property name="merged.file" value="${dita.map.filename.root}_MERGED.xml"/>
+    
+    <!-- configure FO engines -->
+    <!-- default is FOP.  Can be changed here, or with pdf.formatter property. -->
+    <property name="pdf.formatter" value="fop"/>
+    
+    <property name="artwork.dir" value="${pdf2.temp.dir}"/>
+    
+    <condition property="file.protocol.prefix" value="file://">
+      <os family="unix"/>
+    </condition>
+    
+    <condition property="file.protocol.prefix" value="file:/">
+      <not><isset property="file.protocol.prefix"/></not>
+    </condition>
+    
+    <path id="xml.catalog.path">
+      <pathelement location="${customization.dir}/catalog.xml"/>
+      <pathelement location="${dita.plugin.org.dita.pdf2.dir}/cfg/catalog.xml"/>
+      <pathelement location="${dita.plugin.org.dita.base.dir}/catalog-dita.xml"/>
+    </path>
+    <xmlcatalog id="xml.catalog">
+      <catalogpath refid="xml.catalog.path"/>
+    </xmlcatalog>
+    <!-- Deprecated since 3.1 -->
+    <pathconvert property="xml.catalog.files" refid="xml.catalog.path"/>
+    
+    <property name="xsl.dir" value="${dita.plugin.org.dita.pdf2.dir}/xsl"/>
+    <property name="xsl.fo.dir" value="${dita.plugin.org.dita.pdf2.dir}/xsl/fo"/>
+    <property name="xsl.common.dir" value="${dita.plugin.org.dita.pdf2.dir}/xsl/common"/>
+    <property name="cfg.dir" value="${dita.plugin.org.dita.pdf2.dir}/cfg"/>
+    <property name="cfg.fo.dir" value="${dita.plugin.org.dita.pdf2.dir}/cfg/fo"/>
+    <property name="cfg.common.dir" value="${dita.plugin.org.dita.pdf2.dir}/cfg/common"/>
+        
+    <path id="project.class.path">
+      <pathelement path="${java.class.path}"/>
+      <pathelement location="${fo.lib.dir}/fo.jar"/>
+    </path>
+  </target>
+
+  <target name="topic2pdf2" if="noMap">
+    <antcall target="preview.topic.pdf"/>
+  </target>
+
+  <target name="preview.topic.pdf" depends="transform.topic2pdf.init,                    preview.topic.pdf.init,                    transform.topic2pdf"/>
+  <target name="preview.topic.pdf.init">
+    <property name="inputFile" location="${dita.temp.dir}/${user.input.file}"/>
+    <!-- Deprecated since 3.0. Use args.output.base instead -->
+    <condition property="outputFile.base" value="${args.output.base}" else="${dita.topic.filename.root}">
+      <isset property="args.output.base"/>
+    </condition>
+    <property name="artworkPrefix" value="${artwork.dir}"/>
+  </target>
+
+  <target name="map2pdf2" unless="noMap">
+    <dirname property="dita.temp.dir.fullpath" file="${dita.temp.dir}${file.separator}dummy.file"/>
+    <pipeline message="topicmerge" taskname="topic-merge" inputmap="${dita.temp.dir.fullpath}${file.separator}${user.input.file}">
+      <module class="org.dita.dost.module.TopicMergeModule">
+        <param name="output" location="${dita.temp.dir.fullpath}${file.separator}${dita.map.filename.root}_MERGED.xml"/>
+        <param name="style" location="${dita.plugin.org.dita.pdf2.dir}/xsl/common/topicmerge.xsl"/>
+      </module>
+    </pipeline>
+    <antcall target="publish.map.pdf"/>
+  </target>
+
+  <target name="publish.map.pdf" depends="transform.topic2pdf.init,                    publish.map.pdf.init,                    transform.topic2pdf"/>
+  <target name="publish.map.pdf.init">
+    <property name="inputFile" location="${dita.temp.dir}/${merged.file}"/>
+    <!-- Deprecated since 3.0. Use args.output.base instead -->
+    <condition property="outputFile.base" value="${args.output.base}" else="${dita.map.filename.root}">
+      <isset property="args.output.base"/>
+    </condition>
+    <property name="artworkPrefix" value="${artwork.dir}"/>
+  </target>
+
+  <target name="transform.topic2fo" depends="transform.topic2fo.init,                    transform.topic2fo.index,                    transform.topic2fo.main,                    transform.topic2fo.i18n"/>
+    
+  <target name="transform.topic2fo.init" depends="transform.fo2pdf.xep.init,transform.fo2pdf.fop.init,transform.fo2pdf.ah.init">
+    <taskdef name="detect-lang" classname="com.suite.sol.ditaot.DetectLang" classpathref="project.class.path"/>
+    <taskdef name="gen-variable" classname="org.dita.dost.pdf2.VariableFileTask" classpathref="project.class.path"/>
+
+    <makeurl file="${inputFile}" property="inputFile.url" validate="true"/>
+
+    <!-- Set document.locale from xml:lang -->
+    <!-- The map takes precedence, followed by the first topic -->
+    <detect-lang documentPath="${inputFile.url}"/>
+    
+    <tempfile property="variable.file" destdir="${dita.temp.dir}" prefix="strings." suffix=".xml"/>
+    <gen-variable file="${variable.file}">
+      <fileset dir="${customization.dir}/common/vars" erroronmissingdir="false">
+        <include name="*.xml"/>
+      </fileset>
+    </gen-variable>
+    <condition property="variable.file.exists">
+      <available file="${variable.file}"/>
+    </condition>
+
+    <condition property="document.locale" value="${default.locale}">
+      <not><isset property="document.locale"/></not>
+    </condition>
+
+    <!-- WS runtime properties -->
+    <property file="${cfg.common.dir}/properties/${document.locale}.properties"/>
+
+    <condition property="document.language" value="${default.language}">
+      <not><isset property="document.language"/></not>
+    </condition>
+    <echo level="info">Using document.locale=${document.locale}</echo>
+
+    <condition property="args.bookmark.style" value="">
+      <not><isset property="args.bookmark.style"/></not>
+    </condition>
+
+    <condition property="args.chapter.layout" value="">
+      <not><isset property="args.chapter.layout"/></not>
+    </condition>
+
+    <condition property="args.draft" value="no">
+      <not><isset property="args.draft"/></not>
+    </condition>
+
+    <condition property="publish.required.cleanup" value="${args.draft}">
+      <and>
+        <not><isset property="publish.required.cleanup"/></not>
+        <isset property="args.draft"/>
+      </and>
+    </condition>
+
+    <condition property="args.gen.task.lbl" value="">
+      <not><isset property="args.gen.task.lbl"/></not>
+    </condition>
+    <!-- use customized xsl file for pdf transform.-->
+    <condition property="temp.transformation.file" value="${args.xsl.pdf}">
+      <and>
+        <isset property="args.xsl.pdf"/>
+        <available file="${args.xsl.pdf}" type="file"/>
+      </and>
+    </condition>
+    <condition property="temp.transformation.file" value="${dita.plugin.org.dita.pdf2.dir}/${args.xsl.pdf}">
+      <and>
+        <not><isset property="temp.transformation.file"/></not>
+        <isset property="args.xsl.pdf"/>
+      </and>
+    </condition>
+    
+    <condition property="args.bookmap-order" value="discard">
+      <not><isset property="args.bookmap-order"/></not>
+    </condition>
+
+    <condition property="args.figurelink.style" value="NUMTITLE">
+        <not><isset property="args.figurelink.style"/></not>
+    </condition>
+    <condition property="args.tablelink.style" value="NUMTITLE">
+        <not><isset property="args.tablelink.style"/></not>
+    </condition>
+  </target>
+
+  <target name="transform.topic2fo.index">
+    <taskdef classname="com.idiominc.ws.opentopic.fo.index2.IndexPreprocessorTask" name="index-preprocess" classpathref="project.class.path"/>
+    
+    <condition property="index.config.file" value="${customization.dir}/common/index/${document.locale}.xml">
+      <and>
+        <not><isset property="index.config.file"/></not>
+        <available file="${customization.dir}/common/index/${document.locale}.xml"/>
+      </and>
+    </condition>
+    <condition property="index.config.file" value="${cfg.dir}/common/index/${document.locale}.xml">
+      <and>
+        <not><isset property="index.config.file"/></not>
+        <available file="${cfg.dir}/common/index/${document.locale}.xml"/>
+      </and>
+    </condition>
+    <condition property="index.config.file" value="${customization.dir}/common/index/${document.language}.xml">
+      <and>
+        <not><isset property="index.config.file"/></not>
+        <available file="${customization.dir}/common/index/${document.language}.xml"/>
+      </and>
+    </condition>
+    <condition property="index.config.file" value="${cfg.dir}/common/index/${document.language}.xml">
+      <and>
+        <not><isset property="index.config.file"/></not>
+        <available file="${cfg.dir}/common/index/${document.language}.xml"/>
+      </and>
+    </condition>
+    <condition property="index.config.file" value="${cfg.dir}/common/index/${default.language}.xml">
+      <not><isset property="index.config.file"/></not>
+    </condition>
+
+    <index-preprocess input="${inputFile.url}" output="${dita.temp.dir}/stage1.xml" indexConfig="${index.config.file}" locale="${document.locale}" draft="${args.draft}">
+      <xmlcatalog refid="xml.catalog"/>
+    </index-preprocess> 
+  </target>
+  
+  <target name="transform.topic2fo.main">
+    <!--makeurl seems to output file:/C: style instead of file:///C:, but xep, fop, and ah all accept it.-->
+    <makeurl property="artworkPrefixUrl" file="${artworkPrefix}"/>
+    <makeurl property="dita.map.output.dir.url" file="${pdf2.temp.dir}" validate="no"/>
+    <makeurl property="work.dir.url" file="${dita.temp.dir}" validate="no"/>
+    <makeurl property="customization.dir.url" file="${customization.dir}" validate="no"/>
+    <makeurl property="user.input.dir.url" file="${user.input.dir}" validate="no"/>    
+    <makeurl property="variable.file.url" file="${variable.file}" validate="no"/>
+
+    <pipeline>
+    <xslt style="${temp.transformation.file}" in="${dita.temp.dir}/stage1.xml" out="${dita.temp.dir}/stage2.fo">
+      <param name="locale" expression="${document.locale}"/>
+      <param name="customizationDir.url" expression="${customization.dir.url}" if:set="customization.dir"/>
+      <param name="input.dir.url" expression="${user.input.dir.url}"/>
+      <param name="DRAFT" expression="${args.draft}"/>
+      <param name="output.dir.url" expression="${dita.map.output.dir.url}"/>
+      <param name="work.dir.url" expression="${work.dir.url}"/>
+      <param name="artworkPrefix" expression="${artworkPrefixUrl}"/>
+      <param name="publishRequiredCleanup" expression="${publish.required.cleanup}"/>
+      <param name="artLabel" expression="${args.artlbl}" if:set="args.artlbl"/>
+      <param name="antArgsBookmarkStyle" expression="${args.bookmark.style}"/>
+      <param name="antArgsChapterLayout" expression="${args.chapter.layout}"/>
+      <param name="include.rellinks" expression="${include.rellinks}"/>
+      <param name="antArgsGenerateTaskLabels" expression="${args.gen.task.lbl}"/>
+      <param name="pdfFormatter" expression="${pdf.formatter}"/>
+      <param name="bookmap-order" expression="${args.bookmap-order}"/>
+      <param name="figurelink.style" expression="${args.figurelink.style}"/>
+      <param name="tablelink.style" expression="${args.tablelink.style}"/>
+      <param name="variableFiles.url" expression="${variable.file.url}" if:set="variable.file.exists"/>
+      <param name="defaultLanguage" expression="${default.language}"/>
+      
+      <xmlcatalog refid="xml.catalog"/>
+    </xslt>
+    </pipeline>
+  </target>
+
+  <target name="transform.topic2fo.i18n" depends="transform.topic2fo.i18n.filter,                    transform.topic2fo.i18n.no-filter"/>
+  <target name="transform.topic2fo.i18n.filter" unless="pdf2.i18n.skip">
+    <taskdef classname="com.idiominc.ws.opentopic.fo.i18n.PreprocessorTask" name="i18n-preprocess" classpathref="project.class.path"/>
+    
+    <condition property="i18n.config.file" value="${customization.dir}/fo/i18n/${document.locale}.xml">
+      <and>
+        <not><isset property="i18n.config.file"/></not>
+        <available file="${customization.dir}/fo/i18n/${document.locale}.xml"/>
+      </and>
+    </condition>
+    <condition property="i18n.config.file" value="${cfg.fo.dir}/i18n/${document.locale}.xml">
+      <and>
+        <not><isset property="i18n.config.file"/></not>
+        <available file="${cfg.fo.dir}/i18n/${document.locale}.xml"/>
+      </and>
+    </condition>
+    <condition property="i18n.config.file" value="${customization.dir}/fo/i18n/${document.language}.xml">
+      <and>
+        <not><isset property="i18n.config.file"/></not>
+        <available file="${customization.dir}/fo/i18n/${document.language}.xml"/>
+      </and>
+    </condition>
+    <condition property="i18n.config.file" value="${cfg.fo.dir}/i18n/${document.language}.xml">
+      <and>
+        <not><isset property="i18n.config.file"/></not>
+        <available file="${cfg.fo.dir}/i18n/${document.language}.xml"/>
+      </and>
+    </condition>
+    <condition property="i18n.config.file" value="${cfg.fo.dir}/i18n/${default.language}.xml">
+      <not><isset property="i18n.config.file"/></not>
+    </condition>
+
+    <i18n-preprocess input="${dita.temp.dir}/stage2.fo" output="${pdf2.temp.dir}/topic.fo" config="${i18n.config.file}" style="${xsl.fo.dir}/i18n-postprocess.xsl">
+      <xmlcatalog refid="xml.catalog"/>
+    </i18n-preprocess>
+  </target>
+  <target name="transform.topic2fo.i18n.no-filter" if="pdf2.i18n.skip">
+    <echo level="info">Skip I18N font processing.</echo>
+    <move file="${dita.temp.dir}/stage2.fo" tofile="${pdf2.temp.dir}/topic.fo"/>
+  </target>
+
+  <target name="transform.topic2pdf" depends="copyCoreArtwork,transform.topic2fo,transform.fo2pdf"/>
+
+  <target name="transform.fo2pdf" depends="transform.fo2pdf.xep,transform.fo2pdf.fop,transform.fo2pdf.ah"/>
+
+  <target name="copyCoreArtwork">
+    <copy todir="${artwork.dir}/Configuration/OpenTopic" failonerror="false">
+      <fileset dir="${dita.plugin.org.dita.pdf2.dir}" includes="cfg/common/artwork/**/*.*"/>
+    </copy>
+    <copy todir="${artwork.dir}/Customization/OpenTopic" failonerror="false">
+      <fileset dir="${customization.dir}" includes="common/artwork/**/*.*"/>
+    </copy>
+  </target>
+
+</project>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="best-practices-pdf-customization-plugins">
+  <title>Best practices for custom plug-ins</title>
+  <titlealts>
+    <navtitle>Best practices</navtitle>
+  </titlealts>
+  <shortdesc>Adhering to certain development practices will properly isolate your code from that of DITA Open Toolkit.
+    This will make it easier to you to upgrade to new versions of DITA-OT when they are released.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins<indexterm>best practices</indexterm></indexterm>
+        <indexterm>upgrading<indexterm>best practices</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>best practices</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <ul>
+      <li>
+        <p>Use a properly-constructed DITA-OT plug-in.</p></li>
+      <li>
+        <p>Use a version control system to store your code.</p></li>
+      <li>
+        <p>Never modify any of the core DITA-OT code.<note type="tip">You may want to set the permissions on default
+            plug-in directories such as <filepath>org.dita.pdf2</filepath> to “read-only” to ensure that you do not
+            accidentally modify the files within as you develop your customized plug-in.</note></p></li>
+      <li>
+        <p>Avoid copying entire DITA-OT files into your customization plug-in. When you only copy the attribute sets and
+          templates that you need to override, there is less risk of impact from new features or fixes in the base code,
+          making your code more stable and easier to upgrade between releases.</p></li>
+      <li>
+        <p>If you only need to change a few attribute sets and templates, you may prefer to store your overrides in
+            <filepath>custom.xsl</filepath> files, or a simple folder hierarchy within your custom plug-in.</p></li>
+      <li>
+        <p>In cases that require substantial customizations, you may prefer to organize the files in a folder structure
+          that mimics the hierarchy of the default plug-in you are customizing. This facilitates comparisons with the
+          default settings in the base plug-in and makes it easier to migrate your changes to new toolkit versions. See
+          <xref keyref="pdf-plugin-structure"/> for information on the files in the base PDF plug-in.</p></li>
+      <li>
+        <p>Upgrade your customization plug-in to new versions of DITA-OT regularly. Do not wait through several major
+          releases before upgrading.</p></li>
+      <li><div conkeyref="reusable-components/plugin.rnc"/></li>
+      <li>
+        <p>For XSLT customizations, use a custom namespace for any modified template modes, template names, attribute
+          sets, functions, and variables. This helps to clarify which portions of the code are specific to your
+          customizations, and serves to isolate your changes in the event that items with the same name are added to the
+          base plug-ins in the future.</p>
+        <p>For example, instead of creating a template named <codeph>searchbar</codeph>, use something like
+            <codeph>corp:searchbar</codeph> instead. This ensures that if future versions of DITA-OT add a
+            <codeph>searchbar</codeph> template, your custom version will be unaffected.</p>
+        <p>Instead of: <codeblock outputclass="language-xml">&lt;xsl:template name="searchbar"/></codeblock></p>
+        <p>use: <codeblock outputclass="language-xml">&lt;xsl:template name="corp:searchbar"/></codeblock></p>
+      </li>
+    </ul>
+  </conbody>
+</concept>

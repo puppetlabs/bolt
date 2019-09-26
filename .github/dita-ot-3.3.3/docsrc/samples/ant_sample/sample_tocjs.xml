@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<project name="sample_tocjs" default="samples.tocjs" basedir=".">
+
+  <property name="dita.dir" location="${basedir}/../../.."/>
+
+  <target name="samples.tocjs" description="build the samples for the TocJS" depends="clean.samples.tocjs">
+    <ant antfile="${dita.dir}/build.xml">
+      <property name="args.input" location="${dita.dir}/docsrc/samples/hierarchy.ditamap"/>
+      <property name="output.dir" location="${dita.dir}/out/samples/tocjs"/>
+      <property name="transtype" value="tocjs"/>
+    </ant>
+  </target>
+
+  <target name="clean.samples.tocjs" description="remove the sample TocJS output">
+    <delete dir="${dita.dir}/out/samples/tocjs"/>
+  </target>
+
+</project>

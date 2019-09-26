@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Delayed Resolution Domain                    -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ENTITIES DITA Delayed Resolution Domain//EN"
+      Delivered as file "delayResolutionDomain.ent"                -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the substitution context and domain     -->
+<!--             entity declarations for the delayed resolution    -->
+<!--             domain                                            -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             February 2008                                     -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2008, 2009.              -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!--                    DELAYED RESOLUTION DOMAIN ENTITIES         -->
+<!-- ============================================================= -->
+
+<!ENTITY % delay-d-keywords      
+  "exportanchors 
+  "
+>
+
+<!ENTITY delay-d-att     
+  "(topic delay-d)"
+>
+
+
+<!-- ================== End Delayed Resolution Domain Entities === -->

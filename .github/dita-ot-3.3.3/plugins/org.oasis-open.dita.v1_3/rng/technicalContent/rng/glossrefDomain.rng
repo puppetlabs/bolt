@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Glossary Reference Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Glossary Reference Domain                   
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Glossary Reference Domain//EN"
+      Delivered as file "glossrefDomain.mod"                      
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Define elements and specialization attributes    
+            for Glossary Reference Domain                    
+                                                             
+ORIGINAL CREATION DATE:                                      
+            June 2008                                        
+                                                             
+            (C) Copyright OASIS Open 2008, 2009.             
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+=============================================================
+  </headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>glossref-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Glossary Reference Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Glossary Reference Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:glossrefDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:glossrefDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:glossrefDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(map glossref-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="glossref-d-topicref">
+      <ref name="glossref.element"/>
+    </define>
+    <define name="topicref" combine="choice">
+      <ref name="glossref-d-topicref"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="glossref">
+      <ref name="glossref.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation> LONG NAME: Glossary Reference </a:documentation>
+      <define name="glossref.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+      </define>
+      <define name="glossref.attributes">
+        <optional>
+          <attribute name="navtitle"/>
+        </optional>
+        <optional dita:since="DITA 1.3">
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <attribute name="keys"/>
+        <optional>
+          <attribute name="query"/>
+        </optional>
+        <optional>
+          <attribute name="copy-to"/>
+        </optional>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+        <optional>
+          <attribute name="collection-type">
+            <choice>
+              <value>choice</value>
+              <value>family</value>
+              <value>sequence</value>
+              <value>unordered</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="locktitle">
+            <choice>
+              <value>no</value>
+              <value>yes</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="linking" a:defaultValue="none">
+            <choice>
+              <value>none</value>
+              <value>normal</value>
+              <value>sourceonly</value>
+              <value>targetonly</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="toc" a:defaultValue="no">
+            <choice>
+              <value>no</value>
+              <value>yes</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="print" a:defaultValue="no">
+            <choice>
+              <value>no</value>
+              <value>printonly</value>
+              <value>yes</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="search" a:defaultValue="no">
+            <choice>
+              <value>no</value>
+              <value>yes</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="chunk"/>
+        </optional>
+        <optional dita:since="DITA 1.3">
+          <attribute name="processing-role">
+            <choice>
+              <value>normal</value>
+              <value>resource-only</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <define name="glossref.element">
+        <element name="glossref" dita:longName="Glossary Reference">
+          <a:documentation>The &lt;glossref> element is a convenience element for creating a reference to a glossary topic. It has a required keys attribute, which forces the author to create a key by
+            which inline terms may reference their definition. For example, when glossentry topics are used to define acronyms, this will remind authors to create a key which &lt;abbreviated-form>
+            elements may use to reference the short and expanded versions of that acronym.</a:documentation>
+          <ref name="glossref.attlist"/>
+          <ref name="glossref.content"/>
+        </element>
+      </define>
+      <define name="glossref.attlist" combine="interleave">
+        <ref name="glossref.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="glossref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref glossref-d/glossref "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

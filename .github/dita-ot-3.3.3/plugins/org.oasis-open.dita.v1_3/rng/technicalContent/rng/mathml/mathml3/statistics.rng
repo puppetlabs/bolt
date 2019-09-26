@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <!--
+        This is the Mathematical Markup Language (MathML) 3.0, an XML
+        application for describing mathematical notation and capturing
+        both its structure and content.
+    
+        Copyright 1998-2007 World Wide Web Consortium
+           (Massachusetts Institute of Technology, Institut National de
+            Recherche en Informatique et en Automatique, Keio University).
+            All Rights Reserved.
+    
+        Permission to use, copy, modify and distribute the RelaxNG schema for MathML3
+        and its accompanying documentation for any purpose and without fee is
+        hereby granted in perpetuity, provided that the above copyright notice
+        and this paragraph appear in all copies.  The copyright holders make
+        no representation about the suitability of the Schema for any purpose.
+    
+        This file contains the arity checking rules for the symbols
+        from the content dictionary 
+        It is provided "as is" without expressed or implied warranty.
+    
+        Revision:   $Id: statistics.rng,v 1.1 2007/12/11 15:59:28 dcarlis Exp $
+  -->
+  <define name="cd.token.unary.class" combine="choice">
+    <ref name="momentabout.token"/>
+  </define>
+  <define name="cd.token.nary.class" combine="choice">
+    <choice>
+      <ref name="mean.token"/>
+      <ref name="sdev.token"/>
+      <ref name="variance.token"/>
+      <ref name="median.token"/>
+      <ref name="mode.token"/>
+      <ref name="moment.token"/>
+    </choice>
+  </define>
+  <!-- the element definitions for the token elements -->
+  <define name="mean.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="mean.token">
+    <element name="mean">
+      <ref name="mean.content"/>
+    </element>
+  </define>
+  <define name="sdev.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="sdev.token">
+    <element name="sdev">
+      <ref name="sdev.content"/>
+    </element>
+  </define>
+  <define name="variance.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="variance.token">
+    <element name="variance">
+      <ref name="variance.content"/>
+    </element>
+  </define>
+  <define name="median.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="median.token">
+    <element name="median">
+      <ref name="median.content"/>
+    </element>
+  </define>
+  <define name="mode.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="mode.token">
+    <element name="mode">
+      <ref name="mode.content"/>
+    </element>
+  </define>
+  <define name="moment.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="moment.token">
+    <element name="moment">
+      <ref name="moment.content"/>
+    </element>
+  </define>
+  <define name="momentabout.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="momentabout.token">
+    <element name="momentabout">
+      <ref name="momentabout.content"/>
+    </element>
+  </define>
+</grammar>

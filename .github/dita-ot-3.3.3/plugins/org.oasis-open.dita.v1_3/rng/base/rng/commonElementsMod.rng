@@ -1,0 +1,3355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" xmlns:sch="http://purl.oclc.org/dsdl/schematron">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Common Elements</moduleTitle>
+    <headerComment><![CDATA[
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Common Elements                             
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Common Elements//EN"
+      Delivered as file "commonElements.mod"                      
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for content elements used in both     
+            topics and maps.                                 
+                                                             
+ORIGINAL CREATION DATE:                                      
+            June 2006                                        
+                                                             
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2006.06.06 RDA: Add data element                          
+   2006.06.07 RDA: Add @scale to image                       
+   2006.06.07 RDA: Add index-base element                    
+   2006.06.07 RDA: Make universal attributes universal       
+                     (DITA 1.1 proposal #12)                 
+   2006.06.07 RDA: Add unknown element                       
+   2006.06.14 RDA: Add dir attribute to localization-atts    
+   2006.11.30 RDA: Add -dita-use-conref-target to enumerated 
+                     attributes                              
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.01.28 RDA: Add draft-comment to shortdesc            
+   2008.01.28 RDA: Remove enumeration for @disposition on    
+                   draft-comment                             
+   2008.01.29 RDA: Extend content of figgroup                
+   2008.01.30 RDA: Add %conref-atts; and @conaction          
+   2008.02.01 RDA: Added keyref to data, data-about          
+                   Added conkeyref attr to conref attr entity
+   2008.02.12 RDA: Added text element, added to keyword, tm, 
+                   term, ph. Added ph to alt.                
+   2008.02.12 RDA: Added longdescref; add to image, object   
+   2008.02.12 RDA: Modify imbeds to use specific 1.2 version 
+   2008.02.12 RDA: Move navtitle decl. here from topic.mod   
+   2008.02.13 RDA: Create .content and .attributes entities  
+   2008.11.10 RDA: Make href optional on image               
+=============================================================     
+ ]]></headerComment>
+    <moduleMetadata>
+      <moduleType>base</moduleType>
+      <moduleShortName>commonElements</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Common Elements//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Common Elements//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:commonElementMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:xsd:commonElementGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:rnc:commonElementsMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:commonElementsMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution/>
+    </moduleMetadata>
+  </moduleDesc>
+
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="alt">
+      <ref name="alt.element"/>
+    </define>
+    <define name="boolean">
+      <ref name="boolean.element"/>
+    </define>
+    <define name="cite">
+      <ref name="cite.element"/>
+    </define>
+    <define name="data">
+      <ref name="data.element"/>
+    </define>
+    <define name="data-about">
+      <ref name="data-about.element"/>
+    </define>
+    <define name="dd">
+      <ref name="dd.element"/>
+    </define>
+    <define name="ddhd">
+      <ref name="ddhd.element"/>
+    </define>
+    <define name="desc">
+      <ref name="desc.element"/>
+    </define>
+    <define name="div">
+      <ref name="div.element"/>
+    </define>
+    <define name="dl">
+      <ref name="dl.element"/>
+    </define>
+    <define name="dlentry">
+      <ref name="dlentry.element"/>
+    </define>
+    <define name="dlhead">
+      <ref name="dlhead.element"/>
+    </define>
+    <define name="draft-comment">
+      <ref name="draft-comment.element"/>
+    </define>
+    <define name="dt">
+      <ref name="dt.element"/>
+    </define>
+    <define name="dthd">
+      <ref name="dthd.element"/>
+    </define>
+    <define name="fig">
+      <ref name="fig.element"/>
+    </define>
+    <define name="figgroup">
+      <ref name="figgroup.element"/>
+    </define>
+    <define name="fn">
+      <ref name="fn.element"/>
+    </define>
+    <define name="foreign">
+      <ref name="foreign.element"/>
+    </define>
+    <define name="image">
+      <ref name="image.element"/>
+    </define>
+    <define name="indexterm">
+      <ref name="indexterm.element"/>
+    </define>
+    <define name="index-base">
+      <ref name="index-base.element"/>
+    </define>
+    <define name="indextermref">
+      <ref name="indextermref.element"/>
+    </define>
+    <define name="itemgroup">
+      <ref name="itemgroup.element"/>
+    </define>
+    <define name="keyword">
+      <ref name="keyword.element"/>
+    </define>
+    <define name="li">
+      <ref name="li.element"/>
+    </define>
+    <define name="lines">
+      <ref name="lines.element"/>
+    </define>
+    <define name="longdescref">
+      <ref name="longdescref.element"/>
+    </define>
+    <define name="longquoteref">
+      <ref name="longquoteref.element"/>
+    </define>
+    <define name="lq">
+      <ref name="lq.element"/>
+    </define>
+    <define name="navtitle">
+      <ref name="navtitle.element"/>
+    </define>
+    <define name="note">
+      <ref name="note.element"/>
+    </define>
+    <define name="object">
+      <ref name="object.element"/>
+    </define>
+    <define name="ol">
+      <ref name="ol.element"/>
+    </define>
+    <define name="p">
+      <ref name="p.element"/>
+    </define>
+    <define name="param">
+      <ref name="param.element"/>
+    </define>
+    <define name="ph">
+      <ref name="ph.element"/>
+    </define>
+    <define name="pre">
+      <ref name="pre.element"/>
+    </define>
+    <define name="q">
+      <ref name="q.element"/>
+    </define>
+    <define name="required-cleanup">
+      <ref name="required-cleanup.element"/>
+    </define>
+    <define name="sl">
+      <ref name="sl.element"/>
+    </define>
+    <define name="sli">
+      <ref name="sli.element"/>
+    </define>
+    <define name="simpletable">
+      <ref name="simpletable.element"/>
+    </define>
+    <define name="state">
+      <ref name="state.element"/>
+    </define>
+    <define name="stentry">
+      <ref name="stentry.element"/>
+    </define>
+    <define name="sthead">
+      <ref name="sthead.element"/>
+    </define>
+    <define name="strow">
+      <ref name="strow.element"/>
+    </define>
+    <define name="term">
+      <ref name="term.element"/>
+    </define>
+    <define name="text">
+      <ref name="text.element"/>
+    </define>
+    <define name="title">
+      <ref name="title.element"/>
+    </define>
+    <define name="tm">
+      <ref name="tm.element"/>
+    </define>
+    <define name="ul">
+      <ref name="ul.element"/>
+    </define>
+    <define name="unknown">
+      <ref name="unknown.element"/>
+    </define>
+    <define name="xref">
+      <ref name="xref.element"/>
+    </define>
+    <div>
+      <a:documentation>Elements in tblDeclMod</a:documentation>
+      <define name="table">
+        <ref name="table.element"/>
+      </define>
+      <define name="colspec">
+        <ref name="colspec.element"/>
+      </define>
+      <define name="entry">
+        <ref name="entry.element"/>
+      </define>
+      <define name="row">
+        <ref name="row.element"/>
+      </define>
+      <define name="tbody">
+        <ref name="tbody.element"/>
+      </define>
+      <define name="tgroup">
+        <ref name="tgroup.element"/>
+      </define>
+      <define name="thead">
+        <ref name="thead.element"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>Elements in metaDeclMod </a:documentation>
+      <define name="audience">
+        <ref name="audience.element"/>
+      </define>
+      <define name="author">
+        <ref name="author.element"/>
+      </define>
+      <define name="brand">
+        <ref name="brand.element"/>
+      </define>
+      <define name="category">
+        <ref name="category.element"/>
+      </define>
+      <define name="component">
+        <ref name="component.element"/>
+      </define>
+      <define name="copyrholder">
+        <ref name="copyrholder.element"/>
+      </define>
+      <define name="copyright">
+        <ref name="copyright.element"/>
+      </define>
+      <define name="copyryear">
+        <ref name="copyryear.element"/>
+      </define>
+      <define name="created">
+        <ref name="created.element"/>
+      </define>
+      <define name="critdates">
+        <ref name="critdates.element"/>
+      </define>
+      <define name="featnum">
+        <ref name="featnum.element"/>
+      </define>
+      <define name="keywords">
+        <ref name="keywords.element"/>
+      </define>
+      <define name="metadata">
+        <ref name="metadata.element"/>
+      </define>
+      <define name="othermeta">
+        <ref name="othermeta.element"/>
+      </define>
+      <define name="permissions">
+        <ref name="permissions.element"/>
+      </define>
+      <define name="platform">
+        <ref name="platform.element"/>
+      </define>
+      <define name="prodinfo">
+        <ref name="prodinfo.element"/>
+      </define>
+      <define name="prodname">
+        <ref name="prodname.element"/>
+      </define>
+      <define name="prognum">
+        <ref name="prognum.element"/>
+      </define>
+      <define name="publisher">
+        <ref name="publisher.element"/>
+      </define>
+      <define name="resourceid">
+        <ref name="resourceid.element"/>
+      </define>
+      <define name="revised">
+        <ref name="revised.element"/>
+      </define>
+      <define name="series">
+        <ref name="series.element"/>
+      </define>
+      <define name="source">
+        <ref name="source.element"/>
+      </define>
+      <define name="vrm">
+        <ref name="vrm.element"/>
+      </define>
+      <define name="vrmlist">
+        <ref name="vrmlist.element"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>COMMENT ELEMENT SETS</a:documentation>
+    <div>
+      <a:documentation>General-purpose content model fragments</a:documentation>
+      <define name="basic.ph">
+        <choice>
+          <ref name="boolean"/>
+          <ref name="cite"/>
+          <ref name="keyword"/>
+          <ref name="ph"/>
+          <ref name="q"/>
+          <ref name="term"/>
+          <ref name="text" dita:since="1.3"/>
+          <ref name="tm"/>
+          <ref name="xref"/>
+          <ref name="state"/>
+        </choice>
+      </define>
+      <define name="basic.block">
+        <a:documentation>Elements common to most body-like contexts</a:documentation>
+        <choice>
+          <ref name="dl"/>
+          <ref name="div" dita:since="1.3"/>
+          <ref name="fig"/>
+          <ref name="image"/>
+          <ref name="lines"/>
+          <ref name="lq"/>
+          <ref name="note"/>
+          <ref name="object"/>
+          <ref name="ol"/>
+          <ref name="p"/>
+          <ref name="pre"/>
+          <ref name="simpletable"/>
+          <ref name="sl"/>
+          <ref name="table"/>
+          <ref name="ul"/>
+        </choice>
+      </define>
+      <define name="basic.phandblock">
+        <a:documentation>class groupings to preserve in a schema</a:documentation>
+        <choice>
+          <ref name="basic.block"/>
+          <ref name="basic.ph"/>
+        </choice>
+      </define>
+      <a:documentation>Exclusions: models modified by removing excluded content</a:documentation>
+      <define name="basic.ph.noxref.nocite" dita:since="1.3">
+        <choice>
+          <ref name="boolean"/>
+          <ref name="keyword"/>
+          <ref name="ph"/>
+          <ref name="q"/>
+          <ref name="term"/>
+          <ref name="text" dita:since="1.3"/>
+          <ref name="tm"/>
+          <ref name="state"/>
+        </choice>
+      </define>
+      <define name="basic.ph.noxref">
+        <choice>
+          <ref name="basic.ph.noxref.nocite"/>
+          <ref name="cite"/>
+        </choice>
+      </define>
+      <define name="basic.ph.notm">
+        <choice>
+          <ref name="boolean"/>
+          <ref name="cite"/>
+          <ref name="keyword"/>
+          <ref name="ph"/>
+          <ref name="q"/>
+          <ref name="term"/>
+          <ref name="text" dita:since="1.3"/>
+          <ref name="xref"/>
+          <ref name="state"/>
+        </choice>
+      </define>
+      <define name="basic.block.notbl">
+        <choice>
+          <ref name="dl"/>
+          <ref name="div" dita:since="1.3"/>
+          <ref name="fig"/>
+          <ref name="image"/>
+          <ref name="lines"/>
+          <ref name="lq"/>
+          <ref name="note"/>
+          <ref name="object"/>
+          <ref name="ol"/>
+          <ref name="p"/>
+          <ref name="pre"/>
+          <ref name="sl"/>
+          <ref name="ul"/>
+        </choice>
+      </define>
+      <define name="basic.block.nonote">
+        <choice>
+          <ref name="dl"/>
+          <ref name="div" dita:since="1.3"/>
+          <ref name="fig"/>
+          <ref name="image"/>
+          <ref name="lines"/>
+          <ref name="lq"/>
+          <ref name="object"/>
+          <ref name="ol"/>
+          <ref name="p"/>
+          <ref name="pre"/>
+          <ref name="simpletable"/>
+          <ref name="sl"/>
+          <ref name="table"/>
+          <ref name="ul"/>
+        </choice>
+      </define>
+      <define name="basic.block.nopara">
+        <choice>
+          <ref name="dl"/>
+          <ref name="div" dita:since="1.3"/>
+          <ref name="fig"/>
+          <ref name="image"/>
+          <ref name="lines"/>
+          <ref name="lq"/>
+          <ref name="note"/>
+          <ref name="object"/>
+          <ref name="ol"/>
+          <ref name="pre"/>
+          <ref name="simpletable"/>
+          <ref name="sl"/>
+          <ref name="table"/>
+          <ref name="ul"/>
+        </choice>
+      </define>
+      <define name="basic.block.nolq">
+        <choice>
+          <ref name="dl"/>
+          <ref name="div" dita:since="1.3"/>
+          <ref name="fig"/>
+          <ref name="image"/>
+          <ref name="lines"/>
+          <ref name="note"/>
+          <ref name="object"/>
+          <ref name="ol"/>
+          <ref name="p"/>
+          <ref name="pre"/>
+          <ref name="simpletable"/>
+          <ref name="sl"/>
+          <ref name="table"/>
+          <ref name="ul"/>
+        </choice>
+      </define>
+      <define name="basic.block.notbnofg">
+        <choice>
+          <ref name="dl"/>
+          <ref name="div" dita:since="1.3"/>
+          <ref name="image"/>
+          <ref name="lines"/>
+          <ref name="lq"/>
+          <ref name="note"/>
+          <ref name="object"/>
+          <ref name="ol"/>
+          <ref name="p"/>
+          <ref name="pre"/>
+          <ref name="sl"/>
+          <ref name="ul"/>
+        </choice>
+      </define>
+      <define name="basic.block.notbfgobj">
+        <choice>
+          <ref name="dl"/>
+          <ref name="div" dita:since="1.3"/>
+          <ref name="image"/>
+          <ref name="lines"/>
+          <ref name="lq"/>
+          <ref name="note"/>
+          <ref name="ol"/>
+          <ref name="p"/>
+          <ref name="pre"/>
+          <ref name="sl"/>
+          <ref name="ul"/>
+        </choice>
+      </define>
+      <define name="txt.incl">
+        <a:documentation>Inclusions: defined sets that can be added into appropriate models</a:documentation>
+        <choice>
+          <ref name="draft-comment"/>
+          <ref name="fn"/>
+          <ref name="indextermref"/>
+          <ref name="indexterm"/>
+          <ref name="required-cleanup"/>
+        </choice>
+      </define>
+      <define name="data.elements.incl">
+        <a:documentation>Metadata elements intended for specialization</a:documentation>
+        <choice>
+          <ref name="data"/>
+          <ref name="data-about"/>
+        </choice>
+      </define>
+      <define name="foreign.unknown.incl">
+        <choice>
+          <ref name="foreign"/>
+          <ref name="unknown"/>
+        </choice>
+      </define>
+    </div>
+    <div>
+      <a:documentation> Predefined content model groups, based on the previous, element-only categories: txt.incl is appropriate for any mixed content definitions (those that have PCDATA) the context
+        for blocks is implicitly an InfoMaster "containing_division" </a:documentation>
+      <define name="listitem.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.block"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="itemgroup"/>
+          <ref name="txt.incl"/>
+        </choice>
+      </define>
+      <define name="itemgroup.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.block"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="txt.incl"/>
+        </choice>
+      </define>
+      <define name="title.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.ph.noxref"/>
+          <ref name="data.elements.incl"/>
+          <ref name="draft-comment" dita:since="1.3"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="required-cleanup" dita:since="1.3"/>
+          <ref name="image"/>
+        </choice>
+      </define>
+      <define name="xreftext.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.ph.noxref"/>
+          <ref name="data.elements.incl"/>
+          <ref name="draft-comment" dita:since="1.3"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="required-cleanup" dita:since="1.3"/>
+          <ref name="image"/>
+        </choice>
+      </define>
+      <define name="xrefph.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.ph.noxref.nocite"/>
+          <ref name="data.elements.incl"/>
+          <ref name="draft-comment" dita:since="1.3"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="required-cleanup" dita:since="1.3"/>
+        </choice>
+      </define>
+      <define name="shortquote.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="draft-comment" dita:since="1.3"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="required-cleanup" dita:since="1.3"/>
+        </choice>
+      </define>
+      <define name="para.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.block.nopara"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="txt.incl"/>
+        </choice>
+      </define>
+      <define name="note.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.block.nonote"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="txt.incl"/>
+        </choice>
+      </define>
+      <define name="longquote.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.block.nolq"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="longquoteref"/>
+          <ref name="txt.incl"/>
+        </choice>
+      </define>
+      <define name="tblcell.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.block.notbl"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="txt.incl"/>
+        </choice>
+      </define>
+      <define name="desc.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.block.notbfgobj"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="draft-comment" dita:since="1.3"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="required-cleanup" dita:since="1.3"/>
+        </choice>
+      </define>
+      <define name="ph.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="image"/>
+          <ref name="txt.incl"/>
+        </choice>
+      </define>
+      <define name="fn.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.block.notbl"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="draft-comment" dita:since="1.3"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="required-cleanup" dita:since="1.3"/>
+        </choice>
+      </define>
+      <define name="term.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="draft-comment" dita:since="1.3"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="required-cleanup" dita:since="1.3"/>
+          <ref name="image"/>
+        </choice>
+      </define>
+      <define name="defn.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.block"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="itemgroup"/>
+          <ref name="txt.incl"/>
+        </choice>
+      </define>
+      <define name="pre.cnt">
+        <choice>
+          <text/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="txt.incl"/>
+        </choice>
+      </define>
+      <define name="fig.cnt">
+        <choice>
+          <ref name="basic.block.notbnofg"/>
+          <ref name="data.elements.incl"/>
+          <ref name="fn"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="simpletable"/>
+          <ref name="xref"/>
+        </choice>
+      </define>
+      <define name="figgroup.cnt">
+        <choice>
+          <ref name="basic.block.notbnofg"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="draft-comment" dita:since="1.3"/>
+          <ref name="fn"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="required-cleanup" dita:since="1.3"/>
+        </choice>
+      </define>
+      <define name="words.cnt">
+        <choice>
+          <text/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="keyword"/>
+          <ref name="term"/>
+          <ref name="text" dita:since="1.3"/>
+        </choice>
+      </define>
+      <define name="data.cnt">
+        <choice>
+          <text dita:since="1.3"/>
+          <ref name="basic.ph" dita:since="1.3"/>
+          <ref name="data.elements.incl"/>
+          <ref name="draft-comment" dita:since="1.3"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="image"/>
+          <ref name="object"/>
+          <ref name="required-cleanup" dita:since="1.3"/>
+          <ref name="title"/>
+        </choice>
+      </define>
+      <define name="div.cnt" dita:since="1.3">
+        <choice>
+          <text/>
+          <ref name="basic.block"/>
+          <ref name="basic.ph"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="txt.incl"/>
+        </choice>       
+      </define>
+    </div>
+    <div>
+      <a:documentation><![CDATA[Pattern for element types that declare @id attributes as type ID
+      
+      This pattern is required by RELAX NG matching rules as they apply to the <anyName/>
+      pattern. Structural and domain modules that declare element types with an @id attribute
+      of type ID must extend this pattern to add those element types.
+      
+      NOTE: This pattern does not have an XSD or DTD analog, it is only relevant to RELAX NG.
+      ]]></a:documentation>
+      <define name="idElements">
+        <empty/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>COMMON ATTRIBUTE SETS</a:documentation>
+    <define name="display-atts">
+      <optional>
+        <attribute name="scale">
+          <choice>
+            <value>50</value>
+            <value>60</value>
+            <value>70</value>
+            <value>80</value>
+            <value>90</value>
+            <value>100</value>
+            <value>110</value>
+            <value>120</value>
+            <value>140</value>
+            <value>160</value>
+            <value>180</value>
+            <value>200</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="frame">
+          <choice>
+            <value>all</value>
+            <value>bottom</value>
+            <value>none</value>
+            <value>sides</value>
+            <value>top</value>
+            <value>topbot</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="expanse">
+          <choice>
+            <value>column</value>
+            <value>page</value>
+            <value>spread</value>
+            <value>textline</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+    </define>
+
+    <define name="props-attribute-extensions">
+      <a:documentation>Provide a default of no attribute extensions</a:documentation>
+      <empty/>
+    </define>
+    <define name="base-attribute-extensions">
+      <a:documentation>Provide a default of no attribute extensions</a:documentation>
+      <empty/>
+    </define>
+
+
+    <define name="filter-atts">
+      <optional>
+        <attribute name="props"/>
+      </optional>
+      <optional>
+        <attribute name="platform"/>
+      </optional>
+      <optional>
+        <attribute name="product"/>
+      </optional>
+      <optional>
+        <attribute name="audience"/>
+      </optional>
+      <optional>
+        <attribute name="otherprops"/>
+      </optional>
+      <ref name="props-attribute-extensions"/>
+    </define>
+    <define name="select-atts">
+      <ref name="filter-atts"/>
+      <optional>
+        <attribute name="base"/>
+      </optional>
+      <ref name="base-attribute-extensions"/>
+      <optional>
+        <attribute name="importance">
+          <choice>
+            <value>default</value>
+            <value>deprecated</value>
+            <value>high</value>
+            <value>low</value>
+            <value>normal</value>
+            <value>obsolete</value>
+            <value>optional</value>
+            <value>recommended</value>
+            <value>required</value>
+            <value>urgent</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="rev"/>
+      </optional>
+      <optional>
+        <attribute name="status">
+          <choice>
+            <value>changed</value>
+            <value>deleted</value>
+            <value>new</value>
+            <value>unchanged</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+    </define>
+    <define name="conref-atts">
+      <optional>
+        <attribute name="conref"/>
+      </optional>
+      <optional>
+        <attribute name="conrefend"/>
+      </optional>
+      <optional>
+        <attribute name="conaction">
+          <a:documentation>This attribute enables users to push content into a new location.</a:documentation>
+          <choice>
+            <value>mark</value>
+            <a:documentation>Marks the reference position.</a:documentation>
+            <value>pushafter</value>
+            <a:documentation>Push after the marked position.</a:documentation>
+            <value>pushbefore</value>
+            <a:documentation>Push before the marked position.</a:documentation>
+            <value>pushreplace</value>
+            <a:documentation>Push and replace content.</a:documentation>
+            <value>-dita-use-conref-target</value>
+            <a:documentation>Use the value from the conref target.</a:documentation>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="conkeyref"/>
+      </optional>
+    </define>
+    <define name="id-atts">
+      <optional>
+        <attribute name="id">
+          <data type="NMTOKEN"/>
+        </attribute>
+      </optional>
+      <ref name="conref-atts"/>
+    </define>
+
+    <define name="localization-atts">
+      <a:documentation>Attributes related to localization that are used everywhere</a:documentation>
+      <optional>
+        <attribute name="translate">
+          <choice>
+            <value>no</value>
+            <value>yes</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="xml:lang"/>
+      </optional>
+      <optional>
+        <attribute name="dir">
+          <choice>
+            <value>lro</value>
+            <value>ltr</value>
+            <value>rlo</value>
+            <value>rtl</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+    </define>
+
+    <define name="localization-atts-translate-no">
+      <a:documentation>This pattern should be used when defaulting a new element to translate="no", so that other (or new) localization attributes will always be included.</a:documentation>
+      <optional>
+        <attribute name="translate" a:defaultValue="no">
+          <choice>
+            <value>no</value>
+            <value>yes</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="xml:lang"/>
+      </optional>
+      <optional>
+        <attribute name="dir">
+          <choice>
+            <value>lro</value>
+            <value>ltr</value>
+            <value>rlo</value>
+            <value>rtl</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+    </define>
+    <define name="univ-atts">
+      <ref name="id-atts"/>
+      <ref name="select-atts"/>
+      <ref name="localization-atts"/>
+    </define>
+    <define name="univ-atts-translate-no">
+      <ref name="id-atts"/>
+      <ref name="select-atts"/>
+      <ref name="localization-atts-translate-no"/>
+    </define>
+    <define name="global-atts">
+      <optional>
+        <attribute name="xtrc"/>
+      </optional>
+      <optional>
+        <attribute name="xtrf"/>
+      </optional>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation>GENERAL ELEMENT TYPES OR SPECIALIZATION BASES</a:documentation>
+      <div>
+        <a:documentation>LONG NAME: Data About</a:documentation>
+        <define name="data-about.content">
+          <a:documentation/>
+          <ref name="data"/>
+          <zeroOrMore>
+            <choice>
+              <ref name="data"/>
+              <ref name="data-about"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="data-about.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="href"/>
+          </optional>
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <optional>
+            <attribute name="format"/>
+          </optional>
+          <optional>
+            <attribute name="type"/>
+          </optional>
+          <optional>
+            <attribute name="scope">
+              <choice>
+                <value>external</value>
+                <value>local</value>
+                <value>peer</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="data-about.element">
+          <element name="data-about" dita:longName="Data About">
+            <a:documentation>The &lt;data-about> element identifies the subject of a property when the subject isn't associated with the context in which the property is specified. The property itself
+              is expressed by the &lt;data> element. The &lt;data-about> element handles exception cases where a property must be expressed somewhere other than inside the actual subject of the
+              property. The &lt;data-about> element is particularly useful as a basis for specialization in combination with the &lt;data> element. Category: Miscellaneous elements</a:documentation>
+            <ref name="data-about.attlist"/>
+            <ref name="data-about.content"/>
+          </element>
+        </define>
+        <define name="data-about.attlist" combine="interleave">
+          <ref name="data-about.attributes"/>
+        </define>
+        <define name="data-element-atts">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="name"/>
+          </optional>
+          <optional>
+            <attribute name="datatype"/>
+          </optional>
+          <optional>
+            <attribute name="value"/>
+          </optional>
+          <optional>
+            <attribute name="href"/>
+          </optional>
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <optional>
+            <attribute name="format"/>
+          </optional>
+          <optional>
+            <attribute name="type"/>
+          </optional>
+          <optional>
+            <attribute name="scope">
+              <choice>
+                <value>external</value>
+                <value>local</value>
+                <value>peer</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Data element</a:documentation>
+        <define name="data.content">
+          <zeroOrMore>
+            <ref name="data.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="data.attributes">
+          <ref name="data-element-atts"/>
+        </define>
+        <define name="data.element">
+          <element name="data" dita:longName="Data">
+            <a:documentation>The &lt;data> element represents a property within a DITA topic or map. While the &lt;data> element can be used directly to capture properties, it is particularly useful
+              as a basis for specialization. Default processing treats the property values as an unknown kind of metadata, but custom processing can match the name attribute or specialized element to
+              format properties as sidebars or other adornments or to harvest properties for automated processing. Category: Miscellaneous elements</a:documentation>
+            <ref name="data.attlist"/>
+            <ref name="data.content"/>
+          </element>
+        </define>
+        <define name="data.attlist" combine="interleave">
+          <ref name="data.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Unknown element</a:documentation>
+        <define name="unknown.content">
+          <ref name="any"/>
+        </define>
+        <define name="unknown.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="unknown.element">
+          <element name="unknown" dita:longName="Unknown">
+            <a:documentation>The &lt;unknown> element is an open extension that allows information architects to incorporate xml fragments that do not necessarily fit into an existing DITA use case.
+              The base processing for &lt;unknown> is to suppress unless otherwise instructed. Category: Specialization elements</a:documentation>
+            <ref name="unknown.attlist"/>
+            <ref name="unknown.content"/>
+          </element>
+        </define>
+        <define name="unknown.attlist" combine="interleave">
+          <ref name="unknown.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Foreign content element</a:documentation>
+        <define name="foreign.content">
+          <ref name="any"/>
+        </define>
+        <define name="foreign.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="foreign.element">
+          <element name="foreign" dita:longName="Foreign">
+            <a:documentation>The &lt;foreign> element is an open extension that allows information architects to incorporate existing standard vocabularies for non-textual content. like MathML and
+              SVG, as inline objects. If &lt;foreign> contains more than one alternative content element, they will all be processed. Specialization of &lt;foreign> should be implemented as a domain,
+              but for those looking for more control over the content can implement foreign vocabulary as an element specialization. Category: Specialization elements</a:documentation>
+            <ref name="foreign.attlist"/>
+            <ref name="foreign.content"/>
+          </element>
+        </define>
+        <define name="foreign.attlist" combine="interleave">
+          <ref name="foreign.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Title</a:documentation>
+        <define name="title.content">
+          <a:documentation>This is referenced inside CALS table</a:documentation>
+          <zeroOrMore>
+            <ref name="title.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="title.attributes">
+          <ref name="id-atts"/>
+          <ref name="localization-atts"/>
+          <optional>
+            <attribute name="base"/>
+          </optional>
+          <ref name="base-attribute-extensions"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+          <optional>
+            <attribute name="rev" dita:since="1.3"/>
+          </optional>
+        </define>
+        <define name="title.element">
+          <element name="title" dita:longName="Title">
+            <a:documentation>The &lt;title> element contains a heading or label for the main parts of a topic, including the topic as a whole, its sections and examples, and its labelled content, such
+              as figures and tables. Beginning with DITA 1.1, the element may also be used to provide a title for a map. Category: Topic elements</a:documentation>
+            <ref name="title.attlist"/>
+            <ref name="title.content"/>
+          </element>
+        </define>
+        <define name="title.attlist" combine="interleave">
+          <ref name="title.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Navigation Title</a:documentation>
+        <define name="navtitle.content">
+          <zeroOrMore>
+            <choice>
+              <ref name="words.cnt"/>
+              <ref name="ph"/>
+              <ref name="draft-comment" dita:since="1.3"/>
+              <ref name="required-cleanup" dita:since="1.3"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="navtitle.attributes">
+          <ref name="univ-atts"/>
+        </define>
+        <define name="navtitle.element">
+          <element name="navtitle" dita:longName="Navigation Title">
+            <a:documentation>The navigation title (&lt;navtitle>) element is one of a set of alternate titles that can be included inside the &lt;titlealts> element. This navigation title may differ
+              from the first level heading that shows in the main browser window. Use &lt;navtitle> when the actual title of the topic isn't appropriate for use in navigation panes or online contents
+              (for example, because the actual title is too long). Category: Topic elements</a:documentation>
+            <ref name="navtitle.attlist"/>
+            <ref name="navtitle.content"/>
+          </element>
+        </define>
+        <define name="navtitle.attlist" combine="interleave">
+          <ref name="navtitle.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation xml:space="preserve">LONG NAME: Description
+        
+    Desc is used in context with figure and 
+    table titles and also for content models 
+    within linkgroup and object (for 
+    accessibility)
+        </a:documentation>
+        <define name="desc.content">
+          <zeroOrMore>
+            <ref name="desc.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="desc.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="desc.element">
+          <element name="desc" dita:longName="Description">
+            <a:documentation>The &lt;desc> element contains the description of the current element. A description should provide more information than the title. This is its behavior in
+              fig/table/linklist, for example. In xref/link, it provides a description of the target; processors that support it may choose to display this as hover help. In object, it contains
+              alternate content for use when in contexts that cannot display the object. Category: Body elements</a:documentation>
+            <ref name="desc.attlist"/>
+            <ref name="desc.content"/>
+          </element>
+        </define>
+        <define name="desc.attlist" combine="interleave">
+          <ref name="desc.attributes"/>
+        </define>
+
+
+      </div>
+    </div>
+    <div>
+      <a:documentation>BASIC DOCUMENT ELEMENT DECLARATIONS (rich text) </a:documentation>
+      <div>
+        <a:documentation>LONG NAME: Paragraph</a:documentation>
+        <define name="p.content">
+          <zeroOrMore>
+            <ref name="para.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="p.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="p.element">
+          <element name="p" dita:longName="Paragraph">
+            <a:documentation>A paragraph element (&lt;p>) is a block of text containing a single main idea. Category: Body elements</a:documentation>
+            <ref name="p.attlist"/>
+            <ref name="p.content"/>
+          </element>
+        </define>
+        <define name="p.attlist" combine="interleave">
+          <ref name="p.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Note</a:documentation>
+        <define name="note.content">
+          <zeroOrMore>
+            <ref name="note.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="note.attributes">
+          <optional>
+            <attribute name="type">
+              <choice>
+                <value>attention</value>
+                <value>caution</value>
+                <value>danger</value>
+                <value>fastpath</value>
+                <value>important</value>
+                <value>note</value>
+                <value>notice</value>
+                <value>other</value>
+                <value>remember</value>
+                <value>restriction</value>
+                <value>tip</value>
+                <value dita:since="1.3">trouble</value>
+                <value>warning</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="spectitle"/>
+          </optional>
+          <optional>
+            <attribute name="othertype"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="note.element">
+          <element name="note" dita:longName="Note">
+            <a:documentation>A &lt;note> element contains information, differentiated from the main text, which expands on or calls attention to a particular point. Category: Body
+              elements</a:documentation>
+            <ref name="note.attlist"/>
+            <ref name="note.content"/>
+          </element>
+        </define>
+        <define name="note.attlist" combine="interleave">
+          <ref name="note.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Long quote reference</a:documentation>
+        <define name="longquoteref.content">
+          <empty/>
+        </define>
+        <define name="longquoteref.attributes">
+          <optional>
+            <attribute name="href"/>
+          </optional>
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <optional>
+            <attribute name="type"/>
+          </optional>
+          <optional>
+            <attribute name="format"/>
+          </optional>
+          <optional>
+            <attribute name="scope">
+              <choice>
+                <value>external</value>
+                <value>local</value>
+                <value>peer</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="longquoteref.element">
+          <element name="longquoteref" dita:longName="Long Quote Reference">
+            <a:documentation>The &lt;longquoteref> element provides a reference to the source of a long quote. The long quote (&lt;lq>) element itself allows an href attribute to specify the source of
+              a quote, but it does not allow other standard linking attributes such as keyref, scope, and format. The &lt;longquoteref> element should be used for references that make use of these
+              attributes. </a:documentation>
+            <ref name="longquoteref.attlist"/>
+            <ref name="longquoteref.content"/>
+          </element>
+        </define>
+        <define name="longquoteref.attlist" combine="interleave">
+          <ref name="longquoteref.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Long Quote (Excerpt)</a:documentation>
+        <define name="lq.content">
+          <zeroOrMore>
+            <ref name="longquote.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="lq.attributes">
+          <optional>
+            <attribute name="href"/>
+          </optional>
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <optional>
+            <attribute name="format"/>
+          </optional>
+          <optional>
+            <attribute name="type"/>
+          </optional>
+          <optional>
+            <attribute name="scope">
+              <choice>
+                <value>external</value>
+                <value>local</value>
+                <value>peer</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="reftitle"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="lq.element">
+          <element name="lq" dita:longName="Long Quote">
+            <a:documentation>The long quote (&lt;lq>) element indicates content quoted from another source. Use the quote element &lt;q> for short, inline quotations, and long quote &lt;lq> for
+              quotations that are too long for inline use, following normal guidelines for quoting other sources. You can store a URL to the source of the quotation in the href attribute; the href
+              value may point to a DITA topic. Category: Body elements</a:documentation>
+            <ref name="lq.attlist"/>
+            <ref name="lq.content"/>
+          </element>
+        </define>
+        <define name="lq.attlist" combine="interleave">
+          <ref name="lq.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Quoted text</a:documentation>
+        <define name="q.content">
+          <zeroOrMore>
+            <ref name="shortquote.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="q.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="q.element">
+          <element name="q" dita:longName="Quote">
+            <a:documentation>A quotation element (&lt;q>) indicates content quoted from another source. This element is used for short quotes which are displayed inline. Use the long quote element
+              (&lt;lq>) for quotations that should be set off from the surrounding text. Category: Body elements</a:documentation>
+            <ref name="q.attlist"/>
+            <ref name="q.content"/>
+          </element>
+        </define>
+        <define name="q.attlist" combine="interleave">
+          <ref name="q.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Simple List</a:documentation>
+        <define name="sl.content">
+          <zeroOrMore dita:since="1.3">
+            <choice>
+              <ref name="data"/>
+              <ref name="data-about"/>
+            </choice>
+          </zeroOrMore>
+          <oneOrMore>
+            <ref name="sli"/>
+          </oneOrMore>
+        </define>
+        <define name="sl.attributes">
+          <optional>
+            <attribute name="compact">
+              <choice>
+                <value>no</value>
+                <value>yes</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="spectitle"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="sl.element">
+          <element name="sl" dita:longName="Simple List">
+            <a:documentation>The simple list (&lt;sl>) element contains a simple list of items of short, phrase-like content, such as in documenting the materials in a kit or package. Category: Body
+              elements</a:documentation>
+            <ref name="sl.attlist"/>
+            <ref name="sl.content"/>
+          </element>
+        </define>
+        <define name="sl.attlist" combine="interleave">
+          <ref name="sl.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Simple List Item</a:documentation>
+        <define name="sli.content">
+          <zeroOrMore>
+            <ref name="ph.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="sli.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="sli.element">
+          <element name="sli" dita:longName="Simple List Item">
+            <a:documentation>A simple list item (&lt;sli>) is a single item in a simple list &lt;sl>. Simple list items have phrase or text content, adequate for describing package contents, for
+              example. When a DITA topic is formatted for output, the items of a simple list are placed each on its own line, with no other prefix such as a number (as in an ordered list) or bullet
+              (as in an unordered list). Category: Body elements</a:documentation>
+            <ref name="sli.attlist"/>
+            <ref name="sli.content"/>
+          </element>
+        </define>
+        <define name="sli.attlist" combine="interleave">
+          <ref name="sli.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Unordered List</a:documentation>
+        <define name="ul.content">
+          <zeroOrMore dita:since="1.3">
+            <choice>
+              <ref name="data"/>
+              <ref name="data-about"/>
+            </choice>
+          </zeroOrMore>
+          <oneOrMore>
+            <ref name="li"/>
+          </oneOrMore>
+        </define>
+        <define name="ul.attributes">
+          <optional>
+            <attribute name="compact">
+              <choice>
+                <value>no</value>
+                <value>yes</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="spectitle"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="ul.element">
+          <element name="ul" dita:longName="Unordered List">
+            <a:documentation>In an unordered list (&lt;ul>), the order of the list items is not significant. List items are typically styled on output with a "bullet" character, depending on nesting
+              level. Category: Body elements</a:documentation>
+            <sch:pattern name="atLeastTwoChildren">
+              <sch:rule context="ul">
+                <sch:assert test="count(*) > 1" role="warning"> Please make sure you have at least 2 items for this list! </sch:assert>
+              </sch:rule>
+            </sch:pattern>
+            <ref name="ul.attlist"/>
+            <ref name="ul.content"/>
+          </element>
+        </define>
+        <define name="ul.attlist" combine="interleave">
+          <ref name="ul.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Ordered List</a:documentation>
+        <define name="ol.content">
+          <zeroOrMore dita:since="1.3">
+            <choice>
+              <ref name="data"/>
+              <ref name="data-about"/>
+            </choice>
+          </zeroOrMore>
+          <oneOrMore>
+            <ref name="li"/>
+          </oneOrMore>
+        </define>
+        <define name="ol.attributes">
+          <optional>
+            <attribute name="compact">
+              <choice>
+                <value>no</value>
+                <value>yes</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="spectitle"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="ol.element">
+          <element name="ol" dita:longName="Ordered List">
+            <a:documentation>An ordered list (&lt;ol>) is a list of items sorted by sequence or order of importance. Category: List elements</a:documentation>
+            <ref name="ol.attlist"/>
+            <ref name="ol.content"/>
+          </element>
+        </define>
+        <define name="ol.attlist" combine="interleave">
+          <ref name="ol.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: List Item</a:documentation>
+        <define name="li.content">
+          <zeroOrMore>
+            <ref name="listitem.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="li.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="li.element">
+          <element name="li" dita:longName="List Item">
+            <a:documentation>A list (&lt;li>) item is a single item in an ordered &lt;ol> or unordered &lt;ul> list. When a DITA topic is formatted for output, numbers and alpha characters are usually
+              output with list items in ordered lists, while bullets and dashes are usually output with list items in unordered lists. Category: Body elements</a:documentation>
+            <ref name="li.attlist"/>
+            <ref name="li.content"/>
+          </element>
+        </define>
+        <define name="li.attlist" combine="interleave">
+          <ref name="li.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Item Group</a:documentation>
+        <define name="itemgroup.content">
+          <zeroOrMore>
+            <ref name="itemgroup.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="itemgroup.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="itemgroup.element">
+          <element name="itemgroup" dita:longName="Item Group">
+            <a:documentation>The &lt;itemgroup> element is reserved for use in specializations of DITA. As a container element, it can be used to sub-divide or organize elements that occur inside a
+              list item, definition, or parameter definition. Category: Specialization elements</a:documentation>
+            <ref name="itemgroup.attlist"/>
+            <ref name="itemgroup.content"/>
+          </element>
+        </define>
+        <define name="itemgroup.attlist" combine="interleave">
+          <ref name="itemgroup.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Definition List</a:documentation>
+        <define name="dl.content">
+          <zeroOrMore dita:since="1.3">
+            <choice>
+              <ref name="data"/>
+              <ref name="data-about"/>
+            </choice>
+          </zeroOrMore>
+          <optional>
+            <ref name="dlhead"/>
+          </optional>
+          <oneOrMore>
+            <ref name="dlentry"/>
+          </oneOrMore>
+        </define>
+        <define name="dl.attributes">
+          <optional>
+            <attribute name="compact">
+              <choice>
+                <value>no</value>
+                <value>yes</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="spectitle"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="dl.element">
+          <element name="dl" dita:longName="Definition List">
+            <a:documentation>A definition list (&lt;dl>) is a list of terms and corresponding definitions. The term (&lt;dt>) is usually flush left. The description or definition (&lt;dd>) is usually
+              either indented and on the next line, or on the same line to the right of the term. Category: Body elements</a:documentation>
+            <ref name="dl.attlist"/>
+            <ref name="dl.content"/>
+          </element>
+        </define>
+        <define name="dl.attlist" combine="interleave">
+          <ref name="dl.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Definition List Head</a:documentation>
+        <define name="dlhead.content">
+          <optional>
+            <ref name="dthd"/>
+          </optional>
+          <optional>
+            <ref name="ddhd"/>
+          </optional>
+        </define>
+        <define name="dlhead.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="dlhead.element">
+          <element name="dlhead" dita:longName="Definition List Head">
+            <a:documentation>The &lt;dlhead> element contains optional headings for the term and description columns in a definition list. The definition list heading contains a heading &lt;dthd> for
+              the column of terms and an optional heading &lt;ddhd>for the column of descriptions. Category: Body elements</a:documentation>
+            <ref name="dlhead.attlist"/>
+            <ref name="dlhead.content"/>
+          </element>
+        </define>
+        <define name="dlhead.attlist" combine="interleave">
+          <ref name="dlhead.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Term Header</a:documentation>
+        <define name="dthd.content">
+          <zeroOrMore>
+            <ref name="title.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="dthd.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="dthd.element">
+          <element name="dthd" dita:longName="Term Header">
+            <a:documentation>The definition term heading (&lt;dthd>) element is contained in a definition list head (&lt;dlhead>) and provides an optional heading for the column of terms in a
+              description list. Category: Body elements</a:documentation>
+            <ref name="dthd.attlist"/>
+            <ref name="dthd.content"/>
+          </element>
+        </define>
+        <define name="dthd.attlist" combine="interleave">
+          <ref name="dthd.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Definition Header</a:documentation>
+        <define name="ddhd.content">
+          <zeroOrMore>
+            <ref name="title.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="ddhd.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="ddhd.element">
+          <element name="ddhd" dita:longName="Definition Header">
+            <a:documentation>The definition descriptions heading (&lt;ddhd>) element contains an optional heading or title for a column of descriptions or definitions in a definition list. Category:
+              Body elements</a:documentation>
+            <ref name="ddhd.attlist"/>
+            <ref name="ddhd.content"/>
+          </element>
+        </define>
+        <define name="ddhd.attlist" combine="interleave">
+          <ref name="ddhd.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Definition List Entry</a:documentation>
+        <define name="dlentry.content">
+          <oneOrMore>
+            <ref name="dt"/>
+          </oneOrMore>
+          <oneOrMore>
+            <ref name="dd"/>
+          </oneOrMore>
+        </define>
+        <define name="dlentry.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="dlentry.element">
+          <element name="dlentry" dita:longName="Definition List Entry">
+            <a:documentation>In a definition list, each list item is defined by the definition list entry (&lt;dlentry>) element. The definition list entry element includes a term &lt;dt> and one or
+              more definitions or descriptions &lt;dd> of that term. Category: Body elements</a:documentation>
+            <ref name="dlentry.attlist"/>
+            <ref name="dlentry.content"/>
+          </element>
+        </define>
+        <define name="dlentry.attlist" combine="interleave">
+          <ref name="dlentry.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Definition Term</a:documentation>
+        <define name="dt.content">
+          <zeroOrMore>
+            <ref name="term.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="dt.attributes">
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="dt.element">
+          <element name="dt" dita:longName="Definition Term">
+            <a:documentation>The definition term &lt;dt> element contains a term in a definition list entry. Category: Body elements</a:documentation>
+            <ref name="dt.attlist"/>
+            <ref name="dt.content"/>
+          </element>
+        </define>
+        <define name="dt.attlist" combine="interleave">
+          <ref name="dt.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Definition Description</a:documentation>
+        <define name="dd.content">
+          <zeroOrMore>
+            <ref name="defn.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="dd.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="dd.element">
+          <element name="dd" dita:longName="Definition Description">
+            <a:documentation>The definition description (&lt;dd>) element contains the description of a term in a definition list entry. Category: Body elements</a:documentation>
+            <ref name="dd.attlist"/>
+            <ref name="dd.content"/>
+          </element>
+        </define>
+        <define name="dd.attlist" combine="interleave">
+          <ref name="dd.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Figure</a:documentation>
+        <define name="fig.content">
+          <optional>
+            <ref name="title"/>
+          </optional>
+          <optional>
+            <ref name="desc"/>
+          </optional>
+          <zeroOrMore>
+            <choice>
+              <ref name="figgroup"/>
+              <ref name="fig.cnt"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="fig.attributes">
+          <ref name="display-atts"/>
+          <optional>
+            <attribute name="spectitle"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="fig.element">
+          <element name="fig" dita:longName="Figure">
+            <a:documentation>The figure (&lt;fig>) element is a display context (sometimes called an exhibit) with an optional title for a wide variety of content. Most commonly, the figure element
+              contains an image element (a graphic or artwork), but it can contain several kinds of text objects as well. A title is placed inside the figure element to provide a caption to describe
+              the content. Category: Body elements</a:documentation>
+            <ref name="fig.attlist"/>
+            <ref name="fig.content"/>
+          </element>
+        </define>
+        <define name="fig.attlist" combine="interleave">
+          <ref name="fig.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Figure Group</a:documentation>
+        <define name="figgroup.content">
+          <optional>
+            <ref name="title"/>
+          </optional>
+          <zeroOrMore>
+            <choice>
+              <ref name="figgroup"/>
+              <ref name="figgroup.cnt"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="figgroup.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="figgroup.element">
+          <element name="figgroup" dita:longName="Figure Group">
+            <a:documentation>The &lt;figgroup> element is used only for specialization at this time. Figure groups can be used to contain multiple cross-references, footnotes or keywords, but not
+              multipart images. Multipart images in DITA should be represented by a suitable media type displayed by the &lt;object> element. Category: Body elements</a:documentation>
+            <ref name="figgroup.attlist"/>
+            <ref name="figgroup.content"/>
+          </element>
+        </define>
+        <define name="figgroup.attlist" combine="interleave">
+          <ref name="figgroup.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Preformatted Text</a:documentation>
+        <define name="pre.content">
+          <zeroOrMore>
+            <ref name="pre.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="pre.attributes">
+          <ref name="display-atts"/>
+          <optional>
+            <attribute name="spectitle"/>
+          </optional>
+          <optional>
+            <attribute name="xml:space" a:defaultValue="preserve">
+              <value>preserve</value>
+            </attribute>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="pre.element">
+          <element name="pre" dita:longName="Preformatted Text">
+            <a:documentation>The preformatted element (&lt;pre>) preserves line breaks and spaces entered manually by the author in the content of the element, and also presents the content in a
+              monospaced type font (depending on your output formatting processor). Do not use &lt;pre> when a more semantically specific element is appropriate, such as &lt;codeblock>. Category: Body
+              elements</a:documentation>
+            <ref name="pre.attlist"/>
+            <ref name="pre.content"/>
+          </element>
+        </define>
+        <define name="pre.attlist" combine="interleave">
+          <ref name="pre.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Line Respecting Text</a:documentation>
+        <define name="lines.content">
+          <zeroOrMore>
+            <ref name="pre.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="lines.attributes">
+          <ref name="display-atts"/>
+          <optional>
+            <attribute name="spectitle"/>
+          </optional>
+          <optional>
+            <attribute name="xml:space" a:defaultValue="preserve">
+              <value>preserve</value>
+            </attribute>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="lines.element">
+          <element name="lines" dita:longName="Line Respecting Text">
+            <a:documentation>The &lt;lines> element may be used to represent dialogs, lists, text fragments, and so forth. The &lt;lines> element is similar to &lt;pre> in that hard line breaks are
+              preserved, but the font style is not set to monospace, and extra spaces inside the lines are not preserved. Category: Body elements</a:documentation>
+            <ref name="lines.attlist"/>
+            <ref name="lines.content"/>
+          </element>
+        </define>
+        <define name="lines.attlist" combine="interleave">
+          <ref name="lines.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Division</a:documentation>
+        <define name="div.content">
+          <zeroOrMore>
+            <ref name="div.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="div.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="div.element">
+          <element name="div" dita:longName="Division" dita:since="1.3">
+            <a:documentation> Category: Body elements</a:documentation>
+            <ref name="div.attlist"/>
+            <ref name="div.content"/>
+          </element>
+        </define>
+        <define name="div.attlist" combine="interleave">
+          <ref name="div.attributes"/>
+        </define>
+      </div>
+    </div>
+    <div>
+      <a:documentation> BASE FORM PHRASE TYPES</a:documentation>
+      <div>
+        <a:documentation>LONG NAME: Text</a:documentation>
+        <define name="text.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="text.attributes">
+          <ref name="univ-atts"/>
+        </define>
+        <define name="text.element">
+          <element name="text" dita:longName="Text">
+            <a:documentation>The text element associates no semantics with its content. It exists to serve as a container for text where a container is needed (e.g., for conref, or for restricted
+              content models in specializations). Unlike ph, text cannot contain images. Unlike keyword, text does not imply keyword-like semantics. The text element contains only text data, or nested
+              text elements. All universal attributes are available on text.</a:documentation>
+            <ref name="text.attlist"/>
+            <ref name="text.content"/>
+          </element>
+        </define>
+        <define name="text.attlist" combine="interleave">
+          <ref name="text.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Keyword</a:documentation>
+        <define name="keyword.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="draft-comment" dita:since="1.3"/>
+              <ref name="required-cleanup" dita:since="1.3"/>
+              <ref name="text"/>
+              <ref name="tm"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="keyword.attributes">
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="keyword.element">
+          <element name="keyword" dita:longName="Keyword">
+            <a:documentation>The &lt;keyword> element identifies a keyword or token, such as a single value from an enumerated list, the name of a command or parameter, product name, or a lookup key
+              for a message. Category: Body elements</a:documentation>
+            <ref name="keyword.attlist"/>
+            <ref name="keyword.content"/>
+          </element>
+        </define>
+        <define name="keyword.attlist" combine="interleave">
+          <ref name="keyword.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Term</a:documentation>
+        <define name="term.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="draft-comment" dita:since="1.3"/>
+              <ref name="required-cleanup" dita:since="1.3"/>
+              <ref name="text"/>
+              <ref name="tm"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="term.attributes">
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="term.element">
+          <element name="term" dita:longName="Term">
+            <a:documentation>The &lt;term> element identifies words that may have or require extended definitions or explanations. In future development of DITA, for example, terms might provide
+              associative linking to matching glossary entries. Category: Specialization elements</a:documentation>
+            <ref name="term.attlist"/>
+            <ref name="term.content"/>
+          </element>
+        </define>
+        <define name="term.attlist" combine="interleave">
+          <ref name="term.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Phrase</a:documentation>
+        <define name="ph.content">
+          <zeroOrMore>
+            <choice>
+              <ref name="ph.cnt"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="ph.attributes">
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="ph.element">
+          <element name="ph" dita:longName="Phrase">
+            <a:documentation>The phrase (&lt;ph>) element is used to organize content for reuse or conditional processing (for example, when part of a paragraph applies to a particular audience). It
+              can be used by specializations of DITA to create semantic markup for content at the phrase level, which then allows (but does not require) specific processing or formatting. Category:
+              Body elements</a:documentation>
+            <ref name="ph.attlist"/>
+            <ref name="ph.content"/>
+          </element>
+        </define>
+        <define name="ph.attlist" combine="interleave">
+          <ref name="ph.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Trade Mark</a:documentation>
+        <define name="tm.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="text"/>
+              <ref name="tm"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="tm.attributes">
+          <optional>
+            <attribute name="trademark"/>
+          </optional>
+          <optional>
+            <attribute name="tmowner"/>
+          </optional>
+          <attribute name="tmtype">
+            <choice>
+              <value>reg</value>
+              <value>service</value>
+              <value>tm</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+          <optional>
+            <attribute name="tmclass"/>
+          </optional>
+          <ref name="univ-atts"/>
+        </define>
+        <define name="tm.element">
+          <element name="tm" dita:longName="Trade Mark">
+            <a:documentation>The trademark (&lt;tm>) element in DITA is used to markup and identify a term or phrase that is trademarked. Trademarks include registered trademarks, service marks,
+              slogans and logos. Category: Miscellaneous elements</a:documentation>
+            <ref name="tm.attlist"/>
+            <ref name="tm.content"/>
+          </element>
+        </define>
+        <define name="tm.attlist" combine="interleave">
+          <ref name="tm.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Boolean (deprecated)</a:documentation>
+        <define name="boolean.content">
+          <empty/>
+        </define>
+        <define name="boolean.attributes">
+          <attribute name="state">
+            <choice>
+              <value>no</value>
+              <value>yes</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="boolean.element">
+          <element name="boolean" dita:longName="Boolean  (deprecated)">
+            <a:documentation>The &lt;boolean> element is used to express one of two opposite values, such as yes or no, on or off, true or false, high or low, and so forth. The element itself is
+              empty; the value of the element is stored in its state attribute, and the semantic associated with the value is typically in a specialized name derived from this element. Category:
+              Specialization elements</a:documentation>
+            <ref name="boolean.attlist"/>
+            <ref name="boolean.content"/>
+          </element>
+        </define>
+        <define name="boolean.attlist" combine="interleave">
+          <ref name="boolean.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation xml:space="preserve">LONG NAME: State
+        
+    A state can have a name and a string value, 
+    even if empty or indeterminate
+        </a:documentation>
+        <define name="state.content">
+          <empty/>
+        </define>
+        <define name="state.attributes">
+          <attribute name="name"/>
+          <attribute name="value"/>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="state.element">
+          <element name="state" dita:longName="State">
+            <a:documentation>The &lt;state> element specifies a name/value pair whenever it is necessary to represent a named state that has a variable value. The element is primarily intended for use
+              in specializations to represent specific states (like logic circuit states, chemical reaction states, airplane instrumentation states, and so forth). Category: Specialization
+              elements</a:documentation>
+            <ref name="state.attlist"/>
+            <ref name="state.content"/>
+          </element>
+        </define>
+        <define name="state.attlist" combine="interleave">
+          <ref name="state.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Image Data</a:documentation>
+        <define name="image.content">
+          <optional>
+            <ref name="alt"/>
+          </optional>
+          <optional>
+            <ref name="longdescref"/>
+          </optional>
+        </define>
+        <define name="image.attributes">
+          <optional>
+            <attribute name="href"/>
+          </optional>
+          <optional>
+            <attribute name="scope">
+              <choice>
+                <value>external</value>
+                <value>local</value>
+                <value>peer</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <optional>
+            <attribute name="alt"/>
+          </optional>
+          <optional>
+            <attribute name="longdescref"/>
+          </optional>
+          <optional>
+            <attribute name="height">
+              <data type="NMTOKEN"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="width">
+              <data type="NMTOKEN"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="align"/>
+          </optional>
+          <optional>
+            <attribute name="scale">
+              <data type="NMTOKEN"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="scalefit">
+              <choice>
+                <value>yes</value>
+                <value>no</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="placement" a:defaultValue="inline">
+              <choice>
+                <value>break</value>
+                <value>inline</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="format" dita:since="1.3 errata 02"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="image.element">
+          <element name="image" dita:longName="Image Data">
+            <a:documentation>Include artwork or images in a DITA topic by using the &lt;image> element. The &lt;image> element has optional attributes that indicate whether the placement of the
+              included graphic or artwork should be inline (like a button or icon) or on a separate line for a larger image. There are also optional attributes that indicate the size to which the
+              included graphic or artwork should be scaled. An href attribute is required on the image element, as this attribute creates a pointer to the image, and allows the output formatting
+              processor to bring the image into the text flow. To make the intent of the image more accessible for users using screen readers or text-only readers, always include a description of the
+              image's content in the alt element. Category: Body elements</a:documentation>
+            <ref name="image.attlist"/>
+            <ref name="image.content"/>
+          </element>
+        </define>
+        <define name="image.attlist" combine="interleave">
+          <ref name="image.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Alternate text</a:documentation>
+        <define name="alt.content">
+          <zeroOrMore>
+            <choice>
+              <ref name="words.cnt"/>
+              <ref name="draft-comment" dita:since="1.3"/>
+              <ref name="required-cleanup" dita:since="1.3"/>
+              <ref name="ph"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="alt.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="alt.element">
+          <element name="alt" dita:longName="Alternate text">
+            <a:documentation>The alt element provides alternate text for an image. It is equivalent to the alt attribute on the image element; the attribute is deprecated, so the alt element should be
+              used instead. As an element, alt provides direct text entry within an XML editor and is more easily accessed than an attribute for translation. Category: Body elements</a:documentation>
+            <ref name="alt.attlist"/>
+            <ref name="alt.content"/>
+          </element>
+        </define>
+        <define name="alt.attlist" combine="interleave">
+          <ref name="alt.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Long description reference</a:documentation>
+        <define name="longdescref.content">
+          <empty/>
+        </define>
+        <define name="longdescref.attributes">
+          <optional>
+            <attribute name="href"/>
+          </optional>
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <optional>
+            <attribute name="type"/>
+          </optional>
+          <optional>
+            <attribute name="format"/>
+          </optional>
+          <optional>
+            <attribute name="scope">
+              <choice>
+                <value>external</value>
+                <value>local</value>
+                <value>peer</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="longdescref.element">
+          <element name="longdescref" dita:longName="Long description reference">
+            <a:documentation>A reference to a textual description of the graphic or object. This element is a replacement for the longdescref attribute on image and object elements.</a:documentation>
+            <ref name="longdescref.attlist"/>
+            <ref name="longdescref.content"/>
+          </element>
+        </define>
+        <define name="longdescref.attlist" combine="interleave">
+          <ref name="longdescref.attributes"/>
+        </define>
+      </div>
+      <div>
+        <a:documentation xml:space="preserve">LONG NAME: Object (Streaming/Executable Data)
+        
+    The longdescre attribute is an error which appeared in the
+    original DTD implementation of OASIS DITA. It is an error that
+    is not part of the standard. It was left here to provide time
+    to change documents, but it will be removed at a later date.
+    The longdescref (with ending F) should be used instead.
+        </a:documentation>
+        <define name="object.content">
+          <optional>
+            <ref name="desc"/>
+          </optional>
+          <optional>
+            <ref name="longdescref"/>
+          </optional>
+          <zeroOrMore>
+            <ref name="param"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <ref name="foreign.unknown.incl"/>
+          </zeroOrMore>
+        </define>
+        <define name="object.attributes">
+          <optional>
+            <attribute name="declare">
+              <choice>
+                <value>declare</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="classid"/>
+          </optional>
+          <optional>
+            <attribute name="classidkeyref" dita:since="1.3"/>
+          </optional>
+          <optional>
+            <attribute name="codebase"/>
+          </optional>
+          <optional>
+            <attribute name="codebasekeyref" dita:since="1.3"/>
+          </optional>
+          <optional>
+            <attribute name="data"/>
+          </optional>
+          <optional>
+            <attribute name="datakeyref" dita:since="1.3"/>
+          </optional>
+          <optional>
+            <attribute name="type"/>
+          </optional>
+          <optional>
+            <attribute name="codetype"/>
+          </optional>
+          <optional>
+            <attribute name="archive"/>
+          </optional>
+          <optional>
+            <attribute name="archivekeyrefs" dita:since="1.3"/>
+          </optional>
+          <optional>
+            <attribute name="standby"/>
+          </optional>
+          <optional>
+            <attribute name="height">
+              <data type="NMTOKEN"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="width">
+              <data type="NMTOKEN"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="usemap"/>
+          </optional>
+          <optional>
+            <attribute name="name"/>
+          </optional>
+          <optional>
+            <attribute name="tabindex">
+              <data type="NMTOKEN"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="longdescref"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="object.element">
+          <element name="object" dita:longName="Object (Streaming/Executable Data)">
+            <a:documentation>DITA's &lt;object> element corresponds to the HTML &lt;object> element. Category: Body elements</a:documentation>
+            <ref name="object.attlist"/>
+            <ref name="object.content"/>
+          </element>
+        </define>
+        <define name="object.attlist" combine="interleave">
+          <ref name="object.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Parameter</a:documentation>
+        <define name="param.content">
+          <empty/>
+        </define>
+        <define name="param.attributes">
+          <ref name="univ-atts"/>
+          <attribute name="name"/>
+          <optional>
+            <attribute name="value"/>
+          </optional>
+          <optional>
+            <attribute name="valuetype">
+              <choice>
+                <value>data</value>
+                <value>object</value>
+                <value>ref</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="type"/>
+          </optional>
+          <optional>
+            <attribute name="keyref" dita:since="1.3"/>
+          </optional>
+        </define>
+        <define name="param.element">
+          <element name="param" dita:longName="Parameter">
+            <a:documentation>The parameter (&lt;param>) element specifies a set of values that may be required by an &lt;object> at runtime. Any number of &lt;param> elements may appear in the content
+              of an object in any order, but must be placed at the start of the content of the enclosing object. This element is comparable to the XHMTL &lt;param> element. Category: Body
+              elements</a:documentation>
+            <ref name="param.attlist"/>
+            <ref name="param.content"/>
+          </element>
+        </define>
+        <define name="param.attlist" combine="interleave">
+          <ref name="param.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Simple Table</a:documentation>
+        <define name="simpletable.content">
+          <optional>
+            <ref name="sthead"/>
+          </optional>
+          <oneOrMore>
+            <ref name="strow"/>
+          </oneOrMore>
+        </define>
+        <define name="simpletable.attributes">
+          <optional>
+            <attribute name="relcolwidth"/>
+          </optional>
+          <optional>
+            <attribute name="keycol">
+              <data type="NMTOKEN"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="refcols">
+              <data type="NMTOKENS"/>
+            </attribute>
+          </optional>
+          <ref name="display-atts"/>
+          <optional>
+            <attribute name="spectitle"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="simpletable.element">
+          <element name="simpletable" dita:longName="Simple Table">
+            <a:documentation>The &lt;simpletable> element is used for tables that are regular in structure and do not need a caption. Choose the simple table element when you want to show information
+              in regular rows and columns. For example, multi-column tabular data such as phone directory listings or parts lists are good candidates for simpletable. Another good use of simpletable
+              is for information that seems to beg for a "three-part definition list"—just use the keycol attribute to indicate which column represents the "key" or term-like column of your structure.
+              Category: Table elements</a:documentation>
+            <ref name="simpletable.attlist"/>
+            <ref name="simpletable.content"/>
+          </element>
+        </define>
+        <define name="simpletable.attlist" combine="interleave">
+          <ref name="simpletable.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Simple Table Head</a:documentation>
+        <define name="sthead.content">
+          <oneOrMore>
+            <ref name="stentry"/>
+          </oneOrMore>
+        </define>
+        <define name="sthead.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="sthead.element">
+          <element name="sthead" dita:longName="Simple Table Head">
+            <a:documentation>The simpletable header (&lt;sthead>) element contains the table's header row. The header row is optional in a simple table. Category: Table elements</a:documentation>
+            <ref name="sthead.attlist"/>
+            <ref name="sthead.content"/>
+          </element>
+        </define>
+        <define name="sthead.attlist" combine="interleave">
+          <ref name="sthead.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Simple Table Row</a:documentation>
+        <define name="strow.content">
+          <zeroOrMore>
+            <ref name="stentry"/>
+          </zeroOrMore>
+        </define>
+        <define name="strow.attributes">
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="strow.element">
+          <element name="strow" dita:longName="Simple Table Row">
+            <a:documentation>The &lt;simpletable> row (&lt;strow>) element specifies a row in a simple table. Category: Table elements</a:documentation>
+            <ref name="strow.attlist"/>
+            <ref name="strow.content"/>
+          </element>
+        </define>
+        <define name="strow.attlist" combine="interleave">
+          <ref name="strow.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Simple Table Cell (entry)</a:documentation>
+        <define name="stentry.content">
+          <zeroOrMore>
+            <ref name="tblcell.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="stentry.attributes">
+          <optional>
+            <attribute name="specentry"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="stentry.element">
+          <element name="stentry" dita:longName="Simple Table Cell (entry)">
+            <a:documentation>The simpletable entry (&lt;stentry>) element represents a single table cell, like &lt;entry> in &lt;table>. You can place any number of stentry cells in either an
+              &lt;sthead> element (for headings) or &lt;strow> element (for rows of data). Category: Table elements</a:documentation>
+            <ref name="stentry.attlist"/>
+            <ref name="stentry.content"/>
+          </element>
+        </define>
+        <define name="stentry.attlist" combine="interleave">
+          <ref name="stentry.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Review Comments Block</a:documentation>
+        <define name="draft-comment.content">
+          <zeroOrMore>
+            <choice>
+              <text/>
+              <ref name="basic.phandblock"/>
+              <ref name="data.elements.incl"/>
+              <ref name="foreign.unknown.incl"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="draft-comment.attributes">
+          <optional>
+            <attribute name="author"/>
+          </optional>
+          <optional>
+            <attribute name="time"/>
+          </optional>
+          <optional>
+            <attribute name="disposition"/>
+          </optional>
+          <ref name="univ-atts-translate-no"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="draft-comment.element">
+          <element name="draft-comment" dita:longName="Review Comments Block">
+            <a:documentation>The &lt;draft-comment> element allows simple review and discussion of topic contents within the marked-up content. Use the &lt;draft-comment> element to ask a question or
+              make a comment that you would like others to review. To indicate the source of the draft comment or the status of the comment, use the author, time or disposition attributes. Category:
+              Miscellaneous elements</a:documentation>
+            <ref name="draft-comment.attlist"/>
+            <ref name="draft-comment.content"/>
+          </element>
+        </define>
+        <define name="draft-comment.attlist" combine="interleave">
+          <ref name="draft-comment.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Required Cleanup Block</a:documentation>
+        <define name="required-cleanup.content">
+          <ref name="any"/>
+        </define>        
+        <define name="required-cleanup.attributes">
+          <optional>
+            <attribute name="remap"/>
+          </optional>
+          <ref name="univ-atts-translate-no"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="required-cleanup.element">
+          <element name="required-cleanup" dita:longName="Required Cleanup Block">
+            <a:documentation>A &lt;required-cleanup> element is used as a placeholder for migrated elements that cannot be appropriately tagged without manual intervention. As the element name
+              implies, the intent for authors is to clean up the contained material and eventually get rid of the &lt;required-cleanup> element. Authors should not insert this element into documents.
+              Category: Specialization elements</a:documentation>
+            <ref name="required-cleanup.attlist"/>
+            <ref name="required-cleanup.content"/>
+          </element>
+        </define>
+        <define name="required-cleanup.attlist" combine="interleave">
+          <ref name="required-cleanup.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Footnote</a:documentation>
+        <define name="fn.content">
+          <zeroOrMore>
+            <ref name="fn.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="fn.attributes">
+          <optional>
+            <attribute name="callout"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="fn.element">
+          <element name="fn" dita:longName="Footnote">
+            <a:documentation>Use footnote (&lt;fn>) to annotate text with notes that are not appropriate for inclusion in line or to indicate the source for facts or other material used in the text.
+              Category: Miscellaneous elements</a:documentation>
+            <ref name="fn.attlist"/>
+            <ref name="fn.content"/>
+          </element>
+        </define>
+        <define name="fn.attlist" combine="interleave">
+          <ref name="fn.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Index Term</a:documentation>
+        <define name="indexterm.content">
+          <zeroOrMore>
+            <choice>
+              <ref name="words.cnt"/>
+              <ref name="ph" dita:since="1.3"/>
+              <ref name="indexterm"/>
+              <ref name="index-base"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="indexterm.attributes">
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <optional>
+            <attribute name="start"/>
+          </optional>
+          <optional>
+            <attribute name="end"/>
+          </optional>
+          <ref name="univ-atts"/>
+        </define>
+        <define name="indexterm.element">
+          <element name="indexterm" dita:longName="Index Term">
+            <a:documentation>An &lt;indexterm> element allows the author to indicate that a certain word or phrase should produce an index entry in the generated index. Category: Miscellaneous
+              elements</a:documentation>
+            <ref name="indexterm.attlist"/>
+            <ref name="indexterm.content"/>
+          </element>
+        </define>
+        <define name="indexterm.attlist" combine="interleave">
+          <ref name="indexterm.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Index Base</a:documentation>
+        <define name="index-base.content">
+          <zeroOrMore>
+            <choice>
+              <ref name="words.cnt"/>
+              <ref name="indexterm"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="index-base.attributes">
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <ref name="univ-atts"/>
+        </define>
+        <define name="index-base.element">
+          <element name="index-base" dita:longName="Index Base">
+            <a:documentation>The &lt;index-base> element allows indexing extensions to be added by specializing off this element. It does not in itself have any meaning and should be ignored in
+              processing. Category: Miscellaneous elements</a:documentation>
+            <ref name="index-base.attlist"/>
+            <ref name="index-base.content"/>
+          </element>
+        </define>
+        <define name="index-base.attlist" combine="interleave">
+          <ref name="index-base.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Index term reference</a:documentation>
+        <define name="indextermref.content">
+          <empty/>
+        </define>
+        <define name="indextermref.attributes">
+          <attribute name="keyref"/>
+          <ref name="univ-atts"/>
+        </define>
+        <define name="indextermref.element">
+          <element name="indextermref" dita:longName="Index term reference">
+            <a:documentation>This element is not completely defined, and is reserved for future use. Category: Miscellaneous elements</a:documentation>
+            <ref name="indextermref.attlist"/>
+            <ref name="indextermref.content"/>
+          </element>
+        </define>
+        <define name="indextermref.attlist" combine="interleave">
+          <ref name="indextermref.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Citation (bibliographic source)</a:documentation>
+        <define name="cite.content">
+          <zeroOrMore>
+            <ref name="xrefph.cnt"/>
+          </zeroOrMore>
+        </define>
+        <define name="cite.attributes">
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="cite.element">
+          <element name="cite" dita:longName="Citation (bibliographic source)">
+            <a:documentation>The &lt;cite> element is used when you need a bibliographic citation that refers to a book or article. It specifically identifies the title of the resource. Category: Body
+              elements</a:documentation>
+            <ref name="cite.attlist"/>
+            <ref name="cite.content"/>
+          </element>
+        </define>
+        <define name="cite.attlist" combine="interleave">
+          <ref name="cite.attributes"/>
+        </define>
+
+      </div>
+      <div>
+        <a:documentation>LONG NAME: Cross Reference/Link</a:documentation>
+        <define name="xref.content">
+          <zeroOrMore>
+            <choice>
+              <ref name="xreftext.cnt"/>
+              <ref name="desc"/>
+            </choice>
+          </zeroOrMore>
+        </define>
+        <define name="xref.attributes">
+          <optional>
+            <attribute name="href"/>
+          </optional>
+          <optional>
+            <attribute name="keyref"/>
+          </optional>
+          <optional>
+            <attribute name="type"/>
+          </optional>
+          <optional>
+            <attribute name="format"/>
+          </optional>
+          <optional>
+            <attribute name="scope">
+              <choice>
+                <value>external</value>
+                <value>local</value>
+                <value>peer</value>
+                <value>-dita-use-conref-target</value>
+              </choice>
+            </attribute>
+          </optional>
+          <ref name="univ-atts"/>
+          <optional>
+            <attribute name="outputclass"/>
+          </optional>
+        </define>
+        <define name="xref.element">
+          <element name="xref" dita:longName="Cross Reference/Link">
+            <a:documentation>Use the cross-reference (&lt;xref>) element to link to a different location within the current topic, or a different topic within the same help system, or to external
+              sources, such as Web pages, or to a location in another topic. The href attribute on the &lt;xref> element provides the location of the target. Category: Body elements</a:documentation>
+            <ref name="xref.attlist"/>
+            <ref name="xref.content"/>
+          </element>
+        </define>
+        <define name="xref.attlist" combine="interleave">
+          <ref name="xref.attributes"/>
+        </define>
+      </div>
+    </div>
+    <include href="tblDeclMod.rng"/>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="alt.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/alt "/>
+      </optional>
+    </define>
+    <define name="boolean.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/boolean "/>
+      </optional>
+    </define>
+    <define name="cite.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/cite "/>
+      </optional>
+    </define>
+    <define name="dd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/dd "/>
+      </optional>
+    </define>
+    <define name="data.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/data "/>
+      </optional>
+    </define>
+    <define name="data-about.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/data-about "/>
+      </optional>
+    </define>
+    <define name="ddhd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ddhd "/>
+      </optional>
+    </define>
+    <define name="desc.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/desc "/>
+      </optional>
+    </define>
+    <define name="div.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/div "/>
+      </optional>
+    </define>
+    <define name="dl.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/dl "/>
+      </optional>
+    </define>
+    <define name="dlentry.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/dlentry "/>
+      </optional>
+    </define>
+    <define name="dlhead.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/dlhead "/>
+      </optional>
+    </define>
+    <define name="draft-comment.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/draft-comment "/>
+      </optional>
+    </define>
+    <define name="dt.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/dt "/>
+      </optional>
+    </define>
+    <define name="dthd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/dthd "/>
+      </optional>
+    </define>
+    <define name="fig.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/fig "/>
+      </optional>
+    </define>
+    <define name="figgroup.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/figgroup "/>
+      </optional>
+    </define>
+    <define name="fn.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/fn "/>
+      </optional>
+    </define>
+    <define name="foreign.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/foreign "/>
+      </optional>
+    </define>
+    <define name="image.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/image "/>
+      </optional>
+    </define>
+    <define name="indexterm.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/indexterm "/>
+      </optional>
+    </define>
+    <define name="index-base.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/index-base "/>
+      </optional>
+    </define>
+    <define name="indextermref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/indextermref "/>
+      </optional>
+    </define>
+    <define name="itemgroup.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/itemgroup "/>
+      </optional>
+    </define>
+    <define name="keyword.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/keyword "/>
+      </optional>
+    </define>
+    <define name="li.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/li "/>
+      </optional>
+    </define>
+    <define name="lines.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/lines "/>
+      </optional>
+    </define>
+    <define name="longdescref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/longdescref "/>
+      </optional>
+    </define>
+    <define name="longquoteref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/longquoteref "/>
+      </optional>
+    </define>
+    <define name="lq.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/lq "/>
+      </optional>
+    </define>
+    <define name="navtitle.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/navtitle "/>
+      </optional>
+    </define>
+    <define name="note.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/note "/>
+      </optional>
+    </define>
+    <define name="object.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/object "/>
+      </optional>
+    </define>
+    <define name="ol.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ol "/>
+      </optional>
+    </define>
+    <define name="p.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/p "/>
+      </optional>
+    </define>
+    <define name="param.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/param "/>
+      </optional>
+    </define>
+    <define name="ph.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ph "/>
+      </optional>
+    </define>
+    <define name="pre.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/pre "/>
+      </optional>
+    </define>
+    <define name="q.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/q "/>
+      </optional>
+    </define>
+    <define name="required-cleanup.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/required-cleanup "/>
+      </optional>
+    </define>
+    <define name="simpletable.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/simpletable "/>
+      </optional>
+    </define>
+    <define name="sl.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/sl "/>
+      </optional>
+    </define>
+    <define name="sli.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/sli "/>
+      </optional>
+    </define>
+    <define name="state.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/state "/>
+      </optional>
+    </define>
+    <define name="stentry.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry "/>
+      </optional>
+    </define>
+    <define name="sthead.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/sthead "/>
+      </optional>
+    </define>
+    <define name="strow.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/strow "/>
+      </optional>
+    </define>
+    <define name="term.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/term "/>
+      </optional>
+    </define>
+    <define name="text.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/text "/>
+      </optional>
+    </define>
+    <define name="title.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/title "/>
+      </optional>
+    </define>
+    <define name="tm.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/tm "/>
+      </optional>
+    </define>
+    <define name="ul.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ul "/>
+      </optional>
+    </define>
+    <define name="unknown.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/unknown "/>
+      </optional>
+    </define>
+    <define name="xref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/xref "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

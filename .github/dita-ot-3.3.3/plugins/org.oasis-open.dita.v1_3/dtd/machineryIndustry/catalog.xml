@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+   <!--DITA Machinery Task Shell-->
+   <public publicId="-//OASIS//DTD DITA 1.3 Machinery Task//EN"
+           uri="dtd/machineryTask.dtd"/>
+   <public publicId="-//OASIS//DTD DITA 1.x Machinery Task//EN"
+           uri="dtd/machineryTask.dtd"/>
+   <public publicId="-//OASIS//DTD DITA Machinery Task//EN"
+           uri="dtd/machineryTask.dtd"/>
+   <public publicId="-//OASIS//ELEMENTS DITA 1.3 Taskbody Constraint//EN"
+           uri="dtd/machineryTaskbodyConstraint.mod"/>
+   <public publicId="-//OASIS//ELEMENTS DITA 1.x Taskbody Constraint//EN"
+           uri="dtd/machineryTaskbodyConstraint.mod"/>
+   <public publicId="-//OASIS//ELEMENTS DITA Taskbody Constraint//EN"
+           uri="dtd/machineryTaskbodyConstraint.mod"/>
+   <!-- DITA 1.3 Errata 01:
+        Following two public IDs match the pattern used in 1.2, preceding pattern is used in 1.3, both should resolve. -->
+   <public publicId="-//OASIS//ELEMENTS DITA Machinery Taskbody Constraint//EN"
+           uri="dtd/machineryTaskbodyConstraint.mod"/>
+   <public publicId="-//OASIS//ELEMENTS DITA 1.3 Machinery Taskbody Constraint//EN"
+           uri="dtd/machineryTaskbodyConstraint.mod"/>
+   <public publicId="-//OASIS//ELEMENTS DITA 1.x Machinery Taskbody Constraint//EN"
+           uri="dtd/machineryTaskbodyConstraint.mod"/>
+</catalog>

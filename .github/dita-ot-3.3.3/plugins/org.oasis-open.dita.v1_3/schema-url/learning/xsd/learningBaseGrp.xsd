@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA learningBase                                -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identfier or an  -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Learning Base//EN"           -->
+<!--      Delivered as file "learningBase.mod"                        -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for Learning Base                     -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            May 2007                                         -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2007, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- CHANGE LOG:                                                 -->
+<!--                                                             -->
+<!--   Sept 2009: WEK: Make learningBasebody optional per        -->
+<!--   TC decision.                                              -->
+<!--=============================================================  -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:group name="learningBase">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningBase"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningBasebody">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningBasebody"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcIntro">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcIntro"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcObjectives">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcObjectives"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcObjectivesStem">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcObjectivesStem"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcObjectivesGroup">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcObjectivesGroup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcObjective">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcObjective"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcAudience">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcAudience"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcDuration">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcDuration"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcTime">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcTime"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcPrereqs">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcPrereqs"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcSummary">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcSummary"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcNextSteps">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcNextSteps"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcReview">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcReview"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcResources">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcResources"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcChallenge">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcChallenge"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcInstruction">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcInstruction"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcInteraction">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcInteraction"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+</xs:schema>

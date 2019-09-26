@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+Copyright © 2004-2006 by Idiom Technologies, Inc. All rights reserved. 
+IDIOM is a registered trademark of Idiom Technologies, Inc. and WORLDSERVER
+and WORLDSTART are trademarks of Idiom Technologies, Inc. All other 
+trademarks are the property of their respective owners. 
+
+IDIOM TECHNOLOGIES, INC. IS DELIVERING THE SOFTWARE "AS IS," WITH 
+ABSOLUTELY NO WARRANTIES WHATSOEVER, WHETHER EXPRESS OR IMPLIED,  AND IDIOM
+TECHNOLOGIES, INC. DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+PURPOSE AND WARRANTY OF NON-INFRINGEMENT. IDIOM TECHNOLOGIES, INC. SHALL NOT
+BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, COVER, PUNITIVE, EXEMPLARY,
+RELIANCE, OR CONSEQUENTIAL DAMAGES (INCLUDING BUT NOT LIMITED TO LOSS OF 
+ANTICIPATED PROFIT), ARISING FROM ANY CAUSE UNDER OR RELATED TO  OR ARISING 
+OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF IDIOM
+TECHNOLOGIES, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
+
+Idiom Technologies, Inc. and its licensors shall not be liable for any
+damages suffered by any person as a result of using and/or modifying the
+Software or its derivatives. In no event shall Idiom Technologies, Inc.'s
+liability for any damages hereunder exceed the amounts received by Idiom
+Technologies, Inc. as a result of this transaction.
+
+These terms and conditions supersede the terms and conditions in any
+licensing agreement to the extent that such terms and conditions conflict
+with those set forth herein.
+
+This file is part of the DITA Open Toolkit project. 
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <!-- 
+   
+    This file controls strings that appear in the published output.
+    There is one version of this file per language.  To add support 
+    for a new language, simply create a copy of this file and name 
+    it using the <locale ISO code>.xml format.
+    
+    Variables with no localized text, common to all (or nearly all)
+    languages, are stored in commonstrings.xml. Any common string
+    may be copied into <locale ISO code>.xml to provide a 
+    local-specific value for the common variable.
+    
+  -->
+
+  <!-- The header that appears on Preface odd-numbered pages. -->
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Introduction | <param ref-name="pagenum"/></variable>
+
+  <!-- The header that appears on Preface even-numbered pages. -->
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Introduction | <param ref-name="prodname"/></variable>
+
+  <!-- The heading to put at the top of the Table of Contents -->
+  <variable id="Table of Contents">Contents</variable>
+
+  <!-- Indicates when an index continues from the previous page -->
+  <variable id="Index Continued String">continued</variable>
+
+  <!-- Appears before <index-see> element content -->
+  <variable id="Index See String">, See </variable>
+
+  <!-- Appears before <index-see-also> element content -->
+  <variable id="Index See Also String">See also </variable>
+
+  <!-- Label for a chapter within the table of contents. -->
+  <variable id="Table of Contents Chapter">Chapter <param ref-name="number"/>: </variable>
+
+  <!-- Label for an appendix within the table of contents. -->
+  <variable id="Table of Contents Appendix">Appendix <param ref-name="number"/>: </variable>
+
+  <!-- Label for a part within the table of contents. -->
+  <variable id="Table of Contents Part">Part <param ref-name="number"/>: </variable>
+
+  <!-- Label for a preface within the table of contents. -->
+  <variable id="Table of Contents Preface">Preface: </variable>
+
+  <!-- Heading for a preface in body text. -->
+  <variable id="Preface title">Preface</variable>
+
+  <!-- Heading for the Notices topic in body text. -->
+  <variable id="Notices title">Notice</variable>
+
+  <!-- Heading to put at the top a chapter-level "mini-TOC" -->
+  <variable id="Mini Toc">Topics: </variable>
+
+  <!-- Text to use for 'Notice' label generated from <note> element. -->
+  <variable id="Notice">Notice</variable>
+
+  <!-- Text to use for figure titles, with title text or only figure number. -->
+  <variable id="Figure.title">Figure <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">Figure <param ref-name="number"/></variable>
+
+  <!-- Text to use for table titles, with title text or only table number. -->
+  <variable id="Table.title">Table <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Table <param ref-name="number"/></variable>
+
+  <!-- Text to use for related links label. -->
+  <variable id="Related Links">Related Links</variable>
+
+  <!-- UNUSED: Default cross-reference text prefix. Previously used to generate reference 
+       text in case text is unresolvable and not specified in source. -->
+  <variable id="Cross-Reference">Cross-Reference to:</variable>
+
+  <!-- UNUSED: Previously used for unresolved content reference. -->
+  <variable id="Content-Reference">Unresolved content reference to:</variable>
+
+  <!-- Default title text for references to a list item. Used when reference
+       has no specified  content, reference target is a list item, and
+       no list item number can be determined. -->
+  <variable id="List item">List item.</variable>
+
+  <!-- Default title text for referenced footnote. Used when reference has
+       no specified content, reference target is a footnote, and footnote
+       label cannot be determined. -->
+  <variable id="Foot note">Footnote.</variable>
+
+  <!-- Label for a navigation title, included when publishing draft content. -->
+  <variable id="Navigation title">Navigation title</variable>
+
+  <!-- Label for a search title, included when publishing draft content. -->
+  <variable id="Search title">Search title</variable>
+
+  <!-- Heading prefix for chapter titles.-->
+  <variable id="Chapter with number">Chapter <param ref-name="number"/></variable>
+
+  <!-- Heading prefix for appendix titles.-->
+  <variable id="Appendix with number">Appendix <param ref-name="number"/></variable>
+
+  <!-- Heading prefix for part titles.-->
+  <variable id="Part with number">Part <param ref-name="number"/></variable>
+
+  <!-- Label for content of <required-cleanup> element. -->
+  <variable id="Required-Cleanup">[Required-Cleanup]</variable>
+
+  <!-- Template for generated page number of a reference in printed manual. -->
+  <variable id="On the page"> on page <param ref-name="pagenum"/></variable>
+
+  <!-- Template for generated page number of a reference
+       in printed manual, when referenced element has no title. -->
+  <variable id="Page"> page <param ref-name="pagenum"/></variable>
+
+  <!-- UNUSED: Template for generated page number of a reference
+       in chm/html, when referenced element has no title. -->
+  <variable id="This link">this link</variable>
+
+  <!-- UNUSED: The title of links to child topics. -->
+  <variable id="Child topics">Child Topics</variable>
+
+  <!-- UNUSED: The title of links to Related references -->
+  <variable id="Related references">Related References</variable>
+
+  <!-- Labels for a step with importance="optional" or importance="required" -->
+  <variable id="Optional Step">Optional:</variable>
+  <variable id="Required Step">Required:</variable>
+
+  <!--Labels for task sections. These are kept for backwards compatibility, actual
+      labels are now stored in common strings files. -->
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+     
+  <!-- Heading for a Glossary topic -->
+  <variable id="Glossary">Glossary</variable>
+     
+  <!-- Heading for a generated List of Tables -->
+  <variable id="List of Tables">List of Tables</variable>
+     
+  <!-- Heading for a generated List of Figures -->
+  <variable id="List of Figures">List of Figures</variable>
+</vars>

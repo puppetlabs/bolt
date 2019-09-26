@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"
+         xmlns:dita="http://dita-ot.sourceforge.net">
+
+  <rewriteURI uriStartString="platform:" rewritePrefix="../../"/>
+
+  <dita:extension id="dita.catalog.plugin-info"
+    behavior="org.dita.dost.platform.ImportPluginCatalogAction"/>
+
+   <dita:extension id="dita.specialization.catalog"
+                   behavior="org.dita.dost.platform.InsertAction"/>
+   <dita:extension id="dita.specialization.catalog.relative"
+                   behavior="org.dita.dost.platform.ImportCatalogActionRelative"/>
+  
+</catalog>

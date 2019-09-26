@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="dita2pdf-customization" xml:lang="en">
+  <title>Example: Creating a simple PDF plug-in</title>
+  <titlealts>
+    <navtitle>Simple PDF plug-in example</navtitle>
+  </titlealts>
+  <shortdesc>This scenario walks through the process of creating a very simple plug-in
+      (<codeph>com.example.print-pdf</codeph>) that creates a new transformation type: <option>print-pdf</option>. </shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>figure</xmlelement></indexterm>
+        <indexterm>PDF<indexterm>plug-in</indexterm></indexterm>
+        <indexterm>integrator.xml</indexterm>
+        <indexterm>catalog<indexterm>example</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>The <option>print-pdf</option> transformation has the following characteristics:</p>
+      <ul>
+        <li>Uses A4 paper </li>
+        <li>Renders figures with a title at the top and a description at the bottom</li>
+        <li>Use em dashes as the symbols for unordered lists</li>
+      </ul>
+    </context>
+    <steps>
+      <step>
+        <cmd>In the <filepath>plugins</filepath> directory, create a directory named
+            <filepath>com.example.print-pdf</filepath>.</cmd>
+      </step>
+      <step>
+        <cmd>In the new <filepath>com.example.print-pdf</filepath> directory, create a plug-in configuration file
+            (<filepath>plugin.xml</filepath>) that declares the new <option>print-pdf</option> transformation and its
+          dependencies.</cmd>
+        <info>
+          <fig>
+            <title><filepath>plugin.xml</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.print-pdf/plugin.xml"/></codeblock>
+          </fig>
+        </info>
+      </step>
+      <step>
+        <cmd>Add an Ant script (<filepath>integrator.xml</filepath>) to define the transformation type.</cmd>
+        <info>
+          <fig>
+            <title><filepath>integrator.xml</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.print-pdf/integrator.xml"/></codeblock>
+          </fig></info>
+      </step>
+      <step>
+        <cmd>In the new plug-in directory, add a <filepath>cfg/catalog.xml</filepath> file that specifies the custom
+          XSLT style sheets.</cmd>
+        <stepxmp>
+          <fig>
+            <title><filepath>cfg/catalog.xml</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.print-pdf/cfg/catalog.xml"/></codeblock>
+          </fig>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Create the <filepath>cfg/fo/attrs/custom.xsl</filepath> file, and add attribute and variable overrides to
+          it.</cmd>
+        <stepxmp>For example, add the following variables to change the page size to A4.<fig>
+            <title><filepath>cfg/fo/attrs/custom.xsl</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.print-pdf/cfg/fo/attrs/custom.xsl"/></codeblock>
+          </fig></stepxmp>
+      </step>
+      <step>
+        <cmd>Create the <filepath>cfg/fo/xsl/custom.xsl</filepath> file, and add XSLT overrides to it.</cmd>
+        <stepxmp>For example, the following code changes the rendering of <xmlelement>figure</xmlelement> elements.<fig>
+            <title><filepath>cfg/fo/xsl/custom.xsl</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.print-pdf/cfg/fo/xsl/custom.xsl"/></codeblock>
+          </fig></stepxmp>
+      </step>
+      <step>
+        <cmd>Create an English-language variable-definition file (<filepath>cfg/common/vars/en.xml</filepath>) and make
+          any necessary modifications to it.</cmd>
+        <stepxmp>For example, the following code removes the period after the number for an ordered-list item; it also
+          specifies that the bullet for an unordered list item should be an em dash.<fig>
+            <title><filepath>cfg/common/vars/en.xml</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.print-pdf/cfg/common/vars/en.xml"/></codeblock>
+          </fig></stepxmp>
+      </step>
+    </steps>
+    <result>
+      <note type="tip">The files for this sample plug-in are included in the DITA-OT installation directory under
+          <filepath>docsrc/samples/plugins/com.example.print-pdf/</filepath> and on
+        <xref href="https://github.com/dita-ot/docs/tree/develop/samples/plugins/com.example.print-pdf" format="html"
+          scope="external">GitHub</xref>.</note>
+      <p>The plug-in directory has the following layout and files:</p>
+      <codeblock>com.example.print-pdf
+├── cfg
+│   ├── catalog.xml
+│   ├── common
+│   │   └── vars
+│   │       └── en.xml
+│   └── fo
+│       ├── attrs
+│       │   └── custom.xsl
+│       └── xsl
+│           └── custom.xsl
+├── integrator.xml
+└── plugin.xml</codeblock>
+    </result>
+    <postreq>
+      <ol>
+        <li>Run <filepath conref="../resources/conref-task.dita#ID/dita-cmd"/>
+          <parmname>--install</parmname> to install the plug-in and make the <option>print-pdf</option> transformation
+          available.</li>
+        <li>Build output with the new transformation type to verify that the plug-in works as intended.
+          <codeblock><filepath conref="../resources/conref-task.dita#ID/dita-cmd"/> <parmname>--input</parmname>=<varname>my.ditamap</varname> <parmname>--format</parmname>=<option>print-pdf</option></codeblock>
+        </li>
+      </ol>
+    </postreq>
+  </taskbody>
+</task>

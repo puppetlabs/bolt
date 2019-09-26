@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA learningMap Domain                           -->
+<!--  VERSION:   1.1                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ENTITIES DITA Learning Map Domain//EN"
+      Delivered as file "learningMapDomain.ent"                    -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the substitution context and domain     -->
+<!--             entity declarations for the Learning Map Domain   -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             May 2007                                          -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2007, 2009.              -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    LEARNING MAP DOMAIN ENTITIES               -->
+<!-- ============================================================= -->
+
+<!ENTITY % learningmap-d-topicref 
+                        "learningObject |
+                         learningGroup"
+>
+<!ENTITY learningmap-d-att "(map learningmap-d)">
+
+<!-- ================== End Learning Map Domain Entities ========= -->

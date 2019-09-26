@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+  xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Equation Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+============================================================= 
+DITA Equation Domain
+
+Purpose: Provides elements for identifying equations as 
+         equations independent of how the equation itself
+         is defined (e.g., as a graphic, using MathML, etc.).
+         
+Creation Date: March 2014
+
+Copyright (c) OASIS Open 2014
+=============================================================      
+</headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>equation-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Equation Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Equation Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:equationDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:equationDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:equationDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic equation-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+
+    <define name="equation-d-ph">
+      <ref name="equation-inline.element"/>
+    </define>
+
+    <define name="equation-d-div">
+      <ref name="equation-block.element"/>
+    </define>
+
+    <define name="equation-d-fig">
+      <ref name="equation-figure.element"/>
+    </define>
+
+    <define name="ph" combine="choice">
+      <ref name="equation-d-ph"/>
+    </define>
+
+    <define name="div" combine="choice">
+      <ref name="equation-d-div"/>
+    </define>
+
+    <define name="fig" combine="choice">
+      <ref name="equation-d-fig"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="equation-block">
+      <ref name="equation-block.element"/>
+    </define>
+    <define name="equation-figure">
+      <ref name="equation-figure.element"/>
+    </define>
+    <define name="equation-inline">
+      <ref name="equation-inline.element"/>
+    </define>
+    <define name="equation-number">
+      <ref name="equation-number.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>COMMON CONTENT MODEL PATTERNS</a:documentation>
+    <define name="equation.cnt">
+      <choice>
+        <ref name="ph.cnt"/>
+      </choice>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation>LONG NAME: Inline equation</a:documentation>
+      <define name="equation-inline.content">
+        <zeroOrMore>
+          <ref name="equation.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="equation-inline.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="equation-inline.element">
+        <element name="equation-inline" dita:longName="Inline equation" dita:since="1.3">
+          <a:documentation> The Inline Equation element (&lt;equation-inline&gt;) represents an
+            equation that is intended to be rendered inline with its surrounding content. The
+            equation content may be represented in any number of ways, including embedded MathML
+            using the &lt;mathml&gt; specialization of &lt;foreign&gt;, a reference to an image,
+            inline TeX markup, or any other way that an equation might be defined. The equation may
+            include alternative forms, such as both a MathML version and an image. </a:documentation>
+          <ref name="equation-inline.content"/>
+          <ref name="equation-inline.attlist"/>
+        </element>
+      </define>
+      <define name="equation-inline.attlist" combine="interleave">
+        <ref name="equation-inline.attributes"/>
+      </define>
+    </div>    <div>
+      <a:documentation>LONG NAME: Block equation</a:documentation>
+      <define name="equation-block.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="equation.cnt"/>
+            <ref name="equation-number"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="equation-block.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="equation-block.element">
+        <element name="equation-block" dita:longName="Block equation" dita:since="1.3">
+          <a:documentation> The Block Equation element (&lt;equation-block&gt;) represents
+            an equation to be rendered as a block. Block equations may be numbered. The
+            equation content may be represented in any number of ways, including embedded MathML
+            using the &lt;mathml&gt; specialization of &lt;foreign&gt;, a reference to an image,
+            inline TeX markup, or any other way that an equation might be defined. The equation may
+            include alternative forms, such as both a MathML version and an image. </a:documentation>
+          <ref name="equation-block.content"/>
+          <ref name="equation-block.attlist"/>
+        </element>
+      </define>
+      <define name="equation-block.attlist" combine="interleave">
+        <ref name="equation-block.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Equation number</a:documentation>
+      <define name="equation-number.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="ph"/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="equation-number.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="equation-number.element">
+        <element name="equation-number" dita:longName="Equation number" dita:since="1.3">
+          <a:documentation> The Equation Number element (&lt;equation-number&gt;) indicates
+          that the equation should be numbered. If the &lt;equation-number&gt; element has empty or 
+          whitespace-only content, then the number should be generated. If the &lt;equation-number&gt;
+          element has content other than whitespace, the content should be used as the number.</a:documentation>
+          <ref name="equation-number.content"/>
+          <ref name="equation-number.attlist"/>
+        </element>
+      </define>
+      <define name="equation-number.attlist" combine="interleave">
+        <ref name="equation-number.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Equation figure</a:documentation>
+      <define name="equation-figure.content">
+        <optional>
+          <ref name="title"/>
+        </optional>
+        <optional>
+          <ref name="desc"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="figgroup"/>
+            <ref name="fig.cnt"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="equation-figure.attributes">
+        <ref name="display-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="equation-figure.element">
+        <element name="equation-figure" dita:longName="Equation figure" dita:since="1.3">
+          <a:documentation> The Equation Figure element (&lt;equation-figure&gt;) represents an
+            equation that may have a title or a description and that may be numbered. When equation
+            figures are numbered they are often numbered separately from figures. Note that block
+            and inline equations may also be numbered. The equation figure element is intended for
+            equations that are not part of the rhetorical flow of a document but that are presented
+            either out of line or otherwise need a title or description. Equation figures that are
+            simply a single equation plus, optionally, a title or description, may use the
+            &lt;mathml&gt; element directly. When the display equation content is more complicated,
+            it should use &gt;equation-block&gt; to clearly distinguish the equation content from
+            non-equation content, such as paragraphs that provide commentary on the equations within
+            the display equation. The equation content may be represented in any number of ways,
+            including embedded MathML using the &lt;mathml&gt; specialization of &lt;foreign&gt;, a
+            reference to an image, inline TeX markup, or any other way that an equation might be
+            defined. The equation may include alternative forms, such as both a MathML version and
+            an image. </a:documentation>
+          <ref name="equation-figure.content"/>
+          <ref name="equation-figure.attlist"/>
+        </element>
+      </define>
+      <define name="equation-figure.attlist" combine="interleave">
+        <ref name="equation-figure.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="equation-inline.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph equation-d/equation-inline "/>
+      </optional>
+    </define>
+    <define name="equation-block.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/div equation-d/equation-block "/>
+      </optional>
+    </define>
+    <define name="equation-number.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph equation-d/equation-number "/>
+      </optional>
+    </define>
+    <define name="equation-figure.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/fig equation-d/equation-figure "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

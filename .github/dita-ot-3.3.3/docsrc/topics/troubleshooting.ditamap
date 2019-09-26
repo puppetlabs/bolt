@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>Troubleshooting</title>
+
+  <topicref keyref="log-files"/>
+  <topicref keyref="DITA-messages"/>
+  <topicref keyref="other-errors"/>
+  <topicref keyref="dita-command-help"/>
+  <topicref keyref="enabling-debug-mode"/>
+  <topicref keyref="increasing-the-jvm"/>
+  <topicref keyref="reducing-processing-time"/>
+
+</map>

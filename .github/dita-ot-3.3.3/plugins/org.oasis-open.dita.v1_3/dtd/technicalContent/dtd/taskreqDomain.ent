@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    Task Requirements Domain                          -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identfier or an   -->
+<!--       appropriate system identifier                           -->
+<!-- PUBLIC "-//OASIS//ELEMENTS DITA Task Requirements Domain//EN" -->
+<!--       Delivered as file "taskreqDomain.mod"                        -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization attributes     -->
+<!--             for the Task Requirements Domain                  -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             September 2007                                    -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2007, 2009.              -->
+<!--             All Rights Reserved.                              -->
+<!--  UPDATES:                                                     -->
+<!--    2009.10.20 CHK: Make safecond unbound                      -->
+<!-- ============================================================= -->
+<!--                                                               -->
+
+<!-- ============================================================= -->
+<!--                    ELEMENT EXTENSION ENTITY DECLARATIONS      -->
+<!-- ============================================================= -->
+
+<!ENTITY % taskreq-d-prereq
+  "prelreqs"
+>
+<!ENTITY % taskreq-d-postreq
+  "closereqs"
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY taskreq-d-att
+  "(topic task taskreq-d)"
+>
+
+<!-- ================ End DITA Task Requirements Domain ================== -->
+ 

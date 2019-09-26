@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="XhtmlCommon">
+  <title>Common HTML-based processing</title>
+  <shortdesc>After the pre-processing operation runs, HTML-based builds each run a common series of Ant targets to
+    generate HTML file. Navigation may be created before or after this set of common routines.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlatt>chunk</xmlatt><indexterm>HTML-based processing</indexterm></indexterm>
+        <indexterm>DITAVAL<indexterm>HTML-based formats</indexterm></indexterm>
+        <indexterm>HTML<indexterm>common processing</indexterm></indexterm>
+        <indexterm>CSS<indexterm>HTML transforms</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>After the pre-processing is completed, the following targets are run for all of the HTML-based builds:</p>
+    <p>
+      <ul>
+        <li>If the <parmname>args.css</parmname> parameter is passed to the build to add a CSS file, the
+            <codeph>copy-css</codeph> target copies the CSS file from its source location to the relative location in
+          the output directory.</li>
+        <li>If a DITAVAL file is used, the <codeph>copy-revflag</codeph> target copies the default start- and
+          end-revision flags into the output directory.</li>
+        <li>The DITA topics are converted to HTML files. Unless the <xmlatt>chunk</xmlatt> attribute was specified, each
+          DITA topic in the temporary directory now corresponds to one HTML file. The
+            <codeph>dita.inner.topics.xhtml</codeph> target is used to process documents that are in the map directory
+          (or subdirectories of the map directory). The <codeph>dita.outer.topics.xhtml</codeph> target is used to
+          process documents that are outside of the scope of the map, and thus might end up outside of the designated
+          output directory. Various DITA-OT parameters control how documents processed by the
+            <codeph>dita.outer.topics.xhtml</codeph> target are handled.</li>
+      </ul>
+    </p>
+  </conbody>
+</concept>

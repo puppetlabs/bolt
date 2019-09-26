@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA General Task//EN" "generalTask.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="using-dita-properties-file">
+  <title>Setting build parameters with <filepath>.properties</filepath> files</title>
+  <titlealts>
+    <navtitle>Using a properties file</navtitle>
+  </titlealts>
+  <shortdesc>Usually, DITA builds require setting a number of parameters that do not change frequently. You can
+    reference a set of build parameters defined in a <filepath>.properties</filepath> file when building output with the
+      <cmdname>dita</cmdname> command. If needed, you can override any parameter by specifying it explicitly as an
+    argument to the <cmdname>dita</cmdname> command.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>draft<indexterm><xmlelement>draft</xmlelement></indexterm></indexterm>
+        <indexterm><xmlelement>required-cleanup</xmlelement></indexterm>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>.properties file</indexterm></indexterm>
+        <indexterm>DITA maps<indexterm>properties file</indexterm></indexterm>
+        <indexterm>.properties file</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <section>
+      <title>About <filepath>.properties</filepath> files</title>
+      <p>A <filepath>.properties</filepath> file is a text file that enumerates one or more name-value pairs, one per
+        line, in the format <codeph>name = value</codeph>. The <filepath>.properties</filepath> filename extension is
+        customarily used, but is not required.</p>
+      <ul compact="yes">
+        <li>Lines beginning with the <codeph>#</codeph> character are comments.</li>
+        <li>Properties specified as arguments of the <cmdname>dita</cmdname> command override those set in
+            <filepath>.properties</filepath> files. <note type="restriction">For this reason,
+              <parmname>args.input</parmname> and <parmname>transtype</parmname> can’t be set in the
+              <filepath>.properties</filepath> file.</note></li>
+        <li>If you specify the same property more than once, the last instance is used.</li>
+        <li>Properties not used by the selected transformation type are ignored.</li>
+        <li>Properties can reference other property values defined elsewhere in the <filepath>.properties</filepath>
+          file or passed by the <cmdname>dita</cmdname> command. Use the Ant
+            <codeph>${<varname>property.name</varname>}</codeph> syntax.</li>
+        <li>You can set properties not only for the default DITA-OT transformation types, but also for custom plugins.
+        </li>
+      </ul>
+    </section>
+    <steps>
+      <step>
+        <cmd>Create your <filepath>.properties</filepath> file.</cmd>
+        <info>
+          <note conref="../resources/conref-task.dita#ID/template-properties"/>
+        </info>
+        <stepxmp>
+          <p>For example:</p>
+          <p><codeblock outputclass="language-properties normalize-space show-line-numbers show-whitespace"><coderef href="../samples/properties/sequence-html5.properties"/></codeblock>
+          </p>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Reference your <filepath>.properties</filepath> file with the <cmdname>dita</cmdname> command when building
+          your output.</cmd>
+        <stepxmp>
+          <codeblock><cmdname>dita</cmdname> <parmname>--input</parmname>=<varname>my.ditamap</varname> <parmname>--format</parmname>=<option>html5</option> <parmname>--propertyfile</parmname>=<varname>my.properties</varname></codeblock>
+        </stepxmp>
+        <info/>
+      </step>
+      <step>
+        <cmd>If needed, pass additional arguments to the <cmdname>dita</cmdname> command to override specific build
+          parameters. </cmd>
+        <stepxmp>
+          <p>For example, to build output once with <xmlelement>draft</xmlelement> and
+              <xmlelement>required-cleanup</xmlelement> content:</p>
+          <codeblock><cmdname>dita</cmdname> <parmname>--input</parmname>=<varname>my.ditamap</varname> <parmname>--format</parmname>=<option>html5</option> <parmname>--propertyfile</parmname>=<varname>my.properties</varname> \
+     <parmname>--args.draft</parmname>=<option>yes</option></codeblock>
+        </stepxmp>
+        <info>
+          <note conref="../resources/conref-task.dita#ID/pass-input-dir"/>
+        </info>
+      </step>
+    </steps>
+  </taskbody>
+</task>

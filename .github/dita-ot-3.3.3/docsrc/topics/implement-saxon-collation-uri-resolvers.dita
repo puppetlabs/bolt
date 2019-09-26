@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<topic id="implement-saxon-collation-uri-resolvers">
+  <title>Implementing custom Saxon collation URI resolvers</title>
+  <titlealts>
+    <navtitle>Custom collation URI resolvers</navtitle>
+  </titlealts>
+  <shortdesc>Plug-ins can provide custom URI resolvers that provide collators for specific collation URIs.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Saxon<indexterm><xmlelement>service</xmlelement></indexterm></indexterm>
+        <indexterm>Ant<indexterm><xmlelement>jar</xmlelement></indexterm></indexterm>
+        <indexterm><xmlatt>xsl:sort</xmlatt></indexterm>
+        <indexterm>Chinese</indexterm>
+        <indexterm>I18N<indexterm>plug-in</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm end="plugin-ideas"/></indexterm>
+        <indexterm>plug-ins<indexterm end="plugins-saxon"/></indexterm>
+        <indexterm>XSLT<indexterm>URI resolver</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <body>
+    <p>To do custom sorting and grouping in XSLT, you identify collators using URIs that Saxon resolves to collator
+      implementations. You implement the mapping from collation URIs to collators through custom collation URI
+      resolvers.</p>
+    <p>For example, the DITA Community I18N plugin provides a custom collator for doing dictionary-based sorting and
+      grouping of Simplified Chinese. </p>
+    <p>To allow multiple plug-ins to contribute collation URI resolvers, DITA-OT defines a superinterface of Saxon’s
+        <codeph>CollationUriResolver</codeph> interface,
+        <codeph>org.dita.dost.module.saxon.DelegatingCollationUriResolver</codeph>, that takes a base resolver.</p>
+    <p>Implementations of <codeph>DelegatingCollationUriResolver</codeph> should delegate to their base resolver if they
+      do not resolve the URI specified on the resolve request. When multiple plug-ins provide resolvers it results in a
+      chain of resolvers, ending with the built-in Saxon default resolver.</p>
+    <note>The order in which plug-ins will be processed during collation URI resolver configuration is variable, so two
+      plug-ins should not try to resolve the same collation URI. In that case the first one configured will be used at
+      run time.</note>
+    <p>A typical delegating collation URI resolver looks like
+      this:<codeblock outputclass="language-java">public class DCI18nCollationUriResolver implements DelegatingCollationUriResolver {
+
+  public static final String DITA_COMMUNITY_I18N_ZH_CNAWARE_COLLATOR =
+      "http://org.dita-community.i18n.zhCNawareCollator";
+  public static final String LANG_URI_PARAM = "lang";
+
+  private CollationURIResolver baseResolver;
+
+  public DCI18nCollationUriResolver() {
+      super();
+      this.baseResolver = StandardCollationURIResolver.getInstance();
+  }
+
+
+  public net.sf.saxon.lib.StringCollator resolve(String uri, Configuration configuration) 
+          throws XPathException {
+      ZhCnAwareCollator collator = resolveToZhCnAwareCollator(uri, null, configuration);
+      if (null == collator) {
+          return baseResolver.resolve(uri, configuration);
+      }
+      return (StringCollator) collator;
+  }
+
+
+  @Override
+  public void setBaseResolver(CollationURIResolver baseResolver) {
+    this.baseResolver = baseResolver;
+  }
+  
+  /* ... Code to evaluate the collation URI and provide the appropriate collator goes here */
+}</codeblock></p>
+    <p>To implement a custom collation URI resolver:
+      <ol>
+        <li>Add your plugin’s JAR file in the DITA-OT class path as described in <xref keyref="plugin-javalib"/>.</li>
+        <li>Implement an instance of <codeph>org.dita.dost.module.saxon.DelegatingCollationUriResolver</codeph> as
+          described above.</li>
+        <li>Include a file named <filepath>org.dita.dost.module.saxon.DelegatingCollationUriResolver</filepath> in the
+          directory <filepath>META-INF/services</filepath> in the compiled JAR that your plug-in provides. Each line of
+          the file must be the name of a class that implements
+            <codeph>org.dita.dost.module.saxon.DelegatingCollationUriResolver</codeph>:<codeblock>org.example.i18n.saxon.MyCollationUriResolver</codeblock>
+          <p>You can create the services file using <xmlelement>service</xmlelement> elements in an Ant
+            <xmlelement>jar</xmlelement>
+            task:<codeblock outputclass="language-xml">&lt;jar destfile="${basedir}/target/lib/example-saxon.jar">
+  ⋮
+  &lt;service type="org.dita.dost.module.saxon.DelegatingCollationUriResolver">
+    &lt;provider classname="org.example.i18n.saxon.MyCollationUriResolver"/>
+  &lt;/service>
+  ⋮
+&lt;/jar></codeblock></p></li>
+        <li>To use the collator in XSLT style sheets, specify the collation URI on <xmlatt>xsl:sort</xmlatt> elements (or
+          anywhere a collator URI can be
+          specified):<codeblock outputclass="language-xml">&lt;xsl:apply-templates select="word">
+  &lt;xsl:sort collation="http://org.example.i18n.MyCollator"/>
+&lt;/xsl:apply-templates></codeblock></li>
+      </ol></p>
+  </body>
+</topic>

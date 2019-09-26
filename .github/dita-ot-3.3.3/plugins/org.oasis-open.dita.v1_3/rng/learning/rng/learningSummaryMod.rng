@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA learningOverview</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA learningOverview                            
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identfier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Learning Summary//EN"
+      Delivered as file "learningSummary.mod                     
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for Learning Summary                  
+                                                             
+ORIGINAL CREATION DATE:                                      
+            May 2007                                         
+                                                             
+            (C) Copyright OASIS Open 2007, 2009              
+            All Rights Reserved.                             
+=============================================================
+</headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>learningSummary</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Learning Summary//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Learning Summary//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:spec:learning:xsd:learningSummaryMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:spec:learning:xsd:learningSummaryGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:spec:learning:rnc:learningSummaryMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:spec:learning:rng:learningSummaryMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic learningBase learningSummary)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>TOPIC NESTING OVERRIDES</a:documentation>
+    <define name="learningSummary-info-types" combine="choice">
+      <empty/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="learningSummary">
+      <ref name="learningSummary.element"/>
+    </define>
+    <define name="learningSummarybody">
+      <ref name="learningSummarybody.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div><a:documentation>LONG NAME: Learning summary</a:documentation>
+      <define name="learningSummary.content">
+        <ref name="title"/>
+        <optional>
+          <ref name="titlealts"/>
+        </optional>
+        <optional>
+          <choice>
+            <ref name="shortdesc"/>
+            <ref name="abstract"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <ref name="learningSummarybody"/>
+        <optional>
+          <ref name="related-links"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="learningSummary-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="learningSummary.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="learningSummary.element">
+        <element name="learningSummary" dita:longName="Learning summary">
+          <a:documentation><![CDATA[A Learning Summary recaps and provides context for the achievement or accomplishment of learning objectives, provides guidance to reinforce learning and long-term memory, and may pose questions to enhance encoding and verification of the learning content. ]]></a:documentation>
+          <ref name="learningSummary.attlist"/>
+          <ref name="learningSummary.content"/>
+        </element>
+      </define>
+      <define name="learningSummary.attlist" combine="interleave">
+        <ref name="learningSummary.attributes"/>
+        <ref name="arch-atts"/>
+        <ref name="domains-att"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Learning summary body</a:documentation>
+      <define name="learningSummarybody.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="lcSummary"/>
+            <ref name="lcObjectives"/>
+            <ref name="lcReview"/>
+            <ref name="lcNextSteps"/>
+            <ref name="lcResources"/>
+            <ref name="section"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="learningSummarybody.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="learningSummarybody.element">
+        <element name="learningSummarybody" dita:longName="Learning summary body">
+          <a:documentation><![CDATA[The <learningSummarybody> element is the main body-level element in a learningSummary topic. ]]></a:documentation>
+          <ref name="learningSummarybody.attlist"/>
+          <ref name="learningSummarybody.content"/>
+        </element>
+      </define>
+      <define name="learningSummarybody.attlist" combine="interleave">
+        <ref name="learningSummarybody.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="learningSummary.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic learningBase/learningBase     learningSummary/learningSummary "/>
+      </optional>
+    </define>
+    <define name="learningSummarybody.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/body  learningBase/learningBasebody learningSummary/learningSummarybody "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

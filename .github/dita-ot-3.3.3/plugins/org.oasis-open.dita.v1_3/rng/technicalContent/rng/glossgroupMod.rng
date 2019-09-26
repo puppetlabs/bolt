@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Glossary Group</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Glossary Group                              
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Glossary Group//EN"
+      Delivered as file "glossgroup.mod"                          
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Define elements and specialization atttributes   
+            for Glossary Group topics                        
+                                                             
+ORIGINAL CREATION DATE:                                      
+            June 2008                                        
+                                                             
+            (C) Copyright OASIS Open 2008, 2009.             
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+=============================================================
+</headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>glossgroup</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Glossary Group//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Glossary Group//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:glossgroupMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:xsd:glossgroupGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:rnc:glossgroupMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:glossgroupMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic concept glossgroup)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>INFO TYPES PATTERNS</a:documentation>
+    <define name="glossgroup-info-types">
+      <choice>
+        <ref name="glossgroup.element"/>
+        <ref name="glossentry.element"/>
+      </choice>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="glossgroup">
+      <ref name="glossgroup.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation> LONG NAME: Glossary Group </a:documentation>
+      <define name="glossgroup.content">
+        <ref name="title"/>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="glossgroup-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="glossgroup.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossgroup.element">
+        <element name="glossgroup" dita:longName="Glossary Group">
+          <a:documentation>The &lt;glossgroup> element may be used to contain multiple &lt;glossentry> topics within a single collection.</a:documentation>
+          <ref name="glossgroup.attlist"/>
+          <ref name="glossgroup.content"/>
+        </element>
+      </define>
+      <define name="glossgroup.attlist" combine="interleave">
+        <ref name="glossgroup.attributes"/>
+        <ref name="arch-atts"/>
+        <ref name="domains-att"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+
+    <define name="glossgroup.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic concept/concept glossgroup/glossgroup "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

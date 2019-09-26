@@ -1,0 +1,897 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Metadata                                    -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Metadata//EN"                -->
+<!--      Delivered as file "metaDecl.mod"                            -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for the DITA XML Metadata             -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2001                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2001, 2004.        -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2005.11.15 RDA: Corrected the "Delivered as" system ID    -->
+<!--   2006.06.06 RDA: Move indexterm into commonElements        -->
+<!--   2006.06.07 RDA: Make universal attributes universal       -->
+<!--                     (DITA 1.1 proposal #12)                 -->
+<!--   2006.11.30 RDA: Add -dita-use-conref-target to enumerated -->
+<!--                     attributes                              -->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       -->
+<!--   2008.01.28 RDA: Removed enumerations for attributes:      -->
+<!--                   author/@type, copyright/@type,            -->
+<!--                   permissions/@view, audience/@type,        -->
+<!--                   audience/@job, audience/@experiencelevel  -->
+<!--   2008.01.28 RDA: Moved <metadata> defn. here from topic.mod-->
+<!--   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  -->
+<!--   2008.02.12 RDA: Add ph to source                          -->
+<!--   2008.02.12 RDA: Add @format, @scope, and @type to         -->
+<!--                   publisher, source                         -->
+<!--   2008.02.12 RDA: Add @format, @scope, to author            -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--   2009.03.09 RDA: Corrected public ID in comments to use    -->
+<!--                   ELEMENTS instead of ENTITIES              -->
+<!--=============================================================-->
+<!--                                                             -->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/"/>
+      </xs:appinfo>
+   </xs:annotation>
+
+   <xs:group name="date-format">
+      <xs:sequence/>
+   </xs:group>
+   <xs:element name="author">
+      <xs:annotation>
+         <xs:documentation>The &lt;author&gt; metadata element contains the name of the topic's author. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="author.class">
+               <xs:attribute ref="class" default="- topic/author "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="author.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="author.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="author.attributes"/>
+   </xs:complexType>
+   <xs:group name="author.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="author.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="local"/>
+               <xs:enumeration value="peer"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="source">
+      <xs:annotation>
+         <xs:documentation>The &lt;source&gt; element contains a reference to a resource from which the present topic is derived, either completely or in part. The element can contain a description of
+            the resource; the href reference can be a string or a URL that points to it. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="source.class">
+               <xs:attribute ref="class" default="- topic/source "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="source.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="source.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="source.attributes"/>
+   </xs:complexType>
+   <xs:group name="source.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt"/>
+            <xs:group ref="ph"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="source.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="local"/>
+               <xs:enumeration value="peer"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="publisher">
+      <xs:annotation>
+         <xs:documentation>The &lt;publisher&gt; metadata element contains the name of the person, company, or organization responsible for making the content or subject of the topic available. Category:
+            Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="publisher.class">
+               <xs:attribute ref="class" default="- topic/publisher "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="publisher.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="publisher.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="publisher.attributes"/>
+   </xs:complexType>
+   <xs:group name="publisher.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="publisher.attributes">
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="local"/>
+               <xs:enumeration value="peer"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="copyright">
+      <xs:annotation>
+         <xs:documentation>The &lt;copyright&gt; element is used for a single copyright entry. It includes the copyright years and the copyright holder. Multiple &lt;copyright&gt; statements are allowed.
+            Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="copyright.class">
+               <xs:attribute ref="class" default="- topic/copyright "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="copyright.class">
+      <xs:sequence>
+         <xs:group ref="copyright.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="copyright.attributes"/>
+   </xs:complexType>
+   <xs:group name="copyright.content">
+      <xs:sequence>
+         <xs:group ref="copyryear" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:group ref="copyrholder"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="copyright.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="copyryear">
+      <xs:annotation>
+         <xs:documentation>The &lt;copyryear&gt; element contains the copyright year as specified by the year attribute. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="copyryear.class">
+               <xs:attribute ref="class" default="- topic/copyryear "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="copyryear.class">
+      <xs:sequence>
+         <xs:group ref="copyryear.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="copyryear.attributes"/>
+   </xs:complexType>
+   <xs:group name="copyryear.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="copyryear.attributes">
+      <xs:attribute name="year" use="required" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="copyrholder">
+      <xs:annotation>
+         <xs:documentation>The copyright holder (&lt;copyrholder&gt;) element names the entity that holds legal rights to the material contained in the topic. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="copyrholder.class">
+               <xs:attribute ref="class" default="- topic/copyrholder "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="copyrholder.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="copyrholder.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="copyrholder.attributes"/>
+   </xs:complexType>
+   <xs:group name="copyrholder.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="copyrholder.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="critdates">
+      <xs:annotation>
+         <xs:documentation>The &lt;critdates&gt; element contains the critical dates in a document life cycle, such as the creation date and multiple revision dates. Category: Prolog
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="critdates.class">
+               <xs:attribute ref="class" default="- topic/critdates "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="critdates.class">
+      <xs:sequence>
+         <xs:group ref="critdates.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="critdates.attributes"/>
+   </xs:complexType>
+   <xs:group name="critdates.content">
+      <xs:sequence>
+         <xs:group ref="created" minOccurs="0"/>
+         <xs:group ref="revised" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="critdates.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="created">
+      <xs:annotation>
+         <xs:documentation>The &lt;created&gt; element specifies the document creation date using the date attribute. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="created.class">
+               <xs:attribute ref="class" default="- topic/created "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="created.class">
+      <xs:sequence>
+         <xs:group ref="created.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="created.attributes"/>
+   </xs:complexType>
+   <xs:group name="created.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="created.attributes">
+      <xs:attribute name="date" use="required" type="xs:string"/>
+      <xs:attribute name="golive" type="xs:string"/>
+      <xs:attribute name="expiry" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="revised">
+      <xs:annotation>
+         <xs:documentation>The &lt;revised&gt; element in the prolog is used to maintain tracking dates that are important in a topic development cycle, such as the last modification date, the original
+            availability date, and the expiration date. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="revised.class">
+               <xs:attribute ref="class" default="- topic/revised "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="revised.class">
+      <xs:sequence>
+         <xs:group ref="revised.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="revised.attributes"/>
+   </xs:complexType>
+   <xs:group name="revised.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="revised.attributes">
+      <xs:attribute name="modified" use="required" type="xs:string"/>
+      <xs:attribute name="golive" type="xs:string"/>
+      <xs:attribute name="expiry" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="permissions">
+      <xs:annotation>
+         <xs:documentation>The &lt;permissions&gt; prolog element can indicate any preferred controls for access to a topic. Topics can be filtered based on the permissions element. This capability
+            depends on your output formatting process. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="permissions.class">
+               <xs:attribute ref="class" default="- topic/permissions "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="permissions.class">
+      <xs:sequence>
+         <xs:group ref="permissions.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="permissions.attributes"/>
+   </xs:complexType>
+   <xs:group name="permissions.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="permissions.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="view" use="required" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="category">
+      <xs:annotation>
+         <xs:documentation>The &lt;category&gt; element can represent any category by which a topic might be classified for retrieval or navigation; for example, the categories could be used to group
+            topics in a generated navigation bar. Topics can belong to multiple categories. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="category.class">
+               <xs:attribute ref="class" default="- topic/category "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="category.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="category.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="category.attributes"/>
+   </xs:complexType>
+   <xs:group name="category.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="category.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="metadata">
+      <xs:annotation>
+         <xs:documentation>The &lt;metadata&gt; section of the prolog contains information about a topic such as audience and product information. Metadata can be used by computational processes to
+            select particular topics or to prepare search indexes or to customize navigation. Elements inside of &lt;metadata&gt; provide information about the content and subject of a topic; prolog
+            elements outside of &lt;metadata&gt; provide lifecycle information for the content unit (such as the author or copyright), which are unrelated to the subject. Category: Prolog
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="metadata.class">
+               <xs:attribute ref="class" default="- topic/metadata "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="metadata.class">
+      <xs:sequence>
+         <xs:group ref="metadata.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="metadata.attributes"/>
+   </xs:complexType>
+   <xs:group name="metadata.content">
+      <xs:sequence>
+         <xs:group ref="audience" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="category" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="keywords" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="prodinfo" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="othermeta" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="metadata.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="mapkeyref" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="audience">
+      <xs:annotation>
+         <xs:documentation>The &lt;audience&gt; metadata element indicates, through the value of its type attribute, the intended audience for a topic. Since a topic can have multiple audiences, you can
+            include multiple audience elements. For each audience you specify, you can identify the high-level task (job) they are trying to accomplish and the level of experience (experiencelevel)
+            expected. The audience element may be used to provide a more detailed definition of values used throughout the map or topic on the audience attribute. Category: Prolog
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="audience.class">
+               <xs:attribute ref="class" default="- topic/audience "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="audience.class">
+      <xs:sequence>
+         <xs:group ref="audience.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="audience.attributes"/>
+   </xs:complexType>
+   <xs:group name="audience.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="audience.attributes">
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="othertype" type="xs:string"/>
+      <xs:attribute name="job" type="xs:string"/>
+      <xs:attribute name="otherjob" type="xs:string"/>
+      <xs:attribute name="experiencelevel" type="xs:string"/>
+      <xs:attribute name="name" type="xs:NMTOKEN"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="keywords">
+      <xs:annotation>
+         <xs:documentation>The &lt;keywords&gt; element contains a list of key words (using &lt;indexterm&gt; or &lt;keyword&gt; markup) that can be used by a search engine. Category: Prolog
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="keywords.class">
+               <xs:attribute ref="class" default="- topic/keywords "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="keywords.class">
+      <xs:sequence>
+         <xs:group ref="keywords.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="keywords.attributes"/>
+   </xs:complexType>
+   <xs:group name="keywords.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="indexterm"/>
+            <xs:group ref="keyword"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="keywords.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="prodinfo">
+      <xs:annotation>
+         <xs:documentation>The &lt;prodinfo&gt; metadata element in the prolog contains information about the product or products that are the subject matter of the current topic. The prodinfo element
+            may be used to provide a more detailed definition of values used throughout the map or topic on the product attribute. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="prodinfo.class">
+               <xs:attribute ref="class" default="- topic/prodinfo "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="prodinfo.class">
+      <xs:sequence>
+         <xs:group ref="prodinfo.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="prodinfo.attributes"/>
+   </xs:complexType>
+   <xs:group name="prodinfo.content">
+      <xs:sequence>
+         <xs:group ref="prodname"/>
+         <xs:group ref="vrmlist" minOccurs="0"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="brand"/>
+            <xs:group ref="component"/>
+            <xs:group ref="featnum"/>
+            <xs:group ref="platform"/>
+            <xs:group ref="prognum"/>
+            <xs:group ref="series"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="prodinfo.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="prodname">
+      <xs:annotation>
+         <xs:documentation>The &lt;prodname&gt; metadata element contains the name of the product that is supported by the information in this topic. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="prodname.class">
+               <xs:attribute ref="class" default="- topic/prodname "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="prodname.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="prodname.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="prodname.attributes"/>
+   </xs:complexType>
+   <xs:group name="prodname.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="prodname.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="vrmlist">
+      <xs:annotation>
+         <xs:documentation>The &lt;vrmlist&gt; element contains a set of &lt;vrm&gt; elements for logging the version, release, and modification information for multiple products or versions of products to
+            which the topic applies. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="vrmlist.class">
+               <xs:attribute ref="class" default="- topic/vrmlist "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="vrmlist.class">
+      <xs:sequence>
+         <xs:group ref="vrmlist.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="vrmlist.attributes"/>
+   </xs:complexType>
+   <xs:group name="vrmlist.content">
+      <xs:sequence>
+         <xs:group ref="vrm" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="vrmlist.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="vrm">
+      <xs:annotation>
+         <xs:documentation>The vrm empty element contains information about a single product's version, modification, and release, to which the current topic applies. Category: Prolog
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="vrm.class">
+               <xs:attribute ref="class" default="- topic/vrm "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="vrm.class">
+      <xs:sequence>
+         <xs:group ref="vrm.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="vrm.attributes"/>
+   </xs:complexType>
+   <xs:group name="vrm.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="vrm.attributes">
+      <xs:attribute name="version" use="required" type="xs:string"/>
+      <xs:attribute name="release" type="xs:string"/>
+      <xs:attribute name="modification" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="brand">
+      <xs:annotation>
+         <xs:documentation>The &lt;brand&gt; element indicates the manufacturer or brand associated with the product described by the parent &lt;prodinfo&gt; element. Category: Prolog
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="brand.class">
+               <xs:attribute ref="class" default="- topic/brand "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="brand.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="brand.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="brand.attributes"/>
+   </xs:complexType>
+   <xs:group name="brand.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="brand.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="series">
+      <xs:annotation>
+         <xs:documentation>The &lt;series&gt; metadata element contains information about the product series that the topic supports. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="series.class">
+               <xs:attribute ref="class" default="- topic/series "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="series.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="series.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="series.attributes"/>
+   </xs:complexType>
+   <xs:group name="series.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="series.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="platform">
+      <xs:annotation>
+         <xs:documentation>The &lt;platform&gt; metadata element contains a description of the operating system and/or hardware related to the product being described by the &lt;prodinfo&gt; element. The
+            platform element may be used to provide a more detailed definition of values used throughout the map or topic on the platform attribute. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="platform.class">
+               <xs:attribute ref="class" default="- topic/platform "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="platform.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="platform.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="platform.attributes"/>
+   </xs:complexType>
+   <xs:group name="platform.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="platform.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="prognum">
+      <xs:annotation>
+         <xs:documentation>The &lt;prognum&gt; metadata element identifies the program number of the associated program product. This is typically an order number or a product tracking code that could be
+            replaced by an order number when a product completes development. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="prognum.class">
+               <xs:attribute ref="class" default="- topic/prognum "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="prognum.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="prognum.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="prognum.attributes"/>
+   </xs:complexType>
+   <xs:group name="prognum.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="prognum.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="featnum">
+      <xs:annotation>
+         <xs:documentation>The &lt;featnum&gt; element contains the feature number of a product in the metadata. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="featnum.class">
+               <xs:attribute ref="class" default="- topic/featnum "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="featnum.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="featnum.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="featnum.attributes"/>
+   </xs:complexType>
+   <xs:group name="featnum.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="featnum.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="component">
+      <xs:annotation>
+         <xs:documentation>The &lt;component&gt; element describes the component of the product that this topic is concerned with. For example, a product might be made up of many components, each of
+            which is installable separately. Components might also be shared by several products so that the same component is available for installation with many products. An implementation may (but
+            need not) use this identification to check cross-component dependencies when some components are installed, but not others. An implementation may also (but need not) use the identification
+            make sure that topics are hidden, removed, or flagged in some way when the component they describe isn't installed. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="component.class">
+               <xs:attribute ref="class" default="- topic/component "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="component.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="component.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="component.attributes"/>
+   </xs:complexType>
+   <xs:group name="component.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="component.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="othermeta">
+      <xs:annotation>
+         <xs:documentation>The &lt;othermeta&gt; element can be used to identify properties not otherwise included in &lt;metadata&gt; and assign name/content values to those properties. The name attribute
+            identifies the property and the content attribute specifies the property's value. The values in this attribute are output as HTML metadata elements, and have no defined meaning for other
+            possible outputs such as PDF. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="othermeta.class">
+               <xs:attribute ref="class" default="- topic/othermeta "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="othermeta.class">
+      <xs:sequence>
+         <xs:group ref="othermeta.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="othermeta.attributes"/>
+   </xs:complexType>
+   <xs:group name="othermeta.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="othermeta.attributes">
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="content" use="required" type="xs:string"/>
+      <xs:attribute name="translate-content">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="resourceid">
+      <xs:annotation>
+         <xs:documentation>The &lt;resourceid&gt; element provides an identifier for applications that require them in a particular format, when the normal id attribute of the topic can't be used. Each
+            resourceid entry should be unique. It is one of the metadata elements that can be included within the prolog of a topic, along with document tracking and product information, etc. The
+            element has no content, but takes an id attribute, an appname attribute, and an appid attribute. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="resourceid.class">
+               <xs:attribute ref="class" default="- topic/resourceid "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="resourceid.class">
+      <xs:sequence>
+         <xs:group ref="resourceid.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="resourceid.attributes"/>
+   </xs:complexType>
+   <xs:group name="resourceid.content">
+      <xs:sequence>
+         <xs:group ref="data.elements.incl" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="resourceid.attributes">
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="id" type="xs:string"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attribute name="appname" type="xs:string"/>
+      <xs:attribute name="appid" type="xs:string"/>
+      <xs:attribute name="ux-context-string" type="xs:string"/>
+      <xs:attribute name="ux-source-priority" default="topic-and-map">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="topic-and-map"/>
+               <xs:enumeration value="topic-only"/>
+               <xs:enumeration value="map-only"/>
+               <xs:enumeration value="map-takes-priority"/>
+               <xs:enumeration value="topic-takes-priority"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ux-windowref" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

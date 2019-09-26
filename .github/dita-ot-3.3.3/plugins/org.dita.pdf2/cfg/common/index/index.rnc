@@ -1,0 +1,67 @@
+# This file is part of the DITA Open Toolkit project.
+#
+# Copyright 2011 Jarno Elovirta
+#
+# See the accompanying LICENSE file for applicable license.
+index.configuration.set =
+  ## Index configuration set
+  element index.configuration.set {
+    ## Metadata
+    element metadata {
+      element revision.history {
+        element revision {
+          element date { text },
+          element author { text },
+          description
+        }* 
+      }
+    }?,
+    index.configuration*
+  }
+index.configuration =
+  ## Index configuration
+  element index.configuration {
+    ## Configuration language
+    element language { text }?,
+    description?,
+    element collation.sequence { text? }?,
+    index.groups*
+  }
+index.groups =
+  ## Index groups 
+  element index.groups {
+    index.group*
+  }
+index.group =
+  ## Index group
+  element index.group {
+    (group.key | group.label | group.members)*
+  }
+
+group.members =
+  ## Group member characters
+  element group.members {
+    (char.set | char.set-range)*
+  }
+group.label =
+  ## Group label
+  element group.label { text? }
+group.key =
+  ## Group key
+  element group.key { text? }
+char.set-range =
+  ## Character range
+  element char.set {
+    ## Range start character
+    attribute start-range { text },
+    ## Range end character
+    attribute end-range { text }
+  }
+char.set =
+  ## Character
+  element char.set { text }
+description =
+  ## Description
+  element description { text }
+
+start = index.configuration.set

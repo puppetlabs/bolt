@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Utilities Domain                            -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Utilities Domain//EN"        -->
+<!--      Delivered as file "utilitiesDomain.mod"                     -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for the DITA Utilities Domain         -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2001                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2001, 2004.        -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2005.11.15 RDA: Updated these comments to match template  -->
+<!--   2005.11.15 RDA: Corrected the "Delivered as" system ID    -->
+<!--   2006.06.07 RDA: Make universal attributes universal       -->
+<!--                     (DITA 1.1 proposal #12)                 -->
+<!--   2006.06.14 RDA: Move univ-atts-translate-no into topic.mod-->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2      -->
+<!--   2008.02.12 RDA: Add text to shape                         -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic ut-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="imagemap">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="imagemap"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="area">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="area"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="shape">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="shape"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="coords">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="coords"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="sort-as">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="sort-as"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="ut-d-fig">
+      <xs:choice>
+         <xs:element ref="imagemap"/>
+      </xs:choice>
+   </xs:group>
+   <xs:group name="ut-d-data">
+      <xs:choice>
+         <xs:element ref="sort-as"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="imagemap">
+      <xs:annotation>
+         <xs:documentation>The imagemap element supports the basic functionality 
+            of the HTML client-side image map markup. Imagemap allows you to designate 
+            a linkable area or region over an image,
+            allowing a link in that region to display another topic. 
+            Category: Utilities elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="imagemap.class">
+               <xs:attribute ref="class" default="+ topic/fig ut-d/imagemap "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="imagemap.class">
+      <xs:sequence>
+         <xs:group ref="imagemap.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="imagemap.attributes"/>
+   </xs:complexType>
+   <xs:group name="imagemap.content">
+      <xs:sequence>
+         <xs:group ref="image"/>
+         <xs:group ref="area" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="imagemap.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="area">
+      <xs:annotation>
+         <xs:documentation>The area element supports the basic functionality of the HTML 
+            image map markup. 
+            Category: Utilities elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="area.class">
+               <xs:attribute ref="class" default="+ topic/figgroup ut-d/area "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="area.class">
+      <xs:sequence>
+         <xs:group ref="area.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="area.attributes"/>
+   </xs:complexType>
+   <xs:group name="area.content">
+      <xs:sequence>
+         <xs:group ref="shape"/>
+         <xs:group ref="coords"/>
+         <xs:group ref="xref"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="area.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="shape">
+      <xs:annotation>
+         <xs:documentation>The shape element defines the shape of a linkable 
+            area in an imagemap. Category: Utilities elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="shape.class">
+               <xs:attribute ref="class" default="+ topic/keyword ut-d/shape "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="shape.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="shape.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="shape.attributes"/>
+   </xs:complexType>
+   <xs:group name="shape.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="shape.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts-translate-no"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="coords">
+      <xs:annotation>
+         <xs:documentation>The coords element specifies the coordinates of the 
+            linkable region in an imagemap area. Category: Utilities elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="coords.class">
+               <xs:attribute ref="class" default="+ topic/ph ut-d/coords "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="coords.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="coords.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="coords.attributes"/>
+   </xs:complexType>
+   <xs:group name="coords.content">
+      <xs:sequence>
+         <xs:group ref="words.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="coords.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts-translate-no"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="sort-as">
+      <xs:annotation>
+         <xs:documentation> Category: Utilities elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="sort-as.class">
+               <xs:attribute ref="class" default="+ topic/data ut-d/sort-as "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="sort-as.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="sort-as.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="sort-as.attributes"/>
+   </xs:complexType>
+   <xs:group name="sort-as.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+            <xs:group ref="keyword"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="sort-as.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="name" type="xs:string" default="sort-as"/>
+      <xs:attribute name="value" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

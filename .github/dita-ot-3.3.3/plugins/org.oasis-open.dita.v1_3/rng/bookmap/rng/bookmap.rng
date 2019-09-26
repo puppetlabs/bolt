@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:checkShell.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+         xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+      <moduleTitle>DITA Book Map Shell</moduleTitle>
+      <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02
+OASIS Standard
+16 January 2018 
+Copyright (c) OASIS Open 2018. All rights reserved. 
+Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html
+
+============================================================
+ MODULE:    DITA Bookmap                                 
+ VERSION:   1.3                                              
+ DATE:      March 2014                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//DTD DITA BookMap//EN"
+      Delivered as file "bookmap.dtd"                             
+
+The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+PUBLIC "-//OASIS//DTD DITA 1.3 BookMap//EN"                       
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    DTD to describe DITA Book Maps                   
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2004                                       
+                                                             
+            (C) Copyright OASIS Open 2006, 2014         
+            (C) Copyright IBM Corporation 2004, 2005.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2008.02.01 RDA: Added reference to bookmap.ent            
+   2008.02.12 RDA: Modify imbeds to use specific 1.2 version 
+   2008.04.15 RDA: Added delay resolution domain             
+   2010.09.21 RDA: Added base and tec. content topic domains 
+   2014.03.13 WEK: Updated for DITA 1.3, reimplemented as RNG
+=============================================================
+</headerComment>
+      <moduleMetadata>
+         <moduleType>mapshell</moduleType>
+         <moduleShortName>bookmap</moduleShortName>
+         <shellPublicIds>
+            <dtdShell>-//OASIS//DTD DITA<var presep=" " name="ditaver"/> BookMap//EN</dtdShell>
+            <rncShell>urn:oasis:names:tc:dita:rnc:bookmap.rnc<var presep=":" name="ditaver"/>
+            </rncShell>
+            <rngShell>urn:oasis:names:tc:dita:rng:bookmap.rng<var presep=":" name="ditaver"/>
+            </rngShell>
+            <xsdShell>urn:oasis:names:tc:dita:xsd:bookmap.xsd<var presep=":" name="ditaver"/>
+            </xsdShell>
+         </shellPublicIds>
+      </moduleMetadata>
+  </moduleDesc>
+
+  <div>
+      <a:documentation>ROOT ELEMENT DECLARATION</a:documentation>
+      <start>
+         <ref name="bookmap.element"/>
+      </start>
+  </div>
+  <div>
+      <a:documentation>DOMAINS ATTRIBUTE</a:documentation>
+      <define name="domains-att" combine="interleave">
+         <optional>
+            <attribute name="domains"
+                       a:defaultValue="(map bookmap)
+                         (topic abbrev-d)
+                         (topic delay-d)
+                         (map ditavalref-d)
+                         (topic hazard-d)
+                         (topic hi-d)
+                         (topic indexing-d)
+                         (map mapgroup-d)
+                         (topic markup-d xml-d)
+                         (topic markup-d)
+                         (topic pr-d)
+                         (topic relmgmt-d)
+                         (topic sw-d)
+                         (topic ui-d)
+                         (topic ut-d)
+                         (topic xnal-d)
+                         a(props deliveryTarget)"/>
+         </optional>
+      </define>
+
+  </div>
+  <div>
+      <a:documentation>MODULE INCLUSIONS</a:documentation>
+      <include href="../../base/rng/mapMod.rng"/>
+      <include href="../../base/rng/mapGroupDomain.rng"/>
+
+      <include href="bookmapMod.rng"/>
+
+      <include href="../../technicalContent/rng/abbreviateDomain.rng"/>
+      <include href="../../base/rng/delayResolutionDomain.rng"/>
+      <include href="../../base/rng/deliveryTargetAttDomain.rng" dita:since="1.3"/>
+      <include href="../../base/rng/ditavalrefDomain.rng" dita:since="1.3"/>
+      <include href="../../base/rng/hazardstatementDomain.rng"/>
+      <include href="../../base/rng/highlightDomain.rng"/>
+      <include href="../../base/rng/indexingDomain.rng"/>
+      <include href="../../technicalContent/rng/markupDomain.rng" dita:since="1.3"/>
+      <include href="../../technicalContent/rng/programmingDomain.rng"/>
+      <include href="../../technicalContent/rng/releaseManagementDomain.rng" dita:since="1.3"/>
+      <include href="../../technicalContent/rng/softwareDomain.rng"/>
+      <include href="../../technicalContent/rng/uiDomain.rng"/>
+      <include href="../../base/rng/utilitiesDomain.rng"/>
+      <include href="../../xnal/rng/xnalDomain.rng"/>
+      <include href="../../technicalContent/rng/xmlDomain.rng" dita:since="1.3"/>
+  </div>
+  <div>
+      <a:documentation>ID-DEFINING-ELEMENT OVERRIDES</a:documentation>
+      <define name="any">
+         <zeroOrMore>
+            <choice>
+               <ref name="idElements"/>
+               <element>
+                  <anyName>
+                     <except>
+                        <name>map</name>
+                        <name>bookmap</name>
+                        <name>anchor</name>
+                     </except>
+                  </anyName>
+                  <zeroOrMore>
+                     <attribute>
+                        <anyName/>
+                     </attribute>
+                  </zeroOrMore>
+                  <ref name="any"/>
+               </element>
+               <text/>
+            </choice>
+         </zeroOrMore>
+      </define>
+  </div>
+</grammar>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (C) Copyright IBM Corporation 2001, 2005. All Rights Reserved. -->
+
+<concept id="shelvingconcept" xml:lang="en-us">
+  <title>Shelving</title>
+  <shortdesc>Wooden or metal shelving is useful for storing things in the garage.</shortdesc>
+  <conbody>
+    <p>Shelving also keeps things neat and organized.</p>
+  </conbody>
+  <related-links>
+    <link href="../tasks/organizing.xml" format="dita" type="task"/>
+  </related-links>
+</concept>

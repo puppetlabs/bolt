@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+ "../../../../dtd/task.dtd">
+ <!-- 
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+     
+     Copyright 2007 Shawn McKenzie
+     *-->
+     <?xml-stylesheet href="../../../../xsl/ditaview_shell.xsl" type="text/xsl"?>
+<task id="tocjs_integrate" xml:lang="en-us">
+    <title>Integrate and test</title>
+    <taskbody>
+        <context>
+            <p>Once you have obtained the latest tocjs plugin, you need to install and integrate it
+                into the DITA Open Toolkit. Note that if you are using DITA-OT 1.5 or later, you can
+                skip directly to step #3, because the tocjs plugin is already part of your install.</p>
+        </context>
+        <steps>
+            <step>
+                <cmd>Obtain the latest version of the tocjs plugin.</cmd>
+            </step>
+
+            <step>
+                <cmd>Unzip the plugin in your demo directory.</cmd>
+                <stepresult>This should give you a <filepath>tocjs</filepath>
+                directory.</stepresult>
+            </step>
+            <step>
+                <cmd>From your base DITA directory, type:<userinput>ant -f
+                    integrator.xml</userinput>.</cmd>
+                <stepresult>You should see output similar to the following message:
+                    <screen>
+Buildfile: integrator.xml
+                        
+BUILD SUCCESSFUL
+Total time: 1 seconds     
+                     </screen>
+                    The tocjs transtype should be registered with the Open Toolkit.</stepresult>
+            </step>
+            <step>
+                <cmd>Type: <userinput>ant -f demo/tocjs/buildsample.xml sample2tocjs</userinput>.</cmd>
+                <stepresult>The end of the message output should say:
+                    <screen>
+dita2tocjs:
+                        
+BUILD SUCCESSFUL
+Total time: 6 seconds
+                    </screen></stepresult>
+            </step>
+            <step>
+                <cmd>Open <filepath>demo/tocjs/out/sample/frameset.html</filepath> in a browser.</cmd>
+                <stepresult>This documentation should be displayed in a frameset that includes a
+                    JavaScript TOC in the left pane.</stepresult>
+            </step>
+        </steps>
+
+    </taskbody>
+</task>

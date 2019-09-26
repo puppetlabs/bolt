@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<topic id="troubleshooting" xml:lang="en-us">
+  <title>Troubleshooting</title>
+  <shortdesc>The troubleshooting tasks explain how to diagnose the cause of and recover from problems.</shortdesc>
+  <body>
+    <p>To fix a problem, you often have to configure or maintain a component. The troubleshooting tasks help you
+      determine what to work on to get back to normal operations. </p>
+  </body>
+</topic>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="configurewebserver" xml:lang="en-us">
+  <title>Configuring your Web Server</title>
+  <shortdesc>Configuring your Web Server can be as complex or as simple as you want it to be.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>web server</indexterm>
+        <indexterm>configure</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context id="techwriter"><note>In this instance, the technical writer knows nothing about his
+      subject.</note></context>
+    <steps>
+      <step>
+        <cmd>Turn on the web server</cmd>
+      </step>
+      <step>
+        <cmd>Go to the Options menu</cmd>
+      </step>
+      <step>
+        <cmd>Follow that to "Web Server Preferences"</cmd>
+      </step>
+      <step>
+        <cmd>Make sure all of the right buttons are checked, or else you will never get it to work</cmd>
+      </step>
+      <step>
+        <cmd>Go to your site library and check out a book; any book, even about COBOL, is likely to be more helpful than
+          I am.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <!--============================================================= -->
+  <!--MODULE:    DITA Learning Object Map Module Intermediate Module -->
+  <!--VERSION:   1.3                                                -->
+  <!--DATE:      July 2016                                         -->
+  <!--=============================================================-->
+  <!--Refer to the latest version of this file by the following URI:-->
+  <!--urn:oasis:names:tc:dita:spec:learning:xsd:learningObjectMapIntMod.xsd -->
+  <!--To refer to this specific version, you may use this value:   -->
+  <!--urn:oasis:names:tc:dita:spec:learning:xsd:learningObjectMapIntMod.xsd:1.3 -->
+  <!--============================================================= -->
+  <!--SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+  <!--PURPOSE:    Enables redefinition of the topicref group such  -->
+  <!--            that topicref can be omitted.                    -->
+  <!--ORIGINAL CREATION DATE:                                      -->
+  <!--July 2016                                                    -->
+  <!--(C) Copyright OASIS Open                                     -->
+  <!--All Rights Reserved.                                          -->
+  <!--=============================================================-->
+  <!--                                                             -->
+  <xs:redefine schemaLocation="../../base/xsd/mapGrp.xsd">
+    <xs:group name="topicref">
+      <xs:choice>
+        <xs:group ref="topicref"/>
+        <xs:group ref="mapgroup-d-topicref"/>
+        <xs:group ref="ditavalref-d-topicref"/>
+        <xs:group ref="learningmap-d-topicref"/>
+      </xs:choice>
+    </xs:group>
+  </xs:redefine>
+  
+</xs:schema>

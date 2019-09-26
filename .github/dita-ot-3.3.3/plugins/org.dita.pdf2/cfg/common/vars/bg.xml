@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Предговор | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Предговор | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Съдържание</variable>
+  <variable id="Index Continued String">продължение</variable>
+  <variable id="Index See String">, Вижте </variable>
+  <variable id="Index See Also String">Вижте също </variable>
+  <variable id="Table of Contents Chapter">Глава <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">Приложение <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">Глава <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">Предговор: </variable>
+  <variable id="Preface title">Предговор</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">Съдържание: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">Фигура <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">Фигура <param ref-name="number"/></variable>
+  <variable id="Table.title">Таблица <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Таблица <param ref-name="number"/></variable>
+  <variable id="Related Links">Свързана информация</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">Глава <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Приложение <param ref-name="number"/></variable>
+  <variable id="Part with number">Глава <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[Необходимо прочистване]</variable>
+  <variable id="On the page"> на страница <param ref-name="pagenum"/></variable>
+  <variable id="Page"> Страница <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">Избираем:</variable>
+  <variable id="Required Step">Задължителен:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Терминологичен речник</variable>
+  <variable id="List of Tables">Таблици</variable>
+  <variable id="List of Figures">Фигури</variable>
+</vars>

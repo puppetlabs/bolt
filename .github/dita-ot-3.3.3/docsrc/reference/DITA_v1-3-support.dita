@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="dita-13-spec-support" xml:lang="en-US">
+  <title>DITA 1.3 support</title>
+  <shortdesc><ph id="shortdesc-ph">DITA Open Toolkit <keyword keyref="release"/> provides processing support for the
+      OASIS DITA 1.3 specification. Initial preview support for this specification was added in version 2.0 of the
+      toolkit; version 2.2 extended this foundation to support key scopes and branch filtering along with additional
+      DITA 1.3 features.</ph></shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>ditavalref</xmlelement></indexterm>
+        <indexterm><xmlelement>xmlelement</xmlelement></indexterm>
+        <indexterm><xmlelement>xmlatt</xmlelement></indexterm>
+        <indexterm><xmlelement>line-through</xmlelement></indexterm>
+        <indexterm><xmlelement>overline</xmlelement></indexterm>
+        <indexterm><xmlelement>object</xmlelement></indexterm>
+        <indexterm><xmlelement>div</xmlelement><indexterm>support</indexterm></indexterm>
+        <indexterm><xmlatt>keyscope</xmlatt></indexterm>
+        <indexterm><xmlatt>deliveryTarget</xmlatt></indexterm>
+        <indexterm><xmlatt>orient</xmlatt></indexterm>
+        <indexterm><xmlatt>keyref</xmlatt></indexterm>
+        <indexterm><xmlatt>cascade</xmlatt></indexterm>
+        <indexterm>profiling</indexterm>
+        <indexterm>filters<indexterm>support</indexterm></indexterm>
+        <indexterm>branch filters</indexterm>
+        <indexterm>DTD</indexterm>
+        <indexterm>schema<indexterm>DITA 1.3</indexterm></indexterm>
+        <indexterm>grammar files</indexterm>
+        <indexterm>DITA 1.3<indexterm>specification support</indexterm></indexterm>
+        <indexterm>catalog<indexterm>grammar file resolution</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <conbody>
+    <p id="p">Because DITA 1.3 is fully backwards compatible with previous DITA DTDs and schemas, DITA-OT provides the
+      1.3 materials as the default grammar files for processing. The XML Catalog resolution maps any references for
+      unversioned DITA document types to the 1.3 versions. All processing ordinarily dependent on the 1.0, 1.1, or 1.2
+      definitions continues to work as usual, and any documents that make use of the newer DITA 1.3 elements or
+      attributes will be supported with specific new processing.</p>
+    <section>
+      <title>Major features of DITA 1.3</title>
+      <p>The following DITA 1.3 features are supported in DITA Open Toolkit.</p>
+      <ul>
+        <li>
+          <xref keyref="dita13-spec-keyscopes">Scoped keys</xref> supported using DITA 1.3 <xmlatt>keyscope</xmlatt>
+          attribute</li>
+        <li>
+          <xref keyref="dita13-spec-branch-filter">Branch filtering</xref> using <xmlelement>ditavalref</xmlelement>
+          elements in a map</li>
+        <li>Support formatting based on new XML Mention elements, such as adding angle brackets around elements tagged
+          with <xmlelement>xmlelement</xmlelement> and adding <codeph>@</codeph> before attributes tagged with
+            <xmlelement>xmlatt</xmlelement></li>
+        <li>New highlighting elements <xmlelement>line-through</xmlelement> and <xmlelement>overline</xmlelement></li>
+        <li>Support for profiling based on <xmlatt>deliveryTarget</xmlatt> attribute</li>
+        <li>Support for the new <xmlatt>orient</xmlatt> attribute for rotating tables</li>
+        <li>Profile (filter or flag) based on
+          <xref keyref="dita13-spec-profile-groups">groups within profiling attributes</xref></li>
+        <li><xmlatt>keyref</xmlatt> and related key referencing attributes supported on
+          <xmlelement>object</xmlelement></li>
+        <li>New in-topic link syntax using <codeph>.</codeph> in place of the topic ID: <codeph>#./figure</codeph></li>
+        <li>Support for additional new elements, such as the <xmlelement>div</xmlelement> element for grouping</li>
+        <li>Support <xmlatt>cascade</xmlatt> attribute in maps (processing defaults to the value <codeph>merge</codeph>,
+          which is the
+          <xref keyref="dita13-spec-metadata-cascade-example">default cascade operation</xref> described by the DITA
+          Specification)</li>
+      </ul>
+      <note>For the latest status information on DITA 1.3-related features and fixes, see the
+        <xref keyref="dita13-issues">DITA 1.3 label</xref> in the GitHub issues tracker.</note>
+    </section>
+  </conbody>
+
+  <related-links>
+    <link keyref="dita13-spec-all-inclusive"/>
+    <link keyref="dita13-spec-all-inclusive-pdf"/>
+    <link keyref="dita13-spec-source"/>
+    <link keyref="dita-tc"/>
+    <link keyref="dita-adoption-tc"/>
+  </related-links>
+</concept>

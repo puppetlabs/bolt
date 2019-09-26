@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg11.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:attributeGroup name="SVG.onbegin.attrib">
+    <xs:attribute name="onbegin" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onend.attrib">
+    <xs:attribute name="onend" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onrepeat.attrib">
+    <xs:attribute name="onrepeat" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.AnimationEvents.attrib">
+    <xs:attributeGroup ref="SVG.onbegin.attrib"/>
+    <xs:attributeGroup ref="SVG.onend.attrib"/>
+    <xs:attributeGroup ref="SVG.onrepeat.attrib"/>
+    <xs:attributeGroup ref="SVG.onload.attrib"/>
+  </xs:attributeGroup>
+</xs:schema>

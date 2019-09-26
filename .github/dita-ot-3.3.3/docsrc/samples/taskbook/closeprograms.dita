@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="closeprograms" xml:lang="en-us">
+  <title>Close all of your programs</title>
+  <shortdesc>You need to shut down everything else before installing major programs</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Close programs</indexterm>
+        <indexterm>web server</indexterm>
+        <indexterm>database</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>If you are on a Windows system, click the X in the corner of each program.</cmd>
+      </step>
+      <step>
+        <cmd>If you are on a Linux system, type kill -9 [PID] for each of your programs. </cmd>
+        <tutorialinfo>You might want to save your data first.</tutorialinfo>
+      </step>
+      <step>
+        <cmd>If you are on a Macintosh, you will have to ask someone else. I have a wonderful little iPod, but that is
+          the limit of my experience with Apple products.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

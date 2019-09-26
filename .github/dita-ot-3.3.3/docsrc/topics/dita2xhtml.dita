@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="dita2xhtml" xml:lang="en-US">
+  <title>XHTML</title>
+  <shortdesc>The <option>xhtml</option> transformation generates XHTML output and a table of contents (TOC) file. This
+    was the first transformation created for DITA Open Toolkit, and originally served as the basis for all HTML-based
+    transformations.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>languages<indexterm>right-to-left</indexterm></indexterm>
+        <indexterm>transformations<indexterm>XHTML</indexterm></indexterm>
+        <indexterm>XHTML<index-see-also>transformations</index-see-also></indexterm>
+        <indexterm>HTML</indexterm>
+        <indexterm>plug-ins<indexterm>dita2xhtml</indexterm></indexterm>
+        <indexterm>dita2xhtml</indexterm>
+        <indexterm>CSS<indexterm>XHTML</indexterm></indexterm>
+        <indexterm>table of contents<indexterm>XHTML</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>The XHTML output is always associated with the default DITA-OT CSS file (<filepath>commonltr.css</filepath> or
+        <filepath>commonrtl.css</filepath> for right-to-left languages). You can use toolkit parameters to add a custom
+      style sheet to override the default styles.</p>
+    <p>To run the XHTML transformation, set the <parmname>transtype</parmname> parameter to <option>xhtml</option>, or
+      pass the <parmname>--format</parmname>=<option>xhtml</option> option to the <cmdname>dita</cmdname> command
+      line.</p>
+    <codeblock><filepath conref="../resources/conref-task.dita#ID/dita-cmd"/> <parmname>--input</parmname>=<varname>input-file</varname> <parmname>--format</parmname>=<option>xhtml</option></codeblock>
+    <p>where:</p>
+    <ul>
+      <li conref="../resources/conref-task.dita#ID/novice-variables-1"
+        conrefend="../resources/conref-task.dita#ID/novice-variables-2"/>
+    </ul>
+  </conbody>
+</concept>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | <variable id="Preface title"/> | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | <variable id="Preface title"/> | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">תוכן העניינים</variable>
+  <variable id="Index Continued String">המשך</variable>
+  <variable id="Index See String">, ראה </variable>
+  <variable id="Index See Also String">ראה גם </variable>
+  <variable id="Table of Contents Chapter">פרק <param ref-name="number"/>. </variable>
+  <variable id="Table of Contents Appendix">נספח <param ref-name="number"/>. </variable>
+  <variable id="Table of Contents Part">חלק <param ref-name="number"/>. </variable>
+  <variable id="Table of Contents Preface">מבוא: </variable>
+  <variable id="Preface title">מבוא</variable>
+  <variable id="Notices title"><!--TODO:Notice--></variable>
+  <variable id="Mini Toc">נושאים: </variable>
+  <variable id="Notice"><!--TODO:Notice--></variable>
+  <variable id="Figure.title">איור <param ref-name="number"/>. <param ref-name="title"/></variable>
+  <variable id="Figure Number">איור <param ref-name="number"/></variable>
+  <variable id="Table.title">טבלה <param ref-name="number"/>. <param ref-name="title"/></variable>
+  <variable id="Table Number">טבלה <param ref-name="number"/></variable>
+  <variable id="Related Links"><!--TODO:Related Links--></variable>
+  <variable id="Cross-Reference"><!--TODO:Cross-Reference to:--></variable><!--UNUSED-->
+  <variable id="Content-Reference"><!--TODO:Content-Reference to:--></variable><!--UNUSED-->
+  <variable id="List item"><!--TODO:List item.--></variable>
+  <variable id="Foot note"><!--TODO:Footnote.--></variable>
+  <variable id="Navigation title"><!--TODO:Navigation title--></variable>
+  <variable id="Search title"><!--TODO:Search title--></variable>
+  <variable id="Chapter with number">פרק <param ref-name="number"/></variable>
+  <variable id="Appendix with number">נספח <param ref-name="number"/></variable>
+  <variable id="Part with number">חלק <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup"><!--TODO:[Required-Cleanup]--></variable>
+  <variable id="On the page">בעמוד <param ref-name="pagenum"/></variable>
+  <variable id="Page">עמוד <param ref-name="pagenum"/></variable>
+  <variable id="This link"/><!--UNUSED-->
+  <variable id="Child topics"/><!--UNUSED-->
+  <variable id="Related references">תיעוד קשור</variable><!--UNUSED-->
+  <variable id="Optional Step">אופציונלי:</variable>
+  <variable id="Required Step">דרוש:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">מילון מונחים</variable>
+  <variable id="List of Tables">רשימת טבלאות</variable>
+  <variable id="List of Figures">רשימת איורים</variable>
+</vars>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<plugin id="org.dita.pdf2" version="3.3.3">
+  <!-- extension points -->
+  <extension-point id="dita.xsl.xslfo" name="PDF XSLT import"/>
+  <extension-point id="dita.xsl.xslfo.i18n-postprocess" name="PDF I18N postprocess import"/>
+  <extension-point id="org.dita.pdf2.xsl.topicmerge" name="PDF2 topic merge XSLT import"/>
+  <extension-point id="depend.org.dita.pdf2.init.pre" name="Initialization pre-target"/>
+  <extension-point id="depend.org.dita.pdf2.format.pre" name="Formatting pre-target"/>
+  <extension-point id="depend.org.dita.pdf2.format" name="Formatting target"/>
+  <extension-point id="depend.org.dita.pdf2.format.post" name="Formatting post-target"/>
+  <extension-point id="org.dita.pdf2.catalog.relative" name="Configuration XML catalog"/>
+  <extension-point id="dita.conductor.pdf2.param" name="PDF XSLT parameters"/>
+  <extension-point id="dita.conductor.pdf2.formatter.check" name="Formatter check"/>
+  <!-- extensions -->
+  <feature extension="dita.conductor.lib.import" file="lib/fo.jar"/>
+  <transtype name="pdf" desc="PDF">
+    <param name="outputFile.base" desc="Specifies the base file name of the generated PDF file."/>
+    <param name="args.artlbl" desc="Specifies whether to generate a label for each image; the label will contain the image file name." type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param name="args.bookmap-order" desc="Specifies if the frontmatter and backmatter content order is retained in bookmap." type="enum">
+      <val>retain</val>
+      <val default="true">discard</val>
+    </param>
+    <param name="args.bookmark.style" desc="Specifies whether PDF bookmarks are by default expanded or collapsed." type="enum">
+      <val>EXPANDED</val>
+      <val>COLLAPSE</val>
+    </param>
+    <param name="args.chapter.layout" desc="Specifies whether chapter level TOCs are generated." type="enum">
+      <val default="true">MINITOC</val>
+      <val>BASIC</val>
+    </param>
+    <param name="args.xsl.pdf" desc="Specifies an XSL file that is used to override the default XSL transformation." type="file"/>
+    <param name="customization.dir" desc="Specifies the customization directory." type="dir"/>
+    <param name="pdf.formatter" desc="Specifies the XSL processor." type="enum"/>
+    <param name="publish.required.cleanup" desc="Specifies whether draft-comment and required-cleanup elements are included in the output." type="enum">
+      <val>yes</val>
+      <val>no</val>
+    </param>
+    <param name="org.dita.pdf2.i18n.enabled" desc="Enables I18N font processing." type="enum">
+      <val desc="Enables I18N processing" default="true">true</val>
+      <val desc="Disables I18N processing">false</val>
+    </param>
+    <param name="org.dita.pdf2.chunk.enabled" desc="Enables chunk attribute processing." type="enum">
+      <val desc="Enables chunk processing">true</val>
+      <val desc="Disables chunk processing" default="true">false</val>
+    </param>
+  </transtype>
+  <transtype name="pdf2" extends="pdf" desc="PDF2"/>
+  <feature extension="dita.transtype.print" value="pdf"/>
+  <feature extension="dita.transtype.print" value="pdf2"/>
+  <feature extension="ant.import" file="build.xml"/>
+  <feature extension="dita.xsl.messages" file="resource/messages.xml"/>
+  <feature extension="dita.conductor.pdf2.formatter.check" value="ah"/>
+  <feature extension="dita.xsl.strings" file="cfg/common/vars/strings.xml"/>
+  <feature extension="dita.specialization.catalog.relative" file="cfg/catalog.xml"/>
+  <template file="build_template.xml"/>
+  <template file="cfg/catalog_template.xml"/>
+  <template file="xsl/fo/flagging-preprocess_template.xsl"/>
+  <template file="xsl/fo/i18n-postprocess_template.xsl"/>
+  <template file="xsl/fo/topic2fo_shell_template.xsl"/>
+  <template file="xsl/common/topicmerge_template.xsl"/>
+</plugin>

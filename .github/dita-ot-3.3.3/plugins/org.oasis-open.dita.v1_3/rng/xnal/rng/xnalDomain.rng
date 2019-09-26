@@ -1,0 +1,1074 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA XNAL Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    XNAL Domain                                      
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identfier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA XNAL Domain//EN"
+      Delivered as file "xnalDomain.mod"                          
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Define elements and specialization atttributed   
+            for the XNAL Domain                              
+                                                             
+ORIGINAL CREATION DATE:                                      
+            June 2006                                        
+                                                             
+            (C) Copyright OASIS Open 2006, 2009.             
+            All Rights Reserved.                             
+ UPDATES:                                                    
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.01.28 RDA: Removed enumerations for attributes:      
+                   authorinformation/@type                   
+   2008.02.12 RDA: Add keyword to data specializations       
+   2008.02.12 RDA: Add @format, @scope to authorinformation  
+   2008.02.13 RDA: Create .content and .attributes entities  
+=============================================================  
+</headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>xnal-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> XNAL Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> XNAL Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:xnalDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:xnalDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:xnalDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic xnal-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+
+    <define name="xnal-d-author">
+      <ref name="authorinformation.element"/>
+    </define>
+    <define name="author" combine="choice">
+      <ref name="xnal-d-author"/>
+    </define>
+
+
+    <define name="addressdetails">
+      <ref name="addressdetails.element"/>
+    </define>
+    <define name="administrativearea">
+      <ref name="administrativearea.element"/>
+    </define>
+    <define name="contactnumber">
+      <ref name="contactnumber.element"/>
+    </define>
+    <define name="contactnumbers">
+      <ref name="contactnumbers.element"/>
+    </define>
+    <define name="country">
+      <ref name="country.element"/>
+    </define>
+    <define name="emailaddress">
+      <ref name="emailaddress.element"/>
+    </define>
+    <define name="emailaddresses">
+      <ref name="emailaddresses.element"/>
+    </define>
+    <define name="firstname">
+      <ref name="firstname.element"/>
+    </define>
+    <define name="generationidentifier">
+      <ref name="generationidentifier.element"/>
+    </define>
+    <define name="honorific">
+      <ref name="honorific.element"/>
+    </define>
+    <define name="lastname">
+      <ref name="lastname.element"/>
+    </define>
+    <define name="locality">
+      <ref name="locality.element"/>
+    </define>
+    <define name="localityname">
+      <ref name="localityname.element"/>
+    </define>
+    <define name="middlename">
+      <ref name="middlename.element"/>
+    </define>
+    <define name="namedetails">
+      <ref name="namedetails.element"/>
+    </define>
+    <define name="organizationinfo">
+      <ref name="organizationinfo.element"/>
+    </define>
+    <define name="organizationname">
+      <ref name="organizationname.element"/>
+    </define>
+    <define name="organizationnamedetails">
+      <ref name="organizationnamedetails.element"/>
+    </define>
+    <define name="otherinfo">
+      <ref name="otherinfo.element"/>
+    </define>
+    <define name="personinfo">
+      <ref name="personinfo.element"/>
+    </define>
+    <define name="personname">
+      <ref name="personname.element"/>
+    </define>
+    <define name="postalcode">
+      <ref name="postalcode.element"/>
+    </define>
+    <define name="thoroughfare">
+      <ref name="thoroughfare.element"/>
+    </define>
+    <define name="url">
+      <ref name="url.element"/>
+    </define>
+    <define name="urls">
+      <ref name="urls.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation> ELEMENT DECLARATIONS </a:documentation>
+    <div>
+      <a:documentation> LONG NAME: Author Information </a:documentation>
+      <define name="authorinformation.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="organizationinfo"/>
+            <ref name="personinfo"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <a:documentation>
+    20080128: Removed enumeration for @type for DITA 1.2 . Previous values:
+    creator, contributor, -dita-use-conref-target
+  </a:documentation>
+      <define name="authorinformation.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+      </define>
+      <define name="authorinformation.element">
+        <element name="authorinformation" dita:longName="Author Information">
+          <a:documentation><![CDATA[The <authorinformation> element contains detailed information about the author or authoring organization.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="authorinformation.attlist"/>
+          <ref name="authorinformation.content"/>
+        </element>
+      </define>
+      <define name="authorinformation.attlist" combine="interleave">
+        <ref name="authorinformation.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Name Details </a:documentation>
+      <define name="namedetails.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="organizationnamedetails"/>
+            <ref name="personname"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="namedetails.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="namedetails.element">
+        <element name="namedetails" dita:longName="Name Details">
+          <a:documentation><![CDATA[The <namedetails> element contains information about the name of the author or the authoring organization.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="namedetails.attlist"/>
+          <ref name="namedetails.content"/>
+        </element>
+      </define>
+      <define name="namedetails.attlist" combine="interleave">
+        <ref name="namedetails.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Organization Details </a:documentation>
+      <define name="organizationnamedetails.content">
+        <optional>
+          <ref name="organizationname"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="otherinfo"/>
+        </zeroOrMore>
+      </define>
+      <define name="organizationnamedetails.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="organizationnamedetails.element">
+        <element name="organizationnamedetails" dita:longName="Organization Details">
+          <a:documentation><![CDATA[The <organizationnamedetails> element contains information about the name of an authoring organization.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="organizationnamedetails.attlist"/>
+          <ref name="organizationnamedetails.content"/>
+        </element>
+      </define>
+      <define name="organizationnamedetails.attlist" combine="interleave">
+        <ref name="organizationnamedetails.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Organization Name </a:documentation>
+      <define name="organizationname.content">
+        <zeroOrMore>
+          <ref name="ph.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="organizationname.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="organizationname.element">
+        <element name="organizationname" dita:longName="Organization Name">
+          <a:documentation><![CDATA[The <organizationname> element contains name information about the authoring organization.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="organizationname.attlist"/>
+          <ref name="organizationname.content"/>
+        </element>
+      </define>
+      <define name="organizationname.attlist" combine="interleave">
+        <ref name="organizationname.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Person Name </a:documentation>
+      <define name="personname.content">
+        <optional>
+          <ref name="honorific"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="firstname"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="middlename"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="lastname"/>
+        </zeroOrMore>
+        <optional>
+          <ref name="generationidentifier"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="otherinfo"/>
+        </zeroOrMore>
+      </define>
+      <define name="personname.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="personname.element">
+        <element name="personname" dita:longName="Person Name">
+          <a:documentation><![CDATA[The <personname> element contains name information about the author.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="personname.attlist"/>
+          <ref name="personname.content"/>
+        </element>
+      </define>
+      <define name="personname.attlist" combine="interleave">
+        <ref name="personname.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Honorific </a:documentation>
+      <define name="honorific.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="text" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="honorific.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="honorific.element">
+        <element name="honorific" dita:longName="Honorific">
+          <a:documentation><![CDATA[The <honorific> element contains the person's title, such as: Dr., Mr., Ms., HRH.. or Grand Exalted Wizard.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="honorific.attlist"/>
+          <ref name="honorific.content"/>
+        </element>
+      </define>
+      <define name="honorific.attlist" combine="interleave">
+        <ref name="honorific.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: First Name </a:documentation>
+      <define name="firstname.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="text" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="firstname.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="firstname.element">
+        <element name="firstname" dita:longName="First Name">
+          <a:documentation><![CDATA[The <firstname> element contains the person's first name.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="firstname.attlist"/>
+          <ref name="firstname.content"/>
+        </element>
+      </define>
+      <define name="firstname.attlist" combine="interleave">
+        <ref name="firstname.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Middle Name </a:documentation>
+      <define name="middlename.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="text" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="middlename.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="middlename.element">
+        <element name="middlename" dita:longName="Middle Name">
+          <a:documentation><![CDATA[The <middlename> element contains the person's middle name or initial.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="middlename.attlist"/>
+          <ref name="middlename.content"/>
+        </element>
+      </define>
+      <define name="middlename.attlist" combine="interleave">
+        <ref name="middlename.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Last Name </a:documentation>
+      <define name="lastname.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="text" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="lastname.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="lastname.element">
+        <element name="lastname" dita:longName="Last Name">
+          <a:documentation><![CDATA[The <lastname> element contains the person's last name.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="lastname.attlist"/>
+          <ref name="lastname.content"/>
+        </element>
+      </define>
+      <define name="lastname.attlist" combine="interleave">
+        <ref name="lastname.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Generation Identifier </a:documentation>
+      <define name="generationidentifier.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="text" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="generationidentifier.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="generationidentifier.element">
+        <element name="generationidentifier" dita:longName="Generation Identifier">
+          <a:documentation><![CDATA[The <generationidentifier> element contains information about the person's generation, such as: Jr, III, or VIII.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="generationidentifier.attlist"/>
+          <ref name="generationidentifier.content"/>
+        </element>
+      </define>
+      <define name="generationidentifier.attlist" combine="interleave">
+        <ref name="generationidentifier.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Other Information </a:documentation>
+      <define name="otherinfo.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="otherinfo.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="otherinfo.element">
+        <element name="otherinfo" dita:longName="Other Information">
+          <a:documentation><![CDATA[The <otherinfo> element contains other name information about the author or authoring organization.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="otherinfo.attlist"/>
+          <ref name="otherinfo.content"/>
+        </element>
+      </define>
+      <define name="otherinfo.attlist" combine="interleave">
+        <ref name="otherinfo.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Address Details </a:documentation>
+      <define name="addressdetails.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="words.cnt"/>
+            <ref name="administrativearea"/>
+            <ref name="country"/>
+            <ref name="locality"/>
+            <ref name="thoroughfare"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="addressdetails.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="addressdetails.element">
+        <element name="addressdetails" dita:longName="Address Details">
+          <a:documentation><![CDATA[The <addressdetails> element contains information about the address of the author or authoring group.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="addressdetails.attlist"/>
+          <ref name="addressdetails.content"/>
+        </element>
+      </define>
+      <define name="addressdetails.attlist" combine="interleave">
+        <ref name="addressdetails.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Locality </a:documentation>
+      <define name="locality.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="words.cnt"/>
+            <ref name="localityname"/>
+            <ref name="postalcode"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="locality.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="locality.element">
+        <element name="locality" dita:longName="Locality">
+          <a:documentation><![CDATA[The <locality> element contains information about the city and postal or ZIP code. It can contain the information directly, or by acting as a wrapper for <localityname> and <postalcode>.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="locality.attlist"/>
+          <ref name="locality.content"/>
+        </element>
+      </define>
+      <define name="locality.attlist" combine="interleave">
+        <ref name="locality.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Locality Name </a:documentation>
+      <define name="localityname.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="localityname.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="localityname.element">
+        <element name="localityname" dita:longName="Locality Name">
+          <a:documentation><![CDATA[The <localityname> element contains the name of the locality or city.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="localityname.attlist"/>
+          <ref name="localityname.content"/>
+        </element>
+      </define>
+      <define name="localityname.attlist" combine="interleave">
+        <ref name="localityname.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Administrative Area </a:documentation>
+      <define name="administrativearea.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="administrativearea.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="administrativearea.element">
+        <element name="administrativearea" dita:longName="Administrative Area">
+          <a:documentation><![CDATA[The <administrativearea> element contains information about a county, state, or province.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="administrativearea.attlist"/>
+          <ref name="administrativearea.content"/>
+        </element>
+      </define>
+      <define name="administrativearea.attlist" combine="interleave">
+        <ref name="administrativearea.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Thoroughfare </a:documentation>
+      <define name="thoroughfare.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="thoroughfare.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="thoroughfare.element">
+        <element name="thoroughfare" dita:longName="Thoroughfare">
+          <a:documentation><![CDATA[The <thoroughfare> element contains information about the thoroughfare - for example, the street, avenue, or boulevard - on which an address is located.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="thoroughfare.attlist"/>
+          <ref name="thoroughfare.content"/>
+        </element>
+      </define>
+      <define name="thoroughfare.attlist" combine="interleave">
+        <ref name="thoroughfare.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Postal Code </a:documentation>
+      <define name="postalcode.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="text" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="postalcode.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="postalcode.element">
+        <element name="postalcode" dita:longName="Postal Code">
+          <a:documentation><![CDATA[The <postalcode> element contains information about the postal code or the ZIP code.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="postalcode.attlist"/>
+          <ref name="postalcode.content"/>
+        </element>
+      </define>
+      <define name="postalcode.attlist" combine="interleave">
+        <ref name="postalcode.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Country </a:documentation>
+      <define name="country.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="text" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="country.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="country.element">
+        <element name="country" dita:longName="Country">
+          <a:documentation><![CDATA[The <country> element contains the name of a country.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="country.attlist"/>
+          <ref name="country.content"/>
+        </element>
+      </define>
+      <define name="country.attlist" combine="interleave">
+        <ref name="country.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Person Information </a:documentation>
+      <define name="personinfo.content">
+        <optional>
+          <ref name="namedetails"/>
+        </optional>
+        <optional>
+          <ref name="addressdetails"/>
+        </optional>
+        <optional>
+          <ref name="contactnumbers"/>
+        </optional>
+        <optional>
+          <ref name="emailaddresses"/>
+        </optional>
+      </define>
+      <define name="personinfo.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="personinfo.element">
+        <element name="personinfo" dita:longName="Person Information">
+          <a:documentation><![CDATA[The <personinfo> element is a wrapper containing all relevant data about a person, including name, address, and contact information.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="personinfo.attlist"/>
+          <ref name="personinfo.content"/>
+        </element>
+      </define>
+      <define name="personinfo.attlist" combine="interleave">
+        <ref name="personinfo.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Organization Information </a:documentation>
+      <define name="organizationinfo.content">
+        <optional>
+          <ref name="namedetails"/>
+        </optional>
+        <optional>
+          <ref name="addressdetails"/>
+        </optional>
+        <optional>
+          <ref name="contactnumbers"/>
+        </optional>
+        <optional>
+          <ref name="emailaddresses"/>
+        </optional>
+        <optional>
+          <ref name="urls"/>
+        </optional>
+      </define>
+      <define name="organizationinfo.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="organizationinfo.element">
+        <element name="organizationinfo" dita:longName="Organization Information">
+          <a:documentation><![CDATA[The <organizationinfo> element contains detailed information about an authoring organization.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="organizationinfo.attlist"/>
+          <ref name="organizationinfo.content"/>
+        </element>
+      </define>
+      <define name="organizationinfo.attlist" combine="interleave">
+        <ref name="organizationinfo.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Contact Numbers </a:documentation>
+      <define name="contactnumbers.content">
+        <zeroOrMore>
+          <ref name="contactnumber"/>
+        </zeroOrMore>
+      </define>
+      <define name="contactnumbers.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="contactnumbers.element">
+        <element name="contactnumbers" dita:longName="Contact Numbers">
+          <a:documentation><![CDATA[The <contactnumbers> element contains a list of telephone and fax numbers.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="contactnumbers.attlist"/>
+          <ref name="contactnumbers.content"/>
+        </element>
+      </define>
+      <define name="contactnumbers.attlist" combine="interleave">
+        <ref name="contactnumbers.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Contact Number </a:documentation>
+      <a:documentation> Note: set the type of number using @type </a:documentation>
+      <define name="contactnumber.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="text" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="contactnumber.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="contactnumber.element">
+        <element name="contactnumber" dita:longName="Contact Number">
+          <a:documentation><![CDATA[A <contactnumber> element contains a telephone number.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="contactnumber.attlist"/>
+          <ref name="contactnumber.content"/>
+        </element>
+      </define>
+      <define name="contactnumber.attlist" combine="interleave">
+        <ref name="contactnumber.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Email Addresses </a:documentation>
+      <define name="emailaddresses.content">
+        <zeroOrMore>
+          <ref name="emailaddress"/>
+        </zeroOrMore>
+      </define>
+      <define name="emailaddresses.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="emailaddresses.element">
+        <element name="emailaddresses" dita:longName="Email Addresses">
+          <a:documentation><![CDATA[The <emailaddress> element contains a list of e-mail addresses.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="emailaddresses.attlist"/>
+          <ref name="emailaddresses.content"/>
+        </element>
+      </define>
+      <define name="emailaddresses.attlist" combine="interleave">
+        <ref name="emailaddresses.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Email Address </a:documentation>
+      <define name="emailaddress.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="emailaddress.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="emailaddress.element">
+        <element name="emailaddress" dita:longName="Email Address">
+          <a:documentation><![CDATA[The <emailaddress> element contains an e-mail address.
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="emailaddress.attlist"/>
+          <ref name="emailaddress.content"/>
+        </element>
+      </define>
+      <define name="emailaddress.attlist" combine="interleave">
+        <ref name="emailaddress.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: URLs </a:documentation>
+      <define name="urls.content">
+        <zeroOrMore>
+          <ref name="url"/>
+        </zeroOrMore>
+      </define>
+      <define name="urls.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="urls.element">
+        <element name="urls" dita:longName="URLs">
+          <a:documentation><![CDATA[The <urls> element contains a list of Uniform Resource Locators (URLs).
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="urls.attlist"/>
+          <ref name="urls.content"/>
+        </element>
+      </define>
+      <define name="urls.attlist" combine="interleave">
+        <ref name="urls.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: URL </a:documentation>
+      <define name="url.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="url.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="url.element">
+        <element name="url" dita:longName="URL">
+          <a:documentation><![CDATA[The <url> element contains a Uniform Resource Locator (URL).
+    Category: xNAL elements
+  ]]></a:documentation>
+          <ref name="url.attlist"/>
+          <ref name="url.content"/>
+        </element>
+      </define>
+      <define name="url.attlist" combine="interleave">
+        <ref name="url.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation> SPECIALIZATION ATTRIBUTE DECLARATIONS </a:documentation>
+    <define name="addressdetails.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph xnal-d/addressdetails "/>
+      </optional>
+    </define>
+    <define name="administrativearea.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph xnal-d/administrativearea "/>
+      </optional>
+    </define>
+    <define name="authorinformation.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/author xnal-d/authorinformation "/>
+      </optional>
+    </define>
+    <define name="contactnumber.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/contactnumber "/>
+      </optional>
+    </define>
+    <define name="contactnumbers.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/contactnumbers "/>
+      </optional>
+    </define>
+    <define name="country.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph xnal-d/country "/>
+      </optional>
+    </define>
+    <define name="emailaddress.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/emailaddress "/>
+      </optional>
+    </define>
+    <define name="emailaddresses.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/emailaddresses "/>
+      </optional>
+    </define>
+    <define name="firstname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/firstname "/>
+      </optional>
+    </define>
+    <define name="generationidentifier.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/generationidentifier "/>
+      </optional>
+    </define>
+    <define name="honorific.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/honorific "/>
+      </optional>
+    </define>
+    <define name="lastname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/lastname "/>
+      </optional>
+    </define>
+    <define name="locality.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph xnal-d/locality "/>
+      </optional>
+    </define>
+    <define name="localityname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph xnal-d/localityname "/>
+      </optional>
+    </define>
+    <define name="middlename.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/middlename "/>
+      </optional>
+    </define>
+    <define name="namedetails.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/namedetails "/>
+      </optional>
+    </define>
+    <define name="organizationinfo.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/organizationinfo "/>
+      </optional>
+    </define>
+    <define name="organizationname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph xnal-d/organizationname "/>
+      </optional>
+    </define>
+    <define name="organizationnamedetails.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph xnal-d/organizationnamedetails "/>
+      </optional>
+    </define>
+    <define name="otherinfo.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/otherinfo "/>
+      </optional>
+    </define>
+    <define name="personinfo.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/personinfo "/>
+      </optional>
+    </define>
+    <define name="personname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/personname "/>
+      </optional>
+    </define>
+    <define name="postalcode.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph xnal-d/postalcode "/>
+      </optional>
+    </define>
+    <define name="thoroughfare.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph xnal-d/thoroughfare "/>
+      </optional>
+    </define>
+    <define name="url.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/url "/>
+      </optional>
+    </define>
+    <define name="urls.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data xnal-d/urls "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

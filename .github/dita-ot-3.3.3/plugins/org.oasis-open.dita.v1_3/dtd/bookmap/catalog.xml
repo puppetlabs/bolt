@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<!--DITA Book Map Shell-->
+
+   <public publicId="-//OASIS//DTD DITA 1.3 BookMap//EN" uri="dtd/bookmap.dtd"/>
+
+   <public publicId="-//OASIS//DTD DITA 1.x BookMap//EN" uri="dtd/bookmap.dtd"/>
+   <public publicId="-//OASIS//DTD DITA BookMap//EN" uri="dtd/bookmap.dtd"/>
+   <public publicId="-//OASIS//ELEMENTS DITA 1.3 BookMap//EN"
+           uri="dtd/bookmap.mod"/>
+   <public publicId="-//OASIS//ELEMENTS DITA 1.x BookMap//EN"
+           uri="dtd/bookmap.mod"/>
+   <public publicId="-//OASIS//ELEMENTS DITA BookMap//EN" uri="dtd/bookmap.mod"/>
+   <public publicId="-//OASIS//ENTITIES DITA 1.3 BookMap//EN"
+           uri="dtd/bookmap.ent"/>
+   <public publicId="-//OASIS//ENTITIES DITA 1.x BookMap//EN"
+           uri="dtd/bookmap.ent"/>
+   <public publicId="-//OASIS//ENTITIES DITA BookMap//EN" uri="dtd/bookmap.ent"/>
+</catalog>

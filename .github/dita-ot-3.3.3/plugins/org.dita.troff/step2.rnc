@@ -1,0 +1,75 @@
+# This file is part of the DITA Open Toolkit project.
+#
+# Copyright 2013 Jarno Elovirta
+#
+# See the accompanying LICENSE file for applicable license.
+datatypes xsd = "http://www.w3.org/2001/XMLSchema-datatypes"
+
+dita = element dita {
+  debug,
+  xmllang,
+  attribute dir { "ltr" | "rtl" },
+  (section | block | \text)+
+}
+
+## Used for <section> and <example>. This can nest any of the following elements.
+section = element section {
+  debug,
+  xmllang,
+  sectiontitle?,
+  (block | \text)*
+}
+
+## Used for the titles of <section> and <example>. This will nest the <text> element.
+sectiontitle = element sectiontitle {
+  debug,
+  xmllang,
+  \text+
+}
+
+## All other block-like elements. The reason section does not use <block> 
+## is that it maps well to troff-style sections that use the .SH macro
+## for highlighting and indenting. This can nest any number of <block> 
+## or <text> elements. Attributes set lead-in text (such as list item numbers 
+## that must appear before the list item text), as well as indent values.
+## Other attributes are described below.
+block = element block {
+  debug?,
+  style,
+  xmllang,
+  attribute xml:space { "preserve" | "default" }?,
+  attribute leadin {text}?,
+  attribute indent { xsd:int }?,
+  attribute position {text}?,
+  attribute compact { "yes" | "no" }?,
+  (section | block | \text)+
+}
+
+## All text nodes and phrases. This can include text or additional <text> elements.
+## Text will be wrapped, with the width determined by the LINELENGTH parameter. 
+## Formatters such as troff may reflow the text as needed. Line breaks should only
+## be forced in pre-formatted text, or between blocks.
+\text =  element text {
+  debug?,
+  style,
+  xmllang,
+  (attribute scope {"external"}?,
+   attribute href {xsd:anyURI}?,
+   attribute format{text}?)?,
+  (\text+ | text)
+}
+
+xmllang = (
+  attribute xml:lang {text}?
+)
+
+style = (
+  attribute style {text}?
+)
+
+debug = (
+  attribute xtrf {text},
+  attribute xtrc {text}
+)
+
+start = dita

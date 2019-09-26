@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Forord | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Forord | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Innhold</variable>
+  <variable id="Index Continued String">fortsettelse</variable>
+  <variable id="Index See String">, Se </variable>
+  <variable id="Index See Also String">Se også </variable>
+  <variable id="Table of Contents Chapter">Kapittel <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">Tillegg <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">Del <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">Forord: </variable>
+  <variable id="Preface title">Forord</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">Innhold: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">Figur <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">Figur <param ref-name="number"/></variable>
+  <variable id="Table.title">Tabell <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Tabell <param ref-name="number"/></variable>
+  <variable id="Related Links">Beslektet informasjon</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">Kapittel <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Tillegg <param ref-name="number"/></variable>
+  <variable id="Part with number">Del <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[Opprydning nødvendig]</variable>
+  <variable id="On the page"> på side <param ref-name="pagenum"/></variable>
+  <variable id="Page"> side <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">Valgfritt:</variable>
+  <variable id="Required Step">Nødvendig:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Ordliste</variable>
+  <variable id="List of Tables">Tabeller</variable>
+  <variable id="List of Figures">Figurer</variable>
+</vars>

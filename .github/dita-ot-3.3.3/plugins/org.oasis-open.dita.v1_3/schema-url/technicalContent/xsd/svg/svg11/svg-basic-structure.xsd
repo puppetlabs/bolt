@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:include schemaLocation="svg-datatypes.xsd"/>
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:element name="SVG.Profile.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.color-profile.content">
+          <xs:attributeGroup ref="svg:attlist.color-profile"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Gradient.class" abstract="true"/>
+  <xs:element name="SVG.Pattern.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.pattern.content">
+          <xs:attributeGroup ref="svg:attlist.pattern"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Clip.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.clipPath.content">
+          <xs:attributeGroup ref="svg:attlist.clipPath"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Mask.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.mask.content">
+          <xs:attributeGroup ref="svg:attlist.mask"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Filter.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.filter.content">
+          <xs:attributeGroup ref="svg:attlist.filter"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Cursor.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.cursor.content">
+          <xs:attributeGroup ref="svg:attlist.cursor"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Marker.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.marker.content">
+          <xs:attributeGroup ref="svg:attlist.marker"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.View.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.view.content">
+          <xs:attributeGroup ref="svg:attlist.view"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Script.class" abstract="true">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="svg:attlist.script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Font.class" abstract="true"/>
+  <xs:element name="SVG.Extensibility.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.foreignObject.content">
+          <xs:attributeGroup ref="svg:attlist.foreignObject"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Conditional.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.switch.content">
+          <xs:attributeGroup ref="svg:attlist.switch"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Image.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.image.content">
+          <xs:attributeGroup ref="svg:attlist.image"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Style.class" abstract="true">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="svg:attlist.style"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Shape.class" abstract="true"/>
+  <xs:element name="SVG.Text.class" abstract="true"/>
+  <xs:element name="SVG.Hyperlink.class" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.a.content">
+          <xs:attributeGroup ref="svg:attlist.a"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Animation.class" abstract="true"/>
+  <xs:attributeGroup name="SVG.Text.attrib">
+    <xs:attribute name="writing-mode">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="lr-tb"/>
+          <xs:enumeration value="rl-tb"/>
+          <xs:enumeration value="tb-rl"/>
+          <xs:enumeration value="lr"/>
+          <xs:enumeration value="rl"/>
+          <xs:enumeration value="tb"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.TextContent.attrib">
+    <xs:attribute name="alignment-baseline">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="auto"/>
+          <xs:enumeration value="baseline"/>
+          <xs:enumeration value="before-edge"/>
+          <xs:enumeration value="text-before-edge"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="central"/>
+          <xs:enumeration value="after-edge"/>
+          <xs:enumeration value="text-after-edge"/>
+          <xs:enumeration value="ideographic"/>
+          <xs:enumeration value="alphabetic"/>
+          <xs:enumeration value="hanging"/>
+          <xs:enumeration value="mathematical"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="baseline-shift" type="svg:BaselineShiftValue.datatype"/>
+    <xs:attribute name="direction">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="ltr"/>
+          <xs:enumeration value="rtl"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dominant-baseline">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="auto"/>
+          <xs:enumeration value="use-script"/>
+          <xs:enumeration value="no-change"/>
+          <xs:enumeration value="reset-size"/>
+          <xs:enumeration value="ideographic"/>
+          <xs:enumeration value="alphabetic"/>
+          <xs:enumeration value="hanging"/>
+          <xs:enumeration value="mathematical"/>
+          <xs:enumeration value="central"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="text-after-edge"/>
+          <xs:enumeration value="text-before-edge"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="glyph-orientation-horizontal" type="svg:GlyphOrientationHorizontalValue.datatype"/>
+    <xs:attribute name="glyph-orientation-vertical" type="svg:GlyphOrientationVerticalValue.datatype"/>
+    <xs:attribute name="kerning" type="svg:KerningValue.datatype"/>
+    <xs:attribute name="letter-spacing" type="svg:SpacingValue.datatype"/>
+    <xs:attribute name="text-anchor">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="start"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="end"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="text-decoration" type="svg:TextDecorationValue.datatype"/>
+    <xs:attribute name="unicode-bidi">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="normal"/>
+          <xs:enumeration value="embed"/>
+          <xs:enumeration value="bidi-override"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="word-spacing" type="svg:SpacingValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Marker.attrib">
+    <xs:attribute name="marker-start" type="svg:MarkerValue.datatype"/>
+    <xs:attribute name="marker-mid" type="svg:MarkerValue.datatype"/>
+    <xs:attribute name="marker-end" type="svg:MarkerValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Profile.attrib">
+    <xs:attribute name="color-profile"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Gradient.attrib">
+    <xs:attribute name="stop-color" type="svg:SVGColor.datatype"/>
+    <xs:attribute name="stop-opacity" type="svg:OpacityValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Clip.attrib">
+    <xs:attribute name="clip-path" type="svg:ClipPathValue.datatype"/>
+    <xs:attribute name="clip-rule" type="svg:ClipFillRule.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Mask.attrib">
+    <xs:attribute name="mask" type="svg:MaskValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Filter.attrib">
+    <xs:attribute name="filter" type="svg:FilterValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.FilterColor.attrib">
+    <xs:attribute name="color-interpolation-filters">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="auto"/>
+          <xs:enumeration value="sRGB"/>
+          <xs:enumeration value="linearRGB"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Cursor.attrib">
+    <xs:attribute name="cursor" type="svg:CursorValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Conditional.attrib">
+    <xs:attribute name="requiredFeatures" type="svg:FeatureList.datatype"/>
+    <xs:attribute name="requiredExtensions" type="svg:ExtensionList.datatype"/>
+    <xs:attribute name="systemLanguage" type="svg:LanguageCodes.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Style.attrib">
+    <xs:attribute name="style" type="svg:StyleSheet.datatype"/>
+    <xs:attribute name="class" type="svg:ClassList.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Font.attrib">
+    <xs:attribute name="font-family" type="svg:FontFamilyValue.datatype"/>
+    <xs:attribute name="font-size" type="svg:FontSizeValue.datatype"/>
+    <xs:attribute name="font-style">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="normal"/>
+          <xs:enumeration value="italic"/>
+          <xs:enumeration value="oblique"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="font-weight">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="normal"/>
+          <xs:enumeration value="bold"/>
+          <xs:enumeration value="bolder"/>
+          <xs:enumeration value="lighter"/>
+          <xs:enumeration value="100"/>
+          <xs:enumeration value="200"/>
+          <xs:enumeration value="300"/>
+          <xs:enumeration value="400"/>
+          <xs:enumeration value="500"/>
+          <xs:enumeration value="600"/>
+          <xs:enumeration value="700"/>
+          <xs:enumeration value="800"/>
+          <xs:enumeration value="900"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="font-size-adjust" type="svg:FontSizeAdjustValue.datatype"/>
+    <xs:attribute name="font-stretch">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="normal"/>
+          <xs:enumeration value="wider"/>
+          <xs:enumeration value="narrower"/>
+          <xs:enumeration value="ultra-condensed"/>
+          <xs:enumeration value="extra-condensed"/>
+          <xs:enumeration value="condensed"/>
+          <xs:enumeration value="semi-condensed"/>
+          <xs:enumeration value="semi-expanded"/>
+          <xs:enumeration value="expanded"/>
+          <xs:enumeration value="extra-expanded"/>
+          <xs:enumeration value="ultra-expanded"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="font-variant">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="normal"/>
+          <xs:enumeration value="small-caps"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="SVG.Description.class" abstract="true"/>
+  <xs:element name="SVG.Use.class" abstract="true" substitutionGroup="svg:SVG.Structure.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.use.content">
+          <xs:attributeGroup ref="svg:attlist.use"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Structure.class" abstract="true"/>
+  <xs:attributeGroup name="SVG.Presentation.attrib">
+    <xs:attributeGroup ref="SVG.Container.attrib"/>
+    <xs:attributeGroup ref="SVG.Viewport.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Text.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.TextContent.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Font.attrib"/>
+    <xs:attributeGroup ref="SVG.Paint.attrib"/>
+    <xs:attributeGroup ref="SVG.Color.attrib"/>
+    <xs:attributeGroup ref="SVG.Opacity.attrib"/>
+    <xs:attributeGroup ref="SVG.Graphics.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Marker.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Profile.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Gradient.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Clip.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Mask.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Filter.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Cursor.attrib"/>
+    <xs:attribute name="flood-color" type="svg:SVGColor.datatype"/>
+    <xs:attribute name="flood-opacity" type="svg:OpacityValue.datatype"/>
+    <xs:attribute name="lighting-color" type="svg:SVGColor.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.svg.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:SVG.Description.class"/>
+      <xs:element ref="svg:SVG.Animation.class"/>
+      <xs:element ref="svg:SVG.Structure.class"/>
+      <xs:element ref="svg:SVG.Conditional.class"/>
+      <xs:element ref="svg:SVG.Image.class"/>
+      <xs:element ref="svg:SVG.Style.class"/>
+      <xs:element ref="svg:SVG.Shape.class"/>
+      <xs:element ref="svg:SVG.Text.class"/>
+      <xs:element ref="svg:SVG.Marker.class"/>
+      <xs:element ref="svg:SVG.Profile.class"/>
+      <xs:element ref="svg:SVG.Gradient.class"/>
+      <xs:element ref="svg:SVG.Pattern.class"/>
+      <xs:element ref="svg:SVG.Clip.class"/>
+      <xs:element ref="svg:SVG.Mask.class"/>
+      <xs:element ref="svg:SVG.Filter.class"/>
+      <xs:element ref="svg:SVG.Cursor.class"/>
+      <xs:element ref="svg:SVG.Hyperlink.class"/>
+      <xs:element ref="svg:SVG.View.class"/>
+      <xs:element ref="svg:SVG.Script.class"/>
+      <xs:element ref="svg:SVG.Font.class"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="svg" substitutionGroup="svg:SVG.Structure.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.svg.content">
+          <xs:attributeGroup ref="svg:attlist.svg"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.svg">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attributeGroup ref="SVG.DocumentEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.GraphicalEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="x" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="y" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="width" type="svg:Length.datatype"/>
+    <xs:attribute name="height" type="svg:Length.datatype"/>
+    <xs:attribute name="viewBox" type="svg:ViewBoxSpec.datatype"/>
+    <xs:attribute name="preserveAspectRatio" default="xMidYMid meet" type="svg:PreserveAspectRatioSpec.datatype"/>
+    <xs:attribute name="zoomAndPan" default="magnify">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="disable"/>
+          <xs:enumeration value="magnify"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="version" default="1.1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="1.1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="baseProfile" type="svg:Text.datatype"/>
+    <xs:attribute name="contentScriptType" default="text/ecmascript" type="svg:ContentType.datatype"/>
+    <xs:attribute name="contentStyleType" default="text/css" type="svg:ContentType.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.g.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:SVG.Description.class"/>
+      <xs:element ref="svg:SVG.Animation.class"/>
+      <xs:element ref="svg:SVG.Structure.class"/>
+      <xs:element ref="svg:SVG.Conditional.class"/>
+      <xs:element ref="svg:SVG.Image.class"/>
+      <xs:element ref="svg:SVG.Style.class"/>
+      <xs:element ref="svg:SVG.Shape.class"/>
+      <xs:element ref="svg:SVG.Text.class"/>
+      <xs:element ref="svg:SVG.Marker.class"/>
+      <xs:element ref="svg:SVG.Profile.class"/>
+      <xs:element ref="svg:SVG.Gradient.class"/>
+      <xs:element ref="svg:SVG.Pattern.class"/>
+      <xs:element ref="svg:SVG.Clip.class"/>
+      <xs:element ref="svg:SVG.Mask.class"/>
+      <xs:element ref="svg:SVG.Filter.class"/>
+      <xs:element ref="svg:SVG.Cursor.class"/>
+      <xs:element ref="svg:SVG.Hyperlink.class"/>
+      <xs:element ref="svg:SVG.View.class"/>
+      <xs:element ref="svg:SVG.Script.class"/>
+      <xs:element ref="svg:SVG.Font.class"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="g" substitutionGroup="svg:SVG.Structure.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.g.content">
+          <xs:attributeGroup ref="svg:attlist.g"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.g">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attributeGroup ref="SVG.GraphicalEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.defs.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:SVG.Description.class"/>
+      <xs:element ref="svg:SVG.Animation.class"/>
+      <xs:element ref="svg:SVG.Structure.class"/>
+      <xs:element ref="svg:SVG.Conditional.class"/>
+      <xs:element ref="svg:SVG.Image.class"/>
+      <xs:element ref="svg:SVG.Style.class"/>
+      <xs:element ref="svg:SVG.Shape.class"/>
+      <xs:element ref="svg:SVG.Text.class"/>
+      <xs:element ref="svg:SVG.Marker.class"/>
+      <xs:element ref="svg:SVG.Profile.class"/>
+      <xs:element ref="svg:SVG.Gradient.class"/>
+      <xs:element ref="svg:SVG.Pattern.class"/>
+      <xs:element ref="svg:SVG.Clip.class"/>
+      <xs:element ref="svg:SVG.Mask.class"/>
+      <xs:element ref="svg:SVG.Filter.class"/>
+      <xs:element ref="svg:SVG.Cursor.class"/>
+      <xs:element ref="svg:SVG.Hyperlink.class"/>
+      <xs:element ref="svg:SVG.View.class"/>
+      <xs:element ref="svg:SVG.Script.class"/>
+      <xs:element ref="svg:SVG.Font.class"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="defs" substitutionGroup="svg:SVG.Structure.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.defs.content">
+          <xs:attributeGroup ref="svg:attlist.defs"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.defs">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attributeGroup ref="SVG.GraphicalEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+  </xs:attributeGroup>
+  <xs:element name="desc" substitutionGroup="svg:SVG.Description.class">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="svg:attlist.desc"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.desc">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="title" substitutionGroup="svg:SVG.Description.class">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="svg:attlist.title"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.title">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="metadata" substitutionGroup="svg:SVG.Description.class">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="svg:attlist.metadata"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.metadata">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.use.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Animation.class"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="use" substitutionGroup="svg:SVG.Use.class"/>
+  <xs:attributeGroup name="attlist.use">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attributeGroup ref="SVG.GraphicalEvents.attrib"/>
+    <xs:attributeGroup ref="xlink:SVG.XLinkEmbed.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="x" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="y" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="width" type="svg:Length.datatype"/>
+    <xs:attribute name="height" type="svg:Length.datatype"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+  </xs:attributeGroup>
+</xs:schema>

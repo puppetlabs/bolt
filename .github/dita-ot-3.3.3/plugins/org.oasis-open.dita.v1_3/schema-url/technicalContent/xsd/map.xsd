@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!-- Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02     -->
+<!-- OASIS Standard                                           -->
+<!-- 16 January 2018                                           -->
+<!-- Copyright (c) OASIS Open 2018. All rights reserved.           -->
+<!-- Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html                                -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- MODULE:    DITA MAP XSD                                       -->
+<!-- VERSION:   1.3                                                -->
+<!-- DATE:      March 2014                                         -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA maps              -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!-- UPDATES:                                                      -->
+<!--    2005.11.15 EAS: Moved domains attribute definition here    -->
+<!--                    from mapMod.xsd:1.2                        -->
+<!--   TBD EAS:Added deleay resolution domain.                     -->
+<!-- ============================================================= -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:include schemaLocation="../../base/xsd/mapGroupMod.xsd"/>
+   <xs:include schemaLocation="./abbreviateDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/delayResolutionDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/deliveryTargetAttDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/ditavalrefDomain.xsd"/>
+   <xs:include schemaLocation="./glossrefDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/hazardstatementDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/highlightDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/indexingDomain.xsd"/>
+   <xs:include schemaLocation="./markupDomain.xsd"/>
+   <xs:include schemaLocation="./programmingDomain.xsd"/>
+   <xs:include schemaLocation="./releaseManagementDomain.xsd"/>
+   <xs:include schemaLocation="./softwareDomain.xsd"/>
+   <xs:include schemaLocation="./uiDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/utilitiesDomain.xsd"/>
+   <xs:include schemaLocation="./xmlDomain.xsd"/>
+
+   <!-- ================ GROUP DEFINITIONS ===================== -->
+   <xs:include schemaLocation="../../base/xsd/tblDeclGrp.xsd"/>
+
+   <!-- =================  MODULE INCLUDE DEFINITION  ================== -->
+   <xs:include schemaLocation="../../base/xsd/commonElementMod.xsd"/>
+
+   <!-- ======== Table elements ======== -->
+   <xs:include schemaLocation="../../base/xsd/tblDeclMod.xsd"/>
+
+   <!-- ======= MetaData elements, plus keyword and indexterm ======= -->
+   <xs:include schemaLocation="../../base/xsd/metaDeclMod.xsd"/>
+
+  <xs:redefine schemaLocation="../../base/xsd/mapGrp.xsd">
+    <xs:group name="topicref">
+      <xs:choice>
+        <xs:group ref="topicref"/>
+        <xs:group ref="mapgroup-d-topicref"/>
+        <xs:group ref="ditavalref-d-topicref"/>
+        <xs:group ref="glossref-d-topicref"/>
+      </xs:choice>
+    </xs:group>
+  </xs:redefine>
+  <xs:redefine schemaLocation="../../base/xsd/commonElementGrp.xsd">
+      <xs:group name="data">
+         <xs:choice>
+            <xs:group ref="data"/>
+            <xs:group ref="ut-d-data"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="note">
+         <xs:choice>
+            <xs:group ref="note"/>
+            <xs:group ref="hazard-d-note"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="dl">
+         <xs:choice>
+            <xs:group ref="dl"/>
+            <xs:group ref="pr-d-dl"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="fig">
+         <xs:choice>
+            <xs:group ref="fig"/>
+            <xs:group ref="pr-d-fig"/>
+            <xs:group ref="ut-d-fig"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="pre">
+         <xs:choice>
+            <xs:group ref="pre"/>
+            <xs:group ref="pr-d-pre"/>
+            <xs:group ref="sw-d-pre"/>
+            <xs:group ref="ui-d-pre"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="keyword">
+         <xs:choice>
+            <xs:group ref="keyword"/>
+            <xs:group ref="markup-d-keyword"/>
+            <xs:group ref="pr-d-keyword"/>
+            <xs:group ref="sw-d-keyword"/>
+            <xs:group ref="ui-d-keyword"/>
+            <xs:group ref="xml-d-keyword"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="term">
+         <xs:choice>
+            <xs:group ref="term"/>
+            <xs:group ref="abbrev-d-term"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="ph">
+         <xs:choice>
+            <xs:group ref="ph"/>
+            <xs:group ref="hi-d-ph"/>
+            <xs:group ref="pr-d-ph"/>
+            <xs:group ref="sw-d-ph"/>
+            <xs:group ref="ui-d-ph"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="index-base">
+         <xs:choice>
+            <xs:group ref="index-base"/>
+            <xs:group ref="indexing-d-index-base"/>
+         </xs:choice>
+      </xs:group>
+      <xs:attributeGroup name="props-attribute-extensions">
+         <xs:attributeGroup ref="props-attribute-extensions"/>
+         <xs:attributeGroup ref="deliveryTargetAtt-d-attribute"/>
+      </xs:attributeGroup>
+   </xs:redefine>
+   <xs:redefine schemaLocation="../../base/xsd/metaDeclGrp.xsd">
+      <xs:group name="metadata">
+         <xs:choice>
+            <xs:group ref="metadata"/>
+            <xs:group ref="relmgmt-d-metadata"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="keywords">
+         <xs:choice>
+            <xs:group ref="keywords"/>
+            <xs:group ref="delay-d-keywords"/>
+         </xs:choice>
+      </xs:group>
+   </xs:redefine>
+
+   <xs:include schemaLocation="../../base/xsd/mapMod.xsd"/>
+
+   <xs:attributeGroup name="domains-att">
+      <xs:attribute name="domains"
+                    type="xs:string"
+                    default="(topic abbrev-d) (topic delay-d) (map ditavalref-d) (map glossref-d) (topic hazard-d) (topic hi-d) (topic indexing-d) (map mapgroup-d) (topic markup-d xml-d) (topic markup-d) (topic pr-d) (topic relmgmt-d) (topic sw-d) (topic ui-d) (topic ut-d) a(props deliveryTarget)"/>
+   </xs:attributeGroup>
+</xs:schema>

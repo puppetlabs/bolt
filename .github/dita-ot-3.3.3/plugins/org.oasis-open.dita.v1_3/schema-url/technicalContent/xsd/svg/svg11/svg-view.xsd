@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:complexType name="SVG.view.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="view" substitutionGroup="svg:SVG.View.class"/>
+  <xs:attributeGroup name="attlist.view">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="viewBox" type="svg:ViewBoxSpec.datatype"/>
+    <xs:attribute name="preserveAspectRatio" default="xMidYMid meet" type="svg:PreserveAspectRatioSpec.datatype"/>
+    <xs:attribute name="zoomAndPan" default="magnify">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="disable"/>
+          <xs:enumeration value="magnify"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="viewTarget"/>
+  </xs:attributeGroup>
+</xs:schema>

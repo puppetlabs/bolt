@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Inleiding | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Inleiding | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Inhoudsopgave</variable>
+  <variable id="Index Continued String">Vervolg</variable>
+  <variable id="Index See String">, zie </variable>
+  <variable id="Index See Also String">Zie ook </variable>
+  <variable id="Table of Contents Chapter">Hoofdstuk <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">Bijlage <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">Deel <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">Voorwoord: </variable>
+  <variable id="Preface title">Voorwoord</variable>
+  <variable id="Notices title">Let op</variable>
+  <variable id="Mini Toc">Onderwerpen: </variable>
+  <variable id="Notice"><!--TODO:Notice, from note with type="notice"--></variable>
+  <variable id="Figure.title">Figuur <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">Figuur <param ref-name="number"/></variable>
+  <variable id="Table.title">Tabel <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Tabel <param ref-name="number"/></variable>
+  <variable id="Related Links">Verwante onderwerpen</variable>
+  <variable id="Cross-Reference">Verwijzing naar:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Verwijzing naar:</variable><!--UNUSED-->
+  <variable id="List item">Lijst onderdeel.</variable>
+  <variable id="Foot note">Voetnoot.</variable>
+  <variable id="Navigation title">Navigatietitel</variable>
+  <variable id="Search title">Zoektitel</variable>
+  <variable id="Chapter with number">Hoofdstuk <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Appendix <param ref-name="number"/></variable>
+  <variable id="Part with number">Deel <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[Controle nodig]</variable>
+  <variable id="On the page"> op pagina <param ref-name="pagenum"/></variable>
+  <variable id="Page"> pagina <param ref-name="pagenum"/></variable>
+  <variable id="This link">deze verwijzing</variable><!--UNUSED-->
+  <variable id="Child topics">Onderliggende onderwerpen</variable><!--UNUSED-->
+  <variable id="Related references">Verwante verwijzingen</variable><!--UNUSED-->
+  <variable id="Optional Step">Optioneel:</variable>
+  <variable id="Required Step">Vereist:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Verklarende woordenlijst</variable>
+  <variable id="List of Tables">Tabellen</variable>
+  <variable id="List of Figures">Figuren</variable>
+</vars>

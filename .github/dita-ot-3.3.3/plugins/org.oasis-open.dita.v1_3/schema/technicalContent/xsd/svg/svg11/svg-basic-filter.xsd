@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:simpleType name="FilterValue.datatype">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="NumberOptionalNumber.datatype">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:element name="SVG.FilterPrimitive.class" abstract="true"/>
+  <xs:attributeGroup name="SVG.FilterPrimitive.attrib">
+    <xs:attribute name="x" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="y" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="width" type="svg:Length.datatype"/>
+    <xs:attribute name="height" type="svg:Length.datatype"/>
+    <xs:attribute name="result"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.FilterPrimitiveWithIn.attrib">
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitive.attrib"/>
+    <xs:attribute name="in"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.filter.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="svg:animate"/>
+        <xs:element ref="svg:set"/>
+        <xs:element ref="svg:SVG.FilterPrimitive.class"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="filter" substitutionGroup="svg:SVG.Filter.class"/>
+  <xs:attributeGroup name="attlist.filter">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attributeGroup ref="xlink:SVG.XLink.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="x" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="y" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="width" type="svg:Length.datatype"/>
+    <xs:attribute name="height" type="svg:Length.datatype"/>
+    <xs:attribute name="filterRes" type="svg:NumberOptionalNumber.datatype"/>
+    <xs:attribute name="filterUnits">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="userSpaceOnUse"/>
+          <xs:enumeration value="objectBoundingBox"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="primitiveUnits">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="userSpaceOnUse"/>
+          <xs:enumeration value="objectBoundingBox"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feBlend.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feBlend" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feBlend.content">
+          <xs:attributeGroup ref="svg:attlist.feBlend"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feBlend">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="in2" use="required"/>
+    <xs:attribute name="mode" default="normal">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="normal"/>
+          <xs:enumeration value="multiply"/>
+          <xs:enumeration value="screen"/>
+          <xs:enumeration value="darken"/>
+          <xs:enumeration value="lighten"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feColorMatrix.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feColorMatrix" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feColorMatrix.content">
+          <xs:attributeGroup ref="svg:attlist.feColorMatrix"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feColorMatrix">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="type" default="matrix">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="matrix"/>
+          <xs:enumeration value="saturate"/>
+          <xs:enumeration value="hueRotate"/>
+          <xs:enumeration value="luminanceToAlpha"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="values"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feComponentTransfer.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="svg:feFuncR"/>
+      <xs:element minOccurs="0" ref="svg:feFuncG"/>
+      <xs:element minOccurs="0" ref="svg:feFuncB"/>
+      <xs:element minOccurs="0" ref="svg:feFuncA"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="feComponentTransfer" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feComponentTransfer.content">
+          <xs:attributeGroup ref="svg:attlist.feComponentTransfer"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feComponentTransfer">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feComposite.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feComposite" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feComposite.content">
+          <xs:attributeGroup ref="svg:attlist.feComposite"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feComposite">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="in2" use="required"/>
+    <xs:attribute name="operator" default="over">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="over"/>
+          <xs:enumeration value="in"/>
+          <xs:enumeration value="out"/>
+          <xs:enumeration value="atop"/>
+          <xs:enumeration value="xor"/>
+          <xs:enumeration value="arithmetic"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="k1" type="svg:Number.datatype"/>
+    <xs:attribute name="k2" type="svg:Number.datatype"/>
+    <xs:attribute name="k3" type="svg:Number.datatype"/>
+    <xs:attribute name="k4" type="svg:Number.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feFlood.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+      <xs:element ref="svg:animateColor"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feFlood" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feFlood.content">
+          <xs:attributeGroup ref="svg:attlist.feFlood"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feFlood">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="SVG.Color.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="flood-color" type="svg:SVGColor.datatype"/>
+    <xs:attribute name="flood-opacity" type="svg:OpacityValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feGaussianBlur.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feGaussianBlur" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feGaussianBlur.content">
+          <xs:attributeGroup ref="svg:attlist.feGaussianBlur"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feGaussianBlur">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="stdDeviation" type="svg:NumberOptionalNumber.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feImage.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+      <xs:element ref="svg:animateTransform"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feImage" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feImage.content">
+          <xs:attributeGroup ref="svg:attlist.feImage"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feImage">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitive.attrib"/>
+    <xs:attributeGroup ref="xlink:SVG.XLinkEmbed.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="preserveAspectRatio" default="xMidYMid meet" type="svg:PreserveAspectRatioSpec.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feMerge.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:feMergeNode"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="feMerge" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feMerge.content">
+          <xs:attributeGroup ref="svg:attlist.feMerge"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feMerge">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitive.attrib"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feMergeNode.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feMergeNode">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feMergeNode.content">
+          <xs:attributeGroup ref="svg:attlist.feMergeNode"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feMergeNode">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attribute name="in"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feOffset.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feOffset" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feOffset.content">
+          <xs:attributeGroup ref="svg:attlist.feOffset"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feOffset">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+    <xs:attribute name="dx" type="svg:Number.datatype"/>
+    <xs:attribute name="dy" type="svg:Number.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feTile.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feTile" substitutionGroup="svg:SVG.FilterPrimitive.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feTile.content">
+          <xs:attributeGroup ref="svg:attlist.feTile"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feTile">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterColor.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.FilterPrimitiveWithIn.attrib"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feFuncR.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feFuncR">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feFuncR.content">
+          <xs:attributeGroup ref="svg:attlist.feFuncR"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feFuncR">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attribute name="type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="identity"/>
+          <xs:enumeration value="table"/>
+          <xs:enumeration value="discrete"/>
+          <xs:enumeration value="linear"/>
+          <xs:enumeration value="gamma"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tableValues"/>
+    <xs:attribute name="slope" type="svg:Number.datatype"/>
+    <xs:attribute name="intercept" type="svg:Number.datatype"/>
+    <xs:attribute name="amplitude" type="svg:Number.datatype"/>
+    <xs:attribute name="exponent" type="svg:Number.datatype"/>
+    <xs:attribute name="offset" type="svg:Number.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feFuncG.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feFuncG">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feFuncG.content">
+          <xs:attributeGroup ref="svg:attlist.feFuncG"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feFuncG">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attribute name="type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="identity"/>
+          <xs:enumeration value="table"/>
+          <xs:enumeration value="discrete"/>
+          <xs:enumeration value="linear"/>
+          <xs:enumeration value="gamma"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tableValues"/>
+    <xs:attribute name="slope" type="svg:Number.datatype"/>
+    <xs:attribute name="intercept" type="svg:Number.datatype"/>
+    <xs:attribute name="amplitude" type="svg:Number.datatype"/>
+    <xs:attribute name="exponent" type="svg:Number.datatype"/>
+    <xs:attribute name="offset" type="svg:Number.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feFuncB.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feFuncB">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feFuncB.content">
+          <xs:attributeGroup ref="svg:attlist.feFuncB"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feFuncB">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attribute name="type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="identity"/>
+          <xs:enumeration value="table"/>
+          <xs:enumeration value="discrete"/>
+          <xs:enumeration value="linear"/>
+          <xs:enumeration value="gamma"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tableValues"/>
+    <xs:attribute name="slope" type="svg:Number.datatype"/>
+    <xs:attribute name="intercept" type="svg:Number.datatype"/>
+    <xs:attribute name="amplitude" type="svg:Number.datatype"/>
+    <xs:attribute name="exponent" type="svg:Number.datatype"/>
+    <xs:attribute name="offset" type="svg:Number.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.feFuncA.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="feFuncA">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.feFuncA.content">
+          <xs:attributeGroup ref="svg:attlist.feFuncA"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.feFuncA">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attribute name="type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="identity"/>
+          <xs:enumeration value="table"/>
+          <xs:enumeration value="discrete"/>
+          <xs:enumeration value="linear"/>
+          <xs:enumeration value="gamma"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tableValues"/>
+    <xs:attribute name="slope" type="svg:Number.datatype"/>
+    <xs:attribute name="intercept" type="svg:Number.datatype"/>
+    <xs:attribute name="amplitude" type="svg:Number.datatype"/>
+    <xs:attribute name="exponent" type="svg:Number.datatype"/>
+    <xs:attribute name="offset" type="svg:Number.datatype"/>
+  </xs:attributeGroup>
+</xs:schema>

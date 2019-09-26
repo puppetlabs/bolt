@@ -1,0 +1,157 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="This scenario walks through the process of creating a very simple plug-in (com.example.print-pdf) that creates a new transformation type: print-pdf."><meta name="DC.subject" content=", figure, PDF, plug-in, integrator.xml, catalog, example"><meta name="keywords" content=", figure, PDF, plug-in, integrator.xml, catalog, example"><meta name="DC.relation" scheme="URI" content="../topics/pdf-customization.html"><meta name="DC.relation" scheme="URI" content="../topics/plugins-installing.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="dita2pdf-customization"><meta name="DC.language" content="en"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Example: Creating a simple PDF plug-in</title></head><body id="dita2pdf-customization"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a><ul><li><a href="../topics/pdf-customization-approaches.html">PDF customization approaches</a></li><li><a href="../topics/pdf-customization-plugin-types.html">Types of custom PDF plug-ins</a></li><li><a href="../topics/pdf-plugin-structure.html">PDF plug-in structure</a></li><li class="active"><a href="../topics/pdf-customization-example.html">Simple PDF plug-in example</a></li><li><a href="../topics/pdf-customization-resources.html">Custom PDF plug-in resources</a></li><li><a href="../topics/pdf2-creating-change-bars.html">Generating revision bars</a></li></ul></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Example: Creating a simple PDF plug-in</h1>
+  
+  
+  
+  <div class="body taskbody"><p class="shortdesc">This scenario walks through the process of creating a very simple plug-in
+      (<code class="ph codeph">com.example.print-pdf</code>) that creates a new transformation type: <span class="keyword option">print-pdf</span>. </p>
+    <section class="section context"><div class="tasklabel"><h2 class="sectiontitle tasklabel">About this task</h2></div>
+      <p class="p">The <span class="keyword option">print-pdf</span> transformation has the following characteristics:</p>
+      <ul class="ul">
+        <li class="li">Uses A4 paper </li>
+        <li class="li">Renders figures with a title at the top and a description at the bottom</li>
+        <li class="li">Use em dashes as the symbols for unordered lists</li>
+      </ul>
+    </section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">In the <span class="ph filepath">plugins</span> directory, create a directory named
+            <span class="ph filepath">com.example.print-pdf</span>.</span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the new <span class="ph filepath">com.example.print-pdf</span> directory, create a plug-in configuration file
+            (<span class="ph filepath">plugin.xml</span>) that declares the new <span class="keyword option">print-pdf</span> transformation and its
+          dependencies.</span>
+        <div class="itemgroup info">
+          <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 1. </span><span class="ph filepath">plugin.xml</span> file</figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;?xml-model href="dita-ot/plugin.rnc" type="application/relax-ng-compact-syntax"?&gt;
+
+&lt;plugin id="com.example.print-pdf"&gt;
+  &lt;require plugin="org.dita.pdf2"/&gt;
+  &lt;transtype name="print-pdf" extends="pdf" desc="PDF on A4 paper"/&gt;
+  &lt;feature extension="dita.transtype.print" value="print-pdf"/&gt;
+  &lt;feature extension="ant.import" file="integrator.xml"/&gt;
+&lt;/plugin&gt;</code></pre>
+          </figure>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Add an Ant script (<span class="ph filepath">integrator.xml</span>) to define the transformation type.</span>
+        <div class="itemgroup info">
+          <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 2. </span><span class="ph filepath">integrator.xml</span> file</figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;project&gt;
+  &lt;target name="dita2print-pdf"
+       depends="dita2print-pdf.init,
+                dita2pdf2"/&gt;
+  &lt;target name="dita2print-pdf.init"&gt;
+    &lt;property name="customization.dir"
+          location="${dita.plugin.com.example.print-pdf.dir}/cfg"/&gt;
+   &lt;/target&gt;
+&lt;/project&gt;</code></pre>
+          </figure></div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the new plug-in directory, add a <span class="ph filepath">cfg/catalog.xml</span> file that specifies the custom
+          XSLT style sheets.</span>
+        <div class="itemgroup stepxmp">
+          <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 3. </span><span class="ph filepath">cfg/catalog.xml</span> file</figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;catalog prefer="system"
+         xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"&gt;
+  &lt;uri name="cfg:fo/attrs/custom.xsl" uri="fo/attrs/custom.xsl"/&gt;
+  &lt;uri name="cfg:fo/xsl/custom.xsl" uri="fo/xsl/custom.xsl"/&gt;
+&lt;/catalog&gt;</code></pre>
+          </figure>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Create the <span class="ph filepath">cfg/fo/attrs/custom.xsl</span> file, and add attribute and variable overrides to
+          it.</span>
+        <div class="itemgroup stepxmp">For example, add the following variables to change the page size to A4.<figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 4. </span><span class="ph filepath">cfg/fo/attrs/custom.xsl</span> file</figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                version="2.0"&gt;
+  &lt;!-- Change page size to A4 --&gt;
+  &lt;xsl:variable name="page-width"&gt;210mm&lt;/xsl:variable&gt;
+  &lt;xsl:variable name="page-height"&gt;297mm&lt;/xsl:variable&gt;
+&lt;/xsl:stylesheet&gt;</code></pre>
+          </figure></div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Create the <span class="ph filepath">cfg/fo/xsl/custom.xsl</span> file, and add XSLT overrides to it.</span>
+        <div class="itemgroup stepxmp">For example, the following code changes the rendering of <code class="keyword markupname xmlelement">&lt;figure&gt;</code> elements.<figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 5. </span><span class="ph filepath">cfg/fo/xsl/custom.xsl</span> file</figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:fo="http://www.w3.org/1999/XSL/Format"
+                version="2.0"&gt;
+  &lt;!-- Move figure title to top and description to bottom --&gt;
+  &lt;xsl:template match="*[contains(@class,' topic/fig ')]"&gt;
+    &lt;fo:block xsl:use-attribute-sets="fig"&gt;
+      &lt;xsl:call-template name="commonattributes"/&gt;
+      &lt;xsl:if test="not(@id)"&gt;
+        &lt;xsl:attribute name="id"&gt;
+          &lt;xsl:call-template name="get-id"/&gt;
+        &lt;/xsl:attribute&gt;
+      &lt;/xsl:if&gt;
+      &lt;xsl:apply-templates select="*[contains(@class,' topic/title ')]"/&gt;
+      &lt;xsl:apply-templates select="*[not(contains(@class,' topic/title ') or contains(@class,' topic/desc '))]"/&gt;
+      &lt;xsl:apply-templates select="*[contains(@class,' topic/desc ')]"/&gt;
+    &lt;/fo:block&gt;
+  &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;</code></pre>
+          </figure></div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Create an English-language variable-definition file (<span class="ph filepath">cfg/common/vars/en.xml</span>) and make
+          any necessary modifications to it.</span>
+        <div class="itemgroup stepxmp">For example, the following code removes the period after the number for an ordered-list item; it also
+          specifies that the bullet for an unordered list item should be an em dash.<figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 6. </span><span class="ph filepath">cfg/common/vars/en.xml</span> file</figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;vars xmlns="http://www.idiominc.com/opentopic/vars"&gt;
+  &lt;!-- Remove dot from list number --&gt;
+  &lt;variable id="Ordered List Number"&gt;
+    &lt;param ref-name="number"/&gt;
+  &lt;/variable&gt;
+  &lt;!-- Change unordered list bullet to an em dash --&gt;
+  &lt;variable id="Unordered List bullet"&gt;&amp;#x2014;&lt;/variable&gt;
+&lt;/vars&gt;</code></pre>
+          </figure></div>
+      </li></ol></section>
+    <section class="section result"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Results</h2></div>
+      <div class="note tip note_tip"><span class="note__title">Tip:</span> The files for this sample plug-in are included in the DITA-OT installation directory under
+          <span class="ph filepath">docsrc/samples/plugins/com.example.print-pdf/</span> and on
+        <a class="xref" href="https://github.com/dita-ot/docs/tree/develop/samples/plugins/com.example.print-pdf" target="_blank">GitHub</a>.</div>
+      <p class="p">The plug-in directory has the following layout and files:</p>
+      <pre class="pre codeblock"><code>com.example.print-pdf
+├── cfg
+│&nbsp;&nbsp; ├── catalog.xml
+│&nbsp;&nbsp; ├── common
+│&nbsp;&nbsp; │&nbsp;&nbsp; └── vars
+│&nbsp;&nbsp; │&nbsp;&nbsp;     └── en.xml
+│&nbsp;&nbsp; └── fo
+│&nbsp;&nbsp;     ├── attrs
+│&nbsp;&nbsp;     │&nbsp;&nbsp; └── custom.xsl
+│&nbsp;&nbsp;     └── xsl
+│&nbsp;&nbsp;         └── custom.xsl
+├── integrator.xml
+└── plugin.xml</code></pre>
+    </section>
+    <section class="section postreq"><div class="tasklabel"><h2 class="sectiontitle tasklabel">What to do next</h2></div>
+      <ol class="ol">
+        <li class="li">Run <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span>
+          <span class="keyword parmname">--install</span> to install the plug-in and make the <span class="keyword option">print-pdf</span> transformation
+          available.</li>
+        <li class="li">Build output with the new transformation type to verify that the plug-in works as intended.
+          <pre class="pre codeblock"><code><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span> <span class="keyword parmname">--input</span>=<var class="keyword varname">my.ditamap</var> <span class="keyword parmname">--format</span>=<span class="keyword option">print-pdf</span></code></pre>
+        </li>
+      </ol>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/pdf-customization.html" title="You can create custom DITA-OT plug-ins that build on the default DITA to PDF transformation. Plug-ins can customize covers and page layouts, modify formatting, override logic of the default PDF plug-in, and much more.">Customizing PDF output</a></div></div><div class="linklist relinfo reltasks"><strong>Related tasks</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/plugins-installing.html" title="Use the dita command to install a plug-in.">Installing plug-ins</a></li></ul></div></nav></article></main></body></html>

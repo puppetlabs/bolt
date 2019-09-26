@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="plugin-antpreprocess" xml:lang="en-US">
+  <title>Adding an Ant target to the pre-processing pipeline</title>
+  <shortdesc>You can add an Ant target to the pre-processing pipeline. This enables you to insert additional processing
+    before or after the pre-processing chain or a specific step in the pre-processing operation.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins<indexterm>Ant</indexterm></indexterm>
+        <indexterm>Ant<indexterm>preprocessing</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>You can use the <codeph>depend.preprocess.pre</codeph> and <codeph>depend.preprocess.post</codeph> extension
+        points to run a target before or after the entire pre-processing operation. In addition, there are extension
+        points that enable you to run an Ant target before specific pre-processing steps.</p>
+      <note conref="../resources/conref-task.dita#ID/tip-extend-before-after-preprocessing"/>
+    </context>
+    <steps>
+      <step>
+        <cmd>Define and integrate the new Ant target.</cmd>
+      </step>
+      <step>
+        <cmd>Create the following <filepath>plugin.xml</filepath> file:</cmd>
+        <info><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="<varname>plugin-id</varname>">
+  &lt;feature extension="<varname>extension-point</varname>" value="<varname>Ant-target</varname>"/>
+&lt;/plugin></codeblock>where
+          <ul>
+            <li><varname>plugin-id</varname> is the plug-in identifier.</li>
+            <li><varname>extension-point</varname> is a pre-processing extension point.</li>
+            <li><varname>Ant-target</varname> is the name of the Ant target.</li>
+          </ul></info>
+      </step>
+      <step>
+        <cmd>Install the plug-in.</cmd>
+      </step>
+    </steps>
+    <result>The new target is added to the Ant dependency list. The new target is now always run in conjunction with the
+      specified step in the pre-processing pipeline.</result>
+    <example>
+      <title>Example</title>
+      <p>The following <filepath>plugin.xml</filepath> file specifies that the
+          <parmname>myAntTargetBeforeChunk</parmname> target is always run before the <codeph>chunk</codeph> step in the
+        pre-processing stage.</p>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="com.example.extendchunk">
+  &lt;feature extension="depend.preprocess.chunk.pre" 
+           value="myAntTargetBeforeChunk"/>
+&lt;/plugin></codeblock>
+      <p>It assumes that the <parmname>myAntTargetBeforeChunk</parmname> target has already been defined and
+        integrated.</p>
+      <note conref="../resources/conref-task.dita#ID/caution-extend-within-preprocessing"/>
+    </example>
+  </taskbody>
+</task>

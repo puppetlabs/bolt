@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.0.2" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.0.2</title><shortdesc>Release 1.0.2 is a maintenance release to fix defects and adds some minor
+      enhancements in release 1.0.1.</shortdesc><refbody><section>
+        <title>Changes</title>
+        <ol><li>SF Bug 1181950: format attribute should be set to 'dita' for dita topic</li><li>SF RFE 1183487: Document the usage of footer property</li><li>SF RFE 1198847: command line interface support</li><li>SF RFE 1198850: architecture document update</li><li>SF RFE 1200410: need explanation for dita.list</li><li>SF RFE 1201175: XML catalog support</li><li>SF Patch 1176909: Add template for getting image URI</li></ol>
+      </section></refbody></reference>

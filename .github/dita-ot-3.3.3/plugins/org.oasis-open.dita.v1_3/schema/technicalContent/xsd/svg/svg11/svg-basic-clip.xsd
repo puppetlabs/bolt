@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:simpleType name="ClipPathValue.datatype">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:group name="SVG.clipPath.class">
+    <xs:choice>
+      <xs:choice>
+        <xs:element ref="svg:rect"/>
+        <xs:element ref="svg:SVG.Animation.class"/>
+        <xs:element ref="svg:SVG.Use.class"/>
+      </xs:choice>
+      <xs:choice>
+        <xs:element ref="svg:SVG.Shape.class"/>
+        <xs:element ref="svg:SVG.Text.class"/>
+      </xs:choice>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="SVG.clipPath.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.clipPath.class"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="clipPath" substitutionGroup="svg:SVG.Clip.class"/>
+  <xs:attributeGroup name="attlist.clipPath">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Text.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.TextContent.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Font.attrib"/>
+    <xs:attributeGroup ref="SVG.Paint.attrib"/>
+    <xs:attributeGroup ref="SVG.Color.attrib"/>
+    <xs:attributeGroup ref="SVG.Opacity.attrib"/>
+    <xs:attributeGroup ref="SVG.Graphics.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Clip.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Mask.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Filter.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Cursor.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+    <xs:attribute name="clipPathUnits">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="userSpaceOnUse"/>
+          <xs:enumeration value="objectBoundingBox"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:checkShell.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+         xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+      <moduleTitle>DITA Base Map Shell</moduleTitle>
+      <headerComment xml:space="preserve">
+=============================================================
+                              HEADER
+=============================================================
+Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02
+OASIS Standard
+16 January 2018 
+Copyright (c) OASIS Open 2018. All rights reserved. 
+Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html
+
+============================================================
+ MODULE:    DITA Base MAP (only base domains)
+ VERSION:   1.3
+ DATE:      March 2014
+
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION
+                       TYPICAL INVOCATION
+                                                             
+Refer to this file by the following public identifier or an
+     appropriate system identifier:
+     
+PUBLIC "-//OASIS//DTD DITA Base Map//EN"
+
+The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+     
+PUBLIC "-//OASIS//DTD DITA 1.3 Base Map//EN"
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)
+                                                             
+PURPOSE:    DTD to describe DITA maps
+                                                             
+ORIGINAL CREATION DATE:
+            April 2010
+                                                             
+            (C) Copyright OASIS Open 2010, 2014
+            All Rights Reserved.
+                                                             
+ UPDATES:
+   2010.09.20 RDA: Add topic-based domains
+   2014.03.13 WEK: Updated for DITA 1.3, reimplemented as RNG
+=============================================================
+</headerComment>
+      <moduleMetadata>
+         <moduleType>mapshell</moduleType>
+         <moduleShortName>basemap</moduleShortName>
+         <shellPublicIds>
+            <dtdShell>-//OASIS//DTD DITA<var presep=" " name="ditaver"/> Base Map//EN</dtdShell>
+            <xsdShell>urn:oasis:names:tc:dita:xsd:basemap.xsd<var presep=":" name="ditaver"/>
+            </xsdShell>
+            <rncShell>urn:oasis:names:tc:dita:rnc:basemap.rnc<var presep=":" name="ditaver"/>
+            </rncShell>
+            <rngShell>urn:oasis:names:tc:dita:rng:basemap.rng<var presep=":" name="ditaver"/>
+            </rngShell>
+         </shellPublicIds>
+      </moduleMetadata>
+  </moduleDesc>
+  
+  <div>
+      <a:documentation>ROOT ELEMENT DECLARATION</a:documentation>
+      <start>
+         <ref name="map.element"/>
+      </start>
+  </div>
+  <div>
+      <a:documentation>DITA DOMAINS ATTRIBUTE</a:documentation>
+
+      <define name="domains-att">
+         <optional>
+            <attribute name="domains"
+                       a:defaultValue="
+                         (topic delay-d)
+                         (map ditavalref-d)
+                         (topic hazard-d)
+                         (topic hi-d)
+                         (topic indexing-d)
+                         (map mapgroup-d)
+                         (topic ut-d)
+                         a(props deliveryTarget)"/>
+         </optional>
+      </define>
+
+
+  </div>
+  <div>
+      <a:documentation>MODULE INCLUSIONS</a:documentation>
+
+      <include href="mapMod.rng"/>
+      <include href="mapGroupDomain.rng"/>
+
+      <include href="delayResolutionDomain.rng"/>
+      <include href="deliveryTargetAttDomain.rng" dita:since="1.3"/>
+      <include href="ditavalrefDomain.rng" dita:since="1.3"/>
+      <include href="indexingDomain.rng"/>
+      <include href="hazardstatementDomain.rng"/>
+      <include href="highlightDomain.rng"/>
+      <include href="utilitiesDomain.rng"/>
+  </div>
+  <div>
+      <a:documentation>ID-DEFINING-ELEMENT OVERRIDES</a:documentation>
+
+      <define name="any">
+         <zeroOrMore>
+            <choice>
+               <ref name="idElements"/>
+               <element>
+                  <anyName>
+                     <except>
+                        <name>map</name>
+                        <name>anchor</name>
+                     </except>
+                  </anyName>
+                  <zeroOrMore>
+                     <attribute>
+                        <anyName/>
+                     </attribute>
+                  </zeroOrMore>
+                  <ref name="any"/>
+               </element>
+               <text/>
+            </choice>
+         </zeroOrMore>
+      </define>
+  </div>
+</grammar>

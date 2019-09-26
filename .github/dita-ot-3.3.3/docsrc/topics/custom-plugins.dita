@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="custom-plugins">
+  <title>Working with plug-ins</title>
+  <shortdesc id="plugins-creating">You can install or create DITA-OT plug-ins to change the default output types in
+    various ways, add entirely new kinds of output formats, or implement DITA topic specializations.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>DITA<indexterm>specializations</indexterm></indexterm>
+        <indexterm start="plugins">plug-ins</indexterm>
+        <indexterm>plug-ins<indexterm>benefits</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>working with</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <conbody>
+
+    <p>A plug-in consists of a directory, typically stored within the <filepath>plugins/</filepath> subdirectory of the
+      DITA-OT installation. Every plug-in is controlled by a file named <filepath>plugin.xml</filepath>, which is
+      located in the root directory of the plug-in.</p>
+
+    <section id="plugin-benefits">
+      <title>Plug-in benefits</title>
+      <p>Plug-ins allow you to extend the toolkit in a way that is consistent, easy-to-share, and possible to preserve
+        through toolkit upgrades.</p>
+      <p>The DITA-OT plug-in mechanism provides the following benefits:</p>
+      <ul>
+        <li>Plug-ins can easily be shared with other users, teams, or companies. Typically, all users need to do is to
+          unzip and run a single installation command. With many builds, even that installation step is automatic.</li>
+        <li>Plug-ins permit overrides or customizations to grow from simple to complex over time, with no increased
+          complexity to the extension mechanism.</li>
+        <li>Plug-ins can be moved from version to version of DITA-OT by reinstalling or copying the directory from one
+          installation to another. There is no need to re-integrate code based on updates to DITA-OT core
+          processing.</li>
+        <li>Plug-ins can build upon each other. If you like a plug-in, simply install that plug-in, and then create your
+          own plug-in that builds on top of it. The two plug-ins can then be distributed to your team as a unit, or you
+          can share your own extensions with the original provider.</li>
+      </ul>
+    </section>
+
+    <section>
+      <title>Plug-in details</title>
+      <p>The following topics provide additional information on working with plug-ins and creating your own.</p>
+    </section>
+  </conbody>
+</concept>

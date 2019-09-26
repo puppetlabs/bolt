@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Įžanga | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Įžanga | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Turinys</variable>
+  <variable id="Index Continued String">tęsinys</variable>
+  <variable id="Index See String">, Žr. </variable>
+  <variable id="Index See Also String">Taip pat žr. </variable>
+  <variable id="Table of Contents Chapter">Skyrius <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">Priedas <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">Gaminys <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">Įžanga: </variable>
+  <variable id="Preface title">Įžanga</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">Turinys: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">Piešinys <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">Piešinys <param ref-name="number"/></variable>
+  <variable id="Table.title">Lentelė <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Lentelė <param ref-name="number"/></variable>
+  <variable id="Related Links">Susijusi informacija</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">Skyrius <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Priedas <param ref-name="number"/></variable>
+  <variable id="Part with number">Gaminys <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[Reikalingas valymas]</variable>
+  <variable id="On the page"> puslapyje <param ref-name="pagenum"/></variable>
+  <variable id="Page"> Puslapis <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">Nebūtina:</variable>
+  <variable id="Required Step">Būtina:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Klasynas</variable>
+  <variable id="List of Tables">Lentelės</variable>
+  <variable id="List of Figures">Piešiniai</variable>
+</vars>

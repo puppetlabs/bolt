@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="plugin-extension-points-pre-processing">
+  <title>Pre-processing extension points</title>
+  <shortdesc>You can use these extension points to run an Ant target before or after the pre-processing stage. If
+    necessary, you can also run an Ant target before a specific pre-processing step — but this approach is not
+    recommended.</shortdesc>
+  <refbody>
+    <section>
+      <note conref="../resources/conref-task.dita#ID/tip-extend-before-after-preprocessing"/>
+      <dl>
+        <dlentry>
+          <dt><parmname>depend.preprocess.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.pre.desc">Runs an Ant
+            target before the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.post</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.post.desc">Runs an Ant
+            target after the pre-processing stage.</dd>
+        </dlentry>
+      </dl>
+    </section>
+    <section>
+      <title>Legacy pre-processing extensions</title>
+      <p>The following extension points are available in the original <codeph>preprocess</codeph> pipeline that was used
+        by default for all transformations prior to DITA-OT 3.0. These extensions are not available in the newer <xref
+          keyref="map-first-preproc">map-first preprocessing</xref> pipeline (<codeph>preprocess2</codeph>), which is
+        used in the PDF and HTML Help transformations as of DITA-OT 3.0.</p>
+      <note conref="../resources/conref-task.dita#ID/caution-extend-within-preprocessing"/>
+      <dl>
+        <dlentry>
+          <dt><parmname>depend.preprocess.chunk.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.chunk.pre.desc">Runs an
+            Ant target before the <codeph>chunk</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.coderef.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.coderef.pre.desc">Runs an
+            Ant target before the <codeph>coderef</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.conref.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.conref.pre.desc">Runs an
+            Ant target before the <codeph>conref</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.conrefpush.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.conrefpush.pre.desc">Runs
+            an Ant target before the <codeph>conrefpush</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.clean-temp.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.clean-temp.pre.desc">Runs
+            an Ant target before the <codeph>clean-temp</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.copy-files.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.copy-files.pre.desc">Runs
+            an Ant target before the <codeph>copy-files</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.copy-flag.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.copy-flag.pre.desc">Runs
+            an Ant target before the <codeph>copy-flag</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.copy-html.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.copy-html.pre.desc">Runs
+            an Ant target before the <codeph>copy-html</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.copy-image.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.copy-image.pre.desc">Runs
+            an Ant target before the <codeph>copy-image</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.copy-subsidiary.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.copy-subsidiary.pre.desc"
+            >Runs an Ant target before the <codeph>copy-subsidiary</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.debug-filter.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.debug-filter.pre.desc"
+            >Runs an Ant target before the <codeph>debug-filter</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.gen-list.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.gen-list.pre.desc">Runs
+            an Ant target before the <codeph>gen-list</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.keyref.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.keyref.pre.desc">Runs an
+            Ant target before the <codeph>keyref</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.maplink.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.maplink.pre.desc">Runs an
+            Ant target before the <codeph>maplink</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.mappull.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.mappull.pre.desc">Runs an
+            Ant target before the <codeph>mappull</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.mapref.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.mapref.pre.desc">Runs an
+            Ant target before the <codeph>mapref</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.move-meta-entries.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.move-meta-entries.pre.desc"
+            >Runs an Ant target before the <codeph>move-meta-entries</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>depend.preprocess.topicpull.pre</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/depend.preprocess.topicpull.pre.desc">Runs
+            an Ant target before the <codeph>topicpull</codeph> step in the pre-processing stage.</dd>
+        </dlentry>
+      </dl>
+    </section>
+  </refbody>
+</reference>

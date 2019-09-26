@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Prakata | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Prakata | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Kandungan</variable>
+  <variable id="Index Continued String">bersambuhg</variable>
+  <variable id="Index See String">, Lihat </variable>
+  <variable id="Index See Also String">Lihat juga </variable>
+  <variable id="Table of Contents Chapter">Bab <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">Lampiran <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">Bahagian <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">Prakata: </variable>
+  <variable id="Preface title">Prakata</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">Kandungan: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">Rajah <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">Rajah <param ref-name="number"/></variable>
+  <variable id="Table.title">Jadual <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Jadual <param ref-name="number"/></variable>
+  <variable id="Related Links">Maklumat berkaitan</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">Bab <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Lampiran <param ref-name="number"/></variable>
+  <variable id="Part with number">Bahagian <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[Pembersihan diperlukan]</variable>
+  <variable id="On the page"> pada halaman <param ref-name="pagenum"/></variable>
+  <variable id="Page"> halaman <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">Opsyenal:</variable>
+  <variable id="Required Step">Diperlukan:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Glosari</variable>
+  <variable id="List of Tables">Jadual</variable>
+  <variable id="List of Figures">Rajah</variable>
+</vars>

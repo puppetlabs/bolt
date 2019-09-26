@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    XML EXCHANGE TABLE MODEL DECLARATION MODULE      -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2001, 2004.        -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2005.11.15 RDA: Corrected the "Delivered as" system ID    -->
+<!--   2006.06.07 RDA: Make universal attributes universal       -->
+<!--                     (DITA 1.1 proposal #12)                 -->
+<!--   2006.11.30 RDA: Add -dita-use-conref-target to enumerated -->
+<!--                     attributes                              -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities; -->
+<!--                   requires reorganization of some existing  -->
+<!--                   entities provided with the Exchange Model -->
+<!--=============================================================-->
+<!-- Delivered as file "tblDecl.mod"                             -->
+<!--=============================================================-->
+<!--XML EXCHANGE TABLE MODEL DECLARATION MODULE                  -->
+<!--OASIS DITA 1.0 notes:                                        -->
+<!--     The Exchange Table Model replaces the original CALS-based model-->
+<!--     used in development versions of the DITA definition.    -->
+<!--     This set of declarations defines the XML version of the Exchange-->
+<!--     Table Model as adapted for OASIS DITA version 1.0.      -->
+<!--     The base for the DITA version of the Exchange Table Model is-->
+<!--     defined at http://www.oasis-open.org/specs/tm9901.htm . -->
+<!--     The DITA version specifically extends this model with these DITA- -->
+<!--     specific content and attribute adaptations to the DITA processing-->
+<!--     requirements:                                           -->
+<!--STRUCTURE:                                                   -->
+<!--Introduce the DITA-unique <desc> element (optional after <title>); this element-->
+<!--enables more consistent presentation of both figures and tables.-->
+<!--ATTRIBUTES:                                                  -->
+<!--For frame, align, and valign attributes on any element:      -->
+<!--  Add the enumerated value -dita-use-conref-target for DITA 1.1.  -->
+<!--For the <table> element, add:                                -->
+<!--  %univ-atts; which consists of:                             -->
+<!--    %select-atts; [for selection, conditional processing]    -->
+<!--    %id-atts; [for conref and linking]                       -->
+<!--    %localization-atts (@translate + @xml:lang) [for NLS processing support]-->
+<!--    %global-atts; (@xtrf + @xtrc) [for tracing and messaging support in processors]-->
+<!--    @class [for specialization support]                      -->
+<!--  @outputclass [for role designation (ie, styles, future migrations)]-->
+<!--  @rowheader [for accessibility support in processing]       -->
+<!--  %display-atts; which consists of:                          -->
+<!--    @scale [for presentational equivalence with other scaled exhibits: fig, pre, lines, simpletable]-->
+<!--    @frame (already part of table)                           -->
+<!--    @pgwide (already part of table, same intent as original @expanse)-->
+<!--For <tgroup>, <thead>, <tbody>, and <row>, add:              -->
+<!--  %univ-atts;                                                -->
+<!--  %global-atts;                                              -->
+<!--  @class                                                     -->
+<!--  @outputclass [for role designation (ie, styles, future migrations)]-->
+<!--For <entry>, add:                                            -->
+<!--  %id-atts;                                                  -->
+<!--  %global-atts                                               -->
+<!--  @class                                                     -->
+<!--  @outputclass [for role designation (ie, styles, future migrations)]-->
+<!--  @rev [for indication of revised content for flag-based processing]-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/"/>
+      </xs:appinfo>
+   </xs:annotation>
+
+   <xs:group name="yesorno">
+      <xs:sequence/>
+   </xs:group>
+   <xs:group name="titles">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="paracon">
+      <xs:sequence>
+         <xs:group ref="tblcell.cnt"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="tbl.table.name">
+      <xs:sequence/>
+   </xs:group>
+   <xs:group name="tbl.table-titles.mdl">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="desc" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="tbl.table-main.mdl">
+      <xs:sequence>
+         <xs:group ref="tgroup" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="tbl.table.mdl">
+      <xs:sequence>
+         <xs:group ref="tbl.table-titles.mdl"/>
+         <xs:group ref="tbl.table-main.mdl"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="tbl.table.att">
+      <xs:attribute name="pgwide" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:group name="tbl.tgroup.mdl">
+      <xs:sequence>
+         <xs:group ref="colspec" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="thead" minOccurs="0"/>
+         <xs:group ref="tbody"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="tbl.tgroup.att"/>
+   <xs:attributeGroup name="tbl.thead.att"/>
+   <xs:attributeGroup name="tbl.tbody.att"/>
+   <xs:attributeGroup name="tbl.colspec.att">
+      <xs:attribute name="base" type="xs:string"/>
+      <xs:attributeGroup ref="base-attribute-extensions"/>
+   </xs:attributeGroup>
+   <xs:group name="tbl.row.mdl">
+      <xs:sequence>
+         <xs:group ref="entry" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="tbl.row.att"/>
+   <xs:group name="tbl.entry.mdl">
+      <xs:sequence>
+         <xs:group ref="paracon" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="tbl.entry.att">
+      <xs:attribute name="base" type="xs:string"/>
+      <xs:attributeGroup ref="base-attribute-extensions"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="dita.table.attributes">
+      <xs:attribute name="orient">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="port"/>
+               <xs:enumeration value="land"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="rowheader">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="firstcol"/>
+               <xs:enumeration value="headers"/>
+               <xs:enumeration value="norowheader"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="scale">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="50"/>
+               <xs:enumeration value="60"/>
+               <xs:enumeration value="70"/>
+               <xs:enumeration value="80"/>
+               <xs:enumeration value="90"/>
+               <xs:enumeration value="100"/>
+               <xs:enumeration value="110"/>
+               <xs:enumeration value="120"/>
+               <xs:enumeration value="140"/>
+               <xs:enumeration value="160"/>
+               <xs:enumeration value="180"/>
+               <xs:enumeration value="200"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="dita.tgroup.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="dita.thead.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="dita.tbody.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="dita.row.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="dita.entry.attributes">
+      <xs:attributeGroup ref="id-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="rotate" type="xs:string"/>
+      <xs:attribute name="rev" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="row"/>
+               <xs:enumeration value="col"/>
+               <xs:enumeration value="rowgroup"/>
+               <xs:enumeration value="colgroup"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="headers" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="dita.colspec.attributes">
+      <xs:attributeGroup ref="id-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="table">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="table.class">
+               <xs:attribute ref="class" default="- topic/table "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="table.class">
+      <xs:sequence>
+         <xs:group ref="table.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="table.attributes"/>
+   </xs:complexType>
+   <xs:group name="table.content">
+      <xs:sequence>
+         <xs:group ref="tbl.table.mdl"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="table.attributes">
+      <xs:attribute name="frame">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="top"/>
+               <xs:enumeration value="bottom"/>
+               <xs:enumeration value="topbot"/>
+               <xs:enumeration value="all"/>
+               <xs:enumeration value="sides"/>
+               <xs:enumeration value="none"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="colsep" type="xs:string"/>
+      <xs:attribute name="rowsep" type="xs:string"/>
+      <xs:attributeGroup ref="tbl.table.att"/>
+      <xs:attributeGroup ref="dita.table.attributes"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="tgroup">
+      <xs:annotation>
+         <xs:documentation>The &lt;tgroup&gt; element in a table contains column, row, spanning, header and
+        footer specifications, and the body (&lt;tbody&gt;) of the table. 
+        Category: Table elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="tgroup.class">
+               <xs:attribute ref="class" default="- topic/tgroup "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="tgroup.class">
+      <xs:sequence>
+         <xs:group ref="tgroup.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="tgroup.attributes"/>
+   </xs:complexType>
+   <xs:group name="tgroup.content">
+      <xs:sequence>
+         <xs:group ref="tbl.tgroup.mdl"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="tgroup.attributes">
+      <xs:attribute name="cols" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="colsep" type="xs:string"/>
+      <xs:attribute name="rowsep" type="xs:string"/>
+      <xs:attribute name="align">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="left"/>
+               <xs:enumeration value="right"/>
+               <xs:enumeration value="center"/>
+               <xs:enumeration value="justify"/>
+               <xs:enumeration value="char"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="tbl.tgroup.att"/>
+      <xs:attributeGroup ref="dita.tgroup.attributes"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="colspec">
+      <xs:annotation>
+         <xs:documentation>The &lt;colspec&gt; element contains a column specification for a table,
+        including assigning a column name and number, cell content alignment, and column width.
+        Category: Table elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="colspec.class">
+               <xs:attribute ref="class" default="- topic/colspec "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="colspec.class">
+      <xs:sequence>
+         <xs:group ref="colspec.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="colspec.attributes"/>
+   </xs:complexType>
+   <xs:group name="colspec.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="colspec.attributes">
+      <xs:attribute name="colnum" type="xs:NMTOKEN"/>
+      <xs:attribute name="colname" type="xs:NMTOKEN"/>
+      <xs:attribute name="colwidth" type="xs:string"/>
+      <xs:attribute name="colsep" type="xs:string"/>
+      <xs:attribute name="rowsep" type="xs:string"/>
+      <xs:attribute name="align">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="left"/>
+               <xs:enumeration value="right"/>
+               <xs:enumeration value="center"/>
+               <xs:enumeration value="justify"/>
+               <xs:enumeration value="char"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="char" type="xs:string"/>
+      <xs:attribute name="charoff" type="xs:NMTOKEN"/>
+      <xs:attribute name="rowheader">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="firstcol"/>
+               <xs:enumeration value="headers"/>
+               <xs:enumeration value="norowheader"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="tbl.colspec.att"/>
+      <xs:attributeGroup ref="dita.colspec.attributes"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="thead">
+      <xs:annotation>
+         <xs:documentation>The table header (&lt;thead&gt;) element precedes the table body (&lt;tbody&gt;)
+        element in a complex table. 
+        Category: Table elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="thead.class">
+               <xs:attribute ref="class" default="- topic/thead "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="thead.class">
+      <xs:sequence>
+         <xs:group ref="thead.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="thead.attributes"/>
+   </xs:complexType>
+   <xs:group name="thead.content">
+      <xs:sequence>
+         <xs:group ref="row" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="thead.attributes">
+      <xs:attribute name="valign">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="top"/>
+               <xs:enumeration value="middle"/>
+               <xs:enumeration value="bottom"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="tbl.thead.att"/>
+      <xs:attributeGroup ref="dita.thead.attributes"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="tbody">
+      <xs:annotation>
+         <xs:documentation>The &lt;tbody&gt; element contains the rows in a table. 
+        Category: Table elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="tbody.class">
+               <xs:attribute ref="class" default="- topic/tbody "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="tbody.class">
+      <xs:sequence>
+         <xs:group ref="tbody.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="tbody.attributes"/>
+   </xs:complexType>
+   <xs:group name="tbody.content">
+      <xs:sequence>
+         <xs:group ref="row" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="tbody.attributes">
+      <xs:attribute name="valign">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="top"/>
+               <xs:enumeration value="middle"/>
+               <xs:enumeration value="bottom"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="tbl.tbody.att"/>
+      <xs:attributeGroup ref="dita.tbody.attributes"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="row">
+      <xs:annotation>
+         <xs:documentation>The &lt;row&gt; element contains a single row in a table &lt;tgroup&gt;. 
+        Category: Table elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="row.class">
+               <xs:attribute ref="class" default="- topic/row "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="row.class">
+      <xs:sequence>
+         <xs:group ref="row.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="row.attributes"/>
+   </xs:complexType>
+   <xs:group name="row.content">
+      <xs:sequence>
+         <xs:group ref="tbl.row.mdl"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="row.attributes">
+      <xs:attribute name="rowsep" type="xs:string"/>
+      <xs:attribute name="valign">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="top"/>
+               <xs:enumeration value="middle"/>
+               <xs:enumeration value="bottom"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="tbl.row.att"/>
+      <xs:attributeGroup ref="dita.row.attributes"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="entry">
+      <xs:annotation>
+         <xs:documentation>The &lt;entry&gt; element defines a single cell in a table. 
+        Category: Table elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="entry.class">
+               <xs:attribute ref="class" default="- topic/entry "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="entry.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="entry.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="entry.attributes"/>
+   </xs:complexType>
+   <xs:group name="entry.content">
+      <xs:sequence>
+         <xs:group ref="tbl.entry.mdl"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="entry.attributes">
+      <xs:attribute name="colname" type="xs:NMTOKEN"/>
+      <xs:attribute name="namest" type="xs:NMTOKEN"/>
+      <xs:attribute name="nameend" type="xs:NMTOKEN"/>
+      <xs:attribute name="morerows" type="xs:NMTOKEN"/>
+      <xs:attribute name="colsep" type="xs:string"/>
+      <xs:attribute name="rowsep" type="xs:string"/>
+      <xs:attribute name="align">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="left"/>
+               <xs:enumeration value="right"/>
+               <xs:enumeration value="center"/>
+               <xs:enumeration value="justify"/>
+               <xs:enumeration value="char"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="char" type="xs:string"/>
+      <xs:attribute name="charoff" type="xs:NMTOKEN"/>
+      <xs:attribute name="valign">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="top"/>
+               <xs:enumeration value="middle"/>
+               <xs:enumeration value="bottom"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="tbl.entry.att"/>
+      <xs:attributeGroup ref="dita.entry.attributes"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

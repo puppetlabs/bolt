@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA learningAssessment</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA learningAssessment                          
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identfier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Learning Assessment//EN"
+      Delivered as file "learningAssessment.mod                   
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for Learning Assessment               
+                                                             
+ORIGINAL CREATION DATE:                                      
+            May 2007                                         
+                                                             
+            (C) Copyright OASIS Open 2007, 2009.             
+            All Rights Reserved.                             
+=============================================================
+</headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>learningAssessment</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Learning Assessment//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Learning Assessment//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:spec:learning:xsd:learningAssessmentMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:spec:learning:xsd:learningAssessmentGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:spec:learning:rnc:learningAssessmentMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:spec:learning:rng:learningAssessmentMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic learningBase+learningInteractionBase-d)</domainsContribution>
+      <domainsContribution>(topic learningBase+learningInteractionBase-d learningAssessment)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>TOPIC NESTING OVERRIDES</a:documentation>
+    <define name="learningAssessment-info-types">
+      <empty/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="learningAssessment">
+      <ref name="learningAssessment.element"/>
+    </define>
+    <define name="learningAssessmentbody">
+      <ref name="learningAssessmentbody.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation> LONG NAME: Learning Assessment</a:documentation>
+      <define name="learningAssessment.content">
+        <ref name="title"/>
+        <optional>
+          <ref name="titlealts"/>
+        </optional>
+        <optional>
+          <choice>
+            <ref name="shortdesc"/>
+            <ref name="abstract"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <ref name="learningAssessmentbody"/>
+        <optional>
+          <ref name="related-links"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="learningAssessment-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="learningAssessment.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="learningAssessment.element">
+        <element name="learningAssessment" dita:longName="Learning Assessment">
+          <a:documentation>A Learning Assessment presents questions or interactions that measure
+        progress, encourage recollection, and stimulate reinforcement of the learning content, and
+        can be presented before the content as a pre-assessment or as a post-assessment test. The
+        interactions use a sub-set of the Question-Test Interoperability (QTI) specification,
+        implemented as a DITA domain specialization.</a:documentation>
+          <ref name="learningAssessment.attlist"/>
+          <ref name="learningAssessment.content"/>
+        </element>
+      </define>
+      <define name="learningAssessment.attlist" combine="interleave">
+        <ref name="learningAssessment.attributes"/>
+        <ref name="arch-atts"/>
+        <ref name="domains-att"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Learning Assessment Body </a:documentation>
+      <define name="learningAssessmentbody.content">
+        <optional>
+          <ref name="lcIntro"/>
+        </optional>
+        <optional>
+          <ref name="lcObjectives"/>
+        </optional>
+        <optional>
+          <ref name="lcDuration"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="lcInteraction"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="section"/>
+        </zeroOrMore>
+        <optional>
+          <ref name="lcSummary"/>
+        </optional>
+      </define>
+      <define name="learningAssessmentbody.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="learningAssessmentbody.element">
+        <element name="learningAssessmentbody" dita:longName="Learning Assessment Body">
+          <a:documentation>The &lt;learningAssessmentbody> element is the main body-level element in a
+        learningAssessment topic.</a:documentation>
+          <ref name="learningAssessmentbody.attlist"/>
+          <ref name="learningAssessmentbody.content"/>
+        </element>
+      </define>
+      <define name="learningAssessmentbody.attlist" combine="interleave">
+        <ref name="learningAssessmentbody.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="learningAssessment.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic learningBase/learningBase     learningAssessment/learningAssessment "/>
+      </optional>
+    </define>
+    <define name="learningAssessmentbody.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/body  learningBase/learningBasebody learningAssessment/learningAssessmentbody "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

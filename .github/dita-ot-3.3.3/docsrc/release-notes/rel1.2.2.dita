@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.2.2" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.2.2</title><shortdesc>Release
+    1.2.2 is a maintenance release to fix defects and make patches based
+    on release 1.2.1.</shortdesc><refbody><section id="section_yma_eej_nc">
+        <title>Improvements</title>
+        <ol><li>Chinese support in WORD RTF</li><li>Improve plug-in architecture in plug-in dependency handling</li></ol>
+      </section><section id="section_olj_fej_nc">
+        <title>SourceForge Changes</title>
+        <ol><li>SF Bug 1461642 Relative paths in toolkit.</li><li>SF Bug 1463756 TROFF output is not usable</li><li>SF Bug 1459527 Properties elements should generate default headings</li><li>SF Bug 1457552 FO gen-toc does not work right for ditamaps and bookmaps</li><li>SF Bug 1430983 Specialized indexterm does not generate entries in index</li><li>SF Bug 1363055 Shortdesc disappears when optional body is removed</li><li>SF Bug 1368403 The dita2docbook transformation lacks support for args.xsl</li><li>SF Bug 1405184 Note template for XHTML should be easier to override</li><li>SF Bug 1407646 Map titles are not used in print outputs</li><li>SF Bug 1409960 No page numbers in PDF toc</li><li>SF Bug 1459790 Related Links omitted when map references file#topicid</li><li>SF Bug 1428015 Topicmerge.xsl should leave indentation alone</li><li>SF Bug 1429400 FO output should allow more external links</li><li>SF Bug 1405169 Space inside XHTML note title affects CSS presentation</li><li>SF Bug 1402377 Updated translations for Icelandic</li><li>SF Bug 1366845 XRefs do not generate page numbers</li><li>SF Patch 1326450 Make ${basedir} mine</li><li>SF Patch 1328264 FOP task userconfig file</li><li>SF Patch 1385636 Tweaks to docbook/topic2db.xsl</li><li>SF Patch 1435584 Recognize more image extensions</li><li>SF Patch 1444900 Add template for getting input file URI</li><li>SF Patch 1460419 Add a new parameter /cssroot:{args.cssroot}</li><li>SF Patch 1460441 map2hhp [FILES] include</li><li>SF RFE 1400140 Add a new parameter /cssroot:{args.cssroot}</li></ol>
+      </section></refbody></reference>

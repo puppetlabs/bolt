@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>DITA-OT extension points</title>
+  <topicref keyref="plugin-extension-points">
+    <topicref keyref="all-extension-points"/>
+    <topicref keyref="plugin-extension-points-general"/>
+    <topicref keyref="plugin-extension-points-pre-processing"/>
+    <topicref keyref="plugin-extension-points-xslt-import"/>
+    <topicref keyref="plugin-extension-points-xslt-parameters"/>
+    <topicref keyref="plugin-extension-points-support"/>
+    <topicref keyref="extension-points-by-plugin">
+      <!-- Include only topics for plug-ins that actually provide extension points. -->
+      <topicref keyref="extension-points-in-org.dita.base"/>
+      <topicref keyref="extension-points-in-org.dita.eclipsehelp"/>
+      <topicref keyref="extension-points-in-org.dita.html5"/>
+      <topicref keyref="extension-points-in-org.dita.htmlhelp"/>
+      <topicref keyref="extension-points-in-org.dita.pdf2"/>
+      <topicref keyref="extension-points-in-org.dita.troff"/>
+      <topicref keyref="extension-points-in-org.dita.xhtml"/>
+    </topicref>
+    <topicref keyref="extension-points-details" processing-role="resource-only" toc="no"/>
+  </topicref>
+</map>

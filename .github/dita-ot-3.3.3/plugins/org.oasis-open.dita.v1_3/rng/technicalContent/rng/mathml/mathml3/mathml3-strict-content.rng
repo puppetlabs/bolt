@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+      This is the Mathematical Markup Language (MathML) 3.0, an XML
+      application for describing mathematical notation and capturing
+      both its structure and content.
+  
+      Copyright 1998-2010 W3C (MIT, ERCIM, Keio)
+  
+      Use and distribution of this code are permitted under the terms
+      W3C Software Notice and License
+      http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+-->
+<grammar ns="http://www.w3.org/1998/Math/MathML" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <define name="ContExp">
+    <choice>
+      <ref name="semantics-contexp"/>
+      <ref name="cn"/>
+      <ref name="ci"/>
+      <ref name="csymbol"/>
+      <ref name="apply"/>
+      <ref name="bind"/>
+      <ref name="share"/>
+      <ref name="cerror"/>
+      <ref name="cbytes"/>
+      <ref name="cs"/>
+    </choice>
+  </define>
+  <define name="cn">
+    <element name="cn">
+      <ref name="cn.attributes"/>
+      <ref name="cn.content"/>
+    </element>
+  </define>
+  <define name="cn.content">
+    <text/>
+  </define>
+  <define name="cn.attributes">
+    <attribute name="type">
+      <choice>
+        <value>integer</value>
+        <value>real</value>
+        <value>double</value>
+        <value>hexdouble</value>
+      </choice>
+    </attribute>
+  </define>
+  <define name="semantics-ci">
+    <element name="semantics">
+      <ref name="semantics.attributes"/>
+      <choice>
+        <ref name="ci"/>
+        <ref name="semantics-ci"/>
+      </choice>
+      <zeroOrMore>
+        <choice>
+          <ref name="annotation"/>
+          <ref name="annotation-xml"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="semantics-contexp">
+    <element name="semantics">
+      <ref name="semantics.attributes"/>
+      <ref name="ContExp"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="annotation"/>
+          <ref name="annotation-xml"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="ci">
+    <element name="ci">
+      <ref name="ci.attributes"/>
+      <ref name="ci.content"/>
+    </element>
+  </define>
+  <define name="ci.attributes">
+    <ref name="CommonAtt"/>
+    <optional>
+      <ref name="ci.type"/>
+    </optional>
+  </define>
+  <define name="ci.type">
+    <attribute name="type">
+      <choice>
+        <value>integer</value>
+        <value>rational</value>
+        <value>real</value>
+        <value>complex</value>
+        <value>complex-polar</value>
+        <value>complex-cartesian</value>
+        <value>constant</value>
+        <value>function</value>
+        <value>vector</value>
+        <value>list</value>
+        <value>set</value>
+        <value>matrix</value>
+      </choice>
+    </attribute>
+  </define>
+  <define name="ci.content">
+    <text/>
+  </define>
+  <define name="csymbol">
+    <element name="csymbol">
+      <ref name="csymbol.attributes"/>
+      <ref name="csymbol.content"/>
+    </element>
+  </define>
+  <define name="SymbolName">
+    <data type="NCName"/>
+  </define>
+  <define name="csymbol.attributes">
+    <ref name="CommonAtt"/>
+    <ref name="cd"/>
+  </define>
+  <define name="csymbol.content">
+    <ref name="SymbolName"/>
+  </define>
+  <define name="BvarQ">
+    <zeroOrMore>
+      <ref name="bvar"/>
+    </zeroOrMore>
+  </define>
+  <define name="bvar">
+    <element name="bvar">
+      <choice>
+        <ref name="ci"/>
+        <ref name="semantics-ci"/>
+      </choice>
+    </element>
+  </define>
+  <define name="apply">
+    <element name="apply">
+      <ref name="CommonAtt"/>
+      <ref name="apply.content"/>
+    </element>
+  </define>
+  <define name="apply.content">
+    <oneOrMore>
+      <ref name="ContExp"/>
+    </oneOrMore>
+  </define>
+  <define name="bind">
+    <element name="bind">
+      <ref name="CommonAtt"/>
+      <ref name="bind.content"/>
+    </element>
+  </define>
+  <define name="bind.content">
+    <ref name="ContExp"/>
+    <zeroOrMore>
+      <ref name="bvar"/>
+    </zeroOrMore>
+    <ref name="ContExp"/>
+  </define>
+  <define name="share">
+    <element name="share">
+      <ref name="CommonAtt"/>
+      <ref name="src"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="cerror">
+    <element name="cerror">
+      <ref name="cerror.attributes"/>
+      <ref name="csymbol"/>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="cerror.attributes">
+    <ref name="CommonAtt"/>
+  </define>
+  <define name="cbytes">
+    <element name="cbytes">
+      <ref name="cbytes.attributes"/>
+      <ref name="base64"/>
+    </element>
+  </define>
+  <define name="cbytes.attributes">
+    <ref name="CommonAtt"/>
+  </define>
+  <define name="base64">
+    <data type="base64Binary"/>
+  </define>
+  <define name="cs">
+    <element name="cs">
+      <ref name="cs.attributes"/>
+      <text/>
+    </element>
+  </define>
+  <define name="cs.attributes">
+    <ref name="CommonAtt"/>
+  </define>
+  <define name="MathExpression" combine="choice">
+    <ref name="ContExp"/>
+  </define>
+</grammar>

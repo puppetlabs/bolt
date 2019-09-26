@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE subjectScheme PUBLIC "-//OASIS//DTD DITA Subject Scheme Map//EN" "subjectScheme.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<subjectScheme>
+  <subjectHead>
+    <subjectHeadMeta>
+      <navtitle>Controlled values for @outputclass on certain elements</navtitle>
+    </subjectHeadMeta>
+  </subjectHead>
+
+  <subjectdef keys="bootstrap-classes">
+    <topicmeta>
+      <navtitle>Bootstrap–specific classes </navtitle>
+      <shortdesc>Used to pick up Bootstrap formatting in site output.</shortdesc>
+    </topicmeta>
+    <subjectdef keys="table-outputclass">
+      <topicmeta>
+        <navtitle>Tables</navtitle>
+        <shortdesc>Highlight rows on hover</shortdesc>
+      </topicmeta>
+      <subjectdef keys="table-hover"/>
+    </subjectdef>
+    <subjectdef keys="ph-outputclass">
+      <topicmeta>
+        <navtitle>Phrases</navtitle>
+      </topicmeta>
+      <subjectdef keys="small"/>
+      <subjectdef keys="text-muted"/>
+    </subjectdef>
+  </subjectdef>
+
+  <subjectdef keys="codeblock-outputclass">
+    <topicmeta>
+      <navtitle>Codeblocks</navtitle>
+    </topicmeta>
+    <subjectdef keys="codeblock-dita-ot-extensions">
+      <topicmeta>
+        <navtitle>DITA-OT Processing Extensions</navtitle>
+        <shortdesc>https://www.dita-ot.org/dev/reference/extended-functionality.html</shortdesc>
+      </topicmeta>
+      <subjectdef keys="normalize-space"/>
+      <subjectdef keys="show-line-numbers"/>
+      <subjectdef keys="show-whitespace"/>
+    </subjectdef>
+    <subjectdef keys="codeblock-syntax-highlights">
+      <topicmeta>
+        <navtitle>Syntax Highlights</navtitle>
+        <shortdesc>Used to trigger syntax highlighting via https://prismjs.com.</shortdesc>
+      </topicmeta>
+      <subjectdef keys="language-bash"/>
+      <subjectdef keys="language-clike"/>
+      <subjectdef keys="language-css"/>
+      <subjectdef keys="language-haskell"/>
+      <subjectdef keys="language-html"/>
+      <subjectdef keys="language-java"/>
+      <subjectdef keys="language-javascript"/>
+      <subjectdef keys="language-json"/>
+      <subjectdef keys="language-markdown"/>
+      <subjectdef keys="language-markup"/>
+      <subjectdef keys="language-mathml"/>
+      <subjectdef keys="language-properties"/>
+      <subjectdef keys="language-svg"/>
+      <subjectdef keys="language-xml"/>
+      <subjectdef keys="language-yaml"/>
+    </subjectdef>
+  </subjectdef>
+
+  <subjectdef keys="codeph-outputclass">
+    <topicmeta>
+      <navtitle>Code phrases</navtitle>
+      <shortdesc>&lt;codeph&gt; is used semantically three unique ways in the OT docs. Rather than using element
+        specialization this limits @outputclass on &lt;codeph&gt;, effectively creating semantic specialization without
+        needing to modify DTDs or schemas. How &lt;codeph&gt; is used:
+        https://github.com/dita-ot/docs/wiki/coding-guidelines#plug-ins</shortdesc>
+    </topicmeta>
+    <subjectdef keys="ant-target"/>
+    <subjectdef keys="plugin-name"/>
+    <subjectdef keys="preprocess"/>
+  </subjectdef>
+
+  <subjectdef keys="title-outputclass">
+    <topicmeta>
+      <navtitle>Titles</navtitle>
+      <shortdesc>Added by automated processes; not to be manually added by authors.</shortdesc>
+    </topicmeta>
+    <subjectdef keys="generated"/>
+  </subjectdef>
+
+  <!-- Bind an attribute to a tree of related values -->
+  <enumerationdef>
+    <elementdef name="codeblock"/>
+    <attributedef name="outputclass"/>
+    <subjectdef keyref="codeblock-dita-ot-extensions"/>
+    <subjectdef keyref="codeblock-syntax-highlights"/>
+  </enumerationdef>
+  <enumerationdef>
+    <elementdef name="codeph"/>
+    <attributedef name="outputclass"/>
+    <subjectdef keyref="codeph-outputclass"/>
+  </enumerationdef>
+  <enumerationdef>
+    <elementdef name="ph"/>
+    <attributedef name="outputclass"/>
+    <subjectdef keyref="ph-outputclass"/>
+  </enumerationdef>
+  <enumerationdef>
+    <elementdef name="simpletable"/>
+    <attributedef name="outputclass"/>
+    <subjectdef keyref="table-outputclass"/>
+  </enumerationdef>
+  <enumerationdef>
+    <elementdef name="table"/>
+    <attributedef name="outputclass"/>
+    <subjectdef keyref="table-outputclass"/>
+  </enumerationdef>
+  <enumerationdef>
+    <elementdef name="title"/>
+    <attributedef name="outputclass"/>
+    <subjectdef keyref="title-outputclass"/>
+  </enumerationdef>
+</subjectScheme>

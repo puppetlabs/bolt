@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Glossref Domain                  -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe the glossref domain      -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             September 2009                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2009                -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  
+  <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic glossref-d)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    
+    </xs:documentation>
+  </xs:annotation>
+  
+  <xs:group name="glossref-d-topicref">
+    <xs:choice>
+      <xs:element ref="glossref"/>
+    </xs:choice>
+  </xs:group>
+  
+  <xs:group name="glossref">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element ref="glossref"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  
+  
+  <xs:element name="glossref">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="glossref.class">
+          <xs:attribute ref="class" default="+ map/topicref glossref-d/glossref " />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="glossref.class">
+    <xs:sequence>
+      <xs:group ref="glossref.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="glossref.attributes"/>
+  </xs:complexType>
+   
+   <xs:group name="glossref.content">
+     <xs:sequence>
+       <xs:sequence>
+      <xs:group ref="topicmeta" minOccurs="0"/>
+    </xs:sequence>
+     </xs:sequence>
+   </xs:group>
+   
+   <xs:attributeGroup name="glossref.attributes">
+     <xs:attribute name="navtitle" type="xs:string"/>
+     <xs:attribute name="href" type="xs:string" use="required"/>
+     <xs:attribute name="keys" type="xs:string" use="required"/>
+     <xs:attribute name="keyref" type="xs:string"/>
+     <xs:attribute name="query" type="xs:string"/>
+     <xs:attribute name="copy-to" type="xs:string"/>
+     <xs:attribute name="collection-type" type="collection-type.class"/>
+     <xs:attribute name="type" type="xs:string"/>
+     <xs:attribute name="processing-role" type="processing-role-att.class" />
+     <xs:attribute name="scope" type="scope-att.class"/>
+     <xs:attribute name="locktitle" type="yesno-att.class"/>
+     <xs:attribute name="format" type="xs:string"/>
+     <xs:attribute name="linking" type="linkingtypes.class" default="none"/>
+     <xs:attribute name="toc" type="yesno-att.class" default="no"/>
+     <xs:attribute name="print" type="print-att.class" default="no"/>
+     <xs:attribute name="search" type="yesno-att.class" default="no"/>
+     <xs:attribute name="chunk" type="xs:string"/>
+     <xs:attributeGroup ref="univ-atts" />
+     <xs:attribute name="outputclass" type="xs:string"/>
+     <xs:attributeGroup ref="global-atts" />
+   </xs:attributeGroup>
+
+</xs:schema>

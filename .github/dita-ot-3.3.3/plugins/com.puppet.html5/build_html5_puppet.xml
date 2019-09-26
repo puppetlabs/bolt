@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="dita2pup-html5" xmlns:dita="http://dita-ot.sourceforge.net">
+    <target name="dita2pup-html5" depends="dita2pup-html5.init, dita2html5"/>
+
+    <target name="dita2pup-html5.init">
+    </target>
+
+</project>
+

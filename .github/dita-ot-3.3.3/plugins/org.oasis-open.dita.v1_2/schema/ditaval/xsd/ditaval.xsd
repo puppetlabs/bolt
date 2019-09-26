@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA  DITAVAL XML Schema                -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Filtering content         -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE: 2005                                  -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2006, 2009.              -->
+<!--             (C) Copyright IBM Corporation 2002, 2005.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  
+  <xs:element name="val" type="val.class"/>
+    
+  <xs:complexType name="val.class">
+    <xs:sequence>
+      <xs:group ref="val.content"/>
+    </xs:sequence>
+    <!--<xs:attributeGroup ref="val.attributes"/>-->
+  </xs:complexType>
+  
+  <xs:group name="val.content">
+    <xs:sequence>
+      <xs:group ref="style-conflict" minOccurs="0"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="prop"/>
+        <xs:group ref="revprop"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:element name="style-conflict" type="style-conflict.class"/>
+  
+  <xs:group name="style-conflict">
+    <xs:choice>
+      <xs:element ref="style-conflict"/>
+    </xs:choice>
+  </xs:group>
+  
+  <xs:complexType name="style-conflict.class">
+    <xs:attributeGroup ref="style-conflict.attributes"/>
+  </xs:complexType>
+  
+  <xs:attributeGroup name="style-conflict.attributes">
+    <xs:attribute name="foreground-conflict-color" type="xs:string"/>
+    <xs:attribute name="background-conflict-color" type="xs:string"/>
+  </xs:attributeGroup>
+  
+  <xs:element name="prop" type="prop.class"/>
+  
+  <xs:group name="prop">
+    <xs:choice>
+      <xs:element ref="prop"/>
+    </xs:choice>
+  </xs:group>
+  
+  <xs:complexType name="prop.class">
+    <xs:sequence>
+      <xs:group ref="prop.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="prop.attributes"/>
+  </xs:complexType>
+  
+   <xs:group name="prop.content">
+    <xs:sequence>
+      <xs:group ref="startflag" minOccurs="0"/>
+      <xs:group ref="endflag" minOccurs="0"/>
+    </xs:sequence>
+   </xs:group>
+  
+  <xs:attributeGroup name="prop.attributes">
+    <xs:attribute name="att" type="xs:string"/>
+    <xs:attribute name="val" type="xs:string"/>
+    <xs:attribute name="action" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="include"/>
+          <xs:enumeration value="exclude"/>
+          <xs:enumeration value="passthrough"/>
+          <xs:enumeration value="flag"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="color" type="xs:string"/>
+    <xs:attribute name="backcolor" type="xs:string"/>
+    <xs:attribute name="style" type="style-atts.class"/>
+  </xs:attributeGroup>
+  
+  <xs:element name="revprop" type="revprop.class"/>
+  
+  <xs:group name="revprop">
+    <xs:choice>
+      <xs:element ref="revprop"/>
+    </xs:choice>
+  </xs:group>
+  
+  <xs:complexType name="revprop.class">
+    <xs:sequence>
+      <xs:group ref="revprop.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="revprop.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="revprop.content">
+    <xs:sequence>
+      <xs:group ref="startflag" minOccurs="0"/>
+      <xs:group ref="endflag" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="revprop.attributes">
+    <xs:attribute name="val" type="xs:string"/>
+    <xs:attribute name="action" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="include"/>
+          <xs:enumeration value="passthrough"/>
+          <xs:enumeration value="flag"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="color" type="xs:string"/>
+    <xs:attribute name="changebar" type="xs:string"/>
+    <xs:attribute name="backcolor" type="xs:string"/>
+    <xs:attribute name="style" type="style-atts.class"/>
+  </xs:attributeGroup>
+  
+  <xs:element name="startflag" type="startflag.class"/>
+  
+  <xs:group name="startflag">
+    <xs:choice>
+      <xs:element ref="startflag"/>
+    </xs:choice>
+  </xs:group>
+  
+ <xs:complexType name="startflag.class">
+   <xs:sequence>
+     <xs:group ref="startflag.content"/>
+   </xs:sequence>
+   <xs:attributeGroup ref="startflag.attributes"/>
+ </xs:complexType>
+  
+  <xs:group name="startflag.content">
+    <xs:sequence>
+      <xs:group ref="alt-text" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="startflag.attributes">
+    <xs:attribute name="imageref" type="xs:string"/>
+  </xs:attributeGroup>
+  
+  <xs:element name="endflag" type="endflag.class"/>
+  
+  <xs:group name="endflag">
+    <xs:choice>
+      <xs:element ref="endflag"/>
+    </xs:choice>
+  </xs:group>
+  
+  <xs:complexType name="endflag.class">
+   <xs:sequence>
+     <xs:group ref="endflag.content"/>
+   </xs:sequence>
+    <xs:attributeGroup ref="endflag.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="endflag.content">
+    <xs:sequence>
+      <xs:group ref="alt-text" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="endflag.attributes">
+     <xs:attribute name="imageref" type="xs:string"/>
+  </xs:attributeGroup>
+  
+  <xs:element name="alt-text" type="alt-text.class"/>
+  
+  <xs:group name="alt-text">
+    <xs:choice>
+      <xs:element ref="alt-text"/>
+    </xs:choice>
+  </xs:group>
+  
+  <xs:complexType name="alt-text.class" mixed="true">  
+  </xs:complexType>
+  
+  
+   <xs:simpleType name="style-atts.class">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="underline"/>
+      <xs:enumeration value="double-underline"/>
+      <xs:enumeration value="italics"/>
+      <xs:enumeration value="overline"/>
+      <xs:enumeration value="bold"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

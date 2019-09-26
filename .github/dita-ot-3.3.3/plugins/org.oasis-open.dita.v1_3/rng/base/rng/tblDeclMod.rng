@@ -1,0 +1,691 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" 
+  xmlns="http://relaxng.org/ns/structure/1.0" 
+  xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+   <moduleTitle>XML EXCHANGE TABLE MODEL DECLARATION</moduleTitle>
+   <headerComment><![CDATA[
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    XML EXCHANGE TABLE MODEL DECLARATION MODULE      
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2005.11.15 RDA: Corrected the "Delivered as" system ID    
+   2006.06.07 RDA: Make universal attributes universal       
+                     (DITA 1.1 proposal #12)                 
+   2006.11.30 RDA: Add -dita-use-conref-target to enumerated 
+                     attributes                              
+   2008.02.13 RDA: Create .content and .attributes entities; 
+                   requires reorganization of some existing  
+                   entities provided with the Exchange Model 
+
+=============================================================
+ Delivered as file "tblDecl.mod"                             
+=============================================================
+
+
+XML EXCHANGE TABLE MODEL DECLARATION MODULE                  
+
+OASIS DITA 1.0 notes:
+     The Exchange Table Model replaces the original CALS-based model
+     used in development versions of the DITA definition.
+     This set of declarations defines the XML version of the Exchange
+     Table Model as adapted for OASIS DITA version 1.0.
+     The base for the DITA version of the Exchange Table Model is
+     defined at http://www.oasis-open.org/specs/tm9901.htm .
+     The DITA version specifically extends this model with these DITA-
+     specific content and attribute adaptations to the DITA processing
+     requirements:
+
+STRUCTURE:
+
+Introduce the DITA-unique <desc> element (optional after <title>); this element
+enables more consistent presentation of both figures and tables.
+
+
+ATTRIBUTES:
+
+For frame, align, and valign attributes on any element:
+  Add the enumerated value -dita-use-conref-target for DITA 1.1.  
+
+For the <table> element, add:
+  %univ-atts; which consists of:
+    %select-atts; [for selection, conditional processing]
+    %id-atts; [for conref and linking]
+    %localization-atts (@translate + @xml:lang) [for NLS processing support]
+    %global-atts; (@xtrf + @xtrc) [for tracing and messaging support in processors]
+    @class [for specialization support]
+  @outputclass [for role designation (ie, styles, future migrations)]
+  @rowheader [for accessibility support in processing]
+  %display-atts; which consists of:
+    @scale [for presentational equivalence with other scaled exhibits: fig, pre, lines, simpletable]
+    @frame (already part of table)
+    @pgwide (already part of table, same intent as original @expanse)
+
+For <tgroup>, <thead>, <tbody>, and <row>, add:
+  %univ-atts;
+  %global-atts;
+  @class
+  @outputclass [for role designation (ie, styles, future migrations)]
+
+For <entry>, add:
+  %id-atts;
+  %global-atts
+  @class
+  @outputclass [for role designation (ie, styles, future migrations)]
+  @rev [for indication of revised content for flag-based processing]
+
+ ]]></headerComment>
+   <moduleMetadata>
+     <moduleType>base</moduleType>
+     <moduleShortName>tblDecl</moduleShortName>
+     <modulePublicIds>
+       <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Exchange Table Model//EN</dtdMod>
+       <xsdMod>urn:oasis:names:tc:dita:xsd:tblDeclMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+       <xsdGrp>urn:oasis:names:tc:dita:xsd:tblDeclGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+       <rncMod>urn:oasis:names:tc:dita:rnc:tblDeclMod.rnc<var presep=":" name="ditaver"/></rncMod>
+       <rngMod>urn:oasis:names:tc:dita:rng:tblDeclMod.rng<var presep=":" name="ditaver"/></rngMod>
+     </modulePublicIds>
+     <domainsContribution/>
+   </moduleMetadata>
+ </moduleDesc>  
+  <!-- Define type patterns -->
+  <define name="yesorno">
+    <data type="NMTOKEN"/>
+  </define>
+  
+  <define name="titles">
+    <a:documentation>NOTE: This pattern is never referenced. Retained for backward compatibility.</a:documentation>
+    <optional>
+      <ref name="title"/>
+    </optional>
+  </define>
+  <!-- no if zero(s), yes if any other value -->
+  <define name="paracon">
+    <ref name="tblcell.cnt"/>
+  </define>
+  
+  <define name="tbl.table.name">
+    <value type="Name" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"      
+    >table</value>
+  </define>
+  
+  <!-- default for use in entry content -->
+  <define name="tbl.table-titles.mdl">
+    <optional>
+      <ref name="title"/>
+    </optional>
+    <optional>
+      <ref name="desc"/>
+    </optional>
+  </define>
+  <define name="tbl.table-main.mdl">
+    <oneOrMore>
+      <ref name="tgroup"/>
+    </oneOrMore>
+  </define>
+  <define name="tbl.table.mdl">
+    <ref name="tbl.table-titles.mdl"/>
+    <ref name="tbl.table-main.mdl"/>
+  </define>
+  <define name="tbl.table.att">
+    <optional>
+      <attribute name="pgwide">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="bodyatt">
+    <empty/>
+  </define>
+  <define name="tbl.tgroup.mdl">
+    <zeroOrMore>
+      <ref name="colspec"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="thead"/>
+    </optional>
+    <ref name="tbody"/>
+  </define>
+  <define name="tbl.tgroup.att">
+    <empty/>
+  </define>
+  <define name="tbl.thead.att">
+    <empty/>
+  </define>
+  <define name="tbl.tbody.att">
+    <empty/>
+  </define>
+  <define name="tbl.colspec.att">
+    <optional>
+      <attribute name="base"/>
+    </optional>
+    <ref name="base-attribute-extensions"/>
+  </define>
+  <define name="tbl.row.mdl">
+    <oneOrMore>
+      <ref name="entry"/>
+    </oneOrMore>
+  </define>
+  <define name="tbl.row.att">
+    <empty/>
+  </define>
+  <define name="tbl.entry.mdl">
+    <zeroOrMore>
+      <ref name="paracon"/>
+    </zeroOrMore>
+  </define>
+  <define name="tbl.entry.att">
+    <optional>
+      <attribute name="base"/>
+    </optional>
+    <ref name="base-attribute-extensions"/>
+  </define>
+  
+  
+  <!-- DITA BEHAVIOR ATTRIBUTES -->
+  
+  <define name="dita.table.attributes">
+    <optional>
+      <attribute name="orient" dita:since="1.3">
+        <choice>
+          <value>port</value>
+          <value>land</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowheader">
+        <choice>
+          <value>firstcol</value>
+          <value dita:since="1.3">headers</value>
+          <value>norowheader</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="scale">
+        <choice>
+          <value>50</value>
+          <value>60</value>
+          <value>70</value>
+          <value>80</value>
+          <value>90</value>
+          <value>100</value>
+          <value>110</value>
+          <value>120</value>
+          <value>140</value>
+          <value>160</value>
+          <value>180</value>
+          <value>200</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="univ-atts"/>
+    <optional>
+      <attribute name="outputclass"/>
+    </optional>
+  </define>
+  <define name="dita.tgroup.attributes">
+    <ref name="univ-atts"/>
+    <optional>
+      <attribute name="outputclass"/>
+    </optional>
+  </define>
+  <define name="dita.thead.attributes">
+    <ref name="univ-atts"/>
+    <optional>
+      <attribute name="outputclass"/>
+    </optional>
+  </define>
+  <define name="dita.tbody.attributes">
+    <ref name="univ-atts"/>
+    <optional>
+      <attribute name="outputclass"/>
+    </optional>
+  </define>
+  <define name="dita.row.attributes">
+    <ref name="univ-atts"/>
+    <optional>
+      <attribute name="outputclass"/>
+    </optional>
+  </define>
+  <define name="dita.entry.attributes">
+    <ref name="id-atts"/>
+    <ref name="localization-atts"/>
+    <!-- rotate      (0|1|-dita-use-conref-target) -->
+    <optional>
+      <attribute name="rotate" dita:since="1.3">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rev"/>
+    </optional>
+    <optional>
+      <attribute name="outputclass"/>
+    </optional>
+    <optional>
+      <attribute name="scope" dita:since="1.3">
+        <choice>
+          <value>row</value>
+          <value>col</value>
+          <value>rowgroup</value>
+          <value>colgroup</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="headers" dita:since="1.3">
+        <data type="NMTOKENS"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="dita.colspec.attributes">
+    <ref name="id-atts"/>
+    <ref name="localization-atts"/>
+  </define>
+  
+  <!--  -->
+  <define name="table.content">
+    <ref name="tbl.table.mdl"/>
+  </define>
+  <define name="table.attributes">
+    <optional>
+      <attribute name="frame">
+        <choice>
+          <value>top</value>
+          <value>bottom</value>
+          <value>topbot</value>
+          <value>all</value>
+          <value>sides</value>
+          <value>none</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <ref name="tbl.table.att"/>
+    <ref name="bodyatt"/>
+    <ref name="dita.table.attributes"/>
+  </define>
+  <define name="table.element">
+    <element name="table" dita:longName="Table">
+      <ref name="table.attlist"/>
+      <ref name="table.content"/>
+    </element>
+  </define>
+  <define name="table.attlist" combine="interleave">
+    <ref name="table.attributes"/>
+  </define>
+  
+  <!--  -->
+  <define name="tgroup.content">
+    <ref name="tbl.tgroup.mdl"/>
+  </define>
+  <define name="tgroup.attributes">
+    <attribute name="cols">
+      <data type="NMTOKEN"/>
+    </attribute>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+          <value>justify</value>
+          <value>char</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="tbl.tgroup.att"/>
+    <ref name="dita.tgroup.attributes"/>
+  </define>
+  <define name="tgroup.element">
+    <element name="tgroup" dita:longName="Table Group">
+      <a:documentation>The &lt;tgroup> element in a table contains column, row, spanning, header and
+        footer specifications, and the body (&lt;tbody>) of the table. 
+        Category: Table elements</a:documentation>
+      <ref name="tgroup.attlist"/>
+      <ref name="tgroup.content"/>
+    </element>
+  </define>
+  <define name="tgroup.attlist" combine="interleave">
+    <ref name="tgroup.attributes"/>
+  </define>
+  
+  <!--  -->
+  <define name="colspec.content">
+    <empty/>
+  </define>
+  <define name="colspec.attributes">
+    <optional>
+      <attribute name="colnum">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="colname">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="colwidth"/>
+    </optional>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+          <value>justify</value>
+          <value>char</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="char"/>
+    </optional>
+    <optional>
+      <attribute name="charoff">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowheader" dita:since="1.3">
+        <choice>
+          <value>firstcol</value>
+          <value dita:since="1.3">headers</value>
+          <value>norowheader</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="tbl.colspec.att"/>
+    <ref name="dita.colspec.attributes"/>
+  </define>
+  <define name="colspec.element">
+    <element name="colspec" dita:longName="Column Specification">
+      <a:documentation>The &lt;colspec> element contains a column specification for a table,
+        including assigning a column name and number, cell content alignment, and column width.
+        Category: Table elements</a:documentation>
+      <ref name="colspec.attlist"/>
+      <ref name="colspec.content"/>
+    </element>
+  </define>
+  <define name="colspec.attlist" combine="interleave">
+    <ref name="colspec.attributes"/>
+  </define>
+  
+  <!--  -->
+  <define name="thead.content">
+    <oneOrMore>
+      <ref name="row"/>
+    </oneOrMore>
+  </define>
+  <define name="thead.attributes">
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="tbl.thead.att"/>
+    <ref name="dita.thead.attributes"/>
+  </define>
+  <define name="thead.element">
+    <element name="thead" dita:longName="Table Header">
+      <a:documentation>The table header (&lt;thead>) element precedes the table body (&lt;tbody>)
+        element in a complex table. 
+        Category: Table elements</a:documentation>
+      <ref name="thead.attlist"/>
+      <ref name="thead.content"/>
+    </element>
+  </define>
+  <define name="thead.attlist" combine="interleave">
+    <ref name="thead.attributes"/>
+  </define>
+  
+  <!--  -->
+  <define name="tbody.content">
+    <oneOrMore>
+      <ref name="row"/>
+    </oneOrMore>
+  </define>
+  <define name="tbody.attributes">
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="tbl.tbody.att"/>
+    <ref name="dita.tbody.attributes"/>
+  </define>
+  <define name="tbody.element">
+    <element name="tbody" dita:longName="Table Body">
+      <a:documentation>The &lt;tbody> element contains the rows in a table. 
+        Category: Table elements</a:documentation>
+      <ref name="tbody.attlist"/>
+      <ref name="tbody.content"/>
+    </element>
+  </define>
+  <define name="tbody.attlist" combine="interleave">
+    <ref name="tbody.attributes"/>
+  </define>
+  
+  <!--  -->
+  <define name="row.content">
+    <ref name="tbl.row.mdl"/>
+  </define>
+  <define name="row.attributes">
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="tbl.row.att"/>
+    <ref name="dita.row.attributes"/>
+  </define>
+  <define name="row.element">
+    <element name="row" dita:longName="Table Row">
+      <a:documentation>The &lt;row> element contains a single row in a table &lt;tgroup>. 
+        Category: Table elements</a:documentation>
+      <ref name="row.attlist"/>
+      <ref name="row.content"/>
+    </element>
+  </define>
+  <define name="row.attlist" combine="interleave">
+    <ref name="row.attributes"/>
+  </define>
+  
+  <!-- -->
+  <define name="entry.content">
+    <ref name="tbl.entry.mdl"/>
+  </define>
+  <define name="entry.attributes">
+    <optional>
+      <attribute name="colname">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="namest">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="nameend">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="morerows">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+          <value>justify</value>
+          <value>char</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="char"/>
+    </optional>
+    <optional>
+      <attribute name="charoff">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+          <value>-dita-use-conref-target</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="tbl.entry.att"/>
+    <ref name="dita.entry.attributes"/>
+  </define>
+  <define name="entry.element">
+    <element name="entry" dita:longName="Table Row Entry">
+      <a:documentation>The &lt;entry> element defines a single cell in a table. 
+        Category: Table elements</a:documentation>
+      <ref name="entry.attlist"/>
+      <ref name="entry.content"/>
+    </element>
+  </define>
+  <define name="entry.attlist" combine="interleave">
+    <ref name="entry.attributes"/>
+  </define>
+
+  <!-- Specialization attributes. Global attributes and class defaults -->
+
+  <define name="table.attlist" combine="interleave">
+    <ref name="global-atts"/>
+    <optional>
+      <attribute name="class" a:defaultValue="- topic/table "/>
+    </optional>
+  </define>
+  <define name="tgroup.attlist" combine="interleave">
+    <ref name="global-atts"/>
+    <optional>
+      <attribute name="class" a:defaultValue="- topic/tgroup "/>
+    </optional>
+  </define>
+  <define name="colspec.attlist" combine="interleave">
+    <ref name="global-atts"/>
+    <optional>
+      <attribute name="class" a:defaultValue="- topic/colspec "/>
+    </optional>
+  </define>
+  <define name="thead.attlist" combine="interleave">
+    <ref name="global-atts"/>
+    <optional>
+      <attribute name="class" a:defaultValue="- topic/thead "/>
+    </optional>
+  </define>
+  <define name="tbody.attlist" combine="interleave">
+    <ref name="global-atts"/>
+    <optional>
+      <attribute name="class" a:defaultValue="- topic/tbody "/>
+    </optional>
+  </define>
+  <define name="row.attlist" combine="interleave">
+    <ref name="global-atts"/>
+    <optional>
+      <attribute name="class" a:defaultValue="- topic/row "/>
+    </optional>
+  </define>
+  <define name="entry.attlist" combine="interleave">
+    <ref name="global-atts"/>
+    <optional>
+      <attribute name="class" a:defaultValue="- topic/entry "/>
+    </optional>
+  </define>
+</grammar>

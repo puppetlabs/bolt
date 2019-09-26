@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="ID">
+  <title>DITA and DITA-OT resources</title>
+  <titlealts>
+    <navtitle>Resources</navtitle>
+  </titlealts>
+  <shortdesc>In addition to the DITA Open Toolkit documentation, there are other resources about DITA and DITA-OT that
+    you might find helpful.</shortdesc>
+</reference>

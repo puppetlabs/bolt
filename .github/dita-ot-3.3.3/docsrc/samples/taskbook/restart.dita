@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="restart" xml:lang="en-us">
+  <title>Restart your system</title>
+  <shortdesc>This is standard procedure after installing any new software.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Restarting</indexterm>
+        <indexterm>web server</indexterm>
+        <indexterm>database</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>If you are on a Windows system, go to the start menu.</cmd>
+        <substeps>
+          <substep>
+            <cmd>Go to Start -> Shut Down...</cmd>
+          </substep>
+          <substep>
+            <cmd>Select "Restart" and hit OK.</cmd>
+          </substep>
+        </substeps>
+      </step>
+      <step>
+        <cmd>If you are on a Linux system, contact your system administrator for assistance. You may not need to
+          restart.</cmd>
+      </step>
+      <step>
+        <cmd>If you are on a Macintosh, go to Special -> Restart.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

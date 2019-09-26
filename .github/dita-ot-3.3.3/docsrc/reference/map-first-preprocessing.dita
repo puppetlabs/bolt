@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="ID" rev="3.0">
+  <title>Map-first preprocessing</title>
+  <titlealts>
+    <navtitle>Map-first preprocessing</navtitle>
+  </titlealts>
+  <shortdesc><ph id="map-first-preproc-desc">DITA-OT 3.0 provides a map-first preprocessing option as an alternative to
+      the default <codeph>preprocess</codeph> operation. The method, which was introduced in DITA-OT 2.5 as an
+      experimental feature, has been improved and is ready for use in many production scenarios. Map-first-preprocessing
+      provides the same functionality as the default <codeph>preprocess</codeph>, but takes a different
+    approach.</ph></shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>filters<indexterm>map-first preprocessing</indexterm></indexterm>
+        <indexterm>preprocessing<indexterm>map first</indexterm></indexterm>
+        <indexterm>DITA 1.0</indexterm>
+        <indexterm>DITA 1.2</indexterm>
+        <indexterm>DITA 1.3<indexterm>effect on preprocessing</indexterm></indexterm>
+        <indexterm>pipelines<indexterm>map first</indexterm></indexterm>
+        <indexterm>validate</indexterm>
+        <indexterm>maps<index-see>DITA maps</index-see></indexterm>
+        <indexterm>DITA maps<indexterm>validate</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p id="map-first-preproc-gain">Whereas the default preprocessing routine handles both maps and topics at the same
+      time, often switching back and forth between map operations and topic operations, the map-first approach only
+      begins processing topics after nearly all map processing is complete. This simplifies the processing logic and
+      creates cleaner module responsibilities, which makes it easier to process only those topics that are actually
+      referenced after filtering, for example, or to only process the map to validate the map structure.</p>
+    <p>The current preprocessing architecture was established during the DITA 1.0 era when there were fewer DITA
+      features that operated on the map level. Initially, the difference between processing modes was not that great.
+      DITA 1.2 and 1.3 introduced many more map-level features, such as keys and key scopes, that make it difficult to
+      reliably work with topics before all map features have been resolved. </p>
+    <p>The original preprocessing operation already handles many map operations first, but this was not the original
+      design and requires regular refactoring to handle edge cases. The new map-first preprocessing is designed with
+      this model in mind, improving the overall processing flow and making it more formal about the map-first model. The
+      new model also takes advantage of hashed topic file names in the temporary directory, which simplifies many
+      processing steps, and is better able to handle topics referenced outside of the map directory (that case has
+      resulted in a variety of issues with the original model).</p>
+    <note id="map-first-preproc-note">The map-first preprocessing option is enabled by default in DITA-OT 3.0 for PDF
+      and HTML Help. These formats were chosen because they generate a compiled result file, so temporarily hashed file
+      names should all be invisible to the build. After further testing and feedback, the new option will most likely
+      become the default for other output formats in future versions. Because the DITA-OT development team cannot have
+      access to all varieties of DITA, all edge cases, or even all the ways DITA-OT itself is extended, the switch to
+      default map-first preprocessing for other output formats will be smoother for everyone if more people can test and
+      provide feedback.</note>
+    <section>
+      <title>How to use map-first preprocessing</title>
+      <p>To use (or test) map-first preprocessing, call the <codeph>preprocess2</codeph> Ant target in your custom
+        transformation types instead of using the default <codeph>preprocess</codeph> target.</p>
+      <p>For example, if you have a custom HTML5 transformation type named "myhtml", then you may have a plug-in
+        extension that looks this:</p>
+      <codeblock outputclass="language-xml">&lt;!-- Simple variant: set properties and call default HTML5 -->
+&lt;target name="dita2myhtml" depends="myhtml.init,dita2html5"/>
+</codeblock>
+      <p>This type of extension is quite common, and is used to set default properties for your environment followed by
+        a normal build to use those properties. In this case, you'll need to replace <codeph>dita2html5</codeph> with
+        the normal HTML5 steps, swapping out <codeph>preprocess</codeph> for <codeph>preprocess2</codeph>:</p>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;!-- Simple variant: set properties and call default HTML5 -->
+&lt;target name="dita2myhtml" 
+        depends="myhtml.init,
+                 html5.init,
+                 build-init,
+                 <b>preprocess2,</b>
+                 html5.topic,
+                 html5.map,
+                 html5.css"/></codeblock>
+      <note>If you use this simple method for customized PDF or HTML Help builds, you will automatically be using
+          <codeph>preprocess2</codeph>.</note>
+      <p>Some custom transformation types already require you to repeat the default dependencies, in which case you
+        should already call <codeph>preprocess</codeph> directly, as in the following:</p>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;!-- More complex variant: add processing steps to default HTML5 -->
+&lt;target name="dita2myhtml"
+        depends="myhtml.init,
+                 build-init,
+                 preprocess,
+                 local-extensions-after-preprocess,
+                 html5.topic,
+                 html5.map,
+                 html5.css"/></codeblock>
+      <p>In such cases, the modification is much easier – simply add a <codeph>2</codeph> to the existing
+          <codeph>preprocess</codeph> target.</p>
+    </section>
+    <section>
+      <title>How to test in a production environment</title>
+      <p>In some cases, you may be responsible for maintaining transformation types that are actually run by many people
+        on your team or around a company. In this case, you likely need to maintain your existing transformation types
+        based on the backwards-compatible <codeph>preprocess</codeph> modules, but also want to provide your colleagues
+        with a way to test their own documents using <codeph>preprocess2</codeph>.</p>
+      <p>There are several ways to do this. One fairly straightforward approach would be to create a new custom
+        transformation type that is exactly the same, except for preprocessing. For example, if you have a local HTML
+        variant called <codeph>myhtml</codeph> as above, instead of modifying that transformation directly, you could
+        create a second transformation type called <codeph>myhtml-beta</codeph> that provides exactly the same support,
+        but with the new map-first preprocessing:</p>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><i>&lt;!-- Original "myhtml" is not modified, used for production --></i>
+&lt;target name="dita2myhtml5" depends="myhtml.init,dita2html5"/>
+
+<i>&lt;!-- "myhtml-beta" used to test and provide feedback on preprocess2 --></i>
+&lt;target name="dita2myhtml-beta" 
+        depends="myhtml.init,
+                 html5.init,
+                 build-init,
+                 <b>preprocess2,</b>
+                 html5.topic,
+                 html5.map,
+                 html5.css"/></codeblock>
+    </section>
+    <section>
+      <title>Known limitations</title>
+      <p>The <codeph>preprocess2</codeph> implementation details are subject to change; dependencies within
+          <codeph>preprocess2</codeph> may be renamed or removed based on feedback.</p>
+      <p conkeyref="reusable-components/no-internal-preprocess2-ext"/>
+    </section>
+  </conbody>
+</concept>

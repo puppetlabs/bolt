@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.2.1" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.2.1</title><shortdesc>Release 1.2.1 is a maintenance release to fix defects and make patches based on
+      release 1.2.</shortdesc><refbody><section id="section_wxg_hej_nc">
+        <title>Improvements</title>
+        <ol><li>Corrupt table generated in WORD RTF is fixed</li><li>Pictures are merged into the WORD RTF instead of creating links to them</li><li>lq element is supported in WORD RTF</li><li>Generated text can be translated to different languages in WORD RTF</li><li>In WORD RTF, if no &lt;choptionhd&gt; given, head will be generated in table</li></ol>
+      </section><section id="section_axn_hej_nc">
+        <title>SourceForge Changes</title>
+        <ol><li>SF Bug 1460451 Spaces preserving methods are different among tags.</li><li>SF Bug 1460449 Nested list can not be well supported.</li><li>SF Bug 1460445 h2d stylesheet cannot handle HTML files within namespace.</li><li>SF Bug 1431229 hardcoded path in MessageUtils.java</li><li>SF Bug 1408477 &lt;desc&gt; element is not handled inside xref for XHTML</li><li>SF Bug 1398867 ampersands in hrefs (on xref and link) cause build to fail</li><li>SF Bug 1326439 filtered-out indexterms leak into index through dita.list </li><li>SF Bug 1408487 Short description is not retrieved for &lt;xref&gt; element</li><li>SF Bug 1407454 XHTML processing for &lt;alt&gt; is incomplete </li><li>SF Bug 1405221 Some table frames ignored in dita-&gt;xhtml </li><li>SF Bug 1414398 Cannot set provider for Eclipse help transformation </li><li>SF RFE 1448712 add support for /plugins directory in plug-in architecture</li></ol>
+      </section></refbody></reference>

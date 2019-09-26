@@ -1,0 +1,263 @@
+<?xml version="1.0"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<project name="ditaot-init">
+    
+  <!-- Read configuration properties -->
+  <loadproperties>
+    <javaresource name="application.properties"/>
+  </loadproperties>
+  <property file="${dita.dir}/config/org.dita.dost.platform/plugin.properties"/>
+  <property file="${dita.dir}/config/configuration.properties"/>
+  
+  <xmlcatalog id="dita.catalog">
+    <catalogpath path="${dita.plugin.org.dita.base.dir}/catalog-dita.xml"/>
+  </xmlcatalog>
+
+  <taskdef name="pipeline" classname="org.dita.dost.ant.ExtensibleAntInvoker"/>
+  <taskdef name="dita-ot-echo" classname="org.dita.dost.ant.DITAOTEchoTask"/>
+  <taskdef name="dita-ot-fail" classname="org.dita.dost.ant.DITAOTFailTask"/>
+  <taskdef name="dita-ot-copy" classname="org.dita.dost.ant.DITAOTCopy"/>
+  <taskdef name="job-property" classname="org.dita.dost.ant.JobPropertyTask"/>
+  <typedef name="isabsolute" classname="org.dita.dost.ant.IsAbsolute"/>
+  <!-- Deprecated since 3.0 -->
+  <typedef name="dita-fileset" classname="org.dita.dost.ant.types.JobSourceSet"/>
+  <typedef name="ditafileset" classname="org.dita.dost.ant.types.JobSourceSet"/>
+  <typedef name="jobmapper" classname="org.dita.dost.ant.types.JobMapper"/>
+
+  <macrodef name="job-helper" >
+    <attribute name="file"/>
+    <attribute name="property"/>
+    <sequential>
+      <xslt in="${dita.temp.dir}/.job.xml" out="${dita.temp.dir}/@{file}"
+            style="${dita.plugin.org.dita.base.dir}/xsl/job-helper.xsl"
+            force="true" taskname="job-helper">
+        <param name="property" expression="@{property}"/>
+        <outputproperty name="encoding" value="${file.encoding}"/> 
+      </xslt>
+    </sequential>
+  </macrodef>
+
+  <target name="build-init"
+          depends="init-properties,
+                   check-arg,
+                   log-arg"/>
+
+  <target name="init-properties">
+    <property name="default.language" value="en"/>
+    <property name="generate-debug-attributes" value="true"/>
+    <property name="processing-mode" value="lax"/>
+    <tstamp>
+      <format property="current.date" pattern="yyyyMMddHHmmssSSS"/>
+    </tstamp>
+    <property name="base.temp.dir" location="${dita.dir}/temp"/>
+    <property name="dita.temp.dir" location="${base.temp.dir}${file.separator}temp${current.date}" />
+    <fail message="dita.temp.dir property must be an absolute path: ${dita.temp.dir}">
+      <condition>
+        <not><isabsolute path="${dita.temp.dir}"/></not>
+      </condition>
+    </fail>
+    <property name="output.dir" location="${dita.dir}/out" />
+    <condition property="dita.output.dir" value="${dita.temp.dir}${file.separator}${temp.output.dir.name}" else="${output.dir}">
+      <isset property="temp.output.dir.name"/>
+    </condition>
+    <property environment="env" />
+  </target>
+
+  <!-- property value validation begin -->
+  <target name="check-arg"
+    description="Validate and init input arguments">
+    <!-- begin to check input parameters -->
+    <dita-ot-fail id="DOTA003F">
+      <condition>
+        <and>
+          <isset property="args.xsl" />
+          <not>
+            <available file="${args.xsl}" type="file" />
+          </not>
+        </and>
+      </condition>
+      <param name="1" location="${args.xsl}"/>
+    </dita-ot-fail>
+    <!-- end to check input parameters -->
+
+    <!-- begin to init required parameters -->
+    
+    <condition property="filter-stage" value="early">
+      <not>
+        <isset property="filter-stage"/>
+      </not>
+    </condition>
+    <condition property="filter-on-parse" value="true">
+      <and>
+        <equals arg1="${filter-stage}" arg2="early"/>
+      </and>
+    </condition>
+
+    <!-- append a '.' to out.ext if args.outext not contains '.' -->
+    <condition property="out.ext" value=".${args.outext}">
+      <and>
+        <isset property="args.outext" />
+        <not>
+          <contains string="${args.outext}" substring="." />
+        </not>
+      </and>
+    </condition>
+    <condition property="out.ext" value="${args.outext}">
+      <and>
+        <isset property="args.outext" />
+        <contains string="${args.outext}" substring="." />
+      </and>
+    </condition>
+
+    <condition property="args.grammar.cache"
+          value="yes">
+            <not>
+              <isset property="args.grammar.cache" />
+            </not>
+    </condition>
+
+    <condition property="args.xml.systemid.set"
+          value="yes">
+            <not>
+              <isset property="args.xml.systemid.set" />
+            </not>
+    </condition>
+    <!-- end to init required parameters -->
+
+    <!-- create required directories -->
+    <mkdir dir="${output.dir}" />
+    <delete dir="${dita.temp.dir}" quiet="false"/>
+    <mkdir dir="${dita.temp.dir}" />
+
+    <condition property="args.logdir" value="${output.dir}">
+      <not>
+        <isset property="args.logdir" />
+      </not>
+    </condition>
+
+    <!-- Validate the xml file or not,default is validation(true)-->
+    <condition property="validate" value="true">
+       <not>
+       <isset property="validate" />
+       </not>
+    </condition>
+    
+    <!-- Related links to output: none, all, nofamily -->
+    <condition property="include.rellinks" value="">
+      <equals arg1="${args.rellinks}" arg2="none"/>
+    </condition>
+    <condition property="include.rellinks" value="#default sibling friend cousin ancestor descendant sample external other">
+      <equals arg1="${args.rellinks}" arg2="nofamily"/>
+    </condition>
+    <condition property="include.rellinks" value="#default child sibling friend next previous cousin ancestor descendant sample external other">
+      <or>
+        <equals arg1="${args.hide.parent.link}" arg2="yes"/>
+        <equals arg1="${args.rellinks}" arg2="noparent"/>
+      </or>
+    </condition>
+    <condition property="include.rellinks" value="#default parent child sibling friend next previous cousin ancestor descendant sample external other">
+      <or>
+        <equals arg1="${args.rellinks}" arg2="all"/>
+        <not><isset property="args.rellinks"/></not>
+      </or>
+    </condition>
+
+    <!--solution for the output control-->
+    <condition property="generate.copy.outer" value="1">
+       <not>
+       <isset property="generate.copy.outer" />
+       </not>
+    </condition>
+
+    <condition property="onlytopic.in.map" value="false">
+       <not>
+       <isset property="onlytopic.in.map" />
+       </not>
+  </condition>
+
+    <property name="link-crawl" value="topic"/>
+    
+    <!--
+    default value : warn
+  fail     :1a) Fail quickly if files are going to be generated/copied outside of that directory
+  warn  :1b) Complete if files will be generated/copied outside, but log a warning
+  quiet  :1c) Quietly finish with only those files (no warning or error)
+    -->
+    <condition property="outer.control" value="warn">
+       <not>
+       <isset property="outer.control" />
+       </not>
+    </condition>
+
+    <condition property="inner.transform">
+        <equals arg1="${generate.copy.outer}" arg2="1"/>
+    </condition>
+
+    <condition property="old.transform">
+      <equals arg1="${generate.copy.outer}" arg2="3"></equals>
+    </condition>
+    
+    <condition property="conserve-memory" value="false">
+      <not><isset property="conserve-memory"/></not>
+    </condition>
+  </target>
+  
+  <target name="log-arg">
+    <condition property="xml.parser" value="XMLReader ${org.xml.sax.driver}">
+      <and>
+        <isset property="org.xml.sax.driver"/>
+        <not><isset property="xml.parser"/></not>
+      </and>
+    </condition>
+    <condition property="xml.parser" value="Xerces">
+      <and>
+        <available classname="org.apache.xerces.parsers.SAXParser"/>
+        <not><isset property="xml.parser"/></not>
+      </and>
+    </condition>
+    <condition property="xml.parser" value="Xerces in Sun JDK 1.5">
+      <and>
+        <available classname="com.sun.org.apache.xerces.internal.parsers.SAXParser"/>
+        <not><isset property="xml.parser"/></not>
+      </and>
+    </condition>
+    <condition property="xml.parser" value="Crimson">
+      <and>
+        <available classname="org.apache.crimson.parser.XMLReaderImpl"/>
+        <not><isset property="xml.parser"/></not>
+      </and>
+    </condition>
+    <condition property="xslt.parser" value="Saxon" else="Xalan">
+      <or>
+        <available classname="net.sf.saxon.StyleSheet"/>
+        <available classname="net.sf.saxon.Transform"/>
+      </or>
+    </condition>
+    <condition property="collator" value="ICU" else="JDL">
+      <available classname="com.ibm.icu.text.Collator"/>
+    </condition>
+    <!-- output parameters info -->
+    <echo level="info">*****************************************************************</echo>
+    <echo level="info">* basedir = ${basedir}</echo>
+    <echo level="info">* dita.dir = ${dita.dir}</echo>
+    <!--echo level="info">* input = ${args.input}</echo-->
+    <echo level="info">* transtype = ${transtype}</echo>
+    <echo level="info">* tempdir = ${dita.temp.dir}</echo>
+    <echo level="info">* outputdir = ${output.dir}</echo>
+    <echo level="info">* clean.temp = ${clean.temp}</echo>
+    <echo level="info">* DITA-OT version = ${otversion}</echo>
+    <echo level="info">* XML parser = ${xml.parser}</echo>
+    <echo level="info">* XSLT processor = ${xslt.parser}</echo>
+    <echo level="info">* collator = ${collator}</echo>
+    <echo level="info">*****************************************************************</echo>
+    <echoproperties regex="^(arg|preprocess|dita)" taskname="echo" failonerror="false"/>
+    <echo level="info">*****************************************************************</echo>
+  </target>
+
+</project>

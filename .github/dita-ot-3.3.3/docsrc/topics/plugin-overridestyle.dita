@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="plugin-overridestyle" xml:lang="en-US">
+  <title>Overriding an XSLT-processing step</title>
+  <shortdesc>You can override specific XSLT-processing steps in both the pre-processing pipeline and certain DITA-OT
+    transformations.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins<indexterm>XSLT</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>preprocessing</indexterm></indexterm>
+        <indexterm>XHTML</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>Develop an XSL file that contains the XSL override.</cmd>
+      </step>
+      <step>
+        <cmd>Construct a <filepath>plugin.xml</filepath> file that contains the following content:</cmd>
+        <info><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;plugin id="<varname>plugin-id</varname>">
+  &lt;feature extension="<varname>extension-point</varname>" file="<varname>relative-path</varname>"/>
+&lt;/plugin></codeblock>where:
+          <ul>
+            <li><varname>plugin-id</varname> is the plug-in identifier, for example, com.example.brandheader.</li>
+            <li><varname>extension-point</varname> is the DITA-OT extension point, for example,<codeph>
+                dita.xsl.xhtml</codeph>. This indicates the DITA-OT processing step that the XSL override applies
+              to.</li>
+            <li><varname>relative-path</varname> is the relative path and name of the XSLT file, for example,
+                <filepath>xsl/header.xsl</filepath>. </li>
+          </ul></info>
+      </step>
+      <step>
+        <cmd>Install the plug-in.</cmd>
+      </step>
+    </steps>
+    <result>The plug-in installer adds an XSL import statement to the default DITA-OT code, so that the XSL override
+      becomes part of the normal build.</result>
+    <example>
+      <title>Example: Overriding XHTML header processing</title>
+      <p>The following two files represent a complete, simple style plug-in.</p>
+      <p>The <filepath>plugin.xml</filepath> file declares an XSLT file that extends XHTML processing:</p>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;plugin id="com.example.brandheader">
+  &lt;feature extension="dita.xsl.xhtml" file="xsl/header.xsl"/>
+&lt;/plugin></codeblock>
+      <p>The <filepath>xsl/header.xsl</filepath> XSLT file referenced in <filepath>plugin.xml</filepath> overrides the
+        default header processing to add a banner:</p>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;xsl:stylesheet version="1.0" 
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  &lt;xsl:template name="gen-user-header">
+    &lt;div>&lt;img src="http://www.example.com/company_banner.jpg" 
+              alt="Example Company Banner"/>&lt;/div>
+  &lt;/xsl:template>
+&lt;/xsl:stylesheet></codeblock>
+    </example>
+    <!--<example><title>Example – Overriding troff formatting</title><p>To apply custom formatting for your own domain to the intermediate markup generated as input to troff processing, create a plugin that extends <codeph>dita.xsl.troff-ast</codeph> and specify the path to your custom XSL as follows:</p><codeblock>&lt;feature extension="dita.xsl.troff-ast" file="xsl/your-domain.xsl"/></codeblock></example>-->
+  </taskbody>
+</task>

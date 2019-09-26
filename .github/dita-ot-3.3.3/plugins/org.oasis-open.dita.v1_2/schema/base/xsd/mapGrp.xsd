@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA MAP XSD Grouping Decleration                 -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA maps              -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2009                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+
+ <xs:group name="map">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="map"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="navref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="navref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="topicref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="topicref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="reltable">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="reltable"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="relheader">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="relheader"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="relcolspec">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="relcolspec"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="relrow">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="relrow"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="relcell">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="relcell"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="anchor">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="anchor"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="topicmeta">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="topicmeta"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="linktext">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="linktext"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="searchtitle">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="searchtitle"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+ 
+
+  
+
+</xs:schema>

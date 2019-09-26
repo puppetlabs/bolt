@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="runsetup" xml:lang="en-us">
+  <title>Run Setup.exe</title>
+  <shortdesc>As with any major program, you will need to run setup in order to install it.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Setup</indexterm>
+        <indexterm>web server</indexterm>
+        <indexterm>database</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>Setup.exe can be found in the root directory of the CD-ROM with your software.</context>
+    <steps>
+      <step>
+        <cmd>Insert the CD-ROM.</cmd>
+      </step>
+      <step>
+        <cmd>Navigate to it from a typescript, DOS, or other command window.</cmd>
+      </step>
+      <step>
+        <cmd>Type <cmdname>setup.exe</cmdname> and hit enter.</cmd>
+      </step>
+      <step>
+        <cmd>Follow all of the prompts that appear.</cmd>
+      </step>
+      <step importance="optional">
+        <cmd>It is suggested that you follow all of the defaults, but you may select an alternate directory for the
+          install.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

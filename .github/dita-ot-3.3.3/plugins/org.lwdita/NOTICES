@@ -1,0 +1,10 @@
+Markdown DITA for DITA-OT
+Copyright 2015-2019 Jarno Elovirta
+
+This product includes software:
+
+flexmark-java 0.26.4 which is released under Apache 2.0 license. For details, see lib/flexmark-license.txt.
+
+autolink-java 0.6.0 which is released under MIT license. For details, see lib/autolink-license.txt.
+
+Validator.nu HTML parser 1.4 which is released under BSD 2-clause and MIT licences. For details, see lib/htmlparser-license.txt

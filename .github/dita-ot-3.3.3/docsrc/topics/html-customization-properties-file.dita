@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="custom-html-properties-file">
+  <title>Customizing HTML with a <filepath>.properties</filepath> file</title>
+  <titlealts>
+    <navtitle>Using a properties file</navtitle>
+  </titlealts>
+  <shortdesc>You can also use a <filepath>.properties</filepath> file to reference a set of build parameters when
+    building output with the <cmdname>dita</cmdname> command. The DITA-OT documentation uses a
+      <filepath>.properties</filepath> file to include custom CSS, header branding, and table-of-contents navigation in
+    the HTML5 output.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>.properties file</indexterm></indexterm>
+        <indexterm>HTML<indexterm>build properties</indexterm></indexterm>
+        <indexterm>CSS<indexterm>.properties file</indexterm></indexterm>
+        <indexterm>.properties file</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+
+    <steps>
+      <step>
+        <cmd>Create a <filepath>.properties</filepath> file to store the parameter settings for your
+          customization.</cmd>
+        <info>
+          <note type="tip">You can use the <filepath>.properties</filepath> for the DITA-OT documentation as a starting
+            point for your own customizations. This file is available in the installation folder under
+              <filepath>docsrc/samples/properties/docs-build-html5.properties</filepath>.</note>
+        </info>
+        <stepxmp>
+          <p>For example:</p>
+          <fig>
+            <title>The <filepath>docsrc/samples/properties/docs-build-html5.properties</filepath> file</title>
+            <codeblock outputclass="language-properties normalize-space show-line-numbers show-whitespace"><coderef href="../samples/properties/docs-build-html5.properties"/></codeblock>
+          </fig>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Reference your <filepath>.properties</filepath> file with the <cmdname>dita</cmdname> command when building
+          your output.</cmd>
+        <stepxmp>
+          <codeblock><cmdname>dita</cmdname> <parmname>--input</parmname>=<varname>my.ditamap</varname> <parmname>--format</parmname>=<option>html5</option> <parmname>--propertyfile</parmname>=<varname>my.properties</varname></codeblock>
+        </stepxmp>
+        <info/>
+      </step>
+    </steps>
+    <result>
+      <note>For an example of HTML output generated using this method, see the HTML5 version of the DITA-OT
+        documentation included in the installation folder under <filepath>doc/index.html</filepath>.</note>
+    </result>
+  </taskbody>
+</task>

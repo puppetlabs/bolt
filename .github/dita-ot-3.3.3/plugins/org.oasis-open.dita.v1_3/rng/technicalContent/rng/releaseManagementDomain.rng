@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  xmlns:dita="http://dita.oasis-open.org/architecture/2005/" 
+  xmlns="http://relaxng.org/ns/structure/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Release Management Domain</moduleTitle>
+    <headerComment>
+DITA Release Management Metadata Domain
+     
+Defines element types for capturing change details within
+topics or maps.
+
+DITA 1.3
+
+Copyright (c) 2013 OASIS Open
+=============================================================
+                    PUBLIC DOCUMENT TYPE DEFINITION           
+                    TYPICAL INVOCATION                        
+                                                              
+Refer to this file by the following public identifier or an 
+appropriate system identifier 
+
+PUBLIC "-//OASIS//ENTITIES DITA Release Management Domain//EN"
+=============================================================
+    </headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>relmgmt-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Release Management Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Release Management Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:releaseManagementDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:releaseManagementDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:releaseManagementDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic relmgmt-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+
+    <define name="relmgmt-d-metadata">
+      <choice>
+        <ref name="change-historylist.element"/>
+      </choice>
+    </define>
+
+    <define name="metadata" combine="choice">
+      <ref name="relmgmt-d-metadata"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="change-item">
+      <ref name="change-item.element"/>
+    </define>
+    <define name="change-person">
+      <ref name="change-person.element"/>
+    </define>
+    <define name="change-organization">
+      <ref name="change-organization.element"/>
+    </define>
+    <define name="change-revisionid">
+      <ref name="change-revisionid.element"/>
+    </define>
+    <define name="change-request-reference">
+      <ref name="change-request-reference.element"/>
+    </define>
+    <define name="change-started">
+      <ref name="change-started.element"/>
+    </define>
+    <define name="change-completed">
+      <ref name="change-completed.element"/>
+    </define>
+    <define name="change-summary">
+      <ref name="change-summary.element"/>
+    </define>
+    <define name="change-request-system">
+      <ref name="change-request-system.element"/>
+    </define>
+    <define name="change-request-id">
+      <ref name="change-request-id.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>COMMON ATTRIBUTE SETS</a:documentation>
+    <define name="changehistory.data.atts">
+      <ref name="univ-atts"/>
+      <optional>
+        <attribute name="datatype"/>
+      </optional>
+      <optional>
+        <attribute name="outputclass"/>
+      </optional>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>    
+    <div>
+      <a:documentation>LONG NAME: Change History List</a:documentation>
+      <define name="change-historylist.content">
+        <zeroOrMore>
+          <ref name="change-item"/>
+        </zeroOrMore>
+      </define>
+      <define name="change-historylist.attributes">
+        <ref name="changehistory.data.atts"/>
+      </define>
+      <define name="change-historylist.element">
+        <element name="change-historylist" dita:longName="Change History List"
+          dita:since="1.3"
+          >
+          <a:documentation> Category: Change History elements</a:documentation>
+          <ref name="change-historylist.attlist"/>
+          <ref name="change-historylist.content"/>
+        </element>
+      </define>
+      <define name="change-historylist.attlist" combine="interleave">
+        <ref name="change-historylist.attributes"/>
+      </define>
+    </div>    <div>
+      <a:documentation>LONG NAME: Change History List Item</a:documentation>
+      <define name="change-item.content">
+        <zeroOrMore>    
+          <choice>
+            <ref name="change-person"/>
+            <ref name="change-organization"/>
+          </choice>
+        </zeroOrMore>
+        <optional>
+          <ref name="change-revisionid"/>
+        </optional>
+        <optional>
+          <ref name="change-request-reference"/>
+        </optional>
+        <optional>
+          <ref name="change-started"/>
+        </optional>
+        <ref name="change-completed"/>
+        <zeroOrMore>
+          <ref name="change-summary"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="data"/>
+        </zeroOrMore>
+      </define>
+      <define name="change-item.attributes">
+        <ref name="changehistory.data.atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="change-item"/>
+        </optional>
+      </define>
+      <define name="change-item.element">
+        <element name="change-item" dita:longName="Change History List Item"
+          dita:since="1.3"
+          >
+          <a:documentation>An individual release note. Category: Change History List Item</a:documentation>
+          <ref name="change-item.attlist"/>
+          <ref name="change-item.content"/>
+        </element>
+      </define>
+      <define name="change-item.attlist" combine="interleave">
+        <ref name="change-item.attributes"/>
+      </define>
+    </div>    <div>
+      <a:documentation>LONG NAME: Change Person</a:documentation>
+      <define name="change-person.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="change-person.attributes">
+        <ref name="changehistory.data.atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="change-person"/>
+        </optional>
+      </define>
+      <define name="change-person.element">
+        <element name="change-person" dita:longName="Change Person"
+          dita:since="1.3"
+          >
+          <a:documentation>The person who made the change. Category: Change History</a:documentation>
+          <ref name="change-person.attlist"/>
+          <ref name="change-person.content"/>
+        </element>
+      </define>
+      <define name="change-person.attlist" combine="interleave">
+        <ref name="change-person.attributes"/>
+      </define>
+    </div>    <div>
+      <a:documentation>LONG NAME: Change Organization</a:documentation>
+      <define name="change-organization.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="change-organization.attributes">
+        <ref name="changehistory.data.atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="change-organization"/>
+        </optional>
+      </define>
+      <define name="change-organization.element">
+        <element name="change-organization" dita:longName="Change Organization"
+          dita:since="1.3"
+          >
+          <a:documentation>the organization that instigated (required, suggested) the change. 
+            Category: Change History</a:documentation>
+          <ref name="change-organization.attlist"/>
+          <ref name="change-organization.content"/>
+        </element>
+      </define>
+      <define name="change-organization.attlist" combine="interleave">
+        <ref name="change-organization.attributes"/>
+      </define>
+    </div>    
+    <div>
+      <a:documentation>LONG NAME: Revision ID</a:documentation>
+      <define name="change-revisionid.content">
+        <zeroOrMore>
+          <ref name="data.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="change-revisionid.attributes">
+        <ref name="changehistory.data.atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="change-revisionid"/>
+        </optional>
+      </define>
+      <define name="change-revisionid.element">
+        <element name="change-revisionid" dita:longName="Change Revision ID"
+          dita:since="1.3"
+          >
+          <a:documentation>the organization that instigated (required, suggested) the change. 
+            Category: Change History</a:documentation>
+          <ref name="change-revisionid.attlist"/>
+          <ref name="change-revisionid.content"/>
+        </element>
+      </define>
+      <define name="change-revisionid.attlist" combine="interleave">
+        <ref name="change-revisionid.attributes"/>
+      </define>
+    </div>    
+    <div>
+      <a:documentation>LONG NAME: Change Request Reference</a:documentation>
+      <define name="change-request-reference.content">
+        <optional>
+          <ref name="change-request-system"/>
+        </optional>
+        <optional>
+          <ref name="change-request-id"/>
+        </optional>
+      </define>
+      <define name="change-request-reference.attributes">
+        <ref name="changehistory.data.atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="change-request-reference"/>
+        </optional>
+      </define>
+      <define name="change-request-reference.element">
+        <element name="change-request-reference" dita:longName="Change Request Reference"
+          dita:since="1.3"
+          >
+          <a:documentation>Provides traceablity to an external change 
+      request or other ticketing system. 
+            Category: Change History</a:documentation>
+          <ref name="change-request-reference.attlist"/>
+          <ref name="change-request-reference.content"/>
+        </element>
+      </define>
+      <define name="change-request-reference.attlist" combine="interleave">
+        <ref name="change-request-reference.attributes"/>
+      </define>
+    </div>    <div>
+      <a:documentation>LONG NAME: Change Request System</a:documentation>
+      <define name="change-request-system.content">
+        <zeroOrMore>
+          <ref name="data.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="change-request-system.attributes">
+        <ref name="changehistory.data.atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="change-request-system"/>
+        </optional>
+      </define>
+      <define name="change-request-system.element">
+        <element name="change-request-system" dita:longName="Change Request System"
+          dita:since="1.3"
+          >
+          <a:documentation>Some description of or identifier for the information system that
+     manages or serves the referenced change request, for example,
+     an issue tracking system. 
+            Category: Change History</a:documentation>
+          <ref name="change-request-system.attlist"/>
+          <ref name="change-request-system.content"/>
+        </element>
+      </define>
+      <define name="change-request-system.attlist" combine="interleave">
+        <ref name="change-request-system.attributes"/>
+      </define>
+    </div>    <div>
+      <a:documentation>LONG NAME: Change Request ID</a:documentation>
+      <define name="change-request-id.content">
+        <zeroOrMore>
+          <ref name="data.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="change-request-id.attributes">
+        <ref name="changehistory.data.atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="change-request-id"/>
+        </optional>
+      </define>
+      <define name="change-request-id.element">
+        <element name="change-request-id" dita:longName="Change Request ID"
+          dita:since="1.3"
+          >
+          <a:documentation>The identifier of the change request, such as an issue
+     ID or ticket number. 
+            Category: Change History</a:documentation>
+          <ref name="change-request-id.attlist"/>
+          <ref name="change-request-id.content"/>
+        </element>
+      </define>
+      <define name="change-request-id.attlist" combine="interleave">
+        <ref name="change-request-id.attributes"/>
+      </define>
+    </div>    
+    <div>
+      <a:documentation>LONG NAME: Change started date</a:documentation>
+      <define name="change-started.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="change-started.attributes">
+        <ref name="changehistory.data.atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="change-started"/>
+        </optional>
+      </define>
+      <define name="change-started.element">
+        <element name="change-started" dita:longName="Change started date"
+          dita:since="1.3"
+          >
+          <a:documentation>
+            Category: Change History</a:documentation>
+          <ref name="change-started.attlist"/>
+          <ref name="change-started.content"/>
+        </element>
+      </define>
+      <define name="change-started.attlist" combine="interleave">
+        <ref name="change-started.attributes"/>
+      </define>
+    </div>    
+    <div>
+      <a:documentation>LONG NAME: Change completed date</a:documentation>
+      <define name="change-completed.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="change-completed.attributes">
+        <ref name="changehistory.data.atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="change-completed"/>
+        </optional>
+      </define>
+      <define name="change-completed.element">
+        <element name="change-completed" dita:longName="Change completed date"
+          dita:since="1.3"
+          >
+          <a:documentation>
+            Category: Change History</a:documentation>
+          <ref name="change-completed.attlist"/>
+          <ref name="change-completed.content"/>
+        </element>
+      </define>
+      <define name="change-completed.attlist" combine="interleave">
+        <ref name="change-completed.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Change Summary</a:documentation>
+      <define name="change-summary.content">
+        <zeroOrMore>
+          <ref name="data.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="change-summary.attributes">
+        <ref name="changehistory.data.atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="change-summary"/>
+        </optional>
+      </define>
+      <define name="change-summary.element">
+        <element name="change-summary" dita:longName="Change Summary"
+          dita:since="1.3"
+          >
+          <a:documentation>The portion of the release note that will/may appear in a document
+            Category: Change History</a:documentation>
+          <ref name="change-summary.attlist"/>
+          <ref name="change-summary.content"/>
+        </element>
+      </define>
+      <define name="change-summary.attlist" combine="interleave">
+        <ref name="change-summary.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="change-historylist.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/metadata relmgmt-d/change-historylist "/>
+      </optional>
+    </define>
+    <define name="change-item.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data relmgmt-d/change-item "/>
+      </optional>
+    </define>
+    <define name="change-person.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data relmgmt-d/change-person "/>
+      </optional>
+    </define>
+    <define name="change-organization.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data relmgmt-d/change-organization "/>
+      </optional>
+    </define>
+    <define name="change-revisionid.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data relmgmt-d/change-revisionid "/>
+      </optional>
+    </define>
+    <define name="change-request-reference.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data relmgmt-d/change-request-reference "/>
+      </optional>
+    </define>
+    <define name="change-request-system.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data relmgmt-d/change-request-system "/>
+      </optional>
+    </define>
+    <define name="change-request-id.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data relmgmt-d/change-request-id "/>
+      </optional>
+    </define>
+    <define name="change-started.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data relmgmt-d/change-started "/>
+      </optional>
+    </define>
+    <define name="change-completed.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data relmgmt-d/change-completed "/>
+      </optional>
+    </define>
+    <define name="change-summary.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data relmgmt-d/change-summary "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg11.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:attributeGroup name="SVG.onfocusin.attrib">
+    <xs:attribute name="onfocusin" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onfocusout.attrib">
+    <xs:attribute name="onfocusout" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onactivate.attrib">
+    <xs:attribute name="onactivate" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onclick.attrib">
+    <xs:attribute name="onclick" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onmousedown.attrib">
+    <xs:attribute name="onmousedown" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onmouseup.attrib">
+    <xs:attribute name="onmouseup" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onmouseover.attrib">
+    <xs:attribute name="onmouseover" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onmousemove.attrib">
+    <xs:attribute name="onmousemove" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onmouseout.attrib">
+    <xs:attribute name="onmouseout" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.onload.attrib">
+    <xs:attribute name="onload" type="svg:Script.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.GraphicalEvents.attrib">
+    <xs:attributeGroup ref="SVG.onfocusin.attrib"/>
+    <xs:attributeGroup ref="SVG.onfocusout.attrib"/>
+    <xs:attributeGroup ref="SVG.onactivate.attrib"/>
+    <xs:attributeGroup ref="SVG.onclick.attrib"/>
+    <xs:attributeGroup ref="SVG.onmousedown.attrib"/>
+    <xs:attributeGroup ref="SVG.onmouseup.attrib"/>
+    <xs:attributeGroup ref="SVG.onmouseover.attrib"/>
+    <xs:attributeGroup ref="SVG.onmousemove.attrib"/>
+    <xs:attributeGroup ref="SVG.onmouseout.attrib"/>
+    <xs:attributeGroup ref="SVG.onload.attrib"/>
+  </xs:attributeGroup>
+</xs:schema>

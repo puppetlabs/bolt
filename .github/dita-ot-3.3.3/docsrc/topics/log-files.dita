@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="loghandling">
+  <title>Log files</title>
+  <shortdesc>When you run DITA-OT, key information is logged on the screen. This information can also be written to a
+    log file. If you encounter a problem, you can analyze this information to determine the source of the problem and
+    then take action to resolve it.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Apache FOP<indexterm>log files</indexterm></indexterm>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>logging</indexterm></indexterm>
+        <indexterm>logging</indexterm>
+        <indexterm>Ant<indexterm>logging</indexterm></indexterm>
+        <indexterm>debugging<index-see-also>logging</index-see-also></indexterm>
+        <indexterm>Java<indexterm>logging</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>The logging behavior varies depending on whether you use the <cmdname>dita</cmdname> command or Ant to invoke a
+      toolkit build.</p>
+    <dl>
+      <dlentry>
+        <dt><cmdname>dita</cmdname> command</dt>
+        <dd>By default, only warning and error messages are written to the screen. If you use the
+            <parmname>-v</parmname> option, logging will be more verbose and informative messages are also written out.
+          The <parmname>-l</parmname> option can be used to write the log messages into a file.</dd>
+      </dlentry>
+      <dlentry>
+        <dt>Ant</dt>
+        <dd>By default, status information is written to the screen. If you issue the <parmname>-l</parmname> parameter,
+          the build runs silently and the information is written to a log file with the name and location that you
+          specified.</dd>
+      </dlentry>
+    </dl>
+    <section>
+      <title>Using other Ant loggers</title>
+      <p>You also can use other Ant loggers; see
+        <xref href="https://ant.apache.org/manual/listeners.html" format="html" scope="external">Listeners &amp;
+          Loggers</xref> in the Ant documentation for more information.</p>
+      <p>For example, you can use the <b>AnsiColorLogger</b> to colorize the messages written on the screen.</p>
+      <dl>
+        <dlentry>
+          <dt><cmdname>dita</cmdname> command</dt>
+          <dd>
+            <p>To use a custom Ant logger with the <cmdname>dita</cmdname> command, add the logger to the
+                <codeph>ANT_ARGS</codeph> environment variable by calling the following command before calling the
+                <cmdname>dita</cmdname> command:</p>
+            <codeblock>export ANT_ARGS="-logger org.apache.tools.ant.listener.AnsiColorLogger"</codeblock>
+            <p>Now you will get colorized messages when the <cmdname>dita</cmdname> command runs.</p>
+            <note type="tip">Environment variables can also be set permanently. See
+              <xref href="https://www.java.com/en/download/help/path.xml" format="html" scope="external">How do I set or
+                change the PATH system variable?</xref> for information on how to set the <codeph>PATH</codeph>
+              environment variable. You can set the <codeph>ANT_ARGS</codeph> environment variable in the same
+              way.</note>
+          </dd>
+        </dlentry>
+        <dlentry>
+          <dt>Ant</dt>
+          <dd>
+            <p>If you prefer to launch DITA-OT directly from Ant, you can also add the logger to the
+                <codeph>ANT_ARGS</codeph> environment variable, as explained above. You can also set the logger with the
+                <codeph>-logger</codeph> parameter when calling Ant.</p>
+            <codeblock>ant -logger org.apache.tools.ant.listener.AnsiColorLogger</codeblock>
+          </dd>
+        </dlentry>
+      </dl>
+    </section>
+    <section>
+      <title>FOP debug logging</title>
+      <div outputclass="div-index">
+        <indexterm>logback.xml</indexterm>
+        <indexterm>classpath<indexterm>logging</indexterm></indexterm>
+      </div>
+      <p>In PDF processing with <tm trademark="Apache" tmtype="tm">Apache</tm> FOP, DITA-OT 3.1 now uses the Simple
+        Logging Facade for Java (SLF4J), allowing for better control and formatting of FOP log messages. To reduce noise
+        on the console, all FOP messages are set to the Info level and hidden by default.</p>
+      <p>To enable debug logging, modify the <filepath>config/logback.xml</filepath> file or add your own
+          <filepath>logback.xml</filepath> to the classpath with a higher priority to override the default settings. For
+        more information, see the
+        <xref href="https://logback.qos.ch/manual/configuration.html" format="html" scope="external">Logback
+          configuration documentation</xref>.</p>
+      <note type="attention">Enabling FOP debug logging will dramatically increase the size of generated log
+        files.</note>
+    </section>
+    <!--<section><title>Analyze messages on the screen</title><p>During the building process, some information or messages
+        occur on the screen to tell you about the status, warnings, errors, or fatal errors. You need to analyze the
+        messages to solve the problems. <ul>
+          <li>If the build succeeded with some warning messages on the screen, it means that there are something
+            incorrect within the user input parameters or source DITA files; but you can still get the correct
+            output.</li>
+          <li>If the build succeeded with some error messages on the screen, it means that there are something incorrect
+            within the user input parameters or source DITA files; the output maybe not correct.</li>
+          <li>If the build failed with fatal error message on the screen, it means that there are something illegal or
+            invalid within the user input parameters or source DITA files; you may get no output, or wrong output.</li>
+        </ul>
+      </p></section>-->
+    <!--<section><title>Analyze messages in the log file</title><p>A log file in plain text format is generated in the log
+        directory, which has a name combined with both input file name and transformation type. You can open it and find more
+        detailed information, which are helpful for solving problems. You can use the same way introduced above to
+        analyze the messages and solve the problems.</p><p>The log directory can be specified by:</p><ul>
+        <li>using Ant, with argument <codeph>-logfile=<userinput>log-file</userinput></codeph></li>
+        <li>using command-line tool, the parameter <codeph>/logdir:<userinput>log-dir</userinput></codeph>.</li>
+      </ul></section>-->
+    <!--<section><title>Turn on debug mode</title><p>Under debug mode, diagnostic information, such as: environment
+        variables, stack trace, will be logged into the log file. These information can help the user or developer to go
+        deep into the problems and find the root cause.</p><p>By default, the debug mode is disabled. To turn on the
+        debug mode on, you need to follow the usage below: <ul>
+          <li>Append <codeph>-v</codeph> and <codeph>-Dargs.debug=yes</codeph> in Ant command.</li>
+          <li>Append <codeph>/d</codeph> or <codeph>/debug</codeph> in command-line tool.</li>
+        </ul></p></section>-->
+  </conbody>
+</concept>

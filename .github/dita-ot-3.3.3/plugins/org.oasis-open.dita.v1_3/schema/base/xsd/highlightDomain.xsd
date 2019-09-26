@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--MODULE: DITA Highlight Domain VERSION: 1.2 DATE:             -->
+<!--November 2009                                                -->
+<!--SYSTEM: Darwin Information Typing Architecture (DITA)        -->
+<!--PURPOSE: Define elements and specialization attributes for Highlight Domain -->
+<!--ORIGINAL CREATION DATE: March 2001                           -->
+<!--(C) Copyright OASIS Open 2005, 2009.                         -->
+<!--(C) Copyright IBM Corporation 2001, 2004. All Rights Reserved.-->
+<!--UPDATES:                                                     -->
+<!--2005.11.15 RDA: Corrected descriptive names for all elements except bold -->
+<!--2005.11.15 RDA: Corrected the "Delivered as" system ID       -->
+<!--2007.12.01 WEK: Reformatted DTD modulesfor DITA 1.2          -->
+<!--2008.02.13 RDA: Create .content and .attributes entities     -->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic hi-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="b">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="b"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="u">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="u"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="i">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="i"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="line-through">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="line-through"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="overline">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="overline"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="tt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="tt"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="sup">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="sup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="sub">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="sub"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="hi-d-ph">
+      <xs:choice>
+         <xs:element ref="b"/>
+         <xs:element ref="i"/>
+         <xs:element ref="line-through"/>
+         <xs:element ref="overline"/>
+         <xs:element ref="sup"/>
+         <xs:element ref="sub"/>
+         <xs:element ref="tt"/>
+         <xs:element ref="u"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="b">
+      <xs:annotation>
+         <xs:documentation>The bold (&lt;b&gt;) element is used to apply bold highlighting to the content of the element. Use this element only when there is not some other more proper element. For
+            example, for specific items such as GUI controls, use the &lt;uicontrol&gt; element. This element is part of the DITA highlighting domain. Category: Typographic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="b.class">
+               <xs:attribute ref="class" default="+ topic/ph hi-d/b "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="b.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="b.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="b.attributes"/>
+   </xs:complexType>
+   <xs:group name="b.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="required-cleanup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="b.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="u">
+      <xs:annotation>
+         <xs:documentation>The underline (&lt;u&gt;) element is used to apply underline highlighting to the content of the element. Category: Typographic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="u.class">
+               <xs:attribute ref="class" default="+ topic/ph hi-d/u "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="u.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="u.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="u.attributes"/>
+   </xs:complexType>
+   <xs:group name="u.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="required-cleanup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="u.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="i">
+      <xs:annotation>
+         <xs:documentation>The italic (&lt;i&gt;) element is used to apply italic highlighting to the content of the element. Category: Typographic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="i.class">
+               <xs:attribute ref="class" default="+ topic/ph hi-d/i "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="i.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="i.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="i.attributes"/>
+   </xs:complexType>
+   <xs:group name="i.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="required-cleanup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="i.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="line-through">
+      <xs:annotation>
+         <xs:documentation>Category: Typographic elements </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="line-through.class">
+               <xs:attribute ref="class" default="+ topic/ph hi-d/line-through "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="line-through.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="line-through.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="line-through.attributes"/>
+   </xs:complexType>
+   <xs:group name="line-through.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="required-cleanup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="line-through.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="overline">
+      <xs:annotation>
+         <xs:documentation>Category: Typographic elements </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="overline.class">
+               <xs:attribute ref="class" default="+ topic/ph hi-d/overline "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="overline.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="overline.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="overline.attributes"/>
+   </xs:complexType>
+   <xs:group name="overline.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="required-cleanup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="overline.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="tt">
+      <xs:annotation>
+         <xs:documentation> The teletype (&lt;tt&gt;) element is used to apply monospaced highlighting to the content of the element. Category: Typographic elements </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="tt.class">
+               <xs:attribute ref="class" default="+ topic/ph hi-d/tt "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="tt.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="tt.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="tt.attributes"/>
+   </xs:complexType>
+   <xs:group name="tt.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="required-cleanup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="tt.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="sup">
+      <xs:annotation>
+         <xs:documentation>The superscript (&lt;sup&gt;) element indicates that text should be superscripted, or vertically raised in relationship to the surrounding text. Superscripts are usually a
+            smaller font than the surrounding text. Use this element only when there is not some other more proper tag. This element is part of the DITA highlighting domain. Category: Typographic
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="sup.class">
+               <xs:attribute ref="class" default="+ topic/ph hi-d/sup "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="sup.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="sup.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="sup.attributes"/>
+   </xs:complexType>
+   <xs:group name="sup.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="required-cleanup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="sup.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="sub">
+      <xs:annotation>
+         <xs:documentation>A subscript (&lt;sub&gt;) indicates that text should be subscripted, or placed lower in relationship to the surrounding text. Subscripted text is often a smaller font than the
+            surrounding text. Formatting may vary depending on your output process. This element is part of the DITA highlighting domain. Category: Typographic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="sub.class">
+               <xs:attribute ref="class" default="+ topic/ph hi-d/sub "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="sub.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="sub.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="sub.attributes"/>
+   </xs:complexType>
+   <xs:group name="sub.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="required-cleanup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="sub.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

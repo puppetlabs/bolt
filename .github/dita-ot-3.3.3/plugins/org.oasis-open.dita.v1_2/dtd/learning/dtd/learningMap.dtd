@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA learningMap DTD                              -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    DTD to describe DITA Learning Map                 -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             May 2007                                          -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2007, 2009.              -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    2007.05.01 JPH: Original creation                          -->
+<!--    2010.09.21 RDA: Added base topic domains                   -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATIONS                 -->
+<!-- ============================================================= -->
+
+<!ENTITY % learningmap-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Learning Map Domain//EN" 
+         "learningMapdomain.ent">
+  %learningmap-d-dec;
+
+<!ENTITY % learningmeta-d-dec 
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Learning Metadata Domain//EN" 
+         "learningMetadataDomain.ent">
+  %learningmeta-d-dec;
+
+<!ENTITY % mapgroup-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Map Group Domain//EN" 
+         "../../base/dtd/mapGroup.ent">
+  %mapgroup-d-dec;
+
+<!ENTITY % indexing-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Indexing Domain//EN" 
+         "../../base/dtd/indexingDomain.ent">
+  %indexing-d-dec;
+
+<!ENTITY % delay-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Delayed Resolution Domain//EN" 
+         "../../base/dtd/delayResolutionDomain.ent"                                                       
+>%delay-d-dec;
+
+<!ENTITY % hi-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Highlight Domain//EN" 
+         "../../base/dtd/highlightDomain.ent"
+>%hi-d-dec;
+
+<!ENTITY % ut-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Utilities Domain//EN" 
+         "../../base/dtd/utilitiesDomain.ent"                                                
+>%ut-d-dec;
+
+<!ENTITY % hazard-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Hazard Statement Domain//EN" 
+         "../../base/dtd/hazardstatementDomain.ent"
+>%hazard-d-dec;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN EXTENSIONS                          -->
+<!-- ============================================================= -->
+<!--                    One for each extended base element, with
+                        the name of the domain(s) in which the
+                        extension was declared                     -->
+<!ENTITY % index-base   "index-base | 
+                         %indexing-d-index-base;
+                        ">
+<!ENTITY % topicref     "topicref | 
+                         %mapgroup-d-topicref; | 
+                         %learningmap-d-topicref;
+                        ">
+<!ENTITY % metadata     "metadata  | 
+                         %learningmeta-d-metadata;
+                        ">
+<!ENTITY % keywords     "keywords | 
+                         %delay-d-keywords;
+                        ">
+<!ENTITY % ph           "ph | 
+                         %hi-d-ph;
+                        ">
+<!ENTITY % fig          "fig |
+                         %ut-d-fig;
+                        ">
+<!ENTITY % note         "note | 
+                         %hazard-d-note;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE EXTENSIONS                -->
+<!-- ============================================================= -->
+<!ENTITY % props-attribute-extensions  ""                            >
+<!ENTITY % base-attribute-extensions   ""                            >
+
+<!-- ============================================================= -->
+<!--                    DOMAINS ATTRIBUTE OVERRIDE                 -->
+<!-- ============================================================= -->
+<!--                    Must be declared ahead of the DTDs, which
+                        puts @domains first in order               -->
+
+<!ENTITY included-domains 
+                        "&delay-d-att;
+                         &mapgroup-d-att;
+                         &indexing-d-att;
+                         &learningmap-d-att;
+                         &learningmeta-d-att;
+                         &hi-d-att; 
+                         &ut-d-att; 
+                         &hazard-d-att;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    MAP ELEMENT INTEGRATION                    -->
+<!-- ============================================================= -->
+
+<!--Embed map to get generic elements -->
+<!ENTITY % map-type PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 Map//EN" 
+"../../base/dtd/map.mod">
+  %map-type;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ELEMENT INTEGRATION                 -->
+<!-- ============================================================= -->
+
+<!ENTITY % mapgroup-d-def PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 Map Group Domain//EN" 
+"../../base/dtd/mapGroup.mod">
+  %mapgroup-d-def;
+
+<!ENTITY % indexing-d-def     PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 Indexing Domain//EN" 
+"../../base/dtd/indexingDomain.mod">
+%indexing-d-def;
+
+<!ENTITY % delay-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Delayed Resolution Domain//EN" 
+         "../../base/dtd/delayResolutionDomain.mod"
+>%delay-d-def;
+
+<!ENTITY % learningmap-d-def PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 Learning Map Domain//EN" 
+"learningMapdomain.mod">
+  %learningmap-d-def;
+
+<!ENTITY % learningmeta-d-def PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 Learning Metadata Domain//EN" 
+"learningMetadataDomain.mod">
+  %learningmeta-d-def;
+
+<!ENTITY % hi-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Highlight Domain//EN" 
+         "../../base/dtd/highlightDomain.mod"
+>%hi-d-def;
+
+<!ENTITY % ut-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Utilities Domain//EN" 
+         "../../base/dtd/utilitiesDomain.mod"
+>%ut-d-def;
+
+<!ENTITY % hazard-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Hazard Statement Domain//EN" 
+         "../../base/dtd/hazardstatementDomain.mod"
+>%hazard-d-def;
+
+<!-- ================== End DITA Learning Map DTD ================ -->

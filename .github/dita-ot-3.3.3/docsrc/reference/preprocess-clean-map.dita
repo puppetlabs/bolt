@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="preprocess-clean-map" xml:lang="en-US">
+  <title>Map cleanup (clean-map)</title>
+  <shortdesc>The <codeph>clean-map</codeph> step removes any elements and attributes that were added to files to support
+    preprocessing.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>preprocessing<indexterm><codeph>clean-map</codeph></indexterm></indexterm>
+        <indexterm><codeph>clean-map</codeph></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+</concept>

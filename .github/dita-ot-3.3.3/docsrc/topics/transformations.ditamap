@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>DITA-OT transformations</title>
+  <topicref keyref="output-formats">
+    <topicref keyref="dita2pdf"/>
+    <topicref keyref="dita2html5"/>
+    <topicref keyref="dita2eclipsehelp"/>
+    <topicref keyref="dita2htmlhelp" platform="windows"/>
+    <topicref keyref="dita2markdown"/>
+    <topicref keyref="dita2dita"/>
+    <topicref keyref="dita2tocjs"/>
+    <topicref keyref="dita2troff"/>
+    <topicref keyref="dita2xhtml"/>
+  </topicref>
+</map>

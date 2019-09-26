@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>Customizing/Extending DITA-OT</title>
+
+  <mapref href="html-customization.ditamap"/>
+  <mapref href="pdf-customization.ditamap"/>
+  <mapref href="plug-ins.ditamap"/>
+  <mapref href="../extension-points/extension-points.ditamap"/>
+  <mapref href="migration.ditamap"/>
+  <mapref href="globalizing.ditamap"/>
+  <topicref keyref="rebuilding-docs"/>
+</map>

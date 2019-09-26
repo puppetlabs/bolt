@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="lib-org.dita.dost.platform-plugin.properties">
+  <title>The <filepath>plugin.properties</filepath> file</title>
+  <titlealts>
+    <navtitle><filepath>plugin.properties</filepath></navtitle>
+  </titlealts>
+  <shortdesc>The <filepath>plugin.properties</filepath> file is used to store configuration properties that are set by
+    the plug-in installation process.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>files<indexterm>plugin.properties</indexterm></indexterm>
+        <indexterm>plugin.properties file</indexterm>
+        <indexterm>Java<indexterm>plugin.properties</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <p>The file is located in the <filepath>lib/org.dita.dost.platform</filepath> directory of the DITA-OT
+        installation and stores a cached version of the plug-in configuration used by the Java code.</p>
+      <p>The contents of this file depend on the installed plug-ins. Each plug-in may contribute properties such as the
+        path to the plug-in folder, supported extensions and print transformation types.</p>
+      <note type="warning">The <filepath>plugin.properties</filepath> file is regenerated each time the plug-in
+        integration process is run, so it should not be edited manually as these changes would be lost the next time a
+        plug-in is installed or removed.</note>
+    </section>
+  </refbody>
+</reference>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.5.3" ditaarch:DITAArchVersion="1.2"><title>DITA Open Toolkit Release 1.5.3</title><shortdesc>Release 1.5.3 is a maintenance release based on the final version of the DITA 1.2
+      standard.</shortdesc><refbody><section>
+        <p>Version 1.5.3 contains many enhancements, user patches, bug fixes, and significant
+          updates to the documentation.</p>
+        
+        <p>Release 1.5.3 was developed using a series of test builds 
+        released to the community every three weeks. Each item in the list
+        below indicates which test build first contained the update.  The
+        eighth public build was the final build, released as the 
+        DITA-OT 1.5.3 final stable build.</p>
+      </section><section>
+        <title>General Enhancements and Changes</title>
+        <dl><dlentry id="topic_mxs_vps_qc"><dt>Base plug-ins</dt><dd><p>In earlier releases of OT, configuration parameters were hardcoded into Ant files and
+            Java code. Starting from version 1.5.3 OT has externalized base configurations into base
+            plug-ins in plugins folder. Base plug-in identifiers and folder names start with
+              <codeph>org.dita</codeph>: </p>
+          <ul><li>org.dita.base</li><li>org.dita.docbook</li><li>org.dita.eclipsecontent</li><li>org.dita.eclipsehelp</li><li>org.dita.htmlhelp</li><li>org.dita.javahelp</li><li>org.dita.odt</li><li>org.dita.pdf</li><li>org.dita.troff</li><li>org.dita.wordrtf</li><li>org.dita.xhtml</li></ul>
+          <p>For backwards compatibility, only configuration files were moved to plug-in folders,
+            the actual code and resource files were left in original locations.</p>
+          <p>Installations of OT may remove base plug-ins in order to remove funtionality, but the
+                  <codeph>org.dita.base</codeph> plug-in must be retained as it contains
+                configuration for base functionality such as catalog files and preprocessing.</p></dd></dlentry><dlentry id="topic_uxs_vps_qc"><dt>Plug-ing configuration changes</dt><dd>
+            <p>The plug-in configuration file <filepath>plugin.xml</filepath> has support for new
+                syntax, where the old</p>
+            <codeblock xml:space="preserve">&lt;feature extension="foo" value="bar.xml" type="file"/&gt;</codeblock>
+            <p>can be written as</p>
+            <codeblock xml:space="preserve">&lt;feature extension="foo" file="bar.xml"/&gt;</codeblock>
+            <p>The new <codeph>file</codeph> attribute only supports a single file, not a comma
+                separated list like the value attribute.</p><p>In previous releases multiple feature elements with the same
+                extension ID were not supported. In release 1.5.3 multiple definitions are combined,
+                thus</p>
+            <codeblock xml:space="preserve">&lt;feature extension="foo" value="bar,baz"/&gt;</codeblock>
+            <p>can also be written as </p>
+            <codeblock xml:space="preserve">&lt;feature extension="foo" value="bar"/&gt;
+&lt;feature extension="foo" value="baz"/&gt;</codeblock>
+            <p>Plug-in extension points can be added with</p>
+            <codeblock xml:space="preserve">&lt;extension-point id="<i>extension-id</i>" name="<i>human readable name</i>"/&gt;</codeblock>
+            <p>Plug-ins <b>should</b> declare all extension points they support. In version 1.5.3
+                undeclared extension points are supported, but a warning is thrown when running
+                integration in verbose mode. Support for undeclared extension points <b>may</b> be
+                removed in future releases.</p>
+          </dd></dlentry><dlentry id="topic_cys_vps_qc"><dt>PDF2 changes</dt><dd>
+              <p>Support for the format attribute in PDF2 variable files has been remove as
+                redundant. The same functionality as </p>
+              <codeblock xml:space="preserve">&lt;variable id="foo" format="bar"&gt;baz&lt;/variable&gt; </codeblock>
+              <p>can be implemented with e.g. </p>
+              <codeblock xml:space="preserve">&lt;variable id="foo.bar"&gt;baz&lt;/variable&gt; </codeblock>
+              <p>PDF2 no longer logs a warning about PDF2 plug-in replacing the legacy PDF
+                transformation type.</p>
+              <p>Support for flagging has been added.</p>
+              <p>Version of FOP that comes with Full Easy Install has been updated from 0.95 to
+                1.0.</p>
+          </dd></dlentry><dlentry id="topic_oys_vps_qc"><dt>Filtering configuration</dt><dd><p>List of transtypes which are considered to be print types has been moved to
+                  <filepath>integrator.properties</filepath> with the property name
+                  <codeph>print_transtypes</codeph>. In previous releases this list was hardcoded
+                into Java code. Configuring print transtypes is currently not possible in plug-in
+                configuration files.</p></dd></dlentry><dlentry><dt>Java API changes</dt><dd>
+              <p>Multiple Java classes have been changed from public non-final into package-private
+                final. This enables clearer distinction between public and internal API, and forbits
+                subclassing classes which have not been designed and documented for
+                extensibility.</p>
+            </dd></dlentry></dl>
+      </section><section>
+        <title>SourceForge Enhancements Added</title>
+        <ol id="ol_ghy_svh_pc"><li>3177971 Improve plugin configuration file (Milestone 2) </li><li>3178275 Add xsl:import extension point to PDF2 topic merge XSL (Milestone 3)</li><li>3182113 Add common attribute processing to PDF2 plugin (Milestone 3)</li><li>3185914 Improve integration loggin (Milestone 3)</li><li>3189073 Plugin location should be available as Ant property (Milestone 3)</li><li>3126848 Repository cleanup (Milestone 3)</li><li>3204188 Support for defining extension point (Milestone 4)</li><li>3213163 Clean PDF2 build and integration scripts (Milestone 4)</li><li>3227387 Need extension to pass user param to dita.map.xhtml.toc targ (Milestone 4) </li><li>3231695 Use an XML serializer object for writing XML (Milestone 4) </li><li>3256796 Remove lecagy PDF code from xsl (Milestone 4)</li><li>3283638 Remove format attribute support from PDF2 vars (Milestone 5)</li><li>3285716 Clean up PDF2 build files (Milestone 5)</li><li>3286085 Add output and temp dir params to PDF2 (Milestone 5)</li><li>3293738 Use extensible pipeline task implementation (Milestone 6)</li><li>3271552 ${args.xsl.pdf} as an absolut path not supported (Milestone 6)</li><li>3033000 update to Apache FOP 1.0 release (Milestone 6) </li><li>3213324 Separate FOP/XEP/AXF stylesheets in PDF2 (Milestone 6) </li><li>3302779 Dependency extension points for PDF2 formatting (Milestone 7) </li><li>3304945 Allow setting local overrides with properties file (Milestone 7) </li><li>3190356 Pluginize DITA-OT base configuration files (Milestone 8)</li><li>3167087 Reduce static variable usage in Java code (Milestone 8)</li><li>3158929 Java clean-up (Milestone 8)</li><li>3194917 Change Java API to be more final and non-public (Milestone 8)</li><li>3197328 Refactor writers for cleaner XML serialization (Milestone 8) </li><li>3199755 Improve log integration (Milestone 8) </li><li>3296040 Refactor PDF2 build files (Milestone 8)</li><li>3306146 PDF2 stylesheet refactoring (Milestone 8)</li><li>3304447 Add support for selecting output format in PDF2 (Milestone 8)</li><li>3310476 Add plug-in ID and version syntax check (Milestone 8)</li><li>3309275 Warning reported by Apache FOP on any topic (Milestone 8)</li><li>3305843 Support list of tables/figures in PDF2 (Milestone 8)</li></ol>
+      </section><section>
+        <title>SourceForge Patches Added</title>
+        <ol id="ol_iky_svh_pc"><li>3123507 String concat in map2plugin (Milestone 1)</li><li>3110513 HTML XSLT uses complex casts (Milestone 1)</li><li>3097677 Add property to reload XHTML stylesheets (Milestone 1) </li><li>3106659 Added topicgroup elements to tocjs (Milestone 1)</li><li>3109051 RestoreEntity duplicates functionality (Milestone 1)</li><li>3107755 Configure templates with integrator properties (Milestone 1)</li><li>3142967 IndexTermReader leaves tab characters in terms (Milestone 1)</li><li>3140543 Add missing Commons Codec JAR into compile classpath for buildPackage.xml
+            (Milestone 1)</li><li>3087664 Clean plugin configuration parser (Milestone 1)</li><li>3145258 Plug-in integrator code clean-up (Milestone 2)</li><li>3147226 Use common directory layout for Junit (Milestone 2) </li><li>3062765 Fix unit test file paths to be platform dependent (Milestone 2)</li><li>3164523 Refactor platform Java code (Milestone 2)</li><li>3160801 Improve unit test coverage (Milestone 8)</li><li>3189026 Avoid strings where other types are more appropriate (Milestone 8)</li></ol>
+      </section><section>
+        <title>SourceForge Bugs Fixed</title>
+        <ol id="ol_zly_svh_pc"><li>3114411 keyref links don't work for HTML Help (Milestone 1)</li><li>3126578 Chunking Issues in DITA 1.5.1 (Milestone 1)</li><li>3109616 More Antenna House Path Problems (Milestone 1)</li><li>3155375 Incorrect way to specify recognized image extensions(Milestone 2)</li><li>3157890 Navtitle Construction Does not Preserve Markup (Milestone 2)</li><li>3155848 xml decl in ditaval file not closed properly (Milestone 2)</li><li>3162808 Chunking remaps in-file &lt;xref&gt; to invalid value (Milestone 2)</li><li>3164866 Upper letter estensions (Milestone 2)</li><li>3165307 Add boilerplate to Java files (Milestone 2)</li><li>2793836 CHM Index terms come out with extra spaces (Milestone 2)</li><li>3165762 Initializer XMLReader without modifying system variables (Milestone 2)</li><li>3175328 Imagemap alt text gets extra text (Milestone 2)</li><li>3085106 FO: topicmerge drops id on map/topicref without href. (Milestone 2)</li><li>3147328 Error in commons.xsl: getTopicrefShortdesc (Milestone 2)</li><li>3130724 Error in tables.xsl: fix-relcolwidth (Milestone 2)</li><li>3174906 Normalize Map and Bookmap titles for JavaHelp output (Milestone 3)</li><li>3178361 Conkeyref push fails when equivalent conref push succeeds (Milestone 3)</li><li>3180681 PDF2: Inconsistent template import / include. (Milestone 3)</li><li>3191701 Conref Push to Same File Fails (Milestone 3)</li><li>3191704 Push Replace Results in Pushed element Being removed (Milestone 3)</li><li>3189883 MapLinksReader should not be namespace aware (Milestone 3)</li><li>3164587 Warnings issued by Saxon 9.3.0.4 when publishing to PDF (Milestone 3)</li><li>3159001 Clean unit tests (Milestone 4) </li><li>3199985 @chunk : xrefs and links break (Milestone 4)</li><li>3206158 Inconsistent message DOTJ038W (Milestone 4)</li><li>3206373 Better handling of referenced SVG images (Milestone 4)</li><li>3279539 Out of memory error from move-meta module (Milestone 5)</li><li>3281108 Fallback to $locale when xml:lang value is wrong format (Milestone 5)</li><li>3286679 ODT output transform deletes too many files (Milestone 6)</li><li>3287609 Chunking rewrites image based on map directory (Milestone 6)</li><li>3288639 Conref code improperly generalizes map domain elements (Milestone 6)</li><li>3294295 PDF2 indexing and I18N fails with missing languages (Milestone 6)</li><li>3294864 tocjs-demo: tocjs.ditamap is referencing a missing file (Milestone 6)</li><li>3297930 PDF2: axf specific templates can't be overridden. (Milestone 7) </li><li>2001271 DITA-OT documentation wants Ant 1.6.5 (Milestone 8) </li><li>3136773 Incorrect version reported in log file (Milestone 8) </li><li>3260746 Topichead not processed the same as title-only topic (Milestone 8) </li><li>3315029 Garbled character problem in Japanese HTMLHelp (Milestone 8) </li><li>3308775 Keyref map in grandparent folder fails (Milestone 8) </li></ol>
+      </section></refbody></reference>

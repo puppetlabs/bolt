@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA learningBase</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA learningBase                                
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identfier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Learning Base//EN"
+      Delivered as file "learningBase.mod"                        
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for Learning Base                     
+                                                             
+ORIGINAL CREATION DATE:                                      
+            May 2007                                         
+                                                             
+            (C) Copyright OASIS Open 2007, 2009.             
+            All Rights Reserved.                             
+                                                             
+ CHANGE LOG:                                                 
+                                                             
+   Sept 2009: WEK: Make learningBasebody optional per        
+   TC decision.                                              
+=============================================================  </headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>learningBase</moduleShortName>
+      <modulePublicIds>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Learning Base//EN</dtdEnt>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Learning Base//EN</dtdMod>
+        <xsdMod>urn:oasis:names:tc:dita:spec:learning:xsd:learningBaseMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:spec:learning:xsd:learningBaseGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:spec:learning:rnc:learningBaseMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:spec:learning:rng:learningBaseMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic learningBase+learningInteractionBase-d+learningInteractionBase2)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="learningBasebody">
+      <ref name="learningBasebody.element"/>
+    </define>
+    <define name="lcIntro">
+      <ref name="lcIntro.element"/>
+    </define>
+    <define name="lcObjectives">
+      <ref name="lcObjectives.element"/>
+    </define>
+    <define name="lcObjectivesStem">
+      <ref name="lcObjectivesStem.element"/>
+    </define>
+    <define name="lcObjectivesGroup">
+      <ref name="lcObjectivesGroup.element"/>
+    </define>
+    <define name="lcObjective">
+      <ref name="lcObjective.element"/>
+    </define>
+    <define name="lcAudience">
+      <ref name="lcAudience.element"/>
+    </define>
+    <define name="lcDuration">
+      <ref name="lcDuration.element"/>
+    </define>
+    <define name="lcTime">
+      <ref name="lcTime.element"/>
+    </define>
+    <define name="lcPrereqs">
+      <ref name="lcPrereqs.element"/>
+    </define>
+    <define name="lcSummary">
+      <ref name="lcSummary.element"/>
+    </define>
+    <define name="lcNextSteps">
+      <ref name="lcNextSteps.element"/>
+    </define>
+    <define name="lcReview">
+      <ref name="lcReview.element"/>
+    </define>
+    <define name="lcResources">
+      <ref name="lcResources.element"/>
+    </define>
+    <define name="lcChallenge">
+      <ref name="lcChallenge.element"/>
+    </define>
+    <define name="lcInstruction">
+      <ref name="lcInstruction.element"/>
+    </define>
+    <define name="lcInteraction">
+      <ref name="lcInteraction.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>TOPIC NESTING OVERRIDES</a:documentation>
+    <define name="learningBase-info-types">
+      <ref name="info-types"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div><a:documentation>LONG NAME: Learning Base</a:documentation>
+      <define name="learningBase.content">
+        <ref name="title"/>
+        <optional>
+          <ref name="titlealts"/>
+        </optional>
+        <optional>
+          <choice>
+            <ref name="shortdesc"/>
+            <ref name="abstract"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <optional>
+          <ref name="learningBasebody"/>
+        </optional>
+        <optional>
+          <ref name="related-links"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="learningBase-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="learningBase.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="learningBase.element">
+        <element name="learningBase" dita:longName="Learning Base">
+          <a:documentation>The learningBase topic type is not used to deliver any actual learning
+        content, but instead provides a set of common elements for use in the other more specific
+        learning content types: learningOverview,learningContent, learningSummary,
+        learningAssessment, and learningPlan.</a:documentation>
+          <ref name="learningBase.attlist"/>
+          <ref name="learningBase.content"/>
+        </element>
+      </define>
+      <define name="learningBase.attlist" combine="interleave">
+        <ref name="learningBase.attributes"/>
+        <ref name="arch-atts"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Learning base body</a:documentation>
+      <define name="learningBasebody.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="lcAudience"/>
+            <ref name="lcChallenge"/>
+            <ref name="lcDuration"/>
+            <ref name="lcInstruction"/>
+            <ref name="lcInteraction"/>
+            <ref name="lcIntro"/>
+            <ref name="lcNextSteps"/>
+            <ref name="lcObjectives"/>
+            <ref name="lcPrereqs"/>
+            <ref name="lcResources"/>
+            <ref name="lcReview"/>
+            <ref name="lcSummary"/>
+            <ref name="section"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="learningBasebody.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="learningBasebody.element">
+        <element name="learningBasebody" dita:longName="Learning base body">
+          <a:documentation>The &lt;learningBasebody> element is the main body-level element in a
+        learningBase topic. The learningBase topic provides a set of base elements for use in the
+        other specialized learning types. It is not generally intended for creating actual content.
+        As such, each of the body sections in learningBase are optional.</a:documentation>
+          <ref name="learningBasebody.attlist"/>
+          <ref name="learningBasebody.content"/>
+        </element>
+      </define>
+      <define name="learningBasebody.attlist" combine="interleave">
+        <ref name="learningBasebody.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Learning intro section</a:documentation>
+      <define name="lcIntro.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcIntro.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcIntro.element">
+        <element name="lcIntro" dita:longName="Learning intro section">
+          <a:documentation>The &lt;lcIntro> provides a detailed introduction and description of the
+        content to be delivered, in cases where the &lt;shortdesc> is not adequate to fully describe
+        the content. It may also include instructor notes.</a:documentation>
+          <ref name="lcIntro.attlist"/>
+          <ref name="lcIntro.content"/>
+        </element>
+      </define>
+      <define name="lcIntro.attlist" combine="interleave">
+        <ref name="lcIntro.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Learning objectives section</a:documentation>
+      <define name="lcObjectives.content">
+        <optional>
+          <ref name="title"/>
+        </optional>
+        <optional>
+          <ref name="lcObjectivesStem"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="lcObjectivesGroup"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcObjectives.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcObjectives.element">
+        <element name="lcObjectives" dita:longName="Learning objectives section">
+          <a:documentation>The &lt;lcObjectives> lists or describes the learning
+        goals.</a:documentation>
+          <ref name="lcObjectives.attlist"/>
+          <ref name="lcObjectives.content"/>
+        </element>
+      </define>
+      <define name="lcObjectives.attlist" combine="interleave">
+        <ref name="lcObjectives.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: </a:documentation>
+      <define name="lcObjectivesStem.content">
+        <zeroOrMore>
+          <ref name="ph.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcObjectivesStem.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcObjectivesStem.element">
+        <element name="lcObjectivesStem" dita:longName="Learning objectives stem">
+          <a:documentation>The &lt;lcObjectivesStem> provides a leading sentence to introduce a list of
+        learning objectives.</a:documentation>
+          <ref name="lcObjectivesStem.attlist"/>
+          <ref name="lcObjectivesStem.content"/>
+        </element>
+      </define>
+      <define name="lcObjectivesStem.attlist" combine="interleave">
+        <ref name="lcObjectivesStem.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Learning objectives group</a:documentation>
+      <define name="lcObjectivesGroup.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="lcObjective"/>
+        </oneOrMore>
+      </define>
+      <define name="lcObjectivesGroup.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcObjectivesGroup.element">
+        <element name="lcObjectivesGroup" dita:longName="Learning objectives group">
+          <a:documentation>The &lt;lcObjectivesGroup> contains a list of one or more learning
+        objectives.</a:documentation>
+          <ref name="lcObjectivesGroup.attlist"/>
+          <ref name="lcObjectivesGroup.content"/>
+        </element>
+      </define>
+      <define name="lcObjectivesGroup.attlist" combine="interleave">
+        <ref name="lcObjectivesGroup.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Learning objective</a:documentation>
+      <define name="lcObjective.content">
+        <zeroOrMore>
+          <ref name="ph.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcObjective.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcObjective.element">
+        <element name="lcObjective" dita:longName="Learning objective">
+          <a:documentation>The &lt;lcObjective> describes a single learning objective.</a:documentation>
+          <ref name="lcObjective.attlist"/>
+          <ref name="lcObjective.content"/>
+        </element>
+      </define>
+      <define name="lcObjective.attlist" combine="interleave">
+        <ref name="lcObjective.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Audience</a:documentation>
+      <define name="lcAudience.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcAudience.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcAudience.element">
+        <element name="lcAudience" dita:longName="Audience">
+          <a:documentation>The &lt;lcAudience> describes characteristics of the learners who take the
+        instruction.</a:documentation>
+          <ref name="lcAudience.attlist"/>
+          <ref name="lcAudience.content"/>
+        </element>
+      </define>
+      <define name="lcAudience.attlist" combine="interleave">
+        <ref name="lcAudience.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Duration</a:documentation>
+      <define name="lcDuration.content">
+        <optional>
+          <ref name="title"/>
+        </optional>
+        <optional>
+          <ref name="lcTime"/>
+        </optional>
+      </define>
+      <define name="lcDuration.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcDuration.element">
+        <element name="lcDuration" dita:longName="Duration">
+          <a:documentation>The &lt;lcDuration> provides an estimated duration for the learning
+        activity.</a:documentation>
+          <ref name="lcDuration.attlist"/>
+          <ref name="lcDuration.content"/>
+        </element>
+      </define>
+      <define name="lcDuration.attlist" combine="interleave">
+        <ref name="lcDuration.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Time to complete</a:documentation>
+      <define name="lcTime.content">
+        <zeroOrMore>
+          <ref name="ph.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcTime.attributes">
+        <optional>
+          <attribute name="name" a:defaultValue="lcTime"/>
+        </optional>
+        <optional>
+          <attribute name="datatype" a:defaultValue="TimeValue"/>
+        </optional>
+        <attribute name="value"/>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcTime.element">
+        <element name="lcTime" dita:longName="Time to complete">
+          <a:documentation>The &lt;lcTime> specifies the time expected to complete an
+        activity.</a:documentation>
+          <ref name="lcTime.attlist"/>
+          <ref name="lcTime.content"/>
+        </element>
+      </define>
+      <define name="lcTime.attlist" combine="interleave">
+        <ref name="lcTime.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Prerequisites</a:documentation>
+      <define name="lcPrereqs.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcPrereqs.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcPrereqs.element">
+        <element name="lcPrereqs" dita:longName="Prerequisites">
+          <a:documentation>The &lt;lcPrereqs> describes the knowledge, experience, or other
+        prerequisites needed to complete the content.</a:documentation>
+          <ref name="lcPrereqs.attlist"/>
+          <ref name="lcPrereqs.content"/>
+        </element>
+      </define>
+      <define name="lcPrereqs.attlist" combine="interleave">
+        <ref name="lcPrereqs.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Summary section</a:documentation>
+      <define name="lcSummary.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcSummary.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcSummary.element">
+        <element name="lcSummary" dita:longName="Summary section">
+          <a:documentation>The &lt;lcSummary> provides a textual summary that describes the main
+        learning goals and lessons learned.</a:documentation>
+          <ref name="lcSummary.attlist"/>
+          <ref name="lcSummary.content"/>
+        </element>
+      </define>
+      <define name="lcSummary.attlist" combine="interleave">
+        <ref name="lcSummary.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Next steps section</a:documentation>
+      <define name="lcNextSteps.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcNextSteps.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcNextSteps.element">
+        <element name="lcNextSteps" dita:longName="Next steps section">
+          <a:documentation>The &lt;lcNextSteps> suggests next steps to reinforce the knowledge
+        learned.</a:documentation>
+          <ref name="lcNextSteps.attlist"/>
+          <ref name="lcNextSteps.content"/>
+        </element>
+      </define>
+      <define name="lcNextSteps.attlist" combine="interleave">
+        <ref name="lcNextSteps.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Review sections</a:documentation>
+      <define name="lcReview.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcReview.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcReview.element">
+        <element name="lcReview" dita:longName="Review sections">
+          <a:documentation>The &lt;lcReview> provides a review of the main points.</a:documentation>
+          <ref name="lcReview.attlist"/>
+          <ref name="lcReview.content"/>
+        </element>
+      </define>
+      <define name="lcReview.attlist" combine="interleave">
+        <ref name="lcReview.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Related resources</a:documentation>
+      <define name="lcResources.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcResources.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcResources.element">
+        <element name="lcResources" dita:longName="Related resources">
+          <a:documentation>The &lt;lcResources> provides a list of related resources and information
+        about them, such as related articles or samples on the web. </a:documentation>
+          <ref name="lcResources.attlist"/>
+          <ref name="lcResources.content"/>
+        </element>
+      </define>
+      <define name="lcResources.attlist" combine="interleave">
+        <ref name="lcResources.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Learning challenge</a:documentation>
+      <define name="lcChallenge.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcChallenge.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcChallenge.element">
+        <element name="lcChallenge" dita:longName="Learning challenge">
+          <a:documentation>The &lt;lcChallenge> refers to what it is that you want the student to
+        practice. For example, if you're studying network diagrams, and challenge might be &#34;see
+        if you can put this network into its proper sequence&#34; or &#34;see if you understand this
+        network flow&#34;.</a:documentation>
+          <ref name="lcChallenge.attlist"/>
+          <ref name="lcChallenge.content"/>
+        </element>
+      </define>
+      <define name="lcChallenge.attlist" combine="interleave">
+        <ref name="lcChallenge.attributes"/>
+      </define>
+
+    </div>
+    <div><a:documentation>LONG NAME: Learning instruction section</a:documentation>
+      <define name="lcInstruction.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="lcInstruction.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcInstruction.element">
+        <element name="lcInstruction" dita:longName="Learning instruction section">
+          <a:documentation>The &lt;lcInstruction> describes the specifics of a learning
+        activity.</a:documentation>
+          <ref name="lcInstruction.attlist"/>
+          <ref name="lcInstruction.content"/>
+        </element>
+      </define>
+      <define name="lcInstruction.attlist" combine="interleave">
+        <ref name="lcInstruction.attributes"/>
+      </define>
+    </div>
+    <div><a:documentation>LONG NAME: Interactions</a:documentation>
+      <define name="lcInteraction.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="lcInteractionBase"/>
+            <ref name="lcInteractionBase2" dita:since="1.3"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="lcInteraction.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="lcInteraction.element">
+        <element name="lcInteraction" dita:longName="Interactions">
+          <a:documentation>The &lt;lcInteraction> is a wrapper element for all the interactions of the
+        assessment. The interactions themselves are based on a basic set of assessment types
+        implemented as a DITA domain specialization.</a:documentation>
+          <ref name="lcInteraction.attlist"/>
+          <ref name="lcInteraction.content"/>
+        </element>
+      </define>
+      <define name="lcInteraction.attlist" combine="interleave">
+        <ref name="lcInteraction.attributes"/>
+      </define>
+    </div>
+  </div>
+
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="learningBase.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic learningBase/learningBase "/>
+      </optional>
+    </define>
+    <define name="learningBasebody.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/body learningBase/learningBasebody "/>
+      </optional>
+    </define>
+    <define name="lcIntro.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcIntro "/>
+      </optional>
+    </define>
+    <define name="lcObjectives.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcObjectives "/>
+      </optional>
+    </define>
+    <define name="lcObjectivesStem.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ph learningBase/lcObjectivesStem "/>
+      </optional>
+    </define>
+    <define name="lcObjectivesGroup.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ul learningBase/lcObjectivesGroup "/>
+      </optional>
+    </define>
+    <define name="lcObjective.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/li learningBase/lcObjective "/>
+      </optional>
+    </define>
+    <define name="lcAudience.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcAudience "/>
+      </optional>
+    </define>
+    <define name="lcDuration.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcDuration "/>
+      </optional>
+    </define>
+    <define name="lcTime.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/data learningBase/lcTime "/>
+      </optional>
+    </define>
+    <define name="lcPrereqs.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcPrereqs "/>
+      </optional>
+    </define>
+    <define name="lcSummary.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcSummary "/>
+      </optional>
+    </define>
+    <define name="lcNextSteps.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcNextSteps "/>
+      </optional>
+    </define>
+    <define name="lcReview.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcReview "/>
+      </optional>
+    </define>
+    <define name="lcResources.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcResources "/>
+      </optional>
+    </define>
+    <define name="lcChallenge.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcChallenge "/>
+      </optional>
+    </define>
+    <define name="lcInstruction.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcInstruction "/>
+      </optional>
+    </define>
+    <define name="lcInteraction.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section learningBase/lcInteraction "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

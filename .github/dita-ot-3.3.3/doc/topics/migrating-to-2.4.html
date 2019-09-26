@@ -1,0 +1,100 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="In DITA-OT 2.4, the HTML5 transformation was refactored as an independent plug-in that no longer depends on the XHTML plug-in."><meta name="DC.subject" content="deprecated features, classes, .notetitle, GitHub"><meta name="keywords" content="deprecated features, classes, .notetitle, GitHub"><meta name="DC.relation" scheme="URI" content="../topics/migration.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="migrating-to-2.4"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Migrating to release 2.4</title></head><body id="migrating-to-2.4"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a><ul><li><a href="../topics/migrating-to-3.3.html">To 3.3</a></li><li><a href="../topics/migrating-to-3.2.html">To 3.2</a></li><li><a href="../topics/migrating-to-3.1.html">To 3.1</a></li><li><a href="../topics/migrating-to-3.0.html">To 3.0</a></li><li><a href="../topics/migrating-to-2.5.html">To 2.5</a></li><li class="active"><a href="../topics/migrating-to-2.4.html">To 2.4</a></li><li><a href="../topics/migrating-to-2.3.html">To 2.3</a></li><li><a href="../topics/migrating-to-2.2.html">To 2.2</a></li><li><a href="../topics/migrating-to-2.1.html">To 2.1</a></li><li><a href="../topics/migrating-to-2.0.html">To 2.0</a></li><li><a href="../topics/migrating-to-1.8.html">To 1.8</a></li><li><a href="../topics/migrating-to-1.7.html">To 1.7</a></li><li><a href="../topics/migrating-to-1.6.html">To 1.6</a></li><li><a href="../topics/migrating-to-1.5.4.html">To 1.5.4</a></li></ul></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+
+  <h1 class="title topictitle1" id="ariaid-title1">Migrating to release 2.4</h1>
+  
+
+  
+  
+  
+
+  <div class="body refbody"><p class="shortdesc">In DITA-OT 2.4, the <span class="keyword option">HTML5</span> transformation was refactored as an independent plug-in that no
+    longer depends on the <span class="keyword option">XHTML</span> plug-in. </p>
+    <section class="section">
+      <div class="note note note_note"><span class="note__title">Note:</span> This topic provides a summary of changes in DITA-OT 2.4 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the
+        <a class="xref" href="https://www.dita-ot.org/2.4/release-notes/" target="_blank">DITA-OT 2.4 Release Notes</a>.</div>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">HTML5</h2>
+      
+      <ul class="ul">
+        <li class="li">
+          <div class="div" id="migrating-to-2.4__24-html5-split">
+            <p class="p">The <span class="keyword option">HTML5</span> transformation introduced in release 2.0 as part of the <span class="keyword option">XHTML</span>
+              plug-in was moved to a separate <span class="keyword option">HTML5</span> plug-in in release 2.2, but that version of the
+                <span class="keyword option">HTML5</span> transformation still depended on the <span class="keyword option">XHTML</span> plug-in for certain
+              common processing.</p>
+            <p class="p">In release 2.4, all dependencies between <span class="keyword option">HTML5</span> and <span class="keyword option">XHTML</span> have been
+              removed to ensure that HTML5 processing can be further refactored in the future without affecting XHTML
+              output, or other HTML-based transformations such as <span class="keyword option">eclipsehelp</span>,
+                <span class="keyword option">htmlhelp</span> or <span class="keyword option">javahelp</span>.</p>
+          </div>
+          <p class="p">Customizations that extended the previous HTML5 output under the <span class="keyword option">XHTML</span> plug-in (as
+            provided in releases 2.0 and 2.1) or the <span class="keyword option">HTML5</span> plug-in that shipped with release 2.2 will
+            need to be refactored to build on the new HTML5 plug-in.</p></li>
+        <li class="li">
+          <p class="p">Note title processing was revised in release 2.2 to include a common <code class="ph codeph">note__title</code> class for
+            note elements of all types. The legacy <code class="ph codeph"><var class="keyword varname">{$type}</var>title</code> classes (such as
+              <code class="ph codeph">.notetitle</code>, <code class="ph codeph">.cautiontitle</code>, <code class="ph codeph">.tiptitle</code>, etc.) were
+            included in release 2.2 for backwards compatibility, but have now been removed in release 2.4.</p>
+          <p class="p">Stylesheets that apply formatting overrides to note titles should be revised to replace the deprecated
+            class selectors with the equivalent descendant selectors, for example:</p>
+          <ul class="ul">
+            <li class="li"><code class="ph codeph">.note_note .note__title</code></li>
+            <li class="li"><code class="ph codeph">.note_caution .note__title</code></li>
+            <li class="li"><code class="ph codeph">.note_tip .note__title</code></li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+    <section class="section" id="migrating-to-2.4__24-legacy-plugin-removal"><h2 class="title sectiontitle">Legacy plug-ins removed</h2>
+      
+      <div class="div div-index">
+        
+        
+        
+        
+        
+        
+        
+                
+      </div>
+      <p class="p">DITA-OT 2.4 no longer includes the following legacy transformation plug-ins in the default distribution:</p>
+      <table class="table table-hover frame-none"><caption><span class="table--title-label">Table 1. </span><span class="title">Legacy plug-ins</span></caption><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="thead">
+            <tr class="row">
+              <th class="entry colsep-0 rowsep-1" id="migrating-to-2.4__24-legacy-plugin-removal__entry__1">Plug-in </th>
+              <th class="entry colsep-0 rowsep-1" id="migrating-to-2.4__24-legacy-plugin-removal__entry__2">Source code location</th>
+            </tr>
+          </thead><tbody class="tbody">
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="migrating-to-2.4__24-legacy-plugin-removal__entry__1">DocBook</td>
+              <td class="entry colsep-0 rowsep-1" headers="migrating-to-2.4__24-legacy-plugin-removal__entry__2">
+                <a class="xref" href="https://github.com/dita-ot/org.dita.docbook" target="_blank">https://github.com/dita-ot/org.dita.docbook</a></td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="migrating-to-2.4__24-legacy-plugin-removal__entry__1">Eclipse Content</td>
+              <td class="entry colsep-0 rowsep-1" headers="migrating-to-2.4__24-legacy-plugin-removal__entry__2">
+                <a class="xref" href="https://github.com/dita-ot/org.dita.eclipsecontent" target="_blank">https://github.com/dita-ot/org.dita.eclipsecontent</a></td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="migrating-to-2.4__24-legacy-plugin-removal__entry__1">OpenDocument Text</td>
+              <td class="entry colsep-0 rowsep-1" headers="migrating-to-2.4__24-legacy-plugin-removal__entry__2">
+                <a class="xref" href="https://github.com/dita-ot/org.dita.odt" target="_blank">https://github.com/dita-ot/org.dita.odt</a></td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="migrating-to-2.4__24-legacy-plugin-removal__entry__1">Word RTF</td>
+              <td class="entry colsep-0 rowsep-1" headers="migrating-to-2.4__24-legacy-plugin-removal__entry__2">
+                <a class="xref" href="https://github.com/dita-ot/org.dita.wordrtf" target="_blank">https://github.com/dita-ot/org.dita.wordrtf</a></td>
+            </tr>
+          </tbody></table>
+      <div class="note note note_note"><span class="note__title">Note:</span> If necessary, legacy plug-ins may be re-installed from earlier DITA-OT distributions, but they are no longer
+        actively maintained or supported by the core toolkit committers. The source code is available on GitHub for
+        anyone interested in maintaining the plug-ins for use with future toolkit versions.</div>
+    </section>
+
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/migration.html" title="If you have XSL transformation overrides, plug-ins or other customizations written prior to DITA-OT 3.3, you may need to make changes to ensure your overrides work properly with the latest toolkit versions.">Migrating customizations</a></div></div></nav></article></main></body></html>

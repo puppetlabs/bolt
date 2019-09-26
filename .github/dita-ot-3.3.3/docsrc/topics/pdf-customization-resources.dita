@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="ID">
+  <title>Resources for custom PDF plug-ins</title>
+  <titlealts>
+    <navtitle>Custom PDF plug-in resources</navtitle>
+  </titlealts>
+  <shortdesc>There are several external resources that can help you generate and refine custom PDF plug-ins for DITA
+    Open Toolkit.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>RenderX<indexterm>plugin generator</indexterm></indexterm>
+        <indexterm>Antenna House<indexterm>plugin generator</indexterm></indexterm>
+        <indexterm>Apache FOP<indexterm>plugin generator</indexterm></indexterm>
+        <indexterm>Jarno Elovirta</indexterm>
+        <indexterm>PDF<indexterm>plugin generator</indexterm></indexterm>
+        <indexterm>fonts<indexterm>PDF plugin generator</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section id="pdf-plugin-generator">
+      <title>PDF Plugin Generator</title>
+      <p>This online tool, developed and maintained by Jarno Elovirta, enables you to generate a PDF customization
+        plug-in automatically.</p>
+      <p>The application at <xref href="http://dita-generator.elovirta.com/" format="html" scope="external"
+          >dita-generator.elovirta.com</xref> walks you through the process of creating a custom PDF plug-in and allows
+        you to adjust a variety of settings for your PDF output. For example, you can:</p>
+      <ul>
+        <li>Define the target environment, selecting from the most current and two previous versions of DITA-OT</li>
+        <li>Select the XSL formatting engine (FOP, Antenna House Formatter, or RenderX XEP)</li>
+        <li>Specify page size, columns, and margins</li>
+        <li>Select from (limited) options for headers and footers</li>
+        <li>Specify layout options for chapters</li>
+        <li>Select formatting for the following publication components:
+          <ul>
+            <li>Normal text</li>
+            <li>Headings (levels one through four)</li>
+            <li>Titles for sections and examples</li>
+            <li>Tables and figures</li>
+            <li>Notes and examples</li>
+            <li>Lists (unordered, ordered, and definition)</li>
+            <li>Code blocks and pre-formatted text</li>
+            <li>Inline elements such as links and trademarks</li>
+          </ul><draft-comment author="Kristen Eberlein" time="13 February 2016">
+            <p>Given the technical level of our audience here, should we list DITA elements rather than the generic
+              categories?</p>
+          </draft-comment>
+          <p>For each component, you can specify: </p>
+          <ul>
+            <li>Font family, size, weight, and style</li>
+            <li>Color and background color</li>
+            <li>Alignment, indentation, spacing, and padding</li>
+          </ul></li>
+      </ul>
+      <note type="tip">The PDF Plugin Generator should be your first stop as you start developing a brand-new PDF
+        customization plug-in.</note>
+    </section>
+
+    <section conkeyref="reusable-components/dita-for-print"/>
+
+    <section conkeyref="reusable-components/dita-for-practitioners"/>
+
+  </refbody>
+</reference>

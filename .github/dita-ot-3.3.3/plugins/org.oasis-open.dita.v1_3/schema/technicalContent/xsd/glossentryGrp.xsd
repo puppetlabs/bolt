@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Glossary                                    -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Glossary Entry//EN"          -->
+<!--      Delivered as file "glossentry.mod"                            -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Define elements and specialization atttributes   -->
+<!--            for Glossary topics                              -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            June 2006                                        -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2006, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       -->
+<!--   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  -->
+<!--   2008.02.12 RDA: Expand glossary for DITA 1.2               -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--   2009.09.21 WEK: Renamed glossentry.mod                    -->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:group name="glossentry">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossentry"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossterm">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossterm"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossdef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossdef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossBody">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossBody"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossAbbreviation">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossAbbreviation"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossAcronym">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossAcronym"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossShortForm">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossShortForm"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossSynonym">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossSynonym"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossPartOfSpeech">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossPartOfSpeech"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossStatus">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossStatus"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossProperty">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossProperty"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossSurfaceForm">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossSurfaceForm"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossUsage">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossUsage"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossScopeNote">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossScopeNote"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossSymbol">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossSymbol"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossAlt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossAlt"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossAlternateFor">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossAlternateFor"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+</xs:schema>

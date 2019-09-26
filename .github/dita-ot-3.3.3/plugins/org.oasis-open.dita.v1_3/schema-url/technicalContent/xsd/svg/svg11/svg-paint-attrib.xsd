@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg11.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:simpleType name="Paint.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      a 'fill' or 'stroke' property/attribute value: &lt;paint&gt;
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="StrokeDashArrayValue.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      'stroke-dasharray' property/attribute value
+      (e.g., 'none', list of &lt;number&gt;s)
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="StrokeDashOffsetValue.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      'stroke-dashoffset' property/attribute value (e.g., 'none', &lt;legnth&gt;)
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="StrokeMiterLimitValue.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      'stroke-miterlimit' property/attribute value (e.g., &lt;number&gt;)
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="StrokeWidthValue.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      'stroke-width' property/attribute value (e.g., &lt;length&gt;)
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:attributeGroup name="SVG.fill.attrib">
+    <xs:attribute name="fill" type="Paint.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.fill-rule.attrib">
+    <xs:attribute name="fill-rule" type="svg:ClipFillRule.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.stroke.attrib">
+    <xs:attribute name="stroke" type="Paint.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.stroke-dasharray.attrib">
+    <xs:attribute name="stroke-dasharray" type="StrokeDashArrayValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.stroke-dashoffset.attrib">
+    <xs:attribute name="stroke-dashoffset" type="StrokeDashOffsetValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.stroke-linecap.attrib">
+    <xs:attribute name="stroke-linecap">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="butt"/>
+          <xs:enumeration value="round"/>
+          <xs:enumeration value="square"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.stroke-linejoin.attrib">
+    <xs:attribute name="stroke-linejoin">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="miter"/>
+          <xs:enumeration value="round"/>
+          <xs:enumeration value="bevel"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.stroke-miterlimit.attrib">
+    <xs:attribute name="stroke-miterlimit" type="StrokeMiterLimitValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.stroke-width.attrib">
+    <xs:attribute name="stroke-width" type="StrokeWidthValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Paint.attrib">
+    <xs:attributeGroup ref="SVG.fill.attrib"/>
+    <xs:attributeGroup ref="SVG.fill-rule.attrib"/>
+    <xs:attributeGroup ref="SVG.stroke.attrib"/>
+    <xs:attributeGroup ref="SVG.stroke-dasharray.attrib"/>
+    <xs:attributeGroup ref="SVG.stroke-dashoffset.attrib"/>
+    <xs:attributeGroup ref="SVG.stroke-linecap.attrib"/>
+    <xs:attributeGroup ref="SVG.stroke-linejoin.attrib"/>
+    <xs:attributeGroup ref="SVG.stroke-miterlimit.attrib"/>
+    <xs:attributeGroup ref="SVG.stroke-width.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.color.attrib">
+    <xs:attribute name="color" type="svg:Color.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.color-interpolation.attrib">
+    <xs:attribute name="color-interpolation">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="auto"/>
+          <xs:enumeration value="sRGB"/>
+          <xs:enumeration value="linearRGB"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.color-rendering.attrib">
+    <xs:attribute name="color-rendering">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="auto"/>
+          <xs:enumeration value="optimizeSpeed"/>
+          <xs:enumeration value="optimizeQuality"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Color.attrib">
+    <xs:attributeGroup ref="SVG.color.attrib"/>
+    <xs:attributeGroup ref="SVG.color-interpolation.attrib"/>
+    <xs:attributeGroup ref="SVG.color-rendering.attrib"/>
+  </xs:attributeGroup>
+</xs:schema>

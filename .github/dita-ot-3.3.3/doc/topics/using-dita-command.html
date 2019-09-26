@@ -1,0 +1,237 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="You can generate output using the dita command-line tool. Build parameters can be specified on the command line or with .properties files."><meta name="DC.subject" content="macOS, command, dita, Linux, Windows, using"><meta name="keywords" content="macOS, command, dita, Linux, Windows, using"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="using-command-line-tool"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Building output using the dita command</title></head><body id="using-command-line-tool"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Building output using the <span class="keyword cmdname">dita</span> command</h1>
+  
+  
+  <div class="body taskbody"><p class="shortdesc">You can generate output using the <span class="keyword cmdname">dita</span> command-line tool. Build parameters can be
+    specified on the command line or with <span class="ph filepath">.properties</span> files.</p>
+    <section class="section context"><div class="tasklabel"><h2 class="sectiontitle tasklabel">About this task</h2></div>The DITA-OT client is a command-line tool with no graphical user interface. To verify
+      that your installation works correctly, you can build output using the sample files included in the distribution
+      package.</section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">Open a terminal window by typing the following in the search bar:</span>
+        <div class="itemgroup info">
+          <ul class="ul">
+            <li class="li">On Linux and macOS, type <kbd class="ph userinput">Terminal</kbd>.</li>
+            <li class="li">On Windows, type <kbd class="ph userinput">Command Prompt</kbd>.</li>
+          </ul>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">At the command-line prompt, enter the following command:</span>
+        <div class="itemgroup info"><pre class="pre codeblock"><code><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span> <span class="keyword parmname">--input</span>=<var class="keyword varname">input-file</var> <span class="keyword parmname">--format</span>=<var class="keyword varname">format</var> <span class="ph">[<var class="keyword varname">options</var>]</span></code></pre>
+          <p class="p">where:</p>
+          <ul class="ul">
+            <li class="li"><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var></span> is the DITA-OT installation directory.</li><li class="li"><var class="keyword varname">input-file</var> is the DITA map or DITA file that you want to
+              process.</li><li class="li">
+              <p class="p" id="using-command-line-tool__d12e189">
+                <var class="keyword varname">format</var> is the output format (transformation type).
+                This argument corresponds to the common parameter
+                <span class="keyword parmname">transtype</span>.
+                Use the same values as for the <span class="keyword parmname">transtype</span> build
+                parameter, for example <span class="keyword option">html5</span> or <span class="keyword option">pdf</span>.
+              </p>
+            </li>
+            <li class="li"><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var></span> is the DITA-OT installation directory.</li><li class="li"><var class="keyword varname">input-file</var> is the DITA map or DITA file that you want to
+              process.</li>
+            <li class="li">
+              <p class="p">
+                <var class="keyword varname">format</var> is the output format (transformation type).
+                This argument corresponds to the common parameter
+                <span class="keyword parmname">transtype</span>.
+                Use the same values as for the <span class="keyword parmname">transtype</span> build
+                parameter, for example <span class="keyword option">html5</span> or <span class="keyword option">pdf</span>.
+              </p>
+              <div class="p" id="using-command-line-tool__d12e228">You can create plug-ins to add new output formats; by default, the following values are
+                available:
+                
+                <ul class="ul">
+                  <li class="li"><span class="keyword option">dita</span></li>
+                  <li class="li"><span class="keyword option">eclipsehelp</span></li>
+                  <li class="li"><span class="keyword option">html5</span></li>
+                  <li class="li"><span class="keyword option">htmlhelp</span></li>
+                  <li class="li"><span class="keyword option">markdown</span>, <span class="keyword option">markdown_gitbook</span>, and
+                    <span class="keyword option">markdown_github</span></li>
+                  <li class="li"><span class="keyword option">pdf</span></li>
+                  <li class="li"><span class="keyword option">tocjs</span></li>
+                  <li class="li"><span class="keyword option">troff</span></li>
+                  <li class="li"><span class="keyword option">xhtml</span></li>
+                </ul>
+                <div class="note tip note_tip"><span class="note__title">Tip:</span> See <a class="xref" href="../resources/../topics/output-formats.html" title="DITA Open Toolkit ships with several core transformations that generate different output formats from DITA content. Each transformation represents an implementation of the processing that is defined by OASIS in the DITA specification.">DITA-OT transformations (output formats)</a> for sample command line syntax and more information
+                  on each transformation.
+                </div>
+              </div>
+            </li>
+            <li class="li">[<var class="keyword varname">options</var>] include the following optional build parameters:
+              <dl class="dl parml">
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--output</span>=<var class="keyword varname">dir</var></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-o</span>
+            <var class="keyword varname">dir</var>
+          </dt>
+          <dd class="dd pd" id="using-command-line-tool__d12e314">
+            <p class="p">Specifies the path of the output directory; the path can be absolute or relative to the current
+              directory.</p>
+            <p class="p">This argument corresponds to the common parameter <span class="keyword parmname">output.dir</span>. By default, the output
+              is written to the <span class="ph filepath">out</span> subdirectory of the current directory.</p>
+          </dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--filter</span>=<var class="keyword varname">files</var>
+          </dt>
+          <dd class="dd pd">Specifies filter file(s) used to include, exclude, or flag content. </dd>
+          <dd class="dd pd ddexpand">
+            <p class="p">This argument corresponds to the common parameter <span class="keyword parmname">args.filter</span>. Relative paths are
+              resolved against the current directory and internally converted to absolute paths.</p>
+            <div class="note note note_note"><span class="note__title">Note:</span> 
+              <p class="p">To specify multiple filter files, use the system path separator character to delimit individual file
+                paths (semicolon ‘<code class="ph codeph">;</code>’ on Windows, and colon ‘<code class="ph codeph">:</code>’ on macOS and Linux) and
+                wrap the value in quotes:</p>
+              <p class="p"><code class="ph codeph">--filter="filter1.ditaval;filter2.ditaval;filter3.ditaval"</code></p>
+              <p class="p">DITAVAL files are evaluated in the order specified, so conditions specified in the first file take
+                precedence over matching conditions specified in later files, just as conditions at the start of a
+                DITAVAL document take precedence over matching conditions later in the same document.</p>
+            </div>
+          </dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--force</span>
+          </dt>
+          <dd class="dd pd">Force-install an existing plug-in.</dd>
+          <dd class="dd pd ddexpand">Passed as an additional option to the installation command:
+              <span class="keyword cmdname">dita</span>&nbsp;<span class="keyword parmname">--install</span>=<var class="keyword varname">plug-in-zip</var>&nbsp;<span class="keyword parmname">--force</span></dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--temp</span>=<var class="keyword varname">dir</var></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-t</span>
+            <var class="keyword varname">dir</var>
+          </dt>
+          <dd class="dd pd">Specifies the location of the temporary directory.</dd>
+          <dd class="dd pd ddexpand">This argument corresponds to the common parameter <span class="keyword parmname">dita.temp.dir</span>.</dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--verbose</span></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-v</span>
+          </dt>
+          <dd class="dd pd">Verbose logging prints additional information to the console, including directory settings, effective
+            values for Ant properties, input/output files, and informational messages to assist in troubleshooting.</dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--debug</span></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-d</span>
+          </dt>
+          <dd class="dd pd">Debug logging prints considerably more additional information. The debug log includes all information from
+            the verbose log, plus details on Java classes, additional Ant properties and overrides, preprocessing
+            filters, parameters, and stages, and the complete build sequence. Debug logging requires additional
+            resources and can slow down the build process, so it should only be enabled when further details are
+            required to diagnose problems.</dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--logfile</span>=<var class="keyword varname">file</var></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-l</span>
+            <var class="keyword varname">file</var>
+          </dt>
+          <dd class="dd pd">Write logging messages to a file.</dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--parameter</span>=<var class="keyword varname">value</var></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-D</span><var class="keyword varname">parameter</var>=<var class="keyword varname">value</var>
+          </dt>
+          <dd class="dd pd">Specify a value for a DITA-OT or Ant build parameter.
+            <p class="p">The GNU-style <span class="keyword parmname">--parameter</span>=<var class="keyword varname">value</var> form is only available for
+              parameters that are configured in the plug-in configuration file; the Java-style <span class="keyword parmname">-D</span>
+              form can also be used to specify additional non-configured parameters or set system properties.</p>
+            <p class="p">Parameters not implemented by the specified transformation type or referenced in a
+                <span class="ph filepath">.properties</span> file are ignored.</p><div class="note tip note_tip"><span class="note__title">Tip:</span> If you are building in different environments where the location of the input
+        files is not consistent, set <span class="keyword option">args.input.dir</span> with the <span class="keyword cmdname">dita</span> command and
+        reference its value with <code class="ph codeph">${args.input.dir}</code> in your <span class="ph filepath">.properties</span>
+        file.
+        
+        
+      </div></dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--propertyfile</span>=<var class="keyword varname">file</var>
+          </dt>
+          <dd class="dd pd">Use build parameters defined in the referenced <span class="ph filepath">.properties</span> file.
+            <p class="p">Build parameters specified on the command line override those set in the <span class="ph filepath">.properties</span>
+              file.</p></dd>
+        
+      </dl></li>
+          </ul></div>
+        <div class="itemgroup stepresult">
+          <p class="p">If processing is successful, nothing is printed in the terminal window. The built output is written to the
+            specified output directory (by default, in the <span class="ph filepath">out</span> subdirectory of the current
+            directory).</p>
+          <div class="note tip note_tip" id="using-command-line-tool__d12e590"><span class="note__title">Tip:</span> Add the absolute path for <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var></span><span class="ph filepath">/bin</span> to the <var class="keyword varname">PATH</var> environment variable to run the
+              <span class="keyword cmdname">dita</span> command from any location on the file system without typing the path.
+            
+          </div>
+        </div>
+      </li></ol></section>
+    <section class="example"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Example</h2></div>
+      <p class="p">Run from <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/docsrc/samples</span>, the following command generates
+        HTML5 output for the <span class="ph filepath">sequence.ditamap</span> file:</p>
+      <pre class="pre codeblock"><code><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span> <span class="keyword parmname">--input</span>=<span class="ph filepath">sequence.ditamap</span> <span class="keyword parmname">--format</span>=<span class="keyword option">html5</span></code></pre>
+      
+    </section>
+    <section class="example"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Example</h2></div>
+      <p class="p">For example, from <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/docsrc/samples</span>, run:</p>
+      <div class="p">
+        <pre class="pre codeblock"><code><span class="keyword cmdname">dita</span> <span class="keyword parmname">--input</span>=<span class="ph filepath">sequence.ditamap</span> <span class="keyword parmname">--format</span>=<span class="keyword option">html5</span> \
+     <span class="keyword parmname">--output</span>=<span class="ph filepath">output/sequence</span> \
+     <span class="keyword parmname">--args.input.dir</span>=<span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/docsrc/samples</span> \
+     <span class="keyword parmname">--propertyfile</span>=<span class="ph filepath">properties/sequence-html5.properties</span></code></pre>
+      </div>
+      <p class="p">This builds <span class="ph filepath">sequence.ditamap</span> to HTML5 output in <span class="ph filepath">output/sequence</span> using
+        the following additional parameters specified in the <span class="ph filepath">properties/sequence-html5.properties</span>
+        file:</p>
+      <div class="p">
+        <pre class="pre codeblock language-properties normalize-space show-line-numbers show-whitespace"><code># Don't generate headings for sections within task topics:
+args.gen.task.lbl = NO
+
+# Directory that contains the custom .css file:
+args.cssroot = ${args.input.dir}/css/
+
+# Custom .css file used to style output:
+args.css = style.css
+
+# Copy the custom .css file to the output directory:
+args.copycss = yes
+
+# Location of the copied .css file relative to the output:
+args.csspath = branding
+
+# Generate a full navigation TOC in topic pages:
+nav-toc = full
+
+# Base name of the Table of Contents file:
+args.xhtml.toc = toc</code></pre>
+      </div>
+      
+    </section>
+    <section class="section postreq"><div class="tasklabel"><h2 class="sectiontitle tasklabel">What to do next</h2></div>
+      <p class="p">Most builds require you to specify more options than are described in this topic.</p>
+      <p class="p">Usually, you will want to specify a set of reusable build parameters in a
+          <span class="ph filepath">.properties</span> file.</p>
+    </section>
+  </div>
+</article></main></body></html>

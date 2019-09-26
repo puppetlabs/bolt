@@ -1,0 +1,63 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="In DITA-OT 2.2, the HTML5 transformation was refactored as its own plug-in and separate plug-ins were created for each of the rendering engine-specific PDF transformations."><meta name="DC.subject" content=", toc, preface, frontmatter, bookmap, deprecated features, classes, .notetitle, user.input.file, user.input.dir, InputMapDir, RenderX, plug-in, Antenna House, Apache FOP, table of contents, PDF"><meta name="keywords" content=", toc, preface, frontmatter, bookmap, deprecated features, classes, .notetitle, user.input.file, user.input.dir, InputMapDir, RenderX, plug-in, Antenna House, Apache FOP, table of contents, PDF"><meta name="DC.relation" scheme="URI" content="../topics/migration.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="migrating-to-2.2"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Migrating to release 2.2</title></head><body id="migrating-to-2.2"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a><ul><li><a href="../topics/migrating-to-3.3.html">To 3.3</a></li><li><a href="../topics/migrating-to-3.2.html">To 3.2</a></li><li><a href="../topics/migrating-to-3.1.html">To 3.1</a></li><li><a href="../topics/migrating-to-3.0.html">To 3.0</a></li><li><a href="../topics/migrating-to-2.5.html">To 2.5</a></li><li><a href="../topics/migrating-to-2.4.html">To 2.4</a></li><li><a href="../topics/migrating-to-2.3.html">To 2.3</a></li><li class="active"><a href="../topics/migrating-to-2.2.html">To 2.2</a></li><li><a href="../topics/migrating-to-2.1.html">To 2.1</a></li><li><a href="../topics/migrating-to-2.0.html">To 2.0</a></li><li><a href="../topics/migrating-to-1.8.html">To 1.8</a></li><li><a href="../topics/migrating-to-1.7.html">To 1.7</a></li><li><a href="../topics/migrating-to-1.6.html">To 1.6</a></li><li><a href="../topics/migrating-to-1.5.4.html">To 1.5.4</a></li></ul></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+
+  <h1 class="title topictitle1" id="ariaid-title1">Migrating to release 2.2</h1>
+  
+
+  
+  
+
+  <div class="body refbody"><p class="shortdesc">In DITA-OT 2.2, the <span class="keyword option">HTML5</span> transformation was refactored as its own plug-in and separate
+    plug-ins were created for each of the rendering engine-specific PDF transformations.
+  </p>
+    <section class="section">
+      <div class="note note note_note"><span class="note__title">Note:</span> This topic provides a summary of changes in DITA-OT 2.2 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the <a class="xref" href="https://www.dita-ot.org/2.2/release-notes/" target="_blank">DITA-OT 2.2 Release Notes</a>.</div>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">HTML5</h2>
+      
+      <p class="p">The <span class="keyword option">HTML5</span> transformation introduced in release 2.0 as part of the <span class="keyword option">XHTML</span>
+        plug-in has been moved to a separate <span class="keyword option">HTML5</span> plug-in. Customizations that extended the previous
+        HTML5 output under the <span class="keyword option">XHTML</span> plug-in will probably need to be refactored on the new HTML5
+        plug-in.</p>
+      <p class="p">Note title processing has been revised to use a common <code class="ph codeph">note__title</code> class for note elements of
+        all types. The legacy <code class="ph codeph"><var class="keyword varname">{$type}</var>title</code> classes (such as
+          <code class="ph codeph">.notetitle</code>, <code class="ph codeph">.cautiontitle</code>, <code class="ph codeph">.tiptitle</code>, etc.) are included
+        for backwards compatibility, but are deprecated and will be removed in an upcoming release. Stylesheets that
+        apply formatting overrides to note titles should be revised to replace the deprecated class selectors with the
+        equivalent descendant selectors, for example <code class="ph codeph">.note_note .note__title</code>, <code class="ph codeph">.note_caution
+          .note__title</code>, <code class="ph codeph">.note_tip .note__title</code>, etc.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">PDF</h2>
+      
+      <p class="p">Processing specific to Apache FOP, Antenna House Formatter, and RenderX XEP has been separated into separate
+        plug-ins for each of those rendering engines. Customizations that extended this processing might need to extend
+        the new <code class="ph codeph">org.dita.pdf2.fop</code>, <code class="ph codeph">org.dita.pdf2.axf</code>, or
+          <code class="ph codeph">org.dita.pdf2.xep</code> plug-ins.</p>
+      <p class="p">PDF customizations that are not specific to a rendering engine can continue to extend the
+          <code class="ph codeph">org.dita.pdf2</code> plug-in as before.</p>
+      <p class="p">The default format for page numbers in the table of contents (<code class="keyword markupname xmlelement">&lt;toc&gt;</code>) was switched to
+        roman to align with <code class="keyword markupname xmlelement">&lt;preface&gt;</code> and ensure consistent numbering styles for all
+          <code class="keyword markupname xmlelement">&lt;frontmatter&gt;</code> components in <code class="keyword markupname xmlelement">&lt;bookmap&gt;</code>. This prevents numbering
+        from switching back and forth between styles in bookmaps where the Preface follows the table of contents.
+        Earlier versions of DITA-OT produced numbering sequences like <code class="ph codeph">1,2,3,4,v,vi,7,8</code> in this use
+        case.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Deprecated properties</h2>
+      
+      <div class="p">The following Ant properties have been deprecated:
+        <ul class="ul">
+          <li class="li"><span class="keyword parmname">user.input.file</span>, use <span class="keyword parmname">user.input.file.uri</span> instead to specify the
+            input file system path</li>
+          <li class="li"><span class="keyword parmname">user.input.dir</span>, use <span class="keyword parmname">user.input.dir.uri</span> instead to specify the
+            input directory system path</li>
+          <li class="li"><span class="keyword parmname">InputMapDir</span>, use <span class="keyword parmname">InputMapDir.uri</span> instead to specify the input
+            map directory system path</li>
+        </ul></div>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/migration.html" title="If you have XSL transformation overrides, plug-ins or other customizations written prior to DITA-OT 3.3, you may need to make changes to ensure your overrides work properly with the latest toolkit versions.">Migrating customizations</a></div></div></nav></article></main></body></html>

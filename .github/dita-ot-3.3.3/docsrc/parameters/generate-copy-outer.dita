@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="ID">
+  <title>Handling content outside the map directory</title>
+  <shortdesc>By default, DITA-OT assumes content is located in or beneath the directory containing the DITA map file.
+    The <parmname>generate.copy.outer</parmname> parameter can be used to adjust how output is generated for content
+    that is located outside the map directory.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><parmname>generate.copy.outer</parmname></indexterm>
+        <indexterm>HTML<indexterm>files outside map directory</indexterm></indexterm>
+        <indexterm>DITA maps<indexterm>relative file locations</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <conbody>
+    <section>
+      <title>Background</title>
+      <p>This is an issue in the following situations:
+        <ul>
+          <li>The DITA map is in a directory that is a peer to directories that contain referenced objects.</li>
+          <li>The DITA map is in a directory that is below the directories that contain the referenced objects.</li>
+        </ul></p>
+      <p>Let’s assume that the directory structure for the DITA content looks like the following:</p>
+      <p><pre>images/
+  fig.png
+maps/
+  start.ditamap
+topics/
+  topic.dita</pre></p>
+      <p>The DITA map is in the <filepath>maps</filepath> directory, the topics are in the <filepath>topics</filepath>
+        directory, and the images are in the <filepath>images</filepath> directory.</p>
+    </section>
+
+    <section>
+      <title>Exclude content outside the map directory</title>
+      <div outputclass="div-index">
+        <indexterm>index<index-see-also>entry file</index-see-also></indexterm>
+        <indexterm>entry file<indexterm>broken links, reason for</indexterm></indexterm>
+      </div>
+      <p>Let’s assume that you run the HTML5 transformation. By default, DITA-OT uses the
+          <parmname>generate.copy.outer</parmname> parameter with a value of <option>1</option>, which means that no
+        output is generated for content that is located outside the DITA map directory.</p>
+      <p>You receive only the following output:</p>
+      <p><pre>index.html
+commonltr.css
+commonrtl.css</pre></p>
+      <p>The <filepath>index.html</filepath> file contains the navigation structure, but all the links are broken, since
+        no HTML files were built for the topics.</p>
+      <p>How do you fix this? By adjusting the parameter setting to shift the output directory.</p>
+    </section>
+
+    <section>
+      <title>Shift the output directory to include all content</title>
+      <p>To preserve the links to referenced topics and images and make it easier to copy the output directory, set the
+          <parmname>generate.copy.outer</parmname> parameter to <option>3</option>.</p>
+      <p>Now your output directory structure resembles the structure of the source directory:</p>
+      <p><pre>images/
+  fig.png
+maps/
+  index.html
+topics/
+  topic.html
+commonltr.css
+commonrtl.css</pre></p>
+      <p>The <filepath>index.html</filepath> file is in the <filepath>maps</filepath> directory, the HTML files for the
+        topics are in the <filepath>topics</filepath> directory, and the referenced images are in the
+          <filepath>images</filepath> directory.</p>
+      <note type="tip">If <parmname>args.csspath</parmname> is not set, the default CSS files (and any custom CSS files
+        specified via <parmname>args.css</parmname>) will be copied to the root level of the output folder. To copy CSS
+        files to an output subfolder named <filepath>css</filepath>, set <parmname>args.csspath</parmname> to
+          <option>css</option>.
+        <indexterm>CSS<indexterm>copy to specific location</indexterm></indexterm>
+      </note>
+    </section>
+  </conbody>
+</concept>

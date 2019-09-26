@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="drivetrouble" xml:lang="en-us">
+  <title>Troubleshooting your hard disk</title>
+  <shortdesc>Follow these steps to try and fix any problems with your hard drive.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>troubleshooting</indexterm>
+        <indexterm>hard drive</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps-unordered>
+      <step>
+        <cmd>Run scandisk on the drive. This may solve all of your problems.</cmd>
+      </step>
+      <step>
+        <cmd>Try defragmenting the drive. This could help with retrieval times.</cmd>
+      </step>
+      <step>
+        <cmd>If the drive is still slow, try deleting old or useless information.</cmd>
+      </step>
+      <step>
+        <cmd>If the drive cannot access anything, there are some expensive tools at Best Buy that my help you save some
+          of your information. But, you're probably out of luck.</cmd>
+      </step>
+      <step>
+        <cmd>If the drive makes funny clicking noises, back everything up as soon as possible.</cmd>
+        <info>You probably have some important data stored in bad sectors. This is going to be painful to fix. Make sure
+          you have a copy of your Operating System CDs.</info>
+      </step>
+      <step>
+        <cmd>If all else fails, you can always try calling technical support. However, this can be very expensive,
+          unless you call within 13 hours of your purchase.</cmd>
+      </step>
+    </steps-unordered>
+  </taskbody>
+</task>

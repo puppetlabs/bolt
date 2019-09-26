@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="plugin-extension-points">
+  <title>Extension points</title>
+  <shortdesc>DITA Open Toolkit provides a series of extension points that can be used to integrate changes into the core
+    code. Extension points are defined in the <filepath>plugin.xml</filepath> file for each plug-in. When plug-ins are
+    installed, DITA-OT makes each extension visible to the rest of the toolkit.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>extension points<indexterm>overview</indexterm><indexterm>plug-in</indexterm></indexterm>
+        <indexterm>extension points<index-see-also>preprocessing</index-see-also></indexterm>
+        <indexterm><filepath>plugin.xml</filepath></indexterm>
+        <indexterm>topicmerge<index-see>org.dita.pdf2.xsl.topicmerge</index-see></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+</reference>

@@ -1,0 +1,11 @@
+<!-- 
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2007 Shawn McKenzie
+
+See the accompanying LICENSE file for applicable license.
+-->
+<plugin id="com.sophos.tocjs">
+  <transtype name="tocjs" extends="html5" desc="TocJS"/>
+  <feature extension="dita.conductor.target" file="integrator.xml"/>
+</plugin>

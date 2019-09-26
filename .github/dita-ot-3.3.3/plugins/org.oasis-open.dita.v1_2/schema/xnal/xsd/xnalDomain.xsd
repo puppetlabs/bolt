@@ -1,0 +1,1155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA XNAL Domain                             -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      July 2007                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization attributes     -->
+<!--             for XNAL Domain                              -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2006, 2009                -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    <!-- <!ENTITY xnal-d-att "(topic xnal-d)"                                 >-->
+  <xs:annotation>
+    <xs:appinfo>
+       <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic xnal-d)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    
+    </xs:documentation>
+  </xs:annotation>
+
+    <xs:group name="xnal-d-author">
+        <xs:choice>
+            <xs:group ref="authorinformation"/>
+        </xs:choice>
+    </xs:group>
+    
+    <xs:group name="authorinformation">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="authorinformation"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="addressdetails">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="addressdetails"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="administrativearea">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="administrativearea"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="contactnumber">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="contactnumber"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="contactnumbers">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="contactnumbers"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="country">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="country"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="emailaddress">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="emailaddress"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="emailaddresses">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="emailaddresses"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="firstname">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="firstname"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="generationidentifier">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="generationidentifier"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="honorific">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="honorific"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="lastname">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lastname"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="locality">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="locality"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="localityname">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="localityname"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="middlename">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="middlename"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="namedetails">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="namedetails"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="organizationinfo">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="organizationinfo"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="organizationname">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="organizationname"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="organizationnamedetails">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="organizationnamedetails"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="otherinfo">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="otherinfo"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="personinfo">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="personinfo"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="personname">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="personname"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="postalcode">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="postalcode"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="thoroughfare">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="thoroughfare"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="url">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="url"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="urls">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="urls"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+    
+    <!--  Update type attr as per DITA Feature 12022  -->
+    <xs:element name="authorinformation" >
+        <xs:annotation>
+            <xs:documentation>The &lt;authorinformation&gt; element contains detailed information
+                about the author or authoring organization. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="authorinformation.class">
+                    <xs:attribute ref="class" default="+ topic/author xnal-d/authorinformation "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="authorinformation.class">
+        <xs:sequence>
+          <xs:group ref="authorinformation.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="authorinformation.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="authorinformation.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="personinfo"/>
+            <xs:group ref="organizationinfo"/>            
+        </xs:choice>
+        </xs:sequence>
+      </xs:group>
+    
+    <xs:attributeGroup name="authorinformation.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attribute name="scope" type="scope-att.class"/>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attribute name="type" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <!--<!ELEMENT addressdetails     (%words.cnt;|%locality;|%administrativearea;|
+    %thoroughfare;|%country;)*                  >-->
+    <xs:element name="addressdetails">
+        <xs:annotation>
+            <xs:documentation>The &lt;addressdetails&gt; element contains information about the
+                address of the author or authoring group.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="addressdetails.class">
+                    <xs:attribute ref="class" default="+ topic/ph xnal-d/addressdetails "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="addressdetails.class" mixed="true"> 
+      <xs:sequence>
+          <xs:group ref="addressdetails.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="addressdetails.attributes"/>      
+    </xs:complexType>
+  
+  <xs:group name="addressdetails.content">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="words.cnt" minOccurs="0"/>
+        <xs:group ref="locality" minOccurs="0"/>
+        <xs:group ref="administrativearea" minOccurs="0"/>
+        <xs:group ref="thoroughfare" minOccurs="0"/>
+        <xs:group ref="country" minOccurs="0"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+    
+    <xs:attributeGroup name="addressdetails.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="administrativearea">
+        <xs:annotation>
+            <xs:documentation>The &lt;administrativearea&gt; element contains information about
+                a county, state, or province. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="administrativearea.class">
+                    <xs:attribute ref="class" default="+ topic/ph xnal-d/administrativearea "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="administrativearea.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="administrativearea.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="administrativearea.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="administrativearea.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="words.cnt"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="administrativearea.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="contactnumber">
+        <xs:annotation>
+            <xs:documentation>A &lt;contactnumber&gt; element contains a telephone number. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="contactnumber.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/contactnumber "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="contactnumber.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="contactnumber.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="contactnumber.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="contactnumber.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="contactnumber.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="contactnumbers">
+        <xs:annotation>
+            <xs:documentation>The &lt;contactnumbers&gt; element contains a list of telephone and
+                fax numbers. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="contactnumbers.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/contactnumbers "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="contactnumbers.class" >
+        <xs:sequence>
+          <xs:group ref="contactnumbers.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="contactnumbers.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="contactnumbers.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="contactnumber"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="contactnumbers.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="country">
+        <xs:annotation>
+            <xs:documentation>The &lt;country&gt; element contains the name of a country. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="country.class">
+                    <xs:attribute ref="class" default="+ topic/ph xnal-d/country "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="country.class" mixed="true">
+     <xs:sequence>
+          <xs:group ref="country.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="country.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="country.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="country.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="emailaddress">
+        <xs:annotation>
+            <xs:documentation>The &lt;emailaddress&gt; element contains an e-mail address. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="emailaddress.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/emailaddress "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="emailaddress.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="emailaddress.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="emailaddress.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="emailaddress.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="words.cnt"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="emailaddress.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="emailaddresses">
+        <xs:annotation>
+            <xs:documentation>The &lt;emailaddress&gt; element contains a list of e-mail addresses. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="emailaddresses.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/emailaddresses "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="emailaddresses.class">
+        <xs:sequence>
+          <xs:group ref="emailaddresses.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="emailaddresses.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="emailaddresses.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="emailaddress"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="emailaddresses.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="firstname">
+        <xs:annotation>
+            <xs:documentation>The &lt;firstname&gt; element contains the person's first name. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="firstname.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/firstname "/>            
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="firstname.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="firstname.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="firstname.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="firstname.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+      
+      
+      <xs:attributeGroup name="firstname.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="generationidentifier">
+        <xs:annotation>
+            <xs:documentation>The &lt;generationidentifier&gt; element contains information about
+                the person's generation, such as: Jr, III, or VIII.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="generationidentifier.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/generationidentifier "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="generationidentifier.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="generationidentifier.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="generationidentifier.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="generationidentifier.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+      
+      
+      <xs:attributeGroup name="generationidentifier.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="honorific">
+        <xs:annotation>
+            <xs:documentation>The &lt;honorific&gt; element contains the person's title, such as:
+                Dr., Mr., Ms., HRH.. or Grand Exalted Wizard. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="honorific.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/honorific "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="honorific.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="honorific.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="honorific.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="honorific.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+      
+      
+      <xs:attributeGroup name="honorific.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="lastname">
+        <xs:annotation>
+            <xs:documentation>The &lt;lastname&gt; element contains the person's last name. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="lastname.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/lastname "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="lastname.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="lastname.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="lastname.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="lastname.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+      
+      
+      <xs:attributeGroup name="lastname.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="locality">
+        <xs:annotation>
+            <xs:documentation>The &lt;locality&gt; element contains information about the city and
+                postal or ZIP code. It can contain the information directly, or by acting
+                as a wrapper for &lt;localityname&gt; and &lt;postalcode&gt;. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="locality.class">
+                    <xs:attribute ref="class" default="+ topic/ph xnal-d/locality "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="locality.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="locality.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="locality.attributes"/> 
+    </xs:complexType>
+  
+      <xs:group name="locality.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt" minOccurs="0"/>
+            <xs:group ref="localityname" minOccurs="0"/>
+            <xs:group ref="postalcode" minOccurs="0"/>
+        </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+      <xs:attributeGroup name="locality.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="localityname">
+        <xs:annotation>
+            <xs:documentation>The &lt;localityname&gt; element contains the name of the locality
+                or city.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="localityname.class">
+                    <xs:attribute ref="class" default="+ topic/ph xnal-d/localityname "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="localityname.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="localityname.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="localityname.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="localityname.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt" />
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="localityname.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="middlename">
+        <xs:annotation>
+            <xs:documentation>The &lt;middlename&gt; element contains the person's middle name or
+                initial. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="middlename.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/middlename "/>            
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="middlename.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="middlename.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="middlename.attributes"/>      
+    </xs:complexType>
+  
+      <xs:group name="middlename.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+      
+      
+      <xs:attributeGroup name="middlename.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="namedetails">
+        <xs:annotation>
+            <xs:documentation>The &lt;namedetails&gt; element contains information about the name
+                of the author or the authoring organization. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="namedetails.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/namedetails "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="namedetails.class">
+        <xs:sequence>
+          <xs:group ref="namedetails.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="namedetails.attributes"/>   
+    </xs:complexType>
+  
+      <xs:group name="namedetails.content">
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="personname"/>
+            <xs:group ref="organizationnamedetails"/>
+        </xs:choice>
+          </xs:sequence>      
+      </xs:group>
+  
+      <xs:attributeGroup name="namedetails.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="organizationinfo">
+        <xs:annotation>
+            <xs:documentation>The &lt;organizationinfo&gt; element contains detailed information
+                about an authoring organization. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="organizationinfo.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/organizationinfo "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="organizationinfo.class">
+        <xs:sequence>
+          <xs:group ref="organizationinfo.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="organizationinfo.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="organizationinfo.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="namedetails" minOccurs="0"/>
+            <xs:group ref="addressdetails" minOccurs="0"/>
+            <xs:group ref="contactnumbers" minOccurs="0"/>
+            <xs:group ref="emailaddresses" minOccurs="0"/>
+            <xs:group ref="urls" minOccurs="0"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="organizationinfo.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="organizationname">
+        <xs:annotation>
+            <xs:documentation>The &lt;organizationname&gt; element contains name information about
+                the authoring organization. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="organizationname.class">
+                    <xs:attribute ref="class" default="+ topic/ph xnal-d/organizationname "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="organizationname.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="organizationname.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="organizationname.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="organizationname.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="ph.cnt"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="organizationname.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="organizationnamedetails">
+        <xs:annotation>
+            <xs:documentation>The &lt;organizationnamedetails&gt; element contains information about
+                the name of an authoring organization. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="organizationnamedetails.class">
+                    <xs:attribute ref="class" default="+ topic/ph xnal-d/organizationnamedetails "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="organizationnamedetails.class">
+        <xs:sequence>
+            <xs:group ref="organizationnamedetails.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="organizationnamedetails.attributes"/>     
+    </xs:complexType>
+  
+    <xs:group name="organizationnamedetails.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="organizationname" minOccurs="0" />
+            <xs:group ref="otherinfo" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+  <xs:attributeGroup name="organizationnamedetails.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="otherinfo">
+        <xs:annotation>
+            <xs:documentation>The &lt;otherinfo&gt; element contains other name information about
+                the author or authoring organization. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="otherinfo.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/otherinfo "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="otherinfo.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="otherinfo.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="otherinfo.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="otherinfo.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt"/>
+        </xs:choice>
+      </xs:sequence>    
+    </xs:group>
+  
+    <xs:attributeGroup name="otherinfo.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="personinfo">
+        <xs:annotation>
+            <xs:documentation>The &lt;personinfo&gt; element is a wrapper containing all relevant
+                data about a person, including name, address, and contact information.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="personinfo.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/personinfo "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="personinfo.class" >
+        <xs:sequence>
+            <xs:group ref="personinfo.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="personinfo.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="personinfo.content">
+        <xs:sequence>
+          <xs:sequence>
+            <xs:group ref="namedetails" minOccurs="0"/>
+            <xs:group ref="addressdetails" minOccurs="0"/>
+            <xs:group ref="contactnumbers" minOccurs="0"/>
+            <xs:group ref="emailaddresses" minOccurs="0"/>
+        </xs:sequence>
+        </xs:sequence>
+      </xs:group>
+  
+      <xs:attributeGroup name="personinfo.attributes">
+         <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+      </xs:attributeGroup>
+    
+    <xs:element name="personname">
+        <xs:annotation>
+            <xs:documentation>The &lt;personname&gt; element contains name information about the
+                author.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="personname.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/personname "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="personname.class">
+        <xs:sequence>
+           <xs:group ref="personname.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="personname.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="personname.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="honorific" minOccurs="0"/>
+            <xs:group ref="firstname" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="middlename" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="lastname" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="generationidentifier" minOccurs="0"/>
+            <xs:group ref="otherinfo" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+    
+    <xs:attributeGroup name="personname.attributes">
+         <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+      </xs:attributeGroup>
+    
+    <xs:element name="postalcode">
+        <xs:annotation>
+            <xs:documentation>The &lt;postalcode&gt; element contains information about the postal
+                code  or the ZIP code.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="postalcode.class">
+                    <xs:attribute ref="class" default="+ topic/ph xnal-d/postalcode "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="postalcode.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="postalcode.content"></xs:group>
+        </xs:sequence>
+        <xs:attributeGroup ref="postalcode.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="postalcode.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="keyword"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="postalcode.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    
+   
+    <xs:element name="thoroughfare">
+        <xs:annotation>
+            <xs:documentation>The &lt;thoroughfare&gt; element contains information about the thoroughfare
+                - for example, the street, avenue, or boulevard - on which an address is located.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="thoroughfare.class">
+                    <xs:attribute ref="class" default="+ topic/ph xnal-d/thoroughfare "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="thoroughfare.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="thoroughfare.content"></xs:group>
+        </xs:sequence>
+        <xs:attributeGroup ref="thoroughfare.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="thoroughfare.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="thoroughfare.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="url">
+        <xs:annotation>
+            <xs:documentation>The &lt;url&gt; element contains a Uniform Resource Locator (URL). </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="url.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/url "/>                    
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="url.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="url.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="url.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="url.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt"/>
+        </xs:choice>
+      </xs:sequence>    
+    </xs:group>
+  
+    <xs:attributeGroup name="url.attributes">
+      <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="urls">
+        <xs:annotation>
+            <xs:documentation>The &lt;urls&gt; element contains a list of Uniform Resource Locators
+                (URLs). </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="urls.class">
+                    <xs:attribute ref="class" default="+ topic/data xnal-d/urls "/>                    
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="urls.class">
+        <xs:sequence>
+          <xs:group ref="urls.content"/>
+        </xs:sequence>
+       <xs:attributeGroup ref="urls.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="urls.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="url"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+      <xs:attributeGroup name="urls.attributes">
+         <xs:attributeGroup ref="data-element-atts.class" />
+        <xs:attributeGroup ref="global-atts"/>
+      </xs:attributeGroup>
+    
+</xs:schema>

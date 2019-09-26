@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?><plugins><plugin id="com.puppet.html5" version="0.0.0" xml:base="../plugins/com.puppet.html5/plugin.xml">
+    <require plugin="org.dita.html5"/>
+    <transtype desc="Puppet HTML5" extends="common-html" name="pup-html5"/>
+    <feature extension="dita.conductor.target.relative" file="build_html5_puppet.xml"/>
+    <!-- Puppet: Add XSLT override file for tasks. -->
+    <feature extension="dita.xsl.html5" file="xsl/xslhtml/pup_taskdisplay.xsl"/>
+</plugin><plugin id="org.lwdita" version="0.0.0" xml:base="../plugins/org.lwdita/plugin.xml">
+  <!-- DITA to Markdown -->
+  <transtype desc="Markdown" name="markdown"/>
+  <transtype desc="GitHub-flavored Markdown" name="markdown_github"/>
+  <transtype desc="GitBook" name="markdown_gitbook"/>
+  <feature extension="dita.conductor.target.relative" file="conductor.xml"/>
+  <!-- common -->
+  <feature extension="dita.conductor.lib.import" file="lib/org.lwdita-2.3.0.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/htmlparser-1.4.jar"/>
+  <!-- Markdown to DITA -->
+  <template file="build-markdown_template.xml"/>
+  <template file="xsl/dita2markdown_template.xsl"/>
+  <!--template file="xsl/map2markdown-toc_template.xsl"/-->
+  <template file="xsl/map2markdown-cover_template.xsl"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-profile-pegdown-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-abbreviation-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-anchorlink-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-aside-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-autolink-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-definition-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-html-parser-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-escaped-character-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-footnotes-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-jira-converter-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-youtrack-converter-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-gfm-strikethrough-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-gfm-tables-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-gfm-tasklist-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-jekyll-front-matter-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-jekyll-tag-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-ins-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-superscript-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-tables-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-toc-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-typographic-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-wikilink-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-ext-yaml-front-matter-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-formatter-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/flexmark-util-0.50.18.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/autolink-0.6.0.jar"/>
+  <feature extension="dita.parser">
+    <parser class="com.elovirta.dita.markdown.MarkdownReader" format="markdown"/>
+    <parser class="com.elovirta.dita.markdown.MarkdownReader" format="md"/>
+    <parser class="com.elovirta.dita.markdown.MDitaReader" format="mdita"/>
+  </feature>
+  <!-- HTML to DITA -->
+  <template file="build-html_template.xml"/>
+  <feature extension="dita.parser">
+    <parser class="com.elovirta.dita.html.HDitaReader" format="hdita"/>
+  </feature>
+</plugin><plugin id="org.dita.pdf2" version="3.3.3" xml:base="../plugins/org.dita.pdf2/plugin.xml">
+  <!-- extension points -->
+  <extension-point id="dita.xsl.xslfo" name="PDF XSLT import"/>
+  <extension-point id="dita.xsl.xslfo.i18n-postprocess" name="PDF I18N postprocess import"/>
+  <extension-point id="org.dita.pdf2.xsl.topicmerge" name="PDF2 topic merge XSLT import"/>
+  <extension-point id="depend.org.dita.pdf2.init.pre" name="Initialization pre-target"/>
+  <extension-point id="depend.org.dita.pdf2.format.pre" name="Formatting pre-target"/>
+  <extension-point id="depend.org.dita.pdf2.format" name="Formatting target"/>
+  <extension-point id="depend.org.dita.pdf2.format.post" name="Formatting post-target"/>
+  <extension-point id="org.dita.pdf2.catalog.relative" name="Configuration XML catalog"/>
+  <extension-point id="dita.conductor.pdf2.param" name="PDF XSLT parameters"/>
+  <extension-point id="dita.conductor.pdf2.formatter.check" name="Formatter check"/>
+  <!-- extensions -->
+  <feature extension="dita.conductor.lib.import" file="lib/fo.jar"/>
+  <transtype desc="PDF" name="pdf">
+    <param desc="Specifies the base file name of the generated PDF file." name="outputFile.base"/>
+    <param desc="Specifies whether to generate a label for each image; the label will contain the image file name." name="args.artlbl" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies if the frontmatter and backmatter content order is retained in bookmap." name="args.bookmap-order" type="enum">
+      <val>retain</val>
+      <val default="true">discard</val>
+    </param>
+    <param desc="Specifies whether PDF bookmarks are by default expanded or collapsed." name="args.bookmark.style" type="enum">
+      <val>EXPANDED</val>
+      <val>COLLAPSE</val>
+    </param>
+    <param desc="Specifies whether chapter level TOCs are generated." name="args.chapter.layout" type="enum">
+      <val default="true">MINITOC</val>
+      <val>BASIC</val>
+    </param>
+    <param desc="Specifies an XSL file that is used to override the default XSL transformation." name="args.xsl.pdf" type="file"/>
+    <param desc="Specifies the customization directory." name="customization.dir" type="dir"/>
+    <param desc="Specifies the XSL processor." name="pdf.formatter" type="enum"/>
+    <param desc="Specifies whether draft-comment and required-cleanup elements are included in the output." name="publish.required.cleanup" type="enum">
+      <val>yes</val>
+      <val>no</val>
+    </param>
+    <param desc="Enables I18N font processing." name="org.dita.pdf2.i18n.enabled" type="enum">
+      <val default="true" desc="Enables I18N processing">true</val>
+      <val desc="Disables I18N processing">false</val>
+    </param>
+    <param desc="Enables chunk attribute processing." name="org.dita.pdf2.chunk.enabled" type="enum">
+      <val desc="Enables chunk processing">true</val>
+      <val default="true" desc="Disables chunk processing">false</val>
+    </param>
+  </transtype>
+  <transtype desc="PDF2" extends="pdf" name="pdf2"/>
+  <feature extension="dita.transtype.print" value="pdf"/>
+  <feature extension="dita.transtype.print" value="pdf2"/>
+  <feature extension="ant.import" file="build.xml"/>
+  <feature extension="dita.xsl.messages" file="resource/messages.xml"/>
+  <feature extension="dita.conductor.pdf2.formatter.check" value="ah"/>
+  <feature extension="dita.xsl.strings" file="cfg/common/vars/strings.xml"/>
+  <feature extension="dita.specialization.catalog.relative" file="cfg/catalog.xml"/>
+  <template file="build_template.xml"/>
+  <template file="cfg/catalog_template.xml"/>
+  <template file="xsl/fo/flagging-preprocess_template.xsl"/>
+  <template file="xsl/fo/i18n-postprocess_template.xsl"/>
+  <template file="xsl/fo/topic2fo_shell_template.xsl"/>
+  <template file="xsl/common/topicmerge_template.xsl"/>
+</plugin><plugin id="org.dita.pdf2.xep" version="3.3.3" xml:base="../plugins/org.dita.pdf2.xep/plugin.xml">
+  <require plugin="org.dita.pdf2"/>
+  <!-- extensions -->
+  <feature extension="depend.org.dita.pdf2.init.pre" value="transform.fo2pdf.xep.init"/>
+  <feature extension="depend.org.dita.pdf2.format" value="transform.fo2pdf.xep"/>
+  <feature extension="dita.conductor.lib.import" file="lib/xep.jar"/>
+  <transtype desc="PDF" name="pdf">
+    <param desc="Specifies the XSL processor." name="pdf.formatter" type="enum">
+      <val desc="RenderX XEP Engine">xep</val>
+    </param>
+    <param desc="Specifies the user configuration file for RenderX." name="custom.xep.config" type="file"/>
+    <param desc="Specifies the amount of memory allocated to the RenderX process." name="maxJavaMemory"/>
+  </transtype>
+  <feature extension="ant.import" file="build_xep.xml"/>
+  <feature extension="dita.conductor.pdf2.formatter.check" value="xep"/>
+  <template file="xsl/fo/topic2fo_shell_xep_template.xsl"/>
+</plugin><plugin id="org.dita.base" version="3.3.3" xml:base="../plugins/org.dita.base/plugin.xml">
+  <!-- base extension points -->
+  <extension-point id="package.version" name="Plug-in version"/>
+  <extension-point id="package.support.email" name="Plug-in support email"/>
+  <extension-point id="package.support.name" name="Plug-in support name"/>
+  <extension-point id="dita.conductor.plugin" name="Ant conductor plug-in information"/>
+  <extension-point id="dita.catalog.plugin-info" name="Plug-in XML catalog information"/>
+  <extension-point id="dita.image.extensions" name="Image file extension"/>
+  <extension-point id="dita.html.extensions" name="HTML file extension"/>
+  <extension-point id="dita.resource.extensions" name="Resource file extension"/>
+  <!-- deprecated -->
+  <extension-point id="dita.conductor.transtype.check" name="Transtype check"/>
+  <extension-point id="dita.transtype.print" name="Print transtype"/>
+  <extension-point id="dita.conductor.target" name="Ant conductor"/>
+  <extension-point id="dita.conductor.target.relative" name="Ant conductor"/>
+  <extension-point id="ant.import" name="Ant import"/>
+  <extension-point id="dita.specialization.catalog" name="XML catalog"/>
+  <extension-point id="dita.specialization.catalog.relative" name="XML catalog"/>
+  <extension-point id="dita.xsl.strings" name="Generated text"/>
+  <extension-point id="dita.conductor.lib.import" name="Java library import"/>
+  <extension-point id="dita.xsl.messages" name="Diagnostic messages"/>
+  <!-- legacy support -->
+  <extension-point id="dita.basedir-resource-directory" name="Flag to use basedir as resource directory"/>
+  <!-- preprocessing extension points -->
+  <extension-point id="depend.preprocess.pre" name="Preprocessing pre-target"/>
+  <extension-point id="depend.preprocess.clean-temp.pre" name="Clean temp pre-target"/>
+  <extension-point id="depend.preprocess.gen-list.pre" name="Generate list pre-target"/>
+  <extension-point id="depend.preprocess.debug-filter.pre" name="Debug and filter pre-target"/>
+  <extension-point id="depend.preprocess.conrefpush.pre" name="Content reference push pre-target"/>
+  <extension-point id="depend.preprocess.move-meta-entries.pre" name="Move meta entries pre-target"/>
+  <extension-point id="depend.preprocess.conref.pre" name="Content reference pre-target"/>
+  <extension-point id="depend.preprocess.coderef.pre" name="Code reference pre-target"/>
+  <extension-point id="depend.preprocess.mapref.pre" name="Map reference pre-target"/>
+  <extension-point id="depend.preprocess.keyref.pre" name="Key reference pre-target"/>
+  <extension-point id="depend.preprocess.mappull.pre" name="Map pull pre-target"/>
+  <extension-point id="depend.preprocess.chunk.pre" name="Chunking pre-target"/>
+  <extension-point id="depend.preprocess.maplink.pre" name="Map link pre-target"/>
+  <extension-point id="depend.preprocess.topicpull.pre" name="Topic pull pre-target"/>
+  <extension-point id="depend.preprocess.copy-files.pre" name="Copy files pre-target"/>
+  <extension-point id="depend.preprocess.copy-image.pre" name="Copy images pre-target"/>
+  <extension-point id="depend.preprocess.copy-html.pre" name="Copy HTML pre-target"/>
+  <extension-point id="depend.preprocess.copy-flag.pre" name="Copy flag pre-target"/>
+  <!-- Deprecated since 2.1 -->
+  <extension-point id="depend.preprocess.copy-subsidiary.pre" name="Copy subsidiary pre-target"/>
+  <extension-point id="depend.preprocess.post" name="Preprocessing post-target"/>
+  <extension-point id="dita.preprocess.debug-filter.param" name="Debug filter module parameters"/>
+  <extension-point id="dita.preprocess.map-reader.param" name="Debug filter module parameters"/>
+  <extension-point id="dita.preprocess.topic-reader.param" name="Debug filter module parameters"/>
+  <extension-point id="dita.preprocess.conref.param" name="Content reference XSLT parameters"/>
+  <extension-point id="dita.preprocess.mapref.param" name="Map reference XSLT parameters"/>
+  <extension-point id="dita.preprocess.mappull.param" name="Map pull  XSLT parameters"/>
+  <!--extension-point id="dita.preprocess.maplink.param" name="Map link XSLT parameters"/-->
+  <extension-point id="dita.preprocess.topicpull.param" name="Topic pull XSLT parameters"/>
+  <extension-point id="dita.xsl.conref" name="Content reference XSLT import"/>
+  <extension-point id="dita.xsl.topicpull" name="Topic pull XSLT import"/>
+  <extension-point id="dita.xsl.mapref" name="Map reference XSLT import"/>
+  <extension-point id="dita.xsl.mappull" name="Map pull XSLT import"/>
+  <extension-point id="dita.xsl.maplink" name="Map link XSLT import"/>
+  <extension-point id="dita.parser" name="Custom DITA parser"/>
+  <!-- extensions -->
+  <transtype abstract="true" desc="Common" name="base">
+    <param desc="Specifies whether to generate headings for sections within task topics." name="args.gen.task.lbl" type="enum">
+      <val>YES</val>
+      <val>NO</val>
+    </param>
+    <param desc="Specifies which links to include in the output." name="args.rellinks" type="enum">
+      <val desc="No links are included.">none</val>
+      <val desc="All links are included.">all</val>
+      <val desc="Parent links are not included.">noparent</val>
+      <val desc="Parent, child, next, and previous links are not included.">nofamily</val>
+    </param>
+    <!-- Deprecated since 2.5 -->
+    <param deprecated="true" desc="Specifies whether debugging information is included in the log." name="args.debug" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies whether the content of &lt;draft-comment&gt; and &lt;required-cleanup&gt; elements is included in the output." name="args.draft" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies how cross references to figures are styled in output." name="args.figurelink.style" type="enum">
+      <val>NUMBER</val>
+      <val>TITLE</val>
+      <val>NUMTITLE</val>
+    </param>
+    <param desc="Specifies a filter file to be used to include, exclude, or flag content." name="args.filter" type="file"/>
+    <param desc="Specifies whether the grammar-caching feature of the XML parser is used." name="args.grammar.cache" type="enum">
+      <val default="true">yes</val>
+      <val>no</val>
+    </param>
+    <param desc="Specifies the master file for your documentation project." name="args.input" required="true" type="file"/>
+    <param desc="Specifies the base directory for your documentation project." name="args.input.dir" type="dir"/>
+    <!-- Deprecated since 2.5 -->
+    <param deprecated="true" desc="Specifies the location where DITA-OT places log files for your project." name="args.logdir" type="dir"/>
+    <param desc="Specifies the name of the output file without file extension." name="args.output.base" type="string"/>
+    <param desc="Specifies how cross references to tables are styled." name="args.tablelink.style" type="enum">
+      <val>NUMBER</val>
+      <val>TITLE</val>
+      <val>NUMTITLE</val>
+    </param>
+    <param desc="Specifies whether to crawl only those topic links found in maps, or all discovered topic links." name="link-crawl" type="enum">
+      <val>map</val>
+      <val default="true">topic</val>
+    </param>
+    <param desc="Specifies whether DITA-OT deletes the files in the temporary directory after it finishes a build." name="clean.temp" type="enum">
+      <val default="true">yes</val>
+      <val>no</val>
+    </param>
+    <param desc="Specifies where DITA-OT is installed." name="dita.dir" type="dir"/>
+    <param desc="Specifies the location of the temporary directory." name="dita.temp.dir" type="dir"/>
+    <param deprecated="true" desc="Specifies a filter file to be used to include, exclude, or flag content." name="dita.input.valfile" type="file"/>
+    <param desc="Specifies whether filtering is done before all other processing, or after key and conref processing." name="filter-stage" type="enum">
+      <val default="true">early</val>
+      <val>late</val>
+    </param>
+    <param desc="Generate copy-to attributes to duplicate topicref elements." name="force-unique" type="enum">
+      <val>true</val>
+      <val default="true">false</val>
+    </param>
+    <param desc="Specifies whether to generate output files for content that is not located in or beneath the directory containing the DITA map file." name="generate.copy.outer" type="enum">
+      <val default="true" desc="Do not generate output for content that is located outside the DITA map directory.">1</val>
+      <val desc="Shift the output directory so that it contains all output for the publication.">3</val>
+    </param>
+    <param desc="Specifies whether files that are linked to, or referenced with a @conref attribute, generate output." name="onlytopic.in.map" type="enum">
+      <val>true</val>
+      <val default="true">false</val>
+    </param>
+    <param desc="Specifies how DITA-OT handles content files that are not located in or below the directory containing the master DITA map." name="outer.control" type="enum">
+      <val desc="Fail quickly if files are going to be generated or copied outside of the directory.">fail</val>
+      <val default="true" desc="Complete the operation if files will be generated or copied outside of the directory, but log a warning.">warn</val>
+      <val desc="Quietly finish without generating warnings or errors.">quiet</val>
+    </param>
+    <param desc="Specifies the name and location of the output directory." name="output.dir" type="dir"/>
+    <param desc="Override for map chunk attribute value." name="root-chunk-override" type="string"/>
+    <param desc="Specifies the output format (transformation type)." name="transtype" required="true" type="string"/>
+    <param desc="Specifies whether DITA-OT validates the content." name="validate" type="enum">
+      <val default="true">true</val>
+      <val>false</val>
+    </param>
+    <param desc="Specifies whether the @xtrf and @xtrc debugging attributes are generated in the temporary files." name="generate-debug-attributes" type="enum">
+      <val default="true" desc="Enables generation of debugging attributes">true</val>
+      <val desc="Disables generation of debugging attributes">false</val>
+    </param>
+    <param desc="Specifies how DITA-OT handles errors and error recovery." name="processing-mode" type="enum">
+      <val desc="When an error is encountered, DITA-OT stops processing">strict</val>
+      <val default="true" desc="When an error is encountered, DITA-OT attempts to recover from it">lax</val>
+      <val desc="When an error is encountered, DITA-OT continues processing but does not attempt error recovery">skip</val>
+    </param>
+    <param desc="Conserve memory at the expense of processing speed" name="conserve-memory" type="enum">
+      <val>true</val>
+      <val default="true">false</val>
+    </param>
+    <param desc="Specifies the default language for source documents." name="default.language" type="string"/>
+    <param desc="Remove broken related links." name="remove-broken-links" type="enum">
+      <val>true</val>
+      <val default="true">false</val>
+    </param>
+  </transtype>
+  <feature extension="dita.image.extensions" value=".gif"/>
+  <feature extension="dita.image.extensions" value=".eps"/>
+  <feature extension="dita.image.extensions" value=".jpg"/>
+  <feature extension="dita.image.extensions" value=".jpeg"/>
+  <feature extension="dita.image.extensions" value=".png"/>
+  <feature extension="dita.image.extensions" value=".svg"/>
+  <feature extension="dita.image.extensions" value=".tif"/>
+  <feature extension="dita.image.extensions" value=".tiff"/>
+  <feature extension="dita.image.extensions" value=".bmp"/>
+  <feature extension="dita.html.extensions" value=".html"/>
+  <feature extension="dita.html.extensions" value=".htm"/>
+  <feature extension="dita.resource.extensions" value=".pdf"/>
+  <feature extension="dita.resource.extensions" value=".swf"/>
+  <feature extension="ant.import" file="build_init.xml"/>
+  <feature extension="ant.import" file="build_preprocess.xml"/>
+  <feature extension="ant.import" file="build_preprocess2.xml"/>
+  <feature extension="dita.xsl.strings" file="xsl/common/common-strings.xml"/>
+  <template file="catalog-dita_template.xml"/>
+  <template file="build_template.xml"/>
+  <template file="build_preprocess_template.xml"/>
+  <template file="build_preprocess2_template.xml"/>
+  <template file="../../config/messages_template.xml"/>
+  <template file="xsl/common/allstrings_template.xml"/>
+  <template file="xsl/common/strings_template.xml"/>
+  <template file="xsl/preprocess/maplink_template.xsl"/>
+  <template file="xsl/preprocess/mapref_template.xsl"/>
+  <template file="xsl/preprocess/mappull_template.xsl"/>
+  <template file="xsl/preprocess/conref_template.xsl"/>
+  <template file="xsl/preprocess/map-conref_template.xsl"/>
+  <template file="xsl/preprocess/topicpull_template.xsl"/>
+</plugin><plugin id="org.oasis-open.dita.v1_3" version="1.3" xml:base="../plugins/org.oasis-open.dita.v1_3/plugin.xml">
+  <feature extension="dita.specialization.catalog.relative" file="catalog.xml"/>
+</plugin><plugin id="org.dita.specialization.dita11" version="1.1" xml:base="../plugins/org.dita.specialization.dita11/plugin.xml">
+        <feature extension="dita.specialization.catalog.relative" file="catalog.xml"/>
+    </plugin><plugin id="org.dita.pdf2.axf" version="3.3.3" xml:base="../plugins/org.dita.pdf2.axf/plugin.xml">
+  <require plugin="org.dita.pdf2"/>
+  <!-- extensions -->
+  <feature extension="depend.org.dita.pdf2.init.pre" value="transform.fo2pdf.ah.init"/>
+  <feature extension="depend.org.dita.pdf2.format" value="transform.fo2pdf.ah"/>
+  <feature extension="dita.conductor.lib.import" file="lib/axf.jar"/>
+  <transtype desc="PDF" name="pdf">
+    <param desc="Specifies the XSL processor." name="pdf.formatter" type="enum">
+      <val desc="Antenna House Formatter">ah</val>
+    </param>
+    <param desc="Specifies whether draft-comment and required-cleanup elements are included in the output." name="publish.required.cleanup" type="enum">
+      <val>yes</val>
+      <val>no</val>
+    </param>
+    <param desc="Specifies the user configuration file for Antenna House Formatter." name="axf.opt" type="file"/>
+    <param desc="Specifies the path to the Antenna House Formatter executable." name="axf.cmd" type="file"/>
+  </transtype>
+  <feature extension="ant.import" file="build_axf.xml"/>
+  <feature extension="dita.conductor.pdf2.formatter.check" value="ah"/>
+  <template file="xsl/fo/topic2fo_shell_axf_template.xsl"/>
+</plugin><plugin id="org.dita.eclipsehelp" version="3.3.3" xml:base="../plugins/org.dita.eclipsehelp/plugin.xml">
+  <!-- extension points -->
+  <extension-point id="dita.xsl.eclipse.plugin" name="Eclipse plugin XSLT import"/>
+  <extension-point id="dita.map.eclipse.index.pre" name="Eclipse index extraction pre-target"/>
+  <extension-point id="dita.xsl.eclipse.toc" name="Eclipse TOC XSLT import"/>
+  <extension-point id="dita.conductor.eclipse.toc.param" name="Eclipse Help TOC XSLT parameter"/>
+  <!-- extensions -->
+  <transtype desc="Eclipse Help" extends="base-html" name="eclipsehelp">
+    <param desc="Specifies that the output should be zipped and returned using this name." name="args.eclipsehelp.jar.name" type="string"/>
+    <param desc="Specifies the region for the language that is specified by the args." name="args.eclipsehelp.country" type="string"/> 
+    <param desc="Specifies the base language for translated content, such as en for English." name="args.eclipsehelp.language" type="string"/> 
+    <param desc="Specifies the name of the person or organization that provides the Eclipse help." name="args.eclipse.provider" type="string">
+      <val default="true">DITA</val>
+    </param>
+    <param desc="Specifies the version number to include in the output." name="args.eclipse.version" type="string">
+      <val default="true">0.0.0</val>
+    </param>
+    <param desc="Specifies the symbolic name (aka plugin ID) in the output for an Eclipse Help project." name="args.eclipse.symbolic.name" type="string">
+      <val default="true">org.sample.help.doc</val>
+    </param>
+  </transtype>
+  <require plugin="org.dita.xhtml"/>
+  <feature extension="dita.conductor.lib.import" file="lib/eclipsehelp.jar"/>
+  <feature extension="ant.import" file="build_dita2eclipsehelp.xml"/>
+  <template file="build_dita2eclipsehelp_template.xml"/>
+  <template file="xsl/map2eclipse_template.xsl"/>
+  <template file="xsl/map2plugin_template.xsl"/>
+</plugin><plugin id="org.dita.htmlhelp" version="3.3.3" xml:base="../plugins/org.dita.htmlhelp/plugin.xml">
+  <!-- extension points -->
+  <extension-point id="dita.xsl.htmlhelp.map2hhp" name="HTML Help project XSLT import"/>
+  <extension-point id="dita.xsl.htmlhelp.map2hhc" name="HTML Help content XSLT import"/>
+  <!-- extensions -->
+  <transtype desc="Microsoft Compiled HTML Help" extends="base-html" name="htmlhelp">
+    <param desc="Specifies the name of a file that you want included in the HTML Help." name="args.htmlhelp.includefile" type="file"/>
+  </transtype>
+  <require plugin="org.dita.xhtml"/>
+  <feature extension="ant.import" file="build_dita2htmlhelp.xml"/>
+  <feature extension="dita.conductor.lib.import" file="lib/htmlhelp.jar"/>
+  <feature extension="dita.xsl.messages" file="resource/messages.xml"/>
+  <template file="xsl/map2hhc_template.xsl"/>
+  <template file="xsl/map2hhp_template.xsl"/>
+  <template file="build_dita2htmlhelp_template.xml"/>
+</plugin><plugin id="org.dita.xhtml" version="3.3.3" xml:base="../plugins/org.dita.xhtml/plugin.xml">
+  <!-- extension points -->
+  <extension-point id="dita.xsl.xhtml" name="HTML/XHTML XSLT import"/>
+  <extension-point id="dita.conductor.html.param" name="HTML XSLT parameters"/>
+  <extension-point id="dita.conductor.xhtml.param" name="XHTML XSLT parameters"/>
+  <extension-point id="dita.conductor.xhtml.toc.param" name="HTML/XSLT XSLT parameter"/>
+  <extension-point id="dita.xsl.htmltoc" name="HTML/XHTML TOC XSLT import"/>
+  <extension-point id="dita.xsl.html.cover" name="HTML/XHTML Cover XSLT import"/>
+  <!-- extensions -->
+  <transtype abstract="true" desc="HTML-based output" name="base-html">
+    <param desc="Specifies whether to generate a label for each image; the label will contain the image file name." name="args.artlbl" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies whether to copy the custom .css file to the output directory." name="args.copycss" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies the name of a custom .css file." name="args.css" type="string"/>
+    <param desc="Specifies the location of a copied .css file relative to the output directory." name="args.csspath" type="string"/>
+    <param desc="Specifies the directory that contains the custom .css file." name="args.cssroot" type="string"/>
+    <param desc="Specifies the language locale file to use for sorting index entries." name="args.dita.locale" type="string"/>
+    <param desc="Specifies an XML file that contains content for a running footer." name="args.ftr" type="file"/>
+    <param desc="Specifies whether to generate extra metadata that targets parental control scanners, meta elements with name=&#34;security&#34; and name=&#34;Robots&#34;." name="args.gen.default.meta" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies an XML file that contains content to be placed in the document head." name="args.hdf" type="file"/>
+    <param desc="Specifies an XML file that contains content for a running header." name="args.hdr" type="file"/>
+    <param desc="Specifies whether to hide links to parent topics in the HTML or XHTML output." name="args.hide.parent.link" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies whether the content of &lt;indexterm&gt; elements are rendered in the output." name="args.indexshow" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies the file extension for HTML or XHTML output." name="args.outext" type="string">
+      <val default="true">html</val>
+    </param>
+    <param desc="Specifies whether to include the DITA class ancestry inside the XHTML elements." name="args.xhtml.classattr" type="enum">
+      <val default="true">yes</val>
+      <val>no</val>
+    </param>
+    <param desc="Specifies a custom XSL file to be used instead of the default XSL transformation." name="args.xsl" type="file"/>
+  </transtype>
+  <transtype desc="XHTML" extends="base-html" name="xhtml">
+    <param desc="Specifies the value of the @target attribute on the &lt;base&gt; element in the TOC file." name="args.xhtml.contenttarget" type="string">
+      <val default="true">contentwin</val>
+    </param>
+    <param desc="Specifies the base name of the TOC file." name="args.xhtml.toc" type="string">
+      <val default="true">index</val>
+    </param>
+    <param desc="Specifies the value of the @class attribute on the &lt;body&gt; element in the TOC file." name="args.xhtml.toc.class" type="string"/>
+    <param desc="Specifies a custom XSL file to be used for TOC generation." name="args.xhtml.toc.xsl" type="file"/>
+  </transtype>
+  <feature extension="ant.import" file="build_general.xml"/>
+  <feature extension="ant.import" file="build_dita2xhtml.xml"/>
+  <feature extension="dita.xsl.messages" file="resource/messages.xml"/>
+  <template file="build_general_template.xml"/>
+  <template file="build_dita2xhtml_template.xml"/>
+  <template file="xsl/dita2html-base_template.xsl"/>
+  <template file="xsl/map2htmltoc_template.xsl"/>
+  <template file="xsl/map2html-coverImpl_template.xsl"/>
+</plugin><plugin id="org.oasis-open.xdita.v0_2_2" version="0.2.2" xml:base="../plugins/org.oasis-open.xdita.v0_2_2/plugin.xml">
+<title>Lightweight DITA</title>
+
+<!-- Include support name and email -->
+<feature extension="package.support.name" value="OASIS Lightweight DITA subcommittee"/>
+<feature extension="package.support.email" value="dita-lightweight-dita-chair@lists.oasis-open.org"/>
+
+<!-- Provide a version (default is 1.0 if not specified) -->
+<feature extension="package.version" value="1.0.4"/>
+
+<!-- This references a catalog using the OASIS catalog format, to define
+public IDs and system IDs for any DTD modules included in this plugin. -->
+<feature extension="dita.specialization.catalog.relative" type="file" value="catalog-dita.xml"/>
+
+</plugin><plugin id="org.dita.html5" version="3.3.3" xml:base="../plugins/org.dita.html5/plugin.xml">
+  <!-- extension points -->
+  <extension-point id="dita.xsl.html5" name="HTML5 XSLT import"/>
+  <extension-point id="dita.conductor.html5.param" name="HTML5 XSLT parameters"/>
+  <extension-point id="dita.conductor.html5.toc.param" name="HTML/XSLT XSLT parameter"/>
+  <extension-point id="dita.xsl.html5.toc" name="HTML5 TOC XSLT import"/>
+  <extension-point id="dita.xsl.html5.cover" name="HTML5 Cover XSLT import"/>
+  <!-- extensions -->
+  <transtype desc="HTML5" name="html5">
+    <param desc="Specifies whether to generate a label for each image; the label will contain the image file name." name="args.artlbl" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies whether to copy the custom .css file to the output directory." name="args.copycss" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies the name of a custom .css file." name="args.css" type="string"/>
+    <param desc="Specifies the location of a copied .css file relative to the output directory." name="args.csspath" type="string"/>
+    <param desc="Specifies the directory that contains the custom .css file." name="args.cssroot" type="string"/>
+    <param desc="Specifies the language locale file to use for sorting index entries." name="args.dita.locale" type="string"/>
+    <param desc="Specifies an XML file that contains content for a running footer." name="args.ftr" type="file"/>
+    <param desc="Specifies whether to generate extra metadata that targets parental control scanners, meta elements with name=&#34;security&#34; and name=&#34;Robots&#34;." name="args.gen.default.meta" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies an XML file that contains content to be placed in the document head." name="args.hdf" type="file"/>
+    <param desc="Specifies an XML file that contains content for a running header." name="args.hdr" type="file"/>
+    <param desc="Specifies whether to hide links to parent topics in the HTML5 output." name="args.hide.parent.link" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies whether to include the DITA class ancestry inside the HTML5 elements." name="args.html5.classattr" type="enum">
+      <val default="true">yes</val>
+      <val>no</val>
+    </param>
+    <param desc="Specifies the value of the @target attribute on the &lt;base&gt; element in the TOC file." name="args.html5.contenttarget" type="string">
+      <val default="true">contentwin</val>
+    </param>
+    <param desc="Specifies the base name of the TOC file." name="args.html5.toc" type="string">
+      <val default="true">index</val>
+    </param>
+    <param desc="Specifies the value of the @class attribute on the &lt;body&gt; element in the TOC file." name="args.html5.toc.class" type="string"/>
+    <param desc="Specifies a custom XSL file to be used for TOC generation." name="args.html5.toc.xsl" type="file"/>
+    <param desc="Specifies whether the content of &lt;indexterm&gt; elements are rendered in the output." name="args.indexshow" type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param desc="Specifies the file extension for HTML5 output." name="args.outext" type="string">
+      <val default="true">html</val>
+    </param>
+    <param desc="Specifies a custom XSL file to be used instead of the default XSL transformation." name="args.xsl" type="file"/>
+    <param desc="Specifies whether to generate a navigation TOC in topic pages." name="nav-toc" type="enum">
+      <val default="true" desc="No TOC">none</val>
+      <val desc="Partial TOC that shows the current topic">partial</val>
+      <val desc="Full TOC">full</val>
+    </param>
+  </transtype>
+  <feature extension="ant.import" file="build_dita2html5.xml"/>
+  <feature extension="dita.conductor.html5.param" file="params.xml"/>
+  <!--feature extension="dita.xsl.messages" file="resource/messages.xml"/-->
+  <template file="build_dita2html5_template.xml"/>
+  <template file="xsl/dita2html5Impl_template.xsl"/>
+  <template file="xsl/map2html5-coverImpl_template.xsl"/>
+</plugin><plugin id="org.dita.troff" version="0.0.0" xml:base="../plugins/org.dita.troff/plugin.xml">
+  <extension-point id="dita.xsl.troff-ast" name="Troff AST XSLT import"/>
+  <extension-point id="dita.xsl.troff" name="Troff XSLT import"/>
+  <feature extension="dita.conductor.transtype.check" value="troff"/>
+  <feature extension="ant.import" file="build_dita2troff.xml"/>
+  <template file="xsl/dita2troff-ast-shell_template.xsl"/>
+  <template file="xsl/dita2troff-step2-shell_template.xsl"/>
+  <require plugin="org.dita.base"/>
+</plugin><plugin id="org.oasis-open.dita.v1_2" version="1.2" xml:base="../plugins/org.oasis-open.dita.v1_2/plugin.xml">
+  <feature extension="dita.specialization.catalog.relative" file="catalog.xml"/>
+</plugin><plugin id="org.dita.pdf2.fop" version="3.3.3" xml:base="../plugins/org.dita.pdf2.fop/plugin.xml">
+  <require plugin="org.dita.pdf2"/>
+  <!-- extensions -->
+  <feature extension="depend.org.dita.pdf2.init.pre" value="transform.fo2pdf.fop.init"/>
+  <feature extension="depend.org.dita.pdf2.format" value="transform.fo2pdf.fop"/>
+  <feature extension="dita.conductor.lib.import" file="lib/avalon-framework-api-4.3.1.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/avalon-framework-impl-4.3.1.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/batik-all-1.10.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/fontbox-2.0.13.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/fop-pdf-images-2.3.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/pdfbox-2.0.13.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/fop-2.3.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/jcl-over-slf4j-1.7.25.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/xml-apis-ext-1.3.04.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/xmlgraphics-commons-2.3.jar"/>
+  <transtype desc="PDF" name="pdf">
+    <param desc="Specifies the XSL processor." name="pdf.formatter" type="enum">
+      <val default="true" desc="Apache FOP">fop</val>
+    </param>
+    <param desc="Specifies the user configuration file for FOP." name="args.fo.userconfig" type="file"/>
+  </transtype>
+  <feature extension="dita.conductor.pdf2.formatter.check" value="fop"/>
+  <feature extension="ant.import" file="build_fop.xml"/>
+  <template file="xsl/fo/topic2fo_shell_fop_template.xsl"/>
+</plugin><plugin id="org.dita.normalize" version="0.0.0" xml:base="../plugins/org.dita.normalize/plugin.xml">
+  <transtype desc="Normalized DITA" name="dita"/>
+  <feature extension="dita.conductor.target.relative" file="conductor.xml"/>
+</plugin><plugin id="com.sophos.tocjs" version="0.0.0" xml:base="../plugins/com.sophos.tocjs/plugin.xml">
+  <transtype desc="TocJS" extends="html5" name="tocjs"/>
+  <feature extension="dita.conductor.target" file="integrator.xml"/>
+</plugin></plugins>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<topic id="custom_artwork_the_common_artwork_folder">
+  <title>Custom artwork</title>
+  <shortdesc>The <filepath>common/artwork</filepath> folder houses custom artwork files that override the standard icons
+    in <filepath>org.dita.pdf2/cfg/common/artwork</filepath>.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>note</xmlelement></indexterm>
+        <indexterm><xmlatt>type</xmlatt></indexterm>
+        <indexterm>locale</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <body>
+    <p>These files are used to graphically identify different types of DITA <xmlelement>note</xmlelement> element.</p>
+    <p>The mapping between <xmlelement>note</xmlelement> type and graphic is contained in the common variables file
+        <filepath>org.dita.pdf2/cfg/common/vars/commonvariables.xml</filepath>.</p>
+    <p>The variables that control <xmlelement>note</xmlelement> graphics all follow the form</p>
+    <codeblock outputclass="language-xml">&lt;variable id="<varname>{type}</varname> Note Image Path"&gt; <varname>{path to image file}</varname> &lt;/variable&gt;</codeblock>
+    <p>where <varname>{type}</varname> contains a possible value for the <xmlelement>note</xmlelement>
+      <xmlatt>type</xmlatt> attribute and <varname>{path to image file}</varname> is the path to the note icon
+      image.</p>
+  </body>
+</topic>

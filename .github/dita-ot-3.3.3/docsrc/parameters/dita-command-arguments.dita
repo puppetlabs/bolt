@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="dita-command-properties" xml:lang="en">
+  <title>Arguments and options for the <cmdname>dita</cmdname> command</title>
+  <titlealts>
+    <navtitle>DITA command arguments</navtitle>
+  </titlealts>
+  <shortdesc>The <cmdname>dita</cmdname> command takes mandatory arguments to process DITA content, manage plug-ins, or
+    print information about the command. Options can be used to modify the command behavior or specify additional
+    configuration parameters.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>filters<indexterm><cmdname>dita</cmdname> command</indexterm></indexterm>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>arguments list</indexterm></indexterm>
+        <indexterm>arguments<index-see-also><cmdname>dita</cmdname> command</index-see-also></indexterm>
+        <indexterm>installing</indexterm>
+        <indexterm>uninstalling</indexterm>
+        <indexterm>artlbl<index-see>args.artlbl</index-see></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <title>Usage</title>
+      <syntaxdiagram>
+        <fragment>
+          <groupseq>
+            <kwd>dita</kwd>
+            <kwd>--input</kwd><oper>=</oper>
+            <var>file</var>
+            <kwd>--format</kwd><oper>=</oper>
+            <var>name</var>
+            <groupcomp importance="optional">
+              <var>options</var>
+            </groupcomp>
+          </groupseq>
+        </fragment>
+        <fragment>
+          <groupseq>
+            <kwd>dita</kwd>
+            <kwd>--install</kwd><oper>=</oper>
+            <groupchoice importance="optional">
+              <var>filename</var>
+              <var>URL</var>
+            </groupchoice>
+          </groupseq>
+        </fragment>
+        <fragment>
+          <groupseq>
+            <kwd>dita</kwd>
+            <kwd>--uninstall</kwd><oper>=</oper>
+            <var>id</var>
+          </groupseq>
+        </fragment>
+        <fragment>
+          <groupseq>
+            <kwd>dita</kwd>
+            <kwd>--help</kwd>
+          </groupseq>
+        </fragment>
+        <fragment>
+          <groupseq>
+            <kwd>dita</kwd>
+            <kwd>--version</kwd>
+          </groupseq>
+        </fragment>
+      </syntaxdiagram>
+      <note>Most <cmdname>dita</cmdname> command options support several syntax alternatives. All options can be
+        specified with a GNU-style option keyword preceded by two hyphens. In many cases, Unix-style single-letter
+        options (preceded by a single hyphen) are also available for backwards compatibility.</note>
+    </section>
+    <section>
+      <title>Arguments</title>
+      <div outputclass="div-index">
+        <indexterm><parmname>--input</parmname></indexterm>
+        <indexterm><parmname>-i</parmname></indexterm>
+        <indexterm><parmname>--format</parmname></indexterm>
+        <indexterm><parmname>-f</parmname></indexterm>
+        <indexterm><parmname>--install</parmname></indexterm>
+        <indexterm><parmname>--uninstall</parmname></indexterm>
+        <indexterm><parmname>--plugins</parmname></indexterm>
+        <indexterm><parmname>--transtypes</parmname></indexterm>
+        <indexterm><parmname>--help</parmname></indexterm>
+        <indexterm><parmname>-h</parmname></indexterm>
+        <indexterm><parmname>--version</parmname></indexterm>
+      </div>
+      <parml>
+        <plentry>
+          <pt>
+            <parmname>--input</parmname>=<varname>file</varname></pt>
+          <pt>
+            <parmname>-i</parmname>
+            <varname>file</varname>
+          </pt>
+          <pd id="args.input.desc">Specifies the master file for your documentation project. This argument corresponds
+            to the common parameter <parmname>args.input</parmname>. Typically this is a DITA map, however it also can
+            be a DITA topic if you want to transform a single DITA file. The path can be absolute, relative to
+              <parmname>args.input.dir</parmname>, or relative to the current directory if
+              <parmname>args.input.dir</parmname> is not defined.</pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--format</parmname>=<varname>name</varname></pt>
+          <pt>
+            <parmname>-f</parmname>
+            <varname>name</varname>
+          </pt>
+          <pd conref="parameters-base.dita#base/transtype.desc"/>
+          <pd>This argument corresponds to the common parameter <parmname>transtype</parmname>.</pd>
+          <pd>To list the formats that are currently available in your environment, use <cmdname>dita</cmdname>
+            <parmname>--transtypes</parmname>.</pd>
+          <pd>
+            <p conref="../resources/conref-task.dita#ID/transtypes"/>
+          </pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--install</parmname>=<varname>filename</varname></pt>
+          <pt>
+            <parmname>--install</parmname>=<varname>URL</varname></pt>
+          <pd>Install a single plug-in from a local ZIP file or from a URL.</pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--install</parmname>
+          </pt>
+          <pd><ph conref="../resources/conref-task.dita#ID/plugin-integrate-all"/></pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--uninstall</parmname>=<varname>id</varname>
+          </pt>
+          <pd>
+            <p>Remove the plug-in with the specified ID.</p>
+          </pd>
+          <pd>For a list of the currently installed plug-in IDs, use <cmdname>dita</cmdname>
+            <parmname>--plugins</parmname>.</pd>
+          <pd>
+            <note conref="../resources/conref-task.dita#ID/plugin-remove-subdir"/>
+          </pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--plugins</parmname>
+          </pt>
+          <pd>Show a list of the currently installed plug-ins.</pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--transtypes</parmname>
+          </pt>
+          <pd>Show a list of the available output formats (transformation types).</pd>
+          <pd>The entries in this list may be passed as values to the <parmname>--format</parmname> argument.</pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--help</parmname></pt>
+          <pt>
+            <parmname>-h</parmname>
+          </pt>
+          <pd>Print command usage help.</pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--version</parmname>
+          </pt>
+          <pd>Print version information and exit.</pd>
+        </plentry>
+      </parml>
+    </section>
+    <section>
+      <title>Options</title>
+      <div outputclass="div-index">
+        <indexterm><parmname>-o</parmname></indexterm>
+        <indexterm><parmname>--output</parmname></indexterm>
+        <indexterm><parmname>--filter</parmname></indexterm>
+        <indexterm><parmname>--force</parmname></indexterm>
+        <indexterm><parmname>--temp</parmname></indexterm>
+        <indexterm><parmname>-t</parmname></indexterm>
+        <indexterm><parmname>--verbose</parmname></indexterm>
+        <indexterm><parmname>-v</parmname></indexterm>
+        <indexterm><parmname>--debug</parmname></indexterm>
+        <indexterm><parmname>-d</parmname></indexterm>
+        <indexterm><parmname>--logfile</parmname></indexterm>
+        <indexterm><parmname>-l</parmname></indexterm>
+        <indexterm><parmname>--parameter</parmname></indexterm>
+        <indexterm><parmname>-D</parmname></indexterm>
+        <indexterm><parmname>--propertyfile</parmname></indexterm>
+        <indexterm>Java<indexterm>classes</indexterm></indexterm>
+        <indexterm>debugging<indexterm><cmdname>dita</cmdname> command</indexterm></indexterm>
+      </div>
+      <parml id="dita_build_options">
+        <plentry>
+          <pt>
+            <parmname>--output</parmname>=<varname>dir</varname></pt>
+          <pt>
+            <parmname>-o</parmname>
+            <varname>dir</varname>
+          </pt>
+          <pd id="output.dir.desc">
+            <p>Specifies the path of the output directory; the path can be absolute or relative to the current
+              directory.</p>
+            <p>This argument corresponds to the common parameter <parmname>output.dir</parmname>. By default, the output
+              is written to the <filepath>out</filepath> subdirectory of the current directory.</p>
+          </pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--filter</parmname>=<varname>files</varname>
+          </pt>
+          <pd>Specifies filter file(s) used to include, exclude, or flag content. </pd>
+          <pd>
+            <p>This argument corresponds to the common parameter <parmname>args.filter</parmname>. Relative paths are
+              resolved against the current directory and internally converted to absolute paths.</p>
+            <note>
+              <p>To specify multiple filter files, use the system path separator character to delimit individual file
+                paths (semicolon ‘<codeph>;</codeph>’ on Windows, and colon ‘<codeph>:</codeph>’ on macOS and Linux) and
+                wrap the value in quotes:</p>
+              <p><codeph>--filter="filter1.ditaval;filter2.ditaval;filter3.ditaval"</codeph></p>
+              <p>DITAVAL files are evaluated in the order specified, so conditions specified in the first file take
+                precedence over matching conditions specified in later files, just as conditions at the start of a
+                DITAVAL document take precedence over matching conditions later in the same document.</p>
+            </note>
+          </pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--force</parmname>
+          </pt>
+          <pd>Force-install an existing plug-in.</pd>
+          <pd>Passed as an additional option to the installation command:
+              <cmdname>dita</cmdname> <parmname>--install</parmname>=<varname>plug-in-zip</varname> <parmname>--force</parmname></pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--temp</parmname>=<varname>dir</varname></pt>
+          <pt>
+            <parmname>-t</parmname>
+            <varname>dir</varname>
+          </pt>
+          <pd conref="parameters-base.dita#base/dita.temp.dir.desc"/>
+          <pd>This argument corresponds to the common parameter <parmname>dita.temp.dir</parmname>.</pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--verbose</parmname></pt>
+          <pt>
+            <parmname>-v</parmname>
+          </pt>
+          <pd>Verbose logging prints additional information to the console, including directory settings, effective
+            values for Ant properties, input/output files, and informational messages to assist in troubleshooting.</pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--debug</parmname></pt>
+          <pt>
+            <parmname>-d</parmname>
+          </pt>
+          <pd>Debug logging prints considerably more additional information. The debug log includes all information from
+            the verbose log, plus details on Java classes, additional Ant properties and overrides, preprocessing
+            filters, parameters, and stages, and the complete build sequence. Debug logging requires additional
+            resources and can slow down the build process, so it should only be enabled when further details are
+            required to diagnose problems.</pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--logfile</parmname>=<varname>file</varname></pt>
+          <pt>
+            <parmname>-l</parmname>
+            <varname>file</varname>
+          </pt>
+          <pd>Write logging messages to a file.</pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--parameter</parmname>=<varname>value</varname></pt>
+          <pt>
+            <parmname>-D</parmname><varname>parameter</varname>=<varname>value</varname>
+          </pt>
+          <pd>Specify a value for a DITA-OT or Ant build parameter.
+            <p>The GNU-style <parmname>--parameter</parmname>=<varname>value</varname> form is only available for
+              parameters that are configured in the plug-in configuration file; the Java-style <parmname>-D</parmname>
+              form can also be used to specify additional non-configured parameters or set system properties.</p>
+            <p>Parameters not implemented by the specified transformation type or referenced in a
+                <filepath>.properties</filepath> file are ignored.</p><note
+              conref="../resources/conref-task.dita#ID/pass-input-dir"/></pd>
+        </plentry>
+        <plentry>
+          <pt>
+            <parmname>--propertyfile</parmname>=<varname>file</varname>
+          </pt>
+          <pd>Use build parameters defined in the referenced <filepath>.properties</filepath> file.
+            <p>Build parameters specified on the command line override those set in the <filepath>.properties</filepath>
+              file.</p></pd>
+        </plentry>
+      </parml>
+    </section>
+  </refbody>
+</reference>

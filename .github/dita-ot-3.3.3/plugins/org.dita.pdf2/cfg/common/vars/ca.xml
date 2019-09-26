@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Prefaci | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Prefaci | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Contingut</variable>
+  <variable id="Index Continued String">continuació</variable>
+  <variable id="Index See String">, Vegeu </variable>
+  <variable id="Index See Also String">Vegeu també </variable>
+  <variable id="Table of Contents Chapter">Capítol <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">Apèndix <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">Peça <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">Prefaci: </variable>
+  <variable id="Preface title">Prefaci</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">Contingut: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">Figura <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">Figura <param ref-name="number"/></variable>
+  <variable id="Table.title">Taula <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Taula <param ref-name="number"/></variable>
+  <variable id="Related Links">Informació relacionada</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">Capítol <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Apèndix <param ref-name="number"/></variable>
+  <variable id="Part with number">Peça <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[Per revisar]</variable>
+  <variable id="On the page"> a la pàgina <param ref-name="pagenum"/></variable>
+  <variable id="Page"> pàgina <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">Opcional:</variable>
+  <variable id="Required Step">Necessari:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Glossari</variable>
+  <variable id="List of Tables">Taules</variable>
+  <variable id="List of Figures">Figures</variable>
+</vars>

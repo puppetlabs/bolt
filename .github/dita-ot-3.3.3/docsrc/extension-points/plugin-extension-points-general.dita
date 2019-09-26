@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="plugin-general-extension-points">
+  <title>General extension points</title>
+  <shortdesc>These extension points enable you to extend DITA-OT. You can add Ant targets or imports; add a Java library
+    to the <parmname>classpath</parmname> parameter; add a new transformation type; extend a catalog file; add new
+    diagnostic messages, and more.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>deprecated features<indexterm><parmname>dita.conductor.target</parmname></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><parmname>dita.specialization.catalog</parmname></indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <dl>
+        <dlentry id="ant.import">
+          <dt><parmname>ant.import</parmname></dt>
+          <dd conaction="pushreplace" conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/ant.import.desc"
+            >Adds an Ant import to the main Ant build file.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>dita.conductor.lib.import</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/dita.conductor.lib.import.desc">Adds a Java
+            library to the DITA-OT classpath.</dd>
+        </dlentry>
+        <dlentry>
+          <dt importance="deprecated"><parmname>dita.conductor.target</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/dita.conductor.target.desc">Adds an Ant
+            import to the main Ant build file.
+            <p>
+              <note type="attention">This extension point is deprecated; use <codeph>ant.import</codeph> instead.</note>
+            </p>
+          </dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>dita.conductor.target.relative</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/dita.conductor.target.relative.desc">Adds
+            an Ant import to the main Ant build file.
+            <p>
+              <note type="tip">As of DITA-OT 3.0, the <codeph>ant.import</codeph> extension point can be used
+                instead.</note>
+            </p>
+          </dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>dita.conductor.transtype.check</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/dita.conductor.transtype.check.desc">
+            <p>Adds a new value to the list of valid transformation types.</p>
+            <note type="tip">This extension point is still supported for backwards compatibility, but since DITA-OT 2.1,
+              any new customizations should instead use the <xmlelement>transtype</xmlelement> element in the
+              <xref keyref="plugin-configfile"/> to define a new transformation.</note>
+          </dd>
+        </dlentry>
+        <dlentry importance="deprecated">
+          <dt><parmname>dita.specialization.catalog</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/dita.specialization.catalog.desc">Adds the
+            content of a catalog file to the main DITA-OT catalog file. <note type="attention">This extension point is
+              deprecated; use <codeph>dita.specialization.catalog.relative</codeph> instead.</note></dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>dita.specialization.catalog.relative</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/dita.specialization.catalog.relative.desc"
+            >Adds the content of a catalog file to the main DITA-OT catalog file.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>dita.transtype.print</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/dita.transtype.print.desc">Defines a
+            transformation as a print type.<draft-comment author="Kristen Eberlein" time="31 March 2013">What does this
+              actually do? Does this interact with using the deprecated <xmlatt>print</xmlatt>
+              attribute?</draft-comment></dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>dita.xsl.messages</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/dita.xsl.messages.desc">Adds new diagnostic
+            messages to DITA-OT.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>org.dita.pdf2.catalog.relative</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.pdf2.dita#org.dita.pdf2-ext/org.dita.pdf2.catalog.relative.desc">Adds
+            the content of a catalog file to the main catalog file for the PDF plug-in.</dd>
+        </dlentry>
+      </dl>
+    </section>
+  </refbody>
+</reference>

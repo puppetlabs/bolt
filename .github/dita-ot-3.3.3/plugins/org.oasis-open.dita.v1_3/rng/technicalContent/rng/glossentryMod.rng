@@ -1,0 +1,897 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Glossary Entry</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Glossary                                    
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Glossary Entry//EN"
+      Delivered as file "glossentry.mod"                            
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Define elements and specialization atttributes   
+            for Glossary topics                              
+                                                             
+ORIGINAL CREATION DATE:                                      
+            June 2006                                        
+                                                             
+            (C) Copyright OASIS Open 2006, 2009.             
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  
+   2008.02.12 RDA: Expand glossary for DITA 1.2               
+   2008.02.13 RDA: Create .content and .attributes entities  
+   2009.09.21 WEK: Renamed glossentry.mod                    
+=============================================================
+   </headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>glossentry</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Glossary Entry//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Glossary Entry//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:glossentryMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:xsd:glossentryGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:rnc:glossentryMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:glossentryMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic concept glossentry)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <define name="glossentry-info-types" combine="choice">
+      <empty/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="glossAbbreviation">
+      <ref name="glossAbbreviation.element"/>
+    </define>
+    <define name="glossAcronym">
+      <ref name="glossAcronym.element"/>
+    </define>
+    <define name="glossAlt">
+      <ref name="glossAlt.element"/>
+    </define>
+    <define name="glossAlternateFor">
+      <ref name="glossAlternateFor.element"/>
+    </define>
+    <define name="glossBody">
+      <ref name="glossBody.element"/>
+    </define>
+    <define name="glossdef">
+      <ref name="glossdef.element"/>
+    </define>
+    <define name="glossPartOfSpeech">
+      <ref name="glossPartOfSpeech.element"/>
+    </define>
+    <define name="glossProperty">
+      <ref name="glossProperty.element"/>
+    </define>
+    <define name="glossScopeNote">
+      <ref name="glossScopeNote.element"/>
+    </define>
+    <define name="glossShortForm">
+      <ref name="glossShortForm.element"/>
+    </define>
+    <define name="glossStatus">
+      <ref name="glossStatus.element"/>
+    </define>
+    <define name="glossSurfaceForm">
+      <ref name="glossSurfaceForm.element"/>
+    </define>
+    <define name="glossSymbol">
+      <ref name="glossSymbol.element"/>
+    </define>
+    <define name="glossSynonym">
+      <ref name="glossSynonym.element"/>
+    </define>
+    <define name="glossterm">
+      <ref name="glossterm.element"/>
+    </define>
+    <define name="glossUsage">
+      <ref name="glossUsage.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation> LONG NAME: Glossary Entry </a:documentation>
+      <define name="glossentry.content">
+        <ref name="glossterm"/>
+        <optional>
+          <ref name="glossdef"/>
+        </optional>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <optional>
+          <ref name="glossBody"/>
+        </optional>
+        <optional>
+          <ref name="related-links"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="glossentry-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="glossentry.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossentry.element">
+        <element name="glossentry" dita:longName="Glossary Entry">
+          <a:documentation>The &lt;glossentry> element defines a single sense of a glossary term. The expected book processing is to sort and group the glossary entries based on the localized term so
+            a back-of-the-book glossary can contain a collated list of terms with the definitions of the senses of the terms indented under the terms. The glossary can have a different organization in
+            different languages depending on the translation of the terms. One possible online processing is to associate a hotspot for mentions of terms in &lt;term> elements and display the
+            definition on hover or click. Glossary entries for different term senses can be reused independently of one another. Category: Glossentry elements</a:documentation>
+          <ref name="glossentry.attlist"/>
+          <ref name="glossentry.content"/>
+        </element>
+      </define>
+      <define name="glossentry.attlist" combine="interleave">
+        <ref name="glossentry.attributes"/>
+        <ref name="arch-atts"/>
+        <ref name="domains-att"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Term </a:documentation>
+      <define name="glossterm.content">
+        <zeroOrMore>
+          <ref name="title.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="glossterm.attributes">
+        <ref name="id-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="base"/>
+        </optional>
+        <ref name="base-attribute-extensions"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossterm.element">
+        <element name="glossterm" dita:longName="Glossary Term">
+          <a:documentation>The &lt;glossterm> element specifies the preferred term associated with a definition of a sense. If the same term has multiple senses, create a separate &lt;glossentry>
+            topic for each sense. Category: Glossentry elements</a:documentation>
+          <ref name="glossterm.attlist"/>
+          <ref name="glossterm.content"/>
+        </element>
+      </define>
+      <define name="glossterm.attlist" combine="interleave">
+        <ref name="glossterm.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Definition </a:documentation>
+      <define name="glossdef.content">
+        <zeroOrMore>
+          <ref name="abstract.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="glossdef.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossdef.element">
+        <element name="glossdef" dita:longName="Glossary Definition">
+          <a:documentation>The &lt;glossdef> element specifies the definition of one sense of a term. If a term has multiple senses, create a separate &lt;glossentry> topic to define each sense.
+            Category: Glossentry elements</a:documentation>
+          <ref name="glossdef.attlist"/>
+          <ref name="glossdef.content"/>
+        </element>
+      </define>
+      <define name="glossdef.attlist" combine="interleave">
+        <ref name="glossdef.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Body </a:documentation>
+      <define name="glossBody.content">
+        <optional>
+          <ref name="glossPartOfSpeech"/>
+        </optional>
+        <optional>
+          <ref name="glossStatus"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="glossProperty"/>
+        </zeroOrMore>
+        <optional>
+          <ref name="glossSurfaceForm"/>
+        </optional>
+        <optional>
+          <ref name="glossUsage"/>
+        </optional>
+        <optional>
+          <ref name="glossScopeNote"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="glossSymbol"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="note"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="glossAlt"/>
+        </zeroOrMore>
+      </define>
+      <define name="glossBody.attributes">
+        <ref name="id-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="base"/>
+        </optional>
+        <ref name="base-attribute-extensions"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossBody.element">
+        <element name="glossBody" dita:longName="Glossary Body">
+          <a:documentation>The &lt;glossbody> element is used to provide details about a glossary term (such as part of speech or additional forms of the term).</a:documentation>
+          <ref name="glossBody.attlist"/>
+          <ref name="glossBody.content"/>
+        </element>
+      </define>
+      <define name="glossBody.attlist" combine="interleave">
+        <ref name="glossBody.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Abbreviation </a:documentation>
+      <define name="glossAbbreviation.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="term"/>
+            <ref name="text" dita:since="1.3"/>
+            <ref name="tm"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="glossAbbreviation.attributes">
+        <ref name="id-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="base"/>
+        </optional>
+        <ref name="base-attribute-extensions"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossAbbreviation.element">
+        <element name="glossAbbreviation" dita:longName="Glossary Abbreviation">
+          <a:documentation>The &lt;glossAbbreviation> element provides an abbreviated form of the term contained in a &lt;glossterm> element. </a:documentation>
+          <ref name="glossAbbreviation.attlist"/>
+          <ref name="glossAbbreviation.content"/>
+        </element>
+      </define>
+      <define name="glossAbbreviation.attlist" combine="interleave">
+        <ref name="glossAbbreviation.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Acronym </a:documentation>
+      <define name="glossAcronym.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="term"/>
+            <ref name="text" dita:since="1.3"/>
+            <ref name="tm"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="glossAcronym.attributes">
+        <ref name="id-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="base"/>
+        </optional>
+        <ref name="base-attribute-extensions"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossAcronym.element">
+        <element name="glossAcronym" dita:longName="Glossary Acronym">
+          <a:documentation>The &lt;glossAcronym> element defines an acronym as an alternate form for the term defined in the &lt;glossterm> element.</a:documentation>
+          <ref name="glossAcronym.attlist"/>
+          <ref name="glossAcronym.content"/>
+        </element>
+      </define>
+      <define name="glossAcronym.attlist" combine="interleave">
+        <ref name="glossAcronym.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Short Form </a:documentation>
+      <define name="glossShortForm.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="term"/>
+            <ref name="text" dita:since="1.3"/>
+            <ref name="tm"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="glossShortForm.attributes">
+        <ref name="id-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="base"/>
+        </optional>
+        <ref name="base-attribute-extensions"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossShortForm.element">
+        <element name="glossShortForm" dita:longName="Glossary Short Form">
+          <a:documentation>The &lt;glossShortForm> element provides a shorter alternative to the primary term specified in the &lt;glossterm> element.</a:documentation>
+          <ref name="glossShortForm.attlist"/>
+          <ref name="glossShortForm.content"/>
+        </element>
+      </define>
+      <define name="glossShortForm.attlist" combine="interleave">
+        <ref name="glossShortForm.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Synonym </a:documentation>
+      <define name="glossSynonym.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="term"/>
+            <ref name="text" dita:since="1.3"/>
+            <ref name="tm"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="glossSynonym.attributes">
+        <ref name="id-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="base"/>
+        </optional>
+        <ref name="base-attribute-extensions"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossSynonym.element">
+        <element name="glossSynonym" dita:longName="Glossary Synonym">
+          <a:documentation>Provides a term that is a synonym of the primary value in the &lt;glossterm> element.</a:documentation>
+          <ref name="glossSynonym.attlist"/>
+          <ref name="glossSynonym.content"/>
+        </element>
+      </define>
+      <define name="glossSynonym.attlist" combine="interleave">
+        <ref name="glossSynonym.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Part of Speech </a:documentation>
+      <define name="glossPartOfSpeech.content">
+        <empty/>
+      </define>
+      <define name="glossPartOfSpeech.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="glossPartOfSpeech.element">
+        <element name="glossPartOfSpeech" dita:longName="Part of Speech">
+          <a:documentation>Identifies the part of speech for the preferred and alternate terms. Alternate terms must have the same part of speech as the preferred term because all terms in the
+            glossentry topic designate the same subject. If the part of speech isn't specified, the default is a noun for the standard enumeration.</a:documentation>
+          <ref name="glossPartOfSpeech.attlist"/>
+          <ref name="glossPartOfSpeech.content"/>
+        </element>
+      </define>
+      <define name="glossPartOfSpeech.attlist" combine="interleave">
+        <ref name="glossPartOfSpeech.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Status </a:documentation>
+      <define name="glossStatus.content">
+        <empty/>
+      </define>
+      <define name="glossStatus.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="glossStatus.element">
+        <element name="glossStatus" dita:longName="Glossary Status">
+          <a:documentation>Identifies the usage status of a preferred or alternate term. If the status isn't specified, the &lt;glossterm> provides a preferred term and an alternate term provides an
+            allowed term.</a:documentation>
+          <ref name="glossStatus.attlist"/>
+          <ref name="glossStatus.content"/>
+        </element>
+      </define>
+      <define name="glossStatus.attlist" combine="interleave">
+        <ref name="glossStatus.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Status </a:documentation>
+      <define name="glossProperty.content">
+        <zeroOrMore>
+          <ref name="data.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="glossProperty.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="glossProperty.element">
+        <element name="glossProperty" dita:longName="Glossary property">
+          <a:documentation>The &lt;glossProperty> element is an extension point which allows additional details about the preferred term or its subject.</a:documentation>
+          <ref name="glossProperty.attlist"/>
+          <ref name="glossProperty.content"/>
+        </element>
+      </define>
+      <define name="glossProperty.attlist" combine="interleave">
+        <ref name="glossProperty.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Surface Form </a:documentation>
+      <define name="glossSurfaceForm.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="keyword"/>
+            <ref name="term"/>
+            <ref name="text" dita:since="1.3"/>
+            <ref name="tm"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="glossSurfaceForm.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossSurfaceForm.element">
+        <element name="glossSurfaceForm" dita:longName="Glossary Surface Form">
+          <a:documentation> The &lt;glossSurfaceForm> element specifies an unambiguous presentation of the &lt;glossterm> that may combine multiple forms. The surface form is suitable to introduce the
+            term in new contexts.</a:documentation>
+          <ref name="glossSurfaceForm.attlist"/>
+          <ref name="glossSurfaceForm.content"/>
+        </element>
+      </define>
+      <define name="glossSurfaceForm.attlist" combine="interleave">
+        <ref name="glossSurfaceForm.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Usage </a:documentation>
+      <define name="glossUsage.content">
+        <zeroOrMore>
+          <ref name="note.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="glossUsage.attributes">
+        <optional>
+          <attribute name="type">
+            <choice>
+              <value>attention</value>
+              <value>caution</value>
+              <value>danger</value>
+              <value>fastpath</value>
+              <value>important</value>
+              <value>note</value>
+              <value>notice</value>
+              <value>other</value>
+              <value>remember</value>
+              <value>restriction</value>
+              <value>tip</value>
+              <value>warning</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="othertype"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossUsage.element">
+        <element name="glossUsage" dita:longName="Glossary Usage">
+          <a:documentation>The &lt;glossUsage> element provides information about the correct use of a term, such as where or how it can be used.</a:documentation>
+          <ref name="glossUsage.attlist"/>
+          <ref name="glossUsage.content"/>
+        </element>
+      </define>
+      <define name="glossUsage.attlist" combine="interleave">
+        <ref name="glossUsage.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Scope Note </a:documentation>
+      <define name="glossScopeNote.content">
+        <zeroOrMore>
+          <ref name="note.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="glossScopeNote.attributes">
+        <optional>
+          <attribute name="type">
+            <choice>
+              <value>attention</value>
+              <value>caution</value>
+              <value>danger</value>
+              <value>fastpath</value>
+              <value>important</value>
+              <value>note</value>
+              <value>notice</value>
+              <value>other</value>
+              <value>remember</value>
+              <value>restriction</value>
+              <value>tip</value>
+              <value>warning</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="othertype"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossScopeNote.element">
+        <element name="glossScopeNote" dita:longName="Glossary Scope Note">
+          <a:documentation>A clarification of the subject designated by the &lt;glossterm> such as examples of included or excluded companies or products. For instance, a scope note for
+            &#34;Linux&#34; might explain that the term doesn't apply to UNIX products and give some examples of Linux products that are included as well as UNIX products that are
+            excluded.</a:documentation>
+          <ref name="glossScopeNote.attlist"/>
+          <ref name="glossScopeNote.content"/>
+        </element>
+      </define>
+      <define name="glossScopeNote.attlist" combine="interleave">
+        <ref name="glossScopeNote.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Symbol </a:documentation>
+      <define name="glossSymbol.content">
+        <optional>
+          <ref name="alt"/>
+        </optional>
+        <optional>
+          <ref name="longdescref"/>
+        </optional>
+      </define>
+      <define name="glossSymbol.attributes">
+        <optional dita:since="DITA 1.3">
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="longdescref"/>
+        </optional>
+        <optional>
+          <attribute name="height">
+            <data type="NMTOKEN"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="width">
+            <data type="NMTOKEN"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="align"/>
+        </optional>
+        <optional>
+          <attribute name="scale">
+            <data type="NMTOKEN"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="scalefit">
+            <choice>
+              <value>yes</value>
+              <value>no</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="placement" a:defaultValue="inline">
+            <choice>
+              <value>break</value>
+              <value>inline</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossSymbol.element">
+        <element name="glossSymbol" dita:longName="Glossary Symbol">
+          <a:documentation>The &lt;glossSymbol> element identifies a standard image associated with the subject of the &lt;glossterm>.</a:documentation>
+          <ref name="glossSymbol.attlist"/>
+          <ref name="glossSymbol.content"/>
+        </element>
+      </define>
+      <define name="glossSymbol.attlist" combine="interleave">
+        <ref name="glossSymbol.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary Alternate Form </a:documentation>
+      <define name="glossAlt.content">
+        <optional>
+          <choice>
+            <ref name="glossAbbreviation"/>
+            <ref name="glossAcronym"/>
+            <ref name="glossShortForm"/>
+            <ref name="glossSynonym"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="glossStatus"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="glossProperty"/>
+        </zeroOrMore>
+        <optional>
+          <ref name="glossUsage"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="note"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="glossAlternateFor"/>
+        </zeroOrMore>
+      </define>
+      <define name="glossAlt.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossAlt.element">
+        <element name="glossAlt" dita:longName="Glossary Alternate Form">
+          <a:documentation>The &lt;glossAlt> element contains a variant term for the preferred term. The variant should have the same meaning as the term in the &lt;glossterm> element; the variant is
+            simply another way to refer to the same term. There may be many ways to refer to a term; each variant is placed in its own &lt;glossAlt> element.</a:documentation>
+          <ref name="glossAlt.attlist"/>
+          <ref name="glossAlt.content"/>
+        </element>
+      </define>
+      <define name="glossAlt.attlist" combine="interleave">
+        <ref name="glossAlt.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Glossary - Alternate For </a:documentation>
+      <define name="glossAlternateFor.content">
+        <empty/>
+      </define>
+      <define name="glossAlternateFor.attributes">
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="glossAlternateFor.element">
+        <element name="glossAlternateFor" dita:longName="Glossary - Alternate For">
+          <a:documentation>The &lt;glossAlternateFor> element indicates when a variant term has a relationship to another variant term as well as to the preferred term.</a:documentation>
+          <ref name="glossAlternateFor.attlist"/>
+          <ref name="glossAlternateFor.content"/>
+        </element>
+      </define>
+      <define name="glossAlternateFor.attlist" combine="interleave">
+        <ref name="glossAlternateFor.attributes"/>
+      </define>
+
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+
+    <define name="glossentry.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic concept/concept glossentry/glossentry "/>
+      </optional>
+    </define>
+    <define name="glossterm.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/title concept/title glossentry/glossterm "/>
+      </optional>
+    </define>
+    <define name="glossdef.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/abstract concept/abstract glossentry/glossdef "/>
+      </optional>
+    </define>
+    <define name="glossBody.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/body concept/conbody glossentry/glossBody "/>
+      </optional>
+    </define>
+    <define name="glossAbbreviation.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/title concept/title glossentry/glossAbbreviation "/>
+      </optional>
+    </define>
+    <define name="glossAcronym.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/title concept/title glossentry/glossAcronym "/>
+      </optional>
+    </define>
+    <define name="glossShortForm.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/title concept/title glossentry/glossShortForm "/>
+      </optional>
+    </define>
+    <define name="glossSynonym.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/title concept/title glossentry/glossSynonym "/>
+      </optional>
+    </define>
+    <define name="glossPartOfSpeech.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/data concept/data glossentry/glossPartOfSpeech "/>
+      </optional>
+    </define>
+    <define name="glossProperty.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/data concept/data glossentry/glossProperty "/>
+      </optional>
+    </define>
+    <define name="glossStatus.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/data concept/data glossentry/glossStatus "/>
+      </optional>
+    </define>
+    <define name="glossAlt.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section concept/section glossentry/glossAlt "/>
+      </optional>
+    </define>
+    <define name="glossAlternateFor.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/xref concept/xref glossentry/glossAlternateFor "/>
+      </optional>
+    </define>
+    <define name="glossScopeNote.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/note concept/note glossentry/glossScopeNote "/>
+      </optional>
+    </define>
+    <define name="glossSurfaceForm.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/p concept/p glossentry/glossSurfaceForm "/>
+      </optional>
+    </define>
+    <define name="glossSymbol.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/image concept/image glossentry/glossSymbol "/>
+      </optional>
+    </define>
+    <define name="glossUsage.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/note concept/note glossentry/glossUsage "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

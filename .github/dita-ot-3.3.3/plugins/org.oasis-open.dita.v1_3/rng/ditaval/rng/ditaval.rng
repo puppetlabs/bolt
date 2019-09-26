@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+  xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" 
+  xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  >
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA BASE</moduleTitle>
+    <headerComment xml:space="preserve" fileType="dtdShell"><![CDATA[
+=============================================================
+                   HEADER                                    
+=============================================================
+Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02
+OASIS Standard
+16 January 2018 
+Copyright (c) OASIS Open 2018. All rights reserved. 
+Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html
+
+============================================================
+ MODULE:    DITA DITAVAL DTD                                 
+ VERSION:   1.3                                              
+ DATE:      November 2014                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//DTD DITA DITAVAL//EN"
+      Delivered as file "ditaval.dtd"                             
+
+The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+PUBLIC "-//OASIS//DTD DITA 1.3 DITAVAL//EN"                       
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    DTD to describe DITAVAL resources                
+                                                             
+ORIGINAL CREATION DATE: 2005                                 
+                                                             
+            (C) Copyright OASIS Open 2006, 2009.             
+            (C) Copyright IBM Corporation 2002, 2005.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+=============================================================
+
+]]></headerComment>
+    <moduleMetadata>
+      <moduleType>topicshell</moduleType>
+      <moduleShortName>ditaval</moduleShortName>
+      <shellPublicIds>
+        <dtdShell>-//OASIS//DTD DITA<var presep=" " name="ditaver"/> DITAVAL//EN</dtdShell>
+        <rncShell>urn:oasis:names:tc:dita:xsd:ditaval.rnc<var presep=":" name="ditaver"/></rncShell>
+        <rngShell>urn:oasis:names:tc:dita:xsd:ditaval.rng<var presep=":" name="ditaver"/></rngShell>
+        <xsdShell>urn:oasis:names:tc:dita:xsd:ditaval.xsd<var presep=":" name="ditaver"/></xsdShell>
+      </shellPublicIds>
+    </moduleMetadata>
+  </moduleDesc>
+
+  <start>
+    <ref name="val"/>
+  </start>
+
+  <define name="val">
+    <element name="val">
+      <ref name="attlist.val"/>
+      <optional>
+        <ref name="style-conflict"/>
+      </optional>
+      <zeroOrMore>
+        <choice>
+          <ref name="prop"/>
+          <ref name="revprop"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="attlist.val" combine="interleave">
+    <empty/>
+  </define>
+
+  <define name="style-conflict">
+    <element name="style-conflict">
+      <ref name="attlist.style-conflict"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist.style-conflict" combine="interleave">
+    <optional>
+      <attribute name="foreground-conflict-color"/>
+    </optional>
+    <optional>
+      <attribute name="background-conflict-color"/>
+    </optional>
+  </define>
+
+  <define name="prop">
+    <element name="prop">
+      <ref name="attlist.prop"/>
+      <optional>
+        <ref name="startflag"/>
+      </optional>
+      <optional>
+        <ref name="endflag"/>
+      </optional>
+    </element>
+  </define>
+  <define name="attlist.prop" combine="interleave">
+    <optional>
+      <attribute name="att"/>
+    </optional>
+    <optional>
+      <attribute name="val"/>
+    </optional>
+    <attribute name="action">
+      <choice>
+        <value>flag</value>
+        <value>include</value>
+        <value>exclude</value>
+        <value>passthrough</value>
+      </choice>
+    </attribute>
+    <optional>
+      <attribute name="color"/>
+    </optional>
+    <optional>
+      <attribute name="backcolor"/>
+    </optional>
+    <optional>
+      <attribute name="style">
+        <data type="NMTOKENS" dita:since="1.3"/>
+      </attribute>      
+    </optional>
+  </define>
+
+  <define name="startflag">
+    <element name="startflag">
+      <ref name="attlist.startflag"/>
+      <optional>
+        <ref name="alt-text"/>
+      </optional>
+    </element>
+  </define>
+  <define name="attlist.startflag" combine="interleave">
+    <optional>
+      <attribute name="imageref"/>
+    </optional>
+  </define>
+
+  <define name="endflag">
+    <element name="endflag">
+      <ref name="attlist.endflag"/>
+      <optional>
+        <ref name="alt-text"/>
+      </optional>
+    </element>
+  </define>
+  <define name="attlist.endflag" combine="interleave">
+    <optional>
+      <attribute name="imageref"/>
+    </optional>
+  </define>
+  
+  <define name="alt-text">
+    <element name="alt-text">
+      <ref name="attlist.alt-text"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.alt-text" combine="interleave">
+    <empty/>
+  </define>
+  
+  <define name="revprop">
+    <element name="revprop">
+      <ref name="attlist.revprop"/>
+      <optional>
+        <ref name="startflag"/>
+      </optional>
+      <optional>
+        <ref name="endflag"/>
+      </optional>
+    </element>
+  </define>
+  <define name="attlist.revprop" combine="interleave">
+    <optional>
+      <attribute name="val"/>
+    </optional>
+    <attribute name="action">
+      <choice>
+        <value>include</value>
+        <value>passthrough</value>
+        <value>flag</value>
+      </choice>
+    </attribute>
+    <optional>
+      <attribute name="changebar"/>
+    </optional>
+    <optional>
+      <attribute name="color"/>
+    </optional>
+    <optional>
+      <attribute name="backcolor"/>
+    </optional>
+    <optional>
+      <attribute name="style">
+        <a:documentation>
+          The style attribute should be a color value (either a name, or a SRGB value).
+          See below for the supported color names (taken from the XHTML DTD).
+
+          There are 16 widely known color names with their sRGB values:
+          
+          black  = #000000    green  = #008000
+          silver = #C0C0C0    lime   = #00FF00
+          gray   = #808080    olive  = #808000
+          white  = #FFFFFF    yellow = #FFFF00
+          maroon = #800000    navy   = #000080
+          red    = #FF0000    blue   = #0000FF
+          purple = #800080    teal   = #008080
+          fuchsia= #FF00FF    aqua   = #00FFFF
+        </a:documentation>
+        <data type="NMTOKENS" dita:since="1.3"/>
+      </attribute>      
+    </optional>
+  </define>
+</grammar>

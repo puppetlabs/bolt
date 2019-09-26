@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Reference XSD  Module                        -->
+<!--  VERSION:   1.1                                             -->
+<!--  DATE:      November 2006                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    DTD to describe DITA References                   -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2006                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+  <!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="urn:oasis:names:tc:dita:xsd:xml.xsd:1.1"/>
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/" schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.1"/>
+
+  <xs:element name="reference">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>reference</keyword>&gt; element defines a top-level container
+        for a reference topic. Reference topics document programming constructs or
+        facts about a product. Examples of reference topics include language elements,
+        class descriptions, commands, functions, statements, protocols, types, declarators,
+        operands, and API information, which provide quick access to facts, but no
+        explanation of concepts or procedures. Reference topics have the same high-level
+        structure as any other topic type, with a title, short description, and body.
+        Within the body, reference topics are typically organized into one or more
+        sections, property lists, and tables. The reference topic type provides general
+        rules that apply to all kinds of reference information, using elements like &lt;<keyword>refsyn</keyword>&gt; for
+        syntax or signatures, and &lt;<keyword>properties</keyword>&gt; for lists of properties
+        and values.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="reference.class">
+          <xs:attribute ref="class" default="- topic/topic reference/reference "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="refbody">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>refbody</keyword>&gt; element is a container for the
+        main content of the reference topic. Reference topics limit the body structure
+        to tables (both simple and standard), property lists, syntax sections, and
+        generic sections and examples, in any sequence or number.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="refbody.class">
+          <xs:attribute ref="class" default="- topic/body reference/refbody "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="refsyn">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>refsyn</keyword>&gt; element is a special section inside
+        a reference topic. The section often contains syntax or signature content
+        (for example, a command-line utility's calling syntax, or an API's signature).
+        The &lt;<keyword>refsyn</keyword>&gt; contains a brief, possibly diagrammatic
+        description of the subject's interface or high-level structure.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="refsyn.class">
+          <xs:attribute ref="class" default="- topic/section reference/refsyn "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="properties">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>properties</keyword>&gt; element gives a list of properties for 
+        the subject of the current topic, for example whether a class is public or protected. 
+        Each property can include the type, value, and a description. The typical rendering is 
+        usually in a table-like format. To represent multiple values for a type, just create 
+        additional property elements and use only the &lt;<keyword>propvalue</keyword>&gt; 
+        element (and &lt;<keyword>propdesc</keyword>&gt; when needed) for each successive 
+        value.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="properties.class">
+          <xs:attribute ref="class" default="- topic/simpletable reference/properties "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="property">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>property</keyword>&gt; element represents a property
+        of the current topic's subject. For example, if the current topic is a class,
+        the property might show that the class is protected rather than public.
+        It contains three optional elements: type, value, and description.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="property.class">
+          <xs:attribute ref="class" default="- topic/strow  reference/property "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="propvalue">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>propvalue</keyword>&gt; element indicates the value or values
+        for the current property type. You can put values in separate rows if they
+        need separate descriptions, and just leave the &lt;<keyword>proptype</keyword>&gt; element
+        blank.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="propvalue.class">
+          <xs:attribute ref="class" default="- topic/stentry  reference/propvalue "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="propdesc">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>propdesc</keyword>&gt; element is used to provide a short description
+        of the property type and its listed values (or just the value).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="propdesc.class">
+          <xs:attribute ref="class" default="- topic/stentry  reference/propdesc "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="proptype">
+    <xs:annotation>
+      <xs:documentation>
+        The proptype element describes the type of property.        
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="proptype.class">
+          <xs:attribute ref="class" default="- topic/stentry reference/proptype "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="prophead"> 
+    <xs:annotation>
+      <xs:documentation>
+        The prophead element supports regular headings for the properties element.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="prophead.class">
+          <xs:attribute ref="class" default="- topic/sthead  reference/prophead "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="propvaluehd">
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="propvaluehd.class">
+          <xs:attribute ref="class" default="- topic/stentry  reference/propvaluehd "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="propdeschd">
+    <xs:complexType mixed="true">
+     <xs:complexContent>
+       <xs:extension base="propdeschd.class">
+         <xs:attribute ref="class" default="- topic/stentry  reference/propdeschd "/>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType> 
+  </xs:element>
+   
+  <xs:element name="proptypehd">
+    <xs:complexType mixed="true">
+      <xs:complexContent>
+        <xs:extension base="proptypehd.class">
+          <xs:attribute ref="class" default="- topic/stentry reference/proptypehd "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+   <xs:group name="reference-info-types">
+    <xs:choice>
+      <xs:group ref="reference"/>
+      <xs:group ref="info-types"/>
+    </xs:choice>
+  </xs:group>
+
+   <!-- Base type: topic.class -->
+  <xs:complexType name="reference.class">
+    <xs:sequence>
+      <xs:group ref="title"/>
+      <xs:group ref="titlealts" minOccurs="0"/>
+      <xs:choice minOccurs="0">
+        <xs:group ref="shortdesc" minOccurs="0"/>
+        <xs:group ref="abstract" minOccurs="0"/>
+      </xs:choice>
+      <xs:group ref="prolog" minOccurs="0"/>
+      <xs:group ref="refbody" minOccurs="0"/>
+      <xs:group ref="related-links" minOccurs="0"/>
+      <xs:group ref="reference-info-types" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attribute name="conref" type="xs:string"/>
+    <xs:attribute ref="ditaarch:DITAArchVersion"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="select-atts"/>
+    <xs:attributeGroup ref="localization-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: body.class -->
+  <xs:complexType name="refbody.class">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="refsyn"/>
+      <xs:group ref="table"/>
+      <xs:group ref="simpletable"/>
+      <xs:group ref="properties"/>
+      <xs:group ref="section"/>
+      <xs:group ref="example"/>
+      <xs:group ref="data.element.incl"/>
+      <xs:group ref="foreign.unknown.incl"/>
+    </xs:choice>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attribute name="base" type="xs:string" />
+    <xs:attributeGroup ref="base-attribute-extensions"/>
+    <xs:attributeGroup ref="id-atts"/>
+    <xs:attributeGroup ref="localization-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+
+   <!-- Base type: section.class -->
+  <xs:complexType name="refsyn.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="section.cnt"/>
+    </xs:choice>
+    <xs:attribute name="spectitle" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: simpletable.class -->
+  <xs:complexType name="properties.class">
+    <xs:sequence>
+      <xs:group ref="prophead" minOccurs="0"/>
+      <xs:group ref="property" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="relcolwidth" type="xs:string"/>
+    <xs:attribute name="keycol" type="xs:NMTOKEN"/>
+    <xs:attribute name="refcols" type="xs:NMTOKENS"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attribute name="spectitle" type="xs:string"/>
+    <xs:attributeGroup ref="display-atts"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+
+  <!-- Base type: sthead.class -->
+  <xs:complexType name="prophead.class">
+    <xs:sequence>
+      <xs:group ref="proptypehd" minOccurs="0"/>
+      <xs:group ref="propvaluehd" minOccurs="0"/>
+      <xs:group ref="propdeschd" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: stentry.class -->
+  <xs:complexType name="proptypehd.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="tblcell.cnt"/>
+    </xs:choice>
+    <xs:attribute name="specentry" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: stentry.class -->
+  <xs:complexType name="propvaluehd.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="tblcell.cnt"/>
+    </xs:choice>
+    <xs:attribute name="specentry" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: stentry.class -->
+  <xs:complexType name="propdeschd.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="tblcell.cnt"/>
+    </xs:choice>
+    <xs:attribute name="specentry" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+  <!-- Base type: strow.class -->
+  <xs:complexType name="property.class">
+    <xs:sequence>
+      <xs:group ref="proptype" minOccurs="0"/>
+      <xs:group ref="propvalue" minOccurs="0"/>
+      <xs:group ref="propdesc" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <!-- Base type: stentry.class -->
+  <xs:complexType name="proptype.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="ph.cnt"/>
+    </xs:choice>
+    <xs:attribute name="specentry" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <!-- Base type: stentry.class -->
+  <xs:complexType name="propvalue.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="ph.cnt"/>
+    </xs:choice>
+    <xs:attribute name="specentry" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+   <!-- Base type: stentry.class -->
+  <xs:complexType name="propdesc.class" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="desc.cnt"/>
+    </xs:choice>
+    <xs:attribute name="specentry" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+</xs:schema>

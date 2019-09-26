@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Strict Taskbody Constraint</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Strict Taskbody Constraint                  
+ VERSION:   1.3                                             
+ DATE:      March 2014                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Strict Taskbody Constraint//EN"
+      Delivered as file "strictTaskbodyConstraint.mod"            
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the domain entity for the strict task  
+            constraint module                                
+                                                             
+ORIGINAL CREATION DATE:                                      
+            April 2008                                       
+                                                             
+            (C) Copyright OASIS Open 2008, 2014.             
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+=============================================================
+  </headerComment>
+    <moduleMetadata>
+      <moduleType>constraint</moduleType>
+      <moduleShortName>strictTaskbody</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Strict Taskbody Constraint//EN</dtdMod>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:strictTaskbodyConstraintMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:strictTaskbodyConstraintMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:strictTaskbodyConstraintMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic task strictTaskbody-c)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+
+  <div>
+    <a:documentation>CONTENT MODEL OVERRIDES</a:documentation>
+    <include href="taskMod.rng">
+      <define name="taskbody.content">
+        <optional>
+          <ref name="prereq"/>
+        </optional>
+        <optional>
+          <ref name="context"/>
+        </optional>
+        <optional>
+          <choice>
+            <ref name="steps"/>
+            <ref name="steps-unordered"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="result"/>
+        </optional>
+        <optional>
+          <ref name="tasktroubleshooting"/>
+        </optional>
+        <optional>
+          <ref name="example"/>
+        </optional>
+        <optional>
+          <ref name="postreq"/>
+        </optional>
+      </define>
+    </include>
+  </div>
+</grammar>

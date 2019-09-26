@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="migrating-to-2.0">
+
+  <title>Migrating to release 2.0</title>
+  <titlealts>
+    <navtitle>To 2.0</navtitle>
+  </titlealts>
+
+  <shortdesc>In DITA-OT 2.0, XSLT templates were converted to XSLT 2.0, variable typing was implemented, and some older
+    templates were refactored or removed. In addition, the <cmdname>dita</cmdname> command simplifies distribution of
+    plugins by allowing installation from a URL.<draft-comment author="staylor">There are likely other changes that
+      should be noted here. See <xref keyref="2.0-release-notes"/>. </draft-comment>
+  </shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlatt>as</xmlatt></indexterm>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>plug-ins</indexterm></indexterm>
+        <indexterm>uninstalling</indexterm>
+        <indexterm>removing<index-see>uninstalling</index-see></indexterm>
+        <indexterm>deinstalling<index-see>uninstalling</index-see></indexterm>
+        <indexterm>XSLT<indexterm>2.0</indexterm></indexterm>
+        <indexterm>Customization directory</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section>
+      <note>This topic provides a summary of changes in DITA-OT 2.0 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the <xref keyref="2.0-release-notes"/>.</note>
+    </section>
+    <refbodydiv>
+      <section>
+        <title>All transformations — variable typing</title>
+        <p>XSLT stylesheets were converted to XSLT 2.0. With that change, variable types were also implemented. Plug-ins
+          that change template variable values will need to make the following changes:</p>
+        <ul>
+          <li>Declare the same types defined in the default templates with <xmlatt>as</xmlatt>.</li>
+          <li>Ensure that the generated values conform to the declared type.</li>
+        </ul>
+      </section>
+      <example>
+        <p>For example:</p>
+        <codeblock outputclass="language-xml">&lt;xsl:variable name="urltest">
+&lt;xsl:variable name="urltest" <b>as="xs:boolean"</b>></codeblock>
+      </example>
+      <section>
+        <title>All transformations — refactoring</title>
+        <p>Much of the toolkit code was refactored for release 2.0. Customization changes that were based on a specific
+          template in a previous version of the toolkit might not work because the modified template is no longer used.
+          If this is the case, the changes will need to be reimplemented based on the new XSLT templates.</p>
+      </section>
+    </refbodydiv>
+    <section>
+      <title>HTML5</title>
+      <p>A new <option>HTML5</option> transformation type has been added. Customizations that previously modified the
+        XHTML output to generate valid HTML5 should still work, but basing your customization on the new transformation
+        type might simplify the customization and reduce the work required to maintain compatibility with future
+        versions of the toolkit.</p>
+      <note>The <option>HTML5</option> transformation was refactored with release 2.2. Before basing your customization
+        on the changes in release 2.0, consider whether you might want to move to release 2.2 instead. See <xref
+          keyref="migrating-to-2.2"/>.</note>
+    </section>
+    <section>
+      <title>Plug-in installation and distribution</title>
+      <p>Plug-ins can now be installed or uninstalled from a ZIP archive using the new <cmdname>dita</cmdname> command.
+        Plug-ins can also be installed from a referenced URL. See <xref keyref="dita-command-arguments"/>.</p>
+    </section>
+  </refbody>
+</reference>

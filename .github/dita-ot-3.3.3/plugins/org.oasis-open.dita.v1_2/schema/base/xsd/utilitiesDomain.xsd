@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Utilities Domain                             -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization attributes     -->
+<!--             for Utilities Domain                              -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2009                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="urn:oasis:names:tc:dita:xsd:xml.xsd:1.2"/>
+  
+  <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic ut-d)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+      <!--  place holder for documentation -->
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:group name="ut-d-fig">
+    <xs:choice>
+      <xs:element ref="imagemap"/>
+    </xs:choice>
+  </xs:group>
+
+  
+  
+  <xs:group name="imagemap">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="imagemap"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="area">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="area"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="shape">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="shape"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="coords">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="coords"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+  
+  
+
+
+  <!-- Base form: Imagemap ((%image;), (%area;)+) -->
+
+  <xs:element name="imagemap" >
+    <xs:annotation>
+      <xs:documentation>
+        The imagemap element supports the basic functionality of the HTML <q>client-side</q> image map markup.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="imagemap.class">
+          <xs:attribute ref="class" default="+ topic/fig ut-d/imagemap "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="imagemap.class">
+        <xs:sequence>
+          <xs:group ref="imagemap.content"/>      
+        </xs:sequence>
+       <xs:attributeGroup ref="imagemap.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="imagemap.content">
+    <xs:sequence>
+      <xs:sequence>
+          <xs:group ref="image"/>
+          <xs:group ref="area" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="imagemap.attributes">
+     <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="display-atts"/>
+        <xs:attribute name="spectitle" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+
+  <xs:element name="area" >
+    <xs:annotation>
+      <xs:documentation>
+        The area element supports the basic functionality of the HTML image map markup.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="area.class">
+          <xs:attribute ref="class" default="+ topic/figgroup ut-d/area "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="area.class">
+        <xs:sequence>
+          <xs:group ref="area.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="area.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="area.content">
+    <xs:sequence>
+      <xs:sequence>
+          <xs:group ref="shape"/>
+          <xs:group ref="coords"/>
+          <xs:group ref="xref"/>
+        </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="area.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+
+  <xs:element name="shape" >
+    <xs:annotation>
+      <xs:documentation>
+        The shape element supports the basic functionality of the HTML <q>client-side</q> image map markup.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="shape.class">
+          <xs:attribute ref="class" default="+ topic/keyword ut-d/shape "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="shape.class" mixed="true">
+    <xs:sequence>
+      <xs:group ref="shape.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="shape.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="shape.content">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="text"/>
+        </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="shape.attributes">
+    <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts-translate-no"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+
+  <xs:element name="coords" >
+    <xs:annotation>
+      <xs:documentation>
+        The coords element supports the basic functionality of the HTML <q>client-side</q> image map markup.
+       </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="coords.class">
+          <xs:attribute ref="class" default="+ topic/ph ut-d/coords "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="coords.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="coords.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="coords.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="coords.content">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="words.cnt"/>
+        </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="coords.attributes">
+    <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts-translate-no"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+
+</xs:schema>

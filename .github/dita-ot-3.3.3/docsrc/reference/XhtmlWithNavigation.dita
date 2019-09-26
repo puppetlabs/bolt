@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="xhtmlwithnavigation" xml:lang="en-US">
+  <title>HTML-based processing modules</title>
+  <shortdesc>DITA-OT ships with several varieties of HTML output, each of which follows roughly the same path through
+    the processing pipeline. All HTML-based transformations begin with the same call to the pre-processing module, after
+    which they generate HTML files and then branch to create the transformation-specific navigation files.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>HTML<indexterm>various output types</indexterm></indexterm>
+        <indexterm>pipelines<indexterm>HTML</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <draft-comment author="Kristen Eberlein" time="29 March 2013">Does the content in this section pertain to the
+          <codeph>dita.map.xhtml</codeph> target?</draft-comment></section>
+  </conbody>
+</concept>

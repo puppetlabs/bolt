@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--                                                             -->
+<!--      MODULE: DITA Map RNG                                   -->
+<!--      VERSION: 1.3 DATE: November 2013                       -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:group name="map">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="map"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="navref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="navref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="topicref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="topicref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="anchor">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="anchor"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="reltable">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="reltable"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="relheader">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="relheader"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="relcolspec">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="relcolspec"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="relrow">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="relrow"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="relcell">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="relcell"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="topicmeta">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="topicmeta"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="shortdesc">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="shortdesc"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="linktext">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="linktext"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="searchtitle">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="searchtitle"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="ux-window">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="ux-window"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+</xs:schema>

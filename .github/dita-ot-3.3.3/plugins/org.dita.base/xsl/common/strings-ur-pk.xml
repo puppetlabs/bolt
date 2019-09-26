@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2009 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="ur-pk">        <!-- Urdu -->
+  <str name="Figure">تصویر</str>
+  <str name="Table">جدول</str>
+  <str name="Next topic">اگلا موضوع</str>
+  <str name="Previous topic">سابقہ موضوع</str>
+  <str name="Parent topic">مادر موضوع</str>
+  <str name="Required cleanup">مطلوبہ صفائی</str>
+  <str name="Draft comment">تبصرے کا مسودہ</str>
+  <str name="Option">اختیار</str>
+  <str name="Description">وضاحت</str>
+  <str name="Optional">اختیاری</str>
+  <str name="Required">ضروری</str>
+  <str name="Skip visual syntax diagram">وژوئل سنٹیکس کی شکل چھوڑ دیں</str>
+  <str name="Read syntax diagram">وژوئل سنٹیکس کی شکل پڑھیں</str>
+  <str name="Start of change">تبدیلی کی شروعات</str>
+  <str name="End of change">تبدیلی کی کا اختتام</str>
+  <str name="Index">انڈکس</str>
+  <str name="Special characters">خاص حروف</str>
+  <str name="Numerics">نمبر</str>
+  <str name="End notes">اختتامی نوٹس</str>
+  <str name="Artwork">آرٹ ورک</str>
+  <str name="Syntax">سنٹیکس</str>
+  <str name="Type">قسم</str>
+  <str name="Value">قدر</str>
+  <str name="Note">نوٹ</str>
+  <str name="Notes">نوٹس</str>
+  <str name="Tip">مشورہ</str>
+  <str name="Fastpath">تیز طریقہ</str>
+  <str name="Important">اہم</str>
+  <str name="Attention">براۓ توجہ</str>
+  <str name="Caution">احتیاط</str>
+  <str name="Danger">خطرناک</str>
+  <str name="Remember">یاد رکھیں</str>
+  <str name="Restriction">پابندی</str>
+  <str name="Trouble">مشکل/پریشانی</str>
+  <str name="Warning">انتباہ</str>
+  <str name="Contents">فہرست</str>
+  <str name="Related concepts">متعلقہ خیالات</str>
+  <str name="Related tasks">متعلقہ کام</str>
+  <str name="Related reference">متعلقہ حوالہ</str>
+  <str name="Related information">متعلقہ معلومات</str>
+  <str name="Prerequisite">شرط اول</str>
+  <str name="Prerequisites">اولین شرطیں</str>
+  <str name="or">یا</str>
+  <str name="task_context">اس کام کے متعلق</str>
+  <str name="task_example">مثال</str>
+  <str name="task_postreq">آکے کیا کرنا ہے</str>
+  <str name="task_prereq">قبل اس کے کہ آپ شروع کریں</str>
+  <str name="task_procedure">طریق عمل</str>
+  <str name="task_procedure_unordered">طریق عمل</str>
+  <str name="task_results">نتائج</str>
+  <str name="Copyright">حقوق</str>
+  <str name="a11y.and-then"></str>
+</strings>

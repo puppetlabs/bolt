@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../../resources/project.rnc" type="application/relax-ng-compact-syntax"?>
+<project xmlns="https://www.dita-ot.org/project">
+  <deliverable name="HTMLHelp" id="htmlhelp">
+    <context idref="html"/>
+    <output href="htmlhelp"/>
+    <publication transtype="htmlhelp">
+      <param name="args.copycss" value="yes"/>
+      <param name="args.css" value="dita-ot-doc.css"/>
+      <param name="args.csspath" value="css"/>
+      <param name="args.cssroot" path="../../resources"/>
+      <param name="args.gen.task.lbl" value="YES"/>
+      <param name="processing-mode" value="strict"/>
+    </publication>
+  </deliverable>
+</project>

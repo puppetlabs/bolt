@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+
+<strings xml:lang="bg-bg">        <!-- Bulgarian -->
+  <str name="Figure">Фигура</str>
+  <str name="Table">Таблица</str>
+  <str name="Next topic">Следваща тема</str>
+  <str name="Previous topic">Предходна тема</str>
+  <str name="Parent topic">Тема родител</str>
+  <str name="Required cleanup">Необходимо прочистване</str>
+  <str name="Draft comment">Коментар на чернова</str>
+  <str name="Option">Опция</str>
+  <str name="Description">Описание</str>
+  <str name="Optional">Избираем</str>
+  <str name="Required">Задължителен</str>
+  <str name="Skip visual syntax diagram">Пропусни визуална диаграма на синтаксис</str>
+  <str name="Read syntax diagram">Четене на диаграма на синтаксис</str>
+  <str name="Start of change">Начало на промяна</str>
+  <str name="End of change">Край на промяна</str>
+  <str name="Index">Индекс</str>
+  <str name="Special characters">Специални символи</str>
+  <str name="Numerics">Цифри</str>
+  <str name="End notes">Крайни забележки</str>
+  <str name="Artwork">Илюстрации</str>
+  <str name="Syntax">Синтаксис</str>
+  <str name="Type">Тип</str>
+  <str name="Value">Стойност</str>
+  <str name="Note">Забележка</str>
+  <str name="Notes">Забележки</str>
+  <str name="Tip">Съвет</str>
+  <str name="Fastpath">Бърз начин</str>
+  <str name="Important">Важно</str>
+  <str name="Attention">Внимание</str>
+  <str name="Caution">ВНИМАНИЕ</str>
+  <str name="Danger">ОПАСНО</str>
+  <str name="Remember">Запомнете</str>
+  <str name="Restriction">Ограничение</str>
+  <str name="Trouble">Проблем</str>
+  <str name="Warning">Предупреждение</str>
+  <str name="Contents">Съдържание</str>
+  <str name="Related concepts">Свързани понятия</str>
+  <str name="Related tasks">Свързани дейности</str>
+  <str name="Related reference">Свързани справки</str>
+  <str name="Related information">Свързана информация</str>
+  <str name="Prerequisite">Необходимо условие</str>
+  <str name="Prerequisites">Необходими условия</str>
+  <str name="or">or</str>
+  <str name="task_context">За тази дейност</str>
+  <str name="task_example">Пример</str>
+  <str name="task_postreq">Какво да направим после</str>
+  <str name="task_prereq">Преди да започнете</str>
+  <str name="task_procedure">Процедура</str>
+  <str name="task_procedure_unordered">Процедура</str>
+  <str name="task_results">Резултати</str>
+  <str name="Copyright">Авторско право</str>
+  <str name="a11y.and-then"></str>
+</strings>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA learningContent Module</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA learningContent                             
+ VERSION:   1.3                                              
+ DATE:      March 2014                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identfier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Learning Content//EN"
+      Delivered as file "learningContent.mod                      
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for Learning Content                  
+                                                             
+ORIGINAL CREATION DATE:                                      
+            May 2007                                         
+                                                             
+            (C) Copyright OASIS Open 2007, 2014.             
+            All Rights Reserved.                             
+=============================================================
+</headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>learningContent</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Learning Content//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Learning Content//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:spec:learning:xsd:learningContentMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:spec:learning:xsd:learningContentGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:spec:learning:rnc:learningContentMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:spec:learning:rng:learningContentMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic learningBase+learningInteractionBase-d learningContent)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>TOPIC NESTING OVERRIDES</a:documentation>
+    <define name="learningContent-info-types" combine="choice">
+      <empty/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="learningContent">
+      <ref name="learningContent.element"/>
+    </define>
+    <define name="learningContentbody">
+      <ref name="learningContentbody.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <define name="learningContent.content">
+        <ref name="title"/>
+        <optional>
+          <ref name="titlealts"/>
+        </optional>
+        <optional>
+          <choice>
+            <ref name="shortdesc"/>
+            <ref name="abstract"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <ref name="learningContentbody"/>
+        <optional>
+          <ref name="related-links"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="learningContent-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="learningContent.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="learningContent.element">
+        <element name="learningContent" dita:longName="Learning content topic">
+          <a:documentation>A Learning Content topic provides the learning content itself, and enables
+        direct use of content from DITA task, concept, and reference topics, as well as additional
+        content of any topic type that supports specific objectives declared in the Learning
+        Overview topic type. A Learning Content topic comprises a set of self-contained content
+        about a single terminal learning objective supported by zero or more enabling learning
+        objectives.</a:documentation>
+          <ref name="learningContent.attlist"/>
+          <ref name="learningContent.content"/>
+        </element>
+      </define>
+      <define name="learningContent.attlist" combine="interleave">
+        <ref name="learningContent.attributes"/>
+        <ref name="arch-atts"/>
+        <ref name="domains-att"/>
+      </define>
+    </div>
+    <div>
+      <define name="learningContentbody.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="lcIntro"/>
+            <ref name="lcDuration"/>
+            <ref name="lcObjectives"/>
+          </choice>
+        </zeroOrMore>
+        <optional>
+          <ref name="lcChallenge"/>
+        </optional>
+        <optional>
+          <ref name="lcInstruction"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="section"/>
+        </zeroOrMore>
+      </define>
+      <define name="learningContentbody.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="learningContentbody.element">
+        <element name="learningContentbody" dita:longName="Learning content body">
+          <a:documentation>The &lt;learningContentbody> element is the main body-level element in a
+        learningContent topic.</a:documentation>
+          <ref name="learningContentbody.attlist"/>
+          <ref name="learningContentbody.content"/>
+        </element>
+      </define>
+      <define name="learningContentbody.attlist" combine="interleave">
+        <ref name="learningContentbody.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation> Specialization attributes. Global attributes and class defaults </a:documentation>
+    <define name="learningContent.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic learningBase/learningBase learningContent/learningContent "/>
+      </optional>
+    </define>
+    <define name="learningContentbody.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/body  learningBase/learningBasebody learningContent/learningContentbody "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

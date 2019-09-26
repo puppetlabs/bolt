@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Map Group Domain                             -->
+<!--  VERSION:   1.1                                             -->
+<!--  DATE:      November 2006                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization attributes     -->
+<!--             for Map Group Domain                              -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2006                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+  <!--<!ENTITY mapgroup-d-att "(map mapgroup-d)"                           >-->
+  
+  <xs:group name="mapgroup-d-topicref">
+      <xs:choice>
+        <xs:element ref="topichead"/>
+        <xs:element ref="topicgroup"/>
+      </xs:choice>
+  </xs:group>
+  
+  <xs:group name="topichead">
+    <xs:choice>
+      <xs:element ref="topichead"/>      
+    </xs:choice>
+  </xs:group>
+  
+  <xs:group name="topicgroup">
+    <xs:choice>
+      <xs:element ref="topicgroup"/>
+    </xs:choice>
+  </xs:group>
+
+    <xs:element name="topichead">
+      <xs:annotation>
+        <xs:documentation>The &lt;<keyword>topichead</keyword>> element provides a title-only
+          entry in a navigation map, as an alternative to the fully-linked title provided
+          by the &lt;<keyword>topicref</keyword>> element.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+        <xs:complexContent>
+          <xs:extension base="topichead.class">
+            <xs:attribute ref="class" default="+ map/topicref mapgroup-d/topichead " />
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:complexType name="topichead.class">
+        <xs:sequence>
+          <xs:element ref="topicmeta" minOccurs="0" />
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="navref" />
+            <xs:group ref="anchor" />
+            <xs:group ref="topicref" />
+            <xs:group ref="data.element.incl"/>
+          </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="navtitle" type="xs:string" use="required"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="topicref-atts" />
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:complexType>
+  
+
+  <xs:element name="topicgroup">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>topicgroup</keyword>> element is for creating
+        groups of &lt;<keyword>topicref</keyword>> elements without affecting the
+        hierarchy, as opposed to nested &lt;<keyword>topicref</keyword>> elements
+        within a &lt;<keyword>topicref</keyword>>, which does imply a structural hierarchy.
+        It is typically used outside a hierarchy to identify groups for linking without
+        affecting the resulting toc/navigation output.          
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="topicgroup.class">
+          <xs:attribute ref="class" default="+ map/topicref mapgroup-d/topicgroup " />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="topicgroup.class">
+        <xs:sequence>
+          <xs:group ref="topicmeta" minOccurs="0" />
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="navref" />
+            <xs:group ref="anchor" />
+            <xs:group ref="topicref" />
+            <xs:group ref="data.element.incl"/>
+          </xs:choice>
+        </xs:sequence>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="topicref-atts" />
+    <xs:attributeGroup ref="univ-atts"/>
+     <xs:attributeGroup ref="global-atts" />
+  </xs:complexType>
+
+</xs:schema>

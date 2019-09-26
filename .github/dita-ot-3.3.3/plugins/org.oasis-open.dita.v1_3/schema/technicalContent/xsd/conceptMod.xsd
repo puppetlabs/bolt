@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Concept                                     -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Concept//EN"                 -->
+<!--      Delivered as file "concept.mod"                             -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Define elements and specialization atttributes   -->
+<!--            for Concepts                                     -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2001                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2001, 2004.        -->
+<!--            All Rights Reserved.                             -->
+<!-- UPDATES:                                                    -->
+<!--   2005.11.15 RDA: Removed old declaration for               -->
+<!--                   conceptClasses entity                     -->
+<!--   2006.06.07 RDA: Added <abstract> element                  -->
+<!--   2006.06.07 RDA: Make universal attributes universal       -->
+<!--                     (DITA 1.1 proposal #12)                 -->
+<!--   2006.11.30 RDA: Remove #FIXED from DITAArchVersion        -->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       -->
+<!--   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--   2008.05.06 RDA: Added conbodydiv                          -->
+<!--=============================================================-->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/"
+              schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.3"/>
+
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic concept)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+
+   <xs:group name="concept-info-types">
+      <xs:choice>
+         <xs:group ref="concept"/>
+         <xs:group ref="info-types"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="concept">
+      <xs:annotation>
+         <xs:documentation>The &lt;concept&gt; element is the top-level element for a topic that answers the question what is? Concepts provide background information that users must know before they can
+            successfully work with a product or interface. Often, a concept is an extended definition of a major abstraction such as a process or function. It might also have an example or a graphic,
+            but generally the structure of a concept is fairly simple. Category: Concept elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="concept.class">
+               <xs:attribute ref="class" default="- topic/topic concept/concept "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="concept.class">
+      <xs:sequence>
+         <xs:group ref="concept.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="concept.attributes"/>
+   </xs:complexType>
+   <xs:group name="concept.content">
+      <xs:sequence>
+         <xs:group ref="title"/>
+         <xs:group ref="titlealts" minOccurs="0"/>
+         <xs:choice minOccurs="0">
+            <xs:group ref="abstract"/>
+            <xs:group ref="shortdesc"/>
+         </xs:choice>
+         <xs:group ref="prolog" minOccurs="0"/>
+         <xs:group ref="conbody" minOccurs="0"/>
+         <xs:group ref="related-links" minOccurs="0"/>
+         <xs:group ref="concept-info-types" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="concept.attributes">
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="concept.attlist">
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+   </xs:attributeGroup>
+   <xs:element name="conbody">
+      <xs:annotation>
+         <xs:documentation>The &lt;conbody&gt; element is the main body-level element for a concept. Like the &lt;body&gt; element of a general &lt;topic&gt;, &lt;conbody&gt; allows paragraphs, lists, and other
+            elements as well as sections and examples. But &lt;conbody&gt; has a constraint that a section or an example can be followed only by other sections or examples. Category: Concept
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="conbody.class">
+               <xs:attribute ref="class" default="- topic/body  concept/conbody "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="conbody.class">
+      <xs:sequence>
+         <xs:group ref="conbody.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="conbody.attributes"/>
+   </xs:complexType>
+   <xs:group name="conbody.content">
+      <xs:sequence>
+         <xs:group ref="body.cnt" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="section"/>
+            <xs:group ref="example"/>
+            <xs:group ref="conbodydiv"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="conbody.attributes">
+      <xs:attributeGroup ref="id-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="base" type="xs:string"/>
+      <xs:attributeGroup ref="base-attribute-extensions"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="conbodydiv">
+      <xs:annotation>
+         <xs:documentation>The &lt;conbodydiv&gt; element is similar to the &lt;bodydiv&gt; element in that it provides an informal container for content that may be grouped within a concept. There are no
+            additional semantics attached to the conbodydiv element; it is purely a grouping element provided to help organize content.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="conbodydiv.class">
+               <xs:attribute ref="class" default="- topic/bodydiv concept/conbodydiv "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="conbodydiv.class">
+      <xs:sequence>
+         <xs:group ref="conbodydiv.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="conbodydiv.attributes"/>
+   </xs:complexType>
+   <xs:group name="conbodydiv.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="example"/>
+            <xs:group ref="section"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="conbodydiv.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

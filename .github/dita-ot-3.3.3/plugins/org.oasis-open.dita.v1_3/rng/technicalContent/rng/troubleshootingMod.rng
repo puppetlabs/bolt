@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Troubleshooting Domain</moduleTitle>
+    <headerComment xml:space="preserve"><![CDATA[
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Troubleshooting Domain                                      
+ VERSION:   1.3                                              
+ DATE:      March 2014                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Troubleshooting//EN"
+      Delivered as file "troubleshooting.mod"                                
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for the DITA Troubleshootings                    
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2014                                       
+                                                             
+            (C) Copyright OASIS Open 2014             
+            All Rights Reserved.                             
+                                                             
+=============================================================
+]]></headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>troubleshooting</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Troubleshooting//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Troubleshooting//EN</dtdEnt>
+        <xsdGrp>urn:oasis:names:tc:dita:xsd:troubleshootingGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:troubleshootingMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:troubleshootingMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:troubleshootingMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic troubleshooting++task)</domainsContribution> 
+      <domainsContribution>(topic task)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="cause">
+      <ref name="cause.element"/>
+    </define>
+    <define name="condition">
+      <ref name="condition.element"/>
+    </define>
+    <define name="remedy">
+      <ref name="remedy.element"/>
+    </define>
+    <define name="responsibleParty">
+      <ref name="responsibleParty.element"/>
+    </define>
+    <define name="troublebody">
+      <ref name="troublebody.element"/>
+    </define>
+    <define name="troubleshooting">
+      <ref name="troubleshooting.element"/>
+    </define>
+    <define name="troubleSolution">
+      <ref name="troubleSolution.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>COMMON ELEMENT SETS</a:documentation>
+    <define name="section.blocks.only.cnt">
+      <optional>
+        <ref name="title"/>
+      </optional>
+      <zeroOrMore>
+        <choice>
+          <ref name="basic.block"/>
+          <ref name="data.elements.incl"/>
+          <ref name="foreign.unknown.incl"/>
+          <ref name="sectiondiv"/>
+          <ref name="txt.incl"/>
+        </choice>
+      </zeroOrMore>
+    </define>
+  </div>
+  <div>
+    <a:documentation>TOPIC NESTING OVERRIDES</a:documentation>
+    <define name="troubleshooting-info-types">
+      <ref name="info-types"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation> LONG NAME: Troubleshooting </a:documentation>
+      <define name="troubleshooting.content">
+        <ref name="title"/>
+        <optional>
+          <ref name="titlealts"/>
+        </optional>
+        <optional>
+          <choice>
+            <ref name="abstract"/>
+            <ref name="shortdesc"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <optional>
+          <ref name="troublebody"/>
+        </optional>
+        <optional>
+          <ref name="related-links"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="troubleshooting-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="troubleshooting.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="troubleshooting.element">
+        <element name="troubleshooting" dita:longName="Troubleshooting">
+          <a:documentation>
+            <![CDATA[
+    Category: Troubleshooting elements
+  ]]></a:documentation>
+          <ref name="troubleshooting.attlist"/>
+          <ref name="troubleshooting.content"/>
+        </element>
+      </define>
+      <define name="troubleshooting.attlist" combine="interleave">
+        <ref name="troubleshooting.attributes"/>
+        <ref name="arch-atts"/>
+        <ref name="domains-att"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Troubleshooting Body </a:documentation>
+      <define name="troublebody.content">
+        <optional>
+          <optional>
+            <ref name="condition"/>
+          </optional>
+          <oneOrMore>
+            <ref name="troubleSolution"/>
+          </oneOrMore>
+        </optional>
+      </define>
+      <define name="troublebody.attributes">
+        <ref name="id-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="base"/>
+        </optional>
+        <ref name="base-attribute-extensions"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="troublebody.element">
+        <element name="troublebody" dita:longName="Troubleshooting Body" dita:since="1.3">
+          <a:documentation>
+            <![CDATA[
+    Category: Troubleshooting elements
+  ]]></a:documentation>
+          <ref name="troublebody.attlist"/>
+          <ref name="troublebody.content"/>
+        </element>
+      </define>
+      <define name="troublebody.attlist" combine="interleave">
+        <ref name="troublebody.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Cause </a:documentation>
+      <define name="cause.content">
+        <optional>
+          <ref name="section.blocks.only.cnt"/>
+        </optional>
+      </define>
+      <define name="cause.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="cause.element">
+        <element name="cause" dita:longName="Cause" dita:since="1.3">
+          <a:documentation>
+            <![CDATA[
+    Category: Troubleshooting elements
+  ]]></a:documentation>
+          <ref name="cause.attlist"/>
+          <ref name="cause.content"/>
+        </element>
+      </define>
+      <define name="cause.attlist" combine="interleave">
+        <ref name="cause.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Condition</a:documentation>
+      <define name="condition.content">
+        <optional>
+          <ref name="section.blocks.only.cnt"/>
+        </optional>
+      </define>
+      <define name="condition.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="condition.element">
+        <element name="condition" dita:longName="Condition" dita:since="1.3">
+          <a:documentation>
+            <![CDATA[
+    Category: Troubleshooting elements
+  ]]></a:documentation>
+          <ref name="condition.attlist"/>
+          <ref name="condition.content"/>
+        </element>
+      </define>
+      <define name="condition.attlist" combine="interleave">
+        <ref name="condition.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Remedy </a:documentation>
+      <define name="remedy.content">
+        <optional>
+          <ref name="title"/>
+        </optional>
+        <optional>
+          <ref name="responsibleParty"/>
+        </optional>
+        <choice>
+          <ref name="steps"/>
+          <ref name="steps-unordered"/>
+          <ref name="steps-informal"/>
+        </choice>
+      </define>
+      <define name="remedy.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="remedy.element">
+        <element name="remedy" dita:longName="Remedy" dita:since="1.3">
+          <a:documentation>
+            <![CDATA[
+    Category: Troubleshooting elements
+  ]]></a:documentation>
+          <ref name="remedy.attlist"/>
+          <ref name="remedy.content"/>
+        </element>
+      </define>
+      <define name="remedy.attlist" combine="interleave">
+        <ref name="remedy.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Responsible Party </a:documentation>
+      <define name="responsibleParty.content">
+        <zeroOrMore>
+          <ref name="para.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="responsibleParty.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="responsibleParty.element">
+        <element name="responsibleParty" dita:longName="Responsible Party" dita:since="1.3">
+          <a:documentation>
+            <![CDATA[
+    Category: Troubleshooting elements
+  ]]></a:documentation>
+          <ref name="responsibleParty.attlist"/>
+          <ref name="responsibleParty.content"/>
+        </element>
+      </define>
+      <define name="responsibleParty.attlist" combine="interleave">
+        <ref name="responsibleParty.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Trouble Solution </a:documentation>
+      <define name="troubleSolution.content">
+        <group>
+          <zeroOrMore>
+            <ref name="cause"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <ref name="remedy"/>
+          </zeroOrMore>
+        </group>
+      </define>
+      <define name="troubleSolution.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="troubleSolution.element">
+        <element name="troubleSolution" dita:longName="Trouble Solution" dita:since="1.3">
+          <a:documentation>
+            <![CDATA[
+    Category: Troubleshooting elements
+  ]]></a:documentation>
+          <ref name="troubleSolution.attlist"/>
+          <ref name="troubleSolution.content"/>
+        </element>
+      </define>
+      <define name="troubleSolution.attlist" combine="interleave">
+        <ref name="troubleSolution.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="troubleshooting.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic troubleshooting/troubleshooting "/>
+      </optional>
+    </define>
+    <define name="troublebody.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/body troubleshooting/troublebody "/>
+      </optional>
+    </define>
+    <define name="troubleSolution.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/bodydiv troubleshooting/troubleSolution "/>
+      </optional>
+    </define>
+    <define name="cause.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section troubleshooting/cause "/>
+      </optional>
+    </define>
+    <define name="condition.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section troubleshooting/condition "/>
+      </optional>
+    </define>
+    <define name="remedy.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section troubleshooting/remedy "/>
+      </optional>
+    </define>
+    <define name="responsibleParty.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/p troubleshooting/responsibleParty "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

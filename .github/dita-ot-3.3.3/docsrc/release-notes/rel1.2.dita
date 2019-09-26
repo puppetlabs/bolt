@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.2" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.2</title><shortdesc>DITA open toolkit Release 1.2 is a major release to add new functions, fulfill new
+      requirements, make some function enhancements and fix bugs over release 1.1.2.1.</shortdesc><refbody><section id="section_jyg_jej_nc">
+        <title>Important Change</title>
+        <p>DITA-OT 1.2 offers new error handling and logging system. If you invoke your
+          transformation by using java command line where new error handling and logging system is
+          mandatory, you need to set the <varname>CLASSPATH</varname> Environment Variable for
+            <codeph>dost.jar</codeph>. If you invoke your transformation by using an ant script, you
+          need to do one more step after the setting above. That is adding a parameter in your
+          command to invoke an ant script. For example, use <userinput>ant -f ant\sample_xhtml.xml
+            -logger org.dita.dost.log.DITAOTBuildLogger</userinput> instead of <userinput>ant -f
+            ant\sample_xhtml.xml</userinput> to start a transformation defined in ant script file
+          ant\sample_xhtml.xml. </p>
+      </section><section id="section_tix_lej_nc">
+        <title>New Functions</title>
+        <ol><li>
+            <b>New plugin archiecture</b>
+            <p>DITA Open Toolkit 1.2 provides a new function to help users to download, install and
+              use plug-ins and help developers create new plug-ins for DITA Open Toolkit.</p>
+          </li><li>
+            <b>Transformation to wordrtf</b>
+            <p>DITA Open Toolkit 1.2 provides DITA to Word transforming function to transform DITA
+              source files to output in <tm tmclass="special" tmowner="Microsoft Corporation" tmtype="reg" trademark="Microsoft">Microsoft</tm> Word RTF file.</p>
+          </li><li>
+            <b>HTML to DITA migration tool</b>
+            <p>DITA Open Toolkit 1.2 provides a HTML to DITA migration tool, which migrates HTML
+              files to DITA files. This migration tool originally comes from the developerWorks
+              publication of Robert D. Anderson's how-to articles with the original h2d
+              code.</p>
+          </li><li>
+            <b>Problem determination and log analysis</b>
+            <p>In DITA Open Toolkit 1.2, a new logging method is supported to log messages both on
+              the screen and into the log file. The messages on the screen present user with the
+              status information, warning, error, and fatal error messages. The messages in the log
+              file present user with more detailed information about the transformation process. By
+              analyzing these messages, user can know what cause the problem and how to solve
+              it.</p>
+          </li><li>
+            <b>Open DITA User Guide for conditional processing</b>
+            <p>In DITA Open Toolkit 1.2, a new user guide which can help users to use conditional
+              processing is added to toolkit document.</p>
+          </li><li>
+            <b>Include the OASIS version langref</b>
+            <p>In DITA Open Toolkit 1.2, a new OASIS version of language reference for DITA standard
+              is added to toolkit document.</p>
+          </li><li>
+            <b>Document adapt to OASIS DITA 1.0.1 DTDs</b>
+            <p>DITA DTD files are updated to 1.0.1 version in DITA Open Toolkit 1.2.</p>
+          </li></ol>
+      </section><section id="section_cjx_lej_nc">
+        <title>Other Changes</title>
+        <ol><li>SF Bug 1304545 Some folders were copied to DITA-OT's root directory</li><li>SF Bug 1328689 Stylesheet links in HTML emitted with local filesystem paths</li><li>SF Bug 1333481 Mapref function does not work for maps in another directory</li><li>SF Bug 1343963 Blank index.html generated for ditamap contains only reltabe</li><li>SF Bug 1344486 java.io.EOFException thrown out when reading ditaval file</li><li>SF Bug 1347669 Path Spec. in nested DITA maps</li><li>SF Bug 1357139 filtering behavior doesn't conform to spec</li><li>SF Bug 1358619 The property.temp file gets cleaned out by default</li><li>SF Bug 1366843 XRefs do not generate proper links in FO/PDF</li><li>SF Bug 1367636 dita2fo-elems.xsl has strange line breaks</li><li>SF RFE 1296133 Enable related-links in PDF output</li><li>SF RFE 1326377 Add a /dbg or /debug flag for diagnostic info</li><li>SF RFE 1331727 Toolkit need to run on JDK 1.5.x(only support to run under Sun JDK 1.5
+            with saxon in normal case)</li><li>SF RFE 1357054 Be more friendly towards relative directories</li><li>SF RFE 1357906 Provide a default output directory</li><li>SF RFE 1368073 Enable plugins for DITA open toolkit</li><li>SF RFE 1379518 Clearer error messages and improved exception handling</li><li>SF RFE 1379523 DITA to Rich Text Format (.rtf) file</li><li>SF RFE 1382482 plugin architecture of DITA-OT</li></ol>
+      </section></refbody></reference>

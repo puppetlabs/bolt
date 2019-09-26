@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="maintainserver" xml:lang="en-us">
+  <title>Maintaining a Web Server</title>
+  <shortdesc>Maintaining a web server is really quite easy.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Web Server</indexterm>
+        <indexterm>maintain</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps-unordered>
+      <step>
+        <cmd>If the web server crashes, restart it.</cmd>
+      </step>
+      <step>
+        <cmd>Limit the number of connections to your server.</cmd>
+        <info>This will make it run faster.</info>
+      </step>
+      <step>
+        <cmd>Make sure you do not put confidential material on your server.</cmd>
+        <info>It should be kept in a separate folder named "Private."</info>
+      </step>
+    </steps-unordered>
+  </taskbody>
+</task>

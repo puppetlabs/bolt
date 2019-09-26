@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Topic XSD Group Decleration                  -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization attributes     -->
+<!--             for Topics                                        -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2009                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  
+  <xs:group name="topic">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="topic"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="no-topic-nesting">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="no-topic-nesting"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="titlealts">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="titlealts"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="searchtitle">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="searchtitle"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="body">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="body"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="section">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="section"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+  
+  <xs:group name="bodydiv">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bodydiv"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="sectiondiv">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="sectiondiv"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="example">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="example"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="prolog">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="prolog"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="related-links">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="related-links"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="linklist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="linklist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="linkinfo">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="linkinfo"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="linkpool">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="linkpool"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="linktext">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="linktext"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="link">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="link"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="abstract">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="abstract"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+  
+</xs:schema>

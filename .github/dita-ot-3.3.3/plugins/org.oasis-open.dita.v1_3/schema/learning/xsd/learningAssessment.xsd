@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!-- Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02     -->
+<!-- OASIS Standard                                           -->
+<!-- 16 January 2018                                           -->
+<!-- Copyright (c) OASIS Open 2018. All rights reserved.           -->
+<!-- Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html                                -->
+<!--                                                               -->
+<!--  MODULE:    DITA learningAssessment XSD                       -->
+<!--  VERSION:   1.3                                               -->
+<!--  DATE:      March 2014                                        -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA Learning Base     -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             May 2007                                          -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+<!-- ================ TOPIC DOMAINS ===================== -->
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:deliveryTargetAttDomain.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:highlightDomain.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:indexingDomain.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:utilitiesDomain.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:releaseManagementDomain.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:spec:learning:xsd:learningDomain.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:spec:learning:xsd:learning2Domain.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:spec:learning:xsd:learningMetadataDomain.xsd:1.3"/>
+
+   <!-- ================ GROUP DEFINITIONS ===================== -->
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:tblDeclGrp.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:spec:learning:xsd:learningBaseGrp.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:spec:learning:xsd:learningAssessmentGrp.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:topicGrp.xsd:1.3"/>
+
+   <!-- =================  MODULE INCLUDE DEFINITION  ================== -->
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:commonElementMod.xsd:1.3"/>
+
+   <!-- ======== Table elements ======== -->
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:tblDeclMod.xsd:1.3"/>
+
+   <!-- ======= MetaData elements, plus keyword and indexterm ======= -->
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:metaDeclMod.xsd:1.3"/>
+
+   <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:commonElementGrp.xsd:1.3">
+      <xs:group name="data">
+         <xs:choice>
+            <xs:group ref="data"/>
+            <xs:group ref="ut-d-data"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="note">
+         <xs:choice>
+            <xs:group ref="note"/>
+            <xs:group ref="learning-d-note"/>
+            <xs:group ref="learning2-d-note"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="fig">
+         <xs:choice>
+            <xs:group ref="fig"/>
+            <xs:group ref="ut-d-fig"/>
+            <xs:group ref="learning-d-fig"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="div">
+         <xs:choice>
+            <xs:group ref="div"/>
+            <xs:group ref="learning2-d-div"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="ph">
+         <xs:choice>
+            <xs:group ref="ph"/>
+            <xs:group ref="hi-d-ph"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="index-base">
+         <xs:choice>
+            <xs:group ref="index-base"/>
+            <xs:group ref="indexing-d-index-base"/>
+         </xs:choice>
+      </xs:group>
+      <xs:attributeGroup name="props-attribute-extensions">
+         <xs:attributeGroup ref="props-attribute-extensions"/>
+         <xs:attributeGroup ref="deliveryTargetAtt-d-attribute"/>
+      </xs:attributeGroup>
+   </xs:redefine>
+   <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:metaDeclGrp.xsd:1.3">
+      <xs:group name="metadata">
+         <xs:choice>
+            <xs:group ref="metadata"/>
+            <xs:group ref="relmgmt-d-metadata"/>
+            <xs:group ref="learningmeta-d-metadata"/>
+         </xs:choice>
+      </xs:group>
+   </xs:redefine>
+   <xs:redefine schemaLocation="urn:oasis:names:tc:dita:spec:learning:xsd:learningInteractionBaseDomain.xsd:1.3">
+      <xs:group name="lcInteractionBase">
+         <xs:choice>
+            <xs:group ref="lcInteractionBase"/>
+            <xs:group ref="learning-d-lcInteractionBase"/>
+         </xs:choice>
+      </xs:group>
+   </xs:redefine>
+   <xs:redefine schemaLocation="urn:oasis:names:tc:dita:spec:learning:xsd:learningInteractionBase2Domain.xsd:1.3">
+      <xs:group name="lcInteractionBase2">
+         <xs:choice>
+            <xs:group ref="lcInteractionBase2"/>
+            <xs:group ref="learning2-d-lcInteractionBase2"/>
+         </xs:choice>
+      </xs:group>
+   </xs:redefine>
+
+
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:spec:learning:xsd:learningBaseMod.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:spec:learning:xsd:learningAssessmentMod.xsd:1.3"/>
+   <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:topicMod.xsd:1.3"/>
+   <!--  ================ INFO-TYPES DEFINITION =====================  -->
+   <xs:group name="info-types">
+      <xs:annotation>
+         <xs:documentation>
+This group is referenced in all topic modules but not defined there.
+It must be declared in topic-type shells.
+</xs:documentation>
+      </xs:annotation>
+      <xs:choice>
+         <xs:element ref="no-topic-nesting" maxOccurs="0" minOccurs="0"/>
+      </xs:choice>
+   </xs:group>
+
+   <xs:attributeGroup name="domains-att">
+      <xs:attribute name="domains"
+                    type="xs:string"
+                    default="(topic hi-d) (topic indexing-d) (topic learningBase+learningInteractionBase-d) (topic learningBase+learningInteractionBase-d learningAssessment) (topic learningBase+learningInteractionBase-d+learningInteractionBase2) (topic learningInteractionBase-d learning-d) (topic learningInteractionBase-d) (topic learningInteractionBase2-d learning2-d) (topic learningInteractionBase2-d) (topic learningmeta-d) (topic relmgmt-d) (topic ut-d) a(props deliveryTarget)"/>
+   </xs:attributeGroup>
+</xs:schema>

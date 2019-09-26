@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Hazard Statement Domain</moduleTitle>
+    <headerComment>
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Hazard Statement Domain                     
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Hazard Statement Domain//EN"
+      Delivered as file "hazardstatementDomain.mod"               
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for the Hazard Statement Domain       
+                                                             
+ORIGINAL CREATION DATE:                                      
+            February 2008                                    
+                                                             
+            (C) Copyright OASIS Open 2008, 2009.             
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2007.02.20 Chris Kravogel, SeicoDyne GmbH: Created domain 
+   2007.03.06 Chris Kravogel, SeicoDyne GmbH: Add howtoavoid 
+                   entity                                    
+   2007.11.20 Chris Kravogel, SeicoDyne GmbH: Reduced ATTLIST
+                   of hazardstatement to ATTLIST of note     
+   2008.02.05 Chris Kravogel, SeicoDyne GmbH: Renamed symbol 
+                   to hazardsymbol, added %words.cnt; and    
+                   %trademark; to consequences, typeofhazard 
+   2008.02.05 RDA: Reformatted for DITA 1.2 ; removed @alt    
+                   and added @scalefit on hazardsymbol       
+   2008.02.13 RDA: Create .content and .attributes entities  
+   2009.12.03 RDA: Removed caution1 and caution2 values to   
+                   match the revised note/@type values       
+=============================================================
+    </headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>hazard-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Hazard Statement Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Hazard Statement Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:hazardDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:hazardDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:hazardDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic hazard-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="hazard-d-note">
+      <ref name="hazardstatement.element"/>
+    </define>
+    
+    <define name="note" combine="choice">
+      <ref name="hazard-d-note"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="hazardstatement">
+      <ref name="hazardstatement.element"/>
+    </define>
+    <define name="messagepanel">
+      <ref name="messagepanel.element"/>
+    </define>
+    <define name="hazardsymbol">
+      <ref name="hazardsymbol.element"/>
+    </define>
+    <define name="typeofhazard">
+      <ref name="typeofhazard.element"/>
+    </define>
+    <define name="consequence">
+      <ref name="consequence.element"/>
+    </define>
+    <define name="howtoavoid">
+      <ref name="howtoavoid.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>Define elements content and attributes</a:documentation>
+
+    <define name="hazard.cnt">
+      <choice>
+        <text/>
+        <ref name="basic.ph"/>
+        <ref name="sl"/>
+        <ref name="simpletable"/>
+      </choice>
+    </define> 
+
+    <div>
+      <a:documentation>LONG NAME: Hazard Statement</a:documentation>
+      <define name="hazardstatement.content">
+        <oneOrMore>
+          <ref name="messagepanel"/>
+        </oneOrMore>
+        <zeroOrMore>
+          <ref name="hazardsymbol"/>
+        </zeroOrMore>
+      </define>
+      <define name="hazardstatement.attributes">
+        <optional>
+          <attribute name="type">
+            <choice>
+              <value>attention</value>
+              <value>caution</value>
+              <value>danger</value>
+              <value>fastpath</value>
+              <value>important</value>
+              <value>note</value>
+              <value>notice</value>
+              <value>other</value>
+              <value>remember</value>
+              <value>restriction</value>
+              <value>tip</value>
+              <value>warning</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <optional>
+          <attribute name="othertype"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="hazardstatement.element">
+        <element name="hazardstatement" dita:longName="Hazard Statement">
+          <a:documentation>The &lt;hazardstatement> element contains hazard warning information. It is based on the regulations of the ANSI Z535 and the ISO 3864 standards. It gives the author the
+            opportunity to select the hazard statement, to add one or more safety signs and to add the required phrases.</a:documentation>
+          <ref name="hazardstatement.attlist"/>
+          <ref name="hazardstatement.content"/>
+        </element>
+      </define>
+      <define name="hazardstatement.attlist" combine="interleave">
+        <ref name="hazardstatement.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Hazard Symbol</a:documentation>
+      <define name="hazardsymbol.content">
+        <optional>
+          <ref name="alt"/>
+        </optional>
+        <optional>
+          <ref name="longdescref"/>
+        </optional>
+      </define>
+      <define name="hazardsymbol.attributes">
+        <optional dita:since="DITA 1.3">
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="longdescref"/>
+        </optional>
+        <optional>
+          <attribute name="height">
+            <data type="NMTOKEN"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="width">
+            <data type="NMTOKEN"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="align"/>
+        </optional>
+        <optional>
+          <attribute name="scale">
+            <data type="NMTOKEN"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="scalefit">
+            <choice>
+              <value>yes</value>
+              <value>no</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="placement" a:defaultValue="inline">
+            <choice>
+              <value>break</value>
+              <value>inline</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="hazardsymbol.element">
+        <element name="hazardsymbol" dita:longName="Hazard Symbol">
+          <a:documentation>A graphic representation intended to convey a message without the use of words. It may represent a hazard, a hazardous situation, a precaution to avoid a hazard, a result of
+            not avoiding a hazard, or any combination of these messages.</a:documentation>
+          <ref name="hazardsymbol.attlist"/>
+          <ref name="hazardsymbol.content"/>
+        </element>
+      </define>
+      <define name="hazardsymbol.attlist" combine="interleave">
+        <ref name="hazardsymbol.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Hazard Message panel</a:documentation>
+      <define name="messagepanel.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <ref name="typeofhazard"/>
+        <zeroOrMore>
+          <ref name="consequence"/>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="howtoavoid"/>
+        </oneOrMore>
+      </define>
+      <define name="messagepanel.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="messagepanel.element">
+        <element name="messagepanel" dita:longName="Hazard Message panel">
+          <a:documentation>The &lt;messagepanel> element describes the area of a safety sign or label that contains the word message which identifies a hazard, indicates how to avoid the hazard, and
+            advises of the probable consequences of not avoiding the hazard.</a:documentation>
+          <ref name="messagepanel.attlist"/>
+          <ref name="messagepanel.content"/>
+        </element>
+      </define>
+      <define name="messagepanel.attlist" combine="interleave">
+        <ref name="messagepanel.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: The Type of Hazard</a:documentation>
+      <define name="typeofhazard.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="words.cnt"/>
+            <ref name="ph"/>
+            <ref name="tm"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="typeofhazard.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="typeofhazard.element">
+        <element name="typeofhazard" dita:longName="The Type of Hazard">
+          <a:documentation>&lt;typeofhazard> element is the container for the first text entry of a safety label. It contains the description of the type of hazard, such as &#34;Moving parts can crush
+            and cut&#34;.</a:documentation>
+          <ref name="typeofhazard.attlist"/>
+          <ref name="typeofhazard.content"/>
+        </element>
+      </define>
+      <define name="typeofhazard.attlist" combine="interleave">
+        <ref name="typeofhazard.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Consequences of not Avoiding the Hazard</a:documentation>
+      <define name="consequence.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="words.cnt"/>
+            <ref name="ph"/>
+            <ref name="tm"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="consequence.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="consequence.element">
+        <element name="consequence" dita:longName="Consequences of not Avoiding the Hazard">
+          <a:documentation>The &lt;consequence> element is the container for the second text entry of a safety label. It contains the description of the consequences of not avoiding the hazard, such
+            as &#34;Keep guard in place&#34;.</a:documentation>
+          <ref name="consequence.attlist"/>
+          <ref name="consequence.content"/>
+        </element>
+      </define>
+      <define name="consequence.attlist" combine="interleave">
+        <ref name="consequence.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: How to Avoid the Hazard</a:documentation>
+      <define name="howtoavoid.content">
+        <zeroOrMore>
+          <ref name="hazard.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="howtoavoid.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="howtoavoid.element">
+        <element name="howtoavoid" dita:longName="How to Avoid the Hazard">
+          <a:documentation>The &lt;howtoavoid> element is the container for the third text entry of a safety label. It contains the description of how to avoid the hazard, such as &#34;Lock out power
+            before servicing&#34;.</a:documentation>
+          <ref name="howtoavoid.attlist"/>
+          <ref name="howtoavoid.content"/>
+        </element>
+      </define>
+      <define name="howtoavoid.attlist" combine="interleave">
+        <ref name="howtoavoid.attributes"/>
+      </define>
+
+    </div>
+  </div>
+  <div>
+    <a:documentation>Specialization attributes. Global attributes and class defaults</a:documentation>
+
+    <define name="hazardstatement.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/note hazard-d/hazardstatement "/>
+      </optional>
+    </define>
+    <define name="messagepanel.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ul hazard-d/messagepanel "/>
+      </optional>
+    </define>
+    <define name="hazardsymbol.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/image hazard-d/hazardsymbol "/>
+      </optional>
+    </define>
+    <define name="typeofhazard.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li hazard-d/typeofhazard "/>
+      </optional>
+    </define>
+    <define name="consequence.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li hazard-d/consequence "/>
+      </optional>
+    </define>
+    <define name="howtoavoid.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li hazard-d/howtoavoid "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <!--
+        This is the Mathematical Markup Language (MathML) 3.0, an XML
+        application for describing mathematical notation and capturing
+        both its structure and content.
+    
+        Copyright 1998-2007 World Wide Web Consortium
+           (Massachusetts Institute of Technology, Institut National de
+            Recherche en Informatique et en Automatique, Keio University).
+            All Rights Reserved.
+    
+        Permission to use, copy, modify and distribute the RelaxNG schema for MathML3
+        and its accompanying documentation for any purpose and without fee is
+        hereby granted in perpetuity, provided that the above copyright notice
+        and this paragraph appear in all copies.  The copyright holders make
+        no representation about the suitability of the Schema for any purpose.
+    
+        This file contains the arity checking rules for the symbols
+        from the content dictionary 
+        It is provided "as is" without expressed or implied warranty.
+    
+        Revision:   $Id: linear_algebra.rng,v 1.1 2007/12/11 15:59:27 dcarlis Exp $
+  -->
+  <define name="cd.token.unary.class" combine="choice">
+    <choice>
+      <ref name="determinant.token"/>
+      <ref name="transpose.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.binary.class" combine="choice">
+    <choice>
+      <ref name="selector.token"/>
+      <ref name="vectorproduct.token"/>
+      <ref name="outerproduct.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.nary.class" combine="choice">
+    <choice>
+      <ref name="vector.token"/>
+      <ref name="matrix.token"/>
+      <ref name="matrixrow.token"/>
+      <ref name="scalarproduct.token"/>
+    </choice>
+  </define>
+  <!-- the element definitions for the token elements -->
+  <define name="vector.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="vector.token">
+    <element name="vector">
+      <ref name="vector.content"/>
+    </element>
+  </define>
+  <define name="matrix.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="matrix.token">
+    <element name="matrix">
+      <ref name="matrix.content"/>
+    </element>
+  </define>
+  <define name="matrixrow.content">
+    <ref name="Token.type"/>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="matrixrow.token">
+    <element name="matrixrow">
+      <ref name="matrixrow.content"/>
+    </element>
+  </define>
+  <define name="determinant.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="determinant.token">
+    <element name="determinant">
+      <ref name="determinant.content"/>
+    </element>
+  </define>
+  <define name="transpose.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="transpose.token">
+    <element name="transpose">
+      <ref name="transpose.content"/>
+    </element>
+  </define>
+  <define name="selector.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="selector.token">
+    <element name="selector">
+      <ref name="selector.content"/>
+    </element>
+  </define>
+  <define name="vectorproduct.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="vectorproduct.token">
+    <element name="vectorproduct">
+      <ref name="vectorproduct.content"/>
+    </element>
+  </define>
+  <define name="scalarproduct.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="scalarproduct.token">
+    <element name="scalarproduct">
+      <ref name="scalarproduct.content"/>
+    </element>
+  </define>
+  <define name="outerproduct.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="outerproduct.token">
+    <element name="outerproduct">
+      <ref name="outerproduct.content"/>
+    </element>
+  </define>
+</grammar>

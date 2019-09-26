@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="migrating-to-2.5">
+
+  <title>Migrating to release 2.5</title>
+  <titlealts>
+    <navtitle>To 2.5</navtitle>
+  </titlealts>
+
+  <shortdesc>In DITA-OT 2.5, several frequently-overridden legacy style settings were removed from the default PDF
+    plug-in. A separate plug-in can be used to restore the original settings.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>example</xmlelement></indexterm>
+        <indexterm>PDF<indexterm><codeph>org.dita.pdf2.legacy</codeph></indexterm></indexterm>
+        <indexterm>languages<indexterm>right-to-left</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <note>This topic provides a summary of changes in DITA-OT 2.5 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the
+        <xref keyref="2.5-release-notes"/>.</note>
+    </section>
+    <!--<section>
+      <title>HTML5</title>
+      <ul>
+        <li/>
+      </ul>
+    </section>-->
+    <section id="25-pdf-changes">
+      <title>Default PDF style improvements</title>
+      <div outputclass="div-index">
+        <indexterm>tables<indexterm>indentation</indexterm></indexterm>
+      </div>
+      <p>Several legacy styles have been modified or removed in the default PDF plug-in <codeph>org.dita.pdf2</codeph>,
+        including the following:</p>
+      <p>
+        <ul>
+          <li>In task topics with only a single step, the step is now rendered as a simple block (rather than as a list
+            item without a label).</li>
+          <li>Table containers now inherit the initial indentation (<codeph>start-indent</codeph>) from the parent
+            elements.</li>
+          <li>Borders and indentation have been removed from <xmlelement>example</xmlelement> elements.</li>
+          <li>Links are no longer italicized.</li>
+          <li>Titles for related link lists have been standardized to use the <codeph>common.title</codeph> attribute
+            set (which applies the <codeph>sans-serif</codeph> font-family) and bold font weight.</li>
+          <li>Several remaining occurrences of left/right borders, margins, padding, and text alignment now use the
+            corresponding start/end equivalents to better support right-to-left languages.</li>
+        </ul>
+      </p></section>
+    <section id="25-legacy-pdf-plugin">
+      <title>External plug-in for legacy PDF styling</title>
+      <p>If you have a custom PDF plug-in that explicitly depends on the previous default settings for the
+        aforementioned styles, the <codeph>org.dita.pdf2.legacy</codeph> plug-in can be used to restore the pre–2.5
+        styles.</p>
+      <table outputclass="table-hover" frame="none" colsep="0" rowsep="1">
+        <tgroup cols="2">
+          <colspec colwidth="1*"/>
+          <colspec colwidth="1*"/>
+          <thead>
+            <row>
+              <entry>Plug-in </entry>
+              <entry>Source code location</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry><codeph>org.dita.pdf2.legacy</codeph></entry>
+              <entry>
+                <xref href="https://github.com/dita-ot/org.dita.pdf2.legacy" format="html" scope="external"/></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <p>To install the legacy PDF plug-in, run the following command:</p>
+      <codeblock><cmdname>dita</cmdname> <parmname>--install</parmname>=<filepath>https://github.com/dita-ot/org.dita.pdf2.legacy/archive/2.5.zip</filepath></codeblock>
+      <note type="attention">Only install the legacy PDF plug-in if you have a custom PDF plug-in that requires the
+        pre–2.5 styles. If your plug-in was designed for DITA-OT 2.4 and does not override these settings, there is no
+        need to install the legacy PDF plug-in.</note>
+    </section>
+
+  </refbody>
+</reference>

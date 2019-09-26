@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA XML Mention Domain                             -->
+<!--  VERSION:   1.3                                                -->
+<!--  DATE:      November 2013                                      -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- =============================================================      -->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic markup-d xml-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="numcharref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="numcharref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="parameterentity">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="parameterentity"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="textentity">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="textentity"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="xmlatt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="xmlatt"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="xmlelement">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="xmlelement"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="xmlnsname">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="xmlnsname"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="xmlpi">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="xmlpi"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="xml-d-keyword">
+      <xs:choice>
+         <xs:element ref="numcharref"/>
+         <xs:element ref="parameterentity"/>
+         <xs:element ref="textentity"/>
+         <xs:element ref="xmlatt"/>
+         <xs:element ref="xmlelement"/>
+         <xs:element ref="xmlnsname"/>
+         <xs:element ref="xmlpi"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="numcharref">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="numcharref.class">
+               <xs:attribute ref="class"
+                             default="+ topic/keyword markup-d/markupname xml-d/numcharref "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="numcharref.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="numcharref.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="numcharref.attributes"/>
+   </xs:complexType>
+   <xs:group name="numcharref.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="required-cleanup"/>
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="numcharref.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="parameterentity">
+      <xs:annotation>
+         <xs:documentation>The parameterentity (&lt;parameterentity&gt;) element is used to identify mentions of XML DTD parameter entities. Category: Mention elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="parameterentity.class">
+               <xs:attribute ref="class"
+                             default="+ topic/keyword markup-d/markupname xml-d/parameterentity "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="parameterentity.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="parameterentity.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="parameterentity.attributes"/>
+   </xs:complexType>
+   <xs:group name="parameterentity.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="required-cleanup"/>
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="parameterentity.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="textentity">
+      <xs:annotation>
+         <xs:documentation>The textentity (&lt;textentity&gt;) element is used to identify mentions of XML text entities. Category: Mention elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="textentity.class">
+               <xs:attribute ref="class"
+                             default="+ topic/keyword markup-d/markupname xml-d/textentity "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="textentity.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="textentity.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="textentity.attributes"/>
+   </xs:complexType>
+   <xs:group name="textentity.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="required-cleanup"/>
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="textentity.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="xmlatt">
+      <xs:annotation>
+         <xs:documentation>The xmlatt (&lt;xmlatt&gt;) element is used to identify mentions of XML attributes. Category: Mention elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xmlatt.class">
+               <xs:attribute ref="class" default="+ topic/keyword markup-d/markupname xml-d/xmlatt "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="xmlatt.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="xmlatt.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xmlatt.attributes"/>
+   </xs:complexType>
+   <xs:group name="xmlatt.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="required-cleanup"/>
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="xmlatt.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="xmlelement">
+      <xs:annotation>
+         <xs:documentation>The xmlelement (&lt;xmlelement&gt;) element is used to identity mentions of XML element types. Category: Mention elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xmlelement.class">
+               <xs:attribute ref="class"
+                             default="+ topic/keyword markup-d/markupname xml-d/xmlelement "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="xmlelement.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="xmlelement.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xmlelement.attributes"/>
+   </xs:complexType>
+   <xs:group name="xmlelement.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="required-cleanup"/>
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="xmlelement.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="xmlnsname">
+      <xs:annotation>
+         <xs:documentation>The xmlnsname (&lt;xmlnsname&gt;) element is used to identify mentions of XML namespace names, e.g. the value used in @xmlns attributes. Category: Mention
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xmlnsname.class">
+               <xs:attribute ref="class"
+                             default="+ topic/keyword markup-d/markupname xml-d/xmlnsname "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="xmlnsname.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="xmlnsname.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xmlnsname.attributes"/>
+   </xs:complexType>
+   <xs:group name="xmlnsname.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="required-cleanup"/>
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="xmlnsname.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="xmlpi">
+      <xs:annotation>
+         <xs:documentation>The xmlpi (&lt;xmlpi&gt;) element is used to identify mentions of XML processing instruction names (e.g., &lt;?piname the PI value?&gt;). Category: Mention
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xmlpi.class">
+               <xs:attribute ref="class" default="+ topic/keyword markup-d/markupname xml-d/xmlpi "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="xmlpi.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="xmlpi.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xmlpi.attributes"/>
+   </xs:complexType>
+   <xs:group name="xmlpi.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="required-cleanup"/>
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="xmlpi.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

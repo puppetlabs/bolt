@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="ID">
+  <title>Plug-in coding conventions</title>
+  <titlealts>
+    <navtitle>Coding conventions</navtitle>
+  </titlealts>
+  <shortdesc>To ensure custom plug-ins work well with the core toolkit code and remain compatible with future releases,
+    the DITA Open Toolkit project recommends that plug-ins use modern development practices and common coding
+    patterns.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm end="plugins"/>
+        <indexterm>plug-ins<indexterm>best practices</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>best practices</indexterm></indexterm>
+        <indexterm>preprocessing<indexterm>XSLT</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section conkeyref="reusable-components/use-xslt2"/>
+    <section>
+      <title>Use custom <xmlelement>pipeline</xmlelement> elements</title>
+      <div outputclass="div-index">
+        <indexterm>Ant<indexterm><xmlelement>pipeline</xmlelement></indexterm></indexterm>
+        <indexterm>Ant<indexterm><xmlelement>xslt</xmlelement></indexterm></indexterm>
+        <indexterm>Ant<indexterm><xmlelement>style</xmlelement></indexterm></indexterm>
+      </div>
+      <p>In Ant scripts, use the XSLT module from DITA-OT instead of Ant’s built-in <xmlelement>xslt</xmlelement> or
+          <xmlelement>style</xmlelement> tasks. </p>
+      <p>The XSLT module allows access to DITA-OT features like using the job configuration to select files in the
+        temporary folder based on file metadata and custom XSLT extension functions. </p>
+      <p>Instead of:</p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;xslt style="${dita.plugin.example.dir}/custom.xsl"
+      basedir="${dita.temp.dir}"
+      destdir="${dita.output.dir}"
+      includesfile="${dita.temp.dir}/${fullditatopicfile}"/></codeblock></p>
+      <p>use:</p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;pipeline>
+  &lt;xslt style="${dita.plugin.example.dir}/custom.xsl"
+        destdir="${dita.output.dir}">
+    &lt;ditafileset format="dita" />
+  &lt;/xslt>
+&lt;/pipeline></codeblock></p>
+    </section>
+
+    <section>
+      <title>Use the plug-in directory property</title>
+      <p>In Ant scripts, always refer to files in other plug-ins using the
+            <codeph>dita.plugin.<varname>plugin-id</varname>.dir</codeph> property.</p>
+      <p>Instead of:</p>
+      <p><codeblock outputclass="language-xml">&lt;property name="base" location="../example/custom.xsl"/></codeblock></p>
+      <p>use:</p>
+      <p><codeblock outputclass="language-xml">&lt;property name="base" location="${dita.plugin.example.dir}/custom.xsl"/></codeblock></p>
+      <p>This fixes cases where plug-ins are installed to custom plug-in directories or the plug-in folder name doesn’t
+        match the plug-in ID.</p>
+    </section>
+
+    <section>
+      <title>Use <xmlelement>ditafileset</xmlelement> to select files</title>
+      <div outputclass="div-index">
+        <indexterm>Ant<indexterm><xmlelement>ditafileset</xmlelement></indexterm></indexterm>
+        <indexterm><xmlelement>ditafileset</xmlelement></indexterm>
+        <indexterm>images<indexterm>selecting</indexterm></indexterm>
+        <indexterm>images<index-see-also>copy-files</index-see-also></indexterm>
+      </div>
+      <p>In Ant scripts, use <xmlelement>ditafileset</xmlelement> to select resources in the temporary directory.</p>
+      <p>For example, to select all images referenced by input DITA files, instead of:</p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;copy todir="${copy-image.todir}">
+  &lt;fileset dir="${user.input.dir}">
+    &lt;includes name="*.jpg"/>
+    &lt;includes name="*.jpeg"/>
+    &lt;includes name="*.png"/>
+    &lt;includes name="*.gif"/>
+    &lt;includes name="*.svg"/>
+  &lt;/fileset>
+&lt;/copy></codeblock></p>
+      <p>use:</p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;copy todir="${copy-image.todir}">
+  &lt;ditafileset format="image" />
+&lt;/copy></codeblock>
+      </p>
+      <p>The <xmlelement>ditafileset</xmlelement> resource collection can be used to select different types of
+        files.</p>
+      <table outputclass="table-hover" frame="none" colsep="0" rowsep="1">
+        <title>Usage examples of <xmlelement>ditafileset</xmlelement></title>
+        <tgroup cols="2">
+          <colspec colwidth="1*"/>
+          <colspec colwidth="1*"/>
+          <thead>
+            <row>
+              <entry>Example</entry>
+              <entry>Description</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry><codeph>&lt;ditafileset format="dita"/></codeph></entry>
+              <entry>Selects all DITA topics in the temporary directory.</entry>
+            </row>
+            <row>
+              <entry><codeph>&lt;ditafileset format="ditamap"/></codeph></entry>
+              <entry>Selects all DITA maps in the temporary directory.</entry>
+            </row>
+            <row>
+              <entry><codeph>&lt;ditafileset format="image"/></codeph></entry>
+              <entry>Selects images of all known types in the temporary directory.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </section>
+
+    <section>
+      <title>Use the <codeph>plugin</codeph> URI scheme</title>
+      <div outputclass="div-index">
+        <indexterm>Ant<indexterm><xmlelement>xsl:import</xmlelement></indexterm></indexterm>
+        <indexterm>Ant<indexterm><xmlelement>xsl:include</xmlelement></indexterm></indexterm>
+      </div>
+      <p>In XSLT, use the <codeph>plugin</codeph> URI scheme in <xmlelement>xsl:import</xmlelement> and
+          <xmlelement>xsl:include</xmlelement> to reference files in other plug-ins.</p>
+      <p>Instead of:</p>
+      <p><codeblock outputclass="language-xml">&lt;xsl:import href="../../org.dita.base/xsl/common/output-message.xsl"/></codeblock></p>
+      <p>use:</p>
+      <p><codeblock outputclass="language-xml">&lt;xsl:import href="plugin:org.dita.base:xsl/common/output-message.xsl"/></codeblock></p>
+      <p>As with the plug-in directory property in Ant, this allows plug-ins to resolve to the correct directory even
+        when a plug-in moves to a new location. The plug-in is referenced using the syntax
+            <codeph>plugin:<varname>plugin-id</varname>:<varname>path/within/plugin/file.xsl</varname></codeph>.</p>
+    </section>
+
+    <section conkeyref="reusable-components/validating-plugins"/>
+
+  </conbody>
+</concept>

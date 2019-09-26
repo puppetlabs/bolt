@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="preprocess-branch-filter" xml:lang="en-US">
+  <title>Branch filtering (branch-filter)</title>
+  <shortdesc>The <codeph>branch-filter</codeph> step filters topics using DITAVAL files defined in the map.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>DITAVAL<indexterm><codeph>branch-filter</codeph> preprocess step</indexterm></indexterm>
+        <indexterm>filters<index-see-also>branch filters</index-see-also><index-see-also>DITAVAL</index-see-also></indexterm> <!-- https://github.com/dita-ot/dita-ot/issues/3314 -->
+        <indexterm>profiling<index-see-also>DITAVAL</index-see-also></indexterm>
+        <indexterm>branch filters</indexterm>
+        <indexterm>preprocessing<indexterm><codeph>branch-filter</codeph></indexterm></indexterm>
+        <indexterm><codeph>branch-filter</codeph></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+</concept>

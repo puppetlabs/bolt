@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Delayed Resolution Domain                   -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Define elements and specialization attributes    -->
+<!--            for Delayed Resolution Domain                    -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            February 2008                                    -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2008, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic delay-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="exportanchors">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="exportanchors"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="anchorid">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="anchorid"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="anchorkey">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="anchorkey"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="delay-d-keywords">
+      <xs:choice>
+         <xs:element ref="exportanchors"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="exportanchors">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="exportanchors.class">
+               <xs:attribute ref="class" default="+ topic/keywords delay-d/exportanchors "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="exportanchors.class">
+      <xs:sequence>
+         <xs:group ref="exportanchors.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="exportanchors.attributes"/>
+   </xs:complexType>
+   <xs:group name="exportanchors.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="anchorid"/>
+            <xs:group ref="anchorkey"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="exportanchors.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="anchorid">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="anchorid.class">
+               <xs:attribute ref="class" default="+ topic/keyword delay-d/anchorid "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="anchorid.class">
+      <xs:sequence>
+         <xs:group ref="anchorid.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="anchorid.attributes"/>
+   </xs:complexType>
+   <xs:group name="anchorid.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="anchorid.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="anchorkey">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="anchorkey.class">
+               <xs:attribute ref="class" default="+ topic/keyword delay-d/anchorkey "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="anchorkey.class">
+      <xs:sequence>
+         <xs:group ref="anchorkey.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="anchorkey.attributes"/>
+   </xs:complexType>
+   <xs:group name="anchorkey.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="anchorkey.attributes">
+      <xs:attribute name="keyref" use="required" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

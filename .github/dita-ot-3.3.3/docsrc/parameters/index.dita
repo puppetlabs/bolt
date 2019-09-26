@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="ID">
+  <title>Setting DITA Open Toolkit parameters</title>
+  <titlealts>
+    <navtitle>Setting parameters</navtitle>
+  </titlealts>
+  <shortdesc>
+    <ph id="ph_docs-pr-desc">You can adjust DITA Open Toolkit behavior via <cmdname>dita</cmdname> command arguments and
+      options, DITA-OT parameter settings, and configuration properties.</ph>
+  </shortdesc>
+</reference>

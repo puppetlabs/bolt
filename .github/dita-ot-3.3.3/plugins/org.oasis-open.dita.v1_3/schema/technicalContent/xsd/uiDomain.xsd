@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA User Interface Domain                       -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA User Interface Domain//EN"   -->
+<!--      Delivered as file "uiDomain.mod"                            -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for the User Interface Domain         -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2001                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2001, 2004.        -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2005.11.15 RDA: Corrected LONG NAME for screen            -->
+<!--   2005.11.15 RDA: Corrected the "Delivered as" system ID    -->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       -->
+<!--   2008.02.12 RDA: Add text to wintitle, shortcut            -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--=============================================================-->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://www.w3.org/XML/1998/namespace"
+              schemaLocation="urn:oasis:names:tc:dita:xsd:xml.xsd:1.3"/>
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic ui-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="uicontrol">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="uicontrol"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="wintitle">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="wintitle"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="menucascade">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="menucascade"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="shortcut">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="shortcut"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="screen">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="screen"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="ui-d-keyword">
+      <xs:choice>
+         <xs:element ref="wintitle"/>
+      </xs:choice>
+   </xs:group>
+   <xs:group name="ui-d-ph">
+      <xs:choice>
+         <xs:element ref="menucascade"/>
+         <xs:element ref="uicontrol"/>
+      </xs:choice>
+   </xs:group>
+   <xs:group name="ui-d-pre">
+      <xs:choice>
+         <xs:element ref="screen"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="uicontrol">
+      <xs:annotation>
+         <xs:documentation>The user interface control (&lt;uicontrol&gt;) element is used to mark up names of buttons, entry fields, menu items, or other objects that allow the user to control the
+            interface. Use the &lt;uicontrol&gt; element inside a &lt;menucascade&gt; element to identify a sequence of menu choices in a nested menu, such as File New. This element is part of the DITA user
+            interface domain, a special set of DITA elements designed to document user interface tasks, concepts and reference information. Category: User interface elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="uicontrol.class">
+               <xs:attribute ref="class" default="+ topic/ph ui-d/uicontrol "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="uicontrol.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="uicontrol.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="uicontrol.attributes"/>
+   </xs:complexType>
+   <xs:group name="uicontrol.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt"/>
+            <xs:group ref="image"/>
+            <xs:group ref="shortcut"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="uicontrol.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="wintitle">
+      <xs:annotation>
+         <xs:documentation>The window title &lt;wintitle&gt; element can be used to mark up names of windows or dialogs, or other user interface elements at the same level of grouping, including wizard
+            titles, wizard page titles, and window pane titles. This element is part of the DITA user interface domain, a special set of DITA elements designed to document user interface tasks,
+            concepts and reference information. Category: User interface elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="wintitle.class">
+               <xs:attribute ref="class" default="+ topic/keyword ui-d/wintitle "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="wintitle.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="wintitle.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="wintitle.attributes"/>
+   </xs:complexType>
+   <xs:group name="wintitle.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="wintitle.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="menucascade">
+      <xs:annotation>
+         <xs:documentation>The &lt;menucascade&gt; element is used to document a series of menu choices. The &lt;menucascade&gt; element contains one or more user interface control (&lt;uicontrol&gt;)
+            elements, for example: Start &gt; Programs &gt; Accessories &gt; Notepad. If there is more than one &lt;uicontrol&gt; element, the formatter shows connecting characters between the menu items to
+            represent the menu cascade. This element is part of the DITA user interface domain, a special set of DITA elements designed to document user interface tasks, concepts and reference
+            information. Category: User interface elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="menucascade.class">
+               <xs:attribute ref="class" default="+ topic/ph ui-d/menucascade "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="menucascade.class">
+      <xs:sequence>
+         <xs:group ref="menucascade.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="menucascade.attributes"/>
+   </xs:complexType>
+   <xs:group name="menucascade.content">
+      <xs:sequence>
+         <xs:group ref="uicontrol" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="menucascade.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="shortcut">
+      <xs:annotation>
+         <xs:documentation>The &lt;shortcut&gt; element identifies a keyboard shortcut for a menu or window action. This element is part of the DITA user interface domain, a special set of DITA elements
+            designed to document user interface tasks, concepts and reference information. Category: User interface elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="shortcut.class">
+               <xs:attribute ref="class" default="+ topic/keyword ui-d/shortcut "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="shortcut.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="shortcut.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="shortcut.attributes"/>
+   </xs:complexType>
+   <xs:group name="shortcut.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="shortcut.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="screen">
+      <xs:annotation>
+         <xs:documentation>The &lt;screen&gt; element contains or refers to a textual representation of a computer screen or user interface panel (window). Category: User interface
+            elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="screen.class">
+               <xs:attribute ref="class" default="+ topic/pre ui-d/screen "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="screen.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="screen.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="screen.attributes"/>
+   </xs:complexType>
+   <xs:group name="screen.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph.notm"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="txt.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="screen.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attribute ref="xml:space" default="preserve"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

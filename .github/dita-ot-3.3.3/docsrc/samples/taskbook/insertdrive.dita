@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="insertdrive" xml:lang="en-us">
+  <title>Attach the drive to the system</title>
+  <shortdesc>The drive needs to be attached to power cables and other cables inside the computer.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>hard drive</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <prereq><note type="caution">You must be grounded before doing this.</note></prereq>
+    <steps>
+      <step>
+        <cmd>Find an empty bay for your drive.</cmd>
+      </step>
+      <step>
+        <cmd>Remove the drive from its electrostatic bag.</cmd>
+      </step>
+      <step>
+        <cmd>Screw the drive in to the frame.</cmd>
+      </step>
+      <step>
+        <cmd>Attach the multi-colored power cord to the drive.</cmd>
+      </step>
+      <step>
+        <cmd>Attach the cable that connects your hard drive to the motherboard.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

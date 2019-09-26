@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    XML EXCHANGE TABLE MODEL DECLARATION MODULE       -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA Tables            -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             Derived from OASIS Exchange Table Model base      -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2009                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--  Delivered as file "tblDeclGrp.xsd"                           -->
+<!-- ============================================================= -->
+
+
+<!-- XML EXCHANGE TABLE MODEL DECLARATION MODULE                   -->
+
+<!-- OASIS DITA 1.0 notes:
+     The Exchange Table Model replaces the original CALS-based model
+     used in development versions of the DITA definition.
+     This set of declarations defines the XML version of the Exchange
+     Table Model as adapted for OASIS DITA version 1.0.
+     The base for the DITA version of the Exchange Table Model is
+     defined at http://www.oasis-open.org/specs/tm9901.htm .
+     The DITA version specifically extends this model with these DITA-
+     specific content and attribute adaptations to the DITA processing
+     requirements:
+
+     -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:group name="table">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="table"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="tgroup">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="tgroup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="colspec">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="colspec"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="thead">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="thead"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="tbody">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="tbody"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="row">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="row"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="entry">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="entry"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+
+
+</xs:schema>

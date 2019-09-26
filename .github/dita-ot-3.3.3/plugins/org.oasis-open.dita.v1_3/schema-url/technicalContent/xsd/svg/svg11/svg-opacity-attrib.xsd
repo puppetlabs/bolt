@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg11.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:attributeGroup name="SVG.opacity.attrib">
+    <xs:attribute name="opacity" type="svg:OpacityValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.fill-opacity.attrib">
+    <xs:attribute name="fill-opacity" type="svg:OpacityValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.stroke-opacity.attrib">
+    <xs:attribute name="stroke-opacity" type="svg:OpacityValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Opacity.attrib">
+    <xs:attributeGroup ref="SVG.opacity.attrib"/>
+    <xs:attributeGroup ref="SVG.fill-opacity.attrib"/>
+    <xs:attributeGroup ref="SVG.stroke-opacity.attrib"/>
+  </xs:attributeGroup>
+</xs:schema>

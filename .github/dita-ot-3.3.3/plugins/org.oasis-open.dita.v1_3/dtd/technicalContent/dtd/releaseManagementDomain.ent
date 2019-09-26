@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DITA Release Management Metadata Domain                       -->
+<!--                                                               -->
+<!-- Defines element types for capturing change details within     -->
+<!-- topics or maps.                                               -->
+<!-- DITA 1.3                                                      -->
+<!-- Copyright (c) 2013 OASIS Open                                 -->
+<!-- ============================================================= -->
+<!--                     PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                     TYPICAL INVOCATION                         -->
+<!--                                                                -->
+<!-- Refer to this file by the following public identifier or an   -->
+<!-- appropriate system identifier                                 -->
+<!-- PUBLIC "-//OASIS//ENTITIES DITA Release Management Domain//EN" -->
+<!-- ============================================================= -->
+<!--                                                               -->
+
+<!-- ============================================================= -->
+<!--                    ELEMENT EXTENSION ENTITY DECLARATIONS      -->
+<!-- ============================================================= -->
+
+<!ENTITY % relmgmt-d-metadata
+  "change-historylist"
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY relmgmt-d-att
+  "(topic relmgmt-d)"
+>
+
+<!-- ================ End DITA Release Management Domain ================== -->
+ 

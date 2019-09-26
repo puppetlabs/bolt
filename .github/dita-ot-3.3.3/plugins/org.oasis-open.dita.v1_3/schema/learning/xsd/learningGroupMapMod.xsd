@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--============================================================= -->
+<!--MODULE:    DITA Learning Group Map                           -->
+<!--VERSION:   1.3                                                -->
+<!--DATE:      June 2013                                         -->
+<!--=============================================================-->
+<!--Refer to the latest version of this file by the following URI:-->
+<!--urn:oasis:names:tc:dita:spec:learning:xsd:learningGroupMapMod.xsd -->
+<!--To refer to this specific version, you may use this value:   -->
+<!--urn:oasis:names:tc:dita:spec:learning:xsd:learningGroupMapMod.xsd:1.3 -->
+<!--============================================================= -->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--PURPOSE:    Provides a map type for representing a single learning group.-->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--June 2013                                                    -->
+<!--(C) Copyright OASIS Open                                     -->
+<!--All Rights Reserved.                                          -->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/"
+              schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.3"/>
+
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(map learningGroupMap+learningMap-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+
+   <xs:attributeGroup name="topicref-atts-for-learningGroupMap">
+      <xs:attribute name="collection-type">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="choice"/>
+               <xs:enumeration value="family"/>
+               <xs:enumeration value="sequence"/>
+               <xs:enumeration value="unordered"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="processing-role">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="normal"/>
+               <xs:enumeration value="resource-only"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="local"/>
+               <xs:enumeration value="peer"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="locktitle">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attribute name="linking">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="none"/>
+               <xs:enumeration value="normal"/>
+               <xs:enumeration value="sourceonly"/>
+               <xs:enumeration value="targetonly"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="toc">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="print">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="printonly"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="search">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="chunk" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:element name="learningGroupMap">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningGroupMap.class">
+               <xs:attribute ref="class" default="- map/map learningGroupMap/learningGroupMap "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningGroupMap.class">
+      <xs:sequence>
+         <xs:group ref="learningGroupMap.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningGroupMap.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningGroupMap.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="topicref"/>
+         </xs:choice>
+         <xs:group ref="reltable" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningGroupMap.attributes">
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attribute name="anchorref" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attributeGroup ref="topicref-atts-for-learningGroupMap"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="learningGroupMap.attlist">
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+   </xs:attributeGroup>
+</xs:schema>

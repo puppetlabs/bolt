@@ -1,0 +1,43 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="You can build output by using an Ant build script to provide the DITA-OT parameters."><meta name="DC.subject" content=", default, macOS, Ant, Linux, Windows, publishing with"><meta name="keywords" content=", default, macOS, Ant, Linux, Windows, publishing with"><meta name="DC.relation" scheme="URI" content="../topics/publishing-with-ant.html"><meta name="DC.relation" scheme="URI" content="../topics/migrating-ant-to-dita.html"><meta name="DC.relation" scheme="URI" content="../topics/creating-an-ant-build-script.html"><meta name="DC.relation" scheme="URI" content="../topics/ant.html"><meta name="DC.relation" scheme="URI" content="../parameters/parameters_intro.html"><meta name="DC.relation" scheme="URI" content="http://ant.apache.org/manual"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="runant"><meta name="DC.language" content="en"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Building output using Ant</title></head><body id="runant"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a><ul><li><a href="../topics/build-using-dita-command.html">Using the dita command</a></li><li><a href="../topics/publishing-with-ant.html">Using Ant</a><ul><li><a href="../topics/ant.html">Ant</a></li><li class="active"><a href="../topics/building-with-ant.html">Building output using Ant</a></li><li><a href="../topics/creating-an-ant-build-script.html">Creating an Ant build script</a></li></ul></li><li><a href="../reference/java-api.html">Using the Java API</a></li><li><a href="../topics/output-formats.html">Output formats</a></li></ul></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Building output using Ant</h1>
+  
+  
+  <div class="body taskbody"><p class="shortdesc">You can build output by using an Ant build script to provide the DITA-OT parameters.</p>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">Open a command prompt or terminal session, and then change to the directory where DITA
+          Open Toolkit is installed.</span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Issue the following command:</span>
+        <table border="1" frame="hsides" rules="rows" cellpadding="4" cellspacing="0" summary="" class="simpletable choicetable choicetableborder"><colgroup><col style="width:25%"><col style="width:75%"></colgroup><thead><tr class="sthead chhead"><th scope="col" class="stentry choptionhd" style="vertical-align:bottom;text-align:left;">Option</th><th scope="col" class="stentry chdeschd" style="vertical-align:bottom;text-align:left;">Description</th></tr></thead><tbody><tr class="strow chrow">
+            <th style="vertical-align:top;" scope="row" class="stentry choption">Linux or macOS&nbsp;</th>
+            <td style="vertical-align:top;" class="stentry chdesc">
+              <span class="keyword cmdname">bin/ant</span>
+              <span class="keyword option">-f</span>
+              <code class="ph codeph"><var class="keyword varname">build-script</var>
+                <var class="keyword varname">target</var></code>
+            </td>
+          </tr><tr class="strow chrow">
+            <th style="vertical-align:top;" scope="row" class="stentry choption">Windows</th>
+            <td style="vertical-align:top;" class="stentry chdesc">
+              <span class="keyword cmdname">bin\ant</span>
+              <span class="keyword option">-f</span>
+              <code class="ph codeph"><var class="keyword varname">build-script</var>
+                <var class="keyword varname">target</var></code>
+            </td>
+          </tr></tbody></table>
+        <div class="itemgroup info"> where:
+          <ul class="ul">
+            <li class="li"><var class="keyword varname">build-script</var> is name of the Ant build script.</li>
+            <li class="li"><var class="keyword varname">target</var> is an optional switch that specifies the name of the Ant target that you want
+              to run. <p class="p">If you do not specify a target, the value of the <code class="keyword markupname xmlatt">@default</code> attribute for the Ant
+                project is used.</p>
+            </li>
+          </ul></div>
+      </li></ol></section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/publishing-with-ant.html" title="You can use Ant to invoke DITA Open Toolkit and generate output. You can use the complete set of parameters that the toolkit supports.">Building output using Ant</a></div></div><div class="linklist relinfo relconcepts"><strong>Related concepts</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/ant.html" title="Ant is a Java-based, open-source tool that is provided by the Apache Foundation. It can be used to declare a sequence of build actions. It is well suited for both development and document builds. The toolkit ships with a copy of Ant.">Ant</a></li></ul></div><div class="linklist relinfo reltasks"><strong>Related tasks</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/creating-an-ant-build-script.html" title="Instead of typing the DITA-OT parameters at the command prompt, you might want to create an Ant build script that contains all of the parameters.">Creating an Ant build script</a></li><li class="linklist"><a class="link" href="../topics/migrating-ant-to-dita.html" title="Although DITA Open Toolkit still supports Ant builds, switching to the dita command offers a simpler command interface, sets all required environment variables and allows you to run DITA-OT without setting up anything beforehand.">Migrating Ant builds to use the dita command</a></li></ul></div><div class="linklist relinfo relref"><strong>Related reference</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../parameters/parameters_intro.html" title="Certain parameters apply to all DITA-OT transformations. Other parameters are common to the HTML-based transformations. Some parameters apply only to specific transformation types. These parameters can be passed as options to the dita command using the --parameter=value syntax or included in build scripts as Ant properties.">DITA-OT parameters</a></li><li class="linklist"><a class="link" href="http://ant.apache.org/manual" target="_blank">Apache Ant documentation</a></li></ul></div></nav></article></main></body></html>

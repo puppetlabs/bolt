@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Markup Name Mention Domain                             -->
+<!--  VERSION:   1.3                                                -->
+<!--  DATE:      March 2014                                       -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- =============================================================      -->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic markup-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="markupname">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="markupname"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="markup-d-keyword">
+      <xs:choice>
+         <xs:element ref="markupname"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="markupname">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="markupname.class">
+               <xs:attribute ref="class" default="+ topic/keyword markup-d/markupname "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="markupname.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="markupname.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="markupname.attributes"/>
+   </xs:complexType>
+   <xs:group name="markupname.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="required-cleanup"/>
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="markupname.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

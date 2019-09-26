@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | <variable id="Preface title"/> | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | <variable id="Preface title"/> | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Sisällys</variable>
+  <variable id="Index Continued String">jatkoa</variable>
+  <variable id="Index See String">, Katso </variable>
+  <variable id="Index See Also String">Katso myös </variable>
+  <variable id="Table of Contents Chapter">Luku <param ref-name="number"/>. </variable>
+  <variable id="Table of Contents Appendix">Liite <param ref-name="number"/>. </variable>
+  <variable id="Table of Contents Part">Osa <param ref-name="number"/>. </variable>
+  <variable id="Table of Contents Preface">Esipuhe: </variable>
+  <variable id="Preface title">Esipuhe</variable>
+  <variable id="Notices title"><!--TODO:Notice--></variable>
+  <variable id="Mini Toc"><!--TODO:Topics: --></variable>  
+  <variable id="Notice"><!--TODO:Notice--></variable>
+  <variable id="Figure.title">Kuva <param ref-name="number"/>. <param ref-name="title"/></variable>
+  <variable id="Figure Number">Kuva <param ref-name="number"/></variable>
+  <variable id="Table.title">Taulu <param ref-name="number"/>. <param ref-name="title"/></variable>
+  <variable id="Table Number">Taulu <param ref-name="number"/></variable>
+  <variable id="Related Links"><!--TODO:Related Links--></variable>
+  <variable id="Cross-Reference"/><!--UNUSED-->
+  <variable id="Content-Reference"/><!--UNUSED-->
+  <variable id="List item"><!--TODO:List item.--></variable>
+  <variable id="Foot note"><!--TODO:Footnote.--></variable>
+  <variable id="Navigation title"><!--TODO:Navigation title--></variable>
+  <variable id="Search title"><!--TODO:Search title--></variable>
+  <variable id="Chapter with number">Luku <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Liite <param ref-name="number"/></variable>
+  <variable id="Part with number">Osa <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup"><!--TODO:[Required-Cleanup]--></variable>
+  <variable id="On the page"/>
+  <variable id="Page"> sivu <param ref-name="pagenum"/></variable>
+  <variable id="This link"/><!--UNUSED-->
+  <variable id="Child topics"/><!--UNUSED-->
+  <variable id="Related references">Aiheeseen liittyviä tietolähteitä</variable><!--UNUSED-->
+  <variable id="Optional Step">Valinnainen:</variable>
+  <variable id="Required Step">Pakollinen:</variable>
+  <!--Labels for task sections, now reused from common-->
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Sanasto</variable>
+  <variable id="List of Tables">Luettelo tauluista</variable>
+  <variable id="List of Figures">Luettelo kuvista</variable>
+</vars>

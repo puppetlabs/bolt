@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:checkShell.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Topic Base Shell (only base domains)</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER
+=============================================================
+Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02
+OASIS Standard
+16 January 2018 
+Copyright (c) OASIS Open 2018. All rights reserved. 
+Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html
+
+============================================================
+ MODULE:    DITA Topic Base (only base domains)
+ VERSION:   1.3
+ DATE:      March 2014
+
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION
+                   TYPICAL INVOCATION  
+                                                             
+Refer to this file by the following public identifier or an 
+      appropriate system identifier
+      
+PUBLIC "-//OASIS//DTD DITA Base Topic//EN"
+
+The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+     
+PUBLIC "-//OASIS//DTD DITA 1.3 Base Topic//EN"
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)
+
+PURPOSE:    DTD to describe Base DITA Topics
+
+ORIGINAL CREATION DATE:
+            April 2010
+
+            (C) Copyright OASIS Open 2010, 2014
+            All Rights Reserved.
+            
+UPDATES:                                                    
+   2014.03.13 WEK: Updated for DITA 1.3, reimplemented as RNG
+=============================================================
+</headerComment>
+    <moduleMetadata>
+      <moduleType>topicshell</moduleType>
+      <moduleShortName>Base topic</moduleShortName>
+      <shellPublicIds>
+        <dtdShell>-//OASIS//DTD DITA<var presep=" " name="ditaver"/> Base Topic//EN</dtdShell>
+        <rncShell>urn:oasis:names:tc:dita:rnc:basetopic.rnc<var presep=":" name="ditaver"/></rncShell>
+        <rngShell>urn:oasis:names:tc:dita:rng:basetopic.rng<var presep=":" name="ditaver"/></rngShell>
+        <xsdShell>urn:oasis:names:tc:dita:xsd:basetopic.xsd<var presep=":" name="ditaver"/></xsdShell>
+      </shellPublicIds>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>ROOT ELEMENT DECLARATION</a:documentation>
+    <start combine="choice">
+      <ref name="topic.element"/>
+    </start>
+  </div>
+  <div>
+    <a:documentation>DOMAINS ATTRIBUTE</a:documentation>
+    <define name="domains-att">
+      <optional>
+        <attribute name="domains"
+          a:defaultValue="(topic hazard-d)
+                          (topic hi-d)
+                          (topic indexing-d)
+                          (topic ut-d)
+                          a(props deliveryTarget)"
+        />
+      </optional>
+    </define>
+  </div>
+  <div>
+    <a:documentation>MODULE INCLUSIONS</a:documentation>
+    <include href="topicMod.rng">
+      <define name="topic-info-types">
+        <ref name="topic.element"/>
+      </define>
+
+    </include>
+    <include href="deliveryTargetAttDomain.rng" dita:since="1.3"/>
+    <include href="hazardstatementDomain.rng" dita:since="1.3"/>
+    <include href="highlightDomain.rng"/>
+    <include href="indexingDomain.rng"/>
+    <include href="utilitiesDomain.rng"/>
+  </div>
+  <div>
+    <a:documentation>ID-DEFINING-ELEMENT OVERRIDES</a:documentation>
+    <define name="any">
+      <zeroOrMore>
+        <choice>
+          <ref name="idElements"/>
+          <element>
+            <anyName>
+              <except>
+                <name>topic</name>
+              </except>
+            </anyName>
+            <zeroOrMore>
+              <attribute>
+                <anyName/>
+              </attribute>
+            </zeroOrMore>
+            <ref name="any"/>
+          </element>
+          <text/>
+        </choice>
+      </zeroOrMore>
+    </define>
+  </div>
+</grammar>

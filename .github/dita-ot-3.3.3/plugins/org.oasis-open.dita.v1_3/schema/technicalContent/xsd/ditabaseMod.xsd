@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:import namespace="http://www.w3.org/XML/1998/namespace"/>
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/"
+              schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.3"/>
+   <xs:annotation>
+      <xs:documentation>The &lt;<keyword>dita</keyword>&gt; element provides a top-level container
+            for multiple topics when you create documents using the ditabase XSD. The
+            &lt;<keyword>dita</keyword>&gt; element lets you create any sequence of concept,
+            task, and reference topics, and the ditabase XSD lets you further nest these
+            topic types inside each other. The &lt;<keyword>dita</keyword>&gt; element has
+            no particular output implications; it simply allows you to create multiple
+            topics of different types at the same level in a single document.</xs:documentation>
+   </xs:annotation>
+   <xs:element name="dita" type="dita.class"/>
+   <xs:complexType name="dita.class">
+      <xs:choice maxOccurs="unbounded">
+         <xs:group ref="ditabase-info-types"/>
+      </xs:choice>
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:complexType>
+</xs:schema>

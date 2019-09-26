@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD LIGHTWEIGHT DITA Topic//EN" "lw-topic.dtd">
+<topic id="remote-specs">
+  <title>Remote Control Specifications</title>
+  <shortdesc>Specifications describing the electronics and technology inside the remote control.</shortdesc>
+  <body>
+    <simpletable>
+      <sthead>
+        <stentry>
+          <p>Feature</p>
+        </stentry>
+        <stentry>
+          <p>Specification</p>
+        </stentry>
+      </sthead>
+      <strow>
+        <stentry>
+          <p>Power Source</p>
+        </stentry>
+        <stentry>
+          <p>2 AA Batteries 1.5V</p>
+        </stentry>
+      </strow>
+      <strow>
+        <stentry>
+          <p>Max. Lamps</p>
+        </stentry>
+        <stentry>
+          <p>250</p>
+        </stentry>
+      </strow>
+      <strow>
+        <stentry>
+          <p>Groups</p>
+        </stentry>
+        <stentry>
+          <p>4 + All</p>
+        </stentry>
+      </strow>
+      <strow>
+        <stentry>
+          <p>Indicators</p>
+        </stentry>
+        <stentry>
+          <p>LED Status Indicators and Group Selection Indicators</p>
+        </stentry>
+      </strow>
+      <strow>
+        <stentry>
+          <p>Lifetime</p>
+        </stentry>
+        <stentry>
+          <p>>18 Months with Alkaline Batteries</p>
+        </stentry>
+      </strow>
+    </simpletable>
+    <p conref="intro-product.dita#intro-product/warning" />
+  </body>
+</topic>

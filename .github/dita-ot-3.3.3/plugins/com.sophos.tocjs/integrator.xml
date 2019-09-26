@@ -1,0 +1,91 @@
+<!-- 
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2007 Shawn McKenzie
+
+See the accompanying LICENSE file for applicable license.
+-->
+<!--
+  UPDATES:
+    20110817 RDA: Several changes:
+        * Use property dita.plugin.com.sophos.tocjs.dir (remove hard-coded demo/ dir)
+        * Original design only works if $output.file is set in an Ant file, and
+          if XHTML is created independently. Refactoring to use that original
+          processing when $output.file is specified; otherwise:
+          1) Return HTML files along with navigation
+          2) Return default frameset (with name based on map name)
+          3) Set $output.file to a default value of toctree.js
+          4) Return supporting JS and CSS files for the default frameset
+  *-->
+<project>
+
+  <target name="dita2tocjs" depends="build-init, preprocess, tocjsInit, map2tocjs, topic2tocjs, tocjsDefaultOutput">
+  </target>
+
+  <target name="tocjsInit">
+    <property name="html-version" value="xhtml"/>
+    <condition property="dita.plugin.com.sophos.tocjs.copydefaults" value="true">
+        <not>
+            <isset property="output.file" />
+        </not>
+    </condition>
+    <property name="output.file" value="${dita.output.dir}${file.separator}toctree.js"/>
+    <property name="out.ext" value=".html"/>
+  </target>
+
+  <target name="topic2tocjs" if="noMap">
+    <antcall target="dita.map.tocjs">
+      <!-- No real support for tocjs on a single topic, only for map -->
+    </antcall>
+    <echo>The TocJS output type only supports ditamap files as input.</echo>
+  </target>
+
+  <target name="map2tocjs" unless="noMap">
+    <antcall target="dita.map.tocjs">
+      <param name="input" value="${dita.temp.dir}${file.separator}${user.input.file}"/>
+    </antcall>
+  </target>
+
+  <target name="dita.map.tocjs" description="generate merged for tocjs">
+    <xslt in="${input}" out="${output.file}"
+      style="${dita.plugin.com.sophos.tocjs.dir}/xsl/tocjs.xsl">
+      <param name="contentwin" expression="${content.frame}" if="content.frame"/>
+      <param name="htmlext" expression="${out.ext}"/>
+      <xmlcatalog refid="dita.catalog"/>
+    </xslt>
+  </target>
+
+  <target name="tocjsDefaultOutput" 
+          if="dita.plugin.com.sophos.tocjs.copydefaults">
+      <!-- Create usable output for people trying tocjs for the first time -->
+      <antcall target="tocjsDefaultXhtmlOutput"/>
+      <antcall target="tocjsDefaultFrameset"/>
+      <!-- Copy default JS and related files -->
+    <copy todir="${dita.output.dir}"><fileset
+          dir="${dita.plugin.com.sophos.tocjs.dir}${file.separator}basefiles"><include name="**/*"/></fileset></copy>
+  </target>
+
+  <target name="tocjsDefaultXhtmlOutput" depends="copy-revflag, xhtml.topics, copy-css">
+      <!-- Preprocess has already completed based on original dependencies;
+           this target continues to XHTML for default output. Seems very 
+           indirect way to create the XHTML, so would like something better,
+           but do not want to add new XHTML processing for people using
+           the original dita2tocjs target. -->
+  </target>
+
+  <target name="tocjsDefaultFrameset" if="dita.plugin.com.sophos.tocjs.copydefaults">
+      <!-- Create the default frameset itself -->
+      <xslt
+    basedir="${dita.temp.dir}"
+    destdir="${dita.output.dir}"
+        includesfile="${dita.temp.dir}${file.separator}${user.input.file.listfile}"
+        extension="${out.ext}"
+    style="${dita.plugin.com.sophos.tocjs.dir}${file.separator}xsl${file.separator}frameset.xsl">
+        <excludesfile name="${dita.temp.dir}${file.separator}${resourceonlyfile}" if="resourceonlyfile"/>
+        <param name="OUTEXT" expression="${out.ext}" if="out.ext"/>
+        <param name="CSSPATH" expression="${CSSPATH}" if="csspath"/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+  </target>
+
+</project>

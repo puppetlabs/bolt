@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="ca-es">        <!-- Catalan -->
+  <str name="Figure">Figura</str>
+  <str name="Table">Taula</str>
+  <str name="Next topic">Tema següent</str>
+  <str name="Previous topic">Tema anterior</str>
+  <str name="Parent topic">Tema principal</str>
+  <str name="Required cleanup">Per revisar</str>
+  <str name="Draft comment">Esborrany: comentaris</str>
+  <str name="Option">Opció</str>
+  <str name="Description">Descripció</str>
+  <str name="Optional">Opcional</str>
+  <str name="Required">Necessari</str>
+  <str name="Skip visual syntax diagram">Ometre l'esquema de sintaxi visual</str>
+  <str name="Read syntax diagram">Llegir l'esquema de sintaxi</str>
+  <str name="Start of change">Inici del canvi</str>
+  <str name="End of change">Fi del canvi</str>
+  <str name="Index">Índex</str>
+  <str name="Special characters">Caràcters Especials</str>
+  <str name="Numerics">Números</str>
+  <str name="End notes">Notes al peu</str>
+  <str name="Artwork">Gràfics</str>
+  <str name="Syntax">Sintaxi</str>
+  <str name="Type">Tipus</str>
+  <str name="Value">Valor</str>
+  <str name="intro-to-topic-link">apartat</str>
+  <str name="Note">Nota</str>
+  <str name="Notes">Notes</str>
+  <str name="Tip">Consell</str>
+  <str name="Fastpath">Drecera</str>
+  <str name="Important">Important</str>
+  <str name="Attention">Atenció</str>
+  <str name="Caution">PRECAUCIÓ</str>
+  <str name="Danger">PERILL</str>
+  <str name="Remember">Recordeu</str>
+  <str name="Restriction">Restricció</str>
+  <str name="Trouble">Problema</str>
+  <str name="Warning">Avís</str>
+  <str name="Contents">Contingut</str>
+  <str name="Related concepts">Conceptes relacionats</str>
+  <str name="Related tasks">Tasques relacionades</str>
+  <str name="Related reference">Referència relacionada</str>
+  <str name="Related information">Informació relacionada</str>
+  <str name="Prerequisite">Requisit</str>
+  <str name="Prerequisites">Requisits</str>
+  <str name="or">or</str>
+  <str name="task_context">Quant a aquesta tasca</str>
+  <str name="task_example">Exemple</str>
+  <str name="task_postreq">Què cal fer posteriorment</str>
+  <str name="task_prereq">Abans de començar</str>
+  <str name="task_procedure">Procediment</str>
+  <str name="task_procedure_unordered">Procediment</str>
+  <str name="task_results">Resultats</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

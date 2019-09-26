@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="pdf_customization_approaches">
+  <title>PDF customization approaches</title>
+  <shortdesc>Various methods may be used to customize the PDF output that DITA Open Toolkit produces. Each of these
+    approaches have advantages and shortcomings that should be considered when preparing a customization project. Some
+    of these methods are considered “anti-patterns” with disadvantages that outweigh their apparent appeal. In most
+    cases, you should create a custom PDF plug-in.</shortdesc>
+  
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>PDF<indexterm>customizing, best practices</indexterm></indexterm>
+        <indexterm>upgrading<indexterm>default plug-ins</indexterm></indexterm>
+        <indexterm>upgrading<indexterm>PDF</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <conbody>
+    <section id="why_not_edit_default_files">
+      <title>Why not edit default files?</title>
+      <p>When first experimenting with PDF customization, novice users are often tempted to simply edit the default
+          <filepath>org.dita.pdf2</filepath> files in place to see what happens.</p>
+      <p>As practical as this approach may seem, the DITA-OT project does not recommend changing any of the files in the
+          default plug-ins.</p>
+      <p>While this method yields quick results and can help users to determine which files and templates control
+        various aspects of PDF output, it quickly leads to problems, as any errors may prevent the toolkit from
+        generating PDF output.</p>
+      <note type="warning">Any changes made in this fashion would be overwritten when upgrading to newer versions of
+        DITA-OT, so users that have customized their toolkit installation in this way are often “stuck” on older
+        versions of the toolkit and unable to take advantage of improvements in recent versions of DITA-OT.</note>
+    </section>
+
+    <section id="the_customization_folder">
+      <title>Using the <filepath>Customization</filepath> folder</title>
+      <div outputclass="div-index">
+        <indexterm>deprecated features<indexterm><filepath>Customization</filepath> folder</indexterm></indexterm>
+        <indexterm>Customization directory</indexterm>
+      </div>
+      <p>The original Idiom plug-in used its own extension mechanism to provide overrides to the PDF transformation.
+        With this approach, a dedicated folder within the plug-in is used to store customized files.</p>
+      <p>Files in the <filepath>org.dita.pdf2/Customization</filepath> folder can override their default counterparts,
+        allowing users to adjust certain aspects of PDF output without changing any of the plug-in’s default files, or
+        specifying additional parameters when generating output.</p>
+      <note type="important">While this approach is slightly better than editing default files in place, it can still
+        cause problems when upgrading the toolkit to a new version. Since the <filepath>Customization</filepath> folder
+        is located within the <filepath>org.dita.pdf2</filepath> plug-in’s parent directory, users must be take care to
+        preserve the contents of this folder when upgrading to new toolkit versions.</note>
+      <p>Although recent versions of DITA-OT still support this mechanism to ensure backwards compatibility, this
+        practice is deprecated in favor of custom PDF plug-ins.</p>
+      <note type="tip">Users who have used the <filepath>Customization</filepath> folder to modify the default PDF
+        output are encouraged to create a custom PDF plug-in instead. In many cases, this may be as simple as copying
+        the contents of the <filepath>Customization</filepath> folder to a new subfolder in the
+          <filepath>plugins</filepath> folder and creating the necessary <filepath>plugin.xml</filepath> file and an Ant
+        script to define the transformation type as described in the following example.</note>
+    </section>
+
+    <section id="external_customization_directories">
+      <title>Specifying an external customization directory</title>
+      <p>To ensure that overrides in customization folders are not overwritten when upgrading DITA-OT to a new
+        release, an external customization directory can be specified at build time or in build scripts via the
+          <parmname>customization.dir</parmname> parameter.</p>
+      <p>This method is preferable to the use of the <filepath>org.dita.pdf2/Customization</filepath> folder, as the
+        contents of external folders are unaffected when upgrading DITA-OT. In distributed environments, users can use
+        local installations of DITA-OT, yet still take advantage of common customizations stored in a network location
+        available to the entire team, such as a shared drive.</p>
+      <p>It can also be useful in environments where corporate policy, CMS permissions, or network access rights prevent
+        changes to the toolkit installation, which may prohibit the installation of custom plug-ins.</p>
+      <note type="tip">Users who specify external customization directories via <parmname>customization.dir</parmname>
+        are encouraged to create a custom PDF plug-in if possible.</note>
+    </section>
+
+    <section id="plug_ins_and_customization_folders">
+      <title>Combining custom plug-ins &amp; customization directories</title>
+      <p>A common custom plug-in may be used to store base overrides that are applicable to all company publications,
+        and the <parmname>customization.dir</parmname> parameter can be passed at build time to override individual
+        settings as necessary for a given project or publication.</p>
+      <p>In this case, any settings in the customization directory will take precedence over their counterparts in the
+        custom plug-in or default <filepath>org.dita.pdf2</filepath> plug-in.</p>
+      <p>This approach allows a single custom plug-in to be shared between multiple publications or the entire company,
+        without the need to create additional plug-in dependencies per project.</p>
+      <p>However, the use of multiple customization mechanisms can make it difficult to debug the precedence cascade and
+        determine the origin of local formatting or processing overrides.</p>
+      <note type="tip">In most scenarios, the use of dedicated PDF customization plug-ins is preferable. Common
+        customizations can be bundled in one plug-in, and any project-specific overrides can be maintained in separate
+        plug-ins that build on the base branding or other settings in the common custom plug-in.</note>
+    </section>
+  </conbody>
+</concept>

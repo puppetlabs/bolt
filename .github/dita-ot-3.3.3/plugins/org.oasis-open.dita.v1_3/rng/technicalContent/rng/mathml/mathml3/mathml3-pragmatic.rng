@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+      This is the Mathematical Markup Language (MathML) 3.0, an XML
+      application for describing mathematical notation and capturing
+      both its structure and content.
+  
+      Copyright 1998-2008 W3C (MIT, ERCIM, Keio)
+  
+      Use and distribution of this code are permitted under the terms
+      W3C Software Notice and License
+      http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+  
+  
+      Revision:   $Id: mathml3-pragmatic.rng,v 1.3 2008/11/15 22:00:48 dcarlis Exp $
+  
+     Update to MathML3 and Relax NG: David Carlisle and Michael Kohlhase
+  
+      This is the RelaxNG schema module for the pragmatic content part of 
+      MathML (but without the presentation in token elements).
+-->
+<grammar ns="http://www.w3.org/1998/Math/MathML" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns="http://relaxng.org/ns/structure/1.0">
+  <define name="sep">
+    <a:documentation>the content of "cn" may have &lt;sep&gt; elements in it</a:documentation>
+    <element name="sep">
+      <empty/>
+    </element>
+  </define>
+  <define name="cn.content" combine="choice">
+    <zeroOrMore>
+      <choice>
+        <ref name="sep"/>
+        <text/>
+        <ref name="Glyph-alignmark"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="cn.type.vals" combine="choice">
+    <choice>
+      <value>e-notation</value>
+      <value>rational</value>
+      <value>complex-cartesian</value>
+      <value>complex-polar</value>
+      <value>constant</value>
+    </choice>
+  </define>
+  <define name="degree">
+    <a:documentation>allow degree in bvar</a:documentation>
+    <element name="degree">
+      <ref name="MathML.Common.attrib"/>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="logbase">
+    <element name="logbase">
+      <ref name="MathML.Common.attrib"/>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="momentabout">
+    <element name="momentabout">
+      <ref name="MathML.Common.attrib"/>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="bvar-head" combine="choice">
+    <choice>
+      <group>
+        <optional>
+          <ref name="degree"/>
+        </optional>
+        <ref name="ci"/>
+      </group>
+      <group>
+        <ref name="ci"/>
+        <optional>
+          <ref name="degree"/>
+        </optional>
+      </group>
+    </choice>
+  </define>
+  <define name="apply.content" combine="choice">
+    <a:documentation>allow degree to modify &lt;root/&gt;</a:documentation>
+    <ref name="root_arith1_elt"/>
+    <ref name="degree"/>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="apply.content" combine="choice">
+    <ref name="moment_s_data1_elt"/>
+    <interleave>
+      <optional>
+        <ref name="degree"/>
+      </optional>
+      <optional>
+        <ref name="momentabout"/>
+      </optional>
+    </interleave>
+    <zeroOrMore>
+      <ref name="ContInPres"/>
+    </zeroOrMore>
+  </define>
+  <define name="apply.content" combine="choice">
+    <ref name="log_transc1_elt"/>
+    <ref name="logbase"/>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="apply.content" combine="choice">
+    <a:documentation>allow apply to act as a binder</a:documentation>
+    <ref name="bind.content"/>
+  </define>
+  <define name="domainofapplication">
+    <element name="domainofapplication">
+      <ref name="Definition.attrib"/>
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="cdbase.attrib"/>
+      </optional>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="lowlimit">
+    <element name="lowlimit">
+      <ref name="Definition.attrib"/>
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="cdbase.attrib"/>
+      </optional>
+      <oneOrMore>
+        <ref name="ContExp"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="uplimit">
+    <element name="uplimit">
+      <ref name="Definition.attrib"/>
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="cdbase.attrib"/>
+      </optional>
+      <oneOrMore>
+        <ref name="ContExp"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="condition">
+    <element name="condition">
+      <ref name="Definition.attrib"/>
+      <optional>
+        <ref name="cdbase.attrib"/>
+      </optional>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="qualifier" combine="choice">
+    <a:documentation>allow the non-strict qualifiers</a:documentation>
+    <choice>
+      <ref name="domainofapplication"/>
+      <group>
+        <ref name="uplimit"/>
+        <optional>
+          <ref name="lowlimit"/>
+        </optional>
+      </group>
+      <group>
+        <ref name="lowlimit"/>
+        <optional>
+          <ref name="uplimit"/>
+        </optional>
+      </group>
+      <ref name="degree"/>
+      <ref name="condition"/>
+    </choice>
+  </define>
+  <define name="opel.constant">
+    <a:documentation>we collect the operator elements by role</a:documentation>
+    <notAllowed/>
+  </define>
+  <define name="opel.binder">
+    <notAllowed/>
+  </define>
+  <define name="opel.application">
+    <notAllowed/>
+  </define>
+  <define name="opel.semantic-attribution">
+    <notAllowed/>
+  </define>
+  <define name="opel.attribution">
+    <notAllowed/>
+  </define>
+  <define name="opel.error">
+    <notAllowed/>
+  </define>
+  <define name="opels">
+    <choice>
+      <ref name="opel.constant"/>
+      <ref name="opel.binder"/>
+      <ref name="opel.application"/>
+      <ref name="opel.semantic-attribution"/>
+      <ref name="opel.attribution"/>
+      <ref name="opel.error"/>
+    </choice>
+  </define>
+  <define name="container">
+    <notAllowed/>
+  </define>
+  <define name="MathMLType" combine="choice">
+    <a:documentation>the values of the MathML type attributes;  </a:documentation>
+    <choice>
+      <value>real</value>
+      <value>complex</value>
+      <value>function</value>
+      <value>algebraic</value>
+      <value>integer</value>
+    </choice>
+  </define>
+  <define name="apply-binder-head">
+    <a:documentation>we instantiate the strict content model by structure checking</a:documentation>
+    <choice>
+      <ref name="semantics-apply-binder"/>
+      <ref name="opel.binder"/>
+    </choice>
+  </define>
+  <define name="apply.content" combine="choice">
+    <ref name="apply-binder-head"/>
+    <zeroOrMore>
+      <ref name="bvar"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="qualifier"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="semantics-apply-binder">
+    <element name="semantics">
+      <ref name="semantics.attribs"/>
+      <ref name="apply-binder-head"/>
+      <zeroOrMore>
+        <ref name="semantics-annotation"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="apply-head" combine="choice">
+    <ref name="opel.application"/>
+  </define>
+  <define name="bind-head" combine="choice">
+    <ref name="opel.binder"/>
+  </define>
+  <define name="cerror-head" combine="choice">
+    <ref name="opel.error"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <a:documentation>allow all functions, constants, and containers to be content expressions on their own</a:documentation>
+    <choice>
+      <ref name="opel.constant"/>
+      <ref name="opel.application"/>
+      <ref name="container"/>
+    </choice>
+  </define>
+  <!-- allow no body -->
+  <define name="bind.content" combine="choice">
+    <ref name="bind-head"/>
+    <zeroOrMore>
+      <ref name="bvar"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="qualifier"/>
+    </optional>
+  </define>
+  <!--
+    not sure what a sequence of things is supposed to map to in strict/OM
+    but is definitely allowed in pragmatic
+    see Content/SequencesAndSeries/product/rec-product3
+  -->
+  <define name="math.content" combine="choice">
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="opel.content" combine="choice">
+    <choice>
+      <ref name="PresExp"/>
+      <ref name="Glyph-alignmark"/>
+    </choice>
+  </define>
+</grammar>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <!--
+        This is the Mathematical Markup Language (MathML) 3.0, an XML
+        application for describing mathematical notation and capturing
+        both its structure and content.
+    
+        Copyright 1998-2007 World Wide Web Consortium
+           (Massachusetts Institute of Technology, Institut National de
+            Recherche en Informatique et en Automatique, Keio University).
+            All Rights Reserved.
+    
+        Permission to use, copy, modify and distribute the RelaxNG schema for MathML3
+        and its accompanying documentation for any purpose and without fee is
+        hereby granted in perpetuity, provided that the above copyright notice
+        and this paragraph appear in all copies.  The copyright holders make
+        no representation about the suitability of the Schema for any purpose.
+    
+        This file contains the arity checking rules for the symbols
+        from the content dictionary 
+        It is provided "as is" without expressed or implied warranty.
+    
+        Revision:   $Id: constants.rng,v 1.1 2007/12/11 15:59:27 dcarlis Exp $
+  -->
+  <define name="cd.token.class" combine="choice">
+    <choice>
+      <ref name="integers.token"/>
+      <ref name="reals.token"/>
+      <ref name="rationals.token"/>
+      <ref name="naturalnumbers.token"/>
+      <ref name="complexes.token"/>
+      <ref name="primes.token"/>
+      <ref name="exponentiale.token"/>
+      <ref name="imaginaryi.token"/>
+      <ref name="notanumber.token"/>
+      <ref name="true.token"/>
+      <ref name="false.token"/>
+      <ref name="emptyset.token"/>
+      <ref name="pi.token"/>
+      <ref name="eulergamma.token"/>
+      <ref name="infinity.token"/>
+    </choice>
+  </define>
+  <!-- the element definitions for the token elements -->
+  <define name="integers.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="integers.token">
+    <element name="integers">
+      <ref name="integers.content"/>
+    </element>
+  </define>
+  <define name="reals.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="reals.token">
+    <element name="reals">
+      <ref name="reals.content"/>
+    </element>
+  </define>
+  <define name="rationals.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="rationals.token">
+    <element name="rationals">
+      <ref name="rationals.content"/>
+    </element>
+  </define>
+  <define name="naturalnumbers.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="naturalnumbers.token">
+    <element name="naturalnumbers">
+      <ref name="naturalnumbers.content"/>
+    </element>
+  </define>
+  <define name="complexes.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="complexes.token">
+    <element name="complexes">
+      <ref name="complexes.content"/>
+    </element>
+  </define>
+  <define name="primes.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="primes.token">
+    <element name="primes">
+      <ref name="primes.content"/>
+    </element>
+  </define>
+  <define name="exponentiale.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="exponentiale.token">
+    <element name="exponentiale">
+      <ref name="exponentiale.content"/>
+    </element>
+  </define>
+  <define name="imaginaryi.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="imaginaryi.token">
+    <element name="imaginaryi">
+      <ref name="imaginaryi.content"/>
+    </element>
+  </define>
+  <define name="notanumber.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="notanumber.token">
+    <element name="notanumber">
+      <ref name="notanumber.content"/>
+    </element>
+  </define>
+  <define name="true.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="true.token">
+    <element name="true">
+      <ref name="true.content"/>
+    </element>
+  </define>
+  <define name="false.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="false.token">
+    <element name="false">
+      <ref name="false.content"/>
+    </element>
+  </define>
+  <define name="emptyset.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="emptyset.token">
+    <element name="emptyset">
+      <ref name="emptyset.content"/>
+    </element>
+  </define>
+  <define name="pi.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="pi.token">
+    <element name="pi">
+      <ref name="pi.content"/>
+    </element>
+  </define>
+  <define name="eulergamma.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="eulergamma.token">
+    <element name="eulergamma">
+      <ref name="eulergamma.content"/>
+    </element>
+  </define>
+  <define name="infinity.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="infinity.token">
+    <element name="infinity">
+      <ref name="infinity.content"/>
+    </element>
+  </define>
+</grammar>

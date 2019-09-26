@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="custom-html-css">
+  <title>Adding custom CSS</title>
+  <shortdesc>To modify the appearance of the default HTML output that DITA Open Toolkit generates, you can reference a
+    custom Cascading Style Sheet (CSS) file with the typography, colors, and other presentation aspects that define your
+    corporate identity.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>cascading style sheet<index-see>CSS</index-see></indexterm>
+        <indexterm>CSS<indexterm>adding custom</indexterm></indexterm>
+        <indexterm>HTML<indexterm>CSS</indexterm></indexterm>
+        <indexterm>HTML5<indexterm>CSS</indexterm></indexterm>
+        <indexterm>transformations<indexterm>HTML5</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>You can use this approach when you need to adjust the look and feel of the default output for a single project,
+        but don’t want to create a custom DITA-OT plug-in.</p>
+      <p>You can version the CSS file along with the DITA source files in your project, so stylesheet changes can be
+        tracked along with modifications to topic content.</p>
+      <p>You may also find this approach useful as you develop a custom stylesheet. Once the CSS rules stabilize, you
+        can bundle the CSS file in a custom DITA-OT plug-in to ensure consistent HTML output across
+      projects.</p></context>
+    <steps>
+      <step>
+        <cmd>Create a custom CSS file and store it in your project along with your DITA source files.</cmd>
+        <stepxmp>
+          <note>As a starting point, you can use the CSS file that is used for the DITA-OT documentation. This file is
+            available in the installation folder under <filepath>docsrc/resources/dita-ot-doc.css</filepath>.</note>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Set the <parmname>args.css</parmname> parameter to the name of your custom CSS file.</cmd>
+        <info>
+          <p>The value of this parameter should be only the file name. The relative path to the file can be specified
+            with <parmname>args.cssroot</parmname>.</p></info>
+      </step>
+      <step>
+        <cmd>Set the <parmname>args.copycss</parmname> parameter to <option>yes</option>.</cmd>
+        <info>
+          <p>This setting ensures that your custom CSS file will be copied to the output directory.</p></info>
+      </step>
+      <step>
+        <cmd>Set <parmname>args.cssroot</parmname> to the folder path that contains your custom CSS file.</cmd>
+        <info>
+          <p>The value you enter here will be interpreted relative to the location of the input map file. If your map is
+            stored at the root level of your project folder and the CSS file is stored in a subfolder named
+              <filepath>resources</filepath>, set <parmname>args.cssroot</parmname> to
+          <option>resources</option>.</p></info>
+      </step>
+      <step importance="optional">
+        <cmd>Set <parmname>args.csspath</parmname> to specify the location of the CSS file in the output folder.</cmd>
+        <info>
+          <p>If <parmname>args.csspath</parmname> is not set, the custom CSS file will be copied to the root level of
+            the output folder. To copy the CSS file to a subfolder named <filepath>css</filepath>, set
+              <parmname>args.csspath</parmname> to <option>css</option>.</p></info>
+      </step>
+    </steps>
+    <result>
+      <note type="tip">For an example of HTML output generated using this method, see the HTML5 version of the DITA-OT
+        documentation included in the installation folder under <filepath>doc/index.html</filepath>.</note>
+    </result>
+  </taskbody>
+</task>

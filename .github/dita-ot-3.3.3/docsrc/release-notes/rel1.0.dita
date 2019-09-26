@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.0" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.0</title><shortdesc>The initial release of the Open Sourced DITA Toolkit introduces major architectural
+      changes from the previous, developerWorks version of the Toolkit.</shortdesc><refbody><section>
+        <title>New features</title>
+        <ol><li>A new, Java-based processing architecture that supports single-threaded execution
+            throughout.</li><li>Ant-based orchestration of the processing environment, from preprocessing to
+            transformation to any required post-processing.</li><li>A pre-processor core that supports conditional processing and conref resolution.</li><li>Map-driven processing that generates links for transformed topics.</li><li>A new DITA to HTML transform that replaces the previous topic2html_Impl.xsl core
+            transform. This new core is based on requirements for high-volume usage within IBM for
+            the past several years.</li></ol>
+       <p>Ant-driven processing means that you can
+         integrate the DITA processing tools into a seamless pipeline within
+         supportive environments such as Eclipse.</p>       <p>The DTDs and
+           Schemas in this version are based on those in the previous dita132
+           package with bug fixes. The DITA OS Toolkit will later support the
+           OASIS 1.0 specification in its public review form.</p>
+      </section></refbody></reference>

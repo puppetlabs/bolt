@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:checkShell.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  xmlns:svg="http://www.w3.org/2000/svg">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Topic Shell</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02
+OASIS Standard
+16 January 2018 
+Copyright (c) OASIS Open 2018. All rights reserved. 
+Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html
+
+============================================================
+ MODULE:    DITA Topic                                  
+ VERSION:   1.3                                              
+ DATE:      March 2014                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+      
+PUBLIC "-//OASIS//DTD DITA Topic//EN"
+
+The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+
+PUBLIC "-//OASIS//DTD DITA 1.3 Topic//EN"                         
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    DTD to describe DITA Topics                      
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2001                                       
+                                                             
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2006.06.07 RDA: Added indexing domain                     
+   2006.06.21 RDA: Added props attribute extensions          
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.02.12 RDA: Modify imbeds to use specific 1.2 version 
+   2008.04.15 RDA: Added hazard domain                       
+=============================================================
+</headerComment>
+    <moduleMetadata>
+      <moduleType>topicshell</moduleType>
+      <moduleShortName>topic</moduleShortName>
+      <shellPublicIds>
+        <dtdShell>-//OASIS//DTD DITA<var presep=" " name="ditaver"/> Topic//EN</dtdShell>
+        <rncShell>urn:oasis:names:tc:dita:rnc:topic.rnc<var presep=":" name="ditaver"/></rncShell>
+        <rngShell>urn:oasis:names:tc:dita:rng:topic.rng<var presep=":" name="ditaver"/></rngShell>
+        <xsdShell>urn:oasis:names:tc:dita:xsd:topic.xsd<var presep=":" name="ditaver"/></xsdShell>
+      </shellPublicIds>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>ROOT ELEMENT</a:documentation>
+    <start>
+      <ref name="topic.element"/>
+    </start>
+  </div>
+  <div>
+    <a:documentation>DOMAINS ATTRIBUTE</a:documentation>
+    <define name="domains-att">
+      <optional>
+        <attribute name="domains"
+          a:defaultValue="(topic abbrev-d)
+                         (topic equation-d)
+                         (topic hazard-d)
+                         (topic hi-d)
+                         (topic indexing-d)
+                         (topic markup-d xml-d)
+                         (topic markup-d)
+                         (topic mathml-d)
+                         (topic pr-d)
+                         (topic relmgmt-d)
+                         (topic svg-d)
+                         (topic sw-d)
+                         (topic ui-d)
+                         (topic ut-d)
+                         a(props deliveryTarget)"
+        />
+      </optional>
+    </define>
+  </div>
+
+  <div>
+    <a:documentation>INCLUDE MODULES</a:documentation>
+    <include href="../../base/rng/topicMod.rng">
+      <define name="topic-info-types">
+        <ref name="topic.element"/>
+      </define>
+    </include>  
+    <include href="abbreviateDomain.rng"/>
+    <include href="../../base/rng/deliveryTargetAttDomain.rng" dita:since="1.3"/>
+    <include href="equationDomain.rng" dita:since="1.3"/>
+    <include href="../../base/rng/hazardstatementDomain.rng"/>
+    <include href="../../base/rng/highlightDomain.rng"/>
+    <include href="../../base/rng/indexingDomain.rng"/>
+    <include href="markupDomain.rng" dita:since="1.3"/>
+    <include href="mathmlDomain.rng" dita:since="1.3"/>
+    <include href="programmingDomain.rng"/>
+    <include href="releaseManagementDomain.rng" dita:since="1.3"/>
+    <include href="softwareDomain.rng"/>
+    <include href="svgDomain.rng" dita:since="1.3"/>
+    <include href="uiDomain.rng"/>
+    <include href="../../base/rng/utilitiesDomain.rng"/>
+    <include href="xmlDomain.rng" dita:since="1.3"/>
+  </div>
+  <div>
+    <a:documentation>ID-DEFINING-ELEMENT OVERRIDES</a:documentation>
+    <define name="any">
+      <zeroOrMore>
+        <choice>
+          <ref name="idElements"/>
+          <element>
+            <anyName>
+              <except>
+                <name>topic</name>
+                <nsName ns="http://www.w3.org/2000/svg"/>
+                <nsName ns="http://www.w3.org/1998/Math/MathML"/>
+              </except>
+            </anyName>
+            <zeroOrMore>
+              <attribute>
+                <anyName/>
+              </attribute>
+            </zeroOrMore>
+            <ref name="any"/>
+          </element>
+          <text/>
+        </choice>
+      </zeroOrMore>
+    </define>
+  </div>
+</grammar>

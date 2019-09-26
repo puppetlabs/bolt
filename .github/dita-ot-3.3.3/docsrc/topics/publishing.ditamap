@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>Publishing</title>
+  <!-- ↓ branch-filter ↓ -->
+  <topicref href="using-dita-command.dita"
+            keys="build-using-dita-command" locktitle="yes">
+    <topicmeta>
+      <navtitle>Using the <cmdname>dita</cmdname> command</navtitle>
+    </topicmeta>
+    <ditavalref href="../resources/expert.ditaval">
+      <ditavalmeta>
+        <dvrResourcePrefix>build-</dvrResourcePrefix>
+      </ditavalmeta>
+    </ditavalref>
+    <!-- ↑ end-filtering ↑ -->
+    <topicref keyref="using-dita-properties-file"/>
+    <topicref keyref="migrating-ant-to-dita"/>
+  </topicref>
+  <topicref keyref="publishing-with-ant">
+    <topicref keyref="ant"/>
+    <topicref keyref="building-with-ant"/>
+    <topicref keyref="creating-an-ant-build-script"/>
+  </topicref>
+  <topicref keyref="java-api"/>
+
+  <mapref href="transformations.ditamap"/>
+
+  <mapref href="publishing-reltables.ditamap"/>
+</map>

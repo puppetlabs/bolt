@@ -1,0 +1,17 @@
+<topic xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" class="- topic/topic "
+  domains="(topic abbrev-d)                            a(props deliveryTarget)                            (topic equation-d)                            (topic hazard-d)                            (topic hi-d)                            (topic indexing-d)                            (topic markup-d)                            (topic mathml-d)                            (topic pr-d)                            (topic relmgmt-d)                            (topic sw-d)                            (topic svg-d)                            (topic ui-d)                            (topic ut-d)                            (topic markup-d xml-d)   "
+  id="Id1" ditaarch:DITAArchVersion="1.1">
+  <title class="- topic/title ">This is title </title>
+  <prolog class="- topic/prolog ">
+    <metadata class="- topic/metadata ">
+      <keywords class="- topic/keywords ">
+        <indexterm class="- topic/indexterm "> This is indexterm <indexterm
+            class="- topic/indexterm ">This is subindexterm</indexterm>
+          <index-see class="+ topic/index-base indexing-d/index-see ">index-see1</index-see>
+          <index-see-also class="+ topic/index-base indexing-d/index-see-also "
+            >index-see-also1</index-see-also>
+        </indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+</topic>

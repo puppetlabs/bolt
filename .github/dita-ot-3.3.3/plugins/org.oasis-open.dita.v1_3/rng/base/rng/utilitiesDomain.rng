@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Utilities Domain</moduleTitle>
+    <headerComment>
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Utilities Domain                            
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Utilities Domain//EN"
+      Delivered as file "utilitiesDomain.mod"                     
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for the DITA Utilities Domain         
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2001                                       
+                                                             
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2005.11.15 RDA: Updated these comments to match template  
+   2005.11.15 RDA: Corrected the "Delivered as" system ID    
+   2006.06.07 RDA: Make universal attributes universal       
+                     (DITA 1.1 proposal #12)                 
+   2006.06.14 RDA: Move univ-atts-translate-no into topic.mod
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2      
+   2008.02.12 RDA: Add text to shape                         
+   2008.02.13 RDA: Create .content and .attributes entities  
+=============================================================
+    </headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>ut-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Utilities Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Utilities Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:utilitiesDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:utilitiesDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:utilitiesDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic ut-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>Define domain extension patterns</a:documentation>
+    <define name="ut-d-fig">
+      <ref name="imagemap.element"/>
+    </define>
+    <define name="fig" combine="choice">
+      <ref name="ut-d-fig"/>
+    </define>
+    <define name="ut-d-data">
+      <ref name="sort-as.element"/>
+    </define>
+    <define combine="choice" name="data">
+      <ref name="ut-d-data"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="imagemap">
+      <ref name="imagemap.element"/>
+    </define>
+    <define name="area">
+      <ref name="area.element"/>
+    </define>
+    <define name="shape">
+      <ref name="shape.element"/>
+    </define>
+    <define name="coords">
+      <ref name="coords.element"/>
+    </define>
+    <define name="sort-as">
+      <ref name="sort-as.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DEFINITIONS</a:documentation>
+
+    <div>
+      <a:documentation>LONG NAME: Imagemap</a:documentation>
+      <define name="imagemap.content">
+        <ref name="image"/>
+        <oneOrMore>
+          <ref name="area"/>
+        </oneOrMore>
+      </define>
+      <define name="imagemap.attributes">
+        <ref name="display-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="imagemap.element">
+        <element dita:longName="Imagemap" name="imagemap">
+          <a:documentation>The imagemap element supports the basic functionality 
+            of the HTML client-side image map markup. Imagemap allows you to designate 
+            a linkable area or region over an image,
+            allowing a link in that region to display another topic. 
+            Category: Utilities elements</a:documentation>
+          <ref name="imagemap.attlist"/>
+          <ref name="imagemap.content"/>
+        </element>
+      </define>
+      <define combine="interleave" name="imagemap.attlist">
+        <ref name="imagemap.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Hotspot Area Description</a:documentation>
+      <define name="area.content">
+        <ref name="shape"/>
+        <ref name="coords"/>
+        <ref name="xref"/>
+      </define>
+      <define name="area.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="area.element">
+        <element dita:longName="Hotspot Area Description" name="area">
+          <a:documentation>The area element supports the basic functionality of the HTML 
+            image map markup. 
+            Category: Utilities elements</a:documentation>
+          <ref name="area.attlist"/>
+          <ref name="area.content"/>
+        </element>
+      </define>
+      <define combine="interleave" name="area.attlist">
+        <ref name="area.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Shape of the Hotspot</a:documentation>
+      <define name="shape.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="shape.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts-translate-no"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="shape.element">
+        <element dita:longName="Shape of the Hotspot" name="shape">
+          <a:documentation>The shape element defines the shape of a linkable 
+            area in an imagemap. Category: Utilities elements</a:documentation>
+          <ref name="shape.attlist"/>
+          <ref name="shape.content"/>
+        </element>
+      </define>
+      <define combine="interleave" name="shape.attlist">
+        <ref name="shape.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Coordinates of the Hotspot</a:documentation>
+      <define name="coords.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="coords.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts-translate-no"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="coords.element">
+        <element dita:longName="Coordinates of the Hotspot" name="coords">
+          <a:documentation>The coords element specifies the coordinates of the 
+            linkable region in an imagemap area. Category: Utilities elements</a:documentation>
+          <ref name="coords.attlist"/>
+          <ref name="coords.content"/>
+        </element>
+      </define>
+      <define combine="interleave" name="coords.attlist">
+        <ref name="coords.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Sort phrase</a:documentation>
+      <define name="sort-as.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+            <ref name="keyword"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="sort-as.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="name" a:defaultValue="sort-as"/>
+        </optional>
+        <optional>
+          <attribute name="value"/>
+        </optional>
+      </define>
+      <define name="sort-as.element">
+        <element dita:longName="Sort phrase specifier" dita:since="1.3" name="sort-as">
+          <a:documentation> Category: Utilities elements</a:documentation>
+          <ref name="sort-as.attlist"/>
+          <ref name="sort-as.content"/>
+        </element>
+      </define>
+      <define combine="interleave" name="sort-as.attlist">
+        <ref name="sort-as.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+
+    <define combine="interleave" name="imagemap.attlist">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute a:defaultValue="+ topic/fig ut-d/imagemap " name="class"/>
+      </optional>
+    </define>
+    <define combine="interleave" name="area.attlist">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute a:defaultValue="+ topic/figgroup ut-d/area " name="class"/>
+      </optional>
+    </define>
+    <define combine="interleave" name="shape.attlist">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute a:defaultValue="+ topic/keyword ut-d/shape " name="class"/>
+      </optional>
+    </define>
+    <define combine="interleave" name="coords.attlist">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute a:defaultValue="+ topic/ph ut-d/coords " name="class"/>
+      </optional>
+    </define>
+    <define combine="interleave" name="sort-as.attlist">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute a:defaultValue="+ topic/data ut-d/sort-as " name="class"/>
+      </optional>
+    </define>
+
+  </div>
+</grammar>

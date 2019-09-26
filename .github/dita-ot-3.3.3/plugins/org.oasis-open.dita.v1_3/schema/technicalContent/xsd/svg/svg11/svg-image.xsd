@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:complexType name="SVG.image.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Animation.class"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="image" substitutionGroup="svg:SVG.Image.class"/>
+  <xs:attributeGroup name="attlist.image">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="SVG.Viewport.attrib"/>
+    <xs:attributeGroup ref="SVG.Color.attrib"/>
+    <xs:attributeGroup ref="SVG.Opacity.attrib"/>
+    <xs:attributeGroup ref="SVG.Graphics.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Profile.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Clip.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Mask.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Filter.attrib"/>
+    <xs:attributeGroup ref="SVG.GraphicalEvents.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Cursor.attrib"/>
+    <xs:attributeGroup ref="xlink:SVG.XLinkEmbed.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="x" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="y" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="width" use="required" type="svg:Length.datatype"/>
+    <xs:attribute name="height" use="required" type="svg:Length.datatype"/>
+    <xs:attribute name="preserveAspectRatio" default="xMidYMid meet" type="svg:PreserveAspectRatioSpec.datatype"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+  </xs:attributeGroup>
+</xs:schema>

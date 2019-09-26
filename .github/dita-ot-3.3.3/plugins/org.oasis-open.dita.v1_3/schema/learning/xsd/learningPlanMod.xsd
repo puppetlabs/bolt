@@ -1,0 +1,1883 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA learningPlan                                -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identfier or an  -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Learning Plan//EN"           -->
+<!--      Delivered as file "learningPlan.mod                         -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for Learning Plan                     -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            May 2007                                         -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2007, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/"
+              schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.3"/>
+
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic learningBase learningPlan)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+
+   <xs:group name="learningPlan-info-types">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="no-topic-nesting"/>
+            <xs:group ref="info-types"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:element name="learningPlan">
+      <xs:annotation>
+         <xs:documentation>A Learning Plan topic describes learning needs and goals, instructional design models, task analyses, learning taxonomies, and other information necessary to the lesson planning process. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningPlan.class">
+               <xs:attribute ref="class"
+                             default="- topic/topic learningBase/learningBase learningPlan/learningPlan "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningPlan.class">
+      <xs:sequence>
+         <xs:group ref="learningPlan.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningPlan.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningPlan.content">
+      <xs:sequence>
+         <xs:group ref="title"/>
+         <xs:group ref="titlealts" minOccurs="0"/>
+         <xs:choice minOccurs="0">
+            <xs:group ref="shortdesc"/>
+            <xs:group ref="abstract"/>
+         </xs:choice>
+         <xs:group ref="prolog" minOccurs="0"/>
+         <xs:group ref="learningPlanbody"/>
+         <xs:group ref="related-links" minOccurs="0"/>
+         <xs:group ref="learningPlan-info-types" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningPlan.attributes">
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="learningPlan.attlist">
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+   </xs:attributeGroup>
+   <xs:element name="learningPlanbody">
+      <xs:annotation>
+         <xs:documentation>The &lt;learningPlanbody&gt; element is the main body-level element in a learningPlan topic. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningPlanbody.class">
+               <xs:attribute ref="class"
+                             default="- topic/body  learningBase/learningBasebody learningPlan/learningPlanbody "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningPlanbody.class">
+      <xs:sequence>
+         <xs:group ref="learningPlanbody.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningPlanbody.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningPlanbody.content">
+      <xs:sequence>
+         <xs:group ref="lcProject" minOccurs="0"/>
+         <xs:group ref="lcNeedsAnalysis" minOccurs="0"/>
+         <xs:group ref="lcGapAnalysis" minOccurs="0"/>
+         <xs:group ref="lcIntervention" minOccurs="0"/>
+         <xs:group ref="lcTechnical" minOccurs="0"/>
+         <xs:group ref="section" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningPlanbody.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcProject">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcProject&gt; provides learning content project plan description information. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcProject.class">
+               <xs:attribute ref="class"
+                             default="- topic/section  learningBase/section learningPlan/lcProject "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcProject.class">
+      <xs:sequence>
+         <xs:group ref="lcProject.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcProject.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcProject.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcClient" minOccurs="0"/>
+         <xs:group ref="lcPlanTitle" minOccurs="0"/>
+         <xs:group ref="lcCIN" minOccurs="0"/>
+         <xs:group ref="lcModDate" minOccurs="0"/>
+         <xs:group ref="lcDelivDate" minOccurs="0"/>
+         <xs:group ref="lcPlanSubject" minOccurs="0"/>
+         <xs:group ref="lcPlanDescrip" minOccurs="0"/>
+         <xs:group ref="lcPlanPrereqs" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcProject.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcClient">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcPlanTitle&gt; provides a title for this plan. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcClient.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcClient "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcClient.class">
+      <xs:sequence>
+         <xs:group ref="lcClient.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcClient.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcClient.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcClient.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcPlanTitle">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcPlanTitle&gt; provides a title for this plan. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcPlanTitle.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcPlanTitle "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcPlanTitle.class">
+      <xs:sequence>
+         <xs:group ref="lcPlanTitle.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcPlanTitle.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcPlanTitle.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcPlanTitle.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcCIN">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcCIN&gt; provides an alternate identifier for the project title. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcCIN.class">
+               <xs:attribute ref="class" default="- topic/fig  learningBase/fig learningPlan/lcCIN "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcCIN.class">
+      <xs:sequence>
+         <xs:group ref="lcCIN.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcCIN.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcCIN.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcCIN.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcModDate">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcModDate&gt; provides the project modification date. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcModDate.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcModDate "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcModDate.class">
+      <xs:sequence>
+         <xs:group ref="lcModDate.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcModDate.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcModDate.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcModDate.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcDelivDate">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcDelivDate&gt; provides the project delivery date. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcDelivDate.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcDelivDate "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcDelivDate.class">
+      <xs:sequence>
+         <xs:group ref="lcDelivDate.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcDelivDate.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcDelivDate.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcDelivDate.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcPlanSubject">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcPlanSubject&gt; provides a complete description of the subject of the planned learning. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcPlanSubject.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcPlanSubject "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcPlanSubject.class">
+      <xs:sequence>
+         <xs:group ref="lcPlanSubject.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcPlanSubject.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcPlanSubject.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcPlanSubject.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcPlanDescrip">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcPlanDescrip&gt; provides a plan description. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcPlanDescrip.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcPlanDescrip "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcPlanDescrip.class">
+      <xs:sequence>
+         <xs:group ref="lcPlanDescrip.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcPlanDescrip.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcPlanDescrip.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcPlanDescrip.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcPlanPrereqs">
+      <xs:annotation>
+         <xs:documentation>&lt;lcPlanPrereqs&gt; provides the knowledge, skills, abilities, courses and other activities learners must have satisfied to take the instruction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcPlanPrereqs.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcPlanPrereqs "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcPlanPrereqs.class">
+      <xs:sequence>
+         <xs:group ref="lcPlanPrereqs.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcPlanPrereqs.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcPlanPrereqs.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcPlanPrereqs.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcNeedsAnalysis">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcNeedsAnalysis&gt; describes the training requirement and identifies the need to develop or revise content. These include periodic training gap analyses, changes to operational or maintenance requirements, and changes to equipment or systems. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcNeedsAnalysis.class">
+               <xs:attribute ref="class"
+                             default="- topic/section  learningBase/section learningPlan/lcNeedsAnalysis "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcNeedsAnalysis.class">
+      <xs:sequence>
+         <xs:group ref="lcNeedsAnalysis.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcNeedsAnalysis.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcNeedsAnalysis.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcOrganizational" minOccurs="0"/>
+         <xs:group ref="lcPlanAudience" minOccurs="0"/>
+         <xs:group ref="lcWorkEnv" minOccurs="0"/>
+         <xs:group ref="lcTask" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcNeedsAnalysis.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcOrganizational">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcOrganizational&gt; describes an organization's learning requirements. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcOrganizational.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcOrganizational "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcOrganizational.class">
+      <xs:sequence>
+         <xs:group ref="lcOrganizational.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcOrganizational.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcOrganizational.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcGeneralDescription" minOccurs="0"/>
+         <xs:group ref="lcGoals" minOccurs="0"/>
+         <xs:group ref="lcNeeds" minOccurs="0"/>
+         <xs:group ref="lcValues" minOccurs="0"/>
+         <xs:group ref="lcOrgConstraints" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcOrganizational.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcGeneralDescription">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcGeneralDescription&gt; provides a space to develop a general description about the organization's training needs. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcGeneralDescription.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcGeneralDescription "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcGeneralDescription.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcGeneralDescription.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcGeneralDescription.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcGeneralDescription.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcGeneralDescription.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcGoals">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcGoals&gt; provides the outcomes desired by the organization to be addressed by the training effort. These goals may require concurrent efforts outside of training such as technology acquisition, reorganization, and so forth. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcGoals.class">
+               <xs:attribute ref="class" default="- topic/p  learningBase/p learningPlan/lcGoals "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcGoals.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcGoals.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcGoals.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcGoals.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcGoals.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcNeeds">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcNeeds&gt; provides the needs behind the outcomes described by the &lt;lcGoals&gt;. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcNeeds.class">
+               <xs:attribute ref="class" default="- topic/p  learningBase/p learningPlan/lcNeeds "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcNeeds.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcNeeds.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcNeeds.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcNeeds.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcNeeds.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcValues">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcValues&gt; describes affective components of desired instructional outcomes. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcValues.class">
+               <xs:attribute ref="class" default="- topic/p  learningBase/p learningPlan/lcValues "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcValues.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcValues.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcValues.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcValues.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcValues.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcOrgConstraints">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcOrgConstraints&gt; provides organizational aspects that may limit the organization's ability to effectively use the instruction to meet its goals. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcOrgConstraints.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcOrgConstraints "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcOrgConstraints.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcOrgConstraints.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcOrgConstraints.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcOrgConstraints.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcOrgConstraints.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcPlanAudience">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcPlanAudience&gt; describes characteristics of the learners who take the instruction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcPlanAudience.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcPlanAudience "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcPlanAudience.class">
+      <xs:sequence>
+         <xs:group ref="lcPlanAudience.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcPlanAudience.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcPlanAudience.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcGeneralDescription" minOccurs="0"/>
+         <xs:group ref="lcEdLevel" minOccurs="0"/>
+         <xs:group ref="lcAge" minOccurs="0"/>
+         <xs:group ref="lcBackground" minOccurs="0"/>
+         <xs:group ref="lcSkills" minOccurs="0"/>
+         <xs:group ref="lcKnowledge" minOccurs="0"/>
+         <xs:group ref="lcMotivation" minOccurs="0"/>
+         <xs:group ref="lcSpecChars" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcPlanAudience.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcEdLevel">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcEdLevel&gt; provides the range of learners' education level and the relevancy to the learning plan. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcEdLevel.class">
+               <xs:attribute ref="class" default="- topic/p  learningBase/p learningPlan/lcEdLevel "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcEdLevel.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcEdLevel.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcEdLevel.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcEdLevel.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcEdLevel.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcAge">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcAge&gt; provides the age range of the intended learner audience, for use by curriculum developers and course planners. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcAge.class">
+               <xs:attribute ref="class" default="- topic/p  learningBase/p learningPlan/lcAge "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcAge.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcAge.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcAge.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcAge.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcAge.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcBackground">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcBackground&gt; provides the learners' professional background and the relevancy to the learning plan. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcBackground.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcBackground "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcBackground.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcBackground.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcBackground.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcBackground.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcBackground.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcSkills">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcSkills&gt; describes the learners' current skill set and the relevancy to the learning plan. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcSkills.class">
+               <xs:attribute ref="class" default="- topic/p  learningBase/p learningPlan/lcSkills "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcSkills.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcSkills.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcSkills.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcSkills.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcSkills.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcKnowledge">
+      <xs:annotation>
+         <xs:documentation>&lt;lcKnowledge&gt; provides the learners' current knowledge of the learning topics. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcKnowledge.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcKnowledge "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcKnowledge.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcKnowledge.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcKnowledge.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcKnowledge.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcKnowledge.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcMotivation">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcMotivation&gt; provides the reasons why the learners want and/or need to take the instruction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcMotivation.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcMotivation "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcMotivation.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcMotivation.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcMotivation.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcMotivation.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcMotivation.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcSpecChars">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcSpecChars&gt; provides learner characteristics specific to the population that will influence the design, including learning disabilities, physical handicaps, and so forth. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcSpecChars.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcSpecChars "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcSpecChars.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcSpecChars.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcSpecChars.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcSpecChars.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcSpecChars.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcWorkEnv">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcWorkEnv&gt; describes the working conditions and contexts in which the training will be applied. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcWorkEnv.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcWorkEnv "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcWorkEnv.class">
+      <xs:sequence>
+         <xs:group ref="lcWorkEnv.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcWorkEnv.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcWorkEnv.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcWorkEnvDescription" minOccurs="0"/>
+         <xs:group ref="lcPlanResources" minOccurs="0"/>
+         <xs:group ref="lcProcesses" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcWorkEnv.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcWorkEnvDescription">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcWorkEnvDescription&gt; provides the general working environment in which the training will be applied. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcWorkEnvDescription.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcWorkEnvDescription "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcWorkEnvDescription.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcWorkEnvDescription.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcWorkEnvDescription.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcWorkEnvDescription.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcWorkEnvDescription.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcPlanResources">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcPlanResources&gt; describes resource needs. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcPlanResources.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcPlanResources "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcPlanResources.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcPlanResources.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcPlanResources.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcPlanResources.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcPlanResources.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcProcesses">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcProcesses&gt; describes processes learners routinely follow. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcProcesses.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcProcesses "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcProcesses.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcProcesses.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcProcesses.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcProcesses.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcProcesses.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcTask">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcTask&gt; captures a work item to be performed, as part of the learning plan. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcTask.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcTask "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcTask.class">
+      <xs:sequence>
+         <xs:group ref="lcTask.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcTask.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcTask.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcTaskItem" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="lcKnowledge" minOccurs="0"/>
+         <xs:group ref="lcSkills" minOccurs="0"/>
+         <xs:group ref="lcAttitude" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcTask.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcTaskItem">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcTaskItem&gt; describes a discreet task to be taught. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcTaskItem.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcTaskItem "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcTaskItem.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcTaskItem.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcTaskItem.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcTaskItem.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcTaskItem.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcAttitude">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcAttitude&gt; describes mental state that influences the choices of personal actions. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcAttitude.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcAttitude "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcAttitude.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcAttitude.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcAttitude.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcAttitude.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcAttitude.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcGapAnalysis">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcGapAnalysis&gt; compares existing learning objectives to current job task analysis. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcGapAnalysis.class">
+               <xs:attribute ref="class"
+                             default="- topic/section  learningBase/section learningPlan/lcGapAnalysis "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcGapAnalysis.class">
+      <xs:sequence>
+         <xs:group ref="lcGapAnalysis.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcGapAnalysis.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcGapAnalysis.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcGapItem" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcGapAnalysis.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcGapItem">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcGapItem&gt; describes gaps between existing training objectives and related job-task-analysis content. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcGapItem.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcGapItem "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcGapItem.class">
+      <xs:sequence>
+         <xs:group ref="lcGapItem.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcGapItem.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcGapItem.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcPlanObjective" minOccurs="0"/>
+         <xs:group ref="lcJtaItem" minOccurs="0"/>
+         <xs:group ref="lcGapItemDelta" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcGapItem.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcPlanObjective">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcPlanObjective&gt; describes the objective to be addressed by a gap analysis or intervention. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcPlanObjective.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcPlanObjective "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcPlanObjective.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcPlanObjective.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcPlanObjective.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcPlanObjective.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcPlanObjective.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcJtaItem">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcJtaItem&gt; provides description of job task analysis (JTA) as related to a particular learning objective. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcJtaItem.class">
+               <xs:attribute ref="class" default="- topic/p  learningBase/p learningPlan/lcJtaItem "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcJtaItem.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcJtaItem.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcJtaItem.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcJtaItem.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcJtaItem.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcGapItemDelta">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcGapItemDelta&gt; describes the gap between the learning objective and the task analysis. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcGapItemDelta.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcGapItemDelta "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcGapItemDelta.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcGapItemDelta.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcGapItemDelta.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcGapItemDelta.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcGapItemDelta.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcIntervention">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcIntervention&gt; describes the approach and strategies to building the learning materials, based on the needs analysis. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcIntervention.class">
+               <xs:attribute ref="class"
+                             default="- topic/section  learningBase/section learningPlan/lcIntervention "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcIntervention.class">
+      <xs:sequence>
+         <xs:group ref="lcIntervention.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcIntervention.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcIntervention.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcInterventionItem" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcIntervention.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcInterventionItem">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcInterventionItem&gt; describes how learning content is built, based on a systems approach to analyzing, designing, developing, implementing, and evaluating any instructional experience. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcInterventionItem.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcInterventionItem "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcInterventionItem.class">
+      <xs:sequence>
+         <xs:group ref="lcInterventionItem.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcInterventionItem.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcInterventionItem.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcLearnStrat" minOccurs="0"/>
+         <xs:group ref="lcPlanObjective" minOccurs="0"/>
+         <xs:group ref="lcAssessment" minOccurs="0"/>
+         <xs:group ref="lcDelivery" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcInterventionItem.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcLearnStrat">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcLearnStrat&gt; describes the manner in which the learning content will be instructed. This should be a high level design that applies instructional-design theories and models. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcLearnStrat.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcLearnStrat "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcLearnStrat.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcLearnStrat.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcLearnStrat.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcLearnStrat.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcLearnStrat.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcAssessment">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcAssessment&gt; describes assessment plans. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcAssessment.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcAssessment "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcAssessment.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcAssessment.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcAssessment.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcAssessment.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcAssessment.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcDelivery">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcDelivery&gt; describes the delivery method for this learning content. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcDelivery.class">
+               <xs:attribute ref="class"
+                             default="- topic/p  learningBase/p learningPlan/lcDelivery "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcDelivery.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcDelivery.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcDelivery.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcDelivery.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcDelivery.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcTechnical">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcTechnical&gt; describes the technical requirements to the learning content and how those requirements are supported by the instructional design. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcTechnical.class">
+               <xs:attribute ref="class"
+                             default="- topic/section  learningBase/section learningPlan/lcTechnical "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcTechnical.class">
+      <xs:sequence>
+         <xs:group ref="lcTechnical.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcTechnical.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcTechnical.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="lcLMS" minOccurs="0"/>
+         <xs:group ref="lcNoLMS" minOccurs="0"/>
+         <xs:group ref="lcHandouts" minOccurs="0"/>
+         <xs:group ref="lcClassroom" minOccurs="0"/>
+         <xs:group ref="lcOJT" minOccurs="0"/>
+         <xs:group ref="lcConstraints" minOccurs="0"/>
+         <xs:group ref="lcW3C" minOccurs="0"/>
+         <xs:group ref="lcPlayers" minOccurs="0"/>
+         <xs:group ref="lcGraphics" minOccurs="0"/>
+         <xs:group ref="lcViewers" minOccurs="0"/>
+         <xs:group ref="lcResolution" minOccurs="0"/>
+         <xs:group ref="lcFileSizeLimitations" minOccurs="0"/>
+         <xs:group ref="lcDownloadTime" minOccurs="0"/>
+         <xs:group ref="lcSecurity" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcTechnical.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcLMS">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcLMS&gt; provides the LMS name and version number used in the learning event. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcLMS.class">
+               <xs:attribute ref="class" default="- topic/fig  learningBase/fig learningPlan/lcLMS "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcLMS.class">
+      <xs:sequence>
+         <xs:group ref="lcLMS.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcLMS.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcLMS.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcLMS.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcNoLMS">
+      <xs:annotation>
+         <xs:documentation>Use &lt;lcNoLMS&gt; when you plan to deliver the content as a standalone package, without a learning management system (LMS). </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcNoLMS.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcNoLMS "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcNoLMS.class">
+      <xs:sequence>
+         <xs:group ref="lcNoLMS.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcNoLMS.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcNoLMS.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcNoLMS.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcHandouts">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcHandouts&gt; provides aspects of the course that are provided by the instructor in support of the course learning objectives. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcHandouts.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcHandouts "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcHandouts.class">
+      <xs:sequence>
+         <xs:group ref="lcHandouts.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcHandouts.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcHandouts.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcHandouts.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcClassroom">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcClassroom&gt; describes the classroom environment. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcClassroom.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcClassroom "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcClassroom.class">
+      <xs:sequence>
+         <xs:group ref="lcClassroom.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcClassroom.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcClassroom.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcClassroom.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcOJT">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcOJT&gt; is &amp;#34;the job training&amp;#34; and describes aspects of the course taking place in the work environment. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcOJT.class">
+               <xs:attribute ref="class" default="- topic/fig  learningBase/fig learningPlan/lcOJT "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcOJT.class">
+      <xs:sequence>
+         <xs:group ref="lcOJT.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcOJT.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcOJT.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcOJT.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcConstraints">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcConstraints&gt; describes the organizational or technical aspects that may limit the organization's ability to effectively use the instruction to meet its goals. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcConstraints.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcConstraints "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcConstraints.class">
+      <xs:sequence>
+         <xs:group ref="lcConstraints.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcConstraints.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcConstraints.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcConstraints.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcW3C">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcW3C&gt; provides requirements for use of world wide web consortium standards. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcW3C.class">
+               <xs:attribute ref="class" default="- topic/fig  learningBase/fig learningPlan/lcW3C "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcW3C.class">
+      <xs:sequence>
+         <xs:group ref="lcW3C.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcW3C.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcW3C.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcW3C.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcPlayers">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcPlayers&gt; describes tools and plugins used for time-sequenced display at runtime. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcPlayers.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcPlayers "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcPlayers.class">
+      <xs:sequence>
+         <xs:group ref="lcPlayers.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcPlayers.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcPlayers.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcPlayers.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcGraphics">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcGraphics&gt; describes standards and system requirements for displaying graphics and other related content types. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcGraphics.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcGraphics "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcGraphics.class">
+      <xs:sequence>
+         <xs:group ref="lcGraphics.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcGraphics.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcGraphics.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcGraphics.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcViewers">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcViewers&gt; describes viewers used for time-sequenced display at runtime. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcViewers.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcViewers "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcViewers.class">
+      <xs:sequence>
+         <xs:group ref="lcViewers.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcViewers.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcViewers.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcViewers.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcResolution">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcResolution&gt; describes the required computer screen resolution for the online instruction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcResolution.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcResolution "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcResolution.class">
+      <xs:sequence>
+         <xs:group ref="lcResolution.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcResolution.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcResolution.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcResolution.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcFileSizeLimitations">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcFileSizeLimitations&gt; describes any file size limitation in the download environment. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcFileSizeLimitations.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcFileSizeLimitations "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcFileSizeLimitations.class">
+      <xs:sequence>
+         <xs:group ref="lcFileSizeLimitations.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcFileSizeLimitations.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcFileSizeLimitations.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcFileSizeLimitations.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcDownloadTime">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcDownloadTime&gt; describes the maximum time allowed for download time in the client's delivery environment. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcDownloadTime.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcDownloadTime "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcDownloadTime.class">
+      <xs:sequence>
+         <xs:group ref="lcDownloadTime.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcDownloadTime.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcDownloadTime.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcDownloadTime.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcSecurity">
+      <xs:annotation>
+         <xs:documentation>The &lt;lcSecurity&gt; describes the security requirements in the delivered instruction. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcSecurity.class">
+               <xs:attribute ref="class"
+                             default="- topic/fig  learningBase/fig learningPlan/lcSecurity "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcSecurity.class">
+      <xs:sequence>
+         <xs:group ref="lcSecurity.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcSecurity.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcSecurity.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcSecurity.attributes">
+      <xs:attributeGroup ref="display-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

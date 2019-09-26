@@ -1,0 +1,83 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="topic"><meta name="description" content="Plug-ins can provide custom URI resolvers that provide collators for specific collation URIs."><meta name="DC.subject" content="Saxon, service, Ant, jar, xsl:sort, Chinese, I18N, plug-in, plug-ins, XSLT, URI resolver"><meta name="keywords" content="Saxon, service, Ant, jar, xsl:sort, Chinese, I18N, plug-in, plug-ins, XSLT, URI resolver"><meta name="DC.relation" scheme="URI" content="../topics/implement-saxon-customizations.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="implement-saxon-collation-uri-resolvers"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Implementing custom Saxon collation URI resolvers</title></head><body id="implement-saxon-collation-uri-resolvers"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a><ul><li><a href="../topics/plugins-installing.html">Installing plug-ins</a></li><li><a href="../topics/plugins-removing.html">Removing plug-ins</a></li><li><a href="../topics/plugins-registry.html">Plug-in registry</a></li><li><a href="../topics/plugin-configfile.html">Plug-in descriptor file</a></li><li><a href="../topics/plugin-dependencies.html">Plug-in dependencies</a></li><li><a href="../topics/plugin-applications.html">Plug-in applications</a><ul><li><a href="../topics/plugin-xmlcatalog.html">Extending an XML catalog file</a></li><li><a href="../topics/plugin-anttarget.html">Adding a new target to the Ant build process</a></li><li><a href="../topics/plugin-antpreprocess.html">Adding an Ant target to the pre-processing pipeline</a></li><li><a href="../topics/plugin-newtranstype.html">Adding a new transformation type</a></li><li><a href="../topics/plugin-overridestyle.html">Overriding an XSLT-processing step</a></li><li><a href="../topics/using-plugin-URI-extension.html">Referencing files from other plug-ins</a></li><li><a href="../topics/plugin-xsltparams.html">Adding parameters to existing XSLT steps</a></li><li><a href="../topics/plugin-javalib.html">Adding a Java library to the classpath</a></li><li><a href="../topics/plugin-messages.html">Adding new diagnostic messages</a></li><li><a href="../topics/plugin-newextensions.html">Creating a new plug-in extension point</a></li><li><a href="../topics/implement-saxon-customizations.html">Adding Saxon customizations</a><ul><li><a href="../topics/implement-saxon-extension-functions.html">Saxon extensions</a></li><li class="active"><a href="../topics/implement-saxon-collation-uri-resolvers.html">Custom collation URI resolvers</a></li></ul></li></ul></li><li><a href="../topics/plugin-sample.html">Example plugin.xml file</a></li><li><a href="../topics/plugin-best-practices.html">Best practices</a></li><li><a href="../topics/plugin-coding-conventions.html">Coding conventions</a></li></ul></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Implementing custom Saxon collation URI resolvers</h1>
+  
+  
+  
+  <div class="body"><p class="shortdesc">Plug-ins can provide custom URI resolvers that provide collators for specific collation URIs.</p>
+    <p class="p">To do custom sorting and grouping in XSLT, you identify collators using URIs that Saxon resolves to collator
+      implementations. You implement the mapping from collation URIs to collators through custom collation URI
+      resolvers.</p>
+    <p class="p">For example, the DITA Community I18N plugin provides a custom collator for doing dictionary-based sorting and
+      grouping of Simplified Chinese. </p>
+    <p class="p">To allow multiple plug-ins to contribute collation URI resolvers, DITA-OT defines a superinterface of Saxon’s
+        <code class="ph codeph">CollationUriResolver</code> interface,
+        <code class="ph codeph">org.dita.dost.module.saxon.DelegatingCollationUriResolver</code>, that takes a base resolver.</p>
+    <p class="p">Implementations of <code class="ph codeph">DelegatingCollationUriResolver</code> should delegate to their base resolver if they
+      do not resolve the URI specified on the resolve request. When multiple plug-ins provide resolvers it results in a
+      chain of resolvers, ending with the built-in Saxon default resolver.</p>
+    <div class="note note note_note"><span class="note__title">Note:</span> The order in which plug-ins will be processed during collation URI resolver configuration is variable, so two
+      plug-ins should not try to resolve the same collation URI. In that case the first one configured will be used at
+      run time.</div>
+    <div class="p">A typical delegating collation URI resolver looks like
+      this:<pre class="pre codeblock language-java"><code>public class DCI18nCollationUriResolver implements DelegatingCollationUriResolver {
+
+  public static final String DITA_COMMUNITY_I18N_ZH_CNAWARE_COLLATOR =
+      "http://org.dita-community.i18n.zhCNawareCollator";
+  public static final String LANG_URI_PARAM = "lang";
+
+  private CollationURIResolver baseResolver;
+
+  public DCI18nCollationUriResolver() {
+      super();
+      this.baseResolver = StandardCollationURIResolver.getInstance();
+  }
+
+
+  public net.sf.saxon.lib.StringCollator resolve(String uri, Configuration configuration) 
+          throws XPathException {
+      ZhCnAwareCollator collator = resolveToZhCnAwareCollator(uri, null, configuration);
+      if (null == collator) {
+          return baseResolver.resolve(uri, configuration);
+      }
+      return (StringCollator) collator;
+  }
+
+
+  @Override
+  public void setBaseResolver(CollationURIResolver baseResolver) {
+    this.baseResolver = baseResolver;
+  }
+  
+  /* ... Code to evaluate the collation URI and provide the appropriate collator goes here */
+}</code></pre></div>
+    <div class="p">To implement a custom collation URI resolver:
+      <ol class="ol">
+        <li class="li">Add your plugin’s JAR file in the DITA-OT class path as described in <a class="xref" href="plugin-javalib.html" title="You can use the dita.conductor.lib.import extension point to add an additional Java library to the DITA-OT classpath parameter.">Adding a Java library to the DITA-OT classpath</a>.</li>
+        <li class="li">Implement an instance of <code class="ph codeph">org.dita.dost.module.saxon.DelegatingCollationUriResolver</code> as
+          described above.</li>
+        <li class="li">Include a file named <span class="ph filepath">org.dita.dost.module.saxon.DelegatingCollationUriResolver</span> in the
+          directory <span class="ph filepath">META-INF/services</span> in the compiled JAR that your plug-in provides. Each line of
+          the file must be the name of a class that implements
+            <code class="ph codeph">org.dita.dost.module.saxon.DelegatingCollationUriResolver</code>:<pre class="pre codeblock"><code>org.example.i18n.saxon.MyCollationUriResolver</code></pre>
+          <div class="p">You can create the services file using <code class="keyword markupname xmlelement">&lt;service&gt;</code> elements in an Ant
+            <code class="keyword markupname xmlelement">&lt;jar&gt;</code>
+            task:<pre class="pre codeblock language-xml"><code>&lt;jar destfile="${basedir}/target/lib/example-saxon.jar"&gt;
+  ⋮
+  &lt;service type="org.dita.dost.module.saxon.DelegatingCollationUriResolver"&gt;
+    &lt;provider classname="org.example.i18n.saxon.MyCollationUriResolver"/&gt;
+  &lt;/service&gt;
+  ⋮
+&lt;/jar&gt;</code></pre></div></li>
+        <li class="li">To use the collator in XSLT style sheets, specify the collation URI on <code class="keyword markupname xmlatt">@xsl:sort</code> elements (or
+          anywhere a collator URI can be
+          specified):<pre class="pre codeblock language-xml"><code>&lt;xsl:apply-templates select="word"&gt;
+  &lt;xsl:sort collation="http://org.example.i18n.MyCollator"/&gt;
+&lt;/xsl:apply-templates&gt;</code></pre></li>
+      </ol></div>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/implement-saxon-customizations.html" title="Plug-ins can contribute XSLT extension functions and collation URI resolvers. These customizations are automatically configured to work with Saxon when transformations are run using the DITA-OT pipeline task with custom XSLT.">Adding Saxon customizations</a></div></div></nav></article></main></body></html>

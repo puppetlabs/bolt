@@ -1,0 +1,251 @@
+<?xml version="1.0"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<project name="org.dita.pdf2.axf">
+
+  <path id="axf.class.path">
+    <path refid="project.class.path"/>
+    <pathelement location="${dita.plugin.org.dita.pdf2.axf.dir}/lib/axf.jar"/>
+  </path>
+
+  <target name="transform.fo2pdf.ah.test-use">
+    <condition property="use.ah.pdf.formatter">
+      <equals arg1="${pdf.formatter}" arg2="ah"/>
+    </condition>
+  </target>
+
+  <target name="transform.fo2pdf.ah.init" depends="transform.fo2pdf.ah.test-use" if="use.ah.pdf.formatter">
+    <taskdef name="log-processor" classname="org.dita.dost.pdf2.AhfLogProcessorTask"
+             classpathref="axf.class.path"/>
+    
+    <condition property="temp.transformation.file" value="${dita.plugin.org.dita.pdf2.axf.dir}/xsl/fo/topic2fo_shell_axf.xsl">
+      <and>
+        <not><isset property="args.xsl.pdf"/></not>
+        <isset property="use.ah.pdf.formatter"/>
+      </and>
+    </condition>
+    <!-- default output format -->
+    <condition property="axf.formatter.output-format" value="@PDF">
+      <not><isset property="axf.formatter.output-format"/></not>
+    </condition>
+    <!-- output file extension -->
+    <condition property="xsl.formatter.ext" value=".ps">
+      <and>
+        <equals arg1="${axf.formatter.output-format}" arg2="@PS"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".txt">
+      <and>
+        <equals arg1="${axf.formatter.output-format}" arg2="@TEXT"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".inx">
+      <and>
+        <equals arg1="${axf.formatter.output-format}" arg2="@INX"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".svg">
+      <and>
+        <equals arg1="${axf.formatter.output-format}" arg2="@SVG"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".mda">
+      <and>
+        <equals arg1="${axf.formatter.output-format}" arg2="@MODCA"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".mif">
+      <and>
+        <equals arg1="${axf.formatter.output-format}" arg2="@MIF"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".AT.xml">
+      <and>
+        <equals arg1="${axf.formatter.output-format}" arg2="@AreaTree"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".xps">
+      <and>
+        <equals arg1="${axf.formatter.output-format}" arg2="@XPS"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".pdf">
+      <and>
+        <equals arg1="${axf.formatter.output-format}" arg2="@PDF"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+  </target>
+
+  <!--Set up and run Antenna House-->
+  <target name="transform.fo2pdf.ah" if="use.ah.pdf.formatter">
+    <condition property="axf.opt" value="${env.AXF_OPT}">
+      <and>
+        <not><equals arg1="${env.AXF_OPT}" arg2=""/></not>
+        <available file="${env.AXF_OPT}"/>
+      </and>
+    </condition>
+
+    <condition property="axf.path" value="${env.AXF_DIR}">
+      <and>
+        <isset property="env.AXF_DIR"/>
+        <or>
+          <available file="${env.AXF_DIR}/run.sh"/>
+          <available file="${env.AXF_DIR}/XSLCmd.exe"/>
+          <available file="${env.AXF_DIR}/AHFCmd.exe"/>
+        </or>
+      </and>
+    </condition>
+
+    <property name="axf.failOnError" value="true"/>
+
+    <!-- run.sh on Linux, AHFCmd.exe or XSLCmd.exe on Windows -->
+    <condition property="fo.ah.program.name" value="run.sh">
+      <and>
+        <not><isset property="fo.ah.program.name"/></not>
+        <os family="unix"/>
+        <isset property="axf.path"/>
+        <available file="${axf.path}/run.sh"/>
+      </and>
+    </condition>
+    <condition property="fo.ah.program.name" value="AHFCmd.exe">
+      <and>
+        <not><isset property="fo.ah.program.name"/></not>
+        <isset property="axf.path"/>
+        <available file="${axf.path}/AHFCmd.exe"/>
+      </and>
+    </condition>
+    <condition property="fo.ah.program.name" value="XSLCmd.exe">
+      <and>
+        <not><isset property="fo.ah.program.name"/></not>
+        <isset property="axf.path"/>
+        <available file="${axf.path}/XSLCmd.exe"/>
+      </and>
+    </condition>
+
+    <condition property="axf.cmd" value="${axf.path}/${fo.ah.program.name}">
+      <and>
+        <not><isset property="axf.cmd"/></not>
+        <isset property="axf.path"/>
+        <isset property="fo.ah.program.name"/>
+      </and>
+    </condition>
+    <!-- Fall back to brute force search -->
+    <pathconvert property="axf.cmd" setonempty="false">
+      <first>
+        <union>
+          <fileset dir="/Applications" includes="AntennaHouse/run.sh" erroronmissingdir="false"/>
+          <fileset dir="/usr" includes="AHFormatterV*/run.sh" erroronmissingdir="false"/>
+          <fileset dir="/usr" includes="XSLFormatterV*/run.sh" erroronmissingdir="false"/>
+          <fileset dir="C:\Program Files\Antenna House" erroronmissingdir="false">
+            <include name="AHFormatterV*\AHFCmd.exe"/>
+            <include name="XSLFormatterV*\XSLCmd.exe"/>
+          </fileset>
+          <fileset dir="C:\Program Files\AntennaHouse" erroronmissingdir="false">
+            <include name="AHFormatterV*\AHFCmd.exe"/>
+            <include name="XSLFormatterV*\XSLCmd.exe"/>
+          </fileset>
+          <fileset dir="C:\Program Files\Antenna" erroronmissingdir="false">
+            <include name="AHFormatterV*\AHFCmd.exe"/>
+            <include name="XSLFormatterV*\XSLCmd.exe"/>
+          </fileset>
+          <fileset dir="C:\Program Files (x86)\Antenna House" erroronmissingdir="false">
+            <include name="AHFormatterV*\AHFCmd.exe"/>
+            <include name="XSLFormatterV*\XSLCmd.exe"/>
+          </fileset>
+          <fileset dir="C:\Program Files (x86)\AntennaHouse" erroronmissingdir="false">
+            <include name="AHFormatterV*\AHFCmd.exe"/>
+            <include name="XSLFormatterV*\XSLCmd.exe"/>
+          </fileset>
+          <fileset dir="C:\Program Files (x86)\Antenna" erroronmissingdir="false">
+            <include name="AHFormatterV*\AHFCmd.exe"/>
+            <include name="XSLFormatterV*\XSLCmd.exe"/>
+          </fileset>
+        </union>
+      </first>
+    </pathconvert>
+    
+    <fail message="Unable to locate AXF, set property axf.path or axf.cmd">
+      <condition>
+        <not>
+          <and>
+            <isset property="axf.cmd"/>
+            <available file="${axf.cmd}" type="file"/>
+          </and>
+        </not>
+      </condition>
+    </fail>
+    
+    <condition property="outputFile" value="${dita.output.dir}/${outputFile.base}${xsl.formatter.ext}">
+      <not><isset property="outputFile"/></not>
+    </condition>
+    <mkdir dir="${dita.output.dir}"/>
+    
+    <antcall target="transform.fo2pdf.ah.nooption"/>
+    <antcall target="transform.fo2pdf.ah.hasoption"/>
+  </target>
+
+  <target name="transform.fo2pdf.ah.nooption" unless="axf.opt">
+    <echo level="info" taskname="ahf">Processing ${pdf2.temp.dir}/topic.fo to ${outputFile}</echo>
+    <exec executable="${axf.cmd}" resultproperty="errCode" output="${dita.temp.dir}/pdf2.ah.log">
+      <arg value="-d"/>
+      <arg value="${pdf2.temp.dir}/topic.fo"/>
+      <arg value="-o"/>
+      <arg value="${outputFile}"/>
+      <arg value="-p"/>
+      <arg value="${axf.formatter.output-format}"/>
+      <arg value="-extlevel"/>
+      <arg value="4"/>
+      <arg value="-peb"/>
+      <arg value="1"/>
+    </exec>
+    <log-processor file="${dita.temp.dir}/pdf2.ah.log" taskname="ahf"/>
+    <dita-ot-fail id="PDFX013F">
+      <condition>
+        <not>
+          <equals arg1="${errCode}" arg2="0"/>
+        </not>
+      </condition>
+    </dita-ot-fail>
+  </target>
+
+  <target name="transform.fo2pdf.ah.hasoption" if="axf.opt">
+    <echo level="info" taskname="ahf" >Processing ${pdf2.temp.dir}/topic.fo to ${outputFile}</echo>
+    <exec executable="${axf.cmd}" resultproperty="errCode" output="${dita.temp.dir}/pdf2.ah.log">
+      <arg value="-d"/>
+      <arg value="${pdf2.temp.dir}/topic.fo"/>
+      <arg value="-o"/>
+      <arg value="${outputFile}"/>
+      <arg value="-p"/>
+      <arg value="${axf.formatter.output-format}"/>
+      <arg value="-extlevel"/>
+      <arg value="4"/>
+      <arg value="-peb"/>
+      <arg value="1"/>
+      <arg value="-i"/>
+      <arg value="${axf.opt}"/>
+    </exec>
+    <log-processor file="${dita.temp.dir}/pdf2.ah.log" taskname="ahf"/>
+    <dita-ot-fail id="PDFX013F">
+      <condition>
+        <not>
+          <equals arg1="${errCode}" arg2="0"/>
+        </not>
+      </condition>
+    </dita-ot-fail>
+  </target>
+
+</project>

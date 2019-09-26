@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN"
+ "reference.dtd">
+<reference id="rel1.8" xml:lang="en">
+  <title>DITA Open Toolkit Release 1.8</title>
+  <!--reference id="releasehighlights" xml:lang="en-US">
+    <title>Release highlights</title>
+    <refbody>
+      <section/>
+    </refbody>
+  </reference-->
+  <reference id="general-enhancements-and-changes" xml:lang="en-US">
+    <title>General Enhancements and Changes</title>
+    <refbody>
+      <section>
+        <title>Preprocessing</title>
+        <p>Additional validation has been added to check e.g. element ID uniqueness, and <codeph>xml:lang</codeph> and URI syntax.</p>
+      </section>
+      <section>
+        <title>PDF</title>
+        <p>Bundled FOP has been updated from 1.0 to 1.1.</p>
+      </section>
+    </refbody>
+  </reference>
+  <reference id="reference_yvj_ttj_bd">
+    <title>Migration from previous releases</title>
+    <refbody>
+      <section>
+      <p>Stylesheets for the following transtypes have moved
+        to plug-in specific folders:</p>
+        <ul>
+          <li>eclipsehelp</li>
+          <li>htmlhelp</li>
+          <li>javahelp</li>
+          <li>odt</li>
+          <li>xhtml</li>
+        </ul>
+      </section>
+      <section>
+        <title>Preprocessing</title>
+        <p>The following deprecated Ant properties have been removed:</p>
+        <ul id="ul_rp5_hjs_53">
+          <li><codeph>dita.script.dir</codeph>, use <codeph>${dita.plugin.<varname>id</varname>.dir}</codeph>
+            instead</li>
+          <li><codeph>dita.resource.dir</codeph>, use <codeph>${dita.plugin.org.dita.base.dir}/resource</codeph> instead</li>
+          <li><codeph>dita.empty</codeph></li>
+          <li><codeph>args.message.file</codeph></li>
+        </ul>
+      </section>
+      <section>
+        <title>XHTML</title>
+        <p>XSLT Java extension <codeph>ImgUtils</codeph> has been removed from stylesheets and been replaced with preprocessing module <codeph>ImageMetadataModule</codeph>.
+          The old <codeph>ImgUtils</codeph> Java classes are still included in the build.</p>
+      </section>
+      <section>
+        <title>PDF</title>
+        <p>The following deprecated XSLT stylesheets have been removed:</p>
+        <ul id="ul_vmw_v3s_53">
+          <li><filepath>artwork-preprocessor.xsl</filepath></li>
+          <li><filepath>otdita2fo_frontend.xsl</filepath></li>
+        </ul>
+        <p>The following deprecated XSLT templates have been removed:</p>
+        <ul id="ul_bwz_r3s_53">
+          <li><codeph>insertVariable.old</codeph></li>
+        </ul>
+        <p>The following deprecated XSLT modes have been removed:</p>
+        <ul>
+          <li><codeph>layout-masters-processing</codeph></li>
+          <li><codeph>toc-prefix-text</codeph>, use <codeph>tocPrefix</codeph> mode instead</li>
+          <li><codeph>toc-topic-text</codeph>, use <codeph>tocText</codeph> mode instead</li>
+        </ul>
+        <p>Link generation has been simplified by removing deprecated arguments in favour of <codeph>args.rellinks</codeph>.
+          The following deprecated Ant properties have been removed:</p>
+        <ul>
+          <li><codeph>args.fo.include.rellinks</codeph></li>
+        </ul>
+        <p>The following XSLT parameters have been removed:</p>
+        <ul>
+          <li><codeph>antArgsIncludeRelatedLinks</codeph></li>
+          <li><codeph>disableRelatedLinks</codeph></li>
+        </ul>
+        <p>A call to a named template <codeph>pullPrologIndexTerms.end-range</codeph> has been added to <codeph>processTopic*</codeph> templates to handle topic wide index ranges.</p>
+      </section>
+      <section>
+        <title>Legacy PDF</title>
+        <p>The following deprecated XSLT stylesheets have been removed:</p>
+        <ul>
+          <li><filepath>dita2fo-shell_template.xsl</filepath></li>
+          <li><filepath>topic2fo-shell.xsl</filepath></li>
+        </ul>
+      </section>
+      <section>
+        <title>ODT</title>
+        <p>Link generation has been simplified by removing deprecated arguments in favour of <codeph>args.rellinks</codeph>.
+          The following deprecated Ant properties have been removed:</p>
+        <ul>
+          <li><codeph>args.odt.include.rellinks</codeph></li>
+        </ul>
+        <p>The following XSLT parameters have been added:</p>
+        <ul>
+          <li><codeph>include.rellinks</codeph></li>
+        </ul>
+        <p>The following XSLT parameters have been removed:</p>
+        <ul>
+          <li><codeph>disableRelatedLinks</codeph></li>
+        </ul>
+      </section>
+    </refbody>
+  </reference>
+  <reference id="rel1.8.issues">
+    <title>Issues</title>
+    <shortdesc>The following items are included in DITA Open Toolkit Release 1.8. Issue numbers
+      correspond to the tracking number in the <ph><xref keyref="dita-ot-issues" scope="external"
+          >GitHub issues tracker</xref></ph>.</shortdesc>
+    <refbody>
+      <section>
+        <title>Feature requests</title>
+        <ul>
+          <li>#1406 Bundle FOP 1.1 (milestone 1)</li>
+          <li>#1447 Move stylesheets and resource files to plug-in folder (milestone 1)</li>
+          <li>#1449 Add support for Slovenian (milestone 1)</li>
+          <li>#1453 Add image metadata filter (milestone 1)</li>
+          <li>#1435 Add validation filter to debug-filter step</li>
+          <li>#1455 Remove deprecated features</li>
+          <li>#1460 "Get String" template should use parameter instead of variable</li>
+          <li>#1461 Move file list generation to Ant</li>
+          <li>#1465 New doc topic listing non-standard tweaks to preprocessed files</li>
+          <li>#1480 Correcting values for the @relcolwidth attribute</li>
+          <li>#1492 Line range extension to coderef processing</li>
+          <li>#1494 Move integrator configuration to lib/configuration.properties</li>
+          <li>#1495 Remove ancient doc directories</li>
+        </ul>
+      </section>
+      <section>
+        <title>Bugs</title>
+        <ul>
+          <li>#1425 XHTML flagging included before imports (milestone 1)</li>
+          <li>#1428 Topic level calculated incorrectly for appendices (milestone 1)</li>
+          <li>#1427 Fix text overflow issue in lot/lof entries with long titles (milestone 1)</li>
+          <li>#1430 PDF transformation: Problems with index in OT 1.7 (milestone 1)</li>
+          <li>#1432 startcmd.sh broken in 1.7 (milestone 1)</li>
+          <li>#1433 Profiling filter included multiple times (milestone 1)</li>
+          <li>#1437 Fatal UTF-8 error in .job.xml (milestone 1)</li>
+          <li>#1456 XHTML Build failed when referencing subject scheme in different file path (milestone 1)</li>
+          <li>#1080 Index page range issues (milestone 2)</li>
+          <li>#1423 Formatting glitch in PDF index (milestone 2)</li>
+          <li>#1468 Reference to remote image does not appear in PDF (milestone 2)</li>
+          <li>#1469 @outputclass and @class values not passed from &lt;chhead> to &lt;tr> in XHTML output (milestone 2)</li>
+          <li>#1472 PDF output: whitespace not preserved in msgblock element (milestone 2)</li>
+          <li>#1475 Error received in console does not point correctly to location of published DITA Map (milestone 2)</li>
+          <li>#1477 Tables: using percentage in colwidth values [PDF2 plugin] (milestone 2)</li>
+          <li>#1464 Flagging a simpletable row throws off @keycol counting bug (milestone 2)</li>
+          <li>#1459 Link not created in the XHTML output for a xref/@keyref element</li>
+          <li>#1473 Troff output not working in latest build bug troff</li>
+          <li>#1498 White space will break tocjs</li>
+          <li>#1519 Latest code in develop branch fails to build PDF</li>
+          <li>#1528 PDF fails when topic referenced with and without topic ID (maintenance 1)</li>
+          <li>#1529 NPE when topichead has @copy-to and @chunk="to-content" (maintenance 1)</li>
+          <li>#1535 Specialized class cannot be handled during XML parsing (maintenance 1)</li>
+          <li>#1537 Whitespace issue when @conref is preceded by a linefeed in map &lt;title> (maintenance 1)</li>
+          <li>#1538 Incorrect handling of topics outside of map path (maintenance 1)</li>
+          <li>#1531 CSS link generated with backslash on Windows (maintenance 2)</li>
+          <li>#1532 Keyref link generated with backslash and %5C on Windows (maintenance 2)</li>
+          <li>#1540 Add missing @class attribute to &lt;navref> in chunking phase (maintenance 2)</li>
+          <li>#1547 startPageNumbering missing from some page sequence (maintenance 2)</li>
+          <li>#1073 Some elements are not handled correctly in troff transform (maintenance 3)</li>
+          <li>#1175 pdf2 plugin: PDF transform produces invalid FO doc with DITAVAL (flag on simpletable) (maintenance 3)</li>
+          <li>#1234 pdf2 plugin: Note image path broken for "other" note type (maintenance 3)</li>
+          <li>#1373 Cells of a Properties table misaligned in PDF output if Value column is missing (maintenance 3)</li>
+          <li>#1563 path2project generated PI is invalid in copy-to file (maintenance 3)</li>
+          <li>#1570 pdf2 plugin: 'Body first header' variable does not support 'prodname' parameter (maintenance 3)</li>
+          <li>#1571 pdf2 plugin: top level topic titles styled as normal text (maintenance 3)</li>
+          <li>#1581 pdf2 plugin: Change bars from DITAVAL crash FOP (maintenance 3)</li>
+          <li>#1584 Add basic table support to troff #1073 (maintenance 3)</li>
+          <li>#1585 Properties table cell misalligned if no value column #1373 (maintenance 3)</li>
+          <li>#1603 XSD schema for Machinery Task does not allow attributes in prelreqs element (maintenance 3)</li>
+        </ul>
+      </section>
+    </refbody>
+  </reference>
+</reference>

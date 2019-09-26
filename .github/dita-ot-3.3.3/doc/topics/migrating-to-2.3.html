@@ -1,0 +1,138 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="In DITA-OT 2.3, HTML5 table processing has been refactored to use HTML5 best practices and improved CSS properties. In PDF output, table heads and key columns no longer include shading, and unused localization variables have been deprecated. The template for generated error messages has been updated to use a single id variable that contains the entire message ID."><meta name="DC.subject" content="languages, supported, Chinese, English, Indonesian, Korean, I18N, PDF processing, metadata, chunking, effect of, tables, HTML5, PDF"><meta name="keywords" content="languages, supported, Chinese, English, Indonesian, Korean, I18N, PDF processing, metadata, chunking, effect of, tables, HTML5, PDF"><meta name="DC.relation" scheme="URI" content="../topics/migration.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="migrating-to-2.3"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Migrating to release 2.3</title></head><body id="migrating-to-2.3"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a><ul><li><a href="../topics/migrating-to-3.3.html">To 3.3</a></li><li><a href="../topics/migrating-to-3.2.html">To 3.2</a></li><li><a href="../topics/migrating-to-3.1.html">To 3.1</a></li><li><a href="../topics/migrating-to-3.0.html">To 3.0</a></li><li><a href="../topics/migrating-to-2.5.html">To 2.5</a></li><li><a href="../topics/migrating-to-2.4.html">To 2.4</a></li><li class="active"><a href="../topics/migrating-to-2.3.html">To 2.3</a></li><li><a href="../topics/migrating-to-2.2.html">To 2.2</a></li><li><a href="../topics/migrating-to-2.1.html">To 2.1</a></li><li><a href="../topics/migrating-to-2.0.html">To 2.0</a></li><li><a href="../topics/migrating-to-1.8.html">To 1.8</a></li><li><a href="../topics/migrating-to-1.7.html">To 1.7</a></li><li><a href="../topics/migrating-to-1.6.html">To 1.6</a></li><li><a href="../topics/migrating-to-1.5.4.html">To 1.5.4</a></li></ul></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+
+  <h1 class="title topictitle1" id="ariaid-title1">Migrating to release 2.3</h1>
+  
+
+  
+  
+  <div class="body refbody"><p class="shortdesc">In DITA-OT 2.3, <span class="keyword option">HTML5</span> table processing has been refactored to use HTML5 best practices and
+    improved CSS properties. In PDF output, table heads and key columns no longer include shading, and unused
+    localization variables have been deprecated. The template for generated error messages has been updated to use a
+    single <code class="ph codeph">id</code> variable that contains the entire message ID.</p>
+    <section class="section">
+      <div class="note note note_note"><span class="note__title">Note:</span> This topic provides a summary of changes in DITA-OT 2.3 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the <a class="xref" href="https://www.dita-ot.org/2.3/release-notes/" target="_blank">DITA-OT 2.3 Release Notes</a>.</div>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">HTML5</h2>
+      
+      <p class="p">The <span class="keyword option">HTML5</span> table processing has been refactored to use valid HTML5 markup, HTML5 best
+        practices, and better CSS properties for styling. <a class="xref" href="https://en.bem.info/methodology/" target="_blank">BEM</a>-style CSS classes are now generated with the name of the containing element, the
+        name of the attribute, and the value of the attribute. </p>
+      <p class="p">Common CSS files are now generated using separate modules for each DITA domain, implemented as <a class="xref" href="http://sass-lang.com" target="_blank">Sass</a> partials to better support extensions with CSS frameworks, custom plug-ins and future
+        toolkit versions.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">HTML-based formats</h2>
+      
+      <div class="div div-index">
+        
+        
+        
+        
+        
+        
+        
+      </div>
+      <p class="p">The XSLT <code class="ph codeph">tm-area</code> named template, which used to toggle rendering of trademark symbols in US
+        English and Asian languages (Japanese, Korean, and both Chinese) but ignore them in all other languages, has
+        been deprecated. Trademark symbols are now rendered uniformly for all languages and the template will be removed
+        in an upcoming release.</p>
+      <p class="p" id="migrating-to-2.3__2191">In previous releases, short descriptions in <code class="keyword markupname xmlelement">&lt;abstract&gt;</code> elements were rendered
+        as division elements (<code class="keyword markupname xmlelement">&lt;div&gt;</code>), rather than paragraphs (<code class="keyword markupname xmlelement">&lt;p&gt;</code>).
+        Processing has been revised to ensure that short descriptions are consistently rendered as paragraphs,
+        regardless of whether they appear in <code class="keyword markupname xmlelement">&lt;abstract&gt;</code> elements. Users who have previously
+        implemented custom CSS rules to style <code class="ph codeph">div.shortdesc</code> like paragraphs should be able to remove
+        these rules.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">PDF</h2>
+      
+      <div class="div div-index">
+        
+        
+        
+        
+        
+      </div>
+      <p class="p">The <code class="ph codeph">antiquewhite</code> background color has been removed from table heads and key column contents in
+          <code class="keyword markupname xmlelement">&lt;simpletable&gt;</code> and <code class="keyword markupname xmlelement">&lt;properties&gt;</code> tables to synchronize
+        presentation with <code class="keyword markupname xmlelement">&lt;choicetable&gt;</code> and provide a more uniform customization baseline between
+        PDF output and HTML-based formats.</p>
+      <p class="p" id="migrating-to-2.3__2179">PDF: The I18N Java and XSLT processing code has been merged into single task. This eliminated the
+        need for a <span class="ph filepath">stage3.fo</span> file in the temporary directory; instead,
+          <span class="ph filepath">topic.fo</span> is generated directly from <span class="ph filepath">stage2.fo</span>. If custom plug-ins
+        were implemented to handle <span class="ph filepath">stage3.fo</span>, they would need to be updated. </p>
+      <div class="p">Localization variables that are no longer used in PDF processing have been deprecated and will be removed in an
+        upcoming release. PDF customization plug-ins that make use of these variables should plan to refactor
+        accordingly:
+        <ul class="ul">
+          <li class="li">Back button title</li>
+          <li class="li">Contents button title</li>
+          <li class="li">Forward button title</li>
+          <li class="li">Index button title</li>
+          <li class="li">Index multiple entries separator</li>
+          <li class="li">Main page button title</li>
+          <li class="li">Next page button title</li>
+          <li class="li">Online help prefix</li>
+          <li class="li">Online Help Search Method And</li>
+          <li class="li">Online Help Search Method Field</li>
+          <li class="li">Online Help Search Method Or</li>
+          <li class="li">Previous page button title</li>
+          <li class="li">Search button title</li>
+          <li class="li">Search Case Sensitive Switch</li>
+          <li class="li">Search Excluded Stop Words Message</li>
+          <li class="li">Search Highlight Switch</li>
+          <li class="li">Search index button title</li>
+          <li class="li">Search index field title</li>
+          <li class="li">Search index next button title</li>
+          <li class="li">Search Search Give No Results Message</li>
+          <li class="li">Search Search in Progress Message</li>
+          <li class="li">Search Stopped Message</li>
+          <li class="li">Search text button title</li>
+          <li class="li">Search text field title</li>
+          <li class="li">Search title</li>
+          <li class="li">Search Whole Words Switch</li>
+          <li class="li">Untitled section</li>
+        </ul>
+      </div>
+      <div class="note note note_note"><span class="note__title">Note:</span> Most of these variables were never used by the PDF process, and most were not supported (or localized) for
+        any language other than English.</div>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Deprecated properties and targets</h2>
+      
+      <div class="p">The following Ant properties have been deprecated:
+        <ul class="ul">
+          <li class="li"><span class="keyword parmname">conreffile</span></li>
+        </ul>
+      </div>
+      <div class="p">The following preprocessing targets have been deprecated:
+        <ul class="ul">
+          <li class="li"><span class="keyword parmname">conref-check</span></li>
+          <li class="li"><span class="keyword parmname">coderef</span></li>
+        </ul>
+      </div>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Pre-processing</h2>
+      
+      <p class="p" id="migrating-to-2.3__2207">The order of the <code class="ph codeph">chunk</code> and <code class="ph codeph">move-meta-entries</code> pre-processing stages
+        has been switched so that <code class="ph codeph">chunk</code> comes first. This ensures that metadata is properly pulled or
+        pushed into the chunked version of DITA topics. </p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Generating error messages</h2>
+      
+      <p class="p">Previously, the XSLT <code class="ph codeph">output-message</code> named template for generating error messages combined a
+        global variable and two parameters to determine the actual message ID. This function has been updated to use a
+        single <code class="ph codeph">id</code> variable that contains the entire message ID.</p>
+      <div class="p">Plug-ins that make use of the <code class="ph codeph">output-message</code> function should be updated to use the single
+          <code class="ph codeph">id</code> variable, as
+        in:<pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;xsl:call-template name="output-message"&gt;
+  &lt;xsl:with-param name="id" select="'FULLMESSAGENUMBER'"/&gt;
+  &lt;xsl:with-param name="msgparams"&gt;optional-message-parameters&lt;/xsl:with-param&gt;
+&lt;/xsl:call-template&gt;</code></pre>
+      </div>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/migration.html" title="If you have XSL transformation overrides, plug-ins or other customizations written prior to DITA-OT 3.3, you may need to make changes to ensure your overrides work properly with the latest toolkit versions.">Migrating customizations</a></div></div></nav></article></main></body></html>

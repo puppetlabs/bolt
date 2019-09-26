@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Programming Domain                           -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an  -->
+<!--       appropriate system identifier                           -->
+<!-- PUBLIC "-//OASIS//ELEMENTS DITA Programming Domain//EN"       -->
+<!--       Delivered as file "programmingDomain.mod"                    -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the elements and specialization         -->
+<!--             attributes for the Programming Domain             -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2005, 2009.              -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    2005.11.15 RDA: Updated these comments to match template   -->
+<!--    2005.11.15 RDA: Corrected Long Names for syntax groups,    -->
+<!--                    codeph, and kwd                            -->
+<!--    2005.11.15 RDA: Corrected the "Delivered as" system ID     -->
+<!--    2006.06.07 RDA: Make universal attributes universal        -->
+<!--                      (DITA 1.1 proposal #12)                  -->
+<!--    2006.11.30 RDA: Add -dita-use-conref-target to enumerated  -->
+<!--                      attributes                               -->
+<!--    2007.12.01 EK:  Reformatted DTD modules for DITA 1.2        -->
+<!--    2008.02.12 RDA: Add text to synph, items with only #PCDATA -->
+<!--    2008.02.12 RDA: Add coderef element                        -->
+<!--    2008.02.13 RDA: Create .content and .attributes entities   -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    ELEMENT EXTENSION ENTITY DECLARATIONS      -->
+<!-- ============================================================= -->
+
+<!ENTITY % pr-d-ph
+  "codeph |
+   synph"
+>
+<!ENTITY % pr-d-pre
+  "codeblock"
+>
+<!ENTITY % pr-d-keyword
+  "apiname |
+   option |
+   parmname"
+>
+<!ENTITY % pr-d-fig
+  "syntaxdiagram"
+>
+<!ENTITY % pr-d-dl
+  "parml"
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY pr-d-att
+  "(topic pr-d)"
+>
+
+<!-- ================ End DITA Programming Domain ================== -->
+ 

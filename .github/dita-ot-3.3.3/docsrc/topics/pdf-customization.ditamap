@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>Customizing PDF output</title>
+  <topicref keyref="pdf-customization">
+    <topicref keyref="pdf-customization-approaches"/>
+    <topicref keyref="pdf-customization-plugin-types"/>
+    <topicref keyref="pdf-plugin-structure" collection-type="family">
+      <topicref keyref="pdf-plugin-structure_common-artwork"/>
+      <topicref keyref="pdf-plugin-structure_common-index"/>
+      <topicref keyref="pdf-plugin-structure_common-vars"/>
+      <topicref keyref="pdf-plugin-structure_fo-attrs"/>
+      <topicref keyref="pdf-plugin-structure_fo-i18n"/>
+      <topicref keyref="pdf-plugin-structure_fo-xsl"/>
+    </topicref>
+    <topicref keyref="pdf-customization-example"/>
+    <topicref keyref="pdf-customization-resources"/>
+    <topicref keyref="pdf2-creating-change-bars"/>
+  </topicref>
+
+  <reltable>
+    <title>Bi-directional links</title>
+    <relrow>
+      <relcell>
+        <topicref keyref="pdf-customization"/>
+        <topicref keyref="pdf-customization-approaches"/>
+      </relcell>
+      <relcell>
+        <!-- Link formerly PDF-specific content to new location -->
+        <topicref keyref="plugin-best-practices"/>
+        <topicref keyref="plugin-coding-conventions"/>
+      </relcell>
+    </relrow>
+  </reltable>
+</map>

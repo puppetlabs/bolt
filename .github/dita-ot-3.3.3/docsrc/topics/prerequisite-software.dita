@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="prerequisite-software">
+  <title>Prerequisite software</title>
+  <shortdesc>The prerequisite software that DITA-OT requires depends on the types of transformations that you want to
+    use.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>RenderX<indexterm>XSL-FO processor</indexterm></indexterm>
+        <indexterm>Antenna House<indexterm>XSL-FO processor</indexterm></indexterm>
+        <indexterm>Apache FOP<indexterm>XSL-FO processor</indexterm></indexterm>
+        <indexterm>installing<indexterm>prerequisites</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>processor</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>2.0</indexterm></indexterm>
+        <indexterm>Saxon<indexterm>version</indexterm></indexterm>
+        <indexterm>Java<indexterm>Java Development Kit (JDK)</indexterm><indexterm>Java Runtime Environment (JRE)</indexterm></indexterm>
+        <indexterm>XSL-FO processor<index-see>Antenna House</index-see><index-see>RenderX</index-see><index-see>Apache FOP</index-see></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <title>Software required for core DITA-OT processing</title>
+      <p>DITA-OT requires the following software applications:
+        <dl>
+          <dlentry>
+            <dt>Java Runtime Environment (JRE) or Java Development Kit (JDK)</dt>
+            <dd>
+              <p conkeyref="reusable-components/java-clients"/>
+              <note>This is the <i>only</i> prerequisite software that you need to install. The remaining required
+                software is included in the distribution package.</note>
+            </dd>
+          </dlentry>
+          <dlentry id="antbuild">
+            <dt>Apache Ant</dt>
+            <dd>Provides the standard setup and sequencing of processing steps. DITA-OT includes Ant version <keyword
+                keyref="tool.ant.version"/>. You can download Ant from <xref keyref="download.ant"/>.</dd>
+          </dlentry>
+          <dlentry>
+            <dt>XSLT processor</dt>
+            <dd>Provides the main transformation services. It must be compliant with XSLT 2.0. DITA-OT includes Saxon
+              version <keyword keyref="tool.saxon.version"/>. You can download Saxon from <xref keyref="download.saxon"
+              />.</dd>
+          </dlentry>
+        </dl></p>
+    </section>
+    <section>
+      <title>Software required for specific transformations</title>
+      <div outputclass="div-index">
+        <indexterm>locale</indexterm>
+      </div>
+      <p>Depending on the type of output that you want to generate, you might need the following applications:
+        <dl>
+          <dlentry>
+            <dt>ICU for Java</dt>
+            <dd><draft-comment author="Kristen James Eberlein" time="11 August 2012">Does the DITA-OT only use ICU for
+                Java for index processing? Index processing is what is explicitly mentioned in the installing
+                topics.</draft-comment>ICU for Java is a cross-platform, Unicode-based, globalization library. It
+              includes support for comparing locale-sensitive strings; formatting dates, times, numbers, currencies, and
+              messages; detecting text boundaries; and converting character sets. You can download ICU for Java from
+                <xref keyref="download.icu4j"/>.</dd>
+          </dlentry>
+          <dlentry>
+            <dt>Microsoft Help Workshop</dt>
+            <dd>Required for generating HTML help. You can download the Help Workshop from <xref
+                keyref="download.html-help-workshop"/>.</dd>
+          </dlentry>
+          <dlentry>
+            <dt>XSL-FO processor</dt>
+            <dd>Required for generating PDF output. <tm tmtype="tm">Apache</tm> FOP (Formatting Objects Processor) is
+              included in the distribution package. You can download other versions from <xref keyref="download.fop"/>.
+              You can also use commercial FO processors such as Antenna House Formatter or RenderX XEP.</dd>
+          </dlentry>
+        </dl></p>
+    </section>
+  </conbody>
+</concept>

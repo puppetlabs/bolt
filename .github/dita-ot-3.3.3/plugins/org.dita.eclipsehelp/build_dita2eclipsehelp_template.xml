@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<project xmlns:dita="http://dita-ot.sourceforge.net" name="dita2eclipsehelp" xmlns:if="ant:if">
+
+  <target name="dita.eclipsehelp.init">
+    <property name="html-version" value="xhtml"/>
+    <condition property="args.xsl" value="${dita.plugin.org.dita.eclipsehelp.dir}/xsl/dita2xhtml_eclipsehelp.xsl">
+      <not>
+        <isset property="args.xsl" />
+      </not>
+    </condition>
+    <condition property="temp.output.dir.name" value="temp_jar_dir">
+      <isset property="args.eclipsehelp.jar.name"/>
+    </condition>
+  </target>
+
+     <target name="dita.index.eclipsehelp.init">
+        <condition property="dita.eclipsehelp.index.class" value="org.dita.dost.writer.EclipseIndexWriter">
+            <not><isset property="dita.eclipsehelp.index.class"></isset></not>
+        </condition>
+     </target>
+
+
+    <target name="dita2eclipsehelp"
+            unless="noMap"
+        depends="dita.eclipsehelp.init, build-init, preprocess, 
+                 xhtml.topics,
+                 copy-css,
+                 dita.map.eclipse,
+                 build.eclipse.jar">
+    </target>
+
+  <target name="dita.map.eclipse"
+    depends="dita.map.eclipse.init, 
+    copy-plugin-files, 
+    dita.map.eclipse.fragment.language.init, 
+    dita.map.eclipse.fragment.language.country.init, 
+    dita.map.eclipse.fragment.error">
+  </target>
+
+  <target name="dita.map.eclipse.init" if="eclipse.plugin"
+              depends="dita.map.eclipse.plugin.init">
+                  <antcall target="dita.map.eclipse.generate.plugin"/>
+  </target>
+
+    <target name="dita.map.eclipse.plugin.init"
+            description="Init properties for EclipseHelp">
+        <condition property="out.ext" value=".html">
+            <not>
+                <isset property="out.ext" />
+            </not>
+        </condition>
+        <condition property="noPlugin">
+            <equals arg1="${dita.eclipse.plugin}" arg2="no" />
+        </condition>
+      <condition property="eclipse.fragment.language">
+        <and>
+          <isset property="args.eclipsehelp.language" />
+          <not>
+            <isset property="args.eclipsehelp.country" />
+          </not>
+        </and>
+      </condition>
+      <condition property="eclipse.fragment.country">
+        <and>
+          <isset property="args.eclipsehelp.language" />
+          <isset property="args.eclipsehelp.country" />
+        </and>
+      </condition>
+      
+      <condition property="eclipse.plugin">
+        <not>
+          <or>
+            <isset property="args.eclipsehelp.language" />
+            <isset property="args.eclipsehelp.country" />
+            <and>
+              <isset property="args.eclipsehelp.country" />
+              <isset property="args.eclipsehelp.language" />
+            </and>
+          </or>
+        </not>
+      </condition>
+      <condition property="eclipse.fragment.error">
+        <and>
+          <isset property="args.eclipsehelp.country" />
+          <not>
+            <isset property="args.eclipsehelp.language" />
+          </not>
+        </and>
+      </condition>
+      <condition property="args.eclipsehelp.indexsee" value="false">
+          <not>
+            <isset property="args.eclipsehelp.indexsee"></isset>
+          </not>
+      </condition>
+    </target>
+
+    <target name="dita.map.eclipse.toc" unless="noMap"
+            depends="dita.map.eclipse.plugin.init" if="old.transform"
+            description="Build EclipseHelp TOC file">
+      <pipeline>
+        <xslt destdir="${dita.output.dir}"
+              extension=".xml"
+              style="${dita.plugin.org.dita.eclipsehelp.dir}/xsl/map2eclipse.xsl">
+            <ditafileset format="ditamap" processingRole="normal"/>
+            <param name="OUTEXT" expression="${out.ext}" if:set="out.ext" />
+            <param name="WORKDIR" expression="${workdir}" if:set="workdir"/>
+            <param name="defaultLanguage" expression="${default.language}"/>
+          <xmlcatalog refid="dita.catalog"/>
+        </xslt>
+      </pipeline>
+    </target>
+    
+    <target name="dita.out.map.eclipse.toc" unless="noMap"
+        depends="dita.map.eclipse.plugin.init" if="inner.transform"
+        description="Build EclipseHelp TOC file">
+      <pipeline>
+        <xslt
+            destdir="${dita.output.dir}"
+            style="${dita.plugin.org.dita.eclipsehelp.dir}/xsl/map2eclipse.xsl">
+            <ditafileset format="ditamap" processingRole="normal"/>
+            <param name="OUTEXT" expression="${out.ext}" if:set="out.ext" />
+            <param name="WORKDIR" expression="${workdir}" if:set="workdir"/>
+            <param name="defaultLanguage" expression="${default.language}"/>
+            <dita:extension behavior="org.dita.dost.platform.InsertAction" id="dita.conductor.eclipse.toc.param"/>
+            <mapper classname="org.dita.dost.ant.types.JobMapper" to=".xml"/>
+          <xmlcatalog refid="dita.catalog"/>
+        </xslt>
+      </pipeline>
+    </target>
+    
+    <target name="dita.map.eclipse.index" unless="noMap"
+            if="old.transform"
+      dita:depends="{dita.map.eclipse.index.pre},dita.map.eclipse.plugin.init,dita.index.eclipsehelp.init"  
+            dita:extension="depends org.dita.dost.platform.InsertDependsAction"
+            description="Build Eclipse Help index file">
+        <echo level="info"> args.eclipsehelp.indexsee = ${args.eclipsehelp.indexsee} </echo>
+        <pipeline message="Extract index term."
+            inputmap="${user.input.file}">
+          <module class="org.dita.dost.module.IndexTermExtractModule">
+            <param name="output" location="${dita.output.dir}/${user.input.file}"/>
+            <param name="targetext" value="${out.ext}"/>
+            <param name="indextype" value="eclipsehelp"/>
+            <param name="indexclass" value="${dita.eclipsehelp.index.class}"/>
+            <param name="eclipse.indexsee" value="${args.eclipsehelp.indexsee}"/>
+            <param name="encoding" value="${args.dita.locale}" if:set="args.dita.locale"/>
+            <param name="defaultLanguage" expression="${default.language}"/>
+          </module>
+        </pipeline>
+    </target>
+    
+    <target name="dita.out.map.eclipse.index" unless="noMap"
+        if="inner.transform"
+      dita:depends="{dita.map.eclipse.index.pre},dita.map.eclipse.plugin.init,dita.index.eclipsehelp.init"  
+        dita:extension="depends org.dita.dost.platform.InsertDependsAction"
+        description="Build Eclipse Help index file">
+        <echo level="info"> args.eclipsehelp.indexsee = ${args.eclipsehelp.indexsee} </echo>
+        <pipeline message="Extract index term."
+            inputmap="${user.input.file}">
+          <module class="org.dita.dost.module.IndexTermExtractModule">
+            <param name="output" location="${dita.output.dir}/index.xml"/>
+            <param name="targetext" value="${out.ext}"/>
+            <param name="indextype" value="eclipsehelp"/>
+            <param name="indexclass" value="${dita.eclipsehelp.index.class}"/>
+            <param name="eclipse.indexsee" value="${args.eclipsehelp.indexsee}"/>
+            <param name="encoding" value="${args.dita.locale}" if:set="args.dita.locale"/>
+            <param name="defaultLanguage" expression="${default.language}"/>
+          </module>
+        </pipeline>
+    </target>
+
+    <target name="dita.map.eclipse.plugin"
+            unless="noPlugin"
+            depends="dita.map.eclipse.plugin.init" if="old.transform"
+            description="Build Eclipsehelp plugin file">
+      <pipeline>
+        <xslt
+              in="${dita.temp.dir}/${user.input.file}"
+              out="${dita.map.output.dir}/plugin.xml"
+              style="${dita.plugin.org.dita.eclipsehelp.dir}/xsl/map2plugin.xsl">
+            <param name="TOCROOT" expression="${dita.map.filename.root}" />
+            <param name="version"
+                   expression="${args.eclipse.version}"
+                   if:set="args.eclipse.version" />
+            <param name="provider"
+                   expression="${args.eclipse.provider}"
+                   if:set="args.eclipse.provider" />
+            <param name="osgi.symbolic.name"
+                   expression="${args.eclipse.symbolic.name}"
+                   if:set="args.eclipse.symbolic.name"/>
+            <outputproperty value="yes" name="indent"/>
+            <param name="dita.plugin.output"
+                  expression="dita.eclipse.plugin"/>
+          <xmlcatalog refid="dita.catalog"/>
+        </xslt>
+      </pipeline>
+    </target>
+    
+    <target name="dita.out.map.eclipse.plugin"
+        unless="noPlugin"
+        depends="dita.map.eclipse.plugin.init" if="inner.transform"
+        description="Build Eclipsehelp plugin file">
+      <pipeline>  
+        <xslt
+            in="${dita.temp.dir}/${user.input.file}"
+            out="${dita.output.dir}/plugin.xml"
+            style="${dita.plugin.org.dita.eclipsehelp.dir}/xsl/map2plugin.xsl">
+            <param name="TOCROOT" expression="${dita.map.filename.root}" />
+            <param name="version"
+                expression="${args.eclipse.version}"
+                if:set="args.eclipse.version" />
+            <param name="provider"
+                expression="${args.eclipse.provider}"
+                if:set="args.eclipse.provider" />
+            <param name="osgi.symbolic.name"
+                expression="${args.eclipse.symbolic.name}"
+                if:set="args.eclipse.symbolic.name"/>
+            <outputproperty value="yes" name="indent"/>
+            <param name="dita.plugin.output"
+                  expression="dita.eclipse.plugin"/>
+          <xmlcatalog refid="dita.catalog"/>
+        </xslt>
+      </pipeline>
+    </target>
+  
+  <!-- New support for creating Eclipse fragments based on the similar map used to create a plug-in -->
+  
+  
+  
+  <target name="dita.map.eclipse.manifest.file"
+    unless="noPlugin"
+    depends="dita.map.eclipse.plugin.init" if="old.transform"
+    description="Build Eclipsehelp manifest.mf file">
+    <pipeline>
+    <xslt
+      in="${dita.temp.dir}/${user.input.file}"
+      out="${dita.map.output.dir}/META-INF/MANIFEST.MF"
+      style="${dita.plugin.org.dita.eclipsehelp.dir}/xsl/map2plugin.xsl">
+      <param name="version"
+        expression="${args.eclipse.version}"
+        if:set="args.eclipse.version" />
+      <param name="provider"
+        expression="${args.eclipse.provider}"
+        if:set="args.eclipse.provider" />
+      <param name="osgi.symbolic.name"
+        expression="${args.eclipse.symbolic.name}"
+        if:set="args.eclipse.symbolic.name"/>
+      <param name="plugin"
+        expression="${eclipse.plugin}" />
+      <param name="fragment.country" 
+        expression="${args.eclipsehelp.country}" 
+        if:set="eclipse.fragment.country"/>
+      <param name="fragment.lang" 
+        expression="${args.eclipsehelp.language}" 
+        if:set="args.eclipsehelp.language"/>
+      <outputproperty value="text" name="method"/>
+      <param name="dita.plugin.output" 
+        expression="dita.eclipse.manifest"/>
+      <xmlcatalog refid="dita.catalog"/>
+    </xslt>
+    </pipeline>
+  </target>
+  
+  <target name="dita.out.map.eclipse.manifest.file"
+    unless="noPlugin"
+    depends="dita.map.eclipse.plugin.init" if="inner.transform"
+    description="Build Eclipsehelp manifest.mf file">
+    <pipeline>
+    <xslt
+      in="${dita.temp.dir}/${user.input.file}"
+      out="${dita.map.output.dir}/META-INF/MANIFEST.MF"
+      style="${dita.plugin.org.dita.eclipsehelp.dir}/xsl/map2plugin.xsl">
+      <param name="version"
+        expression="${args.eclipse.version}"
+        if:set="args.eclipse.version" />
+      <param name="provider"
+        expression="${args.eclipse.provider}"
+        if:set="args.eclipse.provider" />
+      <param name="osgi.symbolic.name"
+        expression="${args.eclipse.symbolic.name}"
+        if:set="args.eclipse.symbolic.name"/>
+      <param name="plugin"
+        expression="${eclipse.plugin}" />
+      <param name="fragment.country" 
+        expression="${args.eclipsehelp.country}" 
+        if:set="eclipse.fragment.country"/>
+      <param name="fragment.lang" 
+        expression="${args.eclipsehelp.language}" 
+        if:set="args.eclipsehelp.language"/>
+      <outputproperty value="text" name="method"/>
+      <param name="dita.plugin.output" 
+        expression="dita.eclipse.manifest"/>
+      <xmlcatalog refid="dita.catalog"/>
+    </xslt>
+    </pipeline>
+  </target>
+  
+  
+  <target name="dita.map.eclipse.plugin.properties"
+    unless="noPlugin"
+    depends="dita.map.eclipse.plugin.init" if="old.transform"
+    description="Create eclipse plugin.properties file">
+    <pipeline>
+    <xslt
+      in="${dita.temp.dir}/${user.input.file}"
+      out="${dita.output.dir}/plugin.properties"
+      style="${dita.plugin.org.dita.eclipsehelp.dir}/xsl/map2plugin.xsl">
+      <outputproperty value="text" name="method"/>
+      <param name="dita.plugin.output" 
+          expression="dita.eclipse.properties"/>
+      <param name="version"
+          expression="${args.eclipse.version}"
+          if:set="args.eclipse.version" />
+      <param name="provider"
+          expression="${args.eclipse.provider}"
+          if:set="args.eclipse.provider" />
+      <xmlcatalog refid="dita.catalog"/>
+    </xslt>
+    </pipeline>
+  </target>
+  
+  <target name="dita.out.map.eclipse.plugin.properties"
+    unless="noPlugin"
+    depends="dita.map.eclipse.plugin.init" if="inner.transform"
+    description="Create eclipse plugin.properties file">
+    <pipeline>
+    <xslt
+      in="${dita.temp.dir}/${user.input.file}"
+      out="${dita.output.dir}/plugin.properties"
+      style="${dita.plugin.org.dita.eclipsehelp.dir}/xsl/map2plugin.xsl">
+      <outputproperty value="text" name="method"/>
+      <param name="dita.plugin.output" expression="dita.eclipse.properties"/>
+      <param name="version"
+          expression="${args.eclipse.version}"
+          if:set="args.eclipse.version" />
+      <param name="provider"
+          expression="${args.eclipse.provider}"
+          if:set="args.eclipse.provider" />
+      <xmlcatalog refid="dita.catalog"/>
+    </xslt>
+    </pipeline>
+  </target>
+  
+  <target name="dita.map.eclipse.fragment.language.init" if="eclipse.fragment.language"
+    depends="dita.map.eclipse.plugin.init">
+    <property name="fragment.dirname.init" value="nl" />
+    <property name="fragment.dirname" value="${fragment.dirname.init}${file.separator}${args.eclipsehelp.language}"/>
+    <property name="fragment.property.name" value="${args.eclipsehelp.language}"/>
+    <antcall target="dita.map.eclipse.genetrate.fragment"/>
+  </target>
+  
+  <target name="dita.map.eclipse.fragment.language.country.init" if="eclipse.fragment.country"
+    depends="dita.map.eclipse.plugin.init">
+    <property name="fragment.dirname.init" value="nl" />
+    <property name="fragment.dirname" value="${fragment.dirname.init}${file.separator}${args.eclipsehelp.language}${file.separator}${args.eclipsehelp.country}"/>
+    <property name="fragment.property.name" value="${args.eclipsehelp.language}_${args.eclipsehelp.country}"/>
+    <antcall target="dita.map.eclipse.genetrate.fragment"/>
+  </target>
+
+  <target name="dita.map.eclipse.fragment.error" if="eclipse.fragment.error"
+                  depends="dita.map.eclipse.plugin.init">
+              <echo message="The Eclipse Fragment property args.eclipsehelp.language was not set. "/>
+  </target>
+  
+  <target name="dita.map.eclipse.fragment.move.files"
+    if="old.transform">
+    <defaultexcludes add="**/META-INF/**"/>
+    <defaultexcludes add="**/nl/**"/>
+    <delete file="${dita.output.dir}/plugin.xml"/>
+    <delete file="${dita.output.dir}/plugincustomization.ini"/>
+    <move todir="${dita.map.output.dir}/${fragment.dirname}" includeemptydirs="yes">
+      <fileset dir="${dita.map.output.dir}" defaultexcludes="yes">
+        <exclude name="helpData.xml"/>
+        <exclude name="plugin.properties"/>
+        <exclude name="plugin_${fragment.property.name}.properties"/>
+        <exclude name="*.list"/>
+        <exclude name="disabled_book.css"/>
+        <exclude name="narrow_book.css"/>
+        <exclude name="${os}_narrow_book.css"/>
+        <exclude name="book.css"/>
+        <exclude name="plugincustomization.ini"/>
+      </fileset>
+    </move>
+    <move file="${dita.output.dir}/plugin.properties" tofile="${dita.output.dir}/plugin_${fragment.property.name}.properties" failonerror="no"/>
+
+
+  </target>
+  
+  <target name="dita.out.map.eclipse.fragment.move.files"
+    if="inner.transform">
+    <defaultexcludes add="**/META-INF/**"/>
+    <defaultexcludes add="**/nl/**"/>
+    <delete file="${dita.output.dir}/plugin.xml"/>
+    <delete file="${dita.output.dir}/plugincustomization.ini"/>
+    <move todir="${dita.output.dir}/${fragment.dirname}" includeemptydirs="yes">
+      <fileset dir="${dita.output.dir}" defaultexcludes="yes">
+        <exclude name="helpData.xml"/>
+        <exclude name="plugin.properties"/>
+        <exclude name="plugin_${fragment.property.name}.properties"/>
+        <exclude name="*.list"/>
+        <exclude name="disabled_book.css"/>
+        <exclude name="narrow_book.css"/>
+        <exclude name="${os}_narrow_book.css"/>
+        <exclude name="book.css"/>
+        <exclude name="plugincustomization.ini"/>
+      </fileset>
+    </move>
+    <move file="${dita.output.dir}/plugin.properties" tofile="${dita.output.dir}/plugin_${fragment.property.name}.properties" failonerror="no"/>
+  </target>
+  
+  <!--<target name="dita.map.eclipse"
+    depends="dita.map.eclipse.init, 
+    dita.map.eclipse.toc, 
+    dita.map.eclipse.index, 
+    dita.map.eclipse.plugin, 
+    dita.out.map.eclipse.toc, 
+    dita.out.map.eclipse.index, 
+    dita.out.map.eclipse.plugin" />
+  -->
+  
+  <target name="dita.map.eclipse.generate.plugin" 
+    depends="dita.map.eclipse.toc, 
+    dita.map.eclipse.index,
+    dita.map.eclipse.plugin,
+    dita.map.eclipse.plugin.properties, 
+    dita.map.eclipse.manifest.file,
+    dita.out.map.eclipse.plugin.properties, 
+    dita.out.map.eclipse.manifest.file,
+    dita.out.map.eclipse.toc, 
+    dita.out.map.eclipse.index, 
+    dita.out.map.eclipse.plugin" 
+    >
+    
+  </target>
+  
+
+  
+  <target name="dita.map.eclipse.genetrate.fragment" 
+    depends="dita.map.eclipse.toc, 
+    dita.map.eclipse.index, 
+    dita.map.eclipse.plugin.properties, 
+    dita.map.eclipse.manifest.file, 
+    dita.out.map.eclipse.plugin.properties, 
+    dita.out.map.eclipse.manifest.file, 
+    dita.out.map.eclipse.toc, 
+    dita.out.map.eclipse.index, 
+    dita.out.map.eclipse.plugin,
+    dita.map.eclipse.fragment.move.files,
+    dita.out.map.eclipse.fragment.move.files">
+    
+  </target>
+
+  <target name="copy-plugin-files">
+      <!-- Look for files that override behavior in Eclipse plugins -->
+      <copy todir="${dita.output.dir}">
+            <fileset dir="${user.input.dir}">
+              <include name="disabled_book.css"/>
+              <include name="narrow_book.css"/>
+              <include name="${os}_narrow_book.css"/>
+              <include name="book.css"/>
+              <include name="plugincustomization.ini"/>
+              <include name="helpData.xml"/>
+            </fileset>
+
+      </copy>
+  </target>
+  
+  <target name="build.eclipse.jar">
+    <condition property="args.eclipsehelp.jar.name" value="${args.output.base}.jar">
+      <isset property="args.output.base"/>
+    </condition>
+    <jar destfile="${output.dir}/${args.eclipsehelp.jar.name}" basedir="${dita.output.dir}" if:set="args.eclipsehelp.jar.name">
+      <include name="**/*"/>
+    </jar>
+  </target>
+  
+</project>

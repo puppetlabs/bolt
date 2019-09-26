@@ -1,0 +1,15 @@
+// This file is part of the DITA Open Toolkit project.
+//
+// Copyright 2005 IBM Corporation
+//
+// See the accompanying LICENSE file for applicable license.
+
+/* Add space for top level topics */
+.nested0 {
+  margin-top: 1em;
+}
+
+/* div with class=p is used for paragraphs that contain blocks, to keep the XHTML valid */
+.p {
+  margin-top: 1em;
+}

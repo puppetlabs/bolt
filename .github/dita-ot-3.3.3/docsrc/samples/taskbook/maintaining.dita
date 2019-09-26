@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<topic id="maintaining" xml:lang="en-us">
+  <title>Maintaining</title>
+  <shortdesc>You maintain your solution to ensure that all components are operating at maximum efficiency.</shortdesc>
+  <body>
+    <p>Maintenance is a task that you perform along with configuration to get the most from your solution. </p>
+  </body>
+</topic>

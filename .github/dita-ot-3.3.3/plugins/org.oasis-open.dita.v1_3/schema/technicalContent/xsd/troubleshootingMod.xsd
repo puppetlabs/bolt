@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Troubleshooting Domain                                      -->
+<!-- VERSION:   1.3                                              -->
+<!-- DATE:      March 2014                                       -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Troubleshooting//EN"         -->
+<!--      Delivered as file "troubleshooting.mod"                                -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for the DITA Troubleshootings                    -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2014                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2014                    -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!--=============================================================-->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/"
+              schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.3"/>
+
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic troubleshooting++task) (topic task)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+
+   <xs:group name="section.blocks.only.cnt">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.block"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="sectiondiv"/>
+            <xs:group ref="txt.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="troubleshooting-info-types">
+      <xs:choice>
+         <xs:group ref="troubleshooting"/>
+         <xs:group ref="info-types"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="troubleshooting">
+      <xs:annotation>
+         <xs:documentation>
+            
+    Category: Troubleshooting elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="troubleshooting.class">
+               <xs:attribute ref="class" default="- topic/topic troubleshooting/troubleshooting "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="troubleshooting.class">
+      <xs:sequence>
+         <xs:group ref="troubleshooting.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="troubleshooting.attributes"/>
+   </xs:complexType>
+   <xs:group name="troubleshooting.content">
+      <xs:sequence>
+         <xs:group ref="title"/>
+         <xs:group ref="titlealts" minOccurs="0"/>
+         <xs:choice minOccurs="0">
+            <xs:group ref="abstract"/>
+            <xs:group ref="shortdesc"/>
+         </xs:choice>
+         <xs:group ref="prolog" minOccurs="0"/>
+         <xs:group ref="troublebody" minOccurs="0"/>
+         <xs:group ref="related-links" minOccurs="0"/>
+         <xs:group ref="troubleshooting-info-types"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="troubleshooting.attributes">
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="troubleshooting.attlist">
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+   </xs:attributeGroup>
+   <xs:element name="troublebody">
+      <xs:annotation>
+         <xs:documentation>
+            
+    Category: Troubleshooting elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="troublebody.class">
+               <xs:attribute ref="class" default="- topic/body troubleshooting/troublebody "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="troublebody.class">
+      <xs:sequence>
+         <xs:group ref="troublebody.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="troublebody.attributes"/>
+   </xs:complexType>
+   <xs:group name="troublebody.content">
+      <xs:sequence>
+         <xs:group ref="condition" minOccurs="0"/>
+         <xs:group ref="troubleSolution" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="troublebody.attributes">
+      <xs:attributeGroup ref="id-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="base" type="xs:string"/>
+      <xs:attributeGroup ref="base-attribute-extensions"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="cause">
+      <xs:annotation>
+         <xs:documentation>
+            
+    Category: Troubleshooting elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="cause.class">
+               <xs:attribute ref="class" default="- topic/section troubleshooting/cause "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="cause.class">
+      <xs:sequence>
+         <xs:group ref="cause.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="cause.attributes"/>
+   </xs:complexType>
+   <xs:group name="cause.content">
+      <xs:sequence>
+         <xs:group ref="section.blocks.only.cnt" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="cause.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="condition">
+      <xs:annotation>
+         <xs:documentation>
+            
+    Category: Troubleshooting elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="condition.class">
+               <xs:attribute ref="class" default="- topic/section troubleshooting/condition "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="condition.class">
+      <xs:sequence>
+         <xs:group ref="condition.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="condition.attributes"/>
+   </xs:complexType>
+   <xs:group name="condition.content">
+      <xs:sequence>
+         <xs:group ref="section.blocks.only.cnt" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="condition.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="remedy">
+      <xs:annotation>
+         <xs:documentation>
+            
+    Category: Troubleshooting elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="remedy.class">
+               <xs:attribute ref="class" default="- topic/section troubleshooting/remedy "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="remedy.class">
+      <xs:sequence>
+         <xs:group ref="remedy.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="remedy.attributes"/>
+   </xs:complexType>
+   <xs:group name="remedy.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="responsibleParty" minOccurs="0"/>
+         <xs:choice>
+            <xs:group ref="steps"/>
+            <xs:group ref="steps-unordered"/>
+            <xs:group ref="steps-informal"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="remedy.attributes">
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="responsibleParty">
+      <xs:annotation>
+         <xs:documentation>
+            
+    Category: Troubleshooting elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="responsibleParty.class">
+               <xs:attribute ref="class" default="- topic/p troubleshooting/responsibleParty "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="responsibleParty.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="responsibleParty.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="responsibleParty.attributes"/>
+   </xs:complexType>
+   <xs:group name="responsibleParty.content">
+      <xs:sequence>
+         <xs:group ref="para.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="responsibleParty.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="troubleSolution">
+      <xs:annotation>
+         <xs:documentation>
+            
+    Category: Troubleshooting elements
+  </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="troubleSolution.class">
+               <xs:attribute ref="class" default="- topic/bodydiv troubleshooting/troubleSolution "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="troubleSolution.class">
+      <xs:sequence>
+         <xs:group ref="troubleSolution.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="troubleSolution.attributes"/>
+   </xs:complexType>
+   <xs:group name="troubleSolution.content">
+      <xs:sequence>
+         <xs:sequence>
+            <xs:group ref="cause" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="remedy" minOccurs="0" maxOccurs="unbounded"/>
+         </xs:sequence>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="troubleSolution.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file is part of the DITA learning and training content 
+     specialization working design. It is a work-in-progress by
+     the OASIS DITA learning and training content specialization 
+     sub-committee.-->
+<!--             (C) Copyright OASIS Open 2007, 2009                    -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA learningPlan XSD Group Definition         -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      October 2007                                          -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA Learning Plan     -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             October 2007                                          -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+     <xs:group name="learningPlan">
+          <xs:sequence>
+               <xs:element ref="learningPlan"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="learningPlanbody">
+          <xs:sequence>
+               <xs:element ref="learningPlanbody"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcProject">
+          <xs:sequence>
+               <xs:element ref="lcProject"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcClient">
+          <xs:sequence>
+               <xs:element ref="lcClient"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcPlanTitle">
+          <xs:sequence>
+               <xs:element ref="lcPlanTitle"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcCIN">
+          <xs:sequence>
+               <xs:element ref="lcCIN"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcModDate">
+          <xs:sequence>
+               <xs:element ref="lcModDate"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcDelivDate">
+          <xs:sequence>
+               <xs:element ref="lcDelivDate"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcPlanSubject">
+          <xs:sequence>
+               <xs:element ref="lcPlanSubject"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcPlanDescrip">
+          <xs:sequence>
+               <xs:element ref="lcPlanDescrip"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcPlanPrereqs">
+          <xs:sequence>
+               <xs:element ref="lcPlanPrereqs"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcNeedsAnalysis">
+          <xs:sequence>
+               <xs:element ref="lcNeedsAnalysis"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcOrganizational">
+          <xs:sequence>
+               <xs:element ref="lcOrganizational"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcGeneralDescription">
+          <xs:sequence>
+               <xs:element ref="lcGeneralDescription"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcGoals">
+          <xs:sequence>
+               <xs:element ref="lcGoals"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcNeeds">
+          <xs:sequence>
+               <xs:element ref="lcNeeds"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcValues">
+          <xs:sequence>
+               <xs:element ref="lcValues"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcOrgConstraints">
+          <xs:sequence>
+               <xs:element ref="lcOrgConstraints"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcPlanAudience">
+          <xs:sequence>
+               <xs:element ref="lcPlanAudience"/>
+          </xs:sequence>
+     </xs:group>
+     
+     <xs:group name="lcEdLevel">
+          <xs:sequence>
+               <xs:element ref="lcEdLevel"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcAge">
+          <xs:sequence>
+               <xs:element ref="lcAge"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcBackground">
+          <xs:sequence>
+               <xs:element ref="lcBackground"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcSkills">
+          <xs:sequence>
+               <xs:element ref="lcSkills"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcKnowledge">
+          <xs:sequence>
+               <xs:element ref="lcKnowledge"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcMotivation">
+          <xs:sequence>
+               <xs:element ref="lcMotivation"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcSpecChars">
+          <xs:sequence>
+               <xs:element ref="lcSpecChars"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcWorkEnv">
+          <xs:sequence>
+               <xs:element ref="lcWorkEnv"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcWorkEnvDescription">
+          <xs:sequence>
+               <xs:element ref="lcWorkEnvDescription"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcPlanResources">
+          <xs:sequence>
+               <xs:element ref="lcPlanResources"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcProcesses">
+          <xs:sequence>
+               <xs:element ref="lcProcesses"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcTask">
+          <xs:sequence>
+               <xs:element ref="lcTask"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcTaskItem">
+          <xs:sequence>
+               <xs:element ref="lcTaskItem"/>
+          </xs:sequence>
+     </xs:group>
+  
+     <xs:group name="lcAttitude">
+          <xs:sequence>
+               <xs:element ref="lcAttitude"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcGapAnalysis">
+          <xs:sequence>
+               <xs:element ref="lcGapAnalysis"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcGapItem">
+          <xs:sequence>
+               <xs:element ref="lcGapItem"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcPlanObjective">
+          <xs:sequence>
+               <xs:element ref="lcPlanObjective"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcJtaItem">
+          <xs:sequence>
+               <xs:element ref="lcJtaItem"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcGapItemDelta">
+          <xs:sequence>
+               <xs:element ref="lcGapItemDelta"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcIntervention">
+          <xs:sequence>
+               <xs:element ref="lcIntervention"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcInterventionItem">
+          <xs:sequence>
+               <xs:element ref="lcInterventionItem"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcLearnStrat">
+          <xs:sequence>
+               <xs:element ref="lcLearnStrat"/>
+          </xs:sequence>
+     </xs:group>
+     
+     <xs:group name="lcAssessment">
+          <xs:sequence>
+               <xs:element ref="lcAssessment"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcDelivery">
+          <xs:sequence>
+               <xs:element ref="lcDelivery"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcTechnical">
+          <xs:sequence>
+               <xs:element ref="lcTechnical"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcLMS">
+          <xs:sequence>
+               <xs:element ref="lcLMS"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcNoLMS">
+          <xs:sequence>
+               <xs:element ref="lcNoLMS"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcHandouts">
+          <xs:sequence>
+               <xs:element ref="lcHandouts"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcClassroom">
+          <xs:sequence>
+               <xs:element ref="lcClassroom"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcOJT">
+          <xs:sequence>
+               <xs:element ref="lcOJT"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcConstraints">
+          <xs:sequence>
+               <xs:element ref="lcConstraints"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcW3C">
+          <xs:sequence>
+               <xs:element ref="lcW3C"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcPlayers">
+          <xs:sequence>
+               <xs:element ref="lcPlayers"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcGraphics">
+          <xs:sequence>
+               <xs:element ref="lcGraphics"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcViewers">
+          <xs:sequence>
+               <xs:element ref="lcViewers"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcResolution">
+          <xs:sequence>
+               <xs:element ref="lcResolution"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcFileSizeLimitations">
+          <xs:sequence>
+               <xs:element ref="lcFileSizeLimitations"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcDownloadTime">
+          <xs:sequence>
+               <xs:element ref="lcDownloadTime"/>
+          </xs:sequence>
+     </xs:group>
+     <xs:group name="lcSecurity">
+          <xs:sequence>
+               <xs:element ref="lcSecurity"/>
+          </xs:sequence>
+     </xs:group>
+
+</xs:schema>

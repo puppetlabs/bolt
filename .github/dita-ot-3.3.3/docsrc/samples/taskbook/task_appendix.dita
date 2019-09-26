@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<topic id="task_appendix" xml:lang="en-us">
+  <title>Sample Appendix</title>
+  <shortdesc>This appendix describes things that you rarely need to know.</shortdesc>
+  <body>
+    <p>You can consult this section when you need detailed information about a specific component.</p>
+  </body>
+</topic>

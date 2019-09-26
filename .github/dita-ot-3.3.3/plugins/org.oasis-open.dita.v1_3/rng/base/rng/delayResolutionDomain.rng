@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Delay Resolution Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Delayed Resolution Domain                   
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Define elements and specialization attributes    
+            for Delayed Resolution Domain                    
+                                                             
+ORIGINAL CREATION DATE:                                      
+            February 2008                                    
+                                                             
+            (C) Copyright OASIS Open 2008, 2009.             
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+=============================================================
+    </headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>delay-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Delayed Resolution Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Delayed Resolution Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:delayResolutionDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:delayResolutionDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:delayResolutionDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic delay-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+
+
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="delay-d-keywords">
+      <ref name="exportanchors.element"/>
+    </define>
+    <define name="keywords" combine="choice">
+      <ref name="delay-d-keywords"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="exportanchors">
+      <ref name="exportanchors.element"/>
+    </define>
+    <define name="anchorid">
+      <ref name="anchorid.element"/>
+    </define>
+    <define name="anchorkey">
+      <ref name="anchorkey.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation>LONG NAME: Export Anchor List</a:documentation>
+      <define name="exportanchors.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="anchorid"/>
+            <ref name="anchorkey"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="exportanchors.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <define name="exportanchors.element">
+        <a:documentation xml:space="preserve">The &lt;exportanchors> element is used to delay 
+        conref resolution within DITA documents. This allows you to 
+        process or display DITA content in a way that will resolve only some
+        of the conref values in that content, while remaining values are 
+        left for later resolution. The element contains a list of IDs or 
+        keys that should not be resolved during the initial
+        preparation of the content for display; those IDs and keys will be 
+        preserved after that preparation, as will the conref relationship itself.</a:documentation>
+        <element name="exportanchors" dita:longName="Export Anchor List">
+          <ref name="exportanchors.attlist"/>
+          <ref name="exportanchors.content"/>
+        </element>
+      </define>
+      <define name="exportanchors.attlist" combine="interleave">
+        <ref name="exportanchors.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Anchor ID</a:documentation>
+      <define name="anchorid.content">
+        <empty/>
+      </define>
+      <define name="anchorid.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <attribute name="id">
+          <data type="NMTOKEN"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="anchorid.element">
+        <a:documentation xml:space="preserve">The &lt;anchorid> element allows an author to 
+        define a conref target that will be resolved dynamically when 
+        rendered for an end user of the content. This element is useful when
+        doing an initial process of the DITA content prior to final rendering 
+        of the content; it causes specified IDs to be preserved after that 
+        process, and conref relationships that reuse the
+        element will not be resolved during the initial process.</a:documentation>
+        <element name="anchorid" dita:longName="Anchor ID">
+          <ref name="anchorid.attlist"/>
+          <ref name="anchorid.content"/>
+        </element>
+      </define>
+      <define name="anchorid.attlist" combine="interleave">
+        <ref name="anchorid.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Anchor Key</a:documentation>
+      <define name="anchorkey.content">
+        <empty/>
+      </define>
+      <define name="anchorkey.attributes">
+        <attribute name="keyref"/>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="anchorkey.element">
+        <a:documentation xml:space="preserve">The &lt;anchorkey> element allows an author to 
+        define a conref target that will be resolved dynamically when 
+        rendered for an end user of the content. This element is useful when
+        doing an initial process of the DITA content prior to final rendering 
+        of the content; it allows specified keys to be preserved after that 
+        process, and conref relationships which use that key
+        will not be resolved during that initial process. </a:documentation>
+        <element name="anchorkey" dita:longName="Anchor Key">
+          <ref name="anchorkey.attlist"/>
+          <ref name="anchorkey.content"/>
+        </element>
+      </define>
+      <define name="anchorkey.attlist" combine="interleave">
+        <ref name="anchorkey.attributes"/>
+      </define>
+
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+
+    <define name="exportanchors.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keywords delay-d/exportanchors "/>
+      </optional>
+    </define>
+    <define name="anchorid.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword delay-d/anchorid "/>
+      </optional>
+    </define>
+    <define name="anchorkey.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword delay-d/anchorkey "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

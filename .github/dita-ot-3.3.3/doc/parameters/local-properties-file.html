@@ -1,0 +1,36 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="A local.properties file in the root directory of the DITA-OT installation can be used to override the default values of various DITA-OT parameters."><meta name="DC.subject" content="files, local.properties, local.properties file, Windows, RenderX, Antenna House, command line, file, Java, PDF, formatter, Apache FOP, Antenna House"><meta name="keywords" content="files, local.properties, local.properties file, Windows, RenderX, Antenna House, command line, file, Java, PDF, formatter, Apache FOP, Antenna House"><meta name="DC.relation" scheme="URI" content="../parameters/configuration-properties.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="local.properties"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>The local.properties file</title></head><body id="local.properties"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a><ul><li><a href="../parameters/dita-command-arguments.html">DITA command arguments</a></li><li><a href="../parameters/parameters_intro.html">DITA-OT parameters</a></li><li><a href="../parameters/configuration-properties.html">Configuration properties</a><ul><li class="active"><a href="../parameters/local-properties-file.html">local.properties</a></li><li><a href="../parameters/plugin-properties-file.html">plugin.properties</a></li><li><a href="../parameters/configuration-properties-file.html">configuration.properties</a></li><li><a href="../parameters/internal-ant-properties.html">Internal Ant properties</a></li></ul></li></ul></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">The <span class="ph filepath">local.properties</span> file</h1>
+  
+  
+  
+  <div class="body refbody"><p class="shortdesc">A <span class="ph filepath">local.properties</span> file in the root directory of the DITA-OT installation can be used
+    to override the default values of various DITA-OT parameters.</p>
+    <div class="example">
+      <p class="p">For example, if you always use the same rendering engine to produce PDF output for all of your projects, you
+        could create a <span class="ph filepath">local.properties</span> file in the root directory of your DITA-OT installation to
+        set the <span class="keyword parmname">pdf.formatter</span> parameter and additional options for the XSL processor:</p>
+      <pre class="pre codeblock language-properties normalize-space show-line-numbers show-whitespace"><code># Use RenderX XEP Engine for PDF output
+pdf.formatter = xep
+
+# Specify the user configuration file for RenderX
+custom.xep.config = /path/to/custom.config</code></pre>
+      <p class="p">Backslash “\” characters in .properties files must be escaped with a second backslash as “\\”. If you use
+        Antenna House Formatter on a Windows system, for example, you would set the path to the command using a
+        properties file entry like this:</p>
+      <pre class="pre codeblock language-properties normalize-space show-line-numbers show-whitespace"><code># Use Antenna House Formatter for PDF output
+pdf.formatter = ah
+
+# Specify the path to the Antenna House Formatter command
+axf.cmd=C:\\Program Files\\Antenna House\\AHFormatterV62</code></pre>
+    </div>
+    <section class="section">
+      <div class="note note note_note"><span class="note__title">Note:</span> This file can only be used to set Ant property values that can be passed as argument parameters to the
+        command line. The DITA-OT Java code does not read this file.</div>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../parameters/configuration-properties.html" title="DITA-OT uses .properties files and internal properties that store configuration settings for the toolkit and its plug-ins. Configuration properties are available to both Ant and Java processes, but unlike argument properties, they cannot be set at run time.">Configuration properties</a></div></div></nav></article></main></body></html>

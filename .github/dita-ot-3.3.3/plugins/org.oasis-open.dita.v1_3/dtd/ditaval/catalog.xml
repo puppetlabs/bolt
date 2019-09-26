@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<!--DITA BASE-->
+
+   <public publicId="-//OASIS//DTD DITA 1.3 DITAVAL//EN" uri="dtd/ditaval.dtd"/>
+   <public publicId="-//OASIS//DTD DITA 1.x DITAVAL//EN" uri="dtd/ditaval.dtd"/>
+   <public publicId="-//OASIS//DTD DITA DITAVAL//EN" uri="dtd/ditaval.dtd"/>
+</catalog>

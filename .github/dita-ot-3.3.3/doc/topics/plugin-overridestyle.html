@@ -1,0 +1,54 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="You can override specific XSLT-processing steps in both the pre-processing pipeline and certain DITA-OT transformations."><meta name="DC.subject" content="plug-ins, XSLT, preprocessing, XHTML"><meta name="keywords" content="plug-ins, XSLT, preprocessing, XHTML"><meta name="DC.relation" scheme="URI" content="../topics/plugin-applications.html"><meta name="DC.relation" scheme="URI" content="../extension-points/plugin-extension-points-xslt-import.html"><meta name="DC.relation" scheme="URI" content="../topics/plugins-installing.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="plugin-overridestyle"><meta name="DC.language" content="en-US"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Overriding an XSLT-processing step</title></head><body id="plugin-overridestyle"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a><ul><li><a href="../topics/plugins-installing.html">Installing plug-ins</a></li><li><a href="../topics/plugins-removing.html">Removing plug-ins</a></li><li><a href="../topics/plugins-registry.html">Plug-in registry</a></li><li><a href="../topics/plugin-configfile.html">Plug-in descriptor file</a></li><li><a href="../topics/plugin-dependencies.html">Plug-in dependencies</a></li><li><a href="../topics/plugin-applications.html">Plug-in applications</a><ul><li><a href="../topics/plugin-xmlcatalog.html">Extending an XML catalog file</a></li><li><a href="../topics/plugin-anttarget.html">Adding a new target to the Ant build process</a></li><li><a href="../topics/plugin-antpreprocess.html">Adding an Ant target to the pre-processing pipeline</a></li><li><a href="../topics/plugin-newtranstype.html">Adding a new transformation type</a></li><li class="active"><a href="../topics/plugin-overridestyle.html">Overriding an XSLT-processing step</a></li><li><a href="../topics/using-plugin-URI-extension.html">Referencing files from other plug-ins</a></li><li><a href="../topics/plugin-xsltparams.html">Adding parameters to existing XSLT steps</a></li><li><a href="../topics/plugin-javalib.html">Adding a Java library to the classpath</a></li><li><a href="../topics/plugin-messages.html">Adding new diagnostic messages</a></li><li><a href="../topics/plugin-newextensions.html">Creating a new plug-in extension point</a></li><li><a href="../topics/implement-saxon-customizations.html">Adding Saxon customizations</a></li></ul></li><li><a href="../topics/plugin-sample.html">Example plugin.xml file</a></li><li><a href="../topics/plugin-best-practices.html">Best practices</a></li><li><a href="../topics/plugin-coding-conventions.html">Coding conventions</a></li></ul></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Overriding an XSLT-processing step</h1>
+  
+  
+  <div class="body taskbody"><p class="shortdesc">You can override specific XSLT-processing steps in both the pre-processing pipeline and certain DITA-OT
+    transformations.</p>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">Develop an XSL file that contains the XSL override.</span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Construct a <span class="ph filepath">plugin.xml</span> file that contains the following content:</span>
+        <div class="itemgroup info"><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;plugin id="<var class="keyword varname">plugin-id</var>"&gt;
+  &lt;feature extension="<var class="keyword varname">extension-point</var>" file="<var class="keyword varname">relative-path</var>"/&gt;
+&lt;/plugin&gt;</code></pre>where:
+          <ul class="ul">
+            <li class="li"><var class="keyword varname">plugin-id</var> is the plug-in identifier, for example, com.example.brandheader.</li>
+            <li class="li"><var class="keyword varname">extension-point</var> is the DITA-OT extension point, for example,<code class="ph codeph">
+                dita.xsl.xhtml</code>. This indicates the DITA-OT processing step that the XSL override applies
+              to.</li>
+            <li class="li"><var class="keyword varname">relative-path</var> is the relative path and name of the XSLT file, for example,
+                <span class="ph filepath">xsl/header.xsl</span>. </li>
+          </ul></div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Install the plug-in.</span>
+      </li></ol></section>
+    <section class="section result"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Results</h2></div>The plug-in installer adds an XSL import statement to the default DITA-OT code, so that the XSL override
+      becomes part of the normal build.</section>
+    <section class="example"><h2 class="title sectiontitle">Example: Overriding XHTML header processing</h2>
+      
+      <p class="p">The following two files represent a complete, simple style plug-in.</p>
+      <p class="p">The <span class="ph filepath">plugin.xml</span> file declares an XSLT file that extends XHTML processing:</p>
+      <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;plugin id="com.example.brandheader"&gt;
+  &lt;feature extension="dita.xsl.xhtml" file="xsl/header.xsl"/&gt;
+&lt;/plugin&gt;</code></pre>
+      <p class="p">The <span class="ph filepath">xsl/header.xsl</span> XSLT file referenced in <span class="ph filepath">plugin.xml</span> overrides the
+        default header processing to add a banner:</p>
+      <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;xsl:stylesheet version="1.0" 
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt;
+  &lt;xsl:template name="gen-user-header"&gt;
+    &lt;div&gt;&lt;img src="http://www.example.com/company_banner.jpg" 
+              alt="Example Company Banner"/&gt;&lt;/div&gt;
+  &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;</code></pre>
+    </section>
+    
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/plugin-applications.html" title="Plug-ins allow you to extend the functionality of DITA-OT. This might entail adding support for specialized document types, integrating processing overrides, or defining new output transformations.">Plug-in applications</a></div></div><div class="linklist relinfo reltasks"><strong>Related tasks</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/plugins-installing.html" title="Use the dita command to install a plug-in.">Installing plug-ins</a></li></ul></div><div class="linklist relinfo relref"><strong>Related reference</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../extension-points/plugin-extension-points-xslt-import.html" title="You can use these extension points to override XSLT processing steps in pre-processing and certain transformation types. The value of the file attribute in the feature element specifies a relative path to an XSL file in the current plug-in. The plug-in installer adds a XSL import statement to the default DITA-OT code, so that the XSL override becomes part of the normal build.">XSLT-import extension points</a></li></ul></div></nav></article></main></body></html>

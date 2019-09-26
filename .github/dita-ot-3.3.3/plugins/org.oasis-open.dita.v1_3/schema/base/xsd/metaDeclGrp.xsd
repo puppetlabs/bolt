@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Metadata                                    -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Metadata//EN"                -->
+<!--      Delivered as file "metaDecl.mod"                            -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for the DITA XML Metadata             -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2001                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2001, 2004.        -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2005.11.15 RDA: Corrected the "Delivered as" system ID    -->
+<!--   2006.06.06 RDA: Move indexterm into commonElements        -->
+<!--   2006.06.07 RDA: Make universal attributes universal       -->
+<!--                     (DITA 1.1 proposal #12)                 -->
+<!--   2006.11.30 RDA: Add -dita-use-conref-target to enumerated -->
+<!--                     attributes                              -->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       -->
+<!--   2008.01.28 RDA: Removed enumerations for attributes:      -->
+<!--                   author/@type, copyright/@type,            -->
+<!--                   permissions/@view, audience/@type,        -->
+<!--                   audience/@job, audience/@experiencelevel  -->
+<!--   2008.01.28 RDA: Moved <metadata> defn. here from topic.mod-->
+<!--   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  -->
+<!--   2008.02.12 RDA: Add ph to source                          -->
+<!--   2008.02.12 RDA: Add @format, @scope, and @type to         -->
+<!--                   publisher, source                         -->
+<!--   2008.02.12 RDA: Add @format, @scope, to author            -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--   2009.03.09 RDA: Corrected public ID in comments to use    -->
+<!--                   ELEMENTS instead of ENTITIES              -->
+<!--=============================================================-->
+<!--                                                             -->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:group name="author">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="author"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="source">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="source"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="publisher">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="publisher"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="copyright">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="copyright"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="copyryear">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="copyryear"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="copyrholder">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="copyrholder"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="critdates">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="critdates"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="created">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="created"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="revised">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="revised"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="permissions">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="permissions"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="category">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="category"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="metadata">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="metadata"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="audience">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="audience"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="keywords">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="keywords"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="prodinfo">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="prodinfo"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="prodname">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="prodname"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="vrmlist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="vrmlist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="vrm">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="vrm"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="brand">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="brand"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="series">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="series"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="platform">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="platform"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="prognum">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="prognum"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="featnum">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="featnum"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="component">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="component"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="othermeta">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="othermeta"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="resourceid">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="resourceid"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+</xs:schema>

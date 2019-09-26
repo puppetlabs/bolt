@@ -1,0 +1,42 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="topic"><meta name="description" content="Markdown is a lightweight markup language that allows you to write using an easy-to-read plain text format and convert to structurally valid markup as necessary."><meta name="DC.subject" content=", format, authoring formats, Markdown, CommonMark"><meta name="keywords" content=", format, authoring formats, Markdown, CommonMark"><meta name="DC.relation" scheme="URI" content="../topics/alternative-input-formats.html"><meta name="DC.relation" scheme="URI" content="../topics/lwdita-input.html"><meta name="DC.relation" scheme="URI" content="../topics/markdown-dita-syntax-reference.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="markdown-input"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Markdown content</title></head><body id="markdown-input"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a><ul><li class="active"><a href="../topics/markdown-input.html">Markdown content</a></li><li><a href="../topics/lwdita-input.html">Lightweight DITA</a></li><li><a href="../topics/markdown-dita-syntax-reference.html">Markdown DITA syntax</a></li></ul></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Markdown content</h1>
+  
+  
+  <div class="body"><p class="shortdesc">
+    <a class="xref" href="https://daringfireball.net/projects/markdown/" target="_blank">Markdown</a> is a lightweight markup language that allows you to write using an easy-to-read plain text
+    format and convert to structurally valid markup as necessary.</p>
+    <p class="p">In the words of its creators:</p>
+
+    <blockquote class="lq">“The overriding design goal for Markdown’s formatting syntax is to make it as readable as possible. The idea is
+      that a Markdown-formatted document should be publishable as-is, as plain text, without looking like it’s been
+      marked up with tags or formatting instructions.”</blockquote>
+
+    <p class="p">DITA Open Toolkit now allows you to use Markdown files directly in topic references and export DITA content as
+      Markdown.</p>
+
+    <p class="p">These features enable lightweight authoring scenarios that allow subject matter experts to contribute to DITA
+      publications without writing in XML, and support publishing workflows that include DITA content in Markdown-based
+      publishing systems.</p>
+
+    <section class="section"><h2 class="title sectiontitle">Adding Markdown topics</h2>
+      
+      <p class="p">To add a Markdown topic to a DITA publication, create a topic reference in your map and set the
+          <code class="keyword markupname xmlatt">@format</code> attribute to <code class="ph codeph">markdown</code> so the toolkit will recognize the source file
+        as Markdown and convert it to DITA:</p>
+      <div class="p"><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd"&gt;
+&lt;map&gt;
+  &lt;topicref href="markdown-dita-topic.md" <strong class="ph b">format="markdown"</strong>/&gt;
+&lt;/map&gt;</code></pre></div>
+      <p class="p">The <code class="ph codeph">markdown</code> format uses a relatively lenient document parsing approach to support a wide
+        range of content and Markdown syntax constructs. </p>
+      <div class="note note note_note"><span class="note__title">Note:</span> The Markdown support is based on
+        <a class="xref" href="http://commonmark.org" target="_blank">CommonMark</a>, a strongly defined, highly compatible specification of Markdown.</div>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/alternative-input-formats.html" title="DITA-OT³ supports several alternative input formats in addition to standard DITA XML, including Markdown and the proposed XDITA, MDITA and HDITA authoring formats currently in development for Lightweight DITA.">Alternative authoring formats</a></div></div><div class="linklist relinfo"><strong>Related information</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/lwdita-input.html" title="DITA-OT provides preview support for the authoring formats proposed for Lightweight DITA, or “LwDITA”. The XDITA, MDITA and HDITA formats are alternative representations of DITA content in XML, Markdown and HTML5.">Preview support for Lightweight DITA</a></li><li class="linklist"><a class="link" href="../topics/markdown-dita-syntax-reference.html" title="Markdown DITA uses CommonMark as the underlying markup language.">Markdown DITA syntax reference</a></li></ul></div></nav></article></main></body></html>

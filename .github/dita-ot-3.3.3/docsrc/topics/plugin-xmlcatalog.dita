@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="plugin-xmlcatalog" xml:lang="en-US">
+  <title>Extending an XML catalog file</title>
+  <shortdesc>You can update either the main DITA-OT XML catalog or the XML catalog that is used by the PDF plug-in. This
+    enables DITA-OT to support new specializations and document-type shells.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>deprecated features<indexterm><parmname>dita.specialization.catalog</parmname></indexterm></indexterm>
+        <indexterm>DITA<indexterm>specializations</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>DITA specializations</indexterm></indexterm>
+        <indexterm>OASIS</indexterm>
+        <indexterm>catalog<indexterm>extending</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>You can use the <parmname>dita.specialization.catalog.relative</parmname> and
+          <parmname>org.dita.pdf2.catalog.relative</parmname> extension points to update the DITA-OT catalog files.</p>
+      <note type="remember">The <parmname>dita.specialization.catalog</parmname> extension is deprecated. Use
+          <parmname>dita.specialization.catalog.relative</parmname> instead.</note>
+    </context>
+    <steps>
+      <step>
+        <cmd>Using the OASIS catalog format, create an XML catalog file that contains only the new values that you want
+          to add to a DITA-OT catalog file.</cmd>
+      </step>
+      <step>
+        <cmd>Create a <filepath>plugin.xml</filepath> file that contains the following content:</cmd>
+        <info><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="<varname>plugin-id</varname>">
+  &lt;feature extension="<varname>extension-point</varname>" file="<varname>file</varname>"/>
+&lt;/plugin></codeblock>where:
+          <ul>
+            <li><varname>plugin-id</varname> is the plug-in identifier, for example,
+                <codeph>com.example.catalog</codeph>.</li>
+            <li><varname>extension-point</varname> is either <parmname>dita.specialization.catalog.relative</parmname>
+              or <parmname>org.dita.pdf2.catalog.relative</parmname>.</li>
+            <li><varname>file</varname> is the name of the new catalog file, for example,
+                <filepath>catalog-dita.xml</filepath>. </li>
+          </ul></info>
+      </step>
+      <step>
+        <cmd>Save the new XML catalog file to your plug-in. Be sure that the local file references are relative to the
+          location of the catalog and plug-in.</cmd>
+      </step>
+      <step>
+        <cmd>Install the plug-in.</cmd>
+      </step>
+    </steps>
+    <result>The catalog entries inside of the new catalog file are added to the core DITA-OT catalog file.</result>
+    <example>
+      <title>Example</title>
+      <p>This example assumes that <filepath>catalog-dita.xml</filepath> contains an OASIS catalog for any document-type
+        shells inside this plug-in. The catalog entries in <filepath>catalog-dita.xml</filepath> are relative to the
+        catalog itself; when the plug-in is installed, they are added to the core DITA-OT catalog (with the correct
+        path).</p>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="com.example.catalog">
+  &lt;feature extension="dita.specialization.catalog.relative"
+           file="catalog-dita.xml"/>
+&lt;/plugin></codeblock>
+    </example>
+  </taskbody>
+</task>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="et-ee">        <!-- Estonian -->
+  <str name="Figure">Joonis</str>
+  <str name="Table">Tabel</str>
+  <str name="Next topic">Järgmine teema</str>
+  <str name="Previous topic">Eelmine teema</str>
+  <str name="Parent topic">Peateema</str>
+  <str name="Required cleanup">Puhastus nõutav</str>
+  <str name="Draft comment">Mustandi kommentaar</str>
+  <str name="Option">Suvand</str>
+  <str name="Description">Kirjeldus</str>
+  <str name="Optional">Mittenõutav</str>
+  <str name="Required">Nõutav</str>
+  <str name="Skip visual syntax diagram">Jäta süntaksidiagramm vahele</str>
+  <str name="Read syntax diagram">Loe süntaksidiagrammi</str>
+  <str name="Start of change">Muudatuse algus</str>
+  <str name="End of change">Muudatuse lõpp</str>
+  <str name="Index">Register</str>
+  <str name="Special characters">Erimärgid</str>
+  <str name="Numerics">Numbrid</str>
+  <str name="End notes">Lõpumärkused</str>
+  <str name="Artwork">Pilt</str>
+  <str name="Syntax">Süntaks</str>
+  <str name="Type">Tüüp</str>
+  <str name="Value">Väärtus</str>
+  <str name="Note">Märkus</str>
+  <str name="Notes">Märkused</str>
+  <str name="Tip">Soovitus</str>
+  <str name="Fastpath">Kiirtee</str>
+  <str name="Important">Tähtis</str>
+  <str name="Attention">Tähelepanu</str>
+  <str name="Caution">ETTEVAATUST</str>
+  <str name="Danger">OHT</str>
+  <str name="Remember">Pidage meeles</str>
+  <str name="Restriction">Piirang</str>
+  <str name="Trouble">Probleem</str>
+  <str name="Warning">Hoiatus</str>
+  <str name="Contents">Sisukord</str>
+  <str name="Related concepts">Seostuvad mõisted</str>
+  <str name="Related tasks">Seostuvad tegevused</str>
+  <str name="Related reference">Seostuv viide</str>
+  <str name="Related information">Seostuv teave</str>
+  <str name="Prerequisite">Eeltingimus</str>
+  <str name="Prerequisites">Eeltingimused</str>
+  <str name="or">või</str>
+  <str name="task_context">Teave selle toimingu kohta</str>
+  <str name="task_example">Näide</str>
+  <str name="task_postreq">Mis saab edasi?</str>
+  <str name="task_prereq">Enne alustamist</str>
+  <str name="task_procedure">Toimimisviis</str>
+  <str name="task_procedure_unordered">Toimimisviis</str>
+  <str name="task_results">Tulemused</str>
+  <str name="Copyright">Autoriõigus</str>
+  <str name="a11y.and-then"></str>
+</strings>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="id-id">        <!-- Indonesian -->
+  <str name="Figure">Gambar</str>
+  <str name="Table">Tabel</str>
+  <str name="Next topic">Topik berikutnya</str>
+  <str name="Previous topic">Topik sebelumnya</str>
+  <str name="Parent topic">Topik Induk</str>
+  <str name="Required cleanup">Pembersihan diperlukan</str>
+  <str name="Draft comment">Komentar draf</str>
+  <str name="Option">Pilihan</str>
+  <str name="Description">Deskripsi</str>
+  <str name="Optional">Opsional</str>
+  <str name="Required">Diperlukan</str>
+  <str name="Skip visual syntax diagram">Lewatkan diagram sintaks visual</str>
+  <str name="Read syntax diagram">Baca diagram sintaks</str>
+  <str name="Start of change">Mulai perubahan</str>
+  <str name="End of change">Akhiri perubahan</str>
+  <str name="Index">Indeks</str>
+  <str name="Special characters">Karakter khusus</str>
+  <str name="Numerics">Numerik</str>
+  <str name="End notes">Catatan akhir</str>
+  <str name="Artwork">Grafis</str>
+  <str name="Syntax">Sintaks</str>
+  <str name="Type">Jenis</str>
+  <str name="Value">Nilai</str>
+  <str name="Note">Catatan</str>
+  <str name="Notes">Catatan</str>
+  <str name="Tip">Kiat</str>
+  <str name="Fastpath">Jalur cepat</str>
+  <str name="Important">Penting</str>
+  <str name="Attention">Perhatian</str>
+  <str name="Caution">PERINGATAN</str>
+  <str name="Danger">BAHAYA</str>
+  <str name="Remember">Ingat</str>
+  <str name="Trouble">Masalah</str>
+  <str name="Warning">Peringatan</str>
+  <str name="Restriction">Pembatasan</str>
+  <str name="Contents">Isi</str>
+  <str name="Related concepts">Konsep terkait</str>
+  <str name="Related tasks">Tugas terkait</str>
+  <str name="Related reference">Referensi terkait</str>
+  <str name="Related information">Informasi terkait</str>
+  <str name="Prerequisite">Prasyarat</str>
+  <str name="Prerequisites">Prasyarat</str>
+  <str name="or">atau</str>
+  <str name="task_context">Mengenai tugas ini</str>
+  <str name="task_example">Contoh</str>
+  <str name="task_postreq">Yang harus dilakukan berikutnya</str>
+  <str name="task_prereq">Sebelum Anda mulai</str>
+  <str name="task_procedure">Prosedur</str>
+  <str name="task_procedure_unordered">Prosedur</str>
+  <str name="task_results">Hasil</str>
+  <str name="Copyright">Hak cipta</str>
+  <str name="a11y.and-then"></str>
+</strings>

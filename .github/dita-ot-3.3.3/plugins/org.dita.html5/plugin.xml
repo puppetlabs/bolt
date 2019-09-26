@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2015 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<plugin id="org.dita.html5" version="3.3.3">
+  <!-- extension points -->
+  <extension-point id="dita.xsl.html5" name="HTML5 XSLT import"/>
+  <extension-point id="dita.conductor.html5.param" name="HTML5 XSLT parameters"/>
+  <extension-point id="dita.conductor.html5.toc.param" name="HTML/XSLT XSLT parameter"/>
+  <extension-point id="dita.xsl.html5.toc" name="HTML5 TOC XSLT import"/>
+  <extension-point id="dita.xsl.html5.cover" name="HTML5 Cover XSLT import"/>
+  <!-- extensions -->
+  <transtype name="html5" desc="HTML5">
+    <param name="args.artlbl" desc="Specifies whether to generate a label for each image; the label will contain the image file name." type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param name="args.copycss" desc="Specifies whether to copy the custom .css file to the output directory." type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param name="args.css" desc="Specifies the name of a custom .css file." type="string"/>
+    <param name="args.csspath" desc="Specifies the location of a copied .css file relative to the output directory." type="string"/>
+    <param name="args.cssroot" desc="Specifies the directory that contains the custom .css file." type="string"/>
+    <param name="args.dita.locale" desc="Specifies the language locale file to use for sorting index entries." type="string"/>
+    <param name="args.ftr" desc="Specifies an XML file that contains content for a running footer." type="file"/>
+    <param name="args.gen.default.meta" desc="Specifies whether to generate extra metadata that targets parental control scanners, meta elements with name=&#34;security&#34; and name=&#34;Robots&#34;." type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param name="args.hdf" desc="Specifies an XML file that contains content to be placed in the document head." type="file"/>
+    <param name="args.hdr" desc="Specifies an XML file that contains content for a running header." type="file"/>
+    <param name="args.hide.parent.link" desc="Specifies whether to hide links to parent topics in the HTML5 output." type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param name="args.html5.classattr" desc="Specifies whether to include the DITA class ancestry inside the HTML5 elements." type="enum">
+      <val default="true">yes</val>
+      <val>no</val>
+    </param>
+    <param name="args.html5.contenttarget" desc="Specifies the value of the @target attribute on the &lt;base&gt; element in the TOC file." type="string">
+      <val default="true">contentwin</val>
+    </param>
+    <param name="args.html5.toc" desc="Specifies the base name of the TOC file." type="string">
+      <val default="true">index</val>
+    </param>
+    <param name="args.html5.toc.class" desc="Specifies the value of the @class attribute on the &lt;body&gt; element in the TOC file." type="string"/>
+    <param name="args.html5.toc.xsl" desc="Specifies a custom XSL file to be used for TOC generation." type="file"/>
+    <param name="args.indexshow" desc="Specifies whether the content of &lt;indexterm&gt; elements are rendered in the output." type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param name="args.outext" desc="Specifies the file extension for HTML5 output." type="string">
+      <val default="true">html</val>
+    </param>
+    <param name="args.xsl" desc="Specifies a custom XSL file to be used instead of the default XSL transformation." type="file"/>
+    <param name="nav-toc" type="enum" desc="Specifies whether to generate a navigation TOC in topic pages.">
+      <val default="true" desc="No TOC">none</val>
+      <val desc="Partial TOC that shows the current topic">partial</val>
+      <val desc="Full TOC">full</val>
+    </param>
+  </transtype>
+  <feature extension="ant.import" file="build_dita2html5.xml"/>
+  <feature extension="dita.conductor.html5.param" file="params.xml"/>
+  <!--feature extension="dita.xsl.messages" file="resource/messages.xml"/-->
+  <template file="build_dita2html5_template.xml"/>
+  <template file="xsl/dita2html5Impl_template.xsl"/>
+  <template file="xsl/map2html5-coverImpl_template.xsl"/>
+</plugin>

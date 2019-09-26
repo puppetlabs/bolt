@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Кіріспе | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Кіріспе | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Мазмұны</variable>
+  <variable id="Index Continued String">жалғасы бар</variable>
+  <variable id="Index See String">, Қараңыз </variable>
+  <variable id="Index See Also String">Сондай-ақ қараңыз </variable>
+  <variable id="Table of Contents Chapter">Бөлім <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">Қосымша <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">Бөлім <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">Кіріспе: </variable>
+  <variable id="Preface title">Кіріспе</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">Мазмұны: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">Сурет <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">Сурет <param ref-name="number"/></variable>
+  <variable id="Table.title">Кесте <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Кесте <param ref-name="number"/></variable>
+  <variable id="Related Links">Өзара байланысты ақпарат</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">Бөлім <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Қосымша <param ref-name="number"/></variable>
+  <variable id="Part with number">Бөлім <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">Қажет тазалау</variable>
+  <variable id="On the page"> бетте <param ref-name="pagenum"/></variable>
+  <variable id="Page"> Бет <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">Қосымша:</variable>
+  <variable id="Required Step">Қажет:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Глоссарий</variable>
+  <variable id="List of Tables">Кестелер</variable>
+  <variable id="List of Figures">Суреттер</variable>
+</vars>

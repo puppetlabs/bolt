@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+  xmlns="http://relaxng.org/ns/structure/1.0" xmlns:svg="http://www.w3.org/2000/svg">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA SVG Domain</moduleTitle>
+    <headerComment> 
+============================================================= 
+DITA SVG Domain
+
+
+============================================================= 
+    </headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>svg-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> SVG Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> SVG Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:svgDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:svgDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:svgDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic svg-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="svg-d-foreign">
+      <ref name="svg-container.element"/>
+    </define>
+    <define name="foreign" combine="choice">
+      <ref name="svg-d-foreign"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="svg-container">
+      <ref name="svg-container.element"/>
+    </define>
+    <define name="svgref">
+      <ref name="svgref.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation>LONG NAME: SVG container</a:documentation>
+      <define name="svg-container.content">
+        <zeroOrMore>
+          <choice>            
+            <externalRef href="svg/svg11/svg11.rng"
+              dita:namespacePrefix="svg"             
+              dita:dtdPublicId="-//OASIS//ELEMENTS DITA 1.3 SVG 1.1 Driver//EN"
+              dita:dtdSystemId="svg/svg11-ditadriver.dtd"
+              dita:xsdURI="svg/svg11/svg11.xsd" 
+              dita:xsdTargetNamespace="http://www.w3.org/2000/svg"
+              >
+              <a:documentation>NOTE: SVG 1.1 is the W3C recommendation version as of March 2014
+              
+              The SVG RELAX NG grammars are sourced from here: http://www.w3.org/Graphics/SVG/1.1/rng/
+              </a:documentation>
+            </externalRef>
+            <ref name="svgref"/>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="svg-container.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="svg-container.element">
+        <element name="svg-container" ditaarch:longName="SVG container"
+          dita:since="1.3">
+          <a:documentation/>
+          <ref name="svg-container.attlist"/>
+          <ref name="svg-container.content"/>
+        </element>
+      </define>
+      <define name="svg-container.attlist" combine="interleave">
+        <ref name="svg-container.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation>LONG NAME: SVG referece</a:documentation>
+      <define name="svgref.content">
+        <empty/>
+      </define>
+      <define name="svgref.attributes">
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="format" a:defaultValue="svg"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="svgref.element">
+        <element name="svgref" dita:longName="SVG element reference"
+          dita:since="1.3"
+          >
+          <ref name="svgref.attlist"/>
+          <ref name="svgref.content"/>
+        </element>
+      </define>
+      <define name="svgref.attlist" combine="interleave">
+        <ref name="svgref.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="svg-container.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/foreign svg-d/svg-container "/>
+      </optional>
+    </define>
+    <define name="svgref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/xref svg-d/svgref "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

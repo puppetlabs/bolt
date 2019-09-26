@@ -1,0 +1,92 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="Usually, DITA builds require setting a number of parameters that do not change frequently. You can reference a set of build parameters defined in a .properties file when building output with the dita command. If needed, you can override any parameter by specifying it explicitly as an argument to the dita command."><meta name="DC.subject" content="draft, required-cleanup, command, dita, .properties file, DITA maps, properties file"><meta name="keywords" content="draft, required-cleanup, command, dita, .properties file, DITA maps, properties file"><meta name="DC.relation" scheme="URI" content="../topics/build-using-dita-command.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="using-dita-properties-file"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Setting build parameters with .properties files</title></head><body id="using-dita-properties-file"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a><ul><li><a href="../topics/build-using-dita-command.html">Using the dita command</a><ul><li class="active"><a href="../topics/using-dita-properties-file.html">Using a properties file</a></li><li><a href="../topics/migrating-ant-to-dita.html">Migrating Ant builds</a></li></ul></li><li><a href="../topics/publishing-with-ant.html">Using Ant</a></li><li><a href="../reference/java-api.html">Using the Java API</a></li><li><a href="../topics/output-formats.html">Output formats</a></li></ul></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Setting build parameters with <span class="ph filepath">.properties</span> files</h1>
+  
+  
+  
+  <div class="body taskbody"><p class="shortdesc">Usually, DITA builds require setting a number of parameters that do not change frequently. You can
+    reference a set of build parameters defined in a <span class="ph filepath">.properties</span> file when building output with the
+      <span class="keyword cmdname">dita</span> command. If needed, you can override any parameter by specifying it explicitly as an
+    argument to the <span class="keyword cmdname">dita</span> command.</p>
+    <section class="section"><h2 class="title sectiontitle">About <span class="ph filepath">.properties</span> files</h2>
+      
+      <p class="p">A <span class="ph filepath">.properties</span> file is a text file that enumerates one or more name-value pairs, one per
+        line, in the format <code class="ph codeph">name = value</code>. The <span class="ph filepath">.properties</span> filename extension is
+        customarily used, but is not required.</p>
+      <ul class="ul" compact>
+        <li class="li">Lines beginning with the <code class="ph codeph">#</code> character are comments.</li>
+        <li class="li">Properties specified as arguments of the <span class="keyword cmdname">dita</span> command override those set in
+            <span class="ph filepath">.properties</span> files. <div class="note restriction note_restriction"><span class="note__title">Restriction:</span> For this reason,
+              <span class="keyword parmname">args.input</span> and <span class="keyword parmname">transtype</span> can’t be set in the
+              <span class="ph filepath">.properties</span> file.</div></li>
+        <li class="li">If you specify the same property more than once, the last instance is used.</li>
+        <li class="li">Properties not used by the selected transformation type are ignored.</li>
+        <li class="li">Properties can reference other property values defined elsewhere in the <span class="ph filepath">.properties</span>
+          file or passed by the <span class="keyword cmdname">dita</span> command. Use the Ant
+            <code class="ph codeph">${<var class="keyword varname">property.name</var>}</code> syntax.</li>
+        <li class="li">You can set properties not only for the default DITA-OT transformation types, but also for custom plugins.
+        </li>
+      </ul>
+    </section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">Create your <span class="ph filepath">.properties</span> file.</span>
+        <div class="itemgroup info">
+          <div class="note tip note_tip"><span class="note__title">Tip:</span> Copy <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/docsrc/samples</span><span class="ph filepath">/properties/template.properties</span>; this template describes each of the properties you can
+        set.</div>
+        </div>
+        <div class="itemgroup stepxmp">
+          <p class="p">For example:</p>
+          <div class="p"><pre class="pre codeblock language-properties normalize-space show-line-numbers show-whitespace"><code># Don't generate headings for sections within task topics:
+args.gen.task.lbl = NO
+
+# Directory that contains the custom .css file:
+args.cssroot = ${args.input.dir}/css/
+
+# Custom .css file used to style output:
+args.css = style.css
+
+# Copy the custom .css file to the output directory:
+args.copycss = yes
+
+# Location of the copied .css file relative to the output:
+args.csspath = branding
+
+# Generate a full navigation TOC in topic pages:
+nav-toc = full
+
+# Base name of the Table of Contents file:
+args.xhtml.toc = toc</code></pre>
+          </div>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Reference your <span class="ph filepath">.properties</span> file with the <span class="keyword cmdname">dita</span> command when building
+          your output.</span>
+        <div class="itemgroup stepxmp">
+          <pre class="pre codeblock"><code><span class="keyword cmdname">dita</span> <span class="keyword parmname">--input</span>=<var class="keyword varname">my.ditamap</var> <span class="keyword parmname">--format</span>=<span class="keyword option">html5</span> <span class="keyword parmname">--propertyfile</span>=<var class="keyword varname">my.properties</var></code></pre>
+        </div>
+        <div class="itemgroup info"></div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">If needed, pass additional arguments to the <span class="keyword cmdname">dita</span> command to override specific build
+          parameters. </span>
+        <div class="itemgroup stepxmp">
+          <p class="p">For example, to build output once with <code class="keyword markupname xmlelement">&lt;draft&gt;</code> and
+              <code class="keyword markupname xmlelement">&lt;required-cleanup&gt;</code> content:</p>
+          <pre class="pre codeblock"><code><span class="keyword cmdname">dita</span> <span class="keyword parmname">--input</span>=<var class="keyword varname">my.ditamap</var> <span class="keyword parmname">--format</span>=<span class="keyword option">html5</span> <span class="keyword parmname">--propertyfile</span>=<var class="keyword varname">my.properties</var> \
+     <span class="keyword parmname">--args.draft</span>=<span class="keyword option">yes</span></code></pre>
+        </div>
+        <div class="itemgroup info">
+          <div class="note tip note_tip"><span class="note__title">Tip:</span> If you are building in different environments where the location of the input
+        files is not consistent, set <span class="keyword option">args.input.dir</span> with the <span class="keyword cmdname">dita</span> command and
+        reference its value with <code class="ph codeph">${args.input.dir}</code> in your <span class="ph filepath">.properties</span>
+        file.
+        
+        
+      </div>
+        </div>
+      </li></ol></section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/build-using-dita-command.html" title="You can generate output using the dita command-line tool. Build parameters can be specified on the command line or with .properties files.">Building output using the dita command</a></div></div></nav></article></main></body></html>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="en-gb">        <!-- British English -->
+  <str name="Figure">Figure</str>
+  <str name="Table">Table</str>
+  <str name="Next topic">Next topic</str>
+  <str name="Previous topic">Previous topic</str>
+  <str name="Parent topic">Parent topic</str>
+  <str name="Required cleanup">Required cleanup</str>
+  <str name="Draft comment">Draft comment</str>
+  <str name="Option">Option</str>
+  <str name="Description">Description</str>
+  <str name="Optional">Optional</str>
+  <str name="Required">Required</str>
+  <str name="Skip visual syntax diagram">Skip visual syntax diagram</str>
+  <str name="Read syntax diagram">Read syntax diagram</str>
+  <str name="Start of change">Start of change</str>
+  <str name="End of change">End of change</str>
+  <str name="Index">Index</str>
+  <str name="Special characters">Special characters</str>
+  <str name="Numerics">Numerics</str>
+  <str name="End notes">End notes</str>
+  <str name="Artwork">Artwork</str>
+  <str name="Syntax">Syntax</str>
+  <str name="Type">Type</str>
+  <str name="Value">Value</str>
+  <str name="Note">Note</str>
+  <str name="Notes">Notes</str>
+  <str name="Tip">Tip</str>
+  <str name="Fastpath">Fastpath</str>
+  <str name="Important">Important</str>
+  <str name="Attention">Attention</str>
+  <str name="Caution">CAUTION</str>
+  <str name="Danger">DANGER</str>
+  <str name="Remember">Remember</str>
+  <str name="Restriction">Restriction</str>
+  <str name="Trouble">Trouble</str>
+  <str name="Warning">Warning</str>
+  <str name="Contents">Contents</str>
+  <str name="Related concepts">Related concepts</str>
+  <str name="Related tasks">Related tasks</str>
+  <str name="Related reference">Related reference</str>
+  <str name="Related information">Related information</str>
+  <str name="Prerequisite">Prerequisite</str>
+  <str name="Prerequisites">Prerequisites</str>
+  <str name="or">or</str>
+  <str name="task_context">About this task</str>
+  <str name="task_example">Example</str>
+  <str name="task_postreq">What to do next</str>
+  <str name="task_prereq">Before you begin</str>
+  <str name="task_procedure">Procedure</str>
+  <str name="task_procedure_unordered">Procedure</str>
+  <str name="task_results">Results</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

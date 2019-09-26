@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Önsöz | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Önsöz | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">İçindekiler</variable>
+  <variable id="Index Continued String">devamı var</variable>
+  <variable id="Index See String">, Bkz. </variable>
+  <variable id="Index See Also String">Ayrıca bkz. </variable>
+  <variable id="Table of Contents Chapter">Bölüm <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">Ek <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">Bölüm <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">Önsöz: </variable>
+  <variable id="Preface title">Önsöz</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">İçindekiler: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">Şekil <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">Şekil <param ref-name="number"/></variable>
+  <variable id="Table.title">Çizelge <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Çizelge <param ref-name="number"/></variable>
+  <variable id="Related Links">İlgili bilgiler</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">Bölüm <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Ek <param ref-name="number"/></variable>
+  <variable id="Part with number">Bölüm <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[Düzeltilmeli]</variable>
+  <variable id="On the page"> sayfa <param ref-name="pagenum"/></variable>
+  <variable id="Page"> Sayfa <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">İsteğe bağlı:</variable>
+  <variable id="Required Step">Gerekli:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Özel sözlük</variable>
+  <variable id="List of Tables">Çizelgeler</variable>
+  <variable id="List of Figures">Şekiller</variable>
+</vars>

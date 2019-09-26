@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+-->
+<configuration>
+  <alphabet char-set="Bulgarian">
+    <character-set>
+      <!-- Cyrillic block -->
+      <character-range>
+        <start include="yes">&#x400;</start>
+        <end include="yes">&#x4FF;</end>
+      </character-range>
+      <!-- Cyrillic Supplement block -->
+      <character-range>
+        <start include="yes">&#x500;</start>
+        <end include="yes">&#x52F;</end>
+      </character-range>
+      <!-- Cyrillic Extended-A -->
+      <character-range>
+        <start include="yes">&#x2DE0;</start>
+        <end include="yes">&#x2DFF;</end>
+      </character-range>
+      <!-- Cyrillic Extended-B -->
+      <character-range>
+        <start include="yes">&#xA640;</start>
+        <end include="yes">&#xA69F;</end>
+      </character-range>
+    </character-set>
+  </alphabet>
+  <alphabet char-set="SymbolsSuperscript">
+    <character-set>
+      <!-- Copyright -->
+      <character>&#169;</character>
+      <!-- Registered Trademark -->
+      <character>&#174;</character>
+      <!-- Trademark -->
+      <character>&#8482;</character>
+      <!-- Service mark -->
+      <character>&#2120;</character>
+    </character-set>
+  </alphabet>
+  <alphabet char-set="SubmenuSymbol">
+    <character-set>
+      <character>&#x27A4;</character>
+    </character-set>
+  </alphabet>
+</configuration>

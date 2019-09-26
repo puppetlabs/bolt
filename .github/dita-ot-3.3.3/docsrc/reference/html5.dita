@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="ID">
+  <title>HTML5 processing</title>
+  <shortdesc>After the HTML5 files are generated, the <option>html5</option> transformation generates a table of
+    contents (ToC) file called <filepath>index.html</filepath>, which can be loaded as a cover page or rendered in a
+    navigation sidebar or menu via CSS.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>HTML<indexterm>HTML5</indexterm></indexterm>
+        <indexterm>HTML5<indexterm>CSS</indexterm><indexterm>nav-toc</indexterm></indexterm>
+        <indexterm>targets<indexterm>HTML5</indexterm></indexterm>
+        <indexterm>nav-toc</indexterm>
+        <indexterm>CSS<indexterm>HTML5</indexterm></indexterm>
+        <indexterm>entry file<indexterm>HTML5</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>As of DITA-OT 2.2, the <parmname>nav-toc</parmname> parameter can be used in HTML5 transformations to embed
+      navigation directly in topics using native HTML5 elements without JavaScript or framesets.</p>
+  </conbody>
+</concept>

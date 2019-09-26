@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="ant-parameters-other">
+  <title>Other parameters</title>
+  <titlealts>
+    <navtitle>Other</navtitle>
+  </titlealts>
+  <shortdesc>These parameters enable you to reload style sheets that DITA-OT uses for specific pre-processing
+    stages.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>XSLT<index-see-also>extension
+          points</index-see-also><index-see-also>preprocessing</index-see-also></indexterm>
+        <indexterm>preprocessing<indexterm>XSLT</indexterm></indexterm>
+        <indexterm>preprocessing<index-see-also>Java</index-see-also></indexterm>
+        <indexterm>preprocessing<indexterm>extension points, parameters</indexterm></indexterm>
+        <indexterm>Java<indexterm>out of memory</indexterm></indexterm>
+        <indexterm>memory</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <parml>
+        <plentry>
+          <pt id="dita.html5.reloadstylesheet">
+            <parmname>dita.html5.reloadstylesheet</parmname>
+          </pt>
+          <pt id="dita.preprocess.reloadstylesheet">
+            <parmname>dita.preprocess.reloadstylesheet</parmname>
+          </pt>
+          <pt id="dita.preprocess.reloadstylesheet.clean-map">
+            <parmname>dita.preprocess.reloadstylesheet.clean-map</parmname>
+          </pt>
+          <pt id="dita.preprocess.reloadstylesheet.conref">
+            <parmname>dita.preprocess.reloadstylesheet.conref</parmname>
+          </pt>
+          <pt id="dita.preprocess.reloadstylesheet.flag-module">
+            <parmname>dita.preprocess.reloadstylesheet.lag-module</parmname>
+          </pt>
+          <pt id="dita.preprocess.reloadstylesheet.mapref">
+            <parmname>dita.preprocess.reloadstylesheet.mapref</parmname>
+          </pt>
+          <pt id="dita.preprocess.reloadstylesheet.mappull">
+            <parmname>dita.preprocess.reloadstylesheet.mappull</parmname>
+          </pt>
+          <pt id="dita.preprocess.reloadstylesheet.maplink">
+            <parmname>dita.preprocess.reloadstylesheet.maplink</parmname>
+          </pt>
+          <pt id="dita.preprocess.reloadstylesheet.topicpull">
+            <parmname>dita.preprocess.reloadstylesheet.topicpull</parmname>
+          </pt>
+          <pt id="dita.xhtml.reloadstylesheet">
+            <parmname>dita.xhtml.reloadstylesheet</parmname>
+          </pt>
+          <pd id="dita.preprocess.reloadstylesheet.desc">
+            <p>Specifies whether DITA-OT reloads the XSL style sheets that are used for the transformation. The allowed
+              values are <option>true</option> and <option>false</option>; the default value is
+              <option>false</option>.</p>
+            <p>During the pre-processing stage, DITA-OT processes one DITA topic at a time, using the same XSLT
+              stylesheet for the entire process. These parameters control whether Ant will use the same
+                <codeph>Transformer</codeph> object in Java, the object that handles the XSLT processing, for all
+              topics, or create a separate <codeph>Transformer</codeph> for each topic.</p>
+            <p>The default (<option>false</option>) option uses the same <codeph>Transformer</codeph>, which is a little
+              faster, because it will not need to parse/compile the XSLT stylesheets and only needs to read the source
+              trees with <codeph>document()</codeph> once. The downside is that it will not release the source trees
+              from memory, so you can run out of memory.</p>
+            <note type="tip">For large projects that generate Java out-of-memory errors during transformation, set the
+              parameter to <option>true</option> to allow the XSLT processor to release memory. You may also need to
+              increase the memory available to Java.</note>
+          </pd>
+        </plentry>
+      </parml>
+    </section>
+  </refbody>
+</reference>

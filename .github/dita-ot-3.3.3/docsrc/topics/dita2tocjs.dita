@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="dita2tocjs" xml:lang="en-US">
+  <title>TocJS</title>
+  <shortdesc>The <option>tocjs</option> transformation generates XHTML output, a frameset, and a JavaScript-based table
+    of contents with expandable and collapsible entries. The transformation was originally created by Shawn McKenzie as
+    a plug-in and was added to the default distribution in DITA-OT release 1.5.4.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>transformations<indexterm>TocJS</indexterm></indexterm>
+        <indexterm>TocJS<index-see-also>transformations</index-see-also></indexterm>
+        <indexterm>XHTML</indexterm>
+        <indexterm>plug-ins<indexterm>dita2tocjs</indexterm></indexterm>
+        <indexterm>dita2tocjs</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>The <option>tocjs</option> transformation was updated so that it produces XHTML output and uses a default
+      frameset.</p>
+    <p>To run the TocJS transformation, set the <parmname>transtype</parmname> parameter to <option>tocjs</option>, or
+      pass the <parmname>--format</parmname>=<option>tocjs</option> option to the <cmdname>dita</cmdname> command
+      line.</p>
+    <codeblock><filepath conref="../resources/conref-task.dita#ID/dita-cmd"/> <parmname>--input</parmname>=<varname>input-file</varname> <parmname>--format</parmname>=<option>tocjs</option></codeblock>
+    <p>where:</p>
+    <ul>
+      <li conref="../resources/conref-task.dita#ID/novice-variables-1"
+        conrefend="../resources/conref-task.dita#ID/novice-variables-2"/>
+    </ul>
+  </conbody>
+</concept>

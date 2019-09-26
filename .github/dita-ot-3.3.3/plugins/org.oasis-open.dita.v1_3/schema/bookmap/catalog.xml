@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<!--DITA Book Map Shell-->
+
+   <group><!-- System ID (URL) catalog entries -->
+      <system systemId="urn:oasis:names:tc:dita:xsd:bookmap.xsd:1.3"
+              uri="xsd/bookmap.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:bookmap.xsd:1.x"
+              uri="xsd/bookmap.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:bookmap.xsd"
+              uri="xsd/bookmap.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:bookmapGrp.xsd:1.3"
+              uri="xsd/bookmapGrp.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:bookmapGrp.xsd:1.x"
+              uri="xsd/bookmapGrp.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:bookmapGrp.xsd"
+              uri="xsd/bookmapGrp.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:bookmapMod.xsd:1.3"
+              uri="xsd/bookmapMod.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:bookmapMod.xsd:1.x"
+              uri="xsd/bookmapMod.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:bookmapMod.xsd"
+              uri="xsd/bookmapMod.xsd"/>
+   </group>
+   <group><!-- Public ID (URN) catalog entries -->
+      <uri name="urn:oasis:names:tc:dita:xsd:bookmap.xsd:1.3"
+           uri="xsd/bookmap.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:bookmap.xsd:1.x"
+           uri="xsd/bookmap.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:bookmap.xsd" uri="xsd/bookmap.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:bookmapGrp.xsd:1.3"
+           uri="xsd/bookmapGrp.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:bookmapGrp.xsd:1.x"
+           uri="xsd/bookmapGrp.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:bookmapGrp.xsd"
+           uri="xsd/bookmapGrp.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:bookmapMod.xsd:1.3"
+           uri="xsd/bookmapMod.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:bookmapMod.xsd:1.x"
+           uri="xsd/bookmapMod.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:bookmapMod.xsd"
+           uri="xsd/bookmapMod.xsd"/>
+   </group>
+</catalog>

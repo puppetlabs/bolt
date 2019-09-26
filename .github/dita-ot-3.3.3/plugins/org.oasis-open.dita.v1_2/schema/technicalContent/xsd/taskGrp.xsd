@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Task XSD Group Definition                    -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      July 2007                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA Tasks             -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2009                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    2005.11.15 EAS: Corrected definitions for choption,        -->
+<!--                    chdesc, choptionhd, and chdeschd           -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+  
+ <xs:group name="task">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="task"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="taskbody">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="taskbody"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="prereq">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="prereq"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="context">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="context"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="result">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="result"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="postreq">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="postreq"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="choice">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="choice"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="step">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="step"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+  
+    <xs:group name="stepsection">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="stepsection"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="substep">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="substep"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="steps-unordered">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="steps-unordered"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="choices">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="choices"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="steps">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="steps"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="substeps">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="substeps"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="cmd">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="cmd"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="info">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="info"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="tutorialinfo">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="tutorialinfo"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="stepxmp">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="stepxmp"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="stepresult">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="stepresult"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="choicetable">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="choicetable"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="chhead">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="chhead"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="chrow">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="chrow"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="choptionhd">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="choptionhd"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="chdeschd">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="chdeschd"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="choption">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="choption"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="chdesc">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="chdesc"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="steps-informal">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="steps-informal"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+</xs:schema>

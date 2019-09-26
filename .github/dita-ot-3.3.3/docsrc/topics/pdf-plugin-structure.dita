@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="pdf-plugin-structure">
+  <title>PDF plug-in structure</title>
+  <shortdesc>In cases that require substantial customizations, it is often useful to organize the files in a folder
+    structure that mimics the hierarchy of the default PDF plug-in.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>languages<indexterm>adding support for</indexterm></indexterm>
+        <indexterm>I18N<indexterm>plug-in</indexterm></indexterm>
+        <indexterm>PDF<indexterm start="pdf-plugin">plug-in</indexterm></indexterm>
+        <indexterm>font-mappings.xml</indexterm>
+        <indexterm>fonts<indexterm>PDF</indexterm></indexterm>
+        <indexterm>PDF<indexterm>fonts</indexterm></indexterm>
+        <indexterm>index<indexterm>PDF</indexterm></indexterm>
+        <indexterm>Customization directory</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <conbody>
+    <note>For simpler customizations, you may want to structure your plug-in differently, but the information in this
+      topic may help you to locate the files you need to customize.</note>
+    <p>The original Idiom plug-in used its own extension mechanism to provide overrides to the PDF transformation. With
+      this approach, a dedicated <filepath>Customization</filepath> folder within the plug-in was used as a
+      customization layer to store files that override the default behavior.</p>
+    <p>While this method is no longer recommended, the same organization principles can be used in custom PDF plug-ins
+      to facilitate comparisons with the default settings in the base PDF plug-in and make it easier to migrate
+      customizations to new toolkit versions.</p>
+    <fig>
+      <title>Default <filepath>Customization</filepath> folder content</title>
+      <codeblock>.
+├── build.properties.orig
+├── catalog.xml.orig
+└── fo/
+    ├── attrs/
+    │   └── custom.xsl.orig
+    └── xsl/
+        └── custom.xsl.orig</codeblock>
+    </fig>
+    <p>To begin creating a new custom plug-in, you can copy the contents of the customization layer template in
+        <filepath>plugins/org.dita.pdf2/Customization</filepath> to a new folder that will serve as your new custom
+      plug-in folder, such as <filepath>plugins/com.company.pdf</filepath>.</p>
+    <p>To mimic the hierarchy of the default PDF plug-in, you may want to add a <filepath>cfg/</filepath> subfolder and
+      move the contents of the <filepath>fo/</filepath> folder to <filepath>cfg/fo/</filepath>.</p>
+    <p>DITA-OT provides template files that you can start with throughout the <filepath>Customization</filepath>
+      directory structure. These files end in the suffix <codeph>.orig</codeph> (for example,
+        <filepath>catalog.xml.orig</filepath>). To enable these files, remove the <codeph>.orig</codeph> suffix from the
+      copies in your new custom plug-in folder. (For example, rename <filepath>catalog.xml.orig</filepath> to
+        <filepath>catalog.xml</filepath>).</p>
+    <p>You can then make modifications to the copy in your custom plug-in folder, and copy any other files from the
+      default PDF plug-in that you need to override, such as the page layouts in
+      <filepath>layout-masters.xsl</filepath>, or the <filepath>font-mappings.xml</filepath> file that tells your PDF
+      renderer which fonts to use and where to find them.</p>
+    <note type="important"> Wherever possible, avoid copying entire XSL files from the PDF2 plug-in to your custom
+      plug-in. Instead, copy only the specific attribute sets and templates that you want to override. For details, see
+      <xref keyref="plugin-best-practices"/>.</note>
+    <p>Things you can currently override include:</p>
+    <ul>
+      <li>Custom XSL via <filepath>xsl/custom.xsl</filepath> and <filepath>attrs/custom.xsl</filepath></li>
+      <li>Layout overrides via <filepath>layout-masters.xsl</filepath></li>
+      <li>Font overrides via <filepath>font-mappings.xml</filepath></li>
+      <li>Per-locale variable overrides via <filepath>common/vars/[language].xml</filepath></li>
+      <li>I18N configuration via <filepath>i18n/[language].xml</filepath></li>
+      <li>Index configuration via <filepath>index/[language].xml</filepath></li>
+    </ul>
+    <p>When customizing any of these areas, modify the relevant file(s) in your custom plug-in folder. Then, to enable
+      the changes in the publishing process, you find the corresponding entry for each file you modified in the
+        <filepath>catalog.xml</filepath> file.</p>
+    <p>It should look like this:</p>
+    <codeblock outputclass="language-xml">&lt;!--uri name="cfg:fo/attrs/custom.xsl" uri="fo/attrs/custom.xsl"/--&gt;</codeblock>
+    <p>Remove the comment markers <codeph>!--</codeph> and <codeph>--</codeph> to enable the change:</p>
+    <codeblock outputclass="language-xml">&lt;uri name="cfg:fo/attrs/custom.xsl" uri="fo/attrs/custom.xsl"/&gt;</codeblock>
+    <p>Your customization should now be enabled as part of the publishing process.</p>
+    <fig>
+      <title>Sample custom plug-in structure</title>
+      <codeblock>.
+├── plugin.xml
+├── ant-include.xml
+└── cfg/
+    ├── catalog.xml
+    ├── common/
+    │   ├── artwork/
+    │   │   ├── logo.svg
+    │   └── vars/
+    │       ├── strings.xml
+    │       ├── en.xml
+    └── fo/
+        ├── attrs/
+        │   ├── custom.xsl
+        ├── font-mappings.xml
+        ├── layout-masters.xsl
+        └── xsl/
+            └── custom.xsl</codeblock>
+    </fig>
+    <p>When your custom plug-in is installed, the files in its subfolders will override the out-of-the-box settings from
+      their counterparts in <filepath>org.dita.pdf2/cfg/fo/attrs</filepath> and
+        <filepath>org.dita.pdf2/xsl/fo</filepath>.</p>
+    <p>The following topics describe the contents of the base PDF plug-in subfolders and provide additional information
+      on customizing various aspects of the default PDF output.</p>
+  </conbody>
+</concept>

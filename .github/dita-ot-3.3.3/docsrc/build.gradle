@@ -1,0 +1,158 @@
+plugins {
+    id 'com.github.eerohele.dita-ot-gradle' version '0.5.0'
+    id 'com.github.eerohele.saxon-gradle' version '0.7.0'
+}
+
+import com.github.eerohele.DitaOtTask
+import com.github.eerohele.SaxonXsltTask
+
+def getPropertyOrDefault(String name, def defaultValue) {
+    hasProperty(name) ? findProperty(name) : defaultValue
+}
+
+String ditaHome = getPropertyOrDefault('ditaHome', projectDir.getParent())
+String ditaHomeSrc = getPropertyOrDefault('ditaHomeSrc', ditaHome)
+String configDir = "${ditaHomeSrc}/config"
+String ditavalFile = "${projectDir}/platform.ditaval"
+Boolean toolkitBuild = file("${projectDir}/../lib/dost.jar").exists()
+String samplesDir = toolkitBuild ? "${ditaHome}/docsrc/samples" : "${projectDir}/samples"
+String outputDir = getPropertyOrDefault('outputDir', toolkitBuild ? "${ditaHome}/doc" : "${projectDir}/out")
+
+String toURI(String path) {
+    file(path).toURI().toString()
+}
+
+ditaOt.dir ditaHome
+
+task messages(type: SaxonXsltTask) {
+    input "${configDir}/messages.xml"
+    output "${projectDir}/topics/DITA-messages.xml"
+    stylesheet "${projectDir}/resources/messages.xsl"
+}
+
+task params(type: SaxonXsltTask) {
+    input "${configDir}/plugins.xml"
+    output "${projectDir}/parameters/all-parameters.dita"
+    stylesheet "${projectDir}/resources/params.xsl"
+    parameters('output-dir.url': toURI('parameters'))
+    outputs.dir "${projectDir}/parameters"
+}
+
+task extensionPoints(type: SaxonXsltTask) {
+    input "${configDir}/plugins.xml"
+    output "${projectDir}/extension-points/all-extension-points.dita"
+    stylesheet "${projectDir}/resources/extension-points.xsl"
+    parameters('output-dir.url': toURI('extension-points'))
+    outputs.dir "${projectDir}/extension-points"
+}
+
+task generatePlatformFilter {
+    ant.condition(property: 'platform', value: 'windows') {
+        os(family: 'windows')
+    }
+
+    ant.condition(property: 'platform', value: 'mac' ) {
+        os(family: 'mac')
+    }
+
+    ant.condition(property: 'platform', value: 'unix' ) {
+        os(family: 'unix')
+    }
+
+    ant.echoxml(file: ditavalFile) {
+        val {
+            prop(action: 'include', att: 'platform', val: platform)
+            prop(action: 'exclude', att: 'platform')
+        }
+    }
+}
+
+task generatePropertiesTemplate(type: SaxonXsltTask) {
+    input "${configDir}/plugins.xml"
+    output "${samplesDir}/properties/template.properties"
+    stylesheet "${projectDir}/resources/properties-file.xsl"
+}
+
+task autoGenerate(dependsOn: [messages, params, extensionPoints, generatePlatformFilter, generatePropertiesTemplate]) {
+    description 'Run tasks that generate content from resource files and the build environment.'
+}
+
+task pdf(type: DitaOtTask, dependsOn: autoGenerate) {
+    input "${projectDir}/userguide-book.ditamap"
+    output outputDir
+    transtype 'pdf'
+
+    properties {
+        property(file: "${projectDir}/samples/properties/docs-build-pdf.properties")
+    }
+}
+
+task html(type: DitaOtTask, dependsOn: autoGenerate) {
+    input "${projectDir}/userguide.ditamap"
+    output outputDir
+    transtype 'html5'
+    filter "${projectDir}/resources/html.ditaval"
+
+    properties {
+        property(file: "${projectDir}/samples/properties/docs-build-html5.properties")
+    }
+}
+
+task htmlhelp(type: DitaOtTask, dependsOn: autoGenerate) {
+    input "${projectDir}/userguide.ditamap"
+    output outputDir
+    transtype 'htmlhelp'
+    filter ditavalFile
+
+    properties {
+        property(file: "${projectDir}/samples/properties/docs-build-htmlhelp.properties")
+    }
+
+    doLast {
+        ant.move(todir: outputDir, failonerror: 'no') {
+            fileset(dir: "${outputDir}/htmlhelp", includes: '*.chm')
+        }
+
+        ant.delete(dir: "${outputDir}/htmlhelp")
+    }
+}
+
+task cleanUp {
+    doLast {
+        ant.delete(dir: outputDir)
+    }
+}
+
+def commit = new ByteArrayOutputStream()
+
+task gitMetadata {
+  doLast {
+    exec {
+        workingDir = projectDir
+        commandLine 'git'
+        args = ['rev-parse', 'HEAD']
+        standardOutput = commit
+    }
+  }
+}
+
+task site(type: DitaOtTask) {
+    dependsOn 'messages', 'params', 'extensionPoints', 'gitMetadata'
+
+    input file("${projectDir}/site.ditamap")
+    output getPropertyOrDefault('outputDir', "${buildDir}/site")
+    filter "${projectDir}/resources/html.ditaval"
+
+    transtype 'org.dita-ot.html'
+
+    properties {
+        property(name: 'args.gen.task.lbl', value: 'YES')
+        property(name: 'args.rellinks', value: 'noparent')
+        property(name: 'commit', value: commit)
+    }
+}
+
+task all(dependsOn: [pdf, html, htmlhelp])
+task dist(dependsOn: [pdf, html])
+
+defaultTasks 'dist'

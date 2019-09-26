@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="th-th">        <!-- Thai -->
+  <str name="Figure">รูปที่</str>
+  <str name="Table">ตารางที่</str>
+  <str name="Next topic">หัวข้อถัดไป</str>
+  <str name="Previous topic">หัวข้อก่อนหน้า</str>
+  <str name="Parent topic">หัวข้อต้นทาง</str>
+  <str name="Required cleanup">การแก้ไขที่ต้องการ</str>
+  <str name="Draft comment">ข้อคิดเห็นฉบับร่าง</str>
+  <str name="Option">ทางเลือก</str>
+  <str name="Description">คำอธิบาย</str>
+  <str name="Optional">ทางเลือก</str>
+  <str name="Required">บังคับ</str>
+  <str name="Skip visual syntax diagram">ข้ามการดู syntax diagram</str>
+  <str name="Read syntax diagram">อ่าน syntax diagram</str>
+  <str name="Start of change">เริ่มต้นของการเปลี่ยนแปลง</str>
+  <str name="End of change">สิ้นสุดของการเปลี่ยนแปลง</str>
+  <str name="Index">ดัชนี</str>
+  <str name="Special characters">อักขระพิเศษ</str>
+  <str name="Numerics">ตัวเลข</str>
+  <str name="End notes">หมายเหตุท้าย</str>
+  <str name="Artwork">อาร์ตเวิร์ก</str>
+  <str name="Syntax">Syntax</str>
+  <str name="Type">ประเภท</str>
+  <str name="Value">ค่า</str>
+  <str name="Note">หมายเหตุ</str>
+  <str name="Notes">หมายเหตุ</str>
+  <str name="Tip">คำแนะนำ</str>
+  <str name="Fastpath">ทางด่วน</str>
+  <str name="Important">สำคัญ</str>
+  <str name="Attention">ข้อควรสนใจ</str>
+  <str name="Caution">ข้อควรระวัง</str>
+  <str name="Danger">อันตราย</str>
+  <str name="Remember">เตือนความจำ</str>
+  <str name="Restriction">ข้อจำกัด</str>
+  <str name="Trouble">ปัญหา</str>
+  <str name="Warning">คำเตือน</str>
+  <str name="Contents">สารบัญ</str>
+  <str name="Related concepts">หลักการที่เกี่ยวข้อง</str>
+  <str name="Related tasks">งานที่เกี่ยวข้อง</str>
+  <str name="Related reference">สิ่งอ้างอิงที่เกี่ยวข้อง</str>
+  <str name="Related information">ข้อมูลที่เกี่ยวข้อง</str>
+  <str name="Prerequisite">สิ่งที่ต้องทำก่อน</str>
+  <str name="Prerequisites">สิ่งที่ต้องทำก่อน</str>
+  <str name="or">หรือ</str>
+  <str name="task_context">เกี่ยวกับภารกิจนี้</str>
+  <str name="task_example">ตัวอย่าง</str>
+  <str name="task_postreq">สิ่งที่ต้องทำต่อไป</str>
+  <str name="task_prereq">ก่อนเริ่มต้นภารกิจ</str>
+  <str name="task_procedure">กระบวนการ</str>
+  <str name="task_procedure_unordered">กระบวนการ</str>
+  <str name="task_results">ผลลัพธ์</str>
+  <str name="Copyright">ลิขสิทธิ์ของ</str>
+  <str name="a11y.and-then"></str>
+</strings>

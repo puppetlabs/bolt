@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA BASE XSD                                     -->
+<!--  VERSION:   1.1                                             -->
+<!--  DATE:      November 2006                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Based W3C XML Schema holds all the information    -->
+<!--             types                                             -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2006                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="urn:oasis:names:tc:dita:xsd:xml.xsd:1.1"/>
+  <!-- Add the domains to the base topic XML Schema -->
+  <!--  ================ TOPIC DOMAINS =====================  -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:uiDomain.xsd:1.1"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:softwareDomain.xsd:1.1"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:highlightDomain.xsd:1.1"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:programmingDomain.xsd:1.1"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:utilitiesDomain.xsd:1.1"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:indexingDomain.xsd:1.1"/>
+
+  <!--  ================ GROUP DEFINITIONS =====================  -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:referenceGrp.xsd:1.1" />
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:taskGrp.xsd:1.1" />
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:conceptGrp.xsd:1.1" />
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:glossaryGrp.xsd:1.1" />
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:metaDeclGrp.xsd:1.1"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:tblDeclGrp.xsd:1.1"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:topicGrp.xsd:1.1"/>
+  
+  <!-- =================  MODULE INLCUDE DEFINITION  ==================  -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:commonElementMod.xsd:1.1"/>
+  <!-- ======== Table elements ======== -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:tblDeclMod.xsd:1.1"/>    
+  <!-- ======= MetaData elements, plus keyword and indexterm ======= -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:metaDeclMod.xsd:1.1"/>
+  
+  <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:commonElementGrp.xsd:1.1">
+    <xs:group name="keyword">
+      <xs:choice>
+        <xs:group ref="keyword"/>
+        <xs:group ref="pr-d-keyword" />
+        <xs:group ref="ui-d-keyword" />
+        <xs:group ref="sw-d-keyword" />
+      </xs:choice>
+    </xs:group>
+
+    <xs:group name="ph">
+      <xs:choice>
+        <xs:group ref="ph"/>
+        <xs:group ref="pr-d-ph" />
+        <xs:group ref="ui-d-ph" />
+        <xs:group ref="hi-d-ph" />
+        <xs:group ref="sw-d-ph" />
+      </xs:choice>
+    </xs:group>
+
+    <xs:group name="pre">
+      <xs:choice>
+        <xs:group ref="pre"/>
+        <xs:group ref="pr-d-pre" />
+        <xs:group ref="ui-d-pre" />
+        <xs:group ref="sw-d-pre" />
+      </xs:choice>
+    </xs:group>
+
+
+    <xs:group name="dl">
+      <xs:choice>
+        <xs:group ref="dl"/>
+        <xs:group ref="pr-d-dl"/>
+      </xs:choice >
+    </xs:group >
+
+
+    <xs:group name="fig">
+      <xs:choice>
+        <xs:group ref="fig"/>
+        <xs:group ref="pr-d-fig"/>
+        <xs:group ref="ut-d-fig" />
+      </xs:choice>
+    </xs:group >
+    
+    <xs:group name="index-base">
+      <xs:choice>
+        <xs:group ref="index-base"/>
+        <xs:group ref="indexing-d-index-base"/>
+      </xs:choice>
+    </xs:group >
+    
+  </xs:redefine>
+
+  <!--  ================ INFO TYPES =====================  -->
+  <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:topicMod.xsd:1.1" >
+    <xs:complexType name="topic.class">
+      <xs:complexContent>
+        <xs:extension base="topic.class">
+          <xs:attribute name="domains" type="xs:string" default="(topic ui-d) (topic hi-d) (topic sw-d) (topic pr-d) (topic ut-d) (topic indexing-d)"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:group name="topic-info-types">
+      <xs:choice>
+        <xs:group ref="info-types"/>
+      </xs:choice>
+    </xs:group>
+  </xs:redefine>
+
+  <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:conceptMod.xsd:1.1" >
+    <xs:complexType name="concept.class">
+      <xs:complexContent>
+        <xs:extension base="concept.class">
+          <xs:attribute name="domains" type="xs:string" default="(topic ui-d) (topic hi-d) (topic sw-d) (topic pr-d) (topic ut-d) (topic indexing-d)"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:group name="concept-info-types">
+      <xs:choice>
+        <xs:group ref="info-types"/>
+      </xs:choice>
+    </xs:group>
+  </xs:redefine>
+
+  <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:taskMod.xsd:1.1" >
+    <xs:complexType name="task.class">
+      <xs:complexContent>
+        <xs:extension base="task.class">
+          <xs:attribute name="domains" type="xs:string" default="(topic ui-d) (topic hi-d) (topic sw-d) (topic pr-d) (topic ut-d) (topic indexing-d)"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:group name="task-info-types">
+      <xs:choice>
+        <xs:group ref="info-types"/>
+      </xs:choice>
+    </xs:group>
+  </xs:redefine>
+
+  <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:referenceMod.xsd:1.1" >
+    <xs:complexType name="reference.class">
+      <xs:complexContent>
+        <xs:extension base="reference.class">
+          <xs:attribute name="domains" type="xs:string" default="(topic ui-d) (topic hi-d) (topic sw-d) (topic pr-d) (topic ut-d) (topic indexing-d)"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:group name="reference-info-types">
+      <xs:choice>
+        <xs:group ref="info-types"/>
+      </xs:choice>
+    </xs:group>
+  </xs:redefine>
+  
+  <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:glossaryMod.xsd:1.1" >
+    <xs:complexType name="glossentry.class">
+      <xs:complexContent>
+        <xs:extension base="glossentry.class">
+          <xs:attribute name="domains" type="xs:string" default="(topic ui-d) (topic hi-d) (topic sw-d) (topic pr-d) (topic ut-d) (topic indexing-d)"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:group name="glossentry-info-types">
+      <xs:choice>
+        <xs:group ref="no-topic-nesting"/>
+      </xs:choice>
+    </xs:group>
+    
+  </xs:redefine>
+
+  <xs:group name="ditabase-info-types">
+    <xs:choice>
+      <xs:group ref="info-types"/>
+      </xs:choice>
+  </xs:group>
+
+  <xs:group name="info-types">
+    <xs:choice>
+      <xs:element ref="topic"/>
+      <xs:element ref="task"/>
+      <xs:element ref="concept"/>
+      <xs:element ref="reference"/>
+      <xs:element ref="glossentry"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:annotation>
+    <xs:documentation>The &lt;<keyword>dita</keyword>&gt; element provides a top-level container
+      for multiple topics when you create documents using the ditabase DTD. The
+      &lt;<keyword>dita</keyword>&gt; element lets you create any sequence of concept,
+      task, and reference topics, and the ditabase DTD lets you further nest these
+      topic types inside each other. The &lt;<keyword>dita</keyword>&gt; element has
+      no particular output implications; it simply allows you to create multiple
+      topics of different types at the same level in a single document.</xs:documentation>
+  </xs:annotation>
+  <xs:element name="dita" type="dita.class"/>
+  <xs:complexType name="dita.class">
+    <xs:choice maxOccurs="unbounded">
+      <xs:group ref="ditabase-info-types"/>
+    </xs:choice>
+     <xs:attributeGroup ref="global-atts"/>
+  </xs:complexType>
+
+</xs:schema>

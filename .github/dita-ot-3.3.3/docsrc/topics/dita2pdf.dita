@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="dita2pdf" xml:lang="en-US">
+  <title>PDF</title>
+  <shortdesc>The <option>pdf</option> transformation generates output in Portable Document Format.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>PDF<index-see-also>transformations</index-see-also></indexterm>
+        <indexterm>transformations<indexterm>PDF</indexterm></indexterm>
+        <indexterm>PDF<indexterm>plug-in, history of</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>dita2pdf</indexterm></indexterm>
+        <indexterm>dita2pdf</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>This transformation was originally created as a plug-in and maintained outside of the main toolkit code. It was
+      created as a more robust alternative to the demo PDF transformation in the original toolkit, and thus was known as
+      PDF2. The plug-in was bundled into the default toolkit distribution with release 1.4.3.</p>
+    <p>To run the PDF transformation, set the <parmname>transtype</parmname> parameter to <option>pdf</option>, or pass
+      the <parmname>--format</parmname>=<option>pdf</option> option to the <cmdname>dita</cmdname> command line.</p>
+    <codeblock><filepath conref="../resources/conref-task.dita#ID/dita-cmd"/> <parmname>--input</parmname>=<varname>input-file</varname> <parmname>--format</parmname>=<option>pdf</option></codeblock>
+    <p>where:</p>
+    <ul>
+      <li conref="../resources/conref-task.dita#ID/novice-variables-1"
+        conrefend="../resources/conref-task.dita#ID/novice-variables-2"/>
+    </ul>
+  </conbody>
+</concept>

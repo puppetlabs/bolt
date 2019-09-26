@@ -1,0 +1,64 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="You can generate output using the dita command-line tool. Build parameters can be specified on the command line or with .properties files."><meta name="DC.subject" content="macOS, command, dita, Linux, Windows, using"><meta name="keywords" content="macOS, command, dita, Linux, Windows, using"><meta name="DC.relation" scheme="URI" content="../topics/installing-client.html"><meta name="DC.relation" scheme="URI" content="../topics/build-using-dita-command.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="using-command-line-tool"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Building output using the dita command</title></head><body id="using-command-line-tool"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a><ul><li><a href="../topics/prerequisite-software.html">Prerequisite software</a></li><li><a href="../topics/determining-version-of-ditaot.html">Checking the version</a></li><li class="active"><a href="../topics/first-build-using-dita-command.html">Building output</a></li><li><a href="../topics/installing-via-homebrew.html">Installing via Homebrew</a></li></ul></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Building output using the <span class="keyword cmdname">dita</span> command</h1>
+  
+  
+  <div class="body taskbody"><p class="shortdesc">You can generate output using the <span class="keyword cmdname">dita</span> command-line tool. Build parameters can be
+    specified on the command line or with <span class="ph filepath">.properties</span> files.</p>
+    <section class="section context"><div class="tasklabel"><h2 class="sectiontitle tasklabel">About this task</h2></div>The DITA-OT client is a command-line tool with no graphical user interface. To verify
+      that your installation works correctly, you can build output using the sample files included in the distribution
+      package.</section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">Open a terminal window by typing the following in the search bar:</span>
+        <div class="itemgroup info">
+          <ul class="ul">
+            <li class="li">On Linux and macOS, type <kbd class="ph userinput">Terminal</kbd>.</li>
+            <li class="li">On Windows, type <kbd class="ph userinput">Command Prompt</kbd>.</li>
+          </ul>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">At the command-line prompt, enter the following command:</span>
+        <div class="itemgroup info"><pre class="pre codeblock"><code><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span> <span class="keyword parmname">--input</span>=<var class="keyword varname">input-file</var> <span class="keyword parmname">--format</span>=<var class="keyword varname">format</var> </code></pre>
+          <p class="p">where:</p>
+          <ul class="ul">
+            <li class="li"><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var></span> is the DITA-OT installation directory.</li><li class="li"><var class="keyword varname">input-file</var> is the DITA map or DITA file that you want to
+              process.</li><li class="li">
+              <p class="p" id="using-command-line-tool__d12e189">
+                <var class="keyword varname">format</var> is the output format (transformation type).
+                This argument corresponds to the common parameter
+                <span class="keyword parmname">transtype</span>.
+                Use the same values as for the <span class="keyword parmname">transtype</span> build
+                parameter, for example <span class="keyword option">html5</span> or <span class="keyword option">pdf</span>.
+              </p>
+            </li>
+            
+            
+            
+          </ul></div>
+        <div class="itemgroup stepresult">
+          <p class="p">If processing is successful, nothing is printed in the terminal window. The built output is written to the
+            specified output directory (by default, in the <span class="ph filepath">out</span> subdirectory of the current
+            directory).</p>
+          <div class="note tip note_tip" id="using-command-line-tool__d12e590"><span class="note__title">Tip:</span> Add the absolute path for <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var></span><span class="ph filepath">/bin</span> to the <var class="keyword varname">PATH</var> environment variable to run the
+              <span class="keyword cmdname">dita</span> command from any location on the file system without typing the path.
+            
+          </div>
+        </div>
+      </li></ol></section>
+    <section class="example"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Example</h2></div>
+      <p class="p">Run from <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/docsrc/samples</span>, the following command generates
+        HTML5 output for the <span class="ph filepath">sequence.ditamap</span> file:</p>
+      <pre class="pre codeblock"><code><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span> <span class="keyword parmname">--input</span>=<span class="ph filepath">sequence.ditamap</span> <span class="keyword parmname">--format</span>=<span class="keyword option">html5</span></code></pre>
+      
+    </section>
+    
+    <section class="section postreq"><div class="tasklabel"><h2 class="sectiontitle tasklabel">What to do next</h2></div>
+      <p class="p">Most builds require you to specify more options than are described in this topic.</p>
+      
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/installing-client.html" title="The DITA-OT distribution package can be installed on Linux, macOS, and Windows. It contains everything that you need to run the toolkit except for Java.">Installing DITA Open Toolkit</a></div></div><div class="linklist relinfo reltasks"><strong>Related tasks</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/build-using-dita-command.html" title="You can generate output using the dita command-line tool. Build parameters can be specified on the command line or with .properties files.">More information about building output with the <span class="keyword cmdname">dita</span> command</a></li></ul></div></nav></article></main></body></html>

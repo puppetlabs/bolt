@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | <variable id="Preface title"/> | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | <variable id="Preface title"/> | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Innehållsförteckning</variable>
+  <variable id="Index Continued String">forts</variable>
+  <variable id="Index See String">, Se </variable>
+  <variable id="Index See Also String">Se Även </variable>
+  <variable id="Table of Contents Chapter">Kapitel <param ref-name="number"/>. </variable>
+  <variable id="Table of Contents Appendix">Appendix <param ref-name="number"/>. </variable>
+  <variable id="Table of Contents Part">Del <param ref-name="number"/>. </variable>
+  <variable id="Table of Contents Preface">Företal: </variable>
+  <variable id="Preface title">Företal</variable>
+  <variable id="Notices title"><!--TODO:Notice--></variable>
+  <variable id="Mini Toc"><!--TODO:Topics: --></variable>
+  <variable id="Notice"><!--TODO:Notice--></variable>
+  <variable id="Figure.title">Figur <param ref-name="number"/>. <param ref-name="title"/></variable>
+  <variable id="Figure Number">Figur <param ref-name="number"/></variable>
+  <variable id="Table.title">Tabell <param ref-name="number"/>. <param ref-name="title"/></variable>
+  <variable id="Table Number">Tabell <param ref-name="number"/></variable>
+  <variable id="Related Links"><!--TODO:Related Links--></variable>
+  <variable id="Cross-Reference"/><!--UNUSED-->
+  <variable id="Content-Reference"/><!--UNUSED-->
+  <variable id="List item"><!--TODO:List item.--></variable>
+  <variable id="Foot note"><!--TODO:Footnote.--></variable>
+  <variable id="Navigation title"><!--TODO:Navigation title--></variable>
+  <variable id="Search title"><!--TODO:Search title--></variable>
+  <variable id="Chapter with number">Kapitel <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Appendix <param ref-name="number"/></variable>
+  <variable id="Part with number">Del <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup"><!--TODO:[Required-Cleanup]--></variable>
+  <variable id="On the page"/>
+  <variable id="Page"> sidan <param ref-name="pagenum"/></variable>
+  <variable id="This link"/><!--UNUSED-->
+  <variable id="Child topics"/><!--UNUSED-->
+  <variable id="Related references">Närliggande referens</variable><!--UNUSED-->
+  <variable id="Optional Step">Valfritt:</variable>
+  <variable id="Required Step">Krävs:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Gloslista</variable>
+  <variable id="List of Tables">Tabellförteckning</variable>
+  <variable id="List of Figures">Figurförteckning</variable>
+</vars>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+ "../../../../dtd/task.dtd">
+ <!-- 
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+     
+     Copyright 2007 Shawn McKenzie
+     *-->
+     <?xml-stylesheet href="../../../xsl/ditaview_shell.xsl" type="text/xsl"?>
+<task id="tocjs_buildsample" xml:lang="en-us">
+    <title>Build TOCJS sample output</title>
+    <taskbody>
+        <context>
+            <p>This task will walk you through building the tocjs sample documentation. First, be
+                sure you have installed and integrated the tocjs plugin.</p>
+        </context>
+        <steps>
+            <step>
+                <cmd>Change directories to the <filepath>sample</filepath> directory of the tocjs
+                    plugin.</cmd><info>This should be in the <menucascade>
+                        <uicontrol>demo</uicontrol>
+                        <uicontrol>tocjs</uicontrol>
+                        <uicontrol>sample</uicontrol>
+                    </menucascade> directory
+                    </info>
+            </step>
+            <step>
+                <cmd>Type <userinput>ant -f buildtocjs.xml sample2html</userinput></cmd>
+           <info>The <codeph>sample2html</codeph> task generates XHTML, and tocjs output and copies
+               related JavaScript and a <filepath>frameset.html</filepath> file into <menucascade>
+                   <uicontrol>out</uicontrol>
+                   <uicontrol>tocjs</uicontrol>
+               </menucascade> in your base DITA directory.
+           </info>
+            </step>
+            <step>
+                <cmd>From your base DITA directory, open <menucascade>
+                    <uicontrol>out</uicontrol>
+                    <uicontrol>tocjs</uicontrol>
+                    <uicontrol>frameset.html</uicontrol>
+                </menucascade> in a JavaScript-enabled browser.
+                </cmd>
+            </step>
+     </steps>
+
+    </taskbody>
+</task>

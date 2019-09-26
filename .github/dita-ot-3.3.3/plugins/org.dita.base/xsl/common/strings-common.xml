@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2017 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="">
+  <str name="figure-number-separator"> </str>
+  <str name="OpenQuote">“</str>
+  <str name="CloseQuote">”</str>
+  <str name="ColonSymbol">:</str>
+  <str name="#menucascade-separator"> &gt; </str>
+  <!-- Text that goes before a link to a topic -->
+  <str name="intro-to-topic-link"></str>
+</strings>

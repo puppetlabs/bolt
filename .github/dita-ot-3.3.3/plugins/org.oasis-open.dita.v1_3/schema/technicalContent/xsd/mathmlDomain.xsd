@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--                                                             -->
+<!--============================================================= -->
+<!--MODULE:    DITA MathML Domain - RNG                          -->
+<!--VERSION:   1.3                                                -->
+<!--DATE:      May 2013                                          -->
+<!--============================================================= -->
+<!--============================================================= -->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--PURPOSE:    Provides elements for including MathML Markup    -->
+<!--           in DITA documents.                                -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--May 2013                                                     -->
+<!--(C) Copyright OASIS Open 2013                                -->
+<!--All Rights Reserved.                                          -->
+<!--=============================================================    -->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:import schemaLocation="mathml/mathml3/mathml3.xsd"
+              namespace="http://www.w3.org/1998/Math/MathML"/>
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic mathml-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="mathmlref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="mathmlref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="mathml">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="mathml"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="mathml-d-foreign">
+      <xs:choice>
+         <xs:element ref="mathml"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="mathmlref">
+      <xs:annotation>
+         <xs:documentation>
+The MathML reference (&lt;mathmlref&gt;) element is used to refer to a
+non-DITA XML document containing MathML markup in order to use the
+markup by reference. The reference must be to a MathML &lt;math&gt;
+element. The reference may be a URI that addresses an XML document
+whose root element is a MathML &lt;math&gt; element or a URI that
+addresses and XML document and a fragment identifier that is the XML
+
+ID of a &lt;math&gt; element within the document.
+NOTE: To reuse MathML markup stored within a DITA topic, use a normal
+content reference from the &lt;mathml&gt; element.
+
+The reference may be direct, via the @href attribute, or indirect,
+via the @keyref attribute. For key references, only the key name
+should be specified. Any fragment identifier for specifying the ID of
+the &lt;mathml&gt; element to use must be specified as part of the key
+definition's @href value.
+
+Example: For example, to refer to the &lt;math&gt; element
+with the @id value "equation-02" within a larger document using a key
+reference, you would define the key like
+so:
+
+&lt;keydef keys="mathml-equation-02" href="math/mathml-equations.xml#equation-02" format="mathml"/&gt;
+
+You would refer to this key using just the key name:
+
+&lt;mathml&gt;
+  &lt;mathmlref keyref="mathml-equation-02"/&gt;
+&lt;/mathml&gt;
+
+The MathML should be processed and rendered as though the
+&lt;m:math&gt; element had occurred directly in the content of the
+containing &lt;mathml&gt; element.
+
+This element is part of the DITA MathML domain. Category: XRef
+elements
+      </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="mathmlref.class">
+               <xs:attribute ref="class" default="+ topic/xref mathml-d/mathmlref "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="mathmlref.class">
+      <xs:sequence>
+         <xs:group ref="mathmlref.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="mathmlref.attributes"/>
+   </xs:complexType>
+   <xs:group name="mathmlref.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="mathmlref.attributes">
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string" default="mml"/>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="local"/>
+               <xs:enumeration value="peer"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="mathml">
+      <xs:annotation>
+         <xs:documentation>
+The MathML container (&lt;mathml&gt;) element contains inline MathML markup or
+references to MathML elements stored in a separate non-DITA XML
+document.
+
+The purpose of this element is simply to contain MathML markup. It is
+not intended, by itself, to convey the semantic of "equation". Rather,
+it simply serves to hold one of many possible ways that the content of
+an equation may be represented. The companion equation domain provides
+elements for representing equations semantically, independent of the
+format of the equation content.
+
+The MathML markup must have a root element of "math" within the MathML
+namespace "http://www.w3.org/1998/Math/MathML".
+This element is part of the DITA MathML domain. Category: Foreign
+elements
+    </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="mathml.class">
+               <xs:attribute ref="class" default="+ topic/foreign mathml-d/mathml "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="mathml.class">
+      <xs:sequence>
+         <xs:group ref="mathml.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="mathml.attributes"/>
+   </xs:complexType>
+   <xs:group name="mathml.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element xmlns:m="http://www.w3.org/1998/Math/MathML" ref="m:math"/>
+            <xs:group ref="mathmlref"/>
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="mathml.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

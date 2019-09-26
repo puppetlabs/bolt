@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<!--DITA BASE-->
+
+   <group><!-- System ID (URL) catalog entries -->
+      <!-- Errata 02: The following two entries use "xsd:" where they should use "rng:". Correct
+                     entries follow.
+        -->
+      <system systemId="urn:oasis:names:tc:dita:xsd:ditaval.rng:1.3"
+              uri="rng/ditaval.rng"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:ditaval.rng"
+              uri="rng/ditaval.rng"/>
+      <system systemId="urn:oasis:names:tc:dita:rng:ditaval.rng:1.3"
+              uri="rng/ditaval.rng"/>
+      <system systemId="urn:oasis:names:tc:dita:rng:ditaval.rng:1.x"
+              uri="rng/ditaval.rng"/>
+      <system systemId="urn:oasis:names:tc:dita:rng:ditaval.rng"
+              uri="rng/ditaval.rng"/>
+   </group>
+   <group><!-- Public ID (URN) catalog entries -->
+     <!-- Errata 02: The following two entries use "xsd:" where they should use "rng:". Correct
+                     entries follow.
+       -->
+     <uri name="urn:oasis:names:tc:dita:xsd:ditaval.rng:1.3"
+           uri="rng/ditaval.rng"/>
+     <uri name="urn:oasis:names:tc:dita:xsd:ditaval.rng" uri="rng/ditaval.rng"/>
+     <uri name="urn:oasis:names:tc:dita:rng:ditaval.rng:1.3"
+          uri="rng/ditaval.rng"/>
+     <uri name="urn:oasis:names:tc:dita:rng:ditaval.rng:1.x"
+          uri="rng/ditaval.rng"/>
+     <uri name="urn:oasis:names:tc:dita:rng:ditaval.rng" uri="rng/ditaval.rng"/>
+   </group>
+</catalog>

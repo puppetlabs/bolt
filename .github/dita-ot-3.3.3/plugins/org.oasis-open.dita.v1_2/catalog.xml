@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+-->
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  
+  <nextCatalog catalog="dtd/catalog.xml"/>
+  <nextCatalog catalog="schema/catalog.xml"/>
+  
+ </catalog>

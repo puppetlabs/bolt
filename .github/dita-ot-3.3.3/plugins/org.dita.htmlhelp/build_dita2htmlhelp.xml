@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+--><project xmlns:dita="http://dita-ot.sourceforge.net" xmlns:if="ant:if" xmlns:unless="ant:unless" name="dita2htmlhelp">
+
+  <target name="dita2htmlhelp" unless="noMap" depends="dita2htmlhelp.init,                    build-init,                    use-init.envhhcdir,                    use-init.hhcdir,                    preprocess2,                    htmlhelp.topics,                    htmlhelp.copy-image,                    copy-css">
+    <antcall target="dita.map.htmlhelp"/>
+  </target>
+
+  <target name="dita2htmlhelp.init">
+    <property name="html-version" value="html"/>
+    <property name="temp.output.dir.name" value="temp_chm_dir"/>
+    <property name="preprocess.copy-image.skip" value="true"/>
+  </target>
+
+  <target name="use-init.envhhcdir" if="env.HHCDIR">
+    <available file="${env.HHCDIR}/hhc.exe" property="HTMLHelpCompiler" value="${env.HHCDIR}${file.separator}hhc.exe"/>
+  </target>
+
+  <target name="use-init.hhcdir" unless="env.HHCDIR">
+    <condition property="hhc.dir" value="${env.ProgramFiles(x86)}\HTML Help Workshop" else="${env.ProgramFiles}\HTML Help Workshop">
+      <available file="${env.ProgramFiles(x86)}\HTML Help Workshop" type="dir"/>
+    </condition>
+    <available file="${hhc.dir}/hhc.exe" property="HTMLHelpCompiler" value="${hhc.dir}${file.separator}hhc.exe"/>
+  </target>
+  
+  <target name="htmlhelp.copy-image" description="Copy image files">
+    <copy todir="${dita.output.dir}" failonerror="false">
+      <ditafileset format="image"/>
+      <jobmapper type="temp"/>
+    </copy>
+  </target>
+
+  <target name="htmlhelp.topics" depends="xhtml.init,                    xhtml.image-metadata">
+    <topics.html>
+      
+      
+    </topics.html>
+  </target>
+
+  <target name="dita.map.htmlhelp" depends="dita.map.htmlhelp.init,                    dita.map.htmlhelp.hhp,                    dita.map.htmlhelp.hhc,                    dita.map.htmlhelp.hhk,                    dita.htmlhelp.convertlang,                    compile.HTML.Help"/> 
+
+  <target name="dita.map.htmlhelp.init" description="Init properties for HTMLHelp">
+    <condition property="out.ext" value=".html">
+      <not>
+        <isset property="out.ext"/>
+      </not>
+    </condition>
+    <property name="args.output.base" value="${dita.map.filename.root}"/>
+  </target>
+
+  <target name="dita.map.htmlhelp.hhp" depends="dita.map.htmlhelp.init" description="Build HTMLHelp HHP file">
+    <local name="htmlhelp.hhp.output.dir"/>
+    <condition property="htmlhelp.hhp.output.dir" value="${dita.output.dir}" else="${_dita.map.output.dir}">
+      <isset property="inner.transform"/>
+    </condition>
+    <pipeline>
+    <xslt destdir="${htmlhelp.hhp.output.dir}" style="${dita.plugin.org.dita.htmlhelp.dir}/xsl/map2hhp.xsl">
+      <ditafileset input="true" processingRole="normal"/>
+      <param name="OUTEXT" expression="${out.ext}" if:set="out.ext"/>
+      <param name="HHCNAME" expression="${args.output.base}.hhc"/>
+      <param name="INCLUDEFILE" expression="${args.htmlhelp.includefile}" if:set="args.htmlhelp.includefile"/>
+      <param name="defaultLanguage" expression="${default.language}"/>
+      <xmlcatalog refid="dita.catalog"/>
+      <mapper type="merge" to="${args.output.base}.hhp"/>
+    </xslt>
+    </pipeline>
+  </target>
+
+  <target name="dita.map.htmlhelp.hhc" depends="dita.map.htmlhelp.init" description="Build HTMLHelp HHC file">
+    <local name="htmlhelp.hhc.output.dir"/>
+    <condition property="htmlhelp.hhc.output.dir" value="${dita.output.dir}" else="${_dita.map.output.dir}">
+      <isset property="inner.transform"/>
+    </condition>
+    <pipeline>
+    <xslt destdir="${htmlhelp.hhc.output.dir}" style="${dita.plugin.org.dita.htmlhelp.dir}/xsl/map2hhc.xsl">
+      <ditafileset input="true" processingRole="normal"/>
+      <param name="OUTEXT" expression="${out.ext}" if:set="out.ext"/>
+      <param name="defaultLanguage" expression="${default.language}"/>
+      <xmlcatalog refid="dita.catalog"/>
+      <mapper type="merge" to="${args.output.base}.hhc"/>
+    </xslt>
+    </pipeline>
+  </target>
+
+  <target name="dita.map.htmlhelp.hhk" depends="dita.map.htmlhelp.init" description="Build HTMLHelp HHK file">
+    <local name="htmlhelp.hhk.output.dir"/>
+    <condition property="htmlhelp.hhk.output.dir" value="${dita.output.dir}" else="${_dita.map.output.dir}">
+      <isset property="inner.transform"/>
+    </condition>
+    <pipeline message="Extract index term." inputmap="${user.input.file}">
+      <module class="org.dita.dost.module.IndexTermExtractModule">
+        <param name="output" location="${htmlhelp.hhk.output.dir}/${args.output.base}.hhk"/>
+        <param name="targetext" value="${out.ext}"/>
+        <param name="indextype" value="htmlhelp"/>
+        <param name="indexclass" value="org.dita.dost.writer.CHMIndexWriter"/>
+        <param name="encoding" value="${args.dita.locale}" if:set="args.dita.locale"/>
+        <param name="defaultLanguage" expression="${default.language}"/>
+      </module>
+    </pipeline>
+  </target>
+
+  <target name="dita.htmlhelp.convertlang">
+    <taskdef name="check-lang" classname="org.dita.dost.ant.CheckLang"/>
+    <taskdef name="convert-lang" classname="org.dita.dost.ant.ConvertLang"/>
+    <check-lang message="Check Language" basedir="${dita.dir}" tempdir="${dita.temp.dir}" inputmap="${user.input.file}" outputdir="${dita.output.dir}"/>
+    <convert-lang message="Convert Language" basedir="${dita.dir}" outputdir="${dita.output.dir}" langcode="${htmlhelp.locale}"/>
+  </target>
+
+  <target name="compile.HTML.Help" if="HTMLHelpCompiler" description="Compile HTMLHelp output">
+    <exec executable="${HTMLHelpCompiler}" failonerror="${failonerror}" failifexecutionfails="${failonerror}">
+      <arg file="${dita.output.dir}/${args.output.base}.hhp"/>
+    </exec>
+    <copy todir="${output.dir}">
+      <fileset dir="${dita.output.dir}" includes="*.chm"/>
+    </copy>
+  </target>
+
+</project>

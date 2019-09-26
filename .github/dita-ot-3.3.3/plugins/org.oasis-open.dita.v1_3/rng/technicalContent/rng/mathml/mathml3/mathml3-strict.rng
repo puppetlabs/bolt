@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+      This is the Mathematical Markup Language (MathML) 3.0, an XML
+      application for describing mathematical notation and capturing
+      both its structure and content.
+  
+      Copyright 1998-2008 W3C (MIT, ERCIM, Keio)
+  
+      Use and distribution of this code are permitted under the terms
+      W3C Software Notice and License
+      http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+  
+  
+      Revision:   $Id: mathml3-strict.rng,v 1.3 2008/11/15 22:00:48 dcarlis Exp $
+  
+     Update to MathML3 and Relax NG: David Carlisle and Michael Kohlhase
+  
+   This is the RelaxNG schema module for the strict content part of MathML.
+-->
+<grammar ns="http://www.w3.org/1998/Math/MathML" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <include href="mathml3-common.rng"/>
+  <define name="math.content" combine="choice">
+    <ref name="ContExp"/>
+  </define>
+  <!-- ednote(rnc:opel-content) What is the content of a operator element, currently all text? -->
+  <define name="opel.content">
+    <text/>
+  </define>
+  <!--
+    we want to extend this in pragmatic CMathML, so we introduce abbrevs here.
+    ednote(rnc:cn-content) What is the content of a cn?
+  -->
+  <define name="cn.content">
+    <choice>
+      <text/>
+      <group>
+        <ref name="cn"/>
+        <ref name="cn"/>
+      </group>
+    </choice>
+  </define>
+  <define name="cn.type.vals">
+    <choice>
+      <value>integer</value>
+      <value>real</value>
+      <value>double</value>
+    </choice>
+  </define>
+  <define name="cn">
+    <element name="cn">
+      <optional>
+        <attribute name="base"/>
+      </optional>
+      <optional>
+        <attribute name="type">
+          <ref name="cn.type.vals"/>
+        </attribute>
+      </optional>
+      <ref name="Definition.attrib"/>
+      <ref name="MathML.Common.attrib"/>
+      <zeroOrMore>
+        <ref name="cn.content"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="ci">
+    <element name="ci">
+      <optional>
+        <attribute name="type">
+          <data type="string"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="nargs">
+          <data type="string"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="occurrence">
+          <data type="string"/>
+        </attribute>
+      </optional>
+      <ref name="Definition.attrib"/>
+      <ref name="MathML.Common.attrib"/>
+      <ref name="opel.content"/>
+      <optional>
+        <ref name="name.attrib"/>
+      </optional>
+    </element>
+  </define>
+  <define name="cdname.attrib">
+    <attribute name="cd">
+      <data type="NCName"/>
+    </attribute>
+  </define>
+  <define name="csymbol">
+    <element name="csymbol">
+      <ref name="MathML.Common.attrib"/>
+      <ref name="Definition.attrib"/>
+      <optional>
+        <ref name="cdname.attrib"/>
+      </optional>
+      <optional>
+        <ref name="cdbase.attrib"/>
+      </optional>
+      <ref name="opel.content"/>
+    </element>
+  </define>
+  <!-- the content of the apply element, leave it empty and extend it later -->
+  <define name="apply">
+    <element name="apply">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="cdbase.attrib"/>
+      </optional>
+      <ref name="apply.content"/>
+    </element>
+  </define>
+  <define name="apply-head">
+    <choice>
+      <ref name="apply"/>
+      <ref name="bind"/>
+      <ref name="ci"/>
+      <ref name="csymbol"/>
+      <ref name="semantics-apply"/>
+    </choice>
+  </define>
+  <define name="apply.content">
+    <ref name="apply-head"/>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="semantics-apply">
+    <element name="semantics">
+      <ref name="semantics.attribs"/>
+      <ref name="apply-head"/>
+      <zeroOrMore>
+        <ref name="semantics-annotation"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="qualifier">
+    <notAllowed/>
+  </define>
+  <!-- the content of the bind element, leave it empty and extend it later -->
+  <define name="bind">
+    <element name="bind">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="cdbase.attrib"/>
+      </optional>
+      <ref name="bind.content"/>
+    </element>
+  </define>
+  <define name="bind-head">
+    <choice>
+      <ref name="apply"/>
+      <ref name="csymbol"/>
+      <ref name="semantics-bind"/>
+    </choice>
+  </define>
+  <define name="bind.content">
+    <ref name="bind-head"/>
+    <zeroOrMore>
+      <ref name="bvar"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="qualifier"/>
+    </optional>
+    <ref name="ContExp"/>
+  </define>
+  <define name="semantics-bind">
+    <element name="semantics">
+      <ref name="semantics.attribs"/>
+      <ref name="bind-head"/>
+      <zeroOrMore>
+        <ref name="semantics-annotation"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="bvar">
+    <element name="bvar">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="cdbase.attrib"/>
+      </optional>
+      <ref name="bvar-head"/>
+    </element>
+  </define>
+  <define name="bvar-head">
+    <choice>
+      <ref name="ci"/>
+      <ref name="semantics-bvar"/>
+    </choice>
+  </define>
+  <define name="semantics-bvar">
+    <element name="semantics">
+      <ref name="semantics.attribs"/>
+      <ref name="bvar-head"/>
+      <zeroOrMore>
+        <ref name="semantics-annotation"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="share">
+    <element name="share">
+      <ref name="MathML.Common.attrib"/>
+      <attribute name="href">
+        <data type="anyURI"/>
+      </attribute>
+    </element>
+  </define>
+  <!-- the content of the cerror element, leave it empty and extend it later -->
+  <define name="cerror">
+    <element name="cerror">
+      <ref name="MathML.Common.attrib"/>
+      <optional>
+        <ref name="cdbase.attrib"/>
+      </optional>
+      <ref name="cerror.content"/>
+    </element>
+  </define>
+  <define name="cerror-head">
+    <choice>
+      <ref name="csymbol"/>
+      <ref name="apply"/>
+      <ref name="semantics-cerror"/>
+    </choice>
+  </define>
+  <define name="cerror.content">
+    <ref name="cerror-head"/>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="semantics-cerror">
+    <element name="semantics">
+      <ref name="semantics.attribs"/>
+      <ref name="cerror-head"/>
+      <zeroOrMore>
+        <ref name="semantics-annotation"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="semantics-cmml">
+    <element name="semantics">
+      <ref name="semantics.attribs"/>
+      <ref name="ContExp"/>
+      <zeroOrMore>
+        <ref name="semantics-annotation"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="ContExp">
+    <choice>
+      <ref name="cn"/>
+      <ref name="ci"/>
+      <ref name="csymbol"/>
+      <ref name="apply"/>
+      <ref name="bind"/>
+      <ref name="share"/>
+      <ref name="cerror"/>
+      <ref name="semantics-cmml"/>
+    </choice>
+  </define>
+</grammar>

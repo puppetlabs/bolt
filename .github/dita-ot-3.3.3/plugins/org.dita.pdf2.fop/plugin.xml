@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2015 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<plugin id="org.dita.pdf2.fop" version="3.3.3">
+  <require plugin="org.dita.pdf2"/>
+  <!-- extensions -->
+  <feature extension="depend.org.dita.pdf2.init.pre" value="transform.fo2pdf.fop.init"/>
+  <feature extension="depend.org.dita.pdf2.format" value="transform.fo2pdf.fop"/>
+  <feature extension="dita.conductor.lib.import" file="lib/avalon-framework-api-4.3.1.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/avalon-framework-impl-4.3.1.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/batik-all-1.10.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/fontbox-2.0.13.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/fop-pdf-images-2.3.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/pdfbox-2.0.13.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/fop-2.3.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/jcl-over-slf4j-1.7.25.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/xml-apis-ext-1.3.04.jar"/>
+  <feature extension="dita.conductor.lib.import" file="lib/xmlgraphics-commons-2.3.jar"/>
+  <transtype name="pdf" desc="PDF">
+    <param name="pdf.formatter" desc="Specifies the XSL processor." type="enum">
+      <val desc="Apache FOP" default="true">fop</val>
+    </param>
+    <param name="args.fo.userconfig" desc="Specifies the user configuration file for FOP." type="file"/>
+  </transtype>
+  <feature extension="dita.conductor.pdf2.formatter.check" value="fop"/>
+  <feature extension="ant.import" file="build_fop.xml"/>
+  <template file="xsl/fo/topic2fo_shell_fop_template.xsl"/>
+</plugin>

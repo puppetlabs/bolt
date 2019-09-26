@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<topic id="configuring" xml:lang="en-us">
+  <title>Configuring</title>
+  <shortdesc>You configure components to set up or refine your solution.</shortdesc>
+  <body>
+    <p>You don't have to get the best configuration the first time. Instead, you might start with a simple configuration
+      and then refine it gradually as needed. </p>
+  </body>
+</topic>

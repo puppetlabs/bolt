@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ============================================================= -->
+<!-- HEADER -->
+<!-- ============================================================= -->
+<!-- MODULE:    DITA Subject Scheme Map XSD Group definition -->
+<!-- VERSION:   1.2 -->
+<!-- DATE:      February 2009 -->
+<!---->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA) -->
+<!---->
+<!-- PURPOSE:    XSD to describe DITA Subject Scheme maps -->
+<!---->
+<!-- ORIGINAL CREATION DATE: -->
+<!-- February 2009 -->
+<!---->
+<!-- (C) Copyright OASIS Open 2009. -->
+<!-- (C) Copyright IBM Corporation 2005, 2007. -->
+<!-- All Rights Reserved. -->
+<!---->
+<!-- UPDATES: -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:group name="schemeref">
+    <xs:sequence>
+      <xs:element ref="schemeref"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="hasNarrower">
+    <xs:sequence>
+      <xs:element ref="hasNarrower"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="hasKind">
+    <xs:sequence>
+      <xs:element ref="hasKind"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="hasPart">
+    <xs:sequence>
+      <xs:element ref="hasPart"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="hasInstance">
+    <xs:sequence>
+      <xs:element ref="hasInstance"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="hasRelated">
+    <xs:sequence>
+      <xs:element ref="hasRelated"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="subjectdef">
+    <xs:sequence>
+      <xs:element ref="subjectdef"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="subjectHead">
+    <xs:sequence>
+      <xs:element ref="subjectHead"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="subjectHeadMeta">
+    <xs:sequence>
+      <xs:element ref="subjectHeadMeta"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="enumerationdef">
+    <xs:sequence>
+      <xs:element ref="enumerationdef"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="elementdef">
+    <xs:sequence>
+      <xs:element ref="elementdef"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="attributedef">
+    <xs:sequence>
+      <xs:element ref="attributedef"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="defaultSubject">
+    <xs:sequence>
+      <xs:element ref="defaultSubject"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="relatedSubjects">
+    <xs:sequence>
+      <xs:element ref="relatedSubjects"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="subjectRelTable">
+    <xs:sequence>
+      <xs:element ref="subjectRelTable"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="subjectRelHeader">
+    <xs:sequence>
+      <xs:element ref="subjectRelHeader"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="subjectRel">
+    <xs:sequence>
+      <xs:element ref="subjectRel"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="subjectRole">
+    <xs:sequence>
+      <xs:element ref="subjectRole"/>
+    </xs:sequence>
+  </xs:group>
+</xs:schema>

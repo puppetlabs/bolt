@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2017 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <!-- 
+   
+    This file defines common variables that appear in the published output.
+    These variables do not use any localized text, although they
+    may use variables that supply localized text.
+    
+    Any common variable may be copied into <locale ISO code>.xml to provide a 
+    locale-specific version of the variable.
+    
+  -->
+
+  <!-- Product name to be placed inside headers etc. -->
+  <variable id="Product Name"/>
+
+  <!-- The header that appears on the odd-numbered table of contents pages. --> 
+  <variable id="Toc odd header"><param ref-name="prodname"/> | <param ref-name="heading"/> | <param ref-name="pagenum"/></variable>
+
+  <!-- The header that appears on the odd-numbered table of contents pages. --> 
+  <variable id="Toc even header"><param ref-name="pagenum"/> | <param ref-name="heading"/> | <param ref-name="prodname"/></variable>
+
+  <!-- The footer that appears on odd-numbered pages. -->
+  <variable id="Body odd footer"/>
+
+  <!-- The footer that appears on even-numbered pages. -->
+  <variable id="Body even footer"/>
+
+  <!-- The footer that appears on the first page of a chapter. -->
+  <variable id="Body first footer"/>
+
+  <!-- The header that appears on the first page of a chapter. -->
+  <variable id="Body first header"/>
+
+  <!-- The header that appears on odd-numbered pages. -->
+  <variable id="Body odd header"><param ref-name="prodname"/> | <param ref-name="heading"/> | <param ref-name="pagenum"/></variable>
+
+  <!-- The header that appears on even-numbered pages. -->
+  <variable id="Body even header"><param ref-name="pagenum"/> | <param ref-name="heading"/> | <param ref-name="prodname"/></variable>
+
+  <!-- The footer that appears on Preface odd-numbered pages. -->
+  <variable id="Preface odd footer"/>
+
+  <!-- The footer that appears on Preface even-numbered pages. -->
+  <variable id="Preface even footer"/>
+
+  <!-- The footer that appears on the first page of a Preface -->
+  <variable id="Preface first footer"/>
+
+  <!-- The header that appears on Preface first page. -->
+  <variable id="Preface first header"/>
+
+  <!-- The footer that appears on the odd-numbered table of contents pages. --> 
+  <variable id="Toc odd footer"/>
+
+  <!-- The footer that appears on the even-numbered table of contents pages. --> 
+  <variable id="Toc even footer"/>
+
+  <!-- The footer that appears on the odd-numbered index pages. -->
+  <variable id="Index odd footer"/>
+
+  <!-- The footer that appears on the even-numbered index pages. -->
+  <variable id="Index even footer"/>
+
+  <!-- The header that appears on the odd-numbered index pages. -->
+  <variable id="Index odd header"><param ref-name="prodname"/> | <param ref-name="heading"/> | <param ref-name="pagenum"/></variable>
+
+  <!-- The header that appears on the even-numbered index pages. -->
+  <variable id="Index even header"><param ref-name="pagenum"/> | <param ref-name="heading"/> | <param ref-name="prodname"/></variable>
+  
+  <!-- The footer that appears on the odd-numbered glossary pages. -->
+  <variable id="Glossary odd footer"/>
+  
+  <!-- The footer that appears on the even-numbered glossary pages. -->
+  <variable id="Glossary even footer"/>
+  
+  <!-- The header that appears on the odd-numbered glossary pages. -->
+  <variable id="Glossary odd header"><param ref-name="prodname"/> | <param ref-name="heading"/> | <param ref-name="pagenum"/></variable>
+  
+  <!-- The header that appears on the even-numbered glossary pages. -->
+  <variable id="Glossary even header"><param ref-name="pagenum"/> | <param ref-name="heading"/> | <param ref-name="prodname"/></variable>
+
+  <!-- The formatting used to display ordered lists (e.g., "1., 2." or "1), 2)" -->
+  <variable id="Ordered List Number"><param ref-name="number"/>. </variable>
+  <variable id="Ordered List Number 1"><param ref-name="number"/>. </variable>
+  <variable id="Ordered List Number 2"><param ref-name="number"/>. </variable>
+  <variable id="Ordered List Number 3"><param ref-name="number"/>. </variable>
+  <variable id="Ordered List Number 4"><param ref-name="number"/>. </variable>
+  <variable id="Ordered List Format 1">1</variable>
+  <variable id="Ordered List Format 2">a</variable>
+  <variable id="Ordered List Format 3">1</variable>
+  <variable id="Ordered List Format 4">a</variable>
+
+  <!-- The unordered list bullet   -->
+  <variable id="Unordered List bullet">•</variable>
+  <variable id="Unordered List bullet 1">•</variable>
+  <variable id="Unordered List bullet 2">•</variable>
+  <variable id="Unordered List bullet 3">•</variable>
+  <variable id="Unordered List bullet 4">•</variable>
+
+  <!-- The string used to label a preface within the table of contents. -->
+  <variable id="Table of Contents Notices"/>
+
+  <!-- French, Japanese override #note-separator -->
+  <variable id="#note-separator">: </variable>
+
+  <!-- To restore finger image used before 2.2, reference the image: Configuration/OpenTopic/cfg/common/artwork/hand.gif -->
+  <!-- Image path to use for a note of "note" type. -->
+  <variable id="note Note Image Path"></variable>
+  <!-- Image path to use for a note of "notice" type. -->
+  <variable id="notice Note Image Path"></variable>
+  <!-- Image path to use for a note of "attention" type. -->
+  <variable id="attention Note Image Path">Configuration/OpenTopic/cfg/common/artwork/ISO_7010_W001.svg</variable>
+  <!-- Image path to use for a note of "caution" type. -->
+  <variable id="caution Note Image Path">Configuration/OpenTopic/cfg/common/artwork/ISO_7010_W001.svg</variable>
+  <!-- Image path to use for a note of "danger" type. -->
+  <variable id="danger Note Image Path">Configuration/OpenTopic/cfg/common/artwork/ISO_7010_W001.svg</variable>
+  <!-- Image path to use for a note of "warning" type. -->
+  <variable id="warning Note Image Path">Configuration/OpenTopic/cfg/common/artwork/ISO_7010_W001.svg</variable>
+  <!-- Image path to use for a note of "fastpath" type. -->
+  <variable id="fastpath Note Image Path"></variable>
+  <!-- Image path to use for a note of "important" type. -->
+  <variable id="important Note Image Path"></variable>
+  <!-- Image path to use for a note of "remember" type. -->
+  <variable id="remember Note Image Path"></variable>
+  <!-- Image path to use for a note of "restriction" type. -->
+  <variable id="restriction Note Image Path"></variable>
+  <!-- Image path to use for a note of "tip" type. -->
+  <variable id="tip Note Image Path"></variable>
+  <!-- Image path to use for a note of "troubleshooting" type. -->
+  <variable id="trouble Note Image Path">Configuration/OpenTopic/cfg/common/artwork/ISO_7010_W001.svg</variable>
+  <!-- Image path to use for a note of "other" type. -->
+  <variable id="other Note Image Path"></variable>
+
+  <!--Numbering and format for task steps-->
+  <variable id="Step Number"><param ref-name="number"/>. </variable>
+  <variable id="Step Format">1</variable>
+  <variable id="Substep Number"><param ref-name="number"/>) </variable>
+  <variable id="Substep Format">a</variable>
+
+  <variable id="#quote-start"><variable id="OpenQuote"/></variable>
+  <variable id="#quote-end"><variable id="CloseQuote"/></variable>
+    
+  <!-- Hazard statement domain -->
+  <variable id="hazard.image.default">Configuration/OpenTopic/cfg/common/artwork/ISO_7010_W001.svg</variable>
+</vars>

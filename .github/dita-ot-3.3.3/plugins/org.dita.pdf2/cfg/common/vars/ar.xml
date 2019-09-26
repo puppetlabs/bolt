@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | تمهﻳد | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | تمهﻳد | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">المحتوﻳات</variable>
+  <variable id="Index Continued String">استمرار</variable>
+  <variable id="Index See String">, أنظر </variable>
+  <variable id="Index See Also String">أنظر أﻳضا </variable>
+  <variable id="Table of Contents Chapter">الفصل <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">الملحق <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">الجزء <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">تمهﻳد: </variable>
+  <variable id="Preface title">تمهﻳد</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">المحتوﻳات: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">الشكل <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">الشكل <param ref-name="number"/></variable>
+  <variable id="Table.title">الجدول <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">الجدول <param ref-name="number"/></variable>
+  <variable id="Related Links">المعلومات المتعلقة</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">الفصل <param ref-name="number"/></variable>
+  <variable id="Appendix with number">الملحق <param ref-name="number"/></variable>
+  <variable id="Part with number">الجزء <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[الاخلاء المطلوب]</variable>
+  <variable id="On the page"> بالصفحة <param ref-name="pagenum"/></variable>
+  <variable id="Page"> الصفحة <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">اختياري:</variable>
+  <variable id="Required Step">مطلوب:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">قاموس المصطلحات</variable>
+  <variable id="List of Tables">الجداول</variable>
+  <variable id="List of Figures">الأشكال</variable>
+</vars>

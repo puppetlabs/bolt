@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                               HEADER                          -->
+<!-- ============================================================= -->
+<!-- Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02     -->
+<!-- OASIS Standard                                           -->
+<!-- 16 January 2018                                           -->
+<!-- Copyright (c) OASIS Open 2018. All rights reserved.           -->
+<!-- Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html                                -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Base MAP (only base domains)                 -->
+<!--  VERSION:   1.3                                               -->
+<!--  DATE:      March 2014                                        -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                        TYPICAL INVOCATION                     -->
+<!--                                                               -->
+<!-- Refer to this file by the following public identifier or an   -->
+<!--      appropriate system identifier:                           -->
+<!--                                                               -->
+<!-- PUBLIC "-//OASIS//DTD DITA Base Map//EN"                      -->
+<!-- The public ID above refers to the latest version of this DTD. -->
+<!--      To refer to this specific version, you may use this value: -->
+<!--                                                               -->
+<!-- PUBLIC "-//OASIS//DTD DITA 1.3 Base Map//EN"                  -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    DTD to describe DITA maps                         -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             April 2010                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2010, 2014               -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    2010.09.20 RDA: Add topic-based domains                    -->
+<!--    2014.03.13 WEK: Updated for DITA 1.3, reimplemented as RNG -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                MAP ENTITY DECLARATIONS                        -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--             DOMAIN CONSTRAINT INTEGRATION                     -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--             DOMAIN ENTITY DECLARATIONS                        -->
+<!-- ============================================================= -->
+
+<!ENTITY % mapgroup-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Map Group Domain//EN"
+         "mapGroup.ent"
+>%mapgroup-d-dec;
+
+<!ENTITY % delay-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Delayed Resolution Domain//EN"
+         "delayResolutionDomain.ent"
+>%delay-d-dec;
+
+<!ENTITY % ditavalref-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 DITAVAL Ref Domain//EN"
+         "ditavalrefDomain.ent"
+>%ditavalref-d-dec;
+
+<!ENTITY % indexing-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Indexing Domain//EN"
+         "indexingDomain.ent"
+>%indexing-d-dec;
+
+<!ENTITY % hazard-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Hazard Statement Domain//EN"
+         "hazardstatementDomain.ent"
+>%hazard-d-dec;
+
+<!ENTITY % hi-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Highlight Domain//EN"
+         "highlightDomain.ent"
+>%hi-d-dec;
+
+<!ENTITY % ut-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Utilities Domain//EN"
+         "utilitiesDomain.ent"
+>%ut-d-dec;
+
+<!-- ============================================================= -->
+<!--             DOMAIN ATTRIBUTES DECLARATIONS                    -->
+<!-- ============================================================= -->
+
+<!ENTITY % deliveryTargetAtt-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Delivery Target Attribute Domain//EN"
+         "deliveryTargetAttDomain.ent"
+>%deliveryTargetAtt-d-dec;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN EXTENSIONS                          -->
+<!-- ============================================================= -->
+<!--                    One for each extended base element, with
+                        the name of the domain(s) in which the
+                        extension was declared                     -->
+
+<!ENTITY % topicref     "topicref |
+                         %mapgroup-d-topicref; |
+                         %ditavalref-d-topicref;
+                        ">
+<!ENTITY % keywords     "keywords |
+                         %delay-d-keywords;
+                        ">
+<!ENTITY % index-base   "index-base |
+                         %indexing-d-index-base;
+                        ">
+<!ENTITY % note         "note |
+                         %hazard-d-note;
+                        ">
+<!ENTITY % ph           "ph |
+                         %hi-d-ph;
+                        ">
+<!ENTITY % fig          "fig |
+                         %ut-d-fig;
+                        ">
+<!ENTITY % data         "data |
+                         %ut-d-data;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE EXTENSIONS                -->
+<!-- ============================================================= -->
+
+<!ENTITY % props-attribute-extensions
+  "%deliveryTargetAtt-d-attribute;"
+>
+<!ENTITY % base-attribute-extensions
+  ""
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAINS ATTRIBUTE OVERRIDE                 -->
+<!-- ============================================================= -->
+
+<!ENTITY included-domains
+                          "&mapgroup-d-att;
+                           &delay-d-att;
+                           &deliveryTargetAtt-d-att;
+                           &ditavalref-d-att;
+                           &indexing-d-att;
+                           &hazard-d-att;
+                           &hi-d-att;
+                           &ut-d-att;
+  "
+>
+
+<!-- ============================================================= -->
+<!--                    CONTENT CONSTRAINT INTEGRATION             -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                      MAP ELEMENT INTEGRATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY % map-type
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Map//EN"
+         "map.mod"
+>%map-type;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ELEMENT INTEGRATION                 -->
+<!-- ============================================================= -->
+
+<!ENTITY % mapgroup-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Map Group Domain//EN"
+         "mapGroup.mod"
+>%mapgroup-d-def;
+
+<!ENTITY % delay-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Delayed Resolution Domain//EN"
+         "delayResolutionDomain.mod"
+>%delay-d-def;
+
+<!ENTITY % ditavalref-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 DITAVAL Ref Domain//EN"
+         "ditavalrefDomain.mod"
+>%ditavalref-d-def;
+
+<!ENTITY % indexing-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Indexing Domain//EN"
+         "indexingDomain.mod"
+>%indexing-d-def;
+
+<!ENTITY % hazard-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Hazard Statement Domain//EN"
+         "hazardstatementDomain.mod"
+>%hazard-d-def;
+
+<!ENTITY % hi-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Highlight Domain//EN"
+         "highlightDomain.mod"
+>%hi-d-def;
+
+<!ENTITY % ut-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Utilities Domain//EN"
+         "utilitiesDomain.mod"
+>%ut-d-def;
+
+<!-- ================= End of DITA Base Map Shell ================= -->

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Indexing  Domain                             -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an  -->
+<!--       appropriate system identifier                           -->
+<!-- PUBLIC "-//OASIS//ELEMENTS DITA Indexing Domain//EN"          -->
+<!--       Delivered as file "indexingDomain.mod"                       -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the elements and specialization         -->
+<!--             attributes for the DITA Indexing Domain           -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             June 2006                                         -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2006, 2009.              -->
+<!--             All Rights Reserved.                              -->
+<!--  UPDATES:                                                     -->
+<!--    2007.12.01 EK:  Reformatted DTD modules for DITA 1.2        -->
+<!--    2008.02.13 RDA: Create .content and .attributes entities   -->
+<!-- ============================================================= -->
+<!--                                                               -->
+
+<!-- ============================================================= -->
+<!--                    ELEMENT EXTENSION ENTITY DECLARATIONS      -->
+<!-- ============================================================= -->
+
+<!ENTITY % indexing-d-index-base
+  "index-see |
+   index-see-also |
+   index-sort-as"
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY indexing-d-att
+  "(topic indexing-d)"
+>
+
+<!-- ================ End DITA Indexing Domain ================== -->
+ 

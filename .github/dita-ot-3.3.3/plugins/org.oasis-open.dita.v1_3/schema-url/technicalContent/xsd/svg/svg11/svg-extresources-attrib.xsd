@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:attributeGroup name="SVG.externalResourcesRequired.attrib">
+    <xs:attribute name="externalResourcesRequired" type="svg:Boolean.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.External.attrib">
+    <xs:attributeGroup ref="SVG.externalResourcesRequired.attrib"/>
+  </xs:attributeGroup>
+</xs:schema>

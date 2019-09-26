@@ -1,0 +1,93 @@
+<?xml encoding="utf-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA DITAVAL DTD                                  -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//DTD DITA DITAVAL//EN"
+      Delivered as file "ditaval.dtd"                              -->
+
+<!-- The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+PUBLIC "-//OASIS//DTD DITA 1.2 DITAVAL//EN"                        -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    DTD to describe DITAVAL resources                 -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE: 2005                                  -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2006, 2009.              -->
+<!--             (C) Copyright IBM Corporation 2002, 2005.         -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+
+
+<!ELEMENT val (style-conflict?, (prop | revprop)*)>
+
+<!ELEMENT style-conflict EMPTY>
+<!ATTLIST style-conflict
+  foreground-conflict-color CDATA #IMPLIED
+  background-conflict-color CDATA #IMPLIED
+>
+
+
+<!ELEMENT prop (startflag?, endflag?)>
+<!ATTLIST prop
+  att       CDATA	    #IMPLIED
+  val       CDATA       #IMPLIED
+  action    (flag|include|exclude|passthrough)  #REQUIRED
+  color     CDATA       #IMPLIED
+  backcolor CDATA       #IMPLIED
+  style     (underline|double-underline|italics|overline|bold)       #IMPLIED
+  >
+
+<!ELEMENT startflag (alt-text?)>
+<!ATTLIST startflag
+  imageref  CDATA       #IMPLIED
+>
+
+<!ELEMENT endflag (alt-text?)>
+<!ATTLIST endflag
+  imageref  CDATA       #IMPLIED
+>
+
+<!ELEMENT alt-text (#PCDATA)>
+
+<!-- The style attribute should be a color value (either a name, or a SRGB value).
+     See below for the supported color names (taken from the XHTML DTD). -->
+<!ELEMENT revprop (startflag?, endflag?)>
+<!ATTLIST revprop
+  val		CDATA		#IMPLIED
+  action	(include|passthrough|flag)  #REQUIRED
+  changebar CDATA       #IMPLIED
+  color     CDATA       #IMPLIED
+  backcolor CDATA       #IMPLIED
+  style     (underline|double-underline|italics|overline|bold)       #IMPLIED
+  >
+
+<!-- There are 16 widely known color names with their sRGB values:
+
+    black  = #000000    green  = #008000
+    silver = #C0C0C0    lime   = #00FF00
+    gray   = #808080    olive  = #808000
+    white  = #FFFFFF    yellow = #FFFF00
+    maroon = #800000    navy   = #000080
+    red    = #FF0000    blue   = #0000FF
+    purple = #800080    teal   = #008080
+    fuchsia= #FF00FF    aqua   = #00FFFF
+-->
+

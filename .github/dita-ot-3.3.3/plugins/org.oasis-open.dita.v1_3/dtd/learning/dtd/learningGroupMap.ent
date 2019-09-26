@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =============================================================  -->
+<!-- MODULE:    DITA Learning Group Map                            -->
+<!-- VERSION:   1.3                                                 -->
+<!-- DATE:      June 2013                                          -->
+<!-- ============================================================= -->
+<!-- Refer to the latest version of this file by the following public ID: -->
+<!-- -//OASIS//ENTITIES DITA Learning Group Map//EN                -->
+<!-- To refer to this specific version, you may use this value:    -->
+<!-- -//OASIS//ENTITIES DITA 1.3 Learning Group Map//EN            -->
+<!-- =============================================================  -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)      -->
+<!-- PURPOSE:    Provides a map type for representing a single learning group. -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!-- June 2013                                                     -->
+<!-- (C) Copyright OASIS Open                                      -->
+<!-- All Rights Reserved.                                           -->
+<!-- ============================================================= -->
+<!--                                                               -->
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY learningGroupMap-att
+  "(map learningGroupMap+learningMap-d)"
+>
+
+<!-- ================ End DITA Learning Group Map Module ================== -->
+ 

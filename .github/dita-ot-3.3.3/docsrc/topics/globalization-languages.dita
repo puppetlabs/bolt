@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="dita-globalization-languages" xml:lang="en-US">
+  <title>Supported languages</title>
+  <shortdesc>The following languages are supported for all PDF, XHTML, and HTML5-based transformation types.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlatt>xml:lang</xmlatt></indexterm>
+        <indexterm>Arabic</indexterm>
+        <indexterm>Bosnian</indexterm>
+        <indexterm>Belarusian</indexterm>
+        <indexterm>Bulgarian</indexterm>
+        <indexterm>Catalan</indexterm>
+        <indexterm>Chinese</indexterm>
+        <indexterm>Croatian</indexterm>
+        <indexterm>Czech</indexterm>
+        <indexterm>Danish</indexterm>
+        <indexterm>Dutch</indexterm>
+        <indexterm>English</indexterm>
+        <indexterm>Estonian</indexterm>
+        <indexterm>Finnish</indexterm>
+        <indexterm>French</indexterm>
+        <indexterm>German</indexterm>
+        <indexterm>Greek</indexterm>
+        <indexterm>Hebrew</indexterm>
+        <indexterm>Hungarian</indexterm>
+        <indexterm>Hindi</indexterm>
+        <indexterm>Icelandic</indexterm>
+        <indexterm>Indonesian</indexterm>
+        <indexterm>Italian</indexterm>
+        <indexterm>Japanese</indexterm>
+        <indexterm>Kazakh</indexterm>
+        <indexterm>Korean</indexterm>
+        <indexterm>Latvian</indexterm>
+        <indexterm>Lithuanian</indexterm>
+        <indexterm>Malay</indexterm>
+        <indexterm>Montenegrin</indexterm>
+        <indexterm>Norwegian</indexterm>
+        <indexterm>Polish</indexterm>
+        <indexterm>Portuguese</indexterm>
+        <indexterm>Romanian</indexterm>
+        <indexterm>Russian</indexterm>
+        <indexterm>Serbian</indexterm>
+        <indexterm>Slovak</indexterm>
+        <indexterm>Slovenian</indexterm>
+        <indexterm>Spanish</indexterm>
+        <indexterm>Swedish</indexterm>
+        <indexterm>Thai</indexterm>
+        <indexterm>Turkish</indexterm>
+        <indexterm>Ukrainian</indexterm>
+        <indexterm>Urdu</indexterm>
+        <indexterm>Vietnamese</indexterm>
+        <indexterm>languages<indexterm>supported, list of</indexterm></indexterm>
+        <indexterm>language codes</indexterm>
+        <indexterm>strings</indexterm>
+        <indexterm>generated text</indexterm>
+        <indexterm>index<indexterm>sorting</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <refsyn>
+      <note>While language codes listed below use the conventional capitalization style of "aa-BB" and "aa-Script-BB",
+        DITA-OT processing is not case sensitive when reading these values from the <xmlatt>xml:lang</xmlatt>
+        attribute.</note>
+    </refsyn>
+    <table outputclass="table-hover" frame="none" colsep="0" rowsep="1">
+      <title>Supported languages</title>
+      <tgroup cols="3">
+        <colspec colwidth="3*" colname="language"/>
+        <colspec colwidth="2*" colname="code"/>
+        <colspec colwidth="5*" colname="notes"/>
+        <thead>
+          <row>
+            <entry>Language</entry>
+            <entry>Language&#xA0;code</entry>
+            <entry>Notes</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry><ph xml:lang="ar">العربية</ph> (Arabic)</entry>
+            <entry>ar or ar-EG</entry>
+            <entry>Defaults to right-to-left presentation.</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="be">Беларуская</ph> (Belarusian)</entry>
+            <entry>be or be-BY</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="bs">Bosanski</ph> (Bosnian)</entry>
+            <entry>bs or bs-BA</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="bg">Български</ph> (Bulgarian)</entry>
+            <entry>bg or bg-BG</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="ca">Català</ph> (Catalan)</entry>
+            <entry>ca-ES</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="zh-CN">简体中文</ph> (Simplified Chinese)</entry>
+            <entry>zh-CN or zh-Hans</entry>
+            <entry>PDF index is not properly collated by default.</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="zh-TW">繁體中文</ph> (Traditional Chinese)</entry>
+            <entry>zh-TW or zh-Hant</entry>
+            <entry>PDF index is not properly collated by default.</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="hr">Hrvatski</ph> (Croatian)</entry>
+            <entry>hr or hr-HR</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="cs">Čeština</ph> (Czech)</entry>
+            <entry>cs or cs-CZ</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="da">Dansk</ph> (Danish)</entry>
+            <entry>da or da-DK</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="nl">Nederlands</ph> (Dutch)</entry>
+            <entry>nl or nl-NL</entry>
+            <entry>Subset of generated text also available for Belgian Dutch (nl-BE)</entry>
+          </row>
+          <row>
+            <entry>English (US)</entry>
+            <entry>en or en-US</entry>
+            <entry>Subset of generated text also available for British English (en-GB) and Canadian English
+              (en-CA)</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="et">Eesti</ph> (Estonian)</entry>
+            <entry>et or et-EE</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="fi">Suomi</ph> (Finnish)</entry>
+            <entry>fi or fi-FI</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="fr">Français</ph> (French)</entry>
+            <entry>fr or fr-FR</entry>
+            <entry>Subset of generated text also available for Belgian French (fr-BE), Canadian French (fr-CA), and
+              Swiss French (fr-CH)</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="de">Deutsch</ph> (German)</entry>
+            <entry>de or de-DE</entry>
+            <entry>Subset of generated text also available for Swiss German (de-CH)</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="el">Ελληνικά</ph> (Greek)</entry>
+            <entry>el or el-GR</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="he">עברית</ph> (Hebrew)</entry>
+            <entry>he or he-IL</entry>
+            <entry>Defaults to right-to-left presentation.</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="hi">हिन्दी</ph> (Hindi)</entry>
+            <entry>hi or hi-HI</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="hu">Magyar</ph> (Hungarian)</entry>
+            <entry>hu or hu-HU</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="is">Íslenska</ph> (Icelandic)</entry>
+            <entry>is or is-IS</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="id">Bahasa Indonesia</ph> (Indonesian)</entry>
+            <entry>id or id-ID</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="it">Italiano</ph> (Italian)</entry>
+            <entry>it or it-IT</entry>
+            <entry>Subset of generated text also available for Swiss Italian (it-CH)</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="ja">日本語</ph> (Japanese)</entry>
+            <entry>ja or ja-JP</entry>
+            <entry>PDF index is not properly collated by default.</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="kk">Қазақша</ph> (Kazakh)</entry>
+            <entry>kk or kk-KZ</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="ko">한국어</ph> (Korean)</entry>
+            <entry>ko or ko-KR</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="lv">Latviešu</ph> (Latvian)</entry>
+            <entry>lv or lv-LV</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="lt">Lietuvių</ph> (Lithuanian)</entry>
+            <entry>lt or lt-LT</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="mk">Македонски</ph> (Macedonian)</entry>
+            <entry>mk or mk-MK</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="ms">Bahasa Melayu</ph> (Malay)</entry>
+            <entry>ms or ms-MY</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="sr-Latn-ME">Crnogorski</ph> (Montenegrin)</entry>
+            <entry>sr-Latn-ME</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="no">Norsk</ph> (Norwegian)</entry>
+            <entry>no or no-NO</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="pl">Polski</ph> (Polish)</entry>
+            <entry>pl or pl-PL</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="pt">Português</ph> (Portuguese)</entry>
+            <entry>pt or pt-PT</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="pt-BR">Português do Brasil</ph> (Brazilian Portuguese)</entry>
+            <entry>pt-BR</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="ro">Română</ph> (Romanian)</entry>
+            <entry>ro or ro-RO</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="ru">Русский</ph> (Russian)</entry>
+            <entry>ru or ru-RU</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="sr">Српски</ph> (Serbian - Cyrillic script)</entry>
+            <entry>sr, sr-CS, sr-RS, or sr-SP</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="sr-Latn-RS">Srpski</ph> (Serbian - Latin script)</entry>
+            <entry>sr-Latn-RS</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="sk">Slovenčina</ph> (Slovak)</entry>
+            <entry>sk or sk-SK</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="sl">Slovenščina</ph> (Slovenian)</entry>
+            <entry>sl or sl-SI</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="es">Español</ph> (Spanish)</entry>
+            <entry>es or es-ES</entry>
+            <entry>Also supported using es-419 (Latin American Spanish).</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="sv">Svenska</ph> (Swedish)</entry>
+            <entry>sv or sv-SE</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="th">ภาษาไทย</ph> (Thai)</entry>
+            <entry>th or th-TH</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="tr">Türkçe</ph> (Turkish)</entry>
+            <entry>tr or tr-TR</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="uk">Українська</ph> (Ukrainian)</entry>
+            <entry>uk or uk-UA</entry>
+            <entry/>
+          </row>
+          <row>
+            <entry><ph xml:lang="ur">اردو</ph> (Urdu)</entry>
+            <entry>ur or ur-PK</entry>
+            <entry>Defaults to right-to-left presentation.</entry>
+          </row>
+          <row>
+            <entry><ph xml:lang="vi">Tiếng Việt</ph> (Vietnamese)</entry>
+            <entry>vi or vi-VN</entry>
+            <entry/>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </refbody>
+</reference>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<project name="dita.integrator" default="integrate">
+  
+  <dirname property="ant.file.dita.integrator.dir" file="${ant.file.dita.integrator}"/>
+  
+  <!-- First try to initialize ${dita.dir} using the special 
+       property passed by Ant's import task. -->
+  <condition property="dita.dir" value="${ant.file.dita.integrator.dir}">
+    <and>
+      <isset property="ant.file.dita.integrator"/>
+      <not>
+        <isset property="dita.dir"/>
+      </not>
+    </and>
+  </condition>
+  
+  <!-- Try to initialize ${dita.dir} again if it was not set. -->
+  <!-- Deprecated since 1.8 -->
+  <condition property="dita.dir" value="${basedir}">
+    <not>
+      <isset property="dita.dir"/>
+    </not>
+  </condition>
+  
+  <!-- Deprecated since 3.1 -->
+  <path id="dost.class.path">
+    <pathelement location="${dita.dir}/lib/dost.jar"/>
+    <pathelement location="${dita.dir}/lib/dost-configuration.jar"/>
+    <pathelement location="${dita.dir}/lib/commons-io-2.4.jar"/>
+  </path>
+  
+  <taskdef name="integrate" classname="org.dita.dost.ant.IntegratorTask">
+    <classpath refid="dost.class.path"/>
+  </taskdef>
+  <taskdef name="install" classname="org.dita.dost.ant.PluginInstallTask"/>
+
+  <target name="integrate">
+    <integrate ditadir="${dita.dir}" />
+    <antcall target="configuration-jar"/>
+  </target>
+
+  <!-- Deprecated since 3.2 -->
+  <target name="configuration-jar">
+    <!-- place property files into a JAR so Ant will find them -->
+    <jar destfile="${basedir}/lib/dost-configuration.jar">
+      <fileset dir="${basedir}/config">
+        <include name="messages.xml"/>
+        <include name="messages_*.properties"/>
+        <include name="plugins.xml"/>
+        <include name="log4j.properties"/>
+        <include name="configuration.properties"/>
+        <include name="CatalogManager.properties"/>
+        <include name="org.dita.dost.platform/plugin.properties"/>
+      </fileset>
+    </jar>
+  </target>
+  
+  <target name="lax" description="Run integration in lax mode">
+    <echo>WARN: The lax integration mode has been removed, using strict mode</echo>
+    <antcall target="integrate"/>
+  </target>
+
+  <target name="strict" description="Run integration in strict mode">
+    <antcall target="integrate"/>
+  </target>
+
+  <target name="install" description="Install plug-in" >
+    <property name="force" value="false"/>
+    <install pluginFile="${plugin.file}" force="${force}"/>
+    <antcall target="configuration-jar"/>
+  </target>
+  
+  <target name="uninstall" description="Uninstall plug-in">
+    <fail unless="plugin.id"/>
+    <available property="plugin.exists" file="${dita.dir}/plugins/${plugin.id}"/>
+    <fail unless="plugin.exists">Plug-in ${dita.dir}/plugins/${plugin.id} doesn't exist.</fail>
+    <antcall target="uninstall.delete"/>
+  </target>
+  <target name="uninstall.delete" if="plugin.exists">
+    <delete dir="${dita.dir}/plugins/${plugin.id}"/>
+    <antcall target="integrate"/>
+  </target>
+  
+</project>

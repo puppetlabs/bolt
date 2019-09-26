@@ -1,0 +1,115 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="Generated text is the term for strings that are automatically added by the build, such as &#34;Note&#34; before the contents of a note element."><meta name="DC.subject" content=", note, xml:lang, languages, adding support for, English, Icelandic, Russian, Vietnamese, Gaelic, strings, generated text, draft, localizing generated text"><meta name="keywords" content=", note, xml:lang, languages, adding support for, English, Icelandic, Russian, Vietnamese, Gaelic, strings, generated text, draft, localizing generated text"><meta name="DC.relation" scheme="URI" content="../topics/globalization.html"><meta name="DC.relation" scheme="URI" content="../topics/globalization-languages.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="plugin-addgeneratedtext"><meta name="DC.language" content="en-US"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Customizing generated text</title></head><body id="plugin-addgeneratedtext"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a><ul><li><a href="../topics/globalization-support.html">Globalization support</a></li><li class="active"><a href="../topics/plugin-addgeneratedtext.html">Customizing generated text</a></li><li><a href="../topics/globalization-languages.html">Supported languages</a></li></ul></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Customizing generated text</h1>
+  
+  
+  <div class="body refbody"><p class="shortdesc">Generated text is the term for strings that are automatically added by the build, such as "Note" before the
+    contents of a <code class="keyword markupname xmlelement">&lt;note&gt;</code> element.</p>
+    <section class="section">
+      <div class="p">The generated text extension point is used to add new strings to the default set of generated text. There are
+        several reasons you may want to use this:
+        <ul class="ul">
+          <li class="li">It can be used to add new text for your own processing extensions; for example, it could be used to add
+            localized versions of the string "User response" to aid in rendering troubleshooting information.</li>
+          <li class="li">It can be used to override the default strings in the toolkit; for example, it could be used to reset the
+            English string "Figure" to "Fig".</li>
+          <li class="li">It can be used to add support for new languages (for non-PDF transforms only; PDF requires more
+            complicated localization support). For example, it could be used to add support for Vietnamese or Gaelic; it
+            could also be used to support a new variant of a previously supported language, such as Australian
+            English.</li>
+        </ul></div>
+      <dl class="dl">
+        
+          <dt class="dt dlterm"><code class="ph codeph">dita.xsl.strings</code></dt>
+          <dd class="dd">Add new strings to generated text file. </dd>
+        
+      </dl>
+    </section>
+    <div class="example"><h2 class="title sectiontitle">Example: adding new strings</h2>
+      
+      <p class="p">First copy the file <span class="ph filepath">xsl/common/strings.xml</span> to your plug-in, and edit it to contain the
+        languages that you are providing translations for ("en-US" must be present). For this sample, copy the file into
+        your plug-in as <span class="ph filepath">xsl/my-new-strings.xml</span>. The new strings file will look something like
+        this:</p><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!-- Provide strings for my plug-in; this plug-in supports
+     English, Icelandic, and Russian. --&gt;
+&lt;langlist&gt;
+  &lt;lang xml:lang="en"     filename="mystring-en-us.xml"/&gt;
+  &lt;lang xml:lang="en-US"  filename="mystring-en-us.xml"/&gt;
+  &lt;lang xml:lang="is"     filename="mystring-is-is.xml"/&gt;
+  &lt;lang xml:lang="is-IS"  filename="mystring-is-is.xml"/&gt;
+  &lt;lang xml:lang="ru"     filename="mystring-ru-ru.xml"/&gt;
+  &lt;lang xml:lang="ru-RU"  filename="mystring-ru-ru.xml"/&gt;
+&lt;/langlist&gt;</code></pre>
+      <p class="p">Next, copy the file <span class="ph filepath">xsl/common/strings-en-us.xml</span> to your plug-in, and replace the content
+        with your own strings (be sure to give them unique name attributes). Do the same for each language that you are
+        providing a translation for. For example, the file <span class="ph filepath">mystring-en-us.xml</span> might contain:</p><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;strings xml:lang="en-US"&gt;
+  &lt;str name="String1"&gt;English generated text&lt;/str&gt;
+  &lt;str name="Another String"&gt;Another String in English&lt;/str&gt;
+&lt;/strings&gt;</code></pre>
+      <p class="p">Use the following extension code to include your strings in the set of generated text: </p><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;plugin id="com.example.strings"&gt;
+  &lt;feature extension="dita.xsl.strings" file="xsl/my-new-strings.xml"/&gt;
+&lt;/plugin&gt;</code></pre>
+      <p class="p">The string is now available to the "getVariable" template used in many DITA-OT XSLT files.
+        For example, if processing in a context where the xml:lang value is "en-US", the following
+        call would return "Another String in English":</p><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;xsl:call-template name="getVariable"&gt;
+  &lt;xsl:with-param name="id" select="'Another String'"/&gt;
+&lt;/xsl:call-template&gt;</code></pre>
+      <div class="note note note_note"><span class="note__title">Note:</span> If two plug-ins define the same string, the results will be non-deterministic, so multiple plug-ins should
+        not try to create the same generated text string. One common way to avoid this problem is to ensure the name
+        attributes used to look up the string value are related to the ID or purpose of your plug-in.</div>
+    </div>
+    <div class="example"><h2 class="title sectiontitle">Example: modifying existing strings</h2>
+      
+      <p class="p">The process for modifying existing generated text is exactly the same as for adding new text, except that the
+        strings you provide override values that already exist. To begin, set up the
+          <span class="ph filepath">xsl/my-new-strings.xml</span> file in your plug-in as in the previous example. </p>
+      <p class="p">Next, copy the file <span class="ph filepath">xsl/common/strings-en-us.xml</span> to your plug-in, and choose the strings
+        you wish to change (be sure to leave the name attribute unchanged, because this is the key used to look up the
+        string). Create a strings file for each language that needs to modify existing strings. For example, the new
+        file <span class="ph filepath">mystring-en-us.xml</span> might contain:</p><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;strings xml:lang="en-US"&gt;
+  &lt;str name="Figure"&gt;Fig&lt;/str&gt;
+  &lt;str name="Draft comment"&gt;ADDRESS THIS DRAFT COMMENT&lt;/str&gt;
+&lt;/strings&gt;</code></pre>
+      <p class="p">To include the new strings, use the same method as above to add these strings to your
+          <span class="ph filepath">plugin.xml</span> file. Once this plug-in is installed, where XHTML output previously generated
+        the term "Figure", it will now generate "Fig"; where it previously generated "Draft comment", it will now
+        generate "ADDRESS THIS DRAFT COMMENT". The same strings in other languages will not be modified unless you also
+        provide new versions for those languages.</p><div class="note note note_note"><span class="note__title">Note:</span> If two plug-ins override the same string in the same
+        language, the results will be non-deterministic (either string may be used under different conditions). Multiple
+        plug-ins should not override the same generated text string for a single language.</div>
+    </div>
+    <div class="example"><h2 class="title sectiontitle">Example: adding a new language</h2>
+      
+      <div class="p">The process for adding a new language is exactly the same as for adding new text, except you are effectively
+        just translating an existing strings file. To begin, set up the <span class="ph filepath">xsl/my-new-strings.xml</span> file
+        in your plug-in as in the previous examples. In this case, the only difference is that you are adding a mapping
+        to new languages; for example, the following file would be used to set up support for
+        Vietnamese:<pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!-- Map languages with xml:lang="vi" or xml:lang="vi-vn"
+     to the translations in this plug-in. --&gt;
+&lt;langlist&gt;
+  &lt;lang xml:lang="vi"     filename="strings-vi.xml"/&gt;
+  &lt;lang xml:lang="vi-VN"  filename="strings-vi.xml"/&gt;
+&lt;/langlist&gt;</code></pre></div>
+      <p class="p">Next, copy the file <span class="ph filepath">xsl/common/strings-en-us.xml</span> to your plug-in, and rename it to match
+        the language you wish to add. For example, to support Vietnamese strings you may want to pick a name like
+          <span class="ph filepath">strings-vi.xml</span>. In that file, change the <code class="keyword markupname xmlatt">@xml:lang</code> attribute on the root
+        element to match your new language.</p>
+      <p class="p">Once the file is ready, translate the contents of each <code class="keyword markupname xmlelement">&lt;str&gt;</code> element (be sure to leave
+        the name attribute unchanged). Repeat this process for each new language you wish to add.</p>
+      <p class="p">To include the new languages, use the same method as above to add these strings to your
+          <span class="ph filepath">plugin.xml</span> file. Once this plug-in is installed, non-PDF builds will include support for
+        Vietnamese; instead of generating the English word "Caution", the element <code class="ph codeph">&lt;note type="caution"
+          xml:lang="vi"&gt;</code> may generate something like "<dfn class="term" lang="vi">chú ý</dfn>".</p><div class="note note note_note"><span class="note__title">Note:</span> If two
+        plug-ins add support for the same language using different values, the results will be non-deterministic
+        (translations from either plug-in may be picked up under different conditions).</div>
+    </div>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/globalization.html" title="The DITA standard supports content that is written in or translated to any language. In general, DITA Open Toolkit passes content through to the output format unchanged. DITA-OT uses the values for the xml:lang and dir attributes that are set in the source content to provide globalization support.">Globalizing DITA content</a></div></div><div class="linklist relinfo relref"><strong>Related reference</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/globalization-languages.html" title="The following languages are supported for all PDF, XHTML, and HTML5-based transformation types.">Languages supported by the core toolkit</a></li></ul></div></nav></article></main></body></html>

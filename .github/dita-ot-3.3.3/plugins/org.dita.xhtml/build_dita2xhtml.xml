@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+--><project xmlns:dita="http://dita-ot.sourceforge.net" xmlns:if="ant:if" xmlns:unless="ant:unless" name="dita2xhtml">
+
+  <target name="dita2xhtml.init">
+    <property name="html-version" value="xhtml"/>
+  </target>
+
+    <target name="dita2xhtml" depends="dita2xhtml.init,                      build-init,                      preprocess,                       xhtml.topics,                      dita.map.xhtml,                      copy-css">
+    </target>
+
+    <target name="dita.map.xhtml" depends="dita.map.xhtml.init, dita.map.xhtml.toc"/>
+
+    <target name="dita.map.xhtml.init" unless="noMap">
+      <condition property="args.xhtml.toc.xsl" value="${dita.plugin.org.dita.xhtml.dir}/xsl/map2${html-version}-cover.xsl">
+        <not>
+          <isset property="args.xhtml.toc.xsl"/>
+        </not>
+      </condition>
+        <condition property="args.xhtml.toc" value="index">
+            <not>
+                <isset property="args.xhtml.toc"/>
+            </not>
+        </condition>
+    </target>
+    
+
+
+    <target name="dita.map.xhtml.toc" unless="noMap" description="Build HTML TOC file">
+      <map.html>
+        
+      </map.html>
+    </target>
+  
+  <macrodef name="map.html">
+    <element name="params" optional="true" implicit="true"/>
+    <sequential>
+      <local name="xhtml.toc.output.dir"/>
+      <condition property="xhtml.toc.output.dir" value="${dita.output.dir}" else="${_dita.map.output.dir}">
+       <isset property="inner.transform"/>
+      </condition>
+      <pipeline>
+      <xslt destdir="${xhtml.toc.output.dir}" style="${args.xhtml.toc.xsl}">
+        <ditafileset input="true"/>
+        <param name="OUTEXT" expression="${out.ext}" if:set="out.ext"/>
+        <param name="contenttarget" expression="${args.xhtml.contenttarget}" if:set="args.xhtml.contenttarget"/>
+        <param name="CSS" expression="${args.css.file}" if:set="args.css.file"/>
+        <param name="CSSPATH" expression="${user.csspath}" if:set="user.csspath"/>
+        <param name="OUTPUTCLASS" expression="${args.xhtml.toc.class}" if:set="args.xhtml.toc.class"/>
+        <params/>
+        <mapper type="merge" to="${args.xhtml.toc}${out.ext}"/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+      </pipeline>
+    </sequential>
+  </macrodef>
+
+    <!-- Deprecated since 2.1 -->
+    <target name="dita.out.map.xhtml.toc" unless="noMap" if="inner.transform" description="Build HTML TOC file,which will adjust the directory">
+        <dita-ot-echo id="DOTX070W"><param name="1" value="dita.out.map.xhtml.toc"/></dita-ot-echo>
+      <pipeline>
+        <xslt destdir="${dita.output.dir}" style="${args.xhtml.toc.xsl}">
+            <ditafileset input="true"/>
+            <param name="OUTEXT" expression="${out.ext}" if:set="out.ext"/>
+            <param name="contenttarget" expression="${args.xhtml.contenttarget}" if:set="args.xhtml.contenttarget"/>
+            <param name="CSS" expression="${args.css.file}" if:set="args.css.file"/>
+            <param name="CSSPATH" expression="${user.csspath}" if:set="user.csspath"/>
+            <param name="OUTPUTCLASS" expression="${args.xhtml.toc.class}" if:set="args.xhtml.toc.class"/>
+            
+            <mapper type="glob" from="${user.input.file}" to="${args.xhtml.toc}${out.ext}"/>
+          <xmlcatalog refid="dita.catalog"/>
+        </xslt>
+      </pipeline>
+    </target>
+    
+  <target name="copy-revflag" if="dita.input.valfile">
+    <dita-ot-echo id="DOTA069W">
+      <param name="1" value="copy-revflag"/>
+    </dita-ot-echo>
+  </target>
+    
+  <target name="copy-css" unless="user.csspath.url" description="Copy CSS files">
+    <condition property="user.copycss.yes">
+      <and>
+        <equals arg1="${args.copycss}" arg2="yes"/>
+        <isset property="args.css.present"/>
+      </and>
+    </condition>
+    <property name="user.csspath.real" location="${dita.output.dir}/${user.csspath}"/>
+    <mkdir dir="${user.csspath.real}"/>
+    <!-- Always copy system default css files -->
+    <copy todir="${user.csspath.real}">
+      <fileset dir="${dita.plugin.org.dita.xhtml.dir}/resource" includes="*.css"/>
+    </copy>
+    <!-- Copy user specify css file when required -->
+    <antcall target="copy-css-user"/>
+  </target>
+
+  <target name="copy-css-user" if="user.copycss.yes">
+    <copy file="${args.css.real}" todir="${user.csspath.real}"/>
+  </target>
+  
+</project>

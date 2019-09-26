@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<topic id="lwdita-input">
+  <title>Preview support for Lightweight DITA</title>
+  <titlealts>
+    <navtitle>Lightweight DITA</navtitle>
+  </titlealts>
+  <shortdesc>DITA-OT provides preview support for the authoring formats proposed for
+    <xref keyref="lwdita"/>, or “<term>LwDITA</term>”. The XDITA, MDITA and HDITA formats are alternative
+    representations of DITA content in XML, Markdown and HTML5.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>topicref</xmlelement></indexterm>
+        <indexterm><xmlatt>format</xmlatt></indexterm>
+        <indexterm>authoring formats<indexterm>Lightweight DITA</indexterm></indexterm>
+        <indexterm>metadata<indexterm>Lightweight DITA</indexterm></indexterm>
+        <indexterm>DITA 1.3<indexterm>Lightweight DITA</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <note type="attention">Since
+      <xref keyref="lwdita"/> has not yet been released as a formal specification, the implementation for XDITA, MDITA
+      and HDITA authoring formats is subject to change. Future versions of DITA Open Toolkit will be updated as LwDITA
+      evolves.</note>
+    <section>
+      <title>XDITA</title>
+      <p>XDITA is the LwDITA authoring format that uses XML to structure information. XDITA is a subset of DITA, with
+        new multimedia element types added to support interoperability with HTML5. XDITA is designed for users who want
+        to write DITA content but who do not want (or need) the full power of DITA.</p>
+      <p>The XDITA parser included in the <codeph>org.lwdita</codeph> plug-in provides preliminary support for XDITA
+        maps and XDITA topics.</p>
+      <p>To apply XDITA-specific processing to topics in an XDITA map or a full DITA 1.3 map, set the
+          <xmlatt>format</xmlatt> attribute on a <xmlelement>topicref</xmlelement> to <codeph>xdita</codeph>:</p>
+      <p>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;map>
+  &lt;topicref href="xdita-topic.xml" <b>format="xdita"</b>/>
+&lt;/map></codeblock>
+      </p>
+      <note type="tip">For examples of cross-format content sharing between topics in XDITA, HDITA, extended-profile
+        MDITA, and DITA 1.3, see the LwDITA sample files in the DITA-OT installation directory under
+          <filepath>plugins/org.oasis-open.xdita.v0_2_2/samples</filepath>.</note>
+    </section>
+    <section>
+      <title>MDITA</title>
+      <p>MDITA is the LwDITA authoring format based on Markdown. It is designed for users who want to write structured
+        content with the minimum of overhead, but who also want to take advantage of the reuse mechanisms associated
+        with the DITA standard and the multi-channel publishing afforded by standard DITA tooling.</p>
+      <p>Recent proposals for LwDITA include two profiles for authoring MDITA topics:</p>
+      <ul>
+        <li>The “<term>Core profile</term>” is based on
+          <xref keyref="gfm-spec"/> and includes elements that are common to many other Markdown implementations.</li>
+        <li>The “<term>Extended profile</term>” borrows additional features from other flavors of Markdown to represent
+          a broader range of DITA content with existing plain-text syntax conventions.</li>
+      </ul>
+      <p>The Markdown DITA parser included in the <codeph>org.lwdita</codeph> plug-in provides preliminary support for
+        these profiles and additional Markdown constructs as described in the syntax reference.</p>
+      <p>To apply LwDITA-specific processing to Markdown topics, set the <xmlatt>format</xmlatt> attribute to
+          <codeph>mdita</codeph>:</p>
+      <p>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;map>
+  &lt;topicref href="mdita-topic.md" <b>format="mdita"</b>/>
+&lt;/map></codeblock>
+      </p>
+      <p>In this case, the first paragraph in the topic will be treated as a short description, for example, and
+        additional metadata can be specified for the topic via a YAML front matter block.</p>
+      <note>Setting the <xmlatt>format</xmlatt> attribute to <codeph>mdita</codeph> triggers stricter parsing than the
+        more lenient document parsing approach that is applied to <codeph>markdown</codeph> documents.</note>
+      <note type="attention">The MDITA map format is not yet supported. To include Markdown content in publications, use
+        an XDITA map or a DITA 1.3 map.</note>
+    </section>
+
+    <section>
+      <title>HDITA</title>
+      <p>HDITA is the LwDITA authoring format based on HTML5, which is intended to support structured content authoring
+        with tools designed for HTML authoring. HDITA also uses custom data attributes to provide interoperability with
+        DITA.</p>
+      <p>The HDITA parser included in the <codeph>org.lwdita</codeph> plug-in provides preliminary support for these
+        constructs.</p>
+      <p>To apply LwDITA-specific processing to HTML topics, set the <xmlatt>format</xmlatt> attribute to
+          <codeph>hdita</codeph>:</p>
+      <p>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;map>
+  &lt;topicref href="hdita-topic.html" <b>format="hdita"</b>/>
+&lt;/map></codeblock>
+      </p>
+      <note type="attention">The HDITA map format is not yet supported. To include HDITA content, use an XDITA map or a
+        DITA 1.3 map.</note>
+    </section>
+  </body>
+</topic>

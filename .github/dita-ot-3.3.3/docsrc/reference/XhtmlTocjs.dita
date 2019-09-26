@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="xhtmltocjs" xml:lang="en-US">
+  <title>TocJS processing</title>
+  <shortdesc>The <option>tocjs</option> transformation was originally created as a plug-in that was distributed outside
+    of the toolkit, but it is now bundled in the default distribution. It generates a JavaScript-based frameset for
+    XHTML output with Table of Contents entries that expand and collapse.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>HTML<indexterm>TocJS</indexterm></indexterm>
+        <indexterm>dita.map.tocjs</indexterm>
+        <indexterm>TocJS</indexterm>
+        <indexterm>targets<indexterm>TocJS</indexterm></indexterm>
+        <indexterm>table of contents<indexterm>TocJS</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <p>The following Ant targets control most of the TocJS processing:</p>
+      <p>
+        <dl>
+          <dlentry>
+            <dt><codeph>tocjsInit</codeph></dt>
+            <dd>Sets up default properties. This target detects whether builds have already specified a name for
+              JavaScript control file; if not, the default name <filepath>toctree.js</filepath> is used.</dd>
+          </dlentry>
+          <dlentry>
+            <dt><codeph>map2tocjs</codeph></dt>
+            <dd>Calls the <codeph>dita.map.tocjs</codeph> target, which generates the contents frame for TocJS
+              output.</dd>
+          </dlentry>
+          <dlentry>
+            <dt><codeph>tocjsDefaultOutput</codeph></dt>
+            <dd>Ensures that the XHTML processing module is run. If scripts are missing required information, such as a
+              name for the default frameset, this target copies default style and control files. This target was added
+              to DITA-OT in version 1.5.4; earlier versions of the TocJS transformation created only the JavaScript
+              control file by default.</dd>
+          </dlentry>
+        </dl>
+      </p>
+    </section>
+  </conbody>
+</concept>

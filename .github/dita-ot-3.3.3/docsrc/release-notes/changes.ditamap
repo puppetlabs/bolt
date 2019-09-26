@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map>
+  <title>DITA-OT release history</title>
+  <topicref href="rel1.8.dita"/>
+  <topicref href="rel1.7.dita"/>
+  <topicref href="rel1.6.dita"/>
+  <topicref href="rel1.5.4.dita"/>
+  <topicref href="rel1.5.3.dita"/>
+  <topicref href="rel1.5.2.dita"/>
+  <topicref href="rel1.5.1.dita"/>
+  <topicref href="rel1.5.dita"/>
+  <topicref href="rel1.4.3.dita"/>
+  <topicref href="rel1.4.2.1.dita"/>
+  <topicref href="rel1.4.2.dita"/>
+  <topicref href="rel1.4.1.dita"/>
+  <topicref href="rel1.4.dita"/>
+  <topicref href="rel1.3.1.dita"/>
+  <topicref href="rel1.3.dita"/>
+  <topicref href="rel1.2.2.dita"/>
+  <topicref href="rel1.2.1.dita"/>
+  <topicref href="rel1.2.dita"/>
+  <topicref href="rel1.1.2.1.dita"/>
+  <topicref href="rel1.1.2.dita"/>
+  <topicref href="rel1.1.1.dita"/>
+  <topicref href="rel1.1.dita"/>
+  <topicref href="rel1.0.2.dita"/>
+  <topicref href="rel1.0.1.dita"/>
+  <topicref href="rel1.0.dita"/>
+  <topicref href="history.dita"/>
+</map>

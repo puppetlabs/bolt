@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!-- Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02     -->
+<!-- OASIS Standard                                           -->
+<!-- 16 January 2018                                           -->
+<!-- Copyright (c) OASIS Open 2018. All rights reserved.           -->
+<!-- Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html                                -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Glossary Entry Shell                         -->
+<!--  VERSION:   1.3                                               -->
+<!--  DATE:      March 2014                                        -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an  -->
+<!--       appropriate system identifier                           -->
+<!--                                                               -->
+<!-- PUBLIC "-//OASIS//DTD DITA Glossary Entry//EN"                -->
+<!-- The public ID above refers to the latest version of this DTD. -->
+<!--      To refer to this specific version, you may use this value: -->
+<!-- PUBLIC "-//OASIS//DTD DITA 1.3 Glossary Entry//EN"                       -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Document type to describe DITA Glossary Entry topics        -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             June 2006                                         -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2006, 2014.              -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    2008.02.01 RDA: Added references to concept.ent and        -->
+<!--                    glossary.ent                               -->
+<!--    2008.02.12 RDA: Modify imbeds to use specific 1.2 version  -->
+<!--    2008.04.15 RDA: Added hazard domain                        -->
+<!--    2009.09.21 WEK: Renamed to glossentry.dtd                  -->
+<!--    2014.03.12 WEK: Updated for DITA 1.3, reimplemented as     -->
+<!--                    RELAX NG                                   -->
+<!-- ============================================================= -->
+<!--                                                               -->
+
+<!-- ============================================================= -->
+<!--              TOPIC ENTITY DECLARATIONS                        -->
+<!-- ============================================================= -->
+
+<!ENTITY % concept-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Concept//EN"
+         "concept.ent"
+>%concept-dec;
+
+<!ENTITY % glossentry-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Glossary Entry//EN"
+         "glossentry.ent"
+>%glossentry-dec;
+
+<!-- ============================================================= -->
+<!--             DOMAIN CONSTRAINT INTEGRATION                     -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--             DOMAIN ENTITY DECLARATIONS                        -->
+<!-- ============================================================= -->
+
+<!ENTITY % equation-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Equation Domain//EN"
+         "equationDomain.ent"
+>%equation-d-dec;
+
+<!ENTITY % hazard-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Hazard Statement Domain//EN"
+         "../../base/dtd/hazardstatementDomain.ent"
+>%hazard-d-dec;
+
+<!ENTITY % hi-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Highlight Domain//EN"
+         "../../base/dtd/highlightDomain.ent"
+>%hi-d-dec;
+
+<!ENTITY % indexing-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Indexing Domain//EN"
+         "../../base/dtd/indexingDomain.ent"
+>%indexing-d-dec;
+
+<!ENTITY % abbrev-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Abbreviated Form Domain//EN"
+         "abbreviateDomain.ent"
+>%abbrev-d-dec;
+
+<!ENTITY % markup-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Markup Domain//EN"
+         "markupDomain.ent"
+>%markup-d-dec;
+
+<!ENTITY % mathml-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 MathML Domain//EN"
+         "mathmlDomain.ent"
+>%mathml-d-dec;
+
+<!ENTITY % pr-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Programming Domain//EN"
+         "programmingDomain.ent"
+>%pr-d-dec;
+
+<!ENTITY % relmgmt-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Release Management Domain//EN"
+         "releaseManagementDomain.ent"
+>%relmgmt-d-dec;
+
+<!ENTITY % sw-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Software Domain//EN"
+         "softwareDomain.ent"
+>%sw-d-dec;
+
+<!ENTITY % svg-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 SVG Domain//EN"
+         "svgDomain.ent"
+>%svg-d-dec;
+
+<!ENTITY % ui-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 User Interface Domain//EN"
+         "uiDomain.ent"
+>%ui-d-dec;
+
+<!ENTITY % ut-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Utilities Domain//EN"
+         "../../base/dtd/utilitiesDomain.ent"
+>%ut-d-dec;
+
+<!ENTITY % xml-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 XML Domain//EN"
+         "xmlDomain.ent"
+>%xml-d-dec;
+
+<!-- ============================================================= -->
+<!--             DOMAIN ATTRIBUTES DECLARATIONS                    -->
+<!-- ============================================================= -->
+
+<!ENTITY % deliveryTargetAtt-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Delivery Target Attribute Domain//EN"
+         "../../base/dtd/deliveryTargetAttDomain.ent"
+>%deliveryTargetAtt-d-dec;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN EXTENSIONS                          -->
+<!-- ============================================================= -->
+<!--                    One for each extended base element, with
+                        the name of the domain(s) in which the
+                        extension was declared                     -->
+
+<!ENTITY % index-base   "index-base |
+                         %indexing-d-index-base;
+                        ">
+<!ENTITY % note         "note |
+                         %hazard-d-note;
+                        ">
+<!ENTITY % ph           "ph |
+                         %hi-d-ph; |
+                         %pr-d-ph; |
+                         %sw-d-ph; |
+                         %ui-d-ph; |
+                         %equation-d-ph;
+                        ">
+<!ENTITY % fig          "fig |
+                         %ut-d-fig; |
+                         %pr-d-fig; |
+                         %equation-d-fig;
+                        ">
+<!ENTITY % data         "data |
+                         %ut-d-data;
+                        ">
+<!ENTITY % term         "term |
+                         %abbrev-d-term;
+                        ">
+<!ENTITY % keyword      "keyword |
+                         %markup-d-keyword; |
+                         %pr-d-keyword; |
+                         %sw-d-keyword; |
+                         %ui-d-keyword; |
+                         %xml-d-keyword;
+                        ">
+<!ENTITY % pre          "pre |
+                         %pr-d-pre; |
+                         %sw-d-pre; |
+                         %ui-d-pre;
+                        ">
+<!ENTITY % dl           "dl |
+                         %pr-d-dl;
+                        ">
+<!ENTITY % metadata     "metadata |
+                         %relmgmt-d-metadata;
+                        ">
+<!ENTITY % foreign      "foreign |
+                         %svg-d-foreign; |
+                         %mathml-d-foreign;
+                        ">
+<!ENTITY % div          "div |
+                         %equation-d-div;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE EXTENSIONS                -->
+<!-- ============================================================= -->
+
+<!ENTITY % props-attribute-extensions
+  "%deliveryTargetAtt-d-attribute;"
+>
+<!ENTITY % base-attribute-extensions
+  ""
+>
+
+<!-- ============================================================= -->
+<!--                    TOPIC NESTING OVERRIDE                     -->
+<!-- ============================================================= -->
+
+<!ENTITY % glossentry-info-types
+              "no-topic-nesting"
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAINS ATTRIBUTE OVERRIDE                 -->
+<!-- ============================================================= -->
+
+<!ENTITY included-domains
+                          "&concept-att;
+                           &glossentry-att;
+                           &deliveryTargetAtt-d-att;
+                           &equation-d-att;
+                           &hazard-d-att;
+                           &hi-d-att;
+                           &indexing-d-att;
+                           &abbrev-d-att;
+                           &markup-d-att;
+                           &mathml-d-att;
+                           &pr-d-att;
+                           &relmgmt-d-att;
+                           &sw-d-att;
+                           &svg-d-att;
+                           &ui-d-att;
+                           &ut-d-att;
+                           &xml-d-att;
+  "
+>
+
+<!-- ============================================================= -->
+<!--                    CONTENT CONSTRAINT INTEGRATION             -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    TOPIC ELEMENT INTEGRATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY % topic-type
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Topic//EN"
+         "../../base/dtd/topic.mod"
+>%topic-type;
+
+<!ENTITY % concept-type
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Concept//EN"
+         "concept.mod"
+>%concept-type;
+
+<!ENTITY % glossentry-type
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Glossary Entry//EN"
+         "glossentry.mod"
+>%glossentry-type;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ELEMENT INTEGRATION                 -->
+<!-- ============================================================= -->
+
+<!ENTITY % equation-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Equation Domain//EN"
+         "equationDomain.mod"
+>%equation-d-def;
+
+<!ENTITY % hazard-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Hazard Statement Domain//EN"
+         "../../base/dtd/hazardstatementDomain.mod"
+>%hazard-d-def;
+
+<!ENTITY % hi-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Highlight Domain//EN"
+         "../../base/dtd/highlightDomain.mod"
+>%hi-d-def;
+
+<!ENTITY % indexing-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Indexing Domain//EN"
+         "../../base/dtd/indexingDomain.mod"
+>%indexing-d-def;
+
+<!ENTITY % abbrev-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Abbreviated Form Domain//EN"
+         "abbreviateDomain.mod"
+>%abbrev-d-def;
+
+<!ENTITY % markup-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Markup Domain//EN"
+         "markupDomain.mod"
+>%markup-d-def;
+
+<!ENTITY % mathml-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 MathML Domain//EN"
+         "mathmlDomain.mod"
+>%mathml-d-def;
+
+<!ENTITY % pr-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Programming Domain//EN"
+         "programmingDomain.mod"
+>%pr-d-def;
+
+<!ENTITY % relmgmt-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Release Management Domain//EN"
+         "releaseManagementDomain.mod"
+>%relmgmt-d-def;
+
+<!ENTITY % sw-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Software Domain//EN"
+         "softwareDomain.mod"
+>%sw-d-def;
+
+<!ENTITY % svg-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 SVG Domain//EN"
+         "svgDomain.mod"
+>%svg-d-def;
+
+<!ENTITY % ui-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 User Interface Domain//EN"
+         "uiDomain.mod"
+>%ui-d-def;
+
+<!ENTITY % ut-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Utilities Domain//EN"
+         "../../base/dtd/utilitiesDomain.mod"
+>%ut-d-def;
+
+<!ENTITY % xml-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 XML Domain//EN"
+         "xmlDomain.mod"
+>%xml-d-def;
+
+<!-- ================= End of DITA Glossary Entry Shell ================= -->

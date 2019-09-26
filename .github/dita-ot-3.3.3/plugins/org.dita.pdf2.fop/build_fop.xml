@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<project name="org.dita.pdf2.fop">
+
+  <property name="fop.home" value="${dita.plugin.org.dita.pdf2.fop.dir}"/>
+
+  <target name="transform.fo2pdf.fop.test-use">
+    <condition property="use.fop.pdf.formatter">
+      <equals arg1="${pdf.formatter}" arg2="fop"/>
+    </condition>
+  </target>
+
+  <target name="transform.fo2pdf.fop.init" depends="transform.fo2pdf.fop.test-use" if="use.fop.pdf.formatter">
+    <condition property="use.fop.pdf.formatter">
+      <equals arg1="${pdf.formatter}" arg2="fop"/>
+    </condition>
+    
+    <condition property="args.fo.userconfig" value="${fop.home}/cfg/fop.xconf">
+      <not>
+        <isset property="args.fo.userconfig"/>
+      </not>
+    </condition>
+    
+    <condition property="temp.transformation.file" value="${dita.plugin.org.dita.pdf2.fop.dir}/xsl/fo/topic2fo_shell_fop.xsl">
+      <and>
+        <not><isset property="args.xsl.pdf"/></not>
+        <isset property="use.fop.pdf.formatter"/>
+      </and>
+    </condition>
+
+    <property name="fop.failOnError" value="true"/>
+    
+    <!-- default output format -->
+    <condition property="fop.formatter.output-format" value="application/pdf">
+      <not><isset property="fop.formatter.output-format"/></not>
+    </condition>
+    <!-- output file extension -->
+    <condition property="xsl.formatter.ext" value=".mif">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="application/mif"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".pcl">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="application/x-pcl"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".pcl">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="application/vnd.hp-PCL"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".png">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="image/png"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".ps">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="application/postscript"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".mda">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="application/x-afp"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".mda">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="application/vnd.ibm.modcap"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".svg">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="image/svg+xml"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".rtf">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="text/richtext"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".rtf">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="text/rtf"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".rtf">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="application/rtf"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".tif">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="image/tiff "/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".gif">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="image/gif"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".txt">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="text/plain"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".AT.xml">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="application/X-fop-areatree"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".pdf">
+      <and>
+        <equals arg1="${fop.formatter.output-format}" arg2="application/pdf"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+  </target>
+
+  <!--Run FOP-->
+  <target name="transform.fo2pdf.fop" if="use.fop.pdf.formatter">
+    <taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop"/>
+    
+    <condition property="outputFile" value="${dita.output.dir}/${outputFile.base}${xsl.formatter.ext}">
+      <not><isset property="outputFile"/></not>
+    </condition>
+    <mkdir dir="${dita.output.dir}"/>
+    
+    <fop format="${fop.formatter.output-format}" fofile="${pdf2.temp.dir}/topic.fo" basedir="${pdf2.temp.dir}"
+         outfile="${outputFile}" messagelevel="info" relativebase="true" force="true"
+         userconfig="${args.fo.userconfig}"/>
+
+    <dita-ot-fail id="PDFX013F">
+      <condition>
+        <and>
+          <equals arg1="${fop.failOnError}" arg2="true"/>
+          <not>
+            <available file="${outputFile}" type="file"/>
+          </not>
+        </and>
+      </condition>
+      <param name="1" value="${outputFile}"/>
+    </dita-ot-fail>
+  </target>
+
+</project>

@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Bookmap                                     -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA BookMap//EN"                 -->
+<!--      Delivered as file "bookmap.mod"                             -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Define elements and specialization atttributes   -->
+<!--            for Book Maps                                    -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2004                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2004, 2005.        -->
+<!--            All Rights Reserved.                             -->
+<!-- UPDATES:                                                    -->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       -->
+<!--   2008.01.28 RDA: Removed enumerations for attributes:      -->
+<!--                   publishtype/@value, bookrestriction/@value-->
+<!--   2008.01.28 RDA: Added <metadata> to <bookmeta>            -->
+<!--   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  -->
+<!--   2008.02.01 RDA: Added keys attributes, more keyref attrs  -->
+<!--   2008.02.12 RDA: Add keyword to many data specializations  -->
+<!--   2008.02.12 RDA: Add @format, @scope, and @type to         -->
+<!--                   publisherinformation                      -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--   2008.03.17 RDA: Add appendices element                    -->
+<!--=============================================================-->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:group name="bookmap">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookmap"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bookmeta">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookmeta"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="frontmatter">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="frontmatter"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="backmatter">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="backmatter"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="publisherinformation">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="publisherinformation"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="person">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="person"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="organization">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="organization"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bookchangehistory">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookchangehistory"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bookid">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookid"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="summary">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="summary"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="printlocation">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="printlocation"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="published">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="published"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="publishtype">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="publishtype"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="revisionid">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="revisionid"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="started">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="started"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="completed">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="completed"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="year">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="year"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="month">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="month"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="day">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="day"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="reviewed">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="reviewed"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="edited">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="edited"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="tested">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="tested"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="approved">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="approved"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bookevent">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookevent"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bookeventtype">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookeventtype"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bookpartno">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookpartno"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="edition">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="edition"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="isbn">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="isbn"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="booknumber">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="booknumber"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="volume">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="volume"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="maintainer">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="maintainer"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bookrights">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookrights"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="copyrfirst">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="copyrfirst"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="copyrlast">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="copyrlast"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bookowner">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookowner"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bookrestriction">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookrestriction"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="booktitle">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="booktitle"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="booklibrary">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="booklibrary"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="mainbooktitle">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="mainbooktitle"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="booktitlealt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="booktitlealt"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="draftintro">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="draftintro"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bookabstract">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bookabstract"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="dedication">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="dedication"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="preface">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="preface"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="chapter">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="chapter"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="part">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="part"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="appendix">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="appendix"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="appendices">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="appendices"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="notices">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="notices"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="amendments">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="amendments"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="colophon">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="colophon"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="booklists">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="booklists"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="toc">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="toc"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="figurelist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="figurelist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="tablelist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="tablelist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="abbrevlist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="abbrevlist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="trademarklist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="trademarklist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bibliolist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bibliolist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="glossarylist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="glossarylist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="indexlist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="indexlist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="booklist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="booklist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+</xs:schema>

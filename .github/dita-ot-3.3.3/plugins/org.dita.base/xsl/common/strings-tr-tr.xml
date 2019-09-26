@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="tr-tr">        <!-- Turkish -->
+  <str name="Figure">Şekil</str>
+  <str name="Table">Çizelge</str>
+  <str name="Next topic">Sonraki</str>
+  <str name="Previous topic">Önceki</str>
+  <str name="Parent topic">Ana başlık</str>
+  <str name="Required cleanup">Düzeltilmeli</str>
+  <str name="Draft comment">Draft comment</str>
+  <str name="Option">Seçenek</str>
+  <str name="Description">Tanımlama</str>
+  <str name="Optional">İsteğe bağlı</str>
+  <str name="Required">Gerekli</str>
+  <str name="Skip visual syntax diagram">Görsel sözdizim çizgesini atla</str>
+  <str name="Read syntax diagram">Sözdizim çizgesini oku</str>
+  <str name="Start of change">Değişikliklerin başlangıcı</str>
+  <str name="End of change">Değişikliklerin bitişi</str>
+  <str name="Index">Dizin</str>
+  <str name="Special characters">Özel karakterler</str>
+  <str name="Numerics">Sayısallar</str>
+  <str name="End notes">Notların sonu</str>
+  <str name="Artwork">Şekil</str>
+  <str name="Syntax">Sözdizim</str>
+  <str name="Type">İpucu</str>
+  <str name="Value">Değer</str>
+  <str name="Note">Not</str>
+  <str name="Notes">Notlar</str>
+  <str name="Tip">Tip</str>
+  <str name="Fastpath">Kısa yol</str>
+  <str name="Important">Önemli</str>
+  <str name="Attention">Uyarı</str>
+  <str name="Caution">DİKKAT</str>
+  <str name="Danger">TEHLİKE</str>
+  <str name="Remember">Unutmayın</str>
+  <str name="Restriction">Sınırlama</str>
+  <str name="Trouble">Sorun</str>
+  <str name="Warning">Uyarı</str>
+  <str name="Contents">İçindekiler</str>
+  <str name="Related concepts">İlgili kavramlar</str>
+  <str name="Related tasks">İlgili görevler</str>
+  <str name="Related reference">İlgili başvurular</str>
+  <str name="Related information">İlgili bilgiler</str>
+  <str name="Prerequisite">Okunması Gerekenler</str>
+  <str name="Prerequisites">Okunması Gerekenler</str>
+  <str name="or">or</str>
+  <str name="task_context">Bu görev hakkında</str>
+  <str name="task_example">Örnek</str>
+  <str name="task_postreq">Sonraki adım</str>
+  <str name="task_prereq">Başlamadan önce</str>
+  <str name="task_procedure">Yordam</str>
+  <str name="task_procedure_unordered">Yordam</str>
+  <str name="task_results">Sonuçlar</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

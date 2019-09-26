@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<project name="sample_xhtml_plus_css" default="samples.xhtml_plus_css" basedir=".">
+
+  <property name="dita.dir" location="${basedir}/../../.."/>
+
+  <property name="sample.output.dir" value="${dita.dir}/out/samples/xhtml_plus_css"/>
+  <property name="css.source.dir" location="${dita.dir}/docsrc/samples/css"/>
+
+  <target name="samples.xhtml_plus_css" depends="clean.samples.xhtml_plus_css">
+    <ant antfile="${dita.dir}/build.xml">
+      <property name="args.input" location="${dita.dir}/docsrc/samples/hierarchy.ditamap"/>
+      <property name="output.dir" location="${sample.output.dir}"/>
+      <property name="transtype" value="xhtml"/>
+      <property name="args.css" value="style.css"/>
+      <property name="args.csspath" value="css"/>
+      <property name="args.copycss" value="yes"/>
+      <property name="args.cssroot" location="${css.source.dir}"/>
+    </ant>
+  </target>
+
+  <target name="clean.samples.xhtml_plus_css" description="remove the sample web output">
+    <delete dir="${sample.output.dir}"/>
+  </target>
+
+</project>

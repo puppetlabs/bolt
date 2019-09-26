@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="dita-spec-support" xml:lang="en-US">
+  <title>DITA specification support</title>
+  <shortdesc>DITA Open Toolkit <keyword keyref="release"/> supports all versions of the OASIS DITA specification,
+    including 1.0, 1.1, 1.2, and 1.3.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>authoring formats<indexterm>DITA</indexterm></indexterm>
+        <indexterm>DITA 1.0</indexterm>
+        <indexterm>DITA 1.1</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody/>
+</concept>

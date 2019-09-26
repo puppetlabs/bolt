@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="t-enabling-debug-mode">
+  <title>Enabling debug mode</title>
+  <shortdesc>When the debug mode is enabled, additional diagnostic information is written to the log file. This
+    information, which includes environment variables and stack trace data, can help you determine the root cause of a
+    problem.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>property</xmlelement></indexterm>
+        <indexterm>command line<indexterm>debugging</indexterm></indexterm>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>debugging</indexterm></indexterm>
+        <indexterm>debugging<indexterm>args.debug</indexterm></indexterm>
+        <indexterm>environment variables</indexterm>
+        <indexterm>stack trace</indexterm>
+        <indexterm>args.debug</indexterm>
+        <indexterm>Ant<indexterm>args.debug</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>From the command prompt, add the following parameters:</cmd>
+        <choicetable>
+          <chhead>
+            <choptionhd>Application</choptionhd>
+            <chdeschd>Parameters</chdeschd>
+          </chhead>
+          <chrow>
+            <choption><cmdname>dita</cmdname> command</choption>
+            <chdesc><parmname>--debug</parmname>,
+              <parmname>-debug</parmname>, or
+              <parmname>-d</parmname></chdesc>
+          </chrow>
+          <chrow>
+            <choption>Ant</choption>
+            <chdesc><codeph>-v -Dargs.debug=yes</codeph></chdesc>
+          </chrow>
+          <!--<chrow importance="deprecated">
+            <choption>Command-line tool</choption>
+            <chdesc><codeph>/d</codeph> or <codeph>-debug</codeph></chdesc>
+          </chrow>-->
+        </choicetable>
+        <info>
+          <p>You also can add a <xmlelement>property</xmlelement> element to an Ant target in your build file, for
+            example: <codeblock outputclass="language-xml">&lt;property name="args.debug" value="yes"/></codeblock></p></info>
+      </step>
+    </steps>
+  </taskbody>
+</task>

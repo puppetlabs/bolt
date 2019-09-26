@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<plugin id="org.dita.base" version="3.3.3">
+  <!-- base extension points -->
+  <extension-point id="package.version" name="Plug-in version"/>
+  <extension-point id="package.support.email" name="Plug-in support email"/>
+  <extension-point id="package.support.name" name="Plug-in support name"/>
+  <extension-point id="dita.conductor.plugin" name="Ant conductor plug-in information"/>
+  <extension-point id="dita.catalog.plugin-info" name="Plug-in XML catalog information"/>
+  <extension-point id="dita.image.extensions" name="Image file extension"/>
+  <extension-point id="dita.html.extensions" name="HTML file extension"/>
+  <extension-point id="dita.resource.extensions" name="Resource file extension"/>
+  <!-- deprecated -->
+  <extension-point id="dita.conductor.transtype.check" name="Transtype check"/>
+  <extension-point id="dita.transtype.print" name="Print transtype"/>
+  <extension-point id="dita.conductor.target" name="Ant conductor"/>
+  <extension-point id="dita.conductor.target.relative" name="Ant conductor"/>
+  <extension-point id="ant.import" name="Ant import"/>
+  <extension-point id="dita.specialization.catalog" name="XML catalog"/>
+  <extension-point id="dita.specialization.catalog.relative" name="XML catalog"/>
+  <extension-point id="dita.xsl.strings" name="Generated text"/>
+  <extension-point id="dita.conductor.lib.import" name="Java library import"/>
+  <extension-point id="dita.xsl.messages" name="Diagnostic messages"/>
+  <!-- legacy support -->
+  <extension-point id="dita.basedir-resource-directory" name="Flag to use basedir as resource directory"/>
+  <!-- preprocessing extension points -->
+  <extension-point id="depend.preprocess.pre" name="Preprocessing pre-target"/>
+  <extension-point id="depend.preprocess.clean-temp.pre" name="Clean temp pre-target"/>
+  <extension-point id="depend.preprocess.gen-list.pre" name="Generate list pre-target"/>
+  <extension-point id="depend.preprocess.debug-filter.pre" name="Debug and filter pre-target"/>
+  <extension-point id="depend.preprocess.conrefpush.pre" name="Content reference push pre-target"/>
+  <extension-point id="depend.preprocess.move-meta-entries.pre" name="Move meta entries pre-target"/>
+  <extension-point id="depend.preprocess.conref.pre"  name="Content reference pre-target"/>
+  <extension-point id="depend.preprocess.coderef.pre" name="Code reference pre-target"/>
+  <extension-point id="depend.preprocess.mapref.pre" name="Map reference pre-target"/>
+  <extension-point id="depend.preprocess.keyref.pre" name="Key reference pre-target"/>
+  <extension-point id="depend.preprocess.mappull.pre" name="Map pull pre-target"/>
+  <extension-point id="depend.preprocess.chunk.pre" name="Chunking pre-target"/>
+  <extension-point id="depend.preprocess.maplink.pre" name="Map link pre-target"/>
+  <extension-point id="depend.preprocess.topicpull.pre" name="Topic pull pre-target"/>
+  <extension-point id="depend.preprocess.copy-files.pre" name="Copy files pre-target"/>
+  <extension-point id="depend.preprocess.copy-image.pre" name="Copy images pre-target"/>
+  <extension-point id="depend.preprocess.copy-html.pre" name="Copy HTML pre-target"/>
+  <extension-point id="depend.preprocess.copy-flag.pre" name="Copy flag pre-target"/>
+  <!-- Deprecated since 2.1 -->
+  <extension-point id="depend.preprocess.copy-subsidiary.pre" name="Copy subsidiary pre-target"/>
+  <extension-point id="depend.preprocess.post" name="Preprocessing post-target"/>
+  <extension-point id="dita.preprocess.debug-filter.param" name="Debug filter module parameters"/>
+  <extension-point id="dita.preprocess.map-reader.param" name="Debug filter module parameters"/>
+  <extension-point id="dita.preprocess.topic-reader.param" name="Debug filter module parameters"/>
+  <extension-point id="dita.preprocess.conref.param" name="Content reference XSLT parameters"/>
+  <extension-point id="dita.preprocess.mapref.param" name="Map reference XSLT parameters"/>
+  <extension-point id="dita.preprocess.mappull.param" name="Map pull  XSLT parameters"/>
+  <!--extension-point id="dita.preprocess.maplink.param" name="Map link XSLT parameters"/-->
+  <extension-point id="dita.preprocess.topicpull.param" name="Topic pull XSLT parameters"/>
+  <extension-point id="dita.xsl.conref" name="Content reference XSLT import"/>
+  <extension-point id="dita.xsl.topicpull" name="Topic pull XSLT import"/>
+  <extension-point id="dita.xsl.mapref" name="Map reference XSLT import"/>
+  <extension-point id="dita.xsl.mappull" name="Map pull XSLT import"/>
+  <extension-point id="dita.xsl.maplink" name="Map link XSLT import"/>
+  <extension-point id="dita.parser" name="Custom DITA parser"/>
+  <!-- extensions -->
+  <transtype name="base" abstract="true" desc="Common">
+    <param name="args.gen.task.lbl" desc="Specifies whether to generate headings for sections within task topics." type="enum">
+      <val>YES</val>
+      <val>NO</val>
+    </param>
+    <param name="args.rellinks" desc="Specifies which links to include in the output." type="enum">
+      <val desc="No links are included.">none</val>
+      <val desc="All links are included.">all</val>
+      <val desc="Parent links are not included.">noparent</val>
+      <val desc="Parent, child, next, and previous links are not included.">nofamily</val>
+    </param>
+    <!-- Deprecated since 2.5 -->
+    <param name="args.debug" desc="Specifies whether debugging information is included in the log." type="enum" deprecated="true">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param name="args.draft" desc="Specifies whether the content of &lt;draft-comment&gt; and &lt;required-cleanup&gt; elements is included in the output." type="enum">
+      <val>yes</val>
+      <val default="true">no</val>
+    </param>
+    <param name="args.figurelink.style" desc="Specifies how cross references to figures are styled in output." type="enum">
+      <val>NUMBER</val>
+      <val>TITLE</val>
+      <val>NUMTITLE</val>
+    </param>
+    <param name="args.filter" desc="Specifies a filter file to be used to include, exclude, or flag content." type="file"/>
+    <param name="args.grammar.cache" desc="Specifies whether the grammar-caching feature of the XML parser is used." type="enum">
+      <val default="true">yes</val>
+      <val>no</val>
+    </param>
+    <param name="args.input" desc="Specifies the master file for your documentation project." type="file" required="true"/>
+    <param name="args.input.dir" desc="Specifies the base directory for your documentation project." type="dir"/>
+    <!-- Deprecated since 2.5 -->
+    <param name="args.logdir" desc="Specifies the location where DITA-OT places log files for your project." type="dir" deprecated="true"/>
+    <param name="args.output.base" desc="Specifies the name of the output file without file extension." type="string"/>
+    <param name="args.tablelink.style" desc="Specifies how cross references to tables are styled." type="enum">
+      <val>NUMBER</val>
+      <val>TITLE</val>
+      <val>NUMTITLE</val>
+    </param>
+    <param name="link-crawl" desc="Specifies whether to crawl only those topic links found in maps, or all discovered topic links." type="enum">
+      <val>map</val>
+      <val default="true">topic</val>
+    </param>
+    <param name="clean.temp" desc="Specifies whether DITA-OT deletes the files in the temporary directory after it finishes a build." type="enum">
+      <val default="true">yes</val>
+      <val>no</val>
+    </param>
+    <param name="dita.dir" desc="Specifies where DITA-OT is installed." type="dir"/>
+    <param name="dita.temp.dir" desc="Specifies the location of the temporary directory." type="dir"/>
+    <param name="dita.input.valfile" deprecated="true" desc="Specifies a filter file to be used to include, exclude, or flag content." type="file"/>
+    <param name="filter-stage" desc="Specifies whether filtering is done before all other processing, or after key and conref processing." type="enum">
+      <val default="true">early</val>
+      <val>late</val>
+    </param>
+    <param name="force-unique" desc="Generate copy-to attributes to duplicate topicref elements." type="enum">
+      <val>true</val>
+      <val default="true">false</val>
+    </param>
+    <param name="generate.copy.outer" desc="Specifies whether to generate output files for content that is not located in or beneath the directory containing the DITA map file." type="enum">
+      <val desc="Do not generate output for content that is located outside the DITA map directory." default="true">1</val>
+      <val desc="Shift the output directory so that it contains all output for the publication.">3</val>
+    </param>
+    <param name="onlytopic.in.map" desc="Specifies whether files that are linked to, or referenced with a @conref attribute, generate output." type="enum">
+      <val>true</val>
+      <val default="true">false</val>
+    </param>
+    <param name="outer.control" desc="Specifies how DITA-OT handles content files that are not located in or below the directory containing the master DITA map." type="enum">
+      <val desc="Fail quickly if files are going to be generated or copied outside of the directory.">fail</val>
+      <val desc="Complete the operation if files will be generated or copied outside of the directory, but log a warning." default="true">warn</val>
+      <val desc="Quietly finish without generating warnings or errors.">quiet</val>
+    </param>
+    <param name="output.dir" desc="Specifies the name and location of the output directory." type="dir"/>
+    <param name="root-chunk-override" desc="Override for map chunk attribute value." type="string"/>
+    <param name="transtype" desc="Specifies the output format (transformation type)." type="string" required="true"/>
+    <param name="validate" desc="Specifies whether DITA-OT validates the content." type="enum">
+      <val default="true">true</val>
+      <val>false</val>
+    </param>
+    <param name="generate-debug-attributes" desc="Specifies whether the @xtrf and @xtrc debugging attributes are generated in the temporary files." type="enum">
+      <val desc="Enables generation of debugging attributes" default="true">true</val>
+      <val desc="Disables generation of debugging attributes">false</val>
+    </param>
+    <param name="processing-mode" desc="Specifies how DITA-OT handles errors and error recovery." type="enum">
+      <val desc="When an error is encountered, DITA-OT stops processing">strict</val>
+      <val desc="When an error is encountered, DITA-OT attempts to recover from it" default="true">lax</val>
+      <val desc="When an error is encountered, DITA-OT continues processing but does not attempt error recovery">skip</val>
+    </param>
+    <param name="conserve-memory" desc="Conserve memory at the expense of processing speed" type="enum">
+      <val>true</val>
+      <val default="true">false</val>
+    </param>
+    <param name="default.language" desc="Specifies the default language for source documents." type="string"/>
+    <param name="remove-broken-links" desc="Remove broken related links." type="enum">
+      <val>true</val>
+      <val default="true">false</val>
+    </param>
+  </transtype>
+  <feature extension="dita.image.extensions" value=".gif"/>
+  <feature extension="dita.image.extensions" value=".eps"/>
+  <feature extension="dita.image.extensions" value=".jpg"/>
+  <feature extension="dita.image.extensions" value=".jpeg"/>
+  <feature extension="dita.image.extensions" value=".png"/>
+  <feature extension="dita.image.extensions" value=".svg"/>
+  <feature extension="dita.image.extensions" value=".tif"/>
+  <feature extension="dita.image.extensions" value=".tiff"/>
+  <feature extension="dita.image.extensions" value=".bmp"/>
+  <feature extension="dita.html.extensions" value=".html"/>
+  <feature extension="dita.html.extensions" value=".htm"/>
+  <feature extension="dita.resource.extensions" value=".pdf"/>
+  <feature extension="dita.resource.extensions" value=".swf"/>
+  <feature extension="ant.import" file="build_init.xml"/>
+  <feature extension="ant.import" file="build_preprocess.xml"/>
+  <feature extension="ant.import" file="build_preprocess2.xml"/>
+  <feature extension="dita.xsl.strings" file="xsl/common/common-strings.xml"/>
+  <template file="catalog-dita_template.xml"/>
+  <template file="build_template.xml"/>
+  <template file="build_preprocess_template.xml"/>
+  <template file="build_preprocess2_template.xml"/>
+  <template file="../../config/messages_template.xml"/>
+  <template file="xsl/common/allstrings_template.xml"/>
+  <template file="xsl/common/strings_template.xml"/>
+  <template file="xsl/preprocess/maplink_template.xsl"/>
+  <template file="xsl/preprocess/mapref_template.xsl"/>
+  <template file="xsl/preprocess/mappull_template.xsl"/>
+  <template file="xsl/preprocess/conref_template.xsl"/>
+  <template file="xsl/preprocess/map-conref_template.xsl"/>
+  <template file="xsl/preprocess/topicpull_template.xsl"/>
+</plugin>

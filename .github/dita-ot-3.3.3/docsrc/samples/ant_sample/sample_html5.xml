@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<project name="sample_html5" default="samples.html5" basedir=".">
+
+  <property name="dita.dir" location="${basedir}/../../.."/>
+
+  <target name="samples.html5" description="build the HTML5 samples" depends="clean.samples.html5">
+    <ant antfile="${dita.dir}/build.xml">
+      <property name="args.input" location="${dita.dir}/docsrc/samples/hierarchy.ditamap"/>
+      <property name="output.dir" location="${dita.dir}/out/samples/html5"/>
+      <property name="args.html5.toc" value="toc"/>
+      <property name="transtype" value="html5"/>
+    </ant>
+  </target>
+
+  <target name="clean.samples.html5" description="remove the sample html5 output">
+    <delete dir="${dita.dir}/out/samples/html5"/>
+  </target>
+
+</project>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="types-pdf-customization-plugins">
+  <title>Types of custom PDF plug-ins</title>
+  <shortdesc>There are two common types of plug-ins: A plug-in that simply sets the DITA-OT parameters to be used when a
+    PDF is generated, and a plug-in that overrides aspects of the base DITA-OT PDF transformation. A plug-in can, of
+    course, do both of these things.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>property</xmlelement></indexterm>
+        <indexterm>PDF<indexterm>plug-in</indexterm></indexterm>
+        <indexterm>PDF<indexterm>draft comments</indexterm></indexterm>
+        <indexterm>draft<indexterm>PDF</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <title>Plug-in that only provides DITA-OT parameters</title>
+      <p>You might want to build a transformation type that uses a transformation as-is; however, you might want ensure
+        that certain DITA-OT parameters are used. For example, consider the following scenario:</p>
+      <p>You want to ensure that PDFs generated for internal review have the following characteristics:</p>
+      <ul>
+        <li>Use company style sheets</li>
+        <li>Make draft comments visible to the reviewers, as they contain queries from the information developers</li>
+        <li>Print the file names of the graphics underneath figures, so that graphic artists can more quickly respond to
+          requested changes</li>
+      </ul>
+      <p>To accomplish this, you can create a new plug-in. In the Ant script that defines the transformation type,
+        specify the DITA-OT parameters. For example, to render draft comments and art labels, add
+          <xmlelement>property</xmlelement> elements to specify the DITA-OT parameters:</p>
+      <p>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;?xml version='1.0' encoding='UTF-8'?>
+&lt;project name="com.example.draft.pdf">
+  &lt;target name="dita2draft.pdf.init">
+    &lt;property name="customization.dir"
+              location="${dita.plugin.com.example.draft.pdf.dir}/cfg"/>
+    <b>&lt;property name="args.draft" value="yes"/></b>
+    <b>&lt;property name="args.artlbl" value="yes"/></b>
+  &lt;/target>
+  &lt;target name="dita2draft.pdf"
+          depends="dita2draft.pdf.init, dita2production.pdf,dita2pdf2"/>
+&lt;/project></codeblock>
+      </p>
+    </section>
+    <section>
+      <title>Plug-in that overrides the base PDF transformation</title>
+      <p>Production uses of DITA-OT typically rely on a custom PDF plug-in to render PDFs that are styled to match
+        corporate or organizational guidelines. Such customization plug-ins often override the following aspects of
+        DITA-OT default output:</p>
+      <ul>
+        <li>Generated text strings</li>
+        <li>XSL templates</li>
+        <li>XSL-FO attribute sets</li>
+      </ul>
+    </section>
+  </conbody>
+</concept>

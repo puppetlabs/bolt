@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!-- Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02     -->
+<!-- OASIS Standard                                           -->
+<!-- 16 January 2018                                           -->
+<!-- Copyright (c) OASIS Open 2018. All rights reserved.           -->
+<!-- Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html                                -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Learning Summary                             -->
+<!--  VERSION:   1.3                                               -->
+<!--  DATE:      March 2014                                        -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an  -->
+<!--       appropriate system identifier                           -->
+<!--                                                               -->
+<!-- PUBLIC "-//OASIS//DTD DITA Learning Summary//EN"              -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    DTD to describe DITA learning Summary topic       -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             May 2007                                          -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2007, 2014.              -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    2007.05.01 JPH: Original creation                          -->
+<!--    2014.03.13 WEK: Updated for DITA 1.3, reimplemented as RNG -->
+<!-- =============================================================    -->
+<!--                                                               -->
+
+<!-- ============================================================= -->
+<!--              TOPIC ENTITY DECLARATIONS                        -->
+<!-- ============================================================= -->
+
+<!ENTITY % learningBase-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Learning Base//EN"
+         "learningBase.ent"
+>%learningBase-dec;
+
+<!ENTITY % learningSummary-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Learning Summary//EN"
+         "learningSummary.ent"
+>%learningSummary-dec;
+
+<!-- ============================================================= -->
+<!--             DOMAIN CONSTRAINT INTEGRATION                     -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--             DOMAIN ENTITY DECLARATIONS                        -->
+<!-- ============================================================= -->
+
+<!ENTITY % hi-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Highlight Domain//EN"
+         "../../base/dtd/highlightDomain.ent"
+>%hi-d-dec;
+
+<!ENTITY % indexing-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Indexing Domain//EN"
+         "../../base/dtd/indexingDomain.ent"
+>%indexing-d-dec;
+
+<!ENTITY % relmgmt-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Release Management Domain//EN"
+         "../../technicalContent/dtd/releaseManagementDomain.ent"
+>%relmgmt-d-dec;
+
+<!ENTITY % ut-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Utilities Domain//EN"
+         "../../base/dtd/utilitiesDomain.ent"
+>%ut-d-dec;
+
+<!ENTITY % learningInteractionBase-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Learning Interaction Base Domain//EN"
+         "learningInteractionBaseDomain.ent"
+>%learningInteractionBase-d-dec;
+
+<!ENTITY % learningInteractionBase2-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Learning Interaction Base 2 Domain//EN"
+         "learningInteractionBase2Domain.ent"
+>%learningInteractionBase2-d-dec;
+
+<!ENTITY % learning-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Learning Domain//EN"
+         "learningDomain.ent"
+>%learning-d-dec;
+
+<!ENTITY % learning2-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Learning 2 Domain//EN"
+         "learning2Domain.ent"
+>%learning2-d-dec;
+
+<!ENTITY % learningmeta-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Learning Metadata Domain//EN"
+         "learningMetadataDomain.ent"
+>%learningmeta-d-dec;
+
+<!-- ============================================================= -->
+<!--             DOMAIN ATTRIBUTES DECLARATIONS                    -->
+<!-- ============================================================= -->
+
+<!ENTITY % deliveryTargetAtt-d-dec
+  PUBLIC "-//OASIS//ENTITIES DITA 1.3 Delivery Target Attribute Domain//EN"
+         "../../base/dtd/deliveryTargetAttDomain.ent"
+>%deliveryTargetAtt-d-dec;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN EXTENSIONS                          -->
+<!-- ============================================================= -->
+<!--                    One for each extended base element, with
+                        the name of the domain(s) in which the
+                        extension was declared                     -->
+
+<!ENTITY % index-base   "index-base |
+                         %indexing-d-index-base;
+                        ">
+<!ENTITY % ph           "ph |
+                         %hi-d-ph;
+                        ">
+<!ENTITY % fig          "fig |
+                         %ut-d-fig; |
+                         %learningInteractionBase-d-fig; |
+                         %learning-d-fig;
+                        ">
+<!ENTITY % data         "data |
+                         %ut-d-data;
+                        ">
+<!ENTITY % metadata     "metadata |
+                         %relmgmt-d-metadata; |
+                         %learningmeta-d-metadata;
+                        ">
+<!ENTITY % div          "div |
+                         %learningInteractionBase2-d-div; |
+                         %learning2-d-div;
+                        ">
+<!ENTITY % note         "note |
+                         %learning-d-note; |
+                         %learning2-d-note;
+                        ">
+<!ENTITY % lcInteractionBase "lcInteractionBase |
+                         %learning-d-lcInteractionBase;
+                        ">
+<!ENTITY % lcInteractionBase2 "lcInteractionBase2 |
+                         %learning2-d-lcInteractionBase2;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE EXTENSIONS                -->
+<!-- ============================================================= -->
+
+<!ENTITY % props-attribute-extensions
+  "%deliveryTargetAtt-d-attribute;"
+>
+<!ENTITY % base-attribute-extensions
+  ""
+>
+
+<!-- ============================================================= -->
+<!--                    TOPIC NESTING OVERRIDE                     -->
+<!-- ============================================================= -->
+
+<!ENTITY % learningSummary-info-types
+              "no-topic-nesting"
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAINS ATTRIBUTE OVERRIDE                 -->
+<!-- ============================================================= -->
+
+<!ENTITY included-domains
+                          "&learningBase-att;
+                           &learningSummary-att;
+                           &deliveryTargetAtt-d-att;
+                           &hi-d-att;
+                           &indexing-d-att;
+                           &relmgmt-d-att;
+                           &ut-d-att;
+                           &learningInteractionBase-d-att;
+                           &learningInteractionBase2-d-att;
+                           &learning-d-att;
+                           &learning2-d-att;
+                           &learningmeta-d-att;
+  "
+>
+
+<!-- ============================================================= -->
+<!--                    CONTENT CONSTRAINT INTEGRATION             -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    TOPIC ELEMENT INTEGRATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY % topic-type
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Topic//EN"
+         "../../base/dtd/topic.mod"
+>%topic-type;
+
+<!ENTITY % learningBase-type
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning Base//EN"
+         "learningBase.mod"
+>%learningBase-type;
+
+<!ENTITY % learningSummary-type
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning Summary//EN"
+         "learningSummary.mod"
+>%learningSummary-type;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ELEMENT INTEGRATION                 -->
+<!-- ============================================================= -->
+
+<!ENTITY % hi-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Highlight Domain//EN"
+         "../../base/dtd/highlightDomain.mod"
+>%hi-d-def;
+
+<!ENTITY % indexing-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Indexing Domain//EN"
+         "../../base/dtd/indexingDomain.mod"
+>%indexing-d-def;
+
+<!ENTITY % relmgmt-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Release Management Domain//EN"
+         "../../technicalContent/dtd/releaseManagementDomain.mod"
+>%relmgmt-d-def;
+
+<!ENTITY % ut-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Utilities Domain//EN"
+         "../../base/dtd/utilitiesDomain.mod"
+>%ut-d-def;
+
+<!ENTITY % learningInteractionBase-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning Interaction Base Domain//EN"
+         "learningInteractionBaseDomain.mod"
+>%learningInteractionBase-d-def;
+
+<!ENTITY % learningInteractionBase2-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning Interaction Base 2 Domain//EN"
+         "learningInteractionBase2Domain.mod"
+>%learningInteractionBase2-d-def;
+
+<!ENTITY % learning-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning Domain//EN"
+         "learningDomain.mod"
+>%learning-d-def;
+
+<!ENTITY % learning2-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning 2 Domain//EN"
+         "learning2Domain.mod"
+>%learning2-d-def;
+
+<!ENTITY % learningmeta-d-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.3 Learning Metadata Domain//EN"
+         "learningMetadataDomain.mod"
+>%learningmeta-d-def;
+
+<!-- ================= End of DITA Learning Summary Shell ================= -->

@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Map Group Domain                             -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization attributes     -->
+<!--             for Map Group Domain                              -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2009                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+  <!--<!ENTITY mapgroup-d-att "(map mapgroup-d)"                           >-->
+  <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic mapgroup-d)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    
+    </xs:documentation>
+  </xs:annotation>
+  
+  <xs:group name="mapgroup-d-topicref">
+      <xs:choice>
+        <xs:element ref="anchorref"/>
+        <xs:element ref="keydef"/>
+        <xs:element ref="mapref"/>
+        <xs:element ref="topicgroup"/>
+        <xs:element ref="topichead"/>
+        <xs:element ref="topicset"/>
+        <xs:element ref="topicsetref"/>
+      </xs:choice>
+  </xs:group>
+  
+ <xs:group name="topichead">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="topichead"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="topicgroup">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="topicgroup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="anchorref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="anchorref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="mapref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="mapref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="topicset">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="topicset"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="topicsetref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="topicsetref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="keydef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="keydef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   
+  <xs:attributeGroup name="topicref-atts-without-format">
+    <xs:annotation>
+      <xs:documentation>
+        The %topicref-atts-without-format; parameter entity represents a group of attributes
+        used in numerous map elements: mapref,
+        and topicgroup. The set is similar to those documented in <xref href="topicref-atts.xml">topicref-atts</xref> but
+        excludes the <i><keyword>format</keyword></i> attribute.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="collection-type" type="collection-type.class"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="processing-role" type="processing-role-att.class" />
+    <xs:attribute name="scope" type="scope-att.class"/>
+    <xs:attribute name="locktitle" type="yesno-att.class"/>
+    <xs:attribute name="linking" type="linkingtypes.class"/>
+    <xs:attribute name="toc" type="yesno-att.class"/>
+    <xs:attribute name="print" type="print-att.class"/>
+    <xs:attribute name="search" type="yesno-att.class"/>
+    <xs:attribute name="chunk" type="xs:string"/>
+  </xs:attributeGroup>
+  
+    <xs:element name="topichead">
+      <xs:annotation>
+        <xs:documentation>The &lt;<keyword>topichead</keyword>> element provides a title-only
+          entry in a navigation map, as an alternative to the fully-linked title provided
+          by the &lt;<keyword>topicref</keyword>> element.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+        <xs:complexContent>
+          <xs:extension base="topichead.class">
+            <xs:attribute ref="class" default="+ map/topicref mapgroup-d/topichead " />
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:complexType name="topichead.class">
+        <xs:sequence>
+          <xs:group ref="topichead.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="topichead.attributes"/>
+    </xs:complexType>
+  
+  <xs:group name="topichead.content">
+    <xs:sequence>
+      <xs:sequence>
+          <xs:element ref="topicmeta" minOccurs="0" />
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="navref" />
+            <xs:group ref="anchor" />
+            <xs:group ref="topicref" />
+            <xs:group ref="data.elements.incl"/>
+          </xs:choice>
+        </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="topichead.attributes">
+        <xs:attribute name="navtitle" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attribute name="copy-to" type="xs:string"/>
+        <xs:attribute name="keys" type="xs:string"/>
+        <xs:attributeGroup ref="topicref-atts" />
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+  </xs:attributeGroup>
+  
+
+  <xs:element name="topicgroup">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>topicgroup</keyword>> element is for creating
+        groups of &lt;<keyword>topicref</keyword>> elements without affecting the
+        hierarchy, as opposed to nested &lt;<keyword>topicref</keyword>> elements
+        within a &lt;<keyword>topicref</keyword>>, which does imply a structural hierarchy.
+        It is typically used outside a hierarchy to identify groups for linking without
+        affecting the resulting toc/navigation output.          
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="topicgroup.class">
+          <xs:attribute ref="class" default="+ map/topicref mapgroup-d/topicgroup " />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="topicgroup.class">
+        <xs:sequence>
+          <xs:group ref="topicgroup.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="topicgroup.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="topicgroup.content">
+    <xs:sequence>
+      <xs:sequence>
+          <xs:group ref="topicmeta" minOccurs="0" />
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="navref" />
+            <xs:group ref="anchor" />
+            <xs:group ref="topicref" />
+            <xs:group ref="data.elements.incl"/>
+          </xs:choice>
+        </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="topicgroup.attributes">
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="topicref-atts" />
+    <xs:attributeGroup ref="univ-atts"/>
+     <xs:attributeGroup ref="global-atts" />
+  </xs:attributeGroup>
+  
+  <xs:element name="anchorref">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>anchorref</keyword>>  specializes &lt;topicref> to set format="ditamap" 
+        and type="anchor" defaults for a reference to an &lt;<keyword>anchor</keyword>> to enable push of collections
+        of content smaller than a map onto an anchor.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="anchorref.class">
+          <xs:attribute ref="class" default="+ map/topicref mapgroup-d/anchorref " />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="anchorref.class">
+    <xs:sequence>
+      <xs:group ref="anchorref.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="anchorref.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="anchorref.content">
+    <xs:sequence>
+      <xs:sequence>
+      <xs:element ref="topicmeta" minOccurs="0" />
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="topicref" />
+        <xs:group ref="data.elements.incl"/>
+      </xs:choice>
+    </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="anchorref.attributes">
+    <xs:attribute name="navtitle" type="xs:string"/>
+    <xs:attribute name="href" type="xs:string"/>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="keys" type="xs:string"/>
+    <xs:attribute name="query" type="xs:string"/>
+    <xs:attribute name="copy-to" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attribute name="collection-type" type="collection-type.class"/>
+    <xs:attribute name="processing-role" type="processing-role-att.class" />
+     <xs:attribute name="type" type="xs:string" default="anchor"/>
+     <xs:attribute name="scope" type="scope-att.class"/>
+     <xs:attribute name="locktitle" type="yesno-att.class"/>
+     <xs:attribute name="format" type="xs:string" default="ditamap"/>
+     <xs:attribute name="linking" type="linkingtypes.class"/>
+     <xs:attribute name="toc" type="yesno-att.class" />
+     <xs:attribute name="print" type="print-att.class"/>
+     <xs:attribute name="search" type="yesno-att.class"/>
+     <xs:attribute name="chunk" type="xs:string" default="to-navigation"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts" />
+  </xs:attributeGroup>
+  
+  <xs:element name="mapref">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>anchorref</keyword>>  specializes &lt;topicref> to set a format="ditamap" 
+        default for more intuitive map references        
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mapref.class">
+          <xs:attribute ref="class" default="+ map/topicref mapgroup-d/mapref " />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="mapref.class">
+    <xs:sequence>
+      <xs:group ref="mapref.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="mapref.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="mapref.content">
+    <xs:sequence>
+      <xs:sequence>
+      <xs:element ref="topicmeta" minOccurs="0" />
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="data.elements.incl"/>
+      </xs:choice>
+    </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="mapref.attributes">
+    <xs:attribute name="navtitle" type="xs:string"/>
+    <xs:attribute name="href" type="xs:string"/>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="keys" type="xs:string"/>
+    <xs:attribute name="query" type="xs:string"/>
+    <xs:attribute name="copy-to" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="topicref-atts-without-format" />
+    <xs:attribute name="format" type="xs:string" default="ditamap"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts" />
+  </xs:attributeGroup>
+
+  <xs:element name="topicset">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>topicset</keyword>>  specializes &lt;topicref> to set a chunk="to-navigation" 
+        default and required id attribute to make it easy to delimit standalone, reusable collections of content within a 
+        map (such as lessons within a course or large tasks explained by a collection of discrete task topics).        
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="topicset.class">
+          <xs:attribute ref="class" default="+ map/topicref mapgroup-d/topicset " />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="topicset.class">
+    <xs:sequence>
+      <xs:group ref="topicset.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="topicset.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="topicset.content">
+    <xs:sequence>
+      <xs:sequence>
+      <xs:element ref="topicmeta" minOccurs="0" />
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="topicref" />
+        <xs:group ref="anchor" />
+        <xs:group ref="navref" />
+        <xs:group ref="data.elements.incl"/>
+      </xs:choice>
+    </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="topicset.attributes">
+    <xs:attribute name="navtitle" type="xs:string"/>
+    <xs:attribute name="href" type="xs:string"/>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="keys" type="xs:string"/>
+    <xs:attribute name="query" type="xs:string"/>
+    <xs:attribute name="copy-to" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <!-- topic-ref-att plus chuck defaulted to "to-navigation" -->
+    <xs:attribute name="collection-type" type="collection-type.class"/>
+    <xs:attribute name="processing-role" type="processing-role-att.class" />
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="scope" type="scope-att.class"/>
+    <xs:attribute name="locktitle" type="yesno-att.class"/>
+    <xs:attribute name="format" type="xs:string"/>
+    <xs:attribute name="linking" type="linkingtypes.class"/>
+    <xs:attribute name="toc" type="yesno-att.class"/>
+    <xs:attribute name="print" type="print-att.class"/>
+    <xs:attribute name="search" type="yesno-att.class"/>
+    <xs:attribute name="chunk" type="xs:string" default="to-navigation"/>
+    <xs:attribute name="id" type="xs:NMTOKEN" use="required"/>
+    <xs:attributeGroup ref="select-atts"/>
+    <xs:attributeGroup ref="localization-atts"/>
+    <xs:attributeGroup ref="conref-atts" />
+    <xs:attributeGroup ref="global-atts" />
+  </xs:attributeGroup>
+  
+  <xs:element name="topicsetref">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>topicsetref</keyword>>  pecializes &lt;topicref> to set format="ditamap" and 
+        type="branch" defaults for a reference to a &lt;topicset> to enable reuse of small collections within a 
+        map (especially for task composition approaches in which multiple larger task collections reuse smaller component task collections). 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="topicsetref.class">
+          <xs:attribute ref="class" default="+ map/topicref mapgroup-d/topicsetref " />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="topicsetref.class">
+    <xs:sequence>
+      <xs:group ref="topicsetref.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="topicsetref.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="topicsetref.content">
+    <xs:sequence>
+      <xs:sequence>
+      <xs:element ref="topicmeta" minOccurs="0" />
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="topicref" />
+        <xs:group ref="data.elements.incl"/>
+      </xs:choice>
+    </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="topicsetref.attributes">
+    <xs:attribute name="navtitle" type="xs:string"/>
+    <xs:attribute name="href" type="xs:string"/>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="keys" type="xs:string"/>
+    <xs:attribute name="query" type="xs:string"/>
+    <xs:attribute name="copy-to" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <!-- topic-ref-att plus chuck fixed to "to-navigation" -->
+    <xs:attribute name="collection-type" type="collection-type.class"/>
+    <xs:attribute name="processing-role" type="processing-role-att.class" />
+    <xs:attribute name="type" type="xs:string" default="topicset"/>
+    <xs:attribute name="scope" type="scope-att.class"/>
+    <xs:attribute name="locktitle" type="yesno-att.class"/>
+    <xs:attribute name="format" type="xs:string" default="ditamap"/>
+    <xs:attribute name="linking" type="linkingtypes.class"/>
+    <xs:attribute name="toc" type="yesno-att.class"/>
+    <xs:attribute name="print" type="print-att.class"/>
+    <xs:attribute name="search" type="yesno-att.class"/>
+    <xs:attribute name="chunk" type="xs:string" />
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts" />
+  </xs:attributeGroup>
+  
+  <xs:element name="keydef">
+    <xs:annotation>
+      <xs:documentation>The &lt;<keyword>keydef</keyword>>  specializes &lt;topicref> to set a chunk="to-navigation" 
+        default and required id attribute to make it easy to delimit standalone, reusable collections of content within a 
+        map (such as lessons within a course or large tasks explained by a collection of discrete task topics).        
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="keydef.class">
+          <xs:attribute ref="class" default="+ map/topicref mapgroup-d/keydef " />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="keydef.class">
+    <xs:sequence>
+      <xs:group ref="keydef.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="keydef.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="keydef.content">
+    <xs:sequence>
+    <xs:sequence>
+      <xs:element ref="topicmeta" minOccurs="0" />
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="topicref" />
+        <xs:group ref="anchor" />
+        <xs:group ref="navref" />
+        <xs:group ref="data.elements.incl"/>
+      </xs:choice>
+    </xs:sequence>
+      </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="keydef.attributes">
+    <xs:attribute name="navtitle" type="xs:string"/>
+    <xs:attribute name="href" type="xs:string"/>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="keys" type="xs:string" use="required"/>
+    <xs:attribute name="query" type="xs:string"/>
+    <xs:attribute name="copy-to" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attribute name="collection-type" type="collection-type.class"/>
+    <xs:attribute name="processing-role" type="processing-role-att.class" default="resource-only"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="scope" type="scope-att.class"/>
+    <xs:attribute name="locktitle" type="yesno-att.class"/>
+    <xs:attribute name="format" type="xs:string"/>
+    <xs:attribute name="linking" type="linkingtypes.class" />
+    <xs:attribute name="toc" type="yesno-att.class" />
+    <xs:attribute name="print" type="print-att.class" />
+    <xs:attribute name="search" type="yesno-att.class"/>
+    <xs:attribute name="chunk" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts" />
+  </xs:attributeGroup>
+  
+</xs:schema>

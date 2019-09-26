@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+--><project xmlns:dita="http://dita-ot.sourceforge.net">
+
+  <!-- Deprecated since 3.1 -->
+  <path id="dost.class.path">
+    <pathelement location="${dita.dir}${file.separator}../org.dita.eclipsehelp/lib/eclipsehelp.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.htmlhelp/lib/htmlhelp.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2/lib/fo.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.axf/lib/axf.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.fop/lib/avalon-framework-api-4.3.1.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.fop/lib/avalon-framework-impl-4.3.1.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.fop/lib/batik-all-1.10.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.fop/lib/fontbox-2.0.13.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.fop/lib/fop-pdf-images-2.3.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.fop/lib/pdfbox-2.0.13.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.fop/lib/fop-2.3.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.fop/lib/jcl-over-slf4j-1.7.25.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.fop/lib/xml-apis-ext-1.3.04.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.fop/lib/xmlgraphics-commons-2.3.jar"/><pathelement location="${dita.dir}${file.separator}../org.dita.pdf2.xep/lib/xep.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/org.lwdita-2.3.0.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/htmlparser-1.4.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-profile-pegdown-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-abbreviation-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-anchorlink-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-aside-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-autolink-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-definition-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-html-parser-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-escaped-character-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-footnotes-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-jira-converter-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-youtrack-converter-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-gfm-strikethrough-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-gfm-tables-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-gfm-tasklist-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-jekyll-front-matter-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-jekyll-tag-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-ins-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-superscript-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-tables-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-toc-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-typographic-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-wikilink-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-ext-yaml-front-matter-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-formatter-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/flexmark-util-0.50.18.jar"/><pathelement location="${dita.dir}${file.separator}../org.lwdita/lib/autolink-0.6.0.jar"/>
+    <pathelement location="${dita.dir}/lib/dost.jar"/>
+    <pathelement location="${dita.dir}/lib/dost-configuration.jar"/>
+  </path>
+
+  <target name="init">
+    <dita-ot-fail id="DOTA001F">
+      <condition>
+        <and>
+          <not><equals arg1="${transtype}" arg2="html5" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="pup-html5" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="tocjs" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="xhtml" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="eclipsehelp" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="htmlhelp" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="dita" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="pdf" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="pdf2" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="pdf" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="pdf" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="pdf" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="troff" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="markdown" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="markdown_github" casesensitive="false"/></not><not><equals arg1="${transtype}" arg2="markdown_gitbook" casesensitive="false"/></not>
+        </and>
+      </condition>
+      <param name="1" value="${transtype}"/>
+    </dita-ot-fail>
+    <condition property="clean.temp" value="true">
+      <not><isset property="clean.temp"/></not>
+    </condition>
+    <condition property="clean-temp.skip">
+      <isfalse value="${clean.temp}"/>
+    </condition>
+    <antcall>
+      <target name="dita2${transtype}"/>
+      <target name="clean-temp"/>
+    </antcall>
+  </target>
+
+  <property name="dita.plugin.org.dita.base.dir" location="${dita.dir}/plugins/org.dita.base"/><property name="dita.plugin.org.dita.htmlhelp.dir" location="${dita.dir}/plugins/org.dita.htmlhelp"/><property name="dita.plugin.org.dita.pdf2.xep.dir" location="${dita.dir}/plugins/org.dita.pdf2.xep"/><property name="dita.plugin.com.sophos.tocjs.dir" location="${dita.dir}/plugins/com.sophos.tocjs"/><property name="dita.plugin.org.dita.eclipsehelp.dir" location="${dita.dir}/plugins/org.dita.eclipsehelp"/><property name="dita.plugin.org.dita.pdf2.fop.dir" location="${dita.dir}/plugins/org.dita.pdf2.fop"/><property name="dita.plugin.org.dita.specialization.dita11.dir" location="${dita.dir}/plugins/org.dita.specialization.dita11"/><property name="dita.plugin.org.dita.normalize.dir" location="${dita.dir}/plugins/org.dita.normalize"/><property name="dita.plugin.org.oasis-open.xdita.v0_2_2.dir" location="${dita.dir}/plugins/org.oasis-open.xdita.v0_2_2"/><property name="dita.plugin.org.dita.troff.dir" location="${dita.dir}/plugins/org.dita.troff"/><property name="dita.plugin.org.dita.pdf2.axf.dir" location="${dita.dir}/plugins/org.dita.pdf2.axf"/><property name="dita.plugin.org.dita.html5.dir" location="${dita.dir}/plugins/org.dita.html5"/><property name="dita.plugin.com.puppet.html5.dir" location="${dita.dir}/plugins/com.puppet.html5"/><property name="dita.plugin.org.lwdita.dir" location="${dita.dir}/plugins/org.lwdita"/><property name="dita.plugin.org.dita.xhtml.dir" location="${dita.dir}/plugins/org.dita.xhtml"/><property name="dita.plugin.org.dita.pdf2.dir" location="${dita.dir}/plugins/org.dita.pdf2"/><property name="dita.plugin.org.oasis-open.dita.v1_2.dir" location="${dita.dir}/plugins/org.oasis-open.dita.v1_2"/><property name="dita.plugin.org.oasis-open.dita.v1_3.dir" location="${dita.dir}/plugins/org.oasis-open.dita.v1_3"/>
+  <import><fileset dir="${dita.plugin.org.dita.base.dir}" includes="build_init.xml"/></import><import><fileset dir="${dita.plugin.org.dita.base.dir}" includes="build_preprocess.xml"/></import><import><fileset dir="${dita.plugin.org.dita.base.dir}" includes="build_preprocess2.xml"/></import><import><fileset dir="${dita.plugin.org.dita.html5.dir}" includes="build_dita2html5.xml"/></import><import><fileset dir="${dita.plugin.org.dita.xhtml.dir}" includes="build_general.xml"/></import><import><fileset dir="${dita.plugin.org.dita.xhtml.dir}" includes="build_dita2xhtml.xml"/></import><import><fileset dir="${dita.plugin.org.dita.eclipsehelp.dir}" includes="build_dita2eclipsehelp.xml"/></import><import><fileset dir="${dita.plugin.org.dita.htmlhelp.dir}" includes="build_dita2htmlhelp.xml"/></import><import><fileset dir="${dita.plugin.org.dita.pdf2.dir}" includes="build.xml"/></import><import><fileset dir="${dita.plugin.org.dita.pdf2.axf.dir}" includes="build_axf.xml"/></import><import><fileset dir="${dita.plugin.org.dita.pdf2.fop.dir}" includes="build_fop.xml"/></import><import><fileset dir="${dita.plugin.org.dita.pdf2.xep.dir}" includes="build_xep.xml"/></import><import><fileset dir="${dita.plugin.org.dita.troff.dir}" includes="build_dita2troff.xml"/></import>
+  
+    <target name="dita2pup-html5" depends="dita2pup-html5.init, dita2html5"/>
+
+    <target name="dita2pup-html5.init">
+    </target>
+
+
+  <import file="../org.dita.normalize/build.xml"/>
+
+  <import file="../org.lwdita/build-markdown.xml"/>
+  <import file="../org.lwdita/build-html.xml"/>
+
+  
+
+  <target name="dita2tocjs" depends="build-init, preprocess, tocjsInit, map2tocjs, topic2tocjs, tocjsDefaultOutput">
+  </target>
+
+  <target name="tocjsInit">
+    <property name="html-version" value="xhtml"/>
+    <condition property="dita.plugin.com.sophos.tocjs.copydefaults" value="true">
+        <not>
+            <isset property="output.file"/>
+        </not>
+    </condition>
+    <property name="output.file" value="${dita.output.dir}${file.separator}toctree.js"/>
+    <property name="out.ext" value=".html"/>
+  </target>
+
+  <target name="topic2tocjs" if="noMap">
+    <antcall target="dita.map.tocjs">
+      
+    </antcall>
+    <echo>The TocJS output type only supports ditamap files as input.</echo>
+  </target>
+
+  <target name="map2tocjs" unless="noMap">
+    <antcall target="dita.map.tocjs">
+      <param name="input" value="${dita.temp.dir}${file.separator}${user.input.file}"/>
+    </antcall>
+  </target>
+
+  <target name="dita.map.tocjs" description="generate merged for tocjs">
+    <xslt in="${input}" out="${output.file}" style="${dita.plugin.com.sophos.tocjs.dir}/xsl/tocjs.xsl">
+      <param name="contentwin" expression="${content.frame}" if="content.frame"/>
+      <param name="htmlext" expression="${out.ext}"/>
+      <xmlcatalog refid="dita.catalog"/>
+    </xslt>
+  </target>
+
+  <target name="tocjsDefaultOutput" if="dita.plugin.com.sophos.tocjs.copydefaults">
+      
+      <antcall target="tocjsDefaultXhtmlOutput"/>
+      <antcall target="tocjsDefaultFrameset"/>
+      
+    <copy todir="${dita.output.dir}"><fileset dir="${dita.plugin.com.sophos.tocjs.dir}${file.separator}basefiles"><include name="**/*"/></fileset></copy>
+  </target>
+
+  <target name="tocjsDefaultXhtmlOutput" depends="copy-revflag, xhtml.topics, copy-css">
+      
+  </target>
+
+  <target name="tocjsDefaultFrameset" if="dita.plugin.com.sophos.tocjs.copydefaults">
+      
+      <xslt basedir="${dita.temp.dir}" destdir="${dita.output.dir}" includesfile="${dita.temp.dir}${file.separator}${user.input.file.listfile}" extension="${out.ext}" style="${dita.plugin.com.sophos.tocjs.dir}${file.separator}xsl${file.separator}frameset.xsl">
+        <excludesfile name="${dita.temp.dir}${file.separator}${resourceonlyfile}" if="resourceonlyfile"/>
+        <param name="OUTEXT" expression="${out.ext}" if="out.ext"/>
+        <param name="CSSPATH" expression="${CSSPATH}" if="csspath"/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+  </target>
+
+
+
+  <!-- Deprecated since 2.1 -->
+  <target name="help">
+    <echo level="info">See http://www.dita-ot.org/${otrelease}/</echo>
+  </target>
+
+</project>

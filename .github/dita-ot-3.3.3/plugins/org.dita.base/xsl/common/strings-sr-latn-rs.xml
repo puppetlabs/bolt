@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="sr-Latn-RS">        <!-- Serbian Latin -->
+  <str name="Figure">Ilustracija</str>
+  <str name="Table">Tabela</str>
+  <str name="Next topic">Sledeća tema</str>
+  <str name="Previous topic">Prethodna tema</str>
+  <str name="Parent topic">Nadređena tema</str>
+  <str name="Required cleanup">Neophodno čišćenje</str>
+  <str name="Draft comment">Komentar na koncept</str>
+  <str name="Option">Izbor</str>
+  <str name="Description">Opis</str>
+  <str name="Optional">Neobavezno</str>
+  <str name="Required">Neophodno</str>
+  <str name="Skip visual syntax diagram">Preskočite vizualni sintaksni dijagram</str>
+  <str name="Read syntax diagram">Pročitajte vizualni sintaksni dijagram</str>
+  <str name="Start of change">Početak promene</str>
+  <str name="End of change">Kraj promene</str>
+  <str name="Index">Indeks</str>
+  <str name="Special characters">Posebni Znaci</str>
+  <str name="Numerics">Numerici</str>
+  <str name="End notes">Završne primedbe</str>
+  <str name="Artwork">Ilustracije</str>
+  <str name="Syntax">Sintaksa</str>
+  <str name="Type">Vrsta</str>
+  <str name="Value">Vrednost</str>
+  <str name="Note">Napomena</str>
+  <str name="Notes">Napomene</str>
+  <str name="Tip">Savet</str>
+  <str name="Fastpath">Prečica</str>
+  <str name="Important">Važno</str>
+  <str name="Attention">Pažnja</str>
+  <str name="Caution">UPOZORENJE</str>
+  <str name="Danger">OPASNOST</str>
+  <str name="Remember">Zapamtite</str>
+  <str name="Restriction">Ograničenje</str>
+  <str name="Trouble">Problem</str>
+  <str name="Warning">Upozorenje</str>
+  <str name="Contents">Sadržaj</str>
+  <str name="Related concepts">Srodni koncepti</str>
+  <str name="Related tasks">Srodni zadaci</str>
+  <str name="Related reference">Srodna referenca</str>
+  <str name="Related information">Srodna informacija</str>
+  <str name="Prerequisite">Preduslov</str>
+  <str name="Prerequisites">Preduslovi</str>
+  <str name="or">or</str>
+  <str name="task_context">O ovom zadatku</str>
+  <str name="task_example">Primer</str>
+  <str name="task_postreq">Šta uraditi sledeće</str>
+  <str name="task_prereq">Pre nego što počnete</str>
+  <str name="task_procedure">Postupak</str>
+  <str name="task_procedure_unordered">Postupak</str>
+  <str name="task_results">Rezultat</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

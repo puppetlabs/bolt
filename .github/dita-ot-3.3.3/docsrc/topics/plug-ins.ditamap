@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>Working with plug-ins</title>
+  <topicref keyref="custom-plugins">
+    <topicref keyref="plugins-installing"/>
+    <topicref keyref="plugins-removing"/>
+    <topicref keyref="plugins-registry"/>
+    <topicref keyref="plugin-configfile"/>
+    <topicref keyref="plugin-dependencies"/>
+    <topicref keyref="plugin-applications">
+      <topicref keyref="plugin-xmlcatalog"/>
+      <topicref keyref="plugin-anttarget"/>
+      <topicref keyref="plugin-antpreprocess"/>
+      <topicref keyref="plugin-newtranstype"/>
+      <topicref keyref="plugin-overridestyle"/>
+      <topicref keyref="using-plugin-URI-extension"/>
+      <topicref keyref="plugin-xsltparams"/>
+      <topicref keyref="plugin-javalib"/>
+      <topicref keyref="plugin-messages"/>
+      <topicref keyref="plugin-newextensions"/>
+      <topicref keyref="plugin-implement-saxon-customizations">
+        <topicref keyref="plugin-implement-saxon-extension-functions"/>
+        <topicref keyref="plugin-implement-saxon-collation-uri-resolvers"/>
+      </topicref>
+    </topicref>
+    <topicref keyref="plugin-sample"/>
+    <topicref keyref="plugin-best-practices"/>
+    <topicref keyref="plugin-coding-conventions"/>
+  </topicref>
+
+  <reltable>
+    <title>Bi-directional links</title>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-best-practices"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-coding-conventions"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugins-installing"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugins-registry"/>
+      </relcell>
+    </relrow>
+  </reltable>
+
+  <reltable>
+    <title>Source and target links</title>
+    <relheader>
+      <relcolspec linking="sourceonly"/>
+      <relcolspec linking="targetonly"/>
+    </relheader>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-xmlcatalog"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-extension-points-general"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-anttarget"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-extension-points-general"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-antpreprocess"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-extension-points-pre-processing"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-newtranstype"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-extension-points-general"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-overridestyle"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-extension-points-xslt-import"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-xsltparams"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-extension-points-xslt-parameters"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-javalib"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-extension-points-general"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-messages"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-extension-points-general"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-configfile"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-newextensions"/>
+      </relcell>
+    </relrow>
+  </reltable>
+</map>

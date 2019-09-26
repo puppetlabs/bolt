@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA General Task//EN" "generalTask.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="migrating-ant-to-dita">
+  <title>Migrating Ant builds to use the <cmdname>dita</cmdname> command</title>
+  <titlealts>
+    <navtitle>Migrating Ant builds</navtitle>
+  </titlealts>
+  <shortdesc>Although DITA Open Toolkit still supports Ant builds, switching to the <cmdname>dita</cmdname> command
+    offers a simpler command interface, sets all required environment variables and allows you to run DITA-OT without
+    setting up anything beforehand.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Ant<indexterm><xmlelement>exec</xmlelement></indexterm></indexterm>
+        <indexterm>Ant<indexterm><xmlelement>dita-cmd</xmlelement></indexterm><indexterm><cmdname>dita</cmdname>
+            command, benefits of</indexterm></indexterm>
+        <indexterm>dita-cmd</indexterm>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>migrating Ant scripts</indexterm></indexterm>
+        <indexterm>classpath<indexterm><cmdname>dita</cmdname> command</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>Building output with the <cmdname>dita</cmdname> command is often easier than using Ant. In particular, you can
+        use <filepath>.properties</filepath> files to specify sets of DITA-OT parameters for each build.</p>
+      <p>You can include the <cmdname>dita</cmdname> command in shell scripts to perform multiple builds.</p>
+      <note conref="../resources/conref-task.dita#ID/dita-in-path"/>
+    </context>
+    <steps>
+      <step>
+        <cmd>In your Ant build file, identify the properties set in each build target.</cmd>
+        <info>
+          <note>Some build parameters might be specified as properties of the project as a whole. You can refer to a
+            build log to see a list of all properties that were set for the build.</note>
+        </info>
+      </step>
+      <step>
+        <cmd>Create a <filepath>.properties</filepath> file for each build and specify the needed build parameters, one
+          per line, in the format <codeph>name = value</codeph>.</cmd>
+      </step>
+      <step>
+        <cmd>Use the <cmdname>dita</cmdname> command to perform each build, referencing your
+            <filepath>.properties</filepath> with the <parmname>--propertyfile</parmname>=<varname>file</varname>
+          option.</cmd>
+      </step>
+    </steps>
+    <example>
+      <title>Example: Ant build</title>
+      <p>Prior to DITA-OT 2.0, an Ant build like this was typically used to define the properties for each target.</p>
+      <p>Sample build file: <filepath id="samples-dir"
+          ><varname>dita-ot-dir</varname>/docsrc/samples</filepath><filepath>/ant_sample/build-chm-pdf.xml</filepath>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/ant_sample/build-chm-pdf.xml"/></codeblock></p></example>
+    <example>
+      <title>Example: <filepath>.properties</filepath> files with <cmdname>dita</cmdname> command</title>
+      <p>The following <filepath>.properties</filepath> files and <cmdname>dita</cmdname> commands are equivalent to the
+        example Ant build.</p>
+      <p>Sample <filepath>.properties</filepath> file: <filepath conref="../resources/conref-task.dita#ID/samples-dir"
+          /><filepath>/properties/chm.properties</filepath></p>
+      <p>
+        <codeblock outputclass="language-properties normalize-space show-line-numbers show-whitespace"><coderef href="../samples/properties/chm.properties"/></codeblock></p>
+      <p>Sample <filepath>.properties</filepath> file: <filepath conref="../resources/conref-task.dita#ID/samples-dir"
+          /><filepath>/properties/pdf.properties</filepath></p>
+      <p>
+        <codeblock outputclass="language-properties normalize-space show-line-numbers show-whitespace"><coderef href="../samples/properties/pdf.properties"/></codeblock></p>
+      <p>Run from <filepath conref="../resources/conref-task.dita#ID/samples-dir"/>:</p>
+      <codeblock><cmdname>dita</cmdname> <parmname>--input</parmname>=<filepath>sequence.ditamap</filepath> <parmname>--format</parmname>=<option>htmlhelp</option> \
+     <parmname>--propertyfile</parmname>=<filepath>properties/chm.properties</filepath>
+<cmdname>dita</cmdname> <parmname>--input</parmname>=<filepath>taskbook.ditamap</filepath> <parmname>--format</parmname>=<option>pdf</option> \
+     <parmname>--propertyfile</parmname>=<filepath>properties/pdf.properties</filepath></codeblock>
+    </example>
+    <example>
+      <title>Example: Call the <cmdname>dita</cmdname> command from an Ant build</title>
+      <p>In some cases, you might still want to use an Ant build to implement some pre- or post-processing steps, but
+        also want the convenience of using the <cmdname>dita</cmdname> command with <filepath>.properties</filepath>
+        files to define the parameters for each build. This can be accomplished with Ant’s <xmlelement>exec</xmlelement>
+        task.</p>
+      <p>This example uses a <xmlelement>dita-cmd</xmlelement> Ant macro defined in the <filepath
+          conref="../resources/conref-task.dita#ID/samples-dir"/><filepath>/ant_sample/dita-cmd.xml</filepath> file:</p>
+      <p>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/ant_sample/dita-cmd.xml#line=11,32"/></codeblock></p>
+      <p>You can use this macro in your Ant build to call the <cmdname>dita</cmdname> command and pass the
+          <parmname>input</parmname>, <parmname>format</parmname> and <parmname>propertyfile</parmname> parameters as
+        follows:
+        <codeblock outputclass="language-xml">&lt;dita-cmd input="sample.ditamap" format="pdf" propertyfile="sample.properties"/></codeblock>
+      </p>
+      <p>This approach allows you to use Ant builds to perform additional tasks at build time while allowing the
+          <cmdname>dita</cmdname> command to set the classpath and ensure that all necessary JAR libraries are
+        available.</p>
+      <note>The attributes defined in the Ant macro are required and must be supplied each time the task is run. To set
+        optional parameters in one build (but not another), use different <filepath>.properties</filepath> files for
+        each build.</note>
+      <p>Sample build file: <filepath conref="../resources/conref-task.dita#ID/samples-dir"
+          /><filepath>/ant_sample/build-chm-pdf-hybrid.xml</filepath></p>
+      <p>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/ant_sample/build-chm-pdf-hybrid.xml"/></codeblock>
+      </p>
+    </example>
+  </taskbody>
+</task>

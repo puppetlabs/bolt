@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"
+         prefer="public">
+
+  <public publicId="-//OASIS//DTD LIGHTWEIGHT DITA Topic//EN" uri="dtd/lw-topic.dtd"/>
+  <public publicId="-//OASIS//DTD LIGHTWEIGHT DITA Map//EN" uri="dtd/lw-map.dtd"/>
+
+  <public publicId="-//OASIS//ELEMENTS LIGHTWEIGHT DITA Topic//EN" uri="dtd/lw-topic.mod"/>
+  <public publicId="-//OASIS//ELEMENTS LIGHTWEIGHT DITA Map//EN" uri="dtd/lw-map.mod"/>
+
+  <public publicId="-//OASIS//ELEMENTS LIGHTWEIGHT DITA Highlight Domain//EN" uri="dtd/lw-highlightDomain.mod"/>
+
+  <!-- The following values are deprecated, kept only for compatibility with the previous version -->
+
+  <public publicId="-//OASIS//DTD XDITA Topic//EN" uri="dtd/lw-topic.dtd"/>
+  <public publicId="-//OASIS//DTD XDITA Map//EN" uri="dtd/lw-map.dtd"/>
+
+  <public publicId="-//OASIS//ELEMENTS XDITA Topic//EN" uri="dtd/lw-topic.mod"/>
+  <public publicId="-//OASIS//ELEMENTS XDITA Map//EN" uri="dtd/lw-map.mod"/>
+
+  <!-- <public publicId="-//OASIS//ELEMENTS XDITA Highlight Domain//EN" uri="dtd/highlightDomain.mod"/> -->
+
+  <public publicId="-//OASIS//DTD LW DITA Topic//EN" uri="dtd/lw-topic.dtd"/>
+  <public publicId="-//OASIS//DTD LW DITA Map//EN" uri="dtd/lw-map.dtd"/>
+
+  <public publicId="-//OASIS//ELEMENTS LW DITA Topic//EN" uri="dtd/lw-topic.mod"/>
+  <public publicId="-//OASIS//ELEMENTS LW DITA Map//EN" uri="dtd/lw-map.mod"/>
+
+  <public publicId="-//OASIS//ELEMENTS LW DITA Highlight Domain//EN" uri="dtd/lw-highlightDomain.mod"/>
+
+</catalog>

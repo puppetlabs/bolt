@@ -1,0 +1,138 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="In DITA-OT 2.1, the insertVariable template was deprecated for PDF transformations and should be replaced with the getVariable template. Various dita.out.map.* targets have been deprecated in favor of updated dita.map.* equivalents."><meta name="DC.subject" content=", ph, keyword, cite, dt, term, indexterm, href, deprecated features, build target, help, imagefile, image.list, htmlfile, html.list, target, copy-subsidiary, copy-subsidiary-check, extension points, depend.preprocess.copy-subsidiary.pre, PDF,, insertVariable, variable, keydefs, KEYREF-FILE, displaytext, keys, target, template, pull-in-title, common-processing-phrase-within-link, dita.out.map.xhtml.toc, targets, dita.out.map.htmlhelp.*, dita.out.map.javahelp.*, args.odt.img.embed"><meta name="keywords" content=", ph, keyword, cite, dt, term, indexterm, href, deprecated features, build target, help, imagefile, image.list, htmlfile, html.list, target, copy-subsidiary, copy-subsidiary-check, extension points, depend.preprocess.copy-subsidiary.pre, PDF,, insertVariable, variable, keydefs, KEYREF-FILE, displaytext, keys, target, template, pull-in-title, common-processing-phrase-within-link, dita.out.map.xhtml.toc, targets, dita.out.map.htmlhelp.*, dita.out.map.javahelp.*, args.odt.img.embed"><meta name="DC.relation" scheme="URI" content="../topics/migration.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="migrating-to-2.1"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Migrating to release 2.1</title></head><body id="migrating-to-2.1"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a><ul><li><a href="../topics/migrating-to-3.3.html">To 3.3</a></li><li><a href="../topics/migrating-to-3.2.html">To 3.2</a></li><li><a href="../topics/migrating-to-3.1.html">To 3.1</a></li><li><a href="../topics/migrating-to-3.0.html">To 3.0</a></li><li><a href="../topics/migrating-to-2.5.html">To 2.5</a></li><li><a href="../topics/migrating-to-2.4.html">To 2.4</a></li><li><a href="../topics/migrating-to-2.3.html">To 2.3</a></li><li><a href="../topics/migrating-to-2.2.html">To 2.2</a></li><li class="active"><a href="../topics/migrating-to-2.1.html">To 2.1</a></li><li><a href="../topics/migrating-to-2.0.html">To 2.0</a></li><li><a href="../topics/migrating-to-1.8.html">To 1.8</a></li><li><a href="../topics/migrating-to-1.7.html">To 1.7</a></li><li><a href="../topics/migrating-to-1.6.html">To 1.6</a></li><li><a href="../topics/migrating-to-1.5.4.html">To 1.5.4</a></li></ul></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+
+  <h1 class="title topictitle1" id="ariaid-title1">Migrating to release 2.1</h1>
+  
+
+  
+  
+  <div class="body refbody"><p class="shortdesc">In DITA-OT 2.1, the <code class="ph codeph">insertVariable</code> template was deprecated for PDF transformations and
+    should be replaced with the <code class="ph codeph">getVariable</code> template. Various <code class="ph codeph">dita.<strong class="ph b">out.</strong>map.*</code>
+    targets have been deprecated in favor of updated <code class="ph codeph">dita.map.*</code> equivalents.</p>
+    <section class="section">
+      <div class="note note note_note"><span class="note__title">Note:</span> This topic provides a summary of changes in DITA-OT 2.1 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the <a class="xref" href="https://www.dita-ot.org/2.1/release-notes/" target="_blank">DITA-OT 2.1 Release Notes</a>.</div>
+    </section>
+
+    <section class="section">
+      <p class="p">The custom<samp class="ph systemoutput sysout">FileUtils</samp> code used to handle input and output in earlier versions of
+        DITA-OT has been replaced with the <a class="xref" href="http://commons.apache.org/proper/commons-io/" target="_blank">Apache Commons IO</a> utilities library. </p>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">Deprecated targets</h2>
+      
+      <p class="p">The following build targets have been deprecated and will be removed in an upcoming release:</p>
+      <ul class="ul">
+        <li class="li">The <code class="ph codeph">help</code> target that includes a reference to the current DITA-OT version during the build
+          process.</li>
+      </ul>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">Preprocessing</h2>
+      
+      <p class="p">The following Ant properties and generated list files have been deprecated:</p>
+      <ul class="ul">
+        <li class="li"><span class="keyword parmname">imagefile</span> property and <code class="ph codeph">image.list</code> file</li>
+        <li class="li"><span class="keyword parmname">htmlfile</span> property and <code class="ph codeph">html.list</code> file</li>
+      </ul>
+      <p class="p">The following pre-processing targets and extension points have been deprecated:</p>
+      <ul class="ul">
+        <li class="li">The <code class="ph codeph">copy-subsidiary</code> target used to copy subsidiary files</li>
+        <li class="li">The <code class="ph codeph">copy-subsidiary-check</code> target used to check for subsidiary files</li>
+        <li class="li">The <span class="keyword parmname">depend.preprocess.copy-subsidiary.pre</span> extension point used to insert an Ant target
+          before the <code class="ph codeph">copy-subsidiary</code> step in the pre-processing stage.</li>
+      </ul>
+      <p class="p">A new<samp class="ph systemoutput sysout">dita.parser</samp> extension point has been added to allow plug-ins to contribute a
+        custom parser for DITA files. If a custom DITA parser is defined, the preprocessing routines will use it during
+        the gen-list and debug-filter stages to output DITA XML.</p>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">PDF</h2>
+      
+      <p class="p">The following template has been deprecated:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">insertVariable</code>, use <code class="ph codeph">getVariable</code> instead</li>
+      </ul>
+      <p class="p">Calls to that template will result in warnings in the build log.</p>
+      <p class="p">To update your plug-in, make the following changes:</p>
+      <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;xsl:call-template name="<span style="text-decoration:line-through" class="ph line-through">insertVariable</span><strong class="ph b">getVariable</strong>"&gt;
+  &lt;xsl:with-param name="<span style="text-decoration:line-through" class="ph line-through">theVariableID</span><strong class="ph b">id</strong>" select="<var class="keyword varname">var-id</var>"/&gt;
+  &lt;xsl:with-param name="<span style="text-decoration:line-through" class="ph line-through">theParameters</span><strong class="ph b">params</strong>"&gt;
+    <var class="keyword varname">params</var>
+  &lt;/xsl:with-param&gt;
+&lt;/xsl:call-template&gt;</code></pre>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">HTML-based output formats</h2>
+      
+      
+      <div class="p">The <var class="keyword varname">keydefs</var> variable and the following XSL parameters have been deprecated:
+        <ul class="ul">
+          <li class="li"><span class="keyword parmname">KEYREF-FILE</span></li>
+          <li class="li"><span class="keyword parmname">displaytext</span></li>
+          <li class="li"><span class="keyword parmname">keys</span></li>
+          <li class="li"><span class="keyword parmname">target</span></li>
+        </ul>
+      </div>
+      <div class="p">The following template modes have been deprecated:
+        <ul class="ul">
+          <li class="li"><code class="ph codeph">pull-in-title</code></li>
+          <li class="li"><code class="ph codeph">common-processing-phrase-within-link</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">XHTML</h2>
+      
+      <div class="div div-index">
+        
+      </div>
+      <p class="p">The <code class="ph codeph">dita.<strong class="ph b">out.</strong>map.xhtml.toc</code> target has been deprecated and should be replaced with the
+        updated <code class="ph codeph">dita.map.xhtml.toc</code> equivalent.</p>
+      <p class="p">Keydef processing has been removed from the XHTML rendering code. Keys are now resolved in one preprocessing
+        step, whereas in earlier versions of DITA-OT, the XHTML code returned to the <span class="ph filepath">keydef.xml</span>
+        file to look up targets for phrase elements and pull in text when needed.</p>
+      <p class="p">This change affects non-linking elements that can’t take <code class="keyword markupname xmlatt">@href</code> attributes, such as
+          <code class="keyword markupname xmlelement">&lt;ph&gt;</code>, <code class="keyword markupname xmlelement">&lt;keyword&gt;</code>, <code class="keyword markupname xmlelement">&lt;cite&gt;</code>,
+          <code class="keyword markupname xmlelement">&lt;dt&gt;</code>, <code class="keyword markupname xmlelement">&lt;term&gt;</code>, and <code class="keyword markupname xmlelement">&lt;indexterm&gt;</code> (when
+          <code class="ph codeph">$INDEXSHOW</code> is active).</p>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">HTMLHelp</h2>
+      
+      <p class="p">The <code class="ph codeph">dita.<strong class="ph b">out.</strong>map.htmlhelp.*</code> targets have been deprecated and should be replaced with
+        the updated <code class="ph codeph">dita.map.htmlhelp.*</code> equivalents:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">dita.out.map.htmlhelp.hhp</code>, use <code class="ph codeph">dita.map.htmlhelp.hhp</code> instead</li>
+        <li class="li"><code class="ph codeph">dita.out.map.htmlhelp.hhc</code>, use <code class="ph codeph">dita.map.htmlhelp.hhc</code> instead</li>
+        <li class="li"><code class="ph codeph">dita.out.map.htmlhelp.hhk</code>, use <code class="ph codeph">dita.map.htmlhelp.hhk</code> instead</li>
+      </ul>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">JavaHelp</h2>
+      
+      <div class="div div-index">
+        
+      </div>
+      <p class="p">The <code class="ph codeph">dita.<strong class="ph b">out.</strong>map.javahelp.*</code> targets have been deprecated and should be replaced with
+        the updated <code class="ph codeph">dita.map.javahelp.*</code> equivalents:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">dita.out.map.javahelp.toc</code>, use <code class="ph codeph">dita.map.javahelp.toc</code> instead</li>
+        <li class="li"><code class="ph codeph">dita.out.map.javahelp.map</code>, use <code class="ph codeph">dita.map.javahelp.map</code> instead</li>
+        <li class="li"><code class="ph codeph">dita.out.map.javahelp.set</code>, use <code class="ph codeph">dita.map.javahelp.set</code> instead</li>
+        <li class="li"><code class="ph codeph">dita.out.map.javahelp.index</code>, use <code class="ph codeph">dita.map.javahelp.index</code> instead</li>
+      </ul>
+    </section>
+
+    <section class="section"><h2 class="title sectiontitle">OpenDocument Text</h2>
+      
+      <p class="p">Support for the <span class="keyword parmname">args.odt.img.embed</span> parameter has been removed from OpenDocument Text
+        transformations. The previous default behavior was to embed images as Base64-encoded text, but editors do not
+        use this as a default. Instead, office packages such as LibreOffice will convert embedded images into linked
+        images on opening and saving an ODT file.</p>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/migration.html" title="If you have XSL transformation overrides, plug-ins or other customizations written prior to DITA-OT 3.3, you may need to make changes to ensure your overrides work properly with the latest toolkit versions.">Migrating customizations</a></div></div></nav></article></main></body></html>

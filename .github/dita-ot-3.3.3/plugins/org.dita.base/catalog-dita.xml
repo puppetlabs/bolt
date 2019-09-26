@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+--><catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" xmlns:dita="http://dita-ot.sourceforge.net">
+
+  <rewriteURI uriStartString="platform:" rewritePrefix="../../"/>
+
+  <rewriteURI uriStartString="plugin:org.dita.base:" rewritePrefix="../org.dita.base/"/><rewriteURI uriStartString="plugin:org.dita.htmlhelp:" rewritePrefix="../org.dita.htmlhelp/"/><rewriteURI uriStartString="plugin:org.dita.pdf2.xep:" rewritePrefix="../org.dita.pdf2.xep/"/><rewriteURI uriStartString="plugin:com.sophos.tocjs:" rewritePrefix="../com.sophos.tocjs/"/><rewriteURI uriStartString="plugin:org.dita.eclipsehelp:" rewritePrefix="../org.dita.eclipsehelp/"/><rewriteURI uriStartString="plugin:org.dita.pdf2.fop:" rewritePrefix="../org.dita.pdf2.fop/"/><rewriteURI uriStartString="plugin:org.dita.specialization.dita11:" rewritePrefix="../org.dita.specialization.dita11/"/><rewriteURI uriStartString="plugin:org.dita.normalize:" rewritePrefix="../org.dita.normalize/"/><rewriteURI uriStartString="plugin:org.oasis-open.xdita.v0_2_2:" rewritePrefix="../org.oasis-open.xdita.v0_2_2/"/><rewriteURI uriStartString="plugin:org.dita.troff:" rewritePrefix="../org.dita.troff/"/><rewriteURI uriStartString="plugin:org.dita.pdf2.axf:" rewritePrefix="../org.dita.pdf2.axf/"/><rewriteURI uriStartString="plugin:org.dita.html5:" rewritePrefix="../org.dita.html5/"/><rewriteURI uriStartString="plugin:com.puppet.html5:" rewritePrefix="../com.puppet.html5/"/><rewriteURI uriStartString="plugin:org.lwdita:" rewritePrefix="../org.lwdita/"/><rewriteURI uriStartString="plugin:org.dita.xhtml:" rewritePrefix="../org.dita.xhtml/"/><rewriteURI uriStartString="plugin:org.dita.pdf2:" rewritePrefix="../org.dita.pdf2/"/><rewriteURI uriStartString="plugin:org.oasis-open.dita.v1_2:" rewritePrefix="../org.oasis-open.dita.v1_2/"/><rewriteURI uriStartString="plugin:org.oasis-open.dita.v1_3:" rewritePrefix="../org.oasis-open.dita.v1_3/"/>
+
+   
+   <nextCatalog catalog="../org.oasis-open.dita.v1_3/catalog.xml"/><nextCatalog catalog="../org.oasis-open.dita.v1_2/catalog.xml"/><nextCatalog catalog="../org.dita.pdf2/cfg/catalog.xml"/><nextCatalog catalog="../org.dita.specialization.dita11/catalog.xml"/><nextCatalog catalog="../org.oasis-open.xdita.v0_2_2/catalog-dita.xml"/>
+  
+</catalog>

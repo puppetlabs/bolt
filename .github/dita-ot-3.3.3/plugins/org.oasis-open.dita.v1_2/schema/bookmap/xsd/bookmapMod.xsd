@@ -1,0 +1,2183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Book Map XSD Module                           -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA book maps          -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             June 2006                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2006, 2009                -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+    
+    
+    <!-- ======= IMPORT - XML attributes and namespace ======= -->
+    <xs:import namespace="http://dita.oasis-open.org/architecture/2005/" schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.2"/>
+  
+  <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(map bookmap)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    
+    </xs:documentation>
+  </xs:annotation>
+        
+    <xs:attributeGroup name="chapter-atts">
+        <xs:attribute name="navtitle" type="xs:string" />
+        <xs:attribute name="href" type="xs:string" />
+        <xs:attribute name="keyref" type="xs:string" />
+        <xs:attribute name="outputclass" type="xs:string" />
+        <xs:attribute name="copy-to" type="xs:string" />
+        <xs:attributeGroup ref="topicref-atts"/>
+        <xs:attributeGroup ref="univ-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="bookmap">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookmap&gt; element is a map file used to organize DITA content
+                into a traditional book format. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookmap.class">
+                    <xs:attribute ref="class" default="- map/map bookmap/bookmap " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bookmap.class">
+        <xs:sequence>
+          <xs:group ref="bookmap.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="bookmap.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="bookmap.content">
+        <xs:sequence>
+          <xs:sequence>
+            <xs:choice minOccurs="0">
+                <xs:group ref="title"/>
+                <xs:group ref="booktitle"/>
+            </xs:choice>
+            <xs:group ref="bookmeta" minOccurs="0"/>
+            <xs:group ref="frontmatter" minOccurs="0"/>
+            <xs:group ref="chapter" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="part" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:choice>
+              <xs:group ref="appendices" minOccurs="0" />
+              <xs:group ref="appendix" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:choice>
+            
+            <xs:group ref="backmatter" minOccurs="0"/>
+            <xs:group ref="reltable" minOccurs="0" maxOccurs="unbounded"/>            
+        </xs:sequence>
+        </xs:sequence>
+      </xs:group>
+  
+      <xs:attributeGroup name="bookmap.attributes">
+        <xs:attribute name="id" type="xs:ID"/>
+        <xs:attributeGroup ref="conref-atts" />
+        <xs:attribute name="anchorref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="localization-atts"/>
+        <xs:attributeGroup ref="select-atts"/>
+        <xs:attributeGroup ref="topicref-atts"/>
+        <xs:attributeGroup ref="domains-att"/>
+        <xs:attribute ref="ditaarch:DITAArchVersion"/>
+        <xs:attributeGroup ref="global-atts" />
+      </xs:attributeGroup>
+    
+    <xs:element name="bookmeta">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookmeta&gt; element contains information about the book that
+                is not considered book content, such as copyright information, author information,
+                and any classifications. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookmeta.class">
+                    <xs:attribute ref="class" default="- map/topicmeta bookmap/bookmeta " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bookmeta.class">
+        <xs:sequence>
+            <xs:group ref="bookmeta.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="bookmeta.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="bookmeta.content">
+        <xs:sequence>
+            <xs:sequence>
+                <xs:group ref="linktext" minOccurs="0"/>
+                <xs:group ref="searchtitle" minOccurs="0"/>
+                <xs:group ref="shortdesc" minOccurs="0"/>
+                <xs:group ref="author" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:group ref="source" minOccurs="0"/>
+                <xs:group ref="publisherinformation" minOccurs="0"/>
+                <xs:group ref="critdates" minOccurs="0"/>
+                <xs:group ref="permissions" minOccurs="0"/>
+                <xs:group ref="metadata" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:group ref="audience" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:group ref="category" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:group ref="keywords" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:group ref="prodinfo" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:group ref="othermeta" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:group ref="resourceid" minOccurs="0" maxOccurs="unbounded"/>   
+                <xs:group ref="bookid" minOccurs="0"/>
+                <xs:group ref="bookchangehistory"  minOccurs="0" maxOccurs="unbounded"/> 
+                <xs:group ref="bookrights"  minOccurs="0" maxOccurs="unbounded"/>
+                <xs:group ref="data"  minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:sequence>
+      </xs:group>
+  
+     <xs:attributeGroup name="bookmeta.attributes">
+       <xs:attribute name="lockmeta" type="yesno-att.class"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+     </xs:attributeGroup>
+    
+    <xs:element name="frontmatter">
+        <xs:annotation>
+            <xs:documentation>The &lt;frontmatter&gt; element contains the material that precedes
+                the main body of a document. It may include items such as an abstract, a preface,
+                and various types of book lists such as a &lt;toc&gt;, &lt;tablelist&gt;, or &lt;figurelist&gt;. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="frontmatter.class">
+                    <xs:attribute ref="class" default="- map/topicref  bookmap/frontmatter " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="frontmatter.class">
+        <xs:sequence>
+          <xs:group ref="frontmatter.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="frontmatter.attributes"/>
+    </xs:complexType>
+      
+       <xs:group name="frontmatter.content">
+         <xs:sequence>
+           <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="booklists" minOccurs="0"/>
+            <xs:group ref="notices" minOccurs="0"/>
+            <xs:group ref="dedication" minOccurs="0"/>
+            <xs:group ref="colophon" minOccurs="0"/>
+            <xs:group ref="bookabstract" minOccurs="0"/>
+            <xs:group ref="draftintro" minOccurs="0"/>
+            <xs:group ref="preface" minOccurs="0"/>
+            <xs:group ref="topicref" minOccurs="0"/>
+        </xs:choice>
+         </xs:sequence>
+       </xs:group>
+      
+      <xs:attributeGroup name="frontmatter.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="query" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="topicref-atts" />
+        <xs:attributeGroup ref="univ-atts" />
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+      
+    <xs:element name="backmatter">
+        <xs:annotation>
+            <xs:documentation>The &lt;backmatter&gt; element contains the material that follows
+                the main body of a document and any appendixes. It may include items such
+                as a colophon, legal notices, and various types of book lists such as a glossary
+                or an index. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="backmatter.class">
+                    <xs:attribute ref="class" default="- map/topicref  bookmap/backmatter " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="backmatter.class">
+         <xs:sequence>
+           <xs:group ref="backmatter.content"/>
+         </xs:sequence>
+        <xs:attributeGroup ref="backmatter.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="backmatter.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="booklists" minOccurs="0"/>
+            <xs:group ref="notices" minOccurs="0"/>
+            <xs:group ref="dedication" minOccurs="0"/>
+            <xs:group ref="colophon" minOccurs="0"/>
+            <xs:group ref="amendments" minOccurs="0"/>
+            <xs:group ref="topicref" minOccurs="0"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="backmatter.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="query" type="xs:string"/>
+        <xs:attributeGroup ref="topicref-atts" />
+        <xs:attributeGroup ref="univ-atts" />
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="publisherinformation">
+        <xs:annotation>
+            <xs:documentation>The &lt;publisherinformation&gt; contains information about what group
+                or person published the book, where it was published, and certain details
+                about its publication history. Other publication history information is found
+                in the &lt;bookchangehistory&gt; element. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="publisherinformation.class">
+                    <xs:attribute ref="class" default="- topic/publisher bookmap/publisherinformation "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <!--  Update value attr as per DITA Feature 12022  -->
+    <xs:complexType name="publisherinformation.class">
+        <xs:sequence>
+          <xs:group ref="publisherinformation.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="publisherinformation.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="publisherinformation.content">
+      <xs:sequence>
+        <xs:sequence >
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="person" minOccurs="0"/>
+                <xs:group ref="organization" minOccurs="0"/>
+            </xs:choice>
+            <xs:group ref="printlocation" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="published" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="publisherinformation.attributes">
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attribute name="scope" type="scope-att.class"/>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attribute name="type" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="person">
+        <xs:annotation>
+            <xs:documentation>The &lt;person&gt; element contains information about the name of
+                a person. Note that unlike the &lt;personname&gt; element, the &lt;person&gt; element
+                is not restricted to describing the names of authors. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="person.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/person "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="person.class" mixed="true">
+       <xs:sequence>
+          <xs:group ref="person.content"></xs:group>
+        </xs:sequence>
+        <xs:attributeGroup ref="person.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="person.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt" minOccurs="0"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="person.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="organization">
+        <xs:annotation>
+            <xs:documentation>The &lt;organization&gt; element contains the name of an organization.
+                Note that unlike &lt;organizationname&gt;, the &lt;organization&gt; element is not
+                restricted to usage within &lt;authorinformation&gt;; it does not have to contain
+                the name of an authoring organization.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="organization.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/organization "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="organization.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="organization.content"></xs:group>
+        </xs:sequence>
+        <xs:attributeGroup ref="organization.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="organization.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt" minOccurs="0"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="organization.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="bookchangehistory">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookchangehistory&gt; element contains information about the
+                history of the book's creation and publishing lifecycle, who wrote, reviewed,
+                edited, and tested the book, and when these events took place. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookchangehistory.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/bookchangehistory "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bookchangehistory.class" >
+        <xs:sequence>
+          <xs:group ref="bookchangehistory.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="bookchangehistory.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="bookchangehistory.content">
+      <xs:sequence>
+        <xs:sequence >
+            <xs:group ref="reviewed" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="edited" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="tested" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="approved" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="bookevent" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+    <xs:attributeGroup name="bookchangehistory.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="bookid">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookid&gt; element contains the publisher's identification
+                information for the book, such as part number, edition number and ISBN number. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookid.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/bookid "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bookid.class" >
+        <xs:sequence>
+          <xs:group ref="bookid.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="bookid.attributes"/>
+    </xs:complexType>
+  
+     <xs:group name="bookid.content">
+       <xs:sequence>
+         <xs:sequence >
+            <xs:group ref="bookpartno" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="edition" minOccurs="0" />
+            <xs:group ref="isbn" minOccurs="0" />
+            <xs:group ref="booknumber" minOccurs="0" />
+            <xs:group ref="volume" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="maintainer" minOccurs="0" />
+        </xs:sequence>
+       </xs:sequence>
+     </xs:group>
+  
+    <xs:attributeGroup name="bookid.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="summary">
+        <xs:annotation>
+            <xs:documentation>The &lt;summary&gt; element contains a text summary associated with
+                a book event (such as &lt;approved&gt; or &lt;reviewed&gt;) or with the list of
+                copyrights for the book.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="summary.class">
+                    <xs:attribute ref="class" default="- topic/ph bookmap/summary "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="summary.class" mixed="true">
+       <xs:sequence>
+          <xs:group ref="summary.content"></xs:group>
+        </xs:sequence>
+        <xs:attributeGroup ref="summary.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="summary.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt" minOccurs="0"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="summary.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="printlocation">
+        <xs:annotation>
+            <xs:documentation>The &lt;printlocation&gt; element indicates the location where the
+                book was printed. Customarily, the content is restricted to the name of the
+                country. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="printlocation.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/printlocation "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="printlocation.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="printlocation.content"></xs:group>
+        </xs:sequence>
+        <xs:attributeGroup ref="printlocation.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="printlocation.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt" minOccurs="0"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="printlocation.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="published">
+        <xs:annotation>
+            <xs:documentation>The &lt;published&gt; element contains information about the person
+                or organization publishing the book, the dates when it was started and completed,
+                and any special restrictions associated with it. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="published.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/published "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="published.class">
+        <xs:sequence>
+          <xs:group ref="published.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="published.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="published.content">
+        <xs:sequence>
+          <xs:sequence >
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="person" />
+                <xs:group ref="organization"/>
+            </xs:choice>
+            <xs:group ref="publishtype" minOccurs="0" />
+            <xs:group ref="revisionid" minOccurs="0" />
+            <xs:group ref="started" minOccurs="0" />
+            <xs:group ref="completed" minOccurs="0" />
+            <xs:group ref="summary" minOccurs="0" />
+            <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        </xs:sequence>
+      </xs:group>
+  
+      <xs:attributeGroup name="published.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="publishtype">
+        <xs:annotation>
+            <xs:documentation>The &lt;publishtype&gt; element indicates whether the book is generally
+                available or is restricted in some way. The <keyword>value</keyword> attribute
+                indicates the restrictions.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="publishtype.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/publishtype "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="publishtype.class">
+        <xs:attributeGroup ref="publishtype.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="publishtype.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="datatype" type="xs:string"/>
+        <xs:attribute name="value" use="required" type="xs:string"/>
+        <xs:attribute name="href" type="xs:string"/>
+        <xs:attribute name="format" type="xs:string"/>
+        <xs:attribute name="type" type="xs:string"/>
+        <xs:attribute name="scope" type="scope-att.class"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="revisionid">
+        <xs:annotation>
+            <xs:documentation>The &lt;revisionid&gt; element indicates the revision number or revision
+                ID of the book. The processing implementation determines how the level is
+                displayed. Common methods include using a dash, for example "-01". or a period,
+                such as ".01". </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="revisionid.class">
+                    <xs:attribute ref="class" default="- topic/ph bookmap/revisionid "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="revisionid.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="revisionid.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="revisionid.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="revisionid.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="revisionid.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="started">
+        <xs:annotation>
+            <xs:documentation>The &lt;started&gt; element indicates a start date for some type of
+                book event, such as a review, editing, or testing. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="started.class">
+                    <xs:attribute ref="class" default="- topic/ph bookmap/started "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="started.class" >
+        <xs:sequence>
+            <xs:group ref="started.content"/>
+          </xs:sequence>
+        <xs:attributeGroup ref="started.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="started.content">
+        <xs:sequence>
+          <xs:choice>
+            <xs:sequence minOccurs="0">
+                <xs:group ref="year"/>
+                <xs:group ref="month"/>
+                <xs:group ref="day" minOccurs="0"/>
+            </xs:sequence>
+            <xs:sequence>
+                <xs:group ref="month"/>
+                <xs:group ref="day" minOccurs="0"/>
+                <xs:group ref="year"/>
+            </xs:sequence>
+            <xs:sequence>
+                <xs:group ref="day" />
+                <xs:group ref="month"/>
+                <xs:group ref="year"/>
+            </xs:sequence>
+        </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+      <xs:attributeGroup name="started.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="completed">
+        <xs:annotation>
+            <xs:documentation>The &lt;completed&gt; element indicates a completion date for some
+                type of book event, such as a review, editing, or testing. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="completed.class">
+                    <xs:attribute ref="class" default="- topic/ph bookmap/completed "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="completed.class" >
+          <xs:sequence>
+            <xs:group ref="completed.content"/>
+          </xs:sequence>
+        <xs:attributeGroup ref="completed.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="completed.content">
+        <xs:sequence>
+          <xs:choice>
+            <xs:sequence minOccurs="0">
+                <xs:group ref="year"/>
+                <xs:group ref="month"/>
+                <xs:group ref="day" minOccurs="0"/>
+            </xs:sequence>
+            <xs:sequence>
+                <xs:group ref="month"/>
+                <xs:group ref="day" minOccurs="0"/>
+                <xs:group ref="year"/>
+            </xs:sequence>
+            <xs:sequence>
+                <xs:group ref="day" />
+                <xs:group ref="month"/>
+                <xs:group ref="year"/>
+            </xs:sequence>
+        </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+      <xs:attributeGroup name="completed.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="year">
+        <xs:annotation>
+            <xs:documentation>The &lt;year&gt; element denotes a year.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="year.class">
+                    <xs:attribute ref="class" default="- topic/ph bookmap/year "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="year.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="year.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="year.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="year.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="year.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="month">
+        <xs:annotation>
+            <xs:documentation>The &lt;month&gt; element denotes a month of the year. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="month.class">
+                    <xs:attribute ref="class" default="- topic/ph bookmap/month "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="month.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="month.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="month.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="month.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="month.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="day">
+        <xs:annotation>
+            <xs:documentation>The &lt;day&gt; element denotes a day of the month. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="day.class">
+                    <xs:attribute ref="class" default="- topic/ph bookmap/day "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="day.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="day.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="day.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="day.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="day.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="reviewed">
+        <xs:annotation>
+            <xs:documentation>The &lt;reviewed&gt; element contains information about when and by
+                whom the book was reviewed during its publication history.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="reviewed.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/reviewed "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="reviewed.class">
+        <xs:sequence>
+          <xs:group ref="reviewed.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="reviewed.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="reviewed.content">
+      <xs:sequence>
+        <xs:sequence >
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="person" />
+                <xs:group ref="organization" />
+            </xs:choice>
+            <xs:group ref="revisionid" minOccurs="0" />
+            <xs:group ref="started" minOccurs="0" />
+            <xs:group ref="completed" minOccurs="0" />
+            <xs:group ref="summary" minOccurs="0" />
+            <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"  />
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+    
+    <xs:attributeGroup name="reviewed.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="edited">
+        <xs:annotation>
+            <xs:documentation>The &lt;edited&gt; element contains information about when and by
+                whom the book was edited during its publication history.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="edited.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/edited "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="edited.class">
+        <xs:sequence>
+          <xs:group ref="edited.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="edited.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="edited.content">
+      <xs:sequence>
+        <xs:sequence >
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="person" />
+                <xs:group ref="organization" />
+            </xs:choice>
+            <xs:group ref="revisionid" minOccurs="0" />
+            <xs:group ref="started" minOccurs="0" />
+            <xs:group ref="completed" minOccurs="0" />
+            <xs:group ref="summary" minOccurs="0" />
+            <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"  />
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+    
+    <xs:attributeGroup name="edited.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="tested">
+        <xs:annotation>
+            <xs:documentation>The &lt;tested&gt; element contains information about when and by
+                whom the book was tested during its publication history.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="tested.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/tested "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="tested.class">
+        <xs:sequence>
+          <xs:group ref="tested.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="tested.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="tested.content">
+      <xs:sequence>
+        <xs:sequence >
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="person" />
+                <xs:group ref="organization" />
+            </xs:choice>
+            <xs:group ref="revisionid" minOccurs="0" />
+            <xs:group ref="started" minOccurs="0" />
+            <xs:group ref="completed" minOccurs="0" />
+            <xs:group ref="summary" minOccurs="0" />
+            <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"  />
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+    
+    <xs:attributeGroup name="tested.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="approved">
+        <xs:annotation>
+            <xs:documentation>The &lt;approved&gt; element contains information about when and by
+                whom the book was approved during its publication history.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="approved.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/approved "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="approved.class">
+        <xs:sequence>
+          <xs:group ref="approved.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="approved.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="approved.content">
+      <xs:sequence>
+        <xs:sequence >
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="person" />
+                <xs:group ref="organization" />
+            </xs:choice>
+            <xs:group ref="revisionid" minOccurs="0" />
+            <xs:group ref="started" minOccurs="0" />
+            <xs:group ref="completed" minOccurs="0" />
+            <xs:group ref="summary" minOccurs="0" />
+            <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"  />
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+    
+    <xs:attributeGroup name="approved.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="bookevent">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookevent&gt; element indicates a general event in the publication
+                history of a book. This is an appropriate element for specialization if the
+                current set of specific book event types, that is, review, edit, test or approval,
+                does not meed your needs. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookevent.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/bookevent "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bookevent.class">
+        <xs:sequence>
+          <xs:group ref="bookevent.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="bookevent.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="bookevent.content">
+        <xs:sequence>
+          <xs:sequence >
+            <xs:group ref="bookeventtype" minOccurs="0" />
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="person" />
+                <xs:group ref="organization" />
+            </xs:choice>
+            <xs:group ref="revisionid" minOccurs="0" />
+            <xs:group ref="started" minOccurs="0" />
+            <xs:group ref="completed" minOccurs="0" />
+            <xs:group ref="summary" minOccurs="0" />
+            <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"  />
+        </xs:sequence>
+        </xs:sequence>
+      </xs:group>
+  
+      <xs:attributeGroup name="bookevent.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="bookeventtype">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookeventtype&gt; element indicates the specific nature of
+                a &lt;bookevent&gt;, such as updated, indexed, or deprecated. The required <keyword>name</keyword> attribute
+                indicates the event's type. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookeventtype.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/bookeventtype "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bookeventtype.class">
+        <xs:attributeGroup ref="bookeventtype.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="bookeventtype.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="datatype" type="xs:string"/>
+        <xs:attribute name="value" type="xs:string"/>
+        <xs:attribute name="href" type="xs:string"/>
+        <xs:attribute name="format" type="xs:string"/>
+        <xs:attribute name="type" type="xs:string"/>
+        <xs:attribute name="scope" type="scope-att.class"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="bookpartno">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookpartno&gt; element contains the book's part number; such
+                as 99F1234. This is generally the number that the publisher uses to identify
+                the book for tracking purposes. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookpartno.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/bookpartno "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bookpartno.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="bookpartno.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="bookpartno.attributes"/>
+    </xs:complexType>
+    
+      <xs:group name="bookpartno.content">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="words.cnt"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="bookpartno.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="edition">
+        <xs:annotation>
+            <xs:documentation>The &lt;edition&gt; element contains the edition number information,
+                such as First Edition, or Third Edition, used by a publisher to identify a
+                book.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="edition.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/edition "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="edition.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="edition.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="edition.attributes"/>
+    </xs:complexType>
+    
+      <xs:group name="edition.content">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="edition.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="isbn">
+        <xs:annotation>
+            <xs:documentation>The &lt;isbn&gt; element contains the book's International Standard
+                Book Number (ISBN).</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="isbn.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/isbn "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="isbn.class" mixed="true">
+      <xs:sequence>
+          <xs:group ref="isbn.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="isbn.attributes"/>
+    </xs:complexType>
+    
+      <xs:group name="isbn.content">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="isbn.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="booknumber">
+        <xs:annotation>
+            <xs:documentation>The &lt;booknumber&gt; element contains the book's form number, such
+                as SC21-1920.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="booknumber.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/booknumber "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="booknumber.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="booknumber.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="booknumber.attributes"/>
+    </xs:complexType>
+    
+      <xs:group name="booknumber.content">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="words.cnt"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="booknumber.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="volume">
+        <xs:annotation>
+            <xs:documentation>The &lt;volume&gt; element contains the book's volume number, such
+                as Volume <keyword>2</keyword>.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="volume.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/volume "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="volume.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="volume.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="volume.attributes"/>
+    </xs:complexType>
+    
+      <xs:group name="volume.content">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="keyword"/>
+      </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+    <xs:attributeGroup name="volume.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="maintainer">
+        <xs:annotation>
+            <xs:documentation>The &lt;maintainer&gt; element contains information about who maiintains
+                the document; this can be an organization or a person.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="maintainer.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/maintainer "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="maintainer.class">
+        <xs:sequence>
+          <xs:group ref="maintainer.content"/>
+        </xs:sequence>  
+        <xs:attributeGroup ref="maintainer.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="maintainer.content">
+      <xs:sequence>
+        <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="person"/>
+            <xs:group ref="organization"/>
+        </xs:choice>
+            <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence> 
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="maintainer.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="bookrights">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookrights&gt; element contains the information about the
+                legal rights associated with the book, including copyright dates and owners.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookrights.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/bookrights "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bookrights.class" >
+        <xs:sequence>
+          <xs:group ref="bookrights.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="bookrights.attributes"/>
+    </xs:complexType>
+      
+     <xs:group name="bookrights.content">
+       <xs:sequence>
+         <xs:sequence>
+            <xs:group ref="copyrfirst" minOccurs="0"/>
+            <xs:group ref="copyrlast" minOccurs="0"/>
+            <xs:group ref="bookowner" />
+            <xs:group ref="bookrestriction" minOccurs="0"/>
+            <xs:group ref="summary" minOccurs="0"/>
+        </xs:sequence>   
+       </xs:sequence>
+     </xs:group>
+  
+    <xs:attributeGroup name="bookrights.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="copyrfirst">
+        <xs:annotation>
+            <xs:documentation>The &lt;copyfirst&gt; element contains the first copyright year within
+                a multiyear copyright statement.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="copyrfirst.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/copyrfirst "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="copyrfirst.class">
+        <xs:sequence>
+            <xs:group ref="copyrfirst.content" />
+        </xs:sequence>   
+        <xs:attributeGroup ref="copyrfirst.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="copyrfirst.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="year" />
+        </xs:sequence>   
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="copyrfirst.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="copyrlast">
+        <xs:annotation>
+            <xs:documentation>The &lt;copylast&gt; element contains the last copyright year within
+                a multiyear copyright statement.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="copyrlast.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/copyrlast "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="copyrlast.class" >
+        <xs:sequence>
+            <xs:group ref="copyrlast.content" />
+        </xs:sequence>   
+        <xs:attributeGroup ref="copyrlast.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="copyrlast.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="year" />
+        </xs:sequence>   
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="copyrlast.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="bookowner">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookowner&gt; element contains the owner of the copyright.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookowner.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/bookowner "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bookowner.class">
+            <xs:sequence>
+              <xs:group ref="bookowner.content"/>
+            </xs:sequence>
+          <xs:attributeGroup ref="bookowner.attributes"/>
+    </xs:complexType>
+    
+    <xs:group name="bookowner.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="person" minOccurs="0"/>
+                <xs:group ref="organization" minOccurs="0"/>
+            </xs:choice>
+      </xs:sequence>
+    </xs:group>
+    
+    <xs:attributeGroup name="bookowner.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="bookrestriction">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookrestriction&gt; element indicates whether the book is
+                classified, or restricted in some way. The value attribute indicates the restrictions;
+                this may be a string like "All Rights Reserved," representing the publisher's
+                copyright restrictions.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookrestriction.class">
+                    <xs:attribute ref="class" default="- topic/data bookmap/bookrestriction "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <!--  Update value attr as per DITA Feature 12022  -->
+    <xs:complexType name="bookrestriction.class">
+       <xs:attributeGroup ref="bookrestriction.attributes"/>
+    </xs:complexType>
+  
+      <xs:attributeGroup name="bookrestriction.attributes">
+         <xs:attributeGroup ref="univ-atts"/>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="datatype" type="xs:string"/>
+        <xs:attribute name="value" use="required" type="xs:string"/>
+        <xs:attribute name="href" type="xs:string"/>
+        <xs:attribute name="format" type="xs:string"/>
+        <xs:attribute name="type" type="xs:string"/>
+        <xs:attribute name="scope" type="scope-att.class"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="global-atts"/>
+      </xs:attributeGroup>
+    
+    <xs:element name="booktitle">
+        <xs:annotation>
+            <xs:documentation>The &lt;booktitle&gt; element contains the title information for a
+                book. , including &lt;booklibrary&gt; data, a &lt;maintitle&gt; and subtitle (&lt;titlealt&gt;)
+                as required. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="booktitle.class">
+                    <xs:attribute ref="class" default="- topic/title bookmap/booktitle "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="booktitle.class">
+        <xs:sequence>
+            <xs:group ref="booktitle.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="booktitle.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="booktitle.content">
+      <xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="booklibrary" minOccurs="0"/>
+            <xs:group ref="mainbooktitle"/>
+            <xs:group ref="booktitlealt" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="booktitle.attributes">
+      <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attribute name="base" type="xs:string"/>
+        <xs:attributeGroup ref="base-attribute-extensions"/>
+        <xs:attributeGroup ref="id-atts"/>
+        <xs:attributeGroup ref="localization-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+    <xs:element name="booklibrary">
+        <xs:annotation>
+            <xs:documentation>The &lt;booklibrary&gt; element contains the library information for
+                a book. Library entries contain information about the series, library, or
+                collection of documents to which the book belongs. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="booklibrary.class">
+                    <xs:attribute ref="class" default="- topic/ph bookmap/booklibrary "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="booklibrary.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="booklibrary.content"></xs:group>
+        </xs:sequence>
+        <xs:attributeGroup ref="booklibrary.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="booklibrary.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph.noxref"/>
+            <xs:group ref="image"/>
+        </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+      <xs:attributeGroup name="booklibrary.attributes">
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+      </xs:attributeGroup>
+    
+    <xs:element name="mainbooktitle">
+        <xs:annotation>
+            <xs:documentation>The &lt;mainbooktitle&gt; element contains the primary title information
+                for a book.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mainbooktitle.class">
+                    <xs:attribute ref="class" default="- topic/ph bookmap/mainbooktitle "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="mainbooktitle.class" mixed="true">
+       <xs:sequence>
+          <xs:group ref="mainbooktitle.content"></xs:group>
+        </xs:sequence>
+        <xs:attributeGroup ref="mainbooktitle.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="mainbooktitle.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph.noxref"/>
+            <xs:group ref="image"/>
+        </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+      <xs:attributeGroup name="mainbooktitle.attributes">
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+      </xs:attributeGroup>
+    
+    <xs:element name="booktitlealt">
+        <xs:annotation>
+            <xs:documentation>The &lt;booktitlealt&gt; element contains the alternative title, subtitle,
+                or short title for a book.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="booktitlealt.class">
+                    <xs:attribute ref="class" default="- topic/ph bookmap/booktitlealt "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="booktitlealt.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="booktitlealt.content"></xs:group>
+        </xs:sequence>
+        <xs:attributeGroup ref="booktitlealt.attributes"/>
+    </xs:complexType>
+  
+      <xs:group name="booktitlealt.content">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.ph.noxref" minOccurs="0"/>
+            <xs:group ref="image" minOccurs="0"/>
+        </xs:choice>
+        </xs:sequence>
+      </xs:group>
+  
+      <xs:attributeGroup name="booktitlealt.attributes">
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+      </xs:attributeGroup>
+  
+    
+    <xs:element name="draftintro">
+        <xs:annotation>
+            <xs:documentation>The &lt;draftintro&gt; element references a topic used as an introduction
+                to the draft of this book.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="draftintro.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/draftintro " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="draftintro.class">
+        <xs:sequence>
+          <xs:group ref="draftintro.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="draftintro.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="draftintro.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="topicmeta" minOccurs="0"/>
+            <xs:group ref="topicref" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="draftintro.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="bookabstract">
+        <xs:annotation>
+            <xs:documentation>The &lt;bookabstract&gt; element references a topic used within a <keyword>bookmap</keyword> as
+                a brief summary of book content, generally output as part of the book's front
+                matter. It is used to help the reader quickly evaluate the book's purpose.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bookabstract.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/bookabstract " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bookabstract.class">
+        <xs:attributeGroup ref="bookabstract.attributes"/>
+    </xs:complexType>
+  
+  <xs:attributeGroup name="bookabstract.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="dedication">
+        <xs:annotation>
+            <xs:documentation>The &lt;dedication&gt; element references a topic containing a dedication
+                for the book, such as to a person or group.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="dedication.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/dedication " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="dedication.class">
+        <xs:attributeGroup ref="dedication.attributes"/>
+    </xs:complexType>
+  
+  <xs:attributeGroup name="dedication.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="preface">
+        <xs:annotation>
+            <xs:documentation>The &lt;preface&gt; element references introductory information about
+                a book, such as the purpose and structure of the document. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="preface.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/preface " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="preface.class">
+        <xs:sequence>
+          <xs:group ref="preface.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="preface.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="preface.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="topicmeta" minOccurs="0"/>
+            <xs:group ref="topicref" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="preface.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="chapter">
+        <xs:annotation>
+            <xs:documentation>The &lt;chapter&gt; element references a topic as a chapter within
+                a book. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="chapter.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/chapter " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="chapter.class">
+        <xs:sequence>
+          <xs:group ref="chapter.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="chapter.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="chapter.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="topicmeta" minOccurs="0"/>
+            <xs:group ref="topicref" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="chapter.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="part">
+        <xs:annotation>
+            <xs:documentation>The &lt;part&gt; element references a part topic for the book. A new
+                part is started. Use &lt;part&gt; to divide a document's chapters into logical
+                groupings. For example, in a document that contains both guide and reference
+                information, you can define two parts, one containing the guide information
+                and the other containing the reference information. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="part.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/part " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="part.class">
+        <xs:sequence>
+          <xs:group ref="part.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:complexType>
+  
+    <xs:group name="part.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="topicmeta" minOccurs="0"/>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="topicref" />
+                <xs:group ref="chapter" />
+            </xs:choice>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+     <xs:attributeGroup name="part.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="appendix">
+        <xs:annotation>
+            <xs:documentation>designates a topic as an appendix within a bookmap</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="appendix.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/appendix " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="appendix.class">
+        <xs:sequence>
+          <xs:group ref="appendix.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="appendix.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="appendix.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="topicmeta" minOccurs="0"/>
+            <xs:group ref="topicref" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="appendix.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+  
+  
+   <xs:element name="appendices">
+        <xs:annotation>
+            <xs:documentation>designates a topic as an appendix within a bookmap</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="appendices.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/appendices " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="appendices.class">
+        <xs:sequence>
+          <xs:group ref="appendices.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="appendices.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="appendices.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="topicmeta" minOccurs="0"/>
+            <xs:group ref="appendix" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="appendices.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="notices">
+        <xs:annotation>
+            <xs:documentation>The &lt;notices&gt; element references special notice information,
+                for example, legal notices about supplementary copyrights and trademarks associated
+                with the book.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="notices.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/notices " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="notices.class">
+        <xs:sequence>
+          <xs:group ref="notices.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="notices.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="notices.content">
+      <xs:sequence>
+        <xs:sequence>
+            <xs:group ref="topicmeta" minOccurs="0"/>
+            <xs:group ref="topicref" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="notices.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="amendments">
+        <xs:annotation>
+            <xs:documentation>The &lt;amendments&gt; element references a list of amendments or
+                updates to the book. It indicates to the processing software that the author
+                wants an amendments list generated at the particular location. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="amendments.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/amendments " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="amendments.class">
+         <xs:attributeGroup ref="amendments.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="amendments.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="colophon">
+        <xs:annotation>
+            <xs:documentation>The &lt;colophon&gt; element references a topic describing how this
+                document was created. In publishing, a colophon describes details of the production
+                of a book. This information generally includes the typefaces used, and often
+                the names of their designers; the paper, ink and details of the binding materials
+                and methods may also receive mention. In the case of technical books, a colophon
+                may specify the software used to prepare the text and diagrams for publication. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="colophon.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/colophon " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="colophon.class">
+        <xs:attributeGroup ref="colophon.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="colophon.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="booklists">
+        <xs:annotation>
+            <xs:documentation>The &lt;booklists&gt; element references lists of various kinds within
+                the book. For example, it can be used within front matter to reference a &lt;toc&gt;,
+                &lt;tablelist&gt;, and &lt;figurelist&gt;, or within back matter to reference a
+                &lt;glossarylist&gt;, &lt;indexlist&gt;, and &lt;abbrevlist&gt;. It indicates to the
+                processing software that the author wants the lists generated at the &lt;booklists&gt;
+                location. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="booklists.class">
+                    <xs:attribute ref="class" default="- map/topicref  bookmap/booklists " />
+                 </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="booklists.class">
+        <xs:choice minOccurs="0" maxOccurs="unbounded"> 
+            <xs:group ref="toc" />
+            <xs:group ref="figurelist" />
+            <xs:group ref="tablelist" />
+            <xs:group ref="abbrevlist" />
+            <xs:group ref="trademarklist" />
+            <xs:group ref="bibliolist" />
+            <xs:group ref="glossarylist" />
+            <xs:group ref="indexlist" />
+            <xs:group ref="booklist" />
+        </xs:choice>
+        <xs:attributeGroup ref="booklists.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="booklists.attributes">
+      <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attributeGroup ref="topicref-atts" />
+        <xs:attributeGroup ref="id-atts" />
+        <xs:attributeGroup ref="select-atts" />
+        <xs:attributeGroup ref="localization-atts" />
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="toc">
+        <xs:annotation>
+            <xs:documentation>The &lt;toc&gt; element references the table of contents within the
+                book. It indicates to the processing software that the author wants a table
+                of contents generated at the particular location.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="toc.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/toc " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="toc.class">
+        <xs:attributeGroup ref="toc.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="toc.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="figurelist">
+        <xs:annotation>
+            <xs:documentation>The &lt;figurelist&gt; element references a list of figures in the
+                book. It indicates to the processing software that the author wants a list
+                of figures generated at the particular location. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="figurelist.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/figurelist " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="figurelist.class">
+        <xs:attributeGroup ref="figurelist.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="figurelist.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="tablelist">
+        <xs:annotation>
+            <xs:documentation>The &lt;tablelist&gt; element references a list of tables within the
+                book. It indicates to the processing software that the author wants a list
+                of tables generated at the particular location.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="tablelist.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/tablelist " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="tablelist.class">
+        <xs:attributeGroup ref="tablelist.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="tablelist.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="abbrevlist">
+        <xs:annotation>
+            <xs:documentation>The &lt;abbrevlist&gt; element references a list of abbreviations.
+                It indicates to the processing software that the author wants an abbreviation
+                list generated at the particular location. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="abbrevlist.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/abbrevlist " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="abbrevlist.class">
+        <xs:attributeGroup ref="abbrevlist.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="abbrevlist.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="trademarklist">
+        <xs:annotation>
+            <xs:documentation>The &lt;trademarklist&gt; element references a list of trademarks
+                within the book. It indicates to the processing software that the author wants
+                a list of trademarks generated at the particular location.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="trademarklist.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/trademarklist " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="trademarklist.class">
+        <xs:attributeGroup ref="trademarklist.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="trademarklist.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="bibliolist">
+        <xs:annotation>
+            <xs:documentation>The &lt;bibliolist&gt; element references a list of bibliographic
+                entries within the book. It indicates to the processing software that the
+                author wants a bibliography, containing links to related books, articles,
+                published papers, or other types of material, generated at the particular
+                location. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="bibliolist.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/bibliolist " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="bibliolist.class">
+         <xs:attributeGroup ref="bibliolist.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="bibliolist.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="glossarylist">
+        <xs:annotation>
+            <xs:documentation>The &lt;glossarylist&gt; element references a list of glossary entries
+                within the book. It indicates to the processing software that the author wants
+                a glossary list generated at the particular location. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="glossarylist.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/glossarylist " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="glossarylist.class">
+        <xs:sequence>
+          <xs:group ref="glossarylist.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="glossarylist.attributes"/>
+    </xs:complexType>
+  
+  <xs:group name="glossarylist.content">
+    <xs:sequence>
+      <xs:sequence>
+            <xs:group ref="topicmeta" minOccurs="0"/>
+            <xs:group ref="topicref" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+    <xs:attributeGroup name="glossarylist.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="indexlist">
+        <xs:annotation>
+            <xs:documentation>The &lt;indexlist&gt; element lists the index entries in the book.
+                It indicates to the processing software that the author wants an index generated
+                at the particular location. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="indexlist.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/indexlist " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="indexlist.class">
+        <xs:attributeGroup ref="indexlist.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="indexlist.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+    <xs:element name="booklist">
+        <xs:annotation>
+            <xs:documentation>The &lt;booklist&gt; element is a general purpose element, designed
+                for use in specializations, that references a list of particular types of
+                topics within the book. It indicates to the processing software that the author
+                wants that list of topics generated at the particular location. For example,
+                it could be used in a specialization to reference the location of a list of
+                program listings or of authors of topics.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="booklist.class">
+                    <xs:attribute ref="class" default="- map/topicref bookmap/booklist " />
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="booklist.class">
+        <xs:attributeGroup ref="booklist.attributes"/>
+    </xs:complexType>
+  
+    <xs:attributeGroup name="booklist.attributes">
+      <xs:attributeGroup ref="chapter-atts"/>
+        <xs:attributeGroup ref="global-atts" />
+    </xs:attributeGroup>
+    
+</xs:schema>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE bookmap PUBLIC "-//OASIS//DTD DITA BookMap//EN" "bookmap.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<bookmap xml:lang="en-US">
+  <title>DITA Open Toolkit <keyword keyref="release"/></title>
+  <bookmeta>
+    <prodinfo>
+      <prodname>DITA Open Toolkit</prodname>
+      <vrmlist>
+        <vrm version=""/>
+      </vrmlist>
+    </prodinfo>
+  </bookmeta>
+  <frontmatter>
+    <booklists>
+      <toc/>
+    </booklists>
+  </frontmatter>
+  <part keyref="installing-client">
+    <chapter format="ditamap" href="topics/installing.ditamap"/>
+  </part>
+  <part keyref="alternative-input-formats">
+    <chapter href="topics/input-formats.ditamap" format="ditamap"/>
+  </part>
+  <part keyref="building-output">
+    <chapter href="topics/publishing.ditamap" format="ditamap"/>
+  </part>
+  <part keyref="parameters">
+    <chapter href="parameters/parameters.ditamap" format="ditamap"/>
+  </part>
+  <part keyref="customizing">
+    <chapter href="topics/customization.ditamap" format="ditamap"/>
+  </part>
+  <part keyref="troubleshooting-overview">
+    <chapter href="topics/troubleshooting.ditamap" format="ditamap"/>
+  </part>
+  <part keyref="reference">
+    <chapter href="reference/reference.ditamap" format="ditamap"/>
+  </part>
+  <appendices>
+    <appendix keyref="dita-and-dita-ot-resources">
+      <topicref keyref="web-based-resources" print="yes"/>
+      <topicref keyref="books"/>
+    </appendix>
+    <appendix keyref="release-notes"/>
+  </appendices>
+  <backmatter>
+    <mapref href="resources/common-resources.ditamap" processing-role="resource-only"/>
+  </backmatter>
+</bookmap>

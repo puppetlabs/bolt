@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+ 
+ Copyright 2007 Shawn McKenzie
+ *-->
+<?xml-stylesheet href="../../../../xsl/ditaview_shell.xsl" type="text/xsl"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN"
+ "../../../../dtd/concept.dtd">
+<concept id="tocjs_license" xml:lang="en-us">
+ <title>License</title>
+ <conbody>
+  <p>The tocjs plugin includes original code and code from the Yahoo UI Library treeview widget. Both are licensed under the BSD license, and distributed with the DITA Open Toolkit under the Apache
+      License 2.0.</p>
+  <section>
+   <title>Conditions</title>
+   <p>Redistribution and use in source and binary forms, with or without modification, are permitted
+    provided that the following conditions are met: <ul>
+     <li>Redistributions of source code must retain the above copyright notice, this list of
+      conditions and the following disclaimer.</li>
+     <li>Redistributions in binary form must reproduce the above copyright notice, this list of
+      conditions and the following disclaimer in the documentation and/or other materials provided
+      with the distribution.</li>
+     <li>Neither the name of the copyright holders nor the names of the contributors may be used to
+      endorse or promote products derived from this software without specific prior written
+      permission.</li>
+    </ul>
+   </p>
+  </section>
+  <section>
+   <title>DISCLAIMER</title>
+   <pre>
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+    FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+    OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.    
+   </pre>
+  </section>
+
+ </conbody>
+</concept>

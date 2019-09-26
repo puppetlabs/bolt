@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<!--DITA Machinery Task Shell-->
+
+   <group><!-- System ID (URL) catalog entries -->
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:xsd:machinerytask.xsd:1.3"
+              uri="xsd/machineryTask.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:xsd:machinerytask.xsd:1.x"
+              uri="xsd/machineryTask.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:xsd:machinerytask.xsd"
+              uri="xsd/machineryTask.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintMod.xsd:1.3"
+              uri="xsd/machineryTaskbodyConstraintMod.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintMod.xsd:1.x"
+              uri="xsd/machineryTaskbodyConstraintMod.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintMod.xsd"
+              uri="xsd/machineryTaskbodyConstraintMod.xsd"/>
+     <system systemId="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintIntMod.xsd:1.3"
+       uri="xsd/machineryTaskbodyConstraintIntMod.xsd"/>
+     <system systemId="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintIntMod.xsd:1.x"
+       uri="xsd/machineryTaskbodyConstraintIntMod.xsd"/>
+     <system systemId="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintIngMod.xsd"
+       uri="xsd/machineryTaskbodyConstraintIntMod.xsd"/>
+   </group>
+   <group><!-- Public ID (URN) catalog entries -->
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:xsd:machinerytask.xsd:1.3"
+           uri="xsd/machineryTask.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:xsd:machinerytask.xsd:1.x"
+           uri="xsd/machineryTask.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:xsd:machinerytask.xsd"
+           uri="xsd/machineryTask.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintMod.xsd:1.3"
+           uri="xsd/machineryTaskbodyConstraintMod.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintMod.xsd:1.x"
+           uri="xsd/machineryTaskbodyConstraintMod.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintMod.xsd"
+           uri="xsd/machineryTaskbodyConstraintMod.xsd"/>
+     <uri name="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintIntMod.xsd:1.3"
+       uri="xsd/machineryTaskbodyConstraintIntMod.xsd"/>
+     <uri name="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintIntMod.xsd:1.x"
+       uri="xsd/machineryTaskbodyConstraintIntMod.xsd"/>
+     <uri name="urn:oasis:names:tc:dita:spec:machinery:xsd:machineryTaskbodyConstraintIntMod.xsd"
+       uri="xsd/machineryTaskbodyConstraintIntMod.xsd"/>
+   </group>
+</catalog>

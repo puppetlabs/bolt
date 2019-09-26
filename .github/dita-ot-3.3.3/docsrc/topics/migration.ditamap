@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>Migrating customizations</title>
+  <topicref keyref="migration">
+    <topicref keyref="migrating-to-3.3"/>
+    <topicref keyref="migrating-to-3.2"/>
+    <topicref keyref="migrating-to-3.1"/>
+    <topicref keyref="migrating-to-3.0"/>
+    <topicref keyref="migrating-to-2.5"/>
+    <topicref keyref="migrating-to-2.4"/>
+    <topicref keyref="migrating-to-2.3"/>
+    <topicref keyref="migrating-to-2.2"/>
+    <topicref keyref="migrating-to-2.1"/>
+    <topicref keyref="migrating-to-2.0"/>
+    <topicref keyref="migrating-to-1.8"/>
+    <topicref keyref="migrating-to-1.7">
+      <topicref rev="1.7" keyref="flagging-migration"/>
+    </topicref>
+    <topicref keyref="migrating-to-1.6"/>
+    <topicref keyref="migrating-to-1.5.4"/>
+  </topicref>
+</map>

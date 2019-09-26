@@ -1,0 +1,249 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="ID"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Conref file for tasks</title></head><body id="ID"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Conref file for tasks</h1>
+  <div class="body taskbody">
+    <section class="section context"><div class="tasklabel"><h2 class="sectiontitle tasklabel">About this task</h2></div>
+      <p class="p" id="ID__semver-info">DITA-OT releases follow
+        <a class="xref" href="https://semver.org" target="_blank">Semantic Versioning 2.0.0</a> guidelines. Version numbers use the
+            <code class="ph codeph"><var class="keyword varname">major</var>.<var class="keyword varname">minor</var>.<var class="keyword varname">patch</var></code> syntax, where
+          <var class="keyword varname">major</var> versions may include incompatible API changes, <var class="keyword varname">minor</var> versions add
+        functionality in a backwards-compatible manner and <var class="keyword varname">patch</var> versions are maintenance releases
+        that include backwards-compatible bug fixes.</p>
+      <p class="p" id="ID__semver-plugins">Custom plug-ins developed for a previous <var class="keyword varname">major</var> version may require
+        changes to work correctly with recent toolkit versions. Most plug-ins should be compatible with subsequent
+          <var class="keyword varname">minor</var> and <var class="keyword varname">patch</var> versions of the <var class="keyword varname">major</var> release for
+        which they were originally developed.</p>
+      <dl class="dl">
+        
+          <dt class="dt dlterm">Standard Path / Directory Names</dt>
+          <dd class="dd"><span class="ph filepath" id="ID__ot-dir"><var class="keyword varname">dita-ot-dir</var></span></dd>
+          <dd class="dd ddexpand"><span class="ph filepath" id="ID__dita-cmd"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span></dd>
+          <dd class="dd ddexpand"><span class="ph filepath" id="ID__samples-dir"><var class="keyword varname">dita-ot-dir</var>/docsrc/samples</span></dd>
+        
+        
+          <dt class="dt dlterm">Plug-In Info</dt>
+          <dd class="dd">
+            <ul class="ul">
+              <li class="li" id="ID__plug-in-id"><span class="ph filepath"><var class="keyword varname">plug-in-id</var></span> is the unique ID of the plug-in, as
+                defined in the plug-in’s configuration file (<span class="ph filepath">plugin.xml</span>).</li>
+              <li class="li" id="ID__plug-in-zip"><span class="ph filepath"><var class="keyword varname">plug-in-zip</var></span> is the
+                  <var class="keyword varname">filename</var> or <var class="keyword varname">URL</var> of the plug-in’s distribution ZIP file
+                (optional).</li>
+              <li class="li"><span class="ph" id="ID__plugin-integrate-all">If no <var class="keyword varname">filename</var> or <var class="keyword varname">URL</var> argument is
+                  provided, the installation process reloads the current set of plug-ins from the
+                    <span class="ph filepath">plugins</span> directory. This approach can be used to add or remove multiple plug-ins
+                  at once, or any individual plug-ins you have already copied to (or removed from) the
+                <span class="ph filepath">plugins</span> directory. Any plug-ins added or removed in the process will be listed by
+                their plug-in ID.</span></li>
+              <li class="li"><div class="note attention note_attention" id="ID__plugin-remove-subdir"><span class="note__title">Attention:</span> The <span class="keyword parmname">--uninstall</span> option also
+                  removes the corresponding subdirectory from the <span class="ph filepath">plugins</span>
+                folder.</div></li>
+            </ul>
+          </dd>
+        
+      </dl>
+    </section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">
+          
+          <span class="ph" id="ID__download-ot">Download the <span class="ph filepath">dita-ot-<span class="keyword">3.3.3</span>.zip</span>
+            package from the project website at <a class="xref" href="https://www.dita-ot.org/download" target="_blank">dita-ot.org/download</a>.</span>
+        </span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd" id="ID__open-terminal">Open a command prompt or terminal session, and then change to the directory where DITA
+          Open Toolkit is installed.</span>
+        <div class="itemgroup info">
+          <ul class="ul" id="ID__basic-variables">
+            <li class="li" id="ID__novice-variables-1"><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var></span> is the DITA-OT installation directory.</li>
+            <li class="li" id="ID__novice-variables-2"><var class="keyword varname">input-file</var> is the DITA map or DITA file that you want to
+              process.</li>
+            
+            <li class="li" id="ID__novice-variables-last">
+              <p class="p" id="ID__common-format-info">
+                <var class="keyword varname">format</var> is the output format (transformation type).
+                This argument corresponds to the common parameter
+                <span class="keyword parmname">transtype</span>.
+                Use the same values as for the <span class="keyword parmname">transtype</span> build
+                parameter, for example <span class="keyword option">html5</span> or <span class="keyword option">pdf</span>.
+              </p>
+            </li>
+            
+            <li class="li" id="ID__expert-variables-last">
+              <p class="p">
+                <var class="keyword varname">format</var> is the output format (transformation type).
+                This argument corresponds to the common parameter
+                <span class="keyword parmname">transtype</span>.
+                Use the same values as for the <span class="keyword parmname">transtype</span> build
+                parameter, for example <span class="keyword option">html5</span> or <span class="keyword option">pdf</span>.
+              </p>
+              <div class="p" id="ID__transtypes">You can create plug-ins to add new output formats; by default, the following values are
+                available:
+                
+                <ul class="ul">
+                  <li class="li"><span class="keyword option">dita</span></li>
+                  <li class="li"><span class="keyword option">eclipsehelp</span></li>
+                  <li class="li"><span class="keyword option">html5</span></li>
+                  <li class="li"><span class="keyword option">htmlhelp</span></li>
+                  <li class="li"><span class="keyword option">markdown</span>, <span class="keyword option">markdown_gitbook</span>, and
+                    <span class="keyword option">markdown_github</span></li>
+                  <li class="li"><span class="keyword option">pdf</span></li>
+                  <li class="li"><span class="keyword option">tocjs</span></li>
+                  <li class="li"><span class="keyword option">troff</span></li>
+                  <li class="li"><span class="keyword option">xhtml</span></li>
+                </ul>
+                <div class="note tip note_tip"><span class="note__title">Tip:</span> See <a class="xref" href="../topics/output-formats.html" title="DITA Open Toolkit ships with several core transformations that generate different output formats from DITA content. Each transformation represents an implementation of the processing that is defined by OASIS in the DITA specification.">DITA-OT transformations (output formats)</a> for sample command line syntax and more information
+                  on each transformation.
+                </div>
+              </div>
+            </li>
+            <li class="li" id="ID__options">[<var class="keyword varname">options</var>] include the following optional build parameters:
+              <dl class="dl parml">
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--output</span>=<var class="keyword varname">dir</var></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-o</span>
+            <var class="keyword varname">dir</var>
+          </dt>
+          <dd class="dd pd" id="ID__d7e544">
+            <p class="p">Specifies the path of the output directory; the path can be absolute or relative to the current
+              directory.</p>
+            <p class="p">This argument corresponds to the common parameter <span class="keyword parmname">output.dir</span>. By default, the output
+              is written to the <span class="ph filepath">out</span> subdirectory of the current directory.</p>
+          </dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--filter</span>=<var class="keyword varname">files</var>
+          </dt>
+          <dd class="dd pd">Specifies filter file(s) used to include, exclude, or flag content. </dd>
+          <dd class="dd pd ddexpand">
+            <p class="p">This argument corresponds to the common parameter <span class="keyword parmname">args.filter</span>. Relative paths are
+              resolved against the current directory and internally converted to absolute paths.</p>
+            <div class="note note note_note"><span class="note__title">Note:</span> 
+              <p class="p">To specify multiple filter files, use the system path separator character to delimit individual file
+                paths (semicolon ‘<code class="ph codeph">;</code>’ on Windows, and colon ‘<code class="ph codeph">:</code>’ on macOS and Linux) and
+                wrap the value in quotes:</p>
+              <p class="p"><code class="ph codeph">--filter="filter1.ditaval;filter2.ditaval;filter3.ditaval"</code></p>
+              <p class="p">DITAVAL files are evaluated in the order specified, so conditions specified in the first file take
+                precedence over matching conditions specified in later files, just as conditions at the start of a
+                DITAVAL document take precedence over matching conditions later in the same document.</p>
+            </div>
+          </dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--force</span>
+          </dt>
+          <dd class="dd pd">Force-install an existing plug-in.</dd>
+          <dd class="dd pd ddexpand">Passed as an additional option to the installation command:
+              <span class="keyword cmdname">dita</span>&nbsp;<span class="keyword parmname">--install</span>=<var class="keyword varname">plug-in-zip</var>&nbsp;<span class="keyword parmname">--force</span></dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--temp</span>=<var class="keyword varname">dir</var></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-t</span>
+            <var class="keyword varname">dir</var>
+          </dt>
+          <dd class="dd pd">Specifies the location of the temporary directory.</dd>
+          <dd class="dd pd ddexpand">This argument corresponds to the common parameter <span class="keyword parmname">dita.temp.dir</span>.</dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--verbose</span></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-v</span>
+          </dt>
+          <dd class="dd pd">Verbose logging prints additional information to the console, including directory settings, effective
+            values for Ant properties, input/output files, and informational messages to assist in troubleshooting.</dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--debug</span></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-d</span>
+          </dt>
+          <dd class="dd pd">Debug logging prints considerably more additional information. The debug log includes all information from
+            the verbose log, plus details on Java classes, additional Ant properties and overrides, preprocessing
+            filters, parameters, and stages, and the complete build sequence. Debug logging requires additional
+            resources and can slow down the build process, so it should only be enabled when further details are
+            required to diagnose problems.</dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--logfile</span>=<var class="keyword varname">file</var></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-l</span>
+            <var class="keyword varname">file</var>
+          </dt>
+          <dd class="dd pd">Write logging messages to a file.</dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--parameter</span>=<var class="keyword varname">value</var></dt>
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">-D</span><var class="keyword varname">parameter</var>=<var class="keyword varname">value</var>
+          </dt>
+          <dd class="dd pd">Specify a value for a DITA-OT or Ant build parameter.
+            <p class="p">The GNU-style <span class="keyword parmname">--parameter</span>=<var class="keyword varname">value</var> form is only available for
+              parameters that are configured in the plug-in configuration file; the Java-style <span class="keyword parmname">-D</span>
+              form can also be used to specify additional non-configured parameters or set system properties.</p>
+            <p class="p">Parameters not implemented by the specified transformation type or referenced in a
+                <span class="ph filepath">.properties</span> file are ignored.</p><div class="note tip note_tip"><span class="note__title">Tip:</span> If you are building in different environments where the location of the input
+        files is not consistent, set <span class="keyword option">args.input.dir</span> with the <span class="keyword cmdname">dita</span> command and
+        reference its value with <code class="ph codeph">${args.input.dir}</code> in your <span class="ph filepath">.properties</span>
+        file.
+        
+        
+      </div></dd>
+        
+        
+          <dt class="dt pt dlterm">
+            <span class="keyword parmname">--propertyfile</span>=<var class="keyword varname">file</var>
+          </dt>
+          <dd class="dd pd">Use build parameters defined in the referenced <span class="ph filepath">.properties</span> file.
+            <p class="p">Build parameters specified on the command line override those set in the <span class="ph filepath">.properties</span>
+              file.</p></dd>
+        
+      </dl></li>
+          </ul>
+        </div>
+        <div class="itemgroup stepresult" id="ID__running-ditaot-results">
+          <p class="p">If processing is successful, nothing is printed in the terminal window. The built output is written to the
+            specified output directory (by default, in the <span class="ph filepath">out</span> subdirectory of the current
+            directory).</p>
+          <div class="note tip note_tip" id="ID__dita-in-path"><span class="note__title">Tip:</span> Add the absolute path for <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var></span><span class="ph filepath">/bin</span> to the <var class="keyword varname">PATH</var> environment variable to run the
+              <span class="keyword cmdname">dita</span> command from any location on the file system without typing the path.
+            
+          </div>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Extending pre-processing</span>
+        <div class="itemgroup info">
+          <div class="note tip note_tip" id="ID__tip-extend-before-after-preprocessing"><span class="note__title">Tip:</span> For maximum compatibility with future versions of
+            DITA-OT, most plug-ins should use the extension points that run <strong class="ph b">before</strong> or <strong class="ph b">after</strong>
+            pre-processing.</div>
+          <div class="note caution note_caution" id="ID__caution-extend-within-preprocessing"><span class="note__title">CAUTION:</span> The internal order of preprocessing steps is
+            subject to change between versions of DITA-OT. New versions may remove, reorder, combine, or add steps to
+            the process, so the extension points <strong class="ph b">within</strong> the preprocessing stage should only be used if absolutely
+            necessary.</div>
+        </div>
+      </li></ol></section>
+    <section class="section postreq"><div class="tasklabel"><h2 class="sectiontitle tasklabel">What to do next</h2></div>
+      <div class="note tip note_tip" id="ID__template-properties"><span class="note__title">Tip:</span> Copy <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/docsrc/samples</span><span class="ph filepath">/properties/template.properties</span>; this template describes each of the properties you can
+        set.</div>
+      <div class="note tip note_tip" id="ID__pass-input-dir"><span class="note__title">Tip:</span> If you are building in different environments where the location of the input
+        files is not consistent, set <span class="keyword option">args.input.dir</span> with the <span class="keyword cmdname">dita</span> command and
+        reference its value with <code class="ph codeph">${args.input.dir}</code> in your <span class="ph filepath">.properties</span>
+        file.
+        
+        
+      </div>
+    </section>
+  </div>
+</article></main></body></html>

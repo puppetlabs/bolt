@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+  xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  >
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Learning Simple Topicref Constraint</moduleTitle>
+    <headerComment xml:space="preserve">
+============================================================= 
+MODULE:    DITA Learning Simple Topicref Constraint - RNG              
+VERSION:   1.3                                             
+DATE:      June 2013                                       
+=============================================================
+
+============================================================= 
+SYSTEM:     Darwin Information Typing Architecture (DITA)     
+PURPOSE:    Limit topicrefs to non-navigation specializations 
+            of topicref
+ORIGINAL CREATION DATE:  
+June 2013                                              
+(C) Copyright OASIS Open 2013, 2014                                
+All Rights Reserved.                                          
+=============================================================
+    </headerComment>
+    <moduleMetadata>
+      <moduleType>constraint</moduleType>
+      <moduleShortName>learningAggregationsTopicref</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Learning Aggregations Topicref Constraint//EN</dtdMod>
+        <xsdMod>urn:oasis:names:tc:dita:spec:learning:xsd:learningAggregationsTopicrefConstraintMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:spec:learning:xsd:learningAggregationsTopicrefConstraintGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:spec:learning:rnc:learningAggregationsTopicrefConstraintMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:spec:learning:rng:learningAggregationsTopicrefConstraintMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(map learningAggregationsTopicref-c)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <include href="../../base/rng/mapMod.rng">
+    <define name="topicref">
+      <a:documentation>Omit topicref</a:documentation>
+      <ref name="mapgroup-d-topicref"/>
+    </define>    
+  </include>
+  <include href="../../base/rng/mapGroupDomain.rng">
+    <define name="mapgroup-d-topicref">
+      <zeroOrMore>
+        <choice>
+          <ref name="keydef"/> 
+          <ref name="mapref"/>
+          <ref name="topicgroup"/>
+        </choice>
+      </zeroOrMore>
+    </define>
+  </include>
+  
+</grammar>

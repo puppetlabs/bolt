@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="plugin-support" xml:lang="en-US">
+  <title>Version and support information</title>
+  <shortdesc>You can use these extension points to define version and support information for a plug-in. Currently,
+    DITA-OT does not do anything with this information, but it might do so in the future.</shortdesc>
+  <refbody>
+    <section>
+      <dl>
+        <dlentry>
+          <dt><parmname>package.support.name</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/package.support.name.desc">Specifies the
+            person who provides support for the DITA-OT plug-in.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>package.support.email</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/package.support.email.desc">Specifies the
+            e-mail address of the person who provides support for the DITA-OT plug-in.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><parmname>package.version</parmname></dt>
+          <dd conaction="pushreplace"
+            conref="extension-points-in-org.dita.base.dita#org.dita.base-ext/package.version.desc">Specifies the version
+            of the DITA-OT plug-in.</dd>
+          <dd>
+            <p>The value uses the following syntax:</p>
+            <codeblock><varname>major</varname>.<varname>minor</varname>.<varname>micro</varname>.<varname>qualifier</varname></codeblock>
+            <p>where:</p>
+            <ul>
+              <li><varname>major</varname> is a number and is required.</li>
+              <li><varname>minor</varname> is a number and is optional.</li>
+              <li><varname>micro</varname> is a number and is optional.</li>
+              <li><varname>qualifier</varname> is optional and can be composed of numerals, uppercase or lower case
+                letters, underscores, and hyphens.</li>
+            </ul>
+            <p>By default, the <parmname>package.version</parmname> value is set to <codeph>0.0.0</codeph>.</p>
+          </dd>
+        </dlentry>
+      </dl>
+    </section>
+    <example>
+      <title>Example</title>
+      <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="com.example.WithSupportInfo">
+  &lt;feature extension="package.support.name" value="Joe the Author"/>
+  &lt;feature extension="package.support.email" value="joe@example.com"/>
+  &lt;feature extension="package.version" value="1.2.3"/>
+&lt;/plugin></codeblock>
+    </example>
+  </refbody>
+</reference>

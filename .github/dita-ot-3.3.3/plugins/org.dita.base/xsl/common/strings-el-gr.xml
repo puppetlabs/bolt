@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="el-gr">        <!-- Greek -->
+  <str name="Figure">Σχήμα</str>
+  <str name="Table">Πίνακας</str>
+  <str name="Next topic">Επόμενο θέμα</str>
+  <str name="Previous topic">Προηγούμενο θέμα</str>
+  <str name="Parent topic">Γονικό θέμα</str>
+  <str name="Required cleanup">Απαιτείται διόρθωση</str>
+  <str name="Draft comment">Πρόχειρο σχόλιο</str>
+  <str name="Option">Επιλογή</str>
+  <str name="Description">Περιγραφή</str>
+  <str name="Optional">Προαιρετικά</str>
+  <str name="Required">Απαιτείται</str>
+  <str name="Skip visual syntax diagram">Παράλειψη οπτικού διαγράμματος σύνταξης</str>
+  <str name="Read syntax diagram">Ανάγνωση διαγράμματος σύνταξης</str>
+  <str name="Start of change">Αρχή αλλαγής</str>
+  <str name="End of change">Τέλος αλλαγής</str>
+  <str name="Index">Ευρετήριο</str>
+  <str name="Special characters">Ειδικοί χαρακτήρες</str>
+  <str name="Numerics">Αριθμοί</str>
+  <str name="End notes">Υποσημειώσεις</str>
+  <str name="Artwork">Εικόνα</str>
+  <str name="Syntax">Σύνταξη</str>
+  <str name="Type">Είδος</str>
+  <str name="Value">Τιμή</str>
+  <str name="Note">Σημείωση</str>
+  <str name="Notes">Σημειώσεις</str>
+  <str name="Tip">Συμβουλή</str>
+  <str name="Fastpath">Άμεση μετάβαση</str>
+  <str name="Important">Σημαντικό</str>
+  <str name="Attention">Προσοχή</str>
+  <str name="Caution">ΠΡΟΣΟΧΗ</str>
+  <str name="Danger">ΚΙΝΔΥΝΟΣ</str>
+  <str name="Remember">Υπενθύμιση</str>
+  <str name="Restriction">Περιορισμός</str>
+  <str name="Trouble">πρόβλημα</str>
+  <str name="Warning">Προειδοποίηση</str>
+  <str name="Contents">Περιεχόμενα</str>
+  <str name="Related concepts">Συναφείς έννοιες</str>
+  <str name="Related tasks">Συναφείς εργασίες</str>
+  <str name="Related reference">Συναφής αναφορά</str>
+  <str name="Related information">Συναφείς πληροφορίες</str>
+  <str name="Prerequisite">Προϋπόθεση</str>
+  <str name="Prerequisites">Προϋποθέσεις</str>
+  <str name="or">ή</str>
+  <str name="task_context">Σχετικά με αυτή την εργασία</str>
+  <str name="task_example">Παράδειγμα</str>
+  <str name="task_postreq">Επόμενες ενέργειες</str>
+  <str name="task_prereq">Πριν ξεκινήσετε</str>
+  <str name="task_procedure">Διαδικασία</str>
+  <str name="task_procedure_unordered">Διαδικασία</str>
+  <str name="task_results">Αποτελέσματα</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Machinery Task DTD                           -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an 
+PUBLIC "-//OASIS//DTD DITA Machinery Task//EN"
+      Delivered as file "machineryTask.dtd"                        -->
+
+<!-- The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+PUBLIC "-//OASIS//DTD DITA 1.2 Machinery Task//EN"                 -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    DTD to describe DITA Machinery Tasks              -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             April 2008                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2008, 2009.              -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!--                    TOPIC ENTITY DECLARATIONS                  -->
+<!-- ============================================================= -->
+
+<!ENTITY % task-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Task//EN" 
+         "../../technicalContent/dtd/task.ent"
+>%task-dec;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATIONS                 -->
+<!-- ============================================================= -->
+
+<!ENTITY % taskreq-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Task Requirements Domain//EN" 
+         "../../technicalContent/dtd/taskreqDomain.ent"
+>%taskreq-d-dec;
+
+<!ENTITY % hazard-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Hazard Statement Domain//EN" 
+         "../../base/dtd/hazardstatementDomain.ent"
+>%hazard-d-dec;
+
+<!ENTITY % hi-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Highlight Domain//EN" 
+         "../../base/dtd/highlightDomain.ent"
+>%hi-d-dec;
+
+<!ENTITY % ut-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Utilities Domain//EN" 
+         "../../base/dtd/utilitiesDomain.ent"                                                
+>%ut-d-dec;
+
+<!ENTITY % indexing-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Indexing Domain//EN" 
+         "../../base/dtd/indexingDomain.ent"                                                 
+>%indexing-d-dec;
+
+<!ENTITY % ui-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 User Interface Domain//EN" 
+         "../../technicalContent/dtd/uiDomain.ent"                                                       
+>%ui-d-dec;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE DECLARATIONS              -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!--                    DOMAIN EXTENSIONS                          -->
+<!-- ============================================================= -->
+<!--                    One for each extended base element, with
+                        the name of the domain(s) in which the
+                        extension was declared                     -->
+
+<!ENTITY % pre          "pre |
+                         %ui-d-pre;
+                        ">
+<!ENTITY % keyword      "keyword |
+                         %ui-d-keyword;
+                        ">
+<!ENTITY % ph           "ph |
+                         %hi-d-ph; |
+                         %ui-d-ph;
+                        ">
+<!ENTITY % fig          "fig |
+                         %ut-d-fig;
+                        ">
+<!ENTITY % index-base   "index-base | 
+                         %indexing-d-index-base;
+                        ">
+<!ENTITY % prereq       "prereq | 
+                         %taskreq-d-prereq;
+                        ">
+<!ENTITY % postreq      "postreq | 
+                         %taskreq-d-postreq;
+                        ">
+<!ENTITY % note         "note | 
+                         %hazard-d-note;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE EXTENSIONS                -->
+<!-- ============================================================= -->
+<!ENTITY % props-attribute-extensions  ""                            >
+<!ENTITY % base-attribute-extensions   ""                            >
+
+
+<!-- ============================================================= -->
+<!--                    TOPIC NESTING OVERRIDE                     -->
+<!-- ============================================================= -->
+
+<!--                    Redefine the infotype entity to exclude 
+                        other topic types and disallow nesting     -->
+<!ENTITY % task-info-types 
+                        "task"                                       >
+
+
+<!-- ============================================================= -->
+<!--                    DOMAINS ATTRIBUTE OVERRIDE                 -->
+<!-- ============================================================= -->
+<!--                    Must be declared ahead of the DTDs, which
+                        puts @domains first in order               -->
+
+<!ENTITY included-domains 
+                          "&task-att;
+                           &hi-d-att; 
+                           &ut-d-att; 
+                           &indexing-d-att;
+                           &hazard-d-att;
+                           &ui-d-att;
+                           &taskreq-d-att;
+                           &taskbody-constraints;
+  "
+>
+
+<!-- ============================================================= -->
+<!--                    CONTENT CONSTRAINT INTEGRATION             -->
+<!-- ============================================================= -->
+
+<!ENTITY % machineryTaskbody-c-def
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Machinery Taskbody Constraint//EN" 
+  "machineryTaskbodyConstraint.mod">
+%machineryTaskbody-c-def;
+
+<!-- ============================================================= -->
+<!--                    TOPIC ELEMENT INTEGRATION                  -->
+<!-- ============================================================= -->
+
+<!--                    Embed topic to get generic elements        -->
+<!ENTITY % topic-type   PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 Topic//EN" 
+"../../base/dtd/topic.mod"                                                          >
+%topic-type;
+        
+<!--                    Embed task to get specific elements        -->
+<!ENTITY % task-typemod PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 Task//EN" 
+"../../technicalContent/dtd/task.mod"                                                           >
+%task-typemod;
+
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ELEMENT INTEGRATION                 -->
+<!-- ============================================================= -->
+
+
+<!ENTITY % taskreq-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Task Requirements Domain//EN" 
+         "../../technicalContent/dtd/taskreqDomain.mod"
+>%taskreq-d-def;
+
+<!ENTITY % hazard-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Hazard Statement Domain//EN" 
+         "../../base/dtd/hazardstatementDomain.mod"
+>%hazard-d-def;
+
+<!ENTITY % hi-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Highlight Domain//EN" 
+         "../../base/dtd/highlightDomain.mod"
+>%hi-d-def;
+
+<!ENTITY % ut-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Utilities Domain//EN" 
+         "../../base/dtd/utilitiesDomain.mod"
+>%ut-d-def;
+
+<!ENTITY % indexing-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Indexing Domain//EN" 
+         "../../base/dtd/indexingDomain.mod"
+>%indexing-d-def;
+
+<!ENTITY % ui-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 User Interface Domain//EN" 
+         "../../technicalContent/dtd/uiDomain.mod"
+>%ui-d-def;
+
+<!-- ================== End DITA Machinery Task DTD  ============= -->

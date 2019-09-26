@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="custom-html-plugin-webfont">
+  <title>Embedding web fonts in HTML output</title>
+  <titlealts>
+    <navtitle>Embedding web fonts</navtitle>
+  </titlealts>
+  <shortdesc>A custom plug-in can be created to generate HTML output that uses custom fonts for enhanced typographic
+    features, extended character sets or a unique corporate identity.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>require</xmlelement></indexterm>
+        <indexterm><xmlelement>link</xmlelement></indexterm>
+        <indexterm><xmlelement>head</xmlelement></indexterm>
+        <indexterm>HTML<indexterm>custom plug-in</indexterm></indexterm>
+        <indexterm>HTML<indexterm>fonts</indexterm></indexterm>
+        <indexterm>CSS<indexterm>web fonts</indexterm></indexterm>
+        <indexterm>fonts<indexterm>HTML</indexterm></indexterm>
+        <indexterm>web fonts<index-see>fonts</index-see></indexterm>
+        <indexterm>custom.css</indexterm>
+        <indexterm>build_html5-webfont.xml</indexterm>
+        <indexterm>plugin.xml</indexterm>
+        <indexterm>org.dita.html5</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>This scenario walks through the process of creating a very simple plug-in
+          (<codeph>com.example.html5-webfont</codeph>) that creates a new transformation type:
+          <option>html5-webfont</option>. </p>
+      <p>The <option>html5-webfont</option> transformation includes a custom CSS file and sets five parameters to
+        integrate font links and a custom stylesheet in the generated HTML5 output. These parameter settings make the
+        following changes:</p>
+      <ul>
+        <li>
+          <p>Specify a file that links to the font from the document head with <parmname>args.hdf</parmname>.</p></li>
+        <li>
+          <p>Specify the <filepath>css</filepath> subfolder of the plug-in as the source directory for custom CSS with
+              <parmname>args.cssroot</parmname>.</p></li>
+        <li>
+          <p>Specify the name of the custom CSS file with <parmname>args.css</parmname>.</p>
+          <p>The value of this parameter tells DITA-OT to use the <filepath>custom.css</filepath> file provided by the
+            plug-in.</p></li>
+        <li>
+          <p>Ensure that the CSS file is copied to the output directory by setting <parmname>args.copycss</parmname> to
+              <option>yes</option>.</p></li>
+        <li>
+          <p>Set the destination path for CSS files in the output folder with <parmname>args.csspath</parmname>.</p>
+          <p>CSS files are copied to the root level of the output folder by default. Setting this parameter places CSS
+            files in a dedicated <filepath>css</filepath> subfolder.</p></li>
+      </ul>
+      <p>All five parameters are set in the Ant script (<filepath>build_html5-webfont.xml</filepath>).</p>
+    </context>
+    <steps>
+      <step>
+        <cmd>In the <filepath>plugins</filepath> directory, create a directory named
+            <filepath>com.example.html5-webfont</filepath>.</cmd>
+      </step>
+      <step>
+        <cmd>In the new <filepath>com.example.html5-webfont</filepath> directory, create a plug-in configuration file
+            (<filepath>plugin.xml</filepath>) that declares the new <option>html5-webfont</option> transformation and
+          its dependencies.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample <filepath>plugin.xml</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.html5-webfont/plugin.xml"/></codeblock>
+          </fig>
+          <note>This plug-in will extend the default HTML5 transformation, so the <xmlelement>require</xmlelement>
+            element explicitly defines <filepath>org.dita.html5</filepath> as a dependency.</note>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>In the <filepath>com.example.html5-webfont</filepath> directory, create a subdirectory named
+            <filepath>include</filepath>.</cmd>
+      </step>
+      <step>
+        <cmd>In the new <filepath>include</filepath> subdirectory, create a file named
+            <filepath>webfont.hdf.xml</filepath> with your custom font links.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample <filepath>webfont.hdf.xml</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.html5-webfont/include/webfont.hdf.xml"/></codeblock>
+          </fig>
+          <p>This example uses the <xref keyref="noto-sans-font"/> font. You can use multiple fonts by creating
+            additional <xmlelement>link</xmlelement> references in this file. The division wrapper will be discarded
+            when generating HTML files, and the contents will be inserted into the <xmlelement>head</xmlelement> element
+            of each page.</p>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>In the <filepath>com.example.html5-webfont</filepath> directory, create a subdirectory named
+            <filepath>css</filepath>.</cmd>
+      </step>
+      <step>
+        <cmd>In the new <filepath>css</filepath> subdirectory, create a file named <filepath>custom.css</filepath> with
+          the stylesheet rules that apply the custom <codeph>font-family</codeph> to the desired elements.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample <filepath>custom.css</filepath> file</title>
+            <codeblock outputclass="language-css normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.html5-webfont/css/custom.css"/></codeblock>
+          </fig>
+          <p>This example uses <xref keyref="noto-sans-font"/> for all body content. In practice, you would normally use
+            different fonts for headings, body content, tables, etc. by creating additional rules in your CSS file.</p>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>In the <filepath>com.example.html5-webfont</filepath> root directory, add an Ant script
+            (<filepath>build_html5-webfont.xml</filepath>) to define the transformation type.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample build file: <filepath>build_html5-webfont.xml</filepath></title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.html5-webfont/build_html5-webfont.xml"/></codeblock>
+          </fig>
+        </stepxmp>
+      </step>
+    </steps>
+    <result>
+      <note type="tip">The files for this sample plug-in are included in the DITA-OT installation directory under
+          <filepath>docsrc/samples/plugins/com.example.html5-webfont/</filepath> and on <xref
+          href="https://github.com/dita-ot/docs/tree/develop/samples/plugins/com.example.html5-webfont" format="html"
+          scope="external">GitHub</xref>.</note>
+      <p>The plug-in directory has the following layout and files:</p>
+      <codeblock>com.example.html5-webfont
+├── build_html5-webfont.xml
+├── css
+│   └── custom.css
+├── include
+│   └── webfont.hdf.xml
+└── plugin.xml</codeblock>
+    </result>
+    <postreq>
+      <ol>
+        <li>Run <filepath conref="../resources/conref-task.dita#ID/dita-cmd"/>
+          <parmname>--install</parmname> to install the plug-in and make the <option>html5-webfont</option>
+          transformation available.</li>
+        <li>Build output with the new transformation type to verify that the plug-in works as intended.
+          <codeblock><filepath conref="../resources/conref-task.dita#ID/dita-cmd"/> <parmname>--input</parmname>=<varname>my.ditamap</varname> <parmname>--format</parmname>=<option>html5-webfont</option></codeblock>
+        </li>
+        <li>Refine the styles in your <filepath>custom.css</filepath> file to adjust the font usage as necessary.</li>
+      </ol>
+    </postreq>
+  </taskbody>
+</task>

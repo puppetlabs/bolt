@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="maintainstorage" xml:lang="en-us">
+  <title>Maintaining your hard drive</title>
+  <shortdesc>Here are a few tips for maintaining your hard drive.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>hard drive</indexterm>
+        <indexterm>maintain</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>There is really not much to do to maintain a hard drive. However, if you want to keep it running for the
+      next 10 years or so, you should follow these suggestions.</context>
+    <steps-unordered>
+      <step>
+        <cmd>If your drive has a low-power mode, make sure this comes on when your drive is sitting idle.</cmd>
+        <stepresult>It will not get worn out as quickly if it is not needlessly spinning.</stepresult>
+      </step>
+      <step>
+        <cmd>Every once in a while, shake your computer.</cmd>
+        <info>This will cause the bits to fall more comfortably in to place.</info>
+      </step>
+      <step>
+        <cmd>Run Scandisk on the drive at least once a day.</cmd>
+        <info>This way you will ensure that problems with the drive are found quickly. If you share the drive with
+          others, it will also ensure that they are less likely to use it, because it will be so busy all of the
+          time.</info>
+      </step>
+    </steps-unordered>
+  </taskbody>
+</task>

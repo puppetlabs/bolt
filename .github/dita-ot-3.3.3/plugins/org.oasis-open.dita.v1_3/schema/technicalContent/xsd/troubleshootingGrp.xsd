@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Troubleshooting Domain                                      -->
+<!-- VERSION:   1.3                                              -->
+<!-- DATE:      March 2014                                       -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Troubleshooting//EN"         -->
+<!--      Delivered as file "troubleshooting.mod"                                -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for the DITA Troubleshootings                    -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2014                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2014                    -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!--=============================================================-->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:group name="troubleshooting">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="troubleshooting"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="troublebody">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="troublebody"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="cause">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="cause"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="condition">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="condition"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="remedy">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="remedy"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="responsibleParty">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="responsibleParty"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="troubleSolution">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="troubleSolution"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+</xs:schema>

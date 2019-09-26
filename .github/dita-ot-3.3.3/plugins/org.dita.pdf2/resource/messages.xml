@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<messages>
+  <!-- Ant -->
+  <message id="DOTA066F" type="FATAL">
+    <reason>Cannot find the user specified XSLT stylesheet '%1'.</reason>
+    <response></response>
+  </message>
+  <!-- Java -->
+  <message id="PDFJ001E" type="ERROR">
+    <reason>The PDF indexing process could not find the proper sort location for '%1', so the term has been dropped from the index.</reason>
+    <response/>
+  </message>
+  <message id="PDFJ002E" type="ERROR">
+    <reason>The build failed due to problems encountered when sorting the PDF index.</reason>
+    <response>Please address any messages located earlier in the log.</response>
+  </message>
+  <message id="PDFJ003I" type="INFO">
+    <reason>Index entry '%1' will be sorted under the "Special characters" heading.</reason>
+    <response/>
+  </message>
+  <message id="XEPJ001W" type="WARN">
+    <reason>%1</reason>
+    <response/>
+  </message>
+  <message id="XEPJ002E" type="ERROR">
+    <reason>%1</reason>
+    <response/>
+  </message>
+  <message id="XEPJ003E" type="ERROR">
+    <reason>%1</reason>
+    <response/>
+  </message>
+  <!-- DOTA067W and DOTA068W actually come from Java code inside the PDF plug-in.
+       DOTA prefix is innacurate. No reason to change at this point. -->
+  <message id="DOTA067W" type="WARN">
+    <reason>Ignoring index-see '%1' inside parent index entry '%2' because the parent indexterm contains indexterm children.</reason>
+    <response></response>
+  </message>
+  <message id="DOTA068W" type="WARN">
+    <reason>Ignoring index-see-also '%1' inside parent index entry '%2' because the parent indexterm contains indexterm children.</reason>
+    <response></response>
+  </message>
+  <!-- XSLT -->
+  <message id="PDFX001W" type="WARN">
+    <reason>There is an index term specified with start="%1", but there is no matching end for this term.</reason>
+    <response>Add an index term in a valid location with end="%1".</response>
+  </message>
+  <message id="PDFX002W" type="WARN">
+    <reason>There are multiple index terms specified with start="%1", but there is only one term to end this range, or the ranges for this term overlap.</reason>
+    <response>Ensure that each term with this start value has a matching end value, and that the specified ranges for this value do not overlap</response>
+  </message>
+  <message id="PDFX003W" type="WARN">
+    <reason>There are multiple index entries found to close the index range for "%1".</reason>
+    <response>Ensure that any index term with start="%1" has only one matching end term with end="%1".</response>
+  </message>
+  <message id="PDFX004F" type="ERROR">
+    <reason>A topic reference was found with href="".</reason>
+    <response>Please specify a target or remove the href attribute.</response>
+  </message>
+  <message id="PDFX005F" type="ERROR">
+    <reason>The topic reference href="%1" could not be found.</reason>
+    <response>Please correct the reference, or set the scope or format attribute if the target is not a local DITA topic.</response>
+  </message>
+  <!-- PDFX006E cannot appear with version 2.2; commenting out. Should be removed when it is removed from the code.
+  <message id="PDFX006E" type="ERROR">
+    <reason>Number of columns must be specified.</reason>
+    <response/>
+  </message>-->
+  <message id="PDFX007W" type="WARN">
+    <reason>Found an index term with end="%1", but no starting term was found for this entry.</reason>
+    <response/>
+  </message>
+  <message id="PDFX008W" type="WARN">
+    <reason>Font definition not found for the logical name or alias '%1'.</reason>
+    <response/>
+  </message>
+  <message id="PDFX009E" type="ERROR">
+    <reason>Attribute set reflection cannot handle XSLT element %1.</reason>
+    <response/>
+  </message>
+  <message id="PDFX011E" type="ERROR">
+    <reason>The index term '%2' uses both an index-see element and %1 element.</reason>
+    <response>Convert the index-see element to index-see-also.</response>
+  </message>
+  <message id="PDFX012E" type="ERROR">
+    <reason>Found a table row with more entries than allowed.</reason>
+    <response/>
+  </message>
+  <message id="PDFX013F" type="FATAL">
+    <reason>The PDF file '%1' could not be generated.</reason>
+    <response/>
+  </message>
+</messages>  

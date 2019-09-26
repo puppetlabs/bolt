@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<topic id="internationalization_configuration_the_fo_i18n_folder">
+  <title>Internationalization configuration</title>
+  <titlealts>
+    <navtitle>Internationalization</navtitle>
+  </titlealts>
+  <shortdesc>The <filepath>fo/i18n</filepath> folder houses custom internationalization files that override the standard
+    configurations in <filepath>org.dita.pdf2/cfg/fo/i18n</filepath>.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>languages<indexterm>adding support for</indexterm></indexterm>
+        <indexterm>languages<indexterm>ISO 639-1</indexterm></indexterm>
+        <indexterm>ISO 639-1</indexterm>
+        <indexterm>I18N<index-see-also>languages</index-see-also></indexterm>
+        <indexterm>locale<index-see-also>languages</index-see-also><index-see-also>args.dita.locale</index-see-also></indexterm>
+        <indexterm>catalog<indexterm><filepath>catalog.xml</filepath></indexterm></indexterm>
+        <indexterm>catalog<indexterm>adding languages</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <body>
+    <p>As with index configuration and variable overrides, each file contains data for a single language, and should
+      take that language’s ISO 639-1 language designator as its name. </p>
+    <p>Each configuration file contains mappings of certain symbols to the Unicode codepoint which should be used to
+      represent them in the given locale.</p>
+    <p>The best way to start editing a custom configuration is by making a copy of the original from
+        <filepath>org.dita.pdf2/cfg/fo/i18n</filepath> and making changes as desired.</p>
+    <p>In order to apply a custom configuration to your publishing outputs, edit <filepath>catalog.xml</filepath> and
+      uncomment the appropriate entry in the “I18N configuration override entries” section.</p>
+  </body>
+</topic>

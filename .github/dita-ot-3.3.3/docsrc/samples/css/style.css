@@ -1,0 +1,103 @@
+/**
+ *  This file is part of the DITA Open Toolkit project.
+ *  See the accompanying LICENSE file for applicable license.
+ *
+ *  This file uses a few simple settings to create a new look and feel
+ *  for the generated XHTML output. Note that most elements are still
+ *  styled based on the toolkit's default CSS file, while this CSS
+ *  file only provides a few overrides to that core style.
+ *
+ *  For a sample build that uses this CSS file, see the following Ant
+ *  build file within the DITA-OT installation directory:
+ *  `docsrc/samples/ant_sample/sample_xhtml_plus_css.xml`
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  top: auto;
+}
+
+.topictitle1 {
+  font-size: 2.5em;
+}
+
+.topictitle2 {
+  font-size: 2em;
+}
+
+body {
+  background-color: #fff;
+  background-image: -webkit-linear-gradient(top, #eee 0%, #fff); /* Chrome10+,Safari5.1+ */
+  background-image:    -moz-linear-gradient(top, #eee 0%, #fff); /* FF3.6+ */
+  background-image:         linear-gradient(top, #eee 0%, #fff); /* W3C */
+  background-repeat: no-repeat;
+  color: #666;
+  float: left;
+  font-family: 'Trebuchet MS', "Times New Roman", Times, serif;
+  font-size: .9em;
+  margin: 30px 0;
+  padding: 0 5px 0 30px;
+  text-align: left;
+  width: 640px;
+}
+
+h1, h2, h3 {
+  font-family: Arial, Helvetica, sans-serif;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  text-transform: uppercase;
+}
+
+p, ul, ol, dl {
+  margin-top: 1.5em;
+}
+
+ul, ol, dl {
+  margin-left: 3em;
+}
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  margin-left: 3em;
+}
+
+blockquote {
+  font-style: italic;
+  margin-left: 3em;
+  margin-right: 3em;
+}
+
+a {
+  color: #70A300;
+  text-decoration: none;
+}
+
+a:hover {
+  border: 0;
+  color: #70A300;
+}
+
+/* Header */
+
+#header {
+  float: left;
+  height: 90px;
+  margin: 20;
+  width: 960px;
+}
+
+/* Inline Table of Contents */
+nav[role='toc'] {
+  float: right;
+  max-width: 200px;
+  font-size: small;
+  border-left: 1px solid #70A300;
+  margin-left: 1em;
+}
+nav[role='toc'] > ul {
+  margin-top: 0;
+}

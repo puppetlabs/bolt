@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<index.configuration.set>
+    <index.configuration>
+        <language>ko</language>
+        <index.groups>
+            <index.group>
+                <group.key>Specials</group.key>
+                <group.label>특수 문자</group.label>
+                <group.members>
+                    <char.set>\</char.set>
+                    <char.set>`</char.set>
+                    <char.set>~</char.set>
+                    <char.set>!</char.set>
+                    <char.set>@</char.set>
+                    <char.set>#</char.set>
+                    <char.set>$</char.set>
+                    <char.set>%</char.set>
+                    <char.set>^</char.set>
+                    <char.set>&amp;</char.set>
+                    <char.set>*</char.set>
+                    <char.set>(</char.set>
+                    <char.set>)</char.set>
+                    <char.set>_</char.set>
+                    <char.set>-</char.set>
+                    <char.set>=</char.set>
+                    <char.set>+</char.set>
+                    <char.set>'</char.set>
+                    <char.set>"</char.set>
+                    <char.set>;</char.set>
+                    <char.set>:</char.set>
+                    <char.set>&lt;</char.set>
+                    <char.set>&gt;</char.set>
+                    <char.set>.</char.set>
+                    <char.set>,</char.set>
+                    <char.set>/</char.set>
+                    <char.set>?</char.set>
+                    <char.set>[</char.set>
+                    <char.set>]</char.set>
+                    <char.set>{</char.set>
+                    <char.set>}</char.set>
+                    <char.set>|</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>Numbers</group.key>
+                <group.label>숫자</group.label>
+                <group.members>
+                    <char.set>0</char.set>
+                    <char.set>０</char.set>
+                    <char.set>1</char.set>
+                    <char.set>１</char.set>
+                    <char.set>2</char.set>
+                    <char.set>２</char.set>
+                    <char.set>3</char.set>
+                    <char.set>３</char.set>
+                    <char.set>4</char.set>
+                    <char.set>４</char.set>
+                    <char.set>5</char.set>
+                    <char.set>５</char.set>
+                    <char.set>6</char.set>
+                    <char.set>６</char.set>
+                    <char.set>7</char.set>
+                    <char.set>７</char.set>
+                    <char.set>8</char.set>
+                    <char.set>８</char.set>
+                    <char.set>9</char.set>
+                    <char.set>９</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>A</group.key>
+                <group.label>A</group.label>
+                <group.members>
+                    <char.set>A</char.set>
+                    <char.set>a</char.set>
+
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>B</group.key>
+                <group.label>B</group.label>
+                <group.members>
+                    <char.set>B</char.set>
+                    <char.set>b</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>C</group.key>
+                <group.label>C</group.label>
+                <group.members>
+                    <char.set>C</char.set>
+                    <char.set>c</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>D</group.key>
+                <group.label>D</group.label>
+                <group.members>
+                    <char.set>D</char.set>
+                    <char.set>d</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>E</group.key>
+                <group.label>E</group.label>
+                <group.members>
+                    <char.set>E</char.set>
+                    <char.set>e</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>F</group.key>
+                <group.label>F</group.label>
+                <group.members>
+                    <char.set>F</char.set>
+                    <char.set>f</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>G</group.key>
+                <group.label>G</group.label>
+                <group.members>
+                    <char.set>G</char.set>
+                    <char.set>g</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>H</group.key>
+                <group.label>H</group.label>
+                <group.members>
+                    <char.set>H</char.set>
+                    <char.set>h</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>I</group.key>
+                <group.label>I</group.label>
+                <group.members>
+                    <char.set>I</char.set>
+                    <char.set>i</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>J</group.key>
+                <group.label>J</group.label>
+                <group.members>
+                    <char.set>J</char.set>
+                    <char.set>j</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>K</group.key>
+                <group.label>K</group.label>
+                <group.members>
+                    <char.set>K</char.set>
+                    <char.set>k</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>L</group.key>
+                <group.label>L</group.label>
+                <group.members>
+                    <char.set>L</char.set>
+                    <char.set>l</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>M</group.key>
+                <group.label>M</group.label>
+                <group.members>
+                    <char.set>M</char.set>
+                    <char.set>m</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>N</group.key>
+                <group.label>N</group.label>
+                <group.members>
+                    <char.set>N</char.set>
+                    <char.set>n</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>O</group.key>
+                <group.label>O</group.label>
+                <group.members>
+                    <char.set>O</char.set>
+                    <char.set>o</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>P</group.key>
+                <group.label>P</group.label>
+                <group.members>
+                    <char.set>P</char.set>
+                    <char.set>p</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>Q</group.key>
+                <group.label>Q</group.label>
+                <group.members>
+                    <char.set>Q</char.set>
+                    <char.set>q</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>R</group.key>
+                <group.label>R</group.label>
+                <group.members>
+                    <char.set>R</char.set>
+                    <char.set>r</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>S</group.key>
+                <group.label>S</group.label>
+                <group.members>
+                    <char.set>S</char.set>
+                    <char.set>s</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>T</group.key>
+                <group.label>T</group.label>
+                <group.members>
+                    <char.set>T</char.set>
+                    <char.set>t</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>U</group.key>
+                <group.label>U</group.label>
+                <group.members>
+                    <char.set>U</char.set>
+                    <char.set>u</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>V</group.key>
+                <group.label>V</group.label>
+                <group.members>
+                    <char.set>V</char.set>
+                    <char.set>v</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>W</group.key>
+                <group.label>W</group.label>
+                <group.members>
+                    <char.set>W</char.set>
+                    <char.set>w</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>X</group.key>
+                <group.label>X</group.label>
+                <group.members>
+                    <char.set>X</char.set>
+                    <char.set>x</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>Y</group.key>
+                <group.label>Y</group.label>
+                <group.members>
+                    <char.set>Y</char.set>
+                    <char.set>y</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>Z</group.key>
+                <group.label>Z</group.label>
+                <group.members>
+                    <char.set>Z</char.set>
+                    <char.set>z</char.set>
+                </group.members>
+            </index.group>
+
+            <!-- Explanation of following ranges: the first range should be xAC00 to xB097, inclusive.
+                 Using character xB097 (낗) as the end range value results in B097 not ending up in a group.
+                 To keep end of range for each group, adding it as an additional character. -->
+            <index.group>
+                <group.key>ᄀ</group.key>
+                <group.label>가</group.label>
+                <group.members>
+                    <!-- x1100 and x1101 -->
+                    <char.set start-range="ᄀ" end-range="ᄁ"/>
+                    <!-- AC00 to xB097 -->
+                    <char.set start-range="가" end-range="낗"/>
+                    <char.set>낗</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄂ</group.key>
+                <group.label>나</group.label>
+                <group.members>
+                    <char.set>ᄂ</char.set><!--hex x1102-->
+                    <!-- xB098 to xB2E3 -->
+                    <char.set start-range="나" end-range="닣"/>
+                    <char.set>닣</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄃ</group.key>
+                <group.label>다</group.label>
+                <group.members>
+                    <!-- x1103 and x1104 -->
+                    <char.set start-range="ᄃ" end-range="ᄄ"/>
+                    <!-- xB2E4 to xB77B -->
+                    <char.set start-range="다" end-range="띻"/>
+                    <char.set>띻</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄅ</group.key>
+                <group.label>라</group.label>
+                <group.members>
+                    <char.set>ᄅ</char.set><!--hex x1105-->
+                    <!-- xB77C to xB9C7 -->
+                    <char.set start-range="라" end-range="맇"/>
+                    <char.set>맇</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄆ</group.key>
+                <group.label>마</group.label>
+                <group.members>
+                    <char.set>ᄆ</char.set><!--hex x1106-->
+                    <!-- xB9C8 to xBC13 -->
+                    <char.set start-range="마" end-range="밓"/>
+                    <char.set>밓</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄇ</group.key>
+                <group.label>바</group.label>
+                <group.members>
+                    <!-- x1107 and x1108 -->
+                    <char.set start-range="ᄇ" end-range="ᄈ"/>
+                    <!-- xBC14 to xC0AB -->
+                    <char.set start-range="바" end-range="삫"/>
+                    <char.set>삫</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄉ</group.key>
+                <group.label>사</group.label>
+                <group.members>
+                    <!-- x1109 and x110A -->
+                    <char.set start-range="ᄉ" end-range="ᄊ"/>
+                    <!-- xC0AC to xC543 -->
+                    <char.set start-range="사" end-range="앃"/>
+                    <char.set>앃</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄋ</group.key>
+                <group.label>아</group.label>
+                <group.members>
+                    <char.set>ᄋ</char.set><!--hex x110B-->
+                    <!-- xC544 to xC78F -->
+                    <char.set start-range="아" end-range="잏"/>
+                    <char.set>잏</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄌ</group.key>
+                <group.label>자</group.label>
+                <group.members>
+                    <!-- x110C and x110D -->
+                    <char.set start-range="ᄌ" end-range="ᄍ"/>
+                    <!-- xC544 to xCC27 -->
+                    <char.set start-range="자" end-range="찧"/>
+                    <char.set>찧</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄎ</group.key>
+                <group.label>차</group.label>
+                <group.members>
+                    <char.set>ᄎ</char.set><!--hex x110E-->
+                    <!-- xCC28 to xCE73 -->
+                    <char.set start-range="차" end-range="칳"/>
+                    <char.set>칳</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄏ</group.key>
+                <group.label>카</group.label>
+                <group.members>
+                    <char.set>ᄏ</char.set><!--hex x110F-->
+                    <!-- xCE73 to xD0BF -->
+                    <char.set start-range="카" end-range="킿"/>
+                    <char.set>킿</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄐ</group.key>
+                <group.label>타</group.label>
+                <group.members>
+                    <char.set>ᄐ</char.set><!--hex x1110-->
+                    <!-- xD0C0 to xD30B -->
+                    <char.set start-range="타" end-range="팋"/>
+                    <char.set>팋</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄑ</group.key>
+                <group.label>파</group.label>
+                <group.members>
+                    <char.set>ᄑ</char.set><!--hex x1111-->
+                    <!-- xD30C to xD557 -->
+                    <char.set start-range="파" end-range="핗"/>
+                    <char.set>핗</char.set>
+                </group.members>
+            </index.group>
+            <index.group>
+                <group.key>ᄒ</group.key>
+                <group.label>하</group.label>
+                <group.members>
+                    <char.set>ᄒ</char.set><!--hex x1112-->
+                    <!-- xD558 to xD7A3 -->
+                    <char.set start-range="하" end-range="힣"/>
+                    <char.set>힣</char.set>
+                </group.members>
+            </index.group>
+        </index.groups>
+    </index.configuration>
+</index.configuration.set>

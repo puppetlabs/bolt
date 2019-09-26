@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA DITA Topic                                  -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Topic//EN"                   -->
+<!--      Delivered as file "topic.mod"                               -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for the base Topic type               -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2001                                       -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2005, 2009.             -->
+<!--            (C) Copyright IBM Corporation 2001, 2004.        -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2005.11.15 RDA: Corrected the public ID for tblDecl.mod   -->
+<!--   2005.11.15 RDA: Removed old declaration for topicreftypes -->
+<!--                   entity                                    -->
+<!--   2005.11.15 RDA: Corrected the PURPOSE in this comment     -->
+<!--   2005.11.15 RDA: Corrected Long Names for alt, indextermref-->
+<!--   2006.06.06 RDA: Bug fixes:                                -->
+<!--                   Added xref and fn to fig.cnt              -->
+<!--                   Remove xmlns="" from global-atts          -->
+<!--   2006.06.06 RDA: Moved shared items to commonElements file -->
+<!--   2006.06.07 RDA: Added abstract> element                   -->
+<!--   2006.06.07 RDA: Make universal attributes universal       -->
+<!--                     (DITA 1.1 proposal #12)                 -->
+<!--   2006.06.14 RDA: Add dir attribute to localization-atts    -->
+<!--   2006.06.20 RDA: defn.cnt now explicitly sets its content  -->
+<!--   2006.07.06 RDA: Moved class attributes in from topicAttr  -->
+<!--   2006.11.30 RDA: Add -dita-use-conref-target to enumerated -->
+<!--                     attributes                              -->
+<!--   2006.11.30 RDA: Remove #FIXED from DITAArchVersion        -->
+<!--   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       -->
+<!--   2008.01.28 RDA: Add draft-comment to body.cnt             -->
+<!--   2008.01.28 RDA: Moved <metadata> defn. to metaDecl.mod    -->
+<!--   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  -->
+<!--   2008.02.12 RDA: Add ph to linktext, navtitle, searchtitle -->
+<!--   2008.02.12 RDA: Modify imbeds to use specific 1.2 version -->
+<!--   2008.02.12 RDA: Move navtitle to commonElements.mod       -->
+<!--   2008.02.13 RDA: Add bodydiv and sectiondiv                -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--   2008.05.06 RDA: Moved sectiondiv to section.cnt; created  -->
+<!--                   example.cnt for use by example element    -->
+<!--=============================================================-->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:group name="topic">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="topic"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="titlealts">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="titlealts"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="searchtitle">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="searchtitle"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="shortdesc">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="shortdesc"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="abstract">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="abstract"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="body">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="body"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bodydiv">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="bodydiv"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="no-topic-nesting">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="no-topic-nesting"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="section">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="section"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="sectiondiv">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="sectiondiv"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="example">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="example"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="prolog">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="prolog"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="related-links">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="related-links"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="link">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="link"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="linktext">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="linktext"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="linklist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="linklist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="linkinfo">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="linkinfo"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="linkpool">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="linkpool"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+</xs:schema>

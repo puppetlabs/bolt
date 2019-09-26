@@ -1,0 +1,50 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="In HTML5 output, you can set a parameter to include table-of-contents navigation in the nav element of each page. The navigation can be rendered in a sidebar or menu via CSS."><meta name="DC.subject" content=", nav, HTML5, navigation, adding, transformations, CSS, adding custom, nav-toc, table of contents"><meta name="keywords" content=", nav, HTML5, navigation, adding, transformations, CSS, adding custom, nav-toc, table of contents"><meta name="DC.relation" scheme="URI" content="../topics/html-customization-parameters.html"><meta name="DC.relation" scheme="URI" content="../topics/html-customization-css.html"><meta name="DC.relation" scheme="URI" content="../topics/html-customization-header.html"><meta name="DC.relation" scheme="URI" content="../parameters/generate-copy-outer.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="custom-html-navigation"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Adding navigation to topics</title></head><body id="custom-html-navigation"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a><ul><li><a href="../topics/html-customization-parameters.html">Setting HTML parameters</a><ul><li class="active"><a href="../topics/html-customization-navigation.html">Adding navigation</a></li><li><a href="../topics/html-customization-css.html">Adding custom CSS</a></li><li><a href="../topics/html-customization-header.html">Headers and footers</a></li><li><a href="../parameters/generate-copy-outer.html">Handling content outside the map directory</a></li></ul></li><li><a href="../topics/html-customization-properties-file.html">Using a properties file</a></li><li><a href="../topics/html-customization-plugins.html">Custom HTML plug-ins</a></li></ul></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Adding navigation to topics</h1>
+  
+  
+  
+  <div class="body taskbody"><p class="shortdesc">In HTML5 output, you can set a parameter to include table-of-contents navigation in the
+      <code class="keyword markupname xmlelement">&lt;nav&gt;</code> element of each page. The navigation can be rendered in a sidebar or menu via
+    CSS.</p>
+    <section class="section context"><div class="tasklabel"><h2 class="sectiontitle tasklabel">About this task</h2></div>
+      <p class="p">Earlier versions of DITA-OT used the TocJS transformation to render a JavaScript-based table of contents in an
+        XHTML frameset for topic navigation. While this approach is still supported for XHTML output, recent toolkit
+        versions provide a modern HTML5 navigation alternative.</p>
+      <p class="p">As of DITA-OT 2.2, the <span class="keyword parmname">nav-toc</span> parameter can be used in HTML5 transformations to embed
+        navigation directly in topics using native HTML5 elements without JavaScript or framesets.</p></section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">Set the <span class="keyword parmname">nav-toc</span> parameter to one of the following options:</span>
+        <ul class="ul choices">
+          <li class="li choice">The <span class="keyword option">partial</span> option creates a table of contents with the portion of the navigation
+            hierarchy that contains the current topic (along with its parents, siblings and children).</li>
+          <li class="li choice">The <span class="keyword option">full</span> option embeds the complete navigation for the entire map in each
+            topic.</li>
+        </ul>
+      </li><li class="li step stepexpand"><strong>Optional: </strong>
+        <span class="ph cmd">Add custom CSS rules to style the navigation.</span>
+        <div class="itemgroup info">
+          <p class="p">For example, the DITA-OT documentation stylesheet includes the following rules to place the table of
+            contents on the left side of the browser viewport and highlight the current topic in bold:</p>
+          <div class="p">
+            <pre class="pre codeblock language-css normalize-space show-line-numbers show-whitespace"><code>nav[role=toc] {
+  float: left;
+  width: 300px;
+}
+
+nav[role=toc] li.active &gt; a {
+  font-weight: bold;
+}</code></pre>
+          </div>
+        </div>
+      </li></ol></section>
+    <section class="section result"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Results</h2></div>
+      <div class="note tip note_tip"><span class="note__title">Tip:</span> For an example of HTML output generated using this method, see the HTML5 version of the DITA-OT
+        documentation included in the installation folder under <span class="ph filepath">doc/index.html</span>.</div>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/html-customization-parameters.html" title="For simple branded HTML pages, you can adjust the look and feel of the default output to match your company style by setting parameters to include custom CSS, header branding, or table-of-contents navigation in topics. (These changes do not require a custom plug-in.)">Setting parameters for custom HTML</a></div></div><div class="linklist relinfo relconcepts"><strong>Related concepts</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../parameters/generate-copy-outer.html" title="By default, DITA-OT assumes content is located in or beneath the directory containing the DITA map file. The generate.copy.outer parameter can be used to adjust how output is generated for content that is located outside the map directory.">Handling content outside the map directory</a></li></ul></div><div class="linklist relinfo reltasks"><strong>Related tasks</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/html-customization-css.html" title="To modify the appearance of the default HTML output that DITA Open Toolkit generates, you can reference a custom Cascading Style Sheet (CSS) file with the typography, colors, and other presentation aspects that define your corporate identity.">Adding custom CSS</a></li><li class="linklist"><a class="link" href="../topics/html-customization-header.html" title="You add a custom header to include a publication title, company logo, or other common branding elements in HTML output. A custom footer can also be added with copyright information, legal boilerplate, or other fine print.">Adding custom headers and footers</a></li></ul></div></nav></article></main></body></html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="customizing-html-output">
+  <title>Customizing HTML output</title>
+  <titlealts>
+    <navtitle>Customizing HTML</navtitle>
+  </titlealts>
+  <shortdesc>You can adjust the look and feel of your HTML output without creating a DITA-OT plug-in by including custom
+    CSS, headers and footers, or table-of-contents navigation in topics.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>HTML<indexterm>customizing</indexterm></indexterm>
+        <indexterm>transformations<indexterm start="html">HTML</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>HTML5</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+</task>

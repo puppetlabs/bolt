@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map id="keydefs">
+  <title>Key definitions (variables)</title>
+
+  <!-- Submap with key definitions for external web resources -->
+  <mapref href="external-links.ditamap"/>
+
+  <!-- Submap with key definitions for each topic -->
+  <mapref href="source-files.ditamap"/>
+
+  <!--VERSION NUMBERS: DITA-OT-->
+
+  <!-- DITA-OT: Major & minor release version (2 digits) -->
+  <keydef keys="release">
+    <topicmeta>
+      <keywords>
+        <keyword>3.3</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+
+  <!-- DITA-OT: Latest maintenance version (normally 3 digits, 2 for initial minor release) -->
+  <!-- ↓ excerpt-version ↓ -->
+  <keydef keys="maintenance-version">
+    <topicmeta>
+      <keywords>
+        <keyword>3.3.3</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- ↑ end-excerpt ↑ -->
+
+  <!--VERSION NUMBERS: OTHER APPLICATIONS-->
+
+  <!-- Ant: Bundled version-->
+  <keydef keys="tool.ant.version">
+    <topicmeta>
+      <keywords>
+        <keyword>1.10.5</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- Apache Commons Codec: Bundled version -->
+  <keydef keys="tool.codec.version">
+    <topicmeta>
+      <keywords>
+        <keyword>1.10</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- Apache Commons IO: Bundled version -->
+  <keydef keys="tool.io.version">
+    <topicmeta>
+      <keywords>
+        <keyword>2.6</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- Guava: Bundled version -->
+  <keydef keys="tool.guava.version">
+    <topicmeta>
+      <keywords>
+        <keyword>25.1-jre</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- ICU for Java: Bundled version -->
+  <keydef keys="tool.icu4j.version">
+    <topicmeta>
+      <keywords>
+        <keyword>61.1</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- Java-->
+  <keydef keys="tool.java.version">
+    <topicmeta>
+      <keywords>
+        <keyword>8u101</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- Logback Classic Module used by OT Java API -->
+  <keydef keys="tool.logback.version">
+    <topicmeta>
+      <keywords>
+        <keyword>1.2.3</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- Simple Logging Facade for Java (SLF4J) used by OT Java API -->
+  <keydef keys="tool.SLF4J.version">
+    <topicmeta>
+      <keywords>
+        <keyword>1.7.25</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- Xerces: Bundled version-->
+  <keydef keys="tool.xerces.version">
+    <topicmeta>
+      <keywords>
+        <keyword>2.12.0</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- FOP: Bundled version -->
+  <keydef keys="tool.fop.version">
+    <topicmeta>
+      <keywords>
+        <keyword>2.3</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- XML APIs: Bundled version-->
+  <keydef keys="tool.xmlapis.version">
+    <topicmeta>
+      <keywords>
+        <keyword>1.4.01</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- XML Resolver: Bundled version-->
+  <keydef keys="tool.resolver.version">
+    <topicmeta>
+      <keywords>
+        <keyword>1.2</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <!-- Saxon: Bundled version -->
+  <keydef keys="tool.saxon.edition">
+    <topicmeta>
+      <keywords>
+        <keyword>Saxon-HE</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+  <keydef keys="tool.saxon.version">
+    <topicmeta>
+      <keywords>
+        <keyword>9.8.0.14</keyword>
+      </keywords>
+    </topicmeta>
+  </keydef>
+
+</map>

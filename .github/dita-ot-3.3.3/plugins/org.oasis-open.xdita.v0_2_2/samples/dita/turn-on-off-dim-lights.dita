@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="turn-on-off-dim-lights" xml:lang="en-us">
+    <title>Turning On/Off or Dimming Lights</title>
+    <shortdesc>You can turn on, turn off, or dim a lighting group in your <keyword keyref="product-name"/> by pressing the group number
+        button and then pressing the power button or the dimmer control.</shortdesc>
+     <taskbody>
+         <prereq>Before you can operate a lighting group you must program
+             the network light bulbs you want included in that lighting group.</prereq>
+        <context>You must turn on, turn off, or dim an entire lighting group together. You cannot
+            control one individual light bulb in a group (unless only that light bulb is programmed
+            to the group).</context>
+
+        <steps>
+            <step>
+                <cmd>Select the lighting group(s) you want to operate:</cmd>
+                <info>
+                    <note type="caution">When selecting a lighting group, do not press and hold the
+                        lighting group button for longer than 4 seconds. Doing so activates light
+                        bulb programming for the selected lighting group.</note>
+                </info>
+                <choicetable>
+                    <chhead>
+                        <choptionhd>For this situation...</choptionhd>
+                        <chdeschd>Perform this task...</chdeschd>
+                    </chhead>
+                    <chrow>
+                        <choption>Operate the lighting group that was last controlled</choption>
+                        <chdesc>Do not press a lighting group button (pressing the button is
+                            optional). The most recent lighting group remains current on the remote
+                            control.</chdesc>
+                    </chrow>
+                    <chrow>
+                        <choption>Operate one lighting group</choption>
+                        <chdesc>Press the number button for the lighting group you want to
+                            operate.</chdesc>
+                    </chrow>
+                    <chrow>
+                        <choption>Operate all lighting groups</choption>
+                        <chdesc>Press the 1-4 button.</chdesc>
+                    </chrow>
+                    <chrow>
+                        <choption>Turn on/off all network lights regardless of
+                            programming</choption>
+                        <chdesc>Do not press a lighting group button (pressing any lighting group
+                            button is irrelevant). Skip to the next step.</chdesc>
+                    </chrow>
+                </choicetable>
+                <info>
+                    <note>You have 5 seconds to operate the selected lighting group once it is
+                        activated. After 5 seconds of inactivity (when the green indicator light
+                        turns of), you must start over.</note>
+                </info>
+                <stepresult>The button indicator for the selected lighting group turns green when
+                    the group is activated. If the indicator turns red, the lighting group was not
+                    activated and you must try again.</stepresult>
+            </step>
+            <step>
+                <cmd>Turn on, turn off, or dim the lighting group:</cmd>
+                <choicetable>
+                    <chhead>
+                        <choptionhd>For this lighting result...</choptionhd>
+                        <chdeschd>Perform this task...</chdeschd>
+                    </chhead>
+                    <chrow>
+                        <choption>Turn on/off</choption>
+                        <chdesc>Press the power button. The selected lighting group turns on if it
+                            is currently off and turns off if it is currently on.</chdesc>
+                    </chrow>
+                    <chrow>
+                        <choption>Turn on/off all network lights regardless of
+                            programming</choption>
+                        <chdesc>Press and hold the power button for 5 seconds. All network lights
+                            (even if not programmed) initially turn on. Repeat this task to turn
+                            them all off.</chdesc>
+                    </chrow>
+                    <chrow>
+                        <choption>Dim up (brighten)</choption>
+                        <chdesc>Press upward on the dimmer control. You do not have to press the
+                            power button first.</chdesc>
+                    </chrow>
+                    <chrow>
+                        <choption>Dim down (soften)</choption>
+                        <chdesc>Press downward on the dimmer control. You do not have to press the
+                            power button first.</chdesc>
+                    </chrow>
+                </choicetable>
+                <stepresult>The power button indicator turns green if the signal is successfully
+                    sent. If the indicator turns red, the signal was not sent and you must start
+                    over.</stepresult>
+            </step>
+        </steps>
+        <result>The light bulbs in the selected lighting group turn on, turn off, or dim depending
+            on your selection.</result>
+    </taskbody>
+</task>

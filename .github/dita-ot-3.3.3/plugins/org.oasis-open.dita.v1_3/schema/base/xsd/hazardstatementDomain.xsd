@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Hazard Statement Domain                     -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identifier or an -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Hazard Statement Domain//EN" -->
+<!--      Delivered as file "hazardstatementDomain.mod"               -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for the Hazard Statement Domain       -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            February 2008                                    -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2008, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!-- UPDATES:                                                    -->
+<!--   2007.02.20 Chris Kravogel, SeicoDyne GmbH: Created domain -->
+<!--   2007.03.06 Chris Kravogel, SeicoDyne GmbH: Add howtoavoid -->
+<!--                   entity                                    -->
+<!--   2007.11.20 Chris Kravogel, SeicoDyne GmbH: Reduced ATTLIST-->
+<!--                   of hazardstatement to ATTLIST of note     -->
+<!--   2008.02.05 Chris Kravogel, SeicoDyne GmbH: Renamed symbol -->
+<!--                   to hazardsymbol, added %words.cnt; and    -->
+<!--                   %trademark; to consequences, typeofhazard -->
+<!--   2008.02.05 RDA: Reformatted for DITA 1.2 ; removed @alt    -->
+<!--                   and added @scalefit on hazardsymbol       -->
+<!--   2008.02.13 RDA: Create .content and .attributes entities  -->
+<!--   2009.12.03 RDA: Removed caution1 and caution2 values to   -->
+<!--                   match the revised note/@type values       -->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic hazard-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="hazardstatement">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="hazardstatement"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="hazardsymbol">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="hazardsymbol"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="messagepanel">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="messagepanel"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="typeofhazard">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="typeofhazard"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="consequence">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="consequence"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="howtoavoid">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="howtoavoid"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="hazard-d-note">
+      <xs:choice>
+         <xs:element ref="hazardstatement"/>
+      </xs:choice>
+   </xs:group>
+   <xs:group name="hazard.cnt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="sl"/>
+            <xs:group ref="simpletable"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:element name="hazardstatement">
+      <xs:annotation>
+         <xs:documentation>The &lt;hazardstatement&gt; element contains hazard warning information. It is based on the regulations of the ANSI Z535 and the ISO 3864 standards. It gives the author the
+            opportunity to select the hazard statement, to add one or more safety signs and to add the required phrases.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="hazardstatement.class">
+               <xs:attribute ref="class" default="+ topic/note hazard-d/hazardstatement "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="hazardstatement.class">
+      <xs:sequence>
+         <xs:group ref="hazardstatement.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="hazardstatement.attributes"/>
+   </xs:complexType>
+   <xs:group name="hazardstatement.content">
+      <xs:sequence>
+         <xs:group ref="messagepanel" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:group ref="hazardsymbol" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="hazardstatement.attributes">
+      <xs:attribute name="type">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="attention"/>
+               <xs:enumeration value="caution"/>
+               <xs:enumeration value="danger"/>
+               <xs:enumeration value="fastpath"/>
+               <xs:enumeration value="important"/>
+               <xs:enumeration value="note"/>
+               <xs:enumeration value="notice"/>
+               <xs:enumeration value="other"/>
+               <xs:enumeration value="remember"/>
+               <xs:enumeration value="restriction"/>
+               <xs:enumeration value="tip"/>
+               <xs:enumeration value="warning"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attribute name="othertype" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="hazardsymbol">
+      <xs:annotation>
+         <xs:documentation>A graphic representation intended to convey a message without the use of words. It may represent a hazard, a hazardous situation, a precaution to avoid a hazard, a result of
+            not avoiding a hazard, or any combination of these messages.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="hazardsymbol.class">
+               <xs:attribute ref="class" default="+ topic/image hazard-d/hazardsymbol "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="hazardsymbol.class">
+      <xs:sequence>
+         <xs:group ref="hazardsymbol.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="hazardsymbol.attributes"/>
+   </xs:complexType>
+   <xs:group name="hazardsymbol.content">
+      <xs:sequence>
+         <xs:group ref="alt" minOccurs="0"/>
+         <xs:group ref="longdescref" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="hazardsymbol.attributes">
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="local"/>
+               <xs:enumeration value="peer"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attribute name="longdescref" type="xs:string"/>
+      <xs:attribute name="height" type="xs:NMTOKEN"/>
+      <xs:attribute name="width" type="xs:NMTOKEN"/>
+      <xs:attribute name="align" type="xs:string"/>
+      <xs:attribute name="scale" type="xs:NMTOKEN"/>
+      <xs:attribute name="scalefit">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="placement" default="inline">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="break"/>
+               <xs:enumeration value="inline"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="messagepanel">
+      <xs:annotation>
+         <xs:documentation>The &lt;messagepanel&gt; element describes the area of a safety sign or label that contains the word message which identifies a hazard, indicates how to avoid the hazard, and
+            advises of the probable consequences of not avoiding the hazard.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="messagepanel.class">
+               <xs:attribute ref="class" default="+ topic/ul hazard-d/messagepanel "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="messagepanel.class">
+      <xs:sequence>
+         <xs:group ref="messagepanel.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="messagepanel.attributes"/>
+   </xs:complexType>
+   <xs:group name="messagepanel.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+         <xs:group ref="typeofhazard"/>
+         <xs:group ref="consequence" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="howtoavoid" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="messagepanel.attributes">
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="typeofhazard">
+      <xs:annotation>
+         <xs:documentation>&lt;typeofhazard&gt; element is the container for the first text entry of a safety label. It contains the description of the type of hazard, such as "Moving parts can crush
+            and cut".</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="typeofhazard.class">
+               <xs:attribute ref="class" default="+ topic/li hazard-d/typeofhazard "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="typeofhazard.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="typeofhazard.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="typeofhazard.attributes"/>
+   </xs:complexType>
+   <xs:group name="typeofhazard.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt"/>
+            <xs:group ref="ph"/>
+            <xs:group ref="tm"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="typeofhazard.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="consequence">
+      <xs:annotation>
+         <xs:documentation>The &lt;consequence&gt; element is the container for the second text entry of a safety label. It contains the description of the consequences of not avoiding the hazard, such
+            as "Keep guard in place".</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="consequence.class">
+               <xs:attribute ref="class" default="+ topic/li hazard-d/consequence "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="consequence.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="consequence.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="consequence.attributes"/>
+   </xs:complexType>
+   <xs:group name="consequence.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt"/>
+            <xs:group ref="ph"/>
+            <xs:group ref="tm"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="consequence.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="howtoavoid">
+      <xs:annotation>
+         <xs:documentation>The &lt;howtoavoid&gt; element is the container for the third text entry of a safety label. It contains the description of how to avoid the hazard, such as "Lock out power
+            before servicing".</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="howtoavoid.class">
+               <xs:attribute ref="class" default="+ topic/li hazard-d/howtoavoid "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="howtoavoid.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="howtoavoid.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="howtoavoid.attributes"/>
+   </xs:complexType>
+   <xs:group name="howtoavoid.content">
+      <xs:sequence>
+         <xs:group ref="hazard.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="howtoavoid.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

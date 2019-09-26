@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.4" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.4</title><abstract><shortdesc>Release 1.4 is a major release to add new functions, fulfill new
+        requirements, make some function enhancements and fix bugs over release 1.3.1.</shortdesc>
+      Available since August 1, 2007</abstract><refbody><section id="section_ruu_wdj_nc">
+        <p> The DITA-OT Release 1.4 contains full support for the OASIS DITA 1.1 standard. This
+          completes the preliminary support added in the 1.3 and 1.3.1 versions of the toolkit. New
+          and improved items for 1.1 are listed under [Improvements] below. Support for the new
+          bookmap standard is available in the latest version of the FO plug-in, which uses the
+          "pdf2" transform type; it will be released together with or soon after the release of
+          DITA-OT 1.4. The deprecated "pdf" transform type has not been updated for the new bookmap.
+          Together with DITA 1.1 support, the toolkit development team has improved error reporting
+          so that build failures are more accurately reported at the end of the build. Error
+          handling will continue to improve in future releases. Release 1.4 comes in two versions.
+          The full version contains several external packages that are useful or critical to running
+          the toolkit, such as Xalan and the XML Catalog resolver. The smaller package contains only
+          core toolkit code. NOTE ABOUT DEPRECATED CODE: changes for the new DITAVAL standard
+          required a change to code in dita2htmlImpl.xsl. The "flagit" named template is deprecated
+          and will not work with the new ditaval format. Overrides to this step should be updated to
+          use "start-flagit" and "end-flagit". The flagit template will continue to work with the
+          old ditaval but will generate a warning for each call. </p>
+      </section><section id="section_xuu_wdj_nc">
+        <title>Changes</title>
+        <ol><li>
+            <p>Release 1.4 improves the processing of DITA documents using XML Schemas. One was able
+              to process these type of documents in Release 1.3.1 but it meant that the schema
+              location had to have the ablsolute location of the schema in order for the Toolkit
+              properly.</p>
+            <p>DITA 1.1 introduces the use of URNs to normatively identify the schemas used for
+              validation. The URNs have the following desing pattern
+              "urn:oasis:names:tc:dita:xsd:&lt;schemaDocument&gt;:1.1". You should use these in as
+              the value for the attribute xsi:noNamespaceSchemaLocation.</p>
+          </li></ol>
+      </section><section id="section_tra_ydj_nc">
+        <title>13 Improvements</title>
+        <ol><li>Support &lt;title&gt; in map </li><li>Ignore Index-base in default processing</li><li>Retrieve the link text from abstract element.</li><li>Format shortdesc in abstract appropriately</li><li>Add standard code to allow overrides to easily process generalized version of unknown
+            and foreign element </li><li>Support @dir on every element</li><li>Refactor mapref resolution</li><li>Support generalization and re-specialization of unknown/foreign elements</li><li>Replace Move Index module with new Move Metadata module</li><li>New DITAVAL standard support</li><li>New chunk attribute support</li><li>Support XML Schema validated instance document processing using XML Catalogs</li></ol>
+      </section><section id="section_vuo_ydj_nc">
+        <title>17 SF Bugs Fixed</title>
+        <ol><li>1700561 Null Pointer Exception on Missing domain= Attribute</li><li>1733264 pretty.xsl is broken</li><li>1619074 table in step screws up following steps for HTML generation</li><li>1728700 GenMapAndTopicList keeps filtering when called a second time</li><li>1732562 DitaWriter.java can duplicate @xtrf and @xtrc</li><li>1733108 Update Bookmap sample files to DITA 1.1</li><li>1706263 Conrefing from a map to topic is not working properly</li><li>1677620 Non-DITA file is treated as DITA in pre-process</li><li>1717471 Links show up more than once</li><li>1712543 gen-list-without-flagging : NullPointerException</li><li>1652892 Invalid hdr/ftr arg value causes build failure</li><li>1647950 PIs in DITA source are dropped in the processing pipeline</li><li>1644559 Force Toolkit to use private catalog to allow schemas to work properly</li><li>1642138 Move javamerge target out of build_template.xml</li><li>1643155 Map TOC is HTML even for transtype="xhtml"</li><li>1637564 topicpull breaks specializations of xref</li><li>1676968 Plugins adding to classpath break when basedir != dita.dir</li></ol>
+      </section></refbody><related-links><linklist><desc>SourceForge bugs, patches, and RFEs listed above can be found in SourceForge Bugs,
+          Patches, and RFE tracker pages</desc><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725074" scope="external"><linktext>Bugs tracker</linktext></link><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725076" scope="external"><linktext>Patches tracker</linktext></link><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725077" scope="external"><linktext>RFE tracker</linktext></link></linklist></related-links></reference>

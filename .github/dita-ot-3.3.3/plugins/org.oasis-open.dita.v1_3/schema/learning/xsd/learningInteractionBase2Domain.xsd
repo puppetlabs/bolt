@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Learning Interaction Base 2 Domain            -->
+<!-- VERSION:   1.3                                              -->
+<!-- DATE:      March 2014                                        -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identfier or an  -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Learning Interaction Base 2 Domain//EN"-->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for Learning Domain                   -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            March 2014                                        -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2014.                   -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic learningInteractionBase2-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="lcInteractionBase2">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcInteractionBase2"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcInteractionLabel2">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcInteractionLabel2"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="lcQuestionBase2">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="lcQuestionBase2"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="learningInteractionBase2-d-div">
+      <xs:choice>
+         <xs:element ref="lcInteractionBase2"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="lcInteractionBase2">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcInteractionBase2.class">
+               <xs:attribute ref="class"
+                             default="+ topic/div learningInteractionBase2-d/lcInteractionBase2 "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcInteractionBase2.class">
+      <xs:sequence>
+         <xs:group ref="lcInteractionBase2.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcInteractionBase2.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcInteractionBase2.content">
+      <xs:sequence>
+         <xs:group ref="lcInteractionLabel2" minOccurs="0"/>
+         <xs:group ref="lcQuestionBase2"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="basic.block"/>
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="txt.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcInteractionBase2.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcInteractionLabel2">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcInteractionLabel2.class">
+               <xs:attribute ref="class"
+                             default="+ topic/p   learningInteractionBase2-d/lcInteractionLabel2 "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcInteractionLabel2.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcInteractionLabel2.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcInteractionLabel2.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcInteractionLabel2.content">
+      <xs:sequence>
+         <xs:group ref="title.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcInteractionLabel2.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="lcQuestionBase2">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="lcQuestionBase2.class">
+               <xs:attribute ref="class"
+                             default="+ topic/div   learningInteractionBase2-d/lcQuestionBase2 "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="lcQuestionBase2.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="lcQuestionBase2.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="lcQuestionBase2.attributes"/>
+   </xs:complexType>
+   <xs:group name="lcQuestionBase2.content">
+      <xs:sequence>
+         <xs:group ref="div.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="lcQuestionBase2.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

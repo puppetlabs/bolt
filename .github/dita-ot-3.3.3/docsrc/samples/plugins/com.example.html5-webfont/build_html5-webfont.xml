@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<project>
+  <target name="dita2html5-webfont"
+       depends="dita2html5-webfont.init,
+                dita2html5"/>
+  <target name="dita2html5-webfont.init">
+    <property name="args.hdf"
+          location="${dita.plugin.com.example.html5-webfont.dir}/include/webfont.hdf.xml"/>
+    <property name="args.cssroot"
+          location="${dita.plugin.com.example.html5-webfont.dir}/css"/>
+    <property name="args.css" value="custom.css"/>
+    <property name="args.copycss" value="yes"/>
+    <property name="args.csspath" value="css"/>
+  </target>
+</project>

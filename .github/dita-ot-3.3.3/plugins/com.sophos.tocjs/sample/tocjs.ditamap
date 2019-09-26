@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+  
+  Copyright 2007 Shawn McKenzie
+  *-->
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN"
+ "../../../dtd/map.dtd">
+
+<map title="Documentation for tocjs">
+
+  <topicref href="concepts/about.xml"/>
+  <topicref href="concepts/install.xml">
+    <topicref href="tasks/integrate.xml"/>
+  </topicref>
+  <topicref locktitle="yes" navtitle="Customizing" href="concepts/customization.xml">
+    <topicref href="concepts/basefiles.xml"/>
+    <topicref href="concepts/anttasks.xml"/>
+    <topicref href="concepts/paths.xml">
+      <topicref href="tasks/ant-paths.xml"/>
+    </topicref>
+    <topicref href="concepts/css.xml"/>
+  </topicref>
+  <topicref href="concepts/knownissues.xml"/>
+  <topicref href="concepts/license.xml"></topicref>
+</map>

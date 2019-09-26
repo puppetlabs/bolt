@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="migrating-to-3.0">
+
+  <title>Migrating to release 3.0</title>
+  <titlealts>
+    <navtitle>To 3.0</navtitle>
+  </titlealts>
+
+  <shortdesc>DITA-OT 3.0 <ph id="summary">adds support for Markdown, normalized DITA output, and the alternative
+      authoring formats proposed for Lightweight DITA. The map-first preprocessing approach provides a modern
+      alternative to the default <codeph>preprocess</codeph> operation.</ph></shortdesc>
+  
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Lightweight DITA</indexterm>
+        <indexterm>GitHub</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section>
+      <note>This topic provides a summary of changes in DITA-OT 3.0 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the
+        <xref keyref="3.0-release-notes"/>.</note>
+    </section>
+
+    <section conkeyref="reusable-components/use-xslt2"/>
+
+    <section id="30-legacy-plugin-removal">
+      <title>Legacy plug-ins removed</title>
+      <div outputclass="div-index">
+        <indexterm>JavaHelp</indexterm>
+        <indexterm>deprecated features<indexterm>JavaHelp plug-in</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>JavaHelp</indexterm></indexterm>
+      </div>
+      <p>DITA-OT 3.0 no longer includes the following legacy transformation plug-ins in the default distribution:</p>
+      <table outputclass="table-hover" frame="none" colsep="0" rowsep="1">
+        <title>Legacy plug-ins</title>
+        <tgroup cols="2">
+          <colspec colwidth="1*"/>
+          <colspec colwidth="1*"/>
+          <thead>
+            <row>
+              <entry>Plug-in </entry>
+              <entry>Source code location</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>JavaHelp<indexterm>JavaHelp</indexterm></entry>
+              <entry>
+                <xref href="https://github.com/dita-ot/org.dita.javahelp" format="html" scope="external"/></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <note>If necessary, legacy plug-ins may be re-installed from earlier DITA-OT distributions, but they are no longer
+        actively maintained or supported by the core toolkit committers. The source code is available on GitHub for
+        anyone interested in maintaining the plug-ins for use with future toolkit versions.</note>
+      <p>To re-install the JavaHelp plug-in, run the following command:</p>
+      <codeblock><cmdname>dita</cmdname> <parmname>--install</parmname>=<filepath>https://github.com/dita-ot/org.dita.javahelp/archive/2.5.zip</filepath></codeblock>
+    </section>
+
+    <section id="map-first">
+      <title>Map-first preprocessing</title>
+      <p><ph conref="../reference/map-first-preprocessing.dita#ID/map-first-preproc-desc"/></p>
+      <p conkeyref="reusable-components/no-internal-preprocess2-ext"/>
+      <note type="tip">See
+        <xref keyref="map-first-preproc"/> for information on how to use (or test) map-first preprocessing, or revert to
+        the default <codeph>preprocess</codeph> target.</note>
+    </section>
+
+    <section>
+      <title>New <codeph>ant.import</codeph> extension point</title>
+      <p>A new extension point has been added to make it easier to add new targets to the Ant processing pipeline.</p>
+      <p>Earlier versions of DITA-OT use the <codeph>dita.conductor.target.relative</codeph> to call a wrapper file with
+        a dummy task that imports the Ant project file. This approach is still supported for backwards compatibility,
+        but the simpler <codeph>ant.import</codeph> approach should be used for all new customizations. </p>
+      <note type="tip">See
+        <xref keyref="plugin-anttarget"/> for details.</note>
+    </section>
+  </refbody>
+</reference>

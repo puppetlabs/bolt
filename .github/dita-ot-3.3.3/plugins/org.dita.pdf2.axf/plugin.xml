@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2015 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<plugin id="org.dita.pdf2.axf" version="3.3.3">
+  <require plugin="org.dita.pdf2"/>
+  <!-- extensions -->
+  <feature extension="depend.org.dita.pdf2.init.pre" value="transform.fo2pdf.ah.init"/>
+  <feature extension="depend.org.dita.pdf2.format" value="transform.fo2pdf.ah"/>
+  <feature extension="dita.conductor.lib.import" file="lib/axf.jar"/>
+  <transtype name="pdf" desc="PDF">
+    <param name="pdf.formatter" desc="Specifies the XSL processor." type="enum">
+      <val desc="Antenna House Formatter">ah</val>
+    </param>
+    <param name="publish.required.cleanup" desc="Specifies whether draft-comment and required-cleanup elements are included in the output." type="enum">
+      <val>yes</val>
+      <val>no</val>
+    </param>
+    <param name="axf.opt" desc="Specifies the user configuration file for Antenna House Formatter." type="file"/>
+    <param name="axf.cmd" desc="Specifies the path to the Antenna House Formatter executable." type="file"/>
+  </transtype>
+  <feature extension="ant.import" file="build_axf.xml"/>
+  <feature extension="dita.conductor.pdf2.formatter.check" value="ah"/>
+  <template file="xsl/fo/topic2fo_shell_axf_template.xsl"/>
+</plugin>

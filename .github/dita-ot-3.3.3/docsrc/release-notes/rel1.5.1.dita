@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.5.1" ditaarch:DITAArchVersion="1.2"><title>DITA OT Release 1.5.1</title><shortdesc>Release 1.5.1 is a maintenance release based on Committee Draft 01 of the DITA 1.2
+      standard.</shortdesc><refbody><section id="section_uuo_odj_nc">
+        <ul><li><b>Release date</b>: June 18, 2010</li><li><b>Supports</b>: DITA 1.0 through 1.2 (Committee Draft 02 level)</li><li><b>Download at</b>: <xref format="html" href="http://sourceforge.net/projects/dita-ot/files/DITA-OT%20Stable%20Release/" scope="external">DITA-OT Latest Stable Build</xref></li><li><b>Which package is for me?</b> See <xref format="html" href="http://dita.xml.org/freelinking/DITA-OT%2520Packages" scope="external">DITA-OT
+              Packages</xref>. </li></ul>
+        <p>This is the same version of the standard used for the DITA 1.2 Public Review. Release
+          1.5.1 contains many fixes and minor enhancements. It also includes a preview of a new
+          output transform to the Open Document Format; this transform will be completed in a later
+          release.</p>
+        <p>Release 1.5.1 was developed using a series of test builds released to the community every
+          three weeks. Each item in the list below indicates which test build first contained the
+          update. There were seven total test builds.</p>
+      </section><section id="section_bsu_odj_nc">
+        <title>General Enhancements</title>
+        <ol><li>Update to latest copy of DITA 1.2 Draft DTDs and Schemas (last update in Milestone
+            5)</li></ol>
+      </section><section id="section_vib_pdj_nc">
+        <title>14 SourceForge Enhancements Added</title>
+        <ol><li>2797337 Support for ODF output transform (first prototype available in Milestone 2,
+            further updates in each milestone)</li><li>2703335 Reduce duplicated code in XHTML &lt;note&gt; processing (Milestone 3)</li><li>2976463 Provide finer grained control of links in PDF (include reltable and in-topic
+            links, without parent/child links) (Milestone 4)</li><li>2971536 New Java options for existing Ant parameters (Milestone 4)</li><li>2979084 Obey the "args.draft" parameter (Milestone 5)</li><li>2990783 allow caller-provided IndexTermCollection (Milestone 6 contains the core code
+            updates; M7 contains the full enhancement)</li><li>3001750 Shortdesc from map should override link description in PDF (Milestone 7)</li><li>3004305 Notes with type="warning" need styling / localization in XHTML (Milestone
+            7)</li><li>3004859 "eclipsecontent" transform should drop debug info (Milestone 7)</li><li>2892706 Don't delete the FO file (new option to preserve topic.fo) (Milestone 7)</li><li>2928584 Add general model for end-of-topic processing in PDF (Milestone 7)</li><li>3006675 Support new DITA 1.2 &lt;stepsection&gt; element in PDF (Milestone 7)</li><li>3006847 Add generated task headers to PDF (using the option that works for XHTML in
+            DITA-OT 1.5) (Milestone 7)</li><li>2987769 Add support for Eclipse Help index redirects (Milestone 7)</li></ol>
+      </section><section id="section_dqj_pdj_nc">
+        <title>2 SourceForge Patches Added</title>
+        <ol><li>2914475 Use Xerces Grammar Pool to Improve Performance (Milestone 1)</li><li>2991688 Refine package build Ant (Milestone 6)</li></ol>
+      </section><section id="section_wsw_pdj_nc">
+        <title>46 SourceForge Bugs Fixed</title>
+        <ol><li>2916469 @locktitle not respected by preprocessor (Milestone 1)</li><li>2917809 need empty lib/saxon directory for minimum and standard pkg. (Milestone
+            1)</li><li>2925636 Build fails when excluded section contains a table (Milestone 1)</li><li>2926417 Absolute file: URLs are not resolved. (Milestone 1)</li><li>2930109 Move meta module pushes content into peer topic. (Milestone 1)</li><li>1852808 args.css requires dummy file. (Milestone 1)</li><li>2952956 Imagemap processing drops outputclass from image (Milestone 3)</li><li>2953706 Minor improvements to "garage" samples (Milestone 3)</li><li>2961909 /onlytopicinmap does not respect conref (Milestone 3)</li><li>2957456 conkeyref breaks when topic is in subdir (Milestone 3)</li><li>2962813 stepsection throws off numbering in links to steps (Milestone 3)</li><li>2959588 Template Processor Doesn't handle XSLT atts that require ' (Milestone 3)</li><li>2914574 plus-htmlhelp-alias-map: using same extension point twice (Milestone 3)</li><li>2957938 coderef not working everytime (Milestone 3)</li><li>2962781 html documentation out of date (Milestone 3)</li><li>2952956 refactored XSL code in ut-d.xsl (Milestone 3)</li><li>2954819 NullPointer while processing simple BookMap (Milestone 3)</li><li>2954154 Updated default version from 1.0 to 1.0.0 (Milestone 3)</li><li>2970471 XSLFO test for @compact wrong (Milestone 4 for PDF, Milestone 5 for
+            LegacyPDF)</li><li>2972043 Setting onlytopicinmap causes a blank imagelist (Milestone 4)</li><li>2974667 Integrator adds spaces into XML Catalog entries (Milestone 4)</li><li>2986492 Duplicate parameter in XHTML code (Milestone 5)</li><li>2982485 Cannot read a document that was written during the same transform (Milestone
+            5)</li><li>2981216 &lt;tm&gt; @tmclass requires IBM-specific values (Milestone 5)</li><li>2979361 Java stack traces in OT log (Milestone 5)</li><li>2979328 Output parameters info at INFO level (Milestone 5)</li><li>2978858 keyref processing doesn't respect basedir (Milestone 5)</li><li>2990162 Conref to elements in same DITA file throw parsing errors (Milestone 6)</li><li>3000677 msgph and systemoutput should use &lt;samp&gt; instead of &lt;tt&gt; (Milestone
+            7)</li><li>3004220 &lt;tm&gt; elements dropped when keyref text resolved (Milestone 7)</li><li>2987322 Navtitle attribute of glossarylist breaks PDF (Milestone 7)</li><li>2916474 Inappropriate match on mapgroup/topichead in PDF code (Milestone 7)</li><li>2916408 Topichead with &lt;navtitle&gt; not processed same as @navtitle in PDF (Milestone
+            7)</li><li>3006443 CSS for prereq links indents prereq element (Milestone 7)</li><li>2607892 (Plus Plug-in) plus-allhtml-encoding: map x-windows-950 to Big5 (Milestone
+            7)</li><li>2385466 Handle @font-family="inherit" (Milestone 7)</li><li>2928540 Shortdesc should align with body in PDF (use topic__shortdesc) (Milestone
+            7)</li><li>1839827 PDF does not properly process &lt;xref&gt; to &lt;li&gt; elements (Milestone 7)</li><li>2521819 PDF topic title widowed due to fo:marker placed in separate block (Milestone
+            7)</li><li>1385654 docbook/topic2db.xsl - better linking support (Milestone 7)</li><li>3004550 Conkeyref does not work if key referenced is not in same folder (Milestone
+            7)</li><li>3004060 keyref/id not producing link in PDF output (Milestone 7)</li><li>3001705 conkeyref doesn't work across ditamaps (Milestone 7)</li><li>3000604 Legacy PDF: empty @column-number causes errors (Milestone 7)</li><li>3013079 Keyref handling does not respect scope="external" (Final build)</li><li>3005748 XHTML: Topics w/ @print set to "printonly" are included (Final build)</li></ol>
+      </section></refbody><related-links><linklist><desc>SourceForge bugs, patches, and RFEs listed above can be found in SourceForge Bugs,
+        Patches, and RFE tracker pages</desc><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725074" scope="external"><linktext>Bugs tracker</linktext></link><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725076" scope="external"><linktext>Patches tracker</linktext></link><link href="http://sourceforge.net/tracker/?group_id=132728&amp;atid=725077" scope="external"><linktext>RFE tracker</linktext></link></linklist></related-links></reference>

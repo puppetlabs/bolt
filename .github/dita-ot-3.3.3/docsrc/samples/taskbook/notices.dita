@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2007 All Rights Reserved. -->
+
+<concept id="notices" xml:lang="en-us">
+  <title>Notice</title>
+  <shortdesc>This information was developed for products and services offered in the U.S.A.</shortdesc>
+  <conbody>
+    <p>This product is meant for educational purposes only. Some of the trademarks mentioned in this product appear for
+      identification purposes only. Not responsible for direct, indirect, incidental or consequential damages resulting
+      from any defect, error or failure to perform. Any resemblance to real persons, living or dead is purely
+      coincidental. Void where prohibited. Some assembly required. Batteries not included. Use only as directed. Do not
+      use while operating a motor vehicle or heavy equipment. Do not fold, spindle or mutilate. Do not stamp. No
+      user-serviceable parts inside. Subject to change without notice. Drop in any mailbox. No postage necessary if
+      mailed in the United States. Postage will be paid by addressee. Post office will not deliver without postage. Some
+      equipment shown is optional. Objects in mirror may be closer than they appear. Not recommended for children. Your
+      mileage may vary.</p>
+    <p>No other warranty expressed or implied. This supersedes all previous notices.</p>
+    <section>
+      <title>COPYRIGHT LICENSE:</title>
+      <p>This information contains sample application programs in source language, which illustrate programming
+        techniques on various operating platforms. You may copy, modify, and distribute these sample programs in any
+        form without payment to IBM, for the purposes of developing, using, marketing or distributing application
+        programs conforming to the application programming interface for the operating platform for which the sample
+        programs are written. These examples have not been thoroughly tested under all conditions. Retro Tools,
+        therefore, cannot guarantee or imply reliability, serviceability, or function of these programs.</p>
+    </section>
+  </conbody>
+</concept>

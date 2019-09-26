@@ -1,0 +1,59 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="In DITA-OT 2.0, XSLT templates were converted to XSLT 2.0, variable typing was implemented, and some older templates were refactored or removed. In addition, the dita command simplifies distribution of plugins by allowing installation from a URL."><meta name="DC.subject" content=", as, command, dita, plug-ins, uninstalling, removing, deinstalling, XSLT, 2.0, Customization directory"><meta name="keywords" content=", as, command, dita, plug-ins, uninstalling, removing, deinstalling, XSLT, 2.0, Customization directory"><meta name="DC.relation" scheme="URI" content="../topics/migration.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="migrating-to-2.0"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Migrating to release 2.0</title></head><body id="migrating-to-2.0"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a><ul><li><a href="../topics/migrating-to-3.3.html">To 3.3</a></li><li><a href="../topics/migrating-to-3.2.html">To 3.2</a></li><li><a href="../topics/migrating-to-3.1.html">To 3.1</a></li><li><a href="../topics/migrating-to-3.0.html">To 3.0</a></li><li><a href="../topics/migrating-to-2.5.html">To 2.5</a></li><li><a href="../topics/migrating-to-2.4.html">To 2.4</a></li><li><a href="../topics/migrating-to-2.3.html">To 2.3</a></li><li><a href="../topics/migrating-to-2.2.html">To 2.2</a></li><li><a href="../topics/migrating-to-2.1.html">To 2.1</a></li><li class="active"><a href="../topics/migrating-to-2.0.html">To 2.0</a></li><li><a href="../topics/migrating-to-1.8.html">To 1.8</a></li><li><a href="../topics/migrating-to-1.7.html">To 1.7</a></li><li><a href="../topics/migrating-to-1.6.html">To 1.6</a></li><li><a href="../topics/migrating-to-1.5.4.html">To 1.5.4</a></li></ul></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+
+  <h1 class="title topictitle1" id="ariaid-title1">Migrating to release 2.0</h1>
+  
+
+  
+  
+
+  <div class="body refbody"><p class="shortdesc">In DITA-OT 2.0, XSLT templates were converted to XSLT 2.0, variable typing was implemented, and some older
+    templates were refactored or removed. In addition, the <span class="keyword cmdname">dita</span> command simplifies distribution of
+    plugins by allowing installation from a URL.
+  </p>
+    <section class="section">
+      <div class="note note note_note"><span class="note__title">Note:</span> This topic provides a summary of changes in DITA-OT 2.0 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the <a class="xref" href="https://www.dita-ot.org/2.0/readme/changes/rel2.0.html" target="_blank">DITA-OT 2.0 Release Notes</a>.</div>
+    </section>
+    <div class="bodydiv refbodydiv">
+      <section class="section"><h2 class="title sectiontitle">All transformations — variable typing</h2>
+        
+        <p class="p">XSLT stylesheets were converted to XSLT 2.0. With that change, variable types were also implemented. Plug-ins
+          that change template variable values will need to make the following changes:</p>
+        <ul class="ul">
+          <li class="li">Declare the same types defined in the default templates with <code class="keyword markupname xmlatt">@as</code>.</li>
+          <li class="li">Ensure that the generated values conform to the declared type.</li>
+        </ul>
+      </section>
+      <div class="example">
+        <p class="p">For example:</p>
+        <pre class="pre codeblock language-xml"><code>&lt;xsl:variable name="urltest"&gt;
+&lt;xsl:variable name="urltest" <strong class="ph b">as="xs:boolean"</strong>&gt;</code></pre>
+      </div>
+      <section class="section"><h2 class="title sectiontitle">All transformations — refactoring</h2>
+        
+        <p class="p">Much of the toolkit code was refactored for release 2.0. Customization changes that were based on a specific
+          template in a previous version of the toolkit might not work because the modified template is no longer used.
+          If this is the case, the changes will need to be reimplemented based on the new XSLT templates.</p>
+      </section>
+    </div>
+    <section class="section"><h2 class="title sectiontitle">HTML5</h2>
+      
+      <p class="p">A new <span class="keyword option">HTML5</span> transformation type has been added. Customizations that previously modified the
+        XHTML output to generate valid HTML5 should still work, but basing your customization on the new transformation
+        type might simplify the customization and reduce the work required to maintain compatibility with future
+        versions of the toolkit.</p>
+      <div class="note note note_note"><span class="note__title">Note:</span> The <span class="keyword option">HTML5</span> transformation was refactored with release 2.2. Before basing your customization
+        on the changes in release 2.0, consider whether you might want to move to release 2.2 instead. See <a class="xref" href="migrating-to-2.2.html" title="In DITA-OT 2.2, the HTML5 transformation was refactored as its own plug-in and separate plug-ins were created for each of the rendering engine-specific PDF transformations.">Migrating to release 2.2</a>.</div>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Plug-in installation and distribution</h2>
+      
+      <p class="p">Plug-ins can now be installed or uninstalled from a ZIP archive using the new <span class="keyword cmdname">dita</span> command.
+        Plug-ins can also be installed from a referenced URL. See <a class="xref" href="../parameters/dita-command-arguments.html" title="The dita command takes mandatory arguments to process DITA content, manage plug-ins, or print information about the command. Options can be used to modify the command behavior or specify additional configuration parameters.">Arguments and options for the dita command</a>.</p>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/migration.html" title="If you have XSL transformation overrides, plug-ins or other customizations written prior to DITA-OT 3.3, you may need to make changes to ensure your overrides work properly with the latest toolkit versions.">Migrating customizations</a></div></div></nav></article></main></body></html>

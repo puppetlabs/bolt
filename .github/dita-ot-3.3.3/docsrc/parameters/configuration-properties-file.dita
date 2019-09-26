@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="configuration" xml:lang="en">
+  <title>The <filepath>configuration.properties</filepath> file</title>
+  <titlealts>
+    <navtitle><filepath>configuration.properties</filepath></navtitle>
+  </titlealts>
+  <shortdesc>The <filepath>configuration.properties</filepath> file controls certain common properties, as well as some
+    properties that control PDF processing.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>configuration properties<indexterm>default.cascade</indexterm>
+          <indexterm>org.dita.pdf2.i18n.enabled</indexterm>
+          <indexterm>plugin.ignores</indexterm>
+          <indexterm>plugin.order</indexterm>
+          <indexterm>plugindirs</indexterm>
+          <indexterm>temp-file-name-scheme</indexterm>
+          <indexterm>cli.color</indexterm>
+          <indexterm>registry</indexterm>
+          <indexterm>default.coderef-charset</indexterm>
+        </indexterm>
+        <indexterm>files <indexterm>config/configuration.properties file</indexterm>
+        </indexterm>
+        <indexterm>PDF<indexterm>configuration properties</indexterm>
+        </indexterm>
+        <indexterm><xmlatt>cascade</xmlatt></indexterm>
+        <indexterm>macOS<indexterm>colored console output</indexterm></indexterm>
+        <indexterm>Linux<indexterm>colored console output</indexterm></indexterm>
+        <indexterm>Windows<indexterm>colored console output</indexterm></indexterm>
+        <indexterm>command line<index-see-also>dita command</index-see-also></indexterm>
+        <indexterm>terminal<index-see>command line</index-see></indexterm>
+        <indexterm>grammar files<index-see-also>schema</index-see-also><!-- LE: https://github.com/dita-ot/dita-ot/issues/3314 -->
+          <index-see-also>DTD</index-see-also></indexterm>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>colored console output</indexterm></indexterm>
+        <indexterm>metadata<indexterm><xmlatt>cascade</xmlatt></indexterm></indexterm>
+        <indexterm>DITA 1.3<indexterm><xmlatt>cascade</xmlatt></indexterm></indexterm>
+        <indexterm>default.cascade</indexterm>
+        <indexterm>org.dita.pdf2.i18n.enabled</indexterm>
+        <indexterm>plugin.ignores</indexterm>
+        <indexterm>plugin.order</indexterm>
+        <indexterm>plugindirs</indexterm>
+        <indexterm>temp-file-name-scheme</indexterm>
+        <indexterm>cli.color</indexterm>
+        <indexterm>registry</indexterm>
+        <indexterm>default.coderef-charset</indexterm>
+        <indexterm>Java<indexterm>temporary file names</indexterm></indexterm>
+        <indexterm>temporary file names</indexterm>
+        <indexterm>catalog<indexterm>import precedence</indexterm></indexterm>
+        <indexterm>internationalization<index-see>I18N</index-see></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <p>The contents of the <filepath>config/configuration.properties</filepath> file are added to the DITA-OT
+        configuration in the <codeph>dost-configuration.jar</codeph> file when the plug-in integration process runs. The
+        following properties are typically set in this file:</p>
+      <parml>
+        <plentry id="default-cascade">
+          <pt><parmname>default.cascade</parmname></pt>
+          <pd>
+            <p>Specifies the processing default value for the DITA 1.3 <xmlatt>cascade</xmlatt> attribute, which
+              determines how map-level metadata attributes are applied to the children of elements where the attributes
+              are specified. DITA-OT uses the <option>merge</option> value by default for backwards compatibility with
+              DITA 1.2 and earlier.</p>
+            <note type="warning" id="protected-config-props">This property can only be set in
+                <filepath>configuration.properties</filepath> and should not be modified.</note></pd>
+        </plentry>
+        <plentry id="temp-file-name-scheme">
+          <pt><parmname>temp-file-name-scheme</parmname></pt>
+          <!-- org.dita.dost.module.GenMapAndTopicListModule$DefaultTempFileScheme -->
+          <pd>
+            <p>This setting specifies the name of the Java class that defines how the source URL of a topic is mapped to
+              the URL of the temporary file name. The current default method uses a 1:1 mapping, though future
+              implementations may use alternative approaches such as hashes or full absolute paths as file names.</p>
+            <note conref="#configuration/protected-config-props"/>
+          </pd>
+        </plentry>
+        <plentry id="cli-color" rev="2.5">
+          <pt><parmname>cli.color</parmname></pt>
+          <pd>
+            <p>Specifies whether the <cmdname>dita</cmdname> command prints colored output on the command line console.
+              When set to <option>true</option>, error messages in <cmdname>dita</cmdname> command output will appear in
+              red on terminals that support
+              <xref href="https://en.wikipedia.org/wiki/ANSI_escape_code" format="html" scope="external">ANSI escape
+                codes</xref>, such as on Linux or macOS. Set to <option>false</option> to disable the color. (Colored
+              output is not supported on Windows consoles such as <cmdname>cmd.exe</cmdname> or PowerShell).</p>
+          </pd>
+        </plentry>
+        <plentry id="plugindirs">
+          <pt><parmname>plugindirs</parmname></pt>
+          <pd id="plugindirs.desc">A semicolon-separated list of directory paths that DITA-OT searches for plug-ins to
+            install; any relative paths are resolved against the DITA-OT base directory. Any immediate subdirectory that
+            contains a <filepath>plugin.xml</filepath> file is installed.</pd>
+        </plentry>
+        <plentry id="plugin.ignores">
+          <pt><parmname>plugin.ignores</parmname></pt>
+          <pd id="plugin.ignores.desc">A semicolon-separated list of directory names to be ignored during plug-in
+            installation; any relative paths are resolved against the DITA-OT base directory.</pd>
+        </plentry>
+        <plentry id="plugin-order">
+          <pt><parmname>plugin.order</parmname></pt>
+          <pd>Defines the order in which plug-ins are processed. In XML catalog files, the order of imports is
+            significant. If multiple plug-ins define the same thing (differently), the first catalog entry “wins”.
+            DITA-OT uses this property to define the order in which catalog entries are written. This mechanism is
+            currently used to ensure that DITA 1.3 grammar files take precedence over their DITA 1.2 equivalents.</pd>
+        </plentry>
+        <plentry id="registry">
+          <pt><parmname>registry</parmname></pt>
+          <pd>Defines the list (and order) of plug-in repositories that are searched for available plug-ins during the
+            installation process. In addition to the main plug-in registry at
+            <xref keyref="site-plugin-registry"/>, you can create a registry of your own to store the custom plug-ins
+            for your company or organization. To add a new entry, append the URL for your custom registry directory to
+            the <codeph>registry</codeph> key value, separating each entry with a space. For more information, see
+            <xref keyref="plugins-registry"/>.</pd>
+        </plentry>
+        <plentry conref="ant-parameters-details.dita#pdf/org.dita.pdf2.i18n.enabled">
+          <pt/>
+          <pd/>
+        </plentry>
+        <plentry id="charset">
+          <pt><parmname>default.coderef-charset</parmname></pt>
+          <pd>As of DITA-OT 3.3, the default character set for code references can be changed by specifying one of the
+            character set values supported by the Java
+            <xref format="html" href="https://docs.oracle.com/javase/8/docs/api/java/nio/charset/Charset.html"
+              scope="external">Charset</xref> class.</pd>
+        </plentry>
+      </parml>
+    </section>
+  </refbody>
+  <related-links>
+    <link keyref="dita13-spec-metadata-cascade"/>
+    <link keyref="dita13-spec-metadata-cascade-example"/>
+    <link keyref="jelovirt-on-pdf2-i18n"/>
+  </related-links>
+</reference>

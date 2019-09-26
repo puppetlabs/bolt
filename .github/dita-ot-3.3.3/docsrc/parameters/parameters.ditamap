@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>Parameter Reference</title>
+  <topicref keyref="dita-command-arguments"/>
+  <topicref keyref="parameters_intro" keys="dita-ot-params">
+    <topicref keyref="parameters-base"/>
+    <topicref keyref="parameters-pdf"/>
+    <topicref keyref="parameters-base-html"/>
+    <topicref keyref="parameters-html5"/>
+    <topicref keyref="parameters-xhtml"/>
+    <topicref keyref="parameters-htmlhelp" locktitle="yes" platform="windows">
+      <topicmeta>
+        <navtitle>HTML Help</navtitle>
+      </topicmeta>
+    </topicref>
+    <topicref keyref="parameters-eclipsehelp"/>
+    <topicref keyref="parameters-other"/>
+    <topicref keyref="ant-parameters-details" keys="parameters-push" processing-role="resource-only" toc="no"/>
+  </topicref>
+  <topicref keyref="configuration-properties">
+    <topicref keyref="local-properties-file"/>
+    <topicref keyref="plugin-properties-file"/>
+    <topicref keyref="configuration-properties-file"/>
+    <topicref keyref="internal-ant-properties"/>
+  </topicref>
+</map>

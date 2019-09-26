@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="configuring-the-dita-ot">
+  <title>Configuration properties</title>
+  <shortdesc>DITA-OT uses <filepath>.properties</filepath> files and internal properties that store configuration
+    settings for the toolkit and its plug-ins. Configuration properties are available to both Ant and Java processes,
+    but unlike argument properties, they cannot be set at run time.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>command line<indexterm>properties</indexterm></indexterm>
+        <indexterm>properties</indexterm>
+        <indexterm>Ant<indexterm>properties</indexterm></indexterm>
+        <indexterm>Java<indexterm>properties</indexterm></indexterm>
+        <indexterm>Ant<indexterm>configuring</indexterm></indexterm>
+        <indexterm>Java<indexterm>configuring</indexterm></indexterm>
+        <indexterm>Ant<indexterm>precedence</indexterm></indexterm>
+        <indexterm>Java<indexterm>precedence</indexterm></indexterm>
+        <indexterm><filepath>local.properties file</filepath></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <p>When DITA-OT starts the Ant process, it looks for property values in the following order and locations:</p>
+      <ol>
+        <li>Any property passed to Ant from the command line with <parmname>-Dproperty</parmname> or
+            <parmname>--property</parmname>=<option>value</option></li>
+        <li>A custom property file passed with <parmname>--propertyfile</parmname></li>
+        <li>A <filepath>local.properties</filepath> file in the root directory of the DITA-OT installation</li>
+        <li>The <filepath>lib/org.dita.dost.platform/plugin.properties</filepath> file</li>
+        <li>The <filepath>configuration.properties</filepath> file</li>
+      </ol>
+      <p>If a given property is set in multiple places, the first value “wins” and subsequent entries for the same
+        property are ignored.</p>
+      <p>You can use this mechanism to override DITA-OT default settings for your environment by passing parameters to
+        the <cmdname>dita</cmdname> command with <parmname>--property</parmname>=<option>value</option>, or using
+        entries in <filepath>.properties</filepath> files.</p>
+    </section>
+  </refbody>
+</reference>

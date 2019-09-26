@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="availabletransforms" xml:lang="en-US">
+  <title>DITA-OT transformations (output formats)</title>
+  <titlealts>
+    <navtitle>Output formats</navtitle>
+  </titlealts>
+  <shortdesc>DITA Open Toolkit ships with several core transformations that generate different output formats from DITA
+    content. Each transformation represents an implementation of the processing that is defined by OASIS in the DITA
+    specification.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>output formats</indexterm>
+        <indexterm>transformations</indexterm>
+        <indexterm>DITA specification</indexterm>
+        <indexterm>plug-ins<indexterm>default, list of</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+</concept>

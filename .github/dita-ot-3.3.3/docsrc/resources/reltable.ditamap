@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map id="reltable">
+  <title>Relationship tables</title>
+  <reltable>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-addgeneratedtext">
+          <topicmeta>
+            <linktext>How to add support for new languages in HTML</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell>
+        <topicref keyref="globalization-languages">
+          <topicmeta>
+            <linktext>Languages supported by the core toolkit</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+    </relrow>
+  </reltable>
+  <reltable>
+    <title>CTR: Ant topics</title>
+    <relheader>
+      <relcolspec type="concept"/>
+      <relcolspec type="task"/>
+      <relcolspec type="reference"/>
+    </relheader>
+    <relrow>
+      <relcell>
+        <topicref keyref="ant"/>
+      </relcell>
+      <relcell>
+        <topicgroup collection-type="family">
+          <topicref keyref="building-with-ant"/>
+          <topicref keyref="creating-an-ant-build-script"/>
+        </topicgroup>
+      </relcell>
+      <relcell>
+        <topicref keyref="parameters_intro" linking="targetonly"/>
+        <topicref keyref="ant-manual">
+          <topicmeta>
+            <linktext>Apache Ant documentation</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2eclipsehelp">
+          <topicmeta>
+            <linktext>Eclipse help transformation</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell/>
+      <relcell>
+        <topicref keyref="parameters-base"/>
+        <topicref keyref="parameters-base-html"/>
+        <topicref keyref="parameters-eclipsehelp"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2htmlhelp" platform="windows">
+          <topicmeta>
+            <linktext>HTML help transformation</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell/>
+      <relcell>
+        <topicref keyref="parameters-base"/>
+        <topicref keyref="parameters-base-html"/>
+        <topicref keyref="parameters-htmlhelp"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2pdf">
+          <topicmeta>
+            <linktext>PDF transformation</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell/>
+      <relcell>
+        <topicref keyref="parameters-base"/>
+        <topicref keyref="parameters-pdf"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2xhtml">
+          <topicmeta>
+            <linktext>XHTML transformation</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell>
+        <topicref keyref="html-customization-parameters"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="parameters-base"/>
+        <topicref keyref="parameters-base-html"/>
+        <topicref keyref="parameters-xhtml"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2html5">
+          <topicmeta>
+            <linktext>HTML5 transformation</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell>
+        <topicref keyref="html-customization-parameters"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="parameters-base"/>
+        <topicref keyref="parameters-base-html"/>
+        <topicref keyref="parameters-html5"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2markdown" type="topic">
+          <topicmeta>
+            <linktext>Markdown transformations</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell/>
+      <relcell>
+        <topicref keyref="parameters-base"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2dita" type="topic">
+          <topicmeta>
+            <linktext>Normalized DITA transformations</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell/>
+      <relcell>
+        <topicref keyref="parameters-base"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2tocjs">
+          <topicmeta>
+            <linktext>TocJS transformation</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell/>
+      <relcell>
+        <topicref keyref="parameters-base"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2troff">
+          <topicmeta>
+            <linktext>troff transformation</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+      <relcell/>
+      <relcell>
+        <topicref keyref="parameters-base"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell/>
+      <relcell>
+        <topicref keyref="html-customization-plugin-bundle-css"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="parameters-base-html"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell/>
+      <relcell>
+        <topicref keyref="html-customization-plugin-webfont"/>
+        <topicref keyref="html-customization-plugin-javascript"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="parameters-base-html"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell/>
+      <relcell>
+        <topicref keyref="increasing-the-jvm" linking="targetonly"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="parameters-other"/>
+        <topicref keyref="other-errors"/>
+      </relcell>
+    </relrow>
+  </reltable>
+  <reltable>
+    <title>Source and target</title>
+    <relheader>
+      <relcolspec linking="sourceonly"/>
+      <relcolspec linking="targetonly"/>
+    </relheader>
+    <relrow>
+      <relcell>
+        <topicref keyref="parameters-eclipsehelp"/>
+        <topicref keyref="parameters-htmlhelp"/>
+        <topicref keyref="parameters-pdf"/>
+        <topicref keyref="parameters-xhtml"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="parameters-base"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2eclipsehelp"/>
+        <topicref keyref="dita2html5"/>
+        <topicref keyref="dita2htmlhelp"/>
+        <topicref keyref="dita2xhtml"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="generate-copy-outer"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2pdf"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="pdf2-creating-change-bars"/>
+      </relcell>
+    </relrow>
+  </reltable>
+  <reltable>
+    <title>Reference to reference: Bi-directional links</title>
+    <relheader>
+      <relcolspec type="reference"/>
+      <relcolspec type="reference"/>
+    </relheader>
+    <relrow>
+      <relcell>
+        <topicref keyref="parameters-base-html"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="parameters-eclipsehelp"/>
+        <topicref keyref="parameters-html5"/>
+        <topicref keyref="parameters-htmlhelp"/>
+        <topicref keyref="parameters-xhtml"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="other-errors"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="parameters-other"/>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="extension-points-in-org.dita.base"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-extension-points-pre-processing"/>
+        <topicref keyref="plugin-extension-points-support"/>
+        <topicref keyref="plugin-extension-points-general"/>
+      </relcell>
+    </relrow>
+  </reltable>
+  <reltable>
+    <title>Task to task: Bi-directional links</title>
+    <relheader>
+      <relcolspec type="task"/>
+      <relcolspec type="task"/>
+    </relheader>
+    <relrow>
+      <relcell>
+        <topicref keyref="html-customization-css"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="html-customization-plugin-bundle-css"/>
+      </relcell>
+    </relrow>
+  </reltable>
+  <reltable>
+    <title>External resources</title>
+    <relrow>
+      <relcell>
+        <topicref keyref="dita2eclipsehelp"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="eclipse-website">
+          <topicmeta>
+            <linktext>Official Eclipse website</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="globalization"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="dita12-spec-l10n" type="reference">
+          <topicmeta>
+            <linktext>Localization overview in the OASIS DITA standard</linktext>
+          </topicmeta>
+        </topicref>
+      </relcell>
+    </relrow>
+  </reltable>
+  <reltable>
+    <title>Plugins</title>
+    <relheader>
+      <relcolspec type="reference"/>
+      <relcolspec type="reference"/>
+    </relheader>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugin-configfile"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugin-newtranstype" type="task"/>
+        <topicref keyref="plugin-sample"/>
+      </relcell>
+    </relrow>
+  </reltable>
+  <reltable>
+    <title>Plugins</title>
+    <relheader>
+      <relcolspec type="task"/>
+      <relcolspec linking="targetonly" type="task"/>
+    </relheader>
+    <relrow>
+      <relcell>
+        <topicref keyref="pdf-customization-example"/>
+        <topicref keyref="plugin-antpreprocess"/>
+        <topicref keyref="plugin-anttarget"/>
+        <topicref keyref="plugin-javalib"/>
+        <topicref keyref="plugin-messages"/>
+        <topicref keyref="plugin-newtranstype"/>
+        <topicref keyref="plugin-overridestyle"/>
+        <topicref keyref="plugin-xmlcatalog"/>
+        <topicref keyref="plugin-xsltparams"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="plugins-installing"/>
+      </relcell>
+    </relrow>
+  </reltable>
+  <reltable>
+    <title>Source and target: Troubleshooting topics</title>
+    <relheader>
+      <relcolspec linking="sourceonly"/>
+      <relcolspec linking="targetonly"/>
+    </relheader>
+    <relrow>
+      <relcell>
+        <topicref keyref="other-errors"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="release-notes"/>
+        <topicref keyref="installing-client"/>
+      </relcell>
+    </relrow>
+  </reltable>
+</map>

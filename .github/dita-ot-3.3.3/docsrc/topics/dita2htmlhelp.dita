@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="dita2htmlhelp" xml:lang="en-US">
+  <title>HTML Help</title>
+  <shortdesc>The <option>htmlhelp</option> transformation generates HTML output, CSS files, and the control files that
+    are needed to produce a Microsoft Compiled HTML Help (.chm) file.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>transformations<indexterm>HTML Help</indexterm></indexterm>
+        <indexterm>HTML Help<index-see-also>transformations</index-see-also></indexterm>
+        <indexterm>CHM<index-see>HTML Help</index-see></indexterm>
+        <indexterm>Microsoft HTML Help Workshop</indexterm>
+        <indexterm>.hhc</indexterm>
+        <indexterm>.hhk</indexterm>
+        <indexterm>.hhp</indexterm>
+        <indexterm>plug-ins<indexterm>dita2htmlhelp</indexterm></indexterm>
+        <indexterm>dita2htmlhelp</indexterm>
+        <indexterm>CSS<indexterm>HTML Help</indexterm></indexterm>
+        <indexterm>index<indexterm>HTML Help</indexterm></indexterm>
+        <indexterm>table of contents<indexterm>HTML Help</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>In addition to the HTML output and CSS files, this transformation returns the following files, where
+        <varname>mapname</varname> is the name of the master DITA map.</p>
+    <simpletable outputclass="table-hover" frame="all" relcolwidth="2* 3*">
+      <sthead>
+        <stentry>File name</stentry>
+        <stentry>Description</stentry>
+      </sthead>
+      <strow>
+        <stentry><filepath><varname>mapname</varname>.hhc</filepath></stentry>
+        <stentry>Table of contents</stentry>
+      </strow>
+      <strow>
+        <stentry><filepath><varname>mapname</varname>.hhk</filepath></stentry>
+        <stentry>Sorted index</stentry>
+      </strow>
+      <strow>
+        <stentry><filepath><varname>mapname</varname>.hhp</filepath></stentry>
+        <stentry>HTML Help project file</stentry>
+      </strow>
+      <strow>
+        <stentry><filepath><varname>mapname</varname>.chm</filepath></stentry>
+        <stentry>
+          <p>Compiled HTML Help file</p>
+          <note>The compiled file is only generated if the HTML Help Workshop is installed on the build system.</note>
+        </stentry>
+      </strow>
+    </simpletable>
+    <p>To run the HTML Help transformation, set the <parmname>transtype</parmname> parameter to
+        <option>htmlhelp</option>, or pass the <parmname>--format</parmname>=<option>htmlhelp</option> option to the
+        <cmdname>dita</cmdname> command line.</p>
+    <codeblock><filepath conref="../resources/conref-task.dita#ID/dita-cmd"/> <parmname>--input</parmname>=<varname>input-file</varname> <parmname>--format</parmname>=<option>htmlhelp</option></codeblock>
+    <p>where:</p>
+    <ul>
+      <li conref="../resources/conref-task.dita#ID/novice-variables-1"
+        conrefend="../resources/conref-task.dita#ID/novice-variables-2"/>
+    </ul>
+  </conbody>
+</concept>

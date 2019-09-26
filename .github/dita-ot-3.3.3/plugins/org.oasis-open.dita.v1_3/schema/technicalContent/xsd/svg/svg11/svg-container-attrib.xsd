@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:simpleType name="EnableBackgroundValue.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      'enable-background' property/attribute value (e.g., 'new', 'accumulate')
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:attributeGroup name="SVG.enable-background.attrib">
+    <xs:attribute name="enable-background" type="EnableBackgroundValue.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Container.attrib">
+    <xs:attributeGroup ref="SVG.enable-background.attrib"/>
+  </xs:attributeGroup>
+</xs:schema>

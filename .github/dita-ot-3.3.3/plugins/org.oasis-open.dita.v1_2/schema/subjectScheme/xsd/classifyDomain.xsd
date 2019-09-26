@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!-- HEADER -->
+<!-- ============================================================= -->
+<!-- MODULE:    DITA Subject Classification Domain -->
+<!-- VERSION:   1.2 -->
+<!-- DATE:      February 2009 -->
+<!---->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- PUBLIC DOCUMENT TYPE DEFINITION -->
+<!-- TYPICAL INVOCATION -->
+<!---->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA) -->
+<!---->
+<!-- PURPOSE:    Define elements and specialization attributes -->
+<!-- for Map Subject Classification Domain -->
+<!---->
+<!-- ORIGINAL CREATION DATE: -->
+<!-- February 2009 -->
+<!---->
+<!-- (C) Copyright OASIS Open 2009. -->
+<!-- (C) Copyright IBM Corporation 2005, 2007. -->
+<!-- All Rights Reserved. -->
+<!---->
+<!-- UPDATES: -->
+<!-- ============================================================= -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+  xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+
+  <xs:import namespace="http://dita.oasis-open.org/architecture/2005/"    schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.2"/>
+  
+  <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(map classify-d)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:group name="classify-d-topicref">
+    <xs:sequence>
+      <xs:group ref="topicsubject"/>
+      <xs:group ref="topicapply"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="classify-d-reltable">
+    <xs:sequence>
+      <xs:group ref="topicSubjectTable"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="topicSubjectTable">
+    <xs:sequence>
+      <xs:element ref="topicSubjectTable"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="topicsubject">
+    <xs:sequence>
+      <xs:element ref="topicsubject"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="topicapply">
+    <xs:sequence>
+      <xs:element ref="topicapply"/>
+    </xs:sequence>
+  </xs:group>
+  <!-- New -->
+  <xs:group name="subjectref">
+    <xs:sequence>
+      <xs:element ref="subjectref"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="topicSubjectHeader">
+    <xs:sequence>
+      <xs:element ref="topicSubjectHeader"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="topicSubjectRow">
+    <xs:sequence>
+      <xs:element ref="topicSubjectRow"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="topicCell">
+    <xs:sequence>
+      <xs:element ref="topicCell"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="subjectCell">
+    <xs:sequence>
+      <xs:element ref="subjectCell"/>
+    </xs:sequence>
+  </xs:group>
+  
+  
+  <!-- ============================================================= -->
+  <!-- ELEMENT DECLARATIONS -->
+  <!-- ============================================================= -->
+  <!-- LONG NAME: Topic Subject -->
+  <!-- SKOS equivalent:  primary if href or keyref are specified -->
+  
+  <xs:complexType name="topicsubject.class">
+    <xs:sequence>
+      <xs:group ref="topicsubject.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="topicsubject.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="topicsubject.content">
+    <xs:sequence>
+      <xs:group minOccurs="0" ref="topicmeta"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="data.elements.incl"/>
+        <xs:group ref="subjectref"/>
+        <xs:group ref="topicref"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="topicsubject.attributes">
+    <xs:attribute name="navtitle" type="xs:string"/>
+    <xs:attribute name="href" type="xs:string"/>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="keys" type="xs:string"/>
+    <xs:attribute name="query" type="xs:string"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="processing-role" type="processing-role-att.class" default="resource-only"/>
+    <xs:attribute name="scope" type="scope-att.class"/>
+    <xs:attribute name="format" type="xs:string"/>
+    <xs:attribute name="toc" default="no" type="yesno-att.class"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts" />
+  </xs:attributeGroup>
+  
+  <xs:element name="topicsubject">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="topicsubject.class">
+          <xs:attribute name="class" default="+ map/topicref classify-d/topicsubject "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  
+  <xs:complexType name="topicapply.class">
+    <xs:sequence>
+      <xs:group ref="topicapply.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="topicapply.attributes"/>
+  </xs:complexType>
+  
+  <!-- LONG NAME: Topic Apply -->
+  <xs:group name="topicapply.content">
+    <xs:sequence>
+    <xs:sequence>
+      <xs:group minOccurs="0" ref="topicmeta"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="data.elements.incl"/>
+        <xs:group ref="subjectref"/>
+        <xs:group ref="topicref"/>
+      </xs:choice>
+    </xs:sequence>
+      </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="topicapply.attributes">
+    <xs:attribute name="navtitle" type="xs:string"/>
+    <xs:attribute name="href" type="xs:string"/>
+    <xs:attribute name="keys" type="xs:string"/>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="query" type="xs:string"/>
+    <xs:attribute name="collection-type" type="collection-type.class"/>
+     <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="processing-role" type="processing-role-att.class" default="resource-only"/>
+     <xs:attribute name="scope" type="scope-att.class"/>
+     <xs:attribute name="format" type="xs:string"/>
+     <xs:attribute name="linking" type="linkingtypes.class"/>
+     <xs:attribute name="toc" type="yesno-att.class"/>
+    <xs:attributeGroup ref="univ-atts" />
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="global-atts" />
+  </xs:attributeGroup>
+  
+  <xs:element name="topicapply">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="topicapply.class">
+          <xs:attribute name="class" default="+ map/topicref classify-d/topicapply "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="subjectref.class">
+    <xs:sequence>
+      <xs:group ref="subjectref.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="subjectref.attributes"/>
+  </xs:complexType>
+  
+  <!-- LONG NAME: Subject Reference -->
+  <xs:group name="subjectref.content">
+    <xs:sequence>
+    <xs:sequence>
+      <xs:group minOccurs="0" ref="topicmeta"/>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="data.elements.incl"/>
+    </xs:sequence>
+      </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="subjectref.attributes">
+    <xs:attribute name="navtitle" type="xs:string"/>
+    <xs:attribute name="href" type="xs:string"/>
+    <xs:attribute name="keys" type="xs:string"/>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="query" type="xs:string"/>
+    <xs:attribute name="collection-type" type="collection-type.class"/>
+    <xs:attribute name="processing-role" type="processing-role-att.class" default="resource-only"/>
+     <xs:attribute name="type" type="xs:string"/>
+     <xs:attribute name="scope" type="scope-att.class"/>
+     <xs:attribute name="format" type="xs:string"/>
+     <xs:attribute name="linking" type="linkingtypes.class"/>
+     <xs:attribute name="toc" type="yesno-att.class"/>
+    <xs:attributeGroup ref="univ-atts" />
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="global-atts" />
+  </xs:attributeGroup>
+  
+  <xs:element name="subjectref">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="subjectref.class">
+          <xs:attribute name="class" default="+ map/topicref classify-d/subjectref "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+ 
+  <!-- LONG NAME: Topic Subject Relationship Table -->
+  
+  <xs:complexType name="topicSubjectTable.class">
+    <xs:sequence>
+      <xs:group ref="topicSubjectTable.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="topicSubjectTable.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="topicSubjectTable.content">
+   <xs:sequence>
+    <xs:sequence>
+      <xs:group ref="title"/>
+      <xs:group minOccurs="0" ref="topicmeta"/>
+      <xs:group minOccurs="0" ref="topicSubjectHeader"/>
+      <xs:group maxOccurs="unbounded" ref="topicSubjectRow"/>
+    </xs:sequence>
+   </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="topicSubjectTable.attributes">
+    <xs:attribute name="title"/>
+    <xs:attributeGroup ref="topicref-atts-no-toc"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+  
+  <xs:element name="topicSubjectTable">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="topicSubjectTable.class">
+          <xs:attribute name="class" default="+ map/reltable classify-d/topicSubjectTable "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  
+  <!-- LONG NAME: Topic Subject Table Header -->
+  <!--
+    The header defines the set of subjects for each column.
+    By default, the subject in the header cell must be a broader ancestor
+        within a scheme available during processing for the subjects
+        in the same column of other rows
+    In the header, the topicCell serves primarily as a placeholder
+        for the topic column but could also provide some constraints
+        or metadata for the topics
+  -->
+   <xs:complexType name="topicSubjectHeader.class">
+    <xs:sequence>
+      <xs:group ref="topicSubjectHeader.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="topicSubjectHeader.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="topicSubjectHeader.content">
+    <xs:sequence>
+      <xs:sequence>
+        <xs:group ref="topicCell"/>
+        <xs:group maxOccurs="unbounded" ref="subjectCell"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:attributeGroup name="topicSubjectHeader.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+  <xs:element name="topicSubjectHeader">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="topicSubjectHeader.class">
+          <xs:attribute name="class" default="+ map/relrow classify-d/topicSubjectHeader "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- LONG NAME: Topic Subject Table Row -->
+  <xs:complexType name="topicSubjectRow.class">
+    <xs:sequence>
+      <xs:group ref="topicSubjectRow.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="topicSubjectRow.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="topicSubjectRow.content">
+    <xs:sequence>
+      <xs:sequence>
+        <xs:group ref="topicCell"/>
+        <xs:group maxOccurs="unbounded" ref="subjectCell"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:attributeGroup name="topicSubjectRow.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+
+  <xs:element name="topicSubjectRow">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="topicSubjectRow.class">
+          <xs:attribute name="class" default="+ map/relrow classify-d/topicSubjectRow "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- LONG NAME: Topic Subject Table Cell -->
+  <xs:complexType name="topicCell.class">
+    <xs:sequence>
+      <xs:group ref="topicCell.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="topicCell.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="topicCell.content">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
+        <xs:group ref="data.elements.incl"/>
+        <xs:group ref="topicref"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+
+
+  <xs:attributeGroup name="topicCell.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="topicref-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+
+  <xs:element name="topicCell">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="topicCell.class">
+          <xs:attribute name="class" default="+ map/relcell classify-d/topicCell "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- LONG NAME: Topic Subject Cell -->
+   <xs:complexType name="subjectCell.class">
+    <xs:sequence>
+      <xs:group ref="subjectCell.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="subjectCell.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="subjectCell.content">
+    <xs:sequence>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="data.elements.incl"/>
+          <xs:group ref="subjectref"/>
+          <xs:group ref="topicref"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:attributeGroup name="subjectCell.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="topicref-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+
+  <xs:element name="subjectCell">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="subjectCell.class">
+          <xs:attribute name="class" default="+ map/relcell classify-d/subjectCell "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+<!-- ================== DITA Subject Classification Domain  ====== -->

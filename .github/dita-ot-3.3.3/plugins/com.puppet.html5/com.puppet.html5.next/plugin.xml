@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="com.puppet.html5.next">
+    <require plugin="org.dita.html5"/>
+    <transtype name="pup-html5-next" extends="common-html" desc="Puppet HTML5 Next"/>
+    <feature extension="dita.conductor.target.relative" file="build_html5_puppet_next.xml"/>
+    <!-- Puppet: Add XSLT override file for tasks. -->
+    <feature extension="dita.xsl.html5" file="xsl/common/functions.xsl"/>
+    <feature extension="dita.xsl.html5" file="xsl/xslhtml/pup_taskdisplay.xsl"/>
+</plugin>

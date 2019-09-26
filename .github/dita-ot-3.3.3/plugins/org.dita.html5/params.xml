@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2015 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<params xmlns:if="ant:if">
+  <param name="input.map.url" expression="${html5.map.url}" if:set="html5.map.url"/>
+  <param name="nav-toc" expression="${html5.nav-toc}" if:set="html5.nav-toc"/>
+</params>

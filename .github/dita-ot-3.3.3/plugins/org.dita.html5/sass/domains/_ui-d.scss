@@ -1,0 +1,29 @@
+// This file is part of the DITA Open Toolkit project.
+//
+// Copyright 2015 Jarno Elovirta
+//
+// See the accompanying LICENSE file for applicable license.
+
+// block
+.screen {
+  background-color: $screen-bg;
+  border: outset;
+  margin-bottom: 2px;
+  margin-top: 2px;
+  padding: 5px;
+  white-space: pre;
+}
+
+// inline
+.menucascade {
+}
+
+.shortcut {
+}
+
+.uicontrol {
+}
+
+.wintitle {
+  font-weight: bold;
+}

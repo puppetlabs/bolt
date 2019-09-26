@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/XML/1998/namespace" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg11.xsd"/>
+  <xs:attributeGroup name="SVG.id.attrib">
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.base.attrib">
+    <xs:attribute name="base" form="qualified" type="svg:URI.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.lang.attrib">
+    <xs:attribute name="lang" form="qualified" type="svg:LanguageCode.datatype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.space.attrib">
+    <xs:attribute name="space" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="default"/>
+          <xs:enumeration value="preserve"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Core.attrib">
+    <xs:attributeGroup ref="xml:SVG.id.attrib"/>
+    <xs:attributeGroup ref="xml:SVG.base.attrib"/>
+    <xs:attributeGroup ref="xml:SVG.lang.attrib"/>
+    <xs:attributeGroup ref="xml:SVG.space.attrib"/>
+  </xs:attributeGroup>
+  <xs:attribute name="space">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="preserve"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+</xs:schema>

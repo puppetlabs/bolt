@@ -1,0 +1,61 @@
+// This file is part of the DITA Open Toolkit project.
+//
+// Copyright 2016 Roger Sheen
+//
+// See the accompanying LICENSE file for applicable license.
+
+// Sass partial for heading (title) styles
+
+/* Set heading sizes, getting smaller for deeper nesting */
+.topictitle1 {
+  font-size: 1.34em;
+  margin-bottom: 0.1em;
+  margin-top: 0;
+}
+
+.topictitle2 {
+  font-size: 1.17em;
+  margin-bottom: 0.45em;
+  margin-top: 1pc;
+}
+
+.topictitle3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin-bottom: 0.17em;
+  margin-top: 1pc;
+}
+
+.topictitle4 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin-top: 0.83em;
+}
+
+.topictitle5 {
+  font-size: 1.17em;
+  font-weight: bold;
+}
+
+.topictitle6 {
+  font-size: 1.17em;
+  font-style: italic;
+}
+
+.sectiontitle {
+  color: $text-color;
+  font-size: 1.17em;
+  font-weight: bold;
+  margin-bottom: 0;
+  margin-top: 1em;
+}
+
+.section {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+.example {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}

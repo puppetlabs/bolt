@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="dita1.2specification" xml:lang="en-US">
+  <title>DITA 1.2 support</title>
+  <shortdesc>DITA Open Toolkit <keyword keyref="release"/> supports the DITA 1.2 specification. While 1.2 is no longer
+    the latest version of DITA, the grammar files (DTD and XML Schema) are still included with DITA-OT and content
+    explicitly created for 1.2 continues to work as intended.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>abbreviated-form</xmlelement></indexterm>
+        <indexterm><xmlatt>keyref</xmlatt></indexterm>
+        <indexterm><xmlatt>processing-role</xmlatt></indexterm>
+        <indexterm><xmlatt>conref</xmlatt><indexterm>support</indexterm></indexterm>
+        <indexterm>filters<indexterm>subject scheme</indexterm></indexterm>
+        <indexterm>DITA<indexterm>specializations</indexterm></indexterm>
+        <indexterm>DTD</indexterm>
+        <indexterm>schema<indexterm>DITA 1.2</indexterm></indexterm>
+        <indexterm>grammar files</indexterm>
+        <indexterm>DITA 1.2</indexterm>
+        <indexterm>SCORM</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>Highlights of DITA 1.2 support in the toolkit include:
+      <ul>
+        <li>Processing support for all new elements and attributes</li>
+        <li>Link redirection and text replacement using <xmlatt>keyref</xmlatt></li>
+        <li>New <xmlatt>processing-role</xmlatt> attribute in maps to allow references to topics that will not produce
+          output artifacts</li>
+        <li>New content reference extensions, including the ability to reference a range of elements, to push content
+          into another topic, and to use keys for resolving a <xmlatt>conref</xmlatt> attribute.</li>
+        <li>The ability to filter content with controlled values and taxonomies using Subject Scheme Maps</li>
+        <li>Processing support for both default versions of task (original, limited task, and the general task with
+          fewer constraints on element order)</li>
+        <li>Acronym and abbreviation support with the new <xmlelement>abbreviated-form</xmlelement> element</li>
+        <li>New link grouping abilities available with headers in relationship tables</li>
+        <li>OASIS Subcommittee specializations from the learning and machine industry domains (note that the core
+          toolkit contains only basic processing support for these, but can be extended to produce related artifacts
+          such as SCORM modules)</li>
+      </ul></p>
+    <p>To find detailed information about any of these features, see the specification documents at OASIS. The DITA
+      Adoption Technical Committee has also produced several papers to describe individual new features. In general, the
+      white papers are geared more towards DITA users and authors, while the specification is geared more towards tool
+      implementors, though both may be useful for either audience. The DITA Adoption papers can be found from that
+      committee’s main web page.</p>
+  </conbody>
+  <related-links>
+    <link keyref="dita12-xhtml"/>
+    <link keyref="dita12-pdf"/>
+    <link keyref="dita12-source"/>
+    <link keyref="dita-tc"/>
+    <link keyref="dita-adoption-tc"/>
+  </related-links>
+</concept>

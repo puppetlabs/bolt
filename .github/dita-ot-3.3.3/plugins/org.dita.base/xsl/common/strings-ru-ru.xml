@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="ru-ru">        <!-- Russian -->
+  <str name="Figure">Рис.</str>
+  <str name="Table">Табл.</str>
+  <str name="Next topic">Следующая тема</str>
+  <str name="Previous topic">Предыдущая тема</str>
+  <str name="Parent topic">На уровень выше</str>
+  <str name="Required cleanup">Требуется исправление</str>
+  <str name="Draft comment">Замечание в черновой версии</str>
+  <str name="Option">Опция</str>
+  <str name="Description">Описание</str>
+  <str name="Optional">Необязательно</str>
+  <str name="Required">Обязательно</str>
+  <str name="Skip visual syntax diagram">Пропуск синтаксической диаграммы</str>
+  <str name="Read syntax diagram">Чтение синтаксической диаграммы</str>
+  <str name="Start of change">Изменено</str>
+  <str name="End of change">Конец изменений</str>
+  <str name="Index">Индекс</str>
+  <str name="Special characters">Спец. символы</str>
+  <str name="Numerics">Числа</str>
+  <str name="End notes">Сноски</str>
+  <str name="Artwork">Иллюстрация</str>
+  <str name="Syntax">Синтаксис</str>
+  <str name="Type">Тип</str>
+  <str name="Value">Значение</str>
+  <str name="Note">Прим.</str>
+  <str name="Notes">Прим.</str>
+  <str name="Tip">Совет</str>
+  <str name="Fastpath">Быстрый путь</str>
+  <str name="Important">Важное замечание</str>
+  <str name="Attention">Внимание</str>
+  <str name="Caution">ОСТОРОЖНО</str>
+  <str name="Danger">ОПАСНО</str>
+  <str name="Remember">Напоминание</str>
+  <str name="Restriction">Ограничение</str>
+  <str name="Trouble">Неполадка</str>
+  <str name="Warning">Внимание</str>
+  <str name="Contents">Содержание</str>
+  <str name="Related concepts">Понятия, связанные с данным</str>
+  <str name="Related tasks">Задачи, связанные с данной</str>
+  <str name="Related reference">Ссылки, связанные с данной</str>
+  <str name="Related information">Информация, связанная с данной</str>
+  <str name="Prerequisite">Предварительное условие</str>
+  <str name="Prerequisites">Предварительные условия</str>
+  <str name="or">or</str>
+  <str name="task_context">Об этой задаче</str>
+  <str name="task_example">Пример</str>
+  <str name="task_postreq">Дальнейшие действия</str>
+  <str name="task_prereq">Подготовка</str>
+  <str name="task_procedure">Процедура</str>
+  <str name="task_procedure_unordered">Процедура</str>
+  <str name="task_results">Результат</str>
+  <str name="Copyright">Copyright</str>
+  <str name="OpenQuote">«</str>
+  <str name="CloseQuote">»</str>
+  <str name="a11y.and-then"></str>
+</strings>

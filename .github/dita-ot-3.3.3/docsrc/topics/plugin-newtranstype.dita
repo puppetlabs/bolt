@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="plugin-newtranstype" xml:lang="en-US">
+  <title>Adding a new transformation type</title>
+  <shortdesc>Plug-ins can add an entirely new transformation type. The new transformation type can be very simple, such
+    as an HTML build that creates an additional control file; it also can be very complex, adding any number of new
+    processing steps.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>transtype</xmlelement><indexterm>custom</indexterm></indexterm>
+        <indexterm><xmlelement>param</xmlelement></indexterm>
+        <indexterm>plug-ins<indexterm>transformations</indexterm></indexterm>
+        <indexterm>transformations<indexterm>creating</indexterm></indexterm>
+        <indexterm>table of contents<indexterm>HTML5</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>You can use the <xmlelement>transtype</xmlelement> element to define a new transformation type with any new
+        custom parameters that are supported.</p>
+      <p>When a transformation type is defined, the build expects Ant code to be integrated to define the transformation
+        process. The Ant code must define a target based on the name of the transformation type; if the transformation
+        type is "new-transform", the Ant code must define a target named <parmname>dita2new-transform</parmname>.</p>
+    </context>
+    <steps>
+      <step>
+        <cmd>Create an Ant project file for the new transformation. This project file must define a target named
+            "dita2<varname>new-transtype</varname>," where <varname>new-transtype</varname> is the name of the new
+          transformation type. </cmd>
+      </step>
+      <step>
+        <cmd>Create a <filepath>plugin.xml</filepath> with the following content:</cmd>
+        <info>
+          <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="<varname>plugin-id</varname>">
+  &lt;transtype name="<varname>new-transtype</varname>"/>
+  <b>&lt;feature extension="dita.transtype.print" value="<varname>new-transtype</varname>"/></b>
+  &lt;feature extension="ant.import" file="<varname>ant-file</varname>"/>
+&lt;/plugin></codeblock>
+          <p>where:</p>
+          <ul>
+            <li><varname>plugin-id </varname> is the plug-in identifier, for example, com.dita-ot.pdf.</li>
+            <li><varname>new-transtype</varname> is the name of the new transformation, for example, dita-ot-pdf.</li>
+            <li><varname>ant-file</varname> is the name of the Ant file, for example,
+                <filepath>build-dita-ot-pdf.xml</filepath>.</li>
+          </ul>
+          <p>Exclude the content that is highlighted in bold if the transformation is not intended for print.</p>
+        </info>
+      </step>
+      <step>
+        <cmd>Install the plug-in.</cmd>
+      </step>
+    </steps>
+    <result>You now can use the new transformation.</result>
+    <example>
+      <title>Examples</title>
+      <fig>
+        <title>Creating a new print transformation</title>
+        <p>The following <filepath>plugin.xml</filepath> file defines a new transformation type named "print-pdf"; it
+          also defines the transformation type to be a print type. The build will look for a
+            <parmname>dita2print-pdf</parmname> target.</p>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/plugins/com.example.print-pdf/plugin.xml"/></codeblock>
+        <note type="tip">For a complete sample plug-in with all required code, see
+          <xref keyref="pdf-customization-example"/>.</note>
+      </fig>
+      <fig>
+        <title>Defining new parameters</title>
+        <p>If your custom transformation type supports custom parameters, they can be defined in nested
+            <xmlelement>param</xmlelement> elements within the <xmlelement>transtype</xmlelement> element.</p>
+        <p>While the <filepath>org.dita.html5</filepath> plug-in was separated from <codeph>common-html</codeph> in
+          version 2.4, the following example shows how earlier versions of that plug-in used the
+            <xmlelement>transtype</xmlelement> element to extend the common HTML transformation with a new
+            <option>html5</option> transformation type and define a new <parmname>nav-toc</parmname> parameter with
+          three possible values:</p>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><b>&lt;transtype name="html5" extends="common-html" desc="HTML5"></b>
+  &lt;param name="nav-toc" type="enum" 
+         desc="Specifies whether to generate navigation in topic pages.">
+    &lt;val default="true" desc="No TOC">none&lt;/val>
+    &lt;val desc="Partial TOC that shows the current topic">partial&lt;/val>
+    &lt;val desc="Full TOC">full&lt;/val>
+  &lt;/param>
+&lt;/transtype></codeblock>
+      </fig>
+    </example>
+  </taskbody>
+</task>

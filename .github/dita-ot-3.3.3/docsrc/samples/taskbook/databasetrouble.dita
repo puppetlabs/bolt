@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="databasetrouble" xml:lang="en-us">
+  <title>Troubleshooting a database</title>
+  <shortdesc>Databases rarely have problems, but this may be helpful if you find some.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>troubleshooting</indexterm>
+        <indexterm>database</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps-unordered>
+      <step>
+        <cmd>If performance is slow, try removing several thousand records.</cmd>
+      </step>
+      <step>
+        <cmd>If none of your commands work, make sure they are SQL commands and not SEQUEL commands.</cmd>
+      </step>
+      <step>
+        <cmd>If you cannot get anything to work at all, try uninstalling and reinstalling.</cmd>
+      </step>
+      <step>
+        <cmd>For more detailed troubleshooting help, see the online documentation shipped with your database.</cmd>
+      </step>
+    </steps-unordered>
+  </taskbody>
+</task>

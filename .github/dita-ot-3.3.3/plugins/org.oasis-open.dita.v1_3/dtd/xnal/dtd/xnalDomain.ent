@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    XNAL Domain                                       -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identfier or an   -->
+<!--       appropriate system identifier                           -->
+<!-- PUBLIC "-//OASIS//ELEMENTS DITA XNAL Domain//EN"              -->
+<!--       Delivered as file "xnalDomain.mod"                           -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization atttributed    -->
+<!--             for the XNAL Domain                               -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             June 2006                                         -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2006, 2009.              -->
+<!--             All Rights Reserved.                              -->
+<!--  UPDATES:                                                     -->
+<!--    2007.12.01 EK:  Reformatted DTD modules for DITA 1.2        -->
+<!--    2008.01.28 RDA: Removed enumerations for attributes:       -->
+<!--                    authorinformation/@type                    -->
+<!--    2008.02.12 RDA: Add keyword to data specializations        -->
+<!--    2008.02.12 RDA: Add @format, @scope to authorinformation   -->
+<!--    2008.02.13 RDA: Create .content and .attributes entities   -->
+<!-- =============================================================   -->
+
+<!-- ============================================================= -->
+<!--                    ELEMENT EXTENSION ENTITY DECLARATIONS      -->
+<!-- ============================================================= -->
+
+<!ENTITY % xnal-d-author
+  "authorinformation"
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY xnal-d-att
+  "(topic xnal-d)"
+>
+
+<!-- ================ End DITA XNAL Domain ================== -->
+ 

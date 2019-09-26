@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="configuredatabase" xml:lang="en-us">
+  <title>Configuring a Database</title>
+  <shortdesc>Follow these instructions to properly configure your database.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>configure</indexterm>
+        <indexterm>database</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context><note>In this instance, the technical writer knows nothing about his subject.</note></context>
+    <steps>
+      <step>
+        <cmd>Read the product documentation. It will tell you what options are available.</cmd>
+      </step>
+      <step>
+        <cmd>Read further in the product documentation. It will tell you how to change these options.</cmd>
+      </step>
+      <step>
+        <cmd>Make sure you store the product documentation in an easy-to-find location when you are done.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

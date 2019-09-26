@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="task_pd3_vdv_qg">
+  <title>Error messages and troubleshooting</title>
+  <titlealts>
+    <navtitle>Troubleshooting</navtitle>
+  </titlealts>
+  <shortdesc>This section contains information about problems that you might encounter and how to resolve
+    them.</shortdesc>
+</task>

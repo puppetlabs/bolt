@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="processing-structure">
+  <title>Processing structure</title>
+  <shortdesc>DITA-OT implements a multi-stage, map-driven architecture to process DITA content. Each stage in the
+    process examines some or all of the content; some stages result in temporary files that are used by later steps,
+    while others stages result in updated copies of the DITA content. Most of the processing takes place in a temporary
+    working directory; the source files themselves are never modified.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>architecture</indexterm>
+        <indexterm>preprocessing</indexterm>
+        <indexterm>Eclipse Help</indexterm>
+        <indexterm>HTML Help</indexterm>
+        <indexterm>XHTML</indexterm>
+        <indexterm>PDF</indexterm>
+        <indexterm>HTML5<indexterm>preprocesing</indexterm></indexterm>
+        <indexterm>pipelines<indexterm>description of</indexterm></indexterm>
+        <indexterm>pipelines<index-see-also>preprocessing</index-see-also></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>DITA-OT is designed as a pipeline. Most of the pipeline is common to all output formats; it is known as the
+        <term>pre-processing stage</term>. In general, any DITA process begins with this common set of pre-processing
+      routines.</p>
+    <p>Once the pre-processing is completed, the pipeline diverges based on the requested output format. Some processing
+      is still common to multiple output formats; for example, Eclipse Help and HTML Help both use the same routines to
+      generate XHTML topics, after which the two pipelines branch to create different sets of navigation files.</p>
+    <p>The following image illustrates how the pipeline works for several common output formats: PDF, Eclipse Help, HTML
+      Help, XHTML, and HTML5.</p>
+    <note>Other output formats may implement additional processing steps.</note>
+    <fig>
+      <title>Diagram of some possible paths through the transformation pipeline</title>
+      <image href="images/processing-flow.svg" placement="break" width="6.5in"/>
+    </fig>
+  </conbody>
+</concept>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- Generated from plugin source, do not edit! -->
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference id="htmlhelp"><title outputclass="generated">Microsoft Compiled HTML Help parameters</title><titlealts><navtitle>Microsoft Compiled HTML Help</navtitle></titlealts><shortdesc id="shortdesc"/><refbody><section><parml><plentry id="args.htmlhelp.includefile" props="htmlhelp"><pt><parmname>args.htmlhelp.includefile</parmname><ph><indexterm><parmname>args.htmlhelp.includefile</parmname></indexterm><indexterm>parameters<indexterm><parmname>args.htmlhelp.includefile</parmname></indexterm></indexterm></ph></pt><pd id="args.htmlhelp.includefile.desc">Specifies the name of a file that you want included in the HTML Help.</pd></plentry></parml></section></refbody></reference>

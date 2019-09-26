@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<project>
+  <target name="dita2html5-custom-css"
+       depends="dita2html5-custom-css.init,
+                dita2html5"/>
+  <target name="dita2html5-custom-css.init">
+    <property name="args.cssroot"
+          location="${dita.plugin.com.example.html5-custom-css.dir}/css"/>
+    <property name="args.css" value="custom.css"/>
+    <property name="args.copycss" value="yes"/>
+    <property name="args.csspath" value="css"/>
+  </target>
+</project>

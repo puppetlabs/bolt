@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="processing-pipeline-modules" xml:lang="en-US">
+  <title>Processing modules</title>
+  <shortdesc>The DITA-OT processing pipeline is implemented using Ant. Individual modules within the Ant script are
+    implemented in either Java or XSLT, depending on such factors as performance or requirements for customization.
+    Virtually all Ant and XSLT modules can be extended by adding a plug-in to the toolkit; new Ant targets may be
+    inserted before or after common processing, and new rules may be imported into common XSLT modules to override
+    default processing.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>specializations<index-see>DITA<indexterm>specializations</indexterm></index-see></indexterm>
+        <indexterm>DITA<indexterm>specializations</indexterm></indexterm>
+        <indexterm>processing</indexterm>
+        <indexterm>Ant<indexterm>extending</indexterm></indexterm>
+        <indexterm>Java<indexterm>extending</indexterm><indexterm>processing modules</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>processing modules</indexterm></indexterm>
+        <indexterm>preprocessing<indexterm>extension points (overview)</indexterm></indexterm>
+        <indexterm>index<indexterm>sorting</indexterm></indexterm>
+        <indexterm>pipelines<indexterm>Ant module</indexterm></indexterm>
+        <indexterm>pipelines<indexterm>Java module</indexterm></indexterm>
+        <indexterm>locale</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <title>XSLT modules</title>
+      <p>The XSLT modules use shell files. Typically, each shell file begins by importing common rules that apply to all
+        topics. This set of common processing rules may in turn import additional common modules, such as those used for
+        reporting errors or determining the document locale. After the common rules are imported, additional imports can
+        be included in order to support processing for DITA specializations.</p>
+      <p>For example, XHTML processing is controlled by the <filepath>xsl/dita2xhtml.xsl</filepath> file. The shell
+        begins by importing common rules that are applicable to all general topics:
+          <filepath>xslhtml/dita2htmlImpl.xsl</filepath>. After that, additional XSLT overrides are imported for
+        specializations that require modified processing. For example, an override for reference topics is imported in
+        order to add default headers to property tables. Additional modules are imported for tasks, for the highlighting
+        domain, and for several other standard specializations. After the standard XSLT overrides occur, plug-ins may
+        add in additional processing rules for local styles or for additional specializations.</p>
+    </section>
+    <section>
+      <title>Java modules</title>
+      <p>Java modules are typically used when XSLT is a poor fit, such as for processes that make use of standard Java
+        libraries (like those used for index sorting). Java modules are also used in many cases where a step involves
+        copying files, such as the initial process where source files are parsed and copied to a temporary processing
+        directory.</p>
+    </section>
+  </conbody>
+</concept>

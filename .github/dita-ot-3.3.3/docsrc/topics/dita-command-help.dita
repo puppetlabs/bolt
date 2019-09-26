@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="accessing-help-from-the-cl-tool">
+  <title>Accessing help for the dita command</title>
+  <shortdesc>You can access a list of supported parameters for the <cmdname>dita</cmdname> command by passing the
+      <parmname>--help</parmname> option on the command line.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>macOS<indexterm>help</indexterm></indexterm>
+        <indexterm>Linux<indexterm>help</indexterm></indexterm>
+        <indexterm>Windows<indexterm>help</indexterm></indexterm>
+        <indexterm>command line<indexterm>help</indexterm></indexterm>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>help</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd conref="../resources/conref-task.dita#ID/open-terminal"/>
+      </step>
+      <step>
+        <cmd>Issue the following command:</cmd>
+        <choicetable frame="topbot" relcolwidth="1* 3*">
+          <chrow platform="linux mac">
+            <choption>Linux or macOS&#xA0;</choption>
+            <chdesc>
+              <cmdname>bin/dita</cmdname>
+              <parmname>--help</parmname>
+            </chdesc>
+          </chrow>
+          <chrow platform="windows">
+            <choption>Windows</choption>
+            <chdesc>
+              <cmdname>bin\dita</cmdname>
+              <parmname>--help</parmname>
+            </chdesc>
+          </chrow>
+        </choicetable>
+        <info>
+          <note conref="../resources/conref-task.dita#ID/dita-in-path"/>
+        </info>
+      </step>
+    </steps>
+    <result>
+      <p>A brief description of the supported parameters appears in the command-line window.</p>
+    </result>
+  </taskbody>
+</task>

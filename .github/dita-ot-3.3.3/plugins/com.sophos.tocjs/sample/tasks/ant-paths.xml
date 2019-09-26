@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+ "../../../../dtd/task.dtd">
+ <!-- 
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+     
+     Copyright 2007 Shawn McKenzie
+     *-->
+     <?xml-stylesheet href="../../../../xsl/ditaview_shell.xsl" type="text/xsl"?>
+<task id="tocjs_antpaths" xml:lang="en-us">
+    <title>Fix Ant tasks for shared projects</title>
+    <taskbody>
+        <context>
+            <p>To modify existing ant tasks to work with a project that shares content with a peer
+                project:</p>
+        </context>
+        <steps>
+            <step>
+                <cmd>Modify the <codeph>output.file</codeph> parameter so that it will create
+                        <filepath>toctree.js</filepath> in the deeper project output
+                directory.</cmd>
+            </step>
+            <step>
+                <cmd>Modify the <codeph>copy</codeph> elements to copy the tocjs
+                    <filepath>basefiles</filepath> files into the deeper project output
+                directory.</cmd>
+            </step>
+            <step>
+                <cmd>Modify your frameset file so that the <codeph>tocwin</codeph> and
+                        <codeph>contentwin</codeph> frames point to the correct files in the deeper
+                    nested project directory.</cmd>
+            </step>
+        </steps>
+    </taskbody>
+</task>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="fi-fi">        <!-- Finnish -->
+  <str name="Figure">Kuva</str>
+  <str name="Table">Taulukko</str>
+  <str name="Next topic">Seuraava aihe</str>
+  <str name="Previous topic">Edellinen aihe</str>
+  <str name="Parent topic">Pääaihe</str>
+  <str name="Required cleanup">Edellyttää tarkistusta</str>
+  <str name="Draft comment">Käsittelijän huomautus</str>
+  <str name="Option">Valinta</str>
+  <str name="Description">Kuvaus</str>
+  <str name="Optional">Valinnainen</str>
+  <str name="Required">Pakollinen</str>
+  <str name="Skip visual syntax diagram">Graafisen syntaksikuvauksen ohitus</str>
+  <str name="Read syntax diagram">Graafisen syntaksikuvauksen luku</str>
+  <str name="Start of change">muutoksen alku</str>
+  <str name="End of change">muutoksen loppu</str>
+  <str name="Index">Hakemisto</str>
+  <str name="Special characters">Erikoismerkit</str>
+  <str name="Numerics">Numerot</str>
+  <str name="End notes">Loppuviitteet</str>
+  <str name="Artwork">Kuva</str>
+  <str name="Syntax">Syntaksi</str>
+  <str name="Type">Laji</str>
+  <str name="Value">Arvo</str>
+  <str name="Note">Huomautus</str>
+  <str name="Notes">Huomautuksia</str>
+  <str name="Tip">Vihje</str>
+  <str name="Fastpath">Pikaohje</str>
+  <str name="Important">Tärkeää</str>
+  <str name="Attention">Huomio</str>
+  <str name="Caution">Varoitus</str>
+  <str name="Danger">VAARA</str>
+  <str name="Remember">Muistutus</str>
+  <str name="Restriction">Rajoitus</str>
+  <str name="Trouble">Ongelma</str>
+  <str name="Warning">Varoitus</str>
+  <str name="Contents">Sisältö</str>
+  <str name="Related concepts">Aiheeseen liittyviä käsitteitä</str>
+  <str name="Related tasks">Aiheeseen liittyviä tehtäviä</str>
+  <str name="Related reference">Aiheeseen liittyviä tietolähteitä</str>
+  <str name="Related information">Aiheeseen liittyviä tietoja</str>
+  <str name="Prerequisite">Esitiedot</str>
+  <str name="Prerequisites">Esitiedot</str>
+  <str name="or">tai</str>
+  <str name="task_context">Tietoja tästä tehtävästä</str>
+  <str name="task_example">Esimerkki</str>
+  <str name="task_postreq">Seuraavat toimet</str>
+  <str name="task_prereq">Ennen aloitusta</str>
+  <str name="task_procedure">Toimintosarja</str>
+  <str name="task_procedure_unordered">Toimintosarja</str>
+  <str name="task_results">Tulokset</str>
+  <str name="Copyright">Copyright</str>
+  <str name="OpenQuote">”</str>
+  <str name="a11y.and-then"></str>
+</strings>

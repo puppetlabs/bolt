@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="plugin-sample" xml:lang="en-US">
+  <title>Example plugin.xml file</title>
+  <shortdesc>The following is a sample of a <filepath>plugin.xml</filepath> file. This file adds support for a new set
+    of specialized DTDs, and includes an override for the XHTML output processor.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>DITA<indexterm>specializations</indexterm></indexterm>
+        <indexterm>DTD</indexterm>
+        <indexterm>plug-ins<indexterm>DITA specializations</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm><filepath>plugin.xml</filepath></indexterm></indexterm>
+        <indexterm><filepath>plugin.xml</filepath></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <p>This <filepath>plugin.xml</filepath> file would go into a directory such as
+          <filepath>DITA-OT/plugins/music/</filepath> and referenced supporting files would also exist in that
+        directory. A more extensive sample using these values is available in the actual music plug-in, available on
+        <xref format="html" href="https://sourceforge.net/projects/dita-ot/files/Plug-in_%20Music/" scope="external"
+          >SourceForge</xref>.</p>
+    </section>
+    <example><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="org.metadita.specialization.music">
+  &lt;feature extension="dita.specialization.catalog.relative" 
+           file="catalog-dita.xml"/>
+  &lt;feature extension="dita.xsl.xhtml" file="xsl/music2xhtml.xsl"/>
+&lt;/plugin></codeblock></example>
+  </refbody>
+</reference>

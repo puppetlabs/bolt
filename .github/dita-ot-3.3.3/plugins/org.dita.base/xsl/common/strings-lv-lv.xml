@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="lv-lv">        <!-- Latvian -->
+  <str name="Figure">Attēls</str>
+  <str name="Table">Tabula</str>
+  <str name="Next topic">Nākamā tēma</str>
+  <str name="Previous topic">Iepriekšējā tēma</str>
+  <str name="Parent topic">Vecāktēma</str>
+  <str name="Required cleanup">Nepieciešama tīrīšana</str>
+  <str name="Draft comment">Komentārs melnrakstā</str>
+  <str name="Option">Opcija</str>
+  <str name="Description">Apraksts</str>
+  <str name="Optional">Neobligāts</str>
+  <str name="Required">Nepieciešams</str>
+  <str name="Skip visual syntax diagram">Izlaist vizuālo sintakses diagrammu</str>
+  <str name="Read syntax diagram">Lasīt sintakses diagrammu</str>
+  <str name="Start of change">Izmaiņu sākums</str>
+  <str name="End of change">Izmaiņu beigas</str>
+  <str name="Index">Indekss</str>
+  <str name="Special characters">Speciālās rakstzīmes</str>
+  <str name="Numerics">Skaitļi</str>
+  <str name="End notes">Beigu vēres</str>
+  <str name="Artwork">Ilustrācija</str>
+  <str name="Syntax">Sintakse</str>
+  <str name="Type">Tips</str>
+  <str name="Value">Vērtība</str>
+  <str name="Note">Piezīme</str>
+  <str name="Notes">Piezīmes</str>
+  <str name="Tip">Padoms</str>
+  <str name="Fastpath">Ātrais ceļš</str>
+  <str name="Important">Svarīgi</str>
+  <str name="Attention">Brīdinājums</str>
+  <str name="Caution">UZMANĪBU</str>
+  <str name="Danger">BĪSTAMI</str>
+  <str name="Remember">Atcerieties</str>
+  <str name="Restriction">Ierobežojums</str>
+  <str name="Trouble">Problēma</str>
+  <str name="Warning">Brīdinājums</str>
+  <str name="Contents">Saturs</str>
+  <str name="Related concepts">Saistītās koncepcijas</str>
+  <str name="Related tasks">Saistītie uzdevumi</str>
+  <str name="Related reference">Saistītā atsauce</str>
+  <str name="Related information">Saistītā informācija</str>
+  <str name="Prerequisite">Priekšnoteikums</str>
+  <str name="Prerequisites">Priekšnoteikumi</str>
+  <str name="or">vai</str>
+  <str name="task_context">Par šo uzdevumu</str>
+  <str name="task_example">Piemērs</str>
+  <str name="task_postreq">Kā rīkoties tālāk</str>
+  <str name="task_prereq">Pirms sākt darbu</str>
+  <str name="task_procedure">Procedūra</str>
+  <str name="task_procedure_unordered">Procedūra</str>
+  <str name="task_results">Rezultāti</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

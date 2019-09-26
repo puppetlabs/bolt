@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="pt-pt">        <!-- Portuguese -->
+  <str name="Figure">Figura</str>
+  <str name="Table">Tabela</str>
+  <str name="Next topic">Tópico seguinte</str>
+  <str name="Previous topic">Tópico anterior</str>
+  <str name="Parent topic">Tópico ascendente</str>
+  <str name="Required cleanup">Limpeza necessária</str>
+  <str name="Draft comment">Comentário rascunho</str>
+  <str name="Option">Opção</str>
+  <str name="Description">Descrição</str>
+  <str name="Optional">Opcional</str>
+  <str name="Required">Necessário</str>
+  <str name="Skip visual syntax diagram">Manter visual do diagrama de sintaxe</str>
+  <str name="Read syntax diagram">Ler diagrama de sintaxe</str>
+  <str name="Start of change">Início de alteração</str>
+  <str name="End of change">Fim de alteração</str>
+  <str name="Index">Índice remissivo</str>
+  <str name="Special characters">Caracteres especiais</str>
+  <str name="Numerics">Numérico</str>
+  <str name="End notes">Notas finais</str>
+  <str name="Artwork">Gráficos</str>
+  <str name="Syntax">Sintaxe</str>
+  <str name="Type">Tipo</str>
+  <str name="Value">Valor</str>
+  <str name="Note">Nota</str>
+  <str name="Notes">Notas</str>
+  <str name="Tip">Dica</str>
+  <str name="Fastpath">Atalho</str>
+  <str name="Important">Importante</str>
+  <str name="Attention">Atenção</str>
+  <str name="Caution">CUIDADO</str>
+  <str name="Danger">PERIGO</str>
+  <str name="Remember">Lembre-se</str>
+  <str name="Restriction">Restrição</str>
+  <str name="Trouble">Problema</str>
+  <str name="Warning">Aviso</str>
+  <str name="Contents">Índice</str>
+  <str name="Related concepts">Conceitos relacionados</str>
+  <str name="Related tasks">Tarefas relacionadas</str>
+  <str name="Related reference">Referências relacionadas</str>
+  <str name="Related information">Informações relacionadas</str>
+  <str name="Prerequisite">Pré-requisito</str>
+  <str name="Prerequisites">Pré-requisitos</str>
+  <str name="or">or</str>
+  <str name="task_context">Sobre esta tarefa</str>
+  <str name="task_example">Exemplo</str>
+  <str name="task_postreq">Como proceder a seguir</str>
+  <str name="task_prereq">Antes de começar</str>
+  <str name="task_procedure">Procedimento</str>
+  <str name="task_procedure_unordered">Procedimento</str>
+  <str name="task_results">Resultados</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

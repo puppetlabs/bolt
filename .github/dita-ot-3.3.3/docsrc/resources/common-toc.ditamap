@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map xml:lang="en-US">
+  <title>DITA Open Toolkit <keyword keyref="release"/></title>
+
+  <topicref keyref="landing-page"/>
+  <topicref keyref="release-notes"/>
+  <topicref keyref="installing-client">
+    <mapref href="../topics/installing.ditamap"/>
+  </topicref>
+  <topicref keyref="alternative-input-formats" collection-type="family">
+    <mapref href="../topics/input-formats.ditamap"/>
+  </topicref>
+  <topicref keyref="building-output">
+    <mapref href="../topics/publishing.ditamap"/>
+  </topicref>
+  <topicref keyref="parameters">
+    <mapref href="../parameters/parameters.ditamap"/>
+  </topicref>
+  <topicref keyref="customizing">
+    <mapref href="../topics/customization.ditamap"/>
+  </topicref>
+  <topicref keyref="troubleshooting-overview">
+    <mapref href="../topics/troubleshooting.ditamap"/>
+  </topicref>
+  <topicref keyref="reference">
+    <mapref href="../reference/reference.ditamap"/>
+  </topicref>
+  <topicref keyref="dita-and-dita-ot-resources">
+    <mapref href="../topics/dita-resources.ditamap" toc="no"/>
+  </topicref>
+
+  <topicgroup processing-role="resource-only">
+    <mapref href="common-resources.ditamap"/>
+  </topicgroup>
+</map>

@@ -1,0 +1,45 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="concept"><meta name="description" content="A DITA-OT plug-in can be dependent on other plug-ins. Prerequisite plug-ins are installed first, which ensures that DITA-OT handles XSLT overrides correctly."><meta name="DC.subject" content=", require, plug-ins, prerequisites, dependencies, order, XSLT"><meta name="keywords" content=", require, plug-ins, prerequisites, dependencies, order, XSLT"><meta name="DC.relation" scheme="URI" content="../topics/custom-plugins.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="plugin-dependencies"><meta name="DC.language" content="en-US"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Plug-in dependencies</title></head><body id="plugin-dependencies"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a><ul><li><a href="../topics/plugins-installing.html">Installing plug-ins</a></li><li><a href="../topics/plugins-removing.html">Removing plug-ins</a></li><li><a href="../topics/plugins-registry.html">Plug-in registry</a></li><li><a href="../topics/plugin-configfile.html">Plug-in descriptor file</a></li><li class="active"><a href="../topics/plugin-dependencies.html">Plug-in dependencies</a></li><li><a href="../topics/plugin-applications.html">Plug-in applications</a></li><li><a href="../topics/plugin-sample.html">Example plugin.xml file</a></li><li><a href="../topics/plugin-best-practices.html">Best practices</a></li><li><a href="../topics/plugin-coding-conventions.html">Coding conventions</a></li></ul></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Plug-in dependencies</h1>
+  
+  
+  <div class="body conbody"><p class="shortdesc">A DITA-OT plug-in can be dependent on other plug-ins. Prerequisite plug-ins are installed first, which
+    ensures that DITA-OT handles XSLT overrides correctly.</p>
+    
+    <section class="section">
+      <p class="p">The <code class="keyword markupname xmlelement">&lt;require&gt;</code> element in the <span class="ph filepath">plugin.xml</span> file specifies whether the
+        plug-in has dependencies. Use <code class="keyword markupname xmlelement">&lt;require&gt;</code> elements to specify prerequisite plug-ins, in
+        order from most general to most specific.</p>
+      <p class="p">If a prerequisite plug-in is missing, DITA-OT prints a warning during installation. To suppress the warning but
+        keep the installation order if both plug-ins are present, add <code class="ph codeph">importance="optional"</code> to the
+          <code class="keyword markupname xmlelement">&lt;require&gt;</code> element. </p>
+      
+      <p class="p">If a plug-in can depend on any one of several optional plug-ins, separate the plug-in IDs with a vertical bar.
+        This is most useful when combined with <code class="ph codeph">importance="optional"</code>.</p>
+    </section>
+    <div class="example"><h2 class="title sectiontitle">Example: Plug-in with a prerequisite plug-in</h2>
+      
+      <p class="p">The following plug-in will only be installed if the plug-in with the ID <code class="ph codeph">com.example.primary</code> is
+        available. If that plug-in is not available, a warning is generated and the installation operation fails.</p>
+      <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;plugin id="com.example.builds-on-primary"&gt;
+  &lt;!-- ... Extensions here --&gt;
+  &lt;require plugin="com.example.primary"/&gt;
+&lt;/plugin&gt;</code></pre>
+    </div>
+    <div class="example"><h2 class="title sectiontitle">Example: Plug-in that has optional plug-ins</h2>
+      
+      <p class="p">The following plug-in will only be installed if either the plug-in with the ID <code class="ph codeph">pluginA</code> or the
+        plug-in with the ID <code class="ph codeph">pluginB</code> is available. If neither of those plug-ins are installed, a warning
+        is generated but the installation operation is completed.</p>
+      <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;plugin id="pluginC"&gt;
+  &lt;!-- ...extensions here --&gt;
+  &lt;require plugin="pluginA|pluginB" importance="optional"/&gt;
+&lt;/plugin&gt;</code></pre>
+      
+    </div>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/custom-plugins.html" title="You can install or create DITA-OT plug-ins to change the default output types in various ways, add entirely new kinds of output formats, or implement DITA topic specializations.">Working with plug-ins</a></div></div></nav></article></main></body></html>

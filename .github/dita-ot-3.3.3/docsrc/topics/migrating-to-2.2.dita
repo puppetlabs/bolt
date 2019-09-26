@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="migrating-to-2.2">
+
+  <title>Migrating to release 2.2</title>
+  <titlealts>
+    <navtitle>To 2.2</navtitle>
+  </titlealts>
+
+  <shortdesc>In DITA-OT 2.2, the <option>HTML5</option> transformation was refactored as its own plug-in and separate
+    plug-ins were created for each of the rendering engine-specific PDF transformations.<draft-comment author="staylor">
+      There are likely other changes that should be noted here. </draft-comment>
+  </shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>toc</xmlelement></indexterm>
+        <indexterm><xmlelement>preface</xmlelement></indexterm>
+        <indexterm><xmlelement>frontmatter</xmlelement></indexterm>
+        <indexterm><xmlelement>bookmap</xmlelement></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>.notetitle</codeph> classes</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><parmname>user.input.file</parmname></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><parmname>user.input.dir</parmname></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><parmname>InputMapDir</parmname></indexterm></indexterm>
+        <indexterm>RenderX<indexterm>plug-in</indexterm></indexterm>
+        <indexterm>Antenna House<indexterm>plug-in</indexterm></indexterm>
+        <indexterm>Apache FOP<indexterm>plug-in</indexterm></indexterm>
+        <indexterm>table of contents<indexterm>PDF</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section>
+      <note>This topic provides a summary of changes in DITA-OT 2.2 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the <xref keyref="2.2-release-notes"/>.</note>
+    </section>
+    <section>
+      <title>HTML5</title>
+      <p>The <option>HTML5</option> transformation introduced in release 2.0 as part of the <option>XHTML</option>
+        plug-in has been moved to a separate <option>HTML5</option> plug-in. Customizations that extended the previous
+        HTML5 output under the <option>XHTML</option> plug-in will probably need to be refactored on the new HTML5
+        plug-in.</p>
+      <p>Note title processing has been revised to use a common <codeph>note__title</codeph> class for note elements of
+        all types. The legacy <codeph><varname>{$type}</varname>title</codeph> classes (such as
+          <codeph>.notetitle</codeph>, <codeph>.cautiontitle</codeph>, <codeph>.tiptitle</codeph>, etc.) are included
+        for backwards compatibility, but are deprecated and will be removed in an upcoming release. Stylesheets that
+        apply formatting overrides to note titles should be revised to replace the deprecated class selectors with the
+        equivalent descendant selectors, for example <codeph>.note_note .note__title</codeph>, <codeph>.note_caution
+          .note__title</codeph>, <codeph>.note_tip .note__title</codeph>, etc.</p>
+    </section>
+    <section>
+      <title>PDF</title>
+      <p>Processing specific to Apache FOP, Antenna House Formatter, and RenderX XEP has been separated into separate
+        plug-ins for each of those rendering engines. Customizations that extended this processing might need to extend
+        the new <codeph>org.dita.pdf2.fop</codeph>, <codeph>org.dita.pdf2.axf</codeph>, or
+          <codeph>org.dita.pdf2.xep</codeph> plug-ins.</p>
+      <p>PDF customizations that are not specific to a rendering engine can continue to extend the
+          <codeph>org.dita.pdf2</codeph> plug-in as before.</p>
+      <p>The default format for page numbers in the table of contents (<xmlelement>toc</xmlelement>) was switched to
+        roman to align with <xmlelement>preface</xmlelement> and ensure consistent numbering styles for all
+          <xmlelement>frontmatter</xmlelement> components in <xmlelement>bookmap</xmlelement>. This prevents numbering
+        from switching back and forth between styles in bookmaps where the Preface follows the table of contents.
+        Earlier versions of DITA-OT produced numbering sequences like <codeph>1,2,3,4,v,vi,7,8</codeph> in this use
+        case.</p>
+    </section>
+    <section>
+      <title>Deprecated properties</title>
+      <p>The following Ant properties have been deprecated:
+        <ul>
+          <li><parmname>user.input.file</parmname>, use <parmname>user.input.file.uri</parmname> instead to specify the
+            input file system path</li>
+          <li><parmname>user.input.dir</parmname>, use <parmname>user.input.dir.uri</parmname> instead to specify the
+            input directory system path</li>
+          <li><parmname>InputMapDir</parmname>, use <parmname>InputMapDir.uri</parmname> instead to specify the input
+            map directory system path</li>
+        </ul></p>
+    </section>
+  </refbody>
+</reference>

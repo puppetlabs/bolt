@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (C) Copyright IBM Corporation 2001, 2005. All Rights Reserved. -->
+
+<concept id="toolsconcept" xml:lang="en-us">
+  <title>Tools</title>
+  <shortdesc>Invest in a good set of tools for doing all kinds of tasks around the house.</shortdesc>
+  <conbody>
+    <p>Useful tools include the following items:</p>
+    <ul>
+      <li>Hammer</li>
+      <li>Screw driver set</li>
+      <li>Wrench set</li>
+      <li>Nails and screws</li>
+      <li>Level</li>
+      <li>Saws</li>
+      <li>Drill</li>
+      <li>Air pressure guage</li>
+      <li>Spade</li>
+      <li>Rake</li>
+    </ul>
+    <p>Keep your tools organized in a tool box.</p>
+  </conbody>
+  <related-links>
+    <link href="toolbox.xml" format="dita" type="concept"/>
+    <link href="../tasks/organizing.xml" format="dita" type="task"/>
+  </related-links>
+</concept>

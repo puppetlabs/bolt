@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="plugin-anttarget" xml:lang="en-US">
+  <title>Adding a new target to the Ant build process</title>
+  <shortdesc>As of DITA-OT 3.0, the <codeph>ant.import</codeph> extension point can be used to make new targets
+    available to the Ant processing pipeline. This can be done as part of creating a new transformation, extending
+    pre-processing, or simply to make new Ant targets available to other plug-ins.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins<indexterm>Ant</indexterm></indexterm>
+        <indexterm><codeph>ant.import</codeph></indexterm>
+        <indexterm>preprocessing</indexterm>
+        <indexterm>Ant<indexterm>targets</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>Create an Ant project file that contains the new target(s).</cmd>
+      </step>
+      <step>
+        <cmd>Create the <filepath>plugin.xml</filepath> file:</cmd>
+        <stepxmp><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;plugin id="<varname>plugin-id</varname>">
+  &lt;feature extension="ant.import" file="<varname>build-file</varname>"/>
+&lt;/plugin></codeblock>where:
+          <ul>
+            <li><varname>plugin-id</varname> is the plug-in identifier, for example,
+              <codeph>com.example.ant</codeph>.</li>
+            <li><varname>build-file</varname> is the Ant project file that contains the new build target(s).</li>
+          </ul></stepxmp>
+      </step>
+      <step>
+        <cmd>Install the plug-in.</cmd>
+      </step>
+    </steps>
+    <result>
+      <p>The targets from the project (<varname>build-file</varname>) are copied into the <filepath>build.xml</filepath>
+        file, using the correct path. This makes the new Ant targets available to other processes.</p>
+      <note type="tip">Earlier versions of DITA-OT use the <codeph>dita.conductor.target.relative</codeph> to call a
+        wrapper file with a dummy task that imports the Ant project file. This approach is still supported for backwards
+        compatibility, but the simpler <codeph>ant.import</codeph> approach described above should be used for all new
+        customizations.</note>
+    </result>
+  </taskbody>
+</task>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file is part of the DITA learning and training content 
+     specialization working design. It is a work-in-progress by
+     the OASIS DITA learning and training content specialization 
+     sub-committee.-->
+<!--             (C) Copyright OASIS Open 2007, 2009                    -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA learningContent XSD                         -->
+<!--  VERSION:   0.1                                               -->
+<!--  DATE:      May 2007                                          -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA Learning Base     -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             May 2007                                          -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" elementFormDefault="qualified"
+  attributeFormDefault="unqualified">
+  <!-- ==================== Import Section ======================= -->
+  <xs:import namespace="http://dita.oasis-open.org/architecture/2005/"   schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.2"/>
+  
+  <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic learningBase+learningInteractionBase-d learningContent)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    
+    </xs:documentation>
+  </xs:annotation>
+  
+  <!-- Base type: univ-atts -->
+  <xs:attributeGroup name="univ-atts-no-importance-learningContent">
+    <xs:attributeGroup ref="id-atts"/>
+    <xs:attributeGroup ref="filter-atts"/>
+    <xs:attribute name="rev" type="xs:string"/>
+    <xs:attribute name="status" type="status-atts.class"/>
+    <xs:attributeGroup ref="localization-atts"/>
+  </xs:attributeGroup>
+  <!-- Base type: importance-atts.class -->
+  <xs:simpleType name="importance-att-nodefault-learningContent.class">
+    <xs:restriction base="importance-atts.class">
+      <xs:enumeration value="optional"/>
+      <xs:enumeration value="required"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- Element declarations for learningContent.mod -->
+  <xs:element name="learningContent">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>learningContent</keyword>> element is the top-level element
+        for learningContent.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="learningContent.class">
+          <xs:attribute ref="class"
+            default="- topic/topic learningBase/learningBase learningContent/learningContent "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="learningContentbody">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>learningContentbody</keyword>> element is the main body-level
+        element inside a learningContent topic.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="learningContentbody.class">
+          <xs:attribute ref="class"
+            default="- topic/body learningBase/learningBasebody learningContent/learningContentbody "
+          />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <!-- Element declarations for task.mod -->
+  <!-- <!ENTITY % learningContent-info-types "(concept | task | reference | topic)*, (learningAssessment)?, (learningSummary)?"> -->
+  <xs:group name="learningContent-info-types">
+    <xs:choice>
+      <xs:group ref="no-topic-nesting"/>
+      <xs:group ref="info-types"/>
+    </xs:choice>
+  </xs:group>
+  
+  <!-- Base type: topic.class -->
+  <xs:complexType name="learningContent.class">
+    <xs:sequence>
+      <xs:group ref="learningContent.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="learningContent.attributes"/>
+  </xs:complexType>
+
+  <xs:group name="learningContent.content">
+    <xs:sequence>
+      <xs:sequence>
+        <xs:group ref="title"/>
+        <xs:group ref="titlealts" minOccurs="0"/>
+        <xs:choice minOccurs="0">
+          <xs:group ref="shortdesc" minOccurs="0"/>
+          <xs:group ref="abstract" minOccurs="0"/>
+        </xs:choice>
+        <xs:group ref="prolog" minOccurs="0"/>
+        <xs:group ref="learningContentbody"/>
+        <xs:group ref="related-links" minOccurs="0"/>
+        <xs:group ref="learningContent-info-types" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+
+  <!-- Base type: body.class -->
+  <xs:complexType name="learningContentbody.class">
+    <xs:sequence>
+     <xs:group ref="learningContentbody.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="learningContentbody.attributes"/>
+  </xs:complexType>
+
+  <xs:group name="learningContentbody.content">
+    <xs:sequence>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="lcIntro" minOccurs="0"/>
+          <xs:group ref="lcDuration" minOccurs="0"/>
+          <xs:group ref="lcObjectives" minOccurs="0"/>
+        </xs:choice>
+        <xs:group ref="lcChallenge" minOccurs="0"/>
+        <xs:group ref="lcInstruction" minOccurs="0"/>
+        <xs:group ref="section" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:attributeGroup name="learningContentbody.attributes">
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="learningContent.attributes">
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attributeGroup ref="conref-atts"/>
+    <xs:attributeGroup ref="select-atts"/>
+    <xs:attributeGroup ref="domains-att"/>
+    <xs:attribute ref="ditaarch:DITAArchVersion"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="localization-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+</xs:schema>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map processing-role="resource-only">
+  <title>Common Resources</title>
+  <topicref keyref="conref-task"/>
+  <topicref keyref="reusable-components"/>
+  <mapref href="key-definitions.ditamap"/>
+  <mapref href="reltable.ditamap"/>
+  <mapref href="subjectscheme.ditamap" type="subjectScheme"/>
+  <topicref keyref="DITA-messages-details" keys="messages-push"/>
+</map>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2013 Saso Kuncic
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | Uvod | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | Uvod | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">Kazalo</variable>
+  <variable id="Index Continued String">Se nadaljuje</variable>
+  <variable id="Index See String">, Gl. </variable>
+  <variable id="Index See Also String">Gl.tudi </variable>
+  <variable id="Table of Contents Chapter">Kazalo poglavja <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">Kazalo dodatka <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">Kazalo dela <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">Kazalo predgovora: </variable>
+  <variable id="Preface title">Predgovor</variable>
+  <variable id="Notices title">Opozorilo</variable>
+  <variable id="Mini Toc">Teme: </variable>
+  <variable id="Notice">Objava</variable>
+  <variable id="Figure.title">Slika <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">Slika <param ref-name="number"/></variable>
+  <variable id="Table.title">Tabela <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">Tabela <param ref-name="number"/></variable>
+  <variable id="Related Links">Sorodne povezave</variable>
+  <variable id="Cross-Reference">Križni sklic na:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Navzkrižni sklic na:</variable><!--UNUSED-->
+  <variable id="List item">Točka seznama.</variable>
+  <variable id="Foot note">Opomba v nogi.</variable>
+  <variable id="Navigation title">Poimenovanje krmarjenja</variable>
+  <variable id="Search title">Poimenovanje iskanja</variable>
+  <variable id="Chapter with number">Poglavje <param ref-name="number"/></variable>
+  <variable id="Appendix with number">Dodatek <param ref-name="number"/></variable>
+  <variable id="Part with number">Del <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[Zahtevano čiščenje]</variable>
+  <variable id="On the page"> na strani <param ref-name="pagenum"/></variable>
+  <variable id="Page"> stran <param ref-name="pagenum"/></variable>
+  <variable id="This link">ta povezava</variable><!--UNUSED-->
+  <variable id="Child topics">Podrejen</variable><!--UNUSED-->
+  <variable id="Related references">Sorodne reference</variable><!--UNUSED-->
+  <variable id="Optional Step">Izbiren:</variable>
+  <variable id="Required Step">Zahtevano:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">Besednjak</variable>
+  <variable id="List of Tables">Seznam tabel</variable>
+  <variable id="List of Figures">Seznam slik</variable>
+</vars>

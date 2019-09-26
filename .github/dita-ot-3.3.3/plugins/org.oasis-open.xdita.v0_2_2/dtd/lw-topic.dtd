@@ -1,0 +1,109 @@
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    Lightweight DITA Topic                            -->
+<!--  VERSION:   1.0                                               -->
+<!--  DATE:      XXX                                               -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an
+      appropriate system identifier:
+PUBLIC "-//OASIS//DTD LIGHTWEIGHT DITA Topic//EN"
+      Delivered as file "lw-topic.dtd"                             -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Lightweight DITA                                  -->
+<!--                                                               -->
+<!-- PURPOSE:    DTD to describe Lightweight DITA topic            -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             XXXX                                              -->
+<!--                                                               -->
+<!--             (C) OASIS                                         -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    25 Nov 2014 KJE: Upload files to DITA TC SVN repo          -->
+<!--    16 May 2016  MG: Upload files to GitHub repo               -->
+<!--    03 Apr 2017  CE: Added XDITA constraint token              -->
+<!--    11 Jun 2017 KJE: Added headers and update logs             -->
+<!--    20 Jun 2017  CE: Added prefix lw- to filename              -->
+<!--    25 Jul 2017  CE: Changed public identifier to LIGHTWEIGHT  -->
+<!--                     DITA                                      -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!--                    ADD PHRASE ELEMENTS                        -->
+<!-- ============================================================= -->
+
+<!-- hi-d -->
+<!ENTITY % ph           "ph | b | i |u | sup | sub"       >
+
+
+<!-- ============================================================= -->
+<!--                    ADD FILTERING ATTRIBUTES                   -->
+<!-- ============================================================= -->
+
+<!-- none-->
+<!-- ENTITY % filter-adds
+      "ADD-ATTRIBUTE-HERE      CDATA                        #IMPLIED"-->
+
+
+<!-- ============================================================= -->
+<!--                    DECLARE USE OF ELEMENT/ATTRIBUTE DOMAINS                 -->
+<!-- ============================================================= -->
+
+<!ENTITY included-domains                         "(topic hi-d) (topic h5m-d)"           >
+
+<!-- ============================================================= -->
+<!--                    REMOVE ATTRIBUTE/ELEMENT GROUPS                    -->
+<!-- ============================================================= -->
+
+<!-- Remove a group by uncommenting its redefinition below -->
+
+<!--ENTITY % filters " " -->
+<!--ENTITY % reuse " " -->
+<!--ENTITY % variable-content " " -->
+<!--ENTITY % variable-links " " -->
+<!--ENTITY % localization " " -->
+<!--ENTITY % nested-blocks "p" -->
+
+<!--For each group removed add a corresponding constraint value to
+    the excluded-domains entity. The constraint name should be "no-"
+    followed by the name of the entity removed/constrained.
+    For example, if you removed reuse attributes, add the value
+    "no-reuse-c" to the excluded-domains entity definition-->
+
+<!ENTITY excluded-domains                         " "                >
+
+<!-- ============================================================= -->
+<!--                    INCLUDE TOPIC AND SECTION MODULES          -->
+<!-- ============================================================= -->
+
+<!--                    Embed topic module to get generic elements -->
+<!ENTITY % topic-type   PUBLIC
+"-//OASIS//ELEMENTS LIGHTWEIGHT DITA Topic//EN"
+"lw-topic.mod"                                                       >
+%topic-type;
+
+<!--                    Embed section modules                      -->
+<!-- none -->
+
+
+<!-- ============================================================= -->
+<!--                    INCLUDE PHRASE MODULES                     -->
+<!-- ============================================================= -->
+
+<!ENTITY % hi-d-def     PUBLIC
+" -//OASIS//ELEMENTS LIGHTWEIGHT DITA Highlight Domain//EN"
+"lw-highlightDomain.mod"                                                >
+%hi-d-def;
+
+
+<!-- ============== End LIGHTWEIGHT DITA Topic DTD  =============== -->

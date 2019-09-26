@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Reference XSD Group Defenition               -->
+<!--  VERSION:   1.1                                             -->
+<!--  DATE:      November 2006                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA References        -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2006                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+
+  <xs:group name="reference">
+  	<xs:sequence>
+  	  <xs:element ref="reference" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="refbody">
+  	<xs:sequence>
+  	  <xs:element ref="refbody" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="refsyn">
+  	<xs:sequence>
+  	  <xs:element ref="refsyn" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="properties">
+  	<xs:sequence>
+  	  <xs:element ref="properties" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="property">
+  	<xs:sequence>
+  	  <xs:element ref="property" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="prophead">
+  	<xs:sequence>
+  	  <xs:element ref="prophead" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="propvalue">
+  	<xs:sequence>
+  	  <xs:element ref="propvalue" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="proptype">
+  	<xs:sequence>
+  	  <xs:element ref="proptype" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="propdesc">
+  	<xs:sequence>
+  	  <xs:element ref="propdesc" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="propvaluehd">
+  	<xs:sequence>
+  	  <xs:element ref="propvaluehd" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="proptypehd">
+  	<xs:sequence>
+  	  <xs:element ref="proptypehd" />
+  	</xs:sequence>
+  </xs:group>
+
+  <xs:group name="propdeschd">
+  	<xs:sequence>
+  	  <xs:element ref="propdeschd" />
+  	</xs:sequence>
+  </xs:group>
+
+</xs:schema>

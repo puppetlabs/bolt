@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="custom-html-parameters">
+  <title>Setting parameters for custom HTML</title>
+  <titlealts>
+    <navtitle>Setting HTML parameters</navtitle>
+  </titlealts>
+  <shortdesc>For simple branded HTML pages, you can adjust the look and feel of the default output to match your company
+    style by setting parameters to include custom CSS, header branding, or table-of-contents navigation in topics.
+    (These changes do not require a custom plug-in.)</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>HTML<indexterm>parameters</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+</task>

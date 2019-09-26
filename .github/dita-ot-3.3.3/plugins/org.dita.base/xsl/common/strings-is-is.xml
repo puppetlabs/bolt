@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="is-is">        <!-- Icelandic -->
+  <str name="Figure">Mynd</str>
+  <str name="Table">Tafla</str>
+  <str name="Next topic">Næsti kafli</str>
+  <str name="Previous topic">Fyrri kafli</str>
+  <str name="Parent topic">Yfirkafli</str>
+  <str name="Required cleanup">Nauðsynleg hreinsun</str>
+  <str name="Draft comment">Tillaga um athugasemd</str>
+  <str name="Option">Valkostur</str>
+  <str name="Description">Lýsing</str>
+  <str name="Optional">Valfrjáls</str>
+  <str name="Required">Tilskilið</str>
+  <str name="Skip visual syntax diagram">Sleppa sjónrænu flæðiriti málskipunar</str>
+  <str name="Read syntax diagram">Lesa flæðirit málskipunar</str>
+  <str name="Start of change">Byrjun breytingar</str>
+  <str name="End of change">Lok breytingar</str>
+  <str name="Index">Atriðaskrá</str>
+  <str name="Special characters">Sérstök tákn</str>
+  <str name="Numerics">Tölur</str>
+  <str name="End notes">Lok athugasemda</str>
+  <str name="Artwork">Myndefni</str>
+  <str name="Syntax">Málskipan</str>
+  <str name="Type">Gerð</str>
+  <str name="Value">Gildi</str>
+  <str name="Note">Athugið</str>
+  <str name="Notes">Athugasemdir</str>
+  <str name="Tip">Heilræði</str>
+  <str name="Fastpath">Flýtileið</str>
+  <str name="Important">Áríðandi</str>
+  <str name="Attention">Viðvörun</str>
+  <str name="Caution">VARÚÐ</str>
+  <str name="Danger">HÆTTA</str>
+  <str name="Remember">Mundu</str>
+  <str name="Restriction">Takmörkun</str>
+  <str name="Trouble">Vandamál</str>
+  <str name="Warning">Viðvörun</str>
+  <str name="Contents">Efnisyfirlit</str>
+  <str name="Related concepts">Skyld hugtök</str>
+  <str name="Related tasks">Skyld verkefni</str>
+  <str name="Related reference">Skyld tilvísun</str>
+  <str name="Related information">Skyldar upplýsingar</str>
+  <str name="Prerequisite">Forsenda</str>
+  <str name="Prerequisites">Forsendur</str>
+  <str name="or">eða</str>
+  <str name="task_context">Um þetta verk</str>
+  <str name="task_example">Dæmi</str>
+  <str name="task_postreq">Það sem gera þarf næst</str>
+  <str name="task_prereq">Áður en þú byrjar</str>
+  <str name="task_procedure">Aðferð</str>
+  <str name="task_procedure_unordered">Aðferð</str>
+  <str name="task_results">Niðurstöður</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

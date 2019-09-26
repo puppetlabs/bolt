@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="webtrouble" xml:lang="en-us">
+  <title>Troublshooting Web Server problems</title>
+  <shortdesc>There are several things to try if your Web Server is not functioning properly.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>troubleshooting</indexterm>
+        <indexterm>web server</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps-unordered>
+      <step>
+        <cmd>If others cannot connect to your server, try turning off their firewalls.</cmd>
+      </step>
+      <step>
+        <cmd>If your server is running slowly, try limiting it to 2 or 3 connections.</cmd>
+      </step>
+      <step>
+        <cmd>If your server keeps creating pop-up ads when people access it, please turn them off and things will run
+          faster.</cmd>
+      </step>
+      <step>
+        <cmd>If these directions are not helpful, please contact your service representative.</cmd>
+      </step>
+    </steps-unordered>
+  </taskbody>
+</task>

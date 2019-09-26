@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="installstorage" xml:lang="en-us">
+  <title>Installing hard drives or other storage</title>
+  <shortdesc>A simple guide to installing hard drives.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Overview</indexterm>
+        <indexterm>hard drive</indexterm>
+        <indexterm>install</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <prereq>First purchase a hard drive at your local electronics store or from a qualified representative.</prereq>
+  </taskbody>
+</task>

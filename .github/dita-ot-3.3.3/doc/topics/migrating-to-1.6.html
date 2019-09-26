@@ -1,0 +1,173 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="In DITA-OT 1.6, various demo plug-ins were removed along with many deprecated properties, targets, templates and modes. The PDF2 transformation no longer supports the beta version of DITA from IBM, the &#34;bkinfo&#34; demo plug-in, or layout-masters.xml configuration."><meta name="DC.subject" content="deprecated features, folder, demo, processing instruction, workdir, topic pull templates, list of, &#34;bkinfo&#34; demo plug-in, layout-masters.xml, PDF2 templates, list of, XHTML templates, list of, ODT templates, list of"><meta name="keywords" content="deprecated features, folder, demo, processing instruction, workdir, topic pull templates, list of, &#34;bkinfo&#34; demo plug-in, layout-masters.xml, PDF2 templates, list of, XHTML templates, list of, ODT templates, list of"><meta name="DC.relation" scheme="URI" content="../topics/migration.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="ID"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Migrating to release 1.6</title></head><body id="ID"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a><ul><li><a href="../topics/migrating-to-3.3.html">To 3.3</a></li><li><a href="../topics/migrating-to-3.2.html">To 3.2</a></li><li><a href="../topics/migrating-to-3.1.html">To 3.1</a></li><li><a href="../topics/migrating-to-3.0.html">To 3.0</a></li><li><a href="../topics/migrating-to-2.5.html">To 2.5</a></li><li><a href="../topics/migrating-to-2.4.html">To 2.4</a></li><li><a href="../topics/migrating-to-2.3.html">To 2.3</a></li><li><a href="../topics/migrating-to-2.2.html">To 2.2</a></li><li><a href="../topics/migrating-to-2.1.html">To 2.1</a></li><li><a href="../topics/migrating-to-2.0.html">To 2.0</a></li><li><a href="../topics/migrating-to-1.8.html">To 1.8</a></li><li><a href="../topics/migrating-to-1.7.html">To 1.7</a></li><li class="active"><a href="../topics/migrating-to-1.6.html">To 1.6</a></li><li><a href="../topics/migrating-to-1.5.4.html">To 1.5.4</a></li></ul></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+
+  <h1 class="title topictitle1" id="ariaid-title1">Migrating to release 1.6</h1>
+  
+
+  
+  
+  
+
+  <div class="body refbody"><p class="shortdesc">In DITA-OT 1.6, various <span class="ph filepath">demo</span> plug-ins were removed along with many deprecated
+    properties, targets, templates and modes. The PDF2 transformation no longer supports the beta version of DITA from
+    IBM, the "bkinfo" demo plug-in, or <span class="ph filepath">layout-masters.xml</span> configuration.</p>
+    <section class="section">
+      <p class="p">Support for the old DITAVAL format (used before OASIS added DITAVAL to the standard in 2007) has been
+        removed.</p>
+      <p class="p">The <span class="ph filepath">demo</span> folder has been deprecated and the following plug-ins have been moved to the
+          <span class="ph filepath">plugins</span> folder:</p>
+      <table class="table table-hover frame-none"><caption></caption><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="thead">
+            <tr class="row">
+              <th class="entry colsep-0 rowsep-1" id="ID__entry__1">old path</th>
+              <th class="entry colsep-0 rowsep-1" id="ID__entry__2">new path</th>
+            </tr>
+          </thead><tbody class="tbody">
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__1"><span class="ph filepath">demo/dita11</span></td>
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__2"><span class="ph filepath">plugins/org.dita.specialization.dita11</span></td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__1"><span class="ph filepath">demo/dita132</span></td>
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__2"><span class="ph filepath">plugins/org.dita.specialization.dita132</span></td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__1"><span class="ph filepath">demo/eclipsemap</span></td>
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__2"><span class="ph filepath">plugins/org.dita.specialization.eclipsemap</span></td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__1"><span class="ph filepath">demo/fo</span></td>
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__2"><span class="ph filepath">plugins/org.dita.pdf2</span></td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__1"><span class="ph filepath">demo/tocjs</span></td>
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__2"><span class="ph filepath">plugins/com.sophos.tocjs</span></td>
+            </tr>
+            
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__1"><span class="ph filepath">demo/h2d</span></td>
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__2"><span class="ph filepath">plugins/h2d</span></td>
+            </tr>
+            <tr class="row">
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__1"><span class="ph filepath">demo/legacypdf</span></td>
+              <td class="entry colsep-0 rowsep-1" headers="ID__entry__2"><span class="ph filepath">plugins/legacypdf</span></td>
+            </tr>
+          </tbody></table>
+      <p class="p">The remaining plug-ins in the demo folder have been moved to a separate repository at <a class="xref" href="https://github.com/dita-ot/ext-plugins" target="_blank">github.com/dita-ot/ext-plugins</a>.</p>
+    </section>
+    <section class="section">
+      <p class="p">The deprecated property <code class="ph codeph">dita.input.valfile</code> should be replaced with the new argument property
+          <code class="ph codeph">args.filter</code>.</p>
+      <p class="p">The <code class="ph codeph">dita-preprocess</code> target has been removed and dependencies should be replaced with a target
+        sequence <code class="ph codeph">build-init, preprocess</code>.</p>
+      <p class="p">Support for the <code class="ph codeph">args.message.file</code> argument has been removed as message configuration has
+        become static configuration.</p>
+      <p class="p">The <code class="ph codeph">workdir</code> processing instruction has been deprecated in favor of
+          <code class="ph codeph">workdir-uri</code>. The only difference between the two processing instructions is that
+          <code class="ph codeph">workdir-uri</code> contains a URI instead of a system path.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Preprocessing</h2>
+      
+      <p class="p">The following deprecated templates and modes have been removed in topic pull stylesheets:</p>
+      <ul class="ul">
+        <li class="li">inherit</li>
+        <li class="li">get-stuff</li>
+        <li class="li">verify-type-attribute</li>
+        <li class="li">classval</li>
+        <li class="li">getshortdesc</li>
+        <li class="li">getlinktext</li>
+        <li class="li">blocktext</li>
+        <li class="li">figtext</li>
+        <li class="li">tabletext</li>
+        <li class="li">litext</li>
+        <li class="li">fntext</li>
+        <li class="li">dlentrytext</li>
+        <li class="li">firstclass</li>
+        <li class="li">invalid-list-item</li>
+        <li class="li">xref</li>
+      </ul>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">PDF2</h2>
+      
+      <p class="p">The following deprecated items are no longer supported in the PDF transform:</p>
+      <ul class="ul">
+        <li class="li">Support for the beta version of DITA, available from IBM before the OASIS standard was created in 2005.</li>
+        <li class="li">Support for the "bkinfo" demo plug-in, used to support book metadata before OASIS created the BookMap format
+          in 2007.</li>
+        <li class="li">Support for <span class="ph filepath">layout-masters.xml</span> configuration. Plug-ins should use the
+            <code class="ph codeph">createDefaultLayoutMasters</code> template instead.</li>
+      </ul>
+      <p class="p">The following extension-points have been added:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">dita.conductor.pdf2.param</code> to add XSLT parameters to XSL FO transformation.</li>
+      </ul>
+      <p class="p">Custom PDF2 shell stylesheets need to be revised to not include separate IBM and OASIS DITA stylesheets. The
+            <span class="ph filepath"><var class="keyword varname">*</var>_1.0.xsl</span> stylesheets have been removed and their imports must be
+        removed from shell stylesheets.</p>
+      <p class="p">The following template modes have been deprecated:</p>
+      <ul class="ul">
+        <li class="li">toc-prefix-text</li>
+        <li class="li">toc-topic-text</li>
+      </ul>
+      <p class="p">The following named templates have been removed:</p>
+      <ul class="ul">
+        <li class="li">processTopic</li>
+        <li class="li">createMiniToc</li>
+        <li class="li">processTopicTitle</li>
+        <li class="li">createTopicAttrsName</li>
+        <li class="li">processConcept</li>
+        <li class="li">processReference</li>
+        <li class="li">getTitle</li>
+        <li class="li">placeNoteContent</li>
+        <li class="li">placeImage</li>
+        <li class="li">processUnknowType</li>
+        <li class="li">insertReferenceTitle</li>
+        <li class="li">buildRelationships</li>
+        <li class="li">processTask</li>
+      </ul>
+      <p class="p">The main FO generation process now relies on the merging process to rewrite duplicate IDs. The default merging
+        process did this already in previous releases, but now also custom merging processes must fulfill the duplicate
+        ID rewrite requirement.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">XHTML</h2>
+      
+      <p class="p">The following named templates have been deprecated:</p>
+      <ul class="ul">
+        <li class="li">make-index-ref</li>
+      </ul>
+      <p class="p">The following deprecated templates have been removed:</p>
+      <ul class="ul">
+        <li class="li">revblock-deprecated</li>
+        <li class="li">revstyle-deprecated</li>
+        <li class="li">start-revision-flag-deprecated</li>
+        <li class="li">end-revision-flag-deprecated</li>
+        <li class="li">concept-links</li>
+        <li class="li">task-links</li>
+        <li class="li">reference-links</li>
+        <li class="li">relinfo-links</li>
+        <li class="li">sort-links-by-role</li>
+        <li class="li">create-links</li>
+        <li class="li">add-linking-attributes</li>
+        <li class="li">add-link-target-attribute</li>
+        <li class="li">add-user-link-attributes</li>
+      </ul>
+      <p class="p">The removed templates have been replaced by other templates in earlier releases and plug-ins should be changed
+        to use the new templates.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">ODT</h2>
+      
+      <p class="p">The following deprecated templates have been removed:</p>
+      <ul class="ul">
+        <li class="li">revblock-deprecated</li>
+        <li class="li">revstyle-deprecated</li>
+        <li class="li">start-revision-flag-deprecated</li>
+        <li class="li">end-revision-flag-deprecated</li>
+      </ul>
+      <p class="p">The removed templates have been replaced by other templates in earlier releases and plug-ins should be changed
+        to use the new templates.</p>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/migration.html" title="If you have XSL transformation overrides, plug-ins or other customizations written prior to DITA-OT 3.3, you may need to make changes to ensure your overrides work properly with the latest toolkit versions.">Migrating customizations</a></div></div></nav></article></main></body></html>

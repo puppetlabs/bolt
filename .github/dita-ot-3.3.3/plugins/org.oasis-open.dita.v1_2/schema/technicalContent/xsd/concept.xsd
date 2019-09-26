@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Concept XSD                                  -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA concepts          -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2009                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+  <!-- Add the domains to the base topic XML Schema -->
+  <!--  ================ TOPIC DOMAINS INLCUSION =====================  -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:programmingDomain.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:softwareDomain.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:highlightDomain.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:uiDomain.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:utilitiesDomain.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:indexingDomain.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:hazardstatementDomain.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:abbreviateDomain.xsd:1.2" />
+
+  <!--  ================ CONCEPT GROUP DEFINITION=====================  -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:conceptGrp.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:metaDeclGrp.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:tblDeclGrp.xsd:1.2"/>
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:topicGrp.xsd:1.2"/>
+  
+  <!-- =================  MODULE INLCUDE DEFINITION  ==================  -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:commonElementMod.xsd:1.2"/>
+  <!-- ======== Table elements ======== -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:tblDeclMod.xsd:1.2"/>    
+  <!-- ======= MetaData elements, plus keyword and indexterm ======= -->
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:metaDeclMod.xsd:1.2"/>
+  
+  <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:commonElementGrp.xsd:1.2">
+    <xs:group name="keyword">
+      <xs:choice>
+        <xs:group ref="keyword"/>
+        <xs:group ref="pr-d-keyword" />
+        <xs:group ref="ui-d-keyword" />
+        <xs:group ref="sw-d-keyword" />
+      </xs:choice>
+    </xs:group>
+
+    <xs:group name="ph">
+      <xs:choice>
+        <xs:group ref="ph"/>
+        <xs:group ref="pr-d-ph" />
+        <xs:group ref="ui-d-ph" />
+        <xs:group ref="hi-d-ph" />
+        <xs:group ref="sw-d-ph" />
+      </xs:choice>
+    </xs:group>
+
+    <xs:group name="pre">
+      <xs:choice>
+        <xs:group ref="pre"/>
+        <xs:group ref="pr-d-pre" />
+        <xs:group ref="ui-d-pre" />
+        <xs:group ref="sw-d-pre" />
+      </xs:choice>
+    </xs:group>
+
+
+    <xs:group name="dl">
+      <xs:choice>
+        <xs:group ref="dl"/>
+        <xs:group ref="pr-d-dl"/>
+      </xs:choice >
+    </xs:group >
+
+
+    <xs:group name="fig">
+      <xs:choice>
+        <xs:group ref="fig"/>
+        <xs:group ref="pr-d-fig"/>
+        <xs:group ref="ut-d-fig" />
+      </xs:choice>
+    </xs:group >
+    
+    <xs:group name="index-base">
+      <xs:choice>
+        <xs:group ref="index-base"/>
+        <xs:group ref="indexing-d-index-base"/>
+      </xs:choice>
+    </xs:group >
+      
+      <xs:group name="note">
+      <xs:choice>
+        <xs:group ref="note"/>
+        <xs:group ref="hazard-d-note"/>
+      </xs:choice>
+      </xs:group >
+    
+    <xs:group name="term">
+      <xs:choice>
+        <xs:group ref="term"/>
+        <xs:group ref="abbrev-d-term"/>
+      </xs:choice>
+    </xs:group >
+
+  </xs:redefine>
+
+
+  
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:topicMod.xsd:1.2" />  
+  <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:conceptMod.xsd:1.2" />
+  
+  
+  	
+
+  <!--  ================ INFO-TYPES DEFINITION =====================  -->
+  <xs:group name="info-types">
+    <xs:sequence/>
+  </xs:group>
+
+<!--  ================ DOMAINS ATTRIBUTE DEFINITION =====================  -->
+  <xs:attributeGroup name="domains-att">
+    <xs:attribute name="domains" type="xs:string" 
+                          default="(topic abbrev-d)
+                                          (topic hazard-d)
+                                          (topic hi-d)
+                                          (topic indexing-d)                                           
+                                          (topic pr-d) 
+                                          (topic sw-d)
+                                          (topic ui-d) 
+                                          (topic ut-d)
+                                          (topic concept)"/>
+  </xs:attributeGroup>
+   
+</xs:schema>

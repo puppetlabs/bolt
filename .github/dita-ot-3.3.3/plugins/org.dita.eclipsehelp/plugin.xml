@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<plugin id="org.dita.eclipsehelp" version="3.3.3">
+  <!-- extension points -->
+  <extension-point id="dita.xsl.eclipse.plugin" name="Eclipse plugin XSLT import"/>
+  <extension-point id="dita.map.eclipse.index.pre" name="Eclipse index extraction pre-target"/>
+  <extension-point id="dita.xsl.eclipse.toc" name="Eclipse TOC XSLT import"/>
+  <extension-point id="dita.conductor.eclipse.toc.param" name="Eclipse Help TOC XSLT parameter"/>
+  <!-- extensions -->
+  <transtype name="eclipsehelp" extends="base-html" desc="Eclipse Help">
+    <param name="args.eclipsehelp.jar.name" desc="Specifies that the output should be zipped and returned using this name." type="string"/>
+    <param name="args.eclipsehelp.country" desc="Specifies the region for the language that is specified by the args." type="string"/> 
+    <param name="args.eclipsehelp.language" desc="Specifies the base language for translated content, such as en for English." type="string"/> 
+    <param name="args.eclipse.provider" desc="Specifies the name of the person or organization that provides the Eclipse help." type="string">
+      <val default="true">DITA</val>
+    </param>
+    <param name="args.eclipse.version" desc="Specifies the version number to include in the output." type="string">
+      <val default="true">0.0.0</val>
+    </param>
+    <param name="args.eclipse.symbolic.name" desc="Specifies the symbolic name (aka plugin ID) in the output for an Eclipse Help project." type="string">
+      <val default="true">org.sample.help.doc</val>
+    </param>
+  </transtype>
+  <require plugin="org.dita.xhtml"/>
+  <feature extension="dita.conductor.lib.import" file="lib/eclipsehelp.jar"/>
+  <feature extension="ant.import" file="build_dita2eclipsehelp.xml"/>
+  <template file="build_dita2eclipsehelp_template.xml"/>
+  <template file="xsl/map2eclipse_template.xsl"/>
+  <template file="xsl/map2plugin_template.xsl"/>
+</plugin>

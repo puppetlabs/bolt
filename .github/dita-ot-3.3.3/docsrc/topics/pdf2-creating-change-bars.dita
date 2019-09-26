@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="concept_gsc_vcf_vs">
+  <title>Generating revision bars</title>
+  <shortdesc>If you use Antenna House Formatter or RenderX XEP, you can generate revision bars in your PDF output by
+    using the <xmlatt>changebar</xmlatt> and <xmlatt>color</xmlatt> attributes of the DITAVAL
+      <xmlelement>revprop</xmlelement> element.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>revprop</xmlelement></indexterm>
+        <indexterm><xmlatt>changebar</xmlatt></indexterm>
+        <indexterm><xmlatt>color</xmlatt></indexterm>
+        <indexterm>DITAVAL<indexterm>change bars</indexterm></indexterm>
+        <indexterm>RenderX<indexterm>change bars</indexterm></indexterm>
+        <indexterm>Antenna House<indexterm>change bars</indexterm></indexterm>
+        <indexterm>Apache FOP<indexterm>change bars</indexterm></indexterm>
+        <indexterm>PDF<indexterm>change bars</indexterm></indexterm>
+        <indexterm>transformations<indexterm end="pdf"/></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <note>The Apache Formatting Objects Processor (FOP <keyword keyref="tool.fop.version"/>) bundled with DITA-OT does
+      not yet support the XSL <codeph>fo:change-bar</codeph> formatting object. A patch has been submitted to enable
+      this support in a future version of FOP.</note>
+    <p>The DITA specification for <xmlatt>changebar</xmlatt> simply says:<lq>
+        <dl>
+          <dlentry>
+            <dt><xmlatt>changebar</xmlatt></dt>
+            <dd>When flag has been set, specify a changebar color, style, or character, according to the changebar
+              support of the target output format. If flag has not been set, this attribute is ignored.</dd>
+          </dlentry>
+        </dl>
+      </lq></p>
+    <p>The current version of DITA Open Toolkit uses two <xmlelement>revprop</xmlelement> attribute values to define
+      revision bars:</p>
+    <ul>
+      <li>
+        <p>The <xmlatt>changebar</xmlatt> attribute value defines the style to use for the line. The list of possible
+          values is the same as for other XSL-FO rules (see <xref keyref="fo-spec.change-bar-style"/>). The default
+          value is <option>groove</option>.</p></li>
+      <li>
+        <p>The <xmlatt>color</xmlatt> attribute value specifies the change bar color using any color value recognized by
+          XSL-FO, including the usual color names or a hex color value. The default value is
+        <option>black</option>.</p></li>
+    </ul>
+    <fig>
+      <title>Sample revision bar configuration</title>
+      <codeblock outputclass="language-xml">&lt;revprop action="flag" changebar="solid" color="green"/></codeblock>
+    </fig>
+    <p>DITA-OT uses a default offset of 2 mm to place the revision bar near the edge of the text column. The offset,
+      placement and width are not currently configurable via attribute values.</p>
+    <!-- Doesn't look like there is any way to set the offset (defaults to `2mm2), placement, or width -->
+    <!-- https://github.com/dita-ot/dita-ot/pull/3111#issuecomment-431110715 -->
+    <!-- 
+    <parml>
+      <plentry>
+        <pt>offset</pt>
+        <pd>The space to offset the revision bar from the edge of the text column. You can use points (pt) or
+          millimeters (mm).</pd>
+      </plentry>
+      <plentry>
+        <pt>placement</pt>
+        <pd>The side of the text column on which to place the revision bar. The allowed values are
+            <option>start</option> (left side for left-to-right languages) and <option>end</option> (right side for
+          left-to-right languages). The default value is <option>start</option>.</pd>
+      </plentry>
+      <plentry>
+        <pt>width</pt>
+        <pd>The width of the rule as a measurement value. Typical values are <option>1pt</option> and
+            <option>0.5pt</option>, which renders a hairline rule.</pd>
+      </plentry>
+    </parml>
+    -->
+    <p>XSL-FO 1.1 does not provide for revision bars that are not rules, so there is no way to get text revision
+      indicators instead of rules, for example, using a number in place of a rule. Antenna House Formatter provides a
+      proprietary extension to enable this, but the DITA-OT PDF transformation does not take advantage of it.</p>
+  </conbody>
+</concept>

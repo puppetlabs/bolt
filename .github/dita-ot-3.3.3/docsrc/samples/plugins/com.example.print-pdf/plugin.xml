@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="dita-ot/plugin.rnc" type="application/relax-ng-compact-syntax"?>
+
+<plugin id="com.example.print-pdf">
+  <require plugin="org.dita.pdf2"/>
+  <transtype name="print-pdf" extends="pdf" desc="PDF on A4 paper"/>
+  <feature extension="dita.transtype.print" value="print-pdf"/>
+  <feature extension="ant.import" file="integrator.xml"/>
+</plugin>

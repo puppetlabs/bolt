@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project. 
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | مقدمہ | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | مقدمہ | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">مشمولات</variable>
+  <variable id="Index Continued String">جاری</variable>
+  <variable id="Index See String">, دیکھیں </variable>
+  <variable id="Index See Also String">یہ بھی دیکھیں </variable>
+  <variable id="Table of Contents Chapter">باب <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">ضمیمہ <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">جزو <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">مقدمہ: </variable>
+  <variable id="Preface title">مقدمہ</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">مشمولات: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">اعداد <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">اعداد <param ref-name="number"/></variable>
+  <variable id="Table.title">جدول <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">جدول <param ref-name="number"/></variable>
+  <variable id="Related Links">متعلقہ معلومات</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">باب <param ref-name="number"/></variable>
+  <variable id="Appendix with number">ضمیمہ <param ref-name="number"/></variable>
+  <variable id="Part with number">جزو <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[مطلوبہ صفائی]</variable>
+  <variable id="On the page"> صفحہ پر <param ref-name="pagenum"/></variable>
+  <variable id="Page"> صفحہ <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">اختیاری:</variable>
+  <variable id="Required Step">ضروری:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">فرہنگ</variable>
+  <variable id="List of Tables">جدولیں</variable>
+  <variable id="List of Figures">اعداد</variable>
+</vars>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--                                                             -->
+<!--============================================================= -->
+<!--DITA SVG Domain                                              -->
+<!--============================================================= -->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:import schemaLocation="svg/svg11/svg11.xsd"
+              namespace="http://www.w3.org/2000/svg"/>
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic svg-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="svg-container">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="svg-container"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="svgref">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="svgref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="svg-d-foreign">
+      <xs:choice>
+         <xs:element ref="svg-container"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="svg-container">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="svg-container.class">
+               <xs:attribute ref="class" default="+ topic/foreign svg-d/svg-container "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="svg-container.class">
+      <xs:sequence>
+         <xs:group ref="svg-container.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="svg-container.attributes"/>
+   </xs:complexType>
+   <xs:group name="svg-container.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element xmlns:svg="http://www.w3.org/2000/svg" ref="svg:svg"/>
+            <xs:group ref="svgref"/>
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="svg-container.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="svgref">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="svgref.class">
+               <xs:attribute ref="class" default="+ topic/xref svg-d/svgref "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="svgref.class">
+      <xs:sequence>
+         <xs:group ref="svgref.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="svgref.attributes"/>
+   </xs:complexType>
+   <xs:group name="svgref.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="svgref.attributes">
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string" default="svg"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

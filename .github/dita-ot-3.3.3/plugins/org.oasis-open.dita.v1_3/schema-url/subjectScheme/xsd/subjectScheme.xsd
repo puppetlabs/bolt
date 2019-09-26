@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                   HEADER                                      -->
+<!-- ============================================================= -->
+<!-- Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02     -->
+<!-- OASIS Standard                                           -->
+<!-- 16 January 2018                                           -->
+<!-- Copyright (c) OASIS Open 2018. All rights reserved.           -->
+<!-- Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html                                -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- MODULE:    DITA Subject Scheme Map XSD                        -->
+<!-- VERSION:   1.3                                                -->
+<!-- DATE:      March 2014                                         -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    XSD to describe DITA Subject Scheme maps          -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!-- February 2009                                                 -->
+<!--                                                               -->
+<!-- UPDATES:                                                      -->
+<!-- ============================================================= -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:include schemaLocation="../../base/xsd/mapGroupMod.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/deliveryTargetAttDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/hazardstatementDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/highlightDomain.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/utilitiesDomain.xsd"/>
+
+   <!-- ================ GROUP DEFINITIONS ===================== -->
+   <xs:include schemaLocation="../../base/xsd/metaDeclGrp.xsd"/>
+   <xs:include schemaLocation="../../base/xsd/tblDeclGrp.xsd"/>
+   <xs:include schemaLocation="./subjectSchemeGrp.xsd"/>
+
+   <!-- =================  MODULE INCLUDE DEFINITION  ================== -->
+   <xs:include schemaLocation="../../base/xsd/commonElementMod.xsd"/>
+
+   <!-- ======== Table elements ======== -->
+   <xs:include schemaLocation="../../base/xsd/tblDeclMod.xsd"/>
+
+   <!-- ======= MetaData elements, plus keyword and indexterm ======= -->
+   <xs:include schemaLocation="../../base/xsd/metaDeclMod.xsd"/>
+
+  <xs:redefine schemaLocation="../../base/xsd/mapGrp.xsd">
+    <xs:group name="topicref">
+      <xs:choice>
+        <xs:group ref="topicref"/>
+        <xs:group ref="mapgroup-d-topicref"/>
+      </xs:choice>
+    </xs:group>
+  </xs:redefine>
+  <xs:redefine schemaLocation="../../base/xsd/commonElementGrp.xsd">
+      <xs:group name="data">
+         <xs:choice>
+            <xs:group ref="data"/>
+            <xs:group ref="ut-d-data"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="note">
+         <xs:choice>
+            <xs:group ref="note"/>
+            <xs:group ref="hazard-d-note"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="fig">
+         <xs:choice>
+            <xs:group ref="fig"/>
+            <xs:group ref="ut-d-fig"/>
+         </xs:choice>
+      </xs:group>
+      <xs:group name="ph">
+         <xs:choice>
+            <xs:group ref="ph"/>
+            <xs:group ref="hi-d-ph"/>
+         </xs:choice>
+      </xs:group>
+      <xs:attributeGroup name="props-attribute-extensions">
+         <xs:attributeGroup ref="props-attribute-extensions"/>
+         <xs:attributeGroup ref="deliveryTargetAtt-d-attribute"/>
+      </xs:attributeGroup>
+   </xs:redefine>
+
+   <xs:include schemaLocation="../../base/xsd/mapMod.xsd"/>
+   <xs:include schemaLocation="./subjectSchemeMod.xsd"/>
+
+   <xs:attributeGroup name="domains-att">
+      <xs:attribute name="domains"
+                    type="xs:string"
+                    default="(map subjectScheme) (topic hazard-d) (topic hi-d) (map mapgroup-d) (topic ut-d) a(props deliveryTarget)"/>
+   </xs:attributeGroup>
+</xs:schema>

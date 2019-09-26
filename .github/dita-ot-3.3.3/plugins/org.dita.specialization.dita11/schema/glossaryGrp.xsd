@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Concept XSD Group Decleration                -->
+<!--  VERSION:   1.1                                             -->
+<!--  DATE:      November 2006                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA concepts          -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             June 2006                                       -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2006                -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    <xs:group name="glossentry">
+        <xs:sequence>
+            <xs:element ref="glossentry"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="glossterm">
+        <xs:sequence>
+            <xs:element ref="glossterm"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="glossdef">
+        <xs:sequence>
+            <xs:element ref="glossdef"/>
+        </xs:sequence>
+    </xs:group>
+
+</xs:schema>

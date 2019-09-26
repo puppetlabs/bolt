@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This file is part of the DITA Open Toolkit project.
+  See the accompanying license.txt file for applicable licenses.
+-->
+<plugin id="org.dita.normalize">
+  <transtype name="dita" desc="Normalized DITA"/>
+  <feature extension="dita.conductor.target.relative" file="conductor.xml"/>
+</plugin>

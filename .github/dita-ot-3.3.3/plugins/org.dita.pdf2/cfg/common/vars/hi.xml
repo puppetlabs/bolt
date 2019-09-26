@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | मुखबंध | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | मुखबंध | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">सामग्री</variable>
+  <variable id="Index Continued String">निरंतर</variable>
+  <variable id="Index See String">, देखें </variable>
+  <variable id="Index See Also String">यह भी देखें </variable>
+  <variable id="Table of Contents Chapter">अध्याय <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Appendix">परिशिष्ट <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">भाग <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Preface">मुखबंध: </variable>
+  <variable id="Preface title">मुखबंध</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">सामग्री: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice">Notice</variable><!--TODO:Notice-->
+  <variable id="Figure.title">आकृति <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">आकृति <param ref-name="number"/></variable>
+  <variable id="Table.title">टेबल <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">टेबल <param ref-name="number"/></variable>
+  <variable id="Related Links">संबंधित जानकारी</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">अध्याय <param ref-name="number"/></variable>
+  <variable id="Appendix with number">परिशिष्ट <param ref-name="number"/></variable>
+  <variable id="Part with number">भाग <param ref-name="number"/></variable>
+  <variable id="Required-Cleanup">[आवश्यक परिमार्जन]</variable>
+  <variable id="On the page"> पेज पर <param ref-name="pagenum"/></variable>
+  <variable id="Page"> पेज <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Child topics"></variable><!--UNUSED-->
+  <variable id="Related references"></variable><!--UNUSED-->
+  <variable id="Optional Step">वैकल्पिक:</variable>
+  <variable id="Required Step">आवश्यक:</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">शब्दावली</variable>
+  <variable id="List of Tables">टेबल्स</variable>
+  <variable id="List of Figures">आंकड़े</variable>
+</vars>

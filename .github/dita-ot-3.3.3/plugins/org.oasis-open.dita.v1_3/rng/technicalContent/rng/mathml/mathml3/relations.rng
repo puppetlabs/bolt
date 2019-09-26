@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <!--
+        This is the Mathematical Markup Language (MathML) 3.0, an XML
+        application for describing mathematical notation and capturing
+        both its structure and content.
+    
+        Copyright 1998-2007 World Wide Web Consortium
+           (Massachusetts Institute of Technology, Institut National de
+            Recherche en Informatique et en Automatique, Keio University).
+            All Rights Reserved.
+    
+        Permission to use, copy, modify and distribute the RelaxNG schema for MathML3
+        and its accompanying documentation for any purpose and without fee is
+        hereby granted in perpetuity, provided that the above copyright notice
+        and this paragraph appear in all copies.  The copyright holders make
+        no representation about the suitability of the Schema for any purpose.
+    
+        This file contains the arity checking rules for the symbols
+        from the content dictionary 
+        It is provided "as is" without expressed or implied warranty.
+    
+        Revision:   $Id: relations.rng,v 1.1 2007/12/11 15:59:28 dcarlis Exp $
+  -->
+  <define name="cd.token.binary.class" combine="choice">
+    <choice>
+      <ref name="neq.token"/>
+      <ref name="factorof.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.nary.class" combine="choice">
+    <choice>
+      <ref name="eq.token"/>
+      <ref name="gt.token"/>
+      <ref name="lt.token"/>
+      <ref name="geq.token"/>
+      <ref name="leq.token"/>
+      <ref name="equivalent.token"/>
+      <ref name="approx.token"/>
+    </choice>
+  </define>
+  <!-- the element definitions for the token elements -->
+  <define name="eq.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="eq.token">
+    <element name="eq">
+      <ref name="eq.content"/>
+    </element>
+  </define>
+  <define name="neq.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="neq.token">
+    <element name="neq">
+      <ref name="neq.content"/>
+    </element>
+  </define>
+  <define name="gt.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="gt.token">
+    <element name="gt">
+      <ref name="gt.content"/>
+    </element>
+  </define>
+  <define name="lt.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="lt.token">
+    <element name="lt">
+      <ref name="lt.content"/>
+    </element>
+  </define>
+  <define name="geq.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="geq.token">
+    <element name="geq">
+      <ref name="geq.content"/>
+    </element>
+  </define>
+  <define name="leq.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="leq.token">
+    <element name="leq">
+      <ref name="leq.content"/>
+    </element>
+  </define>
+  <define name="equivalent.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="equivalent.token">
+    <element name="equivalent">
+      <ref name="equivalent.content"/>
+    </element>
+  </define>
+  <define name="approx.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="approx.token">
+    <element name="approx">
+      <ref name="approx.content"/>
+    </element>
+  </define>
+  <define name="factorof.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="factorof.token">
+    <element name="factorof">
+      <ref name="factorof.content"/>
+    </element>
+  </define>
+</grammar>

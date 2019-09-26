@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Topic XSD Group Decleration                  -->
+<!--  VERSION:   1.1                                             -->
+<!--  DATE:      November 2006                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization attributes     -->
+<!--             for Topics                                        -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2006                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+  <xs:group name="abstract">
+    <xs:sequence>
+      <xs:element ref="abstract"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:group name="example">
+    <xs:sequence>
+      <xs:element ref="example"/>
+    </xs:sequence>
+  </xs:group> 
+  
+  <xs:group name="metadata">
+    <xs:sequence>
+      <xs:element ref="metadata"/>
+    </xs:sequence>
+  </xs:group>
+ 
+  <xs:group name="topic">
+    <xs:sequence>
+      <xs:element ref="topic"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="titlealts">
+    <xs:sequence>
+      <xs:element ref="titlealts"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="shortdesc">
+    <xs:sequence>
+      <xs:element ref="shortdesc"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="prolog">
+    <xs:sequence>
+      <xs:element ref="prolog"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="body">
+    <xs:sequence>
+      <xs:element ref="body"/>
+    </xs:sequence>
+  </xs:group>
+
+
+  <xs:group name="navtitle">
+    <xs:sequence>
+      <xs:element ref="navtitle"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="searchtitle">
+    <xs:sequence>
+      <xs:element ref="searchtitle"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="section">
+    <xs:sequence>
+      <xs:element ref="section"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="link">
+    <xs:sequence>
+      <xs:element ref="link"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="linkpool">
+    <xs:sequence>
+      <xs:element ref="linkpool"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="linklist">
+    <xs:sequence>
+      <xs:element ref="linklist"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="linkinfo">
+    <xs:sequence>
+      <xs:element ref="linkinfo"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="linktext">
+    <xs:sequence>
+      <xs:element ref="linktext"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="related-links">
+    <xs:sequence>
+      <xs:element ref="related-links"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:group name="no-topic-nesting">
+    <xs:sequence>
+      <xs:element ref="no-topic-nesting"/>
+    </xs:sequence>
+  </xs:group>
+  
+</xs:schema>

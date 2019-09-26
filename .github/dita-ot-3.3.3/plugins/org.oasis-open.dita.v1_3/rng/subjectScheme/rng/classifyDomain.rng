@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Subject Classification Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Subject Classification Domain               
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Map Subject Classification Domain//EN"
+      Delivered as file "classifyDomain.mod"                      
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Define elements and specialization attributes    
+            for Map Subject Classification Domain            
+                                                             
+ORIGINAL CREATION DATE:                                      
+            February 2008                                    
+                                                             
+            (C) Copyright OASIS Open 2008, 2009.             
+            (C) Copyright IBM Corporation 2005, 2007.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2008.02.13 RDA: Created file based upon prototype from IBM
+   2010.01.21 RDA: Update subjectCell content to remove      
+                   duplicate element inclusion               
+=============================================================
+    </headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>classify-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Subject Classification Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Subject Classification Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:tc:tc:dita:spec:classification:xsd:classifyDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:tc:tc:dita:spec:classification:rnc:classifyDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:tc:tc:dita:spec:classification:rng:classifyDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(map classify-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div><a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="classify-d-topicref">
+      <choice>
+        <ref name="topicsubject.element"/>
+        <ref name="topicapply.element"/>
+      </choice>
+    </define>
+    <define name="topicref" combine="choice">
+      <ref name="classify-d-topicref"/>
+    </define>
+
+    <define name="classify-d-reltable">
+      <ref name="topicSubjectTable.element"/>
+    </define>
+    <define name="reltable" combine="choice">
+      <ref name="classify-d-reltable"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="subjectref">
+      <ref name="subjectref.element"/>
+    </define>
+    <define name="topicSubjectHeader">
+      <ref name="topicSubjectHeader.element"/>
+    </define>
+    <define name="topicSubjectRow">
+      <ref name="topicSubjectRow.element"/>
+    </define>
+    <define name="topicCell">
+      <ref name="topicCell.element"/>
+    </define>
+    <define name="subjectCell">
+      <ref name="subjectCell.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation>LONG NAME: Topic Subject</a:documentation>
+      <a:documentation>SKOS equivalent: primary if href or keyref are specified</a:documentation>
+      <define name="topicsubject.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="data.elements.incl"/>
+            <ref name="subjectref"/>
+            <ref name="topicref"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="topicsubject.attributes">
+        <optional>
+          <attribute name="navtitle"/>
+        </optional>
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="keys"/>
+        </optional>
+        <optional>
+          <attribute name="query"/>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="cascade" dita:since="1.3"/>
+        </optional>
+        <optional>
+          <attribute name="processing-role" a:defaultValue="resource-only">
+            <choice>
+              <value>normal</value>
+              <value>resource-only</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="toc" a:defaultValue="no">
+            <choice>
+              <value>no</value>
+              <value>yes</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional dita:since="DITA 1.3">
+          <attribute name="outputclass"/>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <a:documentation><![CDATA[The <topicsubject> element identifies the subjects for which the topic or collection of topics provides the authoritative treatment. The subjects can be identified by keys (if defined in the scheme) or, if the subject definition topic exists, by href (as with ordinary topic references). Additional secondary subjects can be specified by nested <subjectref> elements.]]></a:documentation>
+      <define name="topicsubject.element">
+        <element name="topicsubject" dita:longName="Topic Subject">
+          <ref name="topicsubject.attlist"/>
+          <ref name="topicsubject.content"/>
+        </element>
+      </define>
+      <define name="topicsubject.attlist" combine="interleave">
+        <ref name="topicsubject.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Topic Apply</a:documentation>
+      <define name="topicapply.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+        <zeroOrMore>
+          <choice>
+            <ref name="data.elements.incl"/>
+            <ref name="subjectref"/>
+            <ref name="topicref"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="topicapply.attributes">
+        <optional>
+          <attribute name="navtitle"/>
+        </optional>
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="keys"/>
+        </optional>
+        <optional>
+          <attribute name="query"/>
+        </optional>
+        <optional>
+          <attribute name="collection-type">
+            <choice>
+              <value>choice</value>
+              <value>family</value>
+              <value>sequence</value>
+              <value>unordered</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="cascade" dita:since="1.3"/>
+        </optional>
+        <optional>
+          <attribute name="processing-role" a:defaultValue="resource-only">
+            <choice>
+              <value>normal</value>
+              <value>resource-only</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="linking">
+            <choice>
+              <value>none</value>
+              <value>normal</value>
+              <value>sourceonly</value>
+              <value>targetonly</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="toc" a:defaultValue="no">
+            <choice>
+              <value>no</value>
+              <value>yes</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional dita:since="DITA 1.3">
+          <attribute name="outputclass"/>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <a:documentation><![CDATA[The <topicapply> element identifies subjects that qualify the content for filtering or flagging but not retrieval. The <topicapply> element can identify a single subject. Additional subjects can be specified by nested <subjectref> elements.]]></a:documentation>
+      <define name="topicapply.element">
+        <element name="topicapply" dita:longName="Topic Apply">
+          <ref name="topicapply.attlist"/>
+          <ref name="topicapply.content"/>
+        </element>
+      </define>
+      <define name="topicapply.attlist" combine="interleave">
+        <ref name="topicapply.attributes"/>
+      </define>
+      <a:documentation>LONG NAME: Subject Reference</a:documentation>
+      <define name="subjectref.content">
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="data.elements.incl"/>
+        </zeroOrMore>
+      </define>
+      <define name="subjectref.attributes">
+        <optional>
+          <attribute name="navtitle"/>
+        </optional>
+        <optional>
+          <attribute name="href"/>
+        </optional>
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <optional>
+          <attribute name="keys"/>
+        </optional>
+        <optional>
+          <attribute name="query"/>
+        </optional>
+        <optional>
+          <attribute name="collection-type">
+            <choice>
+              <value>choice</value>
+              <value>family</value>
+              <value>sequence</value>
+              <value>unordered</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="type"/>
+        </optional>
+        <optional>
+          <attribute name="cascade" dita:since="1.3"/>
+        </optional>
+        <optional>
+          <attribute name="processing-role" a:defaultValue="resource-only">
+            <choice>
+              <value>normal</value>
+              <value>resource-only</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="scope">
+            <choice>
+              <value>external</value>
+              <value>local</value>
+              <value>peer</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="format"/>
+        </optional>
+        <optional>
+          <attribute name="linking">
+            <choice>
+              <value>none</value>
+              <value>normal</value>
+              <value>sourceonly</value>
+              <value>targetonly</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="toc" a:defaultValue="no">
+            <choice>
+              <value>no</value>
+              <value>yes</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional dita:since="DITA 1.3">
+          <attribute name="outputclass"/>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <a:documentation><![CDATA[The <subjectref> element identifies a subject to classify content. The <subjectref> can identify the subject with a keyref attribute (if the scheme has a <subjectdef> with a keys attribute that assigns a key to the subject) or an href attribute (if a topic captures the consensus definition for the subject).]]></a:documentation>
+      <define name="subjectref.element">
+        <element name="subjectref" dita:longName="Subject Reference">
+          <ref name="subjectref.attlist"/>
+          <ref name="subjectref.content"/>
+        </element>
+      </define>
+      <define name="subjectref.attlist" combine="interleave">
+        <ref name="subjectref.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Topic Subject Relationship Table</a:documentation>
+      <define name="topicSubjectTable.content">
+        <optional dita:since="DITA 1.3">
+          <ref name="title"/>
+        </optional>
+        <optional>
+          <ref name="topicmeta"/>
+        </optional>
+        <optional>
+          <ref name="topicSubjectHeader"/>
+        </optional>
+        <oneOrMore>
+          <ref name="topicSubjectRow"/>
+        </oneOrMore>
+      </define>
+      <define name="topicSubjectTable.attributes">
+        <ref name="topicref-atts-no-toc"/>
+        <optional dita:since="DITA 1.3">
+          <attribute name="outputclass"/>
+        </optional>
+        <ref name="univ-atts"/>
+      </define>
+      <a:documentation><![CDATA[The <topicSubjectTable> element is a specialized relationship table which allows a map to use relationship tables to associate topics with subjects. In a <topicSubjectTable>, the first column is reserved for references to content. Subsequent columns are reserved for subjects that classify the content, each column supplying the subjects for a different category as identified in the header. The table resembles a traditional relationship table in which the first column identifies the source and the other columns identify the targets, but the relationship reflects the subjects covered by the content rather than linking between documents.]]></a:documentation>
+      <define name="topicSubjectTable.element">
+        <element name="topicSubjectTable" dita:longName="Topic Subject Relationship Table">
+          <ref name="topicSubjectTable.attlist"/>
+          <ref name="topicSubjectTable.content"/>
+        </element>
+      </define>
+      <define name="topicSubjectTable.attlist" combine="interleave">
+        <ref name="topicSubjectTable.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Topic Subject Table Header</a:documentation>
+      <a:documentation> The header defines the set of subjects for each column. By default, the subject in the header cell must be a broader ancestor within a scheme available during processing for
+        the subjects in the same column of other rows In the header, the topicCell serves primarily as a placeholder for the topic column but could also provide some constraints or metadata for the
+        topics </a:documentation>
+      <define name="topicSubjectHeader.content">
+        <ref name="topicCell"/>
+        <oneOrMore>
+          <ref name="subjectCell"/>
+        </oneOrMore>
+      </define>
+      <define name="topicSubjectHeader.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <a:documentation><![CDATA[The <topicSubjectHeader> element specifies constraints on the subjects used in classifications.]]></a:documentation>
+      <define name="topicSubjectHeader.element">
+        <element name="topicSubjectHeader" dita:longName="Topic Subject Table Header">
+          <ref name="topicSubjectHeader.attlist"/>
+          <ref name="topicSubjectHeader.content"/>
+        </element>
+      </define>
+      <define name="topicSubjectHeader.attlist" combine="interleave">
+        <ref name="topicSubjectHeader.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Topic Subject Table Row</a:documentation>
+      <define name="topicSubjectRow.content">
+        <ref name="topicCell"/>
+        <oneOrMore>
+          <ref name="subjectCell"/>
+        </oneOrMore>
+      </define>
+      <define name="topicSubjectRow.attributes">
+        <ref name="univ-atts"/>
+      </define>
+      <a:documentation><![CDATA[The <topicSubjectRow> is a grouping element that contains one row of a subject table. It contains topic references in the first column, and relates those references to the subjects in each following column.]]></a:documentation>
+      <define name="topicSubjectRow.element">
+        <element name="topicSubjectRow" dita:longName="Topic Subject Table Row">
+          <ref name="topicSubjectRow.attlist"/>
+          <ref name="topicSubjectRow.content"/>
+        </element>
+      </define>
+      <define name="topicSubjectRow.attlist" combine="interleave">
+        <ref name="topicSubjectRow.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Topic Subject Table Cell</a:documentation>
+      <define name="topicCell.content">
+        <oneOrMore>
+          <choice>
+            <ref name="data.elements.incl"/>
+            <ref name="topicref"/>
+          </choice>
+        </oneOrMore>
+      </define>
+      <define name="topicCell.attributes">
+        <ref name="univ-atts"/>
+        <ref name="topicref-atts"/>
+      </define>
+      <a:documentation><![CDATA[The <topicCell> element contains topics that will be associated with subjects in each following column of the current row in the <topicSubjectTable>.]]></a:documentation>
+      <define name="topicCell.element">
+        <element name="topicCell" dita:longName="Topic Subject Table Cell">
+          <ref name="topicCell.attlist"/>
+          <ref name="topicCell.content"/>
+        </element>
+      </define>
+      <define name="topicCell.attlist" combine="interleave">
+        <ref name="topicCell.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation>LONG NAME: Topic Subject Cell</a:documentation>
+      <define name="subjectCell.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="data.elements.incl"/>
+            <ref name="subjectref"/>
+            <ref name="topicref"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="subjectCell.attributes">
+        <ref name="univ-atts"/>
+        <ref name="topicref-atts"/>
+      </define>
+      <a:documentation><![CDATA[The <subjectCell> element contains subjects that are associated with topics in the first column of the current row in the <topicSubjectTable>. The subjects themselves have no defined relationship across columns, other than the fact that they apply to the same content.]]></a:documentation>
+      <define name="subjectCell.element">
+        <element name="subjectCell" dita:longName="Topic Subject Cell">
+          <ref name="subjectCell.attlist"/>
+          <ref name="subjectCell.content"/>
+        </element>
+      </define>
+      <define name="subjectCell.attlist" combine="interleave">
+        <ref name="subjectCell.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="topicsubject.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref classify-d/topicsubject "/>
+      </optional>
+    </define>
+    <define name="topicapply.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref classify-d/topicapply "/>
+      </optional>
+    </define>
+    <define name="subjectref.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/topicref classify-d/subjectref "/>
+      </optional>
+    </define>
+    <define name="topicSubjectTable.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/reltable classify-d/topicSubjectTable "/>
+      </optional>
+    </define>
+    <define name="topicSubjectHeader.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/relrow classify-d/topicSubjectHeader "/>
+      </optional>
+    </define>
+    <define name="topicSubjectRow.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/relrow classify-d/topicSubjectRow "/>
+      </optional>
+    </define>
+    <define name="topicCell.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/relcell classify-d/topicCell "/>
+      </optional>
+    </define>
+    <define name="subjectCell.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ map/relcell classify-d/subjectCell "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

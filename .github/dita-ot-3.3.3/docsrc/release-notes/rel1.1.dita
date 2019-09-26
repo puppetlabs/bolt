@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.1" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.1</title><shortdesc>Release 1.1 is a major release to add new functions, fulfill new requirements, make
+      some function enhancements and fix bugs over release 1.0.2.</shortdesc><refbody><section id="section_rnc_tej_nc">
+        <ol><li>
+            <b>Adaptation to the new OASIS DITA standard</b>
+            <p>Release 1.1 implements the new OASIS DITA 1.0 standard for DITA DTDs and Schemas.</p>
+            <p>DTDs of the previous release locate in the directory <b>dtd/dita132</b> and schemas
+              of the previous release locate in the directory <b>schema/dita132</b>. </p>
+          </li><li>
+            <b>Transformation to troff</b>
+            <p>Release 1.1 supports new troff output. Troff output looks like Linux man page
+              output.</p>
+          </li><li>
+            <b>XML catalog support</b>
+            <p>An XML catalog, which can consist of several catalog entry files, is a logical
+              structure that describes mapping information between public IDs and URLs of DTD files.
+              A catalog entry file is an XML file that includes a group of catalog entries. If you
+              want to know more about XML catalog, please refer<xref href="../xmlcatalog.xml">XML
+                Catalog</xref>.</p>
+            <p>A catalog entry can be used to locate a unified resource identifier (URI) reference
+              for a certain resource such as a DTD file. An external entity's public identifier
+              is used for mapping to the URI reference. The URI of any system identifier can be
+              ignored.</p>
+          </li><li>
+            <b>Topicref referring to a nested topic</b>
+            <p>The href attribute of the topicref is extended to quote a nested topic in a dita
+              file.</p>
+            <p>For example, in previous releases, href attribute is set like: href =
+              "xxx.dita"; in release 1.1, href attribute can be set like: href =
+              "xxx.dita#abc.dita".</p>
+          </li><li>
+            <b>Globalization support</b>
+            <p>Release 1.1 supports over 20 popular languages within the content of dita files. And
+              it also provides translation function for DITA keywords to over 20 languages.
+              Currently this globalization support fully applies to Eclipse Help and XHTML
+              transformations, and partially applies to other transformations.</p>
+          </li><li>
+            <b>Accessibility support</b>
+            <p>Accessibility support is now partially applies to PDF and XHTML transformations.</p>
+          </li><li>
+            <b>Eclipse Content Provider Support</b>
+            <p>Please refer to <xref href="../eclipseconprov.xml">Eclipse Content Provider</xref> for
+              detail information.</p>
+          </li><li>
+            <b>Index information in output</b>
+            <p>The output of HTML Help and Java Help transformations contain index information
+              now.</p>
+          </li><li>
+            <b>Mapref function</b>
+            <p>Mapref refers to a special usage of the <tt>&lt;topicref&gt;</tt> element as a
+              reference to another ditamap file. This allows you to manage the overall ditamap file
+              more easily. A large ditamap file can thus be broken down into several ditamap files,
+              making it easier for the user to manage the overall logical structure. On the other
+              hand, this mechanism also increases the reusability of those ditamap files. If you
+              want to know more about mapref, please refer <xref href="../mapref.xml">Mapref</xref>.</p>
+          </li><li>
+            <b>TOC generation for Eclipse Help transformation</b>
+            <p>TOC generation now supported in transformation to Eclipse Help. Eclipse.</p>
+          </li><li>
+            <b>Helpset generation for Java Help transformation</b>
+            <p>Helpset generation now supported in transformation to Java Help.</p>
+          </li><li>
+            <b>New parameters supported in Java commands</b>
+            <p>In Java commands: /indexshow, /outext, /copycss, /xsl, /tempdir.</p>
+          </li><li>
+            <b>New parameters supported in Ant scripts</b>
+            <p>In Ant scripts: args.indexshow, args.outext, args.copycss, args.xsl,
+              dita.temp.dir</p>
+          </li></ol>
+      </section><section id="section_goc_tej_nc">
+        <p>
+          <b>Other Changes</b>
+          <ol><li>SF bug 1220569: Add XML Schema processing to DITA-OT</li><li>SF bug 1220644: Prompted ant--image does not link for single topic to PDF</li><li>SF bug 1229058: Add schema validation loading file for processing</li><li>SF RFE 1176855: Ant must be run from toolkit directory</li><li>SF RFE 1183482: Copy pre-existing html to output dir</li><li>SF RFE 1183490: Provide argument to specify the location of temp dir</li><li>SF RFE 1201242: override capability</li></ol>
+        </p>
+      </section></refbody></reference>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:simpleType name="ClassList.datatype">
+    <xs:restriction base="xs:NMTOKENS"/>
+  </xs:simpleType>
+  <xs:simpleType name="StyleSheet.datatype">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="MediaDesc.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      comma-separated list of media descriptors.
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:element name="style" substitutionGroup="svg:SVG.Style.class"/>
+  <xs:attributeGroup name="attlist.style">
+    <xs:attribute ref="xml:space" default="preserve"/>
+    <xs:attributeGroup ref="xml:SVG.id.attrib"/>
+    <xs:attributeGroup ref="xml:SVG.base.attrib"/>
+    <xs:attributeGroup ref="xml:SVG.lang.attrib"/>
+    <xs:attribute name="type" use="required" type="svg:ContentType.datatype"/>
+    <xs:attribute name="media" type="svg:MediaDesc.datatype"/>
+    <xs:attribute name="title" type="svg:Text.datatype"/>
+  </xs:attributeGroup>
+</xs:schema>

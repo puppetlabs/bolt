@@ -1,0 +1,42 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="DITA-OT ships with a Gradle build script that enables you to rebuild the toolkit documentation. This is especially helpful if your environment contains plug-ins that add new extension points, messages, or parameters to the toolkit."><meta name="DC.subject" content="macOS, gradle, rebuilding documentation, Linux, Windows, gradlew"><meta name="keywords" content="macOS, gradle, rebuilding documentation, Linux, Windows, gradlew"><meta name="DC.relation" scheme="URI" content="../topics/customizing.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="rebuilding-docs"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Rebuilding the DITA-OT documentation</title></head><body id="rebuilding-docs"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li class="active"><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Rebuilding the DITA-OT documentation</h1>
+  
+  
+  
+  <div class="body taskbody"><p class="shortdesc">DITA-OT ships with a <a href="https://gradle.org" target="_blank"><span class="keyword">Gradle</span></a> build script that enables you to rebuild the toolkit
+    documentation. This is especially helpful if your environment contains plug-ins that add new extension points,
+    messages, or parameters to the toolkit.</p>
+    <section class="section context"><div class="tasklabel"><h2 class="sectiontitle tasklabel">About this task</h2></div>
+      <p class="p">The documentation build script reads the toolkit’s plug-in configuration and automatically regenerates topics
+        and properties file templates based on the extension points, messages, and parameters provided by the installed
+        plug-ins.</p>
+      <div class="note attention note_attention"><span class="note__title">Attention:</span> If you have installed new plug-ins, you may need to add the corresponding generated topics
+        to the DITA maps to include the new information in the output.</div></section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">Change to the <span class="ph filepath">docsrc/</span> subdirectory of the DITA-OT installation.</span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Run one of the following commands.</span>
+        <ul class="ul choices">
+          <li class="li choice">On Linux and macOS:
+            <pre class="pre codeblock"><code>./gradlew <var class="keyword varname">target</var></code></pre></li>
+          <li class="li choice">On Windows: <pre class="pre codeblock"><code>gradlew <var class="keyword varname">target</var></code></pre></li>
+        </ul>
+        <div class="itemgroup info">
+          <div class="p">The <var class="keyword varname">target</var> parameter is optional and specifies a transformation type. It takes the
+            following values:
+            <ul class="ul">
+              <li class="li"><span class="keyword option">html</span></li>
+              <li class="li"><span class="keyword option">htmlhelp</span></li>
+              <li class="li"><span class="keyword option">pdf</span></li>
+            </ul>
+          </div>
+          <p class="p">If you do not specify a target, HTML5 and PDF output is generated.</p>
+        </div>
+      </li></ol></section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/customizing.html" title="There are several ways to customize and extend the toolkit. You can adjust various aspects of the default output by setting parameters or using custom stylesheets. For more complex customizations, use custom DITA-OT plug-ins to override other parts of processing.">Customizing DITA Open Toolkit</a></div></div></nav></article></main></body></html>

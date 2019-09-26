@@ -1,0 +1,78 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="You can use the dita.conductor.lib.import extension point to add an additional Java library to the DITA-OT classpath parameter."><meta name="DC.subject" content="deprecated features, property, dost.class.path, plug-ins, Java, classpath, XSLT"><meta name="keywords" content="deprecated features, property, dost.class.path, plug-ins, Java, classpath, XSLT"><meta name="DC.relation" scheme="URI" content="../topics/plugin-applications.html"><meta name="DC.relation" scheme="URI" content="../extension-points/plugin-extension-points-general.html"><meta name="DC.relation" scheme="URI" content="../topics/plugins-installing.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="plugin-javalib"><meta name="DC.language" content="en-US"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Adding a Java library to the DITA-OT classpath</title></head><body id="plugin-javalib"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a><ul><li><a href="../topics/plugins-installing.html">Installing plug-ins</a></li><li><a href="../topics/plugins-removing.html">Removing plug-ins</a></li><li><a href="../topics/plugins-registry.html">Plug-in registry</a></li><li><a href="../topics/plugin-configfile.html">Plug-in descriptor file</a></li><li><a href="../topics/plugin-dependencies.html">Plug-in dependencies</a></li><li><a href="../topics/plugin-applications.html">Plug-in applications</a><ul><li><a href="../topics/plugin-xmlcatalog.html">Extending an XML catalog file</a></li><li><a href="../topics/plugin-anttarget.html">Adding a new target to the Ant build process</a></li><li><a href="../topics/plugin-antpreprocess.html">Adding an Ant target to the pre-processing pipeline</a></li><li><a href="../topics/plugin-newtranstype.html">Adding a new transformation type</a></li><li><a href="../topics/plugin-overridestyle.html">Overriding an XSLT-processing step</a></li><li><a href="../topics/using-plugin-URI-extension.html">Referencing files from other plug-ins</a></li><li><a href="../topics/plugin-xsltparams.html">Adding parameters to existing XSLT steps</a></li><li class="active"><a href="../topics/plugin-javalib.html">Adding a Java library to the classpath</a></li><li><a href="../topics/plugin-messages.html">Adding new diagnostic messages</a></li><li><a href="../topics/plugin-newextensions.html">Creating a new plug-in extension point</a></li><li><a href="../topics/implement-saxon-customizations.html">Adding Saxon customizations</a></li></ul></li><li><a href="../topics/plugin-sample.html">Example plugin.xml file</a></li><li><a href="../topics/plugin-best-practices.html">Best practices</a></li><li><a href="../topics/plugin-coding-conventions.html">Coding conventions</a></li></ul></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Adding a Java library to the DITA-OT <span class="keyword parmname">classpath</span></h1>
+  
+  
+  
+  <div class="body taskbody"><p class="shortdesc">You can use the <code class="ph codeph">dita.conductor.lib.import</code> extension point to add an additional Java
+    library to the DITA-OT <span class="keyword parmname">classpath</span> parameter.</p>
+    <section class="section context"><div class="tasklabel"><h2 class="sectiontitle tasklabel">About this task</h2></div>
+      <p class="p">As of DITA-OT 3.1, the Java class path is managed automatically, meaning you do not (and should not) use
+        explicit references to Java class paths in your build scripts. In particular, the old
+          <code class="ph codeph">dost.class.path</code> property has been deprecated and should not be used. If you are migrating
+        older plug-ins that manage their class path directly, you should remove any explicit class path configuration.
+        If your plug-in was not already using the <code class="ph codeph">dita.conductor.lib.import</code> extension point to
+        integrate its JAR dependencies you must add it.</p>
+      <p class="p">The effective DITA-OT class path is the combination of the JAR files in the main <span class="ph filepath">lib/</span>
+        directory and the plug-in-contributed JARs, which are listed in <span class="ph filepath">config/env.sh</span>. The
+          <span class="ph filepath">env.sh</span> file is updated automatically when plug-ins are installed or removed.</p>
+    </section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">If necessary, compile the Java code into a JAR file.</span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Create a <span class="ph filepath">plugin.xml</span> file that contains the following code:</span>
+        <div class="itemgroup info"><pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;plugin id="<var class="keyword varname">plugin-id</var>"&gt;
+  &lt;feature extension="dita.conductor.lib.import" file="<var class="keyword varname">file</var>"/&gt;
+&lt;/plugin&gt;</code></pre>where:
+          <ul class="ul">
+            <li class="li"><var class="keyword varname">plugin-id</var> is the plug-in identifier, for example,
+              <code class="ph codeph">com.example.addjar</code>.</li>
+            <li class="li"><var class="keyword varname">file</var> is the name of the JAR file, for example,
+              <span class="ph filepath">myJavaLibrary.jar</span>. </li>
+          </ul></div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Install the plug-in.</span>
+      </li></ol></section>
+    <section class="section result"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Results</h2></div>The Ant or XSLT code now can make use of the Java code.</section>
+    <section class="example"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Example</h2></div>
+      <p class="p">In the following extended example, the <span class="ph filepath">myJavaLibrary.jar</span> file performs a validation step
+        during processing, and you want it to run immediately before the <code class="ph codeph">conref </code>step.</p>
+      <p class="p">To accomplish this, you will need to use several features:</p>
+      <ul class="ul">
+        <li class="li">The JAR file must be added to the classpath.</li>
+        <li class="li">The Ant target must be added to the dependency chain for conref.</li>
+        <li class="li">An Ant target must be created that uses this class, and integrated into the code.</li>
+      </ul>
+      <p class="p">The files might look like the following:</p>
+      <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 1. </span><span class="ph filepath">plugin.xml</span> file</figcaption>
+        
+        <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;plugin id="com.example.samplejava"&gt;
+  <em class="ph i">&lt;!-- Add the JAR file to the DITA-OT CLASSPATH --&gt;</em>
+  <strong class="ph b">&lt;feature extension="dita.conductor.lib.import" 
+           file="com.example.sampleValidation.jar"/&gt;</strong>
+  <em class="ph i">&lt;!-- Integrate the Ant code --&gt;</em>
+  &lt;feature extension="ant.import" file="calljava-antcode.xml"/&gt;
+  <em class="ph i">&lt;!-- Define the Ant target to call, and when (before conref) --&gt;</em>
+  &lt;feature extension="depend.preprocess.conref.pre" 
+           value="validateWithJava"/&gt;
+&lt;/plugin&gt;</code></pre>
+      </figure>
+      <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 2. </span><span class="ph filepath">calljava-antcode.xml</span> file</figcaption>
+        
+        <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project default="validateWithJava"&gt;
+  &lt;target name="validateWithJava"&gt;
+    &lt;java classname="com.example.sampleValidation"&gt;
+      &lt;!-- The class was added to the DITA-OT classpath --&gt;
+    &lt;/java&gt;
+  &lt;/target&gt;
+&lt;/project&gt;</code></pre>
+      </figure>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/plugin-applications.html" title="Plug-ins allow you to extend the functionality of DITA-OT. This might entail adding support for specialized document types, integrating processing overrides, or defining new output transformations.">Plug-in applications</a></div></div><div class="linklist relinfo reltasks"><strong>Related tasks</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/plugins-installing.html" title="Use the dita command to install a plug-in.">Installing plug-ins</a></li></ul></div><div class="linklist relinfo relref"><strong>Related reference</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../extension-points/plugin-extension-points-general.html" title="These extension points enable you to extend DITA-OT. You can add Ant targets or imports; add a Java library to the classpath parameter; add a new transformation type; extend a catalog file; add new diagnostic messages, and more.">General extension points</a></li></ul></div></nav></article></main></body></html>

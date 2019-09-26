@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="creating-an-ant-build-script">
+  <title>Creating an Ant build script</title>
+  <shortdesc>Instead of typing the DITA-OT parameters at the command prompt, you might want to create an Ant build
+    script that contains all of the parameters.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>link</xmlelement></indexterm>
+        <indexterm><xmlatt>name</xmlatt></indexterm>
+        <indexterm><xmlatt>default</xmlatt></indexterm>
+        <indexterm>Ant<indexterm>build script</indexterm></indexterm>
+        <indexterm>relationship tables<indexterm>PDF</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>Create an XML file that contains the following content:</cmd>
+        <info>
+          <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;?xml version="1.0" encoding="UTF-8" ?>
+&lt;project name="%project-name%" default="%default-target%" basedir=".">
+
+  &lt;property name="dita.dir" location="%path-to-DITA-OT%"/>
+
+  &lt;target name="%target-name%">
+    &lt;ant antfile="${dita.dir}/build.xml">
+      &lt;property name="args.input" value="%DITA-input%"/>
+      &lt;property name="transtype" value="html5"/>
+    &lt;/ant>
+  &lt;/target>
+
+&lt;/project></codeblock>
+        </info>
+        <info>You will replace the placeholder content (indicated by the % signs) with content applicable to your
+          environment.</info>
+      </step>
+      <step>
+        <cmd>Specify project information:</cmd>
+        <substeps>
+          <substep importance="optional">
+            <cmd>Set the value of the <xmlatt>name</xmlatt> attribute to the name of your project.</cmd>
+          </substep>
+          <substep>
+            <cmd>Set the value of the <xmlatt>default</xmlatt> attribute to the name of a target in the build
+              script.</cmd>
+            <info>If the build script is invoked without specifying a target, this target will be run.</info>
+          </substep>
+        </substeps>
+      </step>
+      <step>
+        <cmd>Set the value of the <parmname>dita.dir</parmname> property to the location of the DITA-OT
+          installation.</cmd>
+        <info>This can be a fully qualified path, or you can specify it relative to the location of the Ant build script
+          that you are writing. </info>
+      </step>
+      <step>
+        <cmd>Create the Ant target:</cmd>
+        <substeps>
+          <substep>
+            <cmd>Set the value of the <xmlatt>name</xmlatt> attribute.</cmd>
+          </substep>
+          <substep>
+            <cmd>Specify the value for the <parmname>args.input</parmname> property.</cmd>
+          </substep>
+          <substep>
+            <cmd>Specify the value of the <parmname>transtype</parmname> property.</cmd>
+          </substep>
+        </substeps>
+      </step>
+      <step>
+        <cmd>Save the build script.</cmd>
+      </step>
+    </steps>
+    <example>
+      <p>The following Ant build script generates CHM and PDF output for the sample DITA maps.</p>
+      <p>
+        <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../samples/ant_sample/build-chm-pdf.xml"/></codeblock></p>
+      <p>In addition to the mandatory parameters (<parmname>args.input</parmname> and <parmname>transtype</parmname>),
+        the chm and pdf targets each specify some optional parameters:
+        <ul>
+          <li>The <parmname>args.gen.task.lbl</parmname> property is set to YES, which ensures that headings are
+            automatically generated for the sections of task topics.</li>
+          <li>The <parmname>output.dir</parmname> property specifies where DITA-OT writes the output of the
+            transformations.</li>
+        </ul></p>
+      <p>The pdf target also specifies that related links should be generated in the PDF, but only those links that are
+        created by relationship tables and <xmlelement>link</xmlelement> elements.</p>
+      <p>Finally, the all target simply specifies that both the chm and pdf target should be run.</p>
+    </example>
+    <postreq>Another resource for learning about Ant scripts are the files in the <filepath
+        conref="../resources/conref-task.dita#ID/samples-dir"/><filepath>/ant_sample/</filepath> directory. This
+      directory contains sample Ant build files for common output formats, as well as templates that you can use to
+      create your own Ant scripts.</postreq>
+  </taskbody>
+</task>

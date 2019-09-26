@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg11.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:attributeGroup name="SVG.XLink.attrib">
+    <xs:attribute name="type" default="simple" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="simple"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="href" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="role" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="arcrole" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="title" form="qualified"/>
+    <xs:attribute name="show" default="other" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="other"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="actuate" default="onLoad" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="onLoad"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.XLinkRequired.attrib">
+    <xs:attribute name="type" default="simple" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="simple"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="href" use="required" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="role" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="arcrole" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="title" form="qualified"/>
+    <xs:attribute name="show" default="other" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="other"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="actuate" default="onLoad" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="onLoad"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.XLinkEmbed.attrib">
+    <xs:attribute name="type" default="simple" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="simple"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="href" use="required" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="role" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="arcrole" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="title" form="qualified"/>
+    <xs:attribute name="show" default="embed" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="embed"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="actuate" default="onLoad" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="onLoad"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.XLinkReplace.attrib">
+    <xs:attribute name="type" default="simple" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="simple"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="href" use="required" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="role" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="arcrole" form="qualified" type="svg:URI.datatype"/>
+    <xs:attribute name="title" form="qualified"/>
+    <xs:attribute name="show" default="replace" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="new"/>
+          <xs:enumeration value="replace"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="actuate" default="onRequest" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="onRequest"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>

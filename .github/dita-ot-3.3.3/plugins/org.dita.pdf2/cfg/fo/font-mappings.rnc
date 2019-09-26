@@ -1,0 +1,56 @@
+# This file is part of the DITA Open Toolkit project.
+#
+# Copyright 2011 Jarno Elovirta
+#
+# See the accompanying LICENSE file for applicable license.
+font-mappings =
+  ## Mapping table from logical fonts and character sets to physical fonts.
+  element font-mappings {
+    font-table*
+  }
+font-table =
+  ## Font mapping table
+  element font-table {
+    aliases*,
+    logical-font*
+  }
+aliases =
+  ## Logical font aliases
+  element aliases {
+    alias*
+  }
+alias =
+  ## Logical font alias
+  element alias {
+    ## Alias name
+    attribute name { text }?,
+    ## Logical font name
+    text
+  }
+logical-font =
+  ## Logical font mapping
+  element logical-font {
+    ## Logical font name
+    attribute name { text }?,
+    physical-font*
+  }
+physical-font =
+  ## Physical font
+  element physical-font {
+    ## Character set name
+    attribute char-set { text | "default" }?,
+    font-face,
+    baseline-shift?,
+    override-size?
+  }
+font-face =
+  ## Physical font name
+  element font-face { text }
+baseline-shift =
+  ## Baseline shift adjustment
+  element baseline-shift { text }
+override-size =
+  ## Font size adjustment
+  element override-size { text }
+
+start = font-mappings

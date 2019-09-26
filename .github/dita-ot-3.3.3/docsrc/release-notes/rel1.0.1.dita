@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.0.1" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.0.1</title><shortdesc>Release 1.0.1 is a maintenance release to fix defects and adds some minor
+      enhancements in release 1.0.</shortdesc><refbody><section>
+        <title>Changes</title>
+        <ol><li>Committer: maplink.xsl doesn't generate related links for second level referred
+            topic </li><li>Committer: avoid infinite loop of conref</li><li>SF Bug 1160964: Can't point above the directory which contains the map file</li><li>SF Bug 1163523: Broken XPath expression in mappull.xsl</li><li>SF Bug 1168974: useless DRAFT param in FO transformation</li><li>SF Bug 1173162: generate null internal link destination in fo transformation</li><li>SF Bug 1173164: Not correctly use document() in dita2fo-links.xsl</li><li>SF Bug 1173663: All base directories are DITA-OT 1.0</li><li>SF Patch 1163561: XLST match patterns test for element names</li><li>SF Patch 1165068: FO hyperlinks and FOP-generated PDF bookmarks</li><li>SF Patch 1174012: Modification to sequence.ditamap</li></ol>
+      </section></refbody></reference>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- 
+Copyright © 2004-2006 by Idiom Technologies, Inc. All rights reserved. 
+IDIOM is a registered trademark of Idiom Technologies, Inc. and WORLDSERVER
+and WORLDSTART are trademarks of Idiom Technologies, Inc. All other 
+trademarks are the property of their respective owners. 
+
+IDIOM TECHNOLOGIES, INC. IS DELIVERING THE SOFTWARE "AS IS," WITH 
+ABSOLUTELY NO WARRANTIES WHATSOEVER, WHETHER EXPRESS OR IMPLIED,  AND IDIOM
+TECHNOLOGIES, INC. DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+PURPOSE AND WARRANTY OF NON-INFRINGEMENT. IDIOM TECHNOLOGIES, INC. SHALL NOT
+BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, COVER, PUNITIVE, EXEMPLARY,
+RELIANCE, OR CONSEQUENTIAL DAMAGES (INCLUDING BUT NOT LIMITED TO LOSS OF 
+ANTICIPATED PROFIT), ARISING FROM ANY CAUSE UNDER OR RELATED TO  OR ARISING 
+OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF IDIOM
+TECHNOLOGIES, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
+
+Idiom Technologies, Inc. and its licensors shall not be liable for any
+damages suffered by any person as a result of using and/or modifying the
+Software or its derivatives. In no event shall Idiom Technologies, Inc.'s
+liability for any damages hereunder exceed the amounts received by Idiom
+Technologies, Inc. as a result of this transaction.
+
+These terms and conditions supersede the terms and conditions in any
+licensing agreement to the extent that such terms and conditions conflict
+with those set forth herein.
+
+This file is part of the DITA Open Toolkit project. 
+See the accompanying LICENSE file for applicable license.
+--><catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+
+    <uri name="cfg:fo/attrs/custom.xsl" uri="fo/attrs/custom.xsl"/>
+    <uri name="cfg:fo/xsl/custom.xsl" uri="fo/xsl/custom.xsl"/>
+
+    <uri name="cfg:fo/font-mappings.xml" uri="fo/font-mappings.xml"/>
+
+    <uri name="cfg:fo/i18n/ar_EG.xml" uri="fo/i18n/ar.xml"/>
+    <uri name="cfg:fo/i18n/ar.xml" uri="fo/i18n/ar.xml"/>
+    <uri name="cfg:fo/i18n/be_BY.xml" uri="fo/i18n/be.xml"/>
+    <uri name="cfg:fo/i18n/be.xml" uri="fo/i18n/be.xml"/>
+    <uri name="cfg:fo/i18n/bg_BG.xml" uri="fo/i18n/bg.xml"/>
+    <uri name="cfg:fo/i18n/bg.xml" uri="fo/i18n/bg.xml"/>
+    <uri name="cfg:fo/i18n/bs_BA.xml" uri="fo/i18n/bs.xml"/>
+    <uri name="cfg:fo/i18n/bs.xml" uri="fo/i18n/bs.xml"/>
+    <uri name="cfg:fo/i18n/ca_ES.xml" uri="fo/i18n/ca.xml"/>
+    <uri name="cfg:fo/i18n/ca.xml" uri="fo/i18n/ca.xml"/>
+    <uri name="cfg:fo/i18n/cs_CZ.xml" uri="fo/i18n/cs.xml"/>
+    <uri name="cfg:fo/i18n/cs.xml" uri="fo/i18n/cs.xml"/>
+    <uri name="cfg:fo/i18n/da_DK.xml" uri="fo/i18n/da.xml"/>
+    <uri name="cfg:fo/i18n/da.xml" uri="fo/i18n/da.xml"/>
+    <uri name="cfg:fo/i18n/de_DE.xml" uri="fo/i18n/de.xml"/>
+    <uri name="cfg:fo/i18n/de.xml" uri="fo/i18n/de.xml"/>
+    <uri name="cfg:fo/i18n/el_GR.xml" uri="fo/i18n/el.xml"/>
+    <uri name="cfg:fo/i18n/el.xml" uri="fo/i18n/el.xml"/>
+    <uri name="cfg:fo/i18n/en_US.xml" uri="fo/i18n/en.xml"/>
+    <uri name="cfg:fo/i18n/en.xml" uri="fo/i18n/en.xml"/>
+    <uri name="cfg:fo/i18n/es_ES.xml" uri="fo/i18n/es.xml"/>
+    <uri name="cfg:fo/i18n/es.xml" uri="fo/i18n/es.xml"/>
+    <uri name="cfg:fo/i18n/et_EE.xml" uri="fo/i18n/et.xml"/>
+    <uri name="cfg:fo/i18n/et.xml" uri="fo/i18n/et.xml"/>
+    <uri name="cfg:fo/i18n/fi_FI.xml" uri="fo/i18n/fi.xml"/>
+    <uri name="cfg:fo/i18n/fi.xml" uri="fo/i18n/fi.xml"/>
+    <uri name="cfg:fo/i18n/fr_FR.xml" uri="fo/i18n/fr.xml"/>
+    <uri name="cfg:fo/i18n/fr.xml" uri="fo/i18n/fr.xml"/>
+    <uri name="cfg:fo/i18n/he_IL.xml" uri="fo/i18n/he.xml"/>
+    <uri name="cfg:fo/i18n/he.xml" uri="fo/i18n/he.xml"/>
+    <uri name="cfg:fo/i18n/hi_IN.xml" uri="fo/i18n/hi.xml"/>
+    <uri name="cfg:fo/i18n/hi.xml" uri="fo/i18n/hi.xml"/>
+    <uri name="cfg:fo/i18n/hr_HR.xml" uri="fo/i18n/hr.xml"/>
+    <uri name="cfg:fo/i18n/hr.xml" uri="fo/i18n/hr.xml"/>
+    <uri name="cfg:fo/i18n/hu_HU.xml" uri="fo/i18n/hu.xml"/>
+    <uri name="cfg:fo/i18n/hu.xml" uri="fo/i18n/hu.xml"/>
+    <uri name="cfg:fo/i18n/id_ID.xml" uri="fo/i18n/id.xml"/>
+    <uri name="cfg:fo/i18n/id.xml" uri="fo/i18n/id.xml"/>
+    <uri name="cfg:fo/i18n/is_IS.xml" uri="fo/i18n/is.xml"/>
+    <uri name="cfg:fo/i18n/is.xml" uri="fo/i18n/is.xml"/>
+    <uri name="cfg:fo/i18n/it_IT.xml" uri="fo/i18n/it.xml"/>
+    <uri name="cfg:fo/i18n/it.xml" uri="fo/i18n/it.xml"/>
+    <uri name="cfg:fo/i18n/ja_JP.xml" uri="fo/i18n/ja.xml"/>
+    <uri name="cfg:fo/i18n/ja.xml" uri="fo/i18n/ja.xml"/>
+    <uri name="cfg:fo/i18n/kk_KZ.xml" uri="fo/i18n/kk.xml"/>
+    <uri name="cfg:fo/i18n/kk.xml" uri="fo/i18n/kk.xml"/>
+    <uri name="cfg:fo/i18n/ko_KR.xml" uri="fo/i18n/ko.xml"/>
+    <uri name="cfg:fo/i18n/ko.xml" uri="fo/i18n/ko.xml"/>
+    <uri name="cfg:fo/i18n/lt_LT.xml" uri="fo/i18n/lt.xml"/>
+    <uri name="cfg:fo/i18n/lt.xml" uri="fo/i18n/lt.xml"/>
+    <uri name="cfg:fo/i18n/lv_LV.xml" uri="fo/i18n/lv.xml"/>
+    <uri name="cfg:fo/i18n/lv.xml" uri="fo/i18n/lv.xml"/>
+    <uri name="cfg:fo/i18n/mk_MK.xml" uri="fo/i18n/mk.xml"/>
+    <uri name="cfg:fo/i18n/mk.xml" uri="fo/i18n/mk.xml"/>
+    <uri name="cfg:fo/i18n/ms_MY.xml" uri="fo/i18n/ms.xml"/>
+    <uri name="cfg:fo/i18n/ms.xml" uri="fo/i18n/ms.xml"/>
+    <uri name="cfg:fo/i18n/nl_NL.xml" uri="fo/i18n/nl.xml"/>
+    <uri name="cfg:fo/i18n/nl.xml" uri="fo/i18n/nl.xml"/>
+    <uri name="cfg:fo/i18n/no_NO.xml" uri="fo/i18n/no.xml"/>
+    <uri name="cfg:fo/i18n/no.xml" uri="fo/i18n/no.xml"/>
+    <uri name="cfg:fo/i18n/pl_PL.xml" uri="fo/i18n/pl.xml"/>
+    <uri name="cfg:fo/i18n/pl.xml" uri="fo/i18n/pl.xml"/>
+    <uri name="cfg:fo/i18n/pt_PT.xml" uri="fo/i18n/pt.xml"/>
+    <uri name="cfg:fo/i18n/pt.xml" uri="fo/i18n/pt.xml"/>
+    <uri name="cfg:fo/i18n/pt_BR.xml" uri="fo/i18n/pt_BR.xml"/>
+    <uri name="cfg:fo/i18n/ro_RO.xml" uri="fo/i18n/ro.xml"/>
+    <uri name="cfg:fo/i18n/ro.xml" uri="fo/i18n/ro.xml"/>
+    <uri name="cfg:fo/i18n/ru_RU.xml" uri="fo/i18n/ru.xml"/>
+    <uri name="cfg:fo/i18n/ru.xml" uri="fo/i18n/ru.xml"/>
+    <uri name="cfg:fo/i18n/sk_SK.xml" uri="fo/i18n/sk.xml"/>
+    <uri name="cfg:fo/i18n/sk.xml" uri="fo/i18n/sk.xml"/>
+    <uri name="cfg:fo/i18n/sl_SI.xml" uri="fo/i18n/sl.xml"/>
+    <uri name="cfg:fo/i18n/sl.xml" uri="fo/i18n/sl.xml"/>
+    <uri name="cfg:fo/i18n/sr_CS.xml" uri="fo/i18n/sr.xml"/>
+    <uri name="cfg:fo/i18n/sr_RS.xml" uri="fo/i18n/sr.xml"/>
+    <uri name="cfg:fo/i18n/sr_SP.xml" uri="fo/i18n/sr.xml"/>
+    <uri name="cfg:fo/i18n/sr.xml" uri="fo/i18n/sr.xml"/>
+    <uri name="cfg:fo/i18n/sr_latn_ME.xml" uri="fo/i18n/sr_latn_ME.xml"/>
+    <uri name="cfg:fo/i18n/sr_latn_RS.xml" uri="fo/i18n/sr_latn_RS.xml"/>
+    <uri name="cfg:fo/i18n/sv_SE.xml" uri="fo/i18n/sv.xml"/>
+    <uri name="cfg:fo/i18n/sv.xml" uri="fo/i18n/sv.xml"/>
+    <uri name="cfg:fo/i18n/th_TH.xml" uri="fo/i18n/th.xml"/>
+    <uri name="cfg:fo/i18n/th.xml" uri="fo/i18n/th.xml"/>
+    <uri name="cfg:fo/i18n/tr_TR.xml" uri="fo/i18n/tr.xml"/>
+    <uri name="cfg:fo/i18n/tr.xml" uri="fo/i18n/tr.xml"/>
+    <uri name="cfg:fo/i18n/uk_UA.xml" uri="fo/i18n/uk.xml"/>
+    <uri name="cfg:fo/i18n/uk.xml" uri="fo/i18n/uk.xml"/>
+    <uri name="cfg:fo/i18n/ur_PK.xml" uri="fo/i18n/ur.xml"/>
+    <uri name="cfg:fo/i18n/ur.xml" uri="fo/i18n/ur.xml"/>
+    <uri name="cfg:fo/i18n/vi_VN.xml" uri="fo/i18n/vi.xml"/>
+    <uri name="cfg:fo/i18n/vi.xml" uri="fo/i18n/vi.xml"/>
+    <uri name="cfg:fo/i18n/zh_CN.xml" uri="fo/i18n/zh_CN.xml"/>
+    <uri name="cfg:fo/i18n/zh_TW.xml" uri="fo/i18n/zh_TW.xml"/>
+
+    <uri name="cfg:common/index/ar_EG.xml" uri="common/index/ar.xml"/>
+    <uri name="cfg:common/index/ar.xml" uri="common/index/ar.xml"/>
+    <uri name="cfg:common/index/be_BY.xml" uri="common/index/be.xml"/>
+    <uri name="cfg:common/index/be.xml" uri="common/index/be.xml"/>
+    <uri name="cfg:common/index/bg_BG.xml" uri="common/index/bg.xml"/>
+    <uri name="cfg:common/index/bg.xml" uri="common/index/bg.xml"/>
+    <uri name="cfg:common/index/bs_BA.xml" uri="common/index/bs.xml"/>
+    <uri name="cfg:common/index/bs.xml" uri="common/index/bs.xml"/>
+    <uri name="cfg:common/index/ca_ES.xml" uri="common/index/ca.xml"/>
+    <uri name="cfg:common/index/ca.xml" uri="common/index/ca.xml"/>
+    <uri name="cfg:common/index/cs_CZ.xml" uri="common/index/cs.xml"/>
+    <uri name="cfg:common/index/cs.xml" uri="common/index/cs.xml"/>
+    <uri name="cfg:common/index/da_DK.xml" uri="common/index/da.xml"/>
+    <uri name="cfg:common/index/da.xml" uri="common/index/da.xml"/>
+    <uri name="cfg:common/index/de_DE.xml" uri="common/index/de.xml"/>
+    <uri name="cfg:common/index/de.xml" uri="common/index/de.xml"/>
+    <uri name="cfg:common/index/el_GR.xml" uri="common/index/el.xml"/>
+    <uri name="cfg:common/index/el.xml" uri="common/index/el.xml"/>
+    <uri name="cfg:common/index/en_US.xml" uri="common/index/en.xml"/>
+    <uri name="cfg:common/index/en.xml" uri="common/index/en.xml"/>
+    <uri name="cfg:common/index/es_ES.xml" uri="common/index/es.xml"/>
+    <uri name="cfg:common/index/es.xml" uri="common/index/es.xml"/>
+    <uri name="cfg:common/index/et_EE.xml" uri="common/index/et.xml"/>
+    <uri name="cfg:common/index/et.xml" uri="common/index/et.xml"/>
+    <uri name="cfg:common/index/fi_FI.xml" uri="common/index/fi.xml"/>
+    <uri name="cfg:common/index/fi.xml" uri="common/index/fi.xml"/>
+    <uri name="cfg:common/index/fr_FR.xml" uri="common/index/fr.xml"/>
+    <uri name="cfg:common/index/fr.xml" uri="common/index/fr.xml"/>
+    <uri name="cfg:common/index/he_IL.xml" uri="common/index/he.xml"/>
+    <uri name="cfg:common/index/he.xml" uri="common/index/he.xml"/>
+    <uri name="cfg:common/index/hi_IN.xml" uri="common/index/hi.xml"/>
+    <uri name="cfg:common/index/hi.xml" uri="common/index/hi.xml"/>
+    <uri name="cfg:common/index/hr_HR.xml" uri="common/index/hr.xml"/>
+    <uri name="cfg:common/index/hr.xml" uri="common/index/hr.xml"/>
+    <uri name="cfg:common/index/hu_HU.xml" uri="common/index/hu.xml"/>
+    <uri name="cfg:common/index/hu.xml" uri="common/index/hu.xml"/>
+    <uri name="cfg:common/index/id_ID.xml" uri="common/index/id.xml"/>
+    <uri name="cfg:common/index/id.xml" uri="common/index/id.xml"/>
+    <uri name="cfg:common/index/is_IS.xml" uri="common/index/is.xml"/>
+    <uri name="cfg:common/index/is.xml" uri="common/index/is.xml"/>
+    <uri name="cfg:common/index/it_IT.xml" uri="common/index/it.xml"/>
+    <uri name="cfg:common/index/it.xml" uri="common/index/it.xml"/>
+    <uri name="cfg:common/index/ja_JP.xml" uri="common/index/ja.xml"/>
+    <uri name="cfg:common/index/ja.xml" uri="common/index/ja.xml"/>
+    <uri name="cfg:common/index/kk_KZ.xml" uri="common/index/kk.xml"/>
+    <uri name="cfg:common/index/kk.xml" uri="common/index/kk.xml"/>
+    <uri name="cfg:common/index/ko_KR.xml" uri="common/index/ko.xml"/>
+    <uri name="cfg:common/index/ko.xml" uri="common/index/ko.xml"/>
+    <uri name="cfg:common/index/lt_LT.xml" uri="common/index/lt.xml"/>
+    <uri name="cfg:common/index/lt.xml" uri="common/index/lt.xml"/>
+    <uri name="cfg:common/index/lv_LV.xml" uri="common/index/lv.xml"/>
+    <uri name="cfg:common/index/lv.xml" uri="common/index/lv.xml"/>
+    <uri name="cfg:common/index/mk_MK.xml" uri="common/index/mk.xml"/>
+    <uri name="cfg:common/index/mk.xml" uri="common/index/mk.xml"/>
+    <uri name="cfg:common/index/ms_MY.xml" uri="common/index/ms.xml"/>
+    <uri name="cfg:common/index/ms.xml" uri="common/index/ms.xml"/>
+    <uri name="cfg:common/index/nl_NL.xml" uri="common/index/nl.xml"/>
+    <uri name="cfg:common/index/nl.xml" uri="common/index/nl.xml"/>
+    <uri name="cfg:common/index/no_NO.xml" uri="common/index/no.xml"/>
+    <uri name="cfg:common/index/no.xml" uri="common/index/no.xml"/>
+    <uri name="cfg:common/index/pl_PL.xml" uri="common/index/pl.xml"/>
+    <uri name="cfg:common/index/pl.xml" uri="common/index/pl.xml"/>
+    <uri name="cfg:common/index/pt_PT.xml" uri="common/index/pt.xml"/>
+    <uri name="cfg:common/index/pt.xml" uri="common/index/pt.xml"/>
+    <uri name="cfg:common/index/pt_BR.xml" uri="common/index/pt_BR.xml"/>
+    <uri name="cfg:common/index/ro_RO.xml" uri="common/index/ro.xml"/>
+    <uri name="cfg:common/index/ro.xml" uri="common/index/ro.xml"/>
+    <uri name="cfg:common/index/ru_RU.xml" uri="common/index/ru.xml"/>
+    <uri name="cfg:common/index/ru.xml" uri="common/index/ru.xml"/>
+    <uri name="cfg:common/index/sk_SK.xml" uri="common/index/sk.xml"/>
+    <uri name="cfg:common/index/sk.xml" uri="common/index/sk.xml"/>
+    <uri name="cfg:common/index/sl_SL.xml" uri="common/index/sl.xml"/>
+    <uri name="cfg:common/index/sl.xml" uri="common/index/sl.xml"/>
+    <uri name="cfg:common/index/sv_SE.xml" uri="common/index/sv.xml"/>
+    <uri name="cfg:common/index/sv.xml" uri="common/index/sv.xml"/>
+    <uri name="cfg:common/index/sr_CS.xml" uri="common/index/sr.xml"/>
+    <uri name="cfg:common/index/sr_RS.xml" uri="common/index/sr.xml"/>
+    <uri name="cfg:common/index/sr_SP.xml" uri="common/index/sr.xml"/>
+    <uri name="cfg:common/index/sr.xml" uri="common/index/sr.xml"/>
+    <uri name="cfg:common/index/sr_latn_ME.xml" uri="common/index/sr_latn_ME.xml"/>
+    <uri name="cfg:common/index/sr_latn_RS.xml" uri="common/index/sr_latn_RS.xml"/>
+    <uri name="cfg:common/index/th_TH.xml" uri="common/index/th.xml"/>
+    <uri name="cfg:common/index/th.xml" uri="common/index/th.xml"/>
+    <uri name="cfg:common/index/tr_TR.xml" uri="common/index/tr.xml"/>
+    <uri name="cfg:common/index/tr.xml" uri="common/index/tr.xml"/>
+    <uri name="cfg:common/index/uk_UA.xml" uri="common/index/uk.xml"/>
+    <uri name="cfg:common/index/uk.xml" uri="common/index/uk.xml"/>
+    <uri name="cfg:common/index/ur_PK.xml" uri="common/index/ur.xml"/>
+    <uri name="cfg:common/index/ur.xml" uri="common/index/ur.xml"/>
+    <uri name="cfg:common/index/vi_VN.xml" uri="common/index/vi.xml"/>
+    <uri name="cfg:common/index/vi.xml" uri="common/index/vi.xml"/>
+    <uri name="cfg:common/index/zh_CN.xml" uri="common/index/zh_CN.xml"/>
+    <uri name="cfg:common/index/zh_TW.xml" uri="common/index/zh_TW.xml"/>
+
+  
+
+</catalog>

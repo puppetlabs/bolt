@@ -1,0 +1,833 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!-- HEADER -->
+<!-- ============================================================= -->
+<!-- MODULE:    Machine Industry Task Domain -->
+<!-- VERSION:   1.2 -->
+<!-- DATE:      September 2009  -->
+<!---->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA) -->
+<!---->
+<!-- PURPOSE:    Define elements and specialization atttributed -->
+<!-- for the Machine Industry Task Domain -->
+<!---->
+<!-- ORIGINAL CREATION DATE: -->
+<!-- September 2007 -->
+<!---->
+<!-- (C) Copyright OASIS Open 2007, 2009. -->
+<!-- All Rights Reserved. -->
+<!-- UPDATES: -->
+<!--    2009.10.20 CHK: Make safecond unbound               -->
+<!-- ============================================================= -->
+<!-- ================== DITA Machine Industry Task Domain  =================== -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+  <xs:import namespace="http://dita.oasis-open.org/architecture/2005/" schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.2"/>
+
+  <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic task taskreq-d)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:group name="taskreq-d-prereq">
+    <xs:choice>
+      <xs:group ref="prelreqs"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="taskreq-d-postreq">
+    <xs:choice>
+      <xs:group ref="closereqs"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="prelreqs">
+    <xs:choice>
+      <xs:element ref="prelreqs"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="closereqs">
+    <xs:choice>
+      <xs:element ref="closereqs"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="reqconds">
+    <xs:sequence>
+      <xs:element ref="reqconds"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="noconds">
+    <xs:sequence>
+      <xs:element ref="noconds"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="reqcond">
+    <xs:sequence>
+      <xs:element ref="reqcond"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="reqcontp">
+    <xs:sequence>
+      <xs:element ref="reqcontp"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="reqpers">
+    <xs:sequence>
+      <xs:element ref="reqpers"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="personnel">
+    <xs:sequence>
+      <xs:element ref="personnel"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="perscat">
+    <xs:sequence>
+      <xs:element ref="perscat"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="perskill">
+    <xs:sequence>
+      <xs:element ref="perskill"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="esttime">
+    <xs:sequence>
+      <xs:element ref="esttime"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="supequip">
+    <xs:sequence>
+      <xs:element ref="supequip"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="nosupeq">
+    <xs:sequence>
+      <xs:element ref="nosupeq"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="supeqli">
+    <xs:sequence>
+      <xs:element ref="supeqli"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="supequi">
+    <xs:sequence>
+      <xs:element ref="supequi"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="supplies">
+    <xs:sequence>
+      <xs:element ref="supplies"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="nosupply">
+    <xs:sequence>
+      <xs:element ref="nosupply"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="supplyli">
+    <xs:sequence>
+      <xs:element ref="supplyli"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="supply">
+    <xs:sequence>
+      <xs:element ref="supply"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="spares">
+    <xs:sequence>
+      <xs:element ref="spares"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="nospares">
+    <xs:sequence>
+      <xs:element ref="nospares"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="sparesli">
+    <xs:sequence>
+      <xs:element ref="sparesli"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="spare">
+    <xs:sequence>
+      <xs:element ref="spare"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="safety">
+    <xs:sequence>
+      <xs:element ref="safety"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="nosafety">
+    <xs:sequence>
+      <xs:element ref="nosafety"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="safecond">
+    <xs:sequence>
+      <xs:element ref="safecond"/>
+    </xs:sequence>
+  </xs:group>
+  <!-- ============================================================= -->
+  <!-- ELEMENT DECLARATIONS -->
+  <!-- ============================================================= -->
+  <!-- LONG NAME: Preliminary Requirements -->
+  <xs:group name="prelreqs.content">
+     <xs:sequence>
+      <xs:group minOccurs="0" ref="reqconds"/>
+      <xs:group minOccurs="0" ref="reqpers"/>
+      <xs:group minOccurs="0" ref="supequip"/>
+      <xs:group minOccurs="0" ref="supplies"/>
+      <xs:group minOccurs="0" ref="spares"/>
+      <xs:group minOccurs="0" ref="safety"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="prelreqs.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  
+  <xs:element name="prelreqs">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="prelreqs.class">
+          <xs:attribute name="class" default="+ topic/section task/prereq taskreq-d/prelreqs "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="prelreqs.class">
+    <xs:sequence>
+      <xs:group ref="prelreqs.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="prelreqs.attributes"/>
+  </xs:complexType>
+  
+  
+  
+  <xs:attributeGroup name="prelreqs.attlist">
+    <xs:attributeGroup ref="prelreqs.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+  
+  <!-- LONG NAME: Closing Requirements -->
+  <xs:group name="closereqs.content">
+    <xs:sequence>
+      <xs:group ref="reqconds"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="closereqs.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  
+  <xs:element name="closereqs" >
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="closereqs.class">
+          <xs:attribute name="class" default="+ topic/section task/postreq taskreq-d/closereqs "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="closereqs.class">
+    <xs:sequence>
+      <xs:group ref="closereqs.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="closereqs.attributes"/>
+  </xs:complexType>
+  
+  <xs:attributeGroup name="closereqs.attlist">
+    <xs:attributeGroup ref="closereqs.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    
+  </xs:attributeGroup>
+  <!-- LONG NAME: Required Conditions -->
+  <xs:complexType name="reqconds.content">
+    <xs:choice>
+      <xs:group ref="noconds"/>
+      <xs:choice maxOccurs="unbounded">
+        <xs:group ref="reqcond"/>
+        <xs:group ref="reqcontp"/>
+      </xs:choice>
+    </xs:choice>
+  </xs:complexType>
+  <xs:attributeGroup name="reqconds.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="reqconds">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="reqconds.content">
+          <xs:attributeGroup ref="reqconds.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="reqconds.attlist">
+    <xs:attributeGroup ref="reqconds.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/ol task/ol taskreq-d/reqconds "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: No Required Conditions -->
+  <!-- specialized from li -->
+  <xs:attributeGroup name="noconds.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="noconds">
+    <xs:complexType>
+      <xs:attributeGroup ref="noconds.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="noconds.attlist">
+    <xs:attributeGroup ref="noconds.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/noconds "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Required Condition -->
+  <!-- specialized from li -->
+  <xs:complexType name="reqcond.content" mixed="true">
+    <xs:group minOccurs="0" maxOccurs="unbounded" ref="listitem.cnt"/>
+  </xs:complexType>
+  <xs:attributeGroup name="reqcond.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="reqcond">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="reqcond.content">
+          <xs:attributeGroup ref="reqcond.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="reqcond.attlist">
+    <xs:attributeGroup ref="reqcond.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/reqcond "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Required Condition Technical Publication -->
+  <!-- specialized from li -->
+  <xs:complexType name="reqcontp.content" mixed="true">
+    <xs:group minOccurs="0" maxOccurs="unbounded" ref="listitem.cnt"/>
+  </xs:complexType>
+  <xs:attributeGroup name="reqcontp.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="reqcontp">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="reqcontp.content">
+          <xs:attributeGroup ref="reqcontp.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="reqcontp.attlist">
+    <xs:attributeGroup ref="reqcontp.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/reqcontp "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Required Persons -->
+  <!-- specialized from ol -->
+  <xs:complexType name="reqpers.content">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:group ref="personnel"/>
+      <xs:sequence minOccurs="0">
+        <xs:group minOccurs="0" ref="perscat"/>
+        <xs:group minOccurs="0" ref="perskill"/>
+        <xs:group minOccurs="0" ref="esttime"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:attributeGroup name="reqpers.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="reqpers">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="reqpers.content">
+          <xs:attributeGroup ref="reqpers.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="reqpers.attlist">
+    <xs:attributeGroup ref="reqpers.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/ol task/ol taskreq-d/reqpers "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Personnel -->
+  <!-- specialized from li -->
+  <xs:complexType name="personnel.content" mixed="true">
+    <xs:group minOccurs="0" maxOccurs="unbounded" ref="listitem.cnt"/>
+  </xs:complexType>
+  <xs:attributeGroup name="personnel.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="personnel">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="personnel.content">
+          <xs:attributeGroup ref="personnel.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  
+  
+  <xs:attributeGroup name="personnel.attlist">
+    <xs:attributeGroup ref="personnel.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/personnel "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Personnel Category -->
+  <!-- specialized from li -->
+  <xs:complexType name="perscat.content" mixed="true">
+    <xs:group minOccurs="0" maxOccurs="unbounded" ref="listitem.cnt"/>
+  </xs:complexType>
+  <xs:attributeGroup name="perscat.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="perscat">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="perscat.content">
+          <xs:attributeGroup ref="perscat.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="perscat.attlist">
+    <xs:attributeGroup ref="perscat.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/perscat "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Personnel Skill Level -->
+  <!-- specialized from li -->
+  <xs:complexType name="perskill.content" mixed="true">
+    <xs:group minOccurs="0" maxOccurs="unbounded" ref="listitem.cnt"/>
+  </xs:complexType>
+  <xs:attributeGroup name="perskill.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="perskill">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="perskill.content">
+          <xs:attributeGroup ref="perskill.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="perskill.attlist">
+    <xs:attributeGroup ref="perskill.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/perskill "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Esttime -->
+  <!-- specialized from li -->
+  <xs:complexType name="esttime.content" mixed="true">
+    <xs:group minOccurs="0" maxOccurs="unbounded" ref="listitem.cnt"/>
+  </xs:complexType>
+  <xs:attributeGroup name="esttime.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="esttime">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="esttime.content">
+          <xs:attributeGroup ref="esttime.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="esttime.attlist">
+    <xs:attributeGroup ref="esttime.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/esttime "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Support Equipment -->
+  <!-- specialized from p -->
+  <xs:complexType name="supequip.content">
+    <xs:choice>
+      <xs:group ref="nosupeq"/>
+      <xs:group ref="supeqli"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:attributeGroup name="supequip.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="supequip">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="supequip.content">
+          <xs:attributeGroup ref="supequip.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="supequip.attlist">
+    <xs:attributeGroup ref="supequip.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/p task/p taskreq-d/supequip "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: No Support Equipment -->
+  <!-- specialized from data -->
+  <xs:attributeGroup name="nosupeq.attributes">
+    <xs:attributeGroup ref="data-element-atts.class"/>
+  </xs:attributeGroup>
+  <xs:element name="nosupeq">
+    <xs:complexType>
+      <xs:attributeGroup ref="nosupeq.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="nosupeq.attlist">
+    <xs:attributeGroup ref="nosupeq.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/data task/data taskreq-d/nosupeq "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Support Equipment List -->
+  <!-- specialized from ul -->
+  <xs:complexType name="supeqli.content">
+    <xs:group maxOccurs="unbounded" ref="supequi"/>
+  </xs:complexType>
+  <xs:attributeGroup name="supeqli.attributes">
+    <xs:attribute name="compact">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="yes"/>
+          <xs:enumeration value="no"/>
+          <xs:enumeration value="-dita-use-conref-target"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="spectitle"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="supeqli">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="supeqli.content">
+          <xs:attributeGroup ref="supeqli.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="supeqli.attlist">
+    <xs:attributeGroup ref="supeqli.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/ul task/ul taskreq-d/supeqli "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Support Equipment Item -->
+  <!-- specialized from li -->
+  <xs:complexType name="supequi.content" mixed="true">
+    <xs:group minOccurs="0" maxOccurs="unbounded" ref="listitem.cnt"/>
+  </xs:complexType>
+  <xs:attributeGroup name="supequi.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="supequi">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="supequi.content">
+          <xs:attributeGroup ref="supequi.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="supequi.attlist">
+    <xs:attributeGroup ref="supequi.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/supequi "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Supplies -->
+  <!-- specialized from p -->
+  <xs:complexType name="supplies.content">
+    <xs:choice>
+      <xs:group ref="nosupply"/>
+      <xs:group ref="supplyli"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:attributeGroup name="supplies.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="supplies">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="supplies.content">
+          <xs:attributeGroup ref="supplies.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="supplies.attlist">
+    <xs:attributeGroup ref="supplies.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/p task/p taskreq-d/supplies "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: No Supplies -->
+  <!-- specialized from data -->
+  <xs:attributeGroup name="nosupply.attributes">
+    <xs:attributeGroup ref="data-element-atts.class"/>
+  </xs:attributeGroup>
+  <xs:element name="nosupply">
+    <xs:complexType>
+      <xs:attributeGroup ref="nosupply.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="nosupply.attlist">
+    <xs:attributeGroup ref="nosupply.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/data task/data taskreq-d/nosupply "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Supply List -->
+  <!-- specialized from ul -->
+  <xs:complexType name="supplyli.content">
+    <xs:group maxOccurs="unbounded" ref="supply"/>
+  </xs:complexType>
+  <xs:attributeGroup name="supplyli.attributes">
+    <xs:attribute name="compact">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="yes"/>
+          <xs:enumeration value="no"/>
+          <xs:enumeration value="-dita-use-conref-target"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="spectitle"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="supplyli">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="supplyli.content">
+          <xs:attributeGroup ref="supplyli.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="supplyli.attlist">
+    <xs:attributeGroup ref="supplyli.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/ul task/ul taskreq-d/supplyli "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Supply Item -->
+  <!-- specialized from li -->
+  <xs:complexType name="supply.content" mixed="true">
+    <xs:group minOccurs="0" maxOccurs="unbounded" ref="listitem.cnt"/>
+  </xs:complexType>
+  <xs:attributeGroup name="supply.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="supply">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="supply.content">
+          <xs:attributeGroup ref="supply.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="supply.attlist">
+    <xs:attributeGroup ref="supply.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/supply "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Spares -->
+  <!-- specialized from p -->
+  <xs:complexType name="spares.content">
+    <xs:choice>
+      <xs:group ref="nospares"/>
+      <xs:group ref="sparesli"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:attributeGroup name="spares.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="spares">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="spares.content">
+          <xs:attributeGroup ref="spares.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="spares.attlist">
+    <xs:attributeGroup ref="spares.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/p task/p taskreq-d/spares "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: No Spares -->
+  <!-- specialized from data -->
+  <xs:attributeGroup name="nospares.attributes">
+    <xs:attributeGroup ref="data-element-atts.class"/>
+  </xs:attributeGroup>
+  <xs:element name="nospares">
+    <xs:complexType>
+      <xs:attributeGroup ref="nospares.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="nospares.attlist">
+    <xs:attributeGroup ref="nospares.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/data task/data taskreq-d/nospares "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Spare List -->
+  <!-- specialized from ul -->
+  <xs:complexType name="sparesli.content">
+    <xs:group maxOccurs="unbounded" ref="spare"/>
+  </xs:complexType>
+  <xs:attributeGroup name="sparesli.attributes">
+    <xs:attribute name="compact">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="yes"/>
+          <xs:enumeration value="no"/>
+          <xs:enumeration value="-dita-use-conref-target"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="spectitle"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="sparesli">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="sparesli.content">
+          <xs:attributeGroup ref="sparesli.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="sparesli.attlist">
+    <xs:attributeGroup ref="sparesli.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/ul task/ul taskreq-d/sparesli "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Spare Item -->
+  <!-- specialized from li -->
+  <xs:complexType name="spare.content" mixed="true">
+    <xs:group minOccurs="0" maxOccurs="unbounded" ref="listitem.cnt"/>
+  </xs:complexType>
+  <xs:attributeGroup name="spare.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="spare">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="spare.content">
+          <xs:attributeGroup ref="spare.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="spare.attlist">
+    <xs:attributeGroup ref="spare.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/spare "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Safety Conditions -->
+  <!-- specialized from ol -->
+  <xs:complexType name="safety.content">
+    <xs:choice>
+      <xs:group ref="nosafety"/>
+      <xs:group ref="safecond" maxOccurs="unbounded"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:attributeGroup name="safety.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="safety">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="safety.content">
+          <xs:attributeGroup ref="safety.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="safety.attlist">
+    <xs:attributeGroup ref="safety.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/ol task/ol taskreq-d/safety "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: No Safety Conditions -->
+  <!-- specialized from li -->
+  <xs:attributeGroup name="nosafety.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="nosafety">
+    <xs:complexType>
+      <xs:attributeGroup ref="nosafety.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="nosafety.attlist">
+    <xs:attributeGroup ref="nosafety.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/nosafety "/>
+  </xs:attributeGroup>
+  <!-- LONG NAME: Safety Condition -->
+  <!-- specialized from li -->
+  <xs:complexType name="safecond.content" mixed="true">
+    <xs:group minOccurs="0" maxOccurs="unbounded" ref="listitem.cnt"/>
+  </xs:complexType>
+  <xs:attributeGroup name="safecond.attributes">
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attribute name="outputclass"/>
+  </xs:attributeGroup>
+  <xs:element name="safecond">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="safecond.content">
+          <xs:attributeGroup ref="safecond.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="safecond.attlist">
+    <xs:attributeGroup ref="safecond.attributes"/>
+    <xs:attributeGroup ref="global-atts"/>
+    <xs:attribute name="class" default="+ topic/li task/li taskreq-d/safecond "/>
+  </xs:attributeGroup>
+  <!-- ============================================================= -->
+  <!-- SPECIALIZATION ATTRIBUTE DECLARATIONS -->
+  <!-- ============================================================= -->
+</xs:schema>
+<!-- ================== End DITA Machine Industry Task Domain  =================== -->

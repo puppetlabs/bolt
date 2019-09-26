@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      July 2007                                     -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA concepts          -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2009                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+  <!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/" schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.2"/>
+   
+   <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic concept)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    
+    </xs:documentation>
+  </xs:annotation>
+
+  <!--Embed concept to get specific elements -->
+  <xs:element name="concept">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>concept</keyword>&gt; element is the top-level
+        element for a topic that answers the question <q>what is?</q> Concepts provide
+        background information that users must know before they can successfully work
+        with a product or interface. Often, a concept is an extended definition of
+        a major abstraction such as a process or function. It might also have an example
+        or a graphic, but generally the structure of a concept is fairly simple.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="concept.class">
+          <xs:attribute ref="class" default="- topic/topic concept/concept "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:element name="conbody">
+    <xs:annotation>
+      <xs:documentation>
+        The &lt;<keyword>conbody</keyword>&gt; element is the main body-level
+        element for a concept. Like the body element of a general topic, &lt;<keyword>conbody</keyword>&gt;
+        allows paragraphs, lists, and other elements as well as sections and examples.
+        But &lt;<keyword>conbody</keyword>&gt; has a constraint that a section
+        or an example can be followed only by other sections or examples.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="conbody.class">
+          <xs:attribute ref="class" default="- topic/body concept/conbody "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="concept-info-types">
+    <xs:choice>
+      <xs:group ref="concept"/>
+      <xs:group ref="info-types" />
+    </xs:choice>
+  </xs:group>
+
+  <!-- Base type: topic.class -->
+  <xs:complexType name="concept.class">
+         <xs:sequence>
+           <xs:group ref="concept.content"/>
+         </xs:sequence>
+         <xs:attributeGroup ref="concept.attributes"></xs:attributeGroup>
+  </xs:complexType>
+   
+   <xs:group name="concept.content">
+     <xs:sequence>
+       <xs:sequence>
+          <xs:group ref="title"/>
+          <xs:group ref="titlealts" minOccurs="0"/>
+          <xs:choice minOccurs="0">
+            <xs:group ref="shortdesc" />
+            <xs:group ref="abstract" />
+          </xs:choice>
+          <xs:group ref="prolog" minOccurs="0"/>
+          <xs:group ref="conbody" minOccurs="0"/>
+          <xs:group ref="related-links" minOccurs="0"/>
+          <xs:group ref="concept-info-types" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+     </xs:sequence>
+   </xs:group>
+   
+   <xs:attributeGroup name="concept.attributes">
+     <xs:attribute name="id" type="xs:ID" use="required"/>
+        <xs:attributeGroup ref="conref-atts" />
+        <xs:attributeGroup ref="select-atts"/>
+        <xs:attribute ref="ditaarch:DITAArchVersion" />
+    <xs:attributeGroup ref="domains-att"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="localization-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+
+  <!-- Base type: body.class -->
+   <xs:complexType name="conbody.class">
+     <xs:sequence>
+       <xs:group ref="conbody.content"/>
+     </xs:sequence>
+     <xs:attributeGroup ref="conbody.attributes"/>
+   </xs:complexType>
+   
+   <xs:group name="conbody.content">
+     <xs:sequence>
+       <xs:sequence>
+         <xs:group ref="body.cnt" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+           <xs:group ref="section" />
+           <xs:group ref="example" />
+           <xs:group ref="conbodydiv" />
+         </xs:choice>
+       </xs:sequence>
+     </xs:sequence>
+   </xs:group>
+   
+   <xs:attributeGroup name="conbody.attributes">
+     <xs:attribute name="outputclass" type="xs:string"/>
+     <xs:attribute name="base" type="xs:string" />
+     <xs:attributeGroup ref="base-attribute-extensions"/>
+     <xs:attributeGroup ref="id-atts"/>
+     <xs:attributeGroup ref="localization-atts"/>
+     <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   
+   <xs:element name="conbodydiv">
+     <xs:annotation>
+       <xs:documentation>
+       </xs:documentation>
+     </xs:annotation>
+     <xs:complexType>
+       <xs:complexContent>
+         <xs:extension base="conbodydiv.class">
+           <xs:attribute ref="class" default="- topic/bodydiv concept/conbodydiv "/>
+         </xs:extension>
+       </xs:complexContent>
+     </xs:complexType>
+   </xs:element>
+   <xs:complexType name="conbodydiv.class">
+     <xs:sequence>
+       <xs:group ref="conbodydiv.content"/>
+     </xs:sequence>
+     <xs:attributeGroup ref="conbodydiv.attributes"/>
+   </xs:complexType>
+   
+   <xs:group name="conbodydiv.content">
+     <xs:sequence>
+       <xs:choice minOccurs="0" maxOccurs="unbounded">
+         <xs:group ref="example"/>
+         <xs:group ref="section"/>
+       </xs:choice>  
+     </xs:sequence>
+   </xs:group>
+   
+   <xs:attributeGroup name="conbodydiv.attributes">
+     <xs:attribute name="outputclass" type="xs:string"/>
+     <xs:attributeGroup ref="univ-atts"/>
+     <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+ </xs:schema>

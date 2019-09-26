@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Glossary XSD Module                           -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      July 2007                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization atttributes    -->
+<!--             for Glossary topics                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             July 2007                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2007, 2009                -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+     <!-- ==================== Import Section ======================= -->
+   
+     <!-- NOTE: The glossaryMod.xsd file was misnamed in DITA 1.1. For DITA 1.2, it simply
+          redirects to the correctly-named glossentryMod.xsd file.
+       -->
+     <xs:include schemaLocation="urn:oasis:names:tc:dita:xsd:glossentryMod.xsd:1.2"/>  
+   
+   
+ </xs:schema>
+ 

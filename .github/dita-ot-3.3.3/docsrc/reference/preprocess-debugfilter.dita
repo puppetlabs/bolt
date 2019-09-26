@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="preprocess-debugfilter" xml:lang="en-US">
+  <title>Debug and filter (debug-filter)</title>
+  <shortdesc>The <codeph>debug-filter</codeph> step processes all referenced DITA content and creates copies in a
+    temporary directory. As the DITA content is copied, filtering is performed, debugging information is inserted, and
+    table column names are adjusted. This step is implemented in Java.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>ph</xmlelement></indexterm>
+        <indexterm><xmlatt>xtrf</xmlatt></indexterm>
+        <indexterm><xmlatt>xtrc</xmlatt></indexterm>
+        <indexterm>DITAVAL<indexterm><codeph>debug-filter</codeph> preprocess step</indexterm></indexterm>
+        <indexterm>preprocessing<indexterm><codeph>debug-filter</codeph></indexterm></indexterm>
+        <indexterm><codeph>debug-filter</codeph></indexterm>
+        <indexterm>debugging<indexterm><codeph>debug-filter</codeph> preprocess step</indexterm></indexterm>
+        <indexterm>tables<indexterm>DITAVAL</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <p>The following modifications are made to the DITA source:</p>
+      <ul>
+        <li>If a DITAVAL file is specified, the DITA source is filtered according to the entries in the DITAVAL
+          file.</li>
+        <li>Debug information is inserted into each element using the <xmlatt>xtrf</xmlatt> and <xmlatt>xtrc</xmlatt>
+          attributes. The values of these attributes enable messages later in the build to reliably indicate the
+          original source of the error. For example, a message might trace back to the fifth <xmlelement>ph</xmlelement>
+          element in a specific DITA topic. Without these attributes, that count might no longer be available due to
+          filtering and other processing.</li>
+        <li>The table column names are adjusted to use a common naming scheme. This is done only to simplify later
+          conref processing. For example, if a table row is pulled into another table, this ensures that a reference to
+          "column 5 properties" will continue to work in the fifth column of the new table.</li>
+      </ul>
+    </section>
+  </conbody>
+</concept>

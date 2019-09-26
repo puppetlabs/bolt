@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="history" ditaarch:DITAArchVersion="1.2"><title>DITA history on developerWorks (pre-Open Source)</title><refbody><section id="section_eer_afj_nc">
+        <p>Versions of the toolkit prior to Open Source are in the developerWorks XML Zone at this
+          address: <xref format="html" href="http://www-106.ibm.com/developerworks/xml/library/x-dita6/x-dita_downloads.html">DITA Downloads</xref> Change logs for those versions are within the Readme files in
+          each distribution.</p>
+      </section></refbody></reference>

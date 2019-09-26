@@ -1,0 +1,92 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="In DITA-OT 1.7, a new preprocessing step implements flagging for HTML-based output formats. PDF processing was corrected with regard to shortdesc handling, and a new XSLT template mode was introduced for HTML TOC processing. Several stylesheets were moved to plug-in specific folders and deprecated properties and XSLT variables were removed."><meta name="DC.subject" content="deprecated features, dita.input, dita.input.dirname, dita.extname, XHTML, flagging-related templates, page-margin-left, page-margin-right"><meta name="keywords" content="deprecated features, dita.input, dita.input.dirname, dita.extname, XHTML, flagging-related templates, page-margin-left, page-margin-right"><meta name="DC.relation" scheme="URI" content="../topics/migration.html"><meta name="DC.relation" scheme="URI" content="../reference/flagging-migration.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="ID"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Migrating to release 1.7</title></head><body id="ID"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a><ul><li><a href="../topics/migrating-to-3.3.html">To 3.3</a></li><li><a href="../topics/migrating-to-3.2.html">To 3.2</a></li><li><a href="../topics/migrating-to-3.1.html">To 3.1</a></li><li><a href="../topics/migrating-to-3.0.html">To 3.0</a></li><li><a href="../topics/migrating-to-2.5.html">To 2.5</a></li><li><a href="../topics/migrating-to-2.4.html">To 2.4</a></li><li><a href="../topics/migrating-to-2.3.html">To 2.3</a></li><li><a href="../topics/migrating-to-2.2.html">To 2.2</a></li><li><a href="../topics/migrating-to-2.1.html">To 2.1</a></li><li><a href="../topics/migrating-to-2.0.html">To 2.0</a></li><li><a href="../topics/migrating-to-1.8.html">To 1.8</a></li><li class="active"><a href="../topics/migrating-to-1.7.html">To 1.7</a><ul><li><a href="../reference/flagging-migration.html">Flagging updates</a></li></ul></li><li><a href="../topics/migrating-to-1.6.html">To 1.6</a></li><li><a href="../topics/migrating-to-1.5.4.html">To 1.5.4</a></li></ul></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+
+  <h1 class="title topictitle1" id="ariaid-title1">Migrating to release 1.7</h1>
+  
+
+  
+  
+  
+
+  <div class="body refbody"><p class="shortdesc">In DITA-OT 1.7, a new preprocessing step implements flagging for HTML-based output formats. PDF processing
+    was corrected with regard to <code class="ph codeph">shortdesc</code> handling, and a new XSLT template mode was introduced for
+    HTML TOC processing. Several stylesheets were moved to plug-in specific folders and deprecated properties and XSLT
+    variables were removed. </p>
+    <section class="section">
+      <p class="p">A new job status file <span class="ph filepath">.job.xml</span> has been introduced and replaces
+          <span class="ph filepath">dita.list</span> and <span class="ph filepath">dita.xml.properties</span> as the normative source for job
+        status. If you have custom processing which modifies the job properties, you should change your code to modify
+          <span class="ph filepath">.job.xml</span> instead.</p>
+      <p class="p">Support for the following deprecated properties has been removed:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">dita.input</code></li>
+        <li class="li"><code class="ph codeph">dita.input.dirname</code></li>
+        <li class="li"><code class="ph codeph">dita.extname</code></li>
+      </ul>
+      <p class="p">Stylesheets for the following transformation types have moved to plug-in specific folders:</p>
+      <ul class="ul">
+        <li class="li"><span class="keyword option">docbook</span></li>
+        <li class="li"><span class="keyword option">eclipsecontent</span></li>
+        <li class="li"><span class="keyword option">troff</span></li>
+        <li class="li"><span class="keyword option">wordrtf</span></li>
+      </ul>
+      <p class="p">If custom plug-ins have hard coded paths to these stylesheets, update references to use either
+          <code class="ph codeph">plugin</code> URIs in <code class="ph codeph">xsl:import</code> instructions or use <code class="ph codeph">dita.plugin.*</code>
+        Ant properties.</p>
+      <p class="p">The integration process has been changed to use strict mode by default. For old plug-ins which are not valid,
+          <span class="keyword">lax</span> processing mode can still be used.</p>
+      <p class="p">Plug-ins that use the <code class="ph codeph">MessageUtils</code> Java class must use <code class="ph codeph">getInstance</code> method to
+        access the <code class="ph codeph">MessageUtils</code> instance, as <code class="ph codeph">getMessage</code> methods have been changed to
+        instance methods.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Preprocessing</h2>
+      
+      <p class="p">The preprocessing Ant dependency chain has been cleaned up. Tasks no longer depend on the previous task in the
+        default chain, but rather the whole preprocess dependency chain is defined by the <code class="ph codeph">preprocess</code>
+        task.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">HTML</h2>
+      
+      <p class="p">Core TOC generation has been moved to a separate XSLT stylesheet
+          <span class="ph filepath">xsl/map2htmtoc/map2htmlImpl.xsl</span> and the new templates use the mode <code class="ph codeph">toc</code>.
+        Plug-ins which override HTML TOC processing should change the map processing templates to <code class="ph codeph">toc</code>
+        mode.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">HTML and extended transformation types</h2>
+      
+      <p class="p">Flagging logic has been pulled out of the core X/HTML code and moved to a preprocess step. This significantly
+        simplifies and optimizes the X/HTML code, while making flagging logic available to any other transformation
+        type. The new preprocess step implements all flagging logic; for each active flag, it adds a DITA-OT specific
+        hint into the intermediate topics (implemented as a specialization of the DITA &lt;foreign&gt; element). As part
+        of this change, all flagging-related templates in the XHTML code (such as start-flagit and gen-style) are
+        deprecated.</p>
+      <p class="p">If you override the X/HTML transforms, you may need to update your overrides to use the new flagging logic. In
+        most cases this just means deleting calls to the deprecated templates; in some cases, the calls can be replaced
+        with 2 lines to process flags in new places. You should compare your override to the updated XHTML code and
+        update as needed. See <a class="xref" href="../reference/flagging-migration.html" title="This topic is primarily of interest to developers with XHTML transform overrides written prior to DITA-OT 1.7. Due to significant changes in the flagging process with the 1.7 release, some changes may be needed to make overrides work properly with DITAVAL-based flagging. The new design is significantly simpler than the old design; in many cases, migration will consist of deleting old code that is no longer needed.">XHTML migration for flagging updates in DITA-OT 1.7</a> for details.</p>
+      <p class="p">Plug-ins that provide support for new transforms need to ensure that they properly support the DITA
+        &lt;foreign&gt; element, which should be ignored by default; if so, this change will have no immediate impact.
+        Support for flagging new transformation types may be more easily added based on this update, because there is no
+        need to re-implement flagging logic, but this is not required. See <a class="xref" href="../reference/preprocess-flagging.html" title="Beginning with DITA-OT 1.7, flagging support is implemented as a common flag-module preprocessing step. The module evaluates the DITAVAL against all flagging attributes, and adds DITA-OT–specific hints to the topic when flags are active. Any extended transformation type may use these hints to support flagging without adding logic to interpret the DITAVAL.">Flagging (flag-module)</a> for
+        details on how to add flagging support.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">PDF</h2>
+      
+      <p class="p">The following deprecated XSLT variables have been removed:</p>
+      <ul class="ul">
+        <li class="li"><code class="ph codeph">page-margin-left</code></li>
+        <li class="li"><code class="ph codeph">page-margin-right</code></li>
+      </ul>
+      <p class="p">XSLT stylesheets have been split to separate specialization topic code and new <code class="ph codeph">xsl:import</code>
+        instructions have been added to <span class="ph filepath">topic2fo.xsl</span>. Plug-ins which define their own shell
+        stylesheet should be revised to import all the required stylesheet modules.</p>
+      <p class="p">PDF processing used to replace topic <code class="ph codeph">shortdesc</code> with map <code class="ph codeph">shortdesc</code>, but this
+        behavior was incorrect and was removed to comply with the DITA specification.</p>
+      <p class="p">A new <code class="ph codeph">#note-separator</code> variable string was added to facilitate customization.</p>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><ul class="ullinks"><li class="link ulchildlink"><strong><a href="../reference/flagging-migration.html">XHTML migration for flagging updates in DITA-OT 1.7</a></strong><br>This topic is primarily of interest to developers with XHTML transform overrides written prior to DITA-OT     1.7. Due to significant changes in the flagging process with the 1.7 release, some changes may be needed to make     overrides work properly with DITAVAL-based flagging. The new design is significantly simpler than the old design; in     many cases, migration will consist of deleting old code that is no longer needed.</li></ul><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/migration.html" title="If you have XSL transformation overrides, plug-ins or other customizations written prior to DITA-OT 3.3, you may need to make changes to ensure your overrides work properly with the latest toolkit versions.">Migrating customizations</a></div></div></nav></article></main></body></html>

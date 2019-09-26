@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="replacecover" xml:lang="en-us">
+  <title>Replace the cover of your system.</title>
+  <shortdesc>The cover needs to be put back on to reduce problems from dust.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>hard drive</indexterm>
+        <indexterm>Computer cover</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>Retrieve the computer's cover from its safe place. Put it back on.</cmd>
+      </step>
+      <step>
+        <cmd>Retrieve the screws from the safe place. Put them back in.</cmd>
+      </step>
+      <step>
+        <cmd>Put away your screwdriver before you lose it.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

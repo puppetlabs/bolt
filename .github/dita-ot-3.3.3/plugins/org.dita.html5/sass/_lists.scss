@@ -1,0 +1,65 @@
+// This file is part of the DITA Open Toolkit project.
+//
+// Copyright 2016 Roger Sheen
+//
+// See the accompanying LICENSE file for applicable license.
+
+// Sass partial for list styles
+
+/* Simple lists do not get a bullet */
+ul.simple {
+  list-style-type: none;
+}
+
+/* Default of bold for definition list terms */
+.dlterm {
+  font-weight: bold;
+}
+
+/* Use CSS to expand lists with @compact="no" */
+.dltermexpand {
+  font-weight: bold;
+  margin-top: 1em;
+}
+
+*[compact="yes"] > li {
+  margin-top: 0;
+}
+
+*[compact="no"] > li {
+  margin-top: 0.53em;
+}
+
+.liexpand {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+.sliexpand {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+.dlexpand {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+.ddexpand {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+.stepexpand {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+.substepexpand {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+dt.prereq {
+  margin-left: 20px;
+}

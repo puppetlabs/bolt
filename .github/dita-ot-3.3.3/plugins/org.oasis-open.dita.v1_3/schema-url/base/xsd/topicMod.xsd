@@ -1,0 +1,841 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!-- Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02     -->
+<!-- OASIS Standard                                           -->
+<!-- 16 January 2018                                           -->
+<!-- Copyright (c) OASIS Open 2018. All rights reserved.           -->
+<!-- Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html                                -->
+<!--                                                               -->
+<!--  MODULE:    DITA Topic XSD Module                             -->
+<!--  VERSION:   1.3                                               -->
+<!--  DATE:      October 2014                                      -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the elements and specialization         -->
+<!--             attributes for the base Topic type                -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!-- UPDATES                                                       -->
+<!-- ============================================================= -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/"
+              schemaLocation="../../base/xsd/ditaarch.xsd"/>
+
+   <xs:group name="topic-info-types">
+      <xs:choice>
+         <xs:group ref="topic"/>
+         <xs:group ref="info-types"/>
+      </xs:choice>
+   </xs:group>
+   <xs:group name="abstract.cnt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="basic.block"/>
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="shortdesc"/>
+            <xs:group ref="txt.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="body.cnt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="basic.block"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="draft-comment"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="required-cleanup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="bodydiv.cnt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="basic.block"/>
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="txt.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="example.cnt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="basic.block"/>
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="title"/>
+            <xs:group ref="txt.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="section.cnt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="basic.block"/>
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="sectiondiv"/>
+            <xs:group ref="title"/>
+            <xs:group ref="txt.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="section.notitle.cnt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="basic.block"/>
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="sectiondiv"/>
+            <xs:group ref="txt.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="sectiondiv.cnt">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="basic.block"/>
+            <xs:group ref="basic.ph"/>
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+            <xs:group ref="txt.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="relational-atts">
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="cascade" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="local"/>
+               <xs:enumeration value="peer"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="role">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="ancestor"/>
+               <xs:enumeration value="child"/>
+               <xs:enumeration value="cousin"/>
+               <xs:enumeration value="descendant"/>
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="friend"/>
+               <xs:enumeration value="next"/>
+               <xs:enumeration value="other"/>
+               <xs:enumeration value="parent"/>
+               <xs:enumeration value="previous"/>
+               <xs:enumeration value="sample"/>
+               <xs:enumeration value="sibling"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="otherrole" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="rel-atts">
+      <xs:annotation>
+         <xs:documentation>rel-atts is deprecated as of DITA 1.2, retained for backward compatibility.</xs:documentation>
+      </xs:annotation>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="role">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="ancestor"/>
+               <xs:enumeration value="child"/>
+               <xs:enumeration value="cousin"/>
+               <xs:enumeration value="descendant"/>
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="friend"/>
+               <xs:enumeration value="next"/>
+               <xs:enumeration value="other"/>
+               <xs:enumeration value="parent"/>
+               <xs:enumeration value="previous"/>
+               <xs:enumeration value="sample"/>
+               <xs:enumeration value="sibling"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="otherrole" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:element name="topic">
+      <xs:annotation>
+         <xs:documentation>The &lt;topic&gt; element is the top-level DITA element for a single-subject topic or article. Other top-level DITA elements that are more content-specific are &lt;concept&gt;,
+            &lt;task&gt;, &lt;reference&gt;, and &lt;glossary&gt;. Category: Topic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="topic.class">
+               <xs:attribute ref="class" default="- topic/topic "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="topic.class">
+      <xs:sequence>
+         <xs:group ref="topic.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="topic.attributes"/>
+   </xs:complexType>
+   <xs:group name="topic.content">
+      <xs:sequence>
+         <xs:group ref="title"/>
+         <xs:group ref="titlealts" minOccurs="0"/>
+         <xs:choice minOccurs="0">
+            <xs:group ref="shortdesc"/>
+            <xs:group ref="abstract"/>
+         </xs:choice>
+         <xs:group ref="prolog" minOccurs="0"/>
+         <xs:group ref="body" minOccurs="0"/>
+         <xs:group ref="related-links" minOccurs="0"/>
+         <xs:group ref="topic-info-types" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="topic.attributes">
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="topic.attlist">
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+   </xs:attributeGroup>
+   <xs:element name="titlealts">
+      <xs:annotation>
+         <xs:documentation>The alternate title element (&lt;titlealts&gt;) is optional, but can occur after the topic title. Two elements can be inserted as sub-elements of &lt;titlealts&gt;: navigation
+            title &lt;navtitle&gt; and search title &lt;searchtitle&gt;. Category: Topic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="titlealts.class">
+               <xs:attribute ref="class" default="- topic/titlealts "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="titlealts.class">
+      <xs:sequence>
+         <xs:group ref="titlealts.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="titlealts.attributes"/>
+   </xs:complexType>
+   <xs:group name="titlealts.content">
+      <xs:sequence>
+         <xs:group ref="navtitle" minOccurs="0"/>
+         <xs:group ref="searchtitle" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="titlealts.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="searchtitle">
+      <xs:annotation>
+         <xs:documentation>When your DITA topic is transformed to XHTML, the &lt;searchtitle&gt; element is used to create a title element at the top of the resulting HTML file. This title is normally
+            used in search result summaries by some search engines, such as that in Eclipse (http://eclipse.org); if not set, the XHTML's title element defaults to the source topic's title content
+            (which may not be as well optimized for search summaries) Category: Topic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="searchtitle.class">
+               <xs:attribute ref="class" default="- topic/searchtitle "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="searchtitle.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="searchtitle.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="searchtitle.attributes"/>
+   </xs:complexType>
+   <xs:group name="searchtitle.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt"/>
+            <xs:group ref="ph"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="searchtitle.attributes">
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="shortdesc">
+      <xs:annotation>
+         <xs:documentation>The short description (&lt;shortdesc&gt;) element occurs between the topic title and the topic body, as the initial paragraph-like content of a topic, or it can be embedded
+              in an abstract element. The short description, which represents the purpose or theme of the topic, is also intended to be used as a link preview and for searching. When used within a
+              DITA map, the short description of the &lt;topicref&gt; can be used to override the short description in the topic. Category: Topic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="shortdesc.class">
+               <xs:attribute ref="class" default="- topic/shortdesc "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="shortdesc.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="shortdesc.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="shortdesc.attributes"/>
+   </xs:complexType>
+   <xs:group name="shortdesc.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="title.cnt"/>
+            <xs:group ref="xref"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="shortdesc.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="abstract">
+      <xs:annotation>
+         <xs:documentation>The abstract element occurs between the topic title and the topic body, as the initial content of a topic. It can contain paragraph-level content as well as one or more
+            shortdesc elements which can be used for providing link previews or summaries. The &lt;abstract&gt; element cannot be overridden by maps, but its contained &lt;shortdesc&gt; elements can be, for
+            the purpose of creating link summaries or previews. Category: Topic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="abstract.class">
+               <xs:attribute ref="class" default="- topic/abstract "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="abstract.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="abstract.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="abstract.attributes"/>
+   </xs:complexType>
+   <xs:group name="abstract.content">
+      <xs:sequence>
+         <xs:group ref="abstract.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="abstract.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="body">
+      <xs:annotation>
+         <xs:documentation>The &lt;body&gt; element is the container for the main content of a &lt;topic&gt;. Category: Topic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="body.class">
+               <xs:attribute ref="class" default="- topic/body "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="body.class">
+      <xs:sequence>
+         <xs:group ref="body.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="body.attributes"/>
+   </xs:complexType>
+   <xs:group name="body.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="body.cnt"/>
+            <xs:group ref="bodydiv"/>
+            <xs:group ref="example"/>
+            <xs:group ref="section"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="body.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="bodydiv">
+      <xs:annotation>
+         <xs:documentation>The &lt;bodydiv&gt; element is used to contain informal blocks of information within the body of a topic. The bodydiv element is specifically designed to be a grouping element,
+            without any explicit semantics, other than to organize subsets of content into logical groups that are not intended or should not be contained as a topic. As such, it does not contain an
+            explicit title to avoid enabling the creation of deeply nested content that would otherwise be written as separate topics. Content that requires a title should use a section element or a
+            nested topic.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bodydiv.class">
+               <xs:attribute ref="class" default="- topic/bodydiv "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="bodydiv.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="bodydiv.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="bodydiv.attributes"/>
+   </xs:complexType>
+   <xs:group name="bodydiv.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="bodydiv.cnt"/>
+            <xs:group ref="bodydiv"/>
+            <xs:group ref="section"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="bodydiv.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="no-topic-nesting">
+      <xs:annotation>
+         <xs:documentation>The &lt;no-topic-nesting&gt; element is a placeholder in the DITA architecture. It is not actually used by the default DITA document types; it is for use only when creating a
+            validly customized document type where the information designer wants to eliminate the ability to nest topics. Not intended for use by authors, and has no associated output processing.
+            Category: Specialization elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="no-topic-nesting.class">
+               <xs:attribute ref="class" default="- topic/no-topic-nesting "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="no-topic-nesting.class">
+      <xs:sequence>
+         <xs:group ref="no-topic-nesting.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="no-topic-nesting.attributes"/>
+   </xs:complexType>
+   <xs:group name="no-topic-nesting.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="no-topic-nesting.attributes">
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="section">
+      <xs:annotation>
+         <xs:documentation>The &lt;section&gt; element represents an organizational division in a topic. Sections are used to organize subsets of information that are directly related to the topic. For
+            example, the titles Reference Syntax, Example and Properties might represent section-level discourse within a topic about a command-line process—the content in each section relates
+            uniquely to the subject of that topic. Multiple sections within a single topic do not represent a hierarchy, but rather peer divisions of that topic. Sections cannot be nested. A section
+            may have an optional title. Category: Topic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="section.class">
+               <xs:attribute ref="class" default="- topic/section "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="section.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="section.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="section.attributes"/>
+   </xs:complexType>
+   <xs:group name="section.content">
+      <xs:sequence>
+         <xs:group ref="section.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="section.attributes">
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="sectiondiv">
+      <xs:annotation>
+         <xs:documentation>The &lt;sectiondiv&gt; element allows logical grouping of content within a section. There is no additional semantic associated with the sectiondiv element, aside from its
+            function as a container for other content. The sectiondiv element does not contain a title; the lowest level of titled content within a topic is the section itself. If additional hierarchy
+            is required, nested topics should be used in place of the section.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="sectiondiv.class">
+               <xs:attribute ref="class" default="- topic/sectiondiv "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="sectiondiv.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="sectiondiv.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="sectiondiv.attributes"/>
+   </xs:complexType>
+   <xs:group name="sectiondiv.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="sectiondiv.cnt"/>
+            <xs:group ref="sectiondiv"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="sectiondiv.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="example">
+      <xs:annotation>
+         <xs:documentation>The &lt;example&gt; element is a section with the specific role of containing examples that illustrate or support the current topic. The &lt;example&gt; element has the same
+            content model as &lt;section&gt;. Category: Topic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="example.class">
+               <xs:attribute ref="class" default="- topic/example "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="example.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="example.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="example.attributes"/>
+   </xs:complexType>
+   <xs:group name="example.content">
+      <xs:sequence>
+         <xs:group ref="example.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="example.attributes">
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="prolog">
+      <xs:annotation>
+         <xs:documentation>The &lt;prolog&gt; element contains information about the topic as an whole (for example, author information or subject category) that is either entered by the author or
+              machine-maintained. Much of the metadata inside the &lt;prolog&gt; will not be displayed with the topic on output, but may be used by processes that generate search indexes or customize
+              navigation. Category: Prolog elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="prolog.class">
+               <xs:attribute ref="class" default="- topic/prolog "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="prolog.class">
+      <xs:sequence>
+         <xs:group ref="prolog.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="prolog.attributes"/>
+   </xs:complexType>
+   <xs:group name="prolog.content">
+      <xs:sequence>
+         <xs:group ref="author" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="source" minOccurs="0"/>
+         <xs:group ref="publisher" minOccurs="0"/>
+         <xs:group ref="copyright" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="critdates" minOccurs="0"/>
+         <xs:group ref="permissions" minOccurs="0"/>
+         <xs:group ref="metadata" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="resourceid" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data.elements.incl"/>
+            <xs:group ref="foreign.unknown.incl"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="prolog.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="related-links">
+      <xs:annotation>
+         <xs:documentation>The related information links of a topic (&lt;related-links&gt; element) are stored in a special section following the body of the topic. After a topic is processed into it
+              final output form, the related links are usually displayed at the end of the topic, although some Web-based help systems might display them in a separate navigation frame. Category:
+              Topic elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="related-links.class">
+               <xs:attribute ref="class" default="- topic/related-links "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="related-links.class">
+      <xs:sequence>
+         <xs:group ref="related-links.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="related-links.attributes"/>
+   </xs:complexType>
+   <xs:group name="related-links.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="link"/>
+            <xs:group ref="linklist"/>
+            <xs:group ref="linkpool"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="related-links.attributes">
+      <xs:attributeGroup ref="relational-atts"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="link">
+      <xs:annotation>
+         <xs:documentation>The &lt;link&gt; element defines a relationship to another topic. Links represent the types and roles of topics in a web of information, and therefore represent navigational
+              links within that web. Links are typically sorted on output based on their attributes. The optional container elements for link (&lt;linkpool&gt; and &lt;linklist&gt;) allow authors to define
+              groups with common attributes, or to preserve the authored sequence of links on output. Links placed in a &lt;linkpool&gt; may be rearranged for display purposes (combined with other local
+              or map-based links); links in a &lt;linklist&gt; should be displayed in the order they are defined. Refer to those elements for additional explanation. Category: Related Links
+              elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="link.class">
+               <xs:attribute ref="class" default="- topic/link "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="link.class">
+      <xs:sequence>
+         <xs:group ref="link.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="link.attributes"/>
+   </xs:complexType>
+   <xs:group name="link.content">
+      <xs:sequence>
+         <xs:group ref="linktext" minOccurs="0"/>
+         <xs:group ref="desc" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="link.attributes">
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attribute name="query" type="xs:string"/>
+      <xs:attributeGroup ref="relational-atts"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="linktext">
+      <xs:annotation>
+         <xs:documentation>The &lt;linktext&gt; element provides the literal label or line of text for a link. In most cases, the text of a link can be resolved during processing by cross reference
+              with the target resource. Use the &lt;linktext&gt; element only when the target cannot be reached, such as when it is a peer or external link, or the target is local but not in DITA format.
+              When used inside a topic, it will be used as the text for the specified link; when used within a map, it will be used as the text for generated links that point to the specified topic.
+              Category: Related Links elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="linktext.class">
+               <xs:attribute ref="class" default="- topic/linktext "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="linktext.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="linktext.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="linktext.attributes"/>
+   </xs:complexType>
+   <xs:group name="linktext.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="words.cnt"/>
+            <xs:group ref="ph"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="linktext.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="linklist">
+      <xs:annotation>
+         <xs:documentation>The &lt;linklist&gt; element defines an author-arranged group of links. Within &lt;linklist&gt;, the organization of links on final output is in the same order as originally
+              authored in the DITA topic. Category: Related Links elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="linklist.class">
+               <xs:attribute ref="class" default="- topic/linklist "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="linklist.class">
+      <xs:sequence>
+         <xs:group ref="linklist.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="linklist.attributes"/>
+   </xs:complexType>
+   <xs:group name="linklist.content">
+      <xs:sequence>
+         <xs:group ref="title" minOccurs="0"/>
+         <xs:group ref="desc" minOccurs="0"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="linklist"/>
+            <xs:group ref="link"/>
+         </xs:choice>
+         <xs:group ref="linkinfo" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="linklist.attributes">
+      <xs:attribute name="collection-type">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="choice"/>
+               <xs:enumeration value="family"/>
+               <xs:enumeration value="sequence"/>
+               <xs:enumeration value="unordered"/>
+               <xs:enumeration value="-dita-use-conref-target">
+                  <xs:annotation>
+                     <xs:documentation>NOTE: The TC is maintaining the value "tree", which was
+                  in the 1.2 DTDs but never defined for documented, only in the DTD version
+                  of linklist.</xs:documentation>
+                  </xs:annotation>
+               </xs:enumeration>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="duplicates">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="mapkeyref" type="xs:string"/>
+      <xs:attributeGroup ref="relational-atts"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="linkinfo">
+      <xs:annotation>
+         <xs:documentation>The &lt;linkinfo&gt; element allows you to place a descriptive paragraph following a list of links in a &lt;linklist&gt; element. Category: Related Links
+              elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="linkinfo.class">
+               <xs:attribute ref="class" default="- topic/linkinfo "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="linkinfo.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="linkinfo.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="linkinfo.attributes"/>
+   </xs:complexType>
+   <xs:group name="linkinfo.content">
+      <xs:sequence>
+         <xs:group ref="desc.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="linkinfo.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="linkpool">
+      <xs:annotation>
+         <xs:documentation>The &lt;linkpool&gt; element defines a group of links that have common characteristics, such as type or audience or source. When links are not in a &lt;linklist&gt; (that is,
+              they are in &lt;related-links&gt; or &lt;linkpool&gt; elements), the organization of links on final output is determined by the output process, not by the order that the links actually occur
+              in the DITA topic. Category: Related Links elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="linkpool.class">
+               <xs:attribute ref="class" default="- topic/linkpool "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="linkpool.class">
+      <xs:sequence>
+         <xs:group ref="linkpool.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="linkpool.attributes"/>
+   </xs:complexType>
+   <xs:group name="linkpool.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="linkpool"/>
+            <xs:group ref="link"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="linkpool.attributes">
+      <xs:attribute name="collection-type">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="choice"/>
+               <xs:enumeration value="family"/>
+               <xs:enumeration value="sequence"/>
+               <xs:enumeration value="unordered"/>
+               <xs:enumeration value="-dita-use-conref-target">
+                  <xs:annotation>
+                     <xs:documentation>NOTE: The TC is maintaining the value "tree", which was
+                  in the 1.2 DTDs but never defined for documented, only in the DTD version
+                  of linkpool.</xs:documentation>
+                  </xs:annotation>
+               </xs:enumeration>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="duplicates">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="mapkeyref" type="xs:string"/>
+      <xs:attributeGroup ref="relational-atts"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

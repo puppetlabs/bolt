@@ -1,0 +1,46 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="concept"><meta name="description" content="The order of processing is often significant when evaluating DITA content. Although the DITA specification does not mandate a specific order for processing, DITA-OT has determined that performing filtering before conref resolution best meets user expectations. Switching the order of processing, while legal, may give different results."><meta name="DC.subject" content=", note, product, conref, resolving, filters, processing order, processing, pipelines"><meta name="keywords" content=", note, product, conref, resolving, filters, processing order, processing, pipelines"><meta name="DC.relation" scheme="URI" content="../reference/architecture.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="processing-order"><meta name="DC.language" content="en-US"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Processing order</title></head><body id="processing-order"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a><ul><li><a href="../reference/architecture.html">DITA-OT architecture</a><ul><li><a href="../reference/processing-structure.html">Processing structure</a></li><li><a href="../reference/map-first-preprocessing.html">Map-first preprocessing</a></li><li><a href="../reference/processing-pipeline-modules.html">Processing modules</a></li><li class="active"><a href="../reference/processing-order.html">Processing order</a></li><li><a href="../reference/preprocessing.html">Pre-processing modules</a></li><li><a href="../reference/XhtmlWithNavigation.html">HTML-based processing modules</a></li><li><a href="../reference/pdf-transform.html">PDF processing modules</a></li></ul></li><li><a href="../reference/DITA_spec-support.html">DITA specification support</a></li><li><a href="../reference/license.html">License</a></li></ul></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Processing order</h1>
+  
+  
+  <div class="body conbody"><p class="shortdesc">The order of processing is often significant when evaluating DITA content. Although the DITA specification
+    does not mandate a specific order for processing, DITA-OT has determined that performing filtering before conref
+    resolution best meets user expectations. Switching the order of processing, while legal, may give different
+    results.</p>
+    <section class="section">
+      <div class="p">The DITA-OT project has found that filtering first provides several benefits. Consider the following sample
+        that contains a <code class="keyword markupname xmlelement">&lt;note&gt;</code> element that both uses conref and contains a
+          <code class="keyword markupname xmlatt">@product</code>
+        attribute:<pre class="pre codeblock language-xml"><code>&lt;note conref="documentA.dita#doc/note" product="MyProd"/&gt;</code></pre></div>
+      <p class="p">If the <code class="keyword markupname xmlatt">@conref</code> attribute is evaluated first, then documentA must be parsed in order to retrieve
+        the note content. That content is then stored in the current document (or in a representation of that document
+        in memory). However, if all content with product="MyProd" is filtered out, then that work is all discarded later
+        in the build.</p>
+      <div class="p">If the filtering is done first (as in DITA-OT), this element is discarded immediately, and documentA is never
+        examined. This provides several important benefits:
+        <ul class="ul">
+          <li class="li">Time is saved by discarding unused content as early as possible; all future steps can load the document
+            without this extra content.</li>
+          <li class="li">Additional time is saved case by not evaluating the <code class="keyword markupname xmlatt">@conref</code> attribute; in fact, documentA
+            does not even need to be parsed.</li>
+          <li class="li">Any user reproducing this build does not need documentA. If the content is sent to a translation team,
+            that team can reproduce an error-free build without documentA; this means documentA can be kept back from
+            translation, preventing accidental translation and increased costs.</li>
+        </ul></div>
+      <div class="p">If the order of these two steps is reversed, so that conref is evaluated first, it is possible that results
+        will differ. For example, in the code sample above, the <code class="keyword markupname xmlatt">@product</code> attribute on the reference
+        target will override the product setting on the referencing note. Assume that the referenced
+          <code class="keyword markupname xmlelement">&lt;note&gt;</code> element in documentA is defined as follows:
+        <pre class="pre codeblock language-xml"><code>&lt;note id="note" product="SomeOtherProduct"&gt;This is an important note!&lt;/note&gt;</code></pre></div>
+      <p class="p">A process that filters out product="SomeOtherProduct" will remove the target of the original conref before that
+        conref is ever evaluated, which will result in a broken reference. Evaluating conref first would resolve the
+        reference, and only later filter out the target of the conref. While some use cases can be found where this is
+        the desired behavior, benefits such as those described above resulted in the current processing order used by
+         DITA-OT.</p>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../reference/architecture.html" title="DITA Open Toolkit is an open-source implementation of the OASIS specification for the Darwin Information Typing Architecture. The toolkit uses Ant, XSLT, and Java to transform DITA content (maps and topics) into different deliverable formats.">DITA Open Toolkit Architecture</a></div></div></nav></article></main></body></html>

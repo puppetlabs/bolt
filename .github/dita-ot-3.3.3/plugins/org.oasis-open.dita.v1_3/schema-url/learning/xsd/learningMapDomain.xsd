@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA Learning Map Domain                         -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identfier or an  -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Learning Map Domain//EN"     -->
+<!--      Delivered as file "learningMapDomain.mod"                   -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for Learning Map Domain               -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            May 2007                                         -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2007, 2009              -->
+<!--            All Rights Reserved.                             -->
+<!--                                                             -->
+<!--                                                             -->
+<!-- 16 Aug 2009: WEK Added learningContentComponentRef per TC   -->
+<!-- 07 Dec 2009: RDA combined @id, conref-atts, select-atts, and-->
+<!--              localization-atts into a single ref to univ-atts-->
+<!--                                                             -->
+<!--                                                             -->
+<!--============================================================= -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(map learningmap-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="learningGroup">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningGroup"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningObject">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningObject"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningPlanRef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningPlanRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningOverviewRef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningOverviewRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningSummaryRef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningSummaryRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningContentRef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningContentRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningContentComponentRef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningContentComponentRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningPreAssessmentRef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningPreAssessmentRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningPostAssessmentRef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningPostAssessmentRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningGroupMapRef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningGroupMapRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="learningObjectMapRef">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="learningObjectMapRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="learningmap-d-topicref">
+      <xs:choice>
+         <xs:element ref="learningObject"/>
+         <xs:element ref="learningGroup"/>
+         <xs:element ref="learningObjectMapRef"/>
+         <xs:element ref="learningGroupMapRef"/>
+      </xs:choice>
+   </xs:group>
+   <xs:attributeGroup name="learningDomain-topicref-atts-no-chunk">
+      <xs:attribute name="navtitle" type="xs:string"/>
+      <xs:attribute name="href" type="xs:string"/>
+      <xs:attribute name="keyref" type="xs:string"/>
+      <xs:attribute name="keys" type="xs:string"/>
+      <xs:attribute name="keyscope" type="xs:string"/>
+      <xs:attribute name="query" type="xs:string"/>
+      <xs:attribute name="copy-to" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute name="cascade" type="xs:string"/>
+      <xs:attribute name="scope">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="external"/>
+               <xs:enumeration value="local"/>
+               <xs:enumeration value="peer"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="processing-role">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="normal"/>
+               <xs:enumeration value="resource-only"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="linking">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="targetonly"/>
+               <xs:enumeration value="sourceonly"/>
+               <xs:enumeration value="normal"/>
+               <xs:enumeration value="none"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="locktitle">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="toc">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="print">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="printonly"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="search">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attributeGroup ref="univ-atts"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="learningDomain-topicref-atts">
+      <xs:attributeGroup ref="learningDomain-topicref-atts-no-chunk"/>
+      <xs:attribute name="chunk" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="learningDomain-mapref-atts">
+      <xs:attributeGroup ref="learningDomain-topicref-atts-no-chunk"/>
+      <xs:attribute name="format" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="learningObjectComponent-topicref-atts">
+      <xs:attributeGroup ref="learningDomain-topicref-atts-no-chunk"/>
+      <xs:attribute name="chunk" type="xs:string" default="to-content"/>
+   </xs:attributeGroup>
+   <xs:element name="learningGroup">
+      <xs:annotation>
+         <xs:documentation>learningGroup introduces and groups learning objects into higher-level organizations, such as course-level, module-level, or lesson-level. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningGroup.class">
+               <xs:attribute ref="class" default="+ map/topicref learningmap-d/learningGroup "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningGroup.class">
+      <xs:sequence>
+         <xs:group ref="learningGroup.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningGroup.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningGroup.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+         <xs:group ref="learningPlanRef" minOccurs="0"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="learningOverviewRef"/>
+            <xs:group ref="learningPreAssessmentRef"/>
+         </xs:choice>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="learningObject"/>
+            <xs:group ref="learningObjectMapRef"/>
+            <xs:group ref="learningGroup"/>
+            <xs:group ref="learningGroupMapRef"/>
+         </xs:choice>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="learningPostAssessmentRef"/>
+            <xs:group ref="learningSummaryRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningGroup.attributes">
+      <xs:attributeGroup ref="learningDomain-topicref-atts"/>
+      <xs:attribute name="collection-type">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="choice"/>
+               <xs:enumeration value="unordered"/>
+               <xs:enumeration value="sequence"/>
+               <xs:enumeration value="family"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="learningObject">
+      <xs:annotation>
+         <xs:documentation>learningObject organizes topic references to DITA learning topics as a learning object. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningObject.class">
+               <xs:attribute ref="class" default="+ map/topicref learningmap-d/learningObject "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningObject.class">
+      <xs:sequence>
+         <xs:group ref="learningObject.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningObject.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningObject.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+         <xs:group ref="learningPlanRef" minOccurs="0"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="learningOverviewRef"/>
+            <xs:group ref="learningPreAssessmentRef"/>
+         </xs:choice>
+         <xs:group ref="learningContentRef" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="learningPostAssessmentRef"/>
+            <xs:group ref="learningSummaryRef"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningObject.attributes">
+      <xs:attributeGroup ref="learningDomain-topicref-atts"/>
+      <xs:attribute name="collection-type">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="choice"/>
+               <xs:enumeration value="unordered"/>
+               <xs:enumeration value="sequence"/>
+               <xs:enumeration value="family"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="learningPlanRef">
+      <xs:annotation>
+         <xs:documentation>Use a learningPlanRef element to include a topic reference to a learning plan topic as part of a learningObject. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningPlanRef.class">
+               <xs:attribute ref="class" default="+ map/topicref learningmap-d/learningPlanRef "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningPlanRef.class">
+      <xs:sequence>
+         <xs:group ref="learningPlanRef.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningPlanRef.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningPlanRef.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningPlanRef.attributes">
+      <xs:attributeGroup ref="learningObjectComponent-topicref-atts"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="learningOverviewRef">
+      <xs:annotation>
+         <xs:documentation>Use a learningOverviewRef element to include a topic reference to a learning overview topic as part of a learningObject. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningOverviewRef.class">
+               <xs:attribute ref="class" default="+ map/topicref learningmap-d/learningOverviewRef "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningOverviewRef.class">
+      <xs:sequence>
+         <xs:group ref="learningOverviewRef.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningOverviewRef.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningOverviewRef.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningOverviewRef.attributes">
+      <xs:attributeGroup ref="learningObjectComponent-topicref-atts"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="learningSummaryRef">
+      <xs:annotation>
+         <xs:documentation>Use a learningSummaryRef to include topic reference to a learning summary topic in a DITA learning object. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningSummaryRef.class">
+               <xs:attribute ref="class" default="+ map/topicref learningmap-d/learningSummaryRef "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningSummaryRef.class">
+      <xs:sequence>
+         <xs:group ref="learningSummaryRef.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningSummaryRef.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningSummaryRef.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningSummaryRef.attributes">
+      <xs:attributeGroup ref="learningObjectComponent-topicref-atts"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="learningContentRef">
+      <xs:annotation>
+         <xs:documentation>Use a learningContentRef element to include a topic reference to a learning content topic as part of a DITA learningObject. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningContentRef.class">
+               <xs:attribute ref="class" default="+ map/topicref learningmap-d/learningContentRef "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningContentRef.class">
+      <xs:sequence>
+         <xs:group ref="learningContentRef.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningContentRef.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningContentRef.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+         <xs:group ref="learningContentComponentRef"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningContentRef.attributes">
+      <xs:attributeGroup ref="learningDomain-topicref-atts-no-chunk"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attribute name="chunk" type="xs:string" default="to-content"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="learningContentComponentRef">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningContentComponentRef.class">
+               <xs:attribute ref="class"
+                             default="+ map/topicref learningmap-d/learningContentComponentRef "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningContentComponentRef.class">
+      <xs:sequence>
+         <xs:group ref="learningContentComponentRef.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningContentComponentRef.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningContentComponentRef.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+         <xs:group ref="learningContentComponentRef"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningContentComponentRef.attributes">
+      <xs:attributeGroup ref="learningDomain-topicref-atts"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="learningPreAssessmentRef">
+      <xs:annotation>
+         <xs:documentation>Use a learningPreAssessmentRef element to include a topic reference to a learning assessment topic as part of a DITA learningObject. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningPreAssessmentRef.class">
+               <xs:attribute ref="class"
+                             default="+ map/topicref learningmap-d/learningPreAssessmentRef "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningPreAssessmentRef.class">
+      <xs:sequence>
+         <xs:group ref="learningPreAssessmentRef.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningPreAssessmentRef.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningPreAssessmentRef.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningPreAssessmentRef.attributes">
+      <xs:attributeGroup ref="learningObjectComponent-topicref-atts"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="learningPostAssessmentRef">
+      <xs:annotation>
+         <xs:documentation>Use a learningPostAssessmentRef element to include a topic reference to a learning assessment topic as part of a DITA learningObject. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningPostAssessmentRef.class">
+               <xs:attribute ref="class"
+                             default="+ map/topicref learningmap-d/learningPostAssessmentRef "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningPostAssessmentRef.class">
+      <xs:sequence>
+         <xs:group ref="learningPostAssessmentRef.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningPostAssessmentRef.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningPostAssessmentRef.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningPostAssessmentRef.attributes">
+      <xs:attributeGroup ref="learningObjectComponent-topicref-atts"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="format" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="learningGroupMapRef">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningGroupMapRef.class">
+               <xs:attribute ref="class" default="+ map/topicref learningmap-d/learningGroupMapRef "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningGroupMapRef.class">
+      <xs:sequence>
+         <xs:group ref="learningGroupMapRef.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningGroupMapRef.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningGroupMapRef.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningGroupMapRef.attributes">
+      <xs:attributeGroup ref="learningDomain-mapref-atts"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="learningObjectMapRef">
+      <xs:annotation>
+         <xs:documentation/>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningObjectMapRef.class">
+               <xs:attribute ref="class"
+                             default="+ map/topicref learningmap-d/learningObjectMapRef "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningObjectMapRef.class">
+      <xs:sequence>
+         <xs:group ref="learningObjectMapRef.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningObjectMapRef.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningObjectMapRef.content">
+      <xs:sequence>
+         <xs:group ref="topicmeta" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningObjectMapRef.attributes">
+      <xs:attributeGroup ref="learningDomain-mapref-atts"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

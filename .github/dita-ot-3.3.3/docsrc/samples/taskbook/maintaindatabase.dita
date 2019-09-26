@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (c) Copyright IBM Corp. 2004, 2005 All Rights Reserved. -->
+
+<task id="maintaindatabase" xml:lang="en-us">
+  <title>Maintaining a database</title>
+  <shortdesc>Maintaining a database does not take much work.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>database</indexterm>
+        <indexterm>maintain</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps-unordered>
+      <step>
+        <cmd>If the database crashes, restart it.</cmd>
+      </step>
+      <step>
+        <cmd>If the database is slow, tell people not to put so much in it.</cmd>
+      </step>
+      <step>
+        <cmd>Try to limit the number of records in your database. Too many records leads to confusion.</cmd>
+      </step>
+    </steps-unordered>
+  </taskbody>
+</task>

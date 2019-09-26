@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+-->
+<configuration>
+
+    <alphabet char-set="SymbolsSuperscript">
+        <character-set>
+            <!-- Copyright -->
+            <character>&#169;</character>
+            <!-- Registered Trademark -->
+            <character>&#174;</character>
+            <!-- Trademark -->
+            <character>&#8482;</character>
+            <!-- Service mark -->
+            <character>&#2120;</character>
+        </character-set>
+    </alphabet>
+
+    <alphabet char-set="SubmenuSymbol">
+        <character-set>
+            <character>&#x27A4;</character>
+        </character-set>
+    </alphabet>
+
+    <alphabet char-set="Traditional Chinese">
+       <character-set>
+          <character-range>
+            <start include="yes">&#x0100;</start>
+            <end include="yes">&#xff00;</end>
+          </character-range>
+       </character-set>
+    </alphabet>    
+
+</configuration>

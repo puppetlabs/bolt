@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Learning Interaction Base Domain             -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      Sept 2009                                         -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identfier or an   -->
+<!--       appropriate system identifier                           -->
+<!-- PUBLIC "-//OASIS//ELEMENTS DITA Learning Interaction Base Domain//EN" -->
+<!--       Delivered as file "learningInteractionBaseDomain.mod"                      -->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the elements and specialization         -->
+<!--             attributes for Learning Domain                    -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             Sept 2009                                         -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2009.                    -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!-- ============================================================= -->
+<!--                                                               -->
+
+<!-- ============================================================= -->
+<!--                    ELEMENT EXTENSION ENTITY DECLARATIONS      -->
+<!-- ============================================================= -->
+
+<!ENTITY % learningInteractionBase-d-fig
+  "lcInteractionBase"
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATION                  -->
+<!-- ============================================================= -->
+
+<!ENTITY learningInteractionBase-d-att
+  "(topic learningInteractionBase-d)"
+>
+
+<!-- ================ End DITA Learning Interaction Base Domain ================== -->
+ 

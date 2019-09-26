@@ -1,0 +1,14 @@
+<bookmap xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+  class="- map/map bookmap/bookmap "
+  domains="(map mapgroup-d)                            (map bookmap)                            (topic abbrev-d)                            (topic delay-d)                            a(props deliveryTarget)                            (map ditavalref-d)                            (topic hazard-d)                            (topic hi-d)                            (topic indexing-d)                            (topic markup-d)                            (topic pr-d)                            (topic relmgmt-d)                            (topic sw-d)                            (topic ui-d)                            (topic ut-d)                            (topic xnal-d)                            (topic markup-d xml-d)   "
+  ditaarch:DITAArchVersion="1.3">
+  <booktitle class="- topic/title bookmap/booktitle ">
+    <mainbooktitle class="- topic/ph bookmap/mainbooktitle ">index-see</mainbooktitle>
+  </booktitle>
+  <chapter class="- map/topicref bookmap/chapter " href="index-see_testdata1.dita"/>
+  <backmatter class="- map/topicref bookmap/backmatter ">
+    <booklists class="- map/topicref bookmap/booklists ">
+      <indexlist class="- map/topicref bookmap/indexlist "/>
+    </booklists>
+  </backmatter>
+</bookmap>

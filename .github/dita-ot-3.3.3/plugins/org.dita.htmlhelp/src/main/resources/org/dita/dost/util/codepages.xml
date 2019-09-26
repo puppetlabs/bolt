@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<codepages>
+  <language lang="en-us">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="ar-eg">
+    <cp format="html" encoding="1256" charset="windows-1256"/>
+    <cp format="windows" encoding="1256" charset="windows-1256"/>
+  </language>
+  <language lang="be-by">
+    <cp format="html" encoding="1251" charset="windows-1251"/>
+    <cp format="windows" encoding="1251" charset="windows-1251"/>
+  </language>
+  <language lang="bg-bg">
+    <cp format="html" encoding="1251" charset="windows-1251"/>
+    <cp format="windows" encoding="1251" charset="windows-1251"/>
+  </language>
+  <language lang="ca-es">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="cs-cz">
+    <cp format="html" encoding="912" charset="iso-8859-2"/>
+    <cp format="windows" encoding="1250" charset="windows-1250"/>
+  </language>
+  <language lang="da-dk">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="de-ch">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="de-de">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="el-gr">
+    <cp format="html" encoding="813" charset="iso-8859-7"/>
+    <cp format="windows" encoding="1253" charset="windows-1253"/>
+  </language>
+  <language lang="en-ca">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="en-gb">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="es-es">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="et-ee">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1257" charset="windows-1257"/>
+  </language>
+  <language lang="fi-fi">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="fr-be">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="fr-ca">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="fr-ch">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="fr-fr">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="he-il">
+    <cp format="html" encoding="1255" charset="windows-1255"/>
+    <cp format="windows" encoding="1255" charset="windows-1255"/>
+  </language>
+  <language lang="hi-in">
+    <cp format="html" encoding="utf-8" charset="utf-8"/>
+    <cp format="windows" encoding="utf-8" charset="utf-8"/>
+  </language>
+  <language lang="hr-hr">
+    <cp format="html" encoding="912" charset="iso-8859-2"/>
+    <cp format="windows" encoding="1250" charset="windows-1250"/>
+  </language>
+  <language lang="hu-hu">
+    <cp format="html" encoding="912" charset="iso-8859-2"/>
+    <cp format="windows" encoding="1250" charset="windows-1250"/>
+  </language>
+  <language lang="is-is">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="it-ch">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="it-it">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="ja-jp">
+    <cp format="html" encoding="943" charset="Windows-31J"/>
+    <cp format="windows" encoding="943" charset="Windows-31J"/>
+  </language>
+  <language lang="kk-kz">
+    <cp format="html" encoding="utf-8" charset="utf-8"/>
+    <cp format="windows" encoding="utf-8" charset="utf-8"/>
+  </language>
+  <language lang="ko-kr">
+    <cp format="html" encoding="1363" charset="euc-kr"/>
+    <cp format="windows" encoding="1363" charset="euc-kr"/>
+  </language>
+  <language lang="lt-lt">
+    <cp format="html" encoding="1257" charset="windows-1257"/>
+    <cp format="windows" encoding="1257" charset="windows-1257"/>
+  </language>
+  <language lang="lv-lv">
+    <cp format="html" encoding="1257" charset="windows-1257"/>
+    <cp format="windows" encoding="1257" charset="windows-1257"/>
+  </language>
+  <language lang="mk-mk">
+    <cp format="html" encoding="1251" charset="windows-1251"/>
+    <cp format="windows" encoding="1251" charset="windows-1251"/>
+  </language>
+  <language lang="nl-be">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="nl-nl">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="no-no">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="pl-pl">
+    <cp format="html" encoding="912" charset="iso-8859-2"/>
+    <cp format="windows" encoding="1250" charset="windows-1250"/>
+  </language>
+  <language lang="pt-br">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="pt-pt">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="ro-ro">
+    <cp format="html" encoding="912" charset="iso-8859-2"/>
+    <cp format="windows" encoding="1250" charset="windows-1250"/>
+  </language>
+  <language lang="ru-ru">
+    <cp format="html" encoding="1251" charset="windows-1251"/>
+    <cp format="windows" encoding="1251" charset="windows-1251"/>
+  </language>
+  <language lang="sk-sk">
+    <cp format="html" encoding="912" charset="iso-8859-2"/>
+    <cp format="windows" encoding="1250" charset="windows-1250"/>
+  </language>
+  <language lang="sl-si">
+    <cp format="html" encoding="912" charset="iso-8859-2"/>
+    <cp format="windows" encoding="1250" charset="windows-1250"/>
+  </language>
+  <language lang="sr-sp">
+    <cp format="html" encoding="1251" charset="windows-1251"/>
+    <cp format="windows" encoding="1251" charset="windows-1251"/>
+  </language>
+  <language lang="sr-rs">
+    <cp format="html" encoding="1251" charset="windows-1251"/>
+    <cp format="windows" encoding="1251" charset="windows-1251"/>
+  </language>
+  <language lang="sr-latn-rs">
+    <cp format="html" encoding="912" charset="iso-8859-2"/>
+    <cp format="windows" encoding="1250" charset="windows-1250"/>
+  </language>
+  <language lang="sr-cs">
+    <cp format="html" encoding="1251" charset="windows-1251"/>
+    <cp format="windows" encoding="1251" charset="windows-1251"/>
+  </language>
+  <language lang="sv-se">
+    <cp format="html" encoding="819" charset="iso-8859-1"/>
+    <cp format="windows" encoding="1252" charset="windows-1252"/>
+  </language>
+  <language lang="th-th">
+    <cp format="html" encoding="874" charset="tis-620"/>
+    <cp format="windows" encoding="874" charset="tis-620"/>
+  </language>
+  <language lang="tr-tr">
+    <cp format="html" encoding="920" charset="iso-8859-9"/>
+    <cp format="windows" encoding="1254" charset="windows-1254"/>
+  </language>
+  <language lang="uk-ua">
+    <cp format="html" encoding="1251" charset="windows-1251"/>
+    <cp format="windows" encoding="1251" charset="windows-1251"/>
+  </language>
+  <language lang="ur-pk">
+    <cp format="html" encoding="utf-8" charset="utf-8"/>
+    <cp format="windows" encoding="1256" charset="windows-1256"/>
+  </language>
+  <language lang="vi-vn">
+    <cp format="html" encoding="utf-8" charset="utf-8"/>
+    <cp format="windows" encoding="1258" charset="windows-1258"/>
+  </language>
+  <language lang="zh-cn">
+    <cp format="html" encoding="1386" charset="gb2312"/>
+    <cp format="windows" encoding="1386" charset="gb2312"/>
+  </language>
+  <language lang="zh-tw">
+    <cp format="html" encoding="950" charset="big5"/>
+    <cp format="windows" encoding="950" charset="big5"/>
+  </language>
+</codepages>

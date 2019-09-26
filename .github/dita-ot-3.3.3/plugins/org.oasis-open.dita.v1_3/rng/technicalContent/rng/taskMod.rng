@@ -1,0 +1,1360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Task</moduleTitle>
+    <headerComment xml:space="preserve"><![CDATA[
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Task                                        
+ VERSION:   1.3                                              
+ DATE:      March 2014                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Task//EN"
+      Delivered as file "task.mod"                                
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for the DITA Tasks                    
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2001                                       
+                                                             
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2005.11.15 RDA: Removed old declaration for               
+                   taskClasses entity                        
+   2005.11.15 RDA: Corrected LONG NAME for chdeschd          
+   2006.06.06 RDA: Changed model of choice to listitem.cnt   
+                   for completeness                          
+   2006.06.07 RDA: Added <abstract> element                  
+   2006.06.07 RDA: Make universal attributes universal       
+                     (DITA 1.1 proposal #12)                 
+   2006.11.30 RDA: Add -dita-use-conref-target to enumerated 
+                     attributes                              
+   2006.11.30 RDA: Remove #FIXED from DITAArchVersion        
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  
+   2008.02.06 RDA: Add note and itemgroup to step, substep   
+   2008.02.06 RDA: Loosen content model of taskbody; add     
+                   process and stepsection elements          
+   2008.02.13 RDA: Create .content and .attributes entities  
+   2008.05.06 RDA: Added sectiondiv to section specializations
+   2008.12.02 RDA: Rename process to steps-informal          
+   2014.04.16 WEK: Redefined as RNG          
+=============================================================
+]]></headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>task</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Task//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Task//EN</dtdEnt>
+        <xsdGrp>urn:oasis:names:tc:dita:xsd:taskGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:taskMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:taskMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:taskMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic task)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="task">
+      <ref name="task.element"/>
+    </define>
+    <define name="taskbody">
+      <ref name="taskbody.element"/>
+    </define>
+    <define name="steps">
+      <ref name="steps.element"/>
+    </define>
+    <define name="steps-unordered">
+      <ref name="steps-unordered.element"/>
+    </define>
+    <define name="step">
+      <ref name="step.element"/>
+    </define>
+    <define name="stepsection">
+      <ref name="stepsection.element"/>
+    </define>
+    <define name="cmd">
+      <ref name="cmd.element"/>
+    </define>
+    <define name="substeps">
+      <ref name="substeps.element"/>
+    </define>
+    <define name="substep">
+      <ref name="substep.element"/>
+    </define>
+    <define name="tutorialinfo">
+      <ref name="tutorialinfo.element"/>
+    </define>
+    <define name="info">
+      <ref name="info.element"/>
+    </define>
+    <define name="stepxmp">
+      <ref name="stepxmp.element"/>
+    </define>
+    <define name="stepresult">
+      <ref name="stepresult.element"/>
+    </define>
+    <define name="steptroubleshooting">
+      <ref name="steptroubleshooting.element"/>
+    </define>
+    <define name="choices">
+      <ref name="choices.element"/>
+    </define>
+    <define name="choice">
+      <ref name="choice.element"/>
+    </define>
+    <define name="steps-informal">
+      <ref name="steps-informal.element"/>
+    </define>
+    <define name="result">
+      <ref name="result.element"/>
+    </define>
+    <define name="tasktroubleshooting">
+      <ref name="tasktroubleshooting.element"/>
+    </define>
+    <define name="prereq">
+      <ref name="prereq.element"/>
+    </define>
+    <define name="postreq">
+      <ref name="postreq.element"/>
+    </define>
+    <define name="context">
+      <ref name="context.element"/>
+    </define>
+    <define name="choicetable">
+      <ref name="choicetable.element"/>
+    </define>
+    <define name="chhead">
+      <ref name="chhead.element"/>
+    </define>
+    <define name="chrow">
+      <ref name="chrow.element"/>
+    </define>
+    <define name="choptionhd">
+      <ref name="choptionhd.element"/>
+    </define>
+    <define name="chdeschd">
+      <ref name="chdeschd.element"/>
+    </define>
+    <define name="choption">
+      <ref name="choption.element"/>
+    </define>
+    <define name="chdesc">
+      <ref name="chdesc.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>COMMON ATTRIBUTE SETS</a:documentation>
+
+    <define name="univ-atts-no-importance-task">
+      <a:documentation> Provide an alternative set of univ-atts that allows importance to be redefined locally </a:documentation>
+      <ref name="id-atts"/>
+      <ref name="filter-atts"/>
+      <optional>
+        <attribute name="base"/>
+      </optional>
+      <ref name="base-attribute-extensions"/>
+      <optional>
+        <attribute name="rev"/>
+      </optional>
+      <optional>
+        <attribute name="status">
+          <choice>
+            <value>new</value>
+            <value>changed</value>
+            <value>deleted</value>
+            <value>unchanged</value>
+            <value>-dita-use-conref-target</value>
+          </choice>
+        </attribute>
+      </optional>
+      <ref name="localization-atts"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>TOPIC NESTING OVERRIDES</a:documentation>
+    <define name="task-info-types">
+      <ref name="info-types"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation> LONG NAME: Task </a:documentation>
+      <define name="task.content">
+        <ref name="title"/>
+        <optional>
+          <ref name="titlealts"/>
+        </optional>
+        <optional>
+          <choice>
+            <ref name="abstract"/>
+            <ref name="shortdesc"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <optional>
+          <ref name="taskbody"/>
+        </optional>
+        <optional>
+          <ref name="related-links"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="task-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="task.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="task.element">
+        <element name="task" dita:longName="Task">
+          <a:documentation>
+            <![CDATA[The <task> element is the top-level element for a task topic. Tasks are the main building blocks for task-oriented user assistance. They generally provide step-by-step instructions that will enable a user to perform a task. A task answers the question of "how to?" by telling the user precisely what to do and the order in which to do it. Tasks have the same high-level structure as other topics, with a title, short description and body.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="task.attlist"/>
+          <ref name="task.content"/>
+        </element>
+      </define>
+      <define name="task.attlist" combine="interleave">
+        <ref name="task.attributes"/>
+        <ref name="arch-atts"/>
+        <ref name="domains-att"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Task Body </a:documentation>
+      <define name="taskbody.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="prereq"/>
+            <ref name="context"/>
+            <ref name="section"/>
+          </choice>
+        </zeroOrMore>
+        <optional>
+          <choice>
+            <ref name="steps"/>
+            <ref name="steps-unordered"/>
+            <ref name="steps-informal"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="result"/>
+        </optional>
+        <optional dita:since="1.3">
+          <ref name="tasktroubleshooting"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="example"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="postreq"/>
+        </zeroOrMore>
+      </define>
+      <define name="taskbody.attributes">
+        <ref name="id-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="base"/>
+        </optional>
+        <ref name="base-attribute-extensions"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="taskbody.element">
+        <element name="taskbody" dita:longName="Task Body">
+          <a:documentation>
+            <![CDATA[The <taskbody> element is the main body-level element inside a task topic. A task body has a very specific structure, with the following elements in this order: <prereq>, <context>, <steps>, <result>, <example> and <postreq>. Each of the body sections are optional.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="taskbody.attlist"/>
+          <ref name="taskbody.content"/>
+        </element>
+      </define>
+      <define name="taskbody.attlist" combine="interleave">
+        <ref name="taskbody.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Prerequisites </a:documentation>
+      <define name="prereq.content">
+        <zeroOrMore>
+          <ref name="section.notitle.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="prereq.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="prereq.element">
+        <element name="prereq" dita:longName="Prerequisites">
+          <a:documentation>
+            <![CDATA[The pre-requisite (<prereq>) section of a task should document things the user needs to know or do before starting the current task. Prerequisite links will be placed in a list after the related-links section; on output the <prereq> links from the related-links section are added to the <prereq> section.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="prereq.attlist"/>
+          <ref name="prereq.content"/>
+        </element>
+      </define>
+      <define name="prereq.attlist" combine="interleave">
+        <ref name="prereq.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Context </a:documentation>
+      <define name="context.content">
+        <zeroOrMore>
+          <ref name="section.notitle.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="context.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="context.element">
+        <element name="context" dita:longName="Context">
+          <a:documentation>
+            <![CDATA[The <context> section of a task provides background information for the task. This information helps the user understand what the purpose of the task is and what they will gain by completing the task. This section should be brief and does not replace or recreate a concept topic on the same subject, although the context section may include some conceptual information.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="context.attlist"/>
+          <ref name="context.content"/>
+        </element>
+      </define>
+      <define name="context.attlist" combine="interleave">
+        <ref name="context.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Informal Steps </a:documentation>
+      <define name="steps-informal.content">
+        <zeroOrMore>
+          <ref name="section.notitle.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="steps-informal.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <a:documentation>
+        <![CDATA[The <steps-informal> element allows authors to describe procedural task information that would not normally be described as steps. ]]></a:documentation>
+      <define name="steps-informal.element">
+        <element name="steps-informal" dita:longName="Informal Steps">
+          <ref name="steps-informal.attlist"/>
+          <ref name="steps-informal.content"/>
+        </element>
+      </define>
+      <define name="steps-informal.attlist" combine="interleave">
+        <ref name="steps-informal.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Steps </a:documentation>
+      <define name="steps.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <optional>
+            <ref name="stepsection"/>
+          </optional>
+          <group>
+            <ref name="step"/>
+          </group>
+        </oneOrMore>
+      </define>
+      <define name="steps.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="steps.element">
+        <element name="steps" dita:longName="Steps">
+          <a:documentation>
+            <![CDATA[The <steps> section of a task provides the main content of the task topic. The task is described as a series of steps that the user must follow to accomplish the task. One or more <steps> elements is required inside the <steps> section.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="steps.attlist"/>
+          <ref name="steps.content"/>
+        </element>
+      </define>
+      <define name="steps.attlist" combine="interleave">
+        <ref name="steps.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Steps: Unordered </a:documentation>
+      <define name="steps-unordered.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <optional>
+            <ref name="stepsection"/>
+          </optional>
+          <group>
+            <ref name="step"/>
+          </group>          
+        </oneOrMore>
+      </define>
+      <define name="steps-unordered.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="steps-unordered.element">
+        <element name="steps-unordered" dita:longName="Unordered steps">
+          <a:documentation>
+            <![CDATA[Like the <steps> element, the <steps-unordered> section of a task provides the main content of the task topic, but particularly for cases in which the order of steps may vary from one situation to another. One or more steps is required inside the <steps-unordered> section.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="steps-unordered.attlist"/>
+          <ref name="steps-unordered.content"/>
+        </element>
+      </define>
+      <define name="steps-unordered.attlist" combine="interleave">
+        <ref name="steps-unordered.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Step section </a:documentation>
+      <define name="stepsection.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="stepsection.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <a:documentation>
+        <![CDATA[The <stepsection> element provides expository text before a step element. Although the element is specialized from <li> and has the same content model as a list item, this is not considered a step, and rendering engines may choose to skip this element when numbering steps. ]]></a:documentation>
+      <define name="stepsection.element">
+        <element name="stepsection" dita:longName="Step section">
+          <ref name="stepsection.attlist"/>
+          <ref name="stepsection.content"/>
+        </element>
+      </define>
+      <define name="stepsection.attlist" combine="interleave">
+        <ref name="stepsection.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Step </a:documentation>
+      <define name="step.content">
+        <zeroOrMore>
+          <ref name="note"/>
+        </zeroOrMore>
+        <ref name="cmd"/>
+        <zeroOrMore>
+          <choice>
+            <ref name="choices"/>
+            <ref name="choicetable"/>
+            <ref name="info"/>
+            <ref name="itemgroup"/>
+            <ref name="stepxmp"/>
+            <ref name="substeps"/>
+            <ref name="tutorialinfo"/>
+          </choice>
+        </zeroOrMore>
+        <optional>
+          <ref name="stepresult"/>
+        </optional>
+        <optional dita:since="1.3">
+          <ref name="steptroubleshooting"/>
+        </optional>
+      </define>
+      <define name="step.attributes">
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>optional</value>
+              <value>required</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance-task"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="step.element">
+        <element name="step" dita:longName="Step">
+          <a:documentation>
+            <![CDATA[The <step> element represents an action that a user must follow to accomplish a task. Each step in a task must contain a command <cmd> element which describes the particular action the user must do to accomplish the overall task. The step element can also contain information <info>, substeps <substeps>, tutorial information <tutorialinfo>, a step example <stepxmp>, choices <choices> or a stepresult <stepresult>, although these are optional.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="step.attlist"/>
+          <ref name="step.content"/>
+        </element>
+      </define>
+      <define name="step.attlist" combine="interleave">
+        <ref name="step.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Command </a:documentation>
+      <define name="cmd.content">
+        <zeroOrMore>
+          <ref name="ph.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="cmd.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="cmd.element">
+        <element name="cmd" dita:longName="Command">
+          <a:documentation>
+            <![CDATA[The command (<cmd>) element is required as the first element inside a <step>. It provides the active voice instruction to the user for completing the step, and should not be more than one sentence. If the step needs additional explanation, this can follow the <cmd> element inside an <info > element.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="cmd.attlist"/>
+          <ref name="cmd.content"/>
+        </element>
+      </define>
+      <define name="cmd.attlist" combine="interleave">
+        <ref name="cmd.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Information </a:documentation>
+      <define name="info.content">
+        <zeroOrMore>
+          <ref name="itemgroup.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="info.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="info.element">
+        <element name="info" dita:longName="Information">
+          <a:documentation>
+            <![CDATA[The information element (<info>) occurs inside a <step> element to provide additional information about the step.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="info.attlist"/>
+          <ref name="info.content"/>
+        </element>
+      </define>
+      <define name="info.attlist" combine="interleave">
+        <ref name="info.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Sub-steps </a:documentation>
+      <define name="substeps.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="substep"/>
+        </oneOrMore>
+      </define>
+      <define name="substeps.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="substeps.element">
+        <element name="substeps" dita:longName="Sub-steps">
+          <a:documentation>
+            <![CDATA[The <substeps> element allows you to break a step down into a series of separate actions, and should be used only if necessary. Try to describe the steps of a task in a single level of steps. If you need to use more than one level of substep nesting, you should probably rewrite the task to simplify it.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="substeps.attlist"/>
+          <ref name="substeps.content"/>
+        </element>
+      </define>
+      <define name="substeps.attlist" combine="interleave">
+        <ref name="substeps.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Sub-step </a:documentation>
+      <define name="substep.content">
+        <zeroOrMore>
+          <ref name="note"/>
+        </zeroOrMore>
+        <ref name="cmd"/>
+        <zeroOrMore>
+          <choice>
+            <ref name="info"/>
+            <ref name="itemgroup"/>
+            <ref name="stepxmp"/>
+            <ref name="tutorialinfo"/>
+          </choice>
+        </zeroOrMore>
+        <optional>
+          <ref name="stepresult"/>
+        </optional>
+      </define>
+      <define name="substep.attributes">
+        <optional>
+          <attribute name="importance">
+            <choice>
+              <value>optional</value>
+              <value>required</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="univ-atts-no-importance-task"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="substep.element">
+        <element name="substep" dita:longName="Sub-step">
+          <a:documentation>
+            <![CDATA[A <substep> element has the same structure as a <step>, except that it does not allow lists of choices or substeps within it, in order to prevent unlimited nesting of steps.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="substep.attlist"/>
+          <ref name="substep.content"/>
+        </element>
+      </define>
+      <define name="substep.attlist" combine="interleave">
+        <ref name="substep.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Tutorial Information </a:documentation>
+      <define name="tutorialinfo.content">
+        <zeroOrMore>
+          <ref name="itemgroup.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="tutorialinfo.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="tutorialinfo.element">
+        <element name="tutorialinfo" dita:longName="Tutorial Information">
+          <a:documentation>
+            <![CDATA[The tutorial info (<tutorialinfo>) element contains additional information that is useful when the task is part of a tutorial.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="tutorialinfo.attlist"/>
+          <ref name="tutorialinfo.content"/>
+        </element>
+      </define>
+      <define name="tutorialinfo.attlist" combine="interleave">
+        <ref name="tutorialinfo.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Step Example </a:documentation>
+      <define name="stepxmp.content">
+        <zeroOrMore>
+          <ref name="itemgroup.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="stepxmp.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="stepxmp.element">
+        <element name="stepxmp" dita:longName="Step Example">
+          <a:documentation>
+            <![CDATA[The step example (<stepxmp>) element is used to illustrate a step of a task. The example can be a couple of words, or an entire paragraph.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="stepxmp.attlist"/>
+          <ref name="stepxmp.content"/>
+        </element>
+      </define>
+      <define name="stepxmp.attlist" combine="interleave">
+        <ref name="stepxmp.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Choices </a:documentation>
+      <define name="choices.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="choice"/>
+        </oneOrMore>
+      </define>
+      <define name="choices.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="choices.element">
+        <element name="choices" dita:longName="Choices">
+          <a:documentation>
+            <![CDATA[The <choices> element contains a list of <choice> elements. It is used when the user will need to choose one of several actions while performing the steps of a task.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="choices.attlist"/>
+          <ref name="choices.content"/>
+        </element>
+      </define>
+      <define name="choices.attlist" combine="interleave">
+        <ref name="choices.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Choice </a:documentation>
+      <define name="choice.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="choice.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="choice.element">
+        <element name="choice" dita:longName="Choice">
+          <a:documentation>
+            <![CDATA[Each <choice> element describes one way that the user could accomplish the current step.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="choice.attlist"/>
+          <ref name="choice.content"/>
+        </element>
+      </define>
+      <define name="choice.attlist" combine="interleave">
+        <ref name="choice.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Choice Table </a:documentation>
+      <define name="choicetable.content">
+        <optional>
+          <ref name="chhead"/>
+        </optional>
+        <oneOrMore>
+          <ref name="chrow"/>
+        </oneOrMore>
+      </define>
+      <define name="choicetable.attributes">
+        <optional>
+          <attribute name="relcolwidth"/>
+        </optional>
+        <optional>
+          <attribute name="keycol" a:defaultValue="1">
+            <data type="NMTOKEN"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="refcols">
+            <data type="NMTOKENS"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="display-atts"/>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="choicetable.element">
+        <element name="choicetable" dita:longName="Choice Table">
+          <a:documentation>
+            <![CDATA[The <choicetable> element contains a series of optional choices available within a step of a task.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="choicetable.attlist"/>
+          <ref name="choicetable.content"/>
+        </element>
+      </define>
+      <define name="choicetable.attlist" combine="interleave">
+        <ref name="choicetable.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Choice Head </a:documentation>
+      <define name="chhead.content">
+        <ref name="choptionhd"/>
+        <ref name="chdeschd"/>
+      </define>
+      <define name="chhead.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="chhead.element">
+        <element name="chhead" dita:longName="Choice Head">
+          <a:documentation>
+            <![CDATA[The <chhead> element is a container inside the <choicetable> element that provides specific heading text to override the default Options and Description headings. The <chhead> element contains both a <choptionhd> and <chdeschd> element as a pair.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="chhead.attlist"/>
+          <ref name="chhead.content"/>
+        </element>
+      </define>
+      <define name="chhead.attlist" combine="interleave">
+        <ref name="chhead.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Choice Option Head </a:documentation>
+      <define name="choptionhd.content">
+        <zeroOrMore>
+          <ref name="tblcell.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="choptionhd.attributes">
+        <optional>
+          <attribute name="specentry"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="choptionhd.element">
+        <element name="choptionhd" dita:longName="Choice Option Head">
+          <a:documentation>
+            <![CDATA[The <choptionhd> element provides a specific label for the list of options that a user chooses from to accomplish a step. The default label for options is Option.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="choptionhd.attlist"/>
+          <ref name="choptionhd.content"/>
+        </element>
+      </define>
+      <define name="choptionhd.attlist" combine="interleave">
+        <ref name="choptionhd.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Choice Description Head </a:documentation>
+      <define name="chdeschd.content">
+        <zeroOrMore>
+          <ref name="tblcell.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="chdeschd.attributes">
+        <optional>
+          <attribute name="specentry"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="chdeschd.element">
+        <element name="chdeschd" dita:longName="Choice Description Head">
+          <a:documentation>
+            <![CDATA[The <chdeschd> option provides a specific label for the list of descriptions of options that a user must choose to accomplish a step of a task. The default label overridden by <chdeschd> is Description.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="chdeschd.attlist"/>
+          <ref name="chdeschd.content"/>
+        </element>
+      </define>
+      <define name="chdeschd.attlist" combine="interleave">
+        <ref name="chdeschd.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Choice Row </a:documentation>
+      <define name="chrow.content">
+        <ref name="choption"/>
+        <ref name="chdesc"/>
+      </define>
+      <define name="chrow.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="chrow.element">
+        <element name="chrow" dita:longName="Choice Row">
+          <a:documentation>
+            <![CDATA[The <chrow> element is a container inside the <choicetable> element. The <chrow> element contains both a <choption> and <chdesc> element as a pair.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="chrow.attlist"/>
+          <ref name="chrow.content"/>
+        </element>
+      </define>
+      <define name="chrow.attlist" combine="interleave">
+        <ref name="chrow.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Choice Option </a:documentation>
+      <define name="choption.content">
+        <zeroOrMore>
+          <ref name="tblcell.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="choption.attributes">
+        <optional>
+          <attribute name="specentry"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="choption.element">
+        <element name="choption" dita:longName="Choice Option">
+          <a:documentation>
+            <![CDATA[The <choption> element describes an option that a user could choose to accomplish a step of a task. In a user interface, for example, this might be the name of radio button.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="choption.attlist"/>
+          <ref name="choption.content"/>
+        </element>
+      </define>
+      <define name="choption.attlist" combine="interleave">
+        <ref name="choption.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Choice Description </a:documentation>
+      <define name="chdesc.content">
+        <zeroOrMore>
+          <ref name="tblcell.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="chdesc.attributes">
+        <optional>
+          <attribute name="specentry"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="chdesc.element">
+        <element name="chdesc" dita:longName="Choice Description">
+          <a:documentation>
+            <![CDATA[The <chdesc> element is a description of an option that a user chooses while performing a step to accomplish a task. It explains why the user would choose that option, and might explain the result of the choice when it is not immediately obvious.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="chdesc.attlist"/>
+          <ref name="chdesc.content"/>
+        </element>
+      </define>
+      <define name="chdesc.attlist" combine="interleave">
+        <ref name="chdesc.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Step Result </a:documentation>
+      <define name="stepresult.content">
+        <zeroOrMore>
+          <ref name="itemgroup.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="stepresult.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="stepresult.element">
+        <element name="stepresult" dita:longName="Step Result">
+          <a:documentation>
+            <![CDATA[The <stepresult> element provides information on the expected outcome of a step. If a user interface is being documented, the outcome could describe a dialog box opening, or the appearance of a progress indicator. Step results are useful to assure a user that they are on track, but should not be used for every step, as this quickly becomes tedious.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="stepresult.attlist"/>
+          <ref name="stepresult.content"/>
+        </element>
+      </define>
+      <define name="stepresult.attlist" combine="interleave">
+        <ref name="stepresult.attributes"/>
+      </define>
+
+    </div>    
+    <div>
+      <a:documentation> LONG NAME: Step Troubleshooting </a:documentation>
+      <define name="steptroubleshooting.content">
+        <zeroOrMore>
+          <ref name="itemgroup.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="steptroubleshooting.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="steptroubleshooting.element">
+        <element name="steptroubleshooting" dita:longName="Step Troubleshooting" dita:since="1.3">
+          <a:documentation>
+            <![CDATA[
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="steptroubleshooting.attlist"/>
+          <ref name="steptroubleshooting.content"/>
+        </element>
+      </define>
+      <define name="steptroubleshooting.attlist" combine="interleave">
+        <ref name="steptroubleshooting.attributes"/>
+      </define>
+
+    </div>    
+    <div>
+      <a:documentation> LONG NAME: Task Troubleshooting </a:documentation>
+      <define name="tasktroubleshooting.content">
+        <zeroOrMore>
+          <ref name="section.notitle.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="tasktroubleshooting.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="tasktroubleshooting.element">
+        <element name="tasktroubleshooting" dita:longName="Task Troubleshooting" dita:since="1.3">
+          <a:documentation>
+            <![CDATA[
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="tasktroubleshooting.attlist"/>
+          <ref name="tasktroubleshooting.content"/>
+        </element>
+      </define>
+      <define name="tasktroubleshooting.attlist" combine="interleave">
+        <ref name="tasktroubleshooting.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Result </a:documentation>
+      <define name="result.content">
+        <zeroOrMore>
+          <ref name="section.notitle.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="result.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="result.element">
+        <element name="result" dita:longName="Result">
+          <a:documentation>
+            <![CDATA[The <result> element describes the expected outcome for the task as a whole.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="result.attlist"/>
+          <ref name="result.content"/>
+        </element>
+      </define>
+      <define name="result.attlist" combine="interleave">
+        <ref name="result.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Post Requirements </a:documentation>
+      <define name="postreq.content">
+        <zeroOrMore>
+          <ref name="section.notitle.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="postreq.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="postreq.element">
+        <element name="postreq" dita:longName="Post Requirements">
+          <a:documentation>
+            <![CDATA[The <postreq> element describes steps or tasks that the user should do after the successful completion of the current task. It is often supported by links to the next task or tasks in the <related-links> section.
+    Category: Task elements
+  ]]></a:documentation>
+          <ref name="postreq.attlist"/>
+          <ref name="postreq.content"/>
+        </element>
+      </define>
+      <define name="postreq.attlist" combine="interleave">
+        <ref name="postreq.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+
+    <define name="task.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic task/task "/>
+      </optional>
+    </define>
+    <define name="taskbody.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/body task/taskbody "/>
+      </optional>
+    </define>
+    <define name="steps.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ol task/steps "/>
+      </optional>
+    </define>
+    <define name="steps-unordered.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ul task/steps-unordered "/>
+      </optional>
+    </define>
+    <define name="stepsection.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/li task/stepsection "/>
+      </optional>
+    </define>
+    <define name="step.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/li task/step "/>
+      </optional>
+    </define>
+    <define name="cmd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ph task/cmd "/>
+      </optional>
+    </define>
+    <define name="substeps.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ol task/substeps "/>
+      </optional>
+    </define>
+    <define name="substep.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/li task/substep "/>
+      </optional>
+    </define>
+    <define name="tutorialinfo.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/itemgroup task/tutorialinfo "/>
+      </optional>
+    </define>
+    <define name="info.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/itemgroup task/info "/>
+      </optional>
+    </define>
+    <define name="stepxmp.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/itemgroup task/stepxmp "/>
+      </optional>
+    </define>
+    <define name="stepresult.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/itemgroup task/stepresult "/>
+      </optional>
+    </define>
+    <define name="steptroubleshooting.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/itemgroup task/steptroubleshooting "/>
+      </optional>
+    </define>
+    <define name="choices.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/ul task/choices "/>
+      </optional>
+    </define>
+    <define name="choice.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/li task/choice "/>
+      </optional>
+    </define>
+    <define name="result.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section task/result "/>
+      </optional>
+    </define>
+    <define name="tasktroubleshooting.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section task/tasktroubleshooting "/>
+      </optional>
+    </define>
+    <define name="prereq.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section task/prereq "/>
+      </optional>
+    </define>
+    <define name="postreq.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section task/postreq "/>
+      </optional>
+    </define>
+    <define name="context.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section task/context "/>
+      </optional>
+    </define>
+    <define name="steps-informal.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section task/steps-informal "/>
+      </optional>
+    </define>
+    <define name="choicetable.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/simpletable task/choicetable "/>
+      </optional>
+    </define>
+    <define name="chhead.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/sthead task/chhead "/>
+      </optional>
+    </define>
+    <define name="chrow.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/strow task/chrow "/>
+      </optional>
+    </define>
+    <define name="choptionhd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry task/choptionhd "/>
+      </optional>
+    </define>
+    <define name="chdeschd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry task/chdeschd "/>
+      </optional>
+    </define>
+    <define name="choption.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry task/choption "/>
+      </optional>
+    </define>
+    <define name="chdesc.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry task/chdesc "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

@@ -1,0 +1,1543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <!--
+        This is the Mathematical Markup Language (MathML) 3.0, an XML
+        application for describing mathematical notation and capturing
+        both its structure and content.
+    
+        Copyright 1998-2010 W3C (MIT, ERCIM, Keio)
+    
+        Use and distribution of this code are permitted under the terms
+        W3C Software Notice and License
+        http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+  -->
+  <include href="mathml3-strict-content.rng">
+    <define name="cn.content">
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="mglyph"/>
+          <ref name="sep"/>
+          <ref name="PresentationExpression"/>
+        </choice>
+      </zeroOrMore>
+    </define>
+    <define name="cn.attributes">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <optional>
+        <attribute name="type"/>
+      </optional>
+      <optional>
+        <ref name="base"/>
+      </optional>
+    </define>
+    <define name="ci.attributes">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <optional>
+        <ref name="ci.type"/>
+      </optional>
+    </define>
+    <define name="ci.type">
+      <attribute name="type"/>
+    </define>
+    <define name="ci.content">
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="mglyph"/>
+          <ref name="PresentationExpression"/>
+        </choice>
+      </zeroOrMore>
+    </define>
+    <define name="csymbol.attributes">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <optional>
+        <attribute name="type"/>
+      </optional>
+      <optional>
+        <ref name="cd"/>
+      </optional>
+    </define>
+    <define name="csymbol.content">
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="mglyph"/>
+          <ref name="PresentationExpression"/>
+        </choice>
+      </zeroOrMore>
+    </define>
+    <define name="bvar">
+      <element name="bvar">
+        <interleave>
+          <choice>
+            <ref name="ci"/>
+            <ref name="semantics-ci"/>
+          </choice>
+          <optional>
+            <ref name="degree"/>
+          </optional>
+        </interleave>
+      </element>
+    </define>
+    <define name="cbytes.attributes">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+    </define>
+    <define name="cs.attributes">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+    </define>
+    <define name="apply.content">
+      <choice>
+        <oneOrMore>
+          <ref name="ContExp"/>
+        </oneOrMore>
+        <group>
+          <ref name="ContExp"/>
+          <ref name="BvarQ"/>
+          <zeroOrMore>
+            <ref name="Qualifier"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <ref name="ContExp"/>
+          </zeroOrMore>
+        </group>
+      </choice>
+    </define>
+    <define name="bind.content">
+      <ref name="apply.content"/>
+    </define>
+  </include>
+  <define name="base">
+    <attribute name="base"/>
+  </define>
+  <define name="sep">
+    <element name="sep">
+      <empty/>
+    </element>
+  </define>
+  <define name="PresentationExpression" combine="choice">
+    <notAllowed/>
+  </define>
+  <define name="DomainQ">
+    <zeroOrMore>
+      <choice>
+        <ref name="domainofapplication"/>
+        <ref name="condition"/>
+        <ref name="interval"/>
+        <group>
+          <ref name="lowlimit"/>
+          <optional>
+            <ref name="uplimit"/>
+          </optional>
+        </group>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="domainofapplication">
+    <element name="domainofapplication">
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="condition">
+    <element name="condition">
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="uplimit">
+    <element name="uplimit">
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="lowlimit">
+    <element name="lowlimit">
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="Qualifier">
+    <choice>
+      <ref name="DomainQ"/>
+      <ref name="degree"/>
+      <ref name="momentabout"/>
+      <ref name="logbase"/>
+    </choice>
+  </define>
+  <define name="degree">
+    <element name="degree">
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="momentabout">
+    <element name="momentabout">
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="logbase">
+    <element name="logbase">
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="type">
+    <attribute name="type"/>
+  </define>
+  <define name="order">
+    <attribute name="order">
+      <choice>
+        <value>numeric</value>
+        <value>lexicographic</value>
+      </choice>
+    </attribute>
+  </define>
+  <define name="closure">
+    <attribute name="closure"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="piecewise"/>
+  </define>
+  <define name="piecewise">
+    <element name="piecewise">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <interleave>
+        <zeroOrMore>
+          <ref name="piece"/>
+        </zeroOrMore>
+        <optional>
+          <ref name="otherwise"/>
+        </optional>
+      </interleave>
+    </element>
+  </define>
+  <define name="piece">
+    <element name="piece">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <ref name="ContExp"/>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="otherwise">
+    <element name="otherwise">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="DeprecatedContExp">
+    <choice>
+      <ref name="reln"/>
+      <ref name="fn"/>
+      <ref name="declare"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="DeprecatedContExp"/>
+  </define>
+  <define name="reln">
+    <element name="reln">
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="fn">
+    <element name="fn">
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="declare">
+    <element name="declare">
+      <optional>
+        <attribute name="type">
+          <data type="string"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="scope">
+          <data type="string"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="nargs">
+          <data type="nonNegativeInteger"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="occurrence">
+          <choice>
+            <value>prefix</value>
+            <value>infix</value>
+            <value>function-model</value>
+          </choice>
+        </attribute>
+      </optional>
+      <ref name="DefEncAtt"/>
+      <oneOrMore>
+        <ref name="ContExp"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="interval.class">
+    <ref name="interval"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="interval.class"/>
+  </define>
+  <define name="interval">
+    <element name="interval">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <optional>
+        <ref name="closure"/>
+      </optional>
+      <ref name="ContExp"/>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="unary-functional.class">
+    <choice>
+      <ref name="inverse"/>
+      <ref name="ident"/>
+      <ref name="domain"/>
+      <ref name="codomain"/>
+      <ref name="image"/>
+      <ref name="ln"/>
+      <ref name="log"/>
+      <ref name="moment"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="unary-functional.class"/>
+  </define>
+  <define name="inverse">
+    <element name="inverse">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="ident">
+    <element name="ident">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="domain">
+    <element name="domain">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="codomain">
+    <element name="codomain">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="image">
+    <element name="image">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="ln">
+    <element name="ln">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="log">
+    <element name="log">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="moment">
+    <element name="moment">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="lambda.class">
+    <ref name="lambda"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="lambda.class"/>
+  </define>
+  <define name="lambda">
+    <element name="lambda">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <ref name="BvarQ"/>
+      <ref name="DomainQ"/>
+      <ref name="ContExp"/>
+    </element>
+  </define>
+  <define name="nary-functional.class">
+    <ref name="compose"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-functional.class"/>
+  </define>
+  <define name="compose">
+    <element name="compose">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="binary-arith.class">
+    <choice>
+      <ref name="quotient"/>
+      <ref name="divide"/>
+      <ref name="minus"/>
+      <ref name="power"/>
+      <ref name="rem"/>
+      <ref name="root"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="binary-arith.class"/>
+  </define>
+  <define name="quotient">
+    <element name="quotient">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="divide">
+    <element name="divide">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="minus">
+    <element name="minus">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="power">
+    <element name="power">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="rem">
+    <element name="rem">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="root">
+    <element name="root">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="unary-arith.class">
+    <choice>
+      <ref name="factorial"/>
+      <ref name="minus"/>
+      <ref name="root"/>
+      <ref name="abs"/>
+      <ref name="conjugate"/>
+      <ref name="arg"/>
+      <ref name="real"/>
+      <ref name="imaginary"/>
+      <ref name="floor"/>
+      <ref name="ceiling"/>
+      <ref name="exp"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="unary-arith.class"/>
+  </define>
+  <define name="factorial">
+    <element name="factorial">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="abs">
+    <element name="abs">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="conjugate">
+    <element name="conjugate">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arg">
+    <element name="arg">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="real">
+    <element name="real">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="imaginary">
+    <element name="imaginary">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="floor">
+    <element name="floor">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="ceiling">
+    <element name="ceiling">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="exp">
+    <element name="exp">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="nary-minmax.class">
+    <choice>
+      <ref name="max"/>
+      <ref name="min"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-minmax.class"/>
+  </define>
+  <define name="max">
+    <element name="max">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="min">
+    <element name="min">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="nary-arith.class">
+    <choice>
+      <ref name="plus"/>
+      <ref name="times"/>
+      <ref name="gcd"/>
+      <ref name="lcm"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-arith.class"/>
+  </define>
+  <define name="plus">
+    <element name="plus">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="times">
+    <element name="times">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="gcd">
+    <element name="gcd">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="lcm">
+    <element name="lcm">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="nary-logical.class">
+    <choice>
+      <ref name="and"/>
+      <ref name="or"/>
+      <ref name="xor"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-logical.class"/>
+  </define>
+  <define name="and">
+    <element name="and">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="or">
+    <element name="or">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="xor">
+    <element name="xor">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="unary-logical.class">
+    <ref name="not"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="unary-logical.class"/>
+  </define>
+  <define name="not">
+    <element name="not">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="binary-logical.class">
+    <choice>
+      <ref name="implies"/>
+      <ref name="equivalent"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="binary-logical.class"/>
+  </define>
+  <define name="implies">
+    <element name="implies">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="equivalent">
+    <element name="equivalent">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="quantifier.class">
+    <choice>
+      <ref name="forall"/>
+      <ref name="exists"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="quantifier.class"/>
+  </define>
+  <define name="forall">
+    <element name="forall">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="exists">
+    <element name="exists">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="nary-reln.class">
+    <choice>
+      <ref name="eq"/>
+      <ref name="gt"/>
+      <ref name="lt"/>
+      <ref name="geq"/>
+      <ref name="leq"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-reln.class"/>
+  </define>
+  <define name="eq">
+    <element name="eq">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="gt">
+    <element name="gt">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="lt">
+    <element name="lt">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="geq">
+    <element name="geq">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="leq">
+    <element name="leq">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="binary-reln.class">
+    <choice>
+      <ref name="neq"/>
+      <ref name="approx"/>
+      <ref name="factorof"/>
+      <ref name="tendsto"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="binary-reln.class"/>
+  </define>
+  <define name="neq">
+    <element name="neq">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="approx">
+    <element name="approx">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="factorof">
+    <element name="factorof">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="tendsto">
+    <element name="tendsto">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <optional>
+        <ref name="type"/>
+      </optional>
+      <empty/>
+    </element>
+  </define>
+  <define name="int.class">
+    <ref name="int"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="int.class"/>
+  </define>
+  <define name="int">
+    <element name="int">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="Differential-Operator.class">
+    <ref name="diff"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="Differential-Operator.class"/>
+  </define>
+  <define name="diff">
+    <element name="diff">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="partialdiff.class">
+    <ref name="partialdiff"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="partialdiff.class"/>
+  </define>
+  <define name="partialdiff">
+    <element name="partialdiff">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="unary-veccalc.class">
+    <choice>
+      <ref name="divergence"/>
+      <ref name="grad"/>
+      <ref name="curl"/>
+      <ref name="laplacian"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="unary-veccalc.class"/>
+  </define>
+  <define name="divergence">
+    <element name="divergence">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="grad">
+    <element name="grad">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="curl">
+    <element name="curl">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="laplacian">
+    <element name="laplacian">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="nary-setlist-constructor.class">
+    <choice>
+      <ref name="set"/>
+      <ref name="list"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-setlist-constructor.class"/>
+  </define>
+  <define name="set">
+    <element name="set">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <optional>
+        <ref name="type"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="BvarQ"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="DomainQ"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="list">
+    <element name="list">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <optional>
+        <ref name="order"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="BvarQ"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="DomainQ"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="nary-set.class">
+    <choice>
+      <ref name="union"/>
+      <ref name="intersect"/>
+      <ref name="cartesianproduct"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-set.class"/>
+  </define>
+  <define name="union">
+    <element name="union">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="intersect">
+    <element name="intersect">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="cartesianproduct">
+    <element name="cartesianproduct">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="binary-set.class">
+    <choice>
+      <ref name="in"/>
+      <ref name="notin"/>
+      <ref name="notsubset"/>
+      <ref name="notprsubset"/>
+      <ref name="setdiff"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="binary-set.class"/>
+  </define>
+  <define name="in">
+    <element name="in">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="notin">
+    <element name="notin">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="notsubset">
+    <element name="notsubset">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="notprsubset">
+    <element name="notprsubset">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="setdiff">
+    <element name="setdiff">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="nary-set-reln.class">
+    <choice>
+      <ref name="subset"/>
+      <ref name="prsubset"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-set-reln.class"/>
+  </define>
+  <define name="subset">
+    <element name="subset">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="prsubset">
+    <element name="prsubset">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="unary-set.class">
+    <ref name="card"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="unary-set.class"/>
+  </define>
+  <define name="card">
+    <element name="card">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="sum.class">
+    <ref name="sum"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="sum.class"/>
+  </define>
+  <define name="sum">
+    <element name="sum">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="product.class">
+    <ref name="product"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="product.class"/>
+  </define>
+  <define name="product">
+    <element name="product">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="limit.class">
+    <ref name="limit"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="limit.class"/>
+  </define>
+  <define name="limit">
+    <element name="limit">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="unary-elementary.class">
+    <choice>
+      <ref name="sin"/>
+      <ref name="cos"/>
+      <ref name="tan"/>
+      <ref name="sec"/>
+      <ref name="csc"/>
+      <ref name="cot"/>
+      <ref name="sinh"/>
+      <ref name="cosh"/>
+      <ref name="tanh"/>
+      <ref name="sech"/>
+      <ref name="csch"/>
+      <ref name="coth"/>
+      <ref name="arcsin"/>
+      <ref name="arccos"/>
+      <ref name="arctan"/>
+      <ref name="arccosh"/>
+      <ref name="arccot"/>
+      <ref name="arccoth"/>
+      <ref name="arccsc"/>
+      <ref name="arccsch"/>
+      <ref name="arcsec"/>
+      <ref name="arcsech"/>
+      <ref name="arcsinh"/>
+      <ref name="arctanh"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="unary-elementary.class"/>
+  </define>
+  <define name="sin">
+    <element name="sin">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="cos">
+    <element name="cos">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="tan">
+    <element name="tan">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="sec">
+    <element name="sec">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="csc">
+    <element name="csc">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="cot">
+    <element name="cot">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="sinh">
+    <element name="sinh">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="cosh">
+    <element name="cosh">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="tanh">
+    <element name="tanh">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="sech">
+    <element name="sech">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="csch">
+    <element name="csch">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="coth">
+    <element name="coth">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arcsin">
+    <element name="arcsin">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arccos">
+    <element name="arccos">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arctan">
+    <element name="arctan">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arccosh">
+    <element name="arccosh">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arccot">
+    <element name="arccot">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arccoth">
+    <element name="arccoth">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arccsc">
+    <element name="arccsc">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arccsch">
+    <element name="arccsch">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arcsec">
+    <element name="arcsec">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arcsech">
+    <element name="arcsech">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arcsinh">
+    <element name="arcsinh">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="arctanh">
+    <element name="arctanh">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="nary-stats.class">
+    <choice>
+      <ref name="mean"/>
+      <ref name="sdev"/>
+      <ref name="variance"/>
+      <ref name="median"/>
+      <ref name="mode"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-stats.class"/>
+  </define>
+  <define name="mean">
+    <element name="mean">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="sdev">
+    <element name="sdev">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="variance">
+    <element name="variance">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="median">
+    <element name="median">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="mode">
+    <element name="mode">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="nary-constructor.class">
+    <choice>
+      <ref name="vector"/>
+      <ref name="matrix"/>
+      <ref name="matrixrow"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-constructor.class"/>
+  </define>
+  <define name="vector">
+    <element name="vector">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <ref name="BvarQ"/>
+      <ref name="DomainQ"/>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="matrix">
+    <element name="matrix">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <ref name="BvarQ"/>
+      <ref name="DomainQ"/>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="matrixrow">
+    <element name="matrixrow">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <ref name="BvarQ"/>
+      <ref name="DomainQ"/>
+      <zeroOrMore>
+        <ref name="ContExp"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="unary-linalg.class">
+    <choice>
+      <ref name="determinant"/>
+      <ref name="transpose"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="unary-linalg.class"/>
+  </define>
+  <define name="determinant">
+    <element name="determinant">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="transpose">
+    <element name="transpose">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="nary-linalg.class">
+    <ref name="selector"/>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="nary-linalg.class"/>
+  </define>
+  <define name="selector">
+    <element name="selector">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="binary-linalg.class">
+    <choice>
+      <ref name="vectorproduct"/>
+      <ref name="scalarproduct"/>
+      <ref name="outerproduct"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="binary-linalg.class"/>
+  </define>
+  <define name="vectorproduct">
+    <element name="vectorproduct">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="scalarproduct">
+    <element name="scalarproduct">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="outerproduct">
+    <element name="outerproduct">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="constant-set.class">
+    <choice>
+      <ref name="integers"/>
+      <ref name="reals"/>
+      <ref name="rationals"/>
+      <ref name="naturalnumbers"/>
+      <ref name="complexes"/>
+      <ref name="primes"/>
+      <ref name="emptyset"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="constant-set.class"/>
+  </define>
+  <define name="integers">
+    <element name="integers">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="reals">
+    <element name="reals">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="rationals">
+    <element name="rationals">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="naturalnumbers">
+    <element name="naturalnumbers">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="complexes">
+    <element name="complexes">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="primes">
+    <element name="primes">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="emptyset">
+    <element name="emptyset">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="constant-arith.class">
+    <choice>
+      <ref name="exponentiale"/>
+      <ref name="imaginaryi"/>
+      <ref name="notanumber"/>
+      <ref name="true"/>
+      <ref name="false"/>
+      <ref name="pi"/>
+      <ref name="eulergamma"/>
+      <ref name="infinity"/>
+    </choice>
+  </define>
+  <define name="ContExp" combine="choice">
+    <ref name="constant-arith.class"/>
+  </define>
+  <define name="exponentiale">
+    <element name="exponentiale">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="imaginaryi">
+    <element name="imaginaryi">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="notanumber">
+    <element name="notanumber">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="true">
+    <element name="true">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="false">
+    <element name="false">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="pi">
+    <element name="pi">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="eulergamma">
+    <element name="eulergamma">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="infinity">
+    <element name="infinity">
+      <ref name="CommonAtt"/>
+      <ref name="DefEncAtt"/>
+      <empty/>
+    </element>
+  </define>
+</grammar>

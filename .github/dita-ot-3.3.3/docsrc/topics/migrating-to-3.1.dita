@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="migrating-to-3.1">
+
+  <title>Migrating to release 3.1</title>
+  <titlealts>
+    <navtitle>To 3.1</navtitle>
+  </titlealts>
+
+  <shortdesc>DITA-OT 3.1 includes <ph id="summary">support for DITA 1.3 SVG domain elements, enhanced
+        <xmlelement>codeblock</xmlelement> processing, and incremental improvements to Lightweight DITA processing and
+      PDF output</ph>.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>codeblock</xmlelement></indexterm>
+        <indexterm><xmlelement>param</xmlelement></indexterm>
+        <indexterm><xmlatt>if:set</xmlatt></indexterm>
+        <indexterm><xmlatt>unless:set</xmlatt></indexterm>
+        <indexterm><xmlatt>if</xmlatt></indexterm>
+        <indexterm><xmlatt>outputclass</xmlatt></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>dost.class.path</codeph> property</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>xml.catalog.files</codeph> property</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>dost.class.path</codeph></indexterm></indexterm>
+        <indexterm>Lightweight DITA</indexterm>
+        <indexterm>XSLT<indexterm>Ant</indexterm></indexterm>
+        <indexterm>DITA 1.3<indexterm>SVG domain</indexterm></indexterm>
+        <indexterm>SVG</indexterm>
+        <indexterm>catalog<indexterm><codeph>xml.catalog.files</codeph></indexterm><indexterm><codeph>xml.catalog.path</codeph></indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <note>This topic provides a summary of changes in DITA-OT 3.1 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the
+        <xref keyref="3.1-release-notes"/>.</note>
+    </section>
+
+    <section>
+      <title>Custom if/unless attributes in Ant scripts</title>
+      <p>Ant scripts for DITA-OT builds now make use of <xmlatt>if:set</xmlatt> and <xmlatt>unless:set</xmlatt>
+        attributes in the Ant namespace, which can be used to control whether parameters are passed to XSLT modules.
+        These attributes replace custom implementations of <codeph>if</codeph> and <codeph>unless</codeph> logic
+        introduced before Ant had this capability.</p>
+      <p>If your plug-ins include Ant scripts that use <xmlatt>if</xmlatt> or <xmlatt>unless</xmlatt> on
+          <xmlelement>param</xmlelement> elements that pass XSLT parameters, add the following namespace attributes to
+        the root project:
+        <ul>
+          <li><xmlnsname>xmlns:if</xmlnsname>=<codeph>"ant:if"</codeph></li>
+          <li><xmlnsname>xmlns:unless</xmlnsname>=<codeph>"ant:unless"</codeph></li>
+        </ul></p>
+      <p>In custom Ant build files and in any files that supply parameters to existing DITA-OT XSLT modules, replace all
+        occurrences of <codeph>if="property"</codeph> on <xmlelement>param</xmlelement> elements with
+            <codeph>if<b>:set</b>="property"</codeph> (and <codeph>unless</codeph> → <codeph>unless<b>:set</b></codeph>
+        respectively).</p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;root xmlns:if="ant:if" xmlns:unless="ant:unless">
+  &lt;param name="antProperty" expression="${antProperty}"
+         if<b>:set</b>="antProperty"/>
+&lt;/root></codeblock></p>
+      <p>For more information on passing parameters to existing XSLT steps, see
+        <xref keyref="plugin-extension-points-xslt-parameters"/>.</p>
+    </section>
+
+    <section>
+      <title>Deprecated properties</title>
+      <sectiondiv>
+        <!-- From plugin-javalib.dita -->
+        <p>As of DITA-OT 3.1, the Java class path is managed automatically, meaning you do not (and should not) use
+          explicit references to Java class paths in your build scripts. In particular, the old
+            <codeph>dost.class.path</codeph> property has been deprecated and should not be used. If you are migrating
+          older plug-ins that manage their class path directly, you should remove any explicit class path configuration.
+          If your plug-in was not already using the <codeph>dita.conductor.lib.import</codeph> extension point to
+          integrate its JAR dependencies you must add it.</p>
+        <p>The effective DITA-OT class path is the combination of the JAR files in the main <filepath>lib/</filepath>
+          directory and the plug-in-contributed JARs, which are listed in <filepath>config/env.sh</filepath>. The
+            <filepath>env.sh</filepath> file is updated automatically when plug-ins are installed or removed.</p>
+      </sectiondiv>
+      <p>The <codeph>xml.catalog.files</codeph> property has been deprecated and should not be used. Replace any such
+        references with the <codeph>xml.catalog.path</codeph> instead.</p>
+    </section>
+
+    <section id="pdf-line-numbers">
+      <title>PDF – Enabling line numbers in codeblocks </title>
+      <p>The <codeph>codeblock.generate-line-number</codeph> template mode default has been changed to check for the
+          <codeph>show-line-numbers</codeph> keyword in the <xmlatt>outputclass</xmlatt> attribute. Earlier versions of
+        DITA-OT required custom PDF plug-ins to override the template mode to return <codeph>true()</codeph>. </p>
+    </section>
+
+  </refbody>
+</reference>

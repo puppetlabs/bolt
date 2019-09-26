@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="preprocess-topicpull" xml:lang="en-US">
+  <title>Pull content into topics (topicpull)</title>
+  <shortdesc>The <codeph>topicpull</codeph> step pulls content into <xmlelement>xref</xmlelement> and
+      <xmlelement>link</xmlelement> elements. This step is implemented in XSLT.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>xref</xmlelement></indexterm>
+        <indexterm><xmlelement>link</xmlelement></indexterm>
+        <indexterm><xmlelement>desc</xmlelement></indexterm>
+        <indexterm><xmlelement>linktext</xmlelement></indexterm>
+        <indexterm>preprocessing<indexterm><codeph>topicpull</codeph></indexterm></indexterm>
+        <indexterm><codeph>topicpull</codeph></indexterm>
+        <indexterm>XSLT<indexterm><codeph>topicpull</codeph></indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section><p>If an <xmlelement>xref</xmlelement> element does not contain link text, the target is examined and the link text is
+        pulled. For example, a reference to a topic pulls the title of the topic; a reference to a list item pulls the
+        number of the item. If the <xmlelement>xref</xmlelement> element references a topic that has a short
+        description, and the <xmlelement>xref</xmlelement> element does not already contain a child
+          <xmlelement>desc</xmlelement> element, a <xmlelement>desc</xmlelement> element is created that contains the
+        text from the topic short description.</p><p>The process is similar for <xmlelement>link</xmlelement> elements. If the <xmlelement>link</xmlelement> element does
+        not have a child <xmlelement>linktext</xmlelement> element, one is created with the appropriate link text.
+        Similarly, if the <xmlelement>link</xmlelement> element does not have a child <xmlelement>desc</xmlelement>
+        element, and the short description of the target can be determined, a <xmlelement>desc</xmlelement> element is
+        created that contains the text from the topic short description.</p></section>
+  </conbody>
+</concept>

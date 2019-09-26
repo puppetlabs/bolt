@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<!--DITA XNAL Domain-->
+
+   <group><!-- System ID (URL) catalog entries -->
+      <system systemId="urn:oasis:names:tc:dita:xsd:xnalDomain.xsd:1.3"
+              uri="xsd/xnalDomain.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:xnalDomain.xsd:1.x"
+              uri="xsd/xnalDomain.xsd"/>
+      <system systemId="urn:oasis:names:tc:dita:xsd:xnalDomain.xsd"
+              uri="xsd/xnalDomain.xsd"/>
+   </group>
+   <group><!-- Public ID (URN) catalog entries -->
+      <uri name="urn:oasis:names:tc:dita:xsd:xnalDomain.xsd:1.3"
+           uri="xsd/xnalDomain.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:xnalDomain.xsd:1.x"
+           uri="xsd/xnalDomain.xsd"/>
+      <uri name="urn:oasis:names:tc:dita:xsd:xnalDomain.xsd"
+           uri="xsd/xnalDomain.xsd"/>
+   </group>
+</catalog>

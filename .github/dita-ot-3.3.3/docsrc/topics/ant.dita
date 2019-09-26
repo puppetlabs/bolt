@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="ant">
+  <title>Ant</title>
+  <shortdesc>Ant is a Java-based, open-source tool that is provided by the Apache Foundation. It can be used to declare
+    a sequence of build actions. It is well suited for both development and document builds. The toolkit ships with a
+    copy of Ant.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Ant<indexterm>overview</indexterm></indexterm>
+        <indexterm>build.xml</indexterm>
+        <indexterm>files<indexterm>build.xml</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>Ant</indexterm></indexterm>
+        <indexterm>Java<indexterm>Ant</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>DITA-OT uses Ant to manage the XSLT scripts that are used to perform the various transformation; it also uses Ant
+      to manage intermediate steps that are written in Java. </p>
+    <p>The most important Ant script is the <filepath>build.xml</filepath> file. This script defines and combines common
+      pre-processing and output transformation routines; it also defines the DITA-OT extension points.</p>
+  </conbody>
+</concept>

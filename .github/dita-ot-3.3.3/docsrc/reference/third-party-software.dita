@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="third-party-software">
+  <title>Third-party software</title>
+  <shortdesc>DITA Open Toolkit uses third-party software components to provide certain features in the core toolkit,
+    Java API, and bundled plug-ins.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>PDF<indexterm>plug-in, required software</indexterm></indexterm>
+        <indexterm>third-party software</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <title>DITA-OT <keyword keyref="release"/></title>
+      <p>DITA-OT core processing uses the following third-party software:</p>
+      <table outputclass="table-hover" frame="none" colsep="0" rowsep="1">
+        <tgroup cols="3">
+          <colspec colname="project" colwidth="1*"/>
+          <colspec colname="version" colwidth="1*"/>
+          <colspec colname="license" colwidth="2*"/>
+          <thead>
+            <row>
+              <entry>Software</entry>
+              <entry>Version</entry>
+              <entry>License</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Ant<indexterm>Ant</indexterm></entry>
+              <entry><keyword keyref="tool.ant.version"/></entry>
+              <entry>
+                <xref keyref="license-apache-2"/>
+              </entry>
+            </row>
+            <row>
+              <entry>Apache Commons Codec<indexterm>Apache Commons Codec</indexterm></entry>
+              <entry><keyword keyref="tool.codec.version"/></entry>
+              <entry>
+                <xref keyref="license-apache-2"/></entry>
+            </row>
+            <row>
+              <entry>Apache Commons IO<indexterm>Apache Commons IO</indexterm></entry>
+              <entry><keyword keyref="tool.io.version"/></entry>
+              <entry>
+                <xref keyref="license-apache-2"/></entry>
+            </row>
+            <row>
+              <entry>Guava<indexterm>Guava</indexterm></entry>
+              <entry><keyword keyref="tool.guava.version"/></entry>
+              <entry>
+                <xref keyref="license-apache-2"/></entry>
+            </row>
+            <row>
+              <entry>ICU for Java (ICU4J)<indexterm>ICU for Java (ICU4J)</indexterm></entry>
+              <entry><keyword keyref="tool.icu4j.version"/></entry>
+              <entry>
+                <xref keyref="license-ICU"/></entry>
+            </row>
+            <row>
+              <entry>Logback Classic Module<indexterm>Logback Classic Module</indexterm></entry>
+              <entry><keyword keyref="tool.logback.version"/></entry>
+              <entry>
+                <xref keyref="license-EPL"/>,
+                <xref keyref="license-LGPL"/>
+              </entry>
+            </row>
+            <row>
+              <entry><keyword keyref="tool.saxon.edition"/><indexterm>Saxon</indexterm></entry>
+              <entry><keyword keyref="tool.saxon.version"/></entry>
+              <entry>
+                <xref keyref="license-MPL"/></entry>
+            </row>
+            <row>
+              <entry>Simple Logging Facade for Java (SLF4J)<indexterm>Simple Logging Facade for Java</indexterm></entry>
+              <entry><keyword keyref="tool.SLF4J.version"/></entry>
+              <entry>
+                <xref keyref="license-MIT"/></entry>
+            </row>
+            <row>
+              <entry>Xerces<indexterm>Xerces</indexterm></entry>
+              <entry><keyword keyref="tool.xerces.version"/></entry>
+              <entry>
+                <xref keyref="license-apache-2"/></entry>
+            </row>
+            <row>
+              <entry>XML APIs<indexterm>XML APIs</indexterm></entry>
+              <entry><keyword keyref="tool.xmlapis.version"/></entry>
+              <entry>
+                <xref keyref="license-apache-2"/>,
+                <xref keyref="license-W3C"/></entry>
+            </row>
+            <row>
+              <entry>XML Resolver<indexterm>XML Resolver</indexterm></entry>
+              <entry><keyword keyref="tool.resolver.version"/></entry>
+              <entry>
+                <xref keyref="license-apache-2"/></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <note>The XML APIs library contains source code for SAX and DOM APIs, which each have their own licenses.</note>
+    </section>
+    <section>
+      <title>PDF plug-in</title>
+      <p>The <codeph>org.dita.pdf2</codeph> plug-in relies on additional third-party software to generate PDF
+        output:</p>
+      <table outputclass="table-hover" frame="none" colsep="0" rowsep="1">
+        <tgroup cols="3">
+          <colspec colname="project" colwidth="1*"/>
+          <colspec colname="version" colwidth="1*"/>
+          <colspec colname="license" colwidth="1*"/>
+          <thead>
+            <row>
+              <entry>Software</entry>
+              <entry>Version</entry>
+              <entry>License</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Apache Commons Logging<indexterm>Apache Commons Logging</indexterm></entry>
+              <entry>1.0.4</entry>
+              <entry>
+                <xref keyref="license-apache-2"/></entry>
+            </row>
+            <row>
+              <entry>Avalon Framework<indexterm>Avalon Framework</indexterm></entry>
+              <entry>4.3.1</entry>
+              <entry>
+                <xref keyref="license-apache-2"/></entry>
+            </row>
+            <row>
+              <entry>Apache XML Graphics<indexterm>Apache XML Graphics</indexterm></entry>
+              <entry>2.1</entry>
+              <entry>
+                <xref keyref="license-apache-2"/></entry>
+            </row>
+            <row>
+              <entry>Batik<indexterm>Batik</indexterm></entry>
+              <entry>1.8</entry>
+              <entry>
+                <xref keyref="license-apache-2"/></entry>
+            </row>
+            <row>
+              <entry>FOP<indexterm>Apache FOP</indexterm></entry>
+              <entry><keyword keyref="tool.fop.version"/></entry>
+              <entry>
+                <xref keyref="license-apache-2"/></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </section>
+  </conbody>
+</concept>

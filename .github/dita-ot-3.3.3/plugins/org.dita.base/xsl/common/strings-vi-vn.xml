@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+ See the accompanying LICENSE file for
+ applicable licenses.-->
+<strings xml:lang="vi-vn">        <!-- Vietnamese -->
+  <str name="Figure">Hình</str>
+  <str name="Table">Bảng</str>
+  <str name="Next topic">Chủ đề tiếp theo</str>
+  <str name="Previous topic">Chủ đề trước</str>
+  <str name="Parent topic">Chủ đề chính</str>
+  <str name="Required cleanup">Yêu cầu dọn dẹp</str>
+  <str name="Draft comment">Đánh giá nháp</str>
+  <str name="Option">Tùy chọn</str>
+  <str name="Description">Mô tả</str>
+  <str name="Optional">Tùy chọn</str>
+  <str name="Required">Yêu cầu</str>
+  <str name="Skip visual syntax diagram">Bỏ qua sơ đồ cú pháp bằng hình ảnh</str>
+  <str name="Read syntax diagram">Đọc sơ đồ cú pháp</str>
+  <str name="Text version of syntax diagram">Phiên bản bằng văn bản của sơ đồ cú pháp</str>
+  <str name="Start of change">Bắt đầu thay đổi</str>
+  <str name="End of change">Kết thúc thay đổi</str>
+  <str name="Index">Chỉ mục</str>
+  <str name="Special characters">Ký tự đặc biệt</str>
+  <str name="Numerics">Số</str>
+  <str name="End notes">Ghi chú cuối trang</str>
+  <str name="Artwork">Ảnh bìa</str>
+  <str name="Syntax">Cú pháp</str>
+  <str name="Type">Loại</str>
+  <str name="Value">Giá trị</str>
+  <str name="Note">Ghi chú</str>
+  <str name="Notes">Các ghi chú</str>
+  <str name="Tip">Mẹo</str>
+  <str name="Fastpath">Đường dẫn nhanh</str>
+  <str name="Important">Quan trọng</str>
+  <str name="Attention">Chú ý</str>
+  <str name="Caution">THẬN TRỌNG</str>
+  <str name="Danger">NGUY HIỂM</str>
+  <str name="Remember">Ghi nhớ</str>
+  <str name="Warning">Cảnh báo</str>
+  <str name="Restriction">Hạn chế</str>
+  <str name="Trouble">sự cố or vấn đề</str>
+  <str name="Contents">Nội dung</str>
+  <str name="Related concepts">Các khái niệm liên quan</str>
+  <str name="Related tasks">Các tác vụ liên quan</str>
+  <str name="Related reference">Tham chiếu liên quan</str>
+  <str name="Related information">Thông tin liên quan</str>
+  <str name="Prerequisite">Điều kiện tiên quyết</str>
+  <str name="Prerequisites">Các điều kiện tiên quyết</str>
+  <str name="or">hoặc</str>
+  <str name="Prerequisite">Prerequisite</str>
+  <str name="Prerequisites">Prerequisites</str>
+  <str name="or">or</str>
+  <str name="task_context">Thông tin về tác vụ này</str>
+  <str name="task_example">Ví dụ</str>
+  <str name="task_postreq">Điều cần làm tiếp theo</str>
+  <str name="task_prereq">Trước khi bạn bắt đầu</str>
+  <str name="task_procedure">Quy trình</str>
+  <str name="task_procedure_unordered">Quy trình</str>
+  <str name="task_results">Kết quả</str>
+  <str name="Copyright">Bản quyền</str>
+  <str name="a11y.and-then"></str>
+</strings>

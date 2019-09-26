@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--DITA Release Management Metadata Domain                      -->
+<!--                                                             -->
+<!--Defines element types for capturing change details within    -->
+<!--topics or maps.                                              -->
+<!--DITA 1.3                                                     -->
+<!--Copyright (c) 2013 OASIS Open                                -->
+<!--=============================================================-->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                    TYPICAL INVOCATION                        -->
+<!--                                                              -->
+<!--Refer to this file by the following public identifier or an  -->
+<!--appropriate system identifier                                -->
+<!--PUBLIC "-//OASIS//ENTITIES DITA Release Management Domain//EN"-->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic relmgmt-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="change-historylist">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-historylist"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="change-item">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-item"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="change-person">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-person"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="change-organization">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-organization"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="change-revisionid">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-revisionid"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="change-request-reference">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-request-reference"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="change-request-system">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-request-system"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="change-request-id">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-request-id"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="change-started">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-started"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="change-completed">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-completed"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="change-summary">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="change-summary"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="relmgmt-d-metadata">
+      <xs:choice>
+         <xs:element ref="change-historylist"/>
+      </xs:choice>
+   </xs:group>
+   <xs:attributeGroup name="changehistory.data.atts">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="datatype" type="xs:string"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+   </xs:attributeGroup>
+   <xs:element name="change-historylist">
+      <xs:annotation>
+         <xs:documentation> Category: Change History elements</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-historylist.class">
+               <xs:attribute ref="class" default="+ topic/metadata relmgmt-d/change-historylist "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-historylist.class">
+      <xs:sequence>
+         <xs:group ref="change-historylist.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-historylist.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-historylist.content">
+      <xs:sequence>
+         <xs:group ref="change-item" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-historylist.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="change-item">
+      <xs:annotation>
+         <xs:documentation>An individual release note. Category: Change History List Item</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-item.class">
+               <xs:attribute ref="class" default="+ topic/data relmgmt-d/change-item "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-item.class">
+      <xs:sequence>
+         <xs:group ref="change-item.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-item.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-item.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="change-person"/>
+            <xs:group ref="change-organization"/>
+         </xs:choice>
+         <xs:group ref="change-revisionid" minOccurs="0"/>
+         <xs:group ref="change-request-reference" minOccurs="0"/>
+         <xs:group ref="change-started" minOccurs="0"/>
+         <xs:group ref="change-completed"/>
+         <xs:group ref="change-summary" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="data" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-item.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attribute name="name" type="xs:string" default="change-item"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="change-person">
+      <xs:annotation>
+         <xs:documentation>The person who made the change. Category: Change History</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-person.class">
+               <xs:attribute ref="class" default="+ topic/data relmgmt-d/change-person "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-person.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="change-person.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-person.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-person.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-person.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attribute name="name" type="xs:string" default="change-person"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="change-organization">
+      <xs:annotation>
+         <xs:documentation>the organization that instigated (required, suggested) the change. 
+            Category: Change History</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-organization.class">
+               <xs:attribute ref="class" default="+ topic/data relmgmt-d/change-organization "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-organization.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="change-organization.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-organization.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-organization.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-organization.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attribute name="name" type="xs:string" default="change-organization"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="change-revisionid">
+      <xs:annotation>
+         <xs:documentation>the organization that instigated (required, suggested) the change. 
+            Category: Change History</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-revisionid.class">
+               <xs:attribute ref="class" default="+ topic/data relmgmt-d/change-revisionid "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-revisionid.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="change-revisionid.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-revisionid.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-revisionid.content">
+      <xs:sequence>
+         <xs:group ref="data.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-revisionid.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attribute name="name" type="xs:string" default="change-revisionid"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="change-request-reference">
+      <xs:annotation>
+         <xs:documentation>Provides traceablity to an external change 
+      request or other ticketing system. 
+            Category: Change History</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-request-reference.class">
+               <xs:attribute ref="class" default="+ topic/data relmgmt-d/change-request-reference "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-request-reference.class">
+      <xs:sequence>
+         <xs:group ref="change-request-reference.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-request-reference.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-request-reference.content">
+      <xs:sequence>
+         <xs:group ref="change-request-system" minOccurs="0"/>
+         <xs:group ref="change-request-id" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-request-reference.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attribute name="name" type="xs:string" default="change-request-reference"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="change-request-system">
+      <xs:annotation>
+         <xs:documentation>Some description of or identifier for the information system that
+     manages or serves the referenced change request, for example,
+     an issue tracking system. 
+            Category: Change History</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-request-system.class">
+               <xs:attribute ref="class" default="+ topic/data relmgmt-d/change-request-system "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-request-system.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="change-request-system.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-request-system.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-request-system.content">
+      <xs:sequence>
+         <xs:group ref="data.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-request-system.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attribute name="name" type="xs:string" default="change-request-system"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="change-request-id">
+      <xs:annotation>
+         <xs:documentation>The identifier of the change request, such as an issue
+     ID or ticket number. 
+            Category: Change History</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-request-id.class">
+               <xs:attribute ref="class" default="+ topic/data relmgmt-d/change-request-id "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-request-id.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="change-request-id.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-request-id.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-request-id.content">
+      <xs:sequence>
+         <xs:group ref="data.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-request-id.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attribute name="name" type="xs:string" default="change-request-id"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="change-started">
+      <xs:annotation>
+         <xs:documentation>
+            Category: Change History</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-started.class">
+               <xs:attribute ref="class" default="+ topic/data relmgmt-d/change-started "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-started.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="change-started.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-started.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-started.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-started.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attribute name="name" type="xs:string" default="change-started"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="change-completed">
+      <xs:annotation>
+         <xs:documentation>
+            Category: Change History</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-completed.class">
+               <xs:attribute ref="class" default="+ topic/data relmgmt-d/change-completed "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-completed.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="change-completed.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-completed.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-completed.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="text"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-completed.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attribute name="name" type="xs:string" default="change-completed"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="change-summary">
+      <xs:annotation>
+         <xs:documentation>The portion of the release note that will/may appear in a document
+            Category: Change History</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="change-summary.class">
+               <xs:attribute ref="class" default="+ topic/data relmgmt-d/change-summary "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="change-summary.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="change-summary.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="change-summary.attributes"/>
+   </xs:complexType>
+   <xs:group name="change-summary.content">
+      <xs:sequence>
+         <xs:group ref="data.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="change-summary.attributes">
+      <xs:attributeGroup ref="changehistory.data.atts"/>
+      <xs:attribute name="name" type="xs:string" default="change-summary"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

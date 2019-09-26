@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="pdfdefault" xml:lang="en-US">
+  <title>PDF processing modules</title>
+  <shortdesc>The <option>PDF</option> (formerly known as <option>PDF2</option>) transformation process runs the
+    pre-processing routine and follows it by a series of additional targets. These steps work together to create a
+    merged set of content, convert the merged content to XSL-FO, and then format the XSL-FO file to PDF.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>DITAVAL<indexterm>PDF</indexterm></indexterm>
+        <indexterm>Antenna House<indexterm><codeph>transform.fo2pdf</codeph></indexterm><indexterm><filepath>topic.fo</filepath></indexterm></indexterm>
+        <indexterm>Apache FOP<indexterm><codeph>transform.fo2pdf</codeph></indexterm><indexterm><filepath>topic.fo</filepath></indexterm></indexterm>
+        <indexterm>PDF<indexterm>preprocessing</indexterm></indexterm>
+        <indexterm>targets<indexterm>PDF</indexterm></indexterm>
+        <indexterm>XSLT<indexterm>PDF</indexterm></indexterm>
+        <indexterm>RenderX<indexterm><codeph>transform.fo2pdf</codeph></indexterm><indexterm><filepath>topic.fo</filepath></indexterm></indexterm>
+        <indexterm>XEP<index-see>RenderX</index-see></indexterm>
+        <indexterm>index<indexterm>PDF</indexterm></indexterm>
+        <indexterm><filepath>stage1.xml</filepath></indexterm>
+        <indexterm>pipelines<indexterm>PDF</indexterm></indexterm>
+        <indexterm><filepath>topic.fo</filepath></indexterm>
+        <indexterm><filepath>stage1a.xml</filepath></indexterm>
+        <indexterm><filepath>stage2.fo</filepath></indexterm>
+        <indexterm><filepath>stage3.fo</filepath></indexterm>
+        <indexterm><filepath>topic.fo</filepath></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <p>The PDF process includes many Ant targets. During a typical conversion from map to PDF, the following targets
+        are most significant.</p>
+      <dl>
+        <dlentry>
+          <dt><codeph>map2pdf2</codeph></dt>
+          <dd>Creates a merged file by calling a common Java merge module. It then calls the
+              <codeph>publish.map.pdf</codeph> target to do the remainder of the work.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><codeph>publish.map.pdf</codeph></dt>
+          <dd>Performs some initialization and then calls the <codeph>transform.topic2pdf</codeph> target to do the
+            remainder of processing.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><codeph>transform.topic2pdf</codeph></dt>
+          <dd>Converts the merged file to XSL-FO, generates the PDF, and deletes the <filepath>topic.fo</filepath> file,
+            unless instructed to keep it.</dd>
+        </dlentry>
+      </dl>
+      <p>The <codeph>transform.topic2pdf</codeph> target uses the following targets to perform those tasks:</p>
+      <dl>
+        <dlentry>
+          <dt><codeph>transform.topic2fo</codeph></dt>
+          <dd>Convert the merged file to an XSL-FO file. This process is composed of several sub-targets. </dd>
+        </dlentry>
+        <!-- Begin sub-targets -->
+        <dlentry>
+          <dt><codeph>transform.topic2fo.index</codeph></dt>
+          <dd>Runs a Java process to set up index processing, based on the document language. This step generates the
+            file <filepath>stage1.xml</filepath> in the temporary processing directory. </dd>
+        </dlentry>
+        <dlentry>
+          <dt><codeph>transform.topic2fo.flagging</codeph></dt>
+          <dd>Sets up preprocessing for flagging based on a DITAVAL file. This step generates the file
+              <filepath>stage1a.xml</filepath> in the temporary processing directory.</dd>
+        </dlentry>
+        <dlentry>
+          <dt><codeph>transform.topic2fo.main</codeph></dt>
+          <dd>Does the bulk of the conversion from DITA to XSL-FO. It runs the XSLT-based process that creates
+              <filepath>stage2.fo</filepath> in the temporary processing directory</dd>
+        </dlentry>
+        <dlentry>
+          <dt><codeph>transform.topic2fo.i18n</codeph></dt>
+          <dd>Does additional localization processing on the FO file; it runs a Java process that converts
+              <filepath>stage2.fo</filepath> into <filepath>stage3.fo</filepath>, followed by an XSLT process that
+            converts <filepath>stage3.fo</filepath> into <filepath>topic.fo</filepath>.</dd>
+        </dlentry>
+        <!-- End sub-targets -->
+        <dlentry>
+          <dt><codeph>transform.fo2pdf</codeph></dt>
+          <dd>Converts the <filepath>topic.fo</filepath> file into PDF using the specified FO processor (Antenna House,
+            XEP, or Apache FOP).</dd>
+        </dlentry>
+        <dlentry>
+          <dt><codeph>delete.fo2pdf.topic.fo</codeph></dt>
+          <dd>Deletes the <filepath>topic.fo</filepath> file, unless otherwise specified by setting an Ant property or
+            command-line option.</dd>
+        </dlentry>
+      </dl>
+    </section>
+  </conbody>
+</concept>

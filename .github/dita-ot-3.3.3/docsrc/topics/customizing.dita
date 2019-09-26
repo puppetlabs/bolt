@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="customizing" xml:lang="en-US">
+  <title>Customizing DITA Open Toolkit</title>
+  <titlealts>
+    <navtitle>Customizing DITA-OT</navtitle>
+  </titlealts>
+  <shortdesc>There are several ways to customize and extend the toolkit. You can adjust various aspects of the default
+    output by setting parameters or using custom stylesheets. For more complex customizations, use custom DITA-OT
+    plug-ins to override other parts of processing.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins<indexterm>best practices</indexterm></indexterm>
+        <indexterm>upgrading<indexterm>default plug-ins</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <p>A single XSL file can be used as an override by passing it in as a parameter. For example, when building XHTML
+        content, the XSL parameter allows users to specify a single local XSL file (inside or outside of the toolkit)
+        that is called in place of the default XHTML code. Typically, this code imports the default processing code, and
+        overrides a couple of processing routines. This approach is best when the override is very minimal, or when the
+        style varies from build to build. However, any extension made with this sort of override is also possible with a
+        plug-in.</p>
+      <p>Creating a plug-in can be very simple to very complex, and is generally the best method for changing or
+        extending the toolkit. Plug-ins can be used to accomplish almost any modification that is needed for toolkit
+        processing, from minor style tweaks to extensive, complicated new output formats.</p>
+      <p>Editing DITA-OT code directly is strongly discouraged. Modifying the code directly significantly increases the
+        work and risk involved with future upgrades. It is also likely that such modifications will break plug-ins
+        provided by others, limiting the functions available to the toolkit.</p>
+      <note type="warning">Any changes made directly in the code would be overwritten when upgrading to newer versions
+        of DITA-OT, so users that have customized their toolkit installation in this way are often “stuck” on older
+        versions of the toolkit and unable to take advantage of improvements in recent versions of DITA-OT.</note>
+    </section>
+  </refbody>
+</reference>

@@ -1,0 +1,82 @@
+# This file is part of the DITA Open Toolkit project.
+#
+# Copyright 2014 Jarno Elovirta
+#
+# See the accompanying LICENSE file for applicable license.
+plugin =
+  element plugin {
+    attribute id { xsd:NCName },
+    attribute version { version }?,
+    (feature | transtype | extension-point | require | metadata | template)*
+  }
+feature =
+  element feature {
+    attribute extension { xsd:NCName },
+    (attribute file { text }
+     | (attribute value { text },
+        attribute type { "file" | "text" }?))?,
+    anyElement*
+  }
+transtype =
+  element transtype {
+    attribute name {
+      list { xsd:NCName+ }
+    },
+    attribute desc { text }?,
+    attribute abstract { xsd:boolean }?,
+    attribute extends {
+      list { xsd:NCName+ }
+    }?,
+    param*
+  }
+param =
+  element param {
+    attribute required { xsd:boolean }?,
+    attribute deprecated { xsd:boolean }?,
+    attribute name {
+      list { xsd:NCName+ }
+    }?,
+    attribute desc { text }?,
+    param.val
+  }
+param.val |=
+  attribute type { "enum" },
+  val*
+param.val |=
+  attribute type { "string" },
+  val*
+param.val |= attribute type { "file" | "dir" | "uri" }
+val =
+  element val {
+    attribute desc { text }?,
+    attribute default { xsd:boolean }?,
+    text
+  }
+extension-point =
+  element extension-point {
+    attribute id { xsd:NCName },
+    attribute name { text }
+  }
+require =
+  element require {
+    attribute plugin { xsd:NCName },
+    attribute version { version }?,
+    attribute importance { "required" | "optional" }?
+  }
+version = text
+metadata =
+  element metadata {
+    attribute type { xsd:NCName },
+    attribute value { text }
+  }
+template =
+  element template {
+    attribute file { text }
+  }
+anyElement =
+  element * {
+    (attribute * { text }
+     | text
+     | anyElement)*
+  }
+start = plugin

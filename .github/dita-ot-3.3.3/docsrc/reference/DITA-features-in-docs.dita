@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="ID">
+  <title>DITA features in the documentation</title>
+  <titlealts>
+    <navtitle>DITA features in docs</navtitle>
+  </titlealts>
+  <shortdesc>DITA Open Toolkit uses various recent DITA features in the project documentation.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlatt>audience</xmlatt></indexterm>
+        <indexterm><xmlatt>orient</xmlatt></indexterm>
+        <indexterm>profiling</indexterm>
+        <indexterm>branch filters</indexterm>
+        <indexterm>Antenna House<indexterm>DITA XML mention domain</indexterm></indexterm>
+        <indexterm>DITA 1.3<indexterm>XML mention domain</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>The
+      <xref href="https://github.com/dita-ot/docs" format="html" scope="external">source files</xref> for the DITA-OT
+      documentation include examples of the following DITA features (among others):</p>
+    <ul>
+      <li>subjectScheme classification for controlling available attributes</li>
+      <li>profiling and branch filtering (novice/expert content)</li>
+      <li>extending topics with conref push</li>
+      <li>keys and key references</li>
+      <li>XML mention domain</li>
+    </ul>
+
+    <section>
+      <title>Subject schemes </title>
+      <p>Various topics, sections and elements in the docs are profiled by audience:</p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../resources/conref-task.dita#token=excerpt-variables,end-excerpt"/></codeblock></p>
+      <p>An “audience” subject scheme controls the values that are available for the <xmlatt>audience</xmlatt>
+        attribute:</p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../resources/subjectscheme.ditamap#token=excerpt-audience,end-excerpt"/></codeblock></p>
+    </section>
+
+    <section>
+      <title>Branch filtering: re-using profiled content</title>
+    </section>
+    <section>
+      <p><cite>Installing DITA-OT</cite> pulls a subset of the build description from <cite>using the
+            <cmdname>dita</cmdname> command</cite>, filtered to display only content deemed suitable for novice users
+        under
+        <xref keyref="first-build-using-dita-command"/>:</p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../topics/installing.ditamap#token=branch-filter,end-filtering"/></codeblock></p>
+      <p>The same content appears later in
+        <xref keyref="build-using-dita-command"/> with additional information on arguments, options and examples.</p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../topics/publishing.ditamap#token=branch-filter,end-filtering"/></codeblock></p>
+    </section>
+
+    <section>
+      <title>Conref push</title>
+    </section>
+    <section>
+      <p>The docs build uses the conref push mechanism (with the <codeph>pushreplace</codeph>, <codeph>mark</codeph>,
+        and <codeph>pushafter</codeph>
+        <xref keyref="dita13-spec-conaction">conactions</xref>) to extend the parameter descriptions embedded in the
+        default plug-ins:</p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../parameters/ant-parameters-details.dita#token=excerpt-csspath,end-excerpt"/></codeblock></p>
+      <p>The pushed content appears in the output after the default description. (See
+        <xref keyref="parameters-base-html"/>.)</p>
+      <note type="tip">You could also use the same mechanism to extend the documentation with custom information that
+        applies only to your company’s toolkit distribution.</note>
+    </section>
+
+    <section>
+      <title>Keys and key references</title>
+    </section>
+    <section>
+      <p>The <codeph>key-definitions.ditamap</codeph> defines keys for version references, re-usable links, etc.</p>
+      <p>This key definition defines the maintenance release version:</p>
+      <p><codeblock outputclass="language-xml normalize-space"><coderef href="../resources/key-definitions.ditamap#token=excerpt-version,end-excerpt"/></codeblock></p>
+      <p>In topics, the keyword is used in place of hard-coded version references:</p>
+      <codeblock outputclass="language-xml">&lt;title&gt;DITA Open Toolkit &lt;keyword keyref="maintenance-version"/&gt; Release Notes&lt;/title&gt;</codeblock>
+    </section>
+
+    <section>
+      <title>XML mention domain</title>
+    </section>
+    <section>
+      <p>The docs use the
+        <xref format="html"
+          href="http://docs.oasis-open.org/dita/dita/v1.3/os/part3-all-inclusive/langRef/containers/xml-mention-domain.html#xml-mention-domain"
+          scope="external">XML mention domain</xref> to mark up XML elements and attributes:</p>
+      <codeblock outputclass="language-xml">&lt;li id="1777"&gt;
+  DITA 1.3: Initial support has been added for the &lt;xmlatt&gt;orient&lt;/xmlatt&gt;
+  attribute on &lt;xmlelement&gt;table&lt;/xmlelement&gt; elements. These changes allow
+  Antenna House Formatter to render tables in landscape mode when the
+  &lt;xmlatt&gt;orient&lt;/xmlatt&gt; attribute is set to &lt;option&gt;land&lt;/option&gt;. […]
+&lt;/li&gt;</codeblock>
+      <p>When the toolkit generates output for the sample above:</p>
+      <ul>
+        <li>the XML element name is wrapped in angle brackets as <xmlelement>table</xmlelement>
+        </li>
+        <li>the attribute name is prefixed with an “at” sign as <xmlatt>orient</xmlatt></li>
+      </ul>
+    </section>
+  </conbody>
+</concept>

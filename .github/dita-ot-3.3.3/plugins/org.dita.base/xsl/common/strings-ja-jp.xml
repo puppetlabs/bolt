@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="ja-jp">        <!-- Japanese -->
+  <str name="Figure">図</str>
+  <str name="Table">表</str>
+  <str name="Next topic">次のトピック</str>
+  <str name="Previous topic">前のトピック</str>
+  <str name="Parent topic">親トピック</str>
+  <str name="Required cleanup">クリーンアップ要求</str>
+  <str name="Draft comment">ドラフト注釈</str>
+  <str name="Option">オプション</str>
+  <str name="Description">説明</str> 
+  <str name="Optional">オプション</str>
+  <str name="Required">必須</str>
+  <str name="Skip visual syntax diagram">構文図をスキップする</str>
+  <str name="Read syntax diagram">構文図を読む</str>
+  <str name="Start of change">変更の始まり</str>
+  <str name="End of change">変更の終わり</str>
+  <str name="Index">索引</str>
+  <str name="Special characters">特殊文字</str>
+  <str name="Numerics">数字</str>
+  <str name="End notes">脚注</str>
+  <str name="Artwork">アートワーク</str>
+  <str name="Syntax">構文</str>
+  <str name="Type">タイプ</str>
+  <str name="Value">値</str>
+  <str name="Note">注</str>
+  <str name="Notes">注</str>
+  <str name="Tip">ヒント</str>
+  <str name="Fastpath">ファースト・パス</str>
+  <str name="Important">重要</str>
+  <str name="Attention">重要</str>
+  <str name="Caution">注意</str>
+  <str name="Danger">危険</str>
+  <str name="Remember">要確認</str>
+  <str name="Restriction">制約事項</str>
+  <str name="Trouble">問題</str>
+  <str name="Warning">警告</str>
+  <str name="Contents">目次</str>
+  <str name="Related concepts">関連概念</str>
+  <str name="Related tasks">関連タスク</str>
+  <str name="Related reference">関連資料</str>
+  <str name="Related information">関連情報</str>
+  <str name="Prerequisite">前提条件</str>
+  <str name="Prerequisites">前提条件</str>
+  <str name="or">または</str>
+  <str name="task_context">このタスクについて</str>
+  <str name="task_example">例</str>
+  <str name="task_prereq">始める前に</str>
+  <str name="task_postreq">次のタスク</str>
+  <str name="task_procedure">手順</str>
+  <str name="task_procedure_unordered">手順</str>
+  <str name="task_results">タスクの結果</str>
+  <str name="Copyright">Copyright</str>
+  <str name="OpenQuote">「</str>
+  <str name="CloseQuote">」</str>
+  <str name="a11y.and-then"></str>
+</strings>

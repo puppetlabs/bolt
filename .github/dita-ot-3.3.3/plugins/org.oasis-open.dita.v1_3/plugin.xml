@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+-->
+<plugin id="org.oasis-open.dita.v1_3" version="1.3">
+  <feature extension="dita.specialization.catalog.relative" file="catalog.xml"/>
+</plugin>

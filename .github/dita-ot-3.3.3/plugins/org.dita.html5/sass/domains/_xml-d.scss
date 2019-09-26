@@ -1,0 +1,44 @@
+// This file is part of the DITA Open Toolkit project.
+//
+// Copyright 2016 Eero Helenius
+//
+// See the accompanying LICENSE file for applicable license.
+
+// Sass partial for DITA 1.3 XML mention domain
+
+$code-fonts: Menlo, Monaco, Consolas, "Courier New", monospace;
+$markup-color: #639;
+
+@mixin markupname {
+  color: $markup-color;
+  font-family: $code-fonts;
+}
+
+// inline
+.numcharref {
+  @include markupname;
+}
+
+.parameterentity {
+  @include markupname;
+}
+
+.textentity {
+  @include markupname;
+}
+
+.xmlatt {
+  @include markupname;
+}
+
+.xmlelement {
+  @include markupname;
+}
+
+.xmlnsname {
+  @include markupname;
+}
+
+.xmlpi {
+  @include markupname;
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference
+  PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<reference xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="rel1.4.2.1" ditaarch:DITAArchVersion="1.2"><title>DITA OT release 1.4.2.1</title><shortdesc>Release 1.4.2.1 is a full build to provide an urgent fix to fix the following
+      critical problem which users found in release 1.4.2.</shortdesc><refbody><section id="section_rmh_udj_nc">
+        <title>SF Bugs Fixed</title>
+        <ol><li>SF Bug 1956231 OSGI Manifest for eclipsehelp transtype contains spaces.</li></ol>
+        <p>For this fix, we have updated xsl/map2pluginImpl.xsl to prevent generating extra spaces
+          at the head of every line in OSGI manifest file of eclipse help output.</p>
+      </section></refbody></reference>

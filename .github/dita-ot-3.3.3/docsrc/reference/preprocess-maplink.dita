@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="preprocess-maplink" xml:lang="en-US">
+  <title>Map based linking (maplink)</title>
+  <shortdesc>This step collects links based on a map and moves those links into the referenced topics. The links are
+    created based on hierarchy in the DITA map, the <xmlatt>collection-type</xmlatt> attribute, and relationship tables.
+    This step is implemented in XSLT and Java.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlatt>collection-type</xmlatt></indexterm>
+        <indexterm>preprocessing<indexterm><codeph>maplink</codeph></indexterm></indexterm>
+        <indexterm><codeph>maplink</codeph></indexterm>
+        <indexterm>Java<indexterm>maplink</indexterm></indexterm>
+        <indexterm>XSLT<indexterm><codeph>maplink</codeph> preprocessing step</indexterm></indexterm>
+        <indexterm>relationship tables<indexterm><codeph>maplink</codeph> preprocessing step</indexterm></indexterm>
+        <indexterm>memory</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <p>The <codeph>maplink</codeph> module runs an XSLT stylesheet that evaluates the map; it places all the generated
+        links into a single file in memory. The module then runs a Java program that pushes the generated links into the
+        applicable topics.</p>
+    </section>
+  </conbody>
+</concept>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="custom-html-header">
+  <title>Adding custom headers and footers</title>
+  <titlealts>
+    <navtitle>Headers and footers</navtitle>
+  </titlealts>
+  <shortdesc>You add a custom header to include a publication title, company logo, or other common branding elements in
+    HTML output. A custom footer can also be added with copyright information, legal boilerplate, or other fine
+    print.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>header</xmlelement></indexterm>
+        <indexterm><xmlelement>footer</xmlelement></indexterm>
+        <indexterm><xmlelement>div</xmlelement><indexterm>HTML header</indexterm><indexterm>HTML footer</indexterm></indexterm>
+        <indexterm><xmlatt>role</xmlatt></indexterm>
+        <indexterm>HTML5<indexterm>headers</indexterm></indexterm>
+        <indexterm>HTML5<indexterm>footers</indexterm></indexterm>
+        <indexterm>CSS<indexterm>adding custom</indexterm></indexterm>
+        <indexterm>CSS<indexterm>HTML5</indexterm></indexterm>
+        <indexterm>HTML5<indexterm>CSS</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>In HTML5 output, the contents of the header file will be wrapped in an HTML5 <xmlelement>header</xmlelement>
+        element with the <xmlatt>role</xmlatt> attribute set to <option>banner</option>. The footer file contents are
+        wrapped in an HTML5 <xmlelement>footer</xmlelement> element with the <xmlatt>role</xmlatt> attribute set to
+          <option>contentinfo</option>.</p>
+      <p>For example, the DITA-OT documentation includes a simple header banner with the publication title and a
+        horizontal rule to separate the header from the generated topic content: </p>
+      <p><codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef href="../resources/header.xml"/></codeblock>
+      </p>
+      <note>Header and footer files should be specified using absolute paths and must contain valid XML. A common
+        practice is to place all content into a <xmlelement>div</xmlelement> element.</note>
+    </context>
+    <steps>
+      <step>
+        <cmd>Set <parmname>args.hdr</parmname> to include an XML file as a running header that appears above the page
+          content.</cmd>
+        <info> </info>
+      </step>
+      <step>
+        <cmd>Set <parmname>args.ftr</parmname> to include an XML file as a running footer that appears below the page
+          content.</cmd>
+      </step>
+      <step importance="optional">
+        <cmd>Add custom CSS rules to style headers and/or footers.</cmd>
+        <info>
+          <p>For example, the DITA-OT documentation stylesheet includes the following header rules: </p>
+          <p><codeblock outputclass="language-css normalize-space show-line-numbers show-whitespace"><coderef href="../resources/dita-ot-doc.css#token=header-coderef,end-header-ref"/></codeblock>
+          </p>
+        </info>
+      </step>
+    </steps>
+    <result>
+      <note type="tip">For an example of HTML output generated using this method, see the HTML5 version of the DITA-OT
+        documentation included in the installation folder under <filepath>doc/index.html</filepath>.</note>
+    </result>
+  </taskbody>
+</task>

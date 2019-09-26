@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="API">
+  <title>Using the Java API</title>
+  <shortdesc>DITA Open Toolkit includes a Java Application Programming Interface to allow developers to embed the
+    toolkit more easily into other Java programs.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Java<indexterm>API</indexterm></indexterm>
+        <indexterm>API</indexterm>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>classpath</indexterm></indexterm>
+        <indexterm>Java<indexterm>classpath</indexterm></indexterm>
+        <indexterm>classpath<indexterm>Java</indexterm><indexterm><cmdname>dita</cmdname> command</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>When using the API, programmers don’t need to know or care that DITA-OT uses Ant, they can just use Java. </p>
+    <note>When running DITA-OT via the <cmdname>dita</cmdname> command, an <codeph>ant</codeph> shell script handles the
+      classpath setup, but when using the API the classpath should be set up as part of the normal classpath
+      configuration for the Java application.</note>
+    <example>
+      <title>Example usage</title>
+      <codeblock outputclass="language-java normalize-space show-line-numbers show-whitespace">// Create a reusable processor factory with DITA-OT base directory
+ProcessorFactory pf = ProcessorFactory.newInstance(ditaDir);
+// and set the temporary directory
+pf.setBaseTempDir(tempDir);
+
+// Create a processor using the factory and configure the processor
+Processor p = pf.newProcessor("html5")
+.setInput(mapFile)
+.setOutputDir(outDir)
+.setProperty("nav-toc", "partial");
+
+// Run conversion
+p.run();</codeblock>
+    </example>
+    <section>
+      <indexterm>debugging<indexterm>logging</indexterm></indexterm>
+      <p>By default, running DITA-OT via the API will write a debug log to the temporary directory. A custom SLF4J
+        logger can also be used to access the log via the Simple Logging Facade for Java.</p>
+      <p>The processor cleans the temporary directory by default, but this can be disabled to simplify debugging in
+        cases where the processor failed.</p>
+      <note type="tip">See the <cite>DITA-OT Java API documentation</cite> in the <filepath>doc/api/</filepath> folder
+        of the DITA-OT distribution package for information on the packages, classes, interfaces and methods provided by
+        the Java API.</note>
+    </section>
+    <section>
+      <title>Downloading DITA-OT from Maven Central</title>
+      <indexterm>Maven Central</indexterm>
+      <p>As of version 2.5, the DITA Open Toolkit base library (<filepath>dost.jar</filepath>) is available via the
+        Maven 2 Central Repository. You can use this mechanism to download the main JAR file and include it in the build
+        for other Java projects.</p>
+      <p>To locate the latest version, <xref href="https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.dita-ot%22"
+          format="html" scope="external">search for the <codeph>org.dita-ot</codeph> group ID</xref>.</p>
+      <note type="important">The <filepath>dost.jar</filepath> file provides only the DITA Open Toolkit base library. It
+        does <b>not</b> contain the full DITA-OT distribution and cannot be used to run DITA-OT by itself. You will need
+        to ensure that your build installs the other files and directories required for the toolkit along with the
+        dependencies for your project.</note>
+    </section>
+  </conbody>
+</concept>

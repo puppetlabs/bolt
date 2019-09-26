@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="he-il">        <!-- Hebrew -->
+  <str name="Figure">תרשים</str>
+  <str name="Table">טבלה</str>
+  <str name="Next topic">הנושא הבא</str>
+  <str name="Previous topic">הנושא הקודם</str>
+  <str name="Parent topic">נושא אב</str>
+  <str name="Required cleanup">ניקוי דרוש</str>
+  <str name="Draft comment">הערות טיוטה</str>
+  <str name="Option">אופציה</str>
+  <str name="Description">תיאור</str>
+  <str name="Optional">אופציונלי</str>
+  <str name="Required">דרוש</str>
+  <str name="Skip visual syntax diagram">דילוג על תרשים תחביר חזותי</str>
+  <str name="Read syntax diagram">קריאת תרשים תחביר</str>
+  <str name="Start of change">מצב שינוי</str>
+  <str name="End of change">סוף השינוי</str>
+  <str name="Index">אינדקס</str>
+  <str name="Special characters">תווים מיוחדים</str>
+  <str name="Numerics">מספרים</str>
+  <str name="End notes">הערות סיום</str>
+  <str name="Artwork">עיבוד</str>
+  <str name="Syntax">תחביר</str>
+  <str name="Type">סוג</str>
+  <str name="Value">ערך</str>
+  <str name="Note">הערה</str>
+  <str name="Notes">הערות</str>
+  <str name="Tip">עצה</str>
+  <str name="Fastpath">נתיב מהיר</str>
+  <str name="Important">חשוב</str>
+  <str name="Attention">אל</str>
+  <str name="Caution">זהירות</str>
+  <str name="Danger">סכנה</str>
+  <str name="Remember">נא לזכור</str>
+  <str name="Restriction">מגבלה</str>
+  <str name="Trouble">בעיה</str>
+  <str name="Warning">אזהרה</str>
+  <str name="Contents">תוכן</str>
+  <str name="Related concepts">מושגים קשורים</str>
+  <str name="Related tasks">משימות קשורות</str>
+  <str name="Related reference">תיעוד קשור</str>
+  <str name="Related information">מידע קשור</str>
+  <str name="Prerequisite">דרישה מוקדמת</str>
+  <str name="Prerequisites">דרישות מוקדמות</str>
+  <str name="or">or</str>
+  <str name="task_context">אודות משימה זו</str>
+  <str name="task_example">דוגמה</str>
+  <str name="task_postreq">איך להמשיך</str>
+  <str name="task_prereq">לפני שתתחילו</str>
+  <str name="task_procedure">נוהל</str>
+  <str name="task_procedure_unordered">נוהל</str>
+  <str name="task_results">תוצאות</str>
+  <str name="Copyright">Copyright</str>
+  <str name="OpenQuote">„</str>
+  <str name="a11y.and-then"></str>
+</strings>

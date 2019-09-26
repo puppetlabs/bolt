@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="no-no">        <!-- Norwegian -->
+  <str name="Figure">Figur</str>
+  <str name="Table">Tabell</str>
+  <str name="Next topic">Neste emne</str>
+  <str name="Previous topic">Forrige emne</str>
+  <str name="Parent topic">Overordnet emne</str>
+  <str name="Required cleanup">Opprydning nødvendig</str>
+  <str name="Draft comment">Kommentar om utkast</str>
+  <str name="Option">Alternativ</str>
+  <str name="Description">Beskrivelse</str>
+  <str name="Optional">Valgfritt</str>
+  <str name="Required">Nødvendig</str>
+  <str name="Skip visual syntax diagram">Hopp over syntaksdiagram</str>
+  <str name="Read syntax diagram">Les syntaksdiagram</str>
+  <str name="Start of change">Start på endring</str>
+  <str name="End of change">Slutt på endring</str>
+  <str name="Index">Stikkordregister</str>
+  <str name="Special characters">Spesialtegn</str>
+  <str name="Numerics">Numerisk</str>
+  <str name="End notes">Sluttnoter</str>
+  <str name="Artwork">Grafikk</str>
+  <str name="Syntax">Syntaks</str>
+  <str name="Type">Type</str>
+  <str name="Value">Verdi</str>
+  <str name="Note">Merk</str>
+  <str name="Notes">Merknader</str>
+  <str name="Tip">Tips</str>
+  <str name="Fastpath">Snarvei</str>
+  <str name="Important">Viktig</str>
+  <str name="Attention">ADVARSEL</str>
+  <str name="Caution">ADVARSEL</str>
+  <str name="Danger">FARE!</str>
+  <str name="Remember">Husk</str>
+  <str name="Restriction">Begrensning</str>
+  <str name="Trouble">Problem</str>
+  <str name="Warning">ADVARSEL</str>
+  <str name="Contents">Innhold</str>
+  <str name="Related concepts">Beslektede begreper</str>
+  <str name="Related tasks">Beslektede oppgaver</str>
+  <str name="Related reference">Beslektet referanse</str>
+  <str name="Related information">Beslektet informasjon</str>
+  <str name="Prerequisite">Krav</str>
+  <str name="Prerequisites">Krav</str>
+  <str name="or">or</str>
+  <str name="task_context">Om denne oppgaven</str>
+  <str name="task_example">Eksempel</str>
+  <str name="task_postreq">Neste oppgave</str>
+  <str name="task_prereq">Før du begynner</str>
+  <str name="task_procedure">Prosedyre</str>
+  <str name="task_procedure_unordered">Prosedyre</str>
+  <str name="task_results">Resultater</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

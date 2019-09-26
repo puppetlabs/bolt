@@ -1,0 +1,128 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="reference"><meta name="description" content="For certain features, the DITA specification allows conforming processors to choose between different implementation alternatives. In these cases, there may be differences in behavior when DITA content is handled by different processors. DITA-OT supports implementation-specific features by applying one or more of the permissible processing approaches."><meta name="DC.relation" scheme="URI" content="../reference/DITA_spec-support.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="implementation-dependent-features"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Implementation-dependent features</title></head><body id="implementation-dependent-features"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a><ul><li><a href="../reference/architecture.html">DITA-OT architecture</a></li><li><a href="../reference/DITA_spec-support.html">DITA specification support</a><ul><li><a href="../reference/DITA_v1-2-support.html">DITA 1.2 support</a></li><li><a href="../reference/DITA_v1-3-support.html">DITA 1.3 support</a></li><li class="active"><a href="../reference/implementation-dependent-features.html">Implementation-dependent features</a></li><li><a href="../reference/extended-functionality.html">Codeblock extensions</a></li><li><a href="../reference/DITA-features-in-docs.html">DITA features in docs</a></li></ul></li><li><a href="../reference/license.html">License</a></li></ul></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+
+  <h1 class="title topictitle1" id="ariaid-title1">Implementation-dependent features</h1>
+
+  
+
+  
+
+  <div class="body refbody"><p class="shortdesc">For certain features, the DITA specification allows conforming processors to choose between different
+    implementation alternatives. In these cases, there may be differences in behavior when DITA content is handled by
+    different processors. DITA-OT supports implementation-specific features by applying one or more of the permissible
+    processing approaches.</p>
+    <section class="section" id="implementation-dependent-features__section_jla_oqn_qc"><h2 class="title sectiontitle">Chunking</h2>
+      
+      <div class="div div-index">
+        
+        
+      </div>
+      <p class="p">DITA content can be divided or merged into new output documents in different ways, depending on the value of
+        the <code class="keyword markupname xmlatt">@chunk</code> attribute.</p>
+      <p class="p">DITA-OT supports the following chunking methods:</p>
+      <ul class="ul">
+        <li class="li">select-topic</li>
+        <li class="li">select-document</li>
+        <li class="li">select-branch</li>
+        <li class="li">by-topic</li>
+        <li class="li">by-document</li>
+        <li class="li">to-content</li>
+        <li class="li">to-navigation.</li>
+      </ul>
+      <p class="p">When no chunk attribute values are given, no chunking is performed.</p>
+      <div class="note note note_note"><span class="note__title">Note:</span> For HTML-based transformation types, this is effectively equivalent to select-document and by-document
+        defaults.</div>
+      <p class="p">Error recovery:</p>
+      <ul class="ul">
+        <li class="li">When two tokens from the same category are used, no error or warning is thrown.</li>
+        <li class="li">When an unrecognized chunking method is used, no error or warning is thrown.</li>
+      </ul>
+    </section>
+    <section class="section" id="implementation-dependent-features__section_zaa_bgs_qc"><h2 class="title sectiontitle">Filtering</h2>
+      
+      <div class="div div-index">
+        
+        
+        
+      </div>
+      <p class="p">Error recovery:</p>
+      <ul class="ul">
+        <li class="li">When there are multiple <code class="keyword markupname xmlelement">&lt;revprop&gt;</code> elements with the same <code class="keyword markupname xmlatt">@val</code>
+          attribute, no error or warning is thrown</li>
+        <li class="li">When multiple prop elements define a duplicate attribute and value combination, attribute default, or
+          fall-back behavior, the <span class="keyword msgnum">DOTJ007W</span> warning is thrown.</li>
+      </ul>
+    </section>
+    <section class="section" id="implementation-dependent-features__section_kjq_egs_qc"><h2 class="title sectiontitle">Debugging attributes</h2>
+      
+      <div class="div div-index">
+        
+        
+        
+      </div>
+      <p class="p">The debug attributes are populated as follows:</p>
+      <dl class="dl">
+        
+          <dt class="dt dlterm">xtrf</dt>
+          <dd class="dd">The XML trace filename is used to store the absolute system path of the original source document.</dd>
+        
+        
+          <dt class="dt dlterm">xtrc</dt>
+          <dd class="dd">The XML trace counter stores an element counter with the following format:
+            <pre class="pre codeblock"><code>element-name ":" integer-counter ";" line-number ":" column-number</code></pre></dd>
+        
+      </dl>
+    </section>
+    <section class="section" id="implementation-dependent-features__section_dco_qgs_qc"><h2 class="title sectiontitle">Image scaling</h2>
+      
+      
+      <p class="p">If both height and width attributes are given, the image is scaled non-uniformly.</p>
+      <p class="p">If the scale attribute is not an unsigned integer, no error or warning is thrown during preprocessing.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Map processing</h2>
+      
+      <div class="div div-index">
+        
+        
+      </div>
+      <p class="p">When a <code class="keyword markupname xmlelement">&lt;topicref&gt;</code> element that references a map contains child
+          <code class="keyword markupname xmlelement">&lt;topicref&gt;</code> elements, the <span class="keyword msgnum">DOTX068W</span> error is thrown and the child
+          <code class="keyword markupname xmlelement">&lt;topicref&gt;</code> elements are ignored. </p>
+    </section>
+    <section class="section" id="implementation-dependent-features__section_h3h_jsx_1h"><h2 class="title sectiontitle">Link processing</h2>
+      
+      <div class="div div-index">
+        
+        
+      </div>
+      <p class="p">When the value of a hyperlink reference in the <code class="keyword markupname xmlatt">@href</code> attribute is not a valid URI reference,
+        the <span class="keyword msgnum">DOTJ054E</span> error is thrown. Depending on the
+        <a class="xref" href="../parameters/parameters-base.html#base__processing-mode">processing-mode</a> setting, error
+        recovery may be attempted.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Copy-to processing</h2>
+      
+      <div class="div div-index">
+        
+        
+      </div>
+      <p class="p">When the <code class="keyword markupname xmlatt">@copy-to</code> attribute is specified on a <code class="keyword markupname xmlelement">&lt;topicref&gt;</code>, the content of
+        the <code class="keyword markupname xmlelement">&lt;shortdesc&gt;</code> element is not used to override the short description of the topic.</p>
+    </section>
+    <section class="section"><h2 class="title sectiontitle">Coderef processing</h2>
+      
+      <div class="div div-index">
+        
+        
+      </div>
+      <p class="p">When <code class="keyword markupname xmlelement">&lt;coderef&gt;</code> elements are used within code blocks to reference external files with
+        literal code samples, the system default character set is used as the target file encoding unless a different
+        character set is explicitly defined via the mechanisms described under
+        <a class="xref" href="extended-functionality.html#code-reference__coderef-charset">Character set definition</a>.</p>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../reference/DITA_spec-support.html" title="DITA Open Toolkit 3.3 supports all versions of the OASIS DITA specification, including 1.0, 1.1, 1.2, and 1.3.">DITA specification support</a></div></div></nav></article></main></body></html>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2015 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<plugin id="org.dita.pdf2.xep" version="3.3.3">
+  <require plugin="org.dita.pdf2"/>
+  <!-- extensions -->
+  <feature extension="depend.org.dita.pdf2.init.pre" value="transform.fo2pdf.xep.init"/>
+  <feature extension="depend.org.dita.pdf2.format" value="transform.fo2pdf.xep"/>
+  <feature extension="dita.conductor.lib.import" file="lib/xep.jar"/>
+  <transtype name="pdf" desc="PDF">
+    <param name="pdf.formatter" desc="Specifies the XSL processor." type="enum">
+      <val desc="RenderX XEP Engine">xep</val>
+    </param>
+    <param name="custom.xep.config" desc="Specifies the user configuration file for RenderX." type="file"/>
+    <param name="maxJavaMemory" desc="Specifies the amount of memory allocated to the RenderX process."/>
+  </transtype>
+  <feature extension="ant.import" file="build_xep.xml"/>
+  <feature extension="dita.conductor.pdf2.formatter.check" value="xep"/>
+  <template file="xsl/fo/topic2fo_shell_xep_template.xsl"/>
+</plugin>

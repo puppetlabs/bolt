@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA User Interface Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA User Interface Domain                       
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA User Interface Domain//EN"
+      Delivered as file "uiDomain.mod"                            
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for the User Interface Domain         
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2001                                       
+                                                             
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2005.11.15 RDA: Corrected LONG NAME for screen            
+   2005.11.15 RDA: Corrected the "Delivered as" system ID    
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.02.12 RDA: Add text to wintitle, shortcut            
+   2008.02.13 RDA: Create .content and .attributes entities  
+=============================================================
+</headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>ui-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> User Interface Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> User Interface Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:uiDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:uiDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:uiDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic ui-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+
+    <define name="ui-d-keyword">
+      <ref name="wintitle.element"/>
+    </define>
+    <define name="ui-d-ph">
+      <choice>
+        <ref name="menucascade.element"/>
+        <ref name="uicontrol.element"/>
+      </choice>
+    </define>
+    <define name="ui-d-pre">
+      <ref name="screen.element"/>
+    </define>
+    <define name="keyword" combine="choice">
+      <ref name="ui-d-keyword"/>
+    </define>
+    <define name="ph" combine="choice">
+      <ref name="ui-d-ph"/>
+    </define>
+    <define name="pre" combine="choice">
+      <ref name="ui-d-pre"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="uicontrol">
+      <ref name="uicontrol.element"/>
+    </define>
+    <define name="wintitle">
+      <ref name="wintitle.element"/>
+    </define>
+    <define name="menucascade">
+      <ref name="menucascade.element"/>
+    </define>
+    <define name="shortcut">
+      <ref name="shortcut.element"/>
+    </define>
+    <define name="screen">
+      <ref name="screen.element"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation> LONG NAME: User Interface Control </a:documentation>
+      <define name="uicontrol.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="words.cnt"/>
+            <ref name="image"/>
+            <ref name="shortcut"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="uicontrol.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="uicontrol.element">
+        <element name="uicontrol" dita:longName="User Interface Control">
+          <a:documentation>The user interface control (&lt;uicontrol>) element is used to mark up names of buttons, entry fields, menu items, or other objects that allow the user to control the
+            interface. Use the &lt;uicontrol> element inside a &lt;menucascade> element to identify a sequence of menu choices in a nested menu, such as File New. This element is part of the DITA user
+            interface domain, a special set of DITA elements designed to document user interface tasks, concepts and reference information. Category: User interface elements</a:documentation>
+          <ref name="uicontrol.attlist"/>
+          <ref name="uicontrol.content"/>
+        </element>
+      </define>
+      <define name="uicontrol.attlist" combine="interleave">
+        <ref name="uicontrol.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Window Title </a:documentation>
+      <define name="wintitle.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="wintitle.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="wintitle.element">
+        <element name="wintitle" dita:longName="Window Title">
+          <a:documentation>The window title &lt;wintitle> element can be used to mark up names of windows or dialogs, or other user interface elements at the same level of grouping, including wizard
+            titles, wizard page titles, and window pane titles. This element is part of the DITA user interface domain, a special set of DITA elements designed to document user interface tasks,
+            concepts and reference information. Category: User interface elements</a:documentation>
+          <ref name="wintitle.attlist"/>
+          <ref name="wintitle.content"/>
+        </element>
+      </define>
+      <define name="wintitle.attlist" combine="interleave">
+        <ref name="wintitle.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Menu Cascade </a:documentation>
+      <define name="menucascade.content">
+        <oneOrMore>
+          <ref name="uicontrol"/>
+        </oneOrMore>
+      </define>
+      <define name="menucascade.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="menucascade.element">
+        <element name="menucascade" dita:longName="Menu Cascade">
+          <a:documentation>The &lt;menucascade> element is used to document a series of menu choices. The &lt;menucascade> element contains one or more user interface control (&lt;uicontrol>)
+            elements, for example: Start > Programs > Accessories > Notepad. If there is more than one &lt;uicontrol> element, the formatter shows connecting characters between the menu items to
+            represent the menu cascade. This element is part of the DITA user interface domain, a special set of DITA elements designed to document user interface tasks, concepts and reference
+            information. Category: User interface elements</a:documentation>
+          <ref name="menucascade.attlist"/>
+          <ref name="menucascade.content"/>
+        </element>
+      </define>
+      <define name="menucascade.attlist" combine="interleave">
+        <ref name="menucascade.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Short Cut </a:documentation>
+      <define name="shortcut.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="shortcut.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="shortcut.element">
+        <element name="shortcut" dita:longName="Short Cut">
+          <a:documentation>The &lt;shortcut> element identifies a keyboard shortcut for a menu or window action. This element is part of the DITA user interface domain, a special set of DITA elements
+            designed to document user interface tasks, concepts and reference information. Category: User interface elements</a:documentation>
+          <ref name="shortcut.attlist"/>
+          <ref name="shortcut.content"/>
+        </element>
+      </define>
+      <define name="shortcut.attlist" combine="interleave">
+        <ref name="shortcut.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Text Screen Capture </a:documentation>
+      <define name="screen.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="basic.ph.notm"/>
+            <ref name="data.elements.incl"/>
+            <ref name="foreign.unknown.incl"/>
+            <ref name="txt.incl"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="screen.attributes">
+        <ref name="display-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <optional>
+          <attribute name="xml:space" a:defaultValue="preserve">
+            <value>preserve</value>
+          </attribute>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="screen.element">
+        <element name="screen" dita:longName="Text Screen Capture">
+          <a:documentation>The &lt;screen> element contains or refers to a textual representation of a computer screen or user interface panel (window). Category: User interface
+            elements</a:documentation>
+          <ref name="screen.attlist"/>
+          <ref name="screen.content"/>
+        </element>
+      </define>
+      <define name="screen.attlist" combine="interleave">
+        <ref name="screen.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="menucascade.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph ui-d/menucascade "/>
+      </optional>
+    </define>
+    <define name="screen.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/pre ui-d/screen "/>
+      </optional>
+    </define>
+    <define name="shortcut.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword ui-d/shortcut "/>
+      </optional>
+    </define>
+    <define name="uicontrol.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph ui-d/uicontrol "/>
+      </optional>
+    </define>
+    <define name="wintitle.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword ui-d/wintitle "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="ID" rev="1.6">
+
+  <title>Migrating to release 1.6</title>
+  <titlealts>
+    <navtitle>To 1.6</navtitle>
+  </titlealts>
+
+  <shortdesc>In DITA-OT 1.6, various <filepath>demo</filepath> plug-ins were removed along with many deprecated
+    properties, targets, templates and modes. The PDF2 transformation no longer supports the beta version of DITA from
+    IBM, the "bkinfo" demo plug-in, or <filepath>layout-masters.xml</filepath> configuration.</shortdesc>
+  
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>deprecated features<indexterm><filepath>demo</filepath> folder</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>workdir</codeph> processing instruction</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>workdir</codeph> processing instruction</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>topic pull templates, list of</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>"bkinfo" demo plug-in</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><filepath>layout-masters.xml</filepath></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>PDF2 templates, list of</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>XHTML templates, list of</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>ODT templates, list of</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section>
+      <p>Support for the old DITAVAL format (used before OASIS added DITAVAL to the standard in 2007) has been
+        removed.</p>
+      <p>The <filepath>demo</filepath> folder has been deprecated and the following plug-ins have been moved to the
+          <filepath>plugins</filepath> folder:</p>
+      <table outputclass="table-hover" frame="none" colsep="0" rowsep="1">
+        <tgroup cols="2">
+          <colspec colwidth="1*"/>
+          <colspec colwidth="1*"/>
+          <thead>
+            <row>
+              <entry>old path</entry>
+              <entry>new path</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry><filepath>demo/dita11</filepath></entry>
+              <entry><filepath>plugins/org.dita.specialization.dita11</filepath></entry>
+            </row>
+            <row>
+              <entry><filepath>demo/dita132</filepath></entry>
+              <entry><filepath>plugins/org.dita.specialization.dita132</filepath></entry>
+            </row>
+            <row>
+              <entry><filepath>demo/eclipsemap</filepath></entry>
+              <entry><filepath>plugins/org.dita.specialization.eclipsemap</filepath></entry>
+            </row>
+            <row>
+              <entry><filepath>demo/fo</filepath></entry>
+              <entry><filepath>plugins/org.dita.pdf2</filepath></entry>
+            </row>
+            <row>
+              <entry><filepath>demo/tocjs</filepath></entry>
+              <entry><filepath>plugins/com.sophos.tocjs</filepath></entry>
+            </row>
+            <!-- These plugins are pulled from ext-plugins during build -->
+            <row>
+              <entry><filepath>demo/h2d</filepath></entry>
+              <entry><filepath>plugins/h2d</filepath></entry>
+            </row>
+            <row>
+              <entry><filepath>demo/legacypdf</filepath></entry>
+              <entry><filepath>plugins/legacypdf</filepath></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <p>The remaining plug-ins in the demo folder have been moved to a separate repository at <xref
+          href="https://github.com/dita-ot/ext-plugins" scope="external" format="html"
+          >github.com/dita-ot/ext-plugins</xref>.</p>
+    </section>
+    <section>
+      <p>The deprecated property <codeph>dita.input.valfile</codeph> should be replaced with the new argument property
+          <codeph>args.filter</codeph>.</p>
+      <p>The <codeph>dita-preprocess</codeph> target has been removed and dependencies should be replaced with a target
+        sequence <codeph>build-init, preprocess</codeph>.</p>
+      <p>Support for the <codeph>args.message.file</codeph> argument has been removed as message configuration has
+        become static configuration.</p>
+      <p>The <codeph>workdir</codeph> processing instruction has been deprecated in favor of
+          <codeph>workdir-uri</codeph>. The only difference between the two processing instructions is that
+          <codeph>workdir-uri</codeph> contains a URI instead of a system path.</p>
+    </section>
+    <section>
+      <title>Preprocessing</title>
+      <p>The following deprecated templates and modes have been removed in topic pull stylesheets:</p>
+      <ul>
+        <li>inherit</li>
+        <li>get-stuff</li>
+        <li>verify-type-attribute</li>
+        <li>classval</li>
+        <li>getshortdesc</li>
+        <li>getlinktext</li>
+        <li>blocktext</li>
+        <li>figtext</li>
+        <li>tabletext</li>
+        <li>litext</li>
+        <li>fntext</li>
+        <li>dlentrytext</li>
+        <li>firstclass</li>
+        <li>invalid-list-item</li>
+        <li>xref</li>
+      </ul>
+    </section>
+    <section>
+      <title>PDF2</title>
+      <p>The following deprecated items are no longer supported in the PDF transform:</p>
+      <ul>
+        <li>Support for the beta version of DITA, available from IBM before the OASIS standard was created in 2005.</li>
+        <li>Support for the "bkinfo" demo plug-in, used to support book metadata before OASIS created the BookMap format
+          in 2007.</li>
+        <li>Support for <filepath>layout-masters.xml</filepath> configuration. Plug-ins should use the
+            <codeph>createDefaultLayoutMasters</codeph> template instead.</li>
+      </ul>
+      <p>The following extension-points have been added:</p>
+      <ul>
+        <li><codeph>dita.conductor.pdf2.param</codeph> to add XSLT parameters to XSL FO transformation.</li>
+      </ul>
+      <p>Custom PDF2 shell stylesheets need to be revised to not include separate IBM and OASIS DITA stylesheets. The
+            <filepath><varname>*</varname>_1.0.xsl</filepath> stylesheets have been removed and their imports must be
+        removed from shell stylesheets.</p>
+      <p>The following template modes have been deprecated:</p>
+      <ul>
+        <li>toc-prefix-text</li>
+        <li>toc-topic-text</li>
+      </ul>
+      <p>The following named templates have been removed:</p>
+      <ul>
+        <li>processTopic</li>
+        <li>createMiniToc</li>
+        <li>processTopicTitle</li>
+        <li>createTopicAttrsName</li>
+        <li>processConcept</li>
+        <li>processReference</li>
+        <li>getTitle</li>
+        <li>placeNoteContent</li>
+        <li>placeImage</li>
+        <li>processUnknowType</li>
+        <li>insertReferenceTitle</li>
+        <li>buildRelationships</li>
+        <li>processTask</li>
+      </ul>
+      <p>The main FO generation process now relies on the merging process to rewrite duplicate IDs. The default merging
+        process did this already in previous releases, but now also custom merging processes must fulfill the duplicate
+        ID rewrite requirement.</p>
+    </section>
+    <section>
+      <title>XHTML</title>
+      <p>The following named templates have been deprecated:</p>
+      <ul>
+        <li>make-index-ref</li>
+      </ul>
+      <p>The following deprecated templates have been removed:</p>
+      <ul>
+        <li>revblock-deprecated</li>
+        <li>revstyle-deprecated</li>
+        <li>start-revision-flag-deprecated</li>
+        <li>end-revision-flag-deprecated</li>
+        <li>concept-links</li>
+        <li>task-links</li>
+        <li>reference-links</li>
+        <li>relinfo-links</li>
+        <li>sort-links-by-role</li>
+        <li>create-links</li>
+        <li>add-linking-attributes</li>
+        <li>add-link-target-attribute</li>
+        <li>add-user-link-attributes</li>
+      </ul>
+      <p>The removed templates have been replaced by other templates in earlier releases and plug-ins should be changed
+        to use the new templates.</p>
+    </section>
+    <section>
+      <title>ODT</title>
+      <p>The following deprecated templates have been removed:</p>
+      <ul>
+        <li>revblock-deprecated</li>
+        <li>revstyle-deprecated</li>
+        <li>start-revision-flag-deprecated</li>
+        <li>end-revision-flag-deprecated</li>
+      </ul>
+      <p>The removed templates have been replaced by other templates in earlier releases and plug-ins should be changed
+        to use the new templates.</p>
+    </section>
+  </refbody>
+</reference>

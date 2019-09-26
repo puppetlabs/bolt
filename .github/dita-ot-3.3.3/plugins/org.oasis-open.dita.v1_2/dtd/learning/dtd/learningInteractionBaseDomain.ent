@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Interaction Base Domain                      -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ENTITIES DITA Learning Domain//EN"
+      Delivered as file "learningDomain.ent"                      -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the substitution context and domain     -->
+<!--             entity declarations for the learning domain       -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             November 2009                                     -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2009.                    -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    LEARNING DOMAIN ENTITIES                   -->
+<!-- ============================================================= -->
+
+<!ENTITY learningInteractionBase-d-att "(topic learningInteractionBase-d)">
+
+
+<!-- NOTE: The interactionBase element type is intended to be used
+           for specialization and should never be used directly
+           in DITA documents. This parameter entity should always
+           be redefined in shell DTDs to list only specializations
+           of lcInteractionBase
+  -->
+
+<!ENTITY % learningInteractionBase-d-fig 
+                       "lcInteractionBase"
+>
+
+<!-- ==== End Learning Interaction Base Domain Entities ========== -->
+
+
+
+
+

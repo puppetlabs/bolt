@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Base MAP DTD (only base domains)             -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      April 2010                                        -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                        TYPICAL INVOCATION                     -->
+<!--                                                               -->
+<!-- Refer to this file by the following public identifier or an
+     appropriate system identifier:
+PUBLIC "-//OASIS//DTD DITA Base Map//EN"
+     Delivered as file "basemap.dtd"                               -->
+
+<!-- The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+PUBLIC "-//OASIS//DTD DITA 1.2 Base Map//EN"                       -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    DTD to describe DITA maps                         -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             April 2010                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2010                     -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    2010.09.20 RDA: Add topic-based domains                    -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!--                    MAP ENTITY DECLARATIONS                    -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATIONS                 -->
+<!-- ============================================================= -->
+
+
+<!ENTITY % mapgroup-d-dec 
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Map Group Domain//EN" 
+         "mapGroup.ent"                                                       
+>%mapgroup-d-dec;
+
+<!ENTITY % indexing-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Indexing Domain//EN" 
+         "indexingDomain.ent"                                                 
+>%indexing-d-dec;
+
+<!ENTITY % delay-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Delayed Resolution Domain//EN" 
+         "delayResolutionDomain.ent"                                                       
+>%delay-d-dec;
+
+<!ENTITY % hi-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Highlight Domain//EN" 
+         "highlightDomain.ent"
+>%hi-d-dec;
+
+<!ENTITY % ut-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Utilities Domain//EN" 
+         "utilitiesDomain.ent"                                                
+>%ut-d-dec;
+
+<!ENTITY % hazard-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Hazard Statement Domain//EN" 
+         "hazardstatementDomain.ent"
+>%hazard-d-dec;
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE DECLARATIONS              -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!--                    DOMAIN EXTENSIONS                          -->
+<!-- ============================================================= -->
+<!--                    One for each extended base element, with
+                        the name of the domain(s) in which the
+                        extension was declared                     -->
+<!ENTITY % keywords     "keywords | 
+                         %delay-d-keywords;
+                        ">
+<!ENTITY % topicref     "topicref | 
+                         %mapgroup-d-topicref;
+                        ">
+<!ENTITY % index-base   "index-base | 
+                         %indexing-d-index-base;
+                        ">
+<!ENTITY % ph           "ph | 
+                         %hi-d-ph;
+                        ">
+<!ENTITY % fig          "fig |
+                         %ut-d-fig;
+                        ">
+<!ENTITY % note         "note | 
+                         %hazard-d-note;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE EXTENSIONS                -->
+<!-- ============================================================= -->
+<!ENTITY % props-attribute-extensions  
+  ""
+>
+<!ENTITY % base-attribute-extensions   
+  ""
+>
+
+<!-- ============================================================= -->
+<!--                    DOMAINS ATTRIBUTE OVERRIDE                 -->
+<!-- ============================================================= -->
+<!--                    Must be declared ahead of the DTDs, which
+                        puts @domains first in order               -->
+
+<!ENTITY included-domains 
+                        "&delay-d-att;
+                         &mapgroup-d-att; 
+                         &indexing-d-att;
+                         &hi-d-att; 
+                         &ut-d-att; 
+                         &hazard-d-att;">
+
+<!-- ============================================================= -->
+<!--                    MAP ELEMENT INTEGRATION                    -->
+<!-- ============================================================= -->
+
+
+<!--                    Embed map to get generic elements          -->
+<!--    2005.11.15 RDA: Corrected public ID for map.mod. It was    -->
+<!--             "-//OASIS//Elements DITA Map Group Domain//EN"    -->
+<!ENTITY % map-type     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Map//EN" 
+         "map.mod"                                                            
+>%map-type;
+
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ELEMENT INTEGRATION                 -->
+<!-- ============================================================= -->
+
+
+<!ENTITY % mapgroup-d-def  
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Map Group Domain//EN" 
+         "mapGroup.mod"                                                       
+>%mapgroup-d-def;
+
+<!ENTITY % indexing-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Indexing Domain//EN" 
+         "indexingDomain.mod"                                                 
+>%indexing-d-def;
+
+<!ENTITY % delay-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Delayed Resolution Domain//EN" 
+         "delayResolutionDomain.mod"
+>%delay-d-def;
+
+<!ENTITY % hi-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Highlight Domain//EN" 
+         "highlightDomain.mod"
+>%hi-d-def;
+
+<!ENTITY % ut-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Utilities Domain//EN" 
+         "utilitiesDomain.mod"
+>%ut-d-def;
+
+<!ENTITY % hazard-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Hazard Statement Domain//EN" 
+         "hazardstatementDomain.mod"
+>%hazard-d-def;
+
+<!-- ================== End DITA Map DTD  ======================== -->

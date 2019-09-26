@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="custom-html-plugins">
+  <title>Custom HTML plug-ins</title>
+  <shortdesc>For more complex customizations, you can create custom DITA-OT plug-ins that bundle custom fonts,
+    JavaScript, and stylesheets; modify the HTML markup, or override other aspects of HTML processing.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>HTML<indexterm>custom plug-in</indexterm></indexterm>
+        <indexterm>HTML<indexterm>fonts</indexterm></indexterm>
+        <indexterm>HTML<indexterm>JavaScript</indexterm></indexterm>
+        <indexterm>HTML<indexterm>CSS</indexterm></indexterm>
+        <indexterm>HTML<indexterm>markup, adding</indexterm></indexterm>
+        <indexterm>CSS<indexterm>HTML</indexterm></indexterm>
+        <indexterm>fonts<indexterm>HTML</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <note>These examples are not intended to be used as-is, but illustrate basic techniques you can use in your own
+      plug-ins. In practise, custom plug-ins often combine several of these approaches.</note>
+  </conbody>
+</concept>

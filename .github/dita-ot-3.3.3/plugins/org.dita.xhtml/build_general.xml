@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+--><project xmlns:dita="http://dita-ot.sourceforge.net" xmlns:if="ant:if" xmlns:unless="ant:unless" name="build_generaltargets">
+
+  <target name="xhtml.init">
+    <dita-ot-fail id="DOTA007E">
+      <condition>
+        <and>
+          <isset property="args.ftr"/>
+          <not>
+            <available file="${args.ftr}" type="file"/>
+          </not>
+        </and>
+      </condition>
+      <param name="1" value="${args.ftr}"/>
+    </dita-ot-fail>
+    <dita-ot-fail id="DOTA008E">
+      <condition>
+        <and>
+          <isset property="args.hdr"/>
+          <not>
+            <available file="${args.hdr}" type="file"/>
+          </not>
+        </and>
+      </condition>
+      <param name="1" value="${args.hdr}"/>
+    </dita-ot-fail>
+    <dita-ot-fail id="DOTA009E">
+      <condition>
+        <and>
+          <isset property="args.hdf"/>
+          <not>
+            <available file="${args.hdf}" type="file"/>
+          </not>
+        </and>
+      </condition>
+      <param name="1" value="${args.hdf}"/>
+    </dita-ot-fail>
+    <!-- begin to check and init css relevant properties -->
+    <condition property="user.csspath.url">
+      <or>
+        <contains string="${args.csspath}" substring="http://"/>
+        <contains string="${args.csspath}" substring="https://"/>
+      </or>
+    </condition>
+    <condition property="args.csspath.absolute">
+      <isabsolute path="${args.csspath}"/>
+    </condition>
+    <!-- Set the csspath as default empty directory when there is no user
+      input csspath or user input csspath is a local absolute path. -->
+    <condition property="user.csspath" value="">
+      <or>
+        <not>
+          <isset property="args.csspath"/>
+        </not>
+        <isset property="args.csspath.absolute"/>
+      </or>
+    </condition>
+    <condition property="user.csspath" value="${args.csspath}/">
+      <not>
+        <isset property="user.csspath"/>
+      </not>
+    </condition>
+    <condition property="args.css.real" value="${args.cssroot}${file.separator}${args.css}">
+      <isset property="args.cssroot"/>
+    </condition>
+    <condition property="args.css.real" value="${args.css}">
+      <not>
+        <isset property="args.cssroot"/>
+      </not>
+    </condition>
+    <available file="${args.css.real}" property="args.css.present" type="file"/>
+    <basename property="args.css.file.temp" file="${args.css}"/>
+    <condition property="args.css.file" value="${args.css.file.temp}">
+      <or>
+        <isset property="args.css.present"/>
+        <isset property="user.csspath.url"/>
+      </or>
+    </condition>
+    <!-- end to check and init css relevant parameters -->
+    <condition property="out.ext" value=".html">
+      <not>
+        <isset property="out.ext"/>
+      </not>
+    </condition>
+    <condition property="html-version" value="xhtml">
+      <not>
+        <isset property="html-version"/>
+      </not>
+    </condition>
+    <condition property="args.xsl" value="${dita.plugin.org.dita.xhtml.dir}/xsl/dita2${html-version}.xsl">
+      <not>
+        <isset property="args.xsl"/>
+      </not>
+    </condition>
+    <makeurl file="${dita.input.valfile}" property="dita.input.valfile.url" validate="no"/>
+    <!-- Set to "true" if you get out-of-memory errors during preprocess
+    while processing very large (thousands of files) document sets. -->
+    <condition property="dita.xhtml.reloadstylesheet" value="false">
+      <not><isset property="dita.xhtml.reloadstylesheet"/></not>
+    </condition>
+    <antcall target="output-css-warn-message"/>
+  </target>
+  
+  <target name="output-css-warn-message" if="args.csspath.absolute">
+    <dita-ot-echo id="DOTA006W"/>
+  </target>  
+
+  <target name="xhtml.topics" depends="xhtml.init,                    xhtml.image-metadata,                    dita.topics.html.common,                    dita.inner.topics.html.common"/>  
+
+  <target name="xhtml.image-metadata" unless="xhtml.image-metadata.skip" description="Read image metadata">
+    <pipeline message="Read image metadata." taskname="image-metadata">
+      <module class="org.dita.dost.module.ImageMetadataModule">
+        <param name="outputdir" location="${dita.output.dir}"/>
+      </module>
+    </pipeline>
+  </target>
+
+  <!--requirement 3, old solution-->
+  
+  <macrodef name="topics.html">
+    <element name="params" optional="true" implicit="true"/>
+    <sequential>
+      <pipeline>
+      <xslt basedir="${dita.temp.dir}" destdir="${dita.output.dir}" reloadstylesheet="${dita.xhtml.reloadstylesheet}" extension="${out.ext}" style="${args.xsl}" filenameparameter="FILENAME" filedirparameter="FILEDIR">
+        <ditafileset format="dita" processingRole="normal"/>
+        <param name="TRANSTYPE" expression="${transtype}"/>
+        <param name="FILTERFILE" expression="${dita.input.valfile.url}" if:set="dita.input.valfile"/>
+        <param name="CSS" expression="${args.css.file}" if:set="args.css.file"/>
+        <param name="CSSPATH" expression="${user.csspath}" if:set="user.csspath"/>
+        <param name="HDF" expression="${args.hdf}" if:set="args.hdf"/>
+        <param name="HDR" expression="${args.hdr}" if:set="args.hdr"/>
+        <param name="FTR" expression="${args.ftr}" if:set="args.ftr"/>
+        <param name="DRAFT" expression="${args.draft}" if:set="args.draft"/>
+        <param name="ARTLBL" expression="${args.artlbl}" if:set="args.artlbl"/>
+        <param name="GENERATE-TASK-LABELS" expression="${args.gen.task.lbl}" if:set="args.gen.task.lbl"/>
+        <param name="PRESERVE-DITA-CLASS" expression="${args.xhtml.classattr}" if:set="args.xhtml.classattr"/>
+        <param name="NOPARENTLINK" expression="${args.hide.parent.link}" if:set="args.hide.parent.link"/>
+        <param name="include.rellinks" expression="${include.rellinks}"/>
+        <param name="INDEXSHOW" expression="${args.indexshow}" if:set="args.indexshow"/>
+        <param name="genDefMeta" expression="${args.gen.default.meta}" if:set="args.gen.default.meta"/>
+        <param name="OUTEXT" expression="${out.ext}" if:set="out.ext"/>
+        <param name="BASEDIR" expression="${dita.dir}"/>
+        <param name="OUTPUTDIR" expression="${dita.output.dir}"/>
+        <param name="DBG" expression="${args.debug}" if:set="args.debug"/>
+        <param name="defaultLanguage" expression="${default.language}"/>
+        <params/>
+        <xmlcatalog refid="dita.catalog"/>
+      </xslt>
+      </pipeline>
+    </sequential>
+  </macrodef>
+  
+  <target name="dita.topics.html.common" unless="noTopic" if="old.transform">
+    <topics.html>
+      
+      
+      <mapper classname="org.dita.dost.ant.types.JobMapper" to="${out.ext}"/>
+    </topics.html>
+  </target>
+  
+  <!--To generate&copy inner files-->
+  <!--requirement 1,2-->
+  
+  <target name="dita.inner.topics.html.common" unless="noTopic" if="inner.transform">
+    <topics.html>
+      
+      
+      <mapper classname="org.dita.dost.ant.types.JobMapper" to="${out.ext}"/>
+    </topics.html>
+  </target>
+  
+</project>

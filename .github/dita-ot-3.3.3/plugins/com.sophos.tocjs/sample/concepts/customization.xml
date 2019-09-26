@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+ 
+ Copyright 2007 Shawn McKenzie
+ *-->
+<?xml-stylesheet href="../../../../xsl/ditaview_shell.xsl" type="text/xsl"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN"
+ "../../../../dtd/concept.dtd">
+<concept id="tocjs_customization" xml:lang="en-us">
+ <title>Customizing tocjs for your project</title>
+ <conbody>
+  <p>Once integrated, the tocjs plugin is not a complete </p>
+  
+ </conbody>
+</concept>

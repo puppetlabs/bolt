@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:include schemaLocation="svg-basic-graphics-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg11.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:attributeGroup name="SVG.image-rendering.attrib">
+    <xs:attribute name="image-rendering">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="auto"/>
+          <xs:enumeration value="optimizeSpeed"/>
+          <xs:enumeration value="optimizeQuality"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.pointer-events.attrib">
+    <xs:attribute name="pointer-events">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="visiblePainted"/>
+          <xs:enumeration value="visibleFill"/>
+          <xs:enumeration value="visibleStroke"/>
+          <xs:enumeration value="visible"/>
+          <xs:enumeration value="painted"/>
+          <xs:enumeration value="fill"/>
+          <xs:enumeration value="stroke"/>
+          <xs:enumeration value="all"/>
+          <xs:enumeration value="none"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.shape-rendering.attrib">
+    <xs:attribute name="shape-rendering">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="auto"/>
+          <xs:enumeration value="optimizeSpeed"/>
+          <xs:enumeration value="crispEdges"/>
+          <xs:enumeration value="geometricPrecision"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.text-rendering.attrib">
+    <xs:attribute name="text-rendering">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="auto"/>
+          <xs:enumeration value="optimizeSpeed"/>
+          <xs:enumeration value="optimizeLegibility"/>
+          <xs:enumeration value="geometricPrecision"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>

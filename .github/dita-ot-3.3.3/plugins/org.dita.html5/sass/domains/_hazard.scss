@@ -1,0 +1,60 @@
+// This file is part of the DITA Open Toolkit project.
+//
+// Copyright 2016 Eero Helenius
+//
+// See the accompanying LICENSE file for applicable license.
+
+// block
+.consequence {
+}
+
+.hazardstatement {
+  td,
+  th {
+    padding: 0.5rem;
+  }
+
+  th {
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  &--caution {
+    background-color: $hazard-ansi-yellow;
+  }
+
+  &--danger {
+    background-color: $hazard-ansi-red;
+    color: $hazard-heading-light;
+  }
+
+  &--warning {
+    background-color: $hazard-ansi-orange;
+  }
+
+  &--attention,
+  &--fastpath,
+  &--important,
+  &--note,
+  &--notice,
+  &--other,
+  &--remember,
+  &--restriction,
+  &--tip {
+    background-color: $hazard-ansi-blue;
+    color: $hazard-heading-light;
+    font-style: italic;
+  }
+}
+
+.hazardsymbol {
+}
+
+.howtoavoid {
+}
+
+.messagepanel {
+}
+
+.typeofhazard {
+}

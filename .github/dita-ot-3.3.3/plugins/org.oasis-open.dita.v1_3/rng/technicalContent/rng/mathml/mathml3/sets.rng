@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <!--
+        This is the Mathematical Markup Language (MathML) 3.0, an XML
+        application for describing mathematical notation and capturing
+        both its structure and content.
+    
+        Copyright 1998-2007 World Wide Web Consortium
+           (Massachusetts Institute of Technology, Institut National de
+            Recherche en Informatique et en Automatique, Keio University).
+            All Rights Reserved.
+    
+        Permission to use, copy, modify and distribute the RelaxNG schema for MathML3
+        and its accompanying documentation for any purpose and without fee is
+        hereby granted in perpetuity, provided that the above copyright notice
+        and this paragraph appear in all copies.  The copyright holders make
+        no representation about the suitability of the Schema for any purpose.
+    
+        This file contains the arity checking rules for the symbols
+        from the content dictionary 
+        It is provided "as is" without expressed or implied warranty.
+    
+        Revision:   $Id: sets.rng,v 1.1 2007/12/11 15:59:28 dcarlis Exp $
+  -->
+  <define name="cd.token.unary.class" combine="choice">
+    <ref name="card.token"/>
+  </define>
+  <define name="cd.token.binary.class" combine="choice">
+    <choice>
+      <ref name="in.token"/>
+      <ref name="notin.token"/>
+      <ref name="notsubset.token"/>
+      <ref name="notprsubset.token"/>
+      <ref name="setdiff.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.nary.class" combine="choice">
+    <choice>
+      <ref name="set.token"/>
+      <ref name="list.token"/>
+      <ref name="intersect.token"/>
+      <ref name="subset.token"/>
+      <ref name="prsubset.token"/>
+      <ref name="cartesianproduct.token"/>
+    </choice>
+  </define>
+  <!-- the element definitions for the token elements -->
+  <define name="set.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="order">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="set.token">
+    <element name="set">
+      <ref name="set.content"/>
+    </element>
+  </define>
+  <define name="list.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="order">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+    <zeroOrMore>
+      <ref name="ContExp"/>
+    </zeroOrMore>
+  </define>
+  <define name="list.token">
+    <element name="list">
+      <ref name="list.content"/>
+    </element>
+  </define>
+  <define name="union.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="union.token">
+    <element name="union">
+      <ref name="union.content"/>
+    </element>
+  </define>
+  <define name="intersect.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="intersect.token">
+    <element name="intersect">
+      <ref name="intersect.content"/>
+    </element>
+  </define>
+  <define name="in.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="in.token">
+    <element name="in">
+      <ref name="in.content"/>
+    </element>
+  </define>
+  <define name="notin.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="notin.token">
+    <element name="notin">
+      <ref name="notin.content"/>
+    </element>
+  </define>
+  <define name="subset.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="subset.token">
+    <element name="subset">
+      <ref name="subset.content"/>
+    </element>
+  </define>
+  <define name="prsubset.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="prsubset.token">
+    <element name="prsubset">
+      <ref name="prsubset.content"/>
+    </element>
+  </define>
+  <define name="notsubset.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="notsubset.token">
+    <element name="notsubset">
+      <ref name="notsubset.content"/>
+    </element>
+  </define>
+  <define name="notprsubset.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="notprsubset.token">
+    <element name="notprsubset">
+      <ref name="notprsubset.content"/>
+    </element>
+  </define>
+  <define name="setdiff.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="setdiff.token">
+    <element name="setdiff">
+      <ref name="setdiff.content"/>
+    </element>
+  </define>
+  <define name="card.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="card.token">
+    <element name="card">
+      <ref name="card.content"/>
+    </element>
+  </define>
+  <define name="cartesianproduct.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="cartesianproduct.token">
+    <element name="cartesianproduct">
+      <ref name="cartesianproduct.content"/>
+    </element>
+  </define>
+</grammar>

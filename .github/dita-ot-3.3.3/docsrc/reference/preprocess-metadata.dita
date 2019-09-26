@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "referenceconcept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="preprocess-metadata" xml:lang="en-US">
+  <title>Move metadata (move-meta-entries) and pull content into maps (mappull) </title>
+  <shortdesc>The <codeph>move-meta-entries</codeph> step pushes metadata back and forth between maps and topics. For
+    example, index entries and copyrights in the map are pushed into affected topics, so that the topics can be
+    processed later in isolation while retaining all relevant metadata. This step is implemented in Java.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>topicref</xmlelement></indexterm>
+        <indexterm><xmlelement>linktext</xmlelement></indexterm>
+        <indexterm><xmlelement>shortdesc</xmlelement></indexterm>
+        <indexterm><xmlatt>locktitle</xmlatt></indexterm>
+        <indexterm><xmlatt>type</xmlatt></indexterm>
+        <indexterm><xmlatt>toc</xmlatt></indexterm>
+        <indexterm><xmlatt>print</xmlatt></indexterm>
+        <indexterm>preprocessing<indexterm><codeph>move-meta-entries</codeph></indexterm></indexterm>
+        <indexterm><codeph>move-meta-entries</codeph></indexterm>
+        <indexterm>Java<indexterm>move-meta-entries</indexterm></indexterm>
+        <indexterm>metadata<indexterm>moving</indexterm></indexterm>
+        <indexterm>XSLT<indexterm><codeph>move-meta-entries</codeph></indexterm></indexterm>
+        <indexterm>index<indexterm>entries in map file</indexterm></indexterm>
+        <indexterm>TOC<index-see>table of contents</index-see></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <conbody>
+    <note>As of DITA-OT 2.2, the <codeph>move-meta-entries</codeph> and <codeph>mappull</codeph> steps have been merged.
+      The <codeph>mappull</codeph> step has been moved into <codeph>move-meta-entries</codeph>.</note>
+    <section>
+      <p>The <codeph>mappull</codeph> step pulls content from referenced topics into maps, and then cascades data within
+        maps. This step is implemented in XSLT.</p>
+      <p>The <codeph>mappull</codeph> step makes the following changes to the DITA map:
+        <ul>
+          <li>Titles are pulled from referenced DITA topics. Unless the <xmlatt>locktitle</xmlatt> attribute is set to
+            "yes", the pulled titles replace the navigation titles specified on the <xmlelement>topicref</xmlelement>
+            elements.</li>
+          <li>The <xmlelement>linktext</xmlelement> element is set based on the title of the referenced topic, unless it
+            is already specified locally.</li>
+          <li>The <xmlelement>shortdesc</xmlelement> element is set based on the short description of the referenced
+            topic, unless it is already specified locally.</li>
+          <li>The <xmlatt>type</xmlatt> attribute is set on <xmlelement>topicref</xmlelement> elements that reference
+            local DITA topics. The value of the <xmlatt>type</xmlatt> attribute is set to value of the root element of
+            the topic; for example, a <xmlelement>topicref</xmlelement> element that references a task topic is given a
+              <xmlatt>type</xmlatt> attribute set to "task"".</li>
+          <li>Attributes that cascade, such as <xmlatt>toc</xmlatt> and <xmlatt>print</xmlatt>, are made explicit on any
+            child <xmlelement>topicref</xmlelement> elements. This allows future steps to work with the attributes
+            directly, without reevaluating the cascading behavior.</li>
+        </ul>
+      </p>
+    </section>
+  </conbody>
+</concept>

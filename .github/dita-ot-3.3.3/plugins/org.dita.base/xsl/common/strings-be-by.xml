@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="be-by"> <!-- Belarusian --> 
+  <str name="Figure">Малюнак</str> 
+  <str name="Table">Табліца</str> 
+  <str name="Next topic">Наступная тэма</str> 
+  <str name="Previous topic">Папярэдняя тэма</str> 
+  <str name="Parent topic">Тэма вышэйшага ўзроўню</str> 
+  <str name="Required cleanup">Патрэбна выпраўленне</str> 
+  <str name="Draft comment">Чарнавая заўвага</str> 
+  <str name="Option">Настройка</str> 
+  <str name="Description">Апісанне</str> 
+  <str name="Optional">Неабавазкова</str> 
+  <str name="Required">Абавязкова</str> 
+  <str name="Skip visual syntax diagram">Прапусціць сінт. дыяграму</str> 
+  <str name="Read syntax diagram">Чытаць сінт. дыяграму</str> 
+  <str name="Start of change">Пачатак змянення</str> 
+  <str name="End of change">Канец змянення</str> 
+  <str name="Index">Індэкс</str> 
+  <str name="Special characters">Спецыяльныя сімвалы</str> 
+  <str name="Numerics">Лічбы</str> 
+  <str name="End notes">Зноскі</str> 
+  <str name="Artwork">Ілюстрацыя</str> 
+  <str name="Syntax">Сінтакс.</str> 
+  <str name="Type">Тып</str> 
+  <str name="Value">Значэнне</str> 
+  <str name="Note">Заўвага</str> 
+  <str name="Notes">Заўвагі</str> 
+  <str name="Tip">Парада</str> 
+  <str name="Fastpath">Хуткі пераход</str> 
+  <str name="Important">Важна</str> 
+  <str name="Attention">Увага</str> 
+  <str name="Caution">ПАПЯРЭДЖАННЕ</str> 
+  <str name="Danger">НЕБЯСПЕКА</str> 
+  <str name="Remember">Напамін</str> 
+  <str name="Restriction">Абмежаванне</str> 
+  <str name="Trouble">Непаладка</str>
+  <str name="Warning">Папярэджанне</str>  
+  <str name="Contents">Змест</str> 
+  <str name="Related concepts">Адпаведныя канцэпцыі</str> 
+  <str name="Related tasks">Адпаведныя задачы</str> 
+  <str name="Related reference">Адпаведная спасылка</str> 
+  <str name="Related information">Адпаведная інфармацыя</str> 
+  <str name="Prerequisite">Перадумова</str> 
+  <str name="Prerequisites">Перадумовы</str> 
+  <str name="or">або</str> 
+  <str name="task_context">Аб гэтай задачы</str>
+  <str name="task_example">Прыклад</str>
+  <str name="task_postreq">Далейшыя дзеяннi</str>
+  <str name="task_prereq">Перад пачаткам работы</str>
+  <str name="task_procedure">Парадак выканання</str>
+  <str name="task_procedure_unordered">Парадак выканання</str>
+  <str name="task_results">Рэзультаты</str>
+  <str name="Copyright">Copyright</str> 
+  <str name="a11y.and-then"></str> 
+</strings>

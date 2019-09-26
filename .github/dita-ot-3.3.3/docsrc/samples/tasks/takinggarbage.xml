@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (C) Copyright IBM Corporation 2001, 2005. All Rights Reserved. -->
+
+<task id="takinggarbage" xml:lang="en-us">
+  <title>Taking out the garbage</title>
+  <shortdesc>Regular garbage removal is necessary for the proper functioning of a home.</shortdesc>
+  <taskbody>
+    <context>
+      <p>Your municipality collects garbage from homes once a week, usually early in the morning.</p></context>
+    <steps>
+      <step>
+        <cmd>Find out from the town what day of the week garbage is collected in your neighborhood.</cmd>
+      </step>
+      <step>
+        <cmd>The night before collection, place the garbage cans on the curb.</cmd>
+      </step>
+      <step>
+        <cmd>After the garbage has been collected, move the cans back into your garage.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map xml:lang="en-US">
+  <title>DITA Open Toolkit <keyword keyref="release"/></title>
+
+  <mapref href="resources/common-toc.ditamap"/>
+
+  <reltable>
+    <title>Source and target: Links that apply only to HTML version of distribution documentation</title>
+    <!-- Links common to all output formats are defined in nested submaps   -->
+    <relheader>
+      <relcolspec linking="sourceonly"/>
+      <relcolspec linking="targetonly"/>
+    </relheader>
+    <relrow>
+      <relcell>
+        <topicref keyref="java-api"/>
+      </relcell>
+      <relcell>
+        <topicref href="api/index.html" format="html" scope="peer">
+          <topicmeta>
+            <navtitle>DITA-OT Java API documentation</navtitle>
+          </topicmeta>
+        </topicref>
+      </relcell>
+    </relrow>
+    <relrow>
+      <relcell>
+        <topicref keyref="plugins-installing"/>
+      </relcell>
+      <relcell>
+        <topicref keyref="custom-plugins"/>
+      </relcell>
+    </relrow>
+  </reltable>
+</map>

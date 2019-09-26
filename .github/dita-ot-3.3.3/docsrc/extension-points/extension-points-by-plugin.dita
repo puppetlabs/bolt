@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--This file is part of the DITA Open Toolkit project. See the accompanying LICENSE.md file for applicable licenses.-->
+
+<reference id="extension-points-by-plugin">
+  <title>Extension points by plug-in</title>
+  <titlealts>
+    <navtitle>Plug-in extension points</navtitle>
+  </titlealts>
+  <shortdesc>The default plug-ins that ship with DITA Open Toolkit include a series of extension points that can be used
+    to modify various aspects of toolkit processing.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins<indexterm>extension points</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <p>If your toolkit installation includes custom plug-ins that define additional extension points, you can add
+        topics by rebuilding the DITA-OT documentation.</p>
+    </section>
+  </refbody>
+</reference>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="ID">
+  <title>Migrating customizations</title>
+  <shortdesc>If you have XSL transformation overrides, plug-ins or other customizations written prior to DITA-OT
+      <keyword keyref="release"/>, you may need to make changes to ensure your overrides work properly with the latest
+    toolkit versions. </shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>upgrading<indexterm>plug-ins</indexterm></indexterm>
+        <!-- LE: Only first alphabetical index-see-also prints in the index -->
+        <indexterm>upgrading<index-see-also>migrating</index-see-also><index-see-also>installing</index-see-also></indexterm>
+        <indexterm>migrating</indexterm> <!-- LE: Build crash for the line above if this line does not exist even though
+        the line below does. Its existence causes duplicate page number to be emitted. Also, the line below does not generate a range. The @end is in migrating-to-1.5.4.dita. -->
+        <indexterm start="migrate">migrating</indexterm>
+        <indexterm>plug-ins<indexterm>upgrading</indexterm></indexterm>
+        <indexterm>installing</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <p>In some cases, you may be able to remove old code that is no longer needed. In other cases, you may need to
+        refactor your code to point to the modified extension points, templates or modes in recent toolkit versions.</p>
+      <p>When migrating customizations, identify the version of the toolkit you're currently using (base version) and
+        the version of the toolkit you want to migrate to (target version). Then, review all of the migration changes
+        described in <i>all</i> of the versions from the base through the target. For instance, if you're currently on
+        2.2 and want to move to 3.3, you should review all of the changes in 2.3 through 3.3. You may want to start at
+        the oldest version and read forward so you can chronologically follow the changes, since it is possible that
+        files or topics have had multiple changes. </p>
+      <note><p conkeyref="conref-task/semver-info" conrefend="semver-plugins"/></note>
+    </section>
+  </refbody>
+</reference>

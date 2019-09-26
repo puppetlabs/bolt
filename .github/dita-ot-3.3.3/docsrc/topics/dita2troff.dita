@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="dita2troff" xml:lang="en-US">
+  <title>troff</title>
+  <shortdesc>The <option>troff</option> transformation produces output for use with the troff viewer on Unix-style
+    platforms, particularly for programs such as the man page viewer.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>tables<indexterm><xmlelement>table</xmlelement></indexterm></indexterm>
+        <indexterm><xmlelement>simpletable</xmlelement></indexterm>
+        <indexterm>UNIX</indexterm>
+        <indexterm>transformations<indexterm>troff</indexterm></indexterm>
+        <indexterm>troff<index-see-also>transformations</index-see-also></indexterm>
+        <indexterm>plug-ins<indexterm>dita2troff</indexterm></indexterm>
+        <indexterm>dita2troff</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>Each DITA topic generally produces one troff output file. The <option>troff</option> transformation supports most
+      common DITA structures, but it does not support <xmlelement>table</xmlelement> or
+        <xmlelement>simpletable</xmlelement> elements. Most testing of troff output was performed using the Cygwin Linux
+      emulator.</p>
+    <p>To run the troff transformation, set the <parmname>transtype</parmname> parameter to <option>troff</option>, or
+      pass the <parmname>--format</parmname>=<option>troff</option> option to the <cmdname>dita</cmdname> command
+      line.</p>
+    <codeblock><filepath conref="../resources/conref-task.dita#ID/dita-cmd"/> <parmname>--input</parmname>=<varname>input-file</varname> <parmname>--format</parmname>=<option>troff</option></codeblock>
+    <p>where:</p>
+    <ul>
+      <li conref="../resources/conref-task.dita#ID/novice-variables-1"
+        conrefend="../resources/conref-task.dita#ID/novice-variables-2"/>
+    </ul>
+  </conbody>
+</concept>

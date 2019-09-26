@@ -1,0 +1,59 @@
+// This file is part of the DITA Open Toolkit project.
+//
+// Copyright 2016 Eero Helenius
+//
+// See the accompanying LICENSE file for applicable license.
+
+// @frame
+
+.frame-top {
+  border-top: solid 1px;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+}
+
+.frame-bottom {
+  border-top: 0;
+  border-right: 0;
+  border-bottom: solid 1px;
+  border-left: 0;
+}
+
+.frame-topbot {
+  border-top: solid 1px;
+  border-right: 0;
+  border-bottom: solid 1px;
+  border-left: 0;
+}
+
+.frame-all {
+  border: solid 1px;
+}
+
+.frame-sides {
+  border-top: 0;
+  border-left: solid 1px;
+  border-right: solid 1px;
+  border-bottom: 0;
+}
+
+.frame-none {
+  border: 0;
+}
+
+// @scale
+
+$scale: 50 60 70 80 90 100 110 120 140 160 180 200;
+
+@each $value in $scale {
+  .scale-#{$value} {
+    font-size: unquote($value + '%');
+  }
+}
+
+// @expanse
+
+.expanse-page, .expanse-spread {
+  width: 100%;
+}

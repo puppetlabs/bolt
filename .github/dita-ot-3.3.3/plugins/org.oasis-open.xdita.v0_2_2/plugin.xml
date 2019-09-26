@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="org.oasis-open.xdita.v0_2_2" version="0.2.2">
+<title>Lightweight DITA</title>
+
+<!-- Include support name and email -->
+<feature extension="package.support.name" value="OASIS Lightweight DITA subcommittee"/>
+<feature extension="package.support.email" value="dita-lightweight-dita-chair@lists.oasis-open.org"/>
+
+<!-- Provide a version (default is 1.0 if not specified) -->
+<feature extension="package.version" value="1.0.4"/>
+
+<!-- This references a catalog using the OASIS catalog format, to define
+public IDs and system IDs for any DTD modules included in this plugin. -->
+<feature extension="dita.specialization.catalog.relative" value="catalog-dita.xml" type="file"/>
+
+</plugin>

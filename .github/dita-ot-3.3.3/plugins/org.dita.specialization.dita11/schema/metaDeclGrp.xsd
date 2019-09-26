@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Metadata                                     -->
+<!--  VERSION:   1.1                                             -->
+<!--  DATE:      November 2006                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Declaring the elements and specialization         -->
+<!--             attributes for the DITA XML Metadata              -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2001                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2005, 2006                -->
+<!--             (C) Copyright IBM Corporation 2001, 2004.         -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+
+  <xs:group name="author">
+    <xs:sequence>
+      <xs:element ref="author"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="source">
+    <xs:sequence>
+      <xs:element ref="source"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="publisher">
+    <xs:sequence>
+      <xs:element ref="publisher"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="copyright">
+    <xs:sequence>
+      <xs:element ref="copyright"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="critdates">
+    <xs:sequence>
+      <xs:element ref="critdates"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="permissions">
+    <xs:sequence>
+      <xs:element ref="permissions"/>
+    </xs:sequence>
+  </xs:group>
+
+
+  <xs:group name="resourceid">
+    <xs:sequence>
+      <xs:element ref="resourceid"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="audience">
+    <xs:sequence>
+      <xs:element ref="audience"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="category">
+    <xs:sequence>
+      <xs:element ref="category"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="keywords">
+    <xs:sequence>
+      <xs:element ref="keywords"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="prodinfo">
+    <xs:sequence>
+      <xs:element ref="prodinfo"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="othermeta">
+    <xs:sequence>
+      <xs:element ref="othermeta"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="copyryear">
+    <xs:sequence>
+      <xs:element ref="copyryear"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="copyrholder">
+    <xs:sequence>
+      <xs:element ref="copyrholder"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="created">
+    <xs:sequence>
+      <xs:element ref="created"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="revised">
+    <xs:sequence>
+      <xs:element ref="revised"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="prodname">
+    <xs:sequence>
+      <xs:element ref="prodname"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="vrmlist">
+    <xs:sequence>
+      <xs:element ref="vrmlist"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="brand">
+    <xs:sequence>
+      <xs:element ref="brand"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="series">
+    <xs:sequence>
+      <xs:element ref="series"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="platform">
+    <xs:sequence>
+      <xs:element ref="platform"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="prognum">
+    <xs:sequence>
+      <xs:element ref="prognum"/>
+    </xs:sequence>
+   </xs:group>
+
+    <xs:group name="featnum">
+      <xs:sequence>
+        <xs:element ref="featnum"/>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:group name="component">
+      <xs:sequence>
+        <xs:element ref="component"/>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:group name="vrm">
+      <xs:sequence>
+        <xs:element ref="vrm"/>
+      </xs:sequence>
+    </xs:group>
+
+
+</xs:schema>

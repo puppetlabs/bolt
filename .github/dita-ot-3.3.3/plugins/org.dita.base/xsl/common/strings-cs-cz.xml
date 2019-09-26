@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="cs-cz">        <!-- Czech -->
+  <str name="Figure">Obrázek</str>
+  <str name="Table">Tabulka</str>
+  <str name="Next topic">Následující téma</str>
+  <str name="Previous topic">Předchozí téma</str>
+  <str name="Parent topic">Nadřazené téma</str>
+  <str name="Required cleanup">Nutno opravit</str>
+  <str name="Draft comment">Poznámka nanečisto</str>
+  <str name="Option">Volba</str>
+  <str name="Description">Popis</str>
+  <str name="Optional">Volitelné</str>
+  <str name="Required">Požadované</str>
+  <str name="Skip visual syntax diagram">Vynechat zobrazení syntaktického diagramu</str>
+  <str name="Read syntax diagram">Číst syntaktický diagram</str>
+  <str name="Start of change">Začátek změn</str>
+  <str name="End of change">Konec změn</str>
+  <str name="Index">Rejstřík</str>
+  <str name="Special characters">Speciální znaky</str>
+  <str name="Numerics">Čísla</str>
+  <str name="End notes">Vysvětlivky</str>
+  <str name="Artwork">Ilustrace</str>
+  <str name="Syntax">Syntaxe</str>
+  <str name="Type">Typ</str>
+  <str name="Value">Hodnota</str>
+  <str name="Note">Poznámka</str>
+  <str name="Notes">Poznámky</str>
+  <str name="Tip">Tip</str>
+  <str name="Fastpath">Rychlá cesta</str>
+  <str name="Important">Důležité</str>
+  <str name="Attention">Upozornění</str>
+  <str name="Caution">POZOR</str>
+  <str name="Danger">NEBEZPEČÍ</str>
+  <str name="Remember">Zapamatujte si</str>
+  <str name="Restriction">Omezení</str>
+  <str name="Trouble">Problém</str>
+  <str name="Warning">Upozornění</str>
+  <str name="Contents">Obsah</str>
+  <str name="Related concepts">Související pojmy</str>
+  <str name="Related tasks">Související úlohy</str>
+  <str name="Related reference">Související odkazy</str>
+  <str name="Related information">Související informace</str>
+  <str name="Prerequisite">Předpoklad</str>
+  <str name="Prerequisites">Předpoklady</str>
+  <str name="or">or</str>
+  <str name="task_context">Informace o této úloze</str>
+  <str name="task_example">Příklad</str>
+  <str name="task_postreq">Jak pokračovat dále</str>
+  <str name="task_prereq">Než začnete</str>
+  <str name="task_procedure">Procedura</str>
+  <str name="task_procedure_unordered">Procedura</str>
+  <str name="task_results">Výsledky</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

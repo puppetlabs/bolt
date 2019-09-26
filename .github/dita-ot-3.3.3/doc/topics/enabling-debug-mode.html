@@ -1,0 +1,29 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="When the debug mode is enabled, additional diagnostic information is written to the log file. This information, which includes environment variables and stack trace data, can help you determine the root cause of a problem."><meta name="DC.subject" content=", property, command line, debugging, command, dita, args.debug, environment variables, stack trace, Ant"><meta name="keywords" content=", property, command line, debugging, command, dita, args.debug, environment variables, stack trace, Ant"><meta name="DC.relation" scheme="URI" content="../topics/troubleshooting-overview.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="t-enabling-debug-mode"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Enabling debug mode</title></head><body id="t-enabling-debug-mode"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a><ul><li><a href="../topics/log-files.html">Log files</a></li><li><a href="../topics/DITA-messages.html">DITA-OT error messages</a></li><li><a href="../topics/other-errors.html">Other error messages</a></li><li><a href="../topics/dita-command-help.html">Accessing help for the dita command</a></li><li class="active"><a href="../topics/enabling-debug-mode.html">Enabling debug mode</a></li><li><a href="../topics/increasing-the-jvm.html">Increasing Java memory</a></li><li><a href="../topics/reducing-processing-time.html">Reducing processing time</a></li></ul></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Enabling debug mode</h1>
+  
+  
+  <div class="body taskbody"><p class="shortdesc">When the debug mode is enabled, additional diagnostic information is written to the log file. This
+    information, which includes environment variables and stack trace data, can help you determine the root cause of a
+    problem.</p>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><div class="li step p">
+        <span class="ph cmd">From the command prompt, add the following parameters:</span>
+        <table border="1" frame="hsides" rules="rows" cellpadding="4" cellspacing="0" summary="" class="simpletable choicetable choicetableborder"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead><tr class="sthead chhead"><th scope="col" class="stentry choptionhd" style="vertical-align:bottom;text-align:left;">Application</th><th scope="col" class="stentry chdeschd" style="vertical-align:bottom;text-align:left;">Parameters</th></tr></thead><tbody><tr class="strow chrow">
+            <th style="vertical-align:top;" scope="row" class="stentry choption"><span class="keyword cmdname">dita</span> command</th>
+            <td style="vertical-align:top;" class="stentry chdesc"><span class="keyword parmname">--debug</span>,
+              <span class="keyword parmname">-debug</span>, or
+              <span class="keyword parmname">-d</span></td>
+          </tr><tr class="strow chrow">
+            <th style="vertical-align:top;" scope="row" class="stentry choption">Ant</th>
+            <td style="vertical-align:top;" class="stentry chdesc"><code class="ph codeph">-v -Dargs.debug=yes</code></td>
+          </tr></tbody></table>
+        <div class="itemgroup info">
+          <div class="p">You also can add a <code class="keyword markupname xmlelement">&lt;property&gt;</code> element to an Ant target in your build file, for
+            example: <pre class="pre codeblock language-xml"><code>&lt;property name="args.debug" value="yes"/&gt;</code></pre></div></div>
+      </div></section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/troubleshooting-overview.html" title="This section contains information about problems that you might encounter and how to resolve them.">Error messages and troubleshooting</a></div></div></nav></article></main></body></html>

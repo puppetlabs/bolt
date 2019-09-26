@@ -1,0 +1,1056 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    Task Requirements Domain                         -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identfier or an  -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Task Requirements Domain//EN"-->
+<!--      Delivered as file "taskreqDomain.mod"                       -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Define elements and specialization attributes    -->
+<!--            for the Task Requirements Domain                 -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            September 2007                                   -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2007, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!-- UPDATES:                                                    -->
+<!--   2009.10.20 CHK: Make safecond unbound                     -->
+<!--=============================================================-->
+<!--                                                             -->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic task taskreq-d)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:group name="prelreqs">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="prelreqs"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="closereqs">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="closereqs"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="reqconds">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="reqconds"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="noconds">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="noconds"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="reqcond">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="reqcond"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="reqcontp">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="reqcontp"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="reqpers">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="reqpers"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="personnel">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="personnel"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="perscat">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="perscat"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="perskill">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="perskill"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="esttime">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="esttime"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="supequip">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="supequip"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="nosupeq">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="nosupeq"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="supeqli">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="supeqli"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="supequi">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="supequi"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="supplies">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="supplies"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="nosupply">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="nosupply"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="supplyli">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="supplyli"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="supply">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="supply"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="spares">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="spares"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="nospares">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="nospares"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="sparesli">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="sparesli"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="spare">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="spare"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="safety">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="safety"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="nosafety">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="nosafety"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:group name="safecond">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element ref="safecond"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+
+   <xs:group name="taskreq-d-prereq">
+      <xs:choice>
+         <xs:element ref="prelreqs"/>
+      </xs:choice>
+   </xs:group>
+   <xs:group name="taskreq-d-postreq">
+      <xs:choice>
+         <xs:element ref="closereqs"/>
+      </xs:choice>
+   </xs:group>
+   <xs:element name="prelreqs">
+      <xs:annotation>
+         <xs:documentation>
+            The preliminary-requirements (&lt;prelreqs&gt;) section of a task should document things the user needs to know or do before starting the current task. The &lt;prelreqs&gt; element is similar to &lt;prereq&gt; but contains a more descriptive content model then &lt;prereq&gt;. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="prelreqs.class">
+               <xs:attribute ref="class" default="+ topic/section task/prereq taskreq-d/prelreqs "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="prelreqs.class">
+      <xs:sequence>
+         <xs:group ref="prelreqs.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="prelreqs.attributes"/>
+   </xs:complexType>
+   <xs:group name="prelreqs.content">
+      <xs:sequence>
+         <xs:group ref="reqconds" minOccurs="0"/>
+         <xs:group ref="reqpers" minOccurs="0"/>
+         <xs:group ref="supequip" minOccurs="0"/>
+         <xs:group ref="supplies" minOccurs="0"/>
+         <xs:group ref="spares" minOccurs="0"/>
+         <xs:group ref="safety" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="prelreqs.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="closereqs">
+      <xs:annotation>
+         <xs:documentation>
+            The closing-requirements (&lt;closereqs&gt;) element describes steps or tasks that the user should do after the successful completion of the current task. closereqs is similar to postreq but contains a more descriptive content model then postreq and has been developed basically to meet the requirements in the machinery industry. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="closereqs.class">
+               <xs:attribute ref="class" default="+ topic/section task/postreq taskreq-d/closereqs "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="closereqs.class">
+      <xs:sequence>
+         <xs:group ref="closereqs.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="closereqs.attributes"/>
+   </xs:complexType>
+   <xs:group name="closereqs.content">
+      <xs:sequence>
+         <xs:group ref="reqconds"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="closereqs.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="reqconds">
+      <xs:annotation>
+         <xs:documentation>
+            The required-conditions (&lt;reqconds&gt;) element contains the description of all required conditions that have to be fulfilled before performing a task. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="reqconds.class">
+               <xs:attribute ref="class" default="+ topic/ul task/ul taskreq-d/reqconds "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="reqconds.class">
+      <xs:sequence>
+         <xs:group ref="reqconds.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="reqconds.attributes"/>
+   </xs:complexType>
+   <xs:group name="reqconds.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+         <xs:choice>
+            <xs:group ref="noconds"/>
+            <xs:choice minOccurs="1" maxOccurs="unbounded">
+               <xs:group ref="reqcond"/>
+               <xs:group ref="reqcontp"/>
+            </xs:choice>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="reqconds.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="noconds">
+      <xs:annotation>
+         <xs:documentation>
+            The No-Required-Condition (&lt;noconds&gt;) element has to be used when there is no required condition. The information that no condition is required is as important as the information which conditions are required. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="noconds.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/noconds "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="noconds.class">
+      <xs:sequence>
+         <xs:group ref="noconds.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="noconds.attributes"/>
+   </xs:complexType>
+   <xs:group name="noconds.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="noconds.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="reqcond">
+      <xs:annotation>
+         <xs:documentation>
+            The Required-Condition (&lt;reqcond&gt;) element has to be used to describe the required condition. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="reqcond.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/reqcond "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="reqcond.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="reqcond.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="reqcond.attributes"/>
+   </xs:complexType>
+   <xs:group name="reqcond.content">
+      <xs:sequence>
+         <xs:group ref="listitem.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="reqcond.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="reqcontp">
+      <xs:annotation>
+         <xs:documentation>
+            The Required-Condition-Technical-Publication (&lt;reqcontp&gt;) element has to be used to list or describe further applicable documents. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="reqcontp.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/reqcontp "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="reqcontp.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="reqcontp.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="reqcontp.attributes"/>
+   </xs:complexType>
+   <xs:group name="reqcontp.content">
+      <xs:sequence>
+         <xs:group ref="listitem.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="reqcontp.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="reqpers">
+      <xs:annotation>
+         <xs:documentation>
+            The Required-Personnel (&lt;reqpers&gt;) element contains information on the personnel required for the task. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="reqpers.class">
+               <xs:attribute ref="class" default="+ topic/ul task/ul taskreq-d/reqpers "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="reqpers.class">
+      <xs:sequence>
+         <xs:group ref="reqpers.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="reqpers.attributes"/>
+   </xs:complexType>
+   <xs:group name="reqpers.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+         <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:group ref="personnel" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:group ref="perscat" minOccurs="0"/>
+            <xs:group ref="perskill" minOccurs="0"/>
+            <xs:group ref="esttime" minOccurs="0"/>
+         </xs:sequence>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="reqpers.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="personnel">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;personnel&gt; element indicates the number of personnel required for the task. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="personnel.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/personnel "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="personnel.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="personnel.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="personnel.attributes"/>
+   </xs:complexType>
+   <xs:group name="personnel.content">
+      <xs:sequence>
+         <xs:group ref="listitem.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="personnel.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="perscat">
+      <xs:annotation>
+         <xs:documentation>
+            The Personnel-Category (&lt;perscat&gt;) element contains the required category level of the person.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="perscat.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/perscat "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="perscat.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="perscat.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="perscat.attributes"/>
+   </xs:complexType>
+   <xs:group name="perscat.content">
+      <xs:sequence>
+         <xs:group ref="listitem.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="perscat.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="perskill">
+      <xs:annotation>
+         <xs:documentation>
+            The Personnel-Skill-Level (&lt;perskill&gt;) element describes the required skill level of the person. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="perskill.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/perskill "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="perskill.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="perskill.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="perskill.attributes"/>
+   </xs:complexType>
+   <xs:group name="perskill.content">
+      <xs:sequence>
+         <xs:group ref="listitem.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="perskill.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="esttime">
+      <xs:annotation>
+         <xs:documentation>
+            The Estimated-Time-Spent (&lt;esttime&gt;) element contains information on the estimated time required for a task. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="esttime.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/esttime "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="esttime.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="esttime.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="esttime.attributes"/>
+   </xs:complexType>
+   <xs:group name="esttime.content">
+      <xs:sequence>
+         <xs:group ref="listitem.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="esttime.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="supequip">
+      <xs:annotation>
+         <xs:documentation>
+            The Support-Equipment (&lt;supequip&gt;) element lists any required support equipment for the task, along with optional descriptions. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="supequip.class">
+               <xs:attribute ref="class" default="+ topic/p task/p taskreq-d/supequip "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="supequip.class">
+      <xs:sequence>
+         <xs:group ref="supequip.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="supequip.attributes"/>
+   </xs:complexType>
+   <xs:group name="supequip.content">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="nosupeq"/>
+            <xs:group ref="supeqli"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="supequip.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="nosupeq">
+      <xs:annotation>
+         <xs:documentation>
+            The No-Support-Equipment (&lt;nosupeq&gt;) element has to be used when there is no support equipment required. The information that no support equipment is required is as important as the information which support equipment is required. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="nosupeq.class">
+               <xs:attribute ref="class" default="+ topic/data task/data taskreq-d/nosupeq "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="nosupeq.class">
+      <xs:sequence>
+         <xs:group ref="nosupeq.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="nosupeq.attributes"/>
+   </xs:complexType>
+   <xs:group name="nosupeq.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="nosupeq.attributes">
+      <xs:attributeGroup ref="data-element-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="supeqli">
+      <xs:annotation>
+         <xs:documentation>
+            The Support-Equipment-List (&lt;supeqli&gt;) element has to be used to list any support equipment required for the task. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="supeqli.class">
+               <xs:attribute ref="class" default="+ topic/ul task/ul taskreq-d/supeqli "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="supeqli.class">
+      <xs:sequence>
+         <xs:group ref="supeqli.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="supeqli.attributes"/>
+   </xs:complexType>
+   <xs:group name="supeqli.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+         <xs:group ref="supequi" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="supeqli.attributes">
+      <xs:attribute name="compact">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="supequi">
+      <xs:annotation>
+         <xs:documentation>
+            The Support-Equipment-Item (&lt;supequi&gt;) element describes the support equipment. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="supequi.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/supequi "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="supequi.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="supequi.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="supequi.attributes"/>
+   </xs:complexType>
+   <xs:group name="supequi.content">
+      <xs:sequence>
+         <xs:group ref="listitem.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="supequi.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="supplies">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;supplies&gt; element has to be used to list and maybe to describe any supplies required for the task. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="supplies.class">
+               <xs:attribute ref="class" default="+ topic/p task/p taskreq-d/supplies "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="supplies.class">
+      <xs:sequence>
+         <xs:group ref="supplies.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="supplies.attributes"/>
+   </xs:complexType>
+   <xs:group name="supplies.content">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="nosupply"/>
+            <xs:group ref="supplyli"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="supplies.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="nosupply">
+      <xs:annotation>
+         <xs:documentation>
+            The No-Supplies (&lt;nosupply&gt;) element has to be used when there are no supplies required. The information that no supplies are required is as important as the information which supplies are is required. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="nosupply.class">
+               <xs:attribute ref="class" default="+ topic/data task/data taskreq-d/nosupply "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="nosupply.class">
+      <xs:sequence>
+         <xs:group ref="nosupply.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="nosupply.attributes"/>
+   </xs:complexType>
+   <xs:group name="nosupply.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="nosupply.attributes">
+      <xs:attributeGroup ref="data-element-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="supplyli">
+      <xs:annotation>
+         <xs:documentation>
+            The Supply-List (&lt;supplyli&gt;) element has to be used to list any supplies required for the task.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="supplyli.class">
+               <xs:attribute ref="class" default="+ topic/ul task/ul taskreq-d/supplyli "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="supplyli.class">
+      <xs:sequence>
+         <xs:group ref="supplyli.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="supplyli.attributes"/>
+   </xs:complexType>
+   <xs:group name="supplyli.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+         <xs:group ref="supply" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="supplyli.attributes">
+      <xs:attribute name="compact">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="supply">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;supply&gt; element describes the supply.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="supply.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/supply "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="supply.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="supply.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="supply.attributes"/>
+   </xs:complexType>
+   <xs:group name="supply.content">
+      <xs:sequence>
+         <xs:group ref="listitem.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="supply.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="spares">
+      <xs:annotation>
+         <xs:documentation>
+            The &lt;spares&gt; element lists spare parts required for a task, and may include descriptions of those parts.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="spares.class">
+               <xs:attribute ref="class" default="+ topic/p task/p taskreq-d/spares "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="spares.class">
+      <xs:sequence>
+         <xs:group ref="spares.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="spares.attributes"/>
+   </xs:complexType>
+   <xs:group name="spares.content">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="nospares"/>
+            <xs:group ref="sparesli"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="spares.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="nospares">
+      <xs:annotation>
+         <xs:documentation>
+            The No-Spares (&lt;nospares&gt;) element has to be used when there are no spares required for the task. As the information that no spares are required is as important as the information which spare is required.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="nospares.class">
+               <xs:attribute ref="class" default="+ topic/data task/data taskreq-d/nospares "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="nospares.class">
+      <xs:sequence>
+         <xs:group ref="nospares.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="nospares.attributes"/>
+   </xs:complexType>
+   <xs:group name="nospares.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="nospares.attributes">
+      <xs:attributeGroup ref="data-element-atts"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="sparesli">
+      <xs:annotation>
+         <xs:documentation>
+            The Spares-List (&lt;sparesli&gt;) element has to be used to list any spares required for the task.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="sparesli.class">
+               <xs:attribute ref="class" default="+ topic/ul task/ul taskreq-d/sparesli "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="sparesli.class">
+      <xs:sequence>
+         <xs:group ref="sparesli.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="sparesli.attributes"/>
+   </xs:complexType>
+   <xs:group name="sparesli.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+         <xs:group ref="spare" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="sparesli.attributes">
+      <xs:attribute name="compact">
+         <xs:simpleType>
+            <xs:restriction base="xs:string">
+               <xs:enumeration value="yes"/>
+               <xs:enumeration value="no"/>
+               <xs:enumeration value="-dita-use-conref-target"/>
+            </xs:restriction>
+         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="spectitle" type="xs:string"/>
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="spare">
+      <xs:annotation>
+         <xs:documentation>
+            The spare element describes a spare part required for the task, and may include a description of the part.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="spare.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/spare "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="spare.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="spare.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="spare.attributes"/>
+   </xs:complexType>
+   <xs:group name="spare.content">
+      <xs:sequence>
+         <xs:group ref="listitem.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="spare.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="safety">
+      <xs:annotation>
+         <xs:documentation>
+            The Safety-Condition (&lt;safety&gt;) element has to be used to list and maybe to describe any safety condition that has to be taken in account for the task.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="safety.class">
+               <xs:attribute ref="class" default="+ topic/ol task/ol taskreq-d/safety "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="safety.class">
+      <xs:sequence>
+         <xs:group ref="safety.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="safety.attributes"/>
+   </xs:complexType>
+   <xs:group name="safety.content">
+      <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data"/>
+            <xs:group ref="data-about"/>
+         </xs:choice>
+         <xs:choice>
+            <xs:group ref="nosafety"/>
+            <xs:group ref="safecond" minOccurs="1" maxOccurs="unbounded"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="safety.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="nosafety">
+      <xs:annotation>
+         <xs:documentation>
+            The No-Safety-Conditions (&lt;nosafety&gt;) element has to be used to indicate that there are no safety requirements for the task. The information that no safety requirements have to be taken in account is as important as the information which safety conditions has to be considered. </xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="nosafety.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/nosafety "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="nosafety.class">
+      <xs:sequence>
+         <xs:group ref="nosafety.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="nosafety.attributes"/>
+   </xs:complexType>
+   <xs:group name="nosafety.content">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="nosafety.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:element name="safecond">
+      <xs:annotation>
+         <xs:documentation>
+            The Safety-Conditions (&lt;safecond&gt;) element has to be used if there are safety requirements.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="safecond.class">
+               <xs:attribute ref="class" default="+ topic/li task/li taskreq-d/safecond "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="safecond.class" mixed="true">
+      <xs:sequence>
+         <xs:group ref="safecond.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="safecond.attributes"/>
+   </xs:complexType>
+   <xs:group name="safecond.content">
+      <xs:sequence>
+         <xs:group ref="listitem.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="safecond.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

@@ -1,0 +1,1077 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Task Requirements Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    Task Requirements Domain                         
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identfier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Task Requirements Domain//EN"
+      Delivered as file "taskreqDomain.mod"                       
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Define elements and specialization attributes   
+            for the Task Requirements Domain                 
+                                                             
+ORIGINAL CREATION DATE:                                      
+            September 2007                                   
+                                                             
+            (C) Copyright OASIS Open 2007, 2009.             
+            All Rights Reserved.                             
+ UPDATES:                                                    
+   2009.10.20 CHK: Make safecond unbound              
+=============================================================
+  </headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>taskreq-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Task Requirements Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Task Requirements Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:taskreqDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:taskreqDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:taskreqDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic task taskreq-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="taskreq-d-prereq">
+      <ref name="prelreqs.element"/>
+    </define>
+    <define name="taskreq-d-postreq">
+      <ref name="closereqs.element"/>
+    </define>
+
+    <define name="prereq" combine="choice">
+      <ref name="taskreq-d-prereq"/>
+    </define>
+    <define name="postreq" combine="choice">
+      <ref name="taskreq-d-postreq"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="prelreqs">
+      <ref name="prelreqs.element"/>
+    </define>
+    <define name="closereqs">
+      <ref name="closereqs.element"/>
+    </define>
+    <define name="reqconds">
+      <ref name="reqconds.element"/>
+    </define>
+    <define name="noconds">
+      <ref name="noconds.element"/>
+    </define>
+    <define name="reqcond">
+      <ref name="reqcond.element"/>
+    </define>
+    <define name="reqcontp">
+      <ref name="reqcontp.element"/>
+    </define>
+    <define name="reqpers">
+      <ref name="reqpers.element"/>
+    </define>
+    <define name="personnel">
+      <ref name="personnel.element"/>
+    </define>
+    <define name="perscat">
+      <ref name="perscat.element"/>
+    </define>
+    <define name="perskill">
+      <ref name="perskill.element"/>
+    </define>
+    <define name="esttime">
+      <ref name="esttime.element"/>
+    </define>
+    <define name="supequip">
+      <ref name="supequip.element"/>
+    </define>
+    <define name="nosupeq">
+      <ref name="nosupeq.element"/>
+    </define>
+    <define name="supeqli">
+      <ref name="supeqli.element"/>
+    </define>
+    <define name="supequi">
+      <ref name="supequi.element"/>
+    </define>
+    <define name="supplies">
+      <ref name="supplies.element"/>
+    </define>
+    <define name="nosupply">
+      <ref name="nosupply.element"/>
+    </define>
+    <define name="supplyli">
+      <ref name="supplyli.element"/>
+    </define>
+    <define name="supply">
+      <ref name="supply.element"/>
+    </define>
+    <define name="spares">
+      <ref name="spares.element"/>
+    </define>
+    <define name="nospares">
+      <ref name="nospares.element"/>
+    </define>
+    <define name="sparesli">
+      <ref name="sparesli.element"/>
+    </define>
+    <define name="spare">
+      <ref name="spare.element"/>
+    </define>
+    <define name="safety">
+      <ref name="safety.element"/>
+    </define>
+    <define name="nosafety">
+      <ref name="nosafety.element"/>
+    </define>
+    <define name="safecond">
+      <ref name="safecond.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation> LONG NAME: Preliminary Requirements </a:documentation>
+      <define name="prelreqs.content">
+        <optional>
+          <ref name="reqconds"/>
+        </optional>
+        <optional>
+          <ref name="reqpers"/>
+        </optional>
+        <optional>
+          <ref name="supequip"/>
+        </optional>
+        <optional>
+          <ref name="supplies"/>
+        </optional>
+        <optional>
+          <ref name="spares"/>
+        </optional>
+        <optional>
+          <ref name="safety"/>
+        </optional>
+      </define>
+      <define name="prelreqs.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="prelreqs.element">
+        <element name="prelreqs" dita:longName="Preliminary Requirements">
+          <a:documentation>
+            <![CDATA[The preliminary-requirements (<prelreqs>) section of a task should document things the user needs to know or do before starting the current task. The <prelreqs> element is similar to <prereq> but contains a more descriptive content model then <prereq>. ]]></a:documentation>
+          <ref name="prelreqs.attlist"/>
+          <ref name="prelreqs.content"/>
+        </element>
+      </define>
+      <define name="prelreqs.attlist" combine="interleave">
+        <ref name="prelreqs.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Closing Requirements </a:documentation>
+      <define name="closereqs.content">
+        <ref name="reqconds"/>
+      </define>
+      <define name="closereqs.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="closereqs.element">
+        <element name="closereqs" dita:longName="Closing Requirements">
+          <a:documentation>
+            <![CDATA[The closing-requirements (<closereqs>) element describes steps or tasks that the user should do after the successful completion of the current task. closereqs is similar to postreq but contains a more descriptive content model then postreq and has been developed basically to meet the requirements in the machinery industry. ]]></a:documentation>
+          <ref name="closereqs.attlist"/>
+          <ref name="closereqs.content"/>
+        </element>
+      </define>
+      <define name="closereqs.attlist" combine="interleave">
+        <ref name="closereqs.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Required Conditions </a:documentation>
+      <define name="reqconds.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <choice>
+          <ref name="noconds"/>
+          <oneOrMore>
+            <choice>
+              <ref name="reqcond"/>
+              <ref name="reqcontp"/>
+            </choice>
+          </oneOrMore>
+        </choice>
+      </define>
+      <define name="reqconds.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="reqconds.element">
+        <element name="reqconds" dita:longName="Required Conditions">
+          <a:documentation>
+            <![CDATA[The required-conditions (<reqconds>) element contains the description of all required conditions that have to be fulfilled before performing a task. ]]></a:documentation>
+          <ref name="reqconds.attlist"/>
+          <ref name="reqconds.content"/>
+        </element>
+      </define>
+      <define name="reqconds.attlist" combine="interleave">
+        <ref name="reqconds.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: No Required Conditions </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="noconds.content">
+        <empty/>
+      </define>
+      <define name="noconds.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="noconds.element">
+        <element name="noconds" dita:longName="No Required Conditions">
+          <a:documentation>
+            <![CDATA[The No-Required-Condition (<noconds>) element has to be used when there is no required condition. The information that no condition is required is as important as the information which conditions are required. ]]></a:documentation>
+          <ref name="noconds.attlist"/>
+          <ref name="noconds.content"/>
+        </element>
+      </define>
+      <define name="noconds.attlist" combine="interleave">
+        <ref name="noconds.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Required Condition </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="reqcond.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="reqcond.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="reqcond.element">
+        <element name="reqcond" dita:longName="Required Condition">
+          <a:documentation>
+            <![CDATA[The Required-Condition (<reqcond>) element has to be used to describe the required condition. ]]></a:documentation>
+          <ref name="reqcond.attlist"/>
+          <ref name="reqcond.content"/>
+        </element>
+      </define>
+      <define name="reqcond.attlist" combine="interleave">
+        <ref name="reqcond.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Required Condition Technical Publication </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="reqcontp.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="reqcontp.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="reqcontp.element">
+        <element name="reqcontp" dita:longName="Required Condition Technical Publication">
+          <a:documentation>
+            <![CDATA[The Required-Condition-Technical-Publication (<reqcontp>) element has to be used to list or describe further applicable documents. ]]></a:documentation>
+          <ref name="reqcontp.attlist"/>
+          <ref name="reqcontp.content"/>
+        </element>
+      </define>
+      <define name="reqcontp.attlist" combine="interleave">
+        <ref name="reqcontp.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Required Persons </a:documentation>
+      <a:documentation> specialized from ol </a:documentation>
+      <define name="reqpers.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="personnel"/>
+          <optional>
+            <optional>
+              <ref name="perscat"/>
+            </optional>
+            <optional>
+              <ref name="perskill"/>
+            </optional>
+            <optional>
+              <ref name="esttime"/>
+            </optional>
+          </optional>
+        </oneOrMore>
+      </define>
+      <define name="reqpers.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="reqpers.element">
+        <element name="reqpers" dita:longName="Required Persons">
+          <a:documentation>
+            <![CDATA[The Required-Personnel (<reqpers>) element contains information on the personnel required for the task. ]]></a:documentation>
+          <ref name="reqpers.attlist"/>
+          <ref name="reqpers.content"/>
+        </element>
+      </define>
+      <define name="reqpers.attlist" combine="interleave">
+        <ref name="reqpers.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Personnel </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="personnel.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="personnel.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="personnel.element">
+        <element name="personnel" dita:longName="Personnel">
+          <a:documentation>
+            <![CDATA[The <personnel> element indicates the number of personnel required for the task. ]]></a:documentation>
+          <ref name="personnel.attlist"/>
+          <ref name="personnel.content"/>
+        </element>
+      </define>
+      <define name="personnel.attlist" combine="interleave">
+        <ref name="personnel.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Personnel Category </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="perscat.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="perscat.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="perscat.element">
+        <element name="perscat" dita:longName="Personnel Category">
+          <a:documentation>
+            <![CDATA[The Personnel-Category (<perscat>) element contains the required category level of the person.]]></a:documentation>
+          <ref name="perscat.attlist"/>
+          <ref name="perscat.content"/>
+        </element>
+      </define>
+      <define name="perscat.attlist" combine="interleave">
+        <ref name="perscat.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Personnel Skill Level </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="perskill.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="perskill.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="perskill.element">
+        <element name="perskill" dita:longName="Personnel Skill Level">
+          <a:documentation>
+            <![CDATA[The Personnel-Skill-Level (<perskill>) element describes the required skill level of the person. ]]></a:documentation>
+          <ref name="perskill.attlist"/>
+          <ref name="perskill.content"/>
+        </element>
+      </define>
+      <define name="perskill.attlist" combine="interleave">
+        <ref name="perskill.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Esttime </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="esttime.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="esttime.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="esttime.element">
+        <element name="esttime" dita:longName="Estimated Time">
+          <a:documentation>
+            <![CDATA[The Estimated-Time-Spent (<esttime>) element contains information on the estimated time required for a task. ]]></a:documentation>
+          <ref name="esttime.attlist"/>
+          <ref name="esttime.content"/>
+        </element>
+      </define>
+      <define name="esttime.attlist" combine="interleave">
+        <ref name="esttime.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Support Equipment </a:documentation>
+      <a:documentation> specialized from p </a:documentation>
+      <define name="supequip.content">
+        <choice>
+          <ref name="nosupeq"/>
+          <ref name="supeqli"/>
+        </choice>
+      </define>
+      <define name="supequip.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="supequip.element">
+        <element name="supequip" dita:longName="Support Equipment">
+          <a:documentation>
+            <![CDATA[The Support-Equipment (<supequip>) element lists any required support equipment for the task, along with optional descriptions. ]]></a:documentation>
+          <ref name="supequip.attlist"/>
+          <ref name="supequip.content"/>
+        </element>
+      </define>
+      <define name="supequip.attlist" combine="interleave">
+        <ref name="supequip.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: No Support Equipment </a:documentation>
+      <a:documentation> specialized from data </a:documentation>
+      <define name="nosupeq.content">
+        <empty/>
+      </define>
+      <define name="nosupeq.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="nosupeq.element">
+        <element name="nosupeq" dita:longName="No Support Equipment">
+          <a:documentation>
+            <![CDATA[The No-Support-Equipment (<nosupeq>) element has to be used when there is no support equipment required. The information that no support equipment is required is as important as the information which support equipment is required. ]]></a:documentation>
+          <ref name="nosupeq.attlist"/>
+          <ref name="nosupeq.content"/>
+        </element>
+      </define>
+      <define name="nosupeq.attlist" combine="interleave">
+        <ref name="nosupeq.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Support Equipment List </a:documentation>
+      <a:documentation> specialized from ul </a:documentation>
+      <define name="supeqli.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="supequi"/>
+        </oneOrMore>
+      </define>
+      <define name="supeqli.attributes">
+        <optional>
+          <attribute name="compact">
+            <choice>
+              <value>yes</value>
+              <value>no</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="supeqli.element">
+        <element name="supeqli" dita:longName="Support Equipment List">
+          <a:documentation>
+            <![CDATA[The Support-Equipment-List (<supeqli>) element has to be used to list any support equipment required for the task. ]]></a:documentation>
+          <ref name="supeqli.attlist"/>
+          <ref name="supeqli.content"/>
+        </element>
+      </define>
+      <define name="supeqli.attlist" combine="interleave">
+        <ref name="supeqli.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Support Equipment Item </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="supequi.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="supequi.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="supequi.element">
+        <element name="supequi" dita:longName="Support Equipment Item">
+          <a:documentation>
+            <![CDATA[The Support-Equipment-Item (<supequi>) element describes the support equipment. ]]></a:documentation>
+          <ref name="supequi.attlist"/>
+          <ref name="supequi.content"/>
+        </element>
+      </define>
+      <define name="supequi.attlist" combine="interleave">
+        <ref name="supequi.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Supplies </a:documentation>
+      <a:documentation> specialized from p </a:documentation>
+      <define name="supplies.content">
+        <choice>
+          <ref name="nosupply"/>
+          <ref name="supplyli"/>
+        </choice>
+      </define>
+      <define name="supplies.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="supplies.element">
+        <element name="supplies" dita:longName="Supplies">
+          <a:documentation>
+            <![CDATA[The <supplies> element has to be used to list and maybe to describe any supplies required for the task. ]]></a:documentation>
+          <ref name="supplies.attlist"/>
+          <ref name="supplies.content"/>
+        </element>
+      </define>
+      <define name="supplies.attlist" combine="interleave">
+        <ref name="supplies.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: No Supplies </a:documentation>
+      <a:documentation> specialized from data </a:documentation>
+      <define name="nosupply.content">
+        <empty/>
+      </define>
+      <define name="nosupply.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="nosupply.element">
+        <element name="nosupply" dita:longName="No Supplies">
+          <a:documentation>
+            <![CDATA[The No-Supplies (<nosupply>) element has to be used when there are no supplies required. The information that no supplies are required is as important as the information which supplies are is required. ]]></a:documentation>
+          <ref name="nosupply.attlist"/>
+          <ref name="nosupply.content"/>
+        </element>
+      </define>
+      <define name="nosupply.attlist" combine="interleave">
+        <ref name="nosupply.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Supply List </a:documentation>
+      <a:documentation> specialized from ul </a:documentation>
+      <define name="supplyli.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="supply"/>
+        </oneOrMore>
+      </define>
+      <define name="supplyli.attributes">
+        <optional>
+          <attribute name="compact">
+            <choice>
+              <value>yes</value>
+              <value>no</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="supplyli.element">
+        <element name="supplyli" dita:longName="Supply List">
+          <a:documentation>
+            <![CDATA[The Supply-List (<supplyli>) element has to be used to list any supplies required for the task.]]></a:documentation>
+          <ref name="supplyli.attlist"/>
+          <ref name="supplyli.content"/>
+        </element>
+      </define>
+      <define name="supplyli.attlist" combine="interleave">
+        <ref name="supplyli.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Supply Item </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="supply.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="supply.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="supply.element">
+        <element name="supply" dita:longName="Supply Item">
+          <a:documentation>
+            <![CDATA[The <supply> element describes the supply.]]></a:documentation>
+          <ref name="supply.attlist"/>
+          <ref name="supply.content"/>
+        </element>
+      </define>
+      <define name="supply.attlist" combine="interleave">
+        <ref name="supply.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Spares </a:documentation>
+      <a:documentation> specialized from p </a:documentation>
+      <define name="spares.content">
+        <choice>
+          <ref name="nospares"/>
+          <ref name="sparesli"/>
+        </choice>
+      </define>
+      <define name="spares.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="spares.element">
+        <element name="spares" dita:longName="Spares">
+          <a:documentation>
+            <![CDATA[The <spares> element lists spare parts required for a task, and may include descriptions of those parts.]]></a:documentation>
+          <ref name="spares.attlist"/>
+          <ref name="spares.content"/>
+        </element>
+      </define>
+      <define name="spares.attlist" combine="interleave">
+        <ref name="spares.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: No Spares </a:documentation>
+      <a:documentation> specialized from data </a:documentation>
+      <define name="nospares.content">
+        <empty/>
+      </define>
+      <define name="nospares.attributes">
+        <ref name="data-element-atts"/>
+      </define>
+      <define name="nospares.element">
+        <element name="nospares" dita:longName="No Spares">
+          <a:documentation>
+            <![CDATA[The No-Spares (<nospares>) element has to be used when there are no spares required for the task. As the information that no spares are required is as important as the information which spare is required.]]></a:documentation>
+          <ref name="nospares.attlist"/>
+          <ref name="nospares.content"/>
+        </element>
+      </define>
+      <define name="nospares.attlist" combine="interleave">
+        <ref name="nospares.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Spare List </a:documentation>
+      <a:documentation> specialized from ul </a:documentation>
+      <define name="sparesli.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="spare"/>
+        </oneOrMore>
+      </define>
+      <define name="sparesli.attributes">
+        <optional>
+          <attribute name="compact">
+            <choice>
+              <value>yes</value>
+              <value>no</value>
+              <value>-dita-use-conref-target</value>
+            </choice>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="sparesli.element">
+        <element name="sparesli" dita:longName="Spare List">
+          <a:documentation>
+            <![CDATA[The Spares-List (<sparesli>) element has to be used to list any spares required for the task.]]></a:documentation>
+          <ref name="sparesli.attlist"/>
+          <ref name="sparesli.content"/>
+        </element>
+      </define>
+      <define name="sparesli.attlist" combine="interleave">
+        <ref name="sparesli.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Spare Item </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="spare.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="spare.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="spare.element">
+        <element name="spare" dita:longName="Spare Item">
+          <a:documentation>
+            <![CDATA[The spare element describes a spare part required for the task, and may include a description of the part.]]></a:documentation>
+          <ref name="spare.attlist"/>
+          <ref name="spare.content"/>
+        </element>
+      </define>
+      <define name="spare.attlist" combine="interleave">
+        <ref name="spare.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Safety Conditions </a:documentation>
+      <a:documentation> specialized from ol </a:documentation>
+      <define name="safety.content">
+        <zeroOrMore dita:since="1.3">
+          <choice>
+            <ref name="data"/>
+            <ref name="data-about"/>
+          </choice>
+        </zeroOrMore>
+        <choice>
+          <ref name="nosafety"/>
+          <oneOrMore>
+            <ref name="safecond"/>
+          </oneOrMore>
+        </choice>
+      </define>
+      <define name="safety.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="safety.element">
+        <element name="safety" dita:longName="Safety Conditions">
+          <a:documentation>
+            <![CDATA[The Safety-Condition (<safety>) element has to be used to list and maybe to describe any safety condition that has to be taken in account for the task.]]></a:documentation>
+          <ref name="safety.attlist"/>
+          <ref name="safety.content"/>
+        </element>
+      </define>
+      <define name="safety.attlist" combine="interleave">
+        <ref name="safety.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: No Safety Conditions </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="nosafety.content">
+        <empty/>
+      </define>
+      <define name="nosafety.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="nosafety.element">
+        <element name="nosafety" dita:longName="No Safety Conditions">
+          <a:documentation>
+            <![CDATA[The No-Safety-Conditions (<nosafety>) element has to be used to indicate that there are no safety requirements for the task. The information that no safety requirements have to be taken in account is as important as the information which safety conditions has to be considered. ]]></a:documentation>
+          <ref name="nosafety.attlist"/>
+          <ref name="nosafety.content"/>
+        </element>
+      </define>
+      <define name="nosafety.attlist" combine="interleave">
+        <ref name="nosafety.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Safety Condition </a:documentation>
+      <a:documentation> specialized from li </a:documentation>
+      <define name="safecond.content">
+        <zeroOrMore>
+          <ref name="listitem.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="safecond.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="safecond.element">
+        <element name="safecond" dita:longName="Safety Condition">
+          <a:documentation>
+            <![CDATA[The Safety-Conditions (<safecond>) element has to be used if there are safety requirements.]]></a:documentation>
+          <ref name="safecond.attlist"/>
+          <ref name="safecond.content"/>
+        </element>
+      </define>
+      <define name="safecond.attlist" combine="interleave">
+        <ref name="safecond.attributes"/>
+      </define>
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="prelreqs.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/section task/prereq taskreq-d/prelreqs "/>
+      </optional>
+    </define>
+    <define name="closereqs.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/section task/postreq taskreq-d/closereqs "/>
+      </optional>
+    </define>
+    <define name="reqconds.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ul task/ul taskreq-d/reqconds "/>
+      </optional>
+    </define>
+    <define name="noconds.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/noconds "/>
+      </optional>
+    </define>
+    <define name="reqcond.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/reqcond "/>
+      </optional>
+    </define>
+    <define name="reqcontp.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/reqcontp "/>
+      </optional>
+    </define>
+    <define name="reqpers.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ul task/ul taskreq-d/reqpers "/>
+      </optional>
+    </define>
+    <define name="personnel.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/personnel "/>
+      </optional>
+    </define>
+    <define name="perscat.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/perscat "/>
+      </optional>
+    </define>
+    <define name="perskill.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/perskill "/>
+      </optional>
+    </define>
+    <define name="esttime.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/esttime "/>
+      </optional>
+    </define>
+    <define name="supequip.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/p task/p taskreq-d/supequip "/>
+      </optional>
+    </define>
+    <define name="nosupeq.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data task/data taskreq-d/nosupeq "/>
+      </optional>
+    </define>
+    <define name="supeqli.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ul task/ul taskreq-d/supeqli "/>
+      </optional>
+    </define>
+    <define name="supequi.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/supequi "/>
+      </optional>
+    </define>
+    <define name="supplies.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/p task/p taskreq-d/supplies "/>
+      </optional>
+    </define>
+    <define name="nosupply.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data task/data taskreq-d/nosupply "/>
+      </optional>
+    </define>
+    <define name="supplyli.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ul task/ul taskreq-d/supplyli "/>
+      </optional>
+    </define>
+    <define name="supply.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/supply "/>
+      </optional>
+    </define>
+    <define name="spares.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/p task/p taskreq-d/spares "/>
+      </optional>
+    </define>
+    <define name="nospares.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/data task/data taskreq-d/nospares "/>
+      </optional>
+    </define>
+    <define name="sparesli.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ul task/ul taskreq-d/sparesli "/>
+      </optional>
+    </define>
+    <define name="spare.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/spare "/>
+      </optional>
+    </define>
+    <define name="safety.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ol task/ol taskreq-d/safety "/>
+      </optional>
+    </define>
+    <define name="nosafety.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/nosafety "/>
+      </optional>
+    </define>
+    <define name="safecond.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/li task/li taskreq-d/safecond "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

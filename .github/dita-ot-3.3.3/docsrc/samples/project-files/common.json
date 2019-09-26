@@ -1,0 +1,11 @@
+{
+  "contexts": [
+    {
+      "id": "html",
+      "input": "../../userguide.ditamap",
+      "profiles": {
+        "ditavals": ["../../resources/html.ditaval"]
+      }
+    }
+  ]
+}

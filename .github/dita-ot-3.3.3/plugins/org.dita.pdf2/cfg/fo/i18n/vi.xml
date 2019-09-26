@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+See the accompanying LICENSE file for applicable license.
+-->
+<configuration>
+  <alphabet char-set="Vietnamese">
+    <character-set>
+      <!-- Vietnamese characters -->
+         <char.set>À</char.set>
+         <char.set>Á</char.set>
+         <char.set>Ã</char.set>
+         <char.set>à</char.set>
+         <char.set>á</char.set>
+         <char.set>ã</char.set>
+         <char.set>Ạ</char.set>
+         <char.set>ạ</char.set>
+         <char.set>Ả</char.set>
+         <char.set>ả</char.set>
+         <char.set>Ă</char.set>
+         <char.set>ă</char.set>
+         <char.set>Ắ</char.set>
+         <char.set>ắ</char.set>
+         <char.set>Ằ</char.set>
+         <char.set>ằ</char.set>
+         <char.set>Ẳ</char.set>
+         <char.set>ẳ</char.set>
+         <char.set>Ẵ</char.set>
+         <char.set>ẵ</char.set>
+         <char.set>Ặ</char.set>
+         <char.set>ặ</char.set>                
+         <char.set>Â</char.set>
+         <char.set>â</char.set>
+         <char.set>Ấ</char.set>
+         <char.set>ấ</char.set>
+         <char.set>Ầ</char.set>
+         <char.set>ầ</char.set>
+         <char.set>Ẩ</char.set>
+         <char.set>ẩ</char.set>
+         <char.set>Ẫ</char.set>
+         <char.set>ẫ</char.set>
+         <char.set>Ậ</char.set>
+         <char.set>ậ</char.set>
+         <char.set>Đ</char.set>
+         <char.set>đ</char.set>
+         <char.set>È</char.set>
+         <char.set>É</char.set>
+         <char.set>è</char.set>
+         <char.set>é</char.set>
+         <char.set>Ẹ</char.set>
+         <char.set>ẹ</char.set>
+         <char.set>Ẻ</char.set>
+         <char.set>ẻ</char.set>
+         <char.set>Ẽ</char.set>
+         <char.set>ẽ</char.set>
+         <char.set>Ê</char.set>
+         <char.set>ê</char.set>
+         <char.set>Ế</char.set>
+         <char.set>ế</char.set>
+         <char.set>Ề</char.set>
+         <char.set>ề</char.set>
+         <char.set>Ể</char.set>
+         <char.set>ể</char.set>
+         <char.set>Ễ</char.set>
+         <char.set>ễ</char.set>
+         <char.set>Ệ</char.set>
+         <char.set>ệ</char.set>
+         <char.set>Ì</char.set>
+         <char.set>Í</char.set>
+         <char.set>ì</char.set>
+         <char.set>í</char.set>
+         <char.set>Ĩ</char.set>
+         <char.set>ĩ</char.set>
+         <char.set>Ỉ</char.set>
+         <char.set>ỉ</char.set>
+         <char.set>Ị</char.set>
+         <char.set>ị</char.set>
+         <char.set>Ò</char.set>
+         <char.set>Ó</char.set>
+         <char.set>Õ</char.set>
+         <char.set>ò</char.set>
+         <char.set>ó</char.set>
+         <char.set>õ</char.set>
+         <char.set>Ọ</char.set>
+         <char.set>ọ</char.set>
+         <char.set>Ỏ</char.set>
+         <char.set>ỏ</char.set>
+         <char.set>Ô</char.set>
+         <char.set>ô</char.set>
+         <char.set>Ố</char.set>
+         <char.set>ố</char.set>
+         <char.set>Ồ</char.set>
+         <char.set>ồ</char.set>
+         <char.set>Ổ</char.set>
+         <char.set>ổ</char.set>
+         <char.set>Ỗ</char.set>
+         <char.set>ỗ</char.set>
+         <char.set>Ộ</char.set>
+         <char.set>ộ</char.set>
+         <char.set>Ơ</char.set>
+         <char.set>ơ</char.set>
+         <char.set>Ớ</char.set>
+         <char.set>ớ</char.set>
+         <char.set>Ờ</char.set>
+         <char.set>ờ</char.set>
+         <char.set>Ở</char.set>
+         <char.set>ở</char.set>
+         <char.set>Ỡ</char.set>
+         <char.set>ỡ</char.set>
+         <char.set>Ợ</char.set>
+         <char.set>ợ</char.set>
+         <char.set>Ù</char.set>
+         <char.set>Ú</char.set>
+         <char.set>ù</char.set>
+         <char.set>ú</char.set>
+         <char.set>Ũ</char.set>
+         <char.set>ũ</char.set>
+         <char.set>Ụ</char.set>
+         <char.set>ụ</char.set>
+         <char.set>Ủ</char.set>
+         <char.set>ủ</char.set>
+         <char.set>Ư</char.set>
+         <char.set>ư</char.set>
+         <char.set>Ứ</char.set>
+         <char.set>ứ</char.set>
+         <char.set>Ừ</char.set>
+         <char.set>ừ</char.set>
+         <char.set>Ử</char.set>
+         <char.set>ử</char.set>
+         <char.set>Ữ</char.set>
+         <char.set>ữ</char.set>
+         <char.set>Ự</char.set>
+         <char.set>ự</char.set>
+         <char.set>Ý</char.set>
+         <char.set>ý</char.set>
+         <char.set>Ỳ</char.set>
+         <char.set>ỳ</char.set>
+         <char.set>Ỵ</char.set>
+         <char.set>ỵ</char.set>
+         <char.set>Ỷ</char.set>
+         <char.set>ỷ</char.set>
+         <char.set>Ỹ</char.set>
+         <char.set>ỹ</char.set>
+    </character-set>
+  </alphabet>
+  <alphabet char-set="SymbolsSuperscript">
+    <character-set>
+      <!-- Copyright -->
+      <character>&#169;</character>
+      <!-- Registered Trademark -->
+      <character>&#174;</character>
+      <!-- Trademark -->
+      <character>&#8482;</character>
+      <!-- Service mark -->
+      <character>&#2120;</character>
+    </character-set>
+  </alphabet>
+  <alphabet char-set="SubmenuSymbol">
+    <character-set>
+      <character>&#x27A4;</character>
+    </character-set>
+  </alphabet>
+</configuration>

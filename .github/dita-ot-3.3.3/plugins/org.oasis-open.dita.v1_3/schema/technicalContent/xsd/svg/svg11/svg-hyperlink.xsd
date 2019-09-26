@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:simpleType name="LinkTarget.datatype">
+    <xs:annotation>
+      <xs:documentation>
+      link to this target
+    </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN"/>
+  </xs:simpleType>
+  <xs:complexType name="SVG.a.content" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:SVG.Description.class"/>
+      <xs:element ref="svg:SVG.Animation.class"/>
+      <xs:element ref="svg:SVG.Structure.class"/>
+      <xs:element ref="svg:SVG.Conditional.class"/>
+      <xs:element ref="svg:SVG.Image.class"/>
+      <xs:element ref="svg:SVG.Style.class"/>
+      <xs:element ref="svg:SVG.Shape.class"/>
+      <xs:element ref="svg:SVG.Text.class"/>
+      <xs:element ref="svg:SVG.Marker.class"/>
+      <xs:element ref="svg:SVG.Profile.class"/>
+      <xs:element ref="svg:SVG.Gradient.class"/>
+      <xs:element ref="svg:SVG.Pattern.class"/>
+      <xs:element ref="svg:SVG.Clip.class"/>
+      <xs:element ref="svg:SVG.Mask.class"/>
+      <xs:element ref="svg:SVG.Filter.class"/>
+      <xs:element ref="svg:SVG.Cursor.class"/>
+      <xs:element ref="svg:SVG.Hyperlink.class"/>
+      <xs:element ref="svg:SVG.View.class"/>
+      <xs:element ref="svg:SVG.Script.class"/>
+      <xs:element ref="svg:SVG.Font.class"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="a" substitutionGroup="svg:SVG.Hyperlink.class"/>
+  <xs:attributeGroup name="attlist.a">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attributeGroup ref="SVG.GraphicalEvents.attrib"/>
+    <xs:attributeGroup ref="xlink:SVG.XLinkReplace.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+    <xs:attribute name="target" type="svg:LinkTarget.datatype"/>
+  </xs:attributeGroup>
+</xs:schema>

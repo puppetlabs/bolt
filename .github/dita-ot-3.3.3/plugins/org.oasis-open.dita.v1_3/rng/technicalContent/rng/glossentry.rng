@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:checkShell.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:dita="http://dita.oasis-open.org/architecture/2005/"
+         xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+      <moduleTitle>DITA Glossary Entry Shell</moduleTitle>
+      <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+Darwin Information Typing Architecture (DITA) Version 1.3 Plus Errata 02
+OASIS Standard
+16 January 2018 
+Copyright (c) OASIS Open 2018. All rights reserved. 
+Source: http://docs.oasis-open.org/dita/dita/v1.3/errata02/csprd01/complete/part0-overview/dita-v1.3-errata02-csprd01-part0-overview-complete.html
+
+============================================================
+ MODULE:    DITA Glossary Entry Shell                 
+ VERSION:   1.3                                              
+ DATE:      March 2014                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+      
+PUBLIC "-//OASIS//DTD DITA Glossary Entry//EN"
+
+The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+
+PUBLIC "-//OASIS//DTD DITA 1.3 Glossary Entry//EN"                      
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Document type to describe DITA Glossary Entry topics       
+                                                             
+ORIGINAL CREATION DATE:                                      
+            June 2006                                        
+                                                             
+            (C) Copyright OASIS Open 2006, 2014.             
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2008.02.01 RDA: Added references to concept.ent and       
+                   glossary.ent                              
+   2008.02.12 RDA: Modify imbeds to use specific 1.2 version 
+   2008.04.15 RDA: Added hazard domain                       
+   2009.09.21 WEK: Renamed to glossentry.dtd                 
+   2014.03.12 WEK: Updated for DITA 1.3, reimplemented as 
+                   RELAX NG
+=============================================================
+
+  </headerComment>
+      <moduleMetadata>
+         <moduleType>topicshell</moduleType>
+         <moduleShortName>Glossary Entry</moduleShortName>
+         <shellPublicIds>
+            <dtdShell>-//OASIS//DTD DITA<var presep=" " name="ditaver"/> Glossary Entry//EN</dtdShell>
+            <rncShell>urn:oasis:names:tc:dita:rnc:glossentry.rnc<var presep=":" name="ditaver"/>
+            </rncShell>
+            <rngShell>urn:oasis:names:tc:dita:rng:glossentry.rng<var presep=":" name="ditaver"/>
+            </rngShell>
+            <xsdShell>urn:oasis:names:tc:dita:xsd:glossentry.xsd<var presep=":" name="ditaver"/>
+            </xsdShell>
+         </shellPublicIds>
+      </moduleMetadata>
+  </moduleDesc>
+  <div>
+      <a:documentation>ROOT ELEMENT DECLARATION</a:documentation>
+      <start>
+         <ref name="glossentry.element"/>
+      </start>
+  </div>
+  <div>
+      <a:documentation>DOMAINS ATTRIBUTE</a:documentation>
+      <define name="domains-att" combine="interleave">
+         <optional>
+            <attribute name="domains"
+                       a:defaultValue="(topic abbrev-d)
+                         (topic concept glossentry)
+                         (topic concept)
+                         (topic equation-d)
+                         (topic hazard-d)
+                         (topic hi-d)
+                         (topic indexing-d)
+                         (topic markup-d xml-d)
+                         (topic markup-d)
+                         (topic mathml-d)
+                         (topic pr-d)
+                         (topic relmgmt-d)
+                         (topic svg-d)
+                         (topic sw-d)
+                         (topic ui-d)
+                         (topic ut-d)
+                         a(props deliveryTarget)"/>
+         </optional>
+      </define>
+  </div>
+  <div>
+      <a:documentation>MODULE INCLUSIONS</a:documentation>
+      <include href="../../base/rng/topicMod.rng"/>
+      <include href="conceptMod.rng"/>
+      <include href="glossentryMod.rng">
+        <define name="glossentry-info-types">
+          <empty/>
+        </define>
+      </include>
+      <include href="../../base/rng/deliveryTargetAttDomain.rng" dita:since="1.3"/>
+      <include href="equationDomain.rng" dita:since="1.3"/>
+      <include href="../../base/rng/hazardstatementDomain.rng"/>
+      <include href="../../base/rng/highlightDomain.rng"/>
+      <include href="../../base/rng/indexingDomain.rng"/>
+      <include href="abbreviateDomain.rng"/>
+      <include href="markupDomain.rng" dita:since="1.3"/>
+      <include href="mathmlDomain.rng" dita:since="1.3"/>
+      <include href="programmingDomain.rng"/>
+      <include href="releaseManagementDomain.rng" dita:since="1.3"/>
+      <include href="softwareDomain.rng"/>
+      <include href="svgDomain.rng" dita:since="1.3"/>
+      <include href="uiDomain.rng"/>
+      <include href="../../base/rng/utilitiesDomain.rng"/>
+      <include href="xmlDomain.rng" dita:since="1.3"/>
+  </div>
+  <div>
+      <a:documentation>ID-DEFINING-ELEMENT OVERRIDES</a:documentation>
+      <define name="any">
+         <zeroOrMore>
+            <choice>
+               <ref name="idElements"/>
+               <element>
+                  <anyName>
+                     <except>
+                        <name>topic</name>
+                        <name>concept</name>
+                        <name>glossentry</name>
+                        <nsName ns="http://www.w3.org/2000/svg"/>
+                        <nsName ns="http://www.w3.org/1998/Math/MathML"/>
+                     </except>
+                  </anyName>
+                  <zeroOrMore>
+                     <attribute>
+                        <anyName/>
+                     </attribute>
+                  </zeroOrMore>
+                  <ref name="any"/>
+               </element>
+               <text/>
+            </choice>
+         </zeroOrMore>
+      </define>
+  </div>
+</grammar>

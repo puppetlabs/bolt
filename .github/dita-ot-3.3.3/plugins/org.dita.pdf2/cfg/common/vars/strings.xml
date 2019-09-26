@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2014 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<langlist>
+  <lang filename="commonvariables.xml" xml:lang=""/>
+  <lang filename="ar.xml" xml:lang="ar"/>
+  <lang filename="be.xml" xml:lang="be"/>
+  <lang filename="bg.xml" xml:lang="bg"/>
+  <lang filename="bs.xml" xml:lang="bs"/>
+  <lang filename="ca.xml" xml:lang="ca"/>
+  <lang filename="cs.xml" xml:lang="cs"/>
+  <lang filename="da.xml" xml:lang="da"/>
+  <lang filename="de.xml" xml:lang="de"/>
+  <lang filename="en.xml" xml:lang="en"/>
+  <lang filename="el.xml" xml:lang="el"/>
+  <lang filename="es.xml" xml:lang="es"/>
+  <lang filename="et.xml" xml:lang="et"/>
+  <lang filename="fi.xml" xml:lang="fi"/>
+  <lang filename="fr.xml" xml:lang="fr"/>
+  <lang filename="he.xml" xml:lang="he"/>
+  <lang filename="hi.xml" xml:lang="hi"/>
+  <lang filename="hr.xml" xml:lang="hr"/>
+  <lang filename="hu.xml" xml:lang="hu"/>
+  <lang filename="id.xml" xml:lang="id"/>
+  <lang filename="is.xml" xml:lang="is"/>
+  <lang filename="it.xml" xml:lang="it"/>
+  <lang filename="ja.xml" xml:lang="ja"/>
+  <lang filename="kk.xml" xml:lang="kk"/>
+  <lang filename="ko.xml" xml:lang="ko"/>
+  <lang filename="lt.xml" xml:lang="lt"/>
+  <lang filename="lv.xml" xml:lang="lv"/>
+  <lang filename="mk.xml" xml:lang="mk"/>
+  <lang filename="ms.xml" xml:lang="ms"/>
+  <lang filename="nl.xml" xml:lang="nl"/>
+  <lang filename="no.xml" xml:lang="no"/>
+  <lang filename="pl.xml" xml:lang="pl"/>
+  <lang filename="pt.xml" xml:lang="pt"/>
+  <lang filename="pt_BR.xml" xml:lang="pt-br"/>
+  <lang filename="ro.xml" xml:lang="ro"/>
+  <lang filename="ru.xml" xml:lang="ru"/>
+  <lang filename="sk.xml" xml:lang="sk"/>
+  <lang filename="sl.xml" xml:lang="sl"/>
+  <lang filename="sr.xml" xml:lang="sr"/>
+  <lang filename="sr-latn-me.xml" xml:lang="sr-latn-me"/>
+  <lang filename="sr-latn-rs.xml" xml:lang="sr-latn-rs"/>
+  <lang filename="sv.xml" xml:lang="sv"/>
+  <lang filename="th.xml" xml:lang="th"/>
+  <lang filename="tr.xml" xml:lang="tr"/>
+  <lang filename="uk.xml" xml:lang="uk"/>
+  <lang filename="ur.xml" xml:lang="ur"/>
+  <lang filename="vi.xml" xml:lang="vi"/>
+  <lang filename="zh_CN.xml" xml:lang="zh-cn"/>
+  <lang filename="zh_TW.xml" xml:lang="zh-tw"/>
+</langlist>

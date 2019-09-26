@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:simpleType name="NumberOrPercentage.datatype">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="SVG.linearGradient.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="svg:stop"/>
+        <xs:element ref="svg:animate"/>
+        <xs:element ref="svg:set"/>
+        <xs:element ref="svg:animateTransform"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="linearGradient" substitutionGroup="svg:SVG.Gradient.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.linearGradient.content">
+          <xs:attributeGroup ref="svg:attlist.linearGradient"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.linearGradient">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="SVG.Color.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Gradient.attrib"/>
+    <xs:attributeGroup ref="xlink:SVG.XLink.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="x1" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="y1" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="x2" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="y2" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="gradientUnits">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="userSpaceOnUse"/>
+          <xs:enumeration value="objectBoundingBox"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="gradientTransform" type="svg:TransformList.datatype"/>
+    <xs:attribute name="spreadMethod">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="pad"/>
+          <xs:enumeration value="reflect"/>
+          <xs:enumeration value="repeat"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.radialGradient.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="svg:stop"/>
+        <xs:element ref="svg:animate"/>
+        <xs:element ref="svg:set"/>
+        <xs:element ref="svg:animateTransform"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="radialGradient" substitutionGroup="svg:SVG.Gradient.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.radialGradient.content">
+          <xs:attributeGroup ref="svg:attlist.radialGradient"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.radialGradient">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="SVG.Color.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Gradient.attrib"/>
+    <xs:attributeGroup ref="xlink:SVG.XLink.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="cx" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="cy" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="r" type="svg:Length.datatype"/>
+    <xs:attribute name="fx" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="fy" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="gradientUnits">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="userSpaceOnUse"/>
+          <xs:enumeration value="objectBoundingBox"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="gradientTransform" type="svg:TransformList.datatype"/>
+    <xs:attribute name="spreadMethod">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="pad"/>
+          <xs:enumeration value="reflect"/>
+          <xs:enumeration value="repeat"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.stop.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:animate"/>
+      <xs:element ref="svg:set"/>
+      <xs:element ref="svg:animateColor"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="stop">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.stop.content">
+          <xs:attributeGroup ref="svg:attlist.stop"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.stop">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="SVG.Color.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Gradient.attrib"/>
+    <xs:attribute name="offset" use="required" type="svg:NumberOrPercentage.datatype"/>
+  </xs:attributeGroup>
+</xs:schema>

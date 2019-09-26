@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<map>
+  <title>Installing</title>
+
+  <topicref keyref="prerequisite-software"/>
+  <topicref keyref="determining-version-of-ditaot"/>
+  <!-- ↓ branch-filter ↓ -->
+  <topicref href="using-dita-command.dita"
+            keys="first-build-using-dita-command" locktitle="yes">
+    <topicmeta>
+      <navtitle>Building output</navtitle>
+    </topicmeta>
+    <ditavalref href="../resources/novice.ditaval">
+      <ditavalmeta>
+        <dvrResourcePrefix>first-build-</dvrResourcePrefix>
+      </ditavalmeta>
+    </ditavalref>
+  </topicref>
+  <!-- ↑ end-filtering ↑ -->
+  <topicref keyref="installing-via-homebrew"/>
+</map>

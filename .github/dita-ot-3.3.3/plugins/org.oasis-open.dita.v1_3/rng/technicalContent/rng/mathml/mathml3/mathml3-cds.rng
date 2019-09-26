@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+      This is the Mathematical Markup Language (MathML) 3.0, an XML
+      application for describing mathematical notation and capturing
+      both its structure and content.
+  
+      Copyright 1998-2007 World Wide Web Consortium
+         (Massachusetts Institute of Technology, Institut National de
+          Recherche en Informatique et en Automatique, Keio University).
+          All Rights Reserved.
+  
+      Permission to use, copy, modify and distribute the RelaxNG schema for MathML3
+      and its accompanying documentation for any purpose and without fee is
+      hereby granted in perpetuity, provided that the above copyright notice
+      and this paragraph appear in all copies.  The copyright holders make
+      no representation about the suitability of the Schema for any purpose.
+  
+      This file contains the grammar driver for CD-based arity checking
+      It is provided "as is" without expressed or implied warranty.
+  
+      Revision:   $Id: mathml3-cds.rng,v 1.1 2007/12/11 15:59:27 dcarlis Exp $
+      Author: Michael Kohlhase http://kwarc.info/kohlhase
+-->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <!--
+    some elements were containers in MathML2, so they get a separate treatment,
+    that can be extended in mathml3-pragmatic.rnc
+  -->
+  <!-- we augment the content of an apply element -->
+  <define name="apply.content" combine="choice">
+    <choice>
+      <group>
+        <ref name="cd.token.unary.class"/>
+        <ref name="ContExp"/>
+      </group>
+      <group>
+        <ref name="cd.token.binary.class"/>
+        <ref name="ContExp"/>
+        <ref name="ContExp"/>
+      </group>
+      <group>
+        <ref name="cd.token.nary.class"/>
+        <oneOrMore>
+          <ref name="ContExp"/>
+        </oneOrMore>
+      </group>
+      <ref name="cd.container.class"/>
+    </choice>
+  </define>
+  <!-- of the bind element -->
+  <define name="binder.class" combine="choice">
+    <ref name="cd.token.binder.class"/>
+  </define>
+  <!-- now we allow all tokens (except the binding symbols) to appear on their own -->
+  <define name="ContExp" combine="choice">
+    <choice>
+      <ref name="cd.token.unary.class"/>
+      <ref name="cd.token.binary.class"/>
+      <ref name="cd.token.nary.class"/>
+      <ref name="cd.token.class"/>
+    </choice>
+  </define>
+  <!-- now we allow the containers as well. -->
+  <define name="ContExp" combine="choice">
+    <ref name="cd.container.class"/>
+  </define>
+  <!-- we set the default content type for tokens -->
+  <define name="Token.type">
+    <ref name="Definition.attrib"/>
+    <ref name="MathML.Common.attrib"/>
+  </define>
+  <!--
+    also set up MathMLtype, which is used in the CDs 
+    ednote(rnc:mathmltype) fudge it for now
+  -->
+  <define name="MathMLtype">
+    <data type="string"/>
+  </define>
+  <!--
+    simple arity checking for Tokens from the MathML3 CDs. 
+    we set up the categories to be extended by the CD-generated grammars
+  -->
+  <define name="cd.token.class">
+    <notAllowed/>
+  </define>
+  <define name="cd.token.unary.class">
+    <notAllowed/>
+  </define>
+  <define name="cd.token.binary.class">
+    <notAllowed/>
+  </define>
+  <define name="cd.token.nary.class">
+    <notAllowed/>
+  </define>
+  <define name="cd.token.binder.class">
+    <notAllowed/>
+  </define>
+  <define name="cd.token.key.class">
+    <notAllowed/>
+  </define>
+  <define name="cd.token.error.class">
+    <notAllowed/>
+  </define>
+  <define name="cd.container.class">
+    <notAllowed/>
+  </define>
+  <!-- then we include the generated ones -->
+  <include href="algebra-logic.rng"/>
+  <include href="basic-content-elements.rng"/>
+  <include href="calculus_veccalc.rng"/>
+  <include href="constants.rng"/>
+  <include href="errors.rng"/>
+  <include href="linear_algebra.rng"/>
+  <include href="relations.rng"/>
+  <include href="sequences_series.rng"/>
+  <include href="sets.rng"/>
+  <include href="specfun.rng"/>
+  <include href="statistics.rng"/>
+</grammar>

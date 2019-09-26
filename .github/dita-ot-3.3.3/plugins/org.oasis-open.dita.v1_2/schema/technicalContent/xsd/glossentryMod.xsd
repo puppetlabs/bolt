@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Glossary Entry XSD Module                    -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      July 2007                                         -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    Define elements and specialization atttributes    -->
+<!--             for Glossary Entry topics                         -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             July 2007                                         -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2007, 2009           -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+     <!-- ==================== Import Section ======================= -->
+     <xs:import namespace="http://dita.oasis-open.org/architecture/2005/" schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.2"/>
+   
+   <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic concept glossentry)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    </xs:documentation>
+  </xs:annotation>
+   
+     
+     <!--Embed concept to get specific elements -->
+     <xs:element name="glossentry">
+         <xs:annotation>
+             <xs:documentation></xs:documentation>
+         </xs:annotation>
+         <xs:complexType>
+             <xs:complexContent>
+                 <xs:extension base="glossentry.class">
+                     <xs:attribute ref="class" default="- topic/topic concept/concept glossentry/glossentry "/>
+                 </xs:extension>
+             </xs:complexContent>
+         </xs:complexType>
+     </xs:element>
+     
+     <xs:element name="glossterm">
+         <xs:annotation>
+             <xs:documentation></xs:documentation>
+         </xs:annotation>
+         <xs:complexType>
+             <xs:complexContent>
+                 <xs:extension base="glossterm.class">
+                     <xs:attribute ref="class" default="- topic/title concept/title glossentry/glossterm "/>
+                 </xs:extension>
+             </xs:complexContent>
+         </xs:complexType>
+     </xs:element>
+     
+     <xs:element name="glossdef">
+         <xs:annotation>
+             <xs:documentation></xs:documentation>
+         </xs:annotation>
+         <xs:complexType>
+             <xs:complexContent>
+                 <xs:extension base="glossdef.class">
+                     <xs:attribute ref="class" default="- topic/abstract concept/abstract glossentry/glossdef " />
+                 </xs:extension>
+             </xs:complexContent>
+         </xs:complexType>
+     </xs:element>
+     
+     <xs:group name="glossentry-info-types">
+         <xs:choice>
+             <xs:group ref="no-topic-nesting"/>
+             <xs:group ref="info-types"/>
+         </xs:choice>
+     </xs:group>
+     
+     <!-- Base type: topic.class -->
+     <xs:complexType name="glossentry.class">
+        <xs:sequence>
+          <xs:group ref="glossenrty.content"/>
+        </xs:sequence>
+         <xs:attributeGroup ref="glossentry.attributes"/>
+     </xs:complexType>
+   
+   <xs:group name="glossenrty.content">
+     <xs:sequence>
+        <xs:sequence>
+             <xs:group ref="glossterm"/>
+             <xs:group ref="glossdef"  minOccurs="0"/>
+             <xs:group ref="prolog"  minOccurs="0"/>
+             <xs:group ref="glossBody"  minOccurs="0"/>
+             <xs:group ref="related-links" minOccurs="0"/>
+             <xs:group ref="glossentry-info-types" minOccurs="0" maxOccurs="unbounded"/>
+         </xs:sequence>
+     </xs:sequence>
+   </xs:group>
+     
+   <xs:attributeGroup name="glossentry.attributes">
+     <xs:attribute name="id" type="xs:ID" use="required"/>
+     <xs:attributeGroup ref="conref-atts" />
+     <xs:attributeGroup ref="select-atts"/>
+     <xs:attribute ref="ditaarch:DITAArchVersion" />
+     <xs:attributeGroup ref="domains-att"/>
+     <xs:attribute name="outputclass" type="xs:string"/>
+     <xs:attributeGroup ref="localization-atts"/>
+     <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+     
+     <xs:complexType name="glossterm.class" mixed="true">
+         <xs:sequence>
+           <xs:group ref="glostterm.content"/>
+         </xs:sequence>
+         <xs:attributeGroup ref="glossterm.attributes"/>
+     </xs:complexType>
+   
+   <xs:group name="glostterm.content">
+     <xs:sequence>
+       <xs:choice minOccurs="0" maxOccurs="unbounded">
+             <xs:group ref="title.cnt" minOccurs="0"/>
+         </xs:choice>
+     </xs:sequence>
+   </xs:group>
+   
+   <xs:attributeGroup name="glossterm.attributes">
+     <xs:attribute name="outputclass" type="xs:string"/>
+         <xs:attribute name="base" type="xs:string" />
+         <xs:attributeGroup ref="base-attribute-extensions"/>
+         <xs:attributeGroup ref="id-atts"/>
+         <xs:attributeGroup ref="localization-atts"/>
+         <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+     
+   <xs:complexType name="glossdef.class" mixed="true">
+     <xs:sequence>
+       <xs:group ref="glossdef.content"></xs:group>
+     </xs:sequence>
+     <xs:attributeGroup ref="glossdef.attributes"/>
+   </xs:complexType>
+   
+   <xs:group name="glossdef.content">
+     <xs:sequence>
+       <xs:choice minOccurs="0" maxOccurs="unbounded">
+         <xs:group ref="abstract.cnt" minOccurs="0"/>
+       </xs:choice>
+     </xs:sequence>
+   </xs:group>
+   
+   <xs:attributeGroup name="glossdef.attributes">
+     <xs:attribute name="outputclass" type="xs:string"/>
+     <xs:attributeGroup ref="univ-atts"/>
+     <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   
+   <xs:element name="glossBody">
+         <xs:annotation>
+             <xs:documentation></xs:documentation>
+         </xs:annotation>
+         <xs:complexType>
+             <xs:complexContent>
+                 <xs:extension base="glossBody.class">
+                     <xs:attribute ref="class" default="- topic/body concept/conbody glossentry/glossBody "/>
+                 </xs:extension>
+             </xs:complexContent>
+         </xs:complexType>
+     </xs:element>
+   
+      <xs:complexType name="glossBody.class">
+     <xs:sequence>
+       <xs:group ref="glossBody.content"/>
+     </xs:sequence>
+     <xs:attributeGroup ref="glossBody.attributes"/>
+   </xs:complexType>
+   
+   <xs:group name="glossBody.content">
+     <xs:sequence>
+       <xs:sequence>
+         <xs:group ref="glossPartOfSpeech" minOccurs="0" />
+         <xs:group ref="glossStatus" minOccurs="0" />
+         <xs:group ref="glossProperty" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="glossSurfaceForm" minOccurs="0" />
+         <xs:group ref="glossUsage" minOccurs="0" />
+         <xs:group ref="glossScopeNote" minOccurs="0" />
+         <xs:group ref="glossSymbol" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="note" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="glossAlt" minOccurs="0" maxOccurs="unbounded"/>
+       </xs:sequence>
+     </xs:sequence>
+   </xs:group>
+   
+   <xs:attributeGroup name="glossBody.attributes">
+     <xs:attribute name="outputclass" type="xs:string"/>
+     <xs:attribute name="base" type="xs:string" />
+     <xs:attributeGroup ref="base-attribute-extensions"/>
+     <xs:attributeGroup ref="id-atts"/>
+     <xs:attributeGroup ref="localization-atts"/>
+     <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   
+   <xs:element name="glossAbbreviation">
+         <xs:annotation>
+             <xs:documentation></xs:documentation>
+         </xs:annotation>
+         <xs:complexType>
+             <xs:complexContent>
+                 <xs:extension base="glossAbbreviation.class">
+                     <xs:attribute ref="class" default="- topic/title concept/title glossentry/glossAbbreviation "/>
+                 </xs:extension>
+             </xs:complexContent>
+         </xs:complexType>
+   </xs:element>
+   
+   <xs:complexType name="glossAbbreviation.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="glossAbbreviation.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="glossAbbreviation.attributes"/>
+    </xs:complexType>
+  
+   <xs:group name="glossAbbreviation.content">
+     <xs:sequence>
+       <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="keyword" minOccurs="0"/>
+           <xs:group ref="term" minOccurs="0"/>
+           <xs:group ref="tm" minOccurs="0"/>
+        </xs:choice>
+     </xs:sequence>
+   </xs:group>
+  
+    <xs:attributeGroup name="glossAbbreviation.attributes">
+      <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attribute name="base" type="xs:string" />
+        <xs:attributeGroup ref="base-attribute-extensions"/>
+        <xs:attributeGroup ref="id-atts"/>
+        <xs:attributeGroup ref="localization-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+   
+     <xs:element name="glossAcronym">
+         <xs:annotation>
+             <xs:documentation></xs:documentation>
+         </xs:annotation>
+         <xs:complexType>
+             <xs:complexContent>
+                 <xs:extension base="glossAcronym.class">
+                     <xs:attribute ref="class" default="- topic/title concept/title glossentry/glossAcronym "/>
+                 </xs:extension>
+             </xs:complexContent>
+         </xs:complexType>
+   </xs:element>
+   
+   <xs:complexType name="glossAcronym.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="glossAcronym.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="glossAcronym.attributes"/>
+    </xs:complexType>
+  
+   <xs:group name="glossAcronym.content">
+     <xs:sequence>
+       <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="keyword" minOccurs="0"/>
+           <xs:group ref="term" minOccurs="0"/>
+           <xs:group ref="tm" minOccurs="0"/>
+        </xs:choice>
+     </xs:sequence>
+   </xs:group>
+  
+    <xs:attributeGroup name="glossAcronym.attributes">
+      <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attribute name="base" type="xs:string" />
+        <xs:attributeGroup ref="base-attribute-extensions"/>
+        <xs:attributeGroup ref="id-atts"/>
+        <xs:attributeGroup ref="localization-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+   
+   <xs:element name="glossShortForm">
+         <xs:annotation>
+             <xs:documentation></xs:documentation>
+         </xs:annotation>
+         <xs:complexType>
+             <xs:complexContent>
+               <xs:extension base="glossShortForm.class">
+                     <xs:attribute ref="class" default="- topic/title concept/title glossentry/glossShortForm "/>
+                 </xs:extension>
+             </xs:complexContent>
+         </xs:complexType>
+   </xs:element>
+   
+   <xs:complexType name="glossShortForm.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="glossShortForm.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="glossShortForm.attributes"/>
+    </xs:complexType>
+  
+   <xs:group name="glossShortForm.content">
+     <xs:sequence>
+       <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="keyword" minOccurs="0"/>
+           <xs:group ref="term" minOccurs="0"/>
+           <xs:group ref="tm" minOccurs="0"/>
+        </xs:choice>
+     </xs:sequence>
+   </xs:group>
+  
+    <xs:attributeGroup name="glossShortForm.attributes">
+      <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attribute name="base" type="xs:string" />
+        <xs:attributeGroup ref="base-attribute-extensions"/>
+        <xs:attributeGroup ref="id-atts"/>
+        <xs:attributeGroup ref="localization-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+    
+   <xs:element name="glossSynonym">
+         <xs:annotation>
+             <xs:documentation></xs:documentation>
+         </xs:annotation>
+         <xs:complexType>
+             <xs:complexContent>
+               <xs:extension base="glossSynonym.class">
+                     <xs:attribute ref="class" default="- topic/title concept/title glossentry/glossSynonym "/>
+                 </xs:extension>
+             </xs:complexContent>
+         </xs:complexType>
+   </xs:element>
+   
+   <xs:complexType name="glossSynonym.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="glossSynonym.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="glossSynonym.attributes"/>
+    </xs:complexType>
+  
+   <xs:group name="glossSynonym.content">
+     <xs:sequence>
+       <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="keyword" minOccurs="0"/>
+           <xs:group ref="term" minOccurs="0"/>
+           <xs:group ref="tm" minOccurs="0"/>
+        </xs:choice>
+     </xs:sequence>
+   </xs:group>
+  
+    <xs:attributeGroup name="glossSynonym.attributes">
+      <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attribute name="base" type="xs:string" />
+        <xs:attributeGroup ref="base-attribute-extensions"/>
+        <xs:attributeGroup ref="id-atts"/>
+        <xs:attributeGroup ref="localization-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+   
+    <xs:element name="glossPartOfSpeech">
+      <xs:annotation>
+        <xs:documentation></xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+        <xs:complexContent>
+          <xs:extension base="glossPartOfSpeech.class">
+            <xs:attribute ref="class" default="- topic/data concept/data glossentry/glossPartOfSpeech "/>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+    </xs:element>  
+   
+    <xs:complexType name="glossPartOfSpeech.class">
+        <xs:sequence>
+          <xs:group ref="glossPartOfSpeech.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="glossPartOfSpeech.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="glossPartOfSpeech.content">
+      <xs:sequence>
+        
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="glossPartOfSpeech.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+      <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+   
+   <xs:element name="glossStatus">
+      <xs:annotation>
+        <xs:documentation></xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+        <xs:complexContent>
+          <xs:extension base="glossStatus.class">
+            <xs:attribute ref="class" default="- topic/data concept/data glossentry/glossStatus "/>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+    </xs:element>  
+   
+    <xs:complexType name="glossStatus.class">
+        <xs:sequence>
+          <xs:group ref="glossStatus.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="glossStatus.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="glossStatus.content">
+      <xs:sequence>
+        
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="glossStatus.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+      <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+   
+   <xs:element name="glossProperty">
+      <xs:annotation>
+        <xs:documentation></xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+        <xs:complexContent>
+          <xs:extension base="glossProperty.class">
+            <xs:attribute ref="class" default="- topic/data concept/data glossentry/glossProperty "/>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+    </xs:element>  
+   
+    <xs:complexType name="glossProperty.class" mixed="true">
+        <xs:sequence>
+          <xs:group ref="glossProperty.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="glossProperty.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="glossProperty.content">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="data.cnt" minOccurs="0"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="glossProperty.attributes">
+      <xs:attributeGroup ref="data-element-atts.class"/>
+      <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+   
+   <xs:element name="glossSurfaceForm">
+    <xs:annotation>
+      <xs:documentation>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="glossSurfaceForm.class">
+          <xs:attribute ref="class" default="- topic/p concept/p glossentry/glossSurfaceForm "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="glossSurfaceForm.class" mixed="true">
+     <xs:sequence>
+      <xs:group ref="glossSurfaceForm.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="glossSurfaceForm.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="glossSurfaceForm.content">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="keyword" minOccurs="0"/>
+        <xs:group ref="term" minOccurs="0"/>
+        <xs:group ref="tm" minOccurs="0"/>
+    </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="glossSurfaceForm.attributes">
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+   
+   <xs:element name="glossUsage">
+    <xs:annotation>
+      <xs:documentation>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="glossUsage.class">
+          <xs:attribute ref="class" default="- topic/note concept/note glossentry/glossUsage "/>          
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="glossUsage.class" mixed="true">
+    <xs:sequence>
+      <xs:group ref="glossUsage.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="glossUsage.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="glossUsage.content">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="note.cnt" minOccurs="0"/>
+    </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="glossUsage.attributes">
+    <xs:attribute name="type" type="type-note-atts.class"/>
+    <xs:attribute name="othertype" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+   
+   <xs:element name="glossScopeNote">
+    <xs:annotation>
+      <xs:documentation>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="glossScopeNote.class">
+          <xs:attribute ref="class" default="- topic/note concept/note glossentry/glossScopeNote "/>          
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="glossScopeNote.class" mixed="true">
+    <xs:sequence>
+      <xs:group ref="glossScopeNote.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="glossScopeNote.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="glossScopeNote.content">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="note.cnt" minOccurs="0"/>
+    </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="glossScopeNote.attributes">
+    <xs:attribute name="type" type="type-note-atts.class"/>
+    <xs:attribute name="othertype" type="xs:string"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+   
+   <xs:element name="glossSymbol">
+    <xs:annotation>
+      <xs:documentation>I
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="glossSymbol.class">
+          <xs:attribute ref="class" default="- topic/image concept/image glossentry/glossSymbol "/>          
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="glossSymbol.class">
+    <xs:sequence>
+      <xs:group ref="glossSymbol.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="glossSymbol.attributes"/>
+  </xs:complexType>
+  
+   <xs:group name="glossSymbol.content">
+     <xs:sequence>
+       <xs:sequence>
+      <xs:group ref="alt" minOccurs="0"/>
+      <xs:group ref="longdescref" minOccurs="0"/>
+    </xs:sequence>
+     </xs:sequence>
+   </xs:group>
+  
+  <xs:attributeGroup name="glossSymbol.attributes">
+    <xs:attribute name="href" type="xs:string" use="required"/>
+    <xs:attribute name="keyref" type="xs:string"/>
+    <xs:attribute name="longdescref" type="xs:string"/>
+    <xs:attribute name="height" type="xs:NMTOKEN"/>
+    <xs:attribute name="width" type="xs:NMTOKEN"/>
+    <xs:attribute name="align" type="xs:string"/>
+    <xs:attribute name="scale" type="xs:NMTOKEN"/>
+    <xs:attribute name="scalefit" type="yesno-att.class"/>
+    <xs:attribute name="placement" type="image-placement-att.class" default="inline"/>
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+   
+   <xs:element name="glossAlternateFor">
+        <xs:annotation>
+          <xs:documentation>
+            </xs:documentation>
+        </xs:annotation>
+      <xs:complexType>
+        <xs:complexContent>
+          <xs:extension base="glossAlternateFor.class">
+            <xs:attribute ref="class" default="- topic/xref concept/xref glossentry/glossAlternateFor  "/>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:complexType name="glossAlternateFor.class" >
+        <xs:sequence>
+          <xs:group ref="glossAlternateFor.content"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="glossAlternateFor.attributes"/>
+    </xs:complexType>
+  
+    <xs:group name="glossAlternateFor.content">
+      <xs:sequence>
+      </xs:sequence>
+    </xs:group>
+  
+    <xs:attributeGroup name="glossAlternateFor.attributes">
+      <xs:attribute name="href" type="xs:string"/>
+        <xs:attribute name="keyref" type="xs:string"/>
+        <xs:attribute name="type" type="xs:string"/>
+        <xs:attribute name="format" type="xs:string"/>
+        <xs:attribute name="scope" type="scope-att.class"/>
+        <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attributeGroup ref="univ-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+  
+    <xs:element name="glossAlt">
+    <xs:annotation>
+      <xs:documentation>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="glossAlt.class">
+          <xs:attribute ref="class" default="- topic/section concept/section glossentry/glossAlt "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="glossAlt.class">
+    <xs:sequence>
+      <xs:group ref="glossAlt.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="glossAlt.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="glossAlt.content">
+    <xs:sequence>
+      <xs:sequence>
+      <xs:choice minOccurs="0" >
+        <xs:group ref="glossAbbreviation" minOccurs="0"/>
+        <xs:group ref="glossAcronym" minOccurs="0"/>
+        <xs:group ref="glossShortForm" minOccurs="0"/>
+        <xs:group ref="glossSynonym" minOccurs="0"/>
+      </xs:choice>  
+       <xs:group ref="glossStatus" minOccurs="0"/>
+        <xs:group ref="glossProperty" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:group ref="glossUsage" minOccurs="0"/>
+        <xs:group ref="note" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:group ref="glossAlternateFor" minOccurs="0" maxOccurs="unbounded"/>        
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+
+<xs:attributeGroup name="glossAlt.attributes">
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+</xs:attributeGroup>
+  
+   
+   
+   
+ </xs:schema>
+ 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic_dt3_gkx_ln">
+  <title>Changes to MathML Declarations For Use With DITA DTDs</title>
+  <shortdesc>Describes the modifications made to the base MathML DTDs for use with DITA DTDs</shortdesc>
+  <body>
+    <p>For use with DITA 1.3, the MathML DTD declarations are used through the DITA-specific
+    file <fn>mathml3-ditadriver.dtd</fn>. This declaration set configures the MathML DTDs
+    for use with DITA using the MathML-provided configuration entities. However, this configuration
+    is not sufficient and additional changes must be made to the W3C-provided MathML declarations.</p>
+    <p>The mathml3-ditadriver turns off use of general text entities. DITA documents should not use
+      general text entities. The entity declaration files are included in the distribution
+      but the inclusion of the entity declarations is turned off.</p>
+<!--    <p>The following changes have been made to the MathML3 DTD declarations
+    as provided by the W3C in order to make them work correctly with DITA DTDs:</p>
+    <ul>
+      <li></li>
+    </ul>
+-->  </body>
+</topic>

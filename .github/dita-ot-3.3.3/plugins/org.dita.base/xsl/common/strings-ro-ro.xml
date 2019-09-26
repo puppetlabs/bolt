@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="ro-ro">      <!-- Romanian -->
+  <str name="Figure">Figura</str>
+  <str name="Table">Tabela</str>
+  <str name="Next topic">Subiect următor</str>
+  <str name="Previous topic">Subiect anterior</str>
+  <str name="Parent topic">Subiect părinte</str>
+  <str name="Required cleanup">Curăţare necesară</str>
+  <str name="Draft comment">Comentariu ciornă</str>
+  <str name="Option">Opţiune</str>
+  <str name="Description">Descriere</str>
+  <str name="Optional">Opţional</str>
+  <str name="Required">Necesar</str>
+  <str name="Skip visual syntax diagram">Salt diagramă sintaxă </str>
+  <str name="Read syntax diagram">Citire diagramă sintaxă</str>
+  <str name="Start of change">Început modificare</str>
+  <str name="End of change">Sfârşit modificare</str>
+  <str name="Index">Index</str>
+  <str name="Special characters">Caractere speciale</str>
+  <str name="Numerics">Numerice</str>
+  <str name="End notes">Note de sfârşit</str>
+  <str name="Artwork">Ilustraţie</str>
+  <str name="Syntax">Sintaxă</str>
+  <str name="Type">Tip</str>
+  <str name="Value">Valoare</str>
+  <str name="Note">Notă</str>
+  <str name="Notes">Note</str>
+  <str name="Tip">Indiciu</str>
+  <str name="Fastpath">Cale rapidă</str>
+  <str name="Important">Important</str>
+  <str name="Attention">Atenţie</str>
+  <str name="Caution">ATENŢIE</str>
+  <str name="Danger">PERICOL</str>
+  <str name="Remember">De reţinut</str>
+  <str name="Restriction">Restricţie</str>
+  <str name="Trouble">Problemă</str>
+  <str name="Warning">Avertisment</str>
+  <str name="Contents">Cuprins</str>
+  <str name="Related concepts">Concepte înrudite</str>
+  <str name="Related tasks">Operaţii înrudite</str>
+  <str name="Related reference">Referinţe înrudite</str>
+  <str name="Related information">Informaţii înrudite</str>
+  <str name="Prerequisite">Cerinţă</str>
+  <str name="Prerequisites">Cerinţe</str>
+  <str name="or">or</str>
+  <str name="task_context">Despre acest task</str>
+  <str name="task_example">Exemplu</str>
+  <str name="task_postreq">Ce se face în continuare</str>
+  <str name="task_prereq">Înainte de a începe</str>
+  <str name="task_procedure">Procedură</str>
+  <str name="task_procedure_unordered">Procedură</str>
+  <str name="task_results">Rezultate</str>
+  <str name="Copyright">Copyright</str>
+  <str name="OpenQuote">„</str>
+  <str name="a11y.and-then"></str>
+</strings>

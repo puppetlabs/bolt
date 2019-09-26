@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<topic id="index_configuration_the_common_index_folder">
+  <title>Index configuration</title>
+  <shortdesc>The <filepath>common/index</filepath> folder houses custom index definition files that override the
+    standard definitions in <filepath>org.dita.pdf2/cfg/common/index</filepath>.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>index.group</xmlelement></indexterm>
+        <indexterm><xmlelement>char.set</xmlelement></indexterm>
+        <indexterm>languages<indexterm>ISO 639-1</indexterm></indexterm>
+        <indexterm>ISO 639-1</indexterm>
+        <indexterm>Portuguese</indexterm>
+        <indexterm>index<indexterm>PDF</indexterm></indexterm>
+        <indexterm>catalog<indexterm><filepath>catalog.xml</filepath></indexterm></indexterm>
+        <indexterm>catalog<indexterm>index configuration</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <body>
+    <p>Each file contains data for a single language, and should take that language’s ISO 639-1 language designator as
+      its name (for example, <filepath>pt.xml</filepath> for Portuguese). If necessary, locale-specific customizations
+      can be provided by adding a region designator to the file name (for example, <filepath>pt_BR.xml</filepath> for
+      Brazilian Portuguese).</p>
+    <p>The index files consist of <xmlelement>index.group</xmlelement> elements which contain sorting information on one
+      or more characters. Index groups are listed in sort order (“specials” before numbers, numbers before the letter
+      ‘A‘, etc), and the <xmlelement>char.set</xmlelement> entries they contain are also listed in sort order (uppercase
+      before lowercase).</p>
+    <p>The best way to start editing a custom index file is by making a copy of the original from
+        <filepath>org.dita.pdf2/cfg/common/index</filepath> and making changes as desired.</p>
+    <p>In order to apply a custom index definition to your publishing outputs, edit <filepath>catalog.xml</filepath> and
+      uncomment the appropriate entry in the “Index configuration override entries” section.</p>
+  </body>
+</topic>

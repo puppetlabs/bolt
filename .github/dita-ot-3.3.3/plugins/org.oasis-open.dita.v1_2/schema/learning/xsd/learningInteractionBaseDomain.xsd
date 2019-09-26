@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!-- HEADER -->
+<!-- ============================================================= -->
+<!-- MODULE:    DITA Learning  Domains -->
+<!-- VERSION:   1.2 -->
+<!-- DATE:      February 2008 -->
+<!---->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA) -->
+<!---->
+<!-- PURPOSE:    XSD to describe DITA Learning domain  -->
+<!---->
+<!-- ORIGINAL CREATION DATE: -->
+<!-- MAy 2007 -->
+<!---->
+<!-- (C) Copyright OASIS Open 2007, 2008. -->
+<!-- All Rights Reserved. -->
+<!---->
+<!-- UPDATES: -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    
+    <!-- <!ENTITY % learningInteractionBase-d-att "(topic learningInteractionBase-d)"> -->
+   <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic learningInteractionBase-d)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    
+    </xs:documentation>
+   </xs:annotation>
+      
+    <xs:group name="learningInteractionBase-d-fig">
+        <xs:choice>
+            <xs:group ref="lcInteractionBase" />
+        </xs:choice>        
+    </xs:group>
+    
+    
+    
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        - ENTITY DECLARATIONS FOR DOMAIN SUBSTITUTION
+        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --> 
+
+  <xs:group name="lcInteractionBase">
+    <xs:choice>
+      <xs:element ref="lcInteractionBase" />
+    </xs:choice>
+  </xs:group>
+  
+  <xs:group name="lcQuestionBase">
+    <xs:choice>
+      <xs:element ref="lcQuestionBase"/>
+    </xs:choice>
+  </xs:group>
+  
+    
+    <xs:element name="lcInteractionBase">
+        <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="lcInteractionBase.class">
+                <xs:attribute ref="class" default="+ topic/fig learningInteractionBase-d/lcInteractionBase "/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+  <xs:complexType name="lcInteractionBase.class">
+        <xs:sequence>
+          <xs:group ref="lcInteractionBase.content" />
+        </xs:sequence>
+    <xs:attributeGroup ref="lcInteractionBase.attributes"/>
+    </xs:complexType>
+  
+  <xs:group name="lcInteractionBase.content">
+    <xs:sequence>
+      <xs:sequence>
+        <xs:group ref="title" minOccurs="0"/>
+        <xs:group ref="lcQuestionBase" />
+        <xs:group ref="fig.cnt" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="lcInteractionBase.attributes">
+      <xs:attribute name="outputclass" type="xs:string"/>
+        <xs:attribute name="id" type="xs:NMTOKEN" use="required"/>
+        <xs:attributeGroup ref="conref-atts"/>
+        <xs:attributeGroup ref="select-atts"/>
+        <xs:attributeGroup ref="localization-atts"/>
+        <xs:attributeGroup ref="global-atts"/>
+    </xs:attributeGroup>
+
+  <xs:element name="lcQuestionBase">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="lcQuestionBase.class">
+          <xs:attribute ref="class" default="+ topic/p learningInteractionBase-d/lcQuestionBase "/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="lcQuestionBase.class" mixed="true">
+    <xs:sequence>
+      <xs:group ref="lcQuestionBase.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="lcQuestionBase.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="lcQuestionBase.content">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ph.cnt"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="lcQuestionBase.attributes">
+    <xs:attribute name="outputclass" type="xs:string"/>
+    <xs:attributeGroup ref="univ-atts"/>
+    <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+  
+</xs:schema>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+>
+  
+  <xs:annotation xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic task strictTaskbody-c)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+      
+    </xs:documentation>
+  </xs:annotation>
+  
+  <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:taskMod.xsd:1.2">
+
+    <xs:group name="taskPreStep" xmlns:xs="http://www.w3.org/2001/XMLSchema">  
+      <xs:sequence>
+        <xs:choice> 
+          <xs:sequence>
+            <xs:group ref="prereq"  minOccurs="0"/>
+            <xs:group ref="context"  minOccurs="0"/>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:group name="taskPostStep" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:sequence>
+        <xs:sequence>
+          <xs:group ref="result"  minOccurs="0"/>
+          <xs:group ref="example"  minOccurs="0"/>
+          <xs:group ref="postreq"  minOccurs="0"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:group>  
+    <xs:group name="taskStep">
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:group ref="steps" />
+          <xs:group ref="steps-unordered" />
+        </xs:choice>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:group name="task-info-types">
+      <xs:choice>
+        <xs:group ref="task-info-types"/>
+      </xs:choice>
+    </xs:group>
+   
+  </xs:redefine>
+
+</xs:schema>

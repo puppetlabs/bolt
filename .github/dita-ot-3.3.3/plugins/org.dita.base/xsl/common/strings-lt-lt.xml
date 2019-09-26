@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2004, 2005 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="lt-lt">        <!-- Lithuanian -->
+  <str name="Figure">Piešinys</str>
+  <str name="Table">Lentelė</str>
+  <str name="Next topic">Paskesnė tema</str>
+  <str name="Previous topic">Ankstesnė tema</str>
+  <str name="Parent topic">Pradinė tema</str>
+  <str name="Required cleanup">Reikalingas valymas</str>
+  <str name="Draft comment">Juodraščio komentarai</str>
+  <str name="Option">Variantas</str>
+  <str name="Description">Aprašas</str>
+  <str name="Optional">Nebūtina</str>
+  <str name="Required">Būtina</str>
+  <str name="Skip visual syntax diagram">Praleisti vaizdinę sintaksės diagramą</str>
+  <str name="Read syntax diagram">Skaityti sintaksės diagramą</str>
+  <str name="Start of change">Keitimų pradžia</str>
+  <str name="End of change">Keitimų pabaiga</str>
+  <str name="Index">Indeksas</str>
+  <str name="Special characters">Specialūs ženklai</str>
+  <str name="Numerics">Skaitmenys</str>
+  <str name="End notes">Galutinės pastabos</str> 
+  <str name="Artwork">Paveikslėliai</str> 
+  <str name="Syntax">Sintaksė</str> 
+  <str name="Type">Tipas</str> 
+  <str name="Value">Reikšmė</str> 
+  <str name="Note">Pastaba</str>
+  <str name="Notes">Pastabos</str>
+  <str name="Tip">Patarimas</str>
+  <str name="Fastpath">Nuoroda</str>
+  <str name="Important">Svarbi informacija</str>
+  <str name="Attention">Dėmesio!</str>
+  <str name="Caution">PERSPĖJIMAS</str>
+  <str name="Danger">PAVOJINGA</str>
+  <str name="Remember">Atminkite</str>
+  <str name="Restriction">APRIBOJIMAS</str>
+  <str name="Trouble">Problema</str>
+  <str name="Warning">Įspėjimas</str>
+  <str name="Contents">Turinys</str>
+  <str name="Related concepts">Susijusios sąvokos</str>
+  <str name="Related tasks">Susijusios užduotys</str>
+  <str name="Related reference">Susijusi nuoroda</str>
+  <str name="Related information">Susijusi informacija</str>
+  <str name="Prerequisite">Nuoroda</str>
+  <str name="Prerequisites">Nuorodos</str>
+  <str name="or">arba</str>
+  <str name="task_context">Apie šią užduotį</str>
+  <str name="task_example">Pavyzdys</str>
+  <str name="task_postreq">Ką daryti toliau</str>
+  <str name="task_prereq">Prieš pradedant</str>
+  <str name="task_procedure">Procedūra</str>
+  <str name="task_procedure_unordered">Procedūra</str>
+  <str name="task_results">Rezultatai</str>
+  <str name="Copyright">Copyright</str>
+  <str name="a11y.and-then"></str>
+</strings>

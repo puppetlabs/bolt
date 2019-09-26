@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<topic id="custom_attributes_the_fo_attrs_folder">
+  <title>Custom attributes</title>
+  <shortdesc>The <filepath>fo/attrs</filepath> folder houses custom attribute configuration files that override the
+    standard attributes in <filepath>org.dita.pdf2/cfg/fo/attrs</filepath>.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>fonts<indexterm>PDF</indexterm></indexterm>
+        <indexterm>PDF<indexterm>fonts</indexterm><indexterm>index</indexterm><indexterm>tables</indexterm></indexterm>
+        <indexterm>index<indexterm>PDF</indexterm></indexterm>
+        <indexterm>tables<indexterm>tables.attr.xsl</indexterm></indexterm>
+        <indexterm>tables<indexterm>PDF</indexterm></indexterm>
+        <indexterm>index-attr.xsl</indexterm>
+        <indexterm>tables-attr.xsl</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <body>
+    <p>These files define the appearance of different elements in XML assets when they are rendered to PDF output. The
+      different DITA elements are organized into files by element type – index-related definitions in
+        <filepath>index-attr.xsl</filepath>, table-related definitions in <filepath>tables-attr.xsl</filepath>, etc.</p>
+    <p>The XSL attribute sets defined in these files can be used to override the presentation of DITA elements,
+      including font size, color, spacing, etc.</p>
+  </body>
+</topic>

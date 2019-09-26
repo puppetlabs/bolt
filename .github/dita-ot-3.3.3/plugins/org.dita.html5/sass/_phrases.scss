@@ -1,0 +1,43 @@
+// This file is part of the DITA Open Toolkit project.
+//
+// Copyright 2016 Roger Sheen
+//
+// See the accompanying LICENSE file for applicable license.
+
+// Sass partial for phrase styles
+
+/* Various basic phrase styles */
+
+.bold {
+  font-weight: bold;
+}
+
+.bolditalic {
+  font-style: italic;
+  font-weight: bold;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.underlined {
+  text-decoration: underline;
+}
+
+.uicontrol {
+  font-weight: bold;
+}
+
+.defkwd {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.shortcut {
+  text-decoration: underline;
+}
+
+.menucascade > abbr {
+    text-decoration: none;
+}

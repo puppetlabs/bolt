@@ -1,0 +1,125 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="JavaScript code can be bundled in a custom plug-in and automatically inserted into the generated HTML pages to enable web analytics or dynamic content delivery."><meta name="DC.subject" content=", footer, require, head, transformations, HTML5, JavaScript, adding"><meta name="keywords" content=", footer, require, head, transformations, HTML5, JavaScript, adding"><meta name="DC.relation" scheme="URI" content="../topics/html-customization-plugins.html"><meta name="DC.relation" scheme="URI" content="../parameters/parameters-base-html.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="custom-html-plugin-webfont"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Inserting JavaScript in generated HTML</title></head><body id="custom-html-plugin-webfont"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a><ul><li><a href="../topics/html-customization-parameters.html">Setting HTML parameters</a></li><li><a href="../topics/html-customization-properties-file.html">Using a properties file</a></li><li><a href="../topics/html-customization-plugins.html">Custom HTML plug-ins</a><ul><li><a href="../topics/html-customization-plugin-bundle-css.html">Bundling custom CSS</a></li><li><a href="../topics/html-customization-plugin-webfont.html">Embedding web fonts</a></li><li class="active"><a href="../topics/html-customization-plugin-javascript.html">Inserting JavaScript</a></li></ul></li></ul></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Inserting JavaScript in generated HTML</h1>
+  
+  
+  
+  <div class="body taskbody"><p class="shortdesc">JavaScript code can be bundled in a custom plug-in and automatically inserted into the generated HTML pages
+    to enable web analytics or dynamic content delivery.</p>
+    <section class="section context"><div class="tasklabel"><h2 class="sectiontitle tasklabel">About this task</h2></div>
+      <p class="p">This scenario walks through the process of creating a very simple plug-in
+          (<code class="ph codeph">com.example.html5-javascript</code>) that creates a new transformation type:
+          <span class="keyword option">html5-javascript</span>. </p>
+      <p class="p">The <span class="keyword option">html5-javascript</span> transformation includes a custom page footer file with a JavaScript
+        tracking snippet and sets the <span class="keyword parmname">args.ftr</span> parameter to integrate the script content in the
+        HTML5 <code class="keyword markupname xmlelement">&lt;footer&gt;</code> element of the generated pages.</p>
+      <div class="note note note_note"><span class="note__title">Note:</span> This example inserts a tracking snippet for Google Analytics, but the basic approach is the same for other
+        analytics platforms or similar use cases that require custom JavaScript.</div>
+    </section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">In the <span class="ph filepath">plugins</span> directory, create a directory named
+            <span class="ph filepath">com.example.html5-javascript</span>.</span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the new <span class="ph filepath">com.example.html5-javascript</span> directory, create a plug-in configuration file
+            (<span class="ph filepath">plugin.xml</span>) that declares the new <span class="keyword option">html5-javascript</span> transformation and
+          its dependencies.</span>
+        <div class="itemgroup stepxmp">
+          <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 1. </span>Sample <span class="ph filepath">plugin.xml</span> file</figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;?xml-model href="dita-ot/plugin.rnc" type="application/relax-ng-compact-syntax"?&gt;
+
+&lt;plugin id="com.example.html5-javascript"&gt;
+  &lt;require plugin="org.dita.html5"/&gt;
+  &lt;transtype name="html5-javascript" extends="html5" desc="HTML5 with embedded JavaScript"/&gt;
+  &lt;feature extension="ant.import" file="build_html5-javascript.xml"/&gt;
+&lt;/plugin&gt;</code></pre>
+          </figure>
+          <div class="note note note_note"><span class="note__title">Note:</span> This plug-in will extend the default HTML5 transformation, so the <code class="keyword markupname xmlelement">&lt;require&gt;</code>
+            element explicitly defines <span class="ph filepath">org.dita.html5</span> as a dependency.</div>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the <span class="ph filepath">com.example.html5-javascript</span> directory, create a subdirectory named
+            <span class="ph filepath">include</span>.</span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the new <span class="ph filepath">include</span> subdirectory, create a file named
+            <span class="ph filepath">javascript.ftr.xml</span> with your custom JavaScript code.</span>
+        <div class="itemgroup stepxmp">
+          <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 2. </span>Sample <span class="ph filepath">javascript.ftr.xml</span> file</figcaption>
+            
+            <pre class="pre codeblock language-javascript normalize-space show-line-numbers show-whitespace"><code>&lt;div&gt;
+&lt;!-- Google Analytics --&gt;
+&lt;script&gt;
+console.log('Adding Google Analytics tracker');
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-XXXXX-Y', 'auto');
+ga('send', 'pageview');
+&lt;/script&gt;
+&lt;!-- End Google Analytics --&gt;
+&lt;/div&gt;</code></pre>
+          </figure>
+          <p class="p">The division wrapper will be discarded when generating HTML files, and the contents will be inserted into
+            the <code class="keyword markupname xmlelement">&lt;footer&gt;</code> element of each page.</p>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the <span class="ph filepath">com.example.html5-javascript</span> root directory, add an Ant script
+            (<span class="ph filepath">build_html5-javascript.xml</span>) to define the transformation type and set the path to the
+          JavaScript footer file created in the previous step.</span>
+        <div class="itemgroup stepxmp">
+          <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 3. </span>Sample build file: <span class="ph filepath">build_html5-javascript.xml</span></figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+
+&lt;project&gt;
+  &lt;target name="dita2html5-javascript"
+       depends="dita2html5-javascript.init,
+                dita2html5"/&gt;
+  &lt;target name="dita2html5-javascript.init"&gt;
+    &lt;property name="args.ftr"
+          location="${dita.plugin.com.example.html5-javascript.dir}/include/javascript.ftr.xml"/&gt;
+  &lt;/target&gt;
+&lt;/project&gt;</code></pre>
+          </figure>
+        </div>
+      </li></ol></section>
+    <section class="section result"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Results</h2></div>
+      <div class="note tip note_tip"><span class="note__title">Tip:</span> The files for this sample plug-in are included in the DITA-OT installation directory under
+          <span class="ph filepath">docsrc/samples/plugins/com.example.html5-javascript/</span> and on <a class="xref" href="https://github.com/dita-ot/docs/tree/develop/samples/plugins/com.example.html5-javascript" target="_blank">GitHub</a>.</div>
+      <p class="p">The plug-in directory has the following layout and files:</p>
+      <pre class="pre codeblock"><code>com.example.html5-javascript
+├── build_html5-javascript.xml
+├── include
+│&nbsp;&nbsp; └── javascript.ftr.xml
+└── plugin.xml</code></pre>
+    </section>
+    <section class="section postreq"><div class="tasklabel"><h2 class="sectiontitle tasklabel">What to do next</h2></div>
+      <ol class="ol">
+        <li class="li">Run <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span>
+          <span class="keyword parmname">--install</span> to install the plug-in and make the <span class="keyword option">html5-javascript</span>
+          transformation available.</li>
+        <li class="li">Build output with the new transformation type to verify that the plug-in works as intended.
+          <pre class="pre codeblock"><code><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span> <span class="keyword parmname">--input</span>=<var class="keyword varname">my.ditamap</var> <span class="keyword parmname">--format</span>=<span class="keyword option">html5-javascript</span></code></pre></li>
+        <li class="li">Open one of the generated HTML topic files in a modern web browser and check the JavaScript
+            <span class="ph uicontrol">Console</span>. When the page is loaded, <samp class="ph msgph">Adding Google Analytics tracker</samp> will
+          appear on the console to verify that the sample script is loaded.</li>
+        <li class="li">Remove the <code class="ph codeph">console.log</code> debugging message from the sample JavaScript code, and replace the
+            <code class="ph codeph">'UA-XXXXX-Y'</code> placeholder string with the tracking ID of the Google Analytics property you
+          wish to track.</li>
+      </ol>
+      <div class="note tip note_tip"><span class="note__title">Tip:</span> This example places the JavaScript code in the page footer to ensure that page display is not
+        delayed while the script is loaded. If your JavaScript code supports pre-loading and your application targets
+        modern browsers that recognize the <code class="ph codeph">async</code> script attribute, you may prefer to insert the
+        JavaScript snippet in the <code class="keyword markupname xmlelement">&lt;head&gt;</code> element of the generated HTML files using the
+          <span class="keyword parmname">args.hdf</span> parameter intead.</div>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/html-customization-plugins.html" title="For more complex customizations, you can create custom DITA-OT plug-ins that bundle custom fonts, JavaScript, and stylesheets; modify the HTML markup, or override other aspects of HTML processing.">Custom HTML plug-ins</a></div></div><div class="linklist relinfo relref"><strong>Related reference</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../parameters/parameters-base-html.html" title="Certain parameters apply to all HTML-based transformation types: HTML5, XHTML, HTML&nbsp;Help, Eclipse help, and TocJS.">HTML-based output parameters</a></li></ul></div></nav></article></main></body></html>

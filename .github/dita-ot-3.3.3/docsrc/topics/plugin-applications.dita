@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="plugins-overview">
+  <title>Plug-in applications</title>
+  <shortdesc>Plug-ins allow you to extend the functionality of DITA-OT. This might entail adding support for specialized
+    document types, integrating processing overrides, or defining new output transformations.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins<indexterm start="plugin-ideas">ideas for</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+</concept>

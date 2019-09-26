@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="ID" rev="1.8">
+
+  <title>Migrating to release 1.8</title>
+  <titlealts>
+    <navtitle>To 1.8</navtitle>
+  </titlealts>
+
+  <shortdesc>In DITA-OT 1.8, certain stylesheets were moved to plug-in specific folders and various deprecated Ant
+    properties, XSLT stylesheets, parameters and modes were removed from the XHTML, PDF and ODT
+    transformations.</shortdesc>
+  
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>deprecated features<indexterm><codeph>dita.script.dir</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>dita.resource.dir</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>dita.empty</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>args.message.file</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>ImgUtils</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><filepath>artwork-preprocessor.xsl</filepath></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><filepath>otdita2fo_frontend.xsl</filepath></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>insertVariable.old</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>XSLT mode, <codeph>layout-masters-processing</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>XSLT mode, <codeph>toc-prefix-text</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>XSLT mode, <codeph>toc-topic-text</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>args.fo.include.rellinks</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm>Legacy PDF</indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>args.odt.include.rellinks</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>disableRelatedLinks</codeph></indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section>
+      <p>Stylesheets for the following transformation types have moved to plug-in specific folders:</p>
+      <ul>
+        <li><option>eclipsehelp</option></li>
+        <li><option>htmlhelp</option></li>
+        <li><option>javahelp</option></li>
+        <li><option>odt</option></li>
+        <li><option>xhtml</option></li>
+      </ul>
+    </section>
+    <section>
+      <title>Preprocessing</title>
+      <p>The following deprecated Ant properties have been removed:</p>
+      <ul>
+        <li><codeph>dita.script.dir</codeph>, use <codeph>${dita.plugin.<varname>id</varname>.dir}</codeph> instead</li>
+        <li><codeph>dita.resource.dir</codeph>, use <codeph>${dita.plugin.org.dita.base.dir}/resource</codeph>
+          instead</li>
+        <li><codeph>dita.empty</codeph></li>
+        <li><codeph>args.message.file</codeph></li>
+      </ul>
+    </section>
+    <section>
+      <title>XHTML</title>
+      <p>XSLT Java extension <codeph>ImgUtils</codeph> has been removed from stylesheets and been replaced with
+        preprocessing module <codeph>ImageMetadataModule</codeph>. The old <codeph>ImgUtils</codeph> Java classes are
+        still included in the build.</p>
+    </section>
+    <section>
+      <title>PDF</title>
+      <div outputclass="div-index">
+        <indexterm>args.rellinks</indexterm>
+        <indexterm>PDF<indexterm>related links</indexterm><indexterm>args.rellinks</indexterm></indexterm>
+      </div>
+      <p>The following deprecated XSLT stylesheets have been removed:</p>
+      <ul>
+        <li><filepath>artwork-preprocessor.xsl</filepath></li>
+        <li><filepath>otdita2fo_frontend.xsl</filepath></li>
+      </ul>
+      <p>The following deprecated XSLT templates have been removed:</p>
+      <ul>
+        <li><codeph>insertVariable.old</codeph></li>
+      </ul>
+      <p>The following deprecated XSLT modes have been removed:</p>
+      <ul>
+        <li><codeph>layout-masters-processing</codeph></li>
+        <li><codeph>toc-prefix-text</codeph>, use <codeph>tocPrefix</codeph> mode instead</li>
+        <li><codeph>toc-topic-text</codeph>, use <codeph>tocText</codeph> mode instead</li>
+      </ul>
+      <p>Link generation has been simplified by removing deprecated arguments in favor of
+        <codeph>args.rellinks</codeph>. The following deprecated Ant properties have been removed:</p>
+      <ul>
+        <li><codeph>args.fo.include.rellinks</codeph></li>
+      </ul>
+      <p>The following XSLT parameters have been removed:</p>
+      <ul>
+        <li><codeph>antArgsIncludeRelatedLinks</codeph></li>
+        <li><codeph>disableRelatedLinks</codeph></li>
+      </ul>
+      <p>A call to a named template <codeph>pullPrologIndexTerms.end-range</codeph> has been added to
+          <codeph>processTopic*</codeph> templates to handle topic wide index ranges.</p>
+    </section>
+    <section>
+      <title>Legacy PDF</title>
+      <p>The following deprecated XSLT stylesheets have been removed:</p>
+      <ul>
+        <li><filepath>dita2fo-shell_template.xsl</filepath></li>
+        <li><filepath>topic2fo-shell.xsl</filepath></li>
+      </ul>
+    </section>
+    <section>
+      <title>ODT</title>
+      <p>Link generation has been simplified by removing deprecated arguments in favor of
+        <codeph>args.rellinks</codeph>. The following deprecated Ant properties have been removed:</p>
+      <ul>
+        <li><codeph>args.odt.include.rellinks</codeph></li>
+      </ul>
+      <p>The following XSLT parameters have been added:</p>
+      <ul>
+        <li><codeph>include.rellinks</codeph></li>
+      </ul>
+      <p>The following XSLT parameters have been removed:</p>
+      <ul>
+        <li><codeph>disableRelatedLinks</codeph></li>
+      </ul>
+    </section>
+  </refbody>
+</reference>

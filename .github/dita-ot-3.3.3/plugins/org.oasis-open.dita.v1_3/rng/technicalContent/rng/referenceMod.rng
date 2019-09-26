@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Reference</moduleTitle>
+    <headerComment xml:space="preserve"><![CDATA[
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Reference                                   
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Reference//EN"
+      Delivered as file "reference.mod"                           
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for Reference                         
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2001                                       
+                                                             
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2005.11.15 RDA: Removed old declaration for               
+                   referenceClasses entity                   
+   2005.11.15 RDA: Corrected LONG NAME for propdeschd        
+   2006.06.07 RDA: Added <abstract> element                  
+   2006.06.07 RDA: Make universal attributes universal       
+                     (DITA 1.1 proposal #12)                 
+   2006.11.30 RDA: Remove #FIXED from DITAArchVersion        
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.01.30 RDA: Replace @conref defn. with %conref-atts;  
+   2008.02.13 RDA: Create .content and .attributes entities  
+   2008.05.06 RDA: Added refbodydiv                          
+=============================================================
+]]></headerComment>
+    <moduleMetadata>
+      <moduleType>topic</moduleType>
+      <moduleShortName>reference</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Reference//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Reference//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:referenceMod.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <xsdGrp>urn:oasis:names:tc:dita:xsd:referenceGrp.xsd<var presep=":" name="ditaver"/></xsdGrp>
+        <rncMod>urn:oasis:names:tc:dita:rnc:referenceMod.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:referenceMod.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic reference)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>TOPIC NESTING OVERRIDES</a:documentation>
+    <define name="reference-info-types">
+      <ref name="info-types"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="refbody">
+      <ref name="refbody.element"/>
+    </define>
+    <define name="refbodydiv">
+      <ref name="refbodydiv.element"/>
+    </define>
+    <define name="refsyn">
+      <ref name="refsyn.element"/>
+    </define>
+    <define name="properties">
+      <ref name="properties.element"/>
+    </define>
+    <define name="property">
+      <ref name="property.element"/>
+    </define>
+    <define name="proptype">
+      <ref name="proptype.element"/>
+    </define>
+    <define name="propvalue">
+      <ref name="propvalue.element"/>
+    </define>
+    <define name="propdesc">
+      <ref name="propdesc.element"/>
+    </define>
+    <define name="prophead">
+      <ref name="prophead.element"/>
+    </define>
+    <define name="proptypehd">
+      <ref name="proptypehd.element"/>
+    </define>
+    <define name="propvaluehd">
+      <ref name="propvaluehd.element"/>
+    </define>
+    <define name="propdeschd">
+      <ref name="propdeschd.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+
+    <div>
+      <a:documentation> LONG NAME: Reference </a:documentation>
+      <define name="reference.content">
+        <ref name="title"/>
+        <optional>
+          <ref name="titlealts"/>
+        </optional>
+        <optional>
+          <choice>
+            <ref name="abstract"/>
+            <ref name="shortdesc"/>
+          </choice>
+        </optional>
+        <optional>
+          <ref name="prolog"/>
+        </optional>
+        <optional>
+          <ref name="refbody"/>
+        </optional>
+        <optional>
+          <ref name="related-links"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="reference-info-types"/>
+        </zeroOrMore>
+      </define>
+      <define name="reference.attributes">
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+        <ref name="conref-atts"/>
+        <ref name="select-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="reference.element">
+        <element name="reference" dita:longName="Reference">
+          <a:documentation>
+            <![CDATA[The <reference> element defines a top-level container for a reference topic. Reference topics document programming constructs or facts about a product. Examples of reference topics include language elements, class descriptions, commands, functions, statements, protocols, types, declarators, operands, and API information, which provide quick access to facts, but no explanation of concepts or procedures. Reference topics have the same high-level structure as any other topic type, with a title, short description, and body. Within the body, reference topics are typically organized into one or more sections, property lists, and tables. The reference topic type provides general rules that apply to all kinds of reference information, using elements like <refsyn> for syntax or signatures, and <properties> for lists of properties and values.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="reference.attlist"/>
+          <ref name="reference.content"/>
+        </element>
+      </define>
+      <define name="reference.attlist" combine="interleave">
+        <ref name="reference.attributes"/>
+        <ref name="arch-atts"/>
+        <ref name="domains-att"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Reference Body </a:documentation>
+      <define name="refbody.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="data.elements.incl"/>
+            <ref name="example"/>
+            <ref name="foreign.unknown.incl"/>
+            <ref name="refbodydiv"/>
+            <ref name="refsyn"/>
+            <ref name="properties"/>
+            <ref name="section"/>
+            <ref name="simpletable"/>
+            <ref name="table"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="refbody.attributes">
+        <ref name="id-atts"/>
+        <ref name="localization-atts"/>
+        <optional>
+          <attribute name="base"/>
+        </optional>
+        <ref name="base-attribute-extensions"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="refbody.element">
+        <element name="refbody" dita:longName="Reference Body">
+          <a:documentation>
+            <![CDATA[The <refbody> element is a container for the main content of the reference topic. Reference topics limit the body structure to tables (both simple and standard), property lists, syntax sections, and generic sections and examples, in any sequence or number.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="refbody.attlist"/>
+          <ref name="refbody.content"/>
+        </element>
+      </define>
+      <define name="refbody.attlist" combine="interleave">
+        <ref name="refbody.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Reference Body division </a:documentation>
+      <define name="refbodydiv.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="data.elements.incl"/>
+            <ref name="example"/>
+            <ref name="foreign.unknown.incl"/>
+            <ref name="refbodydiv"/>
+            <ref name="refsyn"/>
+            <ref name="properties"/>
+            <ref name="section"/>
+            <ref name="simpletable"/>
+            <ref name="table"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="refbodydiv.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="refbodydiv.element">
+        <element name="refbodydiv" dita:longName="Reference Body division">
+          <a:documentation>
+            <![CDATA[The <refbodydiv> element is similar to the <bodydiv> element in that it provides an informal container for content that may be grouped within a reference. Reference topics place many restrictions on their content compared to generic topics; the <refbodydiv> element maintains these restrictions by only allowing elements that are already available within the body of a reference. There are no additional semantics attached to the <refbodydiv> element; it is purely a grouping element provided to help organize content. ]]></a:documentation>
+          <ref name="refbodydiv.attlist"/>
+          <ref name="refbodydiv.content"/>
+        </element>
+      </define>
+      <define name="refbodydiv.attlist" combine="interleave">
+        <ref name="refbodydiv.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Reference Syntax </a:documentation>
+      <define name="refsyn.content">
+        <zeroOrMore>
+          <ref name="section.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="refsyn.attributes">
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="refsyn.element">
+        <element name="refsyn" dita:longName="Reference Syntax">
+          <a:documentation>
+            <![CDATA[The <refsyn> element is a special section inside a reference topic. The section often contains syntax or signature content (for example, a command-line utility's calling syntax, or an API's signature). The <refsyn> contains a brief, possibly diagrammatic description of the subject's interface or high-level structure.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="refsyn.attlist"/>
+          <ref name="refsyn.content"/>
+        </element>
+      </define>
+      <define name="refsyn.attlist" combine="interleave">
+        <ref name="refsyn.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Properties </a:documentation>
+      <define name="properties.content">
+        <optional>
+          <ref name="prophead"/>
+        </optional>
+        <oneOrMore>
+          <ref name="property"/>
+        </oneOrMore>
+      </define>
+      <define name="properties.attributes">
+        <optional>
+          <attribute name="relcolwidth"/>
+        </optional>
+        <optional>
+          <attribute name="keycol">
+            <data type="NMTOKEN"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="refcols">
+            <data type="NMTOKENS"/>
+          </attribute>
+        </optional>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="display-atts"/>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="properties.element">
+        <element name="properties" dita:longName="Properties">
+          <a:documentation>
+            <![CDATA[The <properties> element gives a list of properties for the subject of the current topic, for example whether a class is public or protected. Each property can include the type, value, and a description. The typical rendering is usually in a table-like format. To represent multiple values for a type, just create additional property elements and use only the <propvalue> element (and <propdesc> when needed) for each successive value.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="properties.attlist"/>
+          <ref name="properties.content"/>
+        </element>
+      </define>
+      <define name="properties.attlist" combine="interleave">
+        <ref name="properties.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Property Head </a:documentation>
+      <define name="prophead.content">
+        <optional>
+          <ref name="proptypehd"/>
+        </optional>
+        <optional>
+          <ref name="propvaluehd"/>
+        </optional>
+        <optional>
+          <ref name="propdeschd"/>
+        </optional>
+      </define>
+      <define name="prophead.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="prophead.element">
+        <element name="prophead" dita:longName="Property Head">
+          <a:documentation>
+            <![CDATA[The prophead element supports regular headings for the properties element.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="prophead.attlist"/>
+          <ref name="prophead.content"/>
+        </element>
+      </define>
+      <define name="prophead.attlist" combine="interleave">
+        <ref name="prophead.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Property Type Head </a:documentation>
+      <define name="proptypehd.content">
+        <zeroOrMore>
+          <ref name="tblcell.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="proptypehd.attributes">
+        <optional>
+          <attribute name="specentry"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="proptypehd.element">
+        <element name="proptypehd" dita:longName="Property Type Head">
+          <a:documentation>
+            <![CDATA[The proptypehd element supports regular headings for the type column of a properties table.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="proptypehd.attlist"/>
+          <ref name="proptypehd.content"/>
+        </element>
+      </define>
+      <define name="proptypehd.attlist" combine="interleave">
+        <ref name="proptypehd.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Property Value Head </a:documentation>
+      <define name="propvaluehd.content">
+        <zeroOrMore>
+          <ref name="tblcell.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="propvaluehd.attributes">
+        <optional>
+          <attribute name="specentry"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="propvaluehd.element">
+        <element name="propvaluehd" dita:longName="Property Value Head">
+          <a:documentation>
+            <![CDATA[The propvaluehd element supports regular headings for the value column of a properties table.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="propvaluehd.attlist"/>
+          <ref name="propvaluehd.content"/>
+        </element>
+      </define>
+      <define name="propvaluehd.attlist" combine="interleave">
+        <ref name="propvaluehd.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Property Description Head </a:documentation>
+      <define name="propdeschd.content">
+        <zeroOrMore>
+          <ref name="tblcell.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="propdeschd.attributes">
+        <optional>
+          <attribute name="specentry"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="propdeschd.element">
+        <element name="propdeschd" dita:longName="Property Description Head">
+          <a:documentation>
+            <![CDATA[The propdeschd element supports regular headings for the description column of a properties table.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="propdeschd.attlist"/>
+          <ref name="propdeschd.content"/>
+        </element>
+      </define>
+      <define name="propdeschd.attlist" combine="interleave">
+        <ref name="propdeschd.attributes"/>
+      </define>
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Property </a:documentation>
+      <define name="property.content">
+        <optional>
+          <ref name="proptype"/>
+        </optional>
+        <optional>
+          <ref name="propvalue"/>
+        </optional>
+        <optional>
+          <ref name="propdesc"/>
+        </optional>
+      </define>
+      <define name="property.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="property.element">
+        <element name="property" dita:longName="Property">
+          <a:documentation>
+            <![CDATA[The <property> element represents a property of the current topic's subject. For example, if the current topic is a class, the property might show that the class is protected rather than public. It contains three optional elements: type, value, and description.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="property.attlist"/>
+          <ref name="property.content"/>
+        </element>
+      </define>
+      <define name="property.attlist" combine="interleave">
+        <ref name="property.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Property Type </a:documentation>
+      <define name="proptype.content">
+        <zeroOrMore>
+          <ref name="ph.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="proptype.attributes">
+        <optional>
+          <attribute name="specentry"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="proptype.element">
+        <element name="proptype" dita:longName="Property Type">
+          <a:documentation>
+            <![CDATA[The proptype element describes the type of property.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="proptype.attlist"/>
+          <ref name="proptype.content"/>
+        </element>
+      </define>
+      <define name="proptype.attlist" combine="interleave">
+        <ref name="proptype.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Property Value </a:documentation>
+      <define name="propvalue.content">
+        <zeroOrMore>
+          <ref name="ph.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="propvalue.attributes">
+        <optional>
+          <attribute name="specentry"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="propvalue.element">
+        <element name="propvalue" dita:longName="Property Value">
+          <a:documentation>
+            <![CDATA[The <propvalue> element indicates the value or values for the current property type. You can put values in separate rows if they need separate descriptions, and just leave the <proptype> element blank.
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="propvalue.attlist"/>
+          <ref name="propvalue.content"/>
+        </element>
+      </define>
+      <define name="propvalue.attlist" combine="interleave">
+        <ref name="propvalue.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Property Description </a:documentation>
+      <define name="propdesc.content">
+        <zeroOrMore>
+          <ref name="desc.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="propdesc.attributes">
+        <optional>
+          <attribute name="specentry"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="propdesc.element">
+        <element name="propdesc" dita:longName="Property Description">
+          <a:documentation>
+            <![CDATA[The <propdesc> element is used to provide a short description of the property type and its listed values (or just the value).
+    Category: Reference elements
+  ]]></a:documentation>
+          <ref name="propdesc.attlist"/>
+          <ref name="propdesc.content"/>
+        </element>
+      </define>
+      <define name="propdesc.attlist" combine="interleave">
+        <ref name="propdesc.attributes"/>
+      </define>
+
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+
+    <define name="reference.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/topic       reference/reference "/>
+      </optional>
+    </define>
+    <define name="refbody.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/body        reference/refbody "/>
+      </optional>
+    </define>
+    <define name="refbodydiv.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/bodydiv     reference/refbodydiv "/>
+      </optional>
+    </define>
+    <define name="refsyn.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/section     reference/refsyn "/>
+      </optional>
+    </define>
+    <define name="properties.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/simpletable reference/properties "/>
+      </optional>
+    </define>
+    <define name="property.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/strow       reference/property "/>
+      </optional>
+    </define>
+    <define name="proptype.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry     reference/proptype "/>
+      </optional>
+    </define>
+    <define name="propvalue.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry     reference/propvalue "/>
+      </optional>
+    </define>
+    <define name="propdesc.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry     reference/propdesc "/>
+      </optional>
+    </define>
+    <define name="prophead.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/sthead      reference/prophead "/>
+      </optional>
+    </define>
+    <define name="proptypehd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry     reference/proptypehd "/>
+      </optional>
+    </define>
+    <define name="propvaluehd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry     reference/propvaluehd "/>
+      </optional>
+    </define>
+    <define name="propdeschd.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="- topic/stentry     reference/propdeschd "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

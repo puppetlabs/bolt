@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2009 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<strings xml:lang="hi-in">        <!-- Hindi -->
+  <str name="Figure">संख्या</str>
+  <str name="Table">तालिका</str>
+  <str name="Next topic">अगला विषय</str>
+  <str name="Previous topic">पिछला विषय</str>
+  <str name="Parent topic">जनक विषय</str>
+  <str name="Required cleanup">आवश्यक परिमार्जन</str>
+  <str name="Draft comment">मसौदा टिप्पणी</str>
+  <str name="Option">विकल्प</str>
+  <str name="Description">विवरण</str>
+  <str name="Optional">वैकल्पिक</str>
+  <str name="Required">आवश्यक</str>
+  <str name="Skip visual syntax diagram">दृश्य वाक्यविन्यास आरेख छोड़ जाना</str>
+  <str name="Read syntax diagram">पढ़ें वाक्यविन्यास आरेख</str>
+  <str name="Start of change">शुरू परिवर्तन</str>
+  <str name="End of change">परिवर्तन  समाप्ति</str>
+  <str name="Index">सूचकांक</str>
+  <str name="Special characters">विशेष वर्ण</str>
+  <str name="Numerics">संख्या</str>
+  <str name="End notes">अंत नोट</str>
+  <str name="Artwork">कलाकृति</str>
+  <str name="Syntax">वाक्यविन्यास</str>
+  <str name="Type">प्रकार</str>
+  <str name="Value">मूल्य</str>
+  <str name="Note">नोट</str>
+  <str name="Notes">नोट्स</str>
+  <str name="Tip">टिप</str>
+  <str name="Fastpath">फास्ट पथ</str>
+  <str name="Important">महत्वपूर्ण</str>
+  <str name="Attention">ध्यान दें</str>
+  <str name="Caution">चेतावनी</str>
+  <str name="Danger">खतरा</str>
+  <str name="Remember">याद करना</str>
+  <str name="Restriction">प्रतिबंध</str>
+  <str name="Trouble">समस्या</str>
+  <str name="Warning">चेतावनी</str>
+  <str name="Contents">सामग्री</str>
+  <str name="Related concepts">संबंधित अवधारणाए</str>
+  <str name="Related tasks">संबंधित कार्य</str>
+  <str name="Related reference">संबंधित संदर्भ</str>
+  <str name="Related information">संबंधित जानकारी</str>
+  <str name="Prerequisite">शर्त</str>
+  <str name="Prerequisites">शर्त</str>
+  <str name="or">या</str>
+  <str name="task_context">इस कार्य के बारे में</str>
+  <str name="task_example">उदाहरण</str>
+  <str name="task_postreq">क्या करने के लिए अगले</str>
+  <str name="task_prereq">इससे पहले कि आप शुरू</str>
+  <str name="task_procedure">प्रक्रिया</str>
+  <str name="task_procedure_unordered">प्रक्रिया</str>
+  <str name="task_results">परिणाम</str>
+  <str name="Copyright">कॉपीराइट</str>
+  <str name="a11y.and-then"></str>
+</strings>

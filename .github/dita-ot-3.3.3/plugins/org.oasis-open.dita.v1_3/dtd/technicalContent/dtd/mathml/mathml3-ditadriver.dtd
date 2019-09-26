@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ===============================================
+     MathML driver for use with DITA.
+     
+     Sets the namespace prefix to "m"
+     
+     Date: March 2014
+     
+     =============================================== -->
+
+<!-- NOTE: The SVG modules also define NS.prefixed but since they 
+           both have to be prefixed, it shouldn't be a problem.
+  -->
+<!ENTITY % NS.prefixed     "INCLUDE" >
+<!ENTITY % MATHML.prefixed "%NS.prefixed;" >
+
+<!--  NOTE: The default prefix defined in the mathml3-qname.mod is 'm',
+            which is what we want.
+  -->
+ 
+<!-- We have to declare these here so we can then declarare the
+     parameter entity. These are copied from mathml3-qname.mod.
+  -->
+  
+<!-- XLink ............... -->
+
+<!ENTITY % XLINK.prefix         "xlink" >
+<!ENTITY % XLINK.xmlns "http://www.w3.org/1999/xlink" >
+<!ENTITY % XLINK.xmlns.attrib
+     "xmlns:%XLINK.prefix;  CDATA           #FIXED '%XLINK.xmlns;'"
+>
+
+<!-- W3C XML Schema ............... -->
+
+<!ENTITY % Schema.prefix         "xsi" >
+<!ENTITY % Schema.xmlns "http://www.w3.org/2001/XMLSchema-instance" >
+<!ENTITY % Schema.xmlns.attrib
+     "xmlns:%Schema.prefix;  CDATA           #IMPLIED"
+>
+
+<!-- MathML .............. -->
+
+<!ENTITY % MATHML.xmlns    "http://www.w3.org/1998/Math/MathML" >
+<!ENTITY % MATHML.prefix   "m" >
+<![%MATHML.prefixed;[
+<!ENTITY % MATHML.xmlns.extra.attrib  "" >
+]]>
+<!ENTITY % MATHML.xmlns.extra.attrib 
+     "%XLINK.xmlns.attrib; 
+      %Schema.xmlns.attrib;" >
+
+<![%MATHML.prefixed;[
+<!ENTITY % MATHML.pfx  "%MATHML.prefix;:" >
+<!ENTITY % MATHML.xmlns.attrib
+     "xmlns:%MATHML.prefix;  CDATA   #FIXED '%MATHML.xmlns;'
+      %MATHML.xmlns.extra.attrib;"
+>
+]]>
+<!ENTITY % MATHML.pfx  "" >
+<!ENTITY % MATHML.xmlns.attrib
+     "xmlns        CDATA           #FIXED '%MATHML.xmlns;'
+      %MATHML.xmlns.extra.attrib;"
+>
+
+<![%NS.prefixed;[
+<!ENTITY % XHTML.xmlns.extra.attrib 
+     "%MATHML.xmlns.attrib;" >
+]]>
+<!ENTITY % XHTML.xmlns.extra.attrib
+     "%XLINK.xmlns.attrib;
+      %Schema.xmlns.attrib;"
+>
+
+<!ENTITY % NamespaceDecl.attrib 
+  "%XHTML.xmlns.extra.attrib;
+">
+  
+<!-- DITA-specific: Don't allow use of general text entities. DITA documents should not
+     have any general text entity references.
+  -->
+<!ENTITY % mathml-charent.module "IGNORE" >
+  
+<!ENTITY % mathml3
+   PUBLIC "-//OASIS//ELEMENTS DITA 1.3 MathML 3//EN"
+          "mathml3/mathml3.dtd"
+>%mathml3;
+
+<!-- ============ End of DITA MathML driver ======== -->

@@ -1,0 +1,23 @@
+// This file is part of the DITA Open Toolkit project.
+//
+// Copyright 2016 Roger Sheen
+//
+// See the accompanying LICENSE file for applicable license.
+
+// Sass partial for note styles
+
+/* All note formats have the same default presentation */
+
+.note {
+  margin-bottom: 1em;
+  margin-top: 1em;
+
+  .notetitle,
+  .note__title {
+    font-weight: bold;
+  }
+
+  .notelisttitle {
+    @extend .notetitle;
+  }
+}

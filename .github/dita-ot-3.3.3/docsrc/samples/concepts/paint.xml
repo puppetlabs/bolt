@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (C) Copyright IBM Corporation 2001, 2005. All Rights Reserved. -->
+
+<concept id="paintconcept" xml:lang="en-us">
+  <title>Paint</title>
+  <shortdesc>Paint is useful for refreshing the look of rooms and furniture.</shortdesc>
+  <conbody>
+    <p>Store unused paint in the garage.</p>
+  </conbody>
+  <related-links>
+    <link href="../tasks/spraypainting.xml" format="dita" type="task"/>
+  </related-links>
+</concept>

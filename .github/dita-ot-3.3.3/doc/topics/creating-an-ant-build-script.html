@@ -1,0 +1,105 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="Instead of typing the DITA-OT parameters at the command prompt, you might want to create an Ant build script that contains all of the parameters."><meta name="DC.subject" content=", link, name, default, Ant, build script, relationship tables, PDF"><meta name="keywords" content=", link, name, default, Ant, build script, relationship tables, PDF"><meta name="DC.relation" scheme="URI" content="../topics/publishing-with-ant.html"><meta name="DC.relation" scheme="URI" content="../topics/migrating-ant-to-dita.html"><meta name="DC.relation" scheme="URI" content="../topics/building-with-ant.html"><meta name="DC.relation" scheme="URI" content="../topics/ant.html"><meta name="DC.relation" scheme="URI" content="../parameters/parameters_intro.html"><meta name="DC.relation" scheme="URI" content="http://ant.apache.org/manual"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="creating-an-ant-build-script"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Creating an Ant build script</title></head><body id="creating-an-ant-build-script"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a><ul><li><a href="../topics/build-using-dita-command.html">Using the dita command</a></li><li><a href="../topics/publishing-with-ant.html">Using Ant</a><ul><li><a href="../topics/ant.html">Ant</a></li><li><a href="../topics/building-with-ant.html">Building output using Ant</a></li><li class="active"><a href="../topics/creating-an-ant-build-script.html">Creating an Ant build script</a></li></ul></li><li><a href="../reference/java-api.html">Using the Java API</a></li><li><a href="../topics/output-formats.html">Output formats</a></li></ul></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Creating an Ant build script</h1>
+  
+  
+  <div class="body taskbody"><p class="shortdesc">Instead of typing the DITA-OT parameters at the command prompt, you might want to create an Ant build
+    script that contains all of the parameters.</p>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">Create an XML file that contains the following content:</span>
+        <div class="itemgroup info">
+          <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;project name="%project-name%" default="%default-target%" basedir="."&gt;
+
+  &lt;property name="dita.dir" location="%path-to-DITA-OT%"/&gt;
+
+  &lt;target name="%target-name%"&gt;
+    &lt;ant antfile="${dita.dir}/build.xml"&gt;
+      &lt;property name="args.input" value="%DITA-input%"/&gt;
+      &lt;property name="transtype" value="html5"/&gt;
+    &lt;/ant&gt;
+  &lt;/target&gt;
+
+&lt;/project&gt;</code></pre>
+        </div>
+        <div class="itemgroup info">You will replace the placeholder content (indicated by the % signs) with content applicable to your
+          environment.</div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Specify project information:</span>
+        <ol type="a" class="ol substeps">
+          <li class="li substep substepexpand"><strong>Optional: </strong>
+            <span class="ph cmd">Set the value of the <code class="keyword markupname xmlatt">@name</code> attribute to the name of your project.</span>
+          </li>
+          <li class="li substep substepexpand">
+            <span class="ph cmd">Set the value of the <code class="keyword markupname xmlatt">@default</code> attribute to the name of a target in the build
+              script.</span>
+            <div class="itemgroup info">If the build script is invoked without specifying a target, this target will be run.</div>
+          </li>
+        </ol>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Set the value of the <span class="keyword parmname">dita.dir</span> property to the location of the DITA-OT
+          installation.</span>
+        <div class="itemgroup info">This can be a fully qualified path, or you can specify it relative to the location of the Ant build script
+          that you are writing. </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Create the Ant target:</span>
+        <ol type="a" class="ol substeps">
+          <li class="li substep">
+            <span class="ph cmd">Set the value of the <code class="keyword markupname xmlatt">@name</code> attribute.</span>
+          </li>
+          <li class="li substep">
+            <span class="ph cmd">Specify the value for the <span class="keyword parmname">args.input</span> property.</span>
+          </li>
+          <li class="li substep">
+            <span class="ph cmd">Specify the value of the <span class="keyword parmname">transtype</span> property.</span>
+          </li>
+        </ol>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">Save the build script.</span>
+      </li></ol></section>
+    <section class="example"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Example</h2></div>
+      <p class="p">The following Ant build script generates CHM and PDF output for the sample DITA maps.</p>
+      <div class="p">
+        <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;project name="build-chm-pdf" default="all" basedir="."&gt;
+  &lt;property name="dita.dir" location="${basedir}/../../.."/&gt;
+  &lt;target name="all" description="build CHM and PDF" depends="chm,pdf"/&gt;
+  &lt;target name="chm" description="build CHM"&gt;
+    &lt;ant antfile="${dita.dir}/build.xml"&gt;
+      &lt;property name="args.input" location="../sequence.ditamap"/&gt;
+      &lt;property name="transtype" value="htmlhelp"/&gt;
+      &lt;property name="output.dir" location="../out/chm"/&gt;
+      &lt;property name="args.gen.task.lbl" value="YES"/&gt;
+    &lt;/ant&gt;
+  &lt;/target&gt;
+  &lt;target name="pdf" description="build PDF"&gt;
+    &lt;ant antfile="${dita.dir}/build.xml"&gt;
+      &lt;property name="args.input" location="../taskbook.ditamap"/&gt;
+      &lt;property name="transtype" value="pdf"/&gt;
+      &lt;property name="output.dir" location="../out/pdf"/&gt;
+      &lt;property name="args.gen.task.lbl" value="YES"/&gt;
+      &lt;property name="args.rellinks" value="nofamily"/&gt;
+    &lt;/ant&gt;
+  &lt;/target&gt;
+&lt;/project&gt;</code></pre></div>
+      <div class="p">In addition to the mandatory parameters (<span class="keyword parmname">args.input</span> and <span class="keyword parmname">transtype</span>),
+        the chm and pdf targets each specify some optional parameters:
+        <ul class="ul">
+          <li class="li">The <span class="keyword parmname">args.gen.task.lbl</span> property is set to YES, which ensures that headings are
+            automatically generated for the sections of task topics.</li>
+          <li class="li">The <span class="keyword parmname">output.dir</span> property specifies where DITA-OT writes the output of the
+            transformations.</li>
+        </ul></div>
+      <p class="p">The pdf target also specifies that related links should be generated in the PDF, but only those links that are
+        created by relationship tables and <code class="keyword markupname xmlelement">&lt;link&gt;</code> elements.</p>
+      <p class="p">Finally, the all target simply specifies that both the chm and pdf target should be run.</p>
+    </section>
+    <section class="section postreq"><div class="tasklabel"><h2 class="sectiontitle tasklabel">What to do next</h2></div>Another resource for learning about Ant scripts are the files in the <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/docsrc/samples</span><span class="ph filepath">/ant_sample/</span> directory. This
+      directory contains sample Ant build files for common output formats, as well as templates that you can use to
+      create your own Ant scripts.</section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/publishing-with-ant.html" title="You can use Ant to invoke DITA Open Toolkit and generate output. You can use the complete set of parameters that the toolkit supports.">Building output using Ant</a></div></div><div class="linklist relinfo relconcepts"><strong>Related concepts</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/ant.html" title="Ant is a Java-based, open-source tool that is provided by the Apache Foundation. It can be used to declare a sequence of build actions. It is well suited for both development and document builds. The toolkit ships with a copy of Ant.">Ant</a></li></ul></div><div class="linklist relinfo reltasks"><strong>Related tasks</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../topics/building-with-ant.html" title="You can build output by using an Ant build script to provide the DITA-OT parameters.">Building output using Ant</a></li><li class="linklist"><a class="link" href="../topics/migrating-ant-to-dita.html" title="Although DITA Open Toolkit still supports Ant builds, switching to the dita command offers a simpler command interface, sets all required environment variables and allows you to run DITA-OT without setting up anything beforehand.">Migrating Ant builds to use the dita command</a></li></ul></div><div class="linklist relinfo relref"><strong>Related reference</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../parameters/parameters_intro.html" title="Certain parameters apply to all DITA-OT transformations. Other parameters are common to the HTML-based transformations. Some parameters apply only to specific transformation types. These parameters can be passed as options to the dita command using the --parameter=value syntax or included in build scripts as Ant properties.">DITA-OT parameters</a></li><li class="linklist"><a class="link" href="http://ant.apache.org/manual" target="_blank">Apache Ant documentation</a></li></ul></div></nav></article></main></body></html>

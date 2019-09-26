@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <!--
+        This is the Mathematical Markup Language (MathML) 3.0, an XML
+        application for describing mathematical notation and capturing
+        both its structure and content.
+    
+        Copyright 1998-2007 World Wide Web Consortium
+           (Massachusetts Institute of Technology, Institut National de
+            Recherche en Informatique et en Automatique, Keio University).
+            All Rights Reserved.
+    
+        Permission to use, copy, modify and distribute the RelaxNG schema for MathML3
+        and its accompanying documentation for any purpose and without fee is
+        hereby granted in perpetuity, provided that the above copyright notice
+        and this paragraph appear in all copies.  The copyright holders make
+        no representation about the suitability of the Schema for any purpose.
+    
+        This file contains the arity checking rules for the symbols
+        from the content dictionary 
+        It is provided "as is" without expressed or implied warranty.
+    
+        Revision:   $Id: calculus_veccalc.rng,v 1.1 2007/12/11 15:59:27 dcarlis Exp $
+  -->
+  <define name="cd.token.unary.class" combine="choice">
+    <choice>
+      <ref name="int.token"/>
+      <ref name="diff.token"/>
+      <ref name="grad.token"/>
+      <ref name="curl.token"/>
+      <ref name="laplacian.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.binary.class" combine="choice">
+    <choice>
+      <ref name="defint.token"/>
+      <ref name="defintset.token"/>
+    </choice>
+  </define>
+  <define name="cd.token.nary.class" combine="choice">
+    <ref name="partialdiff.token"/>
+  </define>
+  <define name="cd.binder.class" combine="choice">
+    <choice>
+      <ref name="intalg.token"/>
+      <ref name="Diff.token"/>
+    </choice>
+  </define>
+  <!-- the element definitions for the token elements -->
+  <define name="int.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="int.token">
+    <element name="int">
+      <ref name="int.content"/>
+    </element>
+  </define>
+  <define name="defint.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="defint.token">
+    <element name="defint">
+      <ref name="defint.content"/>
+    </element>
+  </define>
+  <define name="defintset.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="defintset.token">
+    <element name="defintset">
+      <ref name="defintset.content"/>
+    </element>
+  </define>
+  <define name="intalg.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="intalg.token">
+    <element name="intalg">
+      <ref name="intalg.content"/>
+    </element>
+  </define>
+  <define name="diff.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="diff.token">
+    <element name="diff">
+      <ref name="diff.content"/>
+    </element>
+  </define>
+  <define name="Diff.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="Diff.token">
+    <element name="Diff">
+      <ref name="Diff.content"/>
+    </element>
+  </define>
+  <define name="partialdiff.content">
+    <ref name="Token.type"/>
+    <optional>
+      <attribute name="type">
+        <ref name="MathMLtype"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="partialdiff.token">
+    <element name="partialdiff">
+      <ref name="partialdiff.content"/>
+    </element>
+  </define>
+  <define name="divergence.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="divergence.token">
+    <element name="divergence">
+      <ref name="divergence.content"/>
+    </element>
+  </define>
+  <define name="grad.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="grad.token">
+    <element name="grad">
+      <ref name="grad.content"/>
+    </element>
+  </define>
+  <define name="curl.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="curl.token">
+    <element name="curl">
+      <ref name="curl.content"/>
+    </element>
+  </define>
+  <define name="laplacian.content">
+    <ref name="Token.type"/>
+  </define>
+  <define name="laplacian.token">
+    <element name="laplacian">
+      <ref name="laplacian.content"/>
+    </element>
+  </define>
+</grammar>

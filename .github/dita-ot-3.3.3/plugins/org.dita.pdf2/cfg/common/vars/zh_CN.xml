@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   
+Copyright © 2004-2006 by Idiom Technologies, Inc. All rights reserved. 
+IDIOM is a registered trademark of Idiom Technologies, Inc. and WORLDSERVER
+and WORLDSTART are trademarks of Idiom Technologies, Inc. All other 
+trademarks are the property of their respective owners. 
+
+IDIOM TECHNOLOGIES, INC. IS DELIVERING THE SOFTWARE "AS IS," WITH 
+ABSOLUTELY NO WARRANTIES WHATSOEVER, WHETHER EXPRESS OR IMPLIED,  AND IDIOM
+TECHNOLOGIES, INC. DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+PURPOSE AND WARRANTY OF NON-INFRINGEMENT. IDIOM TECHNOLOGIES, INC. SHALL NOT
+BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, COVER, PUNITIVE, EXEMPLARY,
+RELIANCE, OR CONSEQUENTIAL DAMAGES (INCLUDING BUT NOT LIMITED TO LOSS OF 
+ANTICIPATED PROFIT), ARISING FROM ANY CAUSE UNDER OR RELATED TO  OR ARISING 
+OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF IDIOM
+TECHNOLOGIES, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
+
+Idiom Technologies, Inc. and its licensors shall not be liable for any
+damages suffered by any person as a result of using and/or modifying the
+Software or its derivatives. In no event shall Idiom Technologies, Inc.'s
+liability for any damages hereunder exceed the amounts received by Idiom
+Technologies, Inc. as a result of this transaction.
+
+These terms and conditions supersede the terms and conditions in any
+licensing agreement to the extent that such terms and conditions conflict
+with those set forth herein.
+
+This file is part of the DITA Open Toolkit project. 
+See the accompanying LICENSE file for applicable license.
+-->
+<vars xmlns="http://www.idiominc.com/opentopic/vars">
+  <variable id="Preface odd header"><param ref-name="prodname"/> | 序言 | <param ref-name="pagenum"/></variable>
+  <variable id="Preface even header"><param ref-name="pagenum"/> | 序言 | <param ref-name="prodname"/></variable>
+  <variable id="Table of Contents">内容</variable>
+  <variable id="Index Continued String">继续</variable>
+  <variable id="Index See String">，见</variable>
+  <variable id="Index See Also String">参见</variable>
+  <variable id="Table of Contents Chapter">第 <param ref-name="number"/> 章 </variable>
+  <variable id="Table of Contents Appendix">附录 <param ref-name="number"/>: </variable>
+  <variable id="Table of Contents Part">第 <param ref-name="number"/> 部分 </variable>
+  <variable id="Table of Contents Preface">序言 </variable>
+  <variable id="Preface title">序言</variable>
+  <variable id="Notices title">Notice</variable><!--TODO:Notices title-->
+  <variable id="Mini Toc">内容: </variable><!-- TODO: replace translation "Contents" with "Topics"-->
+  <variable id="Notice"><!--TODO:Notice--></variable>
+  <variable id="Figure.title">图 <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Figure Number">图 <param ref-name="number"/></variable>
+  <variable id="Table.title">表 <param ref-name="number"/>: <param ref-name="title"/></variable>
+  <variable id="Table Number">表 <param ref-name="number"/></variable>
+  <variable id="Related Links">相关信息</variable>
+  <variable id="Cross-Reference">Cross-Reference to:</variable><!--UNUSED-->
+  <variable id="Content-Reference">Unresolved content reference to:</variable><!--UNUSED-->
+  <variable id="List item">List item.</variable><!--TODO:List item-->
+  <variable id="Foot note">Footnote.</variable><!--TODO:Footnote-->
+  <variable id="Navigation title">Navigation title</variable><!--TODO:Navigation title-->
+  <variable id="Search title">Search title</variable><!--TODO:Search title-->
+  <variable id="Chapter with number">第 <param ref-name="number"/> 章</variable>
+  <variable id="Appendix with number">附录 <param ref-name="number"/></variable>
+  <variable id="Part with number">第 <param ref-name="number"/> 部分</variable>
+  <variable id="Required-Cleanup">[需要修正]</variable>
+  <variable id="On the page"> on page <param ref-name="pagenum"/></variable>
+  <variable id="Page"> page <param ref-name="pagenum"/></variable>
+  <variable id="This link"></variable><!--UNUSED-->
+  <variable id="Optional Step">可选：</variable>
+  <variable id="Required Step">必需：</variable>
+  <variable id="Task Prereq"></variable>
+  <variable id="Task Context"></variable>
+  <variable id="Task Steps"></variable>
+  <variable id="#steps-unordered-label"></variable>
+  <variable id="Task Result"></variable>
+  <variable id="Task Example"></variable>
+  <variable id="Task Postreq"></variable>
+  <variable id="Glossary">术语表</variable>
+  <variable id="List of Tables">表格清单</variable>
+  <variable id="List of Figures">插图清单</variable>
+</vars>

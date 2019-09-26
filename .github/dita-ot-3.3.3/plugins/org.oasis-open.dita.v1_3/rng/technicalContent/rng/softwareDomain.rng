@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="urn:oasis:names:tc:dita:rng:vocabularyModuleDesc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:dita="http://dita.oasis-open.org/architecture/2005/" xmlns="http://relaxng.org/ns/structure/1.0"
+  xmlns:sch="http://purl.oclc.org/dsdl/schematron">
+  <moduleDesc xmlns="http://dita.oasis-open.org/architecture/2005/">
+    <moduleTitle>DITA Software Domain</moduleTitle>
+    <headerComment xml:space="preserve">
+=============================================================
+                   HEADER                                    
+=============================================================
+ MODULE:    DITA Software Domain                             
+ VERSION:   1.2                                              
+ DATE:      November 2009                                    
+                                                             
+=============================================================
+
+=============================================================
+                   PUBLIC DOCUMENT TYPE DEFINITION           
+                   TYPICAL INVOCATION                        
+                                                             
+ Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//ELEMENTS DITA Software Domain//EN"
+      Delivered as file "softwareDomain.mod"                      
+
+=============================================================
+SYSTEM:     Darwin Information Typing Architecture (DITA)    
+                                                             
+PURPOSE:    Declaring the elements and specialization        
+            attributes for the Software Domain               
+                                                             
+ORIGINAL CREATION DATE:                                      
+            March 2001                                       
+                                                             
+            (C) Copyright OASIS Open 2005, 2009.             
+            (C) Copyright IBM Corporation 2001, 2004.        
+            All Rights Reserved.                             
+                                                             
+ UPDATES:                                                    
+   2005.11.15 RDA: Corrected the PURPOSE in this comment     
+   2005.11.15 RDA: Corrected the "Delivered as" system ID    
+   2007.12.01 EK:  Reformatted DTD modules for DITA 1.2       
+   2008.02.12 RDA: Add text to msgnum, cmdname, varname      
+   2008.02.13 RDA: Create .content and .attributes entities  
+=============================================================  
+</headerComment>
+    <moduleMetadata>
+      <moduleType>elementdomain</moduleType>
+      <moduleShortName>sw-d</moduleShortName>
+      <modulePublicIds>
+        <dtdMod>-//OASIS//ELEMENTS DITA<var presep=" " name="ditaver"/> Software Domain//EN</dtdMod>
+        <dtdEnt>-//OASIS//ENTITIES DITA<var presep=" " name="ditaver"/> Software Domain//EN</dtdEnt>
+        <xsdMod>urn:oasis:names:tc:dita:xsd:softwareDomain.xsd<var presep=":" name="ditaver"/></xsdMod>
+        <rncMod>urn:oasis:names:tc:dita:rnc:softwareDomain.rnc<var presep=":" name="ditaver"/></rncMod>
+        <rngMod>urn:oasis:names:tc:dita:rng:softwareDomain.rng<var presep=":" name="ditaver"/></rngMod>
+      </modulePublicIds>
+      <domainsContribution>(topic sw-d)</domainsContribution>
+    </moduleMetadata>
+  </moduleDesc>
+  <div>
+    <a:documentation>DOMAIN EXTENSION PATTERNS</a:documentation>
+    <define name="sw-d-pre">
+      <ref name="msgblock.element"/>
+    </define>
+    <define name="sw-d-ph">
+      <choice>
+        <ref name="filepath.element"/>
+        <ref name="msgph.element"/>
+        <ref name="systemoutput.element"/>
+        <ref name="userinput.element"/>
+      </choice>
+    </define>
+    <define name="sw-d-keyword">
+      <choice>
+        <ref name="cmdname.element"/>
+        <ref name="msgnum.element"/>
+        <ref name="varname.element"/>
+      </choice>
+    </define>
+    <define name="pre" combine="choice">
+      <ref name="sw-d-pre"/>
+    </define>
+    <define name="ph" combine="choice">
+      <ref name="sw-d-ph"/>
+    </define>
+    <define name="keyword" combine="choice">
+      <ref name="sw-d-keyword"/>
+    </define>
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE NAME PATTERNS</a:documentation>
+    <define name="cmdname">
+      <ref name="cmdname.element"/>
+    </define>
+    <define name="filepath">
+      <ref name="filepath.element"/>
+    </define>
+    <define name="msgblock">
+      <ref name="msgblock.element"/>
+    </define>
+    <define name="msgnum">
+      <ref name="msgnum.element"/>
+    </define>
+    <define name="msgph">
+      <ref name="msgph.element"/>
+    </define>
+    <define name="systemoutput">
+      <ref name="systemoutput.element"/>
+    </define>
+    <define name="userinput">
+      <ref name="userinput.element"/>
+    </define>
+    <define name="varname">
+      <ref name="varname.element"/>
+    </define>
+
+  </div>
+  <div>
+    <a:documentation>ELEMENT TYPE DECLARATIONS</a:documentation>
+    <div>
+      <a:documentation> LONG NAME: Message Phrase </a:documentation>
+      <define name="msgph.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="msgph.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="msgph.element">
+        <element name="msgph" dita:longName="Message Phrase">
+          <a:documentation>
+            <![CDATA[The message phrase (<msgph>) element contains the text content of a message produced by an application or program. It can also contain the variable name (varname) element to illustrate where variable text content can occur in the message. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  ]]></a:documentation>
+          <ref name="msgph.attlist"/>
+          <ref name="msgph.content"/>
+        </element>
+      </define>
+      <define name="msgph.attlist" combine="interleave">
+        <ref name="msgph.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Message Block </a:documentation>
+      <define name="msgblock.content">
+        <zeroOrMore>
+          <choice>
+            <ref name="words.cnt"/>
+            <ref name="msgph" dita:since="DITA 1.3"/>            
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="msgblock.attributes">
+        <ref name="display-atts"/>
+        <optional>
+          <attribute name="spectitle"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+        <optional>
+          <attribute name="xml:space" a:defaultValue="preserve">
+            <value>preserve</value>
+          </attribute>
+        </optional>
+      </define>
+      <define name="msgblock.element">
+        <element name="msgblock" dita:longName="Message Block">
+          <a:documentation>
+            <![CDATA[The message block (<msgblock>) element contains a multi-line message or set of messages. The message block can contain multiple message numbers and message descriptions, each enclosed in a <msgnum> and <msgph> element. It can also contain the message content directly. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  ]]></a:documentation>
+          <ref name="msgblock.attlist"/>
+          <ref name="msgblock.content"/>
+        </element>
+      </define>
+      <define name="msgblock.attlist" combine="interleave">
+        <ref name="msgblock.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Message Number </a:documentation>
+      <define name="msgnum.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="msgnum.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="msgnum.element">
+        <element name="msgnum" dita:longName="Message Number">
+          <a:documentation>
+            <![CDATA[The message number (<msgnum>) element contains the number of a message produced by an application or program. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  ]]></a:documentation>
+          <ref name="msgnum.attlist"/>
+          <ref name="msgnum.content"/>
+        </element>
+      </define>
+      <define name="msgnum.attlist" combine="interleave">
+        <ref name="msgnum.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Command Name </a:documentation>
+      <define name="cmdname.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="cmdname.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="cmdname.element">
+        <element name="cmdname" dita:longName="Command Name">
+          <a:documentation>
+            <![CDATA[The command name (<cmdname>) element specifies the name of a command when it is part of a software discussion. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  ]]></a:documentation>
+          <ref name="cmdname.attlist"/>
+          <ref name="cmdname.content"/>
+        </element>
+      </define>
+      <define name="cmdname.attlist" combine="interleave">
+        <ref name="cmdname.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: Variable Name </a:documentation>
+      <define name="varname.content">
+        <zeroOrMore>
+          <choice>
+            <text/>
+            <ref name="text"/>
+          </choice>
+        </zeroOrMore>
+      </define>
+      <define name="varname.attributes">
+        <optional>
+          <attribute name="keyref"/>
+        </optional>
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="varname.element">
+        <element name="varname" dita:longName="Variable Name">
+          <a:documentation>
+            <![CDATA[The variable name (<varname>) element defines a variable that must be supplied to a software application. The variable name element is very similar to the variable (var) element, but variable name is used outside of syntax diagrams. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  ]]></a:documentation>
+          <ref name="varname.attlist"/>
+          <ref name="varname.content"/>
+        </element>
+      </define>
+      <define name="varname.attlist" combine="interleave">
+        <ref name="varname.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: File Path </a:documentation>
+      <define name="filepath.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="filepath.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="filepath.element">
+        <element name="filepath" dita:longName="File Path">
+          <a:documentation>
+            <![CDATA[The <filepath> element indicates the name and optionally the location of a referenced file by specifying the directory containing the file, and other directories that may precede it in the system hierarchy. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  ]]></a:documentation>
+          <sch:pattern id="checkEmptyFilepath">
+            <sch:rule context="filepath">
+              <sch:assert test="string-length() > 0" role="warning"> The filepath should not be empty! </sch:assert>
+            </sch:rule>
+          </sch:pattern>
+          <ref name="filepath.attlist"/>
+          <ref name="filepath.content"/>
+        </element>
+      </define>
+      <define name="filepath.attlist" combine="interleave">
+        <ref name="filepath.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: User Input </a:documentation>
+      <define name="userinput.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="userinput.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="userinput.element">
+        <element name="userinput" dita:longName="User Input">
+          <a:documentation>
+            <![CDATA[The user input (<userinput>) element represens the text a user should input in response to a program or system prompt. This element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  ]]></a:documentation>
+          <ref name="userinput.attlist"/>
+          <ref name="userinput.content"/>
+        </element>
+      </define>
+      <define name="userinput.attlist" combine="interleave">
+        <ref name="userinput.attributes"/>
+      </define>
+
+    </div>
+    <div>
+      <a:documentation> LONG NAME: System Output </a:documentation>
+      <define name="systemoutput.content">
+        <zeroOrMore>
+          <ref name="words.cnt"/>
+        </zeroOrMore>
+      </define>
+      <define name="systemoutput.attributes">
+        <ref name="univ-atts"/>
+        <optional>
+          <attribute name="outputclass"/>
+        </optional>
+      </define>
+      <define name="systemoutput.element">
+        <element name="systemoutput" dita:longName="System Output">
+          <a:documentation>
+            <![CDATA[The system output (<systemoutput>) element represents computer output or responses to a command or situation. A generalized element, it represents any kind of output from the computer, so the author may wish to choose more specific markup, such as msgph, for messages from the application. The system output element is part of the DITA software domain, a special set of DITA elements designed to document software tasks, concepts and reference information.
+    Category: Software elements
+  ]]></a:documentation>
+          <ref name="systemoutput.attlist"/>
+          <ref name="systemoutput.content"/>
+        </element>
+      </define>
+      <define name="systemoutput.attlist" combine="interleave">
+        <ref name="systemoutput.attributes"/>
+      </define>
+
+    </div>
+  </div>
+  <div>
+    <a:documentation>SPECIALIZATION ATTRIBUTE DECLARATIONS</a:documentation>
+    <define name="cmdname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword sw-d/cmdname "/>
+      </optional>
+    </define>
+    <define name="filepath.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph sw-d/filepath "/>
+      </optional>
+    </define>
+    <define name="msgblock.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/pre sw-d/msgblock "/>
+      </optional>
+    </define>
+    <define name="msgnum.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword sw-d/msgnum "/>
+      </optional>
+    </define>
+    <define name="msgph.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph sw-d/msgph "/>
+      </optional>
+    </define>
+    <define name="systemoutput.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph sw-d/systemoutput "/>
+      </optional>
+    </define>
+    <define name="userinput.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/ph sw-d/userinput "/>
+      </optional>
+    </define>
+    <define name="varname.attlist" combine="interleave">
+      <ref name="global-atts"/>
+      <optional>
+        <attribute name="class" a:defaultValue="+ topic/keyword sw-d/varname "/>
+      </optional>
+    </define>
+  </div>
+</grammar>

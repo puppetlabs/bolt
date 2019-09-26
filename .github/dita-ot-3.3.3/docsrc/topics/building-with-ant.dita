@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="runant" xml:lang="en">
+  <title>Building output using Ant</title>
+  <shortdesc>You can build output by using an Ant build script to provide the DITA-OT parameters.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlatt>default</xmlatt></indexterm>
+        <indexterm>macOS<indexterm>Ant</indexterm></indexterm>
+        <indexterm>Linux<indexterm>Ant</indexterm></indexterm>
+        <indexterm>Windows<indexterm>Ant</indexterm></indexterm>
+        <indexterm>Ant<indexterm>publishing with</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd conref="../resources/conref-task.dita#ID/open-terminal"/>
+      </step>
+      <step>
+        <cmd>Issue the following command:</cmd>
+        <choicetable frame="topbot" relcolwidth="1* 3*">
+          <chrow platform="linux mac">
+            <choption>Linux or macOS&#xA0;</choption>
+            <chdesc>
+              <cmdname>bin/ant</cmdname>
+              <option>-f</option>
+              <codeph><varname>build-script</varname>
+                <varname>target</varname></codeph>
+            </chdesc>
+          </chrow>
+          <chrow platform="windows">
+            <choption>Windows</choption>
+            <chdesc>
+              <cmdname>bin\ant</cmdname>
+              <option>-f</option>
+              <codeph><varname>build-script</varname>
+                <varname>target</varname></codeph>
+            </chdesc>
+          </chrow>
+        </choicetable>
+        <info> where:
+          <ul>
+            <li><varname>build-script</varname> is name of the Ant build script.</li>
+            <li><varname>target</varname> is an optional switch that specifies the name of the Ant target that you want
+              to run. <p>If you do not specify a target, the value of the <xmlatt>default</xmlatt> attribute for the Ant
+                project is used.</p>
+            </li>
+          </ul></info>
+      </step>
+    </steps>
+  </taskbody>
+</task>

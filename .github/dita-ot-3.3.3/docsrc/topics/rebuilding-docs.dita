@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="rebuilding-docs">
+  <title>Rebuilding the DITA-OT documentation</title>
+  <titlealts>
+    <navtitle>Rebuilding documentation</navtitle>
+  </titlealts>
+  <shortdesc>DITA-OT ships with a <keyword keyref="gradle"/> build script that enables you to rebuild the toolkit
+    documentation. This is especially helpful if your environment contains plug-ins that add new extension points,
+    messages, or parameters to the toolkit.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>macOS<indexterm>gradle</indexterm><indexterm>rebuilding documentation</indexterm></indexterm>
+        <indexterm>Linux<indexterm>gradle</indexterm><indexterm>rebuilding documentation</indexterm></indexterm>
+        <indexterm>Windows<indexterm>gradlew</indexterm><indexterm>rebuilding documentation</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <context>
+      <p>The documentation build script reads the toolkit’s plug-in configuration and automatically regenerates topics
+        and properties file templates based on the extension points, messages, and parameters provided by the installed
+        plug-ins.</p>
+      <note type="attention">If you have installed new plug-ins, you may need to add the corresponding generated topics
+        to the DITA maps to include the new information in the output.</note></context>
+    <steps>
+      <step>
+        <cmd>Change to the <filepath>docsrc/</filepath> subdirectory of the DITA-OT installation.</cmd>
+      </step>
+      <step>
+        <cmd>Run one of the following commands.</cmd>
+        <choices>
+          <choice platform="linux mac">On Linux and macOS:
+            <codeblock>./gradlew <varname>target</varname></codeblock></choice>
+          <choice platform="windows">On Windows: <codeblock>gradlew <varname>target</varname></codeblock></choice>
+        </choices>
+        <info>
+          <p>The <varname>target</varname> parameter is optional and specifies a transformation type. It takes the
+            following values:
+            <ul>
+              <li><option>html</option></li>
+              <li><option>htmlhelp</option></li>
+              <li><option>pdf</option></li>
+            </ul>
+          </p>
+          <p>If you do not specify a target, HTML5 and PDF output is generated.</p>
+        </info>
+      </step>
+    </steps>
+  </taskbody>
+</task>

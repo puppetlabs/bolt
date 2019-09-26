@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<task id="plugins-installing" xml:lang="en">
+  <title>Installing plug-ins</title>
+  <shortdesc>Use the <cmdname>dita</cmdname> command to install a plug-in.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><cmdname>dita</cmdname> command<indexterm>plug-ins</indexterm></indexterm>
+        <indexterm>plug-ins<indexterm>installing</indexterm></indexterm>
+        <indexterm>integrator<index-see-also>plug-ins<indexterm>installing</indexterm></index-see-also></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>At the command-line prompt, enter the following command:</cmd>
+        <info>
+          <codeblock><filepath conref="../resources/conref-task.dita#ID/dita-cmd"/> <parmname>--install</parmname>=<varname>plug-in-zip</varname></codeblock>
+          <p>where:</p>
+          <ul>
+            <li conref="../resources/conref-task.dita#ID/novice-variables-1"/>
+            <li conref="../resources/conref-task.dita#ID/plug-in-zip"/>
+          </ul>
+          <note>
+            <ph conref="../resources/conref-task.dita#ID/plugin-integrate-all"/>
+          </note>
+          <note conref="../resources/conref-task.dita#ID/dita-in-path"/>
+        </info>
+      </step>
+    </steps>
+  </taskbody>
+</task>

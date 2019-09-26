@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="migrating-to-3.2">
+
+  <title>Migrating to release 3.2</title>
+  <titlealts>
+    <navtitle>To 3.2</navtitle>
+  </titlealts>
+
+  <shortdesc>DITA-OT 3.2 includes <ph id="summary">new command-line options, support for RELAX NG parsing and
+      validation, preliminary processing for the XDITA authoring format proposed for Lightweight DITA, and a plug-in
+      registry that makes it easier to discover and install new plug-ins</ph>.</shortdesc>
+  
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>deprecated features<indexterm><parmname>configuration-jar</parmname> Ant target</indexterm></indexterm>
+        <indexterm>Lightweight DITA</indexterm>
+        <indexterm>command line<indexterm>RELAX NG parsing</indexterm></indexterm>
+        <indexterm>security</indexterm>
+        <indexterm>TLS</indexterm>
+        <indexterm>registry</indexterm>
+        <indexterm>targets<indexterm>deprecated</indexterm></indexterm>
+        <indexterm>classpath<indexterm><parmname>configuration-jar</parmname></indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <refbody>
+    <section>
+      <note>This topic provides a summary of changes in DITA-OT 3.2 that may require modifications to custom stylesheets
+        or plug-ins. For more information on changes in this release, see the
+        <xref keyref="3.2-release-notes"/>.</note>
+    </section>
+
+    <section>
+      <title>Deprecated targets</title>
+      <p>The <parmname>configuration-jar</parmname> Ant target used during the plug-in integration process has been
+        deprecated and may be removed in an upcoming release. This was previously used to package additional
+        configuration files and properties into <filepath>lib/dost-configuration.jar</filepath>, but recent versions of
+        DITA-OT include the <filepath>config</filepath> directory in the classpath for this purpose, so the
+        configuration JAR is no longer necessary.</p>
+    </section>
+
+    <section>
+      <title>Secure connections to the plug-in registry</title>
+      <note type="attention">To ensure data integrity during the plug-in installation process, Transport Layer Security
+        (TLS) will soon be required to access the plug-in registry. If you are using DITA-OT 3.2 or 3.2.1 and are unable
+        to upgrade to the latest version, modify the <codeph>registry</codeph> key in the
+          <filepath>config/configuration.properties</filepath> file to switch the URI schema to
+          <codeph>http<b>s</b>://</codeph>, so the entry reads <codeph>https://plugins.dita-ot.org/</codeph>.</note>
+      <p>For more information, see
+        <xref keyref="plugins-registry"/>.</p>
+    </section>
+
+  </refbody>
+</reference>

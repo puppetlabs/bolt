@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!-- HEADER -->
+<!-- ============================================================= -->
+<!-- MODULE:    DITA Machine Industry Taskbody Constraint -->
+<!-- VERSION:   1.2 -->
+<!-- DATE:      April 2009 -->
+<!---->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- PUBLIC DOCUMENT TYPE DEFINITION -->
+<!-- TYPICAL INVOCATION -->
+<!---->
+<!--
+  Refer to this file by the following public identifier or an 
+        appropriate system identifier 
+  PUBLIC "-//OASIS//ELEMENTS DITA Machine Industry Task Constraint//EN"
+        Delivered as file "machineryTaskConstraint.mod"
+-->
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA) -->
+<!---->
+<!-- PURPOSE:    Declaring the domain entity for the strict task -->
+<!-- constraint module -->
+<!---->
+<!-- ORIGINAL CREATION DATE: -->
+<!-- April 2009 -->
+<!---->
+<!-- (C) Copyright OASIS Open 2009 -->
+<!-- All Rights Reserved. -->
+<!---->
+<!-- UPDATES: -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- Machine Industry Taskbody ENTITIES -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+    <xs:annotation>
+		<xs:appinfo>
+			<dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic task+taskreq-d machineryTaskbody-c)</dita:domainsModule>
+		</xs:appinfo>
+		<xs:documentation> 
+    
+    </xs:documentation>
+	</xs:annotation>
+	
+   <xs:redefine schemaLocation="urn:oasis:names:tc:dita:xsd:taskGrp.xsd:1.3">  
+    <xs:group name="prereq">
+      <xs:choice>
+        <xs:group ref="prereq"/>
+        <xs:group ref="taskreq-d-prereq"/>
+      </xs:choice>
+    </xs:group>
+    
+    <xs:group name="postreq">
+      <xs:choice>
+        <xs:group ref="postreq"/>
+        <xs:group ref="taskreq-d-postreq"/>
+      </xs:choice>
+    </xs:group>
+ 
+  </xs:redefine>
+  
+</xs:schema>
+<!-- ================== End Machinery Taskbody Entities ========== -->

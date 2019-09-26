@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<concept id="preprocess-topic-fragment" xml:lang="en-US">
+  <title>Resolve topic fragments and code references (topic-fragment)</title>
+  <shortdesc>The <codeph>topic-fragment</codeph> step expands content references to elements in the same topic and
+    resolves references made with the <xmlelement>coderef</xmlelement> element. This step is implemented in SAX
+    pipes.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>coderef</xmlelement></indexterm>
+        <indexterm><xmlelement>codeblock</xmlelement></indexterm>
+        <indexterm>preprocessing<indexterm><codeph>topic-fragment</codeph></indexterm></indexterm>
+        <indexterm><codeph>topic-fragment</codeph></indexterm>
+        <indexterm>Saxon</indexterm>
+        <indexterm>conref</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section>
+      <p>Content references to elements in the same topic are defined via same-topic fragments such as
+          <codeph>#./ID</codeph> in URIs.</p>
+      <p>The <xmlelement>coderef</xmlelement> element is used to reference code stored externally in non-XML documents.
+        During the pre-processing step, the referenced content is pulled into the containing
+          <xmlelement>codeblock</xmlelement> element.</p>
+    </section>
+  </conbody>
+</concept>

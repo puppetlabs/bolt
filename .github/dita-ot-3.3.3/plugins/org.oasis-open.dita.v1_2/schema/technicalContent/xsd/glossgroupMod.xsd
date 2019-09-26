@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Glossgroup XSD module                  -->
+<!--  VERSION:   1.2                                             -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe the glossgroup module      -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             September 2009                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2009                -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/">
+  
+  <xs:import namespace="http://dita.oasis-open.org/architecture/2005/" schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.2"/>
+  
+  <xs:annotation>
+    <xs:appinfo>
+      <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">(topic concept glossgroup)</dita:domainsModule>
+    </xs:appinfo>
+    <xs:documentation> 
+    
+    </xs:documentation>
+  </xs:annotation>
+  
+  <xs:element name="glossgroup">
+     <xs:complexType>
+       <xs:complexContent>
+         <xs:extension base="glossgroup.class">
+           <xs:attribute name="class" default="- topic/topic concept/concept glossgroup/glossgroup "/>
+         </xs:extension>
+       </xs:complexContent>
+     </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="glossgroup.class">
+    <xs:sequence>
+      <xs:group ref="glossgroup.content"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="glossgroup.attributes"/>
+  </xs:complexType>
+  
+  <xs:group name="glossgroup.content">
+    <xs:sequence>
+      <xs:sequence>
+        <xs:group ref="title"/>
+        <xs:group ref="prolog" minOccurs="0"/>
+        <xs:group ref="glossgroup-info-types" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:attributeGroup name="glossgroup.attributes">
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+     <xs:attributeGroup ref="conref-atts" />
+     <xs:attributeGroup ref="select-atts"/>
+     <xs:attribute ref="ditaarch:DITAArchVersion" />
+     <xs:attributeGroup ref="domains-att"/>
+     <xs:attribute name="outputclass" type="xs:string"/>
+     <xs:attributeGroup ref="localization-atts"/>
+     <xs:attributeGroup ref="global-atts"/>
+  </xs:attributeGroup>
+  
+  <xs:group name="glossgroup-info-types">
+         <xs:choice>
+             <xs:group ref="glossgroup" />
+             <xs:group ref="glossentry" />
+             <xs:group ref="info-types"/>
+         </xs:choice>
+     </xs:group>
+
+</xs:schema>

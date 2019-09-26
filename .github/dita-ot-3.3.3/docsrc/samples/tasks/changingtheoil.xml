@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<!-- (C) Copyright IBM Corporation 2001, 2005. All Rights Reserved. -->
+
+<task id="changeoil" xml:lang="en-us">
+  <title>Changing the oil in your car</title>
+  <shortdesc>Once every 6000 kilometers or three months, change the oil in your car.</shortdesc>
+  <taskbody>
+    <context>
+      <p>Changing the oil regularly will help keep the engine in good condition. </p></context>
+    <steps>
+      <stepsection>To change the oil:</stepsection>
+      <step>
+        <cmd>Remove the old oil filter.</cmd>
+      </step>
+      <step>
+        <cmd>Drain the old oil.</cmd>
+      </step>
+      <step>
+        <cmd>Install a new oil filter and gasket.</cmd>
+      </step>
+      <step>
+        <cmd>Add new oil to the engine.</cmd>
+      </step>
+      <step>
+        <cmd>Check the air filter and replace or clean it.</cmd>
+      </step>
+      <step>
+        <cmd>Top up the windshield washer fluid.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+  <related-links>
+    <link href="../concepts/oil.xml" format="dita" type="concept"/>
+    <link href="../concepts/wwfluid.xml" format="dita" type="concept"/>
+  </related-links>
+</task>

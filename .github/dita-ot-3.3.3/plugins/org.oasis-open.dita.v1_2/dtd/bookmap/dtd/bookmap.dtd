@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Bookmap DTD                                  -->
+<!--  VERSION:   1.2                                               -->
+<!--  DATE:      November 2009                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    PUBLIC DOCUMENT TYPE DEFINITION            -->
+<!--                    TYPICAL INVOCATION                         -->
+<!--                                                               -->
+<!--  Refer to this file by the following public identifier or an 
+      appropriate system identifier 
+PUBLIC "-//OASIS//DTD DITA BookMap//EN"
+      Delivered as file "bookmap.dtd"                              -->
+
+<!-- The public ID above refers to the latest version of this DTD.
+     To refer to this specific version, you may use this value:
+PUBLIC "-//OASIS//DTD DITA 1.2 BookMap//EN"                        -->
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    DTD to describe DITA Book Maps                    -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             March 2004                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS Open 2006, 2009.              -->
+<!--             (C) Copyright IBM Corporation 2004, 2005.         -->
+<!--             All Rights Reserved.                              -->
+<!--                                                               -->
+<!--  UPDATES:                                                     -->
+<!--    2008.02.01 RDA: Added reference to bookmap.ent             -->
+<!--    2008.02.12 RDA: Modify imbeds to use specific 1.2 version  -->
+<!--    2008.04.15 RDA: Added delay resolution domain              -->
+<!--    2010.09.21 RDA: Added base and tec. content topic domains  -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!--                    MAP ENTITY DECLARATIONS                    -->
+<!-- ============================================================= -->
+
+<!ENTITY % bookmap-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 BookMap//EN" 
+         "bookmap.ent"
+>%bookmap-dec;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ENTITY DECLARATIONS                 -->
+<!-- ============================================================= -->
+
+<!ENTITY % mapgroup-d-dec 
+                        PUBLIC 
+"-//OASIS//ENTITIES DITA 1.2 Map Group Domain//EN" 
+"../../base/dtd/mapGroup.ent"                                                 >
+%mapgroup-d-dec;
+
+<!ENTITY % indexing-d-dec     PUBLIC 
+"-//OASIS//ENTITIES DITA 1.2 Indexing Domain//EN" 
+"../../base/dtd/indexingDomain.ent"                                           >
+%indexing-d-dec;
+
+<!ENTITY % delay-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Delayed Resolution Domain//EN" 
+         "../../base/dtd/delayResolutionDomain.ent"                                                       
+>%delay-d-dec;
+
+<!ENTITY % xnaldomain-d-dec 
+                        PUBLIC 
+"-//OASIS//ENTITIES DITA 1.2 XNAL Domain//EN" 
+"../../xnal/dtd/xnalDomain.ent"
+>%xnaldomain-d-dec;
+
+<!ENTITY % hi-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Highlight Domain//EN" 
+         "../../base/dtd/highlightDomain.ent"
+>%hi-d-dec;
+
+<!ENTITY % ut-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Utilities Domain//EN" 
+         "../../base/dtd/utilitiesDomain.ent"                                                
+>%ut-d-dec;
+
+<!ENTITY % hazard-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Hazard Statement Domain//EN" 
+         "../../base/dtd/hazardstatementDomain.ent"
+>%hazard-d-dec;
+
+<!ENTITY % abbrev-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Abbreviated Form Domain//EN" 
+         "../../technicalContent/dtd/abbreviateDomain.ent"
+>%abbrev-d-dec;
+
+<!ENTITY % pr-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Programming Domain//EN" 
+         "../../technicalContent/dtd/programmingDomain.ent"                                              
+>%pr-d-dec;
+
+<!ENTITY % sw-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 Software Domain//EN" 
+         "../../technicalContent/dtd/softwareDomain.ent"                                                 
+>%sw-d-dec;
+
+<!ENTITY % ui-d-dec     
+  PUBLIC "-//OASIS//ENTITIES DITA 1.2 User Interface Domain//EN" 
+         "../../technicalContent/dtd/uiDomain.ent"                                                       
+>%ui-d-dec;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE DECLARATIONS              -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!--                    DOMAIN EXTENSIONS                          -->
+<!-- ============================================================= -->
+<!--                    One for each extended base element, with
+                        the name of the domain(s) in which the
+                        extension was declared                     -->
+<!ENTITY % author       "author | 
+                         %xnal-d-author;
+                        ">
+<!ENTITY % topicref     "topicref |
+                         %mapgroup-d-topicref;
+                        ">
+<!ENTITY % index-base   "index-base |
+                         %indexing-d-index-base;
+                        ">
+<!ENTITY % keywords     "keywords | 
+                         %delay-d-keywords;
+                        ">
+<!ENTITY % keyword      "keyword | 
+                         %pr-d-keyword; | 
+                         %sw-d-keyword; |
+                         %ui-d-keyword;
+                        ">
+<!ENTITY % pre          "pre | 
+                         %pr-d-pre; | 
+                         %sw-d-pre; | 
+                         %ui-d-pre;
+                        ">
+<!ENTITY % ph           "ph | 
+                         %hi-d-ph; | 
+                         %pr-d-ph; | 
+                         %sw-d-ph; | 
+                         %ui-d-ph;
+                        ">
+<!ENTITY % term         "term | 
+                         %abbrev-d-term;
+                        ">
+<!ENTITY % fig          "fig |
+                         %pr-d-fig; |
+                         %ut-d-fig;
+                        ">
+<!ENTITY % dl           "dl | 
+                         %pr-d-dl;
+                        ">
+<!ENTITY % note         "note | 
+                         %hazard-d-note;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ATTRIBUTE EXTENSIONS                -->
+<!-- ============================================================= -->
+<!ENTITY % props-attribute-extensions  ""                            >
+<!ENTITY % base-attribute-extensions   ""                            >
+
+<!-- ============================================================= -->
+<!--                    DOMAINS ATTRIBUTE OVERRIDE                 -->
+<!-- ============================================================= -->
+<!--                    Must be declared ahead of the DTDs, which
+                        puts @domains first in order               -->
+<!ENTITY included-domains 
+                        "&bookmap-att;
+                         &delay-d-att;
+                         &mapgroup-d-att;
+                         &indexing-d-att; 
+                         &xnal-d-att;
+                         &hi-d-att; 
+                         &ut-d-att; 
+                         &hazard-d-att;
+                         &abbrev-d-att;
+                         &pr-d-att; 
+                         &sw-d-att;
+                         &ui-d-att;
+                        ">
+
+<!-- ============================================================= -->
+<!--                    MAP ELEMENT INTEGRATION                    -->
+<!-- ============================================================= -->
+
+<!ENTITY % map-type PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 Map//EN" 
+"../../base/dtd/map.mod"                                                      >
+%map-type;
+
+<!ENTITY % bookmap-type PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 BookMap//EN" 
+"bookmap.mod"                                                        >
+%bookmap-type;
+
+<!-- ============================================================= -->
+<!--                    DOMAIN ELEMENT INTEGRATION                 -->
+<!-- ============================================================= -->
+
+<!ENTITY % mapgroup-d-def  
+                        PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 Map Group Domain//EN" 
+"../../base/dtd/mapGroup.mod"                                                 >
+%mapgroup-d-def;
+
+<!ENTITY % indexing-d-def
+                        PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 Indexing Domain//EN" 
+"../../base/dtd/indexingDomain.mod"                                           >
+%indexing-d-def;
+
+<!ENTITY % delay-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Delayed Resolution Domain//EN" 
+         "../../base/dtd/delayResolutionDomain.mod"
+>%delay-d-def;
+
+<!ENTITY % xnaldomain-d-def  
+                        PUBLIC 
+"-//OASIS//ELEMENTS DITA 1.2 XNAL Domain//EN" 
+"../../xnal/dtd/xnalDomain.mod"
+>%xnaldomain-d-def;
+
+<!ENTITY % hi-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Highlight Domain//EN" 
+         "../../base/dtd/highlightDomain.mod"
+>%hi-d-def;
+
+<!ENTITY % ut-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Utilities Domain//EN" 
+         "../../base/dtd/utilitiesDomain.mod"
+>%ut-d-def;
+
+<!ENTITY % hazard-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Hazard Statement Domain//EN" 
+         "../../base/dtd/hazardstatementDomain.mod"
+>%hazard-d-def;
+
+<!ENTITY % abbrev-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Abbreviated Form Domain//EN" 
+         "../../technicalContent/dtd/abbreviateDomain.mod"
+>%abbrev-d-def;
+
+<!ENTITY % ui-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 User Interface Domain//EN" 
+         "../../technicalContent/dtd/uiDomain.mod"
+>%ui-d-def;
+
+<!ENTITY % pr-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Programming Domain//EN" 
+         "../../technicalContent/dtd/programmingDomain.mod"
+>%pr-d-def;
+
+<!ENTITY % sw-d-def     
+  PUBLIC "-//OASIS//ELEMENTS DITA 1.2 Software Domain//EN" 
+         "../../technicalContent/dtd/softwareDomain.mod"
+>%sw-d-def;
+
+<!-- ================== End DITA Bookmap DTD  ==================== -->

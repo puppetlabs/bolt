@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+
+<reference id="flagging-migration" rev="1.7" xml:lang="en-US">
+  <title>XHTML migration for flagging updates in DITA-OT 1.7</title>
+  <titlealts>
+    <navtitle>Flagging updates</navtitle>
+  </titlealts>
+  <shortdesc>This topic is primarily of interest to developers with XHTML transform overrides written prior to DITA-OT
+    1.7. Due to significant changes in the flagging process with the 1.7 release, some changes may be needed to make
+    overrides work properly with DITAVAL-based flagging. The new design is significantly simpler than the old design; in
+    many cases, migration will consist of deleting old code that is no longer needed.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm><xmlelement>ul</xmlelement></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>mode="elementname-fmt"</codeph></indexterm></indexterm>
+        <indexterm>deprecated features<indexterm><codeph>DITAVAL templates</codeph></indexterm></indexterm>
+        <indexterm>DITAVAL<indexterm>template changes in 1.7</indexterm></indexterm>
+        <indexterm>CSS<indexterm>gen-style</indexterm></indexterm>
+        <indexterm>flagging</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section>
+      <title>Which XHTML overrides need to migrate?</title>
+      <p>If your override does not contain any code related to DITAVAL flagging, then there is nothing to migrate.</p>
+      <p>If your builds do not make use of DITAVAL-based flagging, but call the deprecated flagging templates, then you
+        should override but there is little urgency. You will not see any difference in the output, but those templates
+        will be removed in a future release.</p>
+      <p>If you do make use of DITAVAL-based flagging, try using your override with 1.7. Check the elements you
+        override:
+        <ol>
+          <li>In some cases flags may be doubled. This will be the case if you call routines such as
+              <codeph>"start-flagit"</codeph>.</li>
+          <li>In some cases flags may be removed. This will be the case if you call shortcut routines such as
+              <codeph>"revtext"</codeph> or <codeph>"revblock"</codeph>.</li>
+          <li>In other cases, flags may still appear properly, in which case migration is less urgent.</li>
+        </ol></p>
+      <p>For any override that needs migration, please see the instructions that follow.</p></section>
+    <section>
+      <title>Deprecated templates in DITA-OT 1.7</title>
+      <p>All of the old DITAVAL based templates are deprecated in DITA-OT 1.7. If your overrides include any of the
+        following templates, they should be migrated for the new release; in many cases the templates below will not
+        have any effect on your output, but all instances should be migrated.</p>
+      <ul>
+        <li>The <codeph>"gen-style"</codeph> template used to add CSS styling</li>
+        <li>The <codeph>"start-flagit"</codeph> and <codeph>"end-flagit"</codeph> templates used to generate image flags
+          based on property attributes like @audience</li>
+        <li>The <codeph>"start-revflag"</codeph> and <codeph>"end-revflag"</codeph> templates, used to generate images
+          for active revisions</li>
+        <li>Shortcut templates that group these templates into a single call, such as:
+          <ul>
+            <li><codeph>"start-flags-and-rev"</codeph> and <codeph>"end-flags-and-rev"</codeph>, used to combine flags
+              and revisions into one call</li>
+            <li><codeph>"revblock"</codeph> and <codeph>"revtext"</codeph>, both used to output start revisions, element
+              content, and end revisions</li>
+            <li>The modes <codeph>"outputContentsWithFlags"</codeph> and
+                <codeph>"outputContentsWithFlagsAndStyle"</codeph>, both used to combine processing for
+              property/revision flags with content processing</li>
+          </ul></li>
+        <li>All other templates that make use of the <codeph>$flagrules</codeph> variable, which is no longer used in
+          any of the DITA-OT 1.7 code</li>
+        <li>All templates within <filepath>flag.xsl</filepath> that were called from the templates listed above</li>
+        <li>Element processing handled with mode="elementname-fmt", such as <codeph>mode="ul-fmt"</codeph> for
+          processing unordered lists and <codeph>mode="section-fmt"</codeph> for sections.</li>
+      </ul></section>
+    <section>
+      <title>What replaces the templates?</title>
+      <p>The new flagging design described in the preprocess design section now adds literal copies of relevant DITAVAL
+        elements, along with CSS based flagging information, into the relevant section of the topic. This allows most
+        flags to be processed in document order; in addition, there is never a need to read the DITAVAL, interpret CSS,
+        or evaluate flagging logic. The <filepath>htmlflag.xsl</filepath> file contains a few rules to match and process
+        the start/end flags; in most cases, all code to explicitly process flags can be deleted.</p>
+      <p>For example, the common logic for most element rules before DITA-OT 1.7 could be boiled down to the following:
+        <ol>
+          <li>Match element </li>
+          <li>Create <codeph>"flagrules"</codeph> variable by reading DITAVAL for active flags </li>
+          <li>Output start tag such as <codeph>&lt;div></codeph> or <codeph>&lt;span></codeph>
+          </li>
+          <li>Call <codeph>"commonattributes"</codeph> and ID processing </li>
+          <li>Call <codeph>"gen-style"</codeph> with <codeph>$flagrules</codeph>, to create DITAVAL based CSS </li>
+          <li>Call <codeph>"start-flagit"</codeph> with <codeph>$flagrules</codeph>, to create start flag images </li>
+          <li>Call <codeph>"start-revflag"</codeph> with <codeph>$flagrules</codeph>, to create start revision images </li>
+          <li>Output contents </li>
+          <li>Call <codeph>"end-revflag"</codeph> with <codeph>$flagrules</codeph>, to create end revision images </li>
+          <li>Call <codeph>"end-flagit"</codeph> with <codeph>$flagrules</codeph>, to create end flag images </li>
+          <li>Output end tag such as <codeph>&lt;/div></codeph> or <codeph>&lt;/span></codeph></li>
+        </ol>
+      </p>
+      <p>In DITA-OT 1.7, style and images are typically handled with XSLT fallthrough processing. This removes virtually
+        all special flag coding from element rules, because flags are already part of the document and processed in
+        document order. </p>
+      <p>The sample above is reduced to:
+        <ol>
+          <li>Match element </li>
+          <li>Output start tag such as <codeph>&lt;div></codeph> or <codeph>&lt;span></codeph>
+          </li>
+          <li>Call <codeph>"commonattributes"</codeph> and ID processing </li>
+          <li>Output contents </li>
+          <li>Output end tag such as <codeph>&lt;/div></codeph> or <codeph>&lt;/span></codeph></li>
+        </ol>
+      </p>
+    </section>
+    <section>
+      <title>Migrating <codeph>"gen-style"</codeph> named template</title>
+      <p>Calls to the <codeph>"gen-style"</codeph> template should be deleted. There is no need to replace this call for
+        most elements.</p>
+      <p>The <codeph>"gen-style"</codeph> template was designed to read a DITAVAL file, find active style-based flagging
+        (such as colored or bold text), and add it to the generated @style attribute in HTML.</p>
+      <p>With DITA-OT 1.7, the style is calculated in the pre-process flagging module. The result is created as
+        @outputclass on a <codeph>&lt;ditaval-startprop></codeph> sub-element. The <codeph>"commonattributes"</codeph>
+        template now includes a line to process that value; the result is that for every element that calls
+          <codeph>"commonattributes"</codeph>, DITAVAL style will be processed when needed. Because virtually every
+        element includes a call to this common template, there is little chance that your override needs to explicitly
+        process the style. The new line in <codeph>"commonattributes"</codeph> that handles the style is:
+        <codeblock outputclass="language-xml">&lt;xsl:apply-templates select="*[contains(@class,' ditaot-d/ditaval-startprop ')]/@outputclass" mode="add-ditaval-style"/></codeblock></p></section>
+    <section>
+      <title>Migrating <codeph>"start-flagit"</codeph>, <codeph>"start-revflag"</codeph>, <codeph>"end-flagit"</codeph>,
+        and <codeph>"end-flagit"</codeph> named templates</title>
+      <p>Calls to these templates fall into two general groups.</p>
+      <p>If the flow of your element rule is to create a start tag like <codeph>&lt;div></codeph>,
+          <codeph>"start-flagit"</codeph>/<codeph>"start-revflag"</codeph>, process contents,
+          <codeph>"end-revflag"</codeph>/<codeph>"end-flagit"</codeph>, end tag - you just need to delete the calls to
+        these templates. Flags will be generated simply by processing the element contents in document order.</p>
+      <p>If the flow of your element rule processes flags outside of the normal document-order. There are generally two
+        reasons this is done. The first case is for elements like <codeph>&lt;ol></codeph>, where flags must appear
+        before the <codeph>&lt;ol></codeph> in order to create valid XHTML. The second is for elements like
+          <codeph>&lt;section></codeph>, where start flags are created, followed by the title or some generated text,
+        element contents, and finally end flags. In either of these cases, support for processing flags in document
+        order is disabled, so they must be explicitly processed out-of-line.</p>
+      <p>This is done with the following two lines (one for start flag/revision, one for end flag/revision):</p>
+      <ul>
+        <li>
+          <p>Create starting flag and revision images:</p>
+          <codeblock outputclass="language-xml">&lt;xsl:apply-templates select="*[contains(@class,' ditaot-d/ditaval-startprop ')]" mode="out-of-line"/></codeblock></li>
+        <li>
+          <p>Create ending flag and revision images:</p>
+          <codeblock outputclass="language-xml">&lt;xsl:apply-templates select="*[contains(@class,' ditaot-d/ditaval-endprop ')]" mode="out-of-line"/></codeblock></li>
+      </ul>
+      <p>For example, the following lines are used in DITA-OT 1.7 to process the <xmlelement>ul</xmlelement> element
+        (replacing the 29 lines used in DITA-OT
+        1.6):<codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace">&lt;xsl:template match="*[contains(@class,' topic/ul ')]">
+  <b>&lt;xsl:apply-templates select="*[contains(@class,' ditaot-d/ditaval-startprop ')]" mode="out-of-line"/></b>
+  &lt;xsl:call-template name="setaname"/>
+  &lt;ul>
+    &lt;xsl:call-template name="commonattributes"/>
+    &lt;xsl:apply-templates select="@compact"/>
+    &lt;xsl:call-template name="setid"/>
+    &lt;xsl:apply-templates/>
+  &lt;/ul>
+  <b>&lt;xsl:apply-templates select="*[contains(@class,' ditaot-d/ditaval-endprop ')]" mode="out-of-line"/></b>
+  &lt;xsl:value-of select="$newline"/>
+&lt;/xsl:template></codeblock></p></section>
+    <section>
+      <title>Migrating <codeph>"start-flags-and-rev"</codeph> and <codeph>"end-flags-and-rev"</codeph></title>
+      <ul>
+        <li><codeph>"start-flags-and-rev"</codeph> is equivalent to calling <codeph>"start-flagit"</codeph> followed by
+            <codeph>"start-revflag"</codeph>; it should be migrated as in the previous section.</li>
+        <li><codeph>"end-flags-and-rev"</codeph> is equivalent to calling <codeph>"end-revflag"</codeph> followed by
+            <codeph>"end-flagit"</codeph>; it should be migrated as in the previous section.</li>
+      </ul></section>
+    <section>
+      <title>Migrating <codeph>"revblock"</codeph> and <codeph>"revtext"</codeph></title>
+      <p>Calls to these two templates can be replaced with a simple call to
+        <codeph>&lt;xsl:apply-templates/></codeph>.</p></section>
+    <section>
+      <title>Migrating modes <codeph>"outputContentsWithFlags"</codeph> and
+          <codeph>"outputContentsWithFlagsAndStyle"</codeph></title>
+      <p>Processing an element with either of these modes can be replaced with a simple call to
+          <codeph>&lt;xsl:apply-templates/></codeph>.</p></section>
+    <section>
+      <title>Migrating <codeph>mode="elementname-fmt"</codeph></title>
+      <p>Prior to DITA-OT 1.7, many elements were processed with the following
+        logic:<pre>Match element
+    Set variable to determine if revisions are active and $DRAFT is on
+    If active
+        create division with rev style
+            process element with mode="elementname-fmt"
+        end division
+    Else
+        process element with mode="elementname-fmt"
+
+Match element with mode="elementname-fmt"
+    Process as needed</pre></p>
+      <p>Beginning with DITA-OT 1.7, styling from revisions is handled automatically with the
+          <codeph>"commonattributes"</codeph> template. This means there is no need for the extra testing, or the
+        indirection to <codeph>mode="elementname-fmt"</codeph>. These templates are deprecated, and element processing
+        will move into the main element rule. Overrides that include this indirection may remove it; overrides should
+        also be sure to match the default rule, rather than matching with
+      <codeph>mode="elementname-fmt"</codeph>.</p></section>
+  </refbody>
+</reference>

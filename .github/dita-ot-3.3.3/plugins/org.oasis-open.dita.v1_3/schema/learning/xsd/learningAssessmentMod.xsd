@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================================-->
+<!--                   HEADER                                    -->
+<!--=============================================================-->
+<!-- MODULE:    DITA learningAssessment                          -->
+<!-- VERSION:   1.2                                              -->
+<!-- DATE:      November 2009                                    -->
+<!--                                                             -->
+<!--=============================================================-->
+<!--=============================================================-->
+<!--                   PUBLIC DOCUMENT TYPE DEFINITION           -->
+<!--                   TYPICAL INVOCATION                        -->
+<!--                                                             -->
+<!-- Refer to this file by the following public identfier or an  -->
+<!--      appropriate system identifier                          -->
+<!--PUBLIC "-//OASIS//ELEMENTS DITA Learning Assessment//EN"     -->
+<!--      Delivered as file "learningAssessment.mod                   -->
+<!--=============================================================-->
+<!--SYSTEM:     Darwin Information Typing Architecture (DITA)    -->
+<!--                                                             -->
+<!--PURPOSE:    Declaring the elements and specialization        -->
+<!--            attributes for Learning Assessment               -->
+<!--                                                             -->
+<!--ORIGINAL CREATION DATE:                                      -->
+<!--            May 2007                                         -->
+<!--                                                             -->
+<!--            (C) Copyright OASIS Open 2007, 2009.             -->
+<!--            All Rights Reserved.                             -->
+<!--=============================================================-->
+<xs:schema xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- ==================== Import Section ======================= -->
+   <xs:import namespace="http://dita.oasis-open.org/architecture/2005/"
+              schemaLocation="urn:oasis:names:tc:dita:xsd:ditaarch.xsd:1.3"/>
+
+   <xs:annotation>
+      <xs:appinfo>
+         <dita:domainsModule xmlns:dita="http://dita.oasis-open.org/architecture/2005/">
+(topic learningBase+learningInteractionBase-d)
+(topic learningBase+learningInteractionBase-d learningAssessment)</dita:domainsModule>
+      </xs:appinfo>
+   </xs:annotation>
+
+   <xs:group name="learningAssessment-info-types">
+      <xs:sequence>
+         <xs:choice>
+            <xs:group ref="no-topic-nesting"/>
+            <xs:group ref="info-types"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:group>
+   <xs:element name="learningAssessment">
+      <xs:annotation>
+         <xs:documentation>A Learning Assessment presents questions or interactions that measure
+        progress, encourage recollection, and stimulate reinforcement of the learning content, and
+        can be presented before the content as a pre-assessment or as a post-assessment test. The
+        interactions use a sub-set of the Question-Test Interoperability (QTI) specification,
+        implemented as a DITA domain specialization.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningAssessment.class">
+               <xs:attribute ref="class"
+                             default="- topic/topic learningBase/learningBase     learningAssessment/learningAssessment "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningAssessment.class">
+      <xs:sequence>
+         <xs:group ref="learningAssessment.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningAssessment.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningAssessment.content">
+      <xs:sequence>
+         <xs:group ref="title"/>
+         <xs:group ref="titlealts" minOccurs="0"/>
+         <xs:choice minOccurs="0">
+            <xs:group ref="shortdesc"/>
+            <xs:group ref="abstract"/>
+         </xs:choice>
+         <xs:group ref="prolog" minOccurs="0"/>
+         <xs:group ref="learningAssessmentbody"/>
+         <xs:group ref="related-links" minOccurs="0"/>
+         <xs:group ref="learningAssessment-info-types"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningAssessment.attributes">
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attributeGroup ref="conref-atts"/>
+      <xs:attributeGroup ref="select-atts"/>
+      <xs:attributeGroup ref="localization-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+   <xs:attributeGroup name="learningAssessment.attlist">
+      <xs:attribute ref="ditaarch:DITAArchVersion"/>
+      <xs:attributeGroup ref="domains-att"/>
+   </xs:attributeGroup>
+   <xs:element name="learningAssessmentbody">
+      <xs:annotation>
+         <xs:documentation>The &lt;learningAssessmentbody&gt; element is the main body-level element in a
+        learningAssessment topic.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="learningAssessmentbody.class">
+               <xs:attribute ref="class"
+                             default="- topic/body  learningBase/learningBasebody learningAssessment/learningAssessmentbody "/>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:complexType name="learningAssessmentbody.class">
+      <xs:sequence>
+         <xs:group ref="learningAssessmentbody.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="learningAssessmentbody.attributes"/>
+   </xs:complexType>
+   <xs:group name="learningAssessmentbody.content">
+      <xs:sequence>
+         <xs:group ref="lcIntro" minOccurs="0"/>
+         <xs:group ref="lcObjectives" minOccurs="0"/>
+         <xs:group ref="lcDuration" minOccurs="0"/>
+         <xs:group ref="lcInteraction" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="section" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:group ref="lcSummary" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="learningAssessmentbody.attributes">
+      <xs:attributeGroup ref="univ-atts"/>
+      <xs:attribute name="outputclass" type="xs:string"/>
+      <xs:attributeGroup ref="global-atts"/>
+   </xs:attributeGroup>
+</xs:schema>

@@ -1,0 +1,145 @@
+<!DOCTYPE html
+  SYSTEM "about:legacy-compat">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="copyright" content="(C) Copyright 2019"><meta name="DC.rights.owner" content="(C) Copyright 2019"><meta name="DC.type" content="task"><meta name="description" content="A custom plug-in can be created to generate HTML output that uses custom fonts for enhanced typographic features, extended character sets or a unique corporate identity."><meta name="DC.subject" content=", require, link, head, HTML, custom plug-in, fonts, CSS, web fonts, custom.css, build_html5-webfont.xml, plugin.xml, org.dita.html5"><meta name="keywords" content=", require, link, head, HTML, custom plug-in, fonts, CSS, web fonts, custom.css, build_html5-webfont.xml, plugin.xml, org.dita.html5"><meta name="DC.relation" scheme="URI" content="../topics/html-customization-plugins.html"><meta name="DC.relation" scheme="URI" content="../parameters/parameters-base-html.html"><meta name="DC.format" content="HTML5"><meta name="DC.identifier" content="custom-html-plugin-webfont"><link rel="stylesheet" type="text/css" href="../css/commonltr.css"><link rel="stylesheet" type="text/css" href="../css/dita-ot-doc.css"><title>Embedding web fonts in HTML output</title></head><body id="custom-html-plugin-webfont"><header role="banner"><div class="header">
+  <p>DITA Open Toolkit</p>
+  <hr>
+</div></header><nav role="toc"><ul><li><a href="../index.html">DITA Open Toolkit 3.3</a></li><li><a href="../release-notes/index.html">Release Notes</a></li><li><a href="../topics/installing-client.html">Installing DITA-OT</a></li><li><a href="../topics/alternative-input-formats.html">Authoring formats</a></li><li><a href="../topics/building-output.html">Building output</a></li><li><a href="../parameters/index.html">Setting parameters</a></li><li><a href="../topics/customizing.html">Customizing DITA-OT</a><ul><li><a href="../topics/html-customization.html">Customizing HTML</a><ul><li><a href="../topics/html-customization-parameters.html">Setting HTML parameters</a></li><li><a href="../topics/html-customization-properties-file.html">Using a properties file</a></li><li><a href="../topics/html-customization-plugins.html">Custom HTML plug-ins</a><ul><li><a href="../topics/html-customization-plugin-bundle-css.html">Bundling custom CSS</a></li><li class="active"><a href="../topics/html-customization-plugin-webfont.html">Embedding web fonts</a></li><li><a href="../topics/html-customization-plugin-javascript.html">Inserting JavaScript</a></li></ul></li></ul></li><li><a href="../topics/pdf-customization.html">Customizing PDF</a></li><li><a href="../topics/custom-plugins.html">Working with plug-ins</a></li><li><a href="../extension-points/plugin-extension-points.html">Extension points</a></li><li><a href="../topics/migration.html">Migrating customizations</a></li><li><a href="../topics/globalization.html">Globalizing DITA content</a></li><li><a href="../topics/rebuilding-docs.html">Rebuilding documentation</a></li></ul></li><li><a href="../topics/troubleshooting-overview.html">Troubleshooting</a></li><li><a href="../reference/index.html">Reference</a></li><li><a href="../topics/dita-and-dita-ot-resources.html">Resources</a></li></ul></nav><main role="main"><article role="article" aria-labelledby="ariaid-title1">
+  <h1 class="title topictitle1" id="ariaid-title1">Embedding web fonts in HTML output</h1>
+  
+  
+  
+  <div class="body taskbody"><p class="shortdesc">A custom plug-in can be created to generate HTML output that uses custom fonts for enhanced typographic
+    features, extended character sets or a unique corporate identity.</p>
+    <section class="section context"><div class="tasklabel"><h2 class="sectiontitle tasklabel">About this task</h2></div>
+      <p class="p">This scenario walks through the process of creating a very simple plug-in
+          (<code class="ph codeph">com.example.html5-webfont</code>) that creates a new transformation type:
+          <span class="keyword option">html5-webfont</span>. </p>
+      <p class="p">The <span class="keyword option">html5-webfont</span> transformation includes a custom CSS file and sets five parameters to
+        integrate font links and a custom stylesheet in the generated HTML5 output. These parameter settings make the
+        following changes:</p>
+      <ul class="ul">
+        <li class="li">
+          <p class="p">Specify a file that links to the font from the document head with <span class="keyword parmname">args.hdf</span>.</p></li>
+        <li class="li">
+          <p class="p">Specify the <span class="ph filepath">css</span> subfolder of the plug-in as the source directory for custom CSS with
+              <span class="keyword parmname">args.cssroot</span>.</p></li>
+        <li class="li">
+          <p class="p">Specify the name of the custom CSS file with <span class="keyword parmname">args.css</span>.</p>
+          <p class="p">The value of this parameter tells DITA-OT to use the <span class="ph filepath">custom.css</span> file provided by the
+            plug-in.</p></li>
+        <li class="li">
+          <p class="p">Ensure that the CSS file is copied to the output directory by setting <span class="keyword parmname">args.copycss</span> to
+              <span class="keyword option">yes</span>.</p></li>
+        <li class="li">
+          <p class="p">Set the destination path for CSS files in the output folder with <span class="keyword parmname">args.csspath</span>.</p>
+          <p class="p">CSS files are copied to the root level of the output folder by default. Setting this parameter places CSS
+            files in a dedicated <span class="ph filepath">css</span> subfolder.</p></li>
+      </ul>
+      <p class="p">All five parameters are set in the Ant script (<span class="ph filepath">build_html5-webfont.xml</span>).</p>
+    </section>
+    <section><div class="tasklabel"><h2 class="sectiontitle tasklabel">Procedure</h2></div><ol class="ol steps"><li class="li step stepexpand">
+        <span class="ph cmd">In the <span class="ph filepath">plugins</span> directory, create a directory named
+            <span class="ph filepath">com.example.html5-webfont</span>.</span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the new <span class="ph filepath">com.example.html5-webfont</span> directory, create a plug-in configuration file
+            (<span class="ph filepath">plugin.xml</span>) that declares the new <span class="keyword option">html5-webfont</span> transformation and
+          its dependencies.</span>
+        <div class="itemgroup stepxmp">
+          <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 1. </span>Sample <span class="ph filepath">plugin.xml</span> file</figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;?xml-model href="dita-ot/plugin.rnc" type="application/relax-ng-compact-syntax"?&gt;
+
+&lt;plugin id="com.example.html5-webfont"&gt;
+  &lt;require plugin="org.dita.html5"/&gt;
+  &lt;transtype name="html5-webfont" extends="html5" desc="HTML5 with Noto Sans webfont"/&gt;
+  &lt;feature extension="ant.import" file="build_html5-webfont.xml"/&gt;
+&lt;/plugin&gt;</code></pre>
+          </figure>
+          <div class="note note note_note"><span class="note__title">Note:</span> This plug-in will extend the default HTML5 transformation, so the <code class="keyword markupname xmlelement">&lt;require&gt;</code>
+            element explicitly defines <span class="ph filepath">org.dita.html5</span> as a dependency.</div>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the <span class="ph filepath">com.example.html5-webfont</span> directory, create a subdirectory named
+            <span class="ph filepath">include</span>.</span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the new <span class="ph filepath">include</span> subdirectory, create a file named
+            <span class="ph filepath">webfont.hdf.xml</span> with your custom font links.</span>
+        <div class="itemgroup stepxmp">
+          <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 2. </span>Sample <span class="ph filepath">webfont.hdf.xml</span> file</figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;div&gt;
+  &lt;link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet"&gt;&lt;/link&gt;
+&lt;/div&gt;</code></pre>
+          </figure>
+          <p class="p">This example uses the <a class="xref" href="https://fonts.google.com/specimen/Noto+Sans" target="_blank">Noto Sans</a> font. You can use multiple fonts by creating
+            additional <code class="keyword markupname xmlelement">&lt;link&gt;</code> references in this file. The division wrapper will be discarded
+            when generating HTML files, and the contents will be inserted into the <code class="keyword markupname xmlelement">&lt;head&gt;</code> element
+            of each page.</p>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the <span class="ph filepath">com.example.html5-webfont</span> directory, create a subdirectory named
+            <span class="ph filepath">css</span>.</span>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the new <span class="ph filepath">css</span> subdirectory, create a file named <span class="ph filepath">custom.css</span> with
+          the stylesheet rules that apply the custom <code class="ph codeph">font-family</code> to the desired elements.</span>
+        <div class="itemgroup stepxmp">
+          <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 3. </span>Sample <span class="ph filepath">custom.css</span> file</figcaption>
+            
+            <pre class="pre codeblock language-css normalize-space show-line-numbers show-whitespace"><code>body {
+  font-family: 'Noto Sans', sans-serif;
+}</code></pre>
+          </figure>
+          <p class="p">This example uses <a class="xref" href="https://fonts.google.com/specimen/Noto+Sans" target="_blank">Noto Sans</a> for all body content. In practice, you would normally use
+            different fonts for headings, body content, tables, etc. by creating additional rules in your CSS file.</p>
+        </div>
+      </li><li class="li step stepexpand">
+        <span class="ph cmd">In the <span class="ph filepath">com.example.html5-webfont</span> root directory, add an Ant script
+            (<span class="ph filepath">build_html5-webfont.xml</span>) to define the transformation type.</span>
+        <div class="itemgroup stepxmp">
+          <figure class="fig fignone"><figcaption><span class="fig--title-label">Figure 4. </span>Sample build file: <span class="ph filepath">build_html5-webfont.xml</span></figcaption>
+            
+            <pre class="pre codeblock language-xml normalize-space show-line-numbers show-whitespace"><code>&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+
+&lt;project&gt;
+  &lt;target name="dita2html5-webfont"
+       depends="dita2html5-webfont.init,
+                dita2html5"/&gt;
+  &lt;target name="dita2html5-webfont.init"&gt;
+    &lt;property name="args.hdf"
+          location="${dita.plugin.com.example.html5-webfont.dir}/include/webfont.hdf.xml"/&gt;
+    &lt;property name="args.cssroot"
+          location="${dita.plugin.com.example.html5-webfont.dir}/css"/&gt;
+    &lt;property name="args.css" value="custom.css"/&gt;
+    &lt;property name="args.copycss" value="yes"/&gt;
+    &lt;property name="args.csspath" value="css"/&gt;
+  &lt;/target&gt;
+&lt;/project&gt;</code></pre>
+          </figure>
+        </div>
+      </li></ol></section>
+    <section class="section result"><div class="tasklabel"><h2 class="sectiontitle tasklabel">Results</h2></div>
+      <div class="note tip note_tip"><span class="note__title">Tip:</span> The files for this sample plug-in are included in the DITA-OT installation directory under
+          <span class="ph filepath">docsrc/samples/plugins/com.example.html5-webfont/</span> and on <a class="xref" href="https://github.com/dita-ot/docs/tree/develop/samples/plugins/com.example.html5-webfont" target="_blank">GitHub</a>.</div>
+      <p class="p">The plug-in directory has the following layout and files:</p>
+      <pre class="pre codeblock"><code>com.example.html5-webfont
+├── build_html5-webfont.xml
+├── css
+│&nbsp;&nbsp; └── custom.css
+├── include
+│&nbsp;&nbsp; └── webfont.hdf.xml
+└── plugin.xml</code></pre>
+    </section>
+    <section class="section postreq"><div class="tasklabel"><h2 class="sectiontitle tasklabel">What to do next</h2></div>
+      <ol class="ol">
+        <li class="li">Run <span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span>
+          <span class="keyword parmname">--install</span> to install the plug-in and make the <span class="keyword option">html5-webfont</span>
+          transformation available.</li>
+        <li class="li">Build output with the new transformation type to verify that the plug-in works as intended.
+          <pre class="pre codeblock"><code><span class="ph filepath"><var class="keyword varname">dita-ot-dir</var>/bin/<span class="keyword cmdname">dita</span></span> <span class="keyword parmname">--input</span>=<var class="keyword varname">my.ditamap</var> <span class="keyword parmname">--format</span>=<span class="keyword option">html5-webfont</span></code></pre>
+        </li>
+        <li class="li">Refine the styles in your <span class="ph filepath">custom.css</span> file to adjust the font usage as necessary.</li>
+      </ol>
+    </section>
+  </div>
+<nav role="navigation" class="related-links"><div class="familylinks"><div class="parentlink"><strong>Parent topic:</strong> <a class="link" href="../topics/html-customization-plugins.html" title="For more complex customizations, you can create custom DITA-OT plug-ins that bundle custom fonts, JavaScript, and stylesheets; modify the HTML markup, or override other aspects of HTML processing.">Custom HTML plug-ins</a></div></div><div class="linklist relinfo relref"><strong>Related reference</strong><br><ul class="linklist"><li class="linklist"><a class="link" href="../parameters/parameters-base-html.html" title="Certain parameters apply to all HTML-based transformation types: HTML5, XHTML, HTML&nbsp;Help, Eclipse help, and TocJS.">HTML-based output parameters</a></li></ul></div></nav></article></main></body></html>

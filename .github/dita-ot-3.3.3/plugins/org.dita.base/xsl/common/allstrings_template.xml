@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2008 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<allstrings>
+  <stringfile>strings.xml</stringfile>
+  <!--dita:extension id="dita.xsl.strings" behavior="org.dita.dost.platform.ImportStringsAction" xmlns:dita="http://dita-ot.sourceforge.net"/-->
+</allstrings>

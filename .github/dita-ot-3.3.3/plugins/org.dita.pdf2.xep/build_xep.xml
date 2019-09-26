@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2011 Jarno Elovirta
+
+See the accompanying LICENSE file for applicable license.
+-->
+<project name="org.dita.pdf2.xep">
+
+  <target name="transform.fo2pdf.xep.test-use">
+    <condition property="use.xep.pdf.formatter">
+      <equals arg1="${pdf.formatter}" arg2="xep"/>
+    </condition>
+  </target>
+
+  <target name="transform.fo2pdf.xep.init" depends="transform.fo2pdf.xep.test-use" if="use.xep.pdf.formatter">
+    <!-- Default maximum memory to give to forked Java processes.
+
+       Set this higher either in another Ant script or on the
+       Ant command line using the -D parameter, e.g.:
+
+       ant -DmaxJavaMemory=4G
+
+       Memory values are integers followed by "M" for megabytes,
+       "G" for gigabytes.
+
+       On 32-bit systems, the largest memory setting will be somewhere
+       between 1500M and 2000M depending on your system.
+
+       64-bit JVMs can use essentially unlimited memory.
+
+       For memory-intensive process (very large maps),
+       2 or 3 gigabytes should be more than sufficient.
+
+       This value is used in the @maxmemory attribute the of the Ant
+       <java> task.
+    -->
+    <property name="maxJavaMemory" value="500m"/>
+    <!-- Determine the Java architecture and set the JVM arguments
+       appropriately.
+
+       Note that the Java architecture is determined by how the
+       JVM is started, so it is possible for the base Ant
+       JVM to have been started in 32-bit mode on a 64-bit machine.
+
+       The is64bit and is32bit properties are mutually exclusive.
+
+    -->
+    <condition property="is64bit">
+      <!-- NOTE: The following is not a complete list but should cover
+               most of the systems Open Toolkit users are likely
+               to use. Add more values as they become known.
+    -->
+      <and>
+        <or>
+          <os arch="x86_64"/>
+          <os arch="amd64"/>
+          <os arch="ppc64"/>
+        </or>
+        <not>
+          <os family="windows"/>
+        </not>
+      </and>
+    </condition>
+    <condition property="is32bit">
+      <isfalse value="${is64bit}"/>
+    </condition>
+    <!-- For 64-bit machines, the value -d64 runs the
+       the JVM in 64-bit mode. This parameter cannot
+       be specified on 32-bit machines (that is, you cannot
+       specify -d32 on a 32-bit machine, you get an "unrecognized
+       option error in that case).
+    -->
+    <condition property="jvmArchFlag"
+      value="-d64"
+      else="">
+      <istrue value="${is64bit}"/>
+    </condition>
+    <!-- Base JVM argument line to use with any forked Java processes.
+
+       Sets the JVM architecture.
+
+       Use like so:
+
+       <java ...>
+         <jvmarg line="${baseJVMArgLine}"/>
+         ...
+       </java>
+    -->
+    <property name="baseJVMArgLine" value="${jvmArchFlag} -Xmx${maxJavaMemory}"/>
+    
+    <condition property="use.xep.pdf.formatter">
+      <equals arg1="${pdf.formatter}" arg2="xep"/>
+    </condition>
+    
+    <condition property="temp.transformation.file" value="${dita.plugin.org.dita.pdf2.xep.dir}/xsl/fo/topic2fo_shell_xep.xsl">
+      <and>
+        <not><isset property="args.xsl.pdf"/></not>
+        <isset property="use.xep.pdf.formatter"/>
+      </and>
+    </condition>
+    
+    <!-- default output format -->
+    <condition property="xep.formatter.output-format" value="PDF">
+      <not><isset property="xep.formatter.output-format"/></not>
+    </condition>
+    <!-- output file extension -->
+    <condition property="xsl.formatter.ext" value=".ps">
+      <and>
+        <equals arg1="${xep.formatter.output-format}" arg2="PostScript"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".html">
+      <and>
+        <equals arg1="${xep.formatter.output-format}" arg2="XHTML"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".AT.xml">
+      <and>
+        <equals arg1="${xep.formatter.output-format}" arg2="XEP"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <!--condition property="xsl.formatter.ext" value=".AT.xml">
+      <and>
+        <equals arg1="${xep.formatter.output-format}" arg2="AT"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition-->
+    <condition property="xsl.formatter.ext" value=".svg">
+      <and>
+        <equals arg1="${xep.formatter.output-format}" arg2="SVG"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".xps">
+      <and>
+        <equals arg1="${xep.formatter.output-format}" arg2="XPS"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".afp">
+      <and>
+        <equals arg1="${xep.formatter.output-format}" arg2="AFP"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".ppml">
+      <and>
+        <equals arg1="${xep.formatter.output-format}" arg2="PPML"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+    <condition property="xsl.formatter.ext" value=".pdf">
+      <and>
+        <equals arg1="${xep.formatter.output-format}" arg2="PDF"/>
+        <not><isset property="xsl.formatter.ext"/></not>
+      </and>
+    </condition>
+  </target>
+
+  <!-- run XEP -->
+  <target name="transform.fo2pdf.xep" if="use.xep.pdf.formatter">
+    <property name="xep.dir" value="${dita.plugin.org.dita.pdf2.xep.dir}/lib/xep"/>
+  
+    <condition property="xep.config.file" value="${custom.xep.config}">
+      <isset property="custom.xep.config"/>
+    </condition>
+    <condition property="xep.config.file" value="${xep.dir}/xep.xml">
+      <not><isset property="custom.xep.config"/></not>
+    </condition>
+  
+    <path id="xep.class.path">
+      <fileset dir="${lib.dir}" includes="**/*.jar"/>
+      <fileset dir="${xep.dir}/lib" includes="**/*.jar"/>
+      <pathelement location="${fo.lib.dir}/fo.jar"/>
+      <pathelement location="${dita.plugin.org.dita.pdf2.xep.dir}/lib/xep.jar"/>
+    </path>
+
+    <property name="xep.failOnError" value="true"/>
+    
+    <condition property="outputFile" value="${dita.output.dir}/${outputFile.base}${xsl.formatter.ext}">
+      <not><isset property="outputFile"/></not>
+    </condition>
+    <mkdir dir="${dita.output.dir}"/>
+    
+    <echo level="info" taskname="xep">Processing ${pdf2.temp.dir}/topic.fo to ${outputFile}</echo>
+    <java classname="com.idiominc.ws.opentopic.fo.xep.Runner" resultproperty="errCode"
+          failonerror="${xep.failOnError}" fork="true" maxmemory="${maxJavaMemory}" taskname="xep">
+      <jvmarg line="${baseJVMArgLine}"/>
+      <arg value="${pdf2.temp.dir}/topic.fo"/>
+      <arg value="${outputFile}"/>
+      <arg value="failOnError=${xep.failOnError}"/>
+      <arg value="-${xep.formatter.output-format}"/>
+      <classpath refid="xep.class.path"/>
+      <sysproperty key="com.renderx.xep.CONFIG" value="${xep.config.file}"/>
+      <!--Set up catalog resolver with the DITA main catalog file, useful for solving for example SVG image DOCTYPES-->
+      <sysproperty key="com.renderx.sax.entityresolver" value="org.apache.xml.resolver.tools.CatalogResolver"/>
+      <sysproperty key="xml.catalog.files" value="${dita.plugin.org.dita.base.dir}/catalog-dita.xml"/>
+    </java>
+    <condition property="xepExitedOnError" value="true">
+      <not><equals arg1="${errCode}" arg2="0"/></not>
+    </condition>
+  </target>
+
+</project>

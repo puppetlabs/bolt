@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import schemaLocation="local.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:simpleType name="ExtensionList.datatype">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="FeatureList.datatype">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="SVG.switch.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="svg:svg"/>
+        <xs:element ref="svg:g"/>
+        <xs:element ref="svg:use"/>
+        <xs:element ref="svg:text"/>
+        <xs:element ref="svg:SVG.Animation.class"/>
+        <xs:element ref="svg:SVG.Conditional.class"/>
+        <xs:element ref="svg:SVG.Image.class"/>
+        <xs:element ref="svg:SVG.Shape.class"/>
+        <xs:element ref="svg:SVG.Hyperlink.class"/>
+        <xs:element ref="svg:SVG.Extensibility.class"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="switch" substitutionGroup="svg:SVG.Conditional.class"/>
+  <xs:attributeGroup name="attlist.switch">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Conditional.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Style.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attributeGroup ref="SVG.GraphicalEvents.attrib"/>
+    <xs:attributeGroup ref="SVG.External.attrib"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+  </xs:attributeGroup>
+</xs:schema>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="svg-xlink-attrib.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="svg11.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:attributeGroup name="SVG.display.attrib">
+    <xs:attribute name="display">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="inline"/>
+          <xs:enumeration value="block"/>
+          <xs:enumeration value="list-item"/>
+          <xs:enumeration value="run-in"/>
+          <xs:enumeration value="compact"/>
+          <xs:enumeration value="marker"/>
+          <xs:enumeration value="table"/>
+          <xs:enumeration value="inline-table"/>
+          <xs:enumeration value="table-row-group"/>
+          <xs:enumeration value="table-header-group"/>
+          <xs:enumeration value="table-footer-group"/>
+          <xs:enumeration value="table-row"/>
+          <xs:enumeration value="table-column-group"/>
+          <xs:enumeration value="table-column"/>
+          <xs:enumeration value="table-cell"/>
+          <xs:enumeration value="table-caption"/>
+          <xs:enumeration value="none"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.visibility.attrib">
+    <xs:attribute name="visibility">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="visible"/>
+          <xs:enumeration value="hidden"/>
+          <xs:enumeration value="inherit"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="SVG.Graphics.attrib">
+    <xs:attributeGroup ref="SVG.display.attrib"/>
+    <xs:attributeGroup ref="SVG.visibility.attrib"/>
+    <xs:attributeGroup ref="SVG.image-rendering.attrib"/>
+    <xs:attributeGroup ref="SVG.pointer-events.attrib"/>
+    <xs:attributeGroup ref="SVG.shape-rendering.attrib"/>
+    <xs:attributeGroup ref="SVG.text-rendering.attrib"/>
+  </xs:attributeGroup>
+</xs:schema>

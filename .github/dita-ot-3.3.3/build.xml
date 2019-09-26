@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the DITA Open Toolkit project.
+
+Copyright 2006 IBM Corporation
+
+See the accompanying LICENSE file for applicable license.
+-->
+<project name="DOST" default="init">
+
+  <!-- Initialize DITA-OT base directory -->
+  <dirname property="ant.file.DOST.dir" file="${ant.file.DOST}" />
+  <property name="dita.dir" location="${ant.file.DOST.dir}"/>
+  <!-- XXX Is this ever used? -->
+  <property name="dita.dir" location="${basedir}"/>
+
+  <property file="${dita.dir}/local.properties"/>
+
+  <import>
+    <fileset file="${dita.dir}/plugins/org.dita.base/build.xml"/>
+  </import>
+
+</project>

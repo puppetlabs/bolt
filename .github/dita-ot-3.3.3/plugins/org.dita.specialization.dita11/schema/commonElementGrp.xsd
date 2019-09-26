@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!--                    HEADER                                     -->
+<!-- ============================================================= -->
+<!--  MODULE:    DITA Common Element  XSD Group Decleration                -->
+<!--  VERSION:   1.1                                             -->
+<!--  DATE:      November 2006                                     -->
+<!--                                                               -->
+<!-- ============================================================= -->
+
+
+<!-- ============================================================= -->
+<!-- SYSTEM:     Darwin Information Typing Architecture (DITA)     -->
+<!--                                                               -->
+<!-- PURPOSE:    W3C XML Schema to describe DITA common elements          -->
+<!--                                                               -->
+<!-- ORIGINAL CREATION DATE:                                       -->
+<!--             June 2006                                        -->
+<!--                                                               -->
+<!--             (C) Copyright OASIS-Open.org 2006                -->
+<!--             All Rights Reserved.                              -->
+<!-- ============================================================= -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    
+    <xs:group name="alt">
+        <xs:sequence>
+            <xs:element ref="alt"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="boolean">
+        <xs:sequence>
+            <xs:element ref="boolean"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="cite">
+        <xs:sequence>
+            <xs:element ref="cite"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="data">
+        <xs:sequence>
+            <xs:element ref="data"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="data-about">
+        <xs:sequence>
+            <xs:element ref="data-about"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="dd">
+        <xs:sequence>
+            <xs:element ref="dd"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="ddhd">
+        <xs:sequence>
+            <xs:element ref="ddhd"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="desc">
+        <xs:sequence>
+            <xs:element ref="desc"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="dl">
+        <xs:sequence>
+            <xs:element ref="dl"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="dlentry">
+        <xs:sequence>
+            <xs:element ref="dlentry"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="dlhead">
+        <xs:sequence>
+            <xs:element ref="dlhead"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="dthd">
+        <xs:sequence>
+            <xs:element ref="dthd"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="dt">
+        <xs:sequence>
+            <xs:element ref="dt"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="draft-comment">
+        <xs:sequence>
+            <xs:element ref="draft-comment"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="fig">
+        <xs:sequence>
+            <xs:element ref="fig"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="figgroup">
+        <xs:sequence>
+            <xs:element ref="figgroup"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="fn">
+        <xs:sequence>
+            <xs:element ref="fn"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="foreign">
+        <xs:sequence>
+            <xs:element ref="foreign"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="image">
+        <xs:sequence>
+            <xs:element ref="image"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="indexterm">
+        <xs:sequence>
+            <xs:element ref="indexterm"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="indextermref">
+        <xs:sequence>
+            <xs:element ref="indextermref"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="itemgroup">
+        <xs:sequence>
+            <xs:element ref="itemgroup"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="index-base">
+        <xs:sequence>
+            <xs:element ref="index-base"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="keyword">
+        <xs:sequence>
+            <xs:element ref="keyword"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="li">
+        <xs:sequence>
+            <xs:element ref="li"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="lines">
+        <xs:sequence>
+            <xs:element ref="lines"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="lq">
+        <xs:sequence>
+            <xs:element ref="lq"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="note">
+        <xs:sequence>
+            <xs:element ref="note"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="object">
+        <xs:sequence>
+            <xs:element ref="object"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="ol">
+        <xs:sequence>
+            <xs:element ref="ol"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="p">
+        <xs:sequence>
+            <xs:element ref="p"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="param">
+        <xs:sequence>
+            <xs:element ref="param"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="ph">
+        <xs:sequence>
+            <xs:element ref="ph"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="pre">
+        <xs:sequence>
+            <xs:element ref="pre"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="q">
+        <xs:sequence>
+            <xs:element ref="q"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="required-cleanup">
+        <xs:sequence>
+            <xs:element ref="required-cleanup"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="sl">
+        <xs:sequence>
+            <xs:element ref="sl"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="sli">
+        <xs:sequence>
+            <xs:element ref="sli"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="simpletable">
+        <xs:sequence>
+            <xs:element ref="simpletable"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="state">
+        <xs:sequence>
+            <xs:element ref="state"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="sthead">
+        <xs:sequence>
+            <xs:element ref="sthead"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="strow">
+        <xs:sequence>
+            <xs:element ref="strow"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="stentry">
+        <xs:sequence>
+            <xs:element ref="stentry"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="term">
+        <xs:sequence>
+            <xs:element ref="term"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="title">
+        <xs:sequence>
+            <xs:element ref="title"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="tm">
+        <xs:sequence>
+            <xs:element ref="tm"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="ul">
+        <xs:sequence>
+            <xs:element ref="ul"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="unknown">
+        <xs:sequence>
+            <xs:element ref="unknown"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:group name="xref">
+        <xs:sequence>
+            <xs:element ref="xref"/>
+        </xs:sequence>
+    </xs:group>
+    
+    <xs:attributeGroup name="props-attribute-extensions"/>
+    
+    <xs:attributeGroup name="base-attribute-extensions"/>
+    
+</xs:schema>
