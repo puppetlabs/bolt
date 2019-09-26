@@ -248,6 +248,13 @@ module Bolt
         !!File::ALT_SEPARATOR
       end
 
+      # Returns the Windows equivalent of the ruby path
+      def windows_path(path)
+        # Note we can not use the usual helpers (e.g. expand_path) as they depend on the local OS to help.
+        # So we need to construct the path ourselves
+        path.tr('/', '\\')
+      end
+
       # Accept hash and return hash with top level keys of type "String" converted to symbols.
       def symbolize_top_level_keys(hsh)
         hsh.each_with_object({}) { |(k, v), h| k.is_a?(String) ? h[k.to_sym] = v : h[k] = v }
