@@ -7,5 +7,4 @@ Use Bolt commands to connect directly to the systems where you want to execute c
 -   **[Adding options to Bolt commands](bolt_options.md#)**  
 Bolt commands can accept several command line options, some of which are required.
 -   **[Bolt command reference](bolt_command_reference.md#)**  
-Review the subcommands, actions, and options that are available for Bolt.
-
+These subcommands, actions, and options are available for Bolt.

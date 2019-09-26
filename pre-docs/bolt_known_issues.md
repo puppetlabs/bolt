@@ -2,37 +2,36 @@
 
 Known issues for the Bolt 1.x release series.
 
-## False errors for SSH Keys generated with ssh-keygen OpenSSH 7.8 and later
+## Tasks executed with PowerShell version 2.x or earlier cannot use parameters named `type`
 
-The OpenSSH 7.8 release introduced a change to SSH key generation. It now generates private keys with its own format rather than the OpenSSL PEM format. Because the Bolt SSH implementation assumes any key that uses the OpenSSH format uses the public-key signature system ed25519, false errors have resulted. For example:
+When executing PowerShell tasks on targets using a PowerShell interpreter version 2.x or earlier, you cannot use a task parameter with the name `type`. Bolt versions 1.30.0 and earlier contained a [bug](https://github.com/puppetlabs/bolt/issues/1205) that made parameters with the string `type` in their name \(for example, `serverType`\) incompatible. Starting with Bolt version 1.31.0, only PowerShell parameters with `type` as their complete name are incompatible. For PowerShell version 3 and later, any parameter names are permissible.
+
+## JSON strings as command arguments might require additional escaping in PowerShell
+
+When passing complex arguments to tasks with `--params`, JSON strings \(typically created with the `ConvertTo-Json` cmdlet\) might require additional escaping. In some cases, you can use the PowerShell stop parsing symbol `--%` as a workaround. \([BOLT-1130](https://tickets.puppetlabs.com/browse/BOLT-1130)\)
+
+## SSH keys generated with ssh-keygen from OpenSSH 7.8+ fail
+
+OpenSSH 7.8 switched to generating private keys with its own format rather than the OpenSSL PEM format. The Bolt SSH implementation assumes any key using the OpenSSH format uses ed25519, resulting in false errors such as:
 
 ```
-OpenSSH keys only supported if ED25519 is available
-  net-ssh requires the following gems for ed25519 support:
-   * ed25519 (>= 1.2, < 2.0)
-   * bcrypt_pbkdf (>= 1.0, < 2.0)
-  See https://github.com/net-ssh/net-ssh/issues/565 for more information
-  Gem::LoadError : "ed25519 is not part of the bundle. Add it to your Gemfile."
+ OpenSSH keys only supported if ED25519 is available net-ssh requires the following gems for ed25519 support: * ed25519 (>= 1.2, < 2.0) * bcrypt_pbkdf (>= 1.0, < 2.0) See https://github.com/net-ssh/net-ssh/issues/565 for more information Gem::LoadError : "ed25519 is not part of the bundle. Add it to your Gemfile."
 ```
 
 or
 
 ```
-Failed to connect to HOST: expected 64-byte String, got NUM 
+Failed to connect to HOST: expected 64-byte String, got NUM
 ```
 
-Workaround: Generate new keys with the ssh-keygen flag `-m PEM`. For existing keys, OpenSSH provides the export \(`-e`\) option for exporting from its own format, but export is not implemented for all private key types. [\(BOLT-920\)](https://tickets.puppet.com/browse/BOLT-920) 
+As a workaround, you can generate new keys with the ssh-keygen `-m PEM` flag. For existing keys, you can try exporting keys from the OpenSSH format using the `-e` option, although export is not implemented for all private key types. \([BOLT-920](https://tickets.puppetlabs.com/browse/BOLT-920)\)
 
-## JSON strings as command arguments may require additional escaping in PowerShell
+## Commands fail in remote Windows sessions
 
-When passing complex arguments to tasks with `--params`, Bolt may require a JSON string (typically created with the `ConvertTo-Json` cmdlet) to have additional escaping. In some cases, the PowerShell stop parsing symbol `--%` may be used as a workaround, until Bolt provides better PowerShell support [\(BOLT-1130\)](https://tickets.puppet.com/browse/BOLT-1130)
+Interactive tools fail when run in a remote PowerShell session. For example, using `--password` to prompt for a password when running Bolt triggers an error. As a workaround, consider putting the password in `bolt.yaml` or an inventory file, or passing the password on the command line. \([BOLT-1075](https://tickets.puppetlabs.com/browse/BOLT-1075)\)
 
 ## Limited Kerberos support
 
-While we would like to support Kerberos over SSH for authentication, a license incompatibility with other components we are distributing means that we cannot recommend using the net-ssh-krb gem for this functionality. [\(BOLT-980\)](https://tickets.puppet.com/browse/BOLT-980)
+A license incompatibility with other components distributed with Bolt prevents authenticating with Kerberos over SSH using the net-ssh-krb gem. \([BOLT-980](https://tickets.puppetlabs.com/browse/BOLT-980)\)
 
-Support for Kerberos over WinRM from a Linux host is currently experimental and requires the [MIT kerberos library be installed](https://web.mit.edu/Kerberos/www/krb5-latest/doc/admin/install_clients.html). Support from Windows [\(BOLT-1323\)](https://tickets.puppet.com/browse/BOLT-1323) and OSX [\(BOLT-1471\)](https://tickets.puppet.com/browse/BOLT-1471) will be implemented in the future.
-
-## Tasks executed with Powershell 2
-
-When executing powershell tasks on targets using a powershell interpreter version 2 or earlier, the task parameter with the name `type` cannot be used. Bolt versions 1.30.0 and earlier contained [a bug](https://github.com/puppetlabs/bolt/issues/1205) where parameters that contain the string `type` in the name (for example `serverType`) were incompatible. With bolt versions 1.31.0 and greater only powershell parameters with the name `type` cannot be used. Note that for newer versions of powershell this is not an issue.
+Support for Kerberos over WinRM from a Linux host is currently experimental and requires the [MIT Kerberos library](https://web.mit.edu/Kerberos/www/krb5-latest/doc/admin/install_clients.html) to be installed. In the future, Bolt will support Kerberos when running on Windows \([BOLT-1323](https://tickets.puppet.com/browse/BOLT-1323)\) and macOS \([BOLT-1471](https://tickets.puppet.com/browse/BOLT-1471)\).
