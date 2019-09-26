@@ -14,6 +14,7 @@ module BoltSpec
         file.binmode # Stop Ruby implicitly doing CRLF translations and breaking tests
         file.write(contents)
         file.flush
+        file.close(false) # Close the file to release read locks
         yield file
       end
     end
