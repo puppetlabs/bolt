@@ -31,8 +31,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.puppetdb
+      args:
+        hostname: bolt-puppetdb
     environment:
       - "USE_PUPPETSERVER=false"
+      - "CERTNAME=pdb"
     image: puppetdb
     ports:
       # 8081 is a common port
