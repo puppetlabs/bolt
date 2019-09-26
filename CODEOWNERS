@@ -1,6 +1,6 @@
 # Default to Bolt team
 * @puppetlabs/bolt
 
-/pre-docs @cwcowellshah @puppetlabs/bolt
+/documentation @cwcowellshah @puppetlabs/bolt
 /lib/bolt_server @puppetlabs/skeletor
 CHANGELOG.md @cwcowellshah @puppetlabs/bolt

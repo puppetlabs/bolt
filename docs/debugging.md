@@ -44,7 +44,7 @@ Make sure you've specified the `winrm` protocol for the target. You can either i
 
 ## Puppet log functions are not logging to the console
 
-The default log level for the console is `warn`. When a `notice` function is used in a plan, it will not be printed to the console. When you have messages you want to be printed to the console regardless of log level you should use the `out::message` plan function. The [`out::message`](../pre-docs/plan_functions.md#outmessage) function is not available for use in an apply block and only accepts string values.
+The default log level for the console is `warn`. When a `notice` function is used in a plan, it will not be printed to the console. When you have messages you want to be printed to the console regardless of log level you should use the `out::message` plan function. The [`out::message`](../documentation/plan_functions.md#outmessage) function is not available for use in an apply block and only accepts string values.
 
 If you need to send a message that is not a String value or is in an apply block you can use the `warning` Puppet log function. The `notice` Puppet log function could be used when you only wish to see the output in the console when executing your plan with the `--debug` flag which will set the console log level to `debug` for that run.
 
