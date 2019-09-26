@@ -1,0 +1,25 @@
+name: Building and pushing to s3 stage
+
+on: 
+  pull_request:
+    # This relies on the default types [opened, synchronized, reopened]
+    branches: master
+  
+jobs:
+  build-dita:
+    name: build-dita
+    runs-on: ubuntu-latest
+    steps:
+    - name: Initialize repo
+      uses: actions/checkout@master
+    - name: Build HTML from source
+      run: .github/build_s3.sh
+    - name: Install s3-cli
+      uses: actions/aws/cli@master  
+    - name: Upload docs to the bucket
+      run: |
+        aws s3 sync html s3://puppet-docs-website-transfer/bolt-dev --delete
+        aws s3 ls --recursive s3://puppet-docs-website-transfer/bolt-dev
+      env:
+       AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }} 
+       AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEY }}

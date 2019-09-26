@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//PUPPET//DTD DITA Puppet Map//EN" "map.dtd">
+<map id="ditamap-8881" title="Bolt" class="- map/map ">
+    <topicref linking="targetonly" href="bolt.dita" class="- map/topicref "/>
+    <topicref href="bolt_release_notes.dita" class="- map/topicref ">
+        <topicref href="bolt_versioning.dita" class="- map/topicref "/>
+        <topicref href="bolt_new_features.dita" class="- map/topicref "/>
+        <topicref href="bolt_resolved_issues.dita" class="- map/topicref "/>
+        <topicref href="bolt_known_issues.dita" class="- map/topicref "/>
+        <topicref href="bolt_deprecations_and_removals.dita" class="- map/topicref "/>
+    </topicref>
+    <topicref chunk="to-content" href="bolt_installing.dita" class="- map/topicref ">
+        <topicref href="bolt_install_windows.dita" class="- map/topicref ">
+            <topicref href="bolt_install_msi.dita" class="- map/topicref "/>
+            <topicref href="bolt_install_package_chocolatey.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref href="bolt_install_macosx.dita" class="- map/topicref ">
+            <topicref href="bolt_install_dmg.dita" class="- map/topicref "/>
+            <topicref href="bolt_install_package_homebrew.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref href="bolt_install_nix.dita" class="- map/topicref ">
+            <topicref href="bolt_install_package_apt.dita" class="- map/topicref "/>
+            <topicref href="bolt_install_package_yum.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref href="bolt_install_package_gems.dita" class="- map/topicref "/>
+        <topicref href="bolt_install_gem.dita" class="- map/topicref "/>
+        <topicref href="bolt_analytics.dita" class="- map/topicref "/>
+    </topicref>
+    <topicref href="running_bolt.dita" class="- map/topicref ">
+        <topicref chunk="to-content" href="running_bolt_commands.dita" class="- map/topicref ">
+            <topicref href="bolt_running_commands.dita" class="- map/topicref "/>
+            <topicref href="running_commands_with_redirection_or_pipes.dita" class="- map/topicref "/>
+            <topicref href="bolt_running_scripts.dita" class="- map/topicref "/>
+            <topicref href="bolt_uploading_files.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref chunk="to-content" href="bolt_options.dita" class="- map/topicref ">
+            <topicref href="bolt_specifying_nodes.dita" class="- map/topicref "/>
+            <topicref href="bolt_setting_a_default_transport.dita" class="- map/topicref "/>
+            <topicref href="bolt_specifying_connection_credentials.dita" class="- map/topicref "/>
+            <topicref href="rerunning_commands_based_on_the_last_result.dita"
+                class="- map/topicref "/>
+        </topicref>
+        <topicref chunk="to-content" href="bolt_command_reference.dita" class="- map/topicref "/>
+    </topicref>
+    <topicref href="../documentation/introduction.md" chunk="to-content" format="markdown">
+        <topicref href="../documentation/installing_bolt.md" format="markdown"></topicref>
+        <topicref href="../documentation/acquiring_nodes.md" format="markdown"></topicref>
+        <topicref href="../documentation/running_commands.md" format="markdown"></topicref>
+        <topicref href="../documentation/running_scripts.md" format="markdown"></topicref>
+        <topicref href="../documentation/writing_tasks.md" format="markdown"></topicref>
+        <topicref href="../documentation/download_run_tasks.md" format="markdown"></topicref>
+        <topicref href="../documentation/writing_plans.md" format="markdown"></topicref>
+        <topicref href="../documentation/advanced_tasks.md" format="markdown"></topicref>
+        <topicref href="../documentation/advanced_plans.md" format="markdown"></topicref>
+        <topicref href="../documentation/deploy_application.md" format="markdown"></topicref>
+        <topicref href="../documentation/apply_manifest_code.md" format="markdown"></topicref>
+    </topicref>
+    <topicref href="getting_started_with_bolt.dita" class="- map/topicref "/>
+    <topicref href="writing_tasks_and_plans.dita" class="- map/topicref ">
+        <topicref href="inspecting_tasks_and_plans.dita" class="- map/topicref "/>
+        <topicref chunk="to-content" href="bolt_running_tasks.dita" class="- map/topicref ">
+            <topicref href="passing_structured_data_to_plans.dita" class="- map/topicref "/>
+            <topicref href="bolt_specifying_the_module_path.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref chunk="to-content" href="bolt_running_plans.dita" class="- map/topicref ">
+            <topicref href="passing_structured_data_to_plans.dita" class="- map/topicref "/>
+            <topicref href="bolt_specifying_the_module_path.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref chunk="to-content" href="bolt_installing_modules.dita" class="- map/topicref ">
+            <topicref href="packaged_modules.dita" class="- map/topicref "/>
+            <topicref href="install_modules.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref chunk="to-content" href="directory_structure.dita" class="- map/topicref ">
+            <topicref href="directory_structure_of_a_module.dita" class="- map/topicref "/>
+            <topicref href="directory_structure_project-specific.dita" class="- map/topicref "/>
+            <topicref href="directory_structure_standalone_module.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref chunk="to-content" href="writing_tasks.dita" class="- map/topicref ">
+            <topicref href="secure_coding_practices_for_tasks.dita" class="- map/topicref "/>
+            <topicref href="naming_tasks.dita" class="- map/topicref ">
+                <topicref href="single-platform_tasks.dita" class="- map/topicref "/>
+                <topicref href="cross-platform_tasks.dita" class="- map/topicref "/>
+            </topicref>
+            <topicref href="sharing_executables.dita" class="- map/topicref "/>
+            <topicref href="sharing_task_code.dita" class="- map/topicref "/>
+            <topicref href="writing_remote_tasks.dita" class="- map/topicref "/>
+            <topicref href="defining_task_parameters.dita" class="- map/topicref "/>
+            <topicref href="returning_errors_in_tasks.dita" class="- map/topicref "/>
+            <topicref href="structured_input_and_output.dita" class="- map/topicref ">
+                <topicref href="task_structured_input.dita" class="- map/topicref "/>
+                <topicref href="returning_structured_output.dita" class="- map/topicref "/>
+            </topicref>
+            <topicref href="converting_scripts_to_tasks.dita" class="- map/topicref ">
+                <topicref href="wrapping_an_existing_script.dita" class="- map/topicref "/>
+            </topicref>
+            <topicref href="supporting_no-op_in_tasks.dita" class="- map/topicref "/>
+            <topicref href="task_metadata.dita" class="- map/topicref ">
+                <topicref href="adding_parameters_to_metadata.dita" class="- map/topicref "/>
+                <topicref href="task_metadata_reference.dita" class="- map/topicref "/>
+                <topicref href="task_metadata_types.dita" class="- map/topicref "/>
+            </topicref>
+            <topicref href="bolt_specifying_parameters.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref chunk="to-content" href="writing_plans.dita" class="- map/topicref ">
+            <topicref href="naming_plans.dita" class="- map/topicref "/>
+            <topicref href="defining_plan_parameters.dita" class="- map/topicref "/>
+            <topicref href="returning_plan_results.dita" class="- map/topicref "/>
+            <topicref href="returning_errors_in_plans.dita" class="- map/topicref "/>
+            <topicref href="responding_to_errors.dita" class="- map/topicref "/>
+            <topicref href="general_functions_in_plans.dita" class="- map/topicref "/>
+            <topicref href="handling_plan_function_results.dita" class="- map/topicref "/>
+            <topicref href="passing_sensitive_data_to_tasks.dita" class="- map/topicref "/>
+            <topicref href="bolt_target_objects.dita" class="- map/topicref "/>
+            <topicref href="plan_logging.dita" class="- map/topicref "/>
+            <topicref href="example_plans.dita" class="- map/topicref "/>
+            <topicref chunk="to-content" href="plan_functions.dita" class="- map/topicref ">
+                <topicref href="reference.dita" class="- map/topicref "/>
+            </topicref>
+            <topicref chunk="to-content" href="applying_manifest_blocks.dita"
+                class="- map/topicref ">
+                <topicref href="manifest_blocks_about.dita" class="- map/topicref "/>
+                <topicref href="manifest_blocks_hiera.dita" class="- map/topicref "/>
+                <topicref href="manifest_blocks_available_plan_functions.dita"
+                    class="- map/topicref "/>
+                <topicref href="manifest_blocks_limitations.dita" class="- map/topicref "/>
+                <topicref href="create_sample_manifest_nix.dita" class="- map/topicref "/>
+                <topicref href="create_a_sample_manifest_windows.dita" class="- map/topicref "/>
+                <topicref href="using_puppet_device_modules_from_an_apply_statement.dita"
+                    class="- map/topicref "/>
+            </topicref>
+        </topicref>
+        <topicref chunk="to-content" href="writing_yaml_plans.dita" class="- map/topicref ">
+            <topicref href="naming_plans.dita" class="- map/topicref "/>
+            <topicref href="plan_structure.dita" class="- map/topicref ">
+                <topicref href="steps_key.dita" class="- map/topicref "/>
+                <topicref href="parameters_key.dita" class="- map/topicref "/>
+                <topicref href="how_strings_are_evaluated.dita" class="- map/topicref "/>
+            </topicref>
+            <topicref href="using_variables.dita" class="- map/topicref "/>
+            <topicref href="connecting_steps.dita" class="- map/topicref "/>
+            <topicref href="returning_results.dita" class="- map/topicref "/>
+            <topicref href="computing_complex_values.dita" class="- map/topicref "/>
+            <topicref href="converting_yaml_plans_to_puppet_plans.dita" class="- map/topicref "/>
+        </topicref>
+    </topicref>
+    <topicref href="configuring_bolt.dita" class="- map/topicref ">
+        <topicref chunk="to-content" href="bolt_project_directories.dita" class="- map/topicref ">
+            <topicref href="types_of_project_directories.dita" class="- map/topicref "/>
+            <topicref href="how_the_project_directory_is_chosen.dita" class="- map/topicref "/>
+            <topicref href="project_directory_structure.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref href="bolt_configuration_options.dita" class="- map/topicref "/>
+        <topicref href="bolt_configure_orchestrator.dita" class="- map/topicref "/>
+        <topicref href="bolt_connect_puppetdb.dita" class="- map/topicref "/>
+    </topicref>
+    <topicref href="inventory_file.dita" class="- map/topicref ">
+        <topicref chunk="to-content" href="inventory_file_v2.dita" class="- map/topicref ">
+            <topicref href="migrating_to_v2.dita" class="- map/topicref "/>
+            <topicref href="features_v2.dita" class="- map/topicref ">
+                <topicref href="creating_a_node_with_a_human_readable_name_and_ip_address.dita"
+                    class="- map/topicref "/>
+                <topicref href="plugins_and_dynamic_inventory.dita" class="- map/topicref "/>
+            </topicref>
+            <topicref href="inventory_config_v2.dita" class="- map/topicref "/>
+            <topicref href="inventory_facts_vars_and_features_v2.dita" class="- map/topicref "/>
+            <topicref href="objects_v2.dita" class="- map/topicref "/>
+            <topicref href="file_format_v2.dita" class="- map/topicref "/>
+            <topicref href="precedence_v2.dita" class="- map/topicref "/>
+            <topicref href="remote_targets_v2.dita" class="- map/topicref "/>
+        </topicref>
+        <topicref href="inventory_file_generating.dita" class="- map/topicref "/>
+    </topicref>
+    <topicref chunk="to-content" href="bolt_examples.dita" class="- map/topicref ">
+        <topicref href="powershell_script_that_restarts_a_service.dita" class="- map/topicref "/>
+    </topicref>
+    <reltable class="- map/reltable ">
+        <relheader class="- map/relheader ">
+            <relcolspec linking="sourceonly" type="topic" class="- map/relcolspec "/>
+            <relcolspec linking="targetonly" type="topic" class="- map/relcolspec "/>
+        </relheader>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="packaged_modules.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref format="html"
+                    href="https://github.com/puppetlabs/bolt/blob/master/Puppetfile"
+                    scope="external" class="- map/topicref ">
+                    <topicmeta class="- map/topicmeta ">
+                        <linktext class="- map/linktext ">Puppetfile example</linktext>
+                    </topicmeta>
+                </topicref>
+                <topicref format="html" href="https://forge.puppet.com/" scope="external"
+                    class="- map/topicref ">
+                    <topicmeta class="- map/topicmeta ">
+                        <linktext class="- map/linktext ">Puppet Forge</linktext>
+                    </topicmeta>
+                </topicref>
+                <topicref href="bolt_configuration_options.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="applying_manifest_blocks.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="install_modules.dita" class="- map/topicref "/>
+                <topicref format="html"
+                    href="https://github.com/puppetlabs/bolt/blob/master/Puppetfile"
+                    scope="external" class="- map/topicref ">
+                    <topicmeta class="- map/topicmeta ">
+                        <linktext class="- map/linktext ">Puppetfile example</linktext>
+                    </topicmeta>
+                </topicref>
+                <topicref format="html" href="https://forge.puppet.com/" scope="external"
+                    class="- map/topicref ">
+                    <topicmeta class="- map/topicmeta ">
+                        <linktext class="- map/linktext ">Puppet Forge</linktext>
+                    </topicmeta>
+                </topicref>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="bolt_specifying_nodes.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="inventory_file.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="defining_plan_parameters.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="task_metadata_types.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="task_metadata_types.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref format="html"
+                    href="https://puppet.com/docs/puppet/latest/lang_data_type.html"
+                    scope="external" class="- map/topicref ">
+                    <topicmeta class="- map/topicmeta ">
+                        <linktext class="- map/linktext ">Data type syntax</linktext>
+                    </topicmeta>
+                </topicref>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="passing_sensitive_data_to_tasks.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="adding_parameters_to_metadata.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="inventory_file.dita" class="- map/topicref "/>
+                <topicref href="remote_targets_v2.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="naming_tasks.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="bolt_target_objects.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="bolt_connect_puppetdb.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="create_sample_manifest_nix.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref format="html" href="https://www.nginx.com/resources/glossary/nginx/"
+                    scope="external" class="- map/topicref ">
+                    <topicmeta class="- map/topicmeta ">
+                        <linktext class="- map/linktext ">NGINX</linktext>
+                    </topicmeta>
+                </topicref>
+                <topicref href="bolt_specifying_nodes.dita" class="- map/topicref "/>
+                <topicref href="bolt_project_directories.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="create_a_sample_manifest_windows.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref format="html" href="https://www.iis.net" scope="external"
+                    class="- map/topicref ">
+                    <topicmeta class="- map/topicmeta ">
+                        <linktext class="- map/linktext ">IIS</linktext>
+                    </topicmeta>
+                </topicref>
+                <topicref href="bolt_specifying_nodes.dita" class="- map/topicref "/>
+                <topicref href="bolt_project_directories.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="manifest_blocks_limitations.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="reference.dita#puppetdb_query" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="manifest_blocks_hiera.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="configuring_bolt.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="bolt_versioning.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref format="html" href="https://semver.org/" scope="external"
+                    class="- map/topicref ">
+                    <topicmeta class="- map/topicmeta ">
+                        <linktext class="- map/linktext ">Semantic Versioning</linktext>
+                    </topicmeta>
+                </topicref>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="writing_plans.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="converting_yaml_plans_to_puppet_plans.dita" class="- map/topicref "
+                />
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="bolt_running_plans.dita" class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="example_plans.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+        <relrow class="- map/relrow ">
+            <relcell class="- map/relcell ">
+                <topicref href="rerunning_commands_based_on_the_last_result.dita"
+                    class="- map/topicref "/>
+            </relcell>
+            <relcell class="- map/relcell ">
+                <topicref href="bolt_project_directories.dita" class="- map/topicref "/>
+            </relcell>
+        </relrow>
+    </reltable>
+    <keydef keys="ProductNames" href="keywords.dita" class="+ map/topicref mapgroup-d/keydef "/>
+</map>
