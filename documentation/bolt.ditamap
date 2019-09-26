@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map id="boltmap" title="Bolt">
+    <topicref href="bolt.md" format="markdown"/>
+    <topicref href="bolt_release_notes.md" format="markdown">
+        <topicref href="bolt_versioning.md" format="markdown"/>
+    </topicref>
+</map>
