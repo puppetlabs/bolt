@@ -143,7 +143,7 @@ module BoltSpec
                          "params" => { "environment" => "production" } },
               "sha256" => sha['test-file.sh']
             },
-        'arguments' => '--arg',
+        'arguments' => ['--arg'],
         'target' => target2request(target)
       }
     end
