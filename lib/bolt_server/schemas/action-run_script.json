@@ -36,7 +36,10 @@
       ]
     },
     "arguments": {
-      "type": "string"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "target": { "$ref": "partial:target-any" }
   },
