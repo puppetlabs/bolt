@@ -1,7 +1,3 @@
----
-author: Melissa Amos <melissa.amos@puppet.com\>
----
-
 # Project directories
 
 Bolt runs in the context of a project directory or a `Boltdir`. This directory contains all of the configuration, code, and data loaded by Bolt.

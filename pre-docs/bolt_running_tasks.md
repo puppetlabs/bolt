@@ -25,17 +25,15 @@ To run the main module task defined in `init`, refer to the task by the module n
 bolt task run package action=status name=vim --nodes neptune --modulepath ~/modules
 ```
 
-**Tip**: Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](bolt_installing_modules.md#packaged-modules).
+**Tip:** Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](packaged_modules.md).
+
+**Parent topic:**[Tasks and plans](writing_tasks_and_plans.md)
 
 ## Passing structured data
 
-If one of your task or plan parameters accept structured data like an `Array` or
-`Hash`, it can be passed as JSON from the command line.
+If one of your task or plan parameters accept structured data like an `array` or `hash`, it can be passed as JSON from the command line.
 
-If a single parameter can be parsed as JSON and the parsed value matches the
-parameter's type specification in the task metadata or plan definition, it can be passed with
-`<param>=value` syntax. Make sure to wrap the JSON value in single quotes to
-prevent `"` characters from being swallowed by the shell.
+If a single parameter can be parsed as JSON and the parsed value matches the parameter's type specification in the task metadata or plan definition, it can be passed with `<>param=value` syntax. Make sure to wrap the JSON value in single quotes to prevent `"` characters from being swallowed by the shell.
 
 ```
 bolt task run mymodule::mytask --nodes app1.myorg.com load_balancers='["lb1.myorg.com", "lb2.myorg.com"]'
@@ -45,9 +43,7 @@ bolt task run mymodule::mytask --nodes app1.myorg.com load_balancers='["lb1.myor
 bolt plan run mymodule::myplan load_balancers='["lb1.myorg.com", "lb2.myorg.com"]'
 ```
 
-If you want to pass multiple structured values or are having trouble with the
-magic parsing of single parameters, you can pass a single JSON object for all
-parameters with the `--params` flag.
+If you want to pass multiple structured values or are having trouble with the magic parsing of single parameters, you can pass a single JSON object for all parameters with the `--params` flag.
 
 ```
 bolt task run mymodule::mytask --nodes app1.myorg.com --params '{"load_balancers": ["lb1.myorg.com", "lb2.myorg.com"]}'
@@ -59,15 +55,15 @@ bolt plan run mymodule::myplan --params '{"load_balancers": ["lb1.myorg.com", "l
 
 You can also load parameters from a file by putting `@` before the file name.
 
-```
+```no-highlight
 bolt task run mymodule::mytask --nodes app1.myorg.com --params @param_file.json
 ```
 
-```
+```no-highlight
 bolt plan run mymodule::myplan --params @param_file.json
 ```
 
-To pass JSON values in PowerShell without worrying about escaping use `ConvertTo-Json`
+To pass JSON values in PowerShell without worrying about escaping, use `ConvertTo-Json`
 
 ```
 bolt task run mymodule::mytask --nodes app1.myorg.com --params $(@{load_balancers=@("lb1.myorg.com","lb2.myorg.com")} | ConvertTo-Json)
@@ -79,10 +75,7 @@ bolt plan run mymodule::myplan --nodes app1.myorg.com --params $(@{load_balancer
 
 ## Specifying the module path
 
-In order for Bolt to find a task or plan, the task or plan must be in a module on the `modulepath`. By
-default, the `modulepath` includes `modules/` and `site-modules/` directories inside the
-`Boltdir`. If you are developing a new task you can specify `--modulepath
-<PARENT_DIR_OF/MODULE>` to tell Bolt where to load the module. For example if
-your module is in `~/src/modules/my_module/` run Bolt with `--modulepath
-~/src/module`. If you often use the same `modulepath` you can set `modulepath` in
-`bolt.yaml`.
+In order for Bolt to find a task or plan, the task or plan must be in a module on the `modulepath`. By default, the `modulepath` includes `modules/` and `site-modules/` directories inside the Bolt project directory.
+
+If you are developing a new plan, you can specify `--modulepath <PARENT_DIR_OF/MODULE>` to tell Bolt where to load the module. For example, if your module is in `~/src/modules/my_module/`, run Bolt with `--modulepath ~/src/module`. If you often use the same `modulepath`, you can set `modulepath` in `bolt.yaml`.
+

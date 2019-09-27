@@ -2,12 +2,12 @@
 
 New features, enhancements, known issues, and resolved issues for the Bolt 1.x release series.
 
-Version 1.2.0 released October 2018.
+Version 1.31.0 released September 2019.
 
 -   **[Bolt versioning](bolt_versioning.md)**  
-Bolt follows Semantic Versioning guidelines.
+Bolt follows semantic versioning guidelines.
 -   **[New features](bolt_new_features.md)**  
-New features added to Bolt in the 1.x release series. 
+New features added to Bolt in the 1.x release series.
 -   **[Resolved issues](bolt_resolved_issues.md)**  
 Security and bug fixes in the Bolt 1.x release series.
 -   **[Known issues](bolt_known_issues.md)**  

@@ -1,7 +1,3 @@
----
-author: Jean Bond <jean@puppet.com\>
----
-
 # Resolved issues
 
 Security and bug fixes in the Bolt 1.x release series.

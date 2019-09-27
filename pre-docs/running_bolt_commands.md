@@ -2,6 +2,8 @@
 
 Use Bolt commands to connect directly to the systems where you want to execute commands, run scripts, and upload files.
 
+**Parent topic:**[Using Bolt commands](running_bolt.md)
+
 ## Run a command on remote nodes
 
 Specify the command you want to run and which nodes to run it on.
@@ -38,14 +40,12 @@ bolt command run "netstat -an | grep 'tcp.*LISTEN'" --nodes web5.mydomain.edu,we
 
     **Note:** When connecting to Bolt hosts over WinRM that have not configured SSL for port 5986, passing the `--no-ssl` switch is required to connect to the default WinRM port 5985.
 
+
 ## Running commands with redirection or pipes
 
-When you run one-line commands that include redirection or pipes, pass `bash`
-or another shell as the command. Using a shall ensures that the one-liner is
-run as a single command and that it works correctly with `run-as`. For example,
-instead of `bolt command run "echo foo > /root/foo" --run-as root`, use `bolt
-command run "bash -c 'echo foo > /root/foo'" --run-as root`.
+When you run one-line commands that include redirection or pipes, pass `bash` or another shell as the command.
 
+Using a shell ensures that the one-liner is run as a single command and that it works correctly with `run-as`. For example, instead of `bolt command run "echo foo > /root/foo" --run-as root`, use `bolt command run "bash -c 'echo foo > /root/foo'" --run-as root`.
 
 ## Run a script on remote nodes
 

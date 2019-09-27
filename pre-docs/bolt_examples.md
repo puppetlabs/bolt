@@ -1,7 +1,3 @@
----
-author: Melissa Amos <melissa.amos@puppet.com\>
----
-
 # Bolt examples
 
 Bolt lets you automate almost any task you can think of. These are some of the common scenarios we've come across.

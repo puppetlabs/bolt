@@ -1,7 +1,3 @@
----
-author: Melissa Amos <melissa.amos@puppet.com\>
----
-
 # Inventory file version 2
 
 Version 2 of the inventory file is experimental and might experience breaking changes in future releases.
