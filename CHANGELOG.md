@@ -1,3 +1,11 @@
+## 1.31.1
+
+#### Bug fixes
+
+* **Spurious plan failures and warnings on startup**
+
+  A race condition with the analytics client could cause Bolt operations to fail or extraneous warnings to be printed during startup.
+
 ## 1.31.0
 
 #### Deprecations and removals
