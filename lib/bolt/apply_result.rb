@@ -46,6 +46,25 @@ module Bolt
       end
     end
 
+    def self.invalid_report_error(result)
+      # These are the keys ApplyResult methods rely on.
+      expected_report_keys = %w[metrics resource_statuses status]
+      missing_keys = expected_report_keys.reject { |k| result.value.include?(k) }
+
+      unless missing_keys.empty?
+        if result['_output']
+          # rubocop:disable Metrics/LineLength
+          msg = "Report result contains an '_output' key. Catalog application may have printed extraneous output to stdout: #{result['_output']}"
+          # rubocop:enable Metrics/LineLength
+        else
+          msg = "Report did not contain all expected keys missing: #{missing_keys.join(' ,')}"
+        end
+
+        { 'msg' => msg,
+          'kind' => 'bolt/invalid-report' }
+      end
+    end
+
     def self.from_task_result(result)
       if (puppet_missing = puppet_missing_error(result))
         new(result.target,
@@ -53,6 +72,10 @@ module Bolt
             report: result.value.reject { |k| k == '_error' })
       elsif !result.ok?
         new(result.target, error: result.error_hash)
+      elsif (invalid_report = invalid_report_error(result))
+        new(result.target,
+            error: invalid_report,
+            report: result.value.reject { |k| %w[_error _output].include?(k) })
       elsif (resource_error = resource_error(result))
         new(result.target,
             error: resource_error,
