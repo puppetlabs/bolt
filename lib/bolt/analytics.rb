@@ -107,7 +107,7 @@ module Bolt
       end
 
       def report_bundled_content(mode, name)
-        if bundled_content[mode.split.first]&.include?(name)
+        if bundled_content[mode.split(' ').first]&.include?(name)
           event('Bundled Content', mode, label: name)
         end
       end

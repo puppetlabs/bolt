@@ -544,7 +544,7 @@ module Bolt
       # We only need to enumerate bundled content when running a task or plan
       content = { 'Plan' => [],
                   'Task' => [],
-                  'Plugin' => %w[puppetdb pkcs7 prompt terraform task] }
+                  'Plugin' => Bolt::Plugin::BUILTIN_PLUGINS }
       if %w[plan task].include?(options[:subcommand]) && options[:action] == 'run'
         default_content = Bolt::PAL.new([], nil)
         content['Plan'] = default_content.list_plans.each_with_object([]) do |iter, col|
