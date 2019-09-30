@@ -276,9 +276,7 @@ module Bolt
         raise Bolt::ValidationError, "Unsupported format: '#{@format}'"
       end
 
-      if @hiera_config && !(File.file?(@hiera_config) && File.readable?(@hiera_config))
-        raise Bolt::FileError, "Could not read hiera-config file #{@hiera_config}", @hiera_config
-      end
+      Bolt::Util.validate_file('hiera-config', @hiera_config) if @hiera_config
 
       unless @transport.nil? || Bolt::TRANSPORTS.include?(@transport.to_sym)
         raise UnknownTransportError, @transport
