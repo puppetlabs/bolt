@@ -36,7 +36,7 @@ module Bolt
       def validate_resolve_reference(opts)
         # TODO: Remove deprecation warning
         if opts.include?('encrypted-value')
-          raise Bolt::ValidationError, "Inventory file parsing error: The 'encrypted-value' key in the inventory file is deprecated and can no longer be used. Please change the name of the key to 'encrypted_value' instead, and all will be fine."
+          raise Bolt::ValidationError, "Parsing error: The 'encrypted-value' key is deprecated and can no longer be used. In your Bolt config files, please use 'encrypted_value' instead."
         end
         decode(opts['encrypted_value'])
       end
