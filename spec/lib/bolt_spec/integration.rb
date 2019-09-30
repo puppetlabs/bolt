@@ -24,10 +24,10 @@ module BoltSpec
         begin
           opts = cli.parse
           cli.execute(opts)
-        # rubocop:disable HandleExceptions
+        # rubocop:disable Lint/HandleExceptions
         rescue Bolt::Error
         end
-        # rubocop:enable HandleExceptions
+        # rubocop:enable Lint/HandleExceptions
       else
         opts = cli.parse
         cli.execute(opts)
