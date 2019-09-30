@@ -10,12 +10,15 @@
 
   When using the interpreters setting on the WinRM transport, a task would fail to execute if the path to the specified interpreter contains a space. Interpreter paths with spaces in the name are now supported.
 
+* **Resource Types were not registered while running plans** ([#1140](https://github.com/puppetlabs/bolt/issues/1140))
+
+  When referencing a resource type in a plan (for example `get_resources($nodes, Package)`) the plan would fail because the `Package` type is not found. Now all built in types and types on the modulepath can be generated with an invocation of `puppetfile generate-types` which will be registered for plan execution.
+  
 #### New features
 
 * **Azure inventory plugin** ([#1148](https://github.com/puppetlabs/bolt/issues/1148))
 
   A new [module based plugin](https://github.com/puppetlabs/puppetlabs-azure_inventory) allows generation of Bolt targets from Azure VMs.
-
 
 ## 1.31.1
 
