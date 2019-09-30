@@ -2,7 +2,14 @@
 
 #### Bug fixes
 
-* A plan apply() incorrectly returns successful if the report is unparseable([#1241](https://github.com/puppetlabs/bolt/issues/1241))
+* **A plan apply() incorrectly returns successful if the report is unparseable** ([#1241](https://github.com/puppetlabs/bolt/issues/1241))
+
+  Unexpect results for the result of an `apply` are now treated as errors.
+
+* **`interpreters` with spaces fail with the winrm transport** ([#1158](https://github.com/puppetlabs/bolt/issues/1158))
+
+  When using the interpreters setting on the WinRM transport, a task would fail to execute if the path to the specified interpreter contains a space. Interpreter paths with spaces in the name are now supported.
+
 
 ## 1.31.1
 
