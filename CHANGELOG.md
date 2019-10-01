@@ -20,6 +20,11 @@
 
   A new [module based plugin](https://github.com/puppetlabs/puppetlabs-azure_inventory) allows generation of Bolt targets from Azure VMs.
 
+
+* **Clear API for `Target`** ([#1125](https://github.com/puppetlabs/bolt/issues/1125))
+
+  An updated `Target` API for creating and configuring bolt `Targets` during plan execution when using Inventory version 2 is now available.
+
 ## 1.31.1
 
 #### Bug fixes

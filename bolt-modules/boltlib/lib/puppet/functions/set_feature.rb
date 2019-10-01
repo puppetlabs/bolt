@@ -22,6 +22,7 @@ Puppet::Functions.create_function(:set_feature) do
     param 'Target', :target
     param 'String', :feature
     optional_param 'Boolean', :value
+    return_type 'Target'
   end
 
   def set_feature(target, feature, value = true)

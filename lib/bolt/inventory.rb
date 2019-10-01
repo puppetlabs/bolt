@@ -139,9 +139,8 @@ module Bolt
       end
     end
 
-    def set_var(target, key, value)
-      data = { key => value }
-      set_vars_from_hash(target.name, data)
+    def set_var(target, var_hash)
+      set_vars_from_hash(target.name, var_hash)
     end
 
     def vars(target)

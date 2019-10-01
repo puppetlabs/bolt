@@ -31,7 +31,7 @@ describe 'using module based plugins' do
   let(:plan) do
     <<~PLAN
       plan test_plan() {
-        return(get_targets('node1')[0].password)
+        return(get_target('node1').password)
       }
     PLAN
   end
@@ -147,13 +147,13 @@ describe 'using module based plugins' do
     let(:plan) do
       <<~PLAN
         plan test_plan() {
-          return(get_targets('node1')[0].options['data'])
+          return(get_target('node1').config)
         }
       PLAN
     end
 
     it 'fails when configuration is incorrect' do
-      result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', @boltdir], rescue_exec: true)
+      result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir], rescue_exec: true)
 
       expect(result).to include('kind' => "bolt/validation-error")
       expect(result['msg']).to match(/conf_plug plugin expects a String for key required_key/)
@@ -165,9 +165,9 @@ describe 'using module based plugins' do
       it 'passes _config to the task' do
         result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir])
 
-        expect(result).to include('_config' => plugin_config['conf_plug'])
-        expect(result).to include('_boltdir' => boltdir)
-        expect(result).to include('value' => 'ssshhh')
+        expect(result['remote']['data']).to include('_config' => plugin_config['conf_plug'])
+        expect(result['remote']['data']).to include('_boltdir' => boltdir)
+        expect(result['remote']['data']).to include('value' => 'ssshhh')
       end
     end
   end

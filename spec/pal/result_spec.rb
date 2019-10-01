@@ -5,6 +5,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/pal'
 
 require 'bolt/pal'
+require 'bolt/inventory'
 
 describe 'Result DataType' do
   include BoltSpec::Files
@@ -22,7 +23,7 @@ PUPPET
 
   def result_attr(attr)
     code = result_code + attr
-    peval(code, pal)
+    peval(code, pal, nil, Bolt::Inventory.new({}))
   end
 
   it 'should expose target' do
