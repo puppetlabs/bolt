@@ -324,19 +324,22 @@ Query the state of resources on a list of targets using resource definitions in 
 The results are returned as a list of hashes representing each resource.
 
 Requires the Puppet Agent be installed on the target, which can be accomplished with apply_prep
-or by directly running the puppet_agent::install task.
+or by directly running the puppet_agent::install task. In order to be able to reference types without
+string quoting (for example `get_resources($target, Package)` instead of `get_resources($target, 'Package')`)
+run the command `bolt puppetfile generate-types` to generate type references in `$Boldir/.resource_types`.
+
 
 **NOTE:** Not available in apply block
 
 
 ```
-get_resources(Boltlib::TargetSpec $targets, Variant[String, Resource, Array[Variant[String, Resource]]] $resources)
+get_resources(Boltlib::TargetSpec $targets, Variant[String, Type[Resource], Array[Variant[String, Type[Resource]]]] $resources)
 ```
 
 *Returns:* `Any` 
 
 * **targets** `Boltlib::TargetSpec` A pattern or array of patterns identifying a set of targets.
-* **resources** `Variant[String, Resource, Array[Variant[String, Resource]]]` A resource type or instance, or an array of such.
+* **resources** `Variant[String, Type[Resource], Array[Variant[String, Type[Resource]]]]` A resource type or instance, or an array of such.
 
 **Example:** Collect resource states for packages and a file
 ```

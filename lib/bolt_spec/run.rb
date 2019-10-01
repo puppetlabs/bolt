@@ -152,7 +152,10 @@ module BoltSpec
       end
 
       def pal
-        @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.compile_concurrency)
+        @pal ||= Bolt::PAL.new(config.modulepath,
+                               config.hiera_config,
+                               config.boltdir.resource_types,
+                               config.compile_concurrency)
       end
 
       def resolve_targets(target_spec)

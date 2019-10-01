@@ -172,7 +172,7 @@ module BoltSpec
     end
 
     def run_plan(name, params)
-      pal = Bolt::PAL.new(config.modulepath, config.hiera_config)
+      pal = Bolt::PAL.new(config.modulepath, config.hiera_config, config.boltdir.resource_types)
       result = pal.run_plan(name, params, executor, inventory, puppetdb_client)
 
       if executor.error_message

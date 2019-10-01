@@ -8,12 +8,13 @@ describe 'run_plan' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
   let(:tasks_enabled) { true }
+  let(:inventory) { Bolt::Inventory.new({}) }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
     executor.stubs(:noop).returns(false)
 
-    Puppet.override(bolt_executor: executor) do
+    Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       example.run
     end
   end

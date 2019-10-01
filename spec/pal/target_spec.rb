@@ -13,7 +13,7 @@ describe 'Target DataType' do
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:pal) { Bolt::PAL.new(modulepath, nil) }
+  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
 
   let(:target_code) { "$target = Target('pcp://user1:pass1@example.com:33')\n" }
 
