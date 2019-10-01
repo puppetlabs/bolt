@@ -772,7 +772,7 @@ describe "Bolt::CLI" do
     describe "bundled_content" do
       let(:empty_content) {
         { "Plan" => [],
-          "Plugin" => %w[puppetdb pkcs7 prompt terraform task],
+          "Plugin" => Bolt::Plugin::BUILTIN_PLUGINS,
           "Task" => [] }
       }
       it "does not calculate bundled content for a command" do

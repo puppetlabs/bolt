@@ -134,7 +134,7 @@ module Bolt
       plugins
     end
 
-    BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory puppetdb].freeze
+    BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory puppetdb azure_inventory].freeze
 
     attr_reader :pal, :plugin_context
 
@@ -193,7 +193,7 @@ module Bolt
       plugin = by_name(plugin_name)
       raise PluginError::Unknown, plugin_name unless plugin
       raise PluginError::UnsupportedHook.new(plugin_name, hook) unless plugin.hooks.include?(hook)
-      @analytics.report_bundled_content("Plugin #{hook}", plugin_name) if BUILTIN_PLUGINS.include?(plugin_name)
+      @analytics.report_bundled_content("Plugin #{hook}", plugin_name)
 
       plugin.method(hook)
     end

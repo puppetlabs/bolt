@@ -10,6 +10,12 @@
 
   When using the interpreters setting on the WinRM transport, a task would fail to execute if the path to the specified interpreter contains a space. Interpreter paths with spaces in the name are now supported.
 
+#### New features
+
+* **Azure inventory plugin** ([#1148](https://github.com/puppetlabs/bolt/issues/1148))
+
+  A new [module based plugin](https://github.com/puppetlabs/puppetlabs-azure_inventory) allows generation of Bolt targets from Azure VMs.
+
 
 ## 1.31.1
 
