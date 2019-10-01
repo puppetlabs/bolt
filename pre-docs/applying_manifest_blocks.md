@@ -295,7 +295,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 
 ## Using Puppet device modules from an apply statement
 
-Puppet device modules based on remote transports allow network devices and other targets that can't run a Puppetagent to be managed from a proxy.
+Puppet device modules based on remote transports allow network devices and other targets that can't run a Puppet agent to be managed from a proxy.
 
 **Note:** Support for device modules is experimental and might change in future minor \(y\) releases.
 
@@ -308,8 +308,8 @@ nodes:
     config:
       transport: remote
       remote:
-       remote-transport: panos
+        remote-transport: panos
 ```
 
-When you set the `run-on` option with a device module, the puppet-resource\_api gem be must installed with the puppet agent on the proxy target and it must be version 1.8.1 or later.
+When you set the `run-on` option with a device module, the puppet-resource\_api gem must be installed with the puppet agent on the proxy target and it must be version 1.8.1 or later.
 
