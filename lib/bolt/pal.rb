@@ -117,7 +117,8 @@ module Bolt
       static_loader = loaders.static_loader
       static_loader.runtime_3_init
       if File.directory?(@resource_types)
-        Dir.children(@resource_types).each do |resource_pp|
+        # Ruby 2.3 does not support Dir.children
+        (Dir.entries(@resource_types) - %w[. ..]).each do |resource_pp|
           type_name_from_file = File.basename(resource_pp, '.pp').capitalize
           typed_name = Puppet::Pops::Loader::TypedName.new(:type, type_name_from_file)
           resource_type = Puppet::Pops::Types::TypeFactory.resource(type_name_from_file)
