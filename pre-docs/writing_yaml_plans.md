@@ -206,7 +206,7 @@ For each `resources` step, Bolt executes the `apply_prep` plan function against 
 
 Resources steps use these fields:
 
--   `resouces`: An array of resources to apply
+-   `resources`: An array of resources to apply
 -   `target`: A target or list of targets to apply the resources on
 
 Each resource is a YAML map with a type and title, and optionally a `parameters` key. The resource type and title can either be specified separately with the `type` and `title` keys, or can be specified in a single line by using the type name as a key with the title as its value.
@@ -256,12 +256,12 @@ parameters:
   frontends:
     type: TargetSpec
     description: "The frontend web servers"
-backends:
+  backends:
     type: TargetSpec
     description: "The backend application servers"
   version:
     type: String
-              description: "The new application version to deploy"
+    description: "The new application version to deploy"
 ```
 
 ### How strings are evaluated
@@ -323,8 +323,9 @@ parameters:
 
 steps:
   - task: echo
-    message: "hello ${username}"
-           target: $nodes
+    parameters:
+      message: "hello ${username}"
+    target: $nodes
 ```
 
 Many operations can be performed on variables to compute new values for step parameters or other fields.
@@ -391,7 +392,7 @@ You can connect multiple steps by using the result of one step to compute the pa
 
 ### `name` key
 
-The `name` key makes its results available to later steps in a variable with that name.
+The `name` key makes its result available to later steps in a variable with that name.
 
 This example uses the `map` function to get the value of `stdout` from each command result and then joins them into a single string separated by commas.
 
@@ -460,7 +461,7 @@ bolt plan convert path/to/my/plan.yaml
 
 This command takes the relative or absolute path to the YAML plan to be converted and prints the converted Puppet language plan to stdout.
 
-**Note:** Converting a YAML plan might result in a Puppet plan which is syntactically correct, but behaves differently. Always manually verify a converted Puppet language plan's functionality. There are some constructs that do not translate from YAML plans to Puppet language plans. These are listed \[TODO: insert link to section below!\] below. If you convert a YAML plan to Puppet and it changes behavior, [file an issue](https://github.com/puppetlabs/bolt/issues) in Bolt's Git repo.
+**Note:** Converting a YAML plan might result in a Puppet plan which is syntactically correct, but behaves differently. Always manually verify a converted Puppet language plan's functionality. There are some constructs that do not translate from YAML plans to Puppet language plans. These are [listed](#yaml-plan-constructs-that-cannot-be-translated-to-puppet-plans) below. If you convert a YAML plan to Puppet and it changes behavior, [file an issue](https://github.com/puppetlabs/bolt/issues) in Bolt's Git repo.
 
 For example, with this YAML plan:
 
