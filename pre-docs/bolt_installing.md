@@ -215,7 +215,7 @@ The Puppet Tools repository for the APT package management system is [https://ap
 
 Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12, and Fedora 28 and 29.
 
-The Puppet Tools repository for the YUM package management system is [http://yum.puppet.com/puppet-tools/](http://yum.puppet.com). Packages are named using the convention `puppet-tools--release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet Tools on Linux 7 is `puppet-tools-release-el-7.noarch.rpm`.
+The Puppet Tools repository for the YUM package management system is [http://yum.puppet.com/puppet-tools/](http://yum.puppet.com/puppet-tools/). Packages are named using the convention `puppet-tools--release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet Tools on Linux 7 is `puppet-tools-release-el-7.noarch.rpm`.
 
 1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
 
