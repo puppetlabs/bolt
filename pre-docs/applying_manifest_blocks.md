@@ -95,11 +95,11 @@ If a custom data provider is used \(such as `hiera-eyaml`, which allows you to e
 
 In addition to the standard Puppet functions available to a catalog, such as `lookup`, you can use the following Bolt functions in a manifest block.
 
--   `[puppetdb\_query](plan_functions.md#)`
--   `[puppetdb\_facts](plan_functions.md#)`
--   `[get\_targets](plan_functions.md#)`
--   `[facts](plan_functions.md#)`
--   `[vars](plan_functions.md#)`
+-   [`puppetdb\_query`](plan_functions.md#)
+-   [`puppetdb\_facts`](plan_functions.md#)
+-   [`get\_targets`](plan_functions.md#)
+-   [`facts`](plan_functions.md#)
+-   [`vars`](plan_functions.md#)
 
 ## Manifest block limitations
 
