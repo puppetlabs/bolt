@@ -14,7 +14,7 @@ ssh:
   private-key: ~/.ssh/bolt_id
   user: foo 
   interpreters:
-     rb: /home/foo/.rbenv/versions/2.5.1/bin/ruby
+    rb: /home/foo/.rbenv/versions/2.5.1/bin/ruby
 ```
 
 ## Global configuration options
@@ -96,7 +96,7 @@ These are the options configurable in OpenSSH files:
 
 -   `HostKeyAlias`: Use alias instead of real hostname when looking up or saving the host key in the host key database file.
 
--   `IdentitiesOnly`: Use only identity key in SSH config even if ssh-agent offers others.
+-   `IdentitiesOnly`: Use only the identity key in SSH config even if ssh-agent offers others.
 
 -   `HostName`: Host name to log.
 
@@ -179,9 +179,9 @@ When using the SSH transport, Bolt also interacts with the ssh-agent for SSH key
 
 -   `token-file`: The path to the token file.
 
-    `job-poll-interval`: Set interval to poll orchestrator for job status.
+-   `job-poll-interval`: Set interval to poll orchestrator for job status.
 
-    `job-poll-timeout`: Set time to wait for orchestrator job status.
+-   `job-poll-timeout`: Set time to wait for orchestrator job status.
 
 
 ## Local transport configuration options
