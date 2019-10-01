@@ -110,7 +110,7 @@ module BoltSpec
       else
         begin
           unless File.stat(manifest).readable?
-            raise BOLT::FileError.new("The manifest '#{manifest}' is unreadable", manifest)
+            raise Bolt::FileError.new("The manifest '#{manifest}' is unreadable", manifest)
           end
         rescue Errno::ENOENT
           raise Bolt::FileError.new("The manifest '#{manifest}' does not exist", manifest)
