@@ -73,7 +73,7 @@ module Bolt
     # and any additional files (name and path)
     def select_implementation(target, provided_features = [])
       impl = if (impls = implementations)
-               available_features = target.features + provided_features
+               available_features = target.feature_set + provided_features
                impl = impls.find do |imp|
                  remote_impl = imp['remote']
                  remote_impl = metadata['remote'] if remote_impl.nil?

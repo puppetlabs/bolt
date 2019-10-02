@@ -33,7 +33,7 @@ module Bolt
                  'task' => %w[show run],
                  'plan' => %w[show run convert],
                  'file' => %w[upload],
-                 'puppetfile' => %w[install show-modules],
+                 'puppetfile' => %w[install show-modules generate-types],
                  'secret' => %w[encrypt decrypt createkeys],
                  'inventory' => %w[show],
                  'apply' => %w[] }.freeze
@@ -76,7 +76,6 @@ module Bolt
 
     def parse
       parser = BoltOptionParser.new(options)
-
       # This part aims to handle both `bolt <mode> --help` and `bolt help <mode>`.
       remaining = handle_parser_errors { parser.permute(@argv) } unless @argv.empty?
       if @argv.empty? || help?(remaining)
@@ -320,7 +319,11 @@ module Bolt
       when 'plan'
         code = run_plan(options[:object], options[:task_options], options[:target_args], options)
       when 'puppetfile'
-        code = install_puppetfile(@config.puppetfile_config, @config.puppetfile, @config.modulepath)
+        if options[:action] == 'generate-types'
+          code = generate_types
+        elsif options[:action] == 'install'
+          code = install_puppetfile(@config.puppetfile_config, @config.puppetfile, @config.modulepath)
+        end
       when 'secret'
         code = Bolt::Secret.execute(plugins, outputter, options)
       when 'apply'
@@ -474,6 +477,12 @@ module Bolt
       outputter.print_module_list(pal.list_modules)
     end
 
+    def generate_types
+      # generate_types will surface a nice error with helpful message if it fails
+      pal.generate_types
+      0
+    end
+
     def install_puppetfile(config, puppetfile, modulepath)
       require 'r10k/cli'
       require 'bolt/r10k_log_proxy'
@@ -495,6 +504,8 @@ module Bolt
 
         ok = install_action.call
         outputter.print_puppetfile_result(ok, puppetfile, moduledir)
+        # Automatically generate types after installing modules
+        pal.generate_types
 
         ok ? 0 : 1
       else
@@ -505,7 +516,10 @@ module Bolt
     end
 
     def pal
-      @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.compile_concurrency)
+      @pal ||= Bolt::PAL.new(config.modulepath,
+                             config.hiera_config,
+                             config.boltdir.resource_types,
+                             config.compile_concurrency)
     end
 
     def convert_plan(plan)
@@ -544,9 +558,9 @@ module Bolt
       # We only need to enumerate bundled content when running a task or plan
       content = { 'Plan' => [],
                   'Task' => [],
-                  'Plugin' => %w[puppetdb pkcs7 prompt terraform task] }
+                  'Plugin' => Bolt::Plugin::BUILTIN_PLUGINS }
       if %w[plan task].include?(options[:subcommand]) && options[:action] == 'run'
-        default_content = Bolt::PAL.new([], nil)
+        default_content = Bolt::PAL.new([], nil, nil)
         content['Plan'] = default_content.list_plans.each_with_object([]) do |iter, col|
           col << iter&.first
         end

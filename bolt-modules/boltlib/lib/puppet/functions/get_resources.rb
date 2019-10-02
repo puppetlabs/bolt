@@ -6,7 +6,10 @@ require 'bolt/task'
 # The results are returned as a list of hashes representing each resource.
 #
 # Requires the Puppet Agent be installed on the target, which can be accomplished with apply_prep
-# or by directly running the puppet_agent::install task.
+# or by directly running the puppet_agent::install task. In order to be able to reference types without
+# string quoting (for example `get_resources($target, Package)` instead of `get_resources($target, 'Package')`)
+# run the command `bolt puppetfile generate-types` to generate type references in `$Boldir/.resource_types`.
+#
 #
 # **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:get_resources) do
@@ -16,7 +19,7 @@ Puppet::Functions.create_function(:get_resources) do
   #   get_resources('target1,target2', [Package, File[/etc/puppetlabs]])
   dispatch :get_resources do
     param 'Boltlib::TargetSpec', :targets
-    param 'Variant[String, Resource, Array[Variant[String, Resource]]]', :resources
+    param 'Variant[String, Type[Resource], Array[Variant[String, Type[Resource]]]]', :resources
   end
 
   def script_compiler
@@ -44,6 +47,10 @@ Puppet::Functions.create_function(:get_resources) do
     inventory = Puppet.lookup(:bolt_inventory)
 
     resources = [resources].flatten
+
+    # Stringify resource types to pass to task
+    resources.map! { |r| r.is_a?(String) ? r : r.to_s }
+
     resources.each do |resource|
       if resource !~ /^\w+$/ && resource !~ /^\w+\[.+\]$/
         raise Bolt::Error.new("#{resource} is not a valid resource type or type instance name", 'bolt/get-resources')

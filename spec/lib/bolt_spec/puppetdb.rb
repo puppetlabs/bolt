@@ -20,9 +20,9 @@ module BoltSpec
     def make_command(command:, version:, payload:, wait: nil)
       client = pdb_client
       url = "#{client.uri}/pdb/cmd/v1"
+      url += "?secondsToWaitForCompletion=#{wait}" if wait
 
       body = { command: command, version: version, payload: payload }
-      body['secondsToWaitForCompletion' => wait] if wait
       body = JSON.generate(body)
 
       headers = { "Content-Type" => "application/json" }

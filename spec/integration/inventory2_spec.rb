@@ -190,6 +190,30 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
   end
 
+  context 'when creating targets from a plan with empty inventory', ssh: true do
+    let(:conn) { conn_info('ssh') }
+    let(:inventory) { { version: 2 } }
+
+    it 'creates new targets with both target.new and get_target' do
+      new_target_info = { 'new_target_hash' => {
+        'transport' => conn[:protocol],
+        'ssh' => {
+          'host' => conn[:host],
+          'user' => conn[:user],
+          'port' => conn[:port],
+          'password' => conn[:password],
+          'host-key-check' => false
+        }
+      } }
+      plan = ['plan', 'run', 'inventory::new_target', '--params', new_target_info.to_json] + config_flags
+      result = run_cli_json(plan)
+      expect(result['expected_host_key_fail'].count).to eq(1)
+      expect(result['expected_host_key_fail'].first['result']['_error']['issue_code']).to eq('HOST_KEY_ERROR')
+      expect(result['expected_success'].count).to eq(2)
+      result['expected_success'].each { |r| expect(r['status']).to eq('success') }
+    end
+  end
+
   context 'when adding targets to a group in a plan', ssh: true do
     let(:conn) { conn_info('ssh') }
     let(:inventory) do
@@ -271,27 +295,25 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     it 'computes facts and vars based on group hierarchy' do
-      plan = ['plan', 'run', 'add_group', '--nodes', 'add_me'] + config_flags
+      plan = ['plan', 'run', 'add_group::inventory2', '--nodes', 'add_me'] + config_flags
       expected_hash_pre = { 'top_level' => 'keep',
                             'preserve_hierarchy' => 'keep',
                             'parent' => 'keep',
                             'override_parent' => 'discard',
                             'added_group' => 'keep' }
-      expected_hash_post = expected_hash_pre.merge('override_parent' => 'keep', 'plan_context' => 'keep')
+
+      expected_hash_post = expected_hash_pre.merge('override_parent' => 'keep',
+                                                   'plan_context' => 'keep')
       result = run_cli_json(plan)
-      expect(result)
-        .to include(
-          'addme_group' =>
-            ["Target('#{conn[:host]}', {\"user\"=>\"#{conn[:user]}\", \"port\"=>#{conn[:port]}})",
-             "Target('0.0.0.0:20024', {\"user\"=>\"bolt\", \"port\"=>20022})"]
-        )
+
+      expect(result).to include('addme_group' => [conn[:host], '0.0.0.0:20024'])
       expect(result['existing_facts']).to eq(expected_hash_pre)
       expect(result['existing_vars']).to eq(expected_hash_pre)
       expect(result['added_facts']).to eq(expected_hash_post)
       expect(result['added_vars']).to eq(expected_hash_post)
       expect(result['target_not_overwritten']).to eq("dont_overwrite")
-      expect(result['target_not_duplicated']).to eq(["Target('bar_1', {})"])
-      expect(result['target_to_all_group']).to include("Target('add_to_all', {})")
+      expect(result['target_not_duplicated']).to eq(["bar_1"])
+      expect(result['target_to_all_group']).to include('add_to_all')
     end
 
     it 'errors when trying to add to non-existent group' do
@@ -340,6 +362,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
     it 'passes the correct host to the task' do
       task = ['task', 'run', 'remote', '--nodes', 'remote_target'] + config_flags
+
       result = run_one_node(task)
       expect(result['_target']).to include('host' => 'not.the.name')
     end
@@ -582,7 +605,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           result = run_cli_json(run_command)
           expect(result).not_to include('kind')
           # If puppetdb config loaded this would be fake
-          expect(result['items'][0]['result']['stdout']).to eq("#{conn[:system_user]}\n")
+          expect(result['items'][0]['result']['stdout']).to eq("#{conn[:user]}\n")
         end
       end
     end

@@ -256,7 +256,7 @@ For example, the following uploads file 'abc' on windows_target.net:
         - `path`: String, *required* - The endpoint to retrieve the script.
         - `params`: Object, *required* - The parameters to supply the endpoint.
     - `sha256`: String, *required* - The SHA256 value for the script.
-- `arguments`: String, *optional* - Which arguments to pass to the script.
+- `arguments`: Array, *optional* - Which arguments to pass to the script.
 
 For example, the following runs script 'file.sh' on linux_target.net:
 ```
@@ -276,7 +276,7 @@ For example, the following runs script 'file.sh' on linux_target.net:
     },
     "sha256": "SHA256VALUE"
   },
-  "arguments": "--test",
+  "arguments": ["--test"],
 }
 ```
 
@@ -288,7 +288,7 @@ For example, the following runs script 'file.sh' on linux_target.net:
         - `path`: String, *required* - The endpoint to retrieve the script.
         - `params`: Object, *required* - The parameters to supply the endpoint.
     - `sha256`: String, *required* - The SHA256 value for the script.
-- `arguments`: String, *optional* - Which arguments to pass to the script.
+- `arguments`: Array, *optional* - Which arguments to pass to the script.
 
 For example, the following runs script 'file.sh' on windows_target.net:
 ```
@@ -308,7 +308,7 @@ For example, the following runs script 'file.sh' on windows_target.net:
     },
     "sha256": "SHA256VALUE"
   },
-  "arguments": "-Test",
+  "arguments": ["-Test"],
 }
 ```
 

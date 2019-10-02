@@ -323,12 +323,15 @@ file::write('C:/Users/me/report', $apply_result.first.report)
 
 Query the state of resources on a list of targets using resource definitions in the Bolt module path. The results are returned as a list of hashes representing each resource.
 
-The Puppet agent must be installed on the target. You can install the agent with the`apply_prep` function or by directly running the `puppet_agent::install` task.
+Requires the Puppet Agent be installed on the target, which can be accomplished with apply_prep
+or by directly running the puppet_agent::install task. In order to be able to reference types without
+string quoting (for example `get_resources($target, Package)` instead of `get_resources($target, 'Package')`)
+run the command `bolt puppetfile generate-types` to generate type references in `$Boldir/.resource_types`.
 
 **Note:** Not available in apply block.
 
 ```
-get_resources(Boltlib::TargetSpec $targets, Variant[String, Resource, Array[Variant[String, Resource]]] $resources)
+get_resources(Boltlib::TargetSpec $targets, Variant[String, Type[Resource], Array[Variant[String, Type[Resource]]]] $resources)
 ```
 
 *Returns:* `Any`
@@ -336,6 +339,8 @@ get_resources(Boltlib::TargetSpec $targets, Variant[String, Resource, Array[Vari
 -   **targets** `Boltlib::TargetSpec` A pattern or array of patterns identifying a set of targets.
 -   **resources** `Variant[String, Resource, Array[Variant[String, Resource]]]` A resource type or instance, or an array of such.
 
+* **targets** `Boltlib::TargetSpec` A pattern or array of patterns identifying a set of targets.
+* **resources** `Variant[String, Type[Resource], Array[Variant[String, Type[Resource]]]]` A resource type or instance, or an array of such.
 
 **Example:** Collect resource states for packages and a file
 
@@ -343,7 +348,35 @@ get_resources(Boltlib::TargetSpec $targets, Variant[String, Resource, Array[Vari
 get_resources('target1,target2', [Package, File[/etc/puppetlabs]])
 ```
 
-### get\_targets
+## get_target
+
+Get a single target from inventory if it exists, otherwise create a new Target.
+
+**NOTE:** Calling `get_target` inside an `apply` block with a
+version 2 inventory creates a new Target object.
+`get_target('all')` returns an empty array.
+**NOTE:** Only compatible with inventory v2
+
+
+```
+get_target(Boltlib::TargetSpec $name)
+```
+
+*Returns:* `Target` A single target, either new or from inventory.
+
+* **name** `Boltlib::TargetSpec` A Target name.
+
+**Example:** Create a new Target from a URI
+```
+get_target('winrm://host2:54321')
+```
+**Example:** Get an existing Target from inventory
+```
+get_target('existing-target')
+```
+
+
+## get_targets
 
 Parses common ways of referring to targets and returns an array of Targets.
 
@@ -630,7 +663,39 @@ run_task(String[1] $task_name, Boltlib::TargetSpec $targets, Optional[String] $d
 run_task('facts', $targets, 'Gather OS facts')
 ```
 
-### set\_feature
+## set_config
+
+Set configuration options on a target
+
+**NOTE:** Not available in apply block
+**NOTE:** Only compatible with inventory v2
+
+
+```
+set_config(Target $target, Variant[String, Array[String]] $key_or_key_path, Any $value)
+```
+
+*Returns:* `Target` The Target with the updated config
+
+* **target** `Target` The Target object to configure. See [`get_targets`](#get_targets).
+* **key_or_key_path** `Variant[String, Array[String]]` The configuration setting to update.
+* **value** `Any` The configuration value
+
+**Example:** Set the transport for a target
+```
+set_config($target, 'transport', 'ssh')
+```
+**Example:** Set the ssh password
+```
+set_config($target, ['ssh', 'password'], 'secret')
+```
+**Example:** Overwrite ssh config
+```
+set_config($target, 'ssh', { user => 'me', password => 'secret' })
+```
+
+
+## set_feature
 
 Sets a particular feature to present on a target.
 
@@ -649,7 +714,7 @@ Features are used to determine what implementation of a task to run. Currently s
 set_feature(Target $target, String $feature, Optional[Boolean] $value)
 ```
 
-*Returns:* `Any` The target with the updated feature.
+*Returns:* `Target` The target with the updated feature
 
 -   **target** `Target` The Target object to add features to. See [`get_targets`](reference.dita#get_targets).
 -   **feature** `String` The string identifying the feature.
@@ -671,7 +736,7 @@ Sets a variable \{ key =\> value \} for a target.
 set_var(Target $target, String $key, Data $value)
 ```
 
-*Returns:* `Undef`
+*Returns:* `Target` The target with the updated feature
 
 -   **target** `Target` The Target object to set the variable for. See [`get_targets`](reference.dita#get_targets).
 -   **key** `String` The key for the variable.

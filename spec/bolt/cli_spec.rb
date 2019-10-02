@@ -59,6 +59,7 @@ describe "Bolt::CLI" do
     let(:boltdir) { Bolt::Boltdir.new('.') }
     before(:each) do
       allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(boltdir)
+      allow_any_instance_of(Bolt::Boltdir).to receive(:resource_types)
       allow(Bolt::Util).to receive(:read_config_file).and_return({})
     end
 
@@ -772,7 +773,7 @@ describe "Bolt::CLI" do
     describe "bundled_content" do
       let(:empty_content) {
         { "Plan" => [],
-          "Plugin" => %w[puppetdb pkcs7 prompt terraform task],
+          "Plugin" => Bolt::Plugin::BUILTIN_PLUGINS,
           "Task" => [] }
       }
       it "does not calculate bundled content for a command" do
@@ -1911,13 +1912,13 @@ describe "Bolt::CLI" do
       let(:puppetfile) { Pathname.new('path/to/puppetfile') }
       let(:modulepath) { [Pathname.new('path/to/modules')] }
       let(:action_stub) { double('r10k_action_puppetfile_install') }
+
       let(:cli) { Bolt::CLI.new({}) }
 
       before :each do
         allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
         allow(puppetfile).to receive(:exist?).and_return(true)
-
-        # Ensure we never actually install modules.
+        allow_any_instance_of(Bolt::PAL).to receive(:generate_types)
         allow(R10K::Action::Puppetfile::Install).to receive(:new).and_return(action_stub)
       end
 

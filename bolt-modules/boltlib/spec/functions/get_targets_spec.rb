@@ -12,6 +12,7 @@ describe 'get_targets' do
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
+      inventory.stubs(:version).returns(1)
       example.run
     end
   end
@@ -40,7 +41,6 @@ describe 'get_targets' do
 
     it 'with array of Targets' do
       inventory.expects(:get_targets).with([target]).returns([target])
-
       is_expected.to run.with_params([target]).and_return([target])
     end
 

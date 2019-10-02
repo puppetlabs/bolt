@@ -23,6 +23,14 @@ describe Bolt::Applicator do
   let(:applicator) { Bolt::Applicator.new(inventory, executor, modulepath, [], pdb_client, nil, 2) }
   let(:ast) { { 'resources' => [] } }
 
+  let(:report) {
+    {
+      'status' => 'unchanged',
+      'resource_statuses' => {},
+      'metrics' => {}
+    }
+  }
+
   let(:input) {
     {
       code_ast: ast,
@@ -112,7 +120,7 @@ describe Bolt::Applicator do
 
     it 'replaces failures to find Puppet' do
       expect(applicator).to receive(:compile).and_return(ast)
-      result = Bolt::Result.new(target)
+      result = Bolt::Result.new(target, value: report)
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(result)
 
       expect(Bolt::ApplyResult).to receive(:puppet_missing_error).with(result).and_return(nil)
@@ -134,11 +142,7 @@ describe Bolt::Applicator do
     it 'fails if the report signals failure' do
       expect(applicator).to receive(:compile).and_return(ast)
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(
-        Bolt::Result.new(target, value:
-          {
-            'status' => 'failed',
-            'resource_statuses' => {}
-          })
+        Bolt::Result.new(target, value: report.merge('status' => 'failed'))
       )
 
       resultset = applicator.apply([target, '_catch_errors' => true], :body, {})
@@ -158,7 +162,7 @@ describe Bolt::Applicator do
 
       targets = [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
       results = targets.zip(resources, %w[failed failed success]).map do |target, res, status|
-        Bolt::Result.new(target, value: { 'status' => status, 'resource_statuses' => res })
+        Bolt::Result.new(target, value: { 'status' => status, 'resource_statuses' => res, 'metrics' => {} })
       end
 
       allow(applicator).to receive(:compile).and_return(ast)
@@ -191,7 +195,7 @@ MSG
 
       targets = [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task) do |_, batch|
-        Bolt::ApplyResult.new(batch.first)
+        Bolt::Result.new(batch.first, value: report)
       end
 
       t = Thread.new {

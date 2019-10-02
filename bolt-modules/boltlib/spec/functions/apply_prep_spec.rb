@@ -168,9 +168,8 @@ describe 'apply_prep' do
       let(:hostname) { 'agentless' }
       let(:data) {
         {
-          'version' => 2,
-          'targets' => [{
-            'uri' => hostname,
+          'nodes' => [{
+            'name' => hostname,
             'plugin_hooks' => {
               'puppet_library' => {
                 'plugin' => 'task',

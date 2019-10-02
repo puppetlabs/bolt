@@ -316,9 +316,9 @@ google_compute_instance.app.1:
   zone = us-west1-a
 ```
 
-## AWS EC2
+## AWS Inventory
 
-The AWS EC2 plugin supports looking up running AWS EC2 instances. It supports several fields:
+The AWS Inventory plugin supports looking up running AWS EC2 instances. It supports several fields:
 
 - `profile`: The [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to use when loading from AWS `config` and `credentials` files. (optional, defaults to `default`)
 - `region`: The region to look up EC2 instances from.
@@ -333,7 +333,7 @@ One of `uri` or `name` is required. If only `uri` is set, then the value of `uri
 groups:
   - name: aws
     targets:
-      - _plugin: aws::ec2
+      - _plugin: aws_inventory
         profile: user1
         region: us-west-1
         name: public_dns_name

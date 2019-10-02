@@ -39,7 +39,7 @@ module Bolt
 
     attr_reader :modulepath
 
-    def initialize(modulepath, hiera_config, max_compiles = Etc.nprocessors)
+    def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors)
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happens in tests
       self.class.load_puppet
@@ -48,6 +48,7 @@ module Bolt
       @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
       @hiera_config = hiera_config
       @max_compiles = max_compiles
+      @resource_types = resource_types
 
       @logger = Logging.logger[self]
       if modulepath && !modulepath.empty?
@@ -110,6 +111,22 @@ module Bolt
       compiler.evaluate_string('type PlanResult = Boltlib::PlanResult')
     end
 
+    # Register all resource types defined in $Boltdir/.resource_types as well as
+    # the built in types registered with the runtime_3_init method.
+    def register_resource_types(loaders)
+      static_loader = loaders.static_loader
+      static_loader.runtime_3_init
+      if File.directory?(@resource_types)
+        # Ruby 2.3 does not support Dir.children
+        (Dir.entries(@resource_types) - %w[. ..]).each do |resource_pp|
+          type_name_from_file = File.basename(resource_pp, '.pp').capitalize
+          typed_name = Puppet::Pops::Loader::TypedName.new(:type, type_name_from_file)
+          resource_type = Puppet::Pops::Types::TypeFactory.resource(type_name_from_file)
+          loaders.static_loader.set_entry(typed_name, resource_type)
+        end
+      end
+    end
+
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
     # exceptions thrown by the block and re-raises them ensuring they are
     # Bolt::Errors since the script compiler block will squash all exceptions.
@@ -119,6 +136,7 @@ module Bolt
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: @modulepath, facts: {}) do |pal|
         pal.with_script_compiler do |compiler|
           alias_types(compiler)
+          register_resource_types(Puppet.lookup(:loaders)) if @resource_types
           begin
             Puppet.override(yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
               yield compiler
@@ -348,6 +366,16 @@ module Bolt
 
           [path, values]
         end.to_h
+      end
+    end
+
+    def generate_types
+      require 'puppet/face/generate'
+      in_bolt_compiler do
+        generator = Puppet::Generate::Type
+        inputs = generator.find_inputs(:pcore)
+        FileUtils.mkdir_p(@resource_types)
+        generator.generate(inputs, @resource_types, true)
       end
     end
 

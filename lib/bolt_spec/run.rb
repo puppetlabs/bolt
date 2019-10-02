@@ -110,7 +110,7 @@ module BoltSpec
       else
         begin
           unless File.stat(manifest).readable?
-            raise BOLT::FileError.new("The manifest '#{manifest}' is unreadable", manifest)
+            raise Bolt::FileError.new("The manifest '#{manifest}' is unreadable", manifest)
           end
         rescue Errno::ENOENT
           raise Bolt::FileError.new("The manifest '#{manifest}' does not exist", manifest)
@@ -152,7 +152,10 @@ module BoltSpec
       end
 
       def pal
-        @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.compile_concurrency)
+        @pal ||= Bolt::PAL.new(config.modulepath,
+                               config.hiera_config,
+                               config.boltdir.resource_types,
+                               config.compile_concurrency)
       end
 
       def resolve_targets(target_spec)

@@ -1,3 +1,38 @@
+## BOLT NEXT
+
+#### Bug fixes
+
+* **A plan apply() incorrectly returns successful if the report is unparseable** ([#1241](https://github.com/puppetlabs/bolt/issues/1241))
+
+  Unexpect results for the result of an `apply` are now treated as errors.
+
+* **`interpreters` with spaces fail with the winrm transport** ([#1158](https://github.com/puppetlabs/bolt/issues/1158))
+
+  When using the interpreters setting on the WinRM transport, a task would fail to execute if the path to the specified interpreter contains a space. Interpreter paths with spaces in the name are now supported.
+
+* **Resource Types were not registered while running plans** ([#1140](https://github.com/puppetlabs/bolt/issues/1140))
+
+  When referencing a resource type in a plan (for example `get_resources($nodes, Package)`) the plan would fail because the `Package` type is not found. Now all built in types and types on the modulepath can be generated with an invocation of `puppetfile generate-types` which will be registered for plan execution.
+  
+#### New features
+
+* **Azure inventory plugin** ([#1148](https://github.com/puppetlabs/bolt/issues/1148))
+
+  A new [module based plugin](https://github.com/puppetlabs/puppetlabs-azure_inventory) allows generation of Bolt targets from Azure VMs.
+
+
+* **Clear API for `Target`** ([#1125](https://github.com/puppetlabs/bolt/issues/1125))
+
+  An updated `Target` API for creating and configuring bolt `Targets` during plan execution when using Inventory version 2 is now available.
+
+## 1.31.1
+
+#### Bug fixes
+
+* **Spurious plan failures and warnings on startup**
+
+  A race condition with the analytics client could cause Bolt operations to fail or extraneous warnings to be printed during startup.
+
 ## 1.31.0
 
 #### Deprecations and removals

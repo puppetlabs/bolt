@@ -12,7 +12,6 @@ module BoltSpec
 
       # prevent tests from reading users config
       allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(Bolt::Boltdir.new(Dir.mktmpdir))
-
       allow(cli).to receive(:puppetdb_client).and_return(pdb_client)
 
       output =  StringIO.new
@@ -24,10 +23,10 @@ module BoltSpec
         begin
           opts = cli.parse
           cli.execute(opts)
-        # rubocop:disable HandleExceptions
+        # rubocop:disable Lint/HandleExceptions
         rescue Bolt::Error
         end
-        # rubocop:enable HandleExceptions
+        # rubocop:enable Lint/HandleExceptions
       else
         opts = cli.parse
         cli.execute(opts)

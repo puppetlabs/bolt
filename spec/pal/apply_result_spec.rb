@@ -5,6 +5,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/pal'
 
 require 'bolt/pal'
+require 'bolt/inventory'
 
 describe 'ApplyResult DataType' do
   include BoltSpec::Files
@@ -13,7 +14,7 @@ describe 'ApplyResult DataType' do
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:pal) { Bolt::PAL.new(modulepath, nil) }
+  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
   let(:result_code) do
     <<-PUPPET
 $result = results::make_apply_result('pcp://example.com', {'report' => {}})
@@ -22,7 +23,7 @@ PUPPET
 
   def result_attr(attr)
     code = result_code + attr
-    peval(code, pal)
+    peval(code, pal, nil, Bolt::Inventory.new({}))
   end
 
   it 'should expose target' do
