@@ -149,7 +149,7 @@ When using the SSH transport, Bolt also interacts with the ssh-agent for SSH key
 
 -   `file-protocol`: Which file transfer protocol to use. Either `winrm` or `smb`. Using `smb` is recommended for large file transfers. Default is `winrm`.
 
-**Note:** The SMB file protocol is experimental and is currently unsupported in conjunction with SSL, given that only SMB2 is currently implented.
+**Note:** The SMB file protocol is experimental and is currently unsupported in conjunction with SSL, given that only SMB2 is currently implemented.
 
 -   `password`: Login password. Required unless using Kerberos.
 
@@ -167,7 +167,7 @@ When using the SSH transport, Bolt also interacts with the ssh-agent for SSH key
 -   `user`: Login user. Required unless using Kerberos.
 
 
-**Note:** Kerberos client support is experimental and is only supported when running Bolt from a Linux node against a Windows node. In the future, you will be able to use Kerberos when running Bolt from a MacOS or Windows node.
+**Note:** Kerberos client support is experimental and is only supported when running Bolt from a Linux node against a Windows node. In the future, you will be able to use Kerberos when running Bolt from a macOS or Windows node.
 
 ## PCP transport configuration options
 
@@ -235,7 +235,6 @@ log:
   ~/.bolt/debug.log:
     level: debug
     append: false
-
 ```
 
 ## Puppetfile configuration options
@@ -268,6 +267,3 @@ plugin_hooks:
       master: 'puppet.example.com'
       cacert_content: <CERT>
 ```
-
-**Parent topic:**[Configuring Bolt](configuring_bolt.md)
-
