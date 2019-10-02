@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt_spec/plans/action_stubs'
+require 'bolt_spec/plans/publish_stub'
 require 'bolt/error'
 require 'bolt/result_set'
 require 'bolt/result'
@@ -25,6 +26,7 @@ module BoltSpec
         @allow_apply = false
         @modulepath = [modulepath].flatten.map { |path| File.absolute_path(path) }
         MOCKED_ACTIONS.each { |action| instance_variable_set(:"@#{action}_doubles", {}) }
+        @stub_out_message = nil
       end
 
       def module_file_id(file)
@@ -99,12 +101,17 @@ module BoltSpec
             doub.assert_called(object)
           end
         end
+        @stub_out_message.assert_called('out::message') if @stub_out_message
       end
 
       MOCKED_ACTIONS.each do |action|
         define_method(:"stub_#{action}") do |object|
           instance_variable_get(:"@#{action}_doubles")[object] ||= ActionDouble.new(:"#{action.capitalize}Stub")
         end
+      end
+
+      def stub_out_message
+        @stub_out_message ||= ActionDouble.new(:PublishStub)
       end
 
       def stub_apply
@@ -132,6 +139,16 @@ module BoltSpec
       def report_bundled_content(_mode, _name); end
 
       def report_apply(_statements, _resources); end
+
+      def publish_event(event)
+        if event[:type] == :message
+          unless @stub_out_message
+            @error_message = "Unexpected call to 'out::message(#{event[:message]})'"
+            raise UnexpectedInvocation, @error_message
+          end
+          @stub_out_message.process(event[:message])
+        end
+      end
 
       # Mocked for Apply so it does not compile and execute.
       def with_node_logging(_description, targets)
