@@ -220,7 +220,7 @@ describe "apply" do
             expect(result.count).to eq(1)
             expect(result[0]['status']).to eq('success')
             report = result[0]['result']['report']
-            expect(report['resource_statuses']).to include("Notify[Hello #{conn_info('ssh')[:host]}]")
+            expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
           end
         end
 
@@ -252,8 +252,7 @@ describe "apply" do
             expect(result.count).to eq(1)
             expect(result[0]['status']).to eq('success')
             report = result[0]['result']['report']
-            expect(report['resource_statuses']).to include("Notify[Hello #{conn_info('ssh')[:host]}]")
-
+            expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
             result = run_cli_json(%W[task run puppet_agent::version -i #{inv.path}] + config_flags)['items']
             expect(result.count).to eq(1)
             expect(result[0]).to include('status' => 'success')
@@ -268,7 +267,7 @@ describe "apply" do
         expect(result.count).to eq(1)
         expect(result[0]['status']).to eq('success')
         report = result[0]['result']['report']
-        expect(report['resource_statuses']).to include("Notify[Hello #{conn_info('ssh')[:host]}]")
+        expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
 
         # Includes agent facts from apply_prep
         agent_facts = report['resource_statuses']['Notify[agent facts]']['events'][0]['desired_value'].split("\n")
@@ -282,7 +281,7 @@ describe "apply" do
         expect(result.count).to eq(1)
         expect(result[0]['status']).to eq('success')
         report = result[0]['result']['report']
-        expect(report['resource_statuses']).to include("Notify[Hello #{conn_info('ssh')[:host]}]")
+        expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
       end
     end
 

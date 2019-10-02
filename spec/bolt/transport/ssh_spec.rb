@@ -32,6 +32,7 @@ describe Bolt::Transport::SSH do
   let(:bash_password) { 'test' }
   let(:port) { conn_info('ssh')[:port] }
   let(:host_and_port) { "#{hostname}:#{port}" }
+  let(:safe_name) { hostname.to_s }
   let(:key) { conn_info('ssh')[:key] }
   let(:command) { "pwd" }
   let(:config) { mk_config(user: user, password: password) }
@@ -371,7 +372,7 @@ describe Bolt::Transport::SSH do
         expect {
           ssh.run_script(target, file.path, [])
         }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{bash_user} was not provided for #{host_and_port}")
+                         "Sudo password for user #{bash_user} was not provided for #{safe_name}")
       end
     end
   end

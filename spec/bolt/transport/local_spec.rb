@@ -14,6 +14,7 @@ describe Bolt::Transport::Local do
   include BoltSpec::Transport
 
   let(:host_and_port) { "localhost" }
+  let(:safe_name) { host_and_port }
   let(:user) { 'travis' }
   let(:password) { 'travis' }
   let(:transport) { :local }

@@ -8,9 +8,9 @@ module Bolt
     class Docker < Base
       class Connection
         def initialize(target)
-          raise Bolt::ValidationError, "Target #{target.name} does not have a host" unless target.host
+          raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
           @target = target
-          @logger = Logging.logger[target.host]
+          @logger = Logging.logger[target.safe_name]
           @docker_host = @target.options['service-url']
         end
 
@@ -28,7 +28,7 @@ module Bolt
           true
         rescue StandardError => e
           raise Bolt::Node::ConnectError.new(
-            "Failed to connect to #{@target.uri}: #{e.message}",
+            "Failed to connect to #{@target.safe_name}: #{e.message}",
             'CONNECT_ERROR'
           )
         end
