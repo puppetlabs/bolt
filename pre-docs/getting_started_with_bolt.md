@@ -4,7 +4,7 @@ Using hands-on exercises, discover how Bolt can help you manage your infrastruct
 
 ## Hands-on lab
 
-For a step-by-step introduction to Bolt and to the Puppet Tasks ecosystem try out the [Bolt Hands On Lab](https://puppetlabs.github.io/bolt/).
+For a step-by-step introduction to Bolt and to the tasks ecosystem, try the [Bolt hands-on lab](https://puppetlabs.github.io/bolt/).
 
 ## Online training
 

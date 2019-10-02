@@ -2,19 +2,15 @@
 
 In Bolt, you can use an inventory file to store information about your nodes. For example, you can organize your nodes into groups or set up connection information for nodes or node groups.
 
-The inventory file is a yaml file stored by default at `inventory.yaml` inside
-the [Bolt project directory](bolt_project_directory.md). At the top level it
-contains an array of nodes and groups. Each node can have a config, facts,
-vars, and features specific to that node. Each group can have an array of nodes
-and a config hash. node. Each group can have an array of nodes, an array of
-child groups, and can set default config, vars, and features for the entire
-group.
+The inventory file is a yaml file stored by default at`inventory.yaml` inside the [Bolt project directory](bolt_project_directories.md#). At the top level it contains an array of nodes and groups. Each node can have a config, facts, vars, and features specific to that node. Each group can have an array of nodes, an array of child groups, and can set default config, vars, and features for the entire group.
 
 **Note:** Configuration values set at the top level of inventory will only apply to targets included in that inventory file. Set values for unknown targets in the Bolt configuration file.
 
 ## Inventory config
 
-You can only set transport configuration in the inventory file. This means using a top level `transport` value to assign a transport to the target and all values in the section named for the transport (`ssh`, `winrm`, `remote`, etc.). You can set config on nodes or groups in the inventory file. Bolt performs a depth first search of nodes, followed by a search of groups, and uses the first value it finds. Nested hashes are merged.
+You can set transport configuration only in the inventory file. This means using a top level `transport` value to assign a transport to the target and all values in the section named for the transport.
+
+You can set config on nodes or groups in the inventory file. Bolt performs a depth first search of nodes, followed by a search of groups, and uses the first value it finds. Nested hashes are merged.
 
 This inventory file example defines two top-level groups: `ssh_nodes` and `win_nodes`. The `ssh_nodes` group contains two other groups: `webservers` and `memcached`. Five nodes are configured to use ssh transport and four other nodes to use WinRM transport.
 
@@ -63,21 +59,21 @@ groups:
 
 ```
 
-### Override a user for a specific node
+## Override a user for a specific node
 
 ```
-nodes:
+nodes: 
   - name: linux1.example.com
-    config:
+    config: 
       ssh:
         user: me
 ```
 
-### Provide an alias to a node
+## Provide an alias to a node
 
-The inventory can be used to create aliases to refer to a target. This can be useful to refer to nodes with long or complicated names - `db.uswest.acme.example.com` - or for targets that include protocol and/or port for uniqueness - `127.0.0.1:2222` and `127.0.0.1:2223`. It can also be useful when generating nodes in a dynamic environment to give generated targets stable names to refer to.
+The inventory can be used to create aliases to refer to a target. Aliases can be useful to refer to nodes with long or complicated names, like db.uswest.acme.example.com, or for targets that include protocol or port for uniqueness, such as 127.0.0.1:2222 and 127.0.0.1:2223. Aliases can also be useful when generating nodes in a dynamic environment to give generated targets stable names to refer to.
 
-An alias can be a single name or list of names. Each alias must match the regex `/[a-zA-Z]\w+/`. When using Bolt, you may refer to a node by its alias anywhere the node name would be applicable, such as the `--nodes` command-line argument or a `TargetSpec`.
+An alias can be a single name or list of names. Each alias must match the regex`/[a-zA-Z]\w+/`. When usingBolt, you may refer to a node by its alias anywhere the node name would be applicable, such as the`--nodes` command line argument or a`TargetSpec`.
 
 ```
 nodes:
@@ -90,7 +86,8 @@ nodes:
 
 Aliases must be unique across the entire inventory. You can use the same alias multiple places, but they must all refer to the same target. Alias names must not match any group or target names used in the inventory.
 
-A list of nodes may refer to a node by its alias, as in:
+A list of nodes may refer to a node by its alias, for example:
+
 ```
 nodes:
   - linux1
@@ -149,7 +146,7 @@ The inventory file uses the following objects.
 
 -   **Facts**
 
-    A map of fact names and values. values may include arrays or nested maps.
+    A map of fact names and values. Values may include arrays or nested maps.
 
 -   **Feature**
 
@@ -170,15 +167,20 @@ The inventory file uses the following objects.
     ```
     name: "host1.example.com"
     config:
-      transport: "ssh"
+    					   transport: "ssh"
     ```
 
-    If the node entry is a map, it may contain any of:
-    - `alias` : `String` or `Array[String]`
-    - `config` : Config object
-    - `facts` : Facts object
-    - `vars` : Vars object
-    - `features` : `Array[Feature]`
+    If the node entry is a map, it may contain any of the following:
+
+    -   `alias` : `String` or `Array[String]`
+
+    -   `config` : Config object
+
+    -   `facts` : Facts object
+
+    -   `vars` : Vars object
+
+    -   `features` : `Array[Feature]`
 
 -   **Node name**
 
@@ -230,13 +232,11 @@ nodes:
           run-as: root
 ```
 
-## Remote Targets
+## Remote targets
 
-Configure a remote target. When using the remote transport the protocol of the
-node name does not have to map to the transport if you set the transport config
-option. This is useful if the target is an http API as in the following example.
+Configure a remote target. When using the remote transport, the protocol of the node name does not have to map to the transport if you set the transport config option. This is useful if the target is an http API, for example:
 
-```yaml
+```
 nodes:
   - host1.example.com
   - name: https://user1:secret@remote.example.com
@@ -245,15 +245,17 @@ nodes:
       remote:
         # The remote transport will use the host1.example.com target from
         # inventory to proxy tasks execution on.
-        run-on: host1.example.com
+        run-on: host1.example.com  
   # This will execute on localhost.
   - remote://my_aws_account
 ```
 
--   **[Generating inventory files](inventory_file_generating.md)**
+-   **[Inventory file version 2](inventory_file_v2.md#)**  
+Version 2 of the inventory file is experimental and might experience breaking changes in future releases.
+-   **[Generating inventory files](inventory_file_generating.md)**  
  Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries.
 
-**Related information**
+**Related information**  
 
 
 [Naming tasks](writing_tasks.md#)

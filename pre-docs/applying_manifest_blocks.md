@@ -6,10 +6,10 @@ Similar to the `puppet apply` command, which applies a standalone Puppet manifes
 
 **Tip:** If you installed Bolt as a Ruby gem, make sure you have installed the core modules required to use the `puppet apply` command. These modules are listed in the [Bolt GitHub repository](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)and you can install them using a Puppetfile.
 
-**Related information**
+**Related information**  
 
 
-[Set up Bolt to download and install modules](installing_tasks_from_the_forge.md#)
+[Configure Bolt to download and install modules](bolt_installing_modules.md#)
 
 [Puppetfile example](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)
 
@@ -25,7 +25,7 @@ Behind the scenes, Bolt compiles the code in your manifest block \(the code wrap
 
 -   Facts gathered from the targets or set in your inventory.
 -   Local variables in the plan, such as `$site_content.`
--    [ `Vars` ](inventory_file.md#title-1541705359297) set in your inventory.
+-   [`Vars`](inventory_file.md#title-1541705359297) set in your inventory.
 
 Like the code compiled with the `puppet apply` function, all the variables are generated. As a result, you can reuse code between Bolt and Puppet. Bolt then copies custom module content from the Bolt modulepath to the target nodes and applies the catalog using Puppet.
 
@@ -70,7 +70,7 @@ Use Hiera to separate configuration from context-specific data, where context ma
 
 **Note:** Only Hiera version 5 is supported in Bolt.
 
-Hiera is a built-in key-value configuration data lookup system, used for separating data from Puppet code. You use Hiera data to implicitly override default class parameters. You can also explicitly lookup data from Hiera via lookup, for example:
+Hiera is a key-value configuration data lookup system, used for separating data from Puppet code. You use Hiera data to implicitly override default class parameters. You can also explicitly lookup data from Hiera via lookup, for example:
 
 ```
 plan do_thing() {
@@ -86,7 +86,7 @@ Following the Hiera 5 convention, the default data dir is relative to `hiera.yam
 
 If a custom data provider is used \(such as `hiera-eyaml`, which allows you to encrypt your data\) the gem dependencies must be available to Bolt. See [Install gems with Bolt packages](bolt_installing.md#).
 
-**Related information**
+**Related information**  
 
 
 [Configuring Bolt](configuring_bolt.md)
@@ -95,16 +95,11 @@ If a custom data provider is used \(such as `hiera-eyaml`, which allows you to e
 
 In addition to the standard Puppet functions available to a catalog, such as `lookup`, you can use the following Bolt functions in a manifest block.
 
--    [puppetdb\_query](plan_functions.md#)
-
--    [puppetdb\_facts](plan_functions.md#)
-
--    [get\_targets](plan_functions.md#)
-
--    [facts](plan_functions.md#)
-
--    [vars](plan_functions.md#)
-
+-   [`puppetdb\_query`](plan_functions.md#)
+-   [`puppetdb\_facts`](plan_functions.md#)
+-   [`get\_targets`](plan_functions.md#)
+-   [`facts`](plan_functions.md#)
+-   [`vars`](plan_functions.md#)
 
 ## Manifest block limitations
 
@@ -121,7 +116,7 @@ In addition, the following top-level variables, which exist in normal catalog co
 
 You can optionally set these from a target's `vars`, but they don't have defaults in Bolt.
 
-**Related information**
+**Related information**  
 
 
 [puppetdb\_query](plan_functions.md#)
@@ -131,10 +126,13 @@ You can optionally set these from a target's `vars`, but they don't have default
 Create a manifest that sets up a web server with nginx, and run it as a plan.
 
 1.  Go to the `site-modules` directory in the default Bolt project directory: `~/.puppetlabs/bolt/site-modules`
+
 2.  Create a module named profiles.
+
     -   If you use the Puppet Development Kit: `pdk new module profiles`
     -   Otherwise create `~/.puppetlabs/bolt/site-modules/profiles`
 3.  Add a `plans` directory to the profiles module.
+
 4.  In the plans directory, create a manifest file called nginx\_install.pp and add the following code:
 
     ```
@@ -142,12 +140,12 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
          TargetSpec $nodes,
          String $site_content = 'hello!',
        ) {
-
+    
          # Install the puppet-agent package if Puppet is not detected.
          # Copy over custom facts from the Bolt modulepath.
          # Run the `facter` command line tool to gather node information.
          $nodes.apply_prep
-
+    
          # Compile the manifest block into a catalog
          apply($nodes) {
            if($facts['os']['family'] == 'redhat') {
@@ -159,16 +157,16 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
            } else {
              $html_dir = '/var/www/html'
            }
-
+    
            package {'nginx':
              ensure => present,
            }
-
+    
            file {"${html_dir}/index.html":
              content => $site_content,
              ensure  => file,
            }
-
+    
            service {'nginx':
              ensure  => 'running',
              enable  => 'true',
@@ -189,23 +187,31 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
     The page displays the text **hello!**
 
 
-**Tip:** For more complex web server deployments, consider adding the [puppet-nginx](https://forge.puppet.com/puppet/nginx) module.
+**Tip:** For complex web server deployments, consider adding the [puppet-nginx](https://forge.puppet.com/puppet/nginx) module.
 
-**Related information**
+**Related information**  
 
-[Bolt project directory](./bolt_project_directory.md)
+
 [NGINX](https://www.nginx.com/resources/glossary/nginx/)
+
+[Specify target nodes](bolt_options.md#)
+
+[Project directories](bolt_project_directories.md#)
 
 ## Create a sample manifest for IIS on Windows
 
 Create a manifest that sets up a web server with IIS and run it as a plan.
 
-1.  Go to the site-modules directory in the default Bolt project directory: `~/.puppetlabs/bolt/site-modules`
+1.  Go to the `site-modules` directory in the default Bolt project directory: `~/.puppetlabs/bolt/site-modules`
+
 2.  Create a module named profiles.
+
     -   If you use the Puppet Development Kit: `pdk new module profiles`
     -   Otherwise create `~/.puppetlabs/bolt/site-modules/profiles`
 3.  Add a `plans` directory to the profiles module.
+
 4.  Install the IIS dependencies.
+
     1.  Add the following code to `~/.puppetlabs/bolt/Puppetfile`
 
         ```
@@ -215,6 +221,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
         ```
 
     2.  Run `bolt puppetfile install`
+
 5.  In the plans directory, create a manifest file called iis\_install.pp and add the following code:
 
     ```
@@ -222,26 +229,26 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
          TargetSpec $nodes,
          String $site_content = 'hello!',
        ) {
-
-         # Install the puppet-agent package if Puppet is not detected.
+    
+         # Install the puppet-agent package if Puppet is not detected. 
          # Copy over custom facts from the Bolt modulepath.
          # Run the `facter` command line tool to gather node information.
          $nodes.apply_prep
-
+    
          # Compile the manifest block into a catalog
          return apply($nodes, '_catch_errors' => true) {
            $iis_features = ['Web-WebServer','Web-Scripting-Tools']
-
+    
            iis_feature { $iis_features:
              ensure => 'present',
            }
-
+    
            # Delete the default website to prevent a port binding conflict.
            iis_site {'Default Web Site':
              ensure  => absent,
              require => Iis_feature['Web-WebServer'],
            }
-
+    
            iis_site { 'minimal':
              ensure          => 'started',
              physicalpath    => 'c:\\inetpub\\minimal',
@@ -251,12 +258,12 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
                Iis_site['Default Web Site']
              ],
            }
-
+    
            file { 'minimal':
              ensure => 'directory',
              path   => 'c:\\inetpub\\minimal',
            }
-
+    
            file { 'content':
              ensure  => 'file',
              path    => 'c:\\inetpub\\minimal\\index.html',
@@ -276,23 +283,23 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 
     The page displays the text **hello!**
 
-**Related information**
 
-[Bolt project directory](./bolt_project_directory.md)
+**Related information**  
+
+
 [IIS](https://www.iis.net)
 
-## Using Puppet Device modules from an apply statement
+[Specify target nodes](bolt_options.md#)
 
-Puppet device modules based on remote transports allow network devices and
-other targets that cannot run a puppet agent to be managed from a proxy. 
+[Project directories](bolt_project_directories.md#)
 
-**Support for device modules is experimental and may experience breaking changes in y releases**
+## Using Puppet device modules from an apply statement
 
-To use device modules from an apply statements the devices need to be added to the
-bolt inventory as remote targets. The `name` of the target will be used to
-auto-populate the `name`, `uri`, `user`, `password`, `host`, and `port` fields
-of the remote transport's connnection info. You must set the `remote-transport`
-option and any other connnection info under the `remote` section of config.
+Puppet device modules based on remote transports allow network devices and other targets that can't run a Puppet agent to be managed from a proxy.
+
+**Note:** Support for device modules is experimental and might change in future minor \(y\) releases.
+
+To use device modules from an apply statement, the devices must be added to the Bolt inventory as remote targets. The `name` of the target will be used to auto-populate the `name`, `uri`, `user`, `password`, `host`, and `port` fields of the remote transport's connnection info. You must set the `remote-transport` option and any other connnection info under the `remote` section of config.
 
 ```
 ---
@@ -304,7 +311,5 @@ nodes:
         remote-transport: panos
 ```
 
-When you set the `run-on` option with a device module the puppet-resource_api
-gem must installed with the puppet agent on the proxy target must be at least
-version 1.8.1.
+When you set the `run-on` option with a device module, the puppet-resource\_api gem must be installed with the puppet agent on the proxy target and it must be version 1.8.1 or later.
 

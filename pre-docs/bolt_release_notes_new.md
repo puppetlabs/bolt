@@ -1,8 +1,12 @@
+---
+author: Jean Bond <jean@puppet.com\>
+---
+
 # Bolt release notes
 
 New features, enhancements, known issues, and resolved issues for the Bolt 1.x release series.
 
-Version 1.31.0 released September 2019.
+Version 1.31.1 released September 2019.
 
 -   **[Bolt versioning](bolt_versioning.md)**  
 Bolt follows semantic versioning guidelines.

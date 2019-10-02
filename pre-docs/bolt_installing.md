@@ -2,7 +2,7 @@
 
 Packaged versions of Bolt are available for many modern Linux distributions, as well as macOS and Windows.
 
-Have Questions? Get in touch. We're in `#bolt` on the [Puppet community Slack](https://slack.puppet.com/).
+Have questions? Get in touch. We're in \#bolt on the [Puppet community Slack](https://slack.puppet.com/).
 
 **Tip:** Bolt uses an internal version of Puppet that supports tasks and plans, so you do not need to install Puppet. If you use Bolt on a machine that has Puppet installed, then Bolt uses its internal version of Puppet and does not conflict with the Puppet version you have installed.
 
@@ -17,13 +17,17 @@ Use one of the supported Windows installation methods to install Bolt.
 Use the MSI installer package to install Bolt on Windows.
 
 1.  Download the Bolt installer package from [https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi](https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi).
+
 2.  Double-click the MSI file and run the installation.
+
 3.  Run a Bolt command and get started.
 
     ```
     bolt --help
     ```
 
+
+If you see an error message instead of the expected output, you probably need to follow one or both of the additional steps below. See [Add the Bolt module to PowerShell](bolt_installing.md#) and [Change execution policy restrictions](bolt_installing.md#).
 
 ### Install Bolt with Chocolatey
 
@@ -35,7 +39,6 @@ You must have the Chocolatey package manager installed.
 
     ```
     choco install puppet-bolt
-
     ```
 
 2.  Run a Bolt command and get started.
@@ -44,23 +47,54 @@ You must have the Chocolatey package manager installed.
     bolt --help
     ```
 
+
+If you see an error message instead of the expected output, you probably need to follow one or both of the additional steps below. See [Add the Bolt module to PowerShell](bolt_installing.md#) and [Change execution policy restrictions](bolt_installing.md#).
+
 ### Add the Bolt module to PowerShell
 
-PowerShell versions 2.0 and 3.0 cannot automatically discover and load the Bolt module, so you'll need to add it manually.
+PowerShell versions 2.0 and 3.0 cannot automatically discover and load the Bolt module, so you'll need to add it manually. Unless your system dates from 2013 or earlier, this situation probably does not apply to you. To confirm your version, run `echo $PSTableVersion` in PowerShell.
 
-To allow PowerShell to load Bolt, add the module to your PowerShell profile.
+To allow PowerShell to load Bolt, add the correct module to your PowerShell profile.
 
-1.  Run the following command to update your PowerShell profile:
+1.  Update your PowerShell profile.
+
     ```
     'Import-Module -Name ${Env:ProgramFiles}\WindowsPowerShell\Modules\PuppetBolt' | Out-File -Append $PROFILE
     ```
 
-2.  Re-source your profile to load the module in your current PowerShell window:
+2.  Load the module in your current PowerShell window.
+
     ```
     . $PROFILE
     ```
 
-Bolt will now automatically load every time you open PowerShell.
+
+### Change execution policy restrictions
+
+Some Windows installations have security restrictions that do not allow Bolt to run. These restrictions are easy to change, but check with your security team first.
+
+If you see this or a similar error when trying to run Bolt, you probably need to change your script execution policy restrictions, as described here.
+
+```
+bolt : The 'bolt' command was found in the module 'PuppetBolt', but the module could not be loaded. 
+For more information, run 'Import-Module PuppetBolt'.
+                At line:1 char:1
+                + bolt --help
+                + ~~~~
+                + CategoryInfo          : ObjectNotFound: (bolt:String) [], CommandNotFoundExceptio
+                n
+                + FullyQualifiedErrorId : CouldNotAutoloadMatchingModule
+```
+
+1.  Run PowerShell as an administrator.
+
+    Windows-X, a
+
+2.  Set your script execution policy to at least `RemoteSigned`.
+
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+
+    For more information about PowerShell execution policies, see Microsoft's documentation about [execution policies](http://go.microsoft.com/fwlink/?LinkID=135170) and [how to set them](https://msdn.microsoft.com/en-us/powershell/reference/5.1/microsoft.powershell.security/set-executionpolicy).
 
 
 ## Install Bolt on macOS
@@ -75,13 +109,12 @@ Use the Apple Disk Image \(DMG\) to install Bolt on macOS.
 
     **Tip:** To find the macOS version number on your Mac, go to the Apple \(\) menu in the corner of your screen and choose **About This Mac**.
 
-    -   10.11 \(El Capitan\) [https://downloads.puppet.com/mac/puppet6/10.11/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.11/x86_64/puppet-bolt-latest.dmg)
-    -   10.12 \(Sierra\) [https://downloads.puppet.com/mac/puppet6/10.12/x86\_64/puppet-bolt-latest.dmg](
-    https://downloads.puppet.com/mac/puppet6/10.12/x86_64/puppet-bolt-latest.dmg)
-    -   10.13 \(High Sierra\) [https://downloads.puppet.com/mac/puppet6/10.13/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg)
-    -   10.14 \(Mojave\) [https://downloads.puppet.com/mac/puppet6/10.14/x86\_64/puppet-bolt-latest.dmg](
-    https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg)
+    -   10.11 \(El Capitan\) [https://downloads.puppet.com/mac/puppet6/10.11/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.11/x86_64/puppet-bolt-latest.dmg)
+    -   10.12 \(Sierra\) [https://downloads.puppet.com/mac/puppet6/10.12/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.12/x86_64/puppet-bolt-latest.dmg)
+    -   10.13 \(High Sierra\) [https://downloads.puppet.com/mac/puppet6/10.13/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg)
+    -   10.14 \(Mojave\) [https://downloads.puppet.com/mac/puppet6/10.14/x86\_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg)
 2.  Double-click the `puppet-bolt-latest.dmg` file to mount it and then double-click the `puppet-bolt-[version]-installer.pkg` to run the installation.
+
 3.  Run a Bolt command and get started.
 
     ```
@@ -95,11 +128,11 @@ Use the package manager Homebrew to install Bolt on macOS.
 
 You must have the command line tools for macOS and the Homebrew package manager installed.
 
-1.  Download and install the bolt package.
+1.  Download and install the Bolt package.
 
     ```
     brew cask install puppetlabs/puppet/puppet-bolt
-
+    
     ```
 
 2.  Run a Bolt command and get started.
@@ -113,11 +146,9 @@ You must have the command line tools for macOS and the Homebrew package manager 
 
 Use one of the supported \*nix installation methods to install Bolt.
 
-**Warning:** These instructions describe enabling the Puppet Tools repository
-to install Bolt.  While Bolt can also be installed from the Puppet 6 or 5
-Platform repositories adding these repositories to a puppet managed node may
-result in an incompatible version of a package like puppet-agent being
-installed. That may cause downtime especially on a Puppet Enterprise Master.
+CAUTION:
+
+These instructions include enabling the Puppet Tools repository. While Bolt can also be installed from the Puppet 6 or 5 platform repositories, adding these repositories to a Puppet managed node, especially a PE master, might result in an unsupported version of a package like `puppet-agent` being installed. This can cause downtime, especially on a PE master.
 
 ### Install Bolt on Debian or Ubuntu
 
@@ -125,42 +156,51 @@ Packaged versions of Bolt are available for Debian 8 and 9 and Ubuntu 14.04, 16.
 
 The Puppet Tools repository for the APT package management system is [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the convention `puppet-tools-release-<VERSION CODE NAME>.deb`. For example, the release package for Puppet Tools on Debian 8 “Jessie” is `puppet-tools-release-jessie.deb`.
 
-1.   Download and install the software and its dependencies. Use the commands appropriate to your system.
-    -    Debian 8
+1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
+
+    -   Debian 8
 
         ```
         wget https://apt.puppet.com/puppet-tools-release-jessie.deb
         sudo dpkg -i puppet-tools-release-jessie.deb
-        sudo apt-get update
+        sudo apt-get update 
         sudo apt-get install puppet-bolt
-
+        
         ```
 
-    -    Debian 9
+    -   Debian 9
 
         ```
         wget https://apt.puppet.com/puppet-tools-release-stretch.deb
         sudo dpkg -i puppet-tools-release-stretch.deb
-        sudo apt-get update
+        sudo apt-get update 
         sudo apt-get install puppet-bolt
         ```
 
+    -   Ubuntu 14.04
 
-    -    Ubuntu 16.04
+        ```
+        wget https://apt.puppet.com/puppet-tools-release-trusty.deb
+        sudo dpkg -i puppet-tools-release-trusty.deb
+        sudo apt-get update 
+        sudo apt-get install puppet-bolt
+        ```
+
+    -   Ubuntu 16.04
 
         ```
         wget https://apt.puppet.com/puppet-tools-release-xenial.deb
         sudo dpkg -i puppet-tools-release-xenial.deb
-        sudo apt-get update
+        sudo apt-get update 
         sudo apt-get install puppet-bolt
         ```
 
-    -    Ubuntu 18.04
+    -   Ubuntu 18.04
 
         ```
         wget https://apt.puppet.com/puppet-tools-release-bionic.deb
         sudo dpkg -i puppet-tools-release-bionic.deb
-        sudo apt-get update
+        sudo apt-get update 
         sudo apt-get install puppet-bolt
         ```
 
@@ -175,30 +215,30 @@ The Puppet Tools repository for the APT package management system is [https://ap
 
 Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12, and Fedora 28 and 29.
 
-The Puppet Tools repository for the YUM package management system is [http://yum.puppet.com/puppet-tools/](http://yum.puppet.com/puppet-tools/) Packages are named using the convention `puppet-tools-release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet Tools on Linux 7 is `puppet-tools-release-el-7.noarch.rpm`.
+The Puppet Tools repository for the YUM package management system is [http://yum.puppet.com/puppet-tools/](http://yum.puppet.com/puppet-tools/). Packages are named using the convention `puppet-tools--release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet Tools on Linux 7 is `puppet-tools-release-el-7.noarch.rpm`.
 
 1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
-    -   Enterprise Linux 6
+
+    -   RHEL 6
 
         ```
         sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-el-6.noarch.rpm
-        sudo yum install puppet-bolt
+        sudo yum install puppet-bolt			
         ```
 
-    -   Enterprise Linux 7
+    -   RHEL 7
 
         ```
         sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-el-7.noarch.rpm
         sudo yum install puppet-bolt
         ```
 
-    -   Enterprise Linux 8
+    -   RHEL 8
 
         ```
         sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-el-8.noarch.rpm
         sudo yum install puppet-bolt
         ```
-
 
     -   SUSE Linux Enterprise Server 12
 
@@ -225,7 +265,7 @@ The Puppet Tools repository for the YUM package management system is [http://yum
 
         ```
         sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-30.noarch.rpm
-        sudo dnf install puppet-bolt
+                sudo dnf install puppet-bolt
         ```
 
 2.  Run a Bolt command and get started.
@@ -239,13 +279,13 @@ The Puppet Tools repository for the YUM package management system is [http://yum
 
 Bolt packages include their own copy of Ruby.
 
-When you install gems for use with Bolt, use the `--user-install` flag to avoid requiring privileged access for installation. This option also enables sharing gem content with Puppet installations — such as when running `apply` on `​localhost` — that use the same Ruby version.​
+When you install gems for use with Bolt, use the `--user-install` flag to avoid requiring privileged access for installation. This option also enables sharing gem content with Puppet installations — such as when running `apply` on `localhost` — that use the same Ruby version.
 
-To install a gem for use with Bolt, use the command appropriate to your operating system: 
+1.  To install a gem for use with Bolt, use the command appropriate to your operating system: 
 
--   On Windows with the default install location, `"C:/Program Files/Puppet Labs/Bolt/bin/gem.bat" install --user-install <gem>`
--   On other platforms, `/opt/puppetlabs/bolt/bin/gem install --user-install <gem>`
+    -   On Windows with the default install location, `"C:/Program Files/Puppet Labs/Bolt/bin/gem.bat" install --user-install <gem>`
 
+    -   On other platforms, `/opt/puppetlabs/bolt/bin/gem install --user-install <gem>`
 
 ## Install Bolt as a gem
 
@@ -253,27 +293,249 @@ Starting with Bolt 0.20.0, gem installations no longer include core task modules
 
 To install Bolt reliably and with all dependencies, use one of the Bolt installation packages instead of a gem.
 
+## Running Bolt from a Docker image
+
+Bolt is available on Docker Hub, as an image called `puppet-bolt`. There are a number of ways to run Bolt from a Docker image.
+
+### Downloading the image
+
+Docker Hub contains different versions of Bolt, with tags corresponding to Bolt system package and Rubygem versions. The newest version has a `latest` tag.
+
+You can download the latest image with this command:
+
+```
+docker pull puppet/puppet-bolt
+```
+
+### Running Bolt from a Docker image
+
+When running Bolt from a Docker image, Docker creates a container and executes the Bolt command within that container. Running Bolt in this way is simple:
+
+```
+$ docker run puppet/puppet-bolt command run 'cat /etc/os-release' -t localhost
+Started on localhost...
+Finished on localhost:
+  STDOUT:
+    NAME="Ubuntu"
+    VERSION="16.04.6 LTS (Xenial Xerus)"
+    ID=ubuntu
+    ID_LIKE=debian
+    PRETTY_NAME="Ubuntu 16.04.6 LTS"
+    VERSION_ID="16.04"
+    HOME_URL="http://www.ubuntu.com/"
+    SUPPORT_URL="http://help.ubuntu.com/"
+    BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
+    VERSION_CODENAME=xenial
+    UBUNTU_CODENAME=xenial
+Successful on 1 node: localhost
+Ran on 1 node in 0.00 seconds
+```
+
+As you can see from the above example, the `localhost` target is the *container* environment, not the *host* environment.
+
+Typically you would want to run Bolt not against the container environment, but against a different computer. To do this, you must pass information to the Bolt container about how to connect to the target computer. You might also want to pass the container some custom module content for Bolt to use. The next sections describe three different techniques for sharing this kind of information between the host and the Docker container.
+
+### Pass inventory as an environment variable
+
+If you only need to pass information on how to connect to target nodes, and not any custom module content, you can pass the inventory information by assigning it to an environment variable. This `inventory.yaml` file contains all the information needed for connecting to an example target node:
+
+```
+---
+nodes:
+  - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+    alias: docker-example
+    config:
+      transport: ssh
+      ssh:
+        user: root
+        password: secret-password
+        host-key-check: false
+```
+
+Here is an example of running the built-in `facts` task against the target listed in inventory. Note that the command passes the contents of the inventory file via an environment variable:
+
+```
+$ docker run --env "BOLT_INVENTORY=$(cat Boltdir/inventory.yaml)" \
+puppet/puppet-bolt task run facts -t docker-example
+Started on pnz2rzpxfzp95hh.delivery.puppetlabs.net...
+Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
+  {
+    "os": {
+      "name": "CentOS",
+      "release": {
+        "full": "7.2",
+        "major": "7",
+        "minor": "2"
+      },
+      "family": "RedHat"
+    }
+  }
+Successful on 1 node: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+Ran on 1 node in 0.55 seconds
+```
+
+### Mount the host's Bolt project directory
+
+Another way of passing information is to make your Bolt project directory \(Boltdir\) available to the container. Here is the directory structure of a typical Boltdir:
+
+```
+$ tree
+.
+└── Boltdir
+     ├── bolt.yaml
+     ├── inventory.yaml
+     ├── keys
+     │    └── id_rsa-acceptance
+     └── site-modules
+           └── docker_task
+                 └── tasks
+                       └── init.sh
+
+5 directories, 4 files
+```
+
+Here is sample content from relevant files in the Boltdir above.
+
+**bolt.yaml**
+
+This is a basic Bolt configuration file.
+
+```
+---
+log:
+  console:
+    level: notice
+```
+
+**inventory.yaml**
+
+This lists a target node, and connection information for that node.
+
+```
+---
+nodes:
+  - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+    alias: docker-example
+    config:
+      transport: ssh
+      ssh:
+        user: root
+        private-key: /Boltdir/keys/id_rsa-acceptance
+        host-key-check: false
+```
+
+**init.sh**
+
+This is a shell task that prints the contents of the `message` parameter.
+
+```
+#!/bin/bash
+echo "Message: ${PT_message}"
+```
+
+This command executes the Bolt task above within a Docker container, using a shared Boltdir to pass information to the container:
+
+```
+$ docker run --mount type=bind,source=/path/to/Boltdir,destination=/Boltdir \
+puppet/puppet-bolt task run docker_task message=hi -t docker-example
+Started on pnz2rzpxfzp95hh.delivery.puppetlabs.net...
+Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
+  Message: hi
+  {
+  }
+Successful on 1 node: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+Ran on 1 node in 0.56 seconds
+```
+
+The `--mount` flag maps the Bolt project directory on the Docker host to `/Boltdir` in the container. The container is tagged as `puppet-bolt` and the rest of the command is all native to Bolt.
+
+### Building on top of the puppet-bolt Docker image
+
+You can also extend the puppet-bolt image and copy in data that will always be available for that image.
+
+For example, create a file called `Dockerfile` in this location within your Boltdir:
+
+```
+$ tree
+    .
+    └── Boltdir
+          ├── bolt.yaml
+          ├── Dockerfile
+          ├── inventory.yaml
+          ├── keys
+          │    └── id_rsa-acceptance
+          └── site-modules
+                └── docker_task
+                      └── tasks
+                            └── init.sh
+    
+    5 directories, 5 files
+```
+
+Give the Dockerfile the following content:
+
+```
+FROM puppet/puppet-bolt
+COPY . /Boltdir
+```
+
+Now you can build a Docker image with your custom module content and tag it `my-extended-puppet-bolt` with this command:
+
+```
+$ docker build . -t my-extended-puppet-bolt
+Sending build context to Docker daemon  10.75kB
+Step 1/2 : FROM puppet-bolt
+ ---> 5d8d2c1166fc
+Step 2/2 : COPY . /Boltdir
+ ---> 03162d29a1ee
+Successfully built 03162d29a1ee
+Successfully tagged my-extended-puppet-bolt:latest
+```
+
+You can run that container with the custom module content and connection information available inside the container:
+
+```
+$ docker run my-extended-puppet-bolt task run docker_task message=hi -t docker-example
+Started on pnz2rzpxfzp95hh.delivery.puppetlabs.net...
+Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
+  Message: hi
+  {
+  }
+Successful on 1 node: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+Ran on 1 node in 0.56 seconds
+```
+
 ## Analytics data collection
 
 Bolt collects data about how you use it. You can opt out of providing this data.
 
 ### What data does Bolt collect?
 
-- Version of Bolt
-- The Bolt command executed \(for example, `bolt task run` or `bolt plan show`\), excluding arguments
-- The functions called from a plan, excluding arguments
-- User locale
-- Operating system and version
-- Transports used \(SSH, WinRM, PCP\) and number of targets
-- The number of nodes and groups defined in the Bolt inventory file
-- The number of nodes targeted with a Bolt command
-- The output format selected \(human-readable, JSON\) 
-- How the bolt project directory was determined \(ie from the location a `bolt.yaml` file or with the `--boltdir` flag.\)
-- The number of times Bolt tasks and plans are run \(This does not include user-defined tasks or plans.\)
-- Number of statements in an apply block, and how many resources that produces for each target.
-- Number of steps in a YAML plan
-- Return type (expression vs. value) of a YAML plan
-- Which bundled Bolt plugins are used \(This does not include user-installed plugins.\)
+-   Version of Bolt
+-   The Bolt command executed \(for example, `bolt task run` or `bolt plan show`\), excluding arguments
+-   The functions called from a plan, excluding arguments
+
+-   User locale
+-   Operating system and version
+-   Transports used \(SSH, WinRM, PCP\) and number of targets
+-   The number of nodes and groups defined in the Bolt inventory file
+
+-   The number of nodes targeted with a Bolt command
+
+-   The output format selected \(human-readable, JSON\)
+
+-   Whether the Bolt project directory was determined from the location of a `bolt.yaml` file or with the `--boltdir` flag
+
+-   The number of times Bolt tasks and plans are run \(This does not include user-defined tasks or plans.\)
+
+-   The number of statements in a manifest block, and how many resources that produces for each target
+
+-   The number of steps in a YAML plan
+
+-   The return type \(expression vs. value\) of a YAML plan
+
+-   Which bundled plugins Bolt is using \(not including user-installed plugins\)
+
 
 This data is associated with a random, non-identifiable user UUID.
 
@@ -285,7 +547,7 @@ Bolt collects data to help us understand how it's being used and make decisions 
 
 ### How can I opt out of Bolt data collection?
 
-To disable the collection of analytics data add the following line to `~/.puppetlabs/bolt/analytics.yaml` on Unix systems or ` %USERPROFILE%\.puppetlabs\bolt\analytics.yaml` on Windows:
+To disable the collection of analytics data add the following line to `~/.puppetlabs/bolt/analytics.yaml`:
 
 ```
 disabled: true
