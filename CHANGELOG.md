@@ -1,4 +1,4 @@
-## BOLT NEXT
+## 1.32.0
 
 #### Bug fixes
 
@@ -24,6 +24,10 @@
 * **Clear API for `Target`** ([#1125](https://github.com/puppetlabs/bolt/issues/1125))
 
   An updated `Target` API for creating and configuring bolt `Targets` during plan execution when using Inventory version 2 is now available.
+
+* **New stub for `out::message` available for `BoltSpec::Plans`** ([#1217](https://github.com/puppetlabs/bolt/pull/1217))
+
+  Plans that contain calls to `out::message` can now be tested with `BoltSpec::Plans`.
 
 ## 1.31.1
 
