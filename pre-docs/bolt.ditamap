@@ -4,6 +4,7 @@
     <topicref href="bolt.md" format="markdown"/>
         <topicref href="CHANGELOG.md" format="markdown"/>
         <topicref href="bolt_versioning.md" format="markdown"/>
+        <topicref href="../CHANGELOG.md" format="markdown"/>
         <topicref href="bolt_known_issues.md" format="markdown"/>
     <topicref href="bolt_installing.md" format="markdown"/>
     <topicref href="running_bolt.md" format="markdown"/>

@@ -178,7 +178,7 @@ A task can consist of a single executable with or without a corresponding metada
 
 A task can have multiple implementations, with metadata that explains when to use each one. A primary use case for this is to support different implementations for different target platforms, referred to as cross-platform tasks.
 
-A task can also have multiple implementations, with metadata that explains when to use each one. A primary use case for this is to support different implementations for different target platforms, referred to as `cross-platform tasks`. For instance, consider a module with the following files:
+For instance, consider a module with the following files:
 
 ```
 - tasks
@@ -343,7 +343,7 @@ params = JSON.parse(STDIN.read)
 require_relative File.join(params['_installdir'], 'multi_task', 'files', 'rb_helper.rb')
 # Alternatively use relative path
 # require_relative File.join(__dir__, '..', '..', 'multi_task', 'files', 'rb_helper.rb')
- puts useful_ruby.to_json
+puts useful_ruby.to_json
 ```
 
 **Output**
@@ -494,7 +494,7 @@ nodes:
     config:
       transport: remote
       remote:
-	token: <SLACK_API_TOKEN>
+        token: <SLACK_API_TOKEN>
 ```
 
 Finally, make `my_slack` a target that can run the `slack::message`:
