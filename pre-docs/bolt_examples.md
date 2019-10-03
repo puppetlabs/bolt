@@ -16,7 +16,7 @@ To show you how you can use Bolt to reuse your existing PowerShell scripts, this
 -   Ensure you have Windows credentials for the target node.
 -   Ensure you have [configured Windows Remote Management](https://docs.microsoft.com/en-us/windows/desktop/winrm/installation-and-configuration-for-windows-remote-management) on the target node.
 
-The example script, called [restart\_service.ps1](https://gist.github.com/RandomNoun7/03dfb910e5d93fefaae6e6c2da625c44#file-restart_service-ps1), performs common task of restarting a service on demand. The process involves these steps:
+The example script, called [restart_service.ps1](https://gist.github.com/RandomNoun7/03dfb910e5d93fefaae6e6c2da625c44#file-restart_service-ps1), performs common task of restarting a service on demand. The process involves these steps:
 
 1.  Run your PowerShell script on a target Windows node.
 1.  Create an inventory file to store information about the node.

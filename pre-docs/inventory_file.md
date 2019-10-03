@@ -95,7 +95,7 @@ nodes:
 
 ## Inventory facts, vars, and features
 
-In addition to config values you can store information relating to `facts`, `vars` and `features` for nodes in the inventory. `facts` represent observed information about the node including what can be collected by Facter. `vars` contain arbitrary data that may be passed to run\_\* functions or used for logic in plans. `features` represent capabilities of the target that can be used to select a specific task implementation.
+In addition to config values you can store information relating to `facts`, `vars` and `features` for nodes in the inventory. `facts` represent observed information about the node including what can be collected by Facter. `vars` contain arbitrary data that may be passed to `run_*` functions or used for logic in plans. `features` represent capabilities of the target that can be used to select a specific task implementation.
 
 ```yaml
 groups:

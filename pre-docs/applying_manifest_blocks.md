@@ -18,7 +18,7 @@ Similar to the `puppet apply` command, which applies a standalone Puppet manifes
 
 When you run a plan that contains a manifest block, the `apply_prep` function installs the packages necessary to run the Bolt `apply` command.
 
-The `apply_prep` function identifies the nodes that do not have Puppet agents and runs the `puppet_agent::install` task \(from the [puppet\_agent module](https://forge.puppet.com/puppetlabs/puppet_agent)\). It also copies over custom facts from the Bolt modulepath and runs [facter](https://puppet.com/docs/facter/latest/) on the target nodes.
+The `apply_prep` function identifies the nodes that do not have Puppet agents and runs the `puppet_agent::install` task \(from the [puppet_agent module](https://forge.puppet.com/puppetlabs/puppet_agent)\). It also copies over custom facts from the Bolt modulepath and runs [facter](https://puppet.com/docs/facter/latest/) on the target nodes.
 
 Behind the scenes, Bolt compiles the code in your manifest block \(the code wrapped in curly braces that follows the `apply` function\) into a catalog. Code is compiled in the following order:
 
@@ -89,9 +89,9 @@ If a custom data provider is used \(such as `hiera-eyaml`, which allows you to e
 
 In addition to the standard Puppet functions available to a catalog, such as `lookup`, you can use the following Bolt functions in a manifest block.
 
--   [`puppetdb\_query`](plan_functions.md#)
--   [`puppetdb\_facts`](plan_functions.md#)
--   [`get\_targets`](plan_functions.md#)
+-   [`puppetdb_query`](plan_functions.md#)
+-   [`puppetdb_facts`](plan_functions.md#)
+-   [`get_targets`](plan_functions.md#)
 -   [`facts`](plan_functions.md#)
 -   [`vars`](plan_functions.md#)
 
@@ -109,7 +109,7 @@ You can optionally set these from a target's `vars`, but they don't have default
 
 **Related information**  
 
-[puppetdb\_query](plan_functions.md#)
+[puppetdb_query](plan_functions.md#)
 
 ## Create a sample manifest for nginx on Linux
 
@@ -120,7 +120,7 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
     -   If you use the Puppet Development Kit: `pdk new module profiles`
     -   Otherwise create `~/.puppetlabs/bolt/site-modules/profiles`
 1.  Add a `plans` directory to the profiles module.
-1.  In the plans directory, create a manifest file called nginx\_install.pp and add the following code:
+1.  In the plans directory, create a manifest file called `nginx_install.pp` and add the following code:
     ```
     plan profiles::nginx_install(
          TargetSpec $nodes,
@@ -195,7 +195,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
         mod 'profiles', local: true
         ```
     1.  Run `bolt puppetfile install`
-1.  In the plans directory, create a manifest file called iis\_install.pp and add the following code:
+1.  In the plans directory, create a manifest file called `iis_install.pp` and add the following code:
     ```
     plan profiles::iis_install(
          TargetSpec $nodes,
