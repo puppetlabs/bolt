@@ -35,6 +35,3 @@ Interactive tools fail when run in a remote PowerShell session. For example, usi
 A license incompatibility with other components distributed with Bolt prevents authenticating with Kerberos over SSH using the net-ssh-krb gem. \([BOLT-980](https://tickets.puppetlabs.com/browse/BOLT-980)\)
 
 Support for Kerberos over WinRM from a Linux host is currently experimental and requires the [MIT Kerberos library](https://web.mit.edu/Kerberos/www/krb5-latest/doc/admin/install_clients.html) to be installed. In the future, Bolt will support Kerberos when running on Windows \([BOLT-1323](https://tickets.puppet.com/browse/BOLT-1323)\) and macOS \([BOLT-1471](https://tickets.puppet.com/browse/BOLT-1471)\).
-
-**Parent topic:**[Bolt release notes](bolt_release_notes.md)
-

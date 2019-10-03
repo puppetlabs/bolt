@@ -12,10 +12,9 @@ Bolt now tracks release notes about new features, bug fixes, and deprecation war
 
 ## Allow users to configure the `apply_prep()` plan function \(1.30.0\)
 
-Users can now configure how the Puppet agent gets installed when a plan calls the `apply_prep()` function. \([\#1123](https://github.com/puppetlabs/bolt/issues/1123)\)
+Users can now configure how the Puppet agent gets installed when a plan calls the `apply_prep` function. \([\#1123](https://github.com/puppetlabs/bolt/issues/1123)\)
 
 Users can configure two plugins:
-
 -   `install_agent`, which maintains the previous `apply_prep` behavior and is the default
 -   `task`, which allows users to use the `puppet_agent::install` task with non-default parameters, or else use their own task
 
@@ -33,7 +32,7 @@ Bolt automatically calls `apply_prep` on all target nodes before running any `re
 
 ## Publish Bolt images to Docker Hub \(1.28.0\)
 
-We now publish Bolt container images to the [Puppet Docker Hub](https://hub.docker.com/r/puppet/puppet-bolt) when new versions are released. \([BOLT-1407](https://tickets.puppetlabs.com/browse/BOLT-1407)\)
+We now publish Bolt container images to the [Puppet Docker Hub](https://hub.docker.com/r/puppet/puppet-bolt) when releasing new versions. \([BOLT-1407](https://tickets.puppetlabs.com/browse/BOLT-1407)\)
 
 ## AWS plugin has a new location for configuring information \(1.28.0\)
 
@@ -279,11 +278,8 @@ RSA keys stored in the OpenSSH format can now be used for authentication with th
 ## Support for new platforms \(1.11.0\)
 
 Bolt packages are now available for these platforms:
-
 -   Fedora 28 and 29 \( [BOLT-978](https://tickets.puppetlabs.com/browse/BOLT-978)\)
-
 -   macOS 10.14 Mojave \( [BOLT-1040](https://tickets.puppetlabs.com/browse/BOLT-1040)\)
-
 
 ## Hyphens allowed in aliases and group names \(1.10.0\)
 
@@ -300,17 +296,11 @@ Bolt now tries to connect to all configured PuppetDB`server_urls` before failing
 ## Standard library functions \(1.8.0\)
 
 Bolt now includes several standard library functions useful for writing plans, including:
-
 -   `ctrl::sleep`
-
 -   `ctrl::do_until`
-
 -   `file::read`
-
 -   `file::write`
-
 -   `system::env`
-
 
 See [Plan execution functions and standard libraries](plan_functions.md#) for details. \( [BOLT-1054](https://tickets.puppetlabs.com/browse/BOLT-1054)\)
 
@@ -408,13 +398,9 @@ Bolt includes the ability to share code between tasks. A task can include a list
 ## Upgraded WinRM gem dependencies \(1.1.0\)
 
 The following gem dependencies have been upgraded to fix the connection between OMI server on Linux and the WinRM transport:
-
 -   winrm 2.3.0
-
 -   winrm-fs 1.3.1
-
 -   json-schema 2.8.1
-
 
 \([BOLT-929](https://tickets.puppetlabs.com/browse/BOLT-929)\)
 
@@ -429,6 +415,3 @@ The `bolt file upload` command and `upload_file` action now upload directories. 
 ## Support for public-key signature system ed25519 \(1.1.0\)
 
 The ed25519 key type is now supported out-of-the-box in Bolt packages. \( [BOLT-380](https://tickets.puppetlabs.com/browse/BOLT-380)\)
-
-**Parent topic:**[Bolt release notes](bolt_release_notes.md)
-

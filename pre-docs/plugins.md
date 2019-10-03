@@ -40,6 +40,7 @@ hook name.
     }
   }
 }
+```
 
 In this case the plugin will implement two hooks the `resolve_reference` hook
 that is explicitly defined and the `secret_decrypt` hook that is discovered

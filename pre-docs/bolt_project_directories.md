@@ -4,8 +4,6 @@ Bolt runs in the context of a project directory or a `Boltdir`. This directory c
 
 The project directory structure makes it easy to share Bolt code by committing the project directory to Git. You can then check different repositories of Bolt code into different directories in order to manage various applications.
 
-**Parent topic:**[Configuring Bolt](configuring_bolt.md)
-
 ## Types of project directories
 
 There are three types of project directories that you can use depending on how you're using Bolt.
@@ -18,7 +16,7 @@ Bolt treats a directory containing a `bolt.yaml` file as a project directory. Us
 
 A project directory of this type has a structure like:
 
-```
+```console
 project/
 ├── Puppetfile
 ├── bolt.yaml
@@ -45,7 +43,7 @@ For example, you can store management code in the same repo as the application i
 
 A project with an embedded project directory has a structure like:
 
-```
+```console
 project/
 ├── Boltdir
 │   ├── Puppetfile
@@ -77,17 +75,9 @@ If Bolt can't find a project directory based on `Boltdir` or `bolt.yaml`, it use
 
 Bolt uses these methods, in order, to choose a project directory.
 
-1.  Manually specified
-
-    You can specify on the command line what directory Bolt to use with `--boltdir <DIRECTORY_PATH>`. There is not an equivalent configuration setting because the project directory must be known in order to load configuration.
-
-2.  Parent directory
-
-    Bolt traverses parents of the current directory until it finds a directory containing a `Boltdir` or `bolt.yaml`, or it reaches the root of the file system.
-
-3.  User project directory
-
-    If no directory is specified manually or found in a parent directory, the user project directory is used.
+1.  **Manually specified:** You can specify on the command line what directory Bolt to use with `--boltdir <DIRECTORY_PATH>`. There is not an equivalent configuration setting because the project directory must be known in order to load configuration.
+1.  **Parent directory:** Bolt traverses parents of the current directory until it finds a directory containing a `Boltdir` or `bolt.yaml`, or it reaches the root of the file system.
+1.  **User project directory:** If no directory is specified manually or found in a parent directory, the user project directory is used.
 
 
 ## Project directory structure
@@ -96,11 +86,10 @@ The default paths for all Bolt configuration, code, and data are relative to the
 
 |Directory|Description|
 |---------|-----------|
-|`[bolt.yaml](bolt_configuration_options.md)`|Contains configuration options for Bolt.|
+|[`bolt.yaml`](bolt_configuration_options.md)|Contains configuration options for Bolt.|
 |`hiera.yaml`|Contains the Hiera config to use for node-specific data when using `apply`.|
-|`[inventory.yaml](inventory_file.md)`|Contains a list of known targets and target specific data.|
-|`[Puppetfile](bolt_installing_modules.md#)`|Specifies which modules to install for the project.|
-|`[modules/](bolt_installing_modules.md#)`|The directory where modules from the `Puppetfile` are installed. In most cases, do not edit these modules locally.|
-|`[site-modules](writing_tasks_and_plans.md)`|Local modules that are edited and versioned with the project directory.|
+|[`inventory.yaml`](inventory_file.md)|Contains a list of known targets and target specific data.|
+|[`Puppetfile`](bolt_installing_modules.md#)|Specifies which modules to install for the project.|
+|[`modules/`](bolt_installing_modules.md#)|The directory where modules from the `Puppetfile` are installed. In most cases, do not edit these modules locally.|
+|[`site-modules`](writing_tasks_and_plans.md)|Local modules that are edited and versioned with the project directory.|
 |`data/`|The standard path to store static Hiera data files.|
-

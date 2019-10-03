@@ -6,10 +6,7 @@ Write plans in the Puppet language, giving them a `.pp` extension, and place the
 
 Plans can use any combination of [Bolt functions](plan_functions.md#) or [built-in Puppet functions](https://puppet.com/docs/puppet/6.1/function.html).
 
-**Parent topic:**[Tasks and plans](writing_tasks_and_plans.md)
-
 **Related information**  
-
 
 [Converting YAML plans to Puppet language plans](writing_yaml_plans.md#)
 
@@ -20,16 +17,13 @@ Plan names are named based on the filename of the plan, the name of the module c
 Place plan files in your module's `./plans` directory, using these file extensions:
 
 -   Puppet plans — `.pp`
-
 -   YAML plans — `.yaml`, not `.yml`
 
 
 Plan names are composed of two or more name segments, indicating:
 
 -   The name of the module the plan is located in.
-
 -   The name of the plan file, without the extension.
-
 -   The path within the module, if the plan is in a subdirectory of `./plans`.
 
 
@@ -42,15 +36,10 @@ Avoid giving plans the same names as constructs in the Puppet language. Although
 Each plan name segment must begin with a lowercase letter and:
 
 -   May include lowercase letters.
-
 -   May include digits.
-
 -   May include underscores.
-
 -   Must not be a [reserved word](https://docs.puppet.com/puppet/5.3/lang_reserved.html).
-
 -   Must not have the same name as any Puppet data types.
-
 -   Namespace segments must match the following regular expression `\A[a-z][a-z0-9_]*\Z`
 
 
@@ -82,7 +71,7 @@ plan mymodule::my_plan(
  }
 ```
 
-To execute this plan from the command line, pass the parameters as `parameter=value`. The `Targetspec` accepts either an array as json or a comma separated string of target names.
+To execute this plan from the command line, pass the parameters as `<PARAMETER>=<VALUE>`. The `Targetspec` accepts either an array as json or a comma separated string of target names.
 
 ```
 bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com webservers='["kermit.myorg.com","gonzo.myorg.com"]'
@@ -99,24 +88,24 @@ plan test::parameter_passing (
   Optional[String[1]] $example_nul = undef,
 ) {
   return run_task('test::demo_undef_bash', $nodes, example_nul => $example_nul)
-     }
+}
 ```
 
 The default value of `$example_nul` is `undef`. The plan calls the `test::demo_undef_bash` with the `example_nul` parameter. The implementation of the `demo_undef_bash.sh` task is:
 
-```
+```shell script
 #!/bin/bash
 example_env=$PT_example_nul
 echo "Environment: $PT_example_nul"
 echo "Stdin:" 
-     cat -
+cat -
 ```
 
 By default, the task expects parameters passed as a JSON string on stdin to be accessible in prefixed environment variables.
 
 Consider the output of running the plan against localhost:
 
-```
+```console
 bolt@bolt: bolt plan run test::parameter_passing -n localhost
 Starting: plan test::parameter_passing
 Starting: task test::demo_undef_bash on localhost
@@ -129,7 +118,7 @@ Finished on localhost:
   {
   }
 Successful on 1 node: localhost
-     Ran on 1 node
+Ran on 1 node
 ```
 
 The parameters `example_nul` and `_task` metadata are passed to the task as a JSON string over stdin.
@@ -137,7 +126,6 @@ The parameters `example_nul` and `_task` metadata are passed to the task as a JS
 Similarly, parameters are made available to the task as environment variables where the name of the parameter is converted to an environment variable prefixed with `PT_`. The prefixed environment variable points to the `String` representation in `JSON` format of the parameter value. So, the `PT_example_nul` environment variable has the value of `null` of type `String`.
 
 **Related information**  
-
 
 [Task metadata types](writing_tasks.md#)
 
@@ -193,8 +181,6 @@ plan mymodule::myplan {
   }
   fail_plan("Sorry, this plan does not work yet.", 'mymodule/error')
 }
-
-
 ```
 
 ## Success and failure in plans
@@ -220,11 +206,8 @@ Bolt includes a `catch_errors` function that executes a block of code and return
 The `Error` data type includes:
 
 -   `msg`: The error message string.
-
 -   `kind`: A string that defines the kind of error similar to an error class.
-
 -   `details`: A hash with details about the error from a task or from information about the state of a plan when it fails, for example, `exit_code` or `stack_trace`.
-
 -   `issue_code`: A unique code for the message that can be used for translation.
 
 
@@ -242,7 +225,6 @@ plan mymodule::handle_errors {
     Error : { fail_plan($result) } }
   run_plan('mymodule::plan2')
 }
-
 ```
 
 Using the `catch_errors` function:
@@ -272,34 +254,21 @@ This is useful for packaging common general logic in your plan. You can also cal
 Not all Puppet language constructs are allowed in plans. The following constructs are not allowed:
 
 -   Defined types.
-
 -   Classes.
-
 -   Resource expressions, such as `file { title: mode => '0777' }`
-
 -   Resource default expressions, such as `File { mode => '0666' }`
-
 -   Resource overrides, such as `File['/tmp/foo'] { mode => '0444' }`
-
 -   Relationship operators: `-> <- ~> <~`
-
 -   Functions that operate on a catalog: `include`, `require`, `contain`, `create_resources`.
-
 -   Collector expressions, such as `SomeType <| |>`, `SomeType <<| |>>`
-
 -   ERB templates are not supported. Use EPP instead.
-
 
 Be aware of a few other Puppet behaviors in plans:
 
 -   The `--strict_variables` option is on, so if you reference a variable that is not set, you get an error.
-
 -   `--strict=error` is always on, so minor language issues generate errors. For example `{ a => 10, a => 20 }` is an error because there is a duplicate key in the hash.
-
 -   Most Puppet settings are empty and not-configurable when using Bolt.
-
 -   Logs include "source location" \(file, line\) instead of resource type or name.
-
 
 ## Handling plan function results
 
@@ -310,59 +279,37 @@ Each [execution function](plan_functions.md#) returns an object type `ResultSet`
 A `ResultSet` has the following methods:
 
 -   `names()`: The `String` names \(node URIs\) of all nodes in the set as an `Array`.
-
 -   `empty()`: Returns `Boolean` if the execution result set is empty.
-
 -   `count()`: Returns an `Integer` count of nodes.
-
 -   `first()`: The first `Result` object, useful to unwrap single results.
-
 -   `find(String $target_name)`: Look up the `Result` for a specific target.
-
 -   `error_set()`: A `ResultSet`containing only the results of failed nodes.
-
 -   `ok_set()`: A `ResultSet` containing only the successful results.
-
 -   `filter_set(block)`: Filters a `ResultSet` with the given block and returns a `ResultSet` object \(where the [filter function](https://puppet.com/docs/puppet/latest/function.html#filter) returns an array or hash\).
-
 -   `targets()`: An array of all the `Target` objects from every `Result`in the set.
-
 -   `ok():` `Boolean` that is the same as `error_nodes.empty`.
-
 -   `to_data()`: An array of hashes representing either `Result` or `ApplyResults`.
 
 
 A `Result` has the following methods:
 
 -   `value()`: The hash containing the value of the `Result`.
-
 -   `target()`: The `Target` object that the `Result` is from.
-
 -   `error()`: An `Error` object constructed from the `_error` in the value.
-
 -   `message()`: The `_output` key from the value.
-
 -   `ok()`: Returns `true` if the `Result` was successful.
-
 -   `[]`: Accesses the value hash directly.
-
 -   `to_data()`: Hash representation of `Result`.
-
 -   `action()`: String representation of result type \(task, command, etc.\).
 
 
 An `ApplyResult` has the following methods:
 
 -   `report()`: The hash containing the Puppet report from the application.
-
 -   `target()`: The `Target` object that the `Result` is from.
-
 -   `error()`: An `Error` object constructed from the `_error` in the value.
-
 -   `ok()`: Returns `true` if the `Result` was successful.
-
 -   `to_data()`: Hash representation of `ApplyResult`.
-
 -   `action()`: String representation of result type \(apply\).
 
 
@@ -423,11 +370,9 @@ In Puppet you use the `Sensitive` function to mask data in output logs. Because 
 ```
 $pass = Sensitive('$ecret!')
 run_task('task_with_secrets', ..., password => $pass.unwrap)
-
 ```
 
 **Related information**  
-
 
 [Adding parameters to metadata](writing_tasks.md#)
 
@@ -464,7 +409,6 @@ plan vars(String $host) {
 	$targetvars = $target.vars
 	run_command("echo 'Vars for ${host}: ${$targetvars}'", $host)
 }
-
 ```
 
 Or set variables in the inventory file using the `vars` key at the group level.
@@ -494,7 +438,7 @@ This example collects facts with the facts plan and then uses those facts to dec
 
 ```
 plan run_with_facts(TargetSpec $nodes) {
-  # This collects facts on nodes and update the inventory
+  # This collects facts on nodes and updates the inventory
   run_plan(facts, nodes => $nodes)
 
   $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
@@ -537,7 +481,6 @@ plan pdb_discover {
 
 **Related information**  
 
-
 [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
 
 ## Plan logging
@@ -570,7 +513,6 @@ plan deploy( TargetSpec $nodes) {
     }
   }
 }
-
 ```
 
 To avoid complications with parser ambiguity, always call `without_default_logging` with `()` and empty block args `||`.
@@ -597,9 +539,8 @@ Check out some example plans for inspiration writing your own.
 |[reboot module](https://forge.puppet.com/puppetlabs/reboot)|Contains tasks and plans for managing system reboots.|Intermediate|
 |[reboot plan](https://github.com/puppetlabs/puppetlabs-reboot/blob/master/plans/init.pp)|Restarts a target system and waits for it to become available again.|Intermediate|
 |[Introducing Masterless Puppet with Bolt](https://puppet.com/blog/introducing-masterless-puppet-bolt)|Blog post explaining how plans can be used to deploy a load-balanced web server.|Advanced|
-|[profiles::nginx\_install plan](https://puppetlabs.github.io/bolt/lab/11-apply-manifest-code/)|Shows an example plan for deploying Nginx and HAProxy.|Advanced|
+|[profiles::nginx_install plan](https://puppetlabs.github.io/bolt/lab/11-apply-manifest-code/)|Shows an example plan for deploying Nginx and HAProxy.|Advanced|
 
 -   **Getting started** resources show simple use cases such as running a task and manipulating the results.
 -   **Intermediate** resources show more advanced features in the plan language.
 -   **Advanced** resources show more complex use cases such as applying puppet code blocks and using external modules.
-

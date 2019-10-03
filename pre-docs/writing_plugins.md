@@ -1,7 +1,3 @@
----
-author: Chris Cowell <christopher.w.cowell@gmail.com\>
----
-
 # Writing plugins
 
 Users can write plugins that live within a module.
@@ -12,7 +8,7 @@ Include your own plugins within a module by adding a `bolt_plugin.json` file to 
 
 Plugins can use configuration from the `bolt.yaml` file. To allow a plugin to be configured, add a `config` section to the `bolt_plugin.json` file. This section is similar to the `parameters` section in task metadata.
 
-```
+```json
 { 
   "config": {
     "key1": {
@@ -26,7 +22,7 @@ Plugins can use configuration from the `bolt.yaml` file. To allow a plugin to be
 
 A plugin can implement hooks as tasks. Bolt will search for tasks in a plugin module matching the hook name, such as `my_plugin::resolve_reference`. Alternatively, you can map hooks to tasks in the `hooks` section of `bolt_plugin.json`. The `hooks` section is a JSON object where the keys are hook names and the values are objects with a key of `task` and a value containing the name of a task to run. You only have to specify a hook mapping in the `hooks` section if the task name does not match the hook name.
 
-```
+```json
 {
   "hooks": {
     "resolve_reference": {
@@ -61,4 +57,3 @@ Bolt passes no parameters other than the metaparameters to a `createkeys` task. 
 **`puppet_library` tasks**
 
 Bolt uses a `puppet_library` plugin to make sure the Puppet library is available on a target when `apply_prep` is called.
-

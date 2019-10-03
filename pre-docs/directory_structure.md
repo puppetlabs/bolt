@@ -4,8 +4,6 @@ Puppet tasks, plans, functions, classes and types must exist inside a Puppet, mo
 
 By default, the `modulepath` includes the `modules/` and `site-modules` directories in the [Bolt project directory](bolt_project_directories.md#).
 
-**Parent topic:**[Tasks and plans](writing_tasks_and_plans.md)
-
 ## Directory structure of a module
 
 A module is a sub-directory of one of the directories on the modulepath. In order for Bolt to load tasks and plans, they must exist in the `tasks/` or `plans/` directory of a module with the correct name.
@@ -14,7 +12,7 @@ A module is a sub-directory of one of the directories on the modulepath. In orde
 
 A typical module for use with Bolt may contain these directories:
 
-```
+```console
 ├── data/
 ├── files/
 ├── hiera.yaml

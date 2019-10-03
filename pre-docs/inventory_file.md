@@ -10,11 +10,11 @@ The inventory file is a yaml file stored by default at`inventory.yaml` inside th
 
 You can set transport configuration only in the inventory file. This means using a top level `transport` value to assign a transport to the target and all values in the section named for the transport.
 
-You can set config on nodes or groups in the inventory file. Bolt performs a depth first search of nodes, followed by a search of groups, and uses the first value it finds. Nested hashes are merged.
+You can set config on nodes or groups in the inventory file. Bolt performs a depth-first search of nodes, followed by a search of groups, and uses the first value it finds. Nested hashes are merged.
 
 This inventory file example defines two top-level groups: `ssh_nodes` and `win_nodes`. The `ssh_nodes` group contains two other groups: `webservers` and `memcached`. Five nodes are configured to use ssh transport and four other nodes to use WinRM transport.
 
-```
+```yaml
 groups:
   - name: ssh_nodes
     groups:
@@ -61,7 +61,7 @@ groups:
 
 ## Override a user for a specific node
 
-```
+```yaml
 nodes: 
   - name: linux1.example.com
     config: 
@@ -73,9 +73,9 @@ nodes:
 
 The inventory can be used to create aliases to refer to a target. Aliases can be useful to refer to nodes with long or complicated names, like db.uswest.acme.example.com, or for targets that include protocol or port for uniqueness, such as 127.0.0.1:2222 and 127.0.0.1:2223. Aliases can also be useful when generating nodes in a dynamic environment to give generated targets stable names to refer to.
 
-An alias can be a single name or list of names. Each alias must match the regex`/[a-zA-Z]\w+/`. When usingBolt, you may refer to a node by its alias anywhere the node name would be applicable, such as the`--nodes` command line argument or a`TargetSpec`.
+An alias can be a single name or list of names. Each alias must match the regex`/[a-zA-Z]\w+/`. When using Bolt, you may refer to a node by its alias anywhere the node name would be applicable, such as the`--nodes` command line argument or a`TargetSpec`.
 
-```
+```yaml
 nodes:
   - name: linux1.example.com
     alias: linux1
@@ -88,7 +88,7 @@ Aliases must be unique across the entire inventory. You can use the same alias m
 
 A list of nodes may refer to a node by its alias, for example:
 
-```
+```yaml
 nodes:
   - linux1
 ```
@@ -97,7 +97,7 @@ nodes:
 
 In addition to config values you can store information relating to `facts`, `vars` and `features` for nodes in the inventory. `facts` represent observed information about the node including what can be collected by Facter. `vars` contain arbitrary data that may be passed to run\_\* functions or used for logic in plans. `features` represent capabilities of the target that can be used to select a specific task implementation.
 
-```
+```yaml
 groups:
   - name: centos_nodes
     nodes:
@@ -117,45 +117,23 @@ groups:
 
 The inventory file uses the following objects.
 
--   **Config**
-
-    A config is a map that contains transport specific configuration options.
-
--   **Group**
-
-    A group is a map that requires a `name` and can contain any of the following:
-
-    -   `nodes` : `Array[Node]`
-
-    -   `groups` : Groups object
-    -   `config` : Config object
-
-    -   `facts` : Facts object
-
-    -   `vars` : Vars object
-
-    -   `features` : `Array[Feature]`
+-   **Config:** a map that contains transport specific configuration options.
+-   **Group:**  a map that requires a `name` and can contain any of the following:
+    - `nodes` : `Array[Node]`
+    - `groups` : Groups object
+    - `config` : Config object
+    - `facts` : Facts object
+    - `vars` : Vars object
+    - `features` : `Array[Feature]`
 
     A group name must match the regular expression values `/[a-zA-Z]\w+/`. These are the same values used for environments.
 
     A group may contain other groups. Any nodes in the nested groups will also be in the parent group. The configuration of nested groups will override the parent group.
 
--   **Groups**
-
-    An array of group objects.
-
--   **Facts**
-
-    A map of fact names and values. Values may include arrays or nested maps.
-
--   **Feature**
-
-    A string describing a feature of the target.
-
--   **Node**
-
-    A node can be just the string of its node name or a map that requires a name key and can contain a config. For example, a node block can contain any of the following:
-
+- **Groups:** an array of group objects.
+- **Facts:** a map of fact names and values. Values may include arrays or nested maps.
+- **Feature:** a string describing a feature of the target.
+- **Node:** a node can be just the string of its node name or a map that requires a name key and can contain a config. For example, a node block can contain any of the following:
     ```
     "host1.example.com"
     ```
@@ -164,36 +142,22 @@ The inventory file uses the following objects.
     name: "host1.example.com"
     ```
 
-    ```
+    ```yaml
     name: "host1.example.com"
     config:
-    					   transport: "ssh"
+      transport: "ssh"
     ```
 
     If the node entry is a map, it may contain any of the following:
+    - `alias`: `String` or `Array[String]`
+    - `config`: Config object
+    - `facts`: Facts object
+    - `vars`: Vars object
+    - `features`: `Array[Feature]`
 
-    -   `alias` : `String` or `Array[String]`
-
-    -   `config` : Config object
-
-    -   `facts` : Facts object
-
-    -   `vars` : Vars object
-
-    -   `features` : `Array[Feature]`
-
--   **Node name**
-
-    The URI used to create the node.
-
--   **Nodes**
-
-    An array of node objects.
-
--   **Vars**
-
-    A map of value names and values. Values may include arrays or nested maps.
-
+- **Node name:** the URI used to create the node.
+- **Nodes:** an array of node objects.
+- **Vars:** a map of value names and values. Values may include arrays or nested maps.
 
 ## File format
 
@@ -205,7 +169,7 @@ When searching for node config, the URI used to create the target is matched to 
 
 Configure transport for nodes.
 
-```
+```yaml
 groups:
   - name: linux
     nodes:
@@ -223,7 +187,7 @@ groups:
 
 Configure login and escalation for a specific node.
 
-```
+```yaml
 nodes:
   - name: host1.example.com
     config:
@@ -236,7 +200,7 @@ nodes:
 
 Configure a remote target. When using the remote transport, the protocol of the node name does not have to map to the transport if you set the transport config option. This is useful if the target is an http API, for example:
 
-```
+```yaml
 nodes:
   - host1.example.com
   - name: https://user1:secret@remote.example.com
@@ -250,13 +214,11 @@ nodes:
   - remote://my_aws_account
 ```
 
--   **[Inventory file version 2](inventory_file_v2.md#)**  
+- **[Inventory file version 2](inventory_file_v2.md#)**  
 Version 2 of the inventory file is experimental and might experience breaking changes in future releases.
--   **[Generating inventory files](inventory_file_generating.md)**  
+- **[Generating inventory files](inventory_file_generating.md)**  
  Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries.
 
 **Related information**  
 
-
 [Naming tasks](writing_tasks.md#)
-

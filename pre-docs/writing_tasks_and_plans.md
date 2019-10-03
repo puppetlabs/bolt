@@ -30,4 +30,3 @@ Bolt tasks are similar to scripts, but they are kept in modules and can have met
 Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
 -   **[Writing plans in YAML](writing_yaml_plans.md#)**  
 YAML plans run a list of steps in order, which allows you to define simple workflows. Steps can contain embedded Puppet code expressions to add logic where necessary.
-
