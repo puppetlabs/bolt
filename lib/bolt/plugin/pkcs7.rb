@@ -39,7 +39,7 @@ module Bolt
 
       def private_key_path
         path = @options['private-key'] || 'keys/private_key.pkcs7.pem'
-        path = File.absolute_path(path, boltdir)
+        path = File.expand_path(path, boltdir)
         @logger.debug("Using private-key: #{path}")
         path
       end
@@ -50,7 +50,7 @@ module Bolt
 
       def public_key_path
         path = @options['public-key'] || 'keys/public_key.pkcs7.pem'
-        path = File.absolute_path(path, boltdir)
+        path = File.expand_path(path, boltdir)
         @logger.debug("Using public-key: #{path}")
         path
       end
