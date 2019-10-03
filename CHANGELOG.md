@@ -2,32 +2,31 @@
 
 #### Bug fixes
 
-* **A plan apply() incorrectly returns successful if the report is unparseable** ([#1241](https://github.com/puppetlabs/bolt/issues/1241))
+* **The plan function `apply` incorrectly returned successful if the report was unparseable** ([#1241](https://github.com/puppetlabs/bolt/issues/1241))
 
-  Unexpect results for the result of an `apply` are now treated as errors.
+  The plan function `apply` returns an error when it produces unexpected results.
 
-* **`interpreters` with spaces fail with the winrm transport** ([#1158](https://github.com/puppetlabs/bolt/issues/1158))
+* **Setting `interpreters` on the WinRM transport to a value containing spaces caused failures** ([#1158](https://github.com/puppetlabs/bolt/issues/1158))
 
-  When using the interpreters setting on the WinRM transport, a task would fail to execute if the path to the specified interpreter contains a space. Interpreter paths with spaces in the name are now supported.
+  The `interpreters` setting on the WinRM transport now supports spaces in the path to an interpreter.
 
 * **Resource Types were not registered while running plans** ([#1140](https://github.com/puppetlabs/bolt/issues/1140))
 
-  When referencing a resource type in a plan (for example `get_resources($nodes, Package)`) the plan would fail because the `Package` type is not found. Now all built in types and types on the modulepath can be generated with an invocation of `puppetfile generate-types` which will be registered for plan execution.
+  Running `puppetfile generate-types` will now generate all built-in types and types on the modulepath, and make those resource types available for plan execution.
   
 #### New features
 
 * **Azure inventory plugin** ([#1148](https://github.com/puppetlabs/bolt/issues/1148))
 
-  A new [module based plugin](https://github.com/puppetlabs/puppetlabs-azure_inventory) allows generation of Bolt targets from Azure VMs.
-
+  A new [module-based plugin](https://github.com/puppetlabs/puppetlabs-azure_inventory) allows the inventory file to generate Bolt targets from Azure VMs.
 
 * **Clear API for `Target`** ([#1125](https://github.com/puppetlabs/bolt/issues/1125))
 
-  An updated `Target` API for creating and configuring bolt `Targets` during plan execution when using Inventory version 2 is now available.
+  An updated `Target` API for creating and configuring Bolt `Targets` during plan execution with inventory version 2 is now available.
 
 * **New stub for `out::message` available for `BoltSpec::Plans`** ([#1217](https://github.com/puppetlabs/bolt/pull/1217))
 
-  Plans that contain calls to `out::message` can now be tested with `BoltSpec::Plans`.
+  Users can now use `BoltSpec::Plans` to test plans that contain calls to `out::message`.
 
 ## 1.31.1
 
