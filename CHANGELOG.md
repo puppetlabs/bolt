@@ -1,6 +1,8 @@
+# Changelog
+
 ## BOLT NEXT
 
-#### Bug fixes
+### Bug fixes
 
 * **A plan apply() incorrectly returns successful if the report is unparseable** ([#1241](https://github.com/puppetlabs/bolt/issues/1241))
 
@@ -14,7 +16,7 @@
 
   When referencing a resource type in a plan (for example `get_resources($nodes, Package)`) the plan would fail because the `Package` type is not found. Now all built in types and types on the modulepath can be generated with an invocation of `puppetfile generate-types` which will be registered for plan execution.
   
-#### New features
+### New features
 
 * **Azure inventory plugin** ([#1148](https://github.com/puppetlabs/bolt/issues/1148))
 
@@ -26,7 +28,7 @@
 
 ## 1.31.1
 
-#### Bug fixes
+### Bug fixes
 
 * **Spurious plan failures and warnings on startup**
 
@@ -34,13 +36,13 @@
 
 ## 1.31.0
 
-#### Deprecations and removals
+### Deprecations and removals
 
 * **WARNING**: Changes to `aws::ec2`, `pkcs7`, and `task` plugins.
 
   To improve consistency of plugin behavior, there are three changes to plugins. The `aws::ec2` plugin is now named `aws_inventory`. The `pkcs7` plugin now expects a field called `encrypted_value` rather than `encrypted-value`. The task plugin now expects tasks to return both Target lists and config data under the `value` key instead of the `targets` or `values` keys.
 
-#### Bug fixes
+### Bug fixes
 
 * **Tried to read `cacert` file when using WinRM without SSL** ([#1164](https://github.com/puppetlabs/bolt/issues/1164))
 
@@ -51,7 +53,7 @@
   The `token-file` and `cacert` file paths for the PCP transport, and the `cacert` file path for the WinRM transport all now support file expansion.
 
 
-#### New features
+### New features
 
 * **Plugins can ship with modules** \(1.31.0\)
 
@@ -60,11 +62,11 @@
 
 ## 1.30.1
 
-#### Deprecations and removals
+### Deprecations and removals
 
 * **WARNING**: Starting with this release the puppetlabs apt repo for trusty (Ubuntu 1404) no longer contains new puppet-bolt packages.
 
-#### Bug fixes
+### Bug fixes
 
 * **`apply` blocks would ignore the `_run_as` argument passed to
 their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167))
@@ -77,11 +79,11 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.30.0
 
-#### Deprecations and removals
+### Deprecations and removals
 
 * **WARNING**: Ubuntu 14.04 support will be dropped in the near future. Users can install Bolt from the Ubuntu 16.04 package.
 
-#### New features
+### New features
 
 * **Allow users to configure `apply_prep` plan function** ([#1123](https://github.com/puppetlabs/bolt/issues/1123))
 
@@ -94,7 +96,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Bolt now tracks release notes about new features, bug fixes, and deprecation warnings in a `CHANGELOG.md` file in the root of the repo. This file is updated per pull request. As the CHANGELOG file, I'd argue it's the best file in the whole repo.
 
-#### Bug fixes
+### Bug fixes
 
 * **`task show` and `plan show` modulepaths used incorrect file path separator** ([#1183](https://github.com/puppetlabs/bolt/issues/1183))
 
@@ -110,7 +112,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.29.1
 
-#### Bug fixes
+### Bug fixes
 
 * **Tasks with input method `stdin` hung with the `--tty` option** ([#1129](https://github.com/puppetlabs/bolt/issues/1129))
 
@@ -122,7 +124,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.29.0
 
-#### New features
+### New features
 
 * **Remote state files for Terraform inventory plugin**
 
@@ -132,7 +134,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The command reference documentation now shows a list of options available for each command, instead of having separate sections for commands and options. ([BOLT-1422](https://tickets.puppet.com/browse/BOLT-1422))
 
-#### Bug fixes
+### Bug fixes
 
 * **Using `--sudo-password` without `--run-as` raised a warning**
 
@@ -140,7 +142,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.28.0
 
-#### New features
+### New features
 
 * **YAML plans automatically call apply_prep before executing a resources step**
 
@@ -166,7 +168,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Bolt documentation explains what structures within a YAML plan can't fully convert into a Puppet language plan. ([BOLT-1286](https://tickets.puppet.com/browse/BOLT-1286))
 
-#### Bug fixes
+### Bug fixes
 
 * **Bolt actions hung over SSH when `ProxyCommand` is set in OpenSSH config**
 
@@ -174,7 +176,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.27.1
 
-#### Bug fixes
+### Bug fixes
 
 * **Calling `get_targets` in manifest blocks with inventory version 2 caused an exception**
 
@@ -186,7 +188,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.27.0
 
-#### New features
+### New features
 
 * **Use WinRM with Kerberos**
 
@@ -204,7 +206,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Bolt now sends an analytics event when it uses the built-in inventory plugins. ([BOLT-1410](https://tickets.puppet.com/browse/BOLT-1410))
 
-#### Bug fixes
+### Bug fixes
 
 * **Bolt debug output showed task and script arguments as Ruby hashes, not JSON**
 
@@ -216,7 +218,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.26.0
 
-#### New features
+### New features
 
 * **Options for PCP transport now configurable in `bolt.yaml`**
 
@@ -234,7 +236,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   YAML plans now support applying Puppet resources with a `resources` step. ([BOLT-1222](https://tickets.puppet.com/browse/BOLT-1222))
 
-#### Bug fixes
+### Bug fixes
 
 * **Modulepath now handles folder names in uppercase characters on Windows**
 
@@ -242,7 +244,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.25.0
 
-#### Bug fixes
+### Bug fixes
 
 * **`out::message` didn't work inside `without_default_logging`**
 
@@ -252,7 +254,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   When a task action stub expectation fails, the expected parameters are now properly displayed. ([BOLT-1399](https://tickets.puppet.com/browse/BOLT-1399))
 
-#### Deprecations and removals
+### Deprecations and removals
 
 * **lookups removed from target_lookups**
 
@@ -260,7 +262,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.24.0
 
-#### New features
+### New features
 
 * **Help text only lists options for a given command**
 
@@ -280,7 +282,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.23.0
 
-#### New features
+### New features
 
 * **`catch_errors` function**
 
@@ -290,7 +292,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The `puppetfile` config section now supports a Forge subsection that you can use to set an alternate Forge location from which to download modules. ([BOLT-1376](https://tickets.puppet.com/browse/BOLT-1376))
 
-#### Bug fixes
+### Bug fixes
 
 * **The `wait_until_available` function returned incorrect results using orchestrator**
 
@@ -302,7 +304,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.22.0
 
-#### New features
+### New features
 
 * **Proxy configuration**
 
@@ -322,7 +324,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.21.0
 
-#### New features
+### New features
 
 * **Set custom exec commands for Docker transport**
 
@@ -348,7 +350,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The PuppetDB plugin can now be used to look up configuration values from PuppetDB facts for the `name`, `uri`, and `config` inventory options for each target. ([BOLT-1264](https://tickets.puppet.com/browse/BOLT-1264))
 
-#### Deprecations and removals
+### Deprecations and removals
 
 * **Configuration location ~/.puppetlab/bolt.yaml**
 
@@ -356,7 +358,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.20.0
 
-#### New features
+### New features
 
 * **Terraform plugin in inventory v2**
 
@@ -370,7 +372,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The Bolt `apply` command and the `apply` function from plans now show log messages for changes and failures that happened while applying Puppet code. ([BOLT-901](https://tickets.puppet.com/browse/BOLT-901))
 
-#### Bug fixes
+### Bug fixes
 
 * **Inventory was loaded for commands that didn't use it**
 
@@ -382,7 +384,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.19.0
 
-#### New features
+### New features
 
 * **Convert YAML plans to Puppet plans**
 
@@ -394,7 +396,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.18.0
 
-#### New features
+### New features
 
 * **Inventory file version 2**
 
@@ -404,7 +406,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   YAML plan validation now alerts on syntax errors before plan execution. ([BOLT-1194](https://tickets.puppet.com/browse/BOLT-1194))
 
-#### Bug fixes
+### Bug fixes
 
 * **File upload stalled with local transport using run-as**
 
@@ -416,7 +418,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.17.0
 
-#### New features
+### New features
 
 * **Rerun failed commands**
 
@@ -426,7 +428,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Stored information may include passwords, so if you save passwords in URIs, set `save-failures: false` in your Bolt config file to avoid writing passwords to the `.rerun.json` file. ([BOLT-843](https://tickets.puppet.com/browse/BOLT-843))
 
-#### Bug fixes
+### Bug fixes
 
 * **SELinux management didn't work on localhost**
 
@@ -434,7 +436,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.16.0
 
-#### New features
+### New features
 
 * **Packaged hiera-eyaml Gem**
 
@@ -456,7 +458,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   If Bolt is compiling a catalog, `$facts['bolt']` is set to true, allowing you to determine whether modules are being used from a Bolt catalog. ([BOLT-1199](https://tickets.puppet.com/browse/BOLT-1199))
 
-#### Bug fixes
+### Bug fixes
 
 * **Linux implementation of the service and package tasks returned incorrect results**
 
@@ -464,7 +466,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.15.0
 
-#### New features
+### New features
 
 * **YAML plans**
 
@@ -492,7 +494,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   BoltSpec::Run now supports the upload_file action. ([BOLT-953](https://tickets.puppet.com/browse/BOLT-953))
 
-#### Bug fixes
+### Bug fixes
 
 * **Remote tasks could run on non-remote targets**
 
@@ -508,7 +510,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.14.0
 
-#### New features
+### New features
 
 * **Support for Puppet device modules in a manifest block**
 
@@ -520,7 +522,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.13.1
 
-#### Bug fixes
+### Bug fixes
 
 * **The \_run_as option was clobbered by configuration**
 
@@ -532,7 +534,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.13.0
 
-#### New features
+### New features
 
 * **SMB file transfer on Windows**
 
@@ -546,7 +548,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Clearer error messages now alert you when you use plan functions not meant to be called in manifest blocks. ([BOLT-1131](https://tickets.puppet.com/browse/BOLT-1131))
 
-#### Bug fixes
+### Bug fixes
 
 * **Ruby task helper symbolized only top-level parameter keys**
 
@@ -554,7 +556,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.12.0
 
-#### New features
+### New features
 
 * **Updated project directory structure**
 
@@ -568,7 +570,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   All BoltSpec::Run helpers now require the params or arguments argument to be passed. ([BOLT-1057](https://tickets.puppet.com/browse/BOLT-1057))
 
-#### Bug fixes
+### Bug fixes
 
 * **String segments in commands had to be triple-quoted in PowerShell**
 
@@ -576,7 +578,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.11.0
 
-#### New features
+### New features
 
 * **bolt task show displays module path**
 
@@ -594,7 +596,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Bolt packages are now available for Fedora 28 and 29 ([BOLT-978](https://tickets.puppet.com/browse/BOLT-978)), and macOS 10.14 Mojave ([BOLT-1040](https://tickets.puppet.com/browse/BOLT-1040))
 
-#### Bug fixes
+### Bug fixes
 
 * **Unsecured download of the puppet_agent::install task**
 
@@ -602,13 +604,13 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.10.0
 
-#### New features
+### New features
 
 * **Hyphens allowed in aliases and group names**
 
   Node aliases and group names in the Bolt inventory can now contain hyphens. ([BOLT-1022](https://tickets.puppet.com/browse/BOLT-1022))
 
-#### Bug fixes
+### Bug fixes
 
 * **Unsecured download of the puppet_agent::install_powershell task**
 
@@ -616,7 +618,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.9.0
 
-#### New features
+### New features
 
 * **Improved out-of-the-box tasks**
 
@@ -637,7 +639,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.8.1
 
-#### Bug fixes
+### Bug fixes
 
 * **Standard library functions weren't packaged in 1.8.0**
 
@@ -645,7 +647,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.8.0
 
-#### New features
+### New features
 
 * **Standard library functions**
 
@@ -658,7 +660,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   See Plan execution functions and standard libraries for details. ([BOLT-1054](https://tickets.puppet.com/browse/BOLT-1054))
 
-#### Bug fixes
+### Bug fixes
 
 * **puppet_agent::install task didn't match on Red Hat**
 
@@ -666,7 +668,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.7.0
 
-#### New features
+### New features
 
 * **Configure proxy SSH connections through jump hosts**
 
@@ -684,7 +686,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   You can now use shortened command options for modulepath (-m), inventoryfile (-i), and verbose (-v). ([BOLT-1047](https://tickets.puppet.com/browse/BOLT-1047))
 
-#### Bug fixes
+### Bug fixes
 
 * **Select module content missing from puppet-bolt package**
 
@@ -692,7 +694,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.6.0
 
-#### New features
+### New features
 
 * **Remote tasks**
 
@@ -722,7 +724,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.5.0
 
-#### New features
+### New features
 
 * **Node aliases**
 
@@ -734,7 +736,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.4.0
 
-#### New features
+### New features
 
 * **Bolt apply with orchestrator**
 
@@ -754,7 +756,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.3.0
 
-#### New features
+### New features
 
 * **Docker transport for running commands on containers**
 
@@ -764,7 +766,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   A new wait_until_available function waits until all targets are accepting connections, or triggers an error if the command times out. ([BOLT-956](https://tickets.puppet.com/browse/BOLT-956))
 
-#### Bug fixes
+### Bug fixes
 
 * **Plans with no return value weren't marked complete in PE**
 
@@ -775,7 +777,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.2.0
 
-#### New features
+### New features
 
 * **Apply Puppet manifest code with bolt apply command**
 
@@ -793,7 +795,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   When the Target object in a Bolt plan is printed, it includes only the host, user, port, and protocol used. The values for password and sudo-password are redacted. ([BOLT-944](https://tickets.puppet.com/browse/BOLT-944))
 
-#### Bug fixes
+### Bug fixes
 
 * **Task implementation not located relative to other files in installdir**
 
@@ -801,7 +803,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.1.0
 
-#### New features
+### New features
 
 * **Share code between tasks**
 
@@ -827,7 +829,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The ed25519 key type is now supported out-of-the-box in Bolt packages. ([BOLT-380](https://tickets.puppet.com/browse/BOLT-380))
 
-#### Bug fixes
+### Bug fixes
 
 * **Error when puppet_agent task not run as root**
 
@@ -839,7 +841,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 ## 1.0.0
 
-#### Bug fixes
+### Bug fixes
 
 * **Loading bolt/executor is "breaking" gettext setup in spec tests**
 

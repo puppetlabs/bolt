@@ -6,9 +6,9 @@ These subcommands, actions, and options are available for Bolt.
 
 These options are available for all subcommands and actions.
 
-|Option|Description|
-|------|-----------|
-|`-h`, `--help`|Display the help text.
+| Option | Description| 
+|--------|------------|
+|`-h`, `--help` | Display the help text.|
 |`--version`|Display the Bolt version.|
 |`--debug`|Display debug logging.|
 
@@ -30,8 +30,8 @@ You must specify one of `--nodes`, `--targets`, `--query`, or `--rerun`.
 |`-t`, `--targets TARGETS`|The target nodes to apply the manifest to.| |
 |`-q`, `--query QUERY`|Query PuppetDB to determine the target nodes. Enter a comma-separated list of target URIs or group names, or read a target list from an input file `@FILE` or stdin `-`| |
 |`--rerun FILTER`|Retry on nodes from the last run. `all` runs on all targets from the last run. `failure` runs on all targets that failed in the last run. `success` runs on all targets that succeeded in the last run.| |
-|`--noop`|Execute a task that supports it in noop mode.
-|`--description DESCRIPTION`|The description to use for the job.
+|`--noop`|Execute a task that supports it in noop mode. | |
+|`--description DESCRIPTION`|The description to use for the job. | |
 |`-e`, `--execute CODE`|Puppet manifest code to apply to the targets.| |
 |**Authentication**| | |
 |`-u`, `--user USER`|User to authenticate as.| |
@@ -202,7 +202,7 @@ Run a Puppet task plan on remote targets.
 
 **Usage**
 
-bolt plan run <PLAN\> <TARGETS\>
+`bolt plan run <PLAN\> <TARGETS\>`
 
 Plan parameters are of the form `parameter=value`.
 

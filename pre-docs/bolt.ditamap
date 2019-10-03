@@ -2,8 +2,7 @@
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
 <map id="boltmap" title="Bolt">
     <topicref href="bolt.md" format="markdown"/>
-    <topicref href="bolt_release_notes.md" format="markdown"/>
-        <topicref href="../CHANGELOG.md" format="markdown"/>
+        <topicref href="CHANGELOG.md" format="markdown"/>
         <topicref href="bolt_versioning.md" format="markdown"/>
         <topicref href="bolt_known_issues.md" format="markdown"/>
     <topicref href="bolt_installing.md" format="markdown"/>
@@ -26,13 +25,13 @@
         <topicref href="writing_yaml_plans.md" format="markdown"/>
     <topicref href="configuring_bolt.md" format="markdown"/>
         <topicref href="bolt_project_directories.md" format="markdown"/>
-        <topicref href="bolt_configuration_options.md"/>
-        <topicref href="bolt_configure_orchestrator.md"/>
-        <topicref href="bolt_connect_puppetdb.md"/>
-    <topicref href="inventory_file.md"/>
-        <topicref href="inventory_file_v2.md">
-        <topicref href="inventory_file_generating.md"/>
-            <topicref href="using_plugins.md"/>
-            <topicref href="writing_plugins.md"/>
-    <topicref href="bolt_examples.md"/>
+    <topicref href="bolt_configuration_options.md" format="markdown"/>
+    <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
+    <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
+    <topicref href="inventory_file.md" format="markdown"/>
+    <topicref href="inventory_file_v2.md" format="markdown">
+        <topicref href="inventory_file_generating.md" format="markdown"/>
+        <topicref href="using_plugins.md" format="markdown"/>
+        <topicref href="writing_plugins.md" format="markdown"/>
+        <topicref href="bolt_examples.md" format="markdown"/>
 </topicref></map>
