@@ -73,7 +73,7 @@ nodes:
 
 The inventory can be used to create aliases to refer to a target. Aliases can be useful to refer to nodes with long or complicated names, like db.uswest.acme.example.com, or for targets that include protocol or port for uniqueness, such as 127.0.0.1:2222 and 127.0.0.1:2223. Aliases can also be useful when generating nodes in a dynamic environment to give generated targets stable names to refer to.
 
-An alias can be a single name or list of names. Each alias must match the regex`/[a-zA-Z]\w+/`. When using Bolt, you may refer to a node by its alias anywhere the node name would be applicable, such as the`--nodes` command line argument or a`TargetSpec`.
+An alias can be a single name or list of names. Each alias must match the regex`/[a-zA-Z]\w+/`. When using Bolt, you may refer to a node by its alias anywhere the node name would be applicable, such as the`--nodes` command line argument or a `TargetSpec`.
 
 ```yaml
 nodes:
