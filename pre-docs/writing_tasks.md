@@ -360,7 +360,7 @@ Ran on 1 node in 0.12 seconds
 
 ### Task helpers
 
-To help with writing tasks, Bolt includes [python\_task\_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) and [ruby\_task\_helper](https://github.com/puppetlabs/puppetlabs-ruby_task_helper). It also makes a useful demonstration of including code from another module.
+To help with writing tasks, Bolt includes [python_task_helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) and [ruby_task_helper](https://github.com/puppetlabs/puppetlabs-ruby_task_helper). It also makes a useful demonstration of including code from another module.
 
 ### Python example
 
@@ -898,10 +898,10 @@ The following table shows task metadata keys, values, and default values.
 |Metadata key|Description|Value|Default|
 |------------|-----------|-----|-------|
 |"description"|A description of what the task does.|String|None|
-|"input\_method"|What input method the task runner uses to pass parameters to the task.|-   `environment`<br/>- `stdin`<br/>- `powershell`|Both `environment` and `stdin` unless `.ps1` tasks, in which case `powershell`|
+|"input_method"|What input method the task runner uses to pass parameters to the task.|-   `environment`<br/>- `stdin`<br/>- `powershell`|Both `environment` and `stdin` unless `.ps1` tasks, in which case `powershell`|
 |"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.|Array of objects describing each parameter|None|
-|"puppet\_task\_version"|The version of the spec used.|Integer|`1` \(This is the only valid value.\)|
-|"supports\_noop"|Whether the task supports no-op mode. Required for the task to accept the `--noop` option on the command line.|Boolean|`false`|
+|"puppet_task_version"|The version of the spec used.|Integer|`1` \(This is the only valid value.\)|
+|"supports_noop"|Whether the task supports no-op mode. Required for the task to accept the `--noop` option on the command line.|Boolean|`false`|
 |"implementations"|A list of task implementations and the requirements used to select one to run. See [Cross-platform tasks](writing_tasks.md#) for usage information.|Array of Objects describing each implementation|None|
 |"files"|A list of files to be provided when running the task, addressed by module. See [Sharing task code](writing_tasks.md#) for usage information.|Array of Strings|None|
 |"private"|Do not display task by default when listing for UI.|Boolean|`false`|

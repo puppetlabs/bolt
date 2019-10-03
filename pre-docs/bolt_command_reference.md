@@ -202,7 +202,7 @@ Run a Puppet task plan on remote targets.
 
 **Usage**
 
-`bolt plan run <PLAN\> <TARGETS\>`
+`bolt plan run <PLAN> <TARGETS>`
 
 Plan parameters are of the form `parameter=value`.
 

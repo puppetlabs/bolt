@@ -14,38 +14,38 @@ This list of packaged modules is available in a [Puppetfile](https://github.com/
 
 -   [package](https://forge.puppet.com/puppetlabs/package): Install, uninstall, update, and check the status of packages.
 -   [service](https://forge.puppet.com/puppetlabs/service): Manage and inspect the state of services.
--   [puppet\_conf](https://forge.puppet.com/puppetlabs/puppet_conf): Inspect and change the configuration options in the `puppet.conf` file.
+-   [puppet_conf](https://forge.puppet.com/puppetlabs/puppet_conf): Inspect and change the configuration options in the `puppet.conf` file.
 -   [facts](https://forge.puppet.com/puppetlabs/facts): Retrieve facts from specified nodes.
--   [puppet\_agent](https://forge.puppet.com/puppetlabs/puppet_agent): Install Puppet Agent package.
+-   [puppet_agent](https://forge.puppet.com/puppetlabs/puppet_agent): Install Puppet Agent package.
 -   [reboot](https://forge.puppet.com/puppetlabs/reboot): Manage system reboots.
 
 
 ### Core Puppet providers
 
--   [augeas\_core](https://forge.puppet.com/puppetlabs/augeas_core): Manage configuration files using Augeas.
--   [host\_core](https://forge.puppet.com/puppetlabs/host_core): Manage host entries in a hosts file.
--   [scheduled\_task](https://forge.puppet.com/puppetlabs/scheduled_task): Provider capable of using the Version 2 Windows API for task management.
--   [sshkeys\_core](https://forge.puppet.com/puppetlabs/sshkeys_core): Manage `SSH`, `authorized_keys`, and `ssh_known_hosts` files.
--   [zfs\_core](https://forge.puppet.com/puppetlabs/zfs_core): Manage `zfs` and `zpool` resources.
--   [cron\_core](https://forge.puppet.com/puppetlabs/cron_core): Install and manage `cron` resources.
--   [mount\_core](https://forge.puppet.com/puppetlabs/mount_core): Manage mounted filesystems and mount tables.
--   [selinux\_core](https://forge.puppet.com/puppetlabs/selinux_core): Manage Security-Enhanced Linux.
--   [yumrepo\_core](https://forge.puppet.com/puppetlabs/yumrepo_core): Manage client yum repo configurations by parsing INI configuration files.
--   [zone\_core](https://forge.puppet.com/puppetlabs/zone_core): Manage Solaris zone resources.
+-   [augeas_core](https://forge.puppet.com/puppetlabs/augeas_core): Manage configuration files using Augeas.
+-   [host_core](https://forge.puppet.com/puppetlabs/host_core): Manage host entries in a hosts file.
+-   [scheduled_task](https://forge.puppet.com/puppetlabs/scheduled_task): Provider capable of using the Version 2 Windows API for task management.
+-   [sshkeys_core](https://forge.puppet.com/puppetlabs/sshkeys_core): Manage `SSH`, `authorized_keys`, and `ssh_known_hosts` files.
+-   [zfs_core](https://forge.puppet.com/puppetlabs/zfs_core): Manage `zfs` and `zpool` resources.
+-   [cron_core](https://forge.puppet.com/puppetlabs/cron_core): Install and manage `cron` resources.
+-   [mount_core](https://forge.puppet.com/puppetlabs/mount_core): Manage mounted filesystems and mount tables.
+-   [selinux_core](https://forge.puppet.com/puppetlabs/selinux_core): Manage Security-Enhanced Linux.
+-   [yumrepo_core](https://forge.puppet.com/puppetlabs/yumrepo_core): Manage client yum repo configurations by parsing INI configuration files.
+-   [zone_core](https://forge.puppet.com/puppetlabs/zone_core): Manage Solaris zone resources.
 
 
 ### Bolt-specific modules that are not available on the Forge
 
 -   [aggregate](https://github.com/puppetlabs/bolt/tree/master/modules/aggregate): Aggregate task, script or command results.
 -   [canary](https://github.com/puppetlabs/bolt/tree/master/modules/canary): Run action against a small number of nodes and only if it succeeds will it run on the rest.
--   [puppetdb\_fact](https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb_fact): Collect facts for the specified nodes from the configured PuppetDB connection and stores the collected facts on the targets.
+-   [puppetdb_fact](https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb_fact): Collect facts for the specified nodes from the configured PuppetDB connection and stores the collected facts on the targets.
 
 **Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
 
 ### Modules that contain helper code for writing your own tasks
 
--   [ruby\_task\_helper](https://forge.puppet.com/puppetlabs/ruby_task_helper): A helper for writing tasks in Ruby.
--   [python\_task\_helper](https://forge.puppet.com/puppetlabs/python_task_helper): A helper for writing tasks in Python.
+-   [ruby_task_helper](https://forge.puppet.com/puppetlabs/ruby_task_helper): A helper for writing tasks in Ruby.
+-   [python_task_helper](https://forge.puppet.com/puppetlabs/python_task_helper): A helper for writing tasks in Python.
 
 **Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
 

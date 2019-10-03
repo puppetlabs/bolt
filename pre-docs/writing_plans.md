@@ -449,7 +449,7 @@ When targets are running a Puppet agent and sending facts to PuppetDB, you can u
 ```
 plan run_with_facts(TargetSpec $nodes) {
   # This collects facts on nodes and update the inventory
-  run_plan(**puppetdb\_fact**, nodes => $nodes)
+  run_plan(**puppetdb_fact**, nodes => $nodes)
 
   $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
   $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'Ubuntu' }

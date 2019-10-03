@@ -10,11 +10,11 @@ Version 2 of the inventory file changes some terms and syntax. To convert to ver
 
 The default version for inventory files is version 1. In order to have Bolt treat your inventory file as a version 2 inventory, specify `version: 2` at the top level.
 
-**`nodes` =\> `targets`**
+**`nodes` => `targets`**
 
 In order to standardize terminology across Bolt and capture the breadth of possible targets, such as web services, version 2 of the inventory file uses the `targets` section of a group to specify its members instead of `nodes`.
 
-**`name` =\> `uri`**
+**`name` => `uri`**
 
 Changing the `name` key to `uri` results in an inventory file that matches the behavior of version 1.
 
@@ -338,7 +338,7 @@ groups:
           version: 6.2.0
 ```
 
-**`site-modules/custom\_agent/tasks/install.sh`**
+**`site-modules/custom_agent/tasks/install.sh`**
 
 ```shell script
 #!/bin/sh
@@ -449,7 +449,7 @@ groups:
         uri: public_ip
 ```
 
-Multiple resources with the same name are identified as <resource\>.0, <resource\>.1, etc.
+Multiple resources with the same name are identified as <resource>.0, <resource>.1, etc.
 
 The path to nested properties must be separated with `.`: for example, `network_interface.0.access_config.0.nat_ip`.
 
@@ -800,7 +800,7 @@ groups:
 
 ## Inventory facts, vars, and features
 
-In addition to config values you can store information relating to `facts`, `vars` and `features` for targets in the inventory. `facts` represent observed information about the target including what can be collected by Facter. `vars` contain arbitrary data that may be passed to run\\\_\\\* functions or used for logic in plans. `features` represent capabilities of the target that can be used to select a specific task implementation.
+In addition to config values you can store information relating to `facts`, `vars` and `features` for targets in the inventory. `facts` represent observed information about the target including what can be collected by Facter. `vars` contain arbitrary data that may be passed to `run_*` functions or used for logic in plans. `features` represent capabilities of the target that can be used to select a specific task implementation.
 
 ```yaml
 groups:
@@ -815,7 +815,6 @@ groups:
     vars:
       environment: production
     features: ['puppet-agent']
-
 ```
 
 ## Objects

@@ -63,12 +63,12 @@ To specify nodes from an inventory file, reference nodes by node name, a glob ma
     ```
     --nodes elastic_search,web_app
     ```
--   To match all the nodes that start with elasticsearch in the inventory file example:
+-   To match all the nodes that start with "elasticsearch" in the inventory file example:
     ```
     --nodes 'elasticsearch*' 
     ```
 
-This inventory file defines two top-level groups: elastic\_search and web\_app.
+This inventory file defines two top-level groups: elastic_search and web_app.
 ```yaml
 groups:
   - name: elastic_search
@@ -82,7 +82,6 @@ groups:
       - web6.mydomain.edu
       - web7.mydomain.edu
 ```
-
 
 **Related information**  
 
