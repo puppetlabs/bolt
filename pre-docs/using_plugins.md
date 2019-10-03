@@ -112,7 +112,8 @@ To use for targets the task `value` must return an array of target objects in th
 This task looks up a password value from a secret database and returns it.
 
 ```
-#!/usr/bin/env pythonimport json, sys
+#!/usr/bin/env python
+import json, sys
 from my_secret import Client
 
 params = json.load(sys.stdin)
@@ -263,9 +264,9 @@ google_compute_instance.app.1:
   zone = us-west1-a
 ```
 
-## AWS EC2 plugin
+## AWS Inventory plugin
 
-The AWS EC2 plugin supports looking up running AWS EC2 instances. It supports several fields:
+The AWS Inventory plugin supports looking up running AWS EC2 instances. It supports several fields:
 
 -   `profile`: The [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to use when loading from AWS `config` and `credentials` files. \(optional, defaults to `default`\)
 -   `region`: The region to look up EC2 instances from.
@@ -280,7 +281,7 @@ One of `uri` or `name` is required. If only `uri` is set, then the value of `uri
 groups:
   - name: aws
     targets:
-      - _plugin: aws::ec2
+      - _plugin: aws_inventory
         profile: user1
         region: us-west-1
         name: public_dns_name
