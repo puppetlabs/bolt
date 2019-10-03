@@ -1,7 +1,7 @@
 # Bolt Functions
 
 
-## add_facts
+## `add_facts`
 
 Deep merges a hash of facts with the existing facts on a target.
 
@@ -23,7 +23,7 @@ add_facts($target, { 'os' => { 'family' => 'windows', 'name' => 'windows' } })
 ```
 
 
-## add_to_group
+## `add_to_group`
 
 Adds a target to specified inventory group.
 
@@ -57,7 +57,7 @@ add_to_group('foo,bar,baz', 'group1')
 ```
 
 
-## apply_prep
+## `apply_prep`
 
 Installs the puppet-agent package on targets if needed, then collects facts,
 including any custom facts found in Bolt's modulepath. The package is
@@ -88,7 +88,7 @@ apply_prep('target1,target2')
 ```
 
 
-## catch_errors
+## `catch_errors`
 
 Catches errors in a given block and returns them. This will return the
 output of the block if no errors are raised. Accepts an optional list of
@@ -126,7 +126,7 @@ catch_errors(['bolt/parse-error']) || {
 ```
 
 
-## ctrl::do_until
+## `ctrl::do_until`
 
 Repeat the block until it returns a truthy value. Returns the value.
 
@@ -147,7 +147,7 @@ ctrl::do_until() || {
 ```
 
 
-## ctrl::sleep
+## `ctrl::sleep`
 
 Sleeps for specified number of seconds.
 
@@ -166,7 +166,7 @@ ctrl::sleep(5)
 ```
 
 
-## facts
+## `facts`
 
 Returns the facts hash for a target.
 
@@ -185,7 +185,7 @@ facts($target)
 ```
 
 
-## fail_plan
+## `fail_plan`
 
 Raises a Bolt::PlanFailure exception to signal to callers that the plan failed.
 
@@ -229,7 +229,7 @@ fail_plan(Error('We goofed up', 'task-unexpected-result', { 'result' => 'null' }
 ```
 
 
-## file::exists
+## `file::exists`
 
 check if a file exists
 
@@ -252,7 +252,7 @@ file::exists('example/files/VERSION')
 ```
 
 
-## file::read
+## `file::read`
 
 Read a file and return its contents.
 
@@ -275,7 +275,7 @@ file::read('example/files/VERSION')
 ```
 
 
-## file::readable
+## `file::readable`
 
 check if a file is readable
 
@@ -298,7 +298,7 @@ file::readable('example/files/VERSION')
 ```
 
 
-## file::write
+## `file::write`
 
 Write a string to a file.
 
@@ -318,7 +318,7 @@ file::write('C:/Users/me/report', $apply_result.first.report)
 ```
 
 
-## get_resources
+## `get_resources`
 
 Query the state of resources on a list of targets using resource definitions in Bolt's modulepath.
 The results are returned as a list of hashes representing each resource.
@@ -347,7 +347,7 @@ get_resources('target1,target2', [Package, File[/etc/puppetlabs]])
 ```
 
 
-## get_target
+## `get_target`
 
 Get a single target from inventory if it exists, otherwise create a new Target.
 
@@ -375,7 +375,7 @@ get_target('existing-target')
 ```
 
 
-## get_targets
+## `get_targets`
 
 Parses common ways of referring to targets and returns an array of Targets.
 
@@ -414,7 +414,7 @@ get_targets('localhost')
 ```
 
 
-## out::message
+## `out::message`
 
 Output a message for the user.
 
@@ -438,7 +438,7 @@ out::message('Something went wrong')
 ```
 
 
-## puppetdb_fact
+## `puppetdb_fact`
 
 Collects facts based on a list of certnames.
 
@@ -460,7 +460,7 @@ puppetdb_fact(['app.example.com', 'db.example.com'])
 ```
 
 
-## puppetdb_query
+## `puppetdb_query`
 
 Makes a query to {https://puppet.com/docs/puppetdb/latest/index.html puppetdb}
 using Bolt's PuppetDB client.
@@ -481,7 +481,7 @@ puppetdb_query('nodes[certname] {}')
 ```
 
 
-## run_command
+## `run_command`
 
 Runs a command on the given set of targets and returns the result from each command execution.
 This function does nothing if the list of targets is empty.
@@ -525,7 +525,7 @@ run_command('hostname', $targets, 'Get hostname')
 ```
 
 
-## run_plan
+## `run_plan`
 
 Runs the `plan` referenced by its name. A plan is autoloaded from `<moduleroot>/plans`.
 
@@ -566,7 +566,7 @@ run_plan('canary', $nodes, 'command' => 'false')
 ```
 
 
-## run_script
+## `run_script`
 
 Uploads the given script to the given set of targets and returns the result of having each target execute the script.
 This function does nothing if the list of targets is empty.
@@ -618,7 +618,7 @@ run_script('/var/tmp/myscript', $targets, 'Downloading my application')
 ```
 
 
-## run_task
+## `run_task`
 
 Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 This function does nothing if the list of targets is empty.
@@ -662,7 +662,7 @@ run_task('facts', $targets, 'Gather OS facts')
 ```
 
 
-## set_config
+## `set_config`
 
 Set configuration options on a target
 
@@ -694,7 +694,7 @@ set_config($target, 'ssh', { user => 'me', password => 'secret' })
 ```
 
 
-## set_feature
+## `set_feature`
 
 Sets a particular feature to present on a target.
 
@@ -723,7 +723,7 @@ set_feature($target, 'puppet-agent', true)
 ```
 
 
-## set_var
+## `set_var`
 
 Sets a variable { key => value } for a target.
 
@@ -746,7 +746,7 @@ $target.set_var('ephemeral', true)
 ```
 
 
-## system::env
+## `system::env`
 
 Get an environment variable.
 
@@ -765,7 +765,7 @@ system::env('USER')
 ```
 
 
-## upload_file
+## `upload_file`
 
 Uploads the given file or directory to the given set of targets and returns the result from each upload.
 This function does nothing if the list of targets is empty.
@@ -817,7 +817,7 @@ upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, 'Uploading pay
 ```
 
 
-## vars
+## `vars`
 
 Returns a hash of the 'vars' (variables) assigned to a target.
 
@@ -840,7 +840,7 @@ $target.vars
 ```
 
 
-## wait_until_available
+## `wait_until_available`
 
 Wait until all targets accept connections.
 
@@ -862,7 +862,7 @@ wait_until_available($targets, wait_time => 300)
 ```
 
 
-## without_default_logging
+## `without_default_logging`
 
 Define a block where default logging is suppressed.
 

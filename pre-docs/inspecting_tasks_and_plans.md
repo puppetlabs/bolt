@@ -1,12 +1,12 @@
 # Inspecting tasks and plans
 
-Before you run tasks or plans in your environment, inspect them to determine what effect they will have on your target nodes.
+Before you run tasks or plans in your environment, inspect them to determine what effect they have on your target nodes.
 
-**Tip**: Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](bolt_installing_modules.md#packaged-modules).
+**Tip:** Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](packaged_modules.md).
 
 ## Run in no operation mode
 
-You can run some tasks in no-operation mode \(`noop`\) to view changes without taking any action on your target nodes. This way, you ensure the tasks perform as designed. If a task doesn't support no-operation mode, you'll get an error.
+You can run some tasks in no-operation mode \(`noop`\) to view changes without taking any action on your target nodes. This way, you ensure the tasks perform as designed. If a task doesn't support no-operation mode, you get an error.
 
 ```
 bolt task run package name=vim action=install --noop -n example.com
@@ -14,7 +14,7 @@ bolt task run package name=vim action=install --noop -n example.com
 
 ## Show a task list
 
-View a list of what tasks are installed in the current module path. Note that tasks marked with the `private` metadata key will not be shown:
+View a list of what tasks are installed in the current module path. Note that tasks marked with the `private` metadata key are not shown:
 
 ```
 bolt task show
@@ -43,4 +43,3 @@ View parameters and other details for a plan, including whether a plan supports 
 ```
 bolt plan show <PLAN NAME>
 ```
-
