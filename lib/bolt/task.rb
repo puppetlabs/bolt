@@ -77,6 +77,10 @@ module Bolt
                impl = impls.find do |imp|
                  remote_impl = imp['remote']
                  remote_impl = metadata['remote'] if remote_impl.nil?
+                 unless imp['requirements'].is_a?(Array) || imp['requirements'].nil?
+                   msg = "The task metadata 'requirements' key expects an Array, got #{imp['requirements'].class}"
+                   raise ValidationError, msg
+                 end
                  Set.new(imp['requirements']).subset?(available_features) && !!remote_impl == @remote
                end
                raise NoImplementationError.new(target, self) unless impl

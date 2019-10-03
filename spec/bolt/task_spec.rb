@@ -84,5 +84,16 @@ describe Bolt::Task do
         expect { task.select_implementation(target) }.to raise_error('No suitable implementation of foo for example')
       }
     end
+
+    context 'requirements is not an array' do
+      let(:implementations) {
+        [{ 'name' => 'foo.rb', 'requirements' => 'foo' }]
+      }
+
+      it {
+        expect { task.select_implementation(target) }
+          .to raise_error(Bolt::ValidationError, "The task metadata 'requirements' key expects an Array, got String")
+      }
+    end
   end
 end
