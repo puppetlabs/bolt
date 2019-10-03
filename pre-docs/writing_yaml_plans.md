@@ -248,8 +248,11 @@ parameters:
 The behavior of strings is defined by how they're written in the plan.
 
 `'single-quoted strings'` are treated as string literals without any interpolation.
+
 `"double-quoted strings"` are treated as Puppet language double-quoted strings with variable interpolation.
+
 `| block-style strings` are treated as expressions of arbitrary Puppet code. Note the string itself must be on a new line after the `|` character.
+
 `bare strings` are treated dynamically based on their content. If they begin with a `$`, they're treated as Puppet code expressions. Otherwise, they're treated as YAML literals.
 
 Here's an example of different kinds of strings in use:
