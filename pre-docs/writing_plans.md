@@ -173,12 +173,6 @@ For example, if called with `run_plan('mymodule::myplan')`, this would return an
 
 ```
 plan mymodule::myplan {
-  Error(
-    message    => "Sorry, this plan does not work yet.",
-    kind       => 'mymodule/error',
-    issue_code => 'NOT_IMPLEMENTED'
-    )
-  }
   fail_plan("Sorry, this plan does not work yet.", 'mymodule/error')
 }
 ```
@@ -187,7 +181,7 @@ plan mymodule::myplan {
 
 Indicators that a plan has run successfully or failed.
 
-Any plan that completes execution without an error is considered successful. The `bolt` command exits 0 and any calling plans continue execution. If any calls to `run_` functions fail **without** `_catch_errors` then the plan halts execution and is considered a failure. Any calling plans also halt until a `run_plan` call with `_catch_errors` or a `catch_errors` block is reached. If one isn't reached, the `bolt` command performs an exit 2. When writing a plan if you have reason to believe it has failed, you can fail the plan with the `fail_plan` function. This causes the bolt command to exit 2 and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors` or in a `catch_errors` block.
+Any plan that completes execution without an error is considered successful. The `bolt` command exits 0 and any calling plans continue execution. If any calls to `run_` functions fail **without** `_catch_errors` then the plan halts execution and is considered a failure. Any calling plans also halt until a `run_plan` call with `_catch_errors` or a `catch_errors` block is reached. If one isn't reached, the `bolt` command will exit 2. When writing a plan if you have reason to believe it has failed, you can fail the plan with the `fail_plan` function. This causes the bolt command to exit 2 and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors` or in a `catch_errors` block.
 
 ### Failing plans
 
@@ -201,7 +195,7 @@ fail_plan($errorobject)
 
 ### Catching errors in plans
 
-Bolt includes a `catch_errors` function that executes a block of code and returns the error if an error is raised, or returns the result of the block if no errors are raised. You might get an `Error` object returned if you call `run_plan` with `_catch_errors`, use a `catch_errors` block, or call the `Error` method on a result.
+Bolt includes a `catch_errors` function that executes a block of code and returns the error if an error is raised, or returns the result of the block if no errors are raised. You might get an `Error` object returned if you call `run_plan` with `_catch_errors`, use a `catch_errors` block, or call the `error` method on a result.
 
 The `Error` data type includes:
 
