@@ -38,13 +38,12 @@ describe Bolt::Plugin::Pkcs7 do
     expect(pkcs7.secret_decrypt('encrypted_value' => enc)).to eq(value)
   end
 
-  context 'using home directory in for key paths'do
-    
+  context 'using home directory in for key paths' do
     let(:pkcs7) do
       Bolt::Plugin::Pkcs7.new(context: context,
                               config: {
                                 'private-key' => '~/.keys/private_key.pkcs7.pem',
-                                'public-key' => '~/.keys/public_key.pkcs7.pem',
+                                'public-key' => '~/.keys/public_key.pkcs7.pem'
                               })
     end
 
