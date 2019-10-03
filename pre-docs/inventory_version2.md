@@ -78,7 +78,7 @@ plan setup_lb (
 
 ## Creating targets in plans
 
-When using inventory v2 a new and improved API for interacting with `Target`s in inventory is available. Two new plan functions have been added: `get_target` which allows retrieving a single `Target` from inventory and `set_config` which allows setting config on a specific `Target`. The updated API also provides a way to instantiate new `Target`s with data that more closely resembles how targets are declared in an inventory file.
+When using inventory v2 an API for interacting with `Target`s in inventory is available. The API consists of two functions: `get_target` retrieves a single `Target` from inventory, and `set_config` sets config on a specific `Target`. This API also lets you instantiate new `Target`s with data that closely resembles how targets are declared in an inventory file.
 
 For example, consider the following `new_targets` plan:
 ```
@@ -87,11 +87,11 @@ plan new_targets(){
   $new_target.set_config(['ssh', 'host-key-check'], false)
 }
 ```
-In the `new_targets` plan the `get_target` function returns a `Target` identified with the name `ssh://user:secret@1.2.3.4:2222`. If a `Target` with that name does not exist in inventory a new `Target` is instantiated with the `uri` and `name` attributes set to `ssh://user:secret@1.2.3.4:2222` and is added to the `all` group in inventory (where it inherits and configuration for the `all` group). If the `Target` with that name does exist, then it is simply returned.
+In the `new_targets` plan the `get_target` function returns a `Target` identified with the name `ssh://user:secret@1.2.3.4:2222`. If a `Target` with that name does not exist in inventory, a new `Target` is instantiated with the `uri` and `name` attributes set to `ssh://user:secret@1.2.3.4:2222` and is added to the `all` group in inventory (where it inherits all configuration from the `all` group). If the `Target` with that name does exist, it is returned.
 
-The `set_config` method is used to set a transport specific setting specified by the array of keys to that setting that matches the keys in the structured hash found in an inventoryfile under the `config` key. This illustrates how a new `Target` can be created from a URI and configuration options that are not able to be set in URI parts can be modified.
+The `set_config` method sets a transport-specific setting specified by the array of keys to that setting that matches the keys in the structured hash found in an inventoryfile under the `config` key. This illustrates how to create a new `Target` from a URI, and how to modify configuration options that are not able to be set in URI parts.
 
-The `Target.new` method may also be used to instantiate a `Target`:
+You can also use the `Target.new` method to instantiate a `Target`:
 ```
 plan new_target_alternate(){
   $config = { 'transport' => 'ssh',
@@ -106,11 +106,12 @@ plan new_target_alternate(){
   $another_new_target = target.new('name' => 'another_new_target', 'uri' => ssh://foo:bar@baz.com:123, 'facts' => { 'datacenter' => 'east' })
 }
 ```
-In the `new_target_alternate` plan a new `Target` is created from a hash and added to the `all` group in inventory. **Note**: If a `Target` with name `new_target` had already existed in inventory, that `Target` would be destroyed and the new `Target` would take its place.
+
+In the `new_target_alternate` plan a new `Target` is created from a hash and is added to the `all` group in inventory. Note that if a `Target` with name `new_target` already exists in inventory, that `Target` is destroyed and the new `Target` takes its place.
 
 ## `TargetSpec` parameters in plans
 
-When a plan parameter has the type `TargetSpec`, Bolt will ensure that values for that parameter are included in inventory. 
+When a plan parameter has the type `TargetSpec`, Bolt includes values for that parameter in inventory. 
 
 For example:
 ```
@@ -118,11 +119,12 @@ plan auto_add(TargetSpec $nodes) {
   return get_targets('all')
 }
 ```
-The `auto_add` plan returns all of the targets in the `all` group, if the value of `$nodes` resolves to a `String` that does not match a `Target` name, a group name, a `Target` alias or a target regex, a new `Target` is created and added to the `all` group. 
+
+The `auto_add` plan returns all of the targets in the `all` group. If the value of `$nodes` resolves to a `String` that does not match a `Target` name, a group name, a `Target` alias or a target regex, it creates a new `Target` and adds it to the `all` group. 
 
 ## `Target` reference
 
-A target object can be instantiated with `Target.new` from a plan with either a `String` representing the `Target` `name` and `uri` or a hash with the following structure:
+Instantiate a target object with `Target.new` from a plan with either a `String` representing the `Target` `name` and `uri`, or a hash with the following structure:
 
 - `uri`: `String`, Target URI (will be used as the `Target` name if a name is not specified)
 - `name`: `String`, The name of the target
@@ -141,11 +143,12 @@ plan target_example(){
   $target_2 = Target.new('name' = 'new-pcp', 'target_alias' = 'test', 'config' => {'transport' => 'pcp'}, 'features' => [puppet-agent])
 }
 ```
-In the `target_example` plan `target_1` is created from a URI, `target_2` is created from a hash. 
 
-**Note:** In the case where a `Target` is instantiated with only a `String` `uri` value, consider using `get_target` which will create a target without having to use the `Target.new` syntax. 
+The `target_example` plan creates `target_1` from a URI and `target_2` from a hash. 
 
-When a target is instantiated from a `uri` and no `name` is provided, the `name` is set to the `uri`. The `Target` also gets assigned a `safe_name` which is the `uri` with the password redacted. 
+**Note:** In the case where a `Target` is instantiated with only a `String` `uri` value, consider using `get_target`. This creates a `Target` without having to use the `Target.new` syntax. 
+
+When you instantiate a `Target`from a `uri` and provide no `name`, the function sets the `name` to the `uri`. It also assigns the `Target` a `safe_name`, which is the `uri` with the password redacted. 
 
 For example:
 ```
@@ -154,9 +157,10 @@ plan safe_name(){
   out::message($safe.safe_name)
 }
 ```
-In the `safe_name` plan a new target with `name` and `uri` is created and added to inventory. The plan will print `ssh://urser@1.2.3.4:2222` as the safe name. 
 
-It is important to note that the `safe_name` is only different from the `name` in the case where the `Target` is constructed from a URI and there is no `name` specified. When a `name` is supplied, the `safe_name` will always equal the `name`. 
+The `safe_name` plan creates a new target with `name` and `uri`, and adds it to inventory. The plan prints `ssh://urser@1.2.3.4:2222` as the safe name. 
+
+It is important to note that the value of `safe_name` is only different from the value of `name` in the case where the `Target` is constructed from a `uri` and no `name` is specified. When you supply a `name`, the `safe_name` is always set to the value of `name`. 
 
 For example:
 ```
@@ -165,9 +169,10 @@ plan unsafe_name(){
   out::message($unsafe.safe_name)
 }
 ```
+
 In the `unsafe_name` plan, a `Target` is instantiated with the `name` set to the full `uri` that contains the sensitive password and thus the `safe_name` contains the password. 
 
-## Creating a node with a human readable name and ip address
+## Creating a node with a human-readable name and IP address
 
 With version 2 of the inventory you can create a node with a human readable
 name even when an ip address is used for connecting. This can be accomplished
