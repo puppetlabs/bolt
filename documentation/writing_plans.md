@@ -283,6 +283,7 @@ A `ResultSet` has the following methods:
 -   `targets()`: An array of all the `Target` objects from every `Result`in the set.
 -   `ok():` `Boolean` that is the same as `error_nodes.empty`.
 -   `to_data()`: An array of hashes representing either `Result` or `ApplyResults`.
+-   `[]`: Array indexing allows accessing a single `Result` (for example `$result[0]`) or an array of `Result`s (for example `$result[0,2]`)
 
 
 A `Result` has the following methods:
