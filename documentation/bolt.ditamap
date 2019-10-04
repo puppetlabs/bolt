@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
 <map id="boltmap" title="Bolt">
-    <topicref href="bolt.md" format="markdown"/>
+    <topicref href="bolt.md" format="markdown">
         <topicref href="CHANGELOG.md" format="markdown"/>
         <topicref href="bolt_versioning.md" format="markdown"/>
         <topicref href="bolt_known_issues.md" format="markdown"/>
+    </topicref>
     <topicref href="bolt_installing.md" format="markdown"/>
-    <topicref href="running_bolt.md" format="markdown"/>
+    <topicref href="running_bolt.md" format="markdown">
         <topicref href="running_bolt_commands.md" format="markdown"/>
         <topicref href="bolt_options.md" format="markdown"/>
         <topicref href="bolt_command_reference.md" format="markdown"/>
+    </topicref>
     <topicref href="getting_started_with_bolt.md" format="markdown"/>
-    <topicref href="writing_tasks_and_plans.md" format="markdown"/>
+    <topicref href="writing_tasks_and_plans.md" format="markdown">
         <topicref href="inspecting_tasks_and_plans.md" format="markdown"/>
         <topicref href="bolt_running_tasks.md" format="markdown"/>
         <topicref href="bolt_running_plans.md" format="markdown"/>
@@ -19,12 +21,15 @@
         <topicref href="bolt_installing_modules.md" format="markdown"/>
         <topicref href="directory_structure.md" format="markdown"/>
         <topicref href="writing_tasks.md" format="markdown"/>
-        <topicref href="writing_plans.md" format="markdown"/>
+        <topicref href="writing_plans.md" format="markdown">
             <topicref href="plan_functions.md" format="markdown"/>
             <topicref href="applying_manifest_blocks.md" format="markdown"/>
+        </topicref>
         <topicref href="writing_yaml_plans.md" format="markdown"/>
-    <topicref href="configuring_bolt.md" format="markdown"/>
+    </topicref>
+    <topicref href="configuring_bolt.md" format="markdown">
         <topicref href="bolt_project_directories.md" format="markdown"/>
+    </topicref>
     <topicref href="bolt_configuration_options.md" format="markdown"/>
     <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
     <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
@@ -34,4 +39,5 @@
         <topicref href="using_plugins.md" format="markdown"/>
         <topicref href="writing_plugins.md" format="markdown"/>
         <topicref href="bolt_examples.md" format="markdown"/>
-</topicref></map>
+    </topicref>
+</map>
