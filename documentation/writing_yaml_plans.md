@@ -2,7 +2,7 @@
 
 YAML plans run a list of steps in order, which allows you to define simple workflows. Steps can contain embedded Puppet code expressions to add logic where necessary.
 
-**Note:** YAML plans are an experimental feature and might experience breaking changes in future minor \(y\) releases.
+**Note:** YAML plans are an experimental feature and might experience breaking changes in future minor (y) releases.
 
 ## Naming plans
 
@@ -42,8 +42,8 @@ YAML plans contain a list of steps with optional parameters and results.
 YAML maps accept these keys:
 
 -   `steps`: The list of steps to perform
--   `parameters`: \(Optional\) The parameters accepted by the plan
--   `return`: \(Optional\) The value to return from the plan
+-   `parameters`: (Optional) The parameters accepted by the plan
+-   `return`: (Optional) The value to return from the plan
 
 ### Steps key
 
@@ -54,7 +54,7 @@ When the plan runs, each step is executed in order. If a step fails, the plan ha
 Steps use these fields:
 
 -   `name`: A unique name that can be used to refer to the result of the step later
--   `description`: \(Optional\) An explanation of what the step is doing.
+-   `description`: (Optional) An explanation of what the step is doing.
 
 Other available keys depend on the type of step.
 
@@ -89,7 +89,7 @@ Task steps use these fields:
 
 -   `task`: The task to run
 -   `target`: A target or list of targets to run the task on
--   `parameters`: \(Optional\) A map of parameter values to pass to the task
+-   `parameters`: (Optional) A map of parameter values to pass to the task
 
 For example:
 
@@ -116,7 +116,7 @@ Script steps use these fields:
 
 -   `script`: The script to run
 -   `target`: A target or list of targets to run the script on
--   `arguments`: \(Optional\) An array of command-line arguments to pass to the script
+-   `arguments`: (Optional) An array of command-line arguments to pass to the script
 
 For example:
 
@@ -164,7 +164,7 @@ Use a `plan` step to run another plan and save its result.
 Plan steps use these fields:
 
 -   `plan`: The name of the plan to run
--   `parameters`: \(Optional\) A map of parameter values to pass to the plan
+-   `parameters`: (Optional) A map of parameter values to pass to the plan
 
 For example:
 
@@ -221,9 +221,9 @@ Parameter values can be referenced from steps as variables.
 
 Parameters use these fields:
 
--   `type`: \(Optional\) A valid [Puppet data type](https://puppet.com/docs/puppet/latest/lang_data.html#puppet-data-types). The value supplied must match the type or the plan fails.
--   `default`: \(Optional\) Used if no value is given for the parameter
--   `description`: \(Optional\)
+-   `type`: (Optional) A valid [Puppet data type](https://puppet.com/docs/puppet/latest/lang_data.html#puppet-data-types). The value supplied must match the type or the plan fails.
+-   `default`: (Optional) Used if no value is given for the parameter
+-   `description`: (Optional)
 
 
 For example, this plan accepts a `load_balancer` name as a string, two sets of nodes called `frontends` and `backends`, and a `version` string:

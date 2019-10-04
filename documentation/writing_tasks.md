@@ -4,7 +4,7 @@ Bolt tasks are similar to scripts, but they are kept in modules and can have met
 
 You can write tasks in any programming language the target nodes run, such as Bash, PowerShell, or Python. A task can even be a compiled binary that runs on the target. Place your task in the `./tasks` directory of a module and add a metadata file to describe parameters and configure task behavior.
 
-For a task to run on remote \*nix systems, it must include a shebang \(`#!`\) line at the top of the file to specify the interpreter.
+For a task to run on remote *nix systems, it must include a shebang (`#!`) line at the top of the file to specify the interpreter.
 
 For example, the Puppet `mysql::sql` task is written in Ruby and provides the path to the Ruby interpreter. This example also accepts several parameters as JSON on `stdin` and returns an error.
 
@@ -48,7 +48,7 @@ Use secure coding practices when you write tasks and help protect your system.
 
 One of the methods attackers use to gain access to your systems is remote code execution, where by running an allowed script they gain access to other parts of the system and can make arbitrary changes. Because Bolt executes scripts across your infrastructure, it is important to be aware of certain vulnerabilities, and to code tasks in a way that guards against remote code execution.
 
-Adding task metadata that validates input is one way to reduce vulnerability. When you require an enumerated \(`enum`\) or other non-string types, you prevent improper data from being entered. An arbitrary string parameter does not have this assurance.
+Adding task metadata that validates input is one way to reduce vulnerability. When you require an enumerated (`enum`) or other non-string types, you prevent improper data from being entered. An arbitrary string parameter does not have this assurance.
 
 For example, if your task has a parameter that selects from several operational modes that are passed to a shell command, instead of
 
@@ -80,7 +80,7 @@ In addition to these task restrictions, different scripting languages each have 
 
 ### PowerShell
 
-In PowerShell, code injection exploits calls that specifically evaluate code. Do not call `Invoke-Expression` or `Add-Type` with user input. These commands evaluate strings as C\# code.
+In PowerShell, code injection exploits calls that specifically evaluate code. Do not call `Invoke-Expression` or `Add-Type` with user input. These commands evaluate strings as C# code.
 
 Reading sensitive files or overwriting critical files can be less obvious. If you plan to allow users to specify a file name or path, use `Resolve-Path` to verify that the path doesn't go outside the locations you expect the task to access. Use `Split-Path -Parent $path` to check that the resolved path has the desired path as a parent.
 
@@ -129,7 +129,7 @@ For more information on the vulnerabilities of Python or how to escape variables
 
 ### Ruby
 
-In Ruby, command injection is introduced through commands like `eval`, `exec`, `system`, backtick \(\`\`\) or `%x()` execution, or the Open3 module. You can safely call these functions with user input by passing the input as additional arguments instead of a single string.
+In Ruby, command injection is introduced through commands like `eval`, `exec`, `system`, backtick (``) or `%x()` execution, or the Open3 module. You can safely call these functions with user input by passing the input as additional arguments instead of a single string.
 
 Instead of
 
@@ -151,7 +151,7 @@ For more information on securely passing user input, see the blog post [Stop usi
 
 Task names are named based on the filename of the task, the name of the module, and the path to the task within the module.
 
-You can write tasks in any language that runs on the target nodes. Give task files the extension for the language they are written in \(such as `.rb` for Ruby\), and place them in the top level of your module's `./tasks` directory.
+You can write tasks in any language that runs on the target nodes. Give task files the extension for the language they are written in (such as `.rb` for Ruby), and place them in the top level of your module's `./tasks` directory.
 
 Task names are composed of one or two name segments, indicating:
 
@@ -189,7 +189,7 @@ For instance, consider a module with the following files:
   - sql.json
 ```
 
-This task has two executables \(`sql_linux.sh` and `sql_windows.ps1`\), each with an implementation metadata file and a task metadata file. The executables have distinct names and are compatible with older task runners such as Puppet Enterprise 2018.1 and earlier. Each implementation has its own metadata that documents how to use the implementation directly or marks it as private to hide it from UI lists.
+This task has two executables (`sql_linux.sh` and `sql_windows.ps1`), each with an implementation metadata file and a task metadata file. The executables have distinct names and are compatible with older task runners such as Puppet Enterprise 2018.1 and earlier. Each implementation has its own metadata that documents how to use the implementation directly or marks it as private to hide it from UI lists.
 
 An implementation metadata example:
 
@@ -511,7 +511,7 @@ Tasks can receive input as either environment variables, a JSON hash on standard
 
 If your task must receive parameters only in a certain way, such as only `stdin`, you can set the input method in your task metadata. For Windows tasks, it's usually better to use tasks written in PowerShell. See the related topic about task metadata for information about setting the input method.
 
-Environment variables are the easiest way to implement parameters, and they work well for simple JSON types such as strings and numbers. For arrays and hashes, use structured input instead because parameters with undefined values \(`nil`, `undef`\) passed as environment variables have the `String` value `null`. For more information, see [Structured input and output](writing_tasks.md#).
+Environment variables are the easiest way to implement parameters, and they work well for simple JSON types such as strings and numbers. For arrays and hashes, use structured input instead because parameters with undefined values (`nil`, `undef`) passed as environment variables have the `String` value `null`. For more information, see [Structured input and output](writing_tasks.md#).
 
 To add parameters to your task as environment variables, pass the argument prefixed with the Puppet task prefix `PT_` .
 
@@ -556,13 +556,13 @@ if ($Name -eq $null -or $Name -eq "") {
 }
 ```
 
-To pass parameters in your task as environment variables \(`PT_parameter`\), you must set `input_method` in your task metadata to `environment`. To run Ruby tasks on Windows, the Puppet agent must be installed on the target nodes.
+To pass parameters in your task as environment variables (`PT_parameter`), you must set `input_method` in your task metadata to `environment`. To run Ruby tasks on Windows, the Puppet agent must be installed on the target nodes.
 
 ## Returning errors in tasks
 
 To return a detailed error message if your task fails, include an `Error` object in the task's result.
 
-When a task exits non-zero, the task runner checks for an error key \(\`_error\`\). If one is not present, the task runner generates a generic error and adds it to the result. If there is no text on `stdout` but text is present on `stderr`, the `stderr` text is included in the message.
+When a task exits non-zero, the task runner checks for an error key `_error`. If one is not present, the task runner generates a generic error and adds it to the result. If there is no text on `stdout` but text is present on `stderr`, the `stderr` text is included in the message.
 
 ```json
 { "_error": {
@@ -900,7 +900,7 @@ The following table shows task metadata keys, values, and default values.
 |"description"|A description of what the task does.|String|None|
 |"input_method"|What input method the task runner uses to pass parameters to the task.|-   `environment`<br/>- `stdin`<br/>- `powershell`|Both `environment` and `stdin` unless `.ps1` tasks, in which case `powershell`|
 |"parameters"|The parameters or input the task accepts listed with a puppet type string and optional description. See [adding parameters to metadata](writing_tasks.md#) for usage information.|Array of objects describing each parameter|None|
-|"puppet_task_version"|The version of the spec used.|Integer|`1` \(This is the only valid value.\)|
+|"puppet_task_version"|The version of the spec used.|Integer|`1` (This is the only valid value.)|
 |"supports_noop"|Whether the task supports no-op mode. Required for the task to accept the `--noop` option on the command line.|Boolean|`false`|
 |"implementations"|A list of task implementations and the requirements used to select one to run. See [Cross-platform tasks](writing_tasks.md#) for usage information.|Array of Objects describing each implementation|None|
 |"files"|A list of files to be provided when running the task, addressed by module. See [Sharing task code](writing_tasks.md#) for usage information.|Array of Strings|None|
@@ -920,7 +920,7 @@ Some types supported by Puppet can not be represented as JSON, such as `Hash[Int
 |Type|Description|
 |----|-----------|
 |`String`|Accepts any string.|
-|`String[1]`|Accepts any non-empty string \(a String of at least length 1\).|
+|`String[1]`|Accepts any non-empty string (a String of at least length 1).|
 |`Enum[choice1, choice2]`|Accepts one of the listed choices.|
 |`Pattern[/\A\w+\Z/]`|Accepts Strings matching the regex `/\w+/` or non-empty strings of word characters.|
 |`Integer`|Accepts integer values. JSON has no Integer type so this can vary depending on input.|
@@ -962,4 +962,4 @@ To set parameters in a file, specify parameters in JSON format in a file, such a
 }
 ```
 
-Then specify the path to that file \(starting with an at symbol, `@`\) on the command line with the parameters flag: `--params @params.json`
+Then specify the path to that file (starting with an at symbol, `@`) on the command line with the parameters flag: `--params @params.json`

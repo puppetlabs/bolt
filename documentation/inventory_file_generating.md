@@ -16,19 +16,19 @@ For full usage information, type `bolt-inventory-pdb --help`.
 
 The `bolt-inventory-pdb` script uses the configuration file `puppetdb.conf`, which is stored at:
 
--   **\*nix systems** `$HOME/.puppetlabs/client-tools/puppetdb.conf`
+-   ***nix systems** `$HOME/.puppetlabs/client-tools/puppetdb.conf`
 -   **Windows** `%USERPROFILE%\.puppetlabs\client-tools\puppetdb.conf`
 
 **Note:** The precedence used to load puppetdb config is:
 
-1.  `configfile` \(optionally specified with `--configfile`\)
+1.  `configfile` (optionally specified with `--configfile`)
 1.  `$HOME/.puppetlabs/client-tools/puppetdb.conf`
-1.  `/etc/puppetlabs/client-tools/puppetdb.conf` \(Windows: `C:\ProgramData\PuppetLabs\client-tools\puppetdb.conf`\)
+1.  `/etc/puppetlabs/client-tools/puppetdb.conf` (Windows: `C:\ProgramData\PuppetLabs\client-tools\puppetdb.conf`)
 
 `bolt-inventory-pdb` configuration can also be passed on the command line. These settings are required:
 
--   `--cacert` The path for the certification authority \(CA\) certificate.
-    - **\*nix systems** `/etc/puppetlabs/puppet/ssl/certs/ca.pem`
+-   `--cacert` The path for the certification authority (CA) certificate.
+    - ***nix systems** `/etc/puppetlabs/puppet/ssl/certs/ca.pem`
     - **Windows** `C:\\ProgramData\\PuppetLabs\\puppet\\etc\\ssl\\certs\\ca.pem`
 -   `--url` The URL of your PuppetDB server.
 

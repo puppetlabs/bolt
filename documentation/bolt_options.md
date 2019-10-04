@@ -17,7 +17,7 @@ When targeting systems with the `--nodes` flag, you can specify the transport ei
     --nodes neptune,saturn,mars
     ```
 
--   To generate a node list with brace expansion, specify the node list with an equals sign \(`=`\), such as `--nodes=web{1,2}`.
+-   To generate a node list with brace expansion, specify the node list with an equals sign (`=`), such as `--nodes=web{1,2}`.
     ```
      bolt command run --nodes={web{5,6,7},elasticsearch{1,2,3}.subdomain}.mydomain.edu  
     ```
@@ -122,7 +122,7 @@ Whether the target node runs Linux or Windows, the simplest way to specify crede
 bolt command run 'hostname' --nodes <LINUX_NODES> --user <USER> --password <PASSWORD>
 ```
 
-If you'd prefer to have Bolt securely prompt for a password \(so that it won't appear in a process listing or on the console\), use the `--password` option without including a value:
+If you'd prefer to have Bolt securely prompt for a password (so that it won't appear in a process listing or on the console), use the `--password` option without including a value:
 ```
 bolt command run 'hostname' --nodes <LINUX_NODES> --user <USER> --password
 ```
@@ -134,7 +134,7 @@ bolt command run 'hostname' --nodes <LINUX_NODES> --user <USER> --private_key <P
 
 **Tip:** For more information on creating these keys, see [GitHub's clear tutorial](https://help.github.com/en/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
-If the target node runs Linux, you can use an SSH configuration file \(typically at `~/.ssh/config`\) to specify a default username and private key for the remote node.
+If the target node runs Linux, you can use an SSH configuration file (typically at `~/.ssh/config`) to specify a default username and private key for the remote node.
 
 **Tip:** A good guide to using SSH config files is the [Simplify Your Life With an SSH Config File](https://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/) blogpost on the Nerdarati blog.
 

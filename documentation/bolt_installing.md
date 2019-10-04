@@ -2,7 +2,7 @@
 
 Packaged versions of Bolt are available for many modern Linux distributions, as well as macOS and Windows.
 
-Have questions? Get in touch. We're in \#bolt on the [Puppet community Slack](https://slack.puppet.com/).
+Have questions? Get in touch. We're in #bolt on the [Puppet community Slack](https://slack.puppet.com/).
 
 **Tip:** Bolt uses an internal version of Puppet that supports tasks and plans, so you do not need to install Puppet. If you use Bolt on a machine that has Puppet installed, Bolt uses its internal version of Puppet and does not conflict with the Puppet version you have installed.
 
@@ -90,15 +90,15 @@ Use one of the supported macOS installation methods to install Bolt.
 
 ### Install Bolt with macOS installer 
 
-Use the Apple Disk Image \(DMG\) to install Bolt on macOS.
+Use the Apple Disk Image (DMG) to install Bolt on macOS.
 
 1.  Download the Bolt installer package for your macOS version.
     
-    **Tip:** To find the macOS version number on your Mac, go to the Apple \(\) menu in the corner of your screen and choose **About This Mac**.
-    - 10.11 \(El Capitan\) [https://downloads.puppet.com/mac/puppet6/10.11/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.11/x86_64/puppet-bolt-latest.dmg)
-    - 10.12 \(Sierra\) [https://downloads.puppet.com/mac/puppet6/10.12/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.12/x86_64/puppet-bolt-latest.dmg)
-    - 10.13 \(High Sierra\) [https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg)
-    - 10.14 \(Mojave\) [https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg)
+    **Tip:** To find the macOS version number on your Mac, go to the Apple () menu in the corner of your screen and choose **About This Mac**.
+    - 10.11 (El Capitan) [https://downloads.puppet.com/mac/puppet6/10.11/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.11/x86_64/puppet-bolt-latest.dmg)
+    - 10.12 (Sierra) [https://downloads.puppet.com/mac/puppet6/10.12/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.12/x86_64/puppet-bolt-latest.dmg)
+    - 10.13 (High Sierra) [https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg)
+    - 10.14 (Mojave) [https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg)
 1.  Double-click the `puppet-bolt-latest.dmg` file to mount it and then double-click `puppet-bolt-[version]-installer.pkg` to run the installer.
 1.  Run a Bolt command and get started.
     ```
@@ -120,9 +120,9 @@ You must have the command line tools for macOS and the Homebrew package manager 
     bolt --help
     ```
 
-## Install Bolt on \*nix
+## Install Bolt on *nix
 
-Use one of the supported \*nix installation methods to install Bolt.
+Use one of the supported *nix installation methods to install Bolt.
 
 **CAUTION:** These instructions include enabling the Puppet Tools repository. While Bolt can also be installed from the Puppet 6 or 5 platform repositories, adding these repositories to a Puppet-managed node, especially a PE master, might result in an unsupported version of a package like `puppet-agent` being installed. This can cause downtime, especially on a PE master.
 
@@ -316,7 +316,7 @@ Ran on 1 node in 0.55 seconds
 
 ### Mount the host's Bolt project directory
 
-Another way of passing information is to make your Bolt project directory \(Boltdir\) available to the container. Here is the directory structure of a typical Boltdir:
+Another way of passing information is to make your Bolt project directory (Boltdir) available to the container. Here is the directory structure of a typical Boltdir:
 
 ```console
 $ tree
@@ -450,20 +450,20 @@ Bolt collects data about how you use it. You can opt out of providing this data.
 ### What data does Bolt collect?
 
 -   Version of Bolt
--   The Bolt command executed \(for example, `bolt task run` or `bolt plan show`\), excluding arguments
+-   The Bolt command executed (for example, `bolt task run` or `bolt plan show`), excluding arguments
 -   The functions called from a plan, excluding arguments
 -   User locale
 -   Operating system and version
--   Transports used \(SSH, WinRM, PCP\) and number of targets
+-   Transports used (SSH, WinRM, PCP) and number of targets
 -   The number of nodes and groups defined in the Bolt inventory file
 -   The number of nodes targeted with a Bolt command
--   The output format selected \(human-readable, JSON\)
+-   The output format selected (human-readable, JSON)
 -   Whether the Bolt project directory was determined from the location of a `bolt.yaml` file or with the `--boltdir` flag
--   The number of times Bolt tasks and plans are run \(not including user-defined tasks or plans.\)
+-   The number of times Bolt tasks and plans are run (not including user-defined tasks or plans.)
 -   The number of statements in a manifest block, and how many resources that produces for each target
 -   The number of steps in a YAML plan
--   The return type \(expression vs. value\) of a YAML plan
--   Which bundled plugins Bolt is using \(not including user-installed plugins\)
+-   The return type (expression vs. value) of a YAML plan
+-   Which bundled plugins Bolt is using (not including user-installed plugins)
 
 This data is associated with a random, non-identifiable user UUID.
 

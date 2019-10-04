@@ -8,7 +8,7 @@ By default, the `modulepath` includes the `modules/` and `site-modules` director
 
 A module is a sub-directory of one of the directories on the modulepath. In order for Bolt to load tasks and plans, they must exist in the `tasks/` or `plans/` directory of a module with the correct name.
 
-**Tip:** You can use the Puppet Development Kit \(PDK\) to create modules and add tasks to it.
+**Tip:** You can use the Puppet Development Kit (PDK) to create modules and add tasks to it.
 
 A typical module for use with Bolt may contain these directories:
 
@@ -56,6 +56,6 @@ To create a standalone module, run `pdk new module` outside of the project direc
 Follow these tips for managing standalone modules:
 
 -   Add `modules/*` to `.gitignore` of your project to prevent accidentally committing standalone modules.
--   When you run tasks and plans within a project directory, the modulepath \(`modules/` and `site-modules/`\) is searched for modules containing Bolt content. If a module is found in `modules`, tasks and plans from the version of the module in `site-modules` are ignored. Remove a module from `site-modules` if you convert it to a standalone module.
--   As a best practice, write automated tests for the tasks and plans in your module, if possible. For information about automated testing patterns, check out these resources: [Example of unit testing plans and integration \(acceptance\) testing tasks](https://github.com/puppetlabs/puppetlabs-facts) \(GitHub\) and [Writing Robust Puppet Bolt Tasks: A Guide](https://puppet.com/blog/writing-robust-puppet-bolt-tasks-guide) \(Puppet blog\).
+-   When you run tasks and plans within a project directory, the modulepath (`modules/` and `site-modules/`) is searched for modules containing Bolt content. If a module is found in `modules`, tasks and plans from the version of the module in `site-modules` are ignored. Remove a module from `site-modules` if you convert it to a standalone module.
+-   As a best practice, write automated tests for the tasks and plans in your module, if possible. For information about automated testing patterns, check out these resources: [Example of unit testing plans and integration \(acceptance\) testing tasks](https://github.com/puppetlabs/puppetlabs-facts) (GitHub) and [Writing Robust Puppet Bolt Tasks: A Guide](https://puppet.com/blog/writing-robust-puppet-bolt-tasks-guide) (Puppet blog).
 

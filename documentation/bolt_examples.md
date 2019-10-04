@@ -2,7 +2,7 @@
 
 Bolt lets you automate almost any task you can think of. These are some of the common scenarios we've come across.
 
-If you'd like to share a real-world use case, reach out to us in the \#bolt channel on [Slack](https://slack.puppet.com).
+If you'd like to share a real-world use case, reach out to us in the #bolt channel on [Slack](https://slack.puppet.com).
 
 For more usage examples, check out the [Puppet blog](https://puppet.com/blog-tags/puppet-bolt).
 
@@ -72,7 +72,7 @@ To run Bolt commands against multiple nodes at once, you need to provide informa
 
 To convert the `restart_service.ps1` script to a task, giving you the ability to reuse and share it, create a [task metadata](writing_tasks.md#) file. Task metadata files describe task parameters, validate input, and control how the task runner executes the task.
 
-**Note:** This guide shows you how to convert the script to a task by manually creating the `.ps1` file in a directory called `tasks`. Alternatively, you can use Puppet Development Kit \(PDK\), to create a new task by using the [`pdk new task` command](https://puppet.com/docs/pdk/1.x/pdk_reference.html#pdk-new-task-command). If you’re going to be creating a lot of tasks, using PDK is worth getting to know. For more information, see the [PDK documentation.](https://puppet.com/docs/pdk/1.x/pdk_overview.html)
+**Note:** This guide shows you how to convert the script to a task by manually creating the `.ps1` file in a directory called `tasks`. Alternatively, you can use Puppet Development Kit (PDK), to create a new task by using the [`pdk new task` command](https://puppet.com/docs/pdk/1.x/pdk_reference.html#pdk-new-task-command). If you’re going to be creating a lot of tasks, using PDK is worth getting to know. For more information, see the [PDK documentation.](https://puppet.com/docs/pdk/1.x/pdk_overview.html)
 
 1.  In the `bolt-guide` directory, create the following subdirectories:
     ```

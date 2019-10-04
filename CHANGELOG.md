@@ -262,7 +262,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 * **lookups removed from target_lookups**
 
-  We have deprecated the target-lookups key in the experimental inventory file v2. To address this change, migrate any target-lookups entries to targets and move the plugin key in each entry to \_plugin.
+  We have deprecated the target-lookups key in the experimental inventory file v2. To address this change, migrate any target-lookups entries to targets and move the plugin key in each entry to _plugin.
 
 ## 1.24.0
 
@@ -542,7 +542,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 * **SMB file transfer on Windows**
 
-  When transferring files to a Windows host, you can now optionally use the SMB protocol to reduce transfer time. You must have either administrative rights to use an administrative share, like \\host\C$, or use UNC style paths to access existing shares, like \\host\share. You can use SMB file transfers only over HTTP, not HTTPS, and SMB3, which supports encryption, is not yet supported. ([BOLT-153](https://tickets.puppet.com/browse/BOLT-153))
+  When transferring files to a Windows host, you can now optionally use the SMB protocol to reduce transfer time. You must have either administrative rights to use an administrative share, like `\host\C$`, or use UNC style paths to access existing shares, like `\host\share`. You can use SMB file transfers only over HTTP, not HTTPS, and SMB3, which supports encryption, is not yet supported. ([BOLT-153](https://tickets.puppet.com/browse/BOLT-153))
 
 * **Interpreter configuration option**
 
@@ -752,7 +752,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 * **Additional plan test helpers**
 
-  The BoltSpec::Plans library now supports unit testing plans that use the \_run_as parameter, apply, run_command, run_script, and upload_file. ([BOLT-984](https://tickets.puppet.com/browse/BOLT-984))
+  The BoltSpec::Plans library now supports unit testing plans that use the _run_as parameter, apply, run_command, run_script, and upload_file. ([BOLT-984](https://tickets.puppet.com/browse/BOLT-984))
 
 * **Data collection about applied catalogs**
 
@@ -803,7 +803,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 * **Task implementation not located relative to other files in installdir**
 
-  When you use tasks that include shared code, the task executable is located alongside shared code at \_installdir/MODULE/tasks/TASK. ([BOLT-931](https://tickets.puppet.com/browse/BOLT-931))
+  When you use tasks that include shared code, the task executable is located alongside shared code at _installdir/MODULE/tasks/TASK. ([BOLT-931](https://tickets.puppet.com/browse/BOLT-931))
 
 ## 1.1.0
 
@@ -811,7 +811,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 * **Share code between tasks**
 
-  Bolt includes the ability to share code between tasks. A task can include a list of files that it requires, from any module, that it copies over and makes available via a \_installdir parameter. This feature is also supported in Puppet Enterprise 2019.0. For more information see, Sharing task code. ([BOLT-755](https://tickets.puppet.com/browse/BOLT-755))
+  Bolt includes the ability to share code between tasks. A task can include a list of files that it requires, from any module, that it copies over and makes available via a _installdir parameter. This feature is also supported in Puppet Enterprise 2019.0. For more information see, Sharing task code. ([BOLT-755](https://tickets.puppet.com/browse/BOLT-755))
 
 * **Upgraded WinRM gem dependencies**
 

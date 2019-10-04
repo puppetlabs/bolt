@@ -65,7 +65,7 @@ You can run scripts in any language as long as the appropriate interpreter is in
 
 ### Requirements for scripts run on remote \*nix systems
 
-A script must include a shebang \(`#!`\) line specifying the interpreter. For example, for a script written in Bash, provide the path to the Bash interpreter:
+A script must include a shebang (`#!`) line specifying the interpreter. For example, for a script written in Bash, provide the path to the Bash interpreter:
 
 ```shell script
 #!/bin/bash
