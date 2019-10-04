@@ -2,6 +2,14 @@
 
 ## 1.32.0
 
+### New features
+
+* **The `ResultSet` type is now indexable.** ([#1178](https://github.com/puppetlabs/bolt/issues/1178))
+
+  When working with `ResultSet` types in plans the bracket `[]` operator can be used to get `Results` by index.
+
+## 1.32.0
+
 ### Bug fixes
 
 * **The plan function `apply` incorrectly returned successful if the report was unparseable** ([#1241](https://github.com/puppetlabs/bolt/issues/1241))
