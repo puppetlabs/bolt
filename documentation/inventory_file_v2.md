@@ -432,11 +432,11 @@ The Terraform plugin supports looking up target objects from a Terraform state f
 
 -   `dir`: The directory containing either a local Terraform state file or Terraform configuration to read remote state from.
 -   `resource_type`: The Terraform resources to match, as a regular expression.
--   `uri`: \(Optional\) The property of the Terraform resource to use as the target URI.
--   `statefile`: \(Optional\) The name of the local Terraform state file to load, relative to `dir` \(defaults to `terraform.tfstate)`.
--   `name`: \(Optional\) The property of the Terraform resource to use as the target name.
+-   `uri`: (Optional) The property of the Terraform resource to use as the target URI.
+-   `statefile`: (Optional) The name of the local Terraform state file to load, relative to `dir` (defaults to `terraform.tfstate)`.
+-   `name`: (Optional) The property of the Terraform resource to use as the target name.
 -   `config`: A Bolt config map where each value is the Terraform property to use for that config setting.
--   `backend`: \(Optional\) The type of backend to load the state form, either `remote` or `local` \(defaults to `local`\).
+-   `backend`: (Optional) The type of backend to load the state form, either `remote` or `local` (defaults to `local`).
 
 Either `uri` or `name` is required. If only `uri` is set, the value of `uri` is used as the `name`.
 
@@ -515,11 +515,11 @@ google_compute_instance.app.1:
 
 The AWS inventory plugin looks up running AWS EC2 instances. It supports several fields:
 
--   `profile`: the [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to use when loading from AWS `config` and `credentials` files \(optional, defaults to `default`\)
+-   `profile`: the [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to use when loading from AWS `config` and `credentials` files (optional, defaults to `default`)
 -   `region`: the region to look up EC2 instances from
--   `name`: the [EC2 instance attribute](https://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html) to use as the target name \(optional\)
--   `uri`: the [EC2 instance attribute](https://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html) to use as the target URI. \(optional\)
--   `filters`: the [filter request parameters](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html) to filter the EC2 instances. Filters are name-values pairs, where the name is a request parameter and the values are an array of values to filter by. \(optional\)
+-   `name`: the [EC2 instance attribute](https://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html) to use as the target name (optional)
+-   `uri`: the [EC2 instance attribute](https://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html) to use as the target URI. (optional)
+-   `filters`: the [filter request parameters](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html) to filter the EC2 instances. Filters are name-values pairs, where the name is a request parameter and the values are an array of values to filter by. (optional)
 -   `config`: a Bolt config map where the value for each config setting is an EC2 instance attribute
 
 Either`uri` or `name` is required. If only `uri` is set, the value of `uri` is used as the `name`.
@@ -577,7 +577,7 @@ aws_secret_access_key=...
 region=...
 ```
 
-To use AWS credential files stored in a non-standard location \(anywhere other than `~/.aws/credentials`\), specify the location in the Bolt config file:
+To use AWS credential files stored in a non-standard location (anywhere other than `~/.aws/credentials`), specify the location in the Bolt config file:
 
 ```yaml
 plugins:
@@ -655,12 +655,12 @@ plugins:
 This plugin allows configuration values to be set by accessing secrets from a key/value engine on a Vault server. It supports several fields:
 
 -   `_plugin`: The value of `_plugin` must be `vault`
--   `server_url`: The URL of the Vault server \(optional, defaults to `ENV['VAULT_ADDR']`\)
--   `auth`: The method for authorizing with the Vault server and any necessary parameters \(optional, defaults to `ENV['VAULT_TOKEN']`\)
--   `path`: The path to the secrets engine \(required\)
--   `field`: The specific secret being used \(optional, defaults to a Ruby hash of all secrets at `path`\)
--   `version`: The version of the key/value engine \(optional, defaults to 1\)
--   `cacert`: The path to the CA certificate \(required when using `https`, defaults to `ENV['VAULT_CACERT']`\)
+-   `server_url`: The URL of the Vault server (optional, defaults to `ENV['VAULT_ADDR']`)
+-   `auth`: The method for authorizing with the Vault server and any necessary parameters (optional, defaults to `ENV['VAULT_TOKEN']`)
+-   `path`: The path to the secrets engine (required)
+-   `field`: The specific secret being used (optional, defaults to a Ruby hash of all secrets at `path`)
+-   `version`: The version of the key/value engine (optional, defaults to 1)
+-   `cacert`: The path to the CA certificate (required when using `https`, defaults to `ENV['VAULT_CACERT']`)
 
 **Authentication methods**
 
@@ -674,7 +674,7 @@ Vault requires a token to assign an identity and a set of policies to a user bef
     -   `user`: The username
     -   `pass`: The password
 
-You can add any Vault plugin field to the inventory configuration. For example, this is how you would access the `private-key` secret on a Vault key-value engine \(version 2\) mounted at `secrets/bolt`:
+You can add any Vault plugin field to the inventory configuration. For example, this is how you would access the `private-key` secret on a Vault key-value engine (version 2) mounted at `secrets/bolt`:
 
 ```yaml
 version: 2
@@ -696,7 +696,7 @@ config:
         version: 2
 ```
 
-You can also set configuration values in the config file \(typically `bolt.yaml`\) under the `plugins` field. If a field is set in both the inventory file and the config file, Bolt uses the value set in the inventory file. The available fields for the config file:
+You can also set configuration values in the config file (typically `bolt.yaml`) under the `plugins` field. If a field is set in both the inventory file and the config file, Bolt uses the value set in the inventory file. The available fields for the config file:
 
 -   `server_url`
 -   `cacert`

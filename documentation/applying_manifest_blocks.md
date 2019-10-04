@@ -1,6 +1,6 @@
 # Applying manifest blocks
 
-Within a plan, you can use Bolt to apply blocks of Puppet code \(manifest blocks\) to remote nodes. 
+Within a plan, you can use Bolt to apply blocks of Puppet code (manifest blocks) to remote nodes. 
 
 Similar to the `puppet apply` command, which applies a standalone Puppet manifest to a local system, the Bolt `apply` command uses manifest blocks to pass code to remote nodes from the command line. You can create manifest blocks that use existing content from the Forge, or mix declarative resource configuration via manifest blocks with procedural orchestration and action in a plan. Most features of the Puppet language are available in a manifest block: classes, custom resource types, and functions. For information about what language features aren't supported, see [Manifest block limitations](applying_manifest_blocks.md#).
 
@@ -18,9 +18,9 @@ Similar to the `puppet apply` command, which applies a standalone Puppet manifes
 
 When you run a plan that contains a manifest block, the `apply_prep` function installs the packages necessary to run the Bolt `apply` command.
 
-The `apply_prep` function identifies the nodes that do not have Puppet agents and runs the `puppet_agent::install` task \(from the [puppet_agent module](https://forge.puppet.com/puppetlabs/puppet_agent)\). It also copies over custom facts from the Bolt modulepath and runs [facter](https://puppet.com/docs/facter/latest/) on the target nodes.
+The `apply_prep` function identifies the nodes that do not have Puppet agents and runs the `puppet_agent::install` task (from the [puppet_agent module](https://forge.puppet.com/puppetlabs/puppet_agent)). It also copies over custom facts from the Bolt modulepath and runs [facter](https://puppet.com/docs/facter/latest/) on the target nodes.
 
-Behind the scenes, Bolt compiles the code in your manifest block \(the code wrapped in curly braces that follows the `apply` function\) into a catalog. Code is compiled in the following order:
+Behind the scenes, Bolt compiles the code in your manifest block (the code wrapped in curly braces that follows the `apply` function) into a catalog. Code is compiled in the following order:
 
 -   Facts gathered from the targets or set in your inventory.
 -   Local variables in the plan, such as `$site_content`.
@@ -36,7 +36,7 @@ The `apply` action supports the following options:
 
 -   `_catch_errors => true` returns a `ResultSet` including failed results, rather than failing the plan.
 -   `_noop => true` applies the manifest block in Puppet no-operation mode, returning a report of the changes it would make, but takes no action.
--   `_run_as => <USER>` applies the manifest block as the specified user. \(This option is for transports that allow a user to run commands under a different username.\)
+-   `_run_as => <USER>` applies the manifest block as the specified user. (This option is for transports that allow a user to run commands under a different username.)
     ```
     # Preview installing docker as root on $nodes.
     apply($nodes, _catch_errors => true, _noop => true, _run_as => root) {
@@ -79,7 +79,7 @@ Manifest block compilation can access Hiera data that you add to your Bolt confi
 
 Following the Hiera 5 convention, the default data dir is relative to `hiera.yaml` at `$BOLTDIR/data`. For config file examples, see [Configuring Hiera](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html).
 
-If a custom data provider is used \(such as `hiera-eyaml`, which allows you to encrypt your data\) the gem dependencies must be available to Bolt. See [Install gems with Bolt packages](bolt_installing.md#).
+If a custom data provider is used (such as `hiera-eyaml`, which allows you to encrypt your data) the gem dependencies must be available to Bolt. See [Install gems with Bolt packages](bolt_installing.md#).
 
 **Related information**  
 
@@ -262,7 +262,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 
 Puppet device modules based on remote transports allow network devices and other targets that can't run a Puppet agent to be managed from a proxy.
 
-**Note:** Support for device modules is experimental and might change in future minor \(y\) releases.
+**Note:** Support for device modules is experimental and might change in future minor (y) releases.
 
 To use device modules from an apply statement, the devices must be added to the Bolt inventory as remote targets. The `name` of the target will be used to auto-populate the `name`, `uri`, `user`, `password`, `host`, and `port` fields of the remote transport's connnection info. You must set the `remote-transport` option and any other connnection info under the `remote` section of config.
 

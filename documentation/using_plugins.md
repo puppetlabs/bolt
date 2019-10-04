@@ -126,7 +126,7 @@ json.dump({'value': secret}, sys.stdout)
 
 ## PuppetDB
 
-The PuppetDB plugin supports looking up targets from PuppetDB. It takes a `query` field, which is either a string containing a [PQL](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html) query or an array containing a [PuppetDB AST](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html) format query. The query is used to determine which targets should be included in the group. If `name` or `uri` is not specified with a [fact lookup](https://github.com/adreyer/bolt/blob/c4891ad27a8fd871f04df1e17ef5e295a3cab7f4/pre-docs/using_plugins.md#fact-lookups) then the \[certname\] for each target in the query result will be used as the `uri` for the new target. Read the [Migrating to Version 2](https://github.com/adreyer/bolt/blob/c4891ad27a8fd871f04df1e17ef5e295a3cab7f4/pre-docs/using_plugins.md#migrating-to-version-2) section for more details on `uri` and `name` keys.
+The PuppetDB plugin supports looking up targets from PuppetDB. It takes a `query` field, which is either a string containing a [PQL](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html) query or an array containing a [PuppetDB AST](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html) format query. The query is used to determine which targets should be included in the group. If `name` or `uri` is not specified with a [fact lookup](https://github.com/adreyer/bolt/blob/c4891ad27a8fd871f04df1e17ef5e295a3cab7f4/pre-docs/using_plugins.md#fact-lookups) then the `[certname]` for each target in the query result will be used as the `uri` for the new target. Read the [Migrating to Version 2](https://github.com/adreyer/bolt/blob/c4891ad27a8fd871f04df1e17ef5e295a3cab7f4/pre-docs/using_plugins.md#migrating-to-version-2) section for more details on `uri` and `name` keys.
 
 ```
 groups:
@@ -146,7 +146,7 @@ groups:
 
 Make sure you have [configured PuppetDB](https://github.com/adreyer/bolt/blob/c4891ad27a8fd871f04df1e17ef5e295a3cab7f4/pre-docs/bolt_connect_puppetdb.md)
 
-If target-specific configuration is required the PuppetDB plugin can be used to lookup configuration values for the `name`, `uri`, and `config` inventory options for each target. The fact lookup values can be either `certname` to reference the \[certname\] of the target or a [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference fact value. Dot notation is required for both structured and unstructured facts.
+If target-specific configuration is required the PuppetDB plugin can be used to lookup configuration values for the `name`, `uri`, and `config` inventory options for each target. The fact lookup values can be either `certname` to reference the `[certname]` of the target or a [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference fact value. Dot notation is required for both structured and unstructured facts.
 
 **Note:** If the `name` or `uri` values are set to a lookup the PuppetDB plugin will **not** set the `uri` to the certname of the target.
 
@@ -189,7 +189,7 @@ groups:
 
 The Terraform plugin supports looking up targets from Terraform state. It accepts several options:
 
-`dir`: The directory from which to load Terraform state `resource_type`: The Terraform resources to match, as a regular expression `uri`: The property of the Terraform resource to use as the target URI \(optional\) `statefile`: The name of the Terraform state file to load within `dir` \(optional, defaults to `terraform.tfstate`\) `name`: The property of the Terraform resource to use as the target name \(optional\) `config`: A Bolt config map where each value is the Terraform property to use for that config setting
+`dir`: The directory from which to load Terraform state `resource_type`: The Terraform resources to match, as a regular expression `uri`: The property of the Terraform resource to use as the target URI (optional) `statefile`: The name of the Terraform state file to load within `dir` (optional, defaults to `terraform.tfstate`) `name`: The property of the Terraform resource to use as the target name (optional) `config`: A Bolt config map where each value is the Terraform property to use for that config setting
 
 One of `uri` or `name` is required. If only `uri` is set, then the value of `uri` will be used as the `name`.
 
@@ -268,11 +268,11 @@ google_compute_instance.app.1:
 
 The AWS Inventory plugin supports looking up running AWS EC2 instances. It supports several fields:
 
--   `profile`: The [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to use when loading from AWS `config` and `credentials` files. \(optional, defaults to `default`\)
+-   `profile`: The [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to use when loading from AWS `config` and `credentials` files. (optional, defaults to `default`)
 -   `region`: The region to look up EC2 instances from.
--   `name`: The [EC2 instance attribute](https://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html) to use as the target name. \(optional\)
--   `uri`: The [EC2 instance attribute](https://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html) to use as the target URI. \(optional\)
--   `filters`: The [filter request parameters](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html) used to filter the EC2 instances by. Filters are name-values pairs, where the name is a request parameter and the values are an array of values to filter by. \(optional\)
+-   `name`: The [EC2 instance attribute](https://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html) to use as the target name. (optional)
+-   `uri`: The [EC2 instance attribute](https://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html) to use as the target URI. (optional)
+-   `filters`: The [filter request parameters](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html) used to filter the EC2 instances by. Filters are name-values pairs, where the name is a request parameter and the values are an array of values to filter by. (optional)
 -   `config`: A Bolt config map where the value for each config setting is an EC2 instance attribute.
 
 One of `uri` or `name` is required. If only `uri` is set, then the value of `uri` will be used as the `name`.
@@ -330,7 +330,7 @@ aws_secret_access_key=...
 region=...
 ```
 
-AWS credential files stored in a non-standard location \(`~/.aws/credentials`\) can be specified in the Bolt config file:
+AWS credential files stored in a non-standard location (`~/.aws/credentials`) can be specified in the Bolt config file:
 
 ```
 plugins:
@@ -410,12 +410,12 @@ plugins:
 This plugin allows config values to be set by accessing secrets from a Key/Value engine on a Vault server. It supports several fields:
 
 -   `_plugin`: The value of `_plugin` must be `vault`
--   `server_url`: The URL of the Vault server \(optional, defaults to `ENV['VAULT_ADDR']`\)
--   `auth`: The method for authorizing with the Vault server and any necessary parameters \(optional, defaults to `ENV['VAULT_TOKEN']`\)
--   `path`: The path to the secrets engine \(required\)
--   `field`: The specific secret being used \(optional, defaults to a Ruby hash of all secrets at the `path`\)
--   `version`: The version of the K/V engine \(optional, defaults to 1\)
--   `cacert`: Path to the CA certificate \(required when using `https`, defaults to `ENV['VAULT_CACERT']`\)
+-   `server_url`: The URL of the Vault server (optional, defaults to `ENV['VAULT_ADDR']`)
+-   `auth`: The method for authorizing with the Vault server and any necessary parameters (optional, defaults to `ENV['VAULT_TOKEN']`)
+-   `path`: The path to the secrets engine (required)
+-   `field`: The specific secret being used (optional, defaults to a Ruby hash of all secrets at the `path`)
+-   `version`: The version of the K/V engine (optional, defaults to 1)
+-   `cacert`: Path to the CA certificate (required when using `https`, defaults to `ENV['VAULT_CACERT']`)
 
 **Authentication Methods**
 
@@ -458,7 +458,7 @@ config:
         version: 2
 ```
 
-You can also set configuration in the config file \(typically `bolt.yaml`\) under the `plugins` field. If a field is set in both the inventory file and the config file, Bolt will use the value set in the inventory file. The available fields for the config file are:
+You can also set configuration in the config file (typically `bolt.yaml`) under the `plugins` field. If a field is set in both the inventory file and the config file, Bolt will use the value set in the inventory file. The available fields for the config file are:
 
 -   `server_url`
 -   `cacert`

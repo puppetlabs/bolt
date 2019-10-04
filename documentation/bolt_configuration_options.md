@@ -25,7 +25,7 @@ ssh:
 -   `concurrency`: The number of threads to use when executing on remote nodes. Default is `100`.
 -   `format`: The format to use when printing results. Options are `human` and `json`. Default is `human`.
 -   `hiera-config`: Specify the path to your Hiera config. The default path is `hiera.yaml` inside the [Bolt project directory](bolt_project_directories.md#).
--   `interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the `.` character \(`.py` and `py` both map to a task executable `task.py`\) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. When a node's name is `localhost`, Ruby tasks run with the Bolt Ruby interpreter by default. This example demonstrates configuring Python tasks to run with a `python3` interpreter:
+-   `interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the `.` character (`.py` and `py` both map to a task executable `task.py`) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. When a node's name is `localhost`, Ruby tasks run with the Bolt Ruby interpreter by default. This example demonstrates configuring Python tasks to run with a `python3` interpreter:
     ```yaml
     interpreters:
       py: /usr/bin/python3
@@ -116,7 +116,7 @@ When using the SSH transport, Bolt also interacts with the ssh-agent for SSH key
 -   `file-protocol`: Which file transfer protocol to use. Either `winrm` or `smb`. Using `smb` is recommended for large file transfers. Default is `winrm`. **Note:** The SMB file protocol is experimental and is currently unsupported in conjunction with SSL, given that only SMB2 is currently implemented.
 -   `password`: Login password. Required unless using Kerberos.
 -   `port`: Connection port. Default is `5986`, or `5985` if `ssl: false`.
--   `realm`: Kerberos realm \(Active Directory domain\) to authenticate against. \(optional\)
+-   `realm`: Kerberos realm (Active Directory domain) to authenticate against. (optional)
 -   `smb-port`: With `file-protocol` set to `smb`, this is the port to establish a connection on. Default is `445`.
 -   `ssl`: When `true`, Bolt uses secure https connections for WinRM. Default is `true`.
 -   `ssl-verify`: When true, verifies the targets certificate matches the `cacert`. Default is `true`.
@@ -167,7 +167,7 @@ Capture the results of your plan runs in a log file.
 
 -   `log`: the configuration of the log file output. This option includes the following properties:
 
--   `append`: add output to an existing log file. Available for only for logs output to a filepath. Your options are `true` \(default\) and `false`.
+-   `append`: add output to an existing log file. Available for only for logs output to a filepath. Your options are `true` (default) and `false`.
 -   `console` or `path/to.log`: the location of the log output.
 -   `level`: the type of information in the log. Either `debug`, `info`, `notice`, `warn`, or `error`. The default for the `console` destination is `warn`. The default for the `file` destination is `notice`.
 

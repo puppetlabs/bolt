@@ -262,7 +262,7 @@ Be aware of a few other Puppet behaviors in plans:
 -   The `--strict_variables` option is on, so if you reference a variable that is not set, you get an error.
 -   `--strict=error` is always on, so minor language issues generate errors. For example `{ a => 10, a => 20 }` is an error because there is a duplicate key in the hash.
 -   Most Puppet settings are empty and not-configurable when using Bolt.
--   Logs include "source location" \(file, line\) instead of resource type or name.
+-   Logs include "source location" (file, line) instead of resource type or name.
 
 ## Handling plan function results
 
@@ -272,14 +272,14 @@ Each [execution function](plan_functions.md#) returns an object type `ResultSet`
 
 A `ResultSet` has the following methods:
 
--   `names()`: The `String` names \(node URIs\) of all nodes in the set as an `Array`.
+-   `names()`: The `String` names (node URIs) of all nodes in the set as an `Array`.
 -   `empty()`: Returns `Boolean` if the execution result set is empty.
 -   `count()`: Returns an `Integer` count of nodes.
 -   `first()`: The first `Result` object, useful to unwrap single results.
 -   `find(String $target_name)`: Look up the `Result` for a specific target.
 -   `error_set()`: A `ResultSet`containing only the results of failed nodes.
 -   `ok_set()`: A `ResultSet` containing only the successful results.
--   `filter_set(block)`: Filters a `ResultSet` with the given block and returns a `ResultSet` object \(where the [filter function](https://puppet.com/docs/puppet/latest/function.html#filter) returns an array or hash\).
+-   `filter_set(block)`: Filters a `ResultSet` with the given block and returns a `ResultSet` object (where the [filter function](https://puppet.com/docs/puppet/latest/function.html#filter) returns an array or hash).
 -   `targets()`: An array of all the `Target` objects from every `Result`in the set.
 -   `ok():` `Boolean` that is the same as `error_nodes.empty`.
 -   `to_data()`: An array of hashes representing either `Result` or `ApplyResults`.
@@ -294,7 +294,7 @@ A `Result` has the following methods:
 -   `ok()`: Returns `true` if the `Result` was successful.
 -   `[]`: Accesses the value hash directly.
 -   `to_data()`: Hash representation of `Result`.
--   `action()`: String representation of result type \(task, command, etc.\).
+-   `action()`: String representation of result type (task, command, etc.).
 
 
 An `ApplyResult` has the following methods:
@@ -304,7 +304,7 @@ An `ApplyResult` has the following methods:
 -   `error()`: An `Error` object constructed from the `_error` in the value.
 -   `ok()`: Returns `true` if the `Result` was successful.
 -   `to_data()`: Hash representation of `ApplyResult`.
--   `action()`: String representation of result type \(apply\).
+-   `action()`: String representation of result type (apply).
 
 
 An instance of `ResultSet` is `Iterable` as if it were an `Array[Variant[Result, ApplyResult]]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the ResultSet returning each result.
