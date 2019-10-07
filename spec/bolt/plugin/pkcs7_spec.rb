@@ -37,4 +37,20 @@ describe Bolt::Plugin::Pkcs7 do
     expect(enc).to start_with('ENC[PKCS7,')
     expect(pkcs7.secret_decrypt('encrypted_value' => enc)).to eq(value)
   end
+
+  context 'using home directory in for key paths' do
+    let(:pkcs7) do
+      Bolt::Plugin::Pkcs7.new(context: context,
+                              config: {
+                                'private-key' => '~/.keys/private_key.pkcs7.pem',
+                                'public-key' => '~/.keys/public_key.pkcs7.pem'
+                              })
+    end
+
+    it 'resolves file paths' do
+      home_dir = File.expand_path('~')
+      expect(pkcs7.private_key_path).to eq("#{home_dir}/.keys/private_key.pkcs7.pem")
+      expect(pkcs7.public_key_path).to eq("#{home_dir}/.keys/public_key.pkcs7.pem")
+    end
+  end
 end
