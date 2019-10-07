@@ -148,6 +148,7 @@ module Bolt
         end
 
         def write_remote_file(source, destination)
+          @logger.debug { "Uploading #{source}, to #{destination}" }
           if target.options['file-protocol'] == 'smb'
             write_remote_file_smb(source, destination)
           else

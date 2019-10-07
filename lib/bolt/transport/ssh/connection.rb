@@ -261,6 +261,8 @@ module Bolt
         end
 
         def copy_file(source, destination)
+          # Do not log wrapper script content
+          @logger.debug { "Uploading #{source}, to #{destination}" } unless source.is_a?(StringIO)
           @session.scp.upload!(source, destination, recursive: true)
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')

@@ -79,6 +79,7 @@ module Bolt
         end
 
         def write_remote_file(source, destination)
+          @logger.debug { "Uploading #{source}, to #{destination}" }
           _, stdout_str, status = execute_local_docker_command('cp', [source, "#{container_id}:#{destination}"])
           raise "Error writing file to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
         rescue StandardError => e
@@ -86,6 +87,7 @@ module Bolt
         end
 
         def write_remote_directory(source, destination)
+          @logger.debug { "Uploading #{source}, to #{destination}" }
           _, stdout_str, status = execute_local_docker_command('cp', [source, "#{container_id}:#{destination}"])
           raise "Error writing directory to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
         rescue StandardError => e

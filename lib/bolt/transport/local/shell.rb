@@ -73,6 +73,7 @@ module Bolt
         end
 
         def copy_file(source, dest)
+          @logger.debug { "Uploading #{source}, to #{dest}" }
           if source.is_a?(StringIO)
             File.open("tempfile", "w") { |f| f.write(source.read) }
             execute(['mv', 'tempfile', dest])

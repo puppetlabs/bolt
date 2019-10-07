@@ -47,6 +47,7 @@ module Bolt
       private :in_tmpdir
 
       def copy_file(source, destination)
+        logger.debug { "Uploading #{source}, to #{destination}" }
         FileUtils.cp_r(source, destination, remove_destination: true)
       rescue StandardError => e
         raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
