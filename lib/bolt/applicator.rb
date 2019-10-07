@@ -150,7 +150,7 @@ module Bolt
       if args.count > 1
         type1 = Puppet.lookup(:pal_script_compiler).type('Hash[String, Data]')
         Puppet::Pal.assert_type(type1, args[1], 'apply options')
-        options = args[1]
+        options = args[1].map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
       end
 
       # collect plan vars and merge them over target vars
@@ -196,7 +196,7 @@ module Bolt
                 'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
                 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
                 '_task' => catalog_apply_task.name,
-                '_noop' => options['_noop']
+                '_noop' => options[:noop]
               }
 
               callback = proc do |event|
@@ -206,7 +206,8 @@ module Bolt
                 @executor.publish_event(event)
               end
               # Respect the run_as default set on the executor
-              options = { '_run_as' => @executor.run_as }.merge(options) if @executor.run_as
+              options[:run_as] = @executor.run_as if @executor.run_as && !options.key?(:run_as)
+
               results = transport.batch_task(batch, catalog_apply_task, arguments, options, &callback)
               Array(results).map { |result| ApplyResult.from_task_result(result) }
             end
@@ -220,7 +221,7 @@ module Bolt
       resource_counts = r.ok_set.map { |result| result.event_metrics&.fetch('total') }.compact
       @executor.report_apply(count_statements(raw_ast), resource_counts)
 
-      if !r.ok && !options['_catch_errors']
+      if !r.ok && !options[:catch_errors]
         raise Bolt::ApplyFailure, r
       end
       r

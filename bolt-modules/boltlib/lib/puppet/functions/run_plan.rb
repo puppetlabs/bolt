@@ -8,20 +8,20 @@ require 'bolt/error'
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
   # Run a plan
   # @param plan_name The plan to run.
-  # @param named_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
   # @return [PlanResult] The result of running the plan. Undef if plan does not explicitly return results.
   # @example Run a plan
   #   run_plan('canary', 'command' => 'false', 'nodes' => $targets, '_catch_errors' => true)
   dispatch :run_plan do
     scope_param
     param 'String', :plan_name
-    optional_param 'Hash', :named_args
+    optional_param 'Hash', :args
     return_type 'Boltlib::PlanResult'
   end
 
   # Run a plan, specifying $nodes as a positional argument.
   # @param plan_name The plan to run.
-  # @param named_args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @return [PlanResult] The result of running the plan. Undef if plan does not explicitly return results.
   # @example Run a plan
@@ -30,21 +30,21 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     scope_param
     param 'String', :plan_name
     param 'Boltlib::TargetSpec', :targets
-    optional_param 'Hash', :named_args
+    optional_param 'Hash', :args
     return_type 'Boltlib::PlanResult'
   end
 
-  def run_plan_with_targetspec(scope, plan_name, targets, named_args = {})
-    unless named_args['nodes'].nil?
+  def run_plan_with_targetspec(scope, plan_name, targets, args = {})
+    unless args['nodes'].nil?
       raise ArgumentError,
             "A plan's 'nodes' parameter may be specified as the second positional argument to " \
             "run_plan(), but in that case 'nodes' must not be specified in the named arguments " \
             "hash."
     end
-    run_plan(scope, plan_name, named_args.merge('nodes' => targets))
+    run_plan(scope, plan_name, args.merge('nodes' => targets))
   end
 
-  def run_plan(scope, plan_name, named_args = {})
+  def run_plan(scope, plan_name, args = {})
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_plan')
@@ -52,16 +52,17 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
 
     executor = Puppet.lookup(:bolt_executor)
 
+    options, params = args.partition { |k, _v| k.start_with?('_') }.map(&:to_h)
+    options = options.map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+
     # Bolt calls this function internally to trigger plans from the CLI. We
     # don't want to count those invocations.
-    unless named_args['_bolt_api_call']
+    unless options[:bolt_api_call]
       executor.report_function_call(self.class.name)
     end
 
     # Report bundled content, this should capture plans run from both CLI and Plans
     executor.report_bundled_content('Plan', plan_name)
-
-    params = named_args.reject { |k, _| k.start_with?('_') }
 
     loaders = closure_scope.compiler.loaders
     # The perspective of the environment is wanted here (for now) to not have to
@@ -73,7 +74,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       raise Bolt::Error.unknown_plan(plan_name)
     end
 
-    if (run_as = named_args['_run_as'])
+    if (run_as = options[:run_as])
       old_run_as = executor.run_as
       executor.run_as = run_as
     end
@@ -118,7 +119,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
 
         result
       rescue Puppet::PreformattedError => e
-        if named_args['_catch_errors'] && e.cause.is_a?(Bolt::Error)
+        if options[:catch_errors] && e.cause.is_a?(Bolt::Error)
           result = e.cause.to_puppet_error
         else
           raise e

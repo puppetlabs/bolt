@@ -61,7 +61,7 @@ module PlanExecutor
     end
 
     def send_request(targets, task, arguments, options = {})
-      description = options['_description']
+      description = options[:description]
       body = { task: task.name,
                environment: @environment,
                noop: arguments['_noop'],

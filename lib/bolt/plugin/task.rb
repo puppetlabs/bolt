@@ -19,7 +19,7 @@ module Bolt
 
       def run_task(opts)
         params = opts['parameters'] || {}
-        options = { '_catch_errors' => true }
+        options = { catch_errors: true }
 
         raise Bolt::ValidationError, "Task plugin requires that the 'task' is specified" unless opts['task']
         task = @context.get_validated_task(opts['task'], params)

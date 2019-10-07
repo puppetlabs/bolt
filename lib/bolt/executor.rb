@@ -225,9 +225,9 @@ module Bolt
     end
 
     def run_command(targets, command, options = {})
-      description = options.fetch('_description', "command '#{command}'")
+      description = options.fetch(:description, "command '#{command}'")
       log_action(description, targets) do
-        options = { '_run_as' => run_as }.merge(options) if run_as
+        options[:run_as] = run_as if run_as && !options.key?(:run_as)
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Running command '#{command}'", batch) do
@@ -238,9 +238,9 @@ module Bolt
     end
 
     def run_script(targets, script, arguments, options = {})
-      description = options.fetch('_description', "script #{script}")
+      description = options.fetch(:description, "script #{script}")
       log_action(description, targets) do
-        options = { '_run_as' => run_as }.merge(options) if run_as
+        options[:run_as] = run_as if run_as && !options.key?(:run_as)
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Running script #{script} with '#{arguments.to_json}'", batch) do
@@ -251,9 +251,9 @@ module Bolt
     end
 
     def run_task(targets, task, arguments, options = {})
-      description = options.fetch('_description', "task #{task.name}")
+      description = options.fetch(:description, "task #{task.name}")
       log_action(description, targets) do
-        options = { '_run_as' => run_as }.merge(options) if run_as
+        options[:run_as] = run_as if run_as && !options.key?(:run_as)
         arguments['_task'] = task.name
 
         batch_execute(targets) do |transport, batch|
@@ -265,9 +265,9 @@ module Bolt
     end
 
     def upload_file(targets, source, destination, options = {})
-      description = options.fetch('_description', "file upload from #{source} to #{destination}")
+      description = options.fetch(:description, "file upload from #{source} to #{destination}")
       log_action(description, targets) do
-        options = { '_run_as' => run_as }.merge(options) if run_as
+        options[:run_as] = run_as if run_as && !options.key?(:run_as)
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Uploading file #{source} to #{destination}", batch) do

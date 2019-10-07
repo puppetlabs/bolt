@@ -290,20 +290,20 @@ describe Bolt::Transport::SSH do
     end
 
     it "can override run_as for command via an option" do
-      expect(ssh.run_command(target, 'whoami', '_run_as' => 'root')['stdout']).to eq("root\n")
+      expect(ssh.run_command(target, 'whoami', run_as: 'root')['stdout']).to eq("root\n")
     end
 
     it "can override run_as for script via an option" do
       contents = "#!/bin/sh\nwhoami"
       with_tempfile_containing('script test', contents) do |file|
-        expect(ssh.run_script(target, file.path, [], '_run_as' => 'root')['stdout']).to eq("root\n")
+        expect(ssh.run_script(target, file.path, [], run_as: 'root')['stdout']).to eq("root\n")
       end
     end
 
     it "can override run_as for task via an option" do
       contents = "#!/bin/sh\nwhoami"
       with_task_containing('tasks_test', contents, 'environment') do |task|
-        expect(ssh.run_task(target, task, {}, '_run_as' => 'root').message).to eq("root\n")
+        expect(ssh.run_task(target, task, {}, run_as: 'root').message).to eq("root\n")
       end
     end
 
@@ -311,10 +311,10 @@ describe Bolt::Transport::SSH do
       contents = "upload file test as root content"
       dest = '/tmp/root-file-upload-test'
       with_tempfile_containing('tasks test upload as root', contents) do |file|
-        expect(ssh.upload(target, file.path, dest, '_run_as' => 'root').message).to match(/Uploaded/)
-        expect(ssh.run_command(target, "cat #{dest}", '_run_as' => 'root')['stdout']).to eq(contents)
-        expect(ssh.run_command(target, "stat -c %U #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
-        expect(ssh.run_command(target, "stat -c %G #{dest}", '_run_as' => 'root')['stdout'].chomp).to eq('root')
+        expect(ssh.upload(target, file.path, dest, run_as:  'root').message).to match(/Uploaded/)
+        expect(ssh.run_command(target, "cat #{dest}", run_as: 'root')['stdout']).to eq(contents)
+        expect(ssh.run_command(target, "stat -c %U #{dest}", run_as:  'root')['stdout'].chomp).to eq('root')
+        expect(ssh.run_command(target, "stat -c %G #{dest}", run_as:  'root')['stdout'].chomp).to eq('root')
       end
 
       ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
@@ -323,7 +323,7 @@ describe Bolt::Transport::SSH do
     it "runs a task that expects big data on stdin" do
       with_task_containing('tasks_test', stdin_task, 'stdin') do |task|
         expect(ssh).not_to receive(:make_wrapper_stringio)
-        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
         expect(result.value['data'].strip.size).to eq(task_input_size)
       end
     end
@@ -331,7 +331,7 @@ describe Bolt::Transport::SSH do
     it "runs a task that expects big data in environment variable" do
       expect(ssh).not_to receive(:make_wrapper_stringio)
       with_task_containing('tasks_test', env_task, 'environment') do |task|
-        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
         expect(result.value['_output'].strip.size).to eq(task_input_size)
       end
     end
@@ -346,7 +346,7 @@ describe Bolt::Transport::SSH do
     it "runs a task that expects big data on stdin" do
       expect(ssh).not_to receive(:make_wrapper_stringio)
       with_task_containing('tasks_test', stdin_task, 'stdin', '.sh') do |task|
-        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
         expect(result.value['data'].strip.size).to eq(task_input_size)
       end
     end
@@ -354,7 +354,7 @@ describe Bolt::Transport::SSH do
     it "runs a task that expects big data in environment variable" do
       expect(ssh).not_to receive(:make_wrapper_stringio)
       with_task_containing('tasks_test', env_task, 'environment', '.sh') do |task|
-        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
         expect(result.value['_output'].strip.size).to eq(task_input_size)
       end
     end
@@ -405,7 +405,7 @@ describe Bolt::Transport::SSH do
     it "runs a task that expects big data on stdin" do
       expect(ssh).to receive(:make_wrapper_stringio).and_call_original
       with_task_containing('tasks_test', stdin_task, 'stdin') do |task|
-        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
         expect(result.value['data'].strip.size).to eq(task_input_size)
       end
     end
@@ -413,7 +413,7 @@ describe Bolt::Transport::SSH do
     it "runs a task that expects big data in environment variable" do
       expect(ssh).not_to receive(:make_wrapper_stringio)
       with_task_containing('tasks_test', env_task, 'environment') do |task|
-        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
         expect(result.value['_output'].strip.size).to eq(task_input_size)
       end
     end
@@ -428,7 +428,7 @@ describe Bolt::Transport::SSH do
     it "runs a task that expects big data on stdin" do
       expect(ssh).to receive(:make_wrapper_stringio).and_call_original
       with_task_containing('tasks_test', stdin_task, 'stdin', '.sh') do |task|
-        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
         expect(result.value['data'].strip.size).to eq(task_input_size)
       end
     end
@@ -436,7 +436,7 @@ describe Bolt::Transport::SSH do
     it "runs a task that expects big data in environment variable" do
       expect(ssh).not_to receive(:make_wrapper_stringio)
       with_task_containing('tasks_test', env_task, 'environment', '.sh') do |task|
-        result = ssh.run_task(target, task, { 'data' => big_task_input }, '_run_as' => 'root')
+        result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
         expect(result.value['_output'].strip.size).to eq(task_input_size)
       end
     end

@@ -27,7 +27,7 @@ module Bolt
 
       def self.validate(options)
         logger = Logging.logger[self]
-        if options['sudo-password'] || options['run-as'] || options['run-as-command'] || options['_run_as']
+        if options['sudo-password'] || options['run-as'] || options['run-as-command'] || options[:run_as]
           logger.warn("run-as is not supported for Windows hosts using the local transport")
         end
       end
