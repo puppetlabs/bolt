@@ -268,13 +268,6 @@ module Bolt
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
 
-        def write_executable_from_content(dest, content, filename)
-          remote_path = File.join(dest.to_s, filename)
-          @session.scp.upload!(StringIO.new(content), remote_path)
-          make_executable(remote_path)
-          remote_path
-        end
-
         # This handles renaming Net::SSH verifiers between version 4.x and 5.x
         # of the gem
         def net_ssh_verifier(verifier)

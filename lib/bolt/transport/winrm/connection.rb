@@ -224,13 +224,6 @@ module Bolt
           remote_path
         end
 
-        def write_executable_from_content(dir, content, filename)
-          validate_extensions(File.extname(filename))
-          remote_path = "#{dir}\\#{filename}"
-          write_remote_file(content, remote_path)
-          remote_path
-        end
-
         private
 
         def smb_client_login
