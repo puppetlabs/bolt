@@ -2,153 +2,173 @@
 
 require 'bolt/inventory/group'
 require 'bolt/inventory/inventory2'
+require 'bolt/inventory/target'
 
 module Bolt
   class Inventory
     class Group2
-      attr_accessor :name, :targets, :aliases, :name_or_alias, :groups,
-                    :config, :facts, :vars, :features, :plugin_hooks
+      attr_accessor :name, :groups
 
       # THESE are duplicates with the old groups for now.
       # Regex used to validate group names and target aliases.
       NAME_REGEX = /\A[a-z0-9_][a-z0-9_-]*\Z/.freeze
 
-      DATA_KEYS = %w[name config facts vars features plugin_hooks].freeze
-      TARGET_KEYS = DATA_KEYS + %w[alias uri]
-      GROUP_KEYS = DATA_KEYS + %w[groups targets]
+      DATA_KEYS = %w[config facts vars features plugin_hooks].freeze
+      TARGET_KEYS = DATA_KEYS + %w[name alias uri]
+      GROUP_KEYS = DATA_KEYS + %w[name groups targets]
       CONFIG_KEYS = Bolt::TRANSPORTS.keys.map(&:to_s) + ['transport']
 
-      def initialize(data, plugins)
+      def initialize(input, plugins)
         @logger = Logging.logger[self]
-        raise ValidationError.new("Expected group to be a Hash, not #{data.class}", nil) unless data.is_a?(Hash)
-        raise ValidationError.new("Cannot set group with plugin", nil) if data.key?('_plugin')
-        raise ValidationError.new("Group does not have a name", nil) unless data.key?('name')
         @plugins = plugins
 
-        %w[name vars features facts plugin_hooks].each do |key|
-          validate_config_plugin(data[key], key, nil)
-        end
+        raise ValidationError.new("Expected group to be a Hash, not #{input.class}", nil) unless input.is_a?(Hash)
 
-        @name = data['name']
+        input = resolve_top_level_reference(input) if reference?(input)
+
+        raise ValidationError.new("Group does not have a name", nil) unless input.key?('name')
+
+        @name = resolve_references(input['name'])
+
         raise ValidationError.new("Group name must be a String, not #{@name.inspect}", nil) unless @name.is_a?(String)
         raise ValidationError.new("Invalid group name #{@name}", @name) unless @name =~ NAME_REGEX
 
-        # DEPRECATION : remove this before finalization
-        if data.key?('target-lookups')
-          msg = "'target-lookups' are no longer a separate key. Merge 'target-lookups' and 'targets' lists and replace 'plugin' with '_plugin'" # rubocop:disable Metrics/LineLength
-          raise ValidationError.new(msg, @name)
+        validate_group_input(input)
+
+        @input = input
+
+        validate_data_keys(@input)
+
+        targets = input.fetch('targets', [])
+        if reference?(targets)
+          targets = resolve_top_level_reference(targets)
+        elsif targets.is_a?(Array)
+          targets = targets.map { |target| resolve_top_level_reference(target) }
+        else
+          raise ValidationError.new("Targets list must be an Array, not #{targets.class}", @name)
         end
 
-        unless (unexpected_keys = data.keys - GROUP_KEYS).empty?
-          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in group #{@name}"
-          @logger.warn(msg)
-        end
-
-        @vars = fetch_value(data, 'vars', Hash)
-        @facts = fetch_value(data, 'facts', Hash)
-        @features = fetch_value(data, 'features', Array)
-        @plugin_hooks = fetch_value(data, 'plugin_hooks', Hash)
-
-        @config = config_only_plugin(fetch_value(data, 'config', Hash))
-
-        unless (unexpected_keys = @config.keys - CONFIG_KEYS).empty?
-          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for group #{@name}"
-          @logger.warn(msg)
-        end
-
-        targets = fetch_value(data, 'targets', Array)
-        groups = fetch_value(data, 'groups', Array)
-
-        @targets = {}
+        @unresolved_targets = {}
+        @resolved_targets = {}
+        @targets = Set.new
         # @target_objects = {}
         @aliases = {}
-        @name_or_alias = []
+        @string_targets = []
 
-        targets.each do |target|
-          # If target is a string, it can refer to either a target name or
-          # alias. Which can't be determined until all groups have been
-          # resolved, and requires a depth-first traversal to categorize them.
+        Array(targets).flatten.each do |target|
+          target = resolve_top_level_reference(target) if reference?(target)
+
+          # If target is a string, it can either be trivially defining a target
+          # or it could be a name/alias of a target defined in another group.
+          # We can't tell the difference until all groups have been resolved,
+          # so we store the string on its own here and process it later.
           if target.is_a?(String)
-            @name_or_alias << target
+            @string_targets << target
           # Handle plugins at this level so that lookups cannot trigger recursive lookups
           elsif target.is_a?(Hash)
-            if target.include?('_plugin')
-              lookup_targets(target)
-            else
-              add_target(target)
-            end
+            add_target_definition(target)
           else
             raise ValidationError.new("Node entry must be a String or Hash, not #{target.class}", @name)
           end
         end
 
+        groups = input.fetch('groups', [])
+        # 'groups' can be a _plugin reference, in which case we want to resolve
+        # it. That can itself return a reference, so we want to keep resolving
+        # them until we have a value. We don't just use resolve_references
+        # though, since that will resolve any nested references and we want to
+        # leave it to the group to do that lazily.
+        groups = resolve_top_level_reference(groups)
+
+        unless groups.is_a?(Array)
+          raise ValidationError.new("Expected groups list to be an Array, not #{groups.class}", @name)
+        end
+
         @groups = groups.map { |g| Group2.new(g, plugins) }
       end
 
-      def validate_config_plugin(data, key, group_name = nil)
-        if data.is_a?(Hash) && data.include?('_plugin')
-          if group_name
-            raise ValidationError.new("Cannot set target #{key.inspect} with plugin", group_name)
-          else
-            raise ValidationError.new("Cannot set group #{key.inspect} with plugin", nil)
-          end
-        end
-
-        Bolt::Util.walk_vals(data, true) do |v|
-          validate_config_plugin(v, key, group_name)
+      # Evaluate all _plugin references in a data structure. Leaves are
+      # evaluated and then their parents are evaluated with references replaced
+      # by their values. If the result of a reference contains more references,
+      # they are resolved again before continuing to ascend the tree. The final
+      # result will not contain any references.
+      def resolve_references(data)
+        Bolt::Util.postwalk_vals(data) do |value|
+          reference?(value) ? resolve_references(resolve_single_reference(value)) : value
         end
       end
-      private :validate_config_plugin
+      private :resolve_references
 
-      def config_only_plugin(data)
-        Bolt::Util.walk_vals(data) do |value|
-          if value.is_a?(Hash) && value.include?('_plugin')
-            plugin_name = value['_plugin']
-            begin
-              hook = @plugins.get_hook(plugin_name, :resolve_reference)
-            rescue Bolt::Plugin::PluginError => e
-              raise ValidationError.new(e.message, @name)
-            end
-
-            begin
-              validate_proc = @plugins.get_hook(plugin_name, :validate_resolve_reference)
-            rescue Bolt::Plugin::PluginError
-              validate_proc = proc { |*args| }
-            end
-
-            validate_proc.call(value)
-
-            Concurrent::Delay.new do
-              begin
-                hook.call(value)
-              rescue StandardError => e
-                loc = "resolve_reference in #{@name}"
-                raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, plugin_name, loc)
-              end
-            end
-          else
-            value
-          end
+      # Iteratively resolves a reference until the result is no longer a
+      # reference. If parameters of the reference are themselves references,
+      # they will be looked. Any remaining references nested inside the result
+      # will *not* be evaluated once the top-level result is not a reference.
+      # This is used to resolve the `targets` and `groups` keys which are
+      # allowed to be references, but which may return data with nested
+      # references that should be resolved lazily.
+      def resolve_top_level_reference(data)
+        if reference?(data)
+          partially_resolved = data.map do |k, v|
+            [k, resolve_references(v)]
+          end.to_h
+          fully_resolved = resolve_single_reference(partially_resolved)
+          # The top-level reference may have returned more references, so repeat the process
+          resolve_top_level_reference(fully_resolved)
+        else
+          data
         end
       end
-      private :config_only_plugin
+      private :resolve_top_level_reference
+
+      # Evaluates a single reference. The value returned may be another
+      # reference.
+      def resolve_single_reference(reference)
+        plugin_name = reference['_plugin']
+        begin
+          hook = @plugins.get_hook(plugin_name, :resolve_reference)
+        rescue Bolt::Plugin::PluginError => e
+          raise ValidationError.new(e.message, @name)
+        end
+
+        begin
+          validate_proc = @plugins.get_hook(plugin_name, :validate_resolve_reference)
+        rescue Bolt::Plugin::PluginError
+          validate_proc = proc { |*args| }
+        end
+
+        validate_proc.call(reference)
+
+        begin
+          # Evaluate the plugin and then recursively evaluate any plugin returned by it.
+          hook.call(reference)
+        rescue StandardError => e
+          loc = "resolve_reference in #{@name}"
+          raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, plugin_name, loc)
+        end
+      end
+      private :resolve_single_reference
+
+      # Checks whether a given value is a _plugin reference
+      def reference?(input)
+        input.is_a?(Hash) && input.key?('_plugin')
+      end
 
       def target_data(target_name)
-        if (data = @targets[target_name])
-          { 'config' => data['config'] || {},
-            'vars' => data['vars'] || {},
-            'facts' => data['facts'] || {},
-            'features' => data['features'] || [],
-            'plugin_hooks' => data['plugin_hooks'] || {},
-            # This allows us to determine if a target was found?
-            'name' => data['name'] || nil,
-            'uri' => data['uri'] || nil,
+        if @unresolved_targets.key?(target_name)
+          target = @unresolved_targets.delete(target_name)
+          resolved_data = resolve_data_keys(target, target_name).merge(
+            'name' => target['name'],
+            'uri' => target['uri'],
             # groups come from group_data
-            'groups' => [] }
+            'groups' => []
+          )
+          @resolved_targets[target_name] = resolved_data
+        else
+          @resolved_targets[target_name]
         end
       end
 
-      def add_target(target)
+      def add_target_definition(target)
         # This check ensures target lookup plugins do not returns bare strings.
         # Remove it if we decide to allows task plugins to return string node
         # names.
@@ -156,12 +176,9 @@ module Bolt
           raise ValidationError.new("Node entry must be a Hash, not #{target.class}", @name)
         end
 
-        # This check prevents plugins from returning plugins
-        raise ValidationError.new("Cannot set target with plugin", @name) if target.key?('_plugin')
-        target.each do |k, v|
-          next if k == 'config'
-          validate_config_plugin(v, k, @name)
-        end
+        target['name'] = resolve_references(target['name']) if target.key?('name')
+        target['uri'] = resolve_references(target['uri']) if target.key?('uri')
+        target['alias'] = resolve_references(target['alias']) if target.key?('alias')
 
         t_name = target['name'] || target['uri']
 
@@ -173,7 +190,7 @@ module Bolt
           raise ValidationError.new("Target name must be ASCII characters: #{target}", @name)
         end
 
-        if @targets.include?(t_name)
+        if local_targets.include?(t_name)
           @logger.warn("Ignoring duplicate target in #{@name}: #{target}")
           return
         end
@@ -183,17 +200,7 @@ module Bolt
           @logger.warn(msg)
         end
 
-        unless target['config'].nil? || target['config'].is_a?(Hash)
-          raise ValidationError.new("Invalid configuration for target: #{t_name}", @name)
-        end
-
-        config_keys = target['config']&.keys || []
-        unless (unexpected_keys = config_keys - CONFIG_KEYS).empty?
-          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for target #{t_name}"
-          @logger.warn(msg)
-        end
-
-        target['config'] = config_only_plugin(target['config'])
+        validate_data_keys(target, t_name)
 
         if target.include?('alias')
           aliases = target['alias']
@@ -213,24 +220,11 @@ module Bolt
           end
         end
 
-        @targets[t_name] = target
+        @unresolved_targets[t_name] = target
       end
 
-      def lookup_targets(lookup)
-        begin
-          hook = @plugins.get_hook(lookup['_plugin'], :resolve_reference)
-        rescue Bolt::Plugin::PluginError => e
-          raise ValidationError.new(e.message, @name)
-        end
-
-        begin
-          targets = hook.call(lookup)
-        rescue StandardError => e
-          loc = "resolve_reference in #{@name}"
-          raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, lookup['_plugin'], loc)
-        end
-
-        targets.each { |target| add_target(target) }
+      def add_target(target)
+        @resolved_targets[target.name] = { 'name' => target.name }
       end
 
       def data_merge(data1, data2)
@@ -253,37 +247,30 @@ module Bolt
         }
       end
 
-      private def fetch_value(data, key, type)
-        value = data.fetch(key, type.new)
-        unless value.is_a?(type)
-          raise ValidationError.new("Expected #{key} to be of type #{type}, not #{value.class}", @name)
-        end
-        value
-      end
-
-      def resolve_aliases(aliases, target_names)
-        @name_or_alias.each do |name_or_alias|
-          # If an alias is found, insert the name into this group. Otherwise use the name as a new target's uri.
-          if target_names.include?(name_or_alias)
-            @targets[name_or_alias] = { 'name' => name_or_alias }
-          elsif (target_name = aliases[name_or_alias])
-            if @targets.include?(target_name)
-              @logger.warn("Ignoring duplicate target in #{@name}: #{target_name}")
+      def resolve_string_targets(aliases, known_targets)
+        @string_targets.each do |string_target|
+          # If this is the name of a target defined elsewhere, then insert the
+          # target into this group as just a name. Otherwise, add a new target
+          # with the string as the URI.
+          if known_targets.include?(string_target)
+            @unresolved_targets[string_target] = { 'name' => string_target }
+          # If this is an alias for an existing target, then add it to this group
+          elsif (canonical_name = aliases[string_target])
+            if local_targets.include?(canonical_name)
+              @logger.warn("Ignoring duplicate target in #{@name}: #{canonical_name}")
             else
-              @targets[target_name] = { 'name' => target_name }
+              @unresolved_targets[canonical_name] = { 'name' => canonical_name }
             end
+          # If it's not the name or alias of an existing target, then make a
+          # new target using the string as the URI
+          elsif local_targets.include?(string_target)
+            @logger.warn("Ignoring duplicate target in #{@name}: #{string_target}")
           else
-            target_name = name_or_alias
-
-            if @targets.include?(target_name)
-              @logger.warn("Ignoring duplicate target in #{@name}: #{target_name}")
-            else
-              @targets[target_name] = { 'uri' => target_name }
-            end
+            @unresolved_targets[string_target] = { 'uri' => string_target }
           end
         end
 
-        @groups.each { |g| g.resolve_aliases(aliases, target_names) }
+        @groups.each { |g| g.resolve_string_targets(aliases, known_targets) }
       end
 
       private def alias_conflict(name, target1, target2)
@@ -302,50 +289,71 @@ module Bolt
         "Node name #{name} conflicts with alias of the same name"
       end
 
-      def validate(used_names = Set.new, target_names = Set.new, aliased = {}, depth = 0)
-        # Test if this group name conflicts with anything used before.
-        raise ValidationError.new("Tried to redefine group #{@name}", @name) if used_names.include?(@name)
-        raise ValidationError.new(group_target_conflict(@name), @name) if target_names.include?(@name)
-        raise ValidationError.new(group_alias_conflict(@name), @name) if aliased.include?(@name)
+      def validate_group_input(input)
+        # DEPRECATION : remove this before finalization
+        if input.key?('target-lookups')
+          msg = "'target-lookups' are no longer a separate key. Merge 'target-lookups' and 'targets' lists and replace 'plugin' with '_plugin'" # rubocop:disable Metrics/LineLength
+          raise ValidationError.new(msg, @name)
+        end
 
-        used_names << @name
+        unless (unexpected_keys = input.keys - GROUP_KEYS).empty?
+          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in group #{@name}"
+          @logger.warn(msg)
+        end
+
+        Bolt::Util.walk_keys(input) do |key|
+          if reference?(key)
+            raise ValidationError.new("Group keys cannot be specified as _plugin references", @name)
+          else
+            key
+          end
+        end
+      end
+
+      def validate(used_group_names = Set.new, used_target_names = Set.new, used_aliases = {})
+        # Test if this group name conflicts with anything used before.
+        raise ValidationError.new("Tried to redefine group #{@name}", @name) if used_group_names.include?(@name)
+        raise ValidationError.new(group_target_conflict(@name), @name) if used_target_names.include?(@name)
+        raise ValidationError.new(group_alias_conflict(@name), @name) if used_aliases.include?(@name)
+
+        used_group_names << @name
 
         # Collect target names and aliases into a list used to validate that subgroups don't conflict.
         # Used names validate that previously used group names don't conflict with new target names/aliases.
-        @targets.each do |t_name, t_data|
+        @unresolved_targets.merge(@resolved_targets).each do |t_name, t_data|
           # Require targets to be parseable as a Target.
           begin
             # Catch malformed URI here
-            Bolt::Inventory::Inventory2.parse_uri(t_data['uri'])
+            Bolt::Inventory::Target.parse_uri(t_data['uri'])
           rescue Bolt::ParseError => e
             @logger.debug(e)
             raise ValidationError.new("Invalid target uri #{t_data['uri']}", @name)
           end
 
-          raise ValidationError.new(group_target_conflict(t_name), @name) if used_names.include?(t_name)
-          if aliased.include?(t_name)
+          raise ValidationError.new(group_target_conflict(t_name), @name) if used_group_names.include?(t_name)
+          if used_aliases.include?(t_name)
             raise ValidationError.new(alias_target_conflict(t_name), @name)
           end
 
-          target_names << t_name
+          used_target_names << t_name
         end
 
         @aliases.each do |n, target|
-          raise ValidationError.new(group_alias_conflict(n), @name) if used_names.include?(n)
-          if target_names.include?(n)
+          raise ValidationError.new(group_alias_conflict(n), @name) if used_group_names.include?(n)
+          if used_target_names.include?(n)
             raise ValidationError.new(alias_target_conflict(n), @name)
           end
 
-          if aliased.include?(n)
-            raise ValidationError.new(alias_conflict(n, target, aliased[n]), @name)
+          if used_aliases.include?(n)
+            raise ValidationError.new(alias_conflict(n, target, used_aliases[n]), @name)
           end
 
-          aliased[n] = target
+          used_aliases[n] = target
         end
 
         @groups.each do |g|
           begin
-            g.validate(used_names, target_names, aliased, depth + 1)
+            g.validate(used_group_names, used_target_names, used_aliases)
           rescue ValidationError => e
             e.add_parent(@name)
             raise e
@@ -355,35 +363,57 @@ module Bolt
         nil
       end
 
-      # The data functions below expect and return nil or a hash of the schema
-      # {'config' => Hash, 'vars' => Hash, 'facts' => Hash, 'features' => Array,
-      #  'plugin_hooks' => Hash, 'groups' => Array}
-      def data_for(target_name)
-        data_merge(group_collect(target_name), target_collect(target_name))
+      def resolve_data_keys(data, target = nil)
+        result = {
+          'config' => resolve_references(data.fetch('config', {})),
+          'vars' => resolve_references(data.fetch('vars', {})),
+          'facts' => resolve_references(data.fetch('facts', {})),
+          'features' => resolve_references(data.fetch('features', [])),
+          'plugin_hooks' => resolve_references(data.fetch('plugin_hooks', {}))
+        }
+        validate_data_keys(result, target)
+        result['features'] = Set.new(result['features'].flatten)
+        result
+      end
+
+      def validate_data_keys(data, target = nil)
+        {
+          'config' => Hash,
+          'vars' => Hash,
+          'facts' => Hash,
+          'features' => Array,
+          'plugin_hooks' => Hash
+        }.each do |key, expected_type|
+          next if !data.key?(key) || data[key].is_a?(expected_type) || reference?(data[key])
+
+          msg = +"Expected #{key} to be of type #{expected_type}, not #{data[key].class}"
+          msg << " for target #{target}" if target
+          raise ValidationError.new(msg, @name)
+        end
+        unless reference?(data['config'])
+          unexpected_keys = data.fetch('config', {}).keys - CONFIG_KEYS
+          if unexpected_keys.any?
+            msg = +"Found unexpected key(s) #{unexpected_keys.join(', ')} in config for"
+            msg << " target #{target} in" if target
+            msg << " group #{@name}"
+            @logger.warn(msg)
+          end
+        end
       end
 
       def group_data
-        { 'config' => @config,
-          'vars' => @vars,
-          'facts' => @facts,
-          'features' => @features,
-          'plugin_hooks' => @plugin_hooks,
-          'groups' => [@name] }
+        @group_data ||= resolve_data_keys(@input).merge('groups' => [@name])
       end
 
-      def empty_data
-        { 'config' => {},
-          'vars' => {},
-          'facts' => {},
-          'features' => [],
-          'plugin_hooks' => {},
-          'groups' => [] }
+      # Returns targets contained directly within the group, ignoring subgroups
+      def local_targets
+        Set.new(@unresolved_targets.keys) + Set.new(@resolved_targets.keys)
       end
 
       # Returns all targets contained within the group, which includes targets from subgroups.
-      def target_names
-        @groups.inject(local_target_names) do |acc, g|
-          acc.merge(g.target_names)
+      def all_targets
+        @groups.inject(local_targets) do |acc, g|
+          acc.merge(g.all_targets)
         end
       end
 
@@ -401,35 +431,28 @@ module Bolt
         end
       end
 
-      def local_target_names
-        Set.new(@targets.keys)
-      end
-      private :local_target_names
-
       def target_collect(target_name)
-        data = @groups.inject(nil) do |acc, g|
-          if (d = g.target_collect(target_name))
-            data_merge(d, acc)
-          else
-            acc
-          end
+        child_data = @groups.map { |group| group.target_collect(target_name) }
+        # Data from earlier groups wins
+        child_result = child_data.inject do |acc, group_data|
+          data_merge(group_data, acc)
         end
-        data_merge(target_data(target_name), data)
+        # Children override the parent
+        data_merge(target_data(target_name), child_result)
       end
 
       def group_collect(target_name)
-        data = @groups.inject(nil) do |acc, g|
-          if (d = g.data_for(target_name))
-            data_merge(d, acc)
-          else
-            acc
-          end
+        child_data = @groups.map { |group| group.group_collect(target_name) }
+        # Data from earlier groups wins
+        child_result = child_data.inject do |acc, group_data|
+          data_merge(group_data, acc)
         end
 
-        if data
-          data_merge(group_data, data)
-        elsif @targets.include?(target_name)
-          group_data
+        # If this group has the target or one of the child groups has the
+        # target, return the data, otherwise return nil
+        if child_result || local_targets.include?(target_name)
+          # Children override the parent
+          data_merge(group_data, child_result)
         end
       end
     end

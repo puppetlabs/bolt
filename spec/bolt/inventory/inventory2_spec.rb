@@ -293,7 +293,7 @@ describe Bolt::Inventory::Inventory2 do
           ts = ['ssh://a', 'winrm://b:5000', 'u:p@c']
           names = 'ssh://a, winrm://b:5000, u:p@c'
           inventory.get_targets(names)
-          targets = inventory.get_targets(names).map(&:uri)
+          targets = inventory.get_targets('all').map(&:uri)
           expect(targets).to eq(ts)
         end
 
@@ -1161,7 +1161,7 @@ describe Bolt::Inventory::Inventory2 do
   end
 
   describe 'add_facts' do
-    context 'whith and without $future flag' do
+    context 'with and without $future flag' do
       let(:target) { inventory.get_target('foo') }
       let(:facts) { { 'foo' => 'bar' } }
       after(:each) do

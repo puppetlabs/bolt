@@ -10,10 +10,12 @@ module Bolt
     # Target.new from a plan initialized with a hash
     def self.from_asserted_hash(hash)
       inventory = Puppet.lookup(:bolt_inventory)
-      inventory.create_target_from_plan(hash)
+      target = inventory.create_target_from_plan(hash)
+      new(target.name, inventory)
     end
 
-    # Target.new from a plan with just a uri
+    # Target.new from a plan with just a uri. Puppet requires the arguments to
+    # this method to match (by name) the attributes defined on the datatype.
     # rubocop:disable Lint/UnusedMethodArgument
     def self.from_asserted_args(uri = nil,
                                 name = nil,
@@ -23,36 +25,14 @@ module Bolt
                                 vars = nil,
                                 features = nil,
                                 plugin_hooks = nil)
-      inventory = Puppet.lookup(:bolt_inventory)
-      inventory.create_target_from_plan('uri' => uri)
+      from_asserted_hash('uri' => uri)
     end
 
-    # URI can be passes as nil
-    def initialize(uri = nil,
-                   name = nil,
-                   target_alias = nil,
-                   config = nil,
-                   facts = nil,
-                   vars = nil,
-                   features = nil,
-                   plugin_hooks = nil)
+    def initialize(name, inventory = nil)
       @name = name
+      @inventory = inventory
     end
     # rubocop:enable Lint/UnusedMethodArgument
-
-    # Used for munging target + group data
-    def target_data_hash
-      {
-        'config' => @inventory.targets[@name]['config'],
-        'vars' => @inventory.targets[@name]['vars'],
-        'facts' => @inventory.targets[@name]['facts'],
-        'features' => @inventory.targets[@name]['features'].to_a,
-        'plugin_hooks' => @inventory.targets[@name]['plugin_hooks'],
-        'name' => @inventory.targets[@name]['name'],
-        'uri' => @inventory.targets[@name]['uri'],
-        'alias' => @inventory.targets[@name]['target_alias']
-      }
-    end
 
     # features returns an array to be compatible with plans
     def features
@@ -77,15 +57,15 @@ module Bolt
     end
 
     def config
-      @inventory.target_config(self)
+      inventory_target.config
     end
 
     def safe_name
-      @inventory.targets[@name]['safe_name']
+      inventory_target.safe_name
     end
 
     def target_alias
-      @inventory.targets[@name]['target_alias']
+      inventory_target.target_alias
     end
 
     def to_h
@@ -100,53 +80,51 @@ module Bolt
       )
     end
 
+    def inventory_target
+      @inventory.targets[@name]
+    end
+
     def host
-      @inventory.targets[@name]['uri_obj']&.hostname || @inventory.targets[@name]['host']
+      inventory_target.host
     end
 
     attr_reader :name
 
     def uri
-      @inventory.targets[@name]['uri']
+      inventory_target.uri
     end
 
     def remote?
-      @inventory.targets[@name]['uri_obj']&.scheme == 'remote' || @inventory.targets[@name]['protocol'] == 'remote'
+      protocol == 'remote'
     end
 
     def port
-      @inventory.targets[@name]['uri_obj']&.port || @inventory.targets[@name]['port']
+      inventory_target.port
     end
 
-    # transport is separate from protocol for remote targets.
     def transport
-      remote? ? 'remote' : protocol
+      inventory_target.protocol
     end
 
     def protocol
-      @inventory.targets[@name]['uri_obj']&.scheme || @inventory.targets[@name]['protocol']
+      inventory_target.protocol
     end
 
     def user
-      unencode(@inventory.targets[@name]['uri_obj']&.user) || @inventory.targets[@name]['user']
+      inventory_target.user
     end
 
     def password
-      unencode(@inventory.targets[@name]['uri_obj']&.password) || @inventory.targets[@name]['password']
+      inventory_target.password
     end
 
     def options
-      @inventory.targets[@name]['options']
+      inventory_target.options
     end
 
     def plugin_hooks
-      @inventory.targets[@name]['cached_state']['plugin_hooks']
+      inventory_target.plugin_hooks
     end
-
-    def unencode(component)
-      Addressable::URI.unencode_component(component)
-    end
-    private :unencode
 
     def eql?(other)
       self.class.equal?(other.class) && @name == other.name

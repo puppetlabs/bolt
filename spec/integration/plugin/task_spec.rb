@@ -169,19 +169,6 @@ describe 'using the task plugin' do
         end
       end
 
-      it 'errors when targets are strings' do
-        inventory['targets'][0]['parameters']['value'] = %w[foo bar]
-        with_boltdir(inventory: inventory, config: config) do |boltdir|
-          plan_dir = File.join(boltdir, 'modules', 'passw', 'plans')
-          FileUtils.mkdir_p(plan_dir)
-          File.write(File.join(plan_dir, 'init.pp'), plan)
-          result = run_cli_json(['plan', 'run', 'passw', '--boltdir', boltdir], rescue_exec: true)
-
-          expect(result).to include('kind' => "bolt.inventory/validation-error")
-          expect(result['msg']).to match(/Node entry must be a Hash, not String/)
-        end
-      end
-
       it 'errors when execution fails' do
         inventory['targets'][0]['parameters']['bad-key'] = 10
         with_boltdir(inventory: inventory, config: config) do |boltdir|
@@ -190,7 +177,7 @@ describe 'using the task plugin' do
           File.write(File.join(plan_dir, 'init.pp'), plan)
           result = run_cli_json(['plan', 'run', 'passw', '--boltdir', boltdir], rescue_exec: true)
 
-          expect(result).to include('kind' => "bolt/plugin-error")
+          expect(result).to include('kind' => "bolt/validation-error")
           expect(result['msg']).to match(/bad-key/)
         end
       end

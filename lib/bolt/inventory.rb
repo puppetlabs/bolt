@@ -269,7 +269,7 @@ module Bolt
     private :resolve_name
 
     def create_target(data)
-      Target.new(data)
+      Bolt::Target.new(data)
     end
     private :create_target
 
