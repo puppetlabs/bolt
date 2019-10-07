@@ -281,6 +281,7 @@ module Bolt
     def host
       @uri_obj&.hostname || @host
     end
+    alias safe_name host
 
     def name
       @name || @uri

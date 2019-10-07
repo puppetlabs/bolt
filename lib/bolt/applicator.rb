@@ -81,7 +81,7 @@ module Bolt
     end
 
     def compile(target, ast, plan_vars)
-      trusted = Puppet::Context::TrustedInformation.new('local', target.host, {})
+      trusted = Puppet::Context::TrustedInformation.new('local', target.name, {})
       facts = @inventory.facts(target).merge('bolt' => true)
 
       catalog_input = {
@@ -90,7 +90,7 @@ module Bolt
         pdb_config: @pdb_client.config.to_hash,
         hiera_config: @hiera_config,
         target: {
-          name: target.host,
+          name: target.name,
           facts: facts,
           variables: @inventory.vars(target).merge(plan_vars),
           trusted: trusted.to_h

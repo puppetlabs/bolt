@@ -12,7 +12,7 @@ module Bolt
         DEFAULT_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
 
         def initialize(target, transport_logger)
-          raise Bolt::ValidationError, "Target #{target.name} does not have a host" unless target.host
+          raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
           @target = target
 
           default_port = target.options['ssl'] ? HTTPS_PORT : HTTP_PORT
@@ -23,7 +23,7 @@ module Bolt
           extensions += target.options['interpreters'].keys if target.options['interpreters']
           @extensions = DEFAULT_EXTENSIONS.to_set.merge(extensions)
 
-          @logger = Logging.logger[@target.host]
+          @logger = Logging.logger[@target.safe_name]
           @transport_logger = transport_logger
         end
 
@@ -243,12 +243,12 @@ module Bolt
             @logger.debug { "Connected to #{@client.dns_host_name}" }
           when WindowsError::NTStatus::STATUS_LOGON_FAILURE
             raise Bolt::Node::ConnectError.new(
-              "SMB authentication failed for #{target.host}",
+              "SMB authentication failed for #{target.safe_name}",
               'AUTH_ERROR'
             )
           else
             raise Bolt::Node::ConnectError.new(
-              "Failed to connect to #{target.host} using SMB: #{status.description}",
+              "Failed to connect to #{target.safe_name} using SMB: #{status.description}",
               'CONNECT_ERROR'
             )
           end
@@ -267,12 +267,12 @@ module Bolt
         rescue Errno::ECONNREFUSED => e
           # handle this to prevent obscuring error message as SMB problem
           raise Bolt::Node::ConnectError.new(
-            "Failed to connect to #{target.host} using SMB: #{e.message}",
+            "Failed to connect to #{target.safe_name} using SMB: #{e.message}",
             'CONNECT_ERROR'
           )
         rescue Timeout::Error
           raise Bolt::Node::ConnectError.new(
-            "Timeout after #{target.options['connect-timeout']} seconds connecting to #{target.host}",
+            "Timeout after #{target.options['connect-timeout']} seconds connecting to #{target.safe_name}",
             'CONNECT_ERROR'
           )
         end

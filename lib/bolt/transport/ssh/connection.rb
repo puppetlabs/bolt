@@ -19,7 +19,7 @@ module Bolt
           require 'net/ssh'
           require 'net/ssh/proxy/jump'
 
-          raise Bolt::ValidationError, "Target #{target.name} does not have a host" unless target.host
+          raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
           @sudo_id = SecureRandom.uuid
 
           @target = target
@@ -30,7 +30,7 @@ module Bolt
           @run_as = nil
           @strict_host_key_checking = ssh_config[:strict_host_key_checking]
 
-          @logger = Logging.logger[@target.host]
+          @logger = Logging.logger[@target.safe_name]
           @transport_logger = transport_logger
 
           if target.options['private-key']&.instance_of?(String)
@@ -119,17 +119,17 @@ module Bolt
           )
         rescue Net::SSH::HostKeyError => e
           raise Bolt::Node::ConnectError.new(
-            "Host key verification failed for #{target.uri}: #{e.message}",
+            "Host key verification failed for #{target.safe_name}: #{e.message}",
             'HOST_KEY_ERROR'
           )
         rescue Net::SSH::ConnectionTimeout
           raise Bolt::Node::ConnectError.new(
-            "Timeout after #{target.options['connect-timeout']} seconds connecting to #{target.uri}",
+            "Timeout after #{target.options['connect-timeout']} seconds connecting to #{target.safe_name}",
             'CONNECT_ERROR'
           )
         rescue StandardError => e
           raise Bolt::Node::ConnectError.new(
-            "Failed to connect to #{target.uri}: #{e.message}",
+            "Failed to connect to #{target.safe_name}: #{e.message}",
             'CONNECT_ERROR'
           )
         end
@@ -155,7 +155,7 @@ module Bolt
               # Cancel the sudo prompt to prevent later commands getting stuck
               channel.close
               raise Bolt::Node::EscalateError.new(
-                "Sudo password for user #{@user} was not provided for #{target.uri}",
+                "Sudo password for user #{@user} was not provided for #{target.safe_name}",
                 'NO_PASSWORD'
               )
             end
@@ -168,13 +168,13 @@ module Bolt
           elsif data =~ /^#{@user} is not in the sudoers file\./
             @logger.debug { data }
             raise Bolt::Node::EscalateError.new(
-              "User #{@user} does not have sudo permission on #{target.uri}",
+              "User #{@user} does not have sudo permission on #{target.safe_name}",
               'SUDO_DENIED'
             )
           elsif data =~ /^Sorry, try again\./
             @logger.debug { data }
             raise Bolt::Node::EscalateError.new(
-              "Sudo password for user #{@user} not recognized on #{target.uri}",
+              "Sudo password for user #{@user} not recognized on #{target.safe_name}",
               'BAD_PASSWORD'
             )
           end

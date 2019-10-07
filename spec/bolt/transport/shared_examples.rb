@@ -560,6 +560,7 @@ end
 # - host_and_port: host and port to connect to
 # - user: the default user
 # - password: the default user password
+# - safe_name: expected target safe_name
 shared_examples 'with sudo', sudo: true do
   context "with sudo" do
     let(:config) {
@@ -631,7 +632,7 @@ SHELL
         expect {
           runner.run_command(target, 'whoami')
         }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{user} not recognized on #{host_and_port}")
+                         "Sudo password for user #{user} not recognized on #{safe_name}")
       end
     end
 
@@ -643,7 +644,7 @@ SHELL
         expect {
           runner.run_command(target, 'whoami')
         }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{user} was not provided for #{host_and_port}")
+                         "Sudo password for user #{user} was not provided for #{safe_name}")
       end
     end
   end

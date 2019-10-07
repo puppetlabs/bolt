@@ -218,7 +218,7 @@ module Bolt
     end
 
     def with_node_logging(description, batch)
-      @logger.info("#{description} on #{batch.map(&:uri)}")
+      @logger.info("#{description} on #{batch.map(&:safe_name)}")
       result = yield
       @logger.info(result.to_json)
       result
