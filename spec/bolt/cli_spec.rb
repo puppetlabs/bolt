@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'signal_helper'
 require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt/cli'
@@ -838,24 +837,6 @@ describe "Bolt::CLI" do
         allow(cli).to receive(:outputter).and_return(outputter)
       end
 
-      it "traps SIGINT early", :signals_self do
-        options = double(Hash)
-        expect(options) .to receive(:[]) do
-          Process.kill :INT, Process.pid
-          sync_thread.join(1) # give ruby some time to handle the signal
-          raise 'early exit'
-        end
-
-        expect(cli).to receive(:exit!) do
-          sync_thread.kill
-        end
-
-        expect { cli.execute(options) }.to raise_error('early exit')
-        expect(@log_output.readlines.last).to match(
-          /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\.$/
-        )
-      end
-
       context 'when running a command' do
         let(:options) {
           {
@@ -883,24 +864,6 @@ describe "Bolt::CLI" do
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
-        end
-
-        it "traps SIGINT", :signals_self do
-          expect(executor).to receive(:run_command).with(targets, 'whoami', kind_of(Hash)) do
-            Process.kill :INT, Process.pid
-            sync_thread.join(1) # give ruby some time to handle the signal
-            Bolt::ResultSet.new([])
-          end
-
-          expect(cli).to receive(:exit!) do
-            sync_thread.kill
-          end
-
-          cli.execute(options)
-          expect(@log_output.readlines.last).to match(
-            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
-             )There may be processes left executing on some nodes\.$/
-          )
         end
       end
 
@@ -957,26 +920,6 @@ describe "Bolt::CLI" do
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
-        end
-
-        it "traps SIGINT", :signals_self do
-          stub_file(script)
-
-          expect(executor).to receive(:run_script).with(targets, script, [], kind_of(Hash)) do
-            Process.kill :INT, Process.pid
-            sync_thread.join(1) # give ruby some time to handle the signal
-            Bolt::ResultSet.new([])
-          end
-
-          expect(cli).to receive(:exit!) do
-            sync_thread.kill
-          end
-
-          cli.execute(options)
-          expect(@log_output.readlines.last).to match(
-            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
-             )There may be processes left executing on some nodes\.$/
-          )
         end
       end
 
@@ -1427,26 +1370,6 @@ describe "Bolt::CLI" do
           end
         end
 
-        it "traps SIGINT", :signals_self do
-          expect(executor)
-            .to receive(:run_task)
-            .with(targets, task_t, task_params, kind_of(Hash)) do
-              Process.kill :INT, Process.pid
-              sync_thread.join(1) # give ruby some time to handle the signal
-              Bolt::ResultSet.new([])
-            end
-
-          expect(cli).to receive(:exit!) do
-            sync_thread.kill
-          end
-
-          cli.execute(options)
-          expect(@log_output.readlines.last).to match(
-            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
-             )There may be processes left executing on some nodes\.$/
-          )
-        end
-
         describe 'task parameters validation' do
           let(:task_name) { +'sample::params' }
           let(:task_params) { {} }
@@ -1725,30 +1648,6 @@ describe "Bolt::CLI" do
 
           expect(cli.execute(options)).to eq(1)
           expect(JSON.parse(output.string)['msg']).to match(/Could not find a plan named "sample::dne"/)
-        end
-
-        it "traps SIGINT", :signals_self do
-          expect(executor)
-            .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash)) do
-              Process.kill :INT, Process.pid
-              sync_thread.join(1) # give ruby some time to handle the signal
-              Bolt::ResultSet.new([])
-            end
-
-          expect(executor).to receive(:start_plan)
-          expect(executor).to receive(:log_plan)
-          expect(executor).to receive(:finish_plan)
-
-          expect(cli).to receive(:exit!) do
-            sync_thread.kill
-          end
-
-          cli.execute(options)
-          expect(@log_output.readlines.last).to match(
-            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
-             )There may be processes left executing on some nodes\.$/
-          )
         end
       end
 
