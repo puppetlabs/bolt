@@ -301,7 +301,7 @@ module Bolt
 
       Available options are:
     INVENTORY_HELP
-    
+
     GROUP_HELP = <<~GROUP_HELP
       Usage: bolt group <action>
 

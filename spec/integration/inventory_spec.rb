@@ -55,7 +55,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   let(:run_plan) { ['plan', 'run', 'inventory', "command=#{shell_cmd}", "host=#{target}"] + config_flags }
 
   let(:show_inventory) { ['inventory', 'show', '--nodes', target] + config_flags }
-  let(:show_group) { ['group', 'show'] + config_flags }
+  let(:show_group) { %w[group show] + config_flags }
 
   around(:each) do |example|
     with_tempfile_containing('inventory', inventory.to_json, '.yml') do |f|
