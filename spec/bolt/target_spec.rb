@@ -52,6 +52,18 @@ describe Bolt::Target do
                        /Invalid port number/)
     end
 
+    it 'can compare targets' do
+      target = Bolt::Target.new('target')
+      other = Bolt::Target.new('other')
+      target_same_name_foo = Bolt::Target.new(nil, 'name' => 'target')
+      target_same_name_bar = Bolt::Target.new(nil, 'name' => 'target')
+      other_name = Bolt::Target.new(nil, 'name' => 'other')
+      expect(target.eql?(target)).to eq(true)
+      expect(target.eql?(other)).to eq(false)
+      expect(target_same_name_bar.eql?(target_same_name_foo)).to eq(true)
+      expect(target_same_name_foo.eql?(other_name)).to eq(false)
+    end
+
     it "accepts escaped special characters in password" do
       table = {
         "\n" => '%0A',
