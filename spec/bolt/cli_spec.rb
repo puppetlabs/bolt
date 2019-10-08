@@ -2201,6 +2201,12 @@ describe "Bolt::CLI" do
       cli.execute(cli.parse)
     end
 
+    it 'lists groups in the inventory file' do
+      cli = Bolt::CLI.new(%w[group show])
+      expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_groups)
+      cli.execute(cli.parse)
+    end
+
     context 'with BOLT_INVENTORY set' do
       before(:each) { ENV['BOLT_INVENTORY'] = '---' }
       after(:each) { ENV.delete('BOLT_INVENTORY') }

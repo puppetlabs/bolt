@@ -55,6 +55,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   let(:run_plan) { ['plan', 'run', 'inventory', "command=#{shell_cmd}", "host=#{target}"] + config_flags }
 
   let(:show_inventory) { ['inventory', 'show', '--nodes', target] + config_flags }
+  let(:show_group) { ['group', 'show'] + config_flags }
 
   around(:each) do |example|
     with_tempfile_containing('inventory', inventory.to_json, '.yml') do |f|
@@ -390,6 +391,44 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   context 'when showing inventory' do
     it 'lists targets an action would run on' do
       expect(run_cli_json(show_inventory)['targets'][0]).to include(target)
+    end
+  end
+
+  context 'when showing groups' do
+    let(:inventory) do
+      { groups:
+          [
+            { name: 'foogroup',
+              nodes: [
+                { name: conn[:host],
+                  config: {
+                    transport: conn[:protocol],
+                    conn[:protocol] => {
+                      user: conn[:user],
+                      port: conn[:port]
+                    }
+                  } }
+              ] }
+          ],
+        config: {
+          ssh: { 'host-key-check' => false },
+          winrm: { ssl: false, 'ssl-verify' => false }
+        },
+        vars: {
+          daffy: "duck"
+        },
+        facts: {
+          scooby: 'doo',
+          cloud: {
+            provider: 'Azure',
+            foo: 'bar'
+          }
+        } }
+    end
+
+    it 'lists groups in inventory' do
+      expect(run_cli_json(show_group)['groups']).to include('all')
+      expect(run_cli_json(show_group)['groups']).to include('foogroup')
     end
   end
 end

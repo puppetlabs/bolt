@@ -288,12 +288,6 @@ module Bolt
 
       analytics.screen_view(screen, screen_view_fields)
 
-      # bolt config show
-      # bolt config show <target>
-      # bolt var show  # all
-      # bolt var show --target <target>
-      # bolt var show --group <group>
-
       if options[:action] == 'show'
         if options[:subcommand] == 'task'
           if options[:object]
@@ -310,8 +304,6 @@ module Bolt
         elsif options[:subcommand] == 'inventory'
           list_targets
         elsif options[:subcommand] == 'group'
-          # # list all groups
-          # bolt group show
           list_groups
         end
         return 0
