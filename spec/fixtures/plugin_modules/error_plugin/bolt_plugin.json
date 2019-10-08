@@ -1,5 +1,7 @@
 { "hooks": {
   "resolve_reference": {
+    "task": "error_plugin" },
+  "puppet_library": {
     "task": "error_plugin" }
   }
 }

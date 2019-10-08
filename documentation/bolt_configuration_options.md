@@ -13,7 +13,7 @@ format: human
 ssh:
   host-key-check: false
   private-key: ~/.ssh/bolt_id
-  user: foo 
+  user: foo
   interpreters:
     rb: /home/foo/.rbenv/versions/2.5.1/bin/ruby
 ```
@@ -196,12 +196,16 @@ The `plugin_hooks` section allows you to configure what plugins a specific hook 
 
 For now, the only configurable plugin hook is `puppet_library`.
 
+The default is to use the puppet_agent plugin with the agent service stopped:
+
 ```yaml
 plugin_hooks:
   puppet_library:
-    plugin: install_agent
+    plugin: puppet_agent
+    stop_service: true
 ```
 
+You can use the bootstrap task to connect all targets to a PE master instead:
 ```yaml
 plugin_hooks:
   puppet_library:

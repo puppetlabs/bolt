@@ -2,6 +2,12 @@
 
 ## Bolt Next
 
+### Breaking Changes
+
+* **Replace install_agent plugin into puppet_agent module** ([#1294](https://github.com/puppetlabs/bolt/issues/1294))
+
+  The puppetlabs-puppet agent module now provides the same functionality as the `install_agent` plugin did previously. This PR removes the `install_agent` plugin and makes the `puppet_agent` module the default plugin for the `puppet_library` hook. If you do not use the bundled `puppet_agent` module you will need to update to `2.2.1`. If you explicitly referenced the `install_agent` plugin you will need to reference `puppet_agent` instead.
+
 ### New Features
 
 * **Support `limit` option for `do_until` function** ([#1270](https://github.com/puppetlabs/bolt/issues/1270))
