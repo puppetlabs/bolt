@@ -7,6 +7,7 @@ require 'optparse'
 module Bolt
   class BoltOptionParser < OptionParser
     OPTIONS = { inventory: %w[nodes targets query rerun description],
+                group: %w[nodes targets query rerun description],
                 authentication: %w[user password private-key host-key-check ssl ssl-verify],
                 escalation: %w[run-as sudo-password],
                 run_context: %w[concurrency inventoryfile save-rerun],
@@ -31,6 +32,9 @@ module Bolt
       when 'inventory'
         { flags: OPTIONS[:inventory] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
           banner: INVENTORY_HELP }
+      when 'group'
+        { flags: OPTIONS[:group] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
+          banner: GROUP_HELP }
       when 'plan'
         case action
         when 'convert'
@@ -117,6 +121,7 @@ module Bolt
         bolt secret encrypt <plaintext>  Encrypt a value
         bolt secret decrypt <encrypted>  Decrypt a value
         bolt inventory show              Show the list of targets an action would run on
+        bolt group show                  Show the list of groups in the inventory
 
       Run `bolt <subcommand> --help` to view specific examples.
 
@@ -296,6 +301,15 @@ module Bolt
 
       Available options are:
     INVENTORY_HELP
+    
+    GROUP_HELP = <<~GROUP_HELP
+      Usage: bolt group <action>
+
+      Available actions are:
+        show                     Show the list of groups in the inventory
+
+      Available options are:
+    GROUP_HELP
 
     def initialize(options)
       super()
