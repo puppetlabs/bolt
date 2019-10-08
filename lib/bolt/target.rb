@@ -147,6 +147,11 @@ module Bolt
       Addressable::URI.unencode_component(component)
     end
     private :unencode
+
+    def eql?(other)
+      self.class.equal?(other.class) && @name == other.name
+    end
+    alias == eql?
   end
 
   class Target
