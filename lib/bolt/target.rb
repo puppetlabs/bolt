@@ -147,6 +147,11 @@ module Bolt
       Addressable::URI.unencode_component(component)
     end
     private :unencode
+
+    def eql?(other)
+      self.class.equal?(other.class) && @name == other.name
+    end
+    alias == eql?
   end
 
   class Target
@@ -247,13 +252,10 @@ module Bolt
     # should we just compare names? is there something else that is meaninful?
     def eql?(other)
       if self.class.equal?(other.class)
-        if @uri
-          return @uri == other.uri
-        else
-          @name = other.name
-        end
+        @uri ? @uri == other.uri : @name == other.name
+      else
+        false
       end
-      false
     end
     alias == eql?
 
