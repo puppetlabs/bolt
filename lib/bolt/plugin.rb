@@ -143,11 +143,12 @@ module Bolt
       @analytics = analytics
       @plugin_context = PluginContext.new(config, pal)
       @plugins = {}
+      @pal = pal
       @unknown = Set.new
     end
 
     def modules
-      @modules ||= Bolt::Module.discover(@config.modulepath)
+      @modules ||= Bolt::Module.discover(@pal.modulepath)
     end
 
     # Generally this is private. Puppetdb is special though

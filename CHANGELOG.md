@@ -2,6 +2,12 @@
 
 ## BOLT NEXT
 
+### Bug fixes
+
+* **Load `azure_inventory` plugin from default modulepath** ([#1301](https://github.com/puppetlabs/bolt/pull/1301))
+
+  When the Azure inventory plugin was first shipped with Bolt version 1.32.0 it was not loaded from the default modulepath. The module plugin is now loaded and available.
+
 ### New features
 
 * **Only print `safe_name` when referencing `Target`s** ([#1271](https://github.com/puppetlabs/bolt/pull/1271))
