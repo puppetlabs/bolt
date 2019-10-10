@@ -261,16 +261,11 @@ module Bolt
         end
 
         def copy_file(source, destination)
+          # Do not log wrapper script content
+          @logger.debug { "Uploading #{source}, to #{destination}" } unless source.is_a?(StringIO)
           @session.scp.upload!(source, destination, recursive: true)
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
-        end
-
-        def write_executable_from_content(dest, content, filename)
-          remote_path = File.join(dest.to_s, filename)
-          @session.scp.upload!(StringIO.new(content), remote_path)
-          make_executable(remote_path)
-          remote_path
         end
 
         # This handles renaming Net::SSH verifiers between version 4.x and 5.x

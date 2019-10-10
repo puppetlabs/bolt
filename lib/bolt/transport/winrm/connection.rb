@@ -148,6 +148,7 @@ module Bolt
         end
 
         def write_remote_file(source, destination)
+          @logger.debug { "Uploading #{source}, to #{destination}" }
           if target.options['file-protocol'] == 'smb'
             write_remote_file_smb(source, destination)
           else
@@ -220,13 +221,6 @@ module Bolt
           validate_extensions(File.extname(filename))
           remote_path = "#{dir}\\#{filename}"
           write_remote_file(file, remote_path)
-          remote_path
-        end
-
-        def write_executable_from_content(dir, content, filename)
-          validate_extensions(File.extname(filename))
-          remote_path = "#{dir}\\#{filename}"
-          write_remote_file(content, remote_path)
           remote_path
         end
 
