@@ -1,6 +1,6 @@
 # Changelog
 
-## BOLT NEXT
+## 1.33.0
 
 ### Bug fixes
 
@@ -10,7 +10,7 @@
 
 ### New features
 
-* **Only print `safe_name` when referencing `Target`s** ([#1271](https://github.com/puppetlabs/bolt/pull/1271))
+* **Only print `safe_name` when referencing `Target`s** ([#1243](https://github.com/puppetlabs/bolt/issues/1243))
 
   When using Inventory v2 a Target's safe name is the `uri` minus the password component (unless the target `name` is explicitly defined in which case the `name` is used). For Inventory v1, the safe name is the `host`. 
 
