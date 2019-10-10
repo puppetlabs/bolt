@@ -47,4 +47,12 @@ describe Bolt::Result do
   it 'filter_set returns a ResultSet' do
     expect(result_set.filter_set { |r| r['node'] == 'node1' }).to be_a(Bolt::ResultSet)
   end
+
+  it 'is array indexible' do
+    expect([0, 1].map { |i| result_set[i].target.name }).to eq([target1, target2])
+  end
+
+  it 'is array indexible with slice' do
+    expect(result_set[0, 2].map { |result| result.target.name }).to eq([target1, target2])
+  end
 end

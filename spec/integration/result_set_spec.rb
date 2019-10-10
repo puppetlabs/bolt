@@ -39,13 +39,28 @@ describe "when running a plan that manipulates an execution result", ssh: true d
         params = { target: uri }.to_json
         run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
         expect(@log_output.readlines)
-          .to include("NOTICE  Puppet : Filtered set: [Target('ssh://bolt:bolt@localhost:20022', {})]\n")
+          .to include("NOTICE  Puppet : Filtered set: [Target('#{uri}', {})]\n")
       end
 
       it 'excludes target when filter is false' do
         params = { target: uri, fail: true }.to_json
         run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
         expect(@log_output.readlines).to include("NOTICE  Puppet : Filtered set: []\n")
+      end
+    end
+
+    context 'array indexes result sets' do
+      it 'with a single index' do
+        params = { target: uri }.to_json
+        run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
+        expect(@log_output.readlines)
+          .to include("NOTICE  Puppet : Single index: #{uri}\n")
+      end
+
+      it 'with a slice index' do
+        params = { target: uri, fail: true }.to_json
+        run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
+        expect(@log_output.readlines).to include("NOTICE  Puppet : Slice index: [#{uri}]\n")
       end
     end
 
