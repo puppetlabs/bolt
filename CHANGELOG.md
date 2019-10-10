@@ -4,24 +4,24 @@
 
 ### Bug fixes
 
-* **Load `azure_inventory` plugin from default modulepath** ([#1301](https://github.com/puppetlabs/bolt/pull/1301))
+* **Bolt failed to load `azure_inventory` plugin** ([#1301](https://github.com/puppetlabs/bolt/pull/1301))
 
-  When the Azure inventory plugin was first shipped with Bolt version 1.32.0 it was not loaded from the default modulepath. The module plugin is now loaded and available.
+  Bolt now looks in the default modulepath when loading plugins, so it can successfully load the Azure inventory plugin.
 
 ### New features
 
-* **Only print `safe_name` when referencing `Target`s** ([#1243](https://github.com/puppetlabs/bolt/issues/1243))
+* **When referring to `Target`s in log or output, use their `safe_name`** ([#1243](https://github.com/puppetlabs/bolt/issues/1243))
 
-  When using Inventory v2 a Target's safe name is the `uri` minus the password component (unless the target `name` is explicitly defined in which case the `name` is used). For Inventory v1, the safe name is the `host`. 
+  When using inventory version 2, a `Target`'s `safe_name` is the `uri` minus the password (unless the `Target` has an explicitly defined `name`, in which case `safe_name` is the value of `name`). For inventory version 1, `safe_name` is the value of `host`.
 
-* **The `ResultSet` type is now indexable.** ([#1178](https://github.com/puppetlabs/bolt/issues/1178))
+* **The `ResultSet` type is now indexable** ([#1178](https://github.com/puppetlabs/bolt/issues/1178))
+ 
+  When working with `ResultSet` types in plans, use the bracket `[]` operator to get `Results` by index.
 
-  When working with `ResultSet` types in plans the bracket `[]` operator can be used to get `Results` by index.
+* **Log file transfer details at debug level** ([#1256](https://github.com/puppetlabs/bolt/issues/1256))
 
-* **Debug logging for file transfer** ([#1256](https://github.com/puppetlabs/bolt/issues/1256))
-
-  When a file is transferred to a target the source and destination are logged at debug level where previously this information was not logged.
-
+  When Bolt transfers a file, it logs hostname and filepath details at the debug level. Previously Bolt did not log this information.
+  
 ## 1.32.0
 
 ### Bug fixes
