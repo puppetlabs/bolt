@@ -978,6 +978,9 @@ describe Bolt::Inventory::Group2 do
 
       let(:hooks) { [] }
 
+      let(:modulepath) { [''] }
+      let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+
       let(:plugins) do
         plugins = Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new)
         plugin = double('plugin')
