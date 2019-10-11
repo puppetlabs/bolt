@@ -1,5 +1,13 @@
 # Changelog
 
+## BOLT NEXT
+
+### Bug fixes
+
+* **`apply_prep` error when using Inventory Version 2** ([#1303](https://github.com/puppetlabs/bolt/pull/1303))
+
+  When the `plugin_hooks` key was not set for a target/group in Inventory v2 the `apply_prep` function would not work. Bolt now uses the default `plugin_hooks` and honors the `plugin_hooks` from bolt config when using Inventory v2. 
+
 ## 1.33.0
 
 ### Bug fixes
