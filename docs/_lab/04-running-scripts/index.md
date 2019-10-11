@@ -31,7 +31,7 @@ curl -O https://raw.githubusercontent.com/puppetlabs/bolt/master/docs/_includes/
 Run the script using the command `bolt script run <script-name>`. This uploads the script to the nodes you have specified, ensures it's executable, runs it, and returns output to the console.
 
 ```shell
-bolt script run src/bashcheck.sh --nodes node1
+bolt script run bashcheck.sh --nodes node1
 ```
 
 The result:
