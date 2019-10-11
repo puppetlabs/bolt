@@ -17,7 +17,6 @@
         <topicref href="inspecting_tasks_and_plans.md" format="markdown"/>
         <topicref href="bolt_running_tasks.md" format="markdown"/>
         <topicref href="bolt_running_plans.md" format="markdown"/>
-        <topicref href="bolt_running_tasks.md" format="markdown"/>
         <topicref href="bolt_installing_modules.md" format="markdown"/>
         <topicref href="directory_structure.md" format="markdown"/>
         <topicref href="writing_tasks.md" format="markdown"/>
