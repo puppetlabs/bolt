@@ -636,7 +636,7 @@ run_task(String[1] $task_name, Boltlib::TargetSpec $targets, Optional[Hash[Strin
 
 * **task_name** `String[1]` The task to run.
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
-* **args** `Optional[Hash[String[1], Any]]` Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+* **args** `Optional[Hash[String[1], Any]]` Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as', '_noop'.
 
 **Example:** Run a task as root
 ```
@@ -654,7 +654,7 @@ run_task(String[1] $task_name, Boltlib::TargetSpec $targets, Optional[String] $d
 * **task_name** `String[1]` The task to run.
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
 * **description** `Optional[String]` A description to be output when calling this function.
-* **args** `Optional[Hash[String[1], Any]]` Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+* **args** `Optional[Hash[String[1], Any]]` Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as', '_noop'.
 
 **Example:** Run a task
 ```

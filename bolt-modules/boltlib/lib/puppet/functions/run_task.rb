@@ -12,7 +12,7 @@ Puppet::Functions.create_function(:run_task) do
   # Run a task.
   # @param task_name The task to run.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as', '_noop'.
   # @return A list of results, one entry per target.
   # @example Run a task as root
   #   run_task('facts', $targets, '_run_as' => 'root')
@@ -27,7 +27,7 @@ Puppet::Functions.create_function(:run_task) do
   # @param task_name The task to run.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.
-  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as', '_noop'.
   # @return A list of results, one entry per target.
   # @example Run a task
   #   run_task('facts', $targets, 'Gather OS facts')
@@ -108,7 +108,9 @@ Puppet::Functions.create_function(:run_task) do
       end
     end
 
-    if executor.noop
+    # executor.noop is set when run task is called from the CLI
+    # options[:noop] is set when it's called from a plan
+    if executor.noop || options[:noop]
       if task.supports_noop
         params['_noop'] = true
       else
