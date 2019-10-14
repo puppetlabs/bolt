@@ -686,6 +686,33 @@ describe Bolt::Inventory do
     end
   end
 
+  describe 'add_facts' do
+    context 'whith and without $future flag' do
+      let(:inventory) { Bolt::Inventory.new({}) }
+      let(:target) { get_target(inventory, 'foo') }
+      let(:facts) { { 'foo' => 'bar' } }
+      after(:each) do
+        # rubocop:disable Style/GlobalVars
+        $future = nil
+        # rubocop:enable Style/GlobalVars
+      end
+
+      it 'returns facts hash when $future flag is not set' do
+        result = inventory.add_facts(target, facts)
+        expect(result).to eq(facts)
+      end
+
+      it 'returns Target object when $future flag is set' do
+        # rubocop:disable Style/GlobalVars
+        $future = true
+        # rubocop:enable Style/GlobalVars
+        result = inventory.add_facts(target, facts)
+        expect(target).to eq(result)
+        expect(inventory.facts(result)).to eq(facts)
+      end
+    end
+  end
+
   describe :create_version do
     it 'creates a version1 inventory by default' do
       inv = Bolt::Inventory.create_version({}, config, plugins)
