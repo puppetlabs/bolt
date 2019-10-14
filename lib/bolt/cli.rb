@@ -117,6 +117,11 @@ module Bolt
                   Bolt::Config.from_boltdir(boltdir, options)
                 end
 
+      # Set $future global if configured
+      # rubocop:disable Style/GlobalVars
+      $future = @config.future
+      # rubocop:enable Style/GlobalVars
+
       Bolt::Logger.configure(config.log, config.color)
 
       # Logger must be configured before checking path case, otherwise warnings will not display

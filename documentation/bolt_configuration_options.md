@@ -35,6 +35,7 @@ ssh:
 -   `puppetfile`: A map containing options for the `bolt puppetfile install` command.
 -   `save-rerun`: Specify whether to update `.rerun.json` in the [Bolt project directory](bolt_project_directories.md#). If your target names include passwords, set this value to false to avoid writing passwords to disk.
 -   `transport`: Specify the default transport to use when the transport for a target is not specified in the URL or inventory. The valid options for transport are `docker`, `local`, `pcp`, `ssh`, and `winrm`.
+-   `future`: Whether to use new, breaking changes. This allows testing if Bolt content is compatible with expected future behaviour. 
 
 
 ## SSH transport configuration options

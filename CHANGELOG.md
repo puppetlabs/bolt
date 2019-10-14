@@ -2,6 +2,12 @@
 
 ## BOLT NEXT
 
+### New features
+
+* **Harmonize JSON and Puppet language Result Objects** ([#1245](https://github.com/puppetlabs/bolt/issues/1245))
+
+  Previously the JSON representation of a Result object showed different keys than were available for working with the object in a plan. With this feature the expected keys have been harmonized between the JSON representation and the Puppet object. Note this feature is only available with a new `future` flag in the [bolt configuration file](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#global-configuration-options).
+
 ### Bug fixes
 
 * **`apply_prep` error when using Inventory Version 2** ([#1303](https://github.com/puppetlabs/bolt/pull/1303))

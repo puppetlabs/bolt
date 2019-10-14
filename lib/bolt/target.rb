@@ -14,7 +14,7 @@ module Bolt
     end
 
     # Target.new from a plan with just a uri
-    # rubocop:disable UnusedMethodArgument
+    # rubocop:disable Lint/UnusedMethodArgument
     def self.from_asserted_args(uri = nil,
                                 name = nil,
                                 target_alias = nil,
@@ -38,7 +38,7 @@ module Bolt
                    plugin_hooks = nil)
       @name = name
     end
-    # rubocop:enable UnusedMethodArgument
+    # rubocop:enable Lint/UnusedMethodArgument
 
     # Used for munging target + group data
     def target_data_hash
