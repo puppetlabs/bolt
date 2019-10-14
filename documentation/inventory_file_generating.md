@@ -1,5 +1,7 @@
 # Generating inventory files
 
+**DEPRECATED** This command has been deprecated in favor of the [puppetdb inventory plugin](https://puppet.com/docs/bolt/latest/using_plugins.html#puppetdb)
+
 Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries.
 
 ## Usage
