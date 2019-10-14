@@ -208,6 +208,48 @@ describe 'apply_prep' do
         expect(inventory.facts(target)).to eq(fact)
       end
     end
+
+    context 'with default plugin inventory v2' do
+      let(:hostname) { 'agentless' }
+      let(:data) {
+        {
+          'version' => 2,
+          'targets' => [{ 'uri' => hostname }]
+        }
+      }
+
+      let(:config) { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
+      let(:pal) { nil }
+      let(:plugins) { Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new) }
+      let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
+      let(:target) { inventory.get_target(hostname) }
+      let(:targets) { inventory.get_targets(hostname) }
+
+      it 'installs the agent if not present' do
+        version = Bolt::ResultSet.new([Bolt::Result.new(target, value: { 'version' => nil })])
+        executor.expects(:run_task).with([target], version_task, anything, anything).returns(version)
+
+        facts = Bolt::ResultSet.new([Bolt::Result.new(target, value: fact)])
+        executor.expects(:run_task).with([target], custom_facts_task, includes('plugins')).returns(facts)
+
+        plugins.expects(:get_hook)
+               .with('install_agent', :puppet_library)
+               .returns(task_hook)
+
+        executor.expects(:run_task)
+                .with([target], install_task, anything, anything)
+                .returns(Bolt::ResultSet.new([Bolt::Result.new(target, value: { '_output' => 'smores' })]))
+
+        executor.expects(:run_task)
+                .with([target], service_task, anything)
+                .returns(Bolt::ResultSet.new([Bolt::Result.new(target, value: { '_output' => 'ok' })]))
+                .twice
+
+        is_expected.to run.with_params(hostname)
+        expect(inventory.features(target)).to include('puppet-agent')
+        expect(inventory.facts(target)).to eq(fact)
+      end
+    end
   end
 
   context 'with only pcp targets' do
