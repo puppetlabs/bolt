@@ -8,6 +8,10 @@
 
   Previously the JSON representation of a Result object showed different keys than were available for working with the object in a plan. With this feature the expected keys have been harmonized between the JSON representation and the Puppet object. Note this feature is only available with a new `future` flag in the [bolt configuration file](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#global-configuration-options).
 
+* **The `add_facts` plan function returns a `Target` object** ([#1211](https://github.com/puppetlabs/bolt/issues/1211))
+
+  The `add_facts` function has been updated to return a `Target` object to match the `set_*` plan functions for consistency and to allow chaining. Note this feature is only available with a new `future` flag in the [bolt configuration file](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#global-configuration-options).
+
 ### Bug fixes
 
 * **`apply_prep` error when using Inventory Version 2** ([#1303](https://github.com/puppetlabs/bolt/pull/1303))
