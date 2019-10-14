@@ -12,12 +12,16 @@
 
 * **`apply_prep` error when using Inventory Version 2** ([#1303](https://github.com/puppetlabs/bolt/pull/1303))
 
-  When the `plugin_hooks` key was not set for a target/group in Inventory v2 the `apply_prep` function would not work. Bolt now uses the default `plugin_hooks` and honors the `plugin_hooks` from bolt config when using Inventory v2. 
+  When the `plugin_hooks` key was not set for a target/group in Inventory v2 the `apply_prep` function would not work. Bolt now uses the default `plugin_hooks` and honors the `plugin_hooks` from bolt config when using Inventory v2.
 
 * **Better error output when parsing malformed `yaml` files** ([#1296](https://github.com/puppetlabs/bolt/issues/1296))
 
   Previously when parsing `yaml` config files a generic error message was surfaced with no information about where in the file the problem occurred. Now an error message that contains the path to the file as well as the line and column in the file where the error originated from.
 
+* **More detailed error message when task metadata has wrong form** ([#1152](https://github.com/puppetlabs/bolt/issues/1152))
+
+  Raise more informative error message to replace the cryptic message that was surfaced when `requirements` field in a task's `implementations` metadata was not an array.
+  
 ## 1.33.0
 
 ### Bug fixes
