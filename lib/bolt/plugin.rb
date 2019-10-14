@@ -126,7 +126,6 @@ module Bolt
       plugins.add_ruby_plugin('Bolt::Plugin::AwsInventory')
       plugins.add_ruby_plugin('Bolt::Plugin::InstallAgent')
       plugins.add_ruby_plugin('Bolt::Plugin::Task')
-      plugins.add_ruby_plugin('Bolt::Plugin::Terraform')
       plugins.add_ruby_plugin('Bolt::Plugin::Pkcs7')
       plugins.add_ruby_plugin('Bolt::Plugin::Prompt')
       plugins.add_ruby_plugin('Bolt::Plugin::Vault')
