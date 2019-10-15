@@ -42,7 +42,7 @@ describe "BoltSpec::Run", ssh: true do
     end
 
     it 'should accept _catch_errors' do
-      result = run_command('echo hello', 'non_existent_node', options: { '_catch_errors' => true })
+      result = run_command('echo hello', 'non_existent_node', options: { catch_errors: true })
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
@@ -59,7 +59,7 @@ describe "BoltSpec::Run", ssh: true do
     end
 
     it 'should accept _catch_errors' do
-      result = run_script('missing.sh', 'non_existent_node', nil, options: { '_catch_errors' => true })
+      result = run_script('missing.sh', 'non_existent_node', nil, options: { catch_errors: true })
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
@@ -76,7 +76,7 @@ describe "BoltSpec::Run", ssh: true do
     end
 
     it 'should accept _catch_errors' do
-      result = run_script('missing.sh', 'non_existent_node', nil, options: { '_catch_errors' => true })
+      result = run_script('missing.sh', 'non_existent_node', nil, options: { catch_errors: true })
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')

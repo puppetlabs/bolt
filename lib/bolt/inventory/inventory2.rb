@@ -145,7 +145,7 @@ module Bolt
         conf.validate
 
         # Recompute the target cached state with the merged data
-        update_target_state(target, conf.transport_conf, data)
+        update_target_state(target, conf, data)
 
         unless target.transport.nil? || Bolt::TRANSPORTS.include?(target.transport.to_sym)
           raise Bolt::UnknownTransportError.new(target.transport, target.uri)
@@ -357,8 +357,8 @@ module Bolt
       private :build_config_hash
 
       def update_target_state(target, conf, merged_data)
-        @targets[target.name]['protocol'] = conf[:transport]
-        t_conf = conf[:transports][target.transport.to_sym] || {}
+        @targets[target.name]['protocol'] = conf.transport_conf[:transport]
+        t_conf = conf.transport_conf[:transports][target.transport.to_sym] || {}
         @targets[target.name]['user'] = t_conf['user']
         @targets[target.name]['password'] = t_conf['password']
         @targets[target.name]['port'] = t_conf['port']
@@ -381,7 +381,8 @@ module Bolt
 
         target_plugin_hooks = @targets[target.name]['plugin_hooks'] || {}
         new_plugin_hooks = merged_data['plugin_hooks'] || {}
-        @targets[target.name]['cached_state']['plugin_hooks'] = new_plugin_hooks.merge(target_plugin_hooks)
+        plugin_hooks_from_inv = new_plugin_hooks.merge(target_plugin_hooks)
+        @targets[target.name]['cached_state']['plugin_hooks'] = conf.plugin_hooks.merge(plugin_hooks_from_inv)
       end
       private :update_target_state
     end

@@ -14,7 +14,7 @@ module Bolt
     end
 
     # Target.new from a plan with just a uri
-    # rubocop:disable UnusedMethodArgument
+    # rubocop:disable Lint/UnusedMethodArgument
     def self.from_asserted_args(uri = nil,
                                 name = nil,
                                 target_alias = nil,
@@ -38,7 +38,7 @@ module Bolt
                    plugin_hooks = nil)
       @name = name
     end
-    # rubocop:enable UnusedMethodArgument
+    # rubocop:enable Lint/UnusedMethodArgument
 
     # Used for munging target + group data
     def target_data_hash
@@ -147,6 +147,11 @@ module Bolt
       Addressable::URI.unencode_component(component)
     end
     private :unencode
+
+    def eql?(other)
+      self.class.equal?(other.class) && @name == other.name
+    end
+    alias == eql?
   end
 
   class Target
@@ -247,13 +252,10 @@ module Bolt
     # should we just compare names? is there something else that is meaninful?
     def eql?(other)
       if self.class.equal?(other.class)
-        if @uri
-          return @uri == other.uri
-        else
-          @name = other.name
-        end
+        @uri ? @uri == other.uri : @name == other.name
+      else
+        false
       end
-      false
     end
     alias == eql?
 
@@ -281,6 +283,7 @@ module Bolt
     def host
       @uri_obj&.hostname || @host
     end
+    alias safe_name host
 
     def name
       @name || @uri

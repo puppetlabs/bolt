@@ -43,18 +43,20 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     return_type 'ResultSet'
   end
 
-  def run_script(scope, script, targets, options = nil)
+  def run_script(scope, script, targets, options = {})
     run_script_with_description(scope, script, targets, nil, options)
   end
 
-  def run_script_with_description(scope, script, targets, description = nil, options = nil)
+  def run_script_with_description(scope, script, targets, description = nil, options = {})
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_script')
     end
 
-    options ||= {}
-    options = options.merge('_description' => description) if description
+    arguments = options['arguments'] || []
+    options = options.select { |opt| opt.start_with?('_') }.map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+    options[:description] = description if description
+
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
@@ -78,10 +80,10 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     r = if targets.empty?
           Bolt::ResultSet.new([])
         else
-          executor.run_script(targets, found, options['arguments'] || [], options.reject { |k, _| k == 'arguments' })
+          executor.run_script(targets, found, arguments, options)
         end
 
-    if !r.ok && !options['_catch_errors']
+    if !r.ok && !options[:catch_errors]
       raise Bolt::RunFailure.new(r, 'run_script', script)
     end
     r

@@ -264,8 +264,8 @@ PS
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
 
-    it "ignores _run_as", winrm: true do
-      expect(winrm.run_command(target, command, '_run_as' => 'root')['stdout']).to eq("#{user}\r\n")
+    it "ignores run_as", winrm: true do
+      expect(winrm.run_command(target, command, run_as: 'root')['stdout']).to eq("#{user}\r\n")
     end
 
     it "reuses a PowerShell host / runspace for multiple commands", winrm: true do
@@ -375,11 +375,11 @@ PS
       end
     end
 
-    it "ignores _run_as", winrm: true do
+    it "ignores run_as", winrm: true do
       contents = "Write-Output \"hellote\""
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
         expect(
-          winrm.run_script(target, file.path, [], '_run_as' => 'root')['stdout']
+          winrm.run_script(target, file.path, [], run_as: 'root')['stdout']
         ).to eq("hellote\r\n")
       end
     end
@@ -564,12 +564,12 @@ SHELLWORDS
       end
     end
 
-    it "ignores _run_as", winrm: true do
+    it "ignores run_as", winrm: true do
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { message_one: 'task is running',
                     "message two": 'task has run' }
       with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
-        expect(winrm.run_task(target, task, arguments, '_run_as' => 'root').message)
+        expect(winrm.run_task(target, task, arguments, run_as: 'root').message)
           .to eq("task is running task has run\r\n")
       end
     end

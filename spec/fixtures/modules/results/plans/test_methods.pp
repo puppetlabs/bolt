@@ -15,6 +15,9 @@ plan results::test_methods(
     $r['tag'] == "you're it"
   }.targets
   notice("Filtered set: ${$filtered}")
+  # Test resultset is indexible
+  notice("Single index: ${result[0].target.name}")
+  notice("Slice index: ${$result[0,2].map |$res| {$res.target.name}}")
   # return ok
   return $result.ok
 }

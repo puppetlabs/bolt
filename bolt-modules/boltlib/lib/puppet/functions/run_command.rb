@@ -37,18 +37,19 @@ Puppet::Functions.create_function(:run_command) do
     return_type 'ResultSet'
   end
 
-  def run_command(command, targets, options = nil)
+  def run_command(command, targets, options = {})
     run_command_with_description(command, targets, nil, options)
   end
 
-  def run_command_with_description(command, targets, description = nil, options = nil)
+  def run_command_with_description(command, targets, description = nil, options = {})
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_command')
     end
 
-    options ||= {}
-    options = options.merge('_description' => description) if description
+    options = options.map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+    options[:description] = description if description
+
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
@@ -64,7 +65,7 @@ Puppet::Functions.create_function(:run_command) do
       r = executor.run_command(targets, command, options)
     end
 
-    if !r.ok && !options['_catch_errors']
+    if !r.ok && !options[:catch_errors]
       raise Bolt::RunFailure.new(r, 'run_command', command)
     end
     r

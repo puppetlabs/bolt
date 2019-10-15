@@ -164,7 +164,7 @@ module Bolt
         params = params.merge(metaparams)
 
         # There are no executor options to pass now.
-        options = { "_catch_errors" => true }
+        options = { catch_errors: true }
 
         result = @context.run_local_task(task,
                                          params,

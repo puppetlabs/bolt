@@ -125,7 +125,7 @@ module Bolt
         assert_batch_size_one("batch_task()", targets)
         target = targets.first
         with_events(target, callback) do
-          @logger.debug { "Running task run '#{task}' on #{target.uri}" }
+          @logger.debug { "Running task run '#{task}' on #{target.safe_name}" }
           run_task(target, task, arguments, options)
         end
       end
@@ -139,7 +139,7 @@ module Bolt
         assert_batch_size_one("batch_command()", targets)
         target = targets.first
         with_events(target, callback) do
-          @logger.debug("Running command '#{command}' on #{target.uri}")
+          @logger.debug("Running command '#{command}' on #{target.safe_name}")
           run_command(target, command, options)
         end
       end
@@ -153,7 +153,7 @@ module Bolt
         assert_batch_size_one("batch_script()", targets)
         target = targets.first
         with_events(target, callback) do
-          @logger.debug { "Running script '#{script}' on #{target.uri}" }
+          @logger.debug { "Running script '#{script}' on #{target.safe_name}" }
           run_script(target, script, arguments, options)
         end
       end
@@ -167,7 +167,7 @@ module Bolt
         assert_batch_size_one("batch_upload()", targets)
         target = targets.first
         with_events(target, callback) do
-          @logger.debug { "Uploading: '#{source}' to #{destination} on #{target.uri}" }
+          @logger.debug { "Uploading: '#{source}' to #{destination} on #{target.safe_name}" }
           upload(target, source, destination, options)
         end
       end

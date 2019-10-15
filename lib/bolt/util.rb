@@ -29,10 +29,12 @@ module Bolt
           logger.debug(msg)
           nil
         end
-      rescue Psych::Exception
-        raise Bolt::FileError.new("Could not parse #{file_name} file: #{path}", path)
-      rescue IOError, SystemCallError
-        raise Bolt::FileError.new("Could not read #{file_name} file: #{path}", path)
+      rescue Psych::Exception => e
+        raise Bolt::FileError.new("Could not parse #{file_name} file: #{path}\n"\
+                                  "Error at line #{e.line} column #{e.column}", path)
+      rescue IOError, SystemCallError => e
+        raise Bolt::FileError.new("Could not read #{file_name} file: #{path}\n"\
+                                  "error: #{e}", path)
       end
 
       # Accepts a path with either 'plans' or 'tasks' in it and determines

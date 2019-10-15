@@ -118,6 +118,11 @@ module Bolt
                   Bolt::Config.from_boltdir(boltdir, options)
                 end
 
+      # Set $future global if configured
+      # rubocop:disable Style/GlobalVars
+      $future = @config.future
+      # rubocop:enable Style/GlobalVars
+
       Bolt::Logger.configure(config.log, config.color)
 
       # Logger must be configured before checking path case, otherwise warnings will not display
@@ -344,7 +349,7 @@ module Bolt
 
         elapsed_time = Benchmark.realtime do
           executor_opts = {}
-          executor_opts['_description'] = options[:description] if options.key?(:description)
+          executor_opts[:description] = options[:description] if options.key?(:description)
           executor.subscribe(outputter)
           executor.subscribe(log_outputter)
           results =
@@ -470,7 +475,7 @@ module Bolt
         end
 
         results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
-          Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true, '_noop' => noop)
+          Puppet.lookup(:apply_executor).apply_ast(ast, targets, catch_errors: true, noop: noop)
         end
       end
 

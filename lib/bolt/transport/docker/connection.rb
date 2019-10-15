@@ -8,9 +8,9 @@ module Bolt
     class Docker < Base
       class Connection
         def initialize(target)
-          raise Bolt::ValidationError, "Target #{target.name} does not have a host" unless target.host
+          raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
           @target = target
-          @logger = Logging.logger[target.host]
+          @logger = Logging.logger[target.safe_name]
           @docker_host = @target.options['service-url']
         end
 
@@ -28,7 +28,7 @@ module Bolt
           true
         rescue StandardError => e
           raise Bolt::Node::ConnectError.new(
-            "Failed to connect to #{@target.uri}: #{e.message}",
+            "Failed to connect to #{@target.safe_name}: #{e.message}",
             'CONNECT_ERROR'
           )
         end
@@ -79,6 +79,7 @@ module Bolt
         end
 
         def write_remote_file(source, destination)
+          @logger.debug { "Uploading #{source}, to #{destination}" }
           _, stdout_str, status = execute_local_docker_command('cp', [source, "#{container_id}:#{destination}"])
           raise "Error writing file to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
         rescue StandardError => e
@@ -86,6 +87,7 @@ module Bolt
         end
 
         def write_remote_directory(source, destination)
+          @logger.debug { "Uploading #{source}, to #{destination}" }
           _, stdout_str, status = execute_local_docker_command('cp', [source, "#{container_id}:#{destination}"])
           raise "Error writing directory to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
         rescue StandardError => e

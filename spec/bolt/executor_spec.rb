@@ -28,7 +28,7 @@ describe "Bolt::Executor" do
     { type: :node_result, result: result }
   end
 
-  def mock_node_results(_run_as = nil)
+  def mock_node_results
     {
       targets[0] => Bolt::Result.new(targets[0]),
       targets[1] => Bolt::Result.new(targets[1])
@@ -48,10 +48,10 @@ describe "Bolt::Executor" do
       executor.run_command(targets, command, {})
     end
 
-    it 'passes _run_as' do
+    it 'passes run_as' do
       executor.run_as = 'foo'
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_command).with(target, command, '_run_as' => 'foo').and_return(result)
+        expect(ssh).to receive(:run_command).with(target, command, run_as: 'foo').and_return(result)
       end
 
       executor.run_command(targets, command)
@@ -100,10 +100,10 @@ describe "Bolt::Executor" do
       end
     end
 
-    it 'passes _run_as' do
+    it 'passes run_as' do
       executor.run_as = 'foo'
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_script).with(target, script, [], '_run_as' => 'foo').and_return(result)
+        expect(ssh).to receive(:run_script).with(target, script, [], run_as: 'foo').and_return(result)
       end
 
       results = executor.run_script(targets, script, [])
@@ -166,7 +166,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, { '_run_as' => 'foo' }.merge(task_options))
+          .with(target, task_type(task), task_arguments, { run_as: 'foo' }.merge(task_options))
           .and_return(result)
       end
 
