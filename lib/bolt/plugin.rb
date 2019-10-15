@@ -128,7 +128,6 @@ module Bolt
       plugins.add_ruby_plugin('Bolt::Plugin::Task')
       plugins.add_ruby_plugin('Bolt::Plugin::Pkcs7')
       plugins.add_ruby_plugin('Bolt::Plugin::Prompt')
-      plugins.add_ruby_plugin('Bolt::Plugin::Vault')
 
       plugins
     end
