@@ -73,6 +73,10 @@
 * **New stub for `out::message` available for `BoltSpec::Plans`** ([#1217](https://github.com/puppetlabs/bolt/pull/1217))
 
   Users can now use `BoltSpec::Plans` to test plans that contain calls to `out::message`.
+  
+* **New sub command `bolt group show`** ([#537](https://github.com/puppetlabs/bolt/issues/537))
+
+  The CLI now provides a new command `bolt group show` that will list all of the groups in the inventory file.
 
 ## 1.31.1
 

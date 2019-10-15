@@ -154,6 +154,24 @@ You must specify one of `--nodes`, `--targets`, `--query`, or `--rerun`.
 |`-v`, `--[no-]verbose`|Display verbose logging.| |
 |`--trace`|Display error trace stacks.| |
 
+## `group show`
+
+Show the list of groups in the inventory
+
+**Usage**
+
+`bolt group show`
+
+**Options**
+
+|Option|Description|Default|
+|------|-----------|-------|
+|`--boltdir FILEPATH`|Specify what Boltdir to load config from.|Autodiscovered from current working directory.|
+|`--configfile FILEPATH`|Specify where to load config from.|`~/.puppetlabs/bolt/bolt.yaml`|
+|`-i`, `--inventoryfile FILEPATH`|Specify where to load inventory from.|`~/.puppetlabs/bolt/inventory.yaml`|
+|**Display**| | |
+|`--format FORMAT`|Output format to use. `human`, `json`| |
+
 ## `inventory show`
 
 Show the list of targets an action would run on.

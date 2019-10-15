@@ -36,6 +36,7 @@ module Bolt
                  'puppetfile' => %w[install show-modules generate-types],
                  'secret' => %w[encrypt decrypt createkeys],
                  'inventory' => %w[show],
+                 'group' => %w[show],
                  'apply' => %w[] }.freeze
 
     attr_reader :config, :options
@@ -307,6 +308,8 @@ module Bolt
           end
         elsif options[:subcommand] == 'inventory'
           list_targets
+        elsif options[:subcommand] == 'group'
+          list_groups
         end
         return 0
       elsif options[:action] == 'show-modules'
@@ -411,6 +414,11 @@ module Bolt
     def list_targets
       update_targets(options)
       outputter.print_targets(options)
+    end
+
+    def list_groups
+      groups = inventory.group_names
+      outputter.print_groups(groups)
     end
 
     def run_plan(plan_name, plan_arguments, nodes, options)

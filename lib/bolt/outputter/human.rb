@@ -318,6 +318,12 @@ module Bolt
         @stream.puts colorize(:green, count)
       end
 
+      def print_groups(groups)
+        count = "#{groups.count} group#{'s' unless groups.count == 1}"
+        @stream.puts groups.join("\n")
+        @stream.puts colorize(:green, count)
+      end
+
       # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`
       def print_apply_result(apply_result, elapsed_time)
         print_summary(apply_result, elapsed_time)
