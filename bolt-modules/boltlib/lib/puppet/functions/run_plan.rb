@@ -2,7 +2,7 @@
 
 require 'bolt/error'
 
-# Runs the `plan` referenced by its name. A plan is autoloaded from `<moduleroot>/plans`.
+# Runs the `plan` referenced by its name. A plan is autoloaded from `$MODULEROOT/plans`.
 #
 # **NOTE:** Not available in apply block
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
