@@ -739,7 +739,7 @@ Tasks support no-operation functionality, also known as no-op mode. This functio
 
 No-op support allows a user to pass the `--noop` flag with a command to test whether the task will succeed on all targets before making changes.
 
-To support no-op, your task must include code that looks for the `_noop` metaparameter. No-op is supported only in Puppet Enterprise.
+To support no-op, your task must include code that looks for the `_noop` metaparameter.
 
 If the user passes the `--noop` flag with their command, this parameter is set to `true`, and your task must not make changes. You must also set `supports_noop` to `true` in your task metadata or the task runner will refuse to run the task in noop mode.
 

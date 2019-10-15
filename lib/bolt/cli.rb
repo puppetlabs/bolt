@@ -424,9 +424,8 @@ module Bolt
         plan_arguments['nodes'] = nodes.join(',')
       end
 
-      params = options[:noop] ? plan_arguments.merge('_noop' => true) : plan_arguments
       plan_context = { plan_name: plan_name,
-                       params: params }
+                       params: plan_arguments }
       plan_context[:description] = options[:description] if options[:description]
 
       executor = Bolt::Executor.new(config.concurrency, analytics, options[:noop])

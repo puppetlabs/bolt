@@ -18,6 +18,10 @@
 
   Previously when parsing `yaml` config files a generic error message was surfaced with no information about where in the file the problem occurred. Now an error message that contains the path to the file as well as the line and column in the file where the error originated from.
 
+* **Run task function should respect _noop option** ([#1311](https://github.com/puppetlabs/bolt/pull/1311))
+
+  Previously when calling the `run_task` function from a plan with the `_noop` metaparameter, `_noop` would not be passed to the task. Now the parameter is correctly passed to the task.
+
 ## 1.33.0
 
 ### Bug fixes
