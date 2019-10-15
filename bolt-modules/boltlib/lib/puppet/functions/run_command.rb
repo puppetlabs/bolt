@@ -10,10 +10,10 @@ Puppet::Functions.create_function(:run_command) do
   # Run a command.
   # @param command A command to run on target.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @param options Additional options: '\_catch_errors', '\_run_as'.
   # @return A list of results, one entry per target.
   # @example Run a command on targets
-  #   run_command('hostname', $targets, '_catch_errors' => true)
+  #   run_command('hostname', $targets, '\_catch_errors' => true)
   dispatch :run_command do
     param 'String[1]', :command
     param 'Boltlib::TargetSpec', :targets
@@ -25,7 +25,7 @@ Puppet::Functions.create_function(:run_command) do
   # @param command A command to run on target.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.
-  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @param options Additional options: '\_catch_errors', '\_run_as'.
   # @return A list of results, one entry per target.
   # @example Run a command on targets
   #   run_command('hostname', $targets, 'Get hostname')

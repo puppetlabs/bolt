@@ -499,11 +499,11 @@ run_command(String[1] $command, Boltlib::TargetSpec $targets, Optional[Hash[Stri
 
 * **command** `String[1]` A command to run on target.
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
-* **options** `Optional[Hash[String[1], Any]]` Additional options: '_catch_errors', '_run_as'.
+* **options** `Optional[Hash[String[1], Any]]` Additional options: '\_catch_errors', '\_run_as'.
 
 **Example:** Run a command on targets
 ```
-run_command('hostname', $targets, '_catch_errors' => true)
+run_command('hostname', $targets, '\_catch_errors' => true)
 ```
 
 ### Run a command, logging the provided description.
@@ -517,7 +517,7 @@ run_command(String[1] $command, Boltlib::TargetSpec $targets, String $descriptio
 * **command** `String[1]` A command to run on target.
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
 * **description** `String` A description to be output when calling this function.
-* **options** `Optional[Hash[String[1], Any]]` Additional options: '_catch_errors', '_run_as'.
+* **options** `Optional[Hash[String[1], Any]]` Additional options: '\_catch_errors', '\_run_as'.
 
 **Example:** Run a command on targets
 ```
@@ -541,11 +541,11 @@ run_plan(String $plan_name, Optional[Hash] $args)
 *Returns:* `Boltlib::PlanResult` The result of running the plan. Undef if plan does not explicitly return results.
 
 * **plan_name** `String` The plan to run.
-* **args** `Optional[Hash]` Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+* **args** `Optional[Hash]` Arguments to the plan. Can also include additional options: '\_catch_errors', '\_run_as'.
 
 **Example:** Run a plan
 ```
-run_plan('canary', 'command' => 'false', 'nodes' => $targets, '_catch_errors' => true)
+run_plan('canary', 'command' => 'false', 'nodes' => $targets, '\_catch_errors' => true)
 ```
 
 ### Run a plan, specifying $nodes as a positional argument.
@@ -557,7 +557,7 @@ run_plan(String $plan_name, Boltlib::TargetSpec $targets, Optional[Hash] $args)
 *Returns:* `Boltlib::PlanResult` The result of running the plan. Undef if plan does not explicitly return results.
 
 * **plan_name** `String` The plan to run.
-* **args** `Optional[Hash]` Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+* **args** `Optional[Hash]` Arguments to the plan. Can also include additional options: '\_catch_errors', '\_run_as'.
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
 
 **Example:** Run a plan
@@ -583,14 +583,14 @@ run_script(String[1] $script, Boltlib::TargetSpec $targets, Optional[Hash[String
 *Returns:* `ResultSet` A list of results, one entry per target.
 
 * **script** `String[1]` Path to a script to run on target. May be an absolute path or a modulename/filename selector for a
-file in <moduleroot>/files.
+file in $MODULE_ROOT/files.
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
 * **options** `Optional[Hash[String[1], Any]]` Specify an array of arguments to the 'arguments' key to be passed to the script.
-Additional options: '_catch_errors', '_run_as'.
+Additional options: '\_catch_errors', '\_run_as'.
 
 **Example:** Run a local script on Linux targets as 'root'
 ```
-run_script('/var/tmp/myscript', $targets, '_run_as' => 'root')
+run_script('/var/tmp/myscript', $targets, '\_run_as' => 'root')
 ```
 **Example:** Run a module-provided script with arguments
 ```
@@ -606,11 +606,11 @@ run_script(String[1] $script, Boltlib::TargetSpec $targets, String $description,
 *Returns:* `ResultSet` A list of results, one entry per target.
 
 * **script** `String[1]` Path to a script to run on target. May be an absolute path or a modulename/filename selector for a
-file in <moduleroot>/files.
+file in $MODULE_ROOT/files.
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
 * **description** `String` A description to be output when calling this function.
 * **options** `Optional[Hash[String[1], Any]]` Specify an array of arguments to the 'arguments' key to be passed to the script.
-Additional options: '_catch_errors', '_run_as'.
+Additional options: '\_catch_errors', '\_run_as'.
 
 **Example:** Run a script
 ```
@@ -636,11 +636,11 @@ run_task(String[1] $task_name, Boltlib::TargetSpec $targets, Optional[Hash[Strin
 
 * **task_name** `String[1]` The task to run.
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
-* **args** `Optional[Hash[String[1], Any]]` Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as', '_noop'.
+* **args** `Optional[Hash[String[1], Any]]` Arguments to the plan. Can also include additional options: '\_catch_errors', '\_run_as', '\_noop'.
 
 **Example:** Run a task as root
 ```
-run_task('facts', $targets, '_run_as' => 'root')
+run_task('facts', $targets, '\_run_as' => 'root')
 ```
 
 ### Run a task, logging the provided description.
@@ -654,7 +654,7 @@ run_task(String[1] $task_name, Boltlib::TargetSpec $targets, Optional[String] $d
 * **task_name** `String[1]` The task to run.
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
 * **description** `Optional[String]` A description to be output when calling this function.
-* **args** `Optional[Hash[String[1], Any]]` Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as', '_noop'.
+* **args** `Optional[Hash[String[1], Any]]` Arguments to the plan. Can also include additional options: '\_catch_errors', '\_run_as', '\_noop'.
 
 **Example:** Run a task
 ```
@@ -782,14 +782,14 @@ upload_file(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targ
 *Returns:* `ResultSet` A list of results, one entry per target.
 
 * **source** `String[1]` A source path, either an absolute path or a modulename/filename selector for a
-file or directory in <moduleroot>/files.
+file or directory in $MODULE_ROOT/files.
 * **destination** `String[1]` An absolute path on the target(s).
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
-* **options** `Optional[Hash[String[1], Any]]` Additional options: '_catch_errors', '_run_as'.
+* **options** `Optional[Hash[String[1], Any]]` Additional options: '\_catch_errors', '\_run_as'.
 
 **Example:** Upload a local file to Linux targets and change owner to 'root'
 ```
-upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '_run_as' => 'root')
+upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '\_run_as' => 'root')
 ```
 **Example:** Upload a module file to a Windows target
 ```
@@ -805,11 +805,11 @@ upload_file(String[1] $source, String[1] $destination, Boltlib::TargetSpec $targ
 *Returns:* `ResultSet` A list of results, one entry per target.
 
 * **source** `String[1]` A source path, either an absolute path or a modulename/filename selector for a
-file or directory in <moduleroot>/files.
+file or directory in $MODULE_ROOT/files.
 * **destination** `String[1]` An absolute path on the target(s).
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
 * **description** `String` A description to be output when calling this function.
-* **options** `Optional[Hash[String[1], Any]]` Additional options: '_catch_errors', '_run_as'.
+* **options** `Optional[Hash[String[1], Any]]` Additional options: '\_catch_errors', '\_run_as'.
 
 **Example:** Upload a file
 ```
@@ -854,7 +854,7 @@ wait_until_available(Boltlib::TargetSpec $targets, Optional[Hash[String[1], Any]
 *Returns:* `ResultSet` A list of results, one entry per target. Successful results have no value.
 
 * **targets** `Boltlib::TargetSpec` A pattern identifying zero or more targets. See [`get_targets`](#get_targets) for accepted patterns.
-* **options** `Optional[Hash[String[1], Any]]` Additional options: 'description', 'wait_time', 'retry_interval', '_catch_errors'.
+* **options** `Optional[Hash[String[1], Any]]` Additional options: 'description', 'wait_time', 'retry_interval', '\_catch_errors'.
 
 **Example:** Wait for targets
 ```

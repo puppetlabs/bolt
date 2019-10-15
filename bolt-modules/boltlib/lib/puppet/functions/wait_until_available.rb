@@ -8,7 +8,7 @@ require 'bolt/util'
 Puppet::Functions.create_function(:wait_until_available) do
   # Wait until targets are available.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param options Additional options: 'description', 'wait_time', 'retry_interval', '_catch_errors'.
+  # @param options Additional options: 'description', 'wait_time', 'retry_interval', '\_catch_errors'.
   # @return A list of results, one entry per target. Successful results have no value.
   # @example Wait for targets
   #   wait_until_available($targets, wait_time => 300)

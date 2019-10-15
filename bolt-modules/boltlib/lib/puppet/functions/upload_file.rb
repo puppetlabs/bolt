@@ -9,13 +9,13 @@ require 'bolt/error'
 Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunction) do
   # Upload a file or directory.
   # @param source A source path, either an absolute path or a modulename/filename selector for a
-  #               file or directory in <moduleroot>/files.
+  #               file or directory in $MODULE_ROOT/files.
   # @param destination An absolute path on the target(s).
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @param options Additional options: '\_catch_errors', '\_run_as'.
   # @return A list of results, one entry per target.
   # @example Upload a local file to Linux targets and change owner to 'root'
-  #   upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '_run_as' => 'root')
+  #   upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '\_run_as' => 'root')
   # @example Upload a module file to a Windows target
   #   upload_file('postgres/default.conf', 'C:/ProgramData/postgres/default.conf', $target)
   dispatch :upload_file do
@@ -29,11 +29,11 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
 
   # Upload a file or directory, logging the provided description.
   # @param source A source path, either an absolute path or a modulename/filename selector for a
-  #               file or directory in <moduleroot>/files.
+  #               file or directory in $MODULE_ROOT/files.
   # @param destination An absolute path on the target(s).
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.
-  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @param options Additional options: '\_catch_errors', '\_run_as'.
   # @return A list of results, one entry per target.
   # @example Upload a file
   #   upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, 'Uploading payload to unpack')

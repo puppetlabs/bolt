@@ -12,10 +12,10 @@ Puppet::Functions.create_function(:run_task) do
   # Run a task.
   # @param task_name The task to run.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as', '_noop'.
+  # @param args Arguments to the plan. Can also include additional options: '\_catch_errors', '\_run_as', '\_noop'.
   # @return A list of results, one entry per target.
   # @example Run a task as root
-  #   run_task('facts', $targets, '_run_as' => 'root')
+  #   run_task('facts', $targets, '\_run_as' => 'root')
   dispatch :run_task do
     param 'String[1]', :task_name
     param 'Boltlib::TargetSpec', :targets
@@ -27,7 +27,7 @@ Puppet::Functions.create_function(:run_task) do
   # @param task_name The task to run.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.
-  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as', '_noop'.
+  # @param args Arguments to the plan. Can also include additional options: '\_catch_errors', '\_run_as', '\_noop'.
   # @return A list of results, one entry per target.
   # @example Run a task
   #   run_task('facts', $targets, 'Gather OS facts')

@@ -7,13 +7,13 @@
 Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFunction) do
   # Run a script.
   # @param script Path to a script to run on target. May be an absolute path or a modulename/filename selector for a
-  #               file in <moduleroot>/files.
+  #               file in $MODULE_ROOT/files.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param options Specify an array of arguments to the 'arguments' key to be passed to the script.
-  #                Additional options: '_catch_errors', '_run_as'.
+  #                Additional options: '\_catch_errors', '\_run_as'.
   # @return A list of results, one entry per target.
   # @example Run a local script on Linux targets as 'root'
-  #   run_script('/var/tmp/myscript', $targets, '_run_as' => 'root')
+  #   run_script('/var/tmp/myscript', $targets, '\_run_as' => 'root')
   # @example Run a module-provided script with arguments
   #   run_script('iis/setup.ps1', $target, 'arguments' => ['/u', 'Administrator'])
   dispatch :run_script do
@@ -26,11 +26,11 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
 
   # Run a script, logging the provided description.
   # @param script Path to a script to run on target. May be an absolute path or a modulename/filename selector for a
-  #               file in <moduleroot>/files.
+  #               file in $MODULE_ROOT/files.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.
   # @param options Specify an array of arguments to the 'arguments' key to be passed to the script.
-  #                Additional options: '_catch_errors', '_run_as'.
+  #                Additional options: '\_catch_errors', '\_run_as'.
   # @return A list of results, one entry per target.
   # @example Run a script
   #   run_script('/var/tmp/myscript', $targets, 'Downloading my application')
