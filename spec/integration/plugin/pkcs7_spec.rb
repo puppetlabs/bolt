@@ -136,7 +136,7 @@ describe 'using the pkcs7 plugin' do
                           'user' => 'me',
                           'password' => {
                             '_plugin' => 'pkcs7',
-                            'encrypted-value' => encrypted_ssshhh
+                            'encrypted_value' => encrypted_ssshhh
                           }
                         }
                       } }

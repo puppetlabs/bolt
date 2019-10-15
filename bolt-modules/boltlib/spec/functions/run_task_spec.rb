@@ -35,6 +35,7 @@ describe 'run_task' do
     executor.stubs(:noop).returns(false)
 
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
+      inventory.stubs(:version).returns(1)
       example.run
     end
   end
@@ -78,7 +79,7 @@ describe 'run_task' do
       executable = File.join(tasks_root, 'meta.sh')
 
       executor.expects(:run_task)
-              .with([target], mock_task(executable, 'environment'), default_args, '_run_as' => 'root')
+              .with([target], mock_task(executable, 'environment'), default_args, run_as: 'root')
               .returns(result_set)
       inventory.expects(:get_targets).with(hostname).returns([target])
 
@@ -139,14 +140,14 @@ describe 'run_task' do
       let(:message) { 'test message' }
 
       it 'passes the description through if parameters are passed' do
-        executor.expects(:run_task).with([target], anything, {}, '_description' => message).returns(result_set)
+        executor.expects(:run_task).with([target], anything, {}, description: message).returns(result_set)
         inventory.expects(:get_targets).with(hostname).returns([target])
 
         is_expected.to run.with_params('test::yes', hostname, message, {})
       end
 
       it 'passes the description through if no parameters are passed' do
-        executor.expects(:run_task).with([target], anything, {}, '_description' => message).returns(result_set)
+        executor.expects(:run_task).with([target], anything, {}, description: message).returns(result_set)
         inventory.expects(:get_targets).with(hostname).returns([target])
 
         is_expected.to run.with_params('test::yes', hostname, message)
@@ -215,7 +216,7 @@ describe 'run_task' do
           executor.expects(:run_task).with([target, target2],
                                            mock_task(executable, 'environment'),
                                            default_args,
-                                           '_catch_errors' => true)
+                                           catch_errors: true)
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 

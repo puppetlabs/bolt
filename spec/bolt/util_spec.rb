@@ -3,8 +3,10 @@
 require 'spec_helper'
 require 'bolt/pal/yaml_plan'
 require 'bolt/util'
+require 'bolt_spec/files'
 
 describe Bolt::Util do
+  include BoltSpec::Files
   context "when creating a typed name from a modulepath" do
     it "removes init from the typed name" do
       expect(Bolt::Util.module_name('mymod/plans/init.pp')).to eq('mymod')
@@ -56,6 +58,25 @@ describe Bolt::Util do
       it "turns Arrays into code string" do
         array = ['a', 'r', 'r', Bolt::PAL::YamlPlan::BareString.new('$a'), 'y']
         expect(Bolt::Util.to_code(array)).to eq("['a', 'r', 'r', $a, 'y']")
+      end
+    end
+  end
+
+  context "when parsing a invalid file" do
+    it "raises an error with line and column number if the YAML has a syntax error" do
+      contents = <<-YAML
+      ---
+      version: 2
+      config:
+        transport: winrm
+          ssl-verify: false
+          ssl: true
+      YAML
+
+      with_tempfile_containing('config_file_test', contents) do |file|
+        expect {
+          Bolt::Util.read_config_file(file, nil, 'inventory')
+        }.to raise_error(Bolt::FileError, /Error at line 2 column 14/)
       end
     end
   end

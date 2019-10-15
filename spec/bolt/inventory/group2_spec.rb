@@ -4,11 +4,15 @@ require 'spec_helper'
 require 'bolt/inventory'
 require 'bolt/inventory/group'
 require 'bolt/plugin'
+require 'bolt_spec/config'
 
 # This is largely internal and probably shouldn't be tested
 describe Bolt::Inventory::Group2 do
+  include BoltSpec::Config
+
   let(:data) { { 'name' => 'all' } }
-  let(:plugins) { Bolt::Plugin.new(nil, Bolt::Analytics::NoopClient.new) }
+  let(:pal) { nil } # Not used
+  let(:plugins) { Bolt::Plugin.new(config, nil, Bolt::Analytics::NoopClient.new) }
   let(:group) {
     # Inventory always resolves unknown labels to names or aliases from the top-down when constructed,
     # passing the collection of all aliases in it. Do that manually here to ensure plain target strings
@@ -377,16 +381,29 @@ describe Bolt::Inventory::Group2 do
     end
   end
 
-  context 'where a target uses an invalid name' do
+  context 'where a target uses an invalid uri' do
     let(:data) do
       {
         'name' => 'group1',
-        'targets' => [{ 'name' => 'foo:a/b@neptune"' }]
+        'targets' => [{ 'uri' => 'foo:a/b@neptune"' }]
       }
     end
 
     it 'raises an error' do
-      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Invalid target name/)
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Invalid target uri/)
+    end
+  end
+
+  context 'where a target uses an invalid name' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'targets' => [{ 'name' => 'ฒณดตษ๚' }]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Target name must be ASCII/)
     end
   end
 
@@ -961,8 +978,11 @@ describe Bolt::Inventory::Group2 do
 
       let(:hooks) { [] }
 
+      let(:modulepath) { [''] }
+      let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+
       let(:plugins) do
-        plugins = Bolt::Plugin.new(nil, Bolt::Analytics::NoopClient.new)
+        plugins = Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new)
         plugin = double('plugin')
         allow(plugin).to receive(:name).and_return('fake')
         allow(plugin).to receive(:hooks).and_return(hooks)
@@ -1044,13 +1064,13 @@ describe Bolt::Inventory::Group2 do
       it 'fails with an unsupported targets plugin' do
         data['targets'] = [fake_plugin]
         expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/fake does not support inventory_targets/)
+          .to raise_error(/fake does not support resolve_reference/)
       end
 
       it 'fails with an unsupported config plugin' do
         data['config'] = fake_plugin
         expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/fake does not support inventory_config/)
+          .to raise_error(/fake does not support resolve_reference/)
       end
     end
   end

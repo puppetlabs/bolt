@@ -18,6 +18,7 @@ describe "passes parsed AST to the apply_catalog task" do
   let(:config_flags) { %W[--format json --nodes #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
 
   before(:each) do
+    allow(Bolt::ApplyResult).to receive(:from_task_result) { |r| r }
     allow_any_instance_of(Bolt::Applicator).to receive(:catalog_apply_task) {
       path = File.join(__dir__, "../fixtures/apply/#{apply_task}")
       impl = { 'name' => apply_task, 'path' => path }
@@ -29,7 +30,7 @@ describe "passes parsed AST to the apply_catalog task" do
   def get_notifies(result)
     expect(result).not_to include('kind')
     expect(result[0]).to include('status' => 'success')
-    result[0]['result']['report']['resources'].select { |r| r['type'] == 'Notify' }
+    result[0]['result']['report']['catalog']['resources'].select { |r| r['type'] == 'Notify' }
   end
 
   # SSH only required to simplify capturing stdin passed to the task. WinRM omitted as slower and unnecessary.
@@ -56,7 +57,7 @@ describe "passes parsed AST to the apply_catalog task" do
       notify = get_notifies(result)
       expect(notify.count).to eq(1)
       expect(notify[0]['title']).to eq(
-        'trusted {authenticated => local, certname => localhost, extensions => {}, hostname => localhost, domain => }'
+        "trusted {authenticated => local, certname => #{uri}, extensions => {}, hostname => #{uri}, domain => }"
       )
     end
 
@@ -99,7 +100,7 @@ describe "passes parsed AST to the apply_catalog task" do
     it 'applies a complex type from the modulepath' do
       result = run_cli_json(%w[plan run basic::type] + config_flags)
       report = result[0]['result']['report']
-      warn = report['resources'].select { |r| r['type'] == 'Warn' }
+      warn = report['catalog']['resources'].select { |r| r['type'] == 'Warn' }
       expect(warn.count).to eq(1)
     end
 

@@ -12,7 +12,13 @@ describe Bolt::Plugin::Pkcs7 do
     end
   end
 
-  let(:pkcs7) { Bolt::Plugin::Pkcs7.new(@boltdir, {}) }
+  let(:context) do
+    context = instance_double("Bolt::Plugin::PluginContext")
+    allow(context).to receive(:boltdir).and_return(@boltdir)
+    context
+  end
+
+  let(:pkcs7) { Bolt::Plugin::Pkcs7.new(context: context, config: {}) }
 
   it 'createskeys' do
     pkcs7.secret_createkeys
@@ -27,8 +33,24 @@ describe Bolt::Plugin::Pkcs7 do
   it 'has reversible encryption' do
     pkcs7.secret_createkeys
     value = "mystringval"
-    enc = pkcs7.secret_encrypt('plaintext-value' => value)
+    enc = pkcs7.secret_encrypt('plaintext_value' => value)
     expect(enc).to start_with('ENC[PKCS7,')
-    expect(pkcs7.secret_decrypt('encrypted-value' => enc)).to eq(value)
+    expect(pkcs7.secret_decrypt('encrypted_value' => enc)).to eq(value)
+  end
+
+  context 'using home directory in for key paths' do
+    let(:pkcs7) do
+      Bolt::Plugin::Pkcs7.new(context: context,
+                              config: {
+                                'private-key' => '~/.keys/private_key.pkcs7.pem',
+                                'public-key' => '~/.keys/public_key.pkcs7.pem'
+                              })
+    end
+
+    it 'resolves file paths' do
+      home_dir = File.expand_path('~')
+      expect(pkcs7.private_key_path).to eq("#{home_dir}/.keys/private_key.pkcs7.pem")
+      expect(pkcs7.public_key_path).to eq("#{home_dir}/.keys/public_key.pkcs7.pem")
+    end
   end
 end

@@ -42,7 +42,7 @@ describe "when runnning over the ssh transport", ssh: true do
         result = run_failed_node(%W[command run #{whoami}] + config_flags)
         expect(result['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
         expect(result['_error']['msg']).to match(
-          %r{Failed to connect to ssh:\/\/bolt@localhost:62223: Connection refused}
+          /Failed to connect to localhost: Connection refused/
         )
       end
     end
@@ -61,6 +61,11 @@ describe "when runnning over the ssh transport", ssh: true do
     it 'passes noop to a task that supports noop', :reset_puppet_settings do
       result = run_one_node(%w[task run sample::noop message=somemessage --noop] + config_flags)
       expect(result['_output'].strip).to eq("somemessage with noop true")
+    end
+
+    it 'passes noop to a plan that runs a task with noop', :reset_puppet_settings do
+      result = run_cli_json(%w[plan run sample::noop] + config_flags)[0]['result']
+      expect(result['_output'].strip).to eq("This works with noop true")
     end
 
     it 'does not pass noop to a task by default', :reset_puppet_settings do

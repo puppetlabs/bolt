@@ -92,12 +92,15 @@ module Bolt
 
     def status_hash
       # DEPRECATION: node in status hashes is deprecated and should be removed in 2.0
-      { node: @target.name,
+      base = {
         target: @target.name,
         action: action,
         object: object,
-        status: ok? ? 'success' : 'failure',
-        result: @value }
+        status: status
+      }
+      # rubocop:disable Style/GlobalVars
+      $future ? base.merge(value: @value) : base.merge(result: @value, node: @target.name)
+      # rubocop:enable Style/GlobalVars
     end
 
     def generic_value
@@ -130,6 +133,10 @@ module Bolt
 
     def to_data
       Bolt::Util.walk_keys(status_hash, &:to_s)
+    end
+
+    def status
+      ok? ? 'success' : 'failure'
     end
 
     def ok?

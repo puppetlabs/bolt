@@ -17,5 +17,14 @@ module BoltSpec
         yield file
       end
     end
+
+    def fixtures_path(*path)
+      if path
+        File.absolute_path(File.join(__dir__, '..', '..', 'fixtures', path))
+      else
+        File.absolute_path(File.join(__dir__, '..', '..', 'fixtures'))
+      end
+    end
+    module_function :fixtures_path
   end
 end

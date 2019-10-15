@@ -106,5 +106,13 @@ module Bolt
     def ==(other)
       eql?(other)
     end
+
+    def [](from, up_to = nil)
+      if up_to
+        @results[from..up_to]
+      else
+        @results[from]
+      end
+    end
   end
 end

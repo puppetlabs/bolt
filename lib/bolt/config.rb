@@ -33,7 +33,7 @@ module Bolt
   class Config
     attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
                   :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir,
-                  :puppetfile_config, :plugins, :plugin_hooks
+                  :puppetfile_config, :plugins, :plugin_hooks, :future
     attr_writer :modulepath
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
@@ -164,6 +164,8 @@ module Bolt
       @plugins = data['plugins'] if data.key?('plugins')
       @plugin_hooks.merge!(data['plugin_hooks']) if data.key?('plugin_hooks')
 
+      @future = data['future'] == true
+
       %w[concurrency format puppetdb color transport].each do |key|
         send("#{key}=", data[key]) if data.key?(key)
       end
@@ -276,9 +278,7 @@ module Bolt
         raise Bolt::ValidationError, "Unsupported format: '#{@format}'"
       end
 
-      if @hiera_config && !(File.file?(@hiera_config) && File.readable?(@hiera_config))
-        raise Bolt::FileError, "Could not read hiera-config file #{@hiera_config}", @hiera_config
-      end
+      Bolt::Util.validate_file('hiera-config', @hiera_config) if @hiera_config
 
       unless @transport.nil? || Bolt::TRANSPORTS.include?(@transport.to_sym)
         raise UnknownTransportError, @transport

@@ -54,6 +54,7 @@ describe "installing puppetfiles" do
     expect(result['success']).to eq(true)
     expect(result['puppetfile']).to eq(File.join(boltdir, 'Puppetfile'))
     expect(result['moduledir']).to eq(File.join(boltdir, 'modules'))
+    expect(Dir.exist?(File.join(boltdir, '.resource_types')))
 
     result = JSON.parse(run_cli(%W[task show --boltdir #{boltdir}]))
     installed_tasks = Set.new(result['tasks'].map(&:first))
@@ -61,7 +62,6 @@ describe "installing puppetfiles" do
 
     result = JSON.parse(run_cli(%W[plan show --boltdir #{boltdir}]))
     installed_plans = Set.new(result['plans'].map(&:first))
-
     expect(installed_plans).to be_superset(Set.new(%w[foo::c foo::d bar::g bar::h]))
   end
 end

@@ -96,6 +96,12 @@ module Bolt
                        "count": count }.to_json)
       end
 
+      def print_groups(groups)
+        count = groups.count
+        @stream.puts({ "groups": groups,
+                       "count": count }.to_json)
+      end
+
       def fatal_error(err)
         @stream.puts "],\n" if @items_open
         @stream.puts '"_error": ' if @object_open

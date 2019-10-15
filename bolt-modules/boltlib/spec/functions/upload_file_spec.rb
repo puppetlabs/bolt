@@ -15,6 +15,7 @@ describe 'upload_file' do
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
+      inventory.stubs(:version).returns(1)
       example.run
     end
   end
@@ -57,7 +58,7 @@ describe 'upload_file' do
 
     it 'runs as another user' do
       executor.expects(:upload_file)
-              .with([target], full_dir_path, destination, '_run_as' => 'soandso')
+              .with([target], full_dir_path, destination, run_as: 'soandso')
               .returns(result_set)
       inventory.stubs(:get_targets).with(target).returns([target])
 
@@ -77,7 +78,7 @@ describe 'upload_file' do
 
       it 'passes the description through if parameters are passed' do
         executor.expects(:upload_file)
-                .with([target], full_dir_path, destination, '_description' => message)
+                .with([target], full_dir_path, destination, description: message)
                 .returns(result_set)
         inventory.stubs(:get_targets).with(target).returns([target])
 
@@ -86,7 +87,7 @@ describe 'upload_file' do
 
       it 'passes the description through if no parameters are passed' do
         executor.expects(:upload_file)
-                .with([target], full_dir_path, destination, '_description' => message)
+                .with([target], full_dir_path, destination, description: message)
                 .returns(result_set)
         inventory.stubs(:get_targets).with(target).returns([target])
 
@@ -140,7 +141,7 @@ describe 'upload_file' do
         end
 
         it 'does not error with _catch_errors' do
-          executor.expects(:upload_file).with([target, target2], full_path, destination, '_catch_errors' => true)
+          executor.expects(:upload_file).with([target, target2], full_path, destination, catch_errors: true)
                   .returns(result_set)
           inventory.expects(:get_targets).with([hostname, hostname2]).returns([target, target2])
 

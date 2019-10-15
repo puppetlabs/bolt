@@ -15,6 +15,7 @@ describe 'facts' do
   around(:each) do |example|
     Puppet[:tasks] = true
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
+      inventory.stubs(:version).returns(1)
       example.run
     end
   end

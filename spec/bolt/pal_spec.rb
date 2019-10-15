@@ -13,7 +13,7 @@ describe Bolt::PAL do
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
   describe :parse_manifest do
-    let(:pal) { Bolt::PAL.new(nil, nil) }
+    let(:pal) { Bolt::PAL.new(nil, nil, nil) }
 
     it "should parse a manifest string" do
       ast = pal.parse_manifest('notify { "hello world": }', 'test.pp')

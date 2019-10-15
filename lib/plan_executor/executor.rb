@@ -79,7 +79,7 @@ module PlanExecutor
     end
 
     def run_command(targets, command, options = {})
-      description = options.fetch('_description', "command '#{command}'")
+      description = options.fetch(:description, "command '#{command}'")
       log_action(description, targets) do
         results = as_resultset(targets) do
           @orch_client.run_command(targets, command, options)
@@ -90,7 +90,7 @@ module PlanExecutor
     end
 
     def run_script(targets, script, arguments, options = {})
-      description = options.fetch('_description', "script #{script}")
+      description = options.fetch(:description, "script #{script}")
       log_action(description, targets) do
         results = as_resultset(targets) do
           @orch_client.run_script(targets, script, arguments, options)
@@ -101,7 +101,7 @@ module PlanExecutor
     end
 
     def run_task(targets, task, arguments, options = {})
-      description = options.fetch('_description', "task #{task.name}")
+      description = options.fetch(:description, "task #{task.name}")
       log_action(description, targets) do
         arguments['_task'] = task.name
 
@@ -114,7 +114,7 @@ module PlanExecutor
     end
 
     def upload_file(targets, source, destination, options = {})
-      description = options.fetch('_description', "file upload from #{source} to #{destination}")
+      description = options.fetch(:description, "file upload from #{source} to #{destination}")
       log_action(description, targets) do
         results = as_resultset(targets) do
           @orch_client.file_upload(targets, source, destination, options)

@@ -248,6 +248,70 @@ For example, the following uploads file 'abc' on windows_target.net:
 }
 ```
 
+### POST /ssh/run_script
+- `target`: [SSH Target Object](#ssh-target-object), *required* - Target information to run script on.
+- `script`: Object, *required* - The script being executed.
+    - `filename`: String, *required* - The destination for the script on the target.
+    - `uri`: Object, *required* - The location of where to find the script.
+        - `path`: String, *required* - The endpoint to retrieve the script.
+        - `params`: Object, *required* - The parameters to supply the endpoint.
+    - `sha256`: String, *required* - The SHA256 value for the script.
+- `arguments`: Array, *optional* - Which arguments to pass to the script.
+
+For example, the following runs script 'file.sh' on linux_target.net:
+```
+{
+  "target": {
+    "hostname": "linux_target.net",
+    "user": "marauder",
+    "password": "I solemnly swear that I am up to no good",
+    "host-key-check": false,
+    "run-as": "george_weasley"
+  },
+  "script" : {
+    "filename": "file.sh",
+    "uri": {
+      "path": "/puppet/v3/file_content/modules/some_module/file.sh",
+      "params": {}
+    },
+    "sha256": "SHA256VALUE"
+  },
+  "arguments": ["--test"],
+}
+```
+
+### POST /winrm/run_script
+- `target`: [WinRM Target Object](#winrm-target-object), *required* - Target information to run script on.
+- `script`: Object, *required* - The script being executed.
+    - `filename`: String, *required* - The destination for the script on the target.
+    - `uri`: Object, *required* - The location of where to find the script.
+        - `path`: String, *required* - The endpoint to retrieve the script.
+        - `params`: Object, *required* - The parameters to supply the endpoint.
+    - `sha256`: String, *required* - The SHA256 value for the script.
+- `arguments`: Array, *optional* - Which arguments to pass to the script.
+
+For example, the following runs script 'file.sh' on windows_target.net:
+```
+{
+  "target": {
+    "hostname": "windows_target.net",
+    "user": "Administrator",
+    "password": "Secret",
+    "ssl": false,
+    "ssl-verify": false
+  },
+  "script" : {
+    "filename": "file.ps1",
+    "uri": {
+      "path": "/puppet/v3/file_content/modules/some_module/file.ps1",
+      "params": {}
+    },
+    "sha256": "SHA256VALUE"
+  },
+  "arguments": ["-Test"],
+}
+```
+
 ### POST /ssh/check_node_connections
 - `targets`: An array of [SSH Target Objects](#ssh-target-object), *required* - A set of targets to check once for connectivity over SSH.
 

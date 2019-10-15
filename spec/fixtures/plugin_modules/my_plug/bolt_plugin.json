@@ -1,0 +1,2 @@
+{ "hooks": {"createkeys": { "task": "my_plug::resolve_reference" } },
+  "config": { "optional_config": { "type": "Optional[String]" } } }

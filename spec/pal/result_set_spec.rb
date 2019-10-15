@@ -5,6 +5,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/pal'
 
 require 'bolt/pal'
+require 'bolt/inventory'
 
 describe 'ResultSet DataType' do
   include BoltSpec::Files
@@ -13,7 +14,7 @@ describe 'ResultSet DataType' do
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:pal) { Bolt::PAL.new(modulepath, nil) }
+  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
   let(:result_code) do
     <<-PUPPET
 $result_set = results::make_result_set( {
@@ -24,7 +25,7 @@ PUPPET
 
   def result_set(attr)
     code = result_code + attr
-    peval(code, pal)
+    peval(code, pal, nil, Bolt::Inventory.new({}))
   end
 
   it 'should be ok' do

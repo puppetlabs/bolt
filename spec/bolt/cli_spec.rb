@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'signal_helper'
 require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt/cli'
@@ -59,6 +58,7 @@ describe "Bolt::CLI" do
     let(:boltdir) { Bolt::Boltdir.new('.') }
     before(:each) do
       allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(boltdir)
+      allow_any_instance_of(Bolt::Boltdir).to receive(:resource_types)
       allow(Bolt::Util).to receive(:read_config_file).and_return({})
     end
 
@@ -772,7 +772,7 @@ describe "Bolt::CLI" do
     describe "bundled_content" do
       let(:empty_content) {
         { "Plan" => [],
-          "Plugin" => %w[puppetdb pkcs7 prompt terraform task],
+          "Plugin" => Bolt::Plugin::BUILTIN_PLUGINS,
           "Task" => [] }
       }
       it "does not calculate bundled content for a command" do
@@ -837,24 +837,6 @@ describe "Bolt::CLI" do
         allow(cli).to receive(:outputter).and_return(outputter)
       end
 
-      it "traps SIGINT early", :signals_self do
-        options = double(Hash)
-        expect(options) .to receive(:[]) do
-          Process.kill :INT, Process.pid
-          sync_thread.join(1) # give ruby some time to handle the signal
-          raise 'early exit'
-        end
-
-        expect(cli).to receive(:exit!) do
-          sync_thread.kill
-        end
-
-        expect { cli.execute(options) }.to raise_error('early exit')
-        expect(@log_output.readlines.last).to match(
-          /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\.$/
-        )
-      end
-
       context 'when running a command' do
         let(:options) {
           {
@@ -882,24 +864,6 @@ describe "Bolt::CLI" do
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
-        end
-
-        it "traps SIGINT", :signals_self do
-          expect(executor).to receive(:run_command).with(targets, 'whoami', kind_of(Hash)) do
-            Process.kill :INT, Process.pid
-            sync_thread.join(1) # give ruby some time to handle the signal
-            Bolt::ResultSet.new([])
-          end
-
-          expect(cli).to receive(:exit!) do
-            sync_thread.kill
-          end
-
-          cli.execute(options)
-          expect(@log_output.readlines.last).to match(
-            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
-             )There may be processes left executing on some nodes\.$/
-          )
         end
       end
 
@@ -956,26 +920,6 @@ describe "Bolt::CLI" do
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
-        end
-
-        it "traps SIGINT", :signals_self do
-          stub_file(script)
-
-          expect(executor).to receive(:run_script).with(targets, script, [], kind_of(Hash)) do
-            Process.kill :INT, Process.pid
-            sync_thread.join(1) # give ruby some time to handle the signal
-            Bolt::ResultSet.new([])
-          end
-
-          expect(cli).to receive(:exit!) do
-            sync_thread.kill
-          end
-
-          cli.execute(options)
-          expect(@log_output.readlines.last).to match(
-            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
-             )There may be processes left executing on some nodes\.$/
-          )
         end
       end
 
@@ -1359,7 +1303,7 @@ describe "Bolt::CLI" do
           task_name.replace 'dne::task1'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::PAL::PALError, /Could not find a task named "dne::task1"/
+            Bolt::Error, /Could not find a task named "dne::task1"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1368,7 +1312,7 @@ describe "Bolt::CLI" do
           task_name.replace 'sample::dne'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::PAL::PALError, /Could not find a task named "sample::dne"/
+            Bolt::Error, /Could not find a task named "sample::dne"/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1424,26 +1368,6 @@ describe "Bolt::CLI" do
             cli.execute(options)
             expect(JSON.parse(output.string)).to be
           end
-        end
-
-        it "traps SIGINT", :signals_self do
-          expect(executor)
-            .to receive(:run_task)
-            .with(targets, task_t, task_params, kind_of(Hash)) do
-              Process.kill :INT, Process.pid
-              sync_thread.join(1) # give ruby some time to handle the signal
-              Bolt::ResultSet.new([])
-            end
-
-          expect(cli).to receive(:exit!) do
-            sync_thread.kill
-          end
-
-          cli.execute(options)
-          expect(@log_output.readlines.last).to match(
-            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
-             )There may be processes left executing on some nodes\.$/
-          )
         end
 
         describe 'task parameters validation' do
@@ -1548,7 +1472,7 @@ describe "Bolt::CLI" do
                 task_name.replace 'unknown::task'
 
                 expect { cli.execute(options) }.to raise_error(
-                  Bolt::PAL::PALError, /Could not find a task named "unknown::task"/
+                  Bolt::Error, /Could not find a task named "unknown::task"/
                 )
                 expect(JSON.parse(output.string)).to be
               end
@@ -1725,30 +1649,6 @@ describe "Bolt::CLI" do
           expect(cli.execute(options)).to eq(1)
           expect(JSON.parse(output.string)['msg']).to match(/Could not find a plan named "sample::dne"/)
         end
-
-        it "traps SIGINT", :signals_self do
-          expect(executor)
-            .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash)) do
-              Process.kill :INT, Process.pid
-              sync_thread.join(1) # give ruby some time to handle the signal
-              Bolt::ResultSet.new([])
-            end
-
-          expect(executor).to receive(:start_plan)
-          expect(executor).to receive(:log_plan)
-          expect(executor).to receive(:finish_plan)
-
-          expect(cli).to receive(:exit!) do
-            sync_thread.kill
-          end
-
-          cli.execute(options)
-          expect(@log_output.readlines.last).to match(
-            /INFO +Bolt::CLI *: *Exiting after receiving SIGINT signal\. (?x:
-             )There may be processes left executing on some nodes\.$/
-          )
-        end
       end
 
       describe "file uploading" do
@@ -1844,6 +1744,10 @@ describe "Bolt::CLI" do
         expect(Bolt::Executor).to receive(:new).with(Bolt::Config.default.concurrency,
                                                      anything,
                                                      true).and_return(executor)
+
+        plugins = Bolt::Plugin.new(nil, nil, nil)
+        allow(cli).to receive(:plugins).and_return(plugins)
+
         outputter = Bolt::Outputter::JSON.new(false, false, false, output)
         allow(cli).to receive(:outputter).and_return(outputter)
         allow(executor).to receive(:report_bundled_content)
@@ -1907,13 +1811,13 @@ describe "Bolt::CLI" do
       let(:puppetfile) { Pathname.new('path/to/puppetfile') }
       let(:modulepath) { [Pathname.new('path/to/modules')] }
       let(:action_stub) { double('r10k_action_puppetfile_install') }
+
       let(:cli) { Bolt::CLI.new({}) }
 
       before :each do
         allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
         allow(puppetfile).to receive(:exist?).and_return(true)
-
-        # Ensure we never actually install modules.
+        allow_any_instance_of(Bolt::PAL).to receive(:generate_types)
         allow(R10K::Action::Puppetfile::Install).to receive(:new).and_return(action_stub)
       end
 
@@ -2193,6 +2097,12 @@ describe "Bolt::CLI" do
     it 'lists targets the action would run on' do
       cli = Bolt::CLI.new(%w[inventory show -t localhost])
       expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_targets)
+      cli.execute(cli.parse)
+    end
+
+    it 'lists groups in the inventory file' do
+      cli = Bolt::CLI.new(%w[group show])
+      expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_groups)
       cli.execute(cli.parse)
     end
 

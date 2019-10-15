@@ -63,6 +63,8 @@ require 'bolt/pal'
 # - allow_upload(file), expect_upload(file): expect the identified source file
 # - allow_apply_prep: allows `apply_prep` to be invoked in the plan but does not allow modifiers
 # - allow_apply: allows `apply` to be invoked in the plan but does not allow modifiers
+# - allow_out_message, expect_out_message: expect a message to be passed to out::message (only modifiers are
+#   be_called_times(n), with_params(params), and not_be_called)
 #
 # Stub modifiers:
 # - be_called_times(n): if allowed, fail if the action is called more than 'n' times
@@ -128,6 +130,12 @@ require 'bolt/pal'
 #       end
 #       expect(run_plan('my_plan', { 'param1' => 10 })).to eq(10)
 #     end
+
+#     it 'expects multiple messages to out::message' do
+#       expect_out_message.be_called_times(2).with_params(message)
+#       result = run_plan(plan_name, 'messages' => [message, message])
+#       expect(result).to be_ok
+#     end
 #   end
 #
 # See spec/bolt_spec/plan_spec.rb for more examples.
@@ -172,7 +180,7 @@ module BoltSpec
     end
 
     def run_plan(name, params)
-      pal = Bolt::PAL.new(config.modulepath, config.hiera_config)
+      pal = Bolt::PAL.new(config.modulepath, config.hiera_config, config.boltdir.resource_types)
       result = pal.run_plan(name, params, executor, inventory, puppetdb_client)
 
       if executor.error_message
@@ -219,6 +227,15 @@ module BoltSpec
     def allow_get_resources
       allow_task('apply_helpers::query_resources')
       nil
+    end
+
+    def allow_out_message
+      executor.stub_out_message.add_stub
+    end
+    alias allow_any_out_message allow_out_message
+
+    def expect_out_message
+      allow_out_message.expect_call
     end
 
     # Example helpers to mock other run functions

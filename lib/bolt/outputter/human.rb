@@ -73,14 +73,14 @@ module Bolt
       end
 
       def print_start(target)
-        @stream.puts(colorize(:green, "Started on #{target.host}..."))
+        @stream.puts(colorize(:green, "Started on #{target.safe_name}..."))
       end
 
       def print_result(result)
         if result.success?
-          @stream.puts(colorize(:green, "Finished on #{result.target.host}:"))
+          @stream.puts(colorize(:green, "Finished on #{result.target.safe_name}:"))
         else
-          @stream.puts(colorize(:red, "Failed on #{result.target.host}:"))
+          @stream.puts(colorize(:red, "Failed on #{result.target.safe_name}:"))
         end
 
         if result.error_hash
@@ -170,7 +170,7 @@ module Bolt
           @stream.puts format('Successful on %<size>d node%<plural>s: %<names>s',
                               size: ok_set.size,
                               plural: ok_set.size == 1 ? '' : 's',
-                              names: ok_set.names.join(','))
+                              names: ok_set.targets.map(&:safe_name).join(','))
         end
 
         error_set = results.error_set
@@ -179,7 +179,7 @@ module Bolt
                                 format('Failed on %<size>d node%<plural>s: %<names>s',
                                        size: error_set.size,
                                        plural: error_set.size == 1 ? '' : 's',
-                                       names: error_set.names.join(',')))
+                                       names: error_set.targets.map(&:safe_name).join(',')))
         end
 
         total_msg = format('Ran on %<size>d node%<plural>s',
@@ -315,6 +315,12 @@ module Bolt
         targets = options[:targets].map(&:name)
         count = "#{targets.count} target#{'s' unless targets.count == 1}"
         @stream.puts targets.join("\n")
+        @stream.puts colorize(:green, count)
+      end
+
+      def print_groups(groups)
+        count = "#{groups.count} group#{'s' unless groups.count == 1}"
+        @stream.puts groups.join("\n")
         @stream.puts colorize(:green, count)
       end
 

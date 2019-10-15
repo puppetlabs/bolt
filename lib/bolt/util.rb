@@ -29,10 +29,12 @@ module Bolt
           logger.debug(msg)
           nil
         end
-      rescue Psych::Exception
-        raise Bolt::FileError.new("Could not parse #{file_name} file: #{path}", path)
-      rescue IOError, SystemCallError
-        raise Bolt::FileError.new("Could not read #{file_name} file: #{path}", path)
+      rescue Psych::Exception => e
+        raise Bolt::FileError.new("Could not parse #{file_name} file: #{path}\n"\
+                                  "Error at line #{e.line} column #{e.column}", path)
+      rescue IOError, SystemCallError => e
+        raise Bolt::FileError.new("Could not read #{file_name} file: #{path}\n"\
+                                  "error: #{e}", path)
       end
 
       # Accepts a path with either 'plans' or 'tasks' in it and determines
@@ -182,6 +184,12 @@ module Bolt
       # This is stubbed for testing validate_file
       def file_stat(path)
         File.stat(File.expand_path(path))
+      end
+
+      def class_name_to_file_name(cls_name)
+        # Note this turns Bolt::CLI -> 'bolt/cli' not 'bolt/c_l_i'
+        # this won't handle Bolt::Inventory2Foo
+        cls_name.gsub(/([a-z])([A-Z])/, '\1_\2').gsub('::', '/').downcase
       end
 
       def validate_file(type, path, allow_dir = false)

@@ -10,7 +10,7 @@ module Bolt
         def initialize(target)
           @target = target
           @run_as = nil
-          @logger = Logging.logger[@target.host]
+          @logger = Logging.logger[@target.safe_name]
         end
 
         # This method allows the @run_as variable to be used as a per-operation

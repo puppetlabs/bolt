@@ -50,7 +50,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
       with_tempfile_containing('token', 'faketoken') do |conf|
         config = {
           'service-url' => 'https://foo.bar:8143',
-          'cacert' => 'bar',
+          'cacert' => conf.path,
           'token-file' => conf.path
         }
         allow(OrchestratorClient).to receive(:new).and_call_original
@@ -303,7 +303,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     it 'passes description through if supplied' do
       expect(mock_client).to receive(:run_task).with(include(description: 'test message')).and_return(results)
 
-      orch.batch_task(targets, mtask, params, '_description' => 'test message')
+      orch.batch_task(targets, mtask, params, description: 'test message')
     end
 
     it "unwraps Sensitive parameters" do
@@ -390,8 +390,8 @@ describe Bolt::Transport::Orch, orchestrator: true do
       end
     end
 
-    it 'ignores _run_as' do
-      results = orch.batch_command(targets, command, '_run_as' => 'root')
+    it 'ignores run_as' do
+      results = orch.batch_command(targets, command, run_as: 'root')
       expect(results[0]).to be_success
       expect(results[1]).to be_success
     end
@@ -556,8 +556,8 @@ describe Bolt::Transport::Orch, orchestrator: true do
         expect(results[1]['stderr']).to eq('there')
       end
 
-      it 'ignores _run_as' do
-        results = orch.batch_script(targets, script_path, args, '_run_as' => 'root')
+      it 'ignores run_as' do
+        results = orch.batch_script(targets, script_path, args, run_as: 'root')
         expect(results[0]).to be_success
         expect(results[1]).to be_success
       end

@@ -4,12 +4,14 @@ module Bolt
   class Plugin
     class InstallAgent
       def hooks
-        %w[puppet_library]
+        %i[puppet_library]
       end
 
       def name
         'install_agent'
       end
+
+      def initialize(*args); end
 
       def puppet_library(_opts, target, apply_prep)
         install_task = apply_prep.get_task("puppet_agent::install")

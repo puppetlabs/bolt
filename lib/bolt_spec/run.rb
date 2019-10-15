@@ -110,7 +110,7 @@ module BoltSpec
       else
         begin
           unless File.stat(manifest).readable?
-            raise BOLT::FileError.new("The manifest '#{manifest}' is unreadable", manifest)
+            raise Bolt::FileError.new("The manifest '#{manifest}' is unreadable", manifest)
           end
         rescue Errno::ENOENT
           raise Bolt::FileError.new("The manifest '#{manifest}' does not exist", manifest)
@@ -152,7 +152,10 @@ module BoltSpec
       end
 
       def pal
-        @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.compile_concurrency)
+        @pal ||= Bolt::PAL.new(config.modulepath,
+                               config.hiera_config,
+                               config.boltdir.resource_types,
+                               config.compile_concurrency)
       end
 
       def resolve_targets(target_spec)
@@ -199,7 +202,7 @@ module BoltSpec
         end
 
         pal.with_bolt_executor(executor, inventory, puppetdb_client) do
-          Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true, '_noop' => noop)
+          Puppet.lookup(:apply_executor).apply_ast(ast, targets, catch_errors: true, noop: noop)
         end
       end
     end

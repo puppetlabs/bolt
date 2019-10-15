@@ -6,7 +6,7 @@ require 'fileutils'
 module Bolt
   class Plugin
     class Pkcs7 < Bolt::Secret::Base
-      def self.validate_config(config)
+      def self.validate_config(config = {})
         known_keys = %w[private-key public-key keysize]
         known_keys.each do |key|
           unless key.is_a? String
@@ -25,17 +25,21 @@ module Bolt
         'pkcs7'
       end
 
-      def initialize(boltdir, options)
-        self.class.validate_config(options)
+      def initialize(config:, context:, **_opts)
+        self.class.validate_config(config)
         require 'openssl'
-        @boltdir = boltdir
-        @options = options || {}
+        @context = context
+        @options = config || {}
         @logger = Logging.logger[self]
+      end
+
+      def boltdir
+        @context.boltdir
       end
 
       def private_key_path
         path = @options['private-key'] || 'keys/private_key.pkcs7.pem'
-        path = File.absolute_path(path, @boltdir)
+        path = File.expand_path(path, boltdir)
         @logger.debug("Using private-key: #{path}")
         path
       end
@@ -46,7 +50,7 @@ module Bolt
 
       def public_key_path
         path = @options['public-key'] || 'keys/public_key.pkcs7.pem'
-        path = File.absolute_path(path, @boltdir)
+        path = File.expand_path(path, boltdir)
         @logger.debug("Using public-key: #{path}")
         path
       end

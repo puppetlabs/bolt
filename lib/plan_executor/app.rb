@@ -39,7 +39,7 @@ module PlanExecutor
       # functional will be making changes to Puppet that remove the need for
       # global Puppet state.
       # https://github.com/puppetlabs/bolt/blob/master/lib/bolt/pal.rb#L166
-      @pal = Bolt::PAL.new(config['modulepath'], nil)
+      @pal = Bolt::PAL.new(config['modulepath'], nil, nil)
 
       @schema = JSON.parse(File.read(File.join(__dir__, 'schemas', 'run_plan.json')))
       @worker = Concurrent::SingleThreadExecutor.new

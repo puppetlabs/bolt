@@ -221,4 +221,57 @@ describe "BoltSpec::Plans" do
       expect { run_plan(plan_name, 'nodes' => targets) }.to raise_error(RuntimeError, /Unexpected call to/)
     end
   end
+
+  context 'with out::message' do
+    let(:plan_name) { 'plans::out_message' }
+    let(:message) { 'foo' }
+    let(:other_message) { 'bar' }
+
+    it 'allows with params' do
+      allow_out_message.with_params(message)
+      result = run_plan(plan_name, 'messages' => [message])
+      expect(result).to be_ok
+    end
+
+    it 'allows any out message' do
+      allow_any_out_message
+      result = run_plan(plan_name, 'messages' => [message])
+      expect(result).to be_ok
+    end
+
+    it 'errors when not allowed' do
+      expect { run_plan(plan_name, 'messages' => [message]) }.to raise_error(RuntimeError, /Unexpected call to/)
+    end
+
+    it 'expects with params' do
+      expect_out_message.with_params(message)
+      result = run_plan(plan_name, 'messages' => [message])
+      expect(result).to be_ok
+    end
+
+    it 'expects multiple times with params' do
+      expect_out_message.be_called_times(2).with_params(message)
+      result = run_plan(plan_name, 'messages' => [message, message])
+      expect(result).to be_ok
+    end
+
+    it 'expects with different params' do
+      expect_out_message.with_params(message)
+      expect_out_message.with_params(other_message)
+      result = run_plan(plan_name, 'messages' => [message, other_message])
+      expect(result).to be_ok
+    end
+
+    it 'errors when not expected' do
+      expect_out_message.not_be_called
+      expect { run_plan(plan_name, 'messages' => [message]) }
+        .to raise_error(RuntimeError, /Expected out::message to be called 0 times/)
+    end
+
+    it 'errors with wrong params' do
+      expect_out_message.with_params(other_message)
+      expect { run_plan(plan_name, 'messages' => [message]) }
+        .to raise_error(RuntimeError, /Expected out::message to be called 1 times with parameters #{other_message}/)
+    end
+  end
 end

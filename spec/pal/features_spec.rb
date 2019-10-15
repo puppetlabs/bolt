@@ -23,7 +23,7 @@ describe 'set_features function' do
     }
   }
   let(:inventory) { Bolt::Inventory.new(data) }
-  let(:pal) { Bolt::PAL.new(modulepath, nil) }
+  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
   let(:target) { inventory.get_targets('example')[0] }
 
   it 'adds the feature to the target' do

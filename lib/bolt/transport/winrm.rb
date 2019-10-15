@@ -75,7 +75,7 @@ module Bolt
         begin
           conn&.disconnect
         rescue StandardError => e
-          logger.info("Failed to close connection to #{target.uri} : #{e.message}")
+          logger.info("Failed to close connection to #{target.safe_name} : #{e.message}")
         end
       end
 
@@ -163,8 +163,7 @@ module Bolt
               if Powershell.powershell_file?(remote_task_path) && stdin.nil?
                 conn.execute(Powershell.run_ps_task(arguments, remote_task_path, input_method))
               else
-                interpreter = select_interpreter(remote_task_path, target.options['interpreters'])
-                if interpreter
+                if (interpreter = select_interpreter(remote_task_path, target.options['interpreters']))
                   path = interpreter
                   args = [remote_task_path]
                 else

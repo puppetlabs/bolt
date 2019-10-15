@@ -9,12 +9,8 @@ describe Bolt::Plugin::Prompt do
   let(:invalid_prompt_data) { { '_plugin' => 'prompt' } }
   let(:password) { 'opensesame' }
 
-  it 'has a hook for inventory_config' do
-    expect(subject.hooks).to eq(['inventory_config'])
-  end
-
   it 'raises a validation error when no prompt message is provided' do
-    expect { subject.validate_inventory_config(invalid_prompt_data) }.to raise_error(Bolt::ValidationError)
+    expect { subject.validate_resolve_reference(invalid_prompt_data) }.to raise_error(Bolt::ValidationError)
   end
 
   it 'concurrent delay prompts for data when executed' do
@@ -22,7 +18,7 @@ describe Bolt::Plugin::Prompt do
     allow(STDOUT).to receive(:puts)
     expect(STDOUT).to receive(:print).with("#{prompt_data['message']}:")
 
-    val = subject.inventory_config(prompt_data)
+    val = subject.resolve_reference(prompt_data)
     expect(val).to eq(password)
   end
 end

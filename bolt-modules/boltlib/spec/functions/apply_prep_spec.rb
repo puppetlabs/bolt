@@ -5,6 +5,7 @@ require 'bolt/analytics'
 require 'bolt/executor'
 require 'bolt/inventory'
 require 'bolt/plugin'
+require 'bolt/plugin/install_agent'
 require 'bolt/result'
 require 'bolt/result_set'
 require 'bolt/target'
@@ -14,7 +15,7 @@ describe 'apply_prep' do
   include PuppetlabsSpec::Fixtures
   let(:applicator) { mock('Bolt::Applicator') }
   let(:executor) { Bolt::Executor.new(1, Bolt::Analytics::NoopClient.new) }
-  let(:plugins) { Bolt::Plugin.new(nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins) { Bolt::Plugin.new(nil, nil, Bolt::Analytics::NoopClient.new) }
   let(:agent_plugin) { Bolt::Plugin::InstallAgent.new }
   let(:task_hook) { agent_plugin.method(:puppet_library) }
   let(:inventory) { Bolt::Inventory.create_version({}, nil, plugins) }
@@ -167,9 +168,8 @@ describe 'apply_prep' do
       let(:hostname) { 'agentless' }
       let(:data) {
         {
-          'version' => 2,
-          'targets' => [{
-            'uri' => hostname,
+          'nodes' => [{
+            'name' => hostname,
             'plugin_hooks' => {
               'puppet_library' => {
                 'plugin' => 'task',
@@ -198,6 +198,48 @@ describe 'apply_prep' do
                 .returns(Bolt::ResultSet.new([Bolt::Result.new(target, value: { '_output' => 'smores' })]))
 
         # TODO: WHY? This shouldn't be called
+        executor.expects(:run_task)
+                .with([target], service_task, anything)
+                .returns(Bolt::ResultSet.new([Bolt::Result.new(target, value: { '_output' => 'ok' })]))
+                .twice
+
+        is_expected.to run.with_params(hostname)
+        expect(inventory.features(target)).to include('puppet-agent')
+        expect(inventory.facts(target)).to eq(fact)
+      end
+    end
+
+    context 'with default plugin inventory v2' do
+      let(:hostname) { 'agentless' }
+      let(:data) {
+        {
+          'version' => 2,
+          'targets' => [{ 'uri' => hostname }]
+        }
+      }
+
+      let(:config) { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
+      let(:pal) { nil }
+      let(:plugins) { Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new) }
+      let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
+      let(:target) { inventory.get_target(hostname) }
+      let(:targets) { inventory.get_targets(hostname) }
+
+      it 'installs the agent if not present' do
+        version = Bolt::ResultSet.new([Bolt::Result.new(target, value: { 'version' => nil })])
+        executor.expects(:run_task).with([target], version_task, anything, anything).returns(version)
+
+        facts = Bolt::ResultSet.new([Bolt::Result.new(target, value: fact)])
+        executor.expects(:run_task).with([target], custom_facts_task, includes('plugins')).returns(facts)
+
+        plugins.expects(:get_hook)
+               .with('install_agent', :puppet_library)
+               .returns(task_hook)
+
+        executor.expects(:run_task)
+                .with([target], install_task, anything, anything)
+                .returns(Bolt::ResultSet.new([Bolt::Result.new(target, value: { '_output' => 'smores' })]))
+
         executor.expects(:run_task)
                 .with([target], service_task, anything)
                 .returns(Bolt::ResultSet.new([Bolt::Result.new(target, value: { '_output' => 'ok' })]))

@@ -33,9 +33,10 @@ module Bolt
                  'task' => %w[show run],
                  'plan' => %w[show run convert],
                  'file' => %w[upload],
-                 'puppetfile' => %w[install show-modules],
+                 'puppetfile' => %w[install show-modules generate-types],
                  'secret' => %w[encrypt decrypt createkeys],
                  'inventory' => %w[show],
+                 'group' => %w[show],
                  'apply' => %w[] }.freeze
 
     attr_reader :config, :options
@@ -76,7 +77,6 @@ module Bolt
 
     def parse
       parser = BoltOptionParser.new(options)
-
       # This part aims to handle both `bolt <mode> --help` and `bolt help <mode>`.
       remaining = handle_parser_errors { parser.permute(@argv) } unless @argv.empty?
       if @argv.empty? || help?(remaining)
@@ -117,6 +117,11 @@ module Bolt
                             end
                   Bolt::Config.from_boltdir(boltdir, options)
                 end
+
+      # Set $future global if configured
+      # rubocop:disable Style/GlobalVars
+      $future = @config.future
+      # rubocop:enable Style/GlobalVars
 
       Bolt::Logger.configure(config.log, config.color)
 
@@ -244,7 +249,7 @@ module Bolt
     end
 
     def plugins
-      @plugins ||= Bolt::Plugin.setup(config, puppetdb_client, analytics)
+      @plugins ||= Bolt::Plugin.setup(config, pal, puppetdb_client, analytics)
     end
 
     def query_puppetdb_nodes(query)
@@ -303,6 +308,8 @@ module Bolt
           end
         elsif options[:subcommand] == 'inventory'
           list_targets
+        elsif options[:subcommand] == 'group'
+          list_groups
         end
         return 0
       elsif options[:action] == 'show-modules'
@@ -320,7 +327,11 @@ module Bolt
       when 'plan'
         code = run_plan(options[:object], options[:task_options], options[:target_args], options)
       when 'puppetfile'
-        code = install_puppetfile(@config.puppetfile_config, @config.puppetfile, @config.modulepath)
+        if options[:action] == 'generate-types'
+          code = generate_types
+        elsif options[:action] == 'install'
+          code = install_puppetfile(@config.puppetfile_config, @config.puppetfile, @config.modulepath)
+        end
       when 'secret'
         code = Bolt::Secret.execute(plugins, outputter, options)
       when 'apply'
@@ -338,7 +349,7 @@ module Bolt
 
         elapsed_time = Benchmark.realtime do
           executor_opts = {}
-          executor_opts['_description'] = options[:description] if options.key?(:description)
+          executor_opts[:description] = options[:description] if options.key?(:description)
           executor.subscribe(outputter)
           executor.subscribe(log_outputter)
           results =
@@ -405,6 +416,11 @@ module Bolt
       outputter.print_targets(options)
     end
 
+    def list_groups
+      groups = inventory.group_names
+      outputter.print_groups(groups)
+    end
+
     def run_plan(plan_name, plan_arguments, nodes, options)
       unless nodes.empty?
         if plan_arguments['nodes']
@@ -416,9 +432,8 @@ module Bolt
         plan_arguments['nodes'] = nodes.join(',')
       end
 
-      params = options[:noop] ? plan_arguments.merge('_noop' => true) : plan_arguments
       plan_context = { plan_name: plan_name,
-                       params: params }
+                       params: plan_arguments }
       plan_context[:description] = options[:description] if options[:description]
 
       executor = Bolt::Executor.new(config.concurrency, analytics, options[:noop])
@@ -459,7 +474,7 @@ module Bolt
         end
 
         results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
-          Puppet.lookup(:apply_executor).apply_ast(ast, targets, '_catch_errors' => true, '_noop' => noop)
+          Puppet.lookup(:apply_executor).apply_ast(ast, targets, catch_errors: true, noop: noop)
         end
       end
 
@@ -472,6 +487,12 @@ module Bolt
 
     def list_modules
       outputter.print_module_list(pal.list_modules)
+    end
+
+    def generate_types
+      # generate_types will surface a nice error with helpful message if it fails
+      pal.generate_types
+      0
     end
 
     def install_puppetfile(config, puppetfile, modulepath)
@@ -495,6 +516,8 @@ module Bolt
 
         ok = install_action.call
         outputter.print_puppetfile_result(ok, puppetfile, moduledir)
+        # Automatically generate types after installing modules
+        pal.generate_types
 
         ok ? 0 : 1
       else
@@ -505,7 +528,10 @@ module Bolt
     end
 
     def pal
-      @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.compile_concurrency)
+      @pal ||= Bolt::PAL.new(config.modulepath,
+                             config.hiera_config,
+                             config.boltdir.resource_types,
+                             config.compile_concurrency)
     end
 
     def convert_plan(plan)
@@ -544,9 +570,9 @@ module Bolt
       # We only need to enumerate bundled content when running a task or plan
       content = { 'Plan' => [],
                   'Task' => [],
-                  'Plugin' => %w[puppetdb pkcs7 prompt terraform task] }
+                  'Plugin' => Bolt::Plugin::BUILTIN_PLUGINS }
       if %w[plan task].include?(options[:subcommand]) && options[:action] == 'run'
-        default_content = Bolt::PAL.new([], nil)
+        default_content = Bolt::PAL.new([], nil, nil)
         content['Plan'] = default_content.list_plans.each_with_object([]) do |iter, col|
           col << iter&.first
         end

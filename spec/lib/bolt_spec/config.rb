@@ -2,6 +2,7 @@
 
 require 'bolt/config'
 require 'bolt_spec/conn'
+require 'bolt_spec/files'
 
 module BoltSpec
   module Config

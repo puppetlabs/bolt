@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "run_script request",
+  "description": "POST <transport>/run_script request schema",
+  "type": "object",
+  "properties": {
+    "script": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "params": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "path",
+            "params"
+          ]
+        },
+        "sha256": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "filename",
+        "uri",
+        "sha256"
+      ]
+    },
+    "arguments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "target": { "$ref": "partial:target-any" }
+  },
+  "required": ["script", "target"]
+}

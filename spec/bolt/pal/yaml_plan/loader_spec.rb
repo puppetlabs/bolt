@@ -6,7 +6,7 @@ require 'bolt/pal/yaml_plan/loader'
 
 describe Bolt::PAL::YamlPlan::Loader do
   let(:plan_name) { Puppet::Pops::Loader::TypedName.new(:plan, 'test') }
-  let(:pal) { Bolt::PAL.new([], nil) }
+  let(:pal) { Bolt::PAL.new([], nil, nil) }
   # It doesn't really matter which loader or scope we use, but we need them, so take the
   # static loader and global scope
   let(:loader) { Puppet.lookup(:loaders).static_loader }

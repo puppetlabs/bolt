@@ -5,6 +5,16 @@ require 'bolt/apply_result'
 require 'bolt/target'
 
 describe Bolt::ApplyResult do
+  let(:example_target) { Bolt::Target.new('target') }
+  let(:result_value) {
+    { "metrics" => {},
+      "resource_statuses" => {},
+      "status" => "" }
+  }
+
+  let(:task_result) { Bolt::Result.for_task(example_target, result_value.to_json, '', 0, 'catalog') }
+  let(:apply_result) { Bolt::ApplyResult.from_task_result(task_result) }
+
   describe '#puppet_missing_error' do
     it 'returns the nil if no identifiable errors are found' do
       result = Bolt::Result.for_task(:target, '', 'blah', 1, 'catalog')
@@ -50,26 +60,39 @@ describe Bolt::ApplyResult do
     end
   end
 
+  describe :from_task_result do
+    context 'with an unparseable result' do
+      let(:result_value) { 'oops' }
+      it 'generates an error when keys are missing' do
+        expect(apply_result.ok).to eq(false)
+        expect(apply_result['_error']['kind']).to eq('bolt/invalid-report')
+      end
+    end
+
+    context 'with missing keys' do
+      let(:result_value) { {} }
+      it 'generates an error when keys are missing' do
+        expect(apply_result.ok).to eq(false)
+        expect(apply_result['_error']['kind']).to eq('bolt/invalid-report')
+      end
+    end
+  end
+
   describe 'action and object' do
     it 'exposes apply as the action' do
-      result = Bolt::Result.for_task(:target, 'hello', '', 0, 'catalog')
-      result = Bolt::ApplyResult.new(result)
-      expect(result.action).to be('apply')
-      expect(result.object).to be(nil)
+      expect(apply_result.action).to be('apply')
+      expect(apply_result.object).to be(nil)
     end
   end
 
   describe 'exposes methods for examining data' do
-    let(:example_target) { Bolt::Target.new('target') }
-    let(:task_result) { Bolt::Result.for_task(example_target, 'hello', '', 0, 'catalog') }
-    let(:apply_result) { Bolt::ApplyResult.from_task_result(task_result) }
     let(:expected) {
       { "node" => "target",
         "target" => "target",
         "action" => "apply",
         "object" => nil,
         "status" => "success",
-        "result" => { "report" => { "_output" => "hello" } } }
+        "result" => { "report" => result_value } }
     }
 
     it 'with to_json' do

@@ -264,8 +264,8 @@ PS
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
 
-    it "ignores _run_as", winrm: true do
-      expect(winrm.run_command(target, command, '_run_as' => 'root')['stdout']).to eq("#{user}\r\n")
+    it "ignores run_as", winrm: true do
+      expect(winrm.run_command(target, command, run_as: 'root')['stdout']).to eq("#{user}\r\n")
     end
 
     it "reuses a PowerShell host / runspace for multiple commands", winrm: true do
@@ -375,11 +375,11 @@ PS
       end
     end
 
-    it "ignores _run_as", winrm: true do
+    it "ignores run_as", winrm: true do
       contents = "Write-Output \"hellote\""
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
         expect(
-          winrm.run_script(target, file.path, [], '_run_as' => 'root')['stdout']
+          winrm.run_script(target, file.path, [], run_as: 'root')['stdout']
         ).to eq("hellote\r\n")
       end
     end
@@ -564,12 +564,12 @@ SHELLWORDS
       end
     end
 
-    it "ignores _run_as", winrm: true do
+    it "ignores run_as", winrm: true do
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { message_one: 'task is running',
                     "message two": 'task has run' }
       with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
-        expect(winrm.run_task(target, task, arguments, '_run_as' => 'root').message)
+        expect(winrm.run_task(target, task, arguments, run_as: 'root').message)
           .to eq("task is running task has run\r\n")
       end
     end
@@ -1092,6 +1092,67 @@ OUTPUT
             expect(
               winrm.run_task(target, task, {}).message
             ).to eq('42')
+          end
+        end
+      end
+
+      context "with intperpreter path containing spaces" do
+        let(:config) { mk_config(ssl: false, interpreters: interpreter, user: user, password: password) }
+        context "with non-quoted interpreter" do
+          let(:interpreter) { { 'py' => 'C:/Program Files/Miniconda3/python.exe' } }
+          it "quotes interpreter and task executable", winrm: true do
+            expect(Bolt::Transport::Powershell)
+              .to receive(:make_tempdir)
+              .and_return('stubbed')
+            expect(Bolt::Transport::Powershell)
+              .to receive(:shell_init)
+              .and_return('stubbed')
+            expect(Bolt::Transport::Powershell)
+              .to receive(:rmdir)
+              .and_return('stubbed')
+            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
+              .to receive(:execute)
+              .with("stubbed")
+              .exactly(3).times
+              .and_return(output)
+            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
+              .to receive(:execute)
+              .with(/'#{interpreter['py']}'/)
+              .and_return(output)
+            with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
+              expect(
+                winrm.run_task(target, task, {}).message
+              ).to eq('42')
+            end
+          end
+        end
+
+        context "with quoted interpreter" do
+          let(:interpreter) { { 'py' => "'C:/Program Files/Miniconda3/python.exe'" } }
+          it "does not double quote interpreter when quoted and task executable", winrm: true do
+            expect(Bolt::Transport::Powershell)
+              .to receive(:make_tempdir)
+              .and_return('stubbed')
+            expect(Bolt::Transport::Powershell)
+              .to receive(:shell_init)
+              .and_return('stubbed')
+            expect(Bolt::Transport::Powershell)
+              .to receive(:rmdir)
+              .and_return('stubbed')
+            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
+              .to receive(:execute)
+              .with("stubbed")
+              .exactly(3).times
+              .and_return(output)
+            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
+              .to receive(:execute)
+              .with(/#{interpreter['py']}/)
+              .and_return(output)
+            with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
+              expect(
+                winrm.run_task(target, task, {}).message
+              ).to eq('42')
+            end
           end
         end
       end

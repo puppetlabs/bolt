@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
 require 'bolt/inventory/group'
+require 'bolt/inventory/inventory2'
 
 module Bolt
   class Inventory
     class Group2
       attr_accessor :name, :targets, :aliases, :name_or_alias, :groups,
-                    :config, :rest, :facts, :vars, :features, :plugin_hooks
+                    :config, :facts, :vars, :features, :plugin_hooks
 
       # THESE are duplicates with the old groups for now.
       # Regex used to validate group names and target aliases.
       NAME_REGEX = /\A[a-z0-9_][a-z0-9_-]*\Z/.freeze
 
       DATA_KEYS = %w[name config facts vars features plugin_hooks].freeze
-      NODE_KEYS = DATA_KEYS + %w[alias uri]
+      TARGET_KEYS = DATA_KEYS + %w[alias uri]
       GROUP_KEYS = DATA_KEYS + %w[groups targets]
       CONFIG_KEYS = Bolt::TRANSPORTS.keys.map(&:to_s) + ['transport']
 
@@ -59,8 +60,10 @@ module Bolt
         groups = fetch_value(data, 'groups', Array)
 
         @targets = {}
+        # @target_objects = {}
         @aliases = {}
         @name_or_alias = []
+
         targets.each do |target|
           # If target is a string, it can refer to either a target name or
           # alias. Which can't be determined until all groups have been
@@ -102,13 +105,13 @@ module Bolt
           if value.is_a?(Hash) && value.include?('_plugin')
             plugin_name = value['_plugin']
             begin
-              hook = @plugins.get_hook(plugin_name, :inventory_config)
+              hook = @plugins.get_hook(plugin_name, :resolve_reference)
             rescue Bolt::Plugin::PluginError => e
               raise ValidationError.new(e.message, @name)
             end
 
             begin
-              validate_proc = @plugins.get_hook(plugin_name, :validate_inventory_config)
+              validate_proc = @plugins.get_hook(plugin_name, :validate_resolve_reference)
             rescue Bolt::Plugin::PluginError
               validate_proc = proc { |*args| }
             end
@@ -119,7 +122,7 @@ module Bolt
               begin
                 hook.call(value)
               rescue StandardError => e
-                loc = "inventory_config in #{@name}"
+                loc = "resolve_reference in #{@name}"
                 raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, plugin_name, loc)
               end
             end
@@ -152,6 +155,7 @@ module Bolt
         unless target.is_a?(Hash)
           raise ValidationError.new("Node entry must be a Hash, not #{target.class}", @name)
         end
+
         # This check prevents plugins from returning plugins
         raise ValidationError.new("Cannot set target with plugin", @name) if target.key?('_plugin')
         target.each do |k, v|
@@ -159,61 +163,62 @@ module Bolt
           validate_config_plugin(v, k, @name)
         end
 
-        target['name'] ||= target['uri']
+        t_name = target['name'] || target['uri']
 
-        if target['name'].nil? || target['name'].empty?
+        if t_name.nil? || t_name.empty?
           raise ValidationError.new("No name or uri for target: #{target}", @name)
         end
 
-        if @targets.include?(target['name'])
+        unless t_name.ascii_only?
+          raise ValidationError.new("Target name must be ASCII characters: #{target}", @name)
+        end
+
+        if @targets.include?(t_name)
           @logger.warn("Ignoring duplicate target in #{@name}: #{target}")
           return
         end
 
-        raise ValidationError.new("Node #{target} does not have a name", @name) unless target['name']
-        @targets[target['name']] = target
-
-        unless (unexpected_keys = target.keys - NODE_KEYS).empty?
-          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in target #{target['name']}"
+        unless (unexpected_keys = target.keys - TARGET_KEYS).empty?
+          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in target #{t_name}"
           @logger.warn(msg)
         end
 
         unless target['config'].nil? || target['config'].is_a?(Hash)
-          raise ValidationError.new("Invalid configuration for target: #{target['name']}", @name)
+          raise ValidationError.new("Invalid configuration for target: #{t_name}", @name)
         end
 
         config_keys = target['config']&.keys || []
         unless (unexpected_keys = config_keys - CONFIG_KEYS).empty?
-          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for target #{target['name']}"
+          msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in config for target #{t_name}"
           @logger.warn(msg)
         end
 
         target['config'] = config_only_plugin(target['config'])
 
-        unless target.include?('alias')
-          return
-        end
-
-        aliases = target['alias']
-        aliases = [aliases] if aliases.is_a?(String)
-        unless aliases.is_a?(Array)
-          msg = "Alias entry on #{target['name']} must be a String or Array, not #{aliases.class}"
-          raise ValidationError.new(msg, @name)
-        end
-
-        aliases.each do |alia|
-          raise ValidationError.new("Invalid alias #{alia}", @name) unless alia =~ NAME_REGEX
-
-          if (found = @aliases[alia])
-            raise ValidationError.new(alias_conflict(alia, found, target['name']), @name)
+        if target.include?('alias')
+          aliases = target['alias']
+          aliases = [aliases] if aliases.is_a?(String)
+          unless aliases.is_a?(Array)
+            msg = "Alias entry on #{t_name} must be a String or Array, not #{aliases.class}"
+            raise ValidationError.new(msg, @name)
           end
-          @aliases[alia] = target['name']
+
+          aliases.each do |alia|
+            raise ValidationError.new("Invalid alias #{alia}", @name) unless alia =~ NAME_REGEX
+
+            if (found = @aliases[alia])
+              raise ValidationError.new(alias_conflict(alia, found, t_name), @name)
+            end
+            @aliases[alia] = t_name
+          end
         end
+
+        @targets[t_name] = target
       end
 
       def lookup_targets(lookup)
         begin
-          hook = @plugins.get_hook(lookup['_plugin'], :inventory_targets)
+          hook = @plugins.get_hook(lookup['_plugin'], :resolve_reference)
         rescue Bolt::Plugin::PluginError => e
           raise ValidationError.new(e.message, @name)
         end
@@ -221,7 +226,7 @@ module Bolt
         begin
           targets = hook.call(lookup)
         rescue StandardError => e
-          loc = "inventory_targets in #{@name}"
+          loc = "resolve_reference in #{@name}"
           raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, lookup['_plugin'], loc)
         end
 
@@ -307,21 +312,22 @@ module Bolt
 
         # Collect target names and aliases into a list used to validate that subgroups don't conflict.
         # Used names validate that previously used group names don't conflict with new target names/aliases.
-        @targets.each_key do |n|
+        @targets.each do |t_name, t_data|
           # Require targets to be parseable as a Target.
           begin
-            Target.new(n)
+            # Catch malformed URI here
+            Bolt::Inventory::Inventory2.parse_uri(t_data['uri'])
           rescue Bolt::ParseError => e
             @logger.debug(e)
-            raise ValidationError.new("Invalid target name #{n}", @name)
+            raise ValidationError.new("Invalid target uri #{t_data['uri']}", @name)
           end
 
-          raise ValidationError.new(group_target_conflict(n), @name) if used_names.include?(n)
-          if aliased.include?(n)
-            raise ValidationError.new(alias_target_conflict(n), @name)
+          raise ValidationError.new(group_target_conflict(t_name), @name) if used_names.include?(t_name)
+          if aliased.include?(t_name)
+            raise ValidationError.new(alias_target_conflict(t_name), @name)
           end
 
-          target_names << n
+          target_names << t_name
         end
 
         @aliases.each do |n, target|

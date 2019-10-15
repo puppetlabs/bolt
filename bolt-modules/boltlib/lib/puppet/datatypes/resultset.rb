@@ -17,6 +17,9 @@ Puppet::DataTypes.create_type('ResultSet') do
       ok_set => Callable[[], ResultSet],
       targets => Callable[[], Array[Target]],
       to_data => Callable[[], Array[Hash]],
+      '[]' => Variant[Callable[[Integer], Optional[Variant[Result, ApplyResult, Array[Variant[Result, ApplyResult]]]]],
+                      Callable[[Integer, Integer], Optional[Variant[Result, ApplyResult, Array[Variant[Result, ApplyResult]]]]]
+                     ]
     }
   PUPPET
 

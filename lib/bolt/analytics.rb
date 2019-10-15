@@ -107,7 +107,7 @@ module Bolt
       end
 
       def report_bundled_content(mode, name)
-        if bundled_content[mode.split.first]&.include?(name)
+        if bundled_content[mode.split(' ').first]&.include?(name)
           event('Bundled Content', mode, label: name)
         end
       end
@@ -162,16 +162,14 @@ module Bolt
           # User locale
           ul: Locale.current.to_rfc,
           # Custom Dimension 1 (Operating System)
-          cd1: @os.value
+          cd1: @os
         }
       end
 
       def compute_os
-        Concurrent::Future.execute(executor: @executor) do
-          require 'facter'
-          os = Facter.value('os')
-          "#{os['name']} #{os.dig('release', 'major')}"
-        end
+        require 'facter'
+        os = Facter.value('os')
+        "#{os['name']} #{os.dig('release', 'major')}"
       end
 
       # If the user is running a very fast command, there may not be time for

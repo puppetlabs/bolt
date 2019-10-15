@@ -60,7 +60,7 @@ describe Bolt::Analytics::Client do
   end
 
   before :each do
-    allow_any_instance_of(described_class).to receive(:compute_os).and_return(double('os_future', value: 'CentOS 7'))
+    allow_any_instance_of(described_class).to receive(:compute_os).and_return('CentOS 7')
   end
 
   subject { described_class.new(uuid) }
