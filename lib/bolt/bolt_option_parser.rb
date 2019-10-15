@@ -7,7 +7,6 @@ require 'optparse'
 module Bolt
   class BoltOptionParser < OptionParser
     OPTIONS = { inventory: %w[nodes targets query rerun description],
-                group: %w[nodes targets query rerun description],
                 authentication: %w[user password private-key host-key-check ssl ssl-verify],
                 escalation: %w[run-as sudo-password],
                 run_context: %w[concurrency inventoryfile save-rerun],
@@ -33,7 +32,7 @@ module Bolt
         { flags: OPTIONS[:inventory] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
           banner: INVENTORY_HELP }
       when 'group'
-        { flags: OPTIONS[:group] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
+        { flags: OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
           banner: GROUP_HELP }
       when 'plan'
         case action
