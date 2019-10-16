@@ -17,7 +17,7 @@
 * **Debug message when connection based transports are initialized** ([#1307](https://github.com/puppetlabs/bolt/issues/1307))
 
   It can be hard to debug when the wrong transport is being used because the
-  transport type is not part of the logger for connection based loggers.. This
+  transport type is not part of the logger for connection based loggers. This
   information will now be logged at debug level whenever a connection is
   initialized.
 
