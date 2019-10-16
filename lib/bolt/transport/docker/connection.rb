@@ -12,6 +12,7 @@ module Bolt
           @target = target
           @logger = Logging.logger[target.safe_name]
           @docker_host = @target.options['service-url']
+          @logger.debug("Initializing docker connection to #{@target.safe_name}")
         end
 
         def connect

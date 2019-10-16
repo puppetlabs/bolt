@@ -32,6 +32,7 @@ module Bolt
 
           @logger = Logging.logger[@target.safe_name]
           @transport_logger = transport_logger
+          @logger.debug("Initializing ssh connection to #{@target.safe_name}")
 
           if target.options['private-key']&.instance_of?(String)
             begin
