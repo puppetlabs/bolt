@@ -58,3 +58,4 @@ modules/zfs_core/
 modules/zone_core/
 
 .sass-cache/
+locales/
