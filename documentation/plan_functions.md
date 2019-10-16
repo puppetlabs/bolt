@@ -12,7 +12,7 @@ Deep merges a hash of facts with the existing facts on a target.
 add_facts(Target $target, Hash $facts)
 ```
 
-*Returns:* `Hash[String, Data]` The target's new facts.
+*Returns:* `Variant[Target, Hash[String, Data]]` The target's new facts or a `Target` object if you are using the `future` flag
 
 * **target** `Target` A target.
 * **facts** `Hash` A hash of fact names to values that may include structured facts.

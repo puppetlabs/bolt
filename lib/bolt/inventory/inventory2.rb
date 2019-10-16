@@ -312,7 +312,9 @@ module Bolt
       def add_facts(target, new_facts = {})
         @targets[target.name]['facts'] = Bolt::Util.deep_merge(@targets[target.name]['facts'], new_facts)
         update_target(target)
-        facts(target)
+        # rubocop:disable Style/GlobalVars
+        $future ? target : facts(target)
+        # rubocop:enable Style/GlobalVars
       end
 
       def facts(target)
