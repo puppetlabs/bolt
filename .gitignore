@@ -62,6 +62,9 @@ modules/yumrepo_core/
 modules/zfs_core/
 modules/zone_core/
 
+modules/terraform
+modules/azure_inventory
+
 .sass-cache/
 locales/
 documentation/plan_functions.md
