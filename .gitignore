@@ -34,6 +34,11 @@ Gemfile.local
 .vagrant/
 .byebug_history
 
+# Running Bolt from source
+.rerun.json
+Boltdir/
+bolt.yaml
+
 acceptance/hosts.yaml
 
 modules/apply
