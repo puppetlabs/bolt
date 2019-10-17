@@ -34,8 +34,8 @@ ssh:
 -   `modulepath`: The module path for loading tasks and plan code. This is either an array of directories or a string containing a list of directories separated by the OS-specific `PATH` separator. The default path for modules is `modules:site-modules:site` inside the [Bolt project directory](bolt_project_directories.md#).
 -   `puppetfile`: A map containing options for the `bolt puppetfile install` command.
 -   `save-rerun`: Specify whether to update `.rerun.json` in the [Bolt project directory](bolt_project_directories.md#). If your target names include passwords, set this value to false to avoid writing passwords to disk.
--   `transport`: Specify the default transport to use when the transport for a target is not specified in the URL or inventory. The valid options for transport are `docker`, `local`, `pcp`, `ssh`, and `winrm`.
--   `future`: Whether to use new, breaking changes. This allows testing if Bolt content is compatible with expected future behaviour. 
+-   `transport`: Specify the default transport to use when the transport for a target is not specified in the URL or inventory. Options are `docker`, `local`, `pcp`, `ssh`, and `winrm`.
+-   `future`: Whether to use new, breaking changes. This allows testing if Bolt content is compatible with expected future behavior. Options are `true` and `false`. Default is `false`.
 
 
 ## SSH transport configuration options

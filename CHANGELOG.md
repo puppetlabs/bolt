@@ -1,16 +1,17 @@
 # Changelog
 
-## BOLT NEXT
+## 1.34.0
 
 ### New features
 
-* **Harmonize JSON and Puppet language Result Objects** ([#1245](https://github.com/puppetlabs/bolt/issues/1245))
+* **Harmonize JSON and Puppet language `Result` Objects** ([#1245](https://github.com/puppetlabs/bolt/issues/1245))
 
-  Previously the JSON representation of a Result object showed different keys than were available for working with the object in a plan. With this feature the expected keys have been harmonized between the JSON representation and the Puppet object. Note this feature is only available with a new `future` flag in the [bolt configuration file](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#global-configuration-options).
+  Previously the JSON representation of a `Result` object showed different keys than were available when working with the object in a plan. This feature makes the same keys available in both the JSON representation and the Puppet object. It is only available when the `future` flag is set to `true` in the [bolt configuration file](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#global-configuration-options).
 
 * **The `add_facts` plan function returns a `Target` object** ([#1211](https://github.com/puppetlabs/bolt/issues/1211))
 
-  The `add_facts` function has been updated to return a `Target` object to match the `set_*` plan functions for consistency and to allow chaining. Note this feature is only available with a new `future` flag in the [bolt configuration file](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#global-configuration-options).
+  The `add_facts` function now returns a `Target` object to match the `set_*` plan functions for consistency and to allow chaining. This feature is only available when the `future` flag is set to `true` in the [bolt configuration file](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#global-configuration-options).
+
 
 ### Bug fixes
 
@@ -21,21 +22,21 @@
   information will now be logged at debug level whenever a connection is
   initialized.
 
-* **Fix bug in external `puppet_library` plugins**
+* **Error when calling `puppet_library` hook of external plugin**
 
-  Previously bolt would error whenever the `puppet_library` hook of a module based plugin was called.
+  Bolt no longer errors when calling the `puppet_library` hook of a module-based plugin.
 
-* **`apply_prep` error when using Inventory Version 2** ([#1303](https://github.com/puppetlabs/bolt/pull/1303))
+* **`apply_prep` failed when `plugin_hooks` key was not set using inventory version 2** ([#1303](https://github.com/puppetlabs/bolt/pull/1303))
 
-  When the `plugin_hooks` key was not set for a target/group in Inventory v2 the `apply_prep` function would not work. Bolt now uses the default `plugin_hooks` and honors the `plugin_hooks` from bolt config when using Inventory v2.
+  When the `plugin_hooks` key was not set for a target/group in inventory version 2, the `apply_prep` function would not work. Bolt now uses the default `plugin_hooks` and honors `plugin_hooks` from Bolt config when using inventory version 2.
 
-* **Better error output when parsing malformed `yaml` files** ([#1296](https://github.com/puppetlabs/bolt/issues/1296))
+* **Unhelpful error message when parsing malformed `yaml` files** ([#1296](https://github.com/puppetlabs/bolt/issues/1296))
+  
+When parsing a malformed `yaml` file, Bolt now gives an error message containing the path to the file and the line and column in the file where the error originated.
 
-  Previously when parsing `yaml` config files a generic error message was surfaced with no information about where in the file the problem occurred. Now an error message that contains the path to the file as well as the line and column in the file where the error originated from.
+* **`run_task` function didn't respect `_noop` option** ([#12076](https://github.com/puppetlabs/bolt/issues/1207))
 
-* **Run task function should respect _noop option** ([#1311](https://github.com/puppetlabs/bolt/pull/1311))
-
-  Previously when calling the `run_task` function from a plan with the `_noop` metaparameter, `_noop` would not be passed to the task. Now the parameter is correctly passed to the task.
+  When calling the `run_task` function from a plan with the `_noop` metaparameter, `_noop` is now passed to the task.
 
 ## 1.33.0
 
