@@ -126,7 +126,14 @@ json.dump({'value': secret}, sys.stdout)
 
 ## PuppetDB
 
-The PuppetDB plugin supports looking up targets from PuppetDB. It takes a `query` field, which is either a string containing a [PQL](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html) query or an array containing a [PuppetDB AST](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html) format query. The query is used to determine which targets should be included in the group. If `name` or `uri` is not specified with a [fact lookup](https://github.com/adreyer/bolt/blob/c4891ad27a8fd871f04df1e17ef5e295a3cab7f4/pre-docs/using_plugins.md#fact-lookups) then the `[certname]` for each target in the query result will be used as the `uri` for the new target. Read the [Migrating to Version 2](https://github.com/adreyer/bolt/blob/c4891ad27a8fd871f04df1e17ef5e295a3cab7f4/pre-docs/using_plugins.md#migrating-to-version-2) section for more details on `uri` and `name` keys.
+The PuppetDB plugin supports looking up targets from PuppetDB. It takes a `query` field, which is
+either a string containing a [PQL](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html)
+query or an array containing a [PuppetDB
+AST](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html) format query. The query
+determines which targets should be included in the group. If `name` or `uri` is not specified with
+a [fact lookup](#fact-lookup) then the `[certname]` for each target in the query result will be used as the `uri`
+for the new target. Read the [Migrating to Version 2](inventory_file_v2.md#migrating-to-version-2)
+section for more details on `uri` and `name` keys.
 
 ```
 groups:
@@ -144,7 +151,9 @@ groups:
       transport: ssh
 ```
 
-Make sure you have [configured PuppetDB](https://github.com/adreyer/bolt/blob/c4891ad27a8fd871f04df1e17ef5e295a3cab7f4/pre-docs/bolt_connect_puppetdb.md)
+Make sure you have [configured PuppetDB](bolt_connect_puppetdb.md)
+
+### Fact Lookup
 
 If target-specific configuration is required the PuppetDB plugin can be used to lookup configuration values for the `name`, `uri`, and `config` inventory options for each target. The fact lookup values can be either `certname` to reference the `[certname]` of the target or a [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference fact value. Dot notation is required for both structured and unstructured facts.
 

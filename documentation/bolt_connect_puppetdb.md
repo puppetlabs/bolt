@@ -33,7 +33,7 @@ curl -X GET https://$SERVER_URL/pdb/query/v4 --data-urlencode 'query=nodes[certn
 
 ## Configuration
 
-To configure the Bolt PuppetDB client, add a `puppetdb` section to `~/.puppetlabs/bolt/bolt.yaml` with the following values:
+To configure the Bolt PuppetDB client, add a `puppetdb` section to your [Bolt config](configuring_bolt.md) with the following values:
 
 -   `server-urls`: An array containing the PuppetDB host to connect to. Include the protocol `https` and the port, which is usually `8081`. For example, `https://my-master.example.com:8081`.
 -   `cacert`: The path to the ca certificate for PuppetDB.

@@ -7,7 +7,7 @@
 Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFunction) do
   # Run a script.
   # @param script Path to a script to run on target. May be an absolute path or a modulename/filename selector for a
-  #               file in <moduleroot>/files.
+  #               file in $MODULEROOT/files.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param options Specify an array of arguments to the 'arguments' key to be passed to the script.
   #                Additional options: '_catch_errors', '_run_as'.
@@ -26,7 +26,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
 
   # Run a script, logging the provided description.
   # @param script Path to a script to run on target. May be an absolute path or a modulename/filename selector for a
-  #               file in <moduleroot>/files.
+  #               file in $MODULEROOT/files.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.
   # @param options Specify an array of arguments to the 'arguments' key to be passed to the script.
