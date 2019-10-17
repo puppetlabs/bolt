@@ -1,6 +1,6 @@
 # Welcome to Bolt
 
-Bolt is an open source orchestration tool that automates the manual work it takes to maintain your infrastructure. Use Bolt to automate tasks that you perform on an as-needed basis or as part of a greater orchestration workflow. For example, you can use Bolt to patch and update systems, troubleshoot servers, deploy applications, or stop and restart services. Bolt can be installed on your local workstation and connects directly to remote nodes with SSH or WinRM, so you are not required to install any agent software.
+Bolt is an open-source orchestration tool that automates the manual work it takes to maintain your infrastructure. Use Bolt to automate tasks that you perform on an as-needed basis or as part of a greater orchestration workflow. For example, you can use Bolt to patch and update systems, troubleshoot servers, deploy applications, or stop and restart services. Bolt can be installed on your local workstation and connects directly to remote nodes with SSH or WinRM, so you are not required to install any agent software.
 
 <img src="bolt-logo-dark.png" max-width="420"/> 
 
