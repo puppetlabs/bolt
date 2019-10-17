@@ -60,7 +60,7 @@ desc "Generate markdown docs for Bolt's core Puppet functions"
 task :docs do
   FileUtils.mkdir_p 'tmp'
   tmpfile = 'tmp/boltlib.json'
-  PuppetStrings.generate(PuppetStrings::DEFAULT_SEARCH_PATTERNS,
+  PuppetStrings.generate(['bolt-modules/*'],
                          markup: 'markdown', json: true, path: tmpfile,
                          yard_args: ['bolt-modules/boltlib',
                                      'bolt-modules/ctrl',
