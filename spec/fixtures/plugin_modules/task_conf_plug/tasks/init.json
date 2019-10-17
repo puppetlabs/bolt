@@ -1,0 +1,18 @@
+{
+  "input_method": "stdin",
+  "implementations": [
+    {"name": "win.ps1", "requirements": ["powershell"]},
+    {"name": "linux.sh", "requirements": ["shell"]}
+  ],
+  "parameters": {
+    "optional_key": {
+      "type": "Optional[String]"
+    },
+      "required_key": {
+        "type": "String"
+    },
+    "intersection_key": {
+      "type": "Optional[Integer]"
+    }
+  }
+}

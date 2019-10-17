@@ -35,9 +35,18 @@ module Bolt
       # This method interacts with the module on disk so it's separate from initialize
       def setup
         @data = load_data
-        @config_schema = process_schema(@data['config'] || {})
-
         @hook_map = find_hooks(@data['hooks'] || {})
+        # If there is a config section in bolt_plugin.json, validate against that and send
+        # validated values nested under `_config` key. Otherwise validate againsts the intersection
+        # of all task schemas.
+        # TODO: remove @send_config when deprecated
+        schema = if @data['config']
+                   @send_config = true
+                   @data['config']
+                 else
+                   extract_task_parameter_schema
+                 end
+        @config_schema = process_schema(schema)
 
         validate_config(@config, @config_schema)
       end
@@ -150,13 +159,43 @@ module Bolt
         # handled previously. That may not always be the case so filter them
         # out now.
         _meta, params = opts.partition { |key, _val| key.start_with?('_') }.map(&:to_h)
-
         metaparams = {}
-        metaparams['_config'] = config if config?
+        # Send config with `_config` when config is defined in bolt_plugin.json
+        # Otherwise, merge config with params
+        # TODO: remove @send_config when deprecated
+        if @send_config
+          metaparams['_config'] = config if config?
+        else
+          params = @config ? config.merge(params) : params
+        end
         metaparams['_boltdir'] = @context.boltdir
 
         validate_params(task, params)
         [params, metaparams]
+      end
+
+      def extract_task_parameter_schema
+        # Get the intersection of expected types (using Set)
+        type_set = @hook_map.each_with_object({}) do |(_hook, task), acc|
+          next unless (schema = task['task'].metadata['parameters'])
+          schema.each do |param, scheme|
+            next unless scheme['type'].is_a?(String)
+            scheme['type'] = Set.new([scheme['type']])
+            if acc.dig(param, 'type').is_a?(Set)
+              scheme['type'].merge(acc[param]['type'])
+            end
+          end
+          acc.merge!(schema)
+        end
+        # Convert Set to string
+        type_set.each do |_param, schema|
+          next unless schema['type']
+          schema['type'] = if schema['type'].size > 1
+                             "Optional[Variant[#{schema['type'].to_a.join(', ')}]]"
+                           else
+                             "Optional[#{schema['type'].to_a.first}]"
+                           end
+        end
       end
 
       def run_task(task, opts)
@@ -191,7 +230,15 @@ module Bolt
       end
 
       def validate_resolve_reference(opts)
-        params = opts.reject { |k, _v| k.start_with?('_') }
+        # Send config with `_config` when config is defined in bolt_plugin.json
+        # Otherwise, merge config with params
+        # TODO: remove @send_config when deprecated
+        if @send_config
+          params = opts.reject { |k, _v| k.start_with?('_') }
+        else
+          merged = @config.merge(opts)
+          params = merged.reject { |k, _v| k.start_with?('_') }
+        end
         sig = @hook_map[:resolve_reference]['task']
         if sig
           validate_params(sig, params)
