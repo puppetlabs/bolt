@@ -24,6 +24,7 @@ module Bolt
           @extensions = DEFAULT_EXTENSIONS.to_set.merge(extensions)
 
           @logger = Logging.logger[@target.safe_name]
+          logger.debug("Initializing winrm connection to #{@target.safe_name}")
           @transport_logger = transport_logger
         end
 

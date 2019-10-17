@@ -8,11 +8,26 @@
 
   Previously the JSON representation of a Result object showed different keys than were available for working with the object in a plan. With this feature the expected keys have been harmonized between the JSON representation and the Puppet object. Note this feature is only available with a new `future` flag in the [bolt configuration file](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#global-configuration-options).
 
+* **The `add_facts` plan function returns a `Target` object** ([#1211](https://github.com/puppetlabs/bolt/issues/1211))
+
+  The `add_facts` function has been updated to return a `Target` object to match the `set_*` plan functions for consistency and to allow chaining. Note this feature is only available with a new `future` flag in the [bolt configuration file](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#global-configuration-options).
+
 ### Bug fixes
+
+* **Debug message when connection based transports are initialized** ([#1307](https://github.com/puppetlabs/bolt/issues/1307))
+
+  It can be hard to debug when the wrong transport is being used because the
+  transport type is not part of the logger for connection based loggers. This
+  information will now be logged at debug level whenever a connection is
+  initialized.
+
+* **Fix bug in external `puppet_library` plugins**
+
+  Previously bolt would error whenever the `puppet_library` hook of a module based plugin was called.
 
 * **`apply_prep` error when using Inventory Version 2** ([#1303](https://github.com/puppetlabs/bolt/pull/1303))
 
-  When the `plugin_hooks` key was not set for a target/group in Inventory v2 the `apply_prep` function would not work. Bolt now uses the default `plugin_hooks` and honors the `plugin_hooks` from bolt config when using Inventory v2. 
+  When the `plugin_hooks` key was not set for a target/group in Inventory v2 the `apply_prep` function would not work. Bolt now uses the default `plugin_hooks` and honors the `plugin_hooks` from bolt config when using Inventory v2.
 
 * **Better error output when parsing malformed `yaml` files** ([#1296](https://github.com/puppetlabs/bolt/issues/1296))
 
@@ -37,13 +52,13 @@
   When using inventory version 2, a `Target`'s `safe_name` is the `uri` minus the password (unless the `Target` has an explicitly defined `name`, in which case `safe_name` is the value of `name`). For inventory version 1, `safe_name` is the value of `host`.
 
 * **The `ResultSet` type is now indexable** ([#1178](https://github.com/puppetlabs/bolt/issues/1178))
- 
+
   When working with `ResultSet` types in plans, use the bracket `[]` operator to get `Results` by index.
 
 * **Log file transfer details at debug level** ([#1256](https://github.com/puppetlabs/bolt/issues/1256))
 
   When Bolt transfers a file, it logs hostname and filepath details at the debug level. Previously Bolt did not log this information.
-  
+
 ## 1.32.0
 
 ### Bug fixes
@@ -73,7 +88,7 @@
 * **New stub for `out::message` available for `BoltSpec::Plans`** ([#1217](https://github.com/puppetlabs/bolt/pull/1217))
 
   Users can now use `BoltSpec::Plans` to test plans that contain calls to `out::message`.
-  
+
 * **New sub command `bolt group show`** ([#537](https://github.com/puppetlabs/bolt/issues/537))
 
   The CLI now provides a new command `bolt group show` that will list all of the groups in the inventory file.

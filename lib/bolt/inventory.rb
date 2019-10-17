@@ -149,7 +149,10 @@ module Bolt
 
     def add_facts(target, new_facts = {})
       @logger.warn("No facts to add") if new_facts.empty?
-      set_facts(target.name, new_facts)
+      facts = set_facts(target.name, new_facts)
+      # rubocop:disable Style/GlobalVars
+      $future ? target : facts
+      # rubocop:enable Style/GlobalVars
     end
 
     def facts(target)

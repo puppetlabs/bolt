@@ -220,14 +220,12 @@ module Bolt
       end
 
       def puppet_library(opts, target, apply_prep)
-        tasksig = @hook_map[:puppet_library]
+        task = @hook_map[:puppet_library]['task']
 
-        # this also validates
-        params, meta_params = process_params(tasksig, opts)
+        params, meta_params = process_params(task, opts)
 
         # our metaparams are meant for the task not the executor
         params = params.merge(meta_params)
-        task = Bolt::Task.new(tasksig)
 
         proc do
           apply_prep.run_task([target], task, params).first

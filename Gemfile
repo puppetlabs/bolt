@@ -17,7 +17,6 @@ gem "sinatra", '>= 2.0.4'
 
 group(:test) do
   gem "beaker-hostgenerator"
-  gem "gettext-setup", '~> 0.28', require: false
   gem "mocha", '~> 1.4.0'
   gem "rack-test", '~> 1.0'
   gem "rubocop", '~> 0.61', require: false
