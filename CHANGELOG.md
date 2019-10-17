@@ -31,7 +31,7 @@
   
   When parsing a malformed `yaml` file, Bolt now gives an error message containing the path to the file and the line and column in the file where the error originated.
 
-* **`run_task` function didn't respect `_noop` option** ([#12076](https://github.com/puppetlabs/bolt/issues/1207))
+* **`run_task` function didn't respect `_noop` option** ([#1207](https://github.com/puppetlabs/bolt/issues/1207))
 
   When calling the `run_task` function from a plan with the `_noop` metaparameter, `_noop` is now passed to the task.
 
