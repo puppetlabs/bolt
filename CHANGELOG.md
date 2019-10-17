@@ -15,14 +15,11 @@
 
 ### Bug fixes
 
-* **Debug message when connection based transports are initialized** ([#1307](https://github.com/puppetlabs/bolt/issues/1307))
+* **Failed to log transport type when making a connection** ([#1307](https://github.com/puppetlabs/bolt/issues/1307))
 
-  It can be hard to debug when the wrong transport is being used because the
-  transport type is not part of the logger for connection based loggers. This
-  information will now be logged at debug level whenever a connection is
-  initialized.
+  When making a connection to a target node, Bolt now logs the transport type (for example, WinRM or SSH) at debug level.
 
-* **Error when calling `puppet_library` hook of external plugin**
+* **Error when calling `puppet_library` hook of external plugin** ([#1321](https://github.com/puppetlabs/bolt/pull/1321))
 
   Bolt no longer errors when calling the `puppet_library` hook of a module-based plugin.
 
@@ -32,7 +29,7 @@
 
 * **Unhelpful error message when parsing malformed `yaml` files** ([#1296](https://github.com/puppetlabs/bolt/issues/1296))
   
-When parsing a malformed `yaml` file, Bolt now gives an error message containing the path to the file and the line and column in the file where the error originated.
+  When parsing a malformed `yaml` file, Bolt now gives an error message containing the path to the file and the line and column in the file where the error originated.
 
 * **`run_task` function didn't respect `_noop` option** ([#12076](https://github.com/puppetlabs/bolt/issues/1207))
 
