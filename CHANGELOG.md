@@ -8,6 +8,10 @@
 
   The `do_until` function now supports a limit option that prevents it from iterating infinitely.
 
+* **Improve parameter passing for module plugins** ([#1322](https://github.com/puppetlabs/bolt/issues/1322))
+
+  When there is no `config` section in `bolt_plugin.json` configuration options in `bolt.yaml` are validated against the intersection of the parameters schema specified for each task implementation of the plugin's hooks and the values are passed to the task at run time merged with options set in `inventory.yaml`.
+
 ## 1.34.0
 
 ### New features
