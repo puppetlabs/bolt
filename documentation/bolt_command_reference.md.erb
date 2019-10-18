@@ -1,0 +1,20 @@
+# Bolt command reference
+
+These subcommands, actions, and options are available for Bolt.
+
+<% for command in @commands -%>
+- [<%= command[0] %>](#<%= command[0].split(' ').join('-') %>)
+<% end -%>
+
+<% for command in @commands %>
+## <%= command[0] %>
+
+<%= command[1]['banner'] %>
+
+| Option | Description |
+| ------ | ----------- |
+<% for option in command[1]['options'] -%>
+| <% unless option.short.empty? %>`<%= option.short.first %>`, <% end -%>`<%= option.long.first -%><%= option.arg %>` | <%= option.desc.join("<br>") %> |
+<% end %>
+
+<% end -%>

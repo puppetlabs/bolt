@@ -3,6 +3,7 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 require "rubocop/rake_task"
+require 'bolt/cli'
 
 require "puppet-strings"
 require "fileutils"
@@ -54,6 +55,39 @@ end
 
 def format_links(text)
   text.gsub(/{([^}]+)}/, '[`\1`](#\1)')
+end
+
+desc "Generate markdown docs for Bolt's command line options"
+task :reference_docs do
+  parser = Bolt::BoltOptionParser.new({})
+  @commands = {}
+
+  Bolt::CLI::COMMANDS.each do |subcommand, actions|
+    actions << nil if actions.empty?
+
+    actions.each do |action|
+      command = [subcommand, action].compact.join(' ')
+      help_text = parser.get_help_text(subcommand, action)
+
+      options = help_text[:flags].map do |option|
+        parser.top.long[option]
+      end
+
+      banner = help_text[:banner].split("\n").first.gsub("<", '\<').gsub(">", '\>')
+
+      @commands[command] = {
+        'options' => options,
+        'banner' => banner
+      }
+    end
+  end
+
+  # It's nice to have the subcommands/actions sorted alphabetically in the docs
+  # We could get around this by sorting the COMMANDS hash in the CLI
+  @commands = @commands.sort.to_h
+
+  renderer = ERB.new(File.read('documentation/bolt_command_reference.md.erb'), nil, '-')
+  File.write('documentation/bolt_command_reference.md', renderer.result)
 end
 
 desc "Generate markdown docs for Bolt's core Puppet functions"
