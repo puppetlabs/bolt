@@ -1,5 +1,13 @@
 # Changelog
 
+## Bolt Next
+
+### New Features
+
+* **Support `limit` option for `do_until` function** ([#1270](https://github.com/puppetlabs/bolt/issues/1270))
+
+  The `do_until` function now supports a limit option that prevents it from iterating infinitely.
+
 ## 1.34.0
 
 ### New features
@@ -28,7 +36,7 @@
   When the `plugin_hooks` key was not set for a target/group in inventory version 2, the `apply_prep` function would not work. Bolt now uses the default `plugin_hooks` and honors `plugin_hooks` from Bolt config when using inventory version 2.
 
 * **Unhelpful error message when parsing malformed `yaml` files** ([#1296](https://github.com/puppetlabs/bolt/issues/1296))
-  
+
   When parsing a malformed `yaml` file, Bolt now gives an error message containing the path to the file and the line and column in the file where the error originated.
 
 * **`run_task` function didn't respect `_noop` option** ([#1207](https://github.com/puppetlabs/bolt/issues/1207))
