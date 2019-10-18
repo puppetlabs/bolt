@@ -2,19 +2,17 @@
 
 These subcommands, actions, and options are available for Bolt.
 
-<% for command in @commands -%>
-- [<%= command[0] %>](#<%= command[0].split(' ').join('-') %>)
-<% end -%>
 
-<% for command in @commands %>
-## <%= command[0] %>
+<% @commands.each do |key, val| %>
+## <%= key %>
 
-<%= command[1]['banner'] %>
+```plain
+<%= val[:banner] -%>
+```
 
 | Option | Description |
 | ------ | ----------- |
-<% for option in command[1]['options'] -%>
-| <% unless option.short.empty? %>`<%= option.short.first %>`, <% end -%>`<%= option.long.first -%><%= option.arg %>` | <%= option.desc.join("<br>") %> |
+<% val[:options].each do |option| -%>
+| <% if option[:short] %>`<%= option[:short] %>`, <% end -%>`<%= option[:long] -%><%= option[:arg] %>` | <%= option[:desc] %> |
 <% end %>
-
-<% end -%>
+<% end %>

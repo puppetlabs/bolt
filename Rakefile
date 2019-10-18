@@ -3,7 +3,7 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 require "rubocop/rake_task"
-require 'bolt/cli'
+require "bolt/cli"
 
 require "puppet-strings"
 require "fileutils"
@@ -57,102 +57,114 @@ def format_links(text)
   text.gsub(/{([^}]+)}/, '[`\1`](#\1)')
 end
 
-desc "Generate markdown docs for Bolt's command line options"
-task :reference_docs do
-  parser = Bolt::BoltOptionParser.new({})
-  @commands = {}
+namespace :docs do
+  desc "Generate markdown docs for Bolt's command line options"
+  task :cli_reference do
+    parser = Bolt::BoltOptionParser.new({})
+    @commands = {}
 
-  Bolt::CLI::COMMANDS.each do |subcommand, actions|
-    actions << nil if actions.empty?
+    Bolt::CLI::COMMANDS.each do |subcommand, actions|
+      actions << nil if actions.empty?
 
-    actions.each do |action|
-      command = [subcommand, action].compact.join(' ')
-      help_text = parser.get_help_text(subcommand, action)
+      actions.each do |action|
+        command = [subcommand, action].compact.join(' ')
+        help_text = parser.get_help_text(subcommand, action)
 
-      options = help_text[:flags].map do |option|
-        parser.top.long[option]
+        options = help_text[:flags].map do |option|
+          switch = parser.top.long[option]
+
+          {
+            short: switch.short.first,
+            long: switch.long.first,
+            arg: switch.arg,
+            desc: switch.desc.map { |d| d.gsub("<", "&lt;") }.join("<br>")
+          }
+        end
+
+        @commands[command] = {
+          banner: help_text[:banner],
+          options: options
+        }
       end
-
-      banner = help_text[:banner].split("\n").first.gsub("<", '\<').gsub(">", '\>')
-
-      @commands[command] = {
-        'options' => options,
-        'banner' => banner
-      }
-    end
-  end
-
-  # It's nice to have the subcommands/actions sorted alphabetically in the docs
-  # We could get around this by sorting the COMMANDS hash in the CLI
-  @commands = @commands.sort.to_h
-
-  renderer = ERB.new(File.read('documentation/bolt_command_reference.md.erb'), nil, '-')
-  File.write('documentation/bolt_command_reference.md', renderer.result)
-end
-
-desc "Generate markdown docs for Bolt's core Puppet functions"
-task :docs do
-  FileUtils.mkdir_p 'tmp'
-  tmpfile = 'tmp/boltlib.json'
-  PuppetStrings.generate(['bolt-modules/*'],
-                         markup: 'markdown', json: true, path: tmpfile,
-                         yard_args: ['bolt-modules/boltlib',
-                                     'bolt-modules/ctrl',
-                                     'bolt-modules/file',
-                                     'bolt-modules/out',
-                                     'bolt-modules/system'])
-  json = JSON.parse(File.read(tmpfile))
-  funcs = json.delete('puppet_functions')
-  json.delete('data_types')
-  json.each { |k, v| raise "Expected #{k} to be empty, found #{v}" unless v.empty? }
-
-  # @functions will be a list of function descriptions, structured as
-  #   name: function name
-  #   text: function description; first line should be usable as a summary
-  #   signatures: a list of function overloads
-  #     text: overload description
-  #     signature: function signature
-  #     returns: list of return statements
-  #       text: return description
-  #       types: list of types (probably only one entry)
-  #     params: list of params
-  #       name: parameter name
-  #       text: description
-  #       types: list of types (probably only one entry)
-  #     examples: list of examples
-  #       name: description
-  #       text: example body
-  @functions = funcs.map do |func|
-    func['text'] = func['docstring']['text']
-
-    overloads = func['docstring']['tags'].select { |tag| tag['tag_name'] == 'overload' }
-    sig_tags = overloads.map { |overload| overload['docstring']['tags'] }
-    sig_tags = [func['docstring']['tags']] if sig_tags.empty?
-
-    func['signatures'] = func['signatures'].zip(sig_tags).map do |sig, tags|
-      sig['text'] = sig['docstring']['text']
-      sects = sig['docstring']['tags'].group_by { |t| t['tag_name'] }
-      sig['returns'] = sects['return'].map do |ret|
-        ret['text'] = format_links(ret['text'])
-        ret
-      end
-      sig['params'] = sects['param'].map do |param|
-        param['text'] = format_links(param['text'])
-        param
-      end
-
-      # get examples from overload docstring; puppet-strings should probably do this.
-      examples = tags.select { |t| t['tag_name'] == 'example' }
-      sig['examples'] = examples
-      sig.delete('docstring')
-      sig
     end
 
-    func
+    # It's nice to have the subcommands/actions sorted alphabetically in the docs
+    # We could get around this by sorting the COMMANDS hash in the CLI
+    @commands = @commands.sort.to_h
+
+    renderer = ERB.new(File.read('documentation/bolt_command_reference.md.erb'), nil, '-')
+    File.write('documentation/bolt_command_reference.md', renderer.result)
   end
-  renderer = ERB.new(File.read('documentation/reference.md.erb'), nil, '-')
-  File.write('documentation/plan_functions.md', renderer.result)
+
+  desc "Generate markdown docs for Bolt's core Puppet functions"
+  task :function_reference do
+    FileUtils.mkdir_p 'tmp'
+    tmpfile = 'tmp/boltlib.json'
+    PuppetStrings.generate(['bolt-modules/*'],
+                           markup: 'markdown', json: true, path: tmpfile,
+                           yard_args: ['bolt-modules/boltlib',
+                                       'bolt-modules/ctrl',
+                                       'bolt-modules/file',
+                                       'bolt-modules/out',
+                                       'bolt-modules/system'])
+    json = JSON.parse(File.read(tmpfile))
+    funcs = json.delete('puppet_functions')
+    json.delete('data_types')
+    json.each { |k, v| raise "Expected #{k} to be empty, found #{v}" unless v.empty? }
+
+    # @functions will be a list of function descriptions, structured as
+    #   name: function name
+    #   text: function description; first line should be usable as a summary
+    #   signatures: a list of function overloads
+    #     text: overload description
+    #     signature: function signature
+    #     returns: list of return statements
+    #       text: return description
+    #       types: list of types (probably only one entry)
+    #     params: list of params
+    #       name: parameter name
+    #       text: description
+    #       types: list of types (probably only one entry)
+    #     examples: list of examples
+    #       name: description
+    #       text: example body
+    @functions = funcs.map do |func|
+      func['text'] = func['docstring']['text']
+
+      overloads = func['docstring']['tags'].select { |tag| tag['tag_name'] == 'overload' }
+      sig_tags = overloads.map { |overload| overload['docstring']['tags'] }
+      sig_tags = [func['docstring']['tags']] if sig_tags.empty?
+
+      func['signatures'] = func['signatures'].zip(sig_tags).map do |sig, tags|
+        sig['text'] = sig['docstring']['text']
+        sects = sig['docstring']['tags'].group_by { |t| t['tag_name'] }
+        sig['returns'] = sects['return'].map do |ret|
+          ret['text'] = format_links(ret['text'])
+          ret
+        end
+        sig['params'] = sects['param'].map do |param|
+          param['text'] = format_links(param['text'])
+          param
+        end
+
+        # get examples from overload docstring; puppet-strings should probably do this.
+        examples = tags.select { |t| t['tag_name'] == 'example' }
+        sig['examples'] = examples
+        sig.delete('docstring')
+        sig
+      end
+
+      func
+    end
+    renderer = ERB.new(File.read('documentation/reference.md.erb'), nil, '-')
+    File.write('documentation/plan_functions.md', renderer.result)
+  end
+
+  task all: %i[cli_reference function_reference]
 end
+
+desc 'Generate all markdown docs'
+task generate_docs: 'docs:all'
 
 namespace :integration do
   desc 'Run tests that require a host System Under Test configured with WinRM'
