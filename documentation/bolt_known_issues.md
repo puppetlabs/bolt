@@ -30,6 +30,17 @@ As a workaround, you can generate new keys with the ssh-keygen `-m PEM` flag. Fo
 
 Interactive tools fail when run in a remote PowerShell session. For example, using `--password` to prompt for a password when running Bolt triggers an error. As a workaround, consider putting the password in `bolt.yaml` or an inventory file, or passing the password on the command line. ([BOLT-1075](https://tickets.puppetlabs.com/browse/BOLT-1075))
 
+## Unable to authenticate with ed25519 keys over SSH transport on Windows
+
+Using `ed25519` keys to authenticate over the SSH transport when using Windows bolt controllers is currently unsupported because the ed25519 gem is not installable on Windows. The error message below is an example of an error message to expect.
+
+```
+unsupported key type `ssh-ed25519'
+ net-ssh requires the following gems for ed25519 support:
+  * ed25519 (>= 1.2, < 2.0)
+  * bcrypt_pbkdf (>= 1.0, < 2.0)
+```
+
 ## Limited Kerberos support
 
 A license incompatibility with other components distributed with Bolt prevents authenticating with Kerberos over SSH using the net-ssh-krb gem. ([BOLT-980](https://tickets.puppetlabs.com/browse/BOLT-980))
