@@ -1,0 +1,7 @@
+{
+  "parameters": {
+    "intersection_key": {
+      "type": "String"
+    }
+  }
+}

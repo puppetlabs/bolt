@@ -1,0 +1,8 @@
+{
+  "hooks": {
+    "resolve_reference": {
+      "task": "task_conf_plug"
+    },
+    "secret_decrypt": { "task": "task_conf_plug::value" }
+  }
+}

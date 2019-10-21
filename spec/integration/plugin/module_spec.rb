@@ -170,6 +170,68 @@ describe 'using module based plugins' do
         expect(result['remote']['data']).to include('value' => 'ssshhh')
       end
     end
+
+    context 'with values specified in both bolt.yaml and inventory.yaml' do
+      context 'and merging config' do
+        let(:plugin) { { '_plugin' => 'task_conf_plug', 'optional_key' => 'keep' } }
+        let(:plugin_config) { { 'task_conf_plug' => { 'required_key' => 'foo', 'optional_key' => 'clobber' } } }
+
+        it 'merges parameters set in config and does not pass _config' do
+          result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir])
+
+          expect(result['remote']['data']).not_to include('_config' => plugin_config['conf_plug'])
+          expect(result['remote']['data']).to include('_boltdir' => boltdir)
+          expect(result['remote']['data']).to include('required_key' => 'foo')
+          expect(result['remote']['data']).to include('optional_key' => 'keep')
+        end
+      end
+
+      context 'and using task metadata alone for config validation for expected success' do
+        let(:plugin) { { '_plugin' => 'task_conf_plug', 'required_key' => 'foo' } }
+        let(:plugin_config) { { 'task_conf_plug' => { 'optional_key' => 'bar' } } }
+
+        it 'treats all required values from task paramter metadata as optional' do
+          result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir])
+
+          expect(result['remote']['data']).not_to include('_config' => plugin_config['conf_plug'])
+          expect(result['remote']['data']).to include('_boltdir' => boltdir)
+          expect(result['remote']['data']).to include('required_key' => 'foo')
+          expect(result['remote']['data']).to include('optional_key' => 'bar')
+        end
+      end
+
+      context 'and using task metadata alone for config validation for expected failure' do
+        let(:plugin) { { '_plugin' => 'task_conf_plug' } }
+        let(:plugin_config) { { 'task_conf_plug' => { 'random_key' => 'bar' } } }
+
+        it 'forbids config entries that do not match task metadata schema' do
+          result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir], rescue_exec: true)
+
+          expect(result).to include('kind' => "bolt/validation-error")
+          expect(result['msg']).to match(/Config for task_conf_plug plugin contains unexpected key random_key/)
+        end
+      end
+    end
+
+    context 'with multiple task schemas to validate against' do
+      context 'with valid type String string set in config and overriden in inventory' do
+        let(:plugin) {
+          {
+            '_plugin' => 'task_conf_plug',
+            'required_key' => "foo",
+            'intersection_key' => 1
+          }
+        }
+        let(:plugin_config) { { 'task_conf_plug' => { 'intersection_key' => 'String' } } }
+
+        it 'allows valid type in bolt.yaml and expected value is overriden in inventory' do
+          result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir])
+          expect(result['remote']['data']).to include('_boltdir' => boltdir)
+          expect(result['remote']['data']).to include('required_key' => 'foo')
+          expect(result['remote']['data']).to include('intersection_key' => 1)
+        end
+      end
+    end
   end
 
   context 'when handling secrets' do
