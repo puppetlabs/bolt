@@ -10,17 +10,26 @@ _bolt()
 {
     local cur=${COMP_WORDS[COMP_CWORD]}
     local prev=${COMP_WORDS[COMP_CWORD-1]}
+    local prevprev=${COMP_WORDS[COMP_CWORD-2]}
     local next=""
 
-    local all_options="-q, --query --noop --description --params -u, --user -p, --password --private-key --[no-]host-key-check --[no-]ssl --[no-]ssl-verify --run-as --sudo-password -c, --concurrency --modulepath --boltdir --configfile --inventoryfile --transport --connect-timeout --[no-]tty --tmpdir --format --[no-]color -h, --help --verbose --debug --trace --version"
+    local all_options="-q --query --noop --description --params -u --user -p --password --private-key --[no-]host-key-check --[no-]ssl --[no-]ssl-verify --run-as --sudo-password -c --concurrency --modulepath --boltdir --configfile --inventoryfile --transport --connect-timeout --tty --no-tty --tmpdir --format --color --no-color -h --help --verbose --debug --trace --version"
 
-    local all_hosts="$(hget all 2>/dev/null|tr ',' ' ')"
-
-     case $prev in
+    local general_opts="-h --help --debug --format"
+    case $prev in
       bolt)
-         next="command file task plan"
+         next="command file task plan group inventory puppetfile secret"
 		;;
-      command)
+      --format)
+         next="json human"
+		;;
+      secret)
+         next="createkeys encrypt decrypt"
+		;;
+      puppetfile)
+         next="install show-modules"
+		;;
+      command|script)
          next="run"
       ;;
       file)
@@ -30,15 +39,30 @@ _bolt()
          next="show run"
       ;;
       plan)
-         next="show run"
+         next="show run convert"
       ;;
-      run|upload|show)
-         next=""
+      run|upload)
+         next="$all_options"
       ;;
-      --nodes|-n)
-         # TODO: add automatic lookup here, ideally bolt should have a lookup function suitable for this 
-         # to provide completions from the ~/.puppetlabs/bolt/inventory.yaml file
-         next=""
+      group)
+         next="show"
+      ;;
+      inventory)
+         next="show"
+      ;;
+      show)
+         if [ "$prevprev" == "group" ];then
+            next="--boltdir --configfile -i --inventoryfile"
+         elif [ "$prevprev" == "inventory" ];then
+            next="-n --nodes -q --query --description --boltdir --configfile -i --inventoryfile"
+         fi
+      ;;
+      --nodes|-n|-t|--targets)
+         # executing "bolt group show" or "bolt inventory show --nodes all" tends to be slowish
+         # it might be a good idea to accelerate this
+         groups="$(bolt group show|grep -v -P '\d+ groups'|tr '\n' ' ')"
+         nodes="$(bolt inventory show --nodes all|grep -v -P '\d+ targets'|tr '\n' ' ')"
+         next="$groups $nodes"
       ;;
       --query|-q|--description|--params|--user|-u|-p|--password|--private-key|--run-as|--sudo-password|--concurrency|-c|--modulepath|--boltdir|--configfile|--inventoryfile|--transport|--connect-timeout|--tmpdir|--format)
          next=""
@@ -49,7 +73,7 @@ _bolt()
      esac
 
     # Sort the options
-    COMPREPLY=( $(compgen -W "$next" -- $cur) )
+    COMPREPLY=( $(compgen -W "$next $general_opts" -- $cur) )
 }
 
 complete -F _bolt bolt
