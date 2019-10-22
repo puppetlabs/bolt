@@ -22,9 +22,7 @@ module Bolt
         @logger = Logging.logger[self]
         @plugins = plugins
 
-        raise ValidationError.new("Expected group to be a Hash, not #{input.class}", nil) unless input.is_a?(Hash)
-
-        input = resolve_top_level_reference(input) if reference?(input)
+        input = resolve_top_level_references(input) if reference?(input)
 
         raise ValidationError.new("Group does not have a name", nil) unless input.key?('name')
 
@@ -39,14 +37,7 @@ module Bolt
 
         validate_data_keys(@input)
 
-        targets = input.fetch('targets', [])
-        if reference?(targets)
-          targets = resolve_top_level_reference(targets)
-        elsif targets.is_a?(Array)
-          targets = targets.map { |target| resolve_top_level_reference(target) }
-        else
-          raise ValidationError.new("Targets list must be an Array, not #{targets.class}", @name)
-        end
+        targets = resolve_top_level_references(input.fetch('targets', []))
 
         @unresolved_targets = {}
         @resolved_targets = {}
@@ -55,9 +46,7 @@ module Bolt
         @aliases = {}
         @string_targets = []
 
-        Array(targets).flatten.each do |target|
-          target = resolve_top_level_reference(target) if reference?(target)
-
+        Array(targets).each do |target|
           # If target is a string, it can either be trivially defining a target
           # or it could be a name/alias of a target defined in another group.
           # We can't tell the difference until all groups have been resolved,
@@ -78,13 +67,9 @@ module Bolt
         # them until we have a value. We don't just use resolve_references
         # though, since that will resolve any nested references and we want to
         # leave it to the group to do that lazily.
-        groups = resolve_top_level_reference(groups)
+        groups = resolve_top_level_references(groups)
 
-        unless groups.is_a?(Array)
-          raise ValidationError.new("Expected groups list to be an Array, not #{groups.class}", @name)
-        end
-
-        @groups = groups.map { |g| Group2.new(g, plugins) }
+        @groups = Array(groups).map { |g| Group2.new(g, plugins) }
       end
 
       # Evaluate all _plugin references in a data structure. Leaves are
@@ -99,26 +84,32 @@ module Bolt
       end
       private :resolve_references
 
-      # Iteratively resolves a reference until the result is no longer a
-      # reference. If parameters of the reference are themselves references,
-      # they will be looked. Any remaining references nested inside the result
-      # will *not* be evaluated once the top-level result is not a reference.
-      # This is used to resolve the `targets` and `groups` keys which are
-      # allowed to be references, but which may return data with nested
-      # references that should be resolved lazily.
-      def resolve_top_level_reference(data)
-        if reference?(data)
+      # Iteratively resolves "top-level" references until the result no longer
+      # has top-level references. A top-level reference is one which is not
+      # contained within another hash. It may be either the actual top-level
+      # result or arbitrarily nested within arrays. If parameters of the
+      # reference are themselves references, they will be looked. Any remaining
+      # references nested inside the result will *not* be evaluated once the
+      # top-level result is not a reference.  This is used to resolve the
+      # `targets` and `groups` keys which are allowed to be references or
+      # arrays of references, but which may return data with nested references
+      # that should be resolved lazily. The end result will either be a single
+      # hash or a flat array of hashes.
+      def resolve_top_level_references(data)
+        if data.is_a?(Array)
+          data.flat_map { |elem| resolve_top_level_references(elem) }
+        elsif reference?(data)
           partially_resolved = data.map do |k, v|
             [k, resolve_references(v)]
           end.to_h
           fully_resolved = resolve_single_reference(partially_resolved)
           # The top-level reference may have returned more references, so repeat the process
-          resolve_top_level_reference(fully_resolved)
+          resolve_top_level_references(fully_resolved)
         else
           data
         end
       end
-      private :resolve_top_level_reference
+      private :resolve_top_level_references
 
       # Evaluates a single reference. The value returned may be another
       # reference.
@@ -290,6 +281,8 @@ module Bolt
       end
 
       def validate_group_input(input)
+        raise ValidationError.new("Expected group to be a Hash, not #{input.class}", nil) unless input.is_a?(Hash)
+
         # DEPRECATION : remove this before finalization
         if input.key?('target-lookups')
           msg = "'target-lookups' are no longer a separate key. Merge 'target-lookups' and 'targets' lists and replace 'plugin' with '_plugin'" # rubocop:disable Metrics/LineLength

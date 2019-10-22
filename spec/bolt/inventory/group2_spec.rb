@@ -431,16 +431,6 @@ describe Bolt::Inventory::Group2 do
       }
     end
 
-    it 'fails if the targets list is not an array' do
-      data['targets'] = 'foo.example.com,bar.example.com'
-      expect { group }.to raise_error(/Targets list must be an Array/)
-    end
-
-    it 'fails if the groups list is not an array' do
-      data['groups'] = { 'name' => 'foo_group' }
-      expect { group }.to raise_error(/Expected groups list to be an Array/)
-    end
-
     it 'fails if vars is not a hash' do
       data['vars'] = ['foo=bar']
       expect { group }.to raise_error(/Expected vars to be of type Hash/)
@@ -840,6 +830,26 @@ describe Bolt::Inventory::Group2 do
         expect { group }.not_to raise_error
         expect { group.group_data }.not_to raise_error
         expect { group.target_collect('foo') }.to raise_error(/The Error plugin was called/)
+      end
+
+      it 'allows a plugin to return an array of plugins' do
+        lookup_data['target_list'] = [constant('foo'), constant('bar')]
+        data['targets'] = { '_plugin' => 'test_lookup', 'key' => 'target_list' }
+        expect(group.local_targets).to eq(Set.new(%w[foo bar]))
+      end
+
+      it 'allows a plugin to return an array of plugins which return arrays of plugins' do
+        lookup_data['level3'] = [{ 'name' => 'foo' }, { 'name' => 'bar' }]
+        lookup_data['level2'] = [{ '_plugin' => 'test_lookup', 'key' => 'level3' }]
+        lookup_data['level1'] = [{ '_plugin' => 'test_lookup', 'key' => 'level2' }]
+        data['targets'] = { '_plugin' => 'test_lookup', 'key' => 'level1' }
+        expect(group.local_targets).to eq(Set.new(%w[foo bar]))
+      end
+
+      it 'allows the target list to be specified with arbitrarily nested arrays of plugins' do
+        lookup_data['target_plugin'] = [[[[constant([{ 'name' => 'foo' }, { 'name' => 'bar' }])]]]]
+        data['targets'] = [[[[{ '_plugin' => 'test_lookup', 'key' => 'target_plugin' }]]]]
+        expect(group.local_targets).to eq(Set.new(%w[foo bar]))
       end
 
       it 'evaluates a plugin that returns a list of strings' do
