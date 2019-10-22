@@ -91,13 +91,17 @@ module Bolt
           end
           location[key] = value
         end
-        invalidate_caches!
+        invalidate_config_cache!
       end
 
-      def invalidate_caches!
+      def invalidate_group_cache!
         @group_cache = nil
+        # The config cache depends on the group cache, so invalidate it as well
+        invalidate_config_cache!
+      end
+
+      def invalidate_config_cache!
         @transport_config_cache = nil
-        nil
       end
 
       # Computing the transport config is expensive as it requires cloning the

@@ -140,7 +140,7 @@ module Bolt
         if current_group.name == desired_group
           current_group.add_target(target)
           @groups.validate
-          target.invalidate_caches!
+          target.invalidate_group_cache!
           return true
         end
         # Recurse on children Groups if not desired_group
