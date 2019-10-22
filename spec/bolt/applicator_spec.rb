@@ -110,6 +110,9 @@ describe Bolt::Applicator do
 
   context 'with Puppet mocked' do
     before(:each) do
+      allow(scope).to receive(:to_hash).and_return({})
+      allow(scope).to receive(:effective_symtable).and_return(symtable)
+      allow(symtable).to receive(:parent)
       env = Puppet::Node::Environment.create(:testing, modulepath)
       allow(Puppet).to receive(:lookup).with(:pal_script_compiler).and_return(double(:script_compiler, type: nil))
       allow(Puppet).to receive(:lookup).with(:current_environment).and_return(env)
@@ -118,20 +121,22 @@ describe Bolt::Applicator do
       allow(applicator).to receive(:count_statements)
     end
 
+    let(:scope) { double('scope') }
+    let(:symtable) { double('symtable') }
+
     it 'replaces failures to find Puppet' do
       expect(applicator).to receive(:compile).and_return(ast)
       result = Bolt::Result.new(target, value: report)
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(result)
 
       expect(Bolt::ApplyResult).to receive(:puppet_missing_error).with(result).and_return(nil)
-
-      applicator.apply([target], :body, {})
+      applicator.apply([target], :body, scope)
     end
 
     it 'captures compile errors in a result set' do
       expect(applicator).to receive(:compile).and_raise('Something weird happened')
 
-      resultset = applicator.apply([uri, '_catch_errors' => true], :body, {})
+      resultset = applicator.apply([uri, '_catch_errors' => true], :body, scope)
       expect(resultset).to be_a(Bolt::ResultSet)
       expect(resultset).not_to be_ok
       expect(resultset.count).to eq(1)
@@ -145,7 +150,7 @@ describe Bolt::Applicator do
         Bolt::Result.new(target, value: report.merge('status' => 'failed'))
       )
 
-      resultset = applicator.apply([target, '_catch_errors' => true], :body, {})
+      resultset = applicator.apply([target, '_catch_errors' => true], :body, scope)
       expect(resultset).to be_a(Bolt::ResultSet)
       expect(resultset).not_to be_ok
       expect(resultset.count).to eq(1)
@@ -169,7 +174,7 @@ describe Bolt::Applicator do
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(*results)
 
       expect {
-        applicator.apply([targets], :body, {})
+        applicator.apply([targets], :body, scope)
       }.to raise_error(Bolt::ApplyFailure, <<-MSG.chomp)
 Resources failed to apply for node1
   File[/tmp/does/not/exist]: It failed.
@@ -199,7 +204,7 @@ MSG
       end
 
       t = Thread.new {
-        applicator.apply([targets], :body, {})
+        applicator.apply([targets], :body, scope)
       }
       sleep(0.2)
 

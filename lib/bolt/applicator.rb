@@ -145,7 +145,6 @@ module Bolt
       Puppet::Pal.assert_type(type0, args[0], 'apply targets')
 
       @executor.report_function_call('apply')
-
       options = {}
       if args.count > 1
         type1 = Puppet.lookup(:pal_script_compiler).type('Hash[String, Data]')
@@ -157,9 +156,25 @@ module Bolt
       plan_vars = scope.to_hash
       %w[trusted server_facts facts].each { |k| plan_vars.delete(k) }
 
+      # Get variables explicitly set to undef from plan scope
+      symtable = scope.effective_symtable(true)
+      plan_vars = extract_undef_variables(symtable).merge(plan_vars)
       targets = @inventory.get_targets(args[0])
 
       apply_ast(apply_body, targets, options, plan_vars)
+    end
+
+    # Recursively extract variables that have been explicitly assigned `undef`
+    # from all parent scopes.
+    def extract_undef_variables(symtable, acc = {})
+      if (parent = symtable.parent)
+        extract_undef_variables(parent, acc)
+      end
+      if (symbols = symtable.instance_variable_get(:@symbols))
+        null_values = symbols.select { |_sym, val| val.nil? } if symbols
+        acc.merge!(null_values)
+      end
+      acc
     end
 
     # Count the number of top-level statements in the AST.
