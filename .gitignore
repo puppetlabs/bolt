@@ -65,3 +65,4 @@ modules/zone_core/
 .sass-cache/
 locales/
 documentation/plan_functions.md
+documentation/bolt_command_reference.md

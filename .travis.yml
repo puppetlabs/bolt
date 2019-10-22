@@ -67,7 +67,7 @@ script:
     false
   fi
 - |
-  if ! bundle exec rake docs; then
+  if ! bundle exec rake generate_docs; then
     false
   fi
 - bundle exec rake puppetserver

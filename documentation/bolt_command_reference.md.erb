@@ -1,0 +1,18 @@
+# Bolt command reference
+
+These subcommands, actions, and options are available for Bolt.
+
+
+<% @commands.each do |key, val| %>
+## <%= key %>
+
+```plain
+<%= val[:banner] -%>
+```
+
+| Option | Description |
+| ------ | ----------- |
+<% val[:options].each do |option| -%>
+| <% if option[:short] %>`<%= option[:short] %>`, <% end -%>`<%= option[:long] -%><%= option[:arg] %>` | <%= option[:desc] %> |
+<% end %>
+<% end %>
