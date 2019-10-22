@@ -12,7 +12,7 @@ Reference plugins fetch data from an external source and store it in a static da
 
 To use a reference, add an object with a `_plugin` key where you want to use the resolved value. The `_plugin` value must be the name of the plugin to use, and the object must contain any required plugin-specific options.
 
-Bolt currently supports references in the `inventory.yaml` file, at the top level of the `targets` array, and in any location in a `config` object. It resolves references only as needed, which means that `targets` references are resolved when the inventory is loaded, while `config` references are resolved when a target that uses that config is loaded in a plan.
+Bolt currently supports references in the `inventory.yaml` file to define targets, groups, and any data like facts or config. It resolves references only as needed, which means that `targets` and `groups` references are resolved when the inventory is loaded, while data (`vars`, `facts`, `features`, `config`) references are resolved when a target that uses that data is loaded in a plan.
 
 For example, the following `inventory.yaml` will prompt a user for a password the first time the `example.com` target is used.
 
@@ -41,6 +41,8 @@ groups:
         resource_type: google_compute_instance.web
         uri: network_interface.0.access_config.0.nat_ip
 ```
+
+This reference will be resolved as soon as Bolt runs.
 
 ## Secret plugins
 
