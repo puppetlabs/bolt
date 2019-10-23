@@ -62,7 +62,7 @@ plugins:
 
 ## Bundled plugins
 
-Bolt ships with a few plugins out of the box: task, puppetdb, terraform, aws ec2, prompt, pkcs7, and vault.
+Bolt ships with a few plugins out of the box: task, puppetdb, terraform, azure_inventory, aws ec2, prompt, pkcs7, and vault.
 
 ## Task plugin
 
@@ -196,82 +196,11 @@ groups:
 
 ## Terraform
 
-The Terraform plugin supports looking up targets from Terraform state. It accepts several options:
+The `terraform` plugin is a module based plugin. For more information see https://github.com/puppetlabs/puppetlabs-terraform
 
-`dir`: The directory from which to load Terraform state `resource_type`: The Terraform resources to match, as a regular expression `uri`: The property of the Terraform resource to use as the target URI (optional) `statefile`: The name of the Terraform state file to load within `dir` (optional, defaults to `terraform.tfstate`) `name`: The property of the Terraform resource to use as the target name (optional) `config`: A Bolt config map where each value is the Terraform property to use for that config setting
+## Azure inventory
 
-One of `uri` or `name` is required. If only `uri` is set, then the value of `uri` will be used as the `name`.
-
-```
-groups:
-  - name: cloud-webs
-    targets:
-      - _plugin: terraform
-        dir: /path/to/terraform/project1
-        resource_type: google_compute_instance.web
-        uri: network_interface.0.access_config.0.nat_ip
-      - _plugin: terraform
-        dir: /path/to/terraform/project2
-        resource_type: aws_instance.web
-        uri: public_ip
-```
-
-Multiple resources with the same name are identified .0, .1, etc.
-
-The path to nested properties must be separated with `.`: for example, `network_interface.0.access_config.0.nat_ip`.
-
-For example, the following truncated output creates two targets, named `34.83.150.52` and `34.83.16.240`. These targets are created by matching the resources `google_compute_instance.web.0` and `google_compute_instance.web.1`. The `uri` for each target is the value of their `network_interface.0.access_config.0.nat_ip` property, which corresponds to the externally routable IP address in Google Cloud.
-
-```
-google_compute_instance.web.0:
-  id = web-0
-  cpu_platform = Intel Broadwell
-  machine_type = f1-micro
-  name = web-0
-  network_interface.# = 1
-  network_interface.0.access_config.# = 1
-  network_interface.0.access_config.0.assigned_nat_ip =
-  network_interface.0.access_config.0.nat_ip = 34.83.150.52
-  network_interface.0.address =
-  network_interface.0.name = nic0
-  network_interface.0.network = https://www.googleapis.com/compute/v1/projects/cloud-app1/global/networks/default
-  network_interface.0.network_ip = 10.138.0.22
-  project = cloud-app1
-  self_link = https://www.googleapis.com/compute/v1/projects/cloud-app1/zones/us-west1-a/instances/web-0
-  zone = us-west1-a
-google_compute_instance.web.1:
-  id = web-1
-  cpu_platform = Intel Broadwell
-  machine_type = f1-micro
-  name = web-1
-  network_interface.# = 1
-  network_interface.0.access_config.# = 1
-  network_interface.0.access_config.0.assigned_nat_ip =
-  network_interface.0.access_config.0.nat_ip = 34.83.16.240
-  network_interface.0.address =
-  network_interface.0.name = nic0
-  network_interface.0.network = https://www.googleapis.com/compute/v1/projects/cloud-app1/global/networks/default
-  network_interface.0.network_ip = 10.138.0.21
-  project = cloud-app1
-  self_link = https://www.googleapis.com/compute/v1/projects/cloud-app1/zones/us-west1-a/instances/web-1
-  zone = us-west1-a
-google_compute_instance.app.1:
-  id = app-1
-  cpu_platform = Intel Broadwell
-  machine_type = f1-micro
-  name = app-1
-  network_interface.# = 1
-  network_interface.0.access_config.# = 1
-  network_interface.0.access_config.0.assigned_nat_ip =
-  network_interface.0.access_config.0.nat_ip = 35.197.93.137
-  network_interface.0.address =
-  network_interface.0.name = nic0
-  network_interface.0.network = https://www.googleapis.com/compute/v1/projects/cloud-app1/global/networks/default
-  network_interface.0.network_ip = 10.138.0.23
-  project = cloud-app1
-  self_link = https://www.googleapis.com/compute/v1/projects/cloud-app1/zones/us-west1-a/instances/app-1
-  zone = us-west1-a
-```
+The `azure_inventory` plugin is a module based plugin. For more information see https://github.com/puppetlabs/puppetlabs-azure_inventory
 
 ## AWS Inventory plugin
 
