@@ -65,6 +65,7 @@ modules/zone_core/
 
 modules/terraform
 modules/azure_inventory
+modules/aws_inventory
 
 .sass-cache/
 locales/
