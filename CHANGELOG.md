@@ -18,6 +18,10 @@
 
   When running plugins locally to populate config or inventory information, command-line flags such as `--run-as` will no longer be applied to the local transport.
 
+* **Optional plan parameters referenced in `apply` blocks issued warning** ([#1288](https://github.com/puppetlabs/bolt/issues/1288))
+
+    Previously plan parameters that were explicitly set to `undef` (optional parameters) that were referenced in an `apply` block resulted in a warning message when applying puppet code. The warning is no longer issued when optional parameters are referenced.
+
 ## Bolt 1.38.0
 
 ### New features

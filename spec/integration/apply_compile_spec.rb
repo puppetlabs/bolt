@@ -69,11 +69,16 @@ describe "passes parsed AST to the apply_catalog task" do
       expect(notify[0]['title']).to eq('hello there')
     end
 
-    it 'plan vars override target vars' do
+    it 'plan vars override target vars and respects variables explicitly set to undef' do
       result = run_cli_json(%w[plan run basic::plan_vars] + config_flags)
       notify = get_notifies(result)
       expect(notify.count).to eq(1)
       expect(notify[0]['title']).to eq('hello world')
+      logs = @log_output.readlines
+      expect(logs).not_to include(/Unknown variable: 'signature'/)
+      expect(logs).not_to include(/Unknown variable: 'plan_undef'/)
+      expect(logs).to include(/Unknown variable: 'apply_undef'/)
+      expect(logs).to include(/Plan vars set to undef:/)
     end
 
     it 'applies a class from the modulepath' do
