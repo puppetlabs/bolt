@@ -12,6 +12,12 @@
 
   When there is no `config` section in `bolt_plugin.json` configuration options in `bolt.yaml` are validated against the intersection of the parameters schema specified for each task implementation of the plugin's hooks and the values are passed to the task at run time merged with options set in `inventory.yaml`.
 
+### Bug fixes
+
+* **Optional plan parameters referenced in `apply` blocks issued warning** ([#1288](https://github.com/puppetlabs/bolt/issues/1288))
+
+    Previously plan parameters that were explicitly set to `undef` (optional parameters) that were referenced in an `apply` block resulted in a warning message when applying puppet code. The warning is no longer issued when optional parameters are referenced.
+
 ## 1.34.0
 
 ### New features
