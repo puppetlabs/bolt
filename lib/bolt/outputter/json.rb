@@ -89,11 +89,18 @@ module Bolt
                        "moduledir": moduledir }.to_json)
       end
 
-      def print_targets(options)
-        targets = options[:targets].map(&:name)
-        count = targets.count
-        @stream.puts({ "targets": targets,
-                       "count": count }.to_json)
+      def print_targets(targets)
+        @stream.puts ::JSON.pretty_generate(
+          "targets": targets.map(&:name),
+          "count": targets.count
+        )
+      end
+
+      def print_target_info(targets)
+        @stream.puts ::JSON.pretty_generate(
+          "targets": targets.map(&:detail),
+          "count": targets.count
+        )
       end
 
       def print_groups(groups)

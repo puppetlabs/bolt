@@ -4,6 +4,10 @@
 
 ### New Features
 
+* **Add `--detail` option for `inventory show` command** ([#1200](https://github.com/puppetlabs/bolt/issues/1200))
+
+  The `inventory show` command now supports a `--detail` option to show resolved configuration for specified targets.
+
 * **Support `limit` option for `do_until` function** ([#1270](https://github.com/puppetlabs/bolt/issues/1270))
 
   The `do_until` function now supports a limit option that prevents it from iterating infinitely.
