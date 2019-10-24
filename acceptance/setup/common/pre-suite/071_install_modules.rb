@@ -6,11 +6,6 @@ test_name "Install modules" do
   extend Acceptance::BoltCommandHelper
 
   on(bolt, "mkdir -p #{default_boltdir}")
-  create_remote_file(bolt, "#{default_boltdir}/Puppetfile", <<-PUPPETFILE)
-mod 'puppetlabs-facts', '0.6.0'
-mod 'puppetlabs-service', '1.1.0'
-mod 'puppetlabs-puppet_agent', '2.2.0'
-PUPPETFILE
-
-  bolt_command_on(bolt, 'bolt puppetfile install')
+  bolt_command_on(bolt, "cp bolt/Puppetfile #{default_boltdir}")
+  bolt_command_on(bolt, "cd #{default_boltdir} && r10k puppetfile install Puppetfile")
 end
