@@ -1,22 +1,22 @@
 # Changelog
 
-## Bolt Next
+## 1.35.0
 
-### Breaking Changes
+### Deprecation
 
-* **Replace install_agent plugin into puppet_agent module** ([#1294](https://github.com/puppetlabs/bolt/issues/1294))
+* **Replace `install_agent` plugin with `puppet_agent` module** ([#1294](https://github.com/puppetlabs/bolt/issues/1294))
 
-  The puppetlabs-puppet agent module now provides the same functionality as the `install_agent` plugin did previously. This PR removes the `install_agent` plugin and makes the `puppet_agent` module the default plugin for the `puppet_library` hook. If you do not use the bundled `puppet_agent` module you will need to update to `2.2.1`. If you explicitly referenced the `install_agent` plugin you will need to reference `puppet_agent` instead.
+  The `puppetlabs-puppet_agent` module now provides the same functionality as the `install_agent` plugin did previously. The `install_agent` plugin has been removed and the `puppet_agent` module is now the default plugin for the `puppet_library` hook. If you do not use the bundled `puppet_agent` module you will need to update to version `2.2.1` of the module. If you reference the `install_agent` plugin you will need to now reference `puppet_agent` instead.
 
-### New Features
+### New features
 
 * **Support `limit` option for `do_until` function** ([#1270](https://github.com/puppetlabs/bolt/issues/1270))
 
-  The `do_until` function now supports a limit option that prevents it from iterating infinitely.
+  The `do_until` function now supports a `limit` option that prevents it from iterating infinitely.
 
 * **Improve parameter passing for module plugins** ([#1322](https://github.com/puppetlabs/bolt/issues/1322))
 
-  When there is no `config` section in `bolt_plugin.json` configuration options in `bolt.yaml` are validated against the intersection of the parameters schema specified for each task implementation of the plugin's hooks and the values are passed to the task at run time merged with options set in `inventory.yaml`.
+  In the absence of a `config` section in `bolt_plugin.json`, Bolt will validate any configuration options in `bolt.yaml` against the schema for each task of the plugin’s hook. Bolt passes the values to the task at runtime and merges them with options set in `inventory.yaml`.
 
 ## 1.34.0
 
