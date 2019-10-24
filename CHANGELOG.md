@@ -2,7 +2,7 @@
 
 ## 1.35.0
 
-### Depreciation
+### Deprecation
 
 * **Replace `install_agent` plugin with `puppet_agent` module** ([#1294](https://github.com/puppetlabs/bolt/issues/1294))
 
@@ -15,7 +15,7 @@
   The `do_until` function now supports a `limit` option that prevents it from iterating infinitely.
 
 * **Improve parameter passing for module plugins** ([#1322](https://github.com/puppetlabs/bolt/issues/1322))
- 
+
   In the absence of a `config` section in `bolt_plugin.json`, Bolt will validate any configuration options in `bolt.yaml` against the schema for each task of the plugin’s hook. Bolt passes the values to the task at runtime and merges them with options set in `inventory.yaml`.
 
 ## 1.34.0
