@@ -153,7 +153,7 @@ module Bolt
         @nodes.each_key do |n|
           # Require nodes to be parseable as a Target.
           begin
-            Target.new(n)
+            Bolt::Target.new(n)
           rescue Bolt::ParseError => e
             @logger.debug(e)
             raise ValidationError.new("Invalid node name #{n}", @name)

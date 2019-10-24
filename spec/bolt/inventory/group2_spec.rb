@@ -5,6 +5,7 @@ require 'bolt/inventory'
 require 'bolt/inventory/group'
 require 'bolt/plugin'
 require 'bolt_spec/config'
+require 'bolt_spec/plugins'
 
 # This is largely internal and probably shouldn't be tested
 describe Bolt::Inventory::Group2 do
@@ -18,13 +19,13 @@ describe Bolt::Inventory::Group2 do
     # passing the collection of all aliases in it. Do that manually here to ensure plain target strings
     # are included as targets.
     g = Bolt::Inventory::Group2.new(data, plugins)
-    g.resolve_aliases(g.target_aliases, g.target_names)
+    g.resolve_string_targets(g.target_aliases, g.all_targets)
     g
   }
-  let(:target1_ssh) { group.data_for('target1')['config']['ssh']['user'] }
 
   it 'returns nil' do
-    expect(group.data_for('target1')).to be_nil
+    expect(group.target_collect('target1')).to be_nil
+    expect(group.group_collect('target1')).to be_nil
   end
 
   context 'with targets at the top level' do
@@ -46,23 +47,19 @@ describe Bolt::Inventory::Group2 do
       expect(group).to be
     end
 
-    it 'should have three targets' do
-      expect(group.targets.length).to eq(3)
-    end
-
     it 'should return empty data' do
-      expect(group.target_data('target1')).to eq('config' => {},
-                                                 'vars' => {},
-                                                 'name' => nil,
-                                                 'plugin_hooks' => {},
-                                                 'uri' => 'target1',
-                                                 'facts' => {},
-                                                 'features' => [],
-                                                 'groups' => [])
+      expect(group.target_collect('target1')).to eq('config' => {},
+                                                    'vars' => {},
+                                                    'name' => nil,
+                                                    'plugin_hooks' => {},
+                                                    'uri' => 'target1',
+                                                    'facts' => {},
+                                                    'features' => Set.new,
+                                                    'groups' => [])
     end
 
     it 'should find three targets' do
-      expect(group.target_names.to_a.sort).to eq(%w[target1 target2 target3])
+      expect(group.all_targets.to_a.sort).to eq(%w[target1 target2 target3])
     end
 
     it 'should collect one group' do
@@ -72,15 +69,15 @@ describe Bolt::Inventory::Group2 do
     end
 
     it 'should return a hash for a string target' do
-      expect(group.data_for('target1')).to be
+      expect(group.target_collect('target1')).to be
     end
 
     it 'should return a hash for hash defined targets' do
-      expect(group.data_for('target2')).to be
+      expect(group.target_collect('target2')).to be
     end
 
     it 'should return nil for an unknown target' do
-      expect(group.data_for('target5')).to be_nil
+      expect(group.target_collect('target5')).to be_nil
     end
   end
 
@@ -104,12 +101,8 @@ describe Bolt::Inventory::Group2 do
       }
     end
 
-    it 'uses the childs target definition' do
-      expect(group.data_for('target1')['config']['ssh']['user']).to eq('child_target')
-    end
-
     it 'should find one target' do
-      expect(group.target_names.to_a).to eq(%w[target1])
+      expect(group.all_targets.to_a).to eq(%w[target1])
     end
 
     it 'should collect 2 groups' do
@@ -121,198 +114,7 @@ describe Bolt::Inventory::Group2 do
 
     it 'should find one target in the subgroup' do
       groups = group.collect_groups
-      expect(groups['group1'].target_names.to_a).to eq(%w[target1])
-    end
-  end
-
-  context 'with target data in parent and group in the child' do
-    let(:data) do
-      {
-        'name' => 'all',
-        'targets' => [{
-          'name' => 'target1',
-          'config' => { 'ssh' => { 'user' => 'parent_target' } }
-        }],
-        'config' => { 'ssh' => { 'user' => 'parent_group' } },
-        'groups' => [{
-          'name' => 'group1',
-          'targets' => [{
-            'name' => 'target1'
-          }],
-          'config' => { 'ssh' => { 'user' => 'child_group' } }
-        }]
-      }
-    end
-
-    it 'uses the parents target definition' do
-      expect(group.data_for('target1')['config']['ssh']['user']).to eq('parent_target')
-    end
-  end
-
-  context 'with group data at all levels' do
-    let(:data) do
-      {
-        'name' => 'all',
-        'targets' => [{
-          'name' => 'target1'
-        }],
-        'config' => { 'ssh' => { 'user' => 'parent_group' } },
-        'groups' => [{
-          'name' => 'group1',
-          'targets' => [{
-            'name' => 'target1'
-          }],
-          'config' => { 'ssh' => { 'user' => 'child_group' } }
-        }]
-      }
-    end
-
-    it 'uses the childs group definition' do
-      expect(group.data_for('target1')['config']['ssh']['user']).to eq('child_group')
-    end
-  end
-
-  context 'with two children which both set target' do
-    let(:data) do
-      {
-        'name' => 'all',
-        'targets' => [{
-          'name' => 'target1',
-          'config' => { 'ssh' => { 'user' => 'parent_target' } }
-        }],
-        'config' => { 'ssh' => { 'user' => 'parent_group' } },
-        'groups' => [
-          {
-            'name' => 'group1',
-            'targets' => [{
-              'name' => 'target1',
-              'config' => { 'ssh' => { 'user' => 'child1_target' } }
-            }],
-            'config' => { 'ssh' => { 'user' => 'child1_group' } }
-          },
-          {
-            'name' => 'group2',
-            'targets' => [{
-              'name' => 'target1',
-              'config' => { 'ssh' => { 'user' => 'child2_target' } }
-            }],
-            'config' => { 'ssh' => { 'user' => 'child2_group' } }
-          }
-
-        ]
-      }
-    end
-
-    it 'uses the first childs target definition' do
-      expect(target1_ssh).to eq('child1_target')
-    end
-  end
-
-  context 'with two children where the second sets target' do
-    let(:data) do
-      {
-        'name' => 'all',
-        'targets' => [{
-          'name' => 'target1',
-          'config' => { 'ssh' => { 'user' => 'parent_target' } }
-        }],
-        'config' => { 'ssh' => { 'user' => 'parent_group' } },
-        'groups' => [
-          {
-            'name' => 'group1',
-            'targets' => [{
-              'name' => 'target1',
-              'config' => { 'ssh' => {} }
-            }],
-            'config' => { 'ssh' => { 'user' => 'child1_group' } }
-          },
-          {
-            'name' => 'group2',
-            'targets' => [{
-              'name' => 'target1',
-              'config' => { 'ssh' => { 'user' => 'child2_target' } }
-            }],
-            'config' => { 'ssh' => { 'user' => 'child2_group' } }
-          }
-
-        ]
-      }
-    end
-
-    it 'uses the first childs target definition' do
-      expect(target1_ssh).to eq('child2_target')
-    end
-  end
-
-  context 'with two children where both set group' do
-    let(:data) do
-      {
-        'name' => 'all',
-        'targets' => [{
-          'name' => 'target1',
-          'config' => { 'ssh' => {} }
-        }],
-        'config' => { 'ssh' => { 'user' => 'parent_group' } },
-        'groups' => [
-          {
-            'name' => 'group1',
-            'targets' => [{
-              'name' => 'target1',
-              'config' => { 'ssh' => {} }
-            }],
-            'config' => { 'ssh' => { 'user' => 'child1_group' } }
-          },
-          {
-            'name' => 'group2',
-            'targets' => [{
-              'name' => 'target1',
-              'config' => { 'ssh' => {} }
-            }],
-            'config' => { 'ssh' => { 'user' => 'child2_group' } }
-          }
-
-        ]
-      }
-    end
-
-    it 'uses the first childs group definition' do
-      expect(target1_ssh).to eq('child1_group')
-    end
-  end
-
-  context 'with two children where the second sets group' do
-    let(:data) do
-      {
-        'name' => 'all',
-        'targets' => [{
-          'name' => 'target1',
-          'config' => { 'ssh' => {} }
-        }],
-        'config' => { 'ssh' => { 'user' => 'parent_group' } },
-        'groups' => [
-          {
-            'name' => 'group1',
-            'targets' => [{
-              'name' => 'target1',
-              'config' => { 'ssh' => {} }
-            }],
-            'config' => { 'ssh' => {} }
-          },
-          {
-            'name' => 'group2',
-            'targets' => [{
-              'name' => 'target1',
-              'config' => { 'ssh' => {} }
-            }],
-            'config' => { 'ssh' => { 'user' => 'child2_group' } }
-          }
-
-        ]
-      }
-    end
-
-    it 'uses the second childs group definition' do
-      expect(target1_ssh).to eq('child2_group')
+      expect(groups['group1'].all_targets.to_a).to eq(%w[target1])
     end
   end
 
@@ -331,7 +133,7 @@ describe Bolt::Inventory::Group2 do
     end
 
     it 'should find two targets' do
-      expect(group.target_names.to_a).to eq(%w[127.0.0.1 2001:db8:0:1:8080])
+      expect(group.all_targets.to_a).to eq(%w[127.0.0.1 2001:db8:0:1:8080])
     end
 
     it 'should collect 2 groups' do
@@ -343,7 +145,7 @@ describe Bolt::Inventory::Group2 do
 
     it 'should find one target in the subgroup' do
       groups = group.collect_groups
-      expect(groups['group1'].target_names.to_a).to eq(%w[2001:db8:0:1:8080])
+      expect(groups['group1'].all_targets.to_a).to eq(%w[2001:db8:0:1:8080])
     end
   end
 
@@ -359,7 +161,7 @@ describe Bolt::Inventory::Group2 do
     end
 
     it 'should find two distinct targets' do
-      expect(group.target_names.to_a).to eq(%w[ssh://127.0.0.1:22 127.0.0.1])
+      expect(group.all_targets.to_a).to eq(%w[ssh://127.0.0.1:22 127.0.0.1])
     end
   end
 
@@ -369,15 +171,15 @@ describe Bolt::Inventory::Group2 do
         'name' => 'group1',
         'targets' => [
           { 'name' => 'target1',
-            'val' => 'a' },
+            'vars' => { 'val' => 'a' } },
           { 'name' => 'target1',
-            'val' => 'b' }
+            'vars' => { 'val' => 'b' } }
         ]
       }
     end
 
     it 'uses the first value' do
-      expect(group.targets['target1']['val']).to eq('a')
+      expect(group.target_collect('target1').dig('vars', 'val')).to eq('a')
     end
   end
 
@@ -465,14 +267,17 @@ describe Bolt::Inventory::Group2 do
         'groups' => [
           {
             'name' => 'foo1',
-            'targets' => [{ 'name' => 'foo1', 'config' => 'foo' }]
+            'targets' => [{ 'name' => 'footarget', 'config' => 'foo' }]
           }
         ]
       }
     end
 
     it 'raises an error' do
-      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Invalid configuration for target/)
+      expect { group.validate }.to raise_error(
+        Bolt::Inventory::ValidationError,
+        /Expected config to be of type Hash.*for target footarget/
+      )
     end
   end
 
@@ -500,19 +305,19 @@ describe Bolt::Inventory::Group2 do
       end
 
       it 'returns the target as a member of the parent group' do
-        expect(group.target_names).to include('target1')
+        expect(group.all_targets).to include('target1')
       end
 
       it 'overrides parent group data with child group data' do
-        expect(group.data_for('target1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
+        expect(group.group_collect('target1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
       end
 
       it 'combines parent group features with child group features' do
-        expect(group.data_for('target1')['features']).to match_array(%w[a b])
+        expect(group.group_collect('target1')['features']).to match_array(%w[a b])
       end
 
       it 'returns the whole ancestry as the list of groups for the target' do
-        expect(group.data_for('target1')['groups']).to eq(%w[child parent root])
+        expect(group.group_collect('target1')['groups']).to eq(%w[child parent root])
       end
     end
 
@@ -541,17 +346,17 @@ describe Bolt::Inventory::Group2 do
       end
 
       it 'returns all child targets as members of the parent group' do
-        expect(group.target_names.to_a.sort).to eq(%w[target1 target2])
+        expect(group.all_targets.to_a.sort).to eq(%w[target1 target2])
       end
 
       it 'overrides parent group data with child group data' do
-        expect(group.data_for('target1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
-        expect(group.data_for('target2')['vars']).to eq('foo' => 'baz', 'a' => 'b')
+        expect(group.group_collect('target1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
+        expect(group.group_collect('target2')['vars']).to eq('foo' => 'baz', 'a' => 'b')
       end
 
       it 'returns the whole ancestry as the list of groups for the target' do
-        expect(group.data_for('target1')['groups']).to eq(%w[child1 parent root])
-        expect(group.data_for('target2')['groups']).to eq(%w[child2 parent root])
+        expect(group.group_collect('target1')['groups']).to eq(%w[child1 parent root])
+        expect(group.group_collect('target2')['groups']).to eq(%w[child2 parent root])
       end
     end
   end
@@ -607,9 +412,9 @@ describe Bolt::Inventory::Group2 do
     end
 
     it 'uses values from the first branch encountered, picking the most specific subgroup' do
-      expect(group.data_for('target1')['groups']).to eq(%w[parent1 child1 parent2 root])
-      expect(group.data_for('target1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
-      expect(group.data_for('target1')['features']).to match_array(%w[a b])
+      expect(group.group_collect('target1')['groups']).to eq(%w[parent1 child1 parent2 root])
+      expect(group.group_collect('target1')['vars']).to eq('foo' => 'bar', 'a' => 'b')
+      expect(group.group_collect('target1')['features']).to match_array(%w[a b])
     end
   end
 
@@ -626,39 +431,29 @@ describe Bolt::Inventory::Group2 do
       }
     end
 
-    it 'fails if the targets list is not an array' do
-      data['targets'] = 'foo.example.com,bar.example.com'
-      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected targets to be of type Array/)
-    end
-
-    it 'fails if a target in the list is not a string or hash' do
-      data['targets'] = [['foo.example.com']]
-      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Node entry must be a String or Hash/)
-    end
-
-    it 'fails if the groups list is not an array' do
-      data['groups'] = { 'name' => 'foo_group' }
-      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected groups to be of type Array/)
-    end
-
     it 'fails if vars is not a hash' do
       data['vars'] = ['foo=bar']
-      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected vars to be of type Hash/)
+      expect { group }.to raise_error(/Expected vars to be of type Hash/)
     end
 
     it 'fails if facts is not a hash' do
       data['facts'] = ['foo=bar']
-      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected facts to be of type Hash/)
+      expect { group }.to raise_error(/Expected facts to be of type Hash/)
     end
 
     it 'fails if features is not an array' do
       data['features'] = 'shell'
-      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected features to be of type Array/)
+      expect { group }.to raise_error(/Expected features to be of type Array/)
     end
 
     it 'fails if config is not a hash' do
       data['config'] = 'transport=ssh'
-      expect { Bolt::Inventory::Group2.new(data, plugins) }.to raise_error(/Expected config to be of type Hash/)
+      expect { group }.to raise_error(/Expected config to be of type Hash/)
+    end
+
+    it 'fails if plugin_hooks is not a hash' do
+      data['plugin_hooks'] = 'puppet_library'
+      expect { group }.to raise_error(/Expected plugin_hooks to be of type Hash/)
     end
   end
 
@@ -673,7 +468,7 @@ describe Bolt::Inventory::Group2 do
         }
       end
 
-      it { expect(group.target_names.to_a).to eq(%w[target1]) }
+      it { expect(group.all_targets.to_a).to eq(%w[target1]) }
       it { expect(group.target_aliases).to eq('alias1' => 'target1') }
     end
 
@@ -690,7 +485,7 @@ describe Bolt::Inventory::Group2 do
         }
       end
 
-      it { expect(group.target_names.to_a).to eq(%w[target1 target2]) }
+      it { expect(group.all_targets.to_a).to eq(%w[target1 target2]) }
       it { expect(group.target_aliases).to eq('alias1' => 'target1', 'alias2' => 'target1', 'alias3' => 'target2') }
     end
 
@@ -705,7 +500,7 @@ describe Bolt::Inventory::Group2 do
         }
       end
 
-      it { expect(group.target_names.to_a).to eq(%w[target1]) }
+      it { expect(group.all_targets.to_a).to eq(%w[target1]) }
       it { expect(group.target_aliases).to eq('alias1' => 'target1') }
     end
 
@@ -722,7 +517,7 @@ describe Bolt::Inventory::Group2 do
         }
       end
 
-      it { expect(group.target_names.to_a).to eq(%w[target1]) }
+      it { expect(group.all_targets.to_a).to eq(%w[target1]) }
       it { expect(group.target_aliases).to eq('alias1' => 'target1') }
     end
 
@@ -737,7 +532,7 @@ describe Bolt::Inventory::Group2 do
         }
       end
 
-      it { expect(group.target_names.to_a).to eq(%w[target1]) }
+      it { expect(group.all_targets.to_a).to eq(%w[target1]) }
       it { expect(group.target_aliases).to eq('alias1' => 'target1') }
     end
 
@@ -948,129 +743,295 @@ describe Bolt::Inventory::Group2 do
     end
   end
 
-  describe "with config plugins" do
-    context "when parsing/evaluating config _plugin" do
-      let(:data) do
-        {
-          'name' => 'root',
-          'targets' => ['foo.example.com', 'bar.example.com'],
-          'groups' => [{ 'name' => 'foo_group' }],
-          'vars' => { 'key' => 'value' },
-          'facts' => { 'osfamily' => 'windows' },
-          'features' => ['shell'],
-          'config' => { 'transport' => 'ssh' }
-        }
+  describe "defining a group with plugins" do
+    let(:data) do
+      {
+        'name' => 'root',
+        'targets' => ['foo.example.com', 'bar.example.com'],
+        'groups' => [{ 'name' => 'foo_group' }],
+        'vars' => { 'key' => 'value' },
+        'facts' => { 'osfamily' => 'windows' },
+        'features' => ['shell'],
+        'config' => { 'transport' => 'ssh' },
+        'plugin_hooks' => { 'puppet_library' => { 'plugin' => 'install_puppet' } }
+      }
+    end
+
+    let(:lookup_data) { {} }
+
+    let(:modulepath) { [''] }
+    let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+
+    let(:plugins) do
+      plugins = Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new)
+      plugins.add_plugin(BoltSpec::Plugins::Constant.new)
+      plugins.add_plugin(BoltSpec::Plugins::Error.new)
+      plugins.add_plugin(BoltSpec::Plugins::TestLookup.new(lookup_data))
+      plugins
+    end
+
+    # Returns a reference to the 'constant' plugin with the specified value
+    def constant(value)
+      { '_plugin' => 'constant', 'value' => value }
+    end
+
+    it "fails if any keys are specified as plugins" do
+      data.replace('name' => 'testgroup', constant('groups') => [])
+      expect { group }.to raise_error(Bolt::Inventory::ValidationError, /keys cannot be specified as _plugin/)
+    end
+
+    context "defining the entire group with a plugin" do
+      it 'evaluates a single plugin' do
+        data.replace(constant('name' => 'testgroup', 'config' => { 'transport' => 'ssh' }))
+        expect(group.name).to eq('testgroup')
+        expect(group.group_data['config']).to eq('transport' => 'ssh')
       end
 
-      let(:fake_plugin) { { '_plugin' => 'fake' } }
-
-      let(:target) do
-        {
-          'name' => 'foo',
-          'alias' => 'bar',
-          'uri' => 'baz',
-          'vars' => { 'key' => 'value' },
-          'facts' => { 'osfamily' => 'windows' },
-          'features' => ['shell'],
-          'config' => { 'transport' => 'ssh' }
-        }
+      it 'evaluates a plugin that returns a plugin' do
+        lookup_data['groupdata'] = constant('name' => 'testgroup', 'config' => { 'transport' => 'ssh' })
+        data.replace('_plugin' => 'test_lookup', 'key' => 'groupdata')
+        expect(group.name).to eq('testgroup')
+        expect(group.group_data['config']).to eq('transport' => 'ssh')
       end
 
-      let(:hooks) { [] }
-
-      let(:modulepath) { [''] }
-      let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
-
-      let(:plugins) do
-        plugins = Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new)
-        plugin = double('plugin')
-        allow(plugin).to receive(:name).and_return('fake')
-        allow(plugin).to receive(:hooks).and_return(hooks)
-        plugins.add_plugin(plugin)
-        plugins
+      it 'evaluates a plugin with nested plugins' do
+        data.replace(constant('name' => 'testgroup', 'config' => { 'ssh' => { 'port' => constant(3456) } }))
+        expect(group.name).to eq('testgroup')
+        expect(group.group_data['config']).to eq('ssh' => { 'port' => 3456 })
       end
 
-      it 'fails if group name is a config plugin' do
-        data['name'] = fake_plugin
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/Cannot set group "name" with plugin/)
+      it 'does lazily evaluates plugins in the config section' do
+        lookup_data['groupdata'] = { 'name' => 'testgroup', 'config' => { '_plugin' => 'error' } }
+        data.replace('_plugin' => 'test_lookup', 'key' => 'groupdata')
+        expect { group }.not_to raise_error
+        expect(group.name).to eq('testgroup')
+        expect { group.group_data }.to raise_error(/The Error plugin was called/)
+      end
+    end
+
+    context "defining the targets list with a plugin" do
+      it 'evaluates a single plugin' do
+        data['targets'] = constant([{ 'name' => 'foo' }, { 'name' => 'bar' }])
+        expect(group.local_targets).to eq(Set.new(%w[foo bar]))
       end
 
-      it 'fails if target-lookups is present' do
-        data['target-lookups'] = [fake_plugin]
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/'target-lookups' are no longer/)
+      it 'evaluates multiple plugins and concatenates the target lists' do
+        data['targets'] = [
+          constant([{ 'name' => 'foo' }, { 'name' => 'bar' }]),
+          constant([{ 'name' => 'baz' }, { 'name' => 'quux' }])
+        ]
+        expect(group.local_targets).to eq(Set.new(%w[foo bar baz quux]))
       end
 
-      it 'fails if group groups is a config plugin' do
-        data['groups'] = [fake_plugin]
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/Cannot set group with plugin/)
+      it 'lazily evaluates plugins in the config section of a target' do
+        data['targets'] = [
+          { 'name' => 'foo', 'config' => { 'transport' => { '_plugin' => 'error' } } }
+        ]
+        expect { group }.not_to raise_error
+        expect { group.group_data }.not_to raise_error
+        expect { group.target_collect('foo') }.to raise_error(/The Error plugin was called/)
       end
 
-      it 'fails if group vars is a config plugin' do
-        data['vars']['key'] = fake_plugin
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/Cannot set group "vars" with plugin/)
+      it 'allows a plugin to return an array of plugins' do
+        lookup_data['target_list'] = [constant('foo'), constant('bar')]
+        data['targets'] = { '_plugin' => 'test_lookup', 'key' => 'target_list' }
+        expect(group.local_targets).to eq(Set.new(%w[foo bar]))
       end
 
-      it 'fails if group facts is a config plugin' do
-        data['facts'] = fake_plugin
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/Cannot set group "facts" with plugin/)
+      it 'allows a plugin to return an array of plugins which return arrays of plugins' do
+        lookup_data['level3'] = [{ 'name' => 'foo' }, { 'name' => 'bar' }]
+        lookup_data['level2'] = [{ '_plugin' => 'test_lookup', 'key' => 'level3' }]
+        lookup_data['level1'] = [{ '_plugin' => 'test_lookup', 'key' => 'level2' }]
+        data['targets'] = { '_plugin' => 'test_lookup', 'key' => 'level1' }
+        expect(group.local_targets).to eq(Set.new(%w[foo bar]))
       end
 
-      it 'fails if group features is a config plugin' do
-        data['features'] = fake_plugin
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/Cannot set group "features" with plugin/)
+      it 'allows the target list to be specified with arbitrarily nested arrays of plugins' do
+        lookup_data['target_plugin'] = [[[[constant([{ 'name' => 'foo' }, { 'name' => 'bar' }])]]]]
+        data['targets'] = [[[[{ '_plugin' => 'test_lookup', 'key' => 'target_plugin' }]]]]
+        expect(group.local_targets).to eq(Set.new(%w[foo bar]))
       end
 
-      it 'fails if target name is config plugin' do
-        target['uri'] = fake_plugin
-        data['targets'] = [target]
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/Cannot set target "uri" with plugin/)
+      it 'evaluates a plugin that returns a list of strings' do
+        data['targets'] = constant(%w[foo bar])
+        expect(group.local_targets).to eq(Set.new(%w[foo bar]))
       end
 
-      it 'fails if target alias is config plugin' do
-        target['alias'] = fake_plugin
-        data['targets'] = [target]
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/Cannot set target "alias" with plugin/)
+      it 'allows mixing plugins and literal targets' do
+        data['targets'] = [
+          constant([{ 'name' => 'foo' }]),
+          { 'name' => 'bar' }
+        ]
+        expect(group.local_targets).to eq(Set.new(%w[foo bar]))
+      end
+    end
+
+    context "defining the group data with plugins" do
+      it 'lazily evaluates plugins in the config section' do
+        data['config'] = { '_plugin' => 'error' }
+        expect { group }.not_to raise_error
+        expect { group.group_data }.to raise_error(/The Error plugin was called/)
       end
 
-      it 'fails if target uri is config plugin' do
-        target['uri'] = fake_plugin
-        data['targets'] = [target]
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/Cannot set target "uri" with plugin/)
+      it 'evaluates a plugin to set name' do
+        data['name'] = constant('testgroup')
+        expect(group.name).to eq('testgroup')
       end
 
-      context 'fails if an unknown plugin is requested' do
-        it 'for config only plugin' do
-          data['config'] = { 'ssh' => { 'password' => { '_plugin' => 'unknown' } } }
-          expect { Bolt::Inventory::Group2.new(data, plugins) }
-            .to raise_error(/Unknown plugin: 'unknown'/)
+      it 'evaluates a plugin with a nested plugin to set name' do
+        data['name'] = constant(constant('testgroup'))
+        expect(group.name).to eq('testgroup')
+      end
+
+      it 'evaluates a plugin that returns a plugin to set name' do
+        lookup_data['group_name'] = constant('testgroup')
+        data['name'] = { '_plugin' => 'test_lookup', 'key' => 'group_name' }
+        expect(group.name).to eq('testgroup')
+      end
+
+      context "setting config" do
+        it 'sets the value of a top-level setting' do
+          data['config']['transport'] = constant('winrm')
+          expect(group.group_data['config']['transport']).to eq('winrm')
         end
 
-        it 'for target plugin' do
-          data['targets'] = [{ '_plugin' => 'unknown' }]
-          expect { Bolt::Inventory::Group2.new(data, plugins) }
-            .to raise_error(/Unknown plugin: 'unknown'/)
+        it 'sets the value of a transport-specific setting' do
+          data['config']['ssh'] = { 'port' => constant(9876) }
+          expect(group.group_data.dig('config', 'ssh', 'port')).to eq(9876)
+        end
+
+        it 'sets the value of the entire "config" hash' do
+          data['config'] = constant('transport' => 'winrm',
+                                    'winrm' => { 'port' => 9876 })
+          expect(group.group_data['config']).to eq('transport' => 'winrm', 'winrm' => { 'port' => 9876 })
+        end
+
+        it 'fails if the value of "config" is not a hash' do
+          data['config'] = constant('ssh')
+          expect { group.group_data['config'] }.to raise_error(/Expected config to be of type Hash/)
         end
       end
 
-      it 'fails with an unsupported targets plugin' do
-        data['targets'] = [fake_plugin]
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/fake does not support resolve_reference/)
+      context "setting vars" do
+        it 'sets the value of a single var' do
+          data['vars']['key2'] = constant('value2')
+          expect(group.group_data['vars']).to eq('key' => 'value', 'key2' => 'value2')
+        end
+
+        it 'sets the value of a nested var' do
+          data['vars']['key2'] = { 'foo' => constant('bar') }
+          expect(group.group_data['vars']).to eq('key' => 'value', 'key2' => { 'foo' => 'bar' })
+        end
+
+        it 'sets the value of the entire "vars" hash' do
+          data['vars'] = constant('foo' => 'bar', 'baz' => 'quux')
+          expect(group.group_data['vars']).to eq('foo' => 'bar', 'baz' => 'quux')
+        end
+
+        it 'fails if the value of "vars" is not a hash' do
+          data['vars'] = constant('foo=bar')
+          expect { group.group_data['vars'] }.to raise_error(/Expected vars to be of type Hash/)
+        end
       end
 
-      it 'fails with an unsupported config plugin' do
-        data['config'] = fake_plugin
-        expect { Bolt::Inventory::Group2.new(data, plugins) }
-          .to raise_error(/fake does not support resolve_reference/)
+      context "setting facts" do
+        it 'sets the value of a single fact' do
+          data['facts']['ipaddress'] = constant('10.0.1.0')
+          expect(group.group_data['facts']).to eq('osfamily' => 'windows', 'ipaddress' => '10.0.1.0')
+        end
+
+        it 'sets the value of a nested fact' do
+          data['facts']['os'] = { 'name' => constant('windows') }
+          expect(group.group_data['facts']).to eq('osfamily' => 'windows', 'os' => { 'name' => 'windows' })
+        end
+
+        it 'sets value of the entire "facts" hash' do
+          data['facts'] = constant('osfamily' => 'Ubuntu', 'os' => { 'name' => 'Ubuntu' })
+          expect(group.group_data['facts']).to eq('osfamily' => 'Ubuntu', 'os' => { 'name' => 'Ubuntu' })
+        end
+
+        it 'fails if the value of "facts" is not a hash' do
+          data['facts'] = constant(%w[foo bar])
+          expect { group.group_data['facts'] }.to raise_error(/Expected facts to be of type Hash/)
+        end
+      end
+
+      context "setting features" do
+        it 'adds a single feature' do
+          data['features'] << constant('puppet-agent')
+          expect(group.group_data['features']).to eq(Set['shell', 'puppet-agent'])
+        end
+
+        it 'adds a nested array of features' do
+          data['features'] << constant(%w[puppet-agent python])
+          expect(group.group_data['features']).to eq(Set['shell', 'puppet-agent', 'python'])
+        end
+
+        it 'sets the value of the entire "features" array' do
+          data['features'] = constant(%w[puppet-agent shell python])
+          expect(group.group_data['features']).to eq(Set['puppet-agent', 'shell', 'python'])
+        end
+
+        it 'fails if the value of "features" is not an array' do
+          data['features'] = constant('puppet-agent')
+          expect { group.group_data['features'] }.to raise_error(/Expected features to be of type Array/)
+        end
+      end
+
+      context "setting plugin_hooks" do
+        it 'sets the value of a single plugin_hook' do
+          data['plugin_hooks']['another_hook'] = constant('plugin' => 'task', 'task' => 'do_a_thing')
+          expect(group.group_data['plugin_hooks']).to eq(
+            'puppet_library' => { 'plugin' => 'install_puppet' },
+            'another_hook' => { 'plugin' => 'task', 'task' => 'do_a_thing' }
+          )
+        end
+
+        it 'sets the value of one setting of a plugin_hook' do
+          data['plugin_hooks']['puppet_library']['plugin'] = constant('alternate_install')
+          expect(group.group_data['plugin_hooks']).to eq('puppet_library' => { 'plugin' => 'alternate_install' })
+        end
+
+        it 'sets the value of the entire "plugin_hooks" hash' do
+          plugin_hooks = {
+            'puppet_library' => { 'plugin' => 'something' },
+            'another_hook' => { 'plugin' => 'something_else' }
+          }
+          data['plugin_hooks'] = constant(plugin_hooks)
+          expect(group.group_data['plugin_hooks']).to eq(plugin_hooks)
+        end
+
+        it 'fails of the value of "plugin_hooks" is not a hash' do
+          data['plugin_hooks'] = constant('puppet_library')
+          expect { group.group_data['plugin_hooks'] }.to raise_error(/Expected plugin_hooks to be of type Hash/)
+        end
+      end
+
+      it 'allows the value of a plugin to be passed as an argument to another plugin' do
+        # This should evaluate the constant plugin and return foo, then pass
+        # that to the lookup plugin which will find the value bar. If it
+        # evaluates in the wrong order, it will try to lookup with the plugin
+        # invocation as the key and return nil
+        lookup_data['foo'] = 'winrm'
+        data['config']['transport'] = { '_plugin' => 'test_lookup', 'key' => constant('foo') }
+        expect(group.group_data['config']['transport']).to eq('winrm')
+      end
+
+      it 'allows a plugin to return a reference to another plugin' do
+        # The lookup plugin will return a reference to the constant plugin, which will then return 3456
+        lookup_data['foo'] = constant(3456)
+        data['config']['ssh'] = { 'port' => { '_plugin' => 'test_lookup', 'key' => 'foo' } }
+        expect(group.group_data.dig('config', 'ssh', 'port')).to eq(3456)
+      end
+
+      it 'allows a plugin to return a nested plugin reference' do
+        lookup_data['ssh_config'] = {
+          'port' => 3456,
+          'password' => { '_plugin' => 'test_lookup', 'key' => 'ssh_password' }
+        }
+        lookup_data['ssh_password'] = constant('secret_password')
+        data['config']['ssh'] = { '_plugin' => 'test_lookup', 'key' => 'ssh_config' }
+        expect(group.group_data['config']['ssh']).to eq('port' => 3456, 'password' => 'secret_password')
       end
     end
   end

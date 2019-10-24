@@ -147,6 +147,24 @@ module Bolt
         end
       end
 
+      # Accepts a Data object and returns a copy with all hash and array values
+      # modified by the given block. Descendants are modified before their
+      # parents.
+      def postwalk_vals(data, skip_top = false, &block)
+        new_data = if data.is_a? Hash
+                     map_vals(data) { |v| postwalk_vals(v, &block) }
+                   elsif data.is_a? Array
+                     data.map { |v| postwalk_vals(v, &block) }
+                   else
+                     data
+                   end
+        if skip_top
+          new_data
+        else
+          yield(new_data)
+        end
+      end
+
       # Performs a deep_clone, using an identical copy if the cloned structure contains multiple
       # references to the same object and prevents endless recursion.
       # Credit to Jan Molic via https://github.com/rubyworks/facets/blob/master/LICENSE.txt
