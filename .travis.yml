@@ -39,8 +39,8 @@ before_script:
 - sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
 - sudo sh -c "echo 'travis  ALL=(ALL) PASSWD:ALL' >> /etc/sudoers"
 script:
+- bundle exec rubocop || travis_terminate 1
 - bundle exec rake travisci
-- bundle exec rubocop
 - |
   status=0
   for i in 'boltlib' 'ctrl' 'file' 'out' 'system'; do
