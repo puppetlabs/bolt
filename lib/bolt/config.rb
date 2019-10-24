@@ -71,7 +71,7 @@ module Bolt
       @save_rerun = true
       @puppetfile_config = {}
       @plugins = {}
-      @plugin_hooks = { 'puppet_library' => { 'plugin' => 'install_agent' } }
+      @plugin_hooks = { 'puppet_library' => { 'plugin' => 'puppet_agent', 'stop_service' => true } }
 
       # add an entry for the default console logger
       @log = { 'console' => {} }

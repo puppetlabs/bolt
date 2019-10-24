@@ -5,7 +5,6 @@ require 'bolt/analytics'
 require 'bolt/executor'
 require 'bolt/inventory'
 require 'bolt/plugin'
-require 'bolt/plugin/install_agent'
 require 'bolt/result'
 require 'bolt/result_set'
 require 'bolt/target'
@@ -16,15 +15,14 @@ describe 'apply_prep' do
   let(:applicator) { mock('Bolt::Applicator') }
   let(:executor) { Bolt::Executor.new(1, Bolt::Analytics::NoopClient.new) }
   let(:plugins) { Bolt::Plugin.new(nil, nil, Bolt::Analytics::NoopClient.new) }
-  let(:agent_plugin) { Bolt::Plugin::InstallAgent.new }
-  let(:task_hook) { agent_plugin.method(:puppet_library) }
+  let(:plugin_result) { {} }
+  let(:task_hook) { proc { |_opts, target, _fun| proc { Bolt::Result.new(target, value: plugin_result) } } }
   let(:inventory) { Bolt::Inventory.create_version({}, nil, plugins) }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
     executor.stubs(:noop).returns(false)
-    plugins.add_plugin(agent_plugin)
 
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory, apply_executor: applicator) do
       example.run
@@ -85,17 +83,8 @@ describe 'apply_prep' do
       executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(facts)
 
       plugins.expects(:get_hook)
-             .with("install_agent", :puppet_library)
+             .with("puppet_agent", :puppet_library)
              .returns(task_hook)
-
-      executor.expects(:run_task)
-              .with([unknown_targets[1]], install_task, anything, anything)
-              .returns(Bolt::ResultSet.new([Bolt::Result.new(unknown_targets[1], value: { '_output' => 'smores' })]))
-
-      executor.expects(:run_task)
-              .with([unknown_targets[1]], service_task, anything)
-              .returns(Bolt::ResultSet.new([Bolt::Result.new(unknown_targets[1], value: { '_output' => 'ok' })]))
-              .twice
 
       is_expected.to run.with_params(hostnames)
       targets.each do |target|
@@ -107,7 +96,7 @@ describe 'apply_prep' do
     it 'fails if version task is not found' do
       Puppet::Pal::ScriptCompiler.any_instance.expects(:task_signature).with('puppet_agent::version')
       is_expected.to run.with_params(hostnames).and_raise_error(
-        Bolt::Error, 'puppet_agent::version could not be found'
+        Bolt::Error, "Task 'puppet_agent::version' could not be found"
       )
     end
 
@@ -119,34 +108,6 @@ describe 'apply_prep' do
 
       is_expected.to run.with_params(hostnames).and_raise_error(
         Bolt::RunFailure, "Plan aborted: run_task 'puppet_agent::version' failed on 2 nodes"
-      )
-    end
-
-    it 'fails if install task is not found' do
-      versions = Bolt::ResultSet.new(unknown_targets.map { |t| Bolt::Result.new(t, value: {}) })
-      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(versions)
-
-      Puppet::Pal::ScriptCompiler.any_instance.expects(:task_signature).with('puppet_agent::install')
-      is_expected.to run.with_params(hostnames).and_raise_error(
-        Bolt::RunFailure, /Plan aborted: apply_prep failed on 2 nodes/
-      )
-    end
-
-    it 'fails if install fails' do
-      versions = Bolt::ResultSet.new(unknown_targets.map { |t| Bolt::Result.new(t, value: {}) })
-      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(versions)
-      plugins.expects(:get_hook)
-             .with("install_agent", :puppet_library)
-             .returns(task_hook).twice
-
-      unknown_targets.each do |t|
-        r = Bolt::ResultSet.new([Bolt::Result.new(t, error: { 'msg' =>
-                                                              'could not install package' })])
-        executor.expects(:run_task).with([t], install_task, anything, anything).returns(r)
-      end
-
-      is_expected.to run.with_params(hostnames).and_raise_error(
-        Bolt::RunFailure, "Plan aborted: apply_prep failed on 2 nodes"
       )
     end
 
@@ -193,16 +154,6 @@ describe 'apply_prep' do
                .with("task", :puppet_library)
                .returns(task_hook)
 
-        executor.expects(:run_task)
-                .with([target], install_task, anything, anything)
-                .returns(Bolt::ResultSet.new([Bolt::Result.new(target, value: { '_output' => 'smores' })]))
-
-        # TODO: WHY? This shouldn't be called
-        executor.expects(:run_task)
-                .with([target], service_task, anything)
-                .returns(Bolt::ResultSet.new([Bolt::Result.new(target, value: { '_output' => 'ok' })]))
-                .twice
-
         is_expected.to run.with_params(hostname)
         expect(inventory.features(target)).to include('puppet-agent')
         expect(inventory.facts(target)).to eq(fact)
@@ -233,17 +184,8 @@ describe 'apply_prep' do
         executor.expects(:run_task).with([target], custom_facts_task, includes('plugins')).returns(facts)
 
         plugins.expects(:get_hook)
-               .with('install_agent', :puppet_library)
+               .with('puppet_agent', :puppet_library)
                .returns(task_hook)
-
-        executor.expects(:run_task)
-                .with([target], install_task, anything, anything)
-                .returns(Bolt::ResultSet.new([Bolt::Result.new(target, value: { '_output' => 'smores' })]))
-
-        executor.expects(:run_task)
-                .with([target], service_task, anything)
-                .returns(Bolt::ResultSet.new([Bolt::Result.new(target, value: { '_output' => 'ok' })]))
-                .twice
 
         is_expected.to run.with_params(hostname)
         expect(inventory.features(target)).to include('puppet-agent')

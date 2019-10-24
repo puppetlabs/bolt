@@ -33,7 +33,7 @@ Puppet::Functions.create_function(:apply_prep) do
 
   def get_task(name, params = {})
     tasksig = script_compiler.task_signature(name)
-    raise Bolt::Error.new("#{name} could not be found", 'bolt/apply-prep') unless tasksig
+    raise Bolt::Error.new("Task '#{name}' could not be found", 'bolt/apply-prep') unless tasksig
 
     errors = []
     unless tasksig.runnable_with?(params) { |msg| errors << msg }

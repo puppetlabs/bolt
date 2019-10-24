@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
 
 describe 'using module based plugins' do
-  include BoltSpec::Files
+  include BoltSpec::Conn
   include BoltSpec::Integration
 
   def with_boltdir(config: nil, inventory: nil, plan: nil)
@@ -22,10 +23,12 @@ describe 'using module based plugins' do
   end
 
   let(:plugin_config) { {} }
+  let(:plugin_hooks) { {} }
 
   let(:config) {
     { 'modulepath' => ['modules', File.join(__dir__, '../../fixtures/plugin_modules')],
-      "plugins" => plugin_config }
+      'plugins' => plugin_config,
+      'plugin_hooks' => plugin_hooks }
   }
 
   let(:plan) do
@@ -252,5 +255,75 @@ describe 'using module based plugins' do
 
   context 'when managing puppet libraries' do
     # TODO: how do we test this cheaply?
+  end
+
+  context 'when manageing puppet_library', docker: true do
+    let(:plan) do
+      <<~PLAN
+        plan test_plan() {
+          apply_prep('ubuntu_node')
+        }
+      PLAN
+    end
+
+    let(:inventory) { docker_inventory(root: true) }
+
+    context 'with an unsupported hook' do
+      let(:plugin_hooks) {
+        {
+          'puppet_library' => {
+            'plugin' => 'identity'
+          }
+        }
+      }
+
+      it 'fails cleanly' do
+        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir], rescue_exec: true)
+
+        expect(result).to include('kind' => "bolt/run-failure")
+        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 nodes/)
+        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+          /Plugin identity does not support puppet_library/
+        )
+      end
+    end
+
+    context 'with an unknown plugin' do
+      let(:plugin_hooks) {
+        {
+          'puppet_library' => {
+            'plugin' => 'does_not_exist'
+          }
+        }
+      }
+
+      it 'fails cleanly' do
+        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir], rescue_exec: true)
+
+        expect(result).to include('kind' => "bolt/run-failure")
+        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 nodes/)
+        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(/Unknown plugin:/)
+      end
+    end
+
+    context 'with a failing plugin' do
+      let(:plugin_hooks) {
+        {
+          'puppet_library' => {
+            'plugin' => 'error_plugin'
+          }
+        }
+      }
+
+      it 'fails cleanly' do
+        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir], rescue_exec: true)
+
+        expect(result).to include('kind' => "bolt/run-failure")
+        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 nodes/)
+        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+          /The task failed with exit code 1/
+        )
+      end
+    end
   end
 end

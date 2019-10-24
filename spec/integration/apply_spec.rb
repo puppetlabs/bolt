@@ -59,7 +59,7 @@ describe "apply" do
           'uri' => conn_uri('ssh'),
           'plugin_hooks' => {
             'puppet_library' => {
-              'plugin' => 'install_agent'
+              'plugin' => 'puppet_agent'
             }
           }
         }] }
@@ -236,7 +236,7 @@ describe "apply" do
             expect(task_error['msg']).to include("The task failed with exit code 1")
 
             param_error = result_set.select { |h| h['node'] == 'badparams' }[0]['result']['_error']
-            expect(param_error['kind']).to eq('bolt/validation-error')
+            expect(param_error['kind']).to eq('bolt/plugin-error')
             expect(param_error['msg']).to include("Invalid parameters for Task puppet_agent::install")
 
             plugin_error = result_set.select { |h| h['node'] == 'badplugin' }[0]['result']['_error']

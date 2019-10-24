@@ -62,6 +62,31 @@ module BoltSpec
       { "groups" => groups }
     end
 
+    def docker_inventory(root: false)
+      usernamepassword = root ? 'root' : 'bolt'
+      { 'version' => 2,
+        'groups' => [
+          { 'name' => 'ssh',
+            'targets' => [
+              { 'name' => 'ubuntu_node',
+                'alias' => 'agentless',
+                'config' => { 'ssh' => { 'port' => '20022' } } },
+              { 'name' => 'puppet_5_node',
+                'config' => { 'ssh' => { 'port' => '20023' } } },
+              { 'name' => 'puppet_6_node',
+                'config' => { 'ssh' => { 'port' => '20024' } } }
+            ],
+            'config' => {
+              'ssh' => {
+                'host' => 'localhost',
+                'host-key-check' => false,
+                'user' => usernamepassword,
+                'password' => usernamepassword
+              }
+            } }
+        ] }
+    end
+
     def root_password
       'root'
     end
