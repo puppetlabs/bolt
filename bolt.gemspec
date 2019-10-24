@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
                        Dir['bolt-modules/*/lib/**/*.rb'] +
                        Dir['bolt-modules/*/types/**/*.pp'] +
                        Dir['modules/*/metadata.json'] +
+                       Dir['modules/*/bolt_plugin.json'] +
                        Dir['modules/*/files/**/*'] +
                        Dir['modules/*/lib/**/*.rb'] +
                        Dir['modules/*/locales/**/*'] +
