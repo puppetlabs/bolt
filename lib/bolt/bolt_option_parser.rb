@@ -422,7 +422,8 @@ module Bolt
         @options[:boltdir] = path
       end
       define('--configfile FILEPATH',
-             'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml)') do |path|
+             'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml). ' \
+             'Directory containing bolt.yaml will be used as the Boltdir.') do |path|
         @options[:configfile] = path
       end
       define('-i', '--inventoryfile FILEPATH',

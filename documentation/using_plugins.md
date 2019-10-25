@@ -198,14 +198,14 @@ groups:
 
 ## Terraform
 
-The `terraform` plugin is a module based plugin. For more information see https://github.com/puppetlabs/puppetlabs-terraform
+The `terraform` plugin is a module based plugin. For more information see [https://github.com/puppetlabs/puppetlabs-terraform](https://github.com/puppetlabs/puppetlabs-terraform)
 
 ## Azure inventory
 
-The `azure_inventory` plugin is a module based plugin. For more information see https://github.com/puppetlabs/puppetlabs-azure_inventory
+The `azure_inventory` plugin is a module based plugin. For more information see [https://github.com/puppetlabs/puppetlabs-azure_inventory](https://github.com/puppetlabs/puppetlabs-azure_inventory)
 
 ## AWS Inventory plugin
-The `aws_inventory` plugin is a module based plugin. For more information see https://github.com/puppetlabs/puppetlabs-aws_inventory
+The `aws_inventory` plugin is a module based plugin. For more information see [https://github.com/puppetlabs/puppetlabs-aws_inventory](https://github.com/puppetlabs/puppetlabs-aws_inventory)
 
 ## Prompt plugin
 
