@@ -36,6 +36,7 @@
     <topicref href="inventory_file_v2.md" format="markdown">
         <topicref href="using_plugins.md" format="markdown"/>
         <topicref href="writing_plugins.md" format="markdown"/>
+        </topicref>
     <topicref href="bolt_examples.md" format="markdown"/>
     </topicref>
 </map>
