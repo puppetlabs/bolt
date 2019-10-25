@@ -27,7 +27,8 @@ Gem::Specification.new do |spec|
                        Dir['modules/*/lib/**/*.rb'] +
                        Dir['modules/*/locales/**/*'] +
                        Dir['modules/*/plans/**/*.pp'] +
-                       Dir['modules/*/tasks/**/*']
+                       Dir['modules/*/tasks/**/*'] +
+                       Dir['Puppetfile']
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
