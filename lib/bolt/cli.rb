@@ -147,6 +147,7 @@ module Bolt
         options[:verbose] = options[:subcommand] != 'plan'
       end
 
+      warn_inventory_overrides_cli(options)
       options
     rescue Bolt::Error => e
       outputter.fatal_error(e)
@@ -256,6 +257,35 @@ module Bolt
 
     def query_puppetdb_nodes(query)
       puppetdb_client.query_certnames(query)
+    end
+
+    def warn_inventory_overrides_cli(opts)
+      inventory_source = if ENV[Bolt::Inventory::ENVIRONMENT_VAR]
+                           Bolt::Inventory::ENVIRONMENT_VAR
+                         elsif @config.inventoryfile && Bolt::Util.file_stat(@config.inventoryfile)
+                           @config.inventoryfile
+                         elsif (inventory_file = @config.default_inventoryfile.find do |file|
+                                  begin
+                                    Bolt::Util.file_stat(file)
+                                  rescue Errno::ENOENT
+                                    false
+                                  end
+                                end
+                               )
+                           inventory_file
+                         end
+
+      inventory_cli_opts = %i[authentication escalation transports].each_with_object([]) do |key, acc|
+        acc.concat(Bolt::BoltOptionParser::OPTIONS[key])
+      end
+
+      inventory_cli_opts.concat(%w[no-host-key-check no-ssl no-ssl-verify no-tty])
+
+      conflicting_options = Set.new(opts.keys.map(&:to_s)).intersection(inventory_cli_opts)
+
+      if inventory_source && conflicting_options.any?
+        @logger.warn("CLI arguments #{conflicting_options.to_a} may be overridden by Inventory: #{inventory_source}")
+      end
     end
 
     def execute(options)
