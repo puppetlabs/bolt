@@ -423,12 +423,12 @@ Create task and metadata in a new module at `~/.puppetlabs/bolt/site-modules/mym
 #!/usr/bin/env ruby
 require_relative '../../ruby_task_helper/files/task_helper.rb'
 
-class MyTask < TaskHelper 
+# Example task that is based on the ruby_task_helper
+class MyTask < TaskHelper
   def task(name: nil, **kwargs)
     { greeting: "Hi, my name is #{name}" }
   end
 end
-
 
 MyTask.run if $PROGRAM_NAME == __FILE__
 ```
