@@ -430,7 +430,7 @@ class MyTask < TaskHelper
 end
 
 
-MyTask.run if __FILE__ == $0
+MyTask.run if $PROGRAM_NAME == __FILE__
 ```
 
 **Output**
