@@ -110,7 +110,11 @@ module Bolt
     def normalize_log(target)
       return target if target == 'console'
       target = target[5..-1] if target.start_with?('file:')
-      'file:' + File.expand_path(target)
+      if @future
+        'file:' + File.expand_path(target, @boltdir.path)
+      else
+        'file:' + File.expand_path(target)
+      end
     end
 
     def update_logs(logs)
@@ -132,6 +136,8 @@ module Bolt
     end
 
     def update_from_file(data)
+      @future = data['future'] == true
+
       if data['log'].is_a?(Hash)
         update_logs(data['log'])
       end
@@ -164,8 +170,6 @@ module Bolt
       @plugins = data['plugins'] if data.key?('plugins')
       @plugin_hooks.merge!(data['plugin_hooks']) if data.key?('plugin_hooks')
 
-      @future = data['future'] == true
-
       %w[concurrency format puppetdb color transport].each do |key|
         send("#{key}=", data[key]) if data.key?(key)
       end
@@ -173,6 +177,13 @@ module Bolt
       TRANSPORTS.each do |key, impl|
         if data[key.to_s]
           selected = impl.filter_options(data[key.to_s])
+          if @future
+            to_expand = %w[private-key cacert token-file] & selected.keys
+            to_expand.each do |opt|
+              selected[opt] = File.expand_path(selected[opt], @boltdir.path) if opt.is_a?(String)
+            end
+          end
+
           @transports[key] = Bolt::Util.deep_merge(@transports[key], selected)
         end
         if @transports[key]['interpreters']

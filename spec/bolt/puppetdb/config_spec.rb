@@ -5,6 +5,27 @@ require 'bolt/puppetdb/config'
 require 'bolt/util'
 
 describe Bolt::PuppetDB::Config do
+  context "with boltdir available" do
+    let(:cacert) { File.expand_path('relative/to/cacert') }
+    let(:token) { File.expand_path('relative/to/token') }
+    let(:boltdir) { '~/dirbolt' }
+    let(:options) do
+      {
+        'server_urls' => ['https://puppetdb:8081'],
+        'cacert' => cacert,
+        'token' => token
+      }
+    end
+
+    let(:config) { Bolt::PuppetDB::Config.new(options, boltdir) }
+
+    it 'expands the cacert relative to the boltdir if boltdir is available' do
+      allow(config).to receive(:validate_file_exists).with('cacert').and_return true
+
+      expect(config.cacert).to eq(File.expand_path(cacert, boltdir))
+    end
+  end
+
   context "when validating that options" do
     let(:cacert) { File.expand_path('/path/to/cacert') }
     let(:token) { File.expand_path('/path/to/token') }
