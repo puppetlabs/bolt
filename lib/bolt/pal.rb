@@ -102,12 +102,13 @@ module Bolt
       end
     end
 
-    # Create a top-level alias for TargetSpec and PlanResult so that users don't have to
-    # namespace it with Boltlib, which is just an implementation detail. This
-    # allows them to feel like a built-in type in bolt, rather than
-    # something has been, no pun intended, "bolted on".
+    # Create a top-level alias for TargetSpec, SingleTargetSpec, and PlanResult
+    # so that users don't have to namespace it with Boltlib, which is just an
+    # implementation detail. This allows them to feel like a built-in type in
+    # bolt, rather than something has been, no pun intended, "bolted on".
     def alias_types(compiler)
       compiler.evaluate_string('type TargetSpec = Boltlib::TargetSpec')
+      compiler.evaluate_string('type SingleTargetSpec = Boltlib::SingleTargetSpec')
       compiler.evaluate_string('type PlanResult = Boltlib::PlanResult')
     end
 
