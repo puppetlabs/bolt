@@ -80,6 +80,22 @@ module Bolt
       )
     end
 
+    def detail
+      {
+        'name' => name,
+        'uri' => uri,
+        'alias' => @target_alias,
+        'config' => config.merge(
+          'transport' => transport,
+          transport => options
+        ),
+        'vars' => vars,
+        'features' => features,
+        'facts' => facts,
+        'plugin_hooks' => Bolt::Util.deep_clone(plugin_hooks)
+      }
+    end
+
     def inventory_target
       @inventory.targets[@name]
     end
@@ -226,6 +242,14 @@ module Bolt
       end
     end
 
+    def vars
+      @inventory.vars(self)
+    end
+
+    def facts
+      @inventory.facts(self)
+    end
+
     # TODO: WHAT does equality mean here?
     # should we just compare names? is there something else that is meaninful?
     def eql?(other)
@@ -256,6 +280,22 @@ module Bolt
         'host' => host,
         'port' => port
       )
+    end
+
+    def detail
+      {
+        'name' => name,
+        'uri' => uri,
+        'alias' => @target_alias,
+        'config' => {
+          'transport' => transport,
+          transport => options
+        },
+        'vars' => vars,
+        'facts' => facts,
+        'features' => features.to_a,
+        'plugin_hooks' => Bolt::Util.deep_clone(plugin_hooks)
+      }
     end
 
     def host

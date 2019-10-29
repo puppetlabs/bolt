@@ -2083,6 +2083,12 @@ describe "Bolt::CLI" do
       cli.execute(cli.parse)
     end
 
+    it 'lists targets with resolved configuration' do
+      cli = Bolt::CLI.new(%w[inventory show -t localhost --detail])
+      expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_target_info)
+      cli.execute(cli.parse)
+    end
+
     it 'lists groups in the inventory file' do
       cli = Bolt::CLI.new(%w[group show])
       expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_groups)

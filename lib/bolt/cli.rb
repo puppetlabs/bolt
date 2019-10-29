@@ -307,7 +307,11 @@ module Bolt
             list_plans
           end
         elsif options[:subcommand] == 'inventory'
-          list_targets
+          if options[:detail]
+            show_targets
+          else
+            list_targets
+          end
         elsif options[:subcommand] == 'group'
           list_groups
         end
@@ -413,7 +417,12 @@ module Bolt
 
     def list_targets
       update_targets(options)
-      outputter.print_targets(options)
+      outputter.print_targets(options[:targets])
+    end
+
+    def show_targets
+      update_targets(options)
+      outputter.print_target_info(options[:targets])
     end
 
     def list_groups

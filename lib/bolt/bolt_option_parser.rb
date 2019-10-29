@@ -29,7 +29,7 @@ module Bolt
         { flags: ACTION_OPTS + %w[tmpdir],
           banner: FILE_HELP }
       when 'inventory'
-        { flags: OPTIONS[:inventory] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
+        { flags: OPTIONS[:inventory] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile detail],
           banner: INVENTORY_HELP }
       when 'group'
         { flags: OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
@@ -356,6 +356,9 @@ module Bolt
       define('-e', '--execute CODE',
              "Puppet manifest code to apply to the targets") do |code|
         @options[:code] = code
+      end
+      define('--detail', 'Show resolved configuration for the targets') do |detail|
+        @options[:detail] = detail
       end
 
       separator "\nAuthentication:"

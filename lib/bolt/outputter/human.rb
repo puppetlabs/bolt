@@ -311,11 +311,20 @@ module Bolt
         end
       end
 
-      def print_targets(options)
-        targets = options[:targets].map(&:name)
+      def print_targets(targets)
         count = "#{targets.count} target#{'s' unless targets.count == 1}"
-        @stream.puts targets.join("\n")
+        @stream.puts targets.map(&:name).join("\n")
         @stream.puts colorize(:green, count)
+      end
+
+      def print_target_info(targets)
+        data = targets.map(&:detail).map do |target|
+          target.transform_values do |value|
+            value.nil? ? "nil" : value
+          end
+        end
+
+        @stream.puts data.to_yaml
       end
 
       def print_groups(groups)
