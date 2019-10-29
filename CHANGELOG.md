@@ -1,5 +1,19 @@
 # Changelog
 
+## Bolt NEXT
+
+### Deprecation
+
+* **Replace optional arguments for `--password` and `--sudo-password` options with required arguments** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
+
+  The `--password` and `--sudo-password` options now require a password as an argument. Previously, if the password was omitted the user would be prompted to enter one. If you wish to be prompted for a password, use the `prompt` plugin.
+
+### New features
+
+* **`prompt` messages print to `stderr`** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
+
+  The prompt plugin now prints messages to `stderr` instead of `stdout`.
+
 ## 1.35.0
 
 ### Deprecation
