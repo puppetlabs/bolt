@@ -14,6 +14,10 @@
 
   The prompt plugin now prints messages to `stderr` instead of `stdout`.
 
+* **New `project init` subcommand** ([#1285](https://github.com/puppetlabs/bolt/issues/1285))
+
+  The CLI now provides a subcommand `bolt project init` that will create a new file `bolt.yaml` in the current working directory, making the directory a [Bolt project directory](https://puppet.com/docs/bolt/latest/bolt_project_directories.html#local-project-directory)
+
 ## 1.35.0
 
 ### Deprecation

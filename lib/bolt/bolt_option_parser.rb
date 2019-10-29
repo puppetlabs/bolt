@@ -49,6 +49,15 @@ module Bolt
           { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir],
             banner: PLAN_HELP }
         end
+      when 'project'
+        case action
+        when 'init'
+          { flags: OPTIONS[:global],
+            banner: PROJECT_INIT_HELP }
+        else
+          { flags: OPTIONS[:global],
+            banner: PROJECT_HELP }
+        end
       when 'puppetfile'
         case action
         when 'install'
@@ -121,6 +130,7 @@ module Bolt
         bolt secret decrypt <encrypted>  Decrypt a value
         bolt inventory show              Show the list of targets an action would run on
         bolt group show                  Show the list of groups in the inventory
+        bolt project init                Create a new Bolt project
 
       Run `bolt <subcommand> --help` to view specific examples.
 
@@ -309,6 +319,24 @@ module Bolt
 
       Available options are:
     GROUP_HELP
+
+    PROJECT_HELP = <<~PROJECT_HELP
+      Usage: bolt project <action>
+
+      Available actions are:
+        init                     Create a new Bolt project
+
+      Available options are:
+    PROJECT_HELP
+
+    PROJECT_INIT_HELP = <<~PROJECT_INIT_HELP
+      Usage: bolt project init [directory]
+
+      Create a new Bolt project.
+      Specify a directory to create the Bolt project in. Defaults to the current working directory.
+
+      Available options are:
+    PROJECT_INIT_HELP
 
     def initialize(options)
       super()

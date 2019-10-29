@@ -37,6 +37,7 @@ module Bolt
                  'secret' => %w[encrypt decrypt createkeys],
                  'inventory' => %w[show],
                  'group' => %w[show],
+                 'project' => %w[init],
                  'apply' => %w[] }.freeze
 
     attr_reader :config, :options
@@ -134,6 +135,7 @@ module Bolt
       # options[:targets] will contain a resolved set of Target objects
       unless options[:subcommand] == 'puppetfile' ||
              options[:subcommand] == 'secret' ||
+             options[:subcommand] == 'project' ||
              options[:action] == 'show' ||
              options[:action] == 'convert'
 
@@ -328,6 +330,8 @@ module Bolt
       end
 
       case options[:subcommand]
+      when 'project'
+        code = initialize_project
       when 'plan'
         code = run_plan(options[:object], options[:task_options], options[:target_args], options)
       when 'puppetfile'
@@ -502,6 +506,21 @@ module Bolt
       # generate_types will surface a nice error with helpful message if it fails
       pal.generate_types
       0
+    end
+
+    def initialize_project
+      path = File.expand_path(options[:object] || Dir.pwd)
+      FileUtils.mkdir_p(path)
+      ok = FileUtils.touch(File.join(path, 'bolt.yaml'))
+
+      result = if ok
+                 "Successfully created Bolt project directory at #{path}"
+               else
+                 "Could not create Bolt project directory at #{path}"
+               end
+      outputter.print_message result
+
+      ok ? 0 : 1
     end
 
     def install_puppetfile(config, puppetfile, modulepath)
