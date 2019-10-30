@@ -27,7 +27,7 @@ module Bolt
         target_str = if targets.length > 5
                        "#{targets.count} targets"
                      else
-                       targets.map(&:uri).join(', ')
+                       targets.map(&:safe_name).join(', ')
                      end
         @logger.info("Starting: #{description} on #{target_str}")
       end
