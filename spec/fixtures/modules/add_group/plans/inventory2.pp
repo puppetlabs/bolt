@@ -6,6 +6,7 @@ plan add_group::inventory2 (TargetSpec $nodes) {
       'password' => 'bolt' }}
   $new_target = Target.new(
     uri => "0.0.0.0:20024",
+    target_alias => ['alias'],
     config => $new_target_config
   )
 
@@ -29,7 +30,8 @@ plan add_group::inventory2 (TargetSpec $nodes) {
     'added_vars' => $add_me_targets[1].vars,
     'target_not_overwritten' => get_targets('bar')[0].vars['bar_1_var'],
     'target_not_duplicated' => get_targets('bar'),
-    'target_to_all_group' => get_targets('all')
+    'target_to_all_group' => get_targets('all'),
+    'target_by_alias' => get_target('alias')
   }
 
   return $result

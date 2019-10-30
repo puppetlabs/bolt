@@ -41,7 +41,7 @@ module Bolt
 
         @unresolved_targets = {}
         @resolved_targets = {}
-        @targets = Set.new
+
         # @target_objects = {}
         @aliases = {}
         @string_targets = []
@@ -150,6 +150,7 @@ module Bolt
           resolved_data = resolve_data_keys(target, target_name).merge(
             'name' => target['name'],
             'uri' => target['uri'],
+            'alias' => target['alias'],
             # groups come from group_data
             'groups' => []
           )
@@ -157,6 +158,10 @@ module Bolt
         else
           @resolved_targets[target_name]
         end
+      end
+
+      def all_target_names
+        @unresolved_targets.keys + @resolved_targets.keys
       end
 
       def add_target_definition(target)
@@ -201,14 +206,7 @@ module Bolt
             raise ValidationError.new(msg, @name)
           end
 
-          aliases.each do |alia|
-            raise ValidationError.new("Invalid alias #{alia}", @name) unless alia =~ NAME_REGEX
-
-            if (found = @aliases[alia])
-              raise ValidationError.new(alias_conflict(alia, found, t_name), @name)
-            end
-            @aliases[alia] = t_name
-          end
+          insert_alia(t_name, aliases)
         end
 
         @unresolved_targets[t_name] = target
@@ -216,6 +214,17 @@ module Bolt
 
       def add_target(target)
         @resolved_targets[target.name] = { 'name' => target.name }
+      end
+
+      def insert_alia(target_name, aliases)
+        aliases.each do |alia|
+          raise ValidationError.new("Invalid alias #{alia}", @name) unless alia =~ NAME_REGEX
+
+          if (found = @aliases[alia])
+            raise ValidationError.new(alias_conflict(alia, found, target_name), @name)
+          end
+          @aliases[alia] = target_name
+        end
       end
 
       def data_merge(data1, data2)
@@ -227,6 +236,7 @@ module Bolt
           'config' => Bolt::Util.deep_merge(data1['config'], data2['config']),
           'name' => data1['name'] || data2['name'],
           'uri' => data1['uri'] || data2['uri'],
+          'alias' => data1['alias'] || data2['alias'],
           # Shallow merge instead of deep merge so that vars with a hash value
           # are assigned a new hash, rather than merging the existing value
           # with the value meant to replace it
