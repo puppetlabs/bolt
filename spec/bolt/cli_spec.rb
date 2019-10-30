@@ -2107,4 +2107,24 @@ describe "Bolt::CLI" do
       end
     end
   end
+
+  describe 'project' do
+    it 'init creates a new project at the specified path' do
+      Dir.mktmpdir do |dir|
+        file = File.join(dir, 'bolt.yaml')
+        cli = Bolt::CLI.new(%W[project init #{dir}])
+        cli.execute(cli.parse)
+        expect(File.file?(file)).to be
+      end
+    end
+
+    it 'init creates a new project in the current working directory' do
+      Dir.mktmpdir do |dir|
+        file = File.join(dir, 'bolt.yaml')
+        cli = Bolt::CLI.new(%w[project init])
+        Dir.chdir(dir) { cli.execute(cli.parse) }
+        expect(File.file?(file)).to be
+      end
+    end
+  end
 end
