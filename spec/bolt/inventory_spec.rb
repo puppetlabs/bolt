@@ -158,18 +158,32 @@ describe Bolt::Inventory do
     let(:target) { inventory.get_targets('node1')[0] }
 
     before(:each) do
-      ENV['BOLT_INVENTORY'] = {
-        'nodes' => ['node1'],
-        'config' => {
-          'transport' => 'winrm'
-        }
-      }.to_yaml
+      ENV['BOLT_INVENTORY'] = inventory_env.to_yaml
     end
 
     after(:each) { ENV.delete('BOLT_INVENTORY') }
 
-    it 'should have the default protocol' do
-      expect(target.protocol).to eq('winrm')
+    context 'with valid config' do
+      let(:inventory_env) {
+        {
+          'nodes' => ['node1'],
+          'config' => {
+            'transport' => 'winrm'
+          }
+        }
+      }
+
+      it 'should have the default protocol' do
+        expect(target.protocol).to eq('winrm')
+      end
+    end
+
+    context 'with invalid config' do
+      let(:inventory_env) { 'I thought I could specify a file path here... ' }
+
+      it 'should have the default protocol' do
+        expect { inventory }.to raise_error(Bolt::ParseError, /Could not parse inventory from \$BOLT_INVENTORY/)
+      end
     end
   end
 
@@ -727,6 +741,11 @@ describe Bolt::Inventory do
     it 'creates a version2 inventory when specified' do
       inv = Bolt::Inventory.create_version({ 'version' => 2 }, config, plugins)
       expect(inv.class).to eq(Bolt::Inventory::Inventory2)
+    end
+
+    it 'errors when invalid version number is specified' do
+      expect { Bolt::Inventory.create_version({ 'version' => 666 }, config, plugins) }
+        .to raise_error(Bolt::Inventory::ValidationError, /Unsupported version/)
     end
   end
 end

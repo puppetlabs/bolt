@@ -2127,4 +2127,35 @@ describe "Bolt::CLI" do
       end
     end
   end
+
+  context 'when warning about CLI flags being overridden by inventory' do
+    it "does not warn when no inventory is detected" do
+      cli = Bolt::CLI.new(%w[command run whoami -t foo --password bar])
+      cli.parse
+      expect(@log_output.readlines.join)
+        .not_to match(/CLI arguments ["password"] may be overridden by Inventory/)
+    end
+
+    context 'when BOLT_INVENTORY is set' do
+      before(:each) { ENV['BOLT_INVENTORY'] = JSON.dump(version: 2) }
+      after(:each) { ENV.delete('BOLT_INVENTORY') }
+
+      it "warns when BOLT_INVENTORY data is detected and CLI option could be overridden" do
+        cli = Bolt::CLI.new(%w[command run whoami -t foo --password bar])
+        cli.parse
+        expect(@log_output.readlines.join)
+          .to match(/CLI arguments \["password"\] may be overridden by Inventory: BOLT_INVENTORY/)
+      end
+    end
+
+    context 'when inventory file is set' do
+      let(:inventoryfile) { File.join(__dir__, '..', 'fixtures', 'configs', 'empty.yml') }
+      it "warns when BOLT_INVENTORY data is detected and CLI option could be overridden" do
+        cli = Bolt::CLI.new(%W[command run whoami -t foo --password bar --inventoryfile #{inventoryfile}])
+        cli.parse
+        expect(@log_output.readlines.join)
+          .to match(/CLI arguments \["password"\] may be overridden by Inventory:/)
+      end
+    end
+  end
 end

@@ -18,6 +18,10 @@
 
   The CLI now provides a subcommand `bolt project init` that will create a new file `bolt.yaml` in the current working directory, making the directory a [Bolt project directory](https://puppet.com/docs/bolt/latest/bolt_project_directories.html#local-project-directory)
 
+* **Issue warning when cli options may be overridden by inventory** ([#1341](https://github.com/puppetlabs/bolt/issues/1341))
+
+  When a CLI option that can be overridden in inventory is provided and inventory is loaded from a file or from the BOLT_INVENTORY environment variable an issue is warned about which options could be overridden.
+
 ## 1.35.0
 
 ### Deprecation

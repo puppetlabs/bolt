@@ -47,6 +47,7 @@ module Bolt
       if ENV.include?(ENVIRONMENT_VAR)
         begin
           data = YAML.safe_load(ENV[ENVIRONMENT_VAR])
+          raise Bolt::ParseError, "Could not parse inventory from $#{ENVIRONMENT_VAR}" unless data.is_a?(Hash)
         rescue Psych::Exception
           raise Bolt::ParseError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
         end
@@ -67,7 +68,7 @@ module Bolt
       when 2
         Bolt::Inventory::Inventory2.new(data, config, plugins: plugins)
       else
-        raise ValidationError, "Unsupported version #{version} specified in inventory"
+        raise ValidationError.new("Unsupported version #{version} specified in inventory", nil)
       end
     end
 
