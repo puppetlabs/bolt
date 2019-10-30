@@ -15,6 +15,7 @@ describe "apply" do
   include BoltSpec::Run
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
+  let(:hiera_config) { File.join(__dir__, '../fixtures/configs/empty.yml') }
   let(:config_flags) { %W[--format json --nodes #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
 
   describe 'over ssh', ssh: true do
@@ -170,6 +171,17 @@ describe "apply" do
             expect(result['status']).to eq('success')
             report = result['result']['report']
             expect(report['resource_statuses']).to include("Notify[Apply: Hi!]")
+          end
+        end
+      end
+
+      it 'succeeds with an empty hiera config' do
+        with_tempfile_containing('bolt', YAML.dump("hiera-config" => hiera_config), '.yaml') do |conf|
+          results = run_cli_json(%W[plan run prep --configfile #{conf.path}] + config_flags)
+          results.each do |result|
+            expect(result['status']).to eq('success')
+            report = result['result']['report']
+            expect(report['resource_statuses']).to include("Notify[Hello #{uri}]")
           end
         end
       end
