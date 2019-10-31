@@ -1,33 +1,33 @@
 # Changelog
 
-## Bolt NEXT
+## Bolt 1.36.0
 
 ### Deprecation
 
-* **Replace optional arguments for `--password` and `--sudo-password` options with required arguments** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
+* **Change arguments for `--password` and `--sudo-password` from optional to required** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
 
-  The `--password` and `--sudo-password` options now require a password as an argument. Previously, if the password was omitted the user would be prompted to enter one. If you wish to be prompted for a password, use the `prompt` plugin.
+  The `--password` and `--sudo-password` options now require a password as an argument. Previously, if the password was omitted the user would be prompted to enter one. To continue to be prompted for a password, use the `prompt` plugin.
 
 ### New features
 
 * **`prompt` messages print to `stderr`** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
 
-  The prompt plugin now prints messages to `stderr` instead of `stdout`.
+  The `prompt` plugin now prints messages to `stderr` instead of `stdout`.
 
-* **New `project init` subcommand** ([#1285](https://github.com/puppetlabs/bolt/issues/1285))
+* **Subcommand `project init` new to the CLI** ([#1285](https://github.com/puppetlabs/bolt/issues/1285))
 
-  The CLI now provides a subcommand `bolt project init` that will create a new file `bolt.yaml` in the current working directory, making the directory a [Bolt project directory](https://puppet.com/docs/bolt/latest/bolt_project_directories.html#local-project-directory)
+  The CLI now provides the subcommand `project init` which creates a new file `bolt.yaml` in the current working directory, making the directory a [Bolt project directory](https://puppet.com/docs/bolt/latest/bolt_project_directories.html#local-project-directory).
 
-* **Issue warning when cli options may be overridden by inventory** ([#1341](https://github.com/puppetlabs/bolt/issues/1341))
+* **Bolt issues a warning when inventory overrides a CLI option** ([#1341](https://github.com/puppetlabs/bolt/issues/1341))
 
-  When a CLI option that can be overridden in inventory is provided and inventory is loaded from a file or from the BOLT_INVENTORY environment variable an issue is warned about which options could be overridden.
-
+  Bolt issues a warning when an option is set both on the CLI and in the inventory, whether the inventory loads from a file or from the `bolt_inventory` environment variable.
+  
 ### Bug fixes
 
-* **Standardize configured paths to be relative to Boltdir** ([#1162](https://github.com/puppetlabs/bolt/issues/1162))
+* **Standardized configured paths to be relative to Boltdir** ([#1162](https://github.com/puppetlabs/bolt/issues/1162))
 
-  Previously we expanded some configured paths relative to the directory Bolt was run from, and other paths were expanded relative to the Boltdir. This standardizes all configured paths, including the modulepath, to be relative to the Boltdir. This only applies to file-based config, not command line flags, which are expanded relative to CWD. This fix is gated on the `future` config option, and will be available by default in Bolt 2.0
-
+  This fix standardizes all configured paths, including the modulepath, to be relative to the Boltdir. It only applies to file-based configs, not command line flags which expand relative to CWD. It is gated on the future config option, and will be available by default in Bolt 2.0.
+  
 ## 1.35.0
 
 ### Deprecation
