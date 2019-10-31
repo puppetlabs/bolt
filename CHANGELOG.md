@@ -1,26 +1,26 @@
 # Changelog
 
-## Bolt NEXT
+## Bolt 1.36.0
 
 ### Deprecation
 
-* **Replace optional arguments for `--password` and `--sudo-password` options with required arguments** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
+* **Change arguments for `--password` and `--sudo-password` from optional to required** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
 
-  The `--password` and `--sudo-password` options now require a password as an argument. Previously, if the password was omitted the user would be prompted to enter one. If you wish to be prompted for a password, use the `prompt` plugin.
+  The `--password` and `--sudo-password` options now require a password as an argument. Previously, if the password was omitted the user would be prompted to enter one. If you still wish to be prompted for a password, you can use the `prompt` plugin.
 
 ### New features
 
 * **`prompt` messages print to `stderr`** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
 
-  The prompt plugin now prints messages to `stderr` instead of `stdout`.
+  The `prompt` plugin now prints messages to `stderr` instead of `stdout`.
 
-* **New `project init` subcommand** ([#1285](https://github.com/puppetlabs/bolt/issues/1285))
+* **Subcommand `project init` new to the CLI** ([#1285](https://github.com/puppetlabs/bolt/issues/1285))
 
-  The CLI now provides a subcommand `bolt project init` that will create a new file `bolt.yaml` in the current working directory, making the directory a [Bolt project directory](https://puppet.com/docs/bolt/latest/bolt_project_directories.html#local-project-directory)
+  The CLI now provides the subcommand `project init` which creates a new file in `bolt.yaml` in the current working directory, making the directory a [Bolt project directory](https://puppet.com/docs/bolt/latest/bolt_project_directories.html#local-project-directory).
 
-* **Issue warning when cli options may be overridden by inventory** ([#1341](https://github.com/puppetlabs/bolt/issues/1341))
+* **Bolt issues a warning when inventory overrides a CLI option** ([#1341](https://github.com/puppetlabs/bolt/issues/1341))
 
-  When a CLI option that can be overridden in inventory is provided and inventory is loaded from a file or from the BOLT_INVENTORY environment variable an issue is warned about which options could be overridden.
+  Bolt issues a warning when an option is set both on the CLI and in the inventory, whether the inventory loads from a file or from the `bolt_inventory` environment variable.
 
 ## 1.35.0
 
