@@ -169,6 +169,15 @@ describe Bolt::Config do
       expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
     end
 
+    it "expands the private-key hash with 'future' set" do
+      data = {
+        'ssh' => { 'private-key' => 'my-private-key' },
+        'future' => true
+      }
+      config = Bolt::Config.new(boltdir, data)
+      expect(config.transports[:ssh]['private-key']).to eq(File.expand_path('my-private-key', boltdir.path))
+    end
+
     it "does not accept a private-key hash without data" do
       config = {
         'ssh' => { 'private-key' => { 'not-data' => "foo" } }
@@ -230,6 +239,57 @@ describe Bolt::Config do
         'winrm' => { 'ssl' => false, 'cacert' => 'does not exist' }
       }
       expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
+    end
+  end
+
+  describe 'expanding paths' do
+    it "expands cacert relative to boltdir" do
+      expect(Bolt::Util)
+        .to receive(:validate_file)
+        .with('cacert', File.expand_path('ssl/ca.pem', boltdir.path))
+        .and_return(true)
+
+      data = {
+        'winrm' => { 'ssl' => true, 'cacert' => 'ssl/ca.pem' },
+        'future' => true
+      }
+
+      config = Bolt::Config.new(boltdir, data)
+      expect(config.transports[:winrm]['cacert'])
+        .to eq(File.expand_path('ssl/ca.pem', boltdir.path))
+    end
+
+    it "expands token-file relative to boltdir" do
+      data = {
+        'pcp' => { 'token-file' => 'token' },
+        'future' => true
+      }
+
+      config = Bolt::Config.new(boltdir, data)
+      expect(config.transports[:pcp]['token-file'])
+        .to eq(File.expand_path('token', boltdir.path))
+    end
+
+    it "expands private-key relative to boltdir" do
+      data = {
+        'ssh' => { 'private-key' => 'secret/key' },
+        'future' => true
+      }
+
+      config = Bolt::Config.new(boltdir, data)
+      expect(config.transports[:ssh]['private-key'])
+        .to eq(File.expand_path('secret/key', boltdir.path))
+    end
+
+    it "expands inventoryfile relative to boltdir" do
+      data = {
+        'inventoryfile' => 'targets.yml',
+        'future' => true
+      }
+
+      config = Bolt::Config.new(boltdir, data)
+      expect(config.inventoryfile)
+        .to eq(File.expand_path('targets.yml', boltdir.path))
     end
   end
 end

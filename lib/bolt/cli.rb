@@ -247,7 +247,7 @@ module Bolt
 
     def puppetdb_client
       return @puppetdb_client if @puppetdb_client
-      puppetdb_config = Bolt::PuppetDB::Config.load_config(nil, config.puppetdb)
+      puppetdb_config = Bolt::PuppetDB::Config.load_config(nil, config.puppetdb, config.boltdir.path)
       @puppetdb_client = Bolt::PuppetDB::Client.new(puppetdb_config)
     end
 

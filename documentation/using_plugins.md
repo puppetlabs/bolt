@@ -271,8 +271,8 @@ plugins:
 ```
 
 -   `keysize`: They size of the key to generate with `bolt secret createkeys`: default: `2048`
--   `private-key`: The path to the private key file. default: `keys/private_key.pkcs7.pem`
--   `public-key`: The path to the public key file. default: `keys/public_key.pkcs7.pem`
+-   `private-key`: The path to the private key file. default: `<boltdir>/keys/private_key.pkcs7.pem`
+-   `public-key`: The path to the public key file. default: `<boltdir>/keys/public_key.pkcs7.pem`
 
 ## Vault plugin
 
