@@ -701,7 +701,7 @@ describe Bolt::Inventory do
   end
 
   describe 'add_facts' do
-    context 'whith and without $future flag' do
+    context 'with and without $future flag' do
       let(:inventory) { Bolt::Inventory.new({}) }
       let(:target) { get_target(inventory, 'foo') }
       let(:facts) { { 'foo' => 'bar' } }

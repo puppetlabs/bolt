@@ -22,6 +22,12 @@
 
   When a CLI option that can be overridden in inventory is provided and inventory is loaded from a file or from the BOLT_INVENTORY environment variable an issue is warned about which options could be overridden.
 
+### Bug fixes
+
+* **Standardize configured paths to be relative to Boltdir** ([#1162](https://github.com/puppetlabs/bolt/issues/1162))
+
+  Previously we expanded some configured paths relative to the directory Bolt was run from, and other paths were expanded relative to the Boltdir. This standardizes all configured paths, including the modulepath, to be relative to the Boltdir. This only applies to file-based config, not command line flags, which are expanded relative to CWD. This fix is gated on the `future` config option, and will be available by default in Bolt 2.0
+
 ## 1.35.0
 
 ### Deprecation

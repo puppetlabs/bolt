@@ -19,7 +19,7 @@ module Bolt
 
       end
 
-      def self.load_config(filename, options)
+      def self.load_config(filename, options, boltdir_path = nil)
         config = {}
         global_path = Bolt::Util.windows? ? DEFAULT_CONFIG[:win_global] : DEFAULT_CONFIG[:global]
         if filename
@@ -43,11 +43,12 @@ module Bolt
         end
 
         config = config.fetch('puppetdb', {})
-        new(config.merge(options))
+        new(config.merge(options), boltdir_path)
       end
 
-      def initialize(settings)
+      def initialize(settings, boltdir_path = nil)
         @settings = settings
+        @boltdir_path = boltdir_path
         expand_paths
       end
 
@@ -66,7 +67,14 @@ module Bolt
 
       def expand_paths
         %w[cacert cert key token].each do |file|
-          @settings[file] = File.expand_path(@settings[file]) if @settings[file]
+          next unless @settings[file]
+          # rubocop:disable Style/GlobalVars
+          @settings[file] = if $future && @boltdir_path
+                              File.expand_path(@settings[file], @boltdir_path)
+                            else
+                              File.expand_path(@settings[file])
+                            end
+          # rubocop:enable Style/GlobalVars
         end
       end
 
