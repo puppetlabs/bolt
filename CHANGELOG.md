@@ -6,7 +6,7 @@
 
 * **Change arguments for `--password` and `--sudo-password` from optional to required** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
 
-  The `--password` and `--sudo-password` options now require a password as an argument. Previously, if the password was omitted the user would be prompted to enter one. If you still wish to be prompted for a password, you can use the `prompt` plugin.
+  The `--password` and `--sudo-password` options now require a password as an argument. Previously, if the password was omitted the user would be prompted to enter one. To continue to be prompted for a password, use the `prompt` plugin.
 
 ### New features
 
@@ -24,7 +24,7 @@
   
 ### Bug fixes
 
-* **Standardized configured paths to be relative to Boltdir** ([#1162])(https://github.com/puppetlabs/bolt/issues/1162)
+* **Standardized configured paths to be relative to Boltdir** ([#1162](https://github.com/puppetlabs/bolt/issues/1162))
 
   This fix standardizes all configured paths, including the modulepath, to be relative to the Boltdir. It only applies to file-based configs, not command line flags which expand relative to CWD. It is gated on the future config option, and will be available by default in Bolt 2.0.
   
