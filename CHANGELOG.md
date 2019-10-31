@@ -16,7 +16,7 @@
 
 * **Subcommand `project init` new to the CLI** ([#1285](https://github.com/puppetlabs/bolt/issues/1285))
 
-  The CLI now provides the subcommand `project init` which creates a new file in `bolt.yaml` in the current working directory, making the directory a [Bolt project directory](https://puppet.com/docs/bolt/latest/bolt_project_directories.html#local-project-directory).
+  The CLI now provides the subcommand `project init` which creates a new file `bolt.yaml` in the current working directory, making the directory a [Bolt project directory](https://puppet.com/docs/bolt/latest/bolt_project_directories.html#local-project-directory).
 
 * **Bolt issues a warning when inventory overrides a CLI option** ([#1341](https://github.com/puppetlabs/bolt/issues/1341))
 
