@@ -1,5 +1,13 @@
 # Changelog
 
+## Bolt Next
+
+### New features
+
+* **Support `_run_as` parameter for puppet_library hook** ([#1191](https://github.com/puppetlabs/bolt/issues/1191))
+
+  Bolt now accepts the `_run_as` metaparameter for puppet_library hooks. `_run_as` specifies which user the library install task will be executed as.
+
 ## Bolt 1.37.0
 
 ## New features
@@ -43,7 +51,15 @@
 * **Bolt issues a warning when inventory overrides a CLI option** ([#1341](https://github.com/puppetlabs/bolt/issues/1341))
 
   Bolt issues a warning when an option is set both on the CLI and in the inventory, whether the inventory loads from a file or from the `bolt_inventory` environment variable.
-  
+<<<<<<< HEAD
+
+=======
+
+* **New `resolve_references` plan function** ([#1365](https://github.com/puppetlabs/bolt/issues/1365))
+
+  The new plan function, `resolve_references`, accepts a hash of structured data and returns a hash of structured data with all plugin references resolved.
+
+>>>>>>> (GH-1191) Support _run_as metaparameter for puppet_library plugins
 ### Bug fixes
 
 * **Some configured paths were relative to Boltdir and some were relative to the current working directory** ([#1162](https://github.com/puppetlabs/bolt/issues/1162))
