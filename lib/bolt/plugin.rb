@@ -177,12 +177,6 @@ module Bolt
       add_plugin(plugin)
     end
 
-    def add_from_config
-      @config.plugins.keys.each do |plugin_name|
-        by_name(plugin_name)
-      end
-    end
-
     def config_for_plugin(plugin_name)
       @config.plugins[plugin_name] || {}
     end
