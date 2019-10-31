@@ -21,7 +21,13 @@
 * **Bolt issues a warning when inventory overrides a CLI option** ([#1341](https://github.com/puppetlabs/bolt/issues/1341))
 
   Bolt issues a warning when an option is set both on the CLI and in the inventory, whether the inventory loads from a file or from the `bolt_inventory` environment variable.
+  
+### Bug fixes
 
+* **Standardized configured paths to be relative to Boltdir** ([#1162])(https://github.com/puppetlabs/bolt/issues/1162)
+
+  This fix standardizes all configured paths, including the modulepath, to be relative to the Boltdir. It only applies to file-based configs, not command line flags which expand relative to CWD. It is gated on the future config option, and will be available by default in Bolt 2.0.
+  
 ## 1.35.0
 
 ### Deprecation
