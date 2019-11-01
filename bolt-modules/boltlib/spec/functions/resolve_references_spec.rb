@@ -1,0 +1,61 @@
+# frozen_string_literal: true
+
+require 'spec_helper'
+require 'bolt/plugin'
+
+describe 'resolve_references' do
+  include PuppetlabsSpec::Fixtures
+  let(:boltdir) { Bolt::Boltdir.new('./spec/fixtures') }
+  let(:config) { Bolt::Config.new(boltdir, {}) }
+  let(:pal) { Bolt::PAL.new(config.modulepath, config.hiera_config, config.boltdir.resource_types) }
+  let(:pdb_client) { Bolt::PuppetDB::Client.new({}) }
+  let(:analytics) { Bolt::Analytics::NoopClient.new }
+  let(:plugins) { Bolt::Plugin.setup(config, pal, pdb_client, analytics) }
+  let(:inventory) { Bolt::Inventory.new({}, plugins: plugins) }
+  let(:tasks_enabled) { true }
+
+  let(:references) do
+    {
+      "targets" => {
+        "_plugin" => "task",
+        "task" => "test::references"
+      }
+    }
+  end
+
+  let(:resolved) do
+    {
+      "targets" => {
+        "name" => "127.0.0.1"
+      }
+    }
+  end
+
+  around(:each) do |example|
+    Puppet[:tasks] = tasks_enabled
+    Puppet.override(bolt_inventory: inventory) do
+      example.run
+    end
+  end
+
+  context 'calls resolve_references' do
+    it 'resolves all plugin references' do
+      is_expected.to run.with_params(references).and_return(resolved)
+    end
+
+    it 'errors when called with incorrect plugin data' do
+      references['targets']['_plugin'] = 'fake_plugin'
+      is_expected.to run.with_params(references).and_raise_error(/Unknown plugin/)
+    end
+  end
+
+  context 'without tasks enabled' do
+    let(:tasks_enabled) { false }
+
+    it 'fails and reports that resolve_references is not available' do
+      is_expected.to run
+        .with_params(references)
+        .and_raise_error(/Plan language function 'resolve_references' cannot be used/)
+    end
+  end
+end

@@ -208,6 +208,72 @@ module Bolt
         nil
       end
     end
+
+    # Evaluate all _plugin references in a data structure. Leaves are
+    # evaluated and then their parents are evaluated with references replaced
+    # by their values. If the result of a reference contains more references,
+    # they are resolved again before continuing to ascend the tree. The final
+    # result will not contain any references.
+    def resolve_references(data)
+      Bolt::Util.postwalk_vals(data) do |value|
+        reference?(value) ? resolve_references(resolve_single_reference(value)) : value
+      end
+    end
+
+    # Iteratively resolves "top-level" references until the result no longer
+    # has top-level references. A top-level reference is one which is not
+    # contained within another hash. It may be either the actual top-level
+    # result or arbitrarily nested within arrays. If parameters of the
+    # reference are themselves references, they will be looked. Any remaining
+    # references nested inside the result will *not* be evaluated once the
+    # top-level result is not a reference.  This is used to resolve the
+    # `targets` and `groups` keys which are allowed to be references or
+    # arrays of references, but which may return data with nested references
+    # that should be resolved lazily. The end result will either be a single
+    # hash or a flat array of hashes.
+    def resolve_top_level_references(data)
+      if data.is_a?(Array)
+        data.flat_map { |elem| resolve_top_level_references(elem) }
+      elsif reference?(data)
+        partially_resolved = data.map do |k, v|
+          [k, resolve_references(v)]
+        end.to_h
+        fully_resolved = resolve_single_reference(partially_resolved)
+        # The top-level reference may have returned more references, so repeat the process
+        resolve_top_level_references(fully_resolved)
+      else
+        data
+      end
+    end
+
+    # Evaluates a single reference. The value returned may be another
+    # reference.
+    def resolve_single_reference(reference)
+      plugin_name = reference['_plugin']
+      hook = get_hook(plugin_name, :resolve_reference)
+
+      begin
+        validate_proc = get_hook(plugin_name, :validate_resolve_reference)
+      rescue PluginError
+        validate_proc = proc { |*args| }
+      end
+
+      validate_proc.call(reference)
+
+      begin
+        # Evaluate the plugin and then recursively evaluate any plugin returned by it.
+        hook.call(reference)
+      rescue StandardError => e
+        loc = "resolve_reference in #{plugin_name}"
+        raise PluginError::ExecutionError.new(e.message, plugin_name, loc)
+      end
+    end
+    private :resolve_single_reference
+
+    # Checks whether a given value is a _plugin reference
+    def reference?(input)
+      input.is_a?(Hash) && input.key?('_plugin')
+    end
   end
 end
 

@@ -22,11 +22,11 @@ module Bolt
         @logger = Logging.logger[self]
         @plugins = plugins
 
-        input = resolve_top_level_references(input) if reference?(input)
+        input = @plugins.resolve_top_level_references(input) if @plugins.reference?(input)
 
         raise ValidationError.new("Group does not have a name", nil) unless input.key?('name')
 
-        @name = resolve_references(input['name'])
+        @name = @plugins.resolve_references(input['name'])
 
         raise ValidationError.new("Group name must be a String, not #{@name.inspect}", nil) unless @name.is_a?(String)
         raise ValidationError.new("Invalid group name #{@name}", @name) unless @name =~ NAME_REGEX
@@ -37,7 +37,7 @@ module Bolt
 
         validate_data_keys(@input)
 
-        targets = resolve_top_level_references(input.fetch('targets', []))
+        targets = @plugins.resolve_top_level_references(input.fetch('targets', []))
 
         @unresolved_targets = {}
         @resolved_targets = {}
@@ -67,81 +67,9 @@ module Bolt
         # them until we have a value. We don't just use resolve_references
         # though, since that will resolve any nested references and we want to
         # leave it to the group to do that lazily.
-        groups = resolve_top_level_references(groups)
+        groups = @plugins.resolve_top_level_references(groups)
 
         @groups = Array(groups).map { |g| Group2.new(g, plugins) }
-      end
-
-      # Evaluate all _plugin references in a data structure. Leaves are
-      # evaluated and then their parents are evaluated with references replaced
-      # by their values. If the result of a reference contains more references,
-      # they are resolved again before continuing to ascend the tree. The final
-      # result will not contain any references.
-      def resolve_references(data)
-        Bolt::Util.postwalk_vals(data) do |value|
-          reference?(value) ? resolve_references(resolve_single_reference(value)) : value
-        end
-      end
-      private :resolve_references
-
-      # Iteratively resolves "top-level" references until the result no longer
-      # has top-level references. A top-level reference is one which is not
-      # contained within another hash. It may be either the actual top-level
-      # result or arbitrarily nested within arrays. If parameters of the
-      # reference are themselves references, they will be looked. Any remaining
-      # references nested inside the result will *not* be evaluated once the
-      # top-level result is not a reference.  This is used to resolve the
-      # `targets` and `groups` keys which are allowed to be references or
-      # arrays of references, but which may return data with nested references
-      # that should be resolved lazily. The end result will either be a single
-      # hash or a flat array of hashes.
-      def resolve_top_level_references(data)
-        if data.is_a?(Array)
-          data.flat_map { |elem| resolve_top_level_references(elem) }
-        elsif reference?(data)
-          partially_resolved = data.map do |k, v|
-            [k, resolve_references(v)]
-          end.to_h
-          fully_resolved = resolve_single_reference(partially_resolved)
-          # The top-level reference may have returned more references, so repeat the process
-          resolve_top_level_references(fully_resolved)
-        else
-          data
-        end
-      end
-      private :resolve_top_level_references
-
-      # Evaluates a single reference. The value returned may be another
-      # reference.
-      def resolve_single_reference(reference)
-        plugin_name = reference['_plugin']
-        begin
-          hook = @plugins.get_hook(plugin_name, :resolve_reference)
-        rescue Bolt::Plugin::PluginError => e
-          raise ValidationError.new(e.message, @name)
-        end
-
-        begin
-          validate_proc = @plugins.get_hook(plugin_name, :validate_resolve_reference)
-        rescue Bolt::Plugin::PluginError
-          validate_proc = proc { |*args| }
-        end
-
-        validate_proc.call(reference)
-
-        begin
-          # Evaluate the plugin and then recursively evaluate any plugin returned by it.
-          hook.call(reference)
-        rescue StandardError => e
-          loc = "resolve_reference in #{@name}"
-          raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, plugin_name, loc)
-        end
-      end
-      private :resolve_single_reference
-
-      # Checks whether a given value is a _plugin reference
-      def reference?(input)
-        input.is_a?(Hash) && input.key?('_plugin')
       end
 
       def target_data(target_name)
@@ -172,9 +100,9 @@ module Bolt
           raise ValidationError.new("Node entry must be a Hash, not #{target.class}", @name)
         end
 
-        target['name'] = resolve_references(target['name']) if target.key?('name')
-        target['uri'] = resolve_references(target['uri']) if target.key?('uri')
-        target['alias'] = resolve_references(target['alias']) if target.key?('alias')
+        target['name'] = @plugins.resolve_references(target['name']) if target.key?('name')
+        target['uri'] = @plugins.resolve_references(target['uri']) if target.key?('uri')
+        target['alias'] = @plugins.resolve_references(target['alias']) if target.key?('alias')
 
         t_name = target['name'] || target['uri']
 
@@ -305,7 +233,7 @@ module Bolt
         end
 
         Bolt::Util.walk_keys(input) do |key|
-          if reference?(key)
+          if @plugins.reference?(key)
             raise ValidationError.new("Group keys cannot be specified as _plugin references", @name)
           else
             key
@@ -368,11 +296,11 @@ module Bolt
 
       def resolve_data_keys(data, target = nil)
         result = {
-          'config' => resolve_references(data.fetch('config', {})),
-          'vars' => resolve_references(data.fetch('vars', {})),
-          'facts' => resolve_references(data.fetch('facts', {})),
-          'features' => resolve_references(data.fetch('features', [])),
-          'plugin_hooks' => resolve_references(data.fetch('plugin_hooks', {}))
+          'config' => @plugins.resolve_references(data.fetch('config', {})),
+          'vars' => @plugins.resolve_references(data.fetch('vars', {})),
+          'facts' => @plugins.resolve_references(data.fetch('facts', {})),
+          'features' => @plugins.resolve_references(data.fetch('features', [])),
+          'plugin_hooks' => @plugins.resolve_references(data.fetch('plugin_hooks', {}))
         }
         validate_data_keys(result, target)
         result['features'] = Set.new(result['features'].flatten)
@@ -387,13 +315,13 @@ module Bolt
           'features' => Array,
           'plugin_hooks' => Hash
         }.each do |key, expected_type|
-          next if !data.key?(key) || data[key].is_a?(expected_type) || reference?(data[key])
+          next if !data.key?(key) || data[key].is_a?(expected_type) || @plugins.reference?(data[key])
 
           msg = +"Expected #{key} to be of type #{expected_type}, not #{data[key].class}"
           msg << " for target #{target}" if target
           raise ValidationError.new(msg, @name)
         end
-        unless reference?(data['config'])
+        unless @plugins.reference?(data['config'])
           unexpected_keys = data.fetch('config', {}).keys - CONFIG_KEYS
           if unexpected_keys.any?
             msg = +"Found unexpected key(s) #{unexpected_keys.join(', ')} in config for"
