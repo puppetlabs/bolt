@@ -11,7 +11,7 @@ module Bolt
           raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
           @target = target
           @logger = Logging.logger[target.safe_name]
-          @lxd_host = @target.options['service-url']
+          @lxd_remote = @target.options['service-url'].nil? ? 'local' : @target.options['service-url']
           @logger.debug("Initializing lxd connection to #{@target.safe_name}")
         end
 
@@ -38,7 +38,7 @@ module Bolt
         # @param options [Hash] command specific options
         # @option opts [String] :interpreter statements that are prefixed to the command e.g `/bin/bash` or `cmd.exe /c`
         # @option opts [Hash] :environment A hash of environment variables that will be injected into the command
-        # @option opts [IO] :stdin TODO, currently unset (lxc default is --mode=auto)
+        # @option opts [IO] :stdin An IO object that will be used to redirect STDIN for the lxc command
         def execute(*command, options)
           command.unshift(options[:interpreter]) if options[:interpreter]
           # Build the `--env` parameters
@@ -48,9 +48,12 @@ module Bolt
           end
 
           command_options = []
-          # :stdin TODO, currently unset (lxc default is --mode=auto)
+          # unsure about how to handle tty as theres no explicit exec option
+          # command_options << '--force-interactive' if options[:tty]
+          command_options << '--disable-stdin' unless options[:stdin]
           command_options.concat(envs) unless envs.empty?
-          command_options << container_id
+          command_options << @lxd_remote + ':' + container_id
+          command_options << '--'
           command_options.concat(command)
 
           @logger.debug { "Executing: exec #{command_options}" }
@@ -143,18 +146,16 @@ module Bolt
         # rubocop:disable Metrics/LineLength
         # Executes a LXC CLI command
         #
-        # @param subcommand [String] The lxc subcommands to run e.g. ['config', 'show'] for `lxc config show`
+        # @param subcommands [Array] The lxc subcommands to run e.g. ['config', 'show'] for `lxc config show`
         # @param command_options [Array] Additional command options e.g. ['--expanded'] for `lxc config show --expanded`
-        # @param redir_stdin [IO] TODO, currently unset (lxc default is --mode=auto)
+        # @param redir_stdin [IO] IO object which will be use to as STDIN in the lxc command. Default is nil, which does not perform redirection
         # @return [String, String, Process::Status] The output of the command:  STDOUT, STDERR, Process Status
         # rubocop:enable Metrics/LineLength
-        def execute_local_lxc_command(subcommand = [], command_options = [], redir_stdin = nil)
+        def execute_local_lxc_command(subcommands = [], command_options = [], redir_stdin = nil)
           env_hash = {}
-          # Set the LXD_HOST if we are using a non-default service-url
-          env_hash['LXD_HOST'] = @lxd_host unless @lxd_host.nil?
 
           command_options = [] if command_options.nil?
-          lxc_command = ['--force-local'].concat(subcommand).concat(command_options)
+          lxc_command = subcommands.concat(command_options)
 
           # Always use binary mode for any text data
           capture_options = { binmode: true }
@@ -165,13 +166,13 @@ module Bolt
 
         # Executes a LXC CLI command and parses the output in JSON format
         #
-        # @param subcommand [String] The lxc subcommands to run e.g. ['config', 'show'] for `lxc config show`
+        # @param subcommands [Array] The lxc subcommands to run e.g. ['config', 'show'] for `lxc config show`
         # @param command_options [Array] Additional command options e.g. ['--expanded'] for `lxc config show --expanded`
         # @return [Object] Ruby object representation of the JSON string
-        def execute_local_lxc_json_command(subcommand = [], command_options = [])
+        def execute_local_lxc_json_command(subcommands = [], command_options = [])
           command_options = [] if command_options.nil?
           command_options = ['--format', 'json'].concat(command_options)
-          stdout_str, _stderr_str, _status = execute_local_lxc_command(subcommand, command_options)
+          stdout_str, _stderr_str, _status = execute_local_lxc_command(subcommands, command_options)
           JSON.parse(stdout_str)
         end
 

@@ -171,6 +171,15 @@ When using the SSH transport, Bolt also interacts with the ssh-agent for SSH key
 -   `tty`: When `true`, enable tty on Docker exec commands. Default is `false`.
 
 
+## LXD transport configuration options
+
+**Note:** The LXD transport is experimental because the capabilities and role of the LXD API might change.
+-   `service-url`: Remote name of the LXD host used for API requests. Defaults to `local`.
+-   `shell-command`: A shell command to wrap any lxc exec commands in, such as `bash -lc`.
+-   `tmpdir`: The directory to upload and execute temporary files on the target.
+-   TODO `tty`: When `true`, enable tty on lxc exec commands. Default is `false`.
+
+
 ## Remote transport configuration options
 
 **Note:** The remote transport is experimental. Its configuration options and behavior might change between Y releases.
