@@ -10,6 +10,7 @@ require 'bolt/transport/orch'
 require 'bolt/transport/local'
 require 'bolt/transport/local_windows'
 require 'bolt/transport/docker'
+require 'bolt/transport/lxd'
 require 'bolt/transport/remote'
 require 'bolt/util'
 
@@ -20,6 +21,7 @@ module Bolt
     pcp: Bolt::Transport::Orch,
     local: Bolt::Util.windows? ? Bolt::Transport::LocalWindows : Bolt::Transport::Local,
     docker: Bolt::Transport::Docker,
+    lxd: Bolt::Transport::LXD,
     remote: Bolt::Transport::Remote
   }.freeze
 
