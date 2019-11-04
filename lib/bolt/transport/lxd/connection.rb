@@ -154,7 +154,7 @@ module Bolt
           env_hash['LXD_HOST'] = @lxd_host unless @lxd_host.nil?
 
           command_options = [] if command_options.nil?
-          lxc_command = [].concat(subcommand).concat(command_options)
+          lxc_command = ['--force-local'].concat(subcommand).concat(command_options)
 
           # Always use binary mode for any text data
           capture_options = { binmode: true }
