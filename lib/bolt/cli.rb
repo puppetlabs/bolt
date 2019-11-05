@@ -147,6 +147,12 @@ module Bolt
         options[:verbose] = options[:subcommand] != 'plan'
       end
 
+      # TODO: Remove deprecation warning
+      if options[:nodes]
+        @logger.warn("Deprecation Warning: The --nodes command line option has been " \
+                     "deprecated in favor of --targets.")
+      end
+
       warn_inventory_overrides_cli(options)
       options
     rescue Bolt::Error => e

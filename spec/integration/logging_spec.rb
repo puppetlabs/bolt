@@ -21,7 +21,7 @@ describe "when logging executor activity", ssh: true do
   let(:lines) { @log_output.readlines }
 
   let(:config_flags) {
-    %W[--nodes #{uri} --no-host-key-check --format json --modulepath #{modulepath} --password #{password}]
+    %W[--targets #{uri} --no-host-key-check --format json --modulepath #{modulepath} --password #{password}]
   }
 
   before :each do

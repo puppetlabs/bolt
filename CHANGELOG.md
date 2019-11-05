@@ -8,6 +8,10 @@
 
   The `--password` and `--sudo-password` options now require a password as an argument. Previously, if the password was omitted the user would be prompted to enter one. To continue to be prompted for a password, use the `prompt` plugin.
 
+* **Favor `--targets` over `--nodes`** ([#1375](https://github.com/puppetlabs/bolt/issues/1375))
+
+  The `--nodes` command line option has been deprecated in favor of `--targets`. When using `--nodes`, a deprecation warning will be displayed.
+
 ### New features
 
 * **`prompt` messages print to `stderr`** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))

@@ -344,7 +344,8 @@ module Bolt
       @options = options
 
       define('-n', '--nodes NODES',
-             'Alias for --targets') do |nodes|
+             'Alias for --targets',
+             'Deprecated in favor of --targets') do |nodes|
         @options [:nodes] ||= []
         @options[:nodes] << get_arg_input(nodes)
       end
