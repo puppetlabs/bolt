@@ -31,7 +31,7 @@ mod 'puppetlabs-ruby_task_helper', '0.4.0'
 # Plugin modules
 mod 'puppetlabs-azure_inventory', '0.2.0'
 mod 'puppetlabs-terraform', '0.2.0'
-mod 'puppetlabs-vault', '0.2.1'
+mod 'puppetlabs-vault', '0.2.2'
 mod 'puppetlabs-aws_inventory', '0.2.0'
 
 # If we don't list these modules explicitly, r10k will purge them
