@@ -10,6 +10,10 @@
 
 ### New features
 
+* **Add `--detail` option for `inventory show` command** ([#1200](https://github.com/puppetlabs/bolt/issues/1200))
+
+  The `inventory show` command now supports a `--detail` option to show resolved configuration for specified targets.
+
 * **`prompt` messages print to `stderr`** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
 
   The `prompt` plugin now prints messages to `stderr` instead of `stdout`.
@@ -27,7 +31,7 @@
 * **Standardized configured paths to be relative to Boltdir** ([#1162](https://github.com/puppetlabs/bolt/issues/1162))
 
   This fix standardizes all configured paths, including the modulepath, to be relative to the Boltdir. It only applies to file-based configs, not command line flags which expand relative to CWD. It is gated on the future config option, and will be available by default in Bolt 2.0.
-  
+
 ## 1.35.0
 
 ### Deprecation
@@ -37,10 +41,6 @@
   The `puppetlabs-puppet_agent` module now provides the same functionality as the `install_agent` plugin did previously. The `install_agent` plugin has been removed and the `puppet_agent` module is now the default plugin for the `puppet_library` hook. If you do not use the bundled `puppet_agent` module you will need to update to version `2.2.1` of the module. If you reference the `install_agent` plugin you will need to now reference `puppet_agent` instead.
 
 ### New features
-
-* **Add `--detail` option for `inventory show` command** ([#1200](https://github.com/puppetlabs/bolt/issues/1200))
-
-  The `inventory show` command now supports a `--detail` option to show resolved configuration for specified targets.
 
 * **Support `limit` option for `do_until` function** ([#1270](https://github.com/puppetlabs/bolt/issues/1270))
 
