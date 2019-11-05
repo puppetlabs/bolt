@@ -71,6 +71,7 @@ describe Bolt::Applicator do
             },
             local: {},
             docker: {},
+            lxd: {},
             remote: { 'run-on': 'localhost' }
           }
         }

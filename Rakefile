@@ -19,14 +19,14 @@ RSpec::Core::RakeTask.new(:spec)
 
 desc "Run RSpec tests that don't require VM fixtures or a particular shell"
 RSpec::Core::RakeTask.new(:unit) do |t|
-  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~winrm ' \
+  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd --tag ~bash --tag ~winrm ' \
                  '--tag ~appveyor_agents --tag ~puppetserver --tag ~puppetdb ' \
                  '--tag ~omi --tag ~kerberos'
 end
 
 desc "Run RSpec tests for AppVeyor that don't require SSH, Bash, Appveyor Puppet Agents, or orchestrator"
 RSpec::Core::RakeTask.new(:appveyor) do |t|
-  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~appveyor_agents ' \
+  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd --tag ~bash --tag ~appveyor_agents ' \
          '--tag ~orchestrator --tag ~puppetserver --tag ~puppetdb --tag ~omi ' \
          '--tag ~kerberos'
 end
@@ -180,6 +180,11 @@ namespace :integration do
   desc 'Run tests that require a host System Under Test configured with Docker'
   RSpec::Core::RakeTask.new(:docker) do |t|
     t.rspec_opts = '--tag docker'
+  end
+
+  desc 'Run tests that require a host System Under Test configured with LXD'
+  RSpec::Core::RakeTask.new(:lxd) do |t|
+    t.rspec_opts = '--tag lxd'
   end
 
   desc 'Run tests that require Bash on the local host'

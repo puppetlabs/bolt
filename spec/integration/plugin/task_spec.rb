@@ -264,4 +264,76 @@ describe 'using the task plugin' do
       end
     end
   end
+
+  # Because the only way we have to test this and apply_prep will fail to
+  # gather facts these can only test error cases now.
+  context 'With a puppet_library call', lxd: true do
+    let(:task) { 'error::fail' }
+    let(:parameters) { {} }
+    let(:inventory) { lxd_inventory(root: true) }
+
+    let(:plugin_hooks) {
+      {
+        'puppet_library' => {
+          'plugin' => 'task',
+          'task' => task,
+          'parameters' => parameters
+        }
+      }
+    }
+
+    let(:plan) do
+      <<~PLAN
+        plan test_plan(TargetSpec $nodes) {
+          apply_prep($nodes)
+        }
+      PLAN
+    end
+
+    context 'with a failing task' do
+      it 'fails cleanly' do
+        result = run_cli_json(['plan', 'run',
+                               'test_plan', '--nodes', 'agentless', '--boltdir', boltdir],
+                              rescue_exec: true)
+
+        expect(result).to include('kind' => "bolt/run-failure")
+        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 nodes/)
+        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+          /The task failed with exit code 1/
+        )
+      end
+    end
+
+    context 'with invalid parameters' do
+      let(:task) { 'sample::params' }
+
+      it 'fails cleanly' do
+        result = run_cli_json(['plan', 'run',
+                               'test_plan', '--nodes', 'agentless', '--boltdir', boltdir],
+                              rescue_exec: true)
+
+        expect(result).to include('kind' => "bolt/run-failure")
+        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 nodes/)
+        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+          /Invalid parameters for Task sample::params/
+        )
+      end
+    end
+
+    context 'with a non-existent task' do
+      let('task') { 'non_existent_task' }
+
+      it 'fails cleanly' do
+        result = run_cli_json(['plan', 'run',
+                               'test_plan', '--nodes', 'agentless', '--boltdir', boltdir],
+                              rescue_exec: true)
+
+        expect(result).to include('kind' => "bolt/run-failure")
+        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 nodes/)
+        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+          /Task 'non_existent_task' could not be found/
+        )
+      end
+    end
+  end
 end

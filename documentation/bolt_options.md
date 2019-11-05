@@ -96,6 +96,7 @@ Available transports are:
 -   `winrm`
 -   `local`
 -   `docker`
+-   `lxd`
 -   `pcp`
 
 Pass the `--transport` option after the nodes list:

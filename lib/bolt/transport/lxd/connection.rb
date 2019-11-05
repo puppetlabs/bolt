@@ -12,13 +12,13 @@ module Bolt
           @target = target
           @logger = Logging.logger[target.safe_name]
           @lxd_remote = @target.options['service-url'].nil? ? 'local' : @target.options['service-url']
-          @logger.debug("Initializing lxd connection to #{@target.safe_name}")
+          @logger.debug("Initializing lxd connection to #{@target.safe_name} with options #{@target.options}")
         end
 
         def connect
           # We don't actually have a connection, but we do need to
           # check that the container exists and is running.
-          output = execute_local_lxc_json_command(['list'])
+          output = execute_local_lxc_json_command(%w[list])
           index = output.find_index { |item| item["name"] == @target.host }
           raise "Could not find a container with name matching '#{@target.host}'" if index.nil?
           # Store the container information for later
@@ -58,7 +58,7 @@ module Bolt
 
           @logger.debug { "Executing: exec #{command_options}" }
 
-          stdout_str, stderr_str, status = execute_local_lxc_command(['exec'], command_options, options[:stdin])
+          stdout_str, stderr_str, status = execute_local_lxc_command(%w[exec], command_options, options[:stdin])
 
           # The actual result is the exitstatus not the process object
           status = status.nil? ? -32768 : status.exitstatus
@@ -80,7 +80,7 @@ module Bolt
 
         def write_remote_file(source, destination)
           @logger.debug { "Uploading #{source}, to #{destination}" }
-          _, stdout_str, status = execute_local_lxc_command(['file', 'push'], [source, "#{container_id}/#{destination}"])
+          _, stdout_str, status = execute_local_lxc_command(%w[file push], [source, "#{container_id}/#{destination}"])
           raise "Error writing file to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
@@ -88,7 +88,7 @@ module Bolt
 
         def write_remote_directory(source, destination)
           @logger.debug { "Uploading #{source}, to #{destination}" }
-          _, stdout_str, status = execute_local_lxc_command(['file', 'push'], [source, "#{container_id}/#{destination}"])
+          _, stdout_str, status = execute_local_lxc_command(%w[file push], [source, "#{container_id}/#{destination}"])
           raise "Error writing directory to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')

@@ -23,6 +23,11 @@ module BoltSpec
         default_user = ''
         default_password = ''
         default_host = 'ubuntu_node'
+      when 'lxd'
+        default_user = ''
+        default_password = ''
+        # lxd container names are hostnames and thus underscores are not allowed
+        default_host = 'ubuntunode'
       else
         raise Error, "The transport must be either 'ssh' or 'winrm'"
       end

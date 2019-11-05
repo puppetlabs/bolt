@@ -475,8 +475,8 @@ QUOTED
         # This assumes that the thing running the tests is the
         # same platform as the thing we're running the task on
         use_windows = Bolt::Util.windows?
-        if safe_target.transport == "docker"
-          # Only support linux containers with the docker transport
+        if safe_target.transport == "docker" || safe_target.transport == "lxd"
+          # Only support linux containers with the docker and lxd transport
           use_windows = false
         end
 

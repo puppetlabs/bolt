@@ -285,6 +285,13 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     include_examples 'basic inventory'
   end
 
+  context 'when running over lxd', lxd: true do
+    let(:conn) { conn_info('lxd') }
+    let(:shell_cmd) { "whoami" }
+
+    include_examples 'basic inventory'
+  end
+
   context 'when running over local with bash shell', bash: true do
     let(:shell_cmd) { "whoami" }
 

@@ -25,7 +25,7 @@ ssh:
 -   `concurrency`: The number of threads to use when executing on remote nodes. Default is `100`.
 -   `format`: The format to use when printing results. Options are `human` and `json`. Default is `human`.
 -   `hiera-config`: Specify the path to your Hiera config. The default path is `hiera.yaml` inside the [Bolt project directory](bolt_project_directories.md#).
--   `interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the `.` character (`.py` and `py` both map to a task executable `task.py`) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. When a node's name is `localhost`, Ruby tasks run with the Bolt Ruby interpreter by default. This example demonstrates configuring Python tasks to run with a `python3` interpreter:
+-   `interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the `.` character (`.py` and `py` both map to a task executable `task.py`) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `lxd`, `ssh`, and `winrm`. When a node's name is `localhost`, Ruby tasks run with the Bolt Ruby interpreter by default. This example demonstrates configuring Python tasks to run with a `python3` interpreter:
     ```yaml
     interpreters:
       py: /usr/bin/python3
@@ -34,7 +34,7 @@ ssh:
 -   `modulepath`: The module path for loading tasks and plan code. This is either an array of directories or a string containing a list of directories separated by the OS-specific `PATH` separator. The default path for modules is `modules:site-modules:site` inside the [Bolt project directory](bolt_project_directories.md#).
 -   `puppetfile`: A map containing options for the `bolt puppetfile install` command.
 -   `save-rerun`: Specify whether to update `.rerun.json` in the [Bolt project directory](bolt_project_directories.md#). If your target names include passwords, set this value to false to avoid writing passwords to disk.
--   `transport`: Specify the default transport to use when the transport for a target is not specified in the URL or inventory. Options are `docker`, `local`, `pcp`, `ssh`, and `winrm`.
+-   `transport`: Specify the default transport to use when the transport for a target is not specified in the URL or inventory. Options are `docker`, `local`, `lxd`, `pcp`, `ssh`, and `winrm`.
 -   `future`: Whether to use new, breaking changes. This allows testing if Bolt content is compatible with expected future behavior. Options are `true` and `false`. Default is `false`.
 
 
