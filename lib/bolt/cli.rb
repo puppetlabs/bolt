@@ -526,6 +526,7 @@ module Bolt
     end
 
     def apply_manifest(code, targets, filename = nil, noop = false)
+      Puppet[:tasks] = false
       ast = pal.parse_manifest(code, filename)
 
       executor = Bolt::Executor.new(config.concurrency, analytics, noop)

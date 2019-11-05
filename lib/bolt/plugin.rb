@@ -120,20 +120,31 @@ module Bolt
 
     def self.setup(config, pal, pdb_client, analytics)
       plugins = new(config, pal, analytics)
-      # PDB is special do we want to expose the default client to the context?
+
+      # PDB is special because it needs the PDB client. Since it has no config,
+      # we can just add it first.
       plugins.add_plugin(Bolt::Plugin::Puppetdb.new(pdb_client))
 
-      plugins.add_ruby_plugin('Bolt::Plugin::InstallAgent')
-      plugins.add_ruby_plugin('Bolt::Plugin::Task')
-      plugins.add_ruby_plugin('Bolt::Plugin::Pkcs7')
-      plugins.add_ruby_plugin('Bolt::Plugin::Prompt')
+      # Initialize any plugins referenced in config. This will also indirectly
+      # initialize any plugins they depend on.
+      if plugins.reference?(config.plugins)
+        msg = "The 'plugins' setting cannot be set by a plugin reference"
+        raise PluginError.new(msg, 'bolt/plugin-error')
+      end
+
+      config.plugins.keys.each do |plugin|
+        plugins.by_name(plugin)
+      end
 
       plugins
     end
 
+    RUBY_PLUGINS = %w[install_agent task pkcs7 prompt].freeze
     BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory puppetdb azure_inventory].freeze
 
     attr_reader :pal, :plugin_context
+
+    private_class_method :new
 
     def initialize(config, pal, analytics)
       @config = config
@@ -142,6 +153,8 @@ module Bolt
       @plugins = {}
       @pal = pal
       @unknown = Set.new
+      @resolution_stack = []
+      @unresolved_plugin_configs = config.plugins.dup
     end
 
     def modules
@@ -153,11 +166,11 @@ module Bolt
       @plugins[plugin.name] = plugin
     end
 
-    def add_ruby_plugin(cls_name)
-      snake_name = Bolt::Util.class_name_to_file_name(cls_name)
-      require snake_name
-      cls = Kernel.const_get(cls_name)
-      plugin_name = snake_name.split('/').last
+    def add_ruby_plugin(plugin_name)
+      cls_name = Bolt::Util.snake_name_to_class_name(plugin_name)
+      filename = "bolt/plugin/#{plugin_name}"
+      require filename
+      cls = Kernel.const_get("Bolt::Plugin::#{cls_name}")
       opts = {
         context: @plugin_context,
         config: config_for_plugin(plugin_name)
@@ -178,7 +191,17 @@ module Bolt
     end
 
     def config_for_plugin(plugin_name)
-      @config.plugins[plugin_name] || {}
+      return {} unless @unresolved_plugin_configs.include?(plugin_name)
+      if @resolution_stack.include?(plugin_name)
+        msg = "Configuration for plugin '#{plugin_name}' depends on the plugin itself"
+        raise PluginError.new(msg, 'bolt/plugin-error')
+      else
+        @resolution_stack.push(plugin_name)
+        config = resolve_references(@unresolved_plugin_configs[plugin_name])
+        @unresolved_plugin_configs.delete(plugin_name)
+        @resolution_stack.pop
+        config
+      end
     end
 
     def get_hook(plugin_name, hook)
@@ -194,7 +217,9 @@ module Bolt
     def by_name(plugin_name)
       return @plugins[plugin_name] if @plugins.include?(plugin_name)
       begin
-        unless @unknown.include?(plugin_name)
+        if RUBY_PLUGINS.include?(plugin_name)
+          add_ruby_plugin(plugin_name)
+        elsif !@unknown.include?(plugin_name)
           add_module_plugin(plugin_name)
         end
       rescue PluginError::Unknown

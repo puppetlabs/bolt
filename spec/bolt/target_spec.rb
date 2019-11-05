@@ -216,7 +216,7 @@ describe Bolt::Target2 do
   describe "when parsing userinfo" do
     let(:config) { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
     let(:pal) { nil }
-    let(:plugins) { Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new) }
+    let(:plugins) { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
     let(:inventory) { Bolt::Inventory.create_version({ 'version' => 2 }, config, plugins) }
     let(:user)     { 'gunther' }
     let(:password) { 'foobar' }

@@ -21,7 +21,7 @@ describe Bolt::Inventory do
   end
 
   let(:pal) { nil } # Not used
-  let(:plugins) { Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new) }
+  let(:plugins) { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
 
   let(:data) {
     {
