@@ -84,15 +84,12 @@ module Bolt
       {
         'name' => name,
         'uri' => uri,
-        'alias' => @target_alias,
-        'config' => config.merge(
-          'transport' => transport,
-          transport => options
-        ),
+        'alias' => target_alias,
+        'config' => Bolt::Util.deep_merge(config, 'transport' => transport, transport => options),
         'vars' => vars,
         'features' => features,
         'facts' => facts,
-        'plugin_hooks' => Bolt::Util.deep_clone(plugin_hooks)
+        'plugin_hooks' => plugin_hooks
       }
     end
 
@@ -250,6 +247,10 @@ module Bolt
       @inventory.facts(self)
     end
 
+    def target_alias
+      @inventory.target_alias(self)
+    end
+
     # TODO: WHAT does equality mean here?
     # should we just compare names? is there something else that is meaninful?
     def eql?(other)
@@ -285,8 +286,7 @@ module Bolt
     def detail
       {
         'name' => name,
-        'uri' => uri,
-        'alias' => @target_alias,
+        'alias' => target_alias,
         'config' => {
           'transport' => transport,
           transport => options
@@ -294,7 +294,7 @@ module Bolt
         'vars' => vars,
         'facts' => facts,
         'features' => features.to_a,
-        'plugin_hooks' => Bolt::Util.deep_clone(plugin_hooks)
+        'plugin_hooks' => plugin_hooks
       }
     end
 

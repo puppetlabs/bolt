@@ -173,6 +173,14 @@ module Bolt
       @target_features[target.name] || Set.new
     end
 
+    def target_alias(target)
+      @groups.node_aliases.each_with_object([]) do |(alia, name), acc|
+        if target.name == name
+          acc << alia
+        end
+      end.uniq
+    end
+
     def data_hash
       {
         data: @data,

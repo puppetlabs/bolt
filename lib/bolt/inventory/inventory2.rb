@@ -176,8 +176,27 @@ module Bolt
         unless existing_target
           add_to_group([new_target], 'all')
         end
+        # Insert target alias into groups that contain the target
+        if (aliases = new_target.target_alias)
+          aliases = [aliases] if aliases.is_a?(String)
+          unless aliases.is_a?(Array)
+            msg = "Alias entry on #{t_name} must be a String or Array, not #{aliases.class}"
+            raise ValidationError.new(msg, @name)
+          end
+
+          insert_alias_into_group(@groups, new_target.name, aliases)
+        end
 
         new_target
+      end
+
+      def insert_alias_into_group(group, target_name, aliases)
+        if group.all_target_names.include?(target_name)
+          group.insert_alia(target_name, aliases)
+        end
+        group.groups.each do |grp|
+          insert_alias_into_group(grp, target_name, aliases)
+        end
       end
 
       def add_to_group(targets, desired_group)

@@ -4,7 +4,7 @@ module Bolt
   class Inventory
     # This class represents the active state of a target within the inventory.
     class Target
-      attr_reader :name, :uri, :safe_name
+      attr_reader :name, :uri, :safe_name, :target_alias
 
       def initialize(target_data, inventory)
         unless target_data['name'] || target_data['uri']
@@ -34,7 +34,9 @@ module Bolt
         @features = target_data['features'] || Set.new
         @options = target_data['options'] || {}
         @plugin_hooks = target_data['plugin_hooks'] || {}
-        @target_alias = target_data['target_alias'] || []
+        # When alias is specified in a plan, the key will be `target_alias`, when
+        # alias is specified in inventory the key will be `alias`.
+        @target_alias = target_data['target_alias'] || target_data['alias'] || []
 
         @inventory = inventory
 

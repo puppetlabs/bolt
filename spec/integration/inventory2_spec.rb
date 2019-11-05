@@ -314,6 +314,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       expect(result['target_not_overwritten']).to eq("dont_overwrite")
       expect(result['target_not_duplicated']).to eq(["bar_1"])
       expect(result['target_to_all_group']).to include('add_to_all')
+      expect(result['target_by_alias']).to eq('0.0.0.0:20024')
     end
 
     it 'errors when trying to add to non-existent group' do

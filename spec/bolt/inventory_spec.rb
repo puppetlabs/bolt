@@ -748,4 +748,41 @@ describe Bolt::Inventory do
         .to raise_error(Bolt::Inventory::ValidationError, /Unsupported version/)
     end
   end
+
+  context 'when using inventory show' do
+    let(:data) {
+      { 'nodes' => [{
+        'name' => 'foo',
+        'alias' => %w[bar baz],
+        'config' => { 'ssh' => { 'disconnect-timeout' => 100 } },
+        'facts' => { 'foo' => 'bar' }
+      }] }
+    }
+
+    let(:inventory) { Bolt::Inventory.new(data) }
+    let(:target) { get_target(inventory, 'foo') }
+    let(:expected_data) {
+      { 'name' => 'foo',
+        'alias' => %w[bar baz],
+        'config' => {
+          'transport' => 'ssh',
+          'ssh' => {
+            'connect-timeout' => 10,
+            'tty' => false,
+            'load-config' => true,
+            'disconnect-timeout' => 100
+          }
+        },
+        'vars' => {},
+        'facts' => { 'foo' => 'bar' },
+        'features' => [],
+        'plugin_hooks' => {
+          'puppet_library' => { 'plugin' => 'puppet_agent', 'stop_service' => true }
+        } }
+    }
+
+    it 'target detail method returns expected munged config from inventory' do
+      expect(target.detail).to eq(expected_data)
+    end
+  end
 end

@@ -53,6 +53,7 @@ describe Bolt::Inventory::Group2 do
                                                     'name' => nil,
                                                     'plugin_hooks' => {},
                                                     'uri' => 'target1',
+                                                    'alias' => nil,
                                                     'facts' => {},
                                                     'features' => Set.new,
                                                     'groups' => [])
