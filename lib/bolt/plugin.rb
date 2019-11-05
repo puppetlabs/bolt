@@ -39,9 +39,10 @@ module Bolt
     end
 
     class PluginContext
-      def initialize(config, pal)
+      def initialize(config, pal, plugins)
         @pal = pal
         @config = config
+        @plugins = plugins
       end
 
       def serial_executor
@@ -50,7 +51,7 @@ module Bolt
       private :serial_executor
 
       def empty_inventory
-        @empty_inventory ||= Bolt::Inventory.new({}, @config)
+        @empty_inventory ||= Bolt::Inventory::Inventory2.new({}, @config, plugins: @plugins)
       end
       private :empty_inventory
 
@@ -136,6 +137,8 @@ module Bolt
         plugins.by_name(plugin)
       end
 
+      plugins.default_plugin_hooks = plugins.resolve_references(config.plugin_hooks)
+
       plugins
     end
 
@@ -143,18 +146,20 @@ module Bolt
     BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory puppetdb azure_inventory].freeze
 
     attr_reader :pal, :plugin_context
+    attr_accessor :default_plugin_hooks
 
     private_class_method :new
 
     def initialize(config, pal, analytics)
       @config = config
       @analytics = analytics
-      @plugin_context = PluginContext.new(config, pal)
+      @plugin_context = PluginContext.new(config, pal, self)
       @plugins = {}
       @pal = pal
       @unknown = Set.new
       @resolution_stack = []
       @unresolved_plugin_configs = config.plugins.dup
+      @default_plugin_hooks = {}
     end
 
     def modules

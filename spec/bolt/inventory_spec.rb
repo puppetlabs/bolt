@@ -759,7 +759,7 @@ describe Bolt::Inventory do
       }] }
     }
 
-    let(:inventory) { Bolt::Inventory.new(data) }
+    let(:inventory) { Bolt::Inventory.new(data, plugins: plugins) }
     let(:target) { get_target(inventory, 'foo') }
     let(:expected_data) {
       { 'name' => 'foo',

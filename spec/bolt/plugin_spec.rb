@@ -67,4 +67,16 @@ describe Bolt::Plugin do
       expect { plugins }.to raise_error(/The 'plugins' setting cannot be set by a plugin reference/)
     end
   end
+
+  context 'loading plugin_hooks' do
+    it 'evaluates plugin references in the plugin_hooks configuration' do
+      config_data['plugin_hooks'] = {
+        'puppet_library' => {
+          'plugin' => 'my_hook',
+          'param' => identity('foobar')
+        }
+      }
+      expect(plugins.default_plugin_hooks['puppet_library']).to eq('plugin' => 'my_hook', 'param' => 'foobar')
+    end
+  end
 end
