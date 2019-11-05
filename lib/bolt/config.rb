@@ -166,30 +166,14 @@ module Bolt
 
       @save_rerun = data['save-rerun'] if data.key?('save-rerun')
 
-      # Plugins are only settable from config not inventory so we can overwrite
       @plugins = data['plugins'] if data.key?('plugins')
       @plugin_hooks.merge!(data['plugin_hooks']) if data.key?('plugin_hooks')
 
-      %w[concurrency format puppetdb color transport].each do |key|
+      %w[concurrency format puppetdb color].each do |key|
         send("#{key}=", data[key]) if data.key?(key)
       end
 
-      TRANSPORTS.each do |key, impl|
-        if data[key.to_s]
-          selected = impl.filter_options(data[key.to_s])
-          if @future
-            to_expand = %w[private-key cacert token-file] & selected.keys
-            to_expand.each do |opt|
-              selected[opt] = File.expand_path(selected[opt], @boltdir.path) if opt.is_a?(String)
-            end
-          end
-
-          @transports[key] = Bolt::Util.deep_merge(@transports[key], selected)
-        end
-        if @transports[key]['interpreters']
-          @transports[key]['interpreters'] = normalize_interpreters(@transports[key]['interpreters'])
-        end
-      end
+      update_transports(data)
     end
     private :update_from_file
 
@@ -229,11 +213,28 @@ module Bolt
     end
 
     def update_from_inventory(data)
-      update_from_file(data)
+      update_transports(data)
+    end
 
-      if data['transport']
-        @transport = data['transport']
+    def update_transports(data)
+      TRANSPORTS.each do |key, impl|
+        if data[key.to_s]
+          selected = impl.filter_options(data[key.to_s])
+          if @future
+            to_expand = %w[private-key cacert token-file] & selected.keys
+            to_expand.each do |opt|
+              selected[opt] = File.expand_path(selected[opt], @boltdir.path) if opt.is_a?(String)
+            end
+          end
+
+          @transports[key] = Bolt::Util.deep_merge(@transports[key], selected)
+        end
+        if @transports[key]['interpreters']
+          @transports[key]['interpreters'] = normalize_interpreters(@transports[key]['interpreters'])
+        end
       end
+
+      @transport = data['transport'] if data.key?('transport')
     end
 
     def transport_conf
