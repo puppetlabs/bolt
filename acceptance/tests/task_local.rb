@@ -19,7 +19,7 @@ test_name "bolt task run should execute tasks on localhost via local transport" 
       bolt_command = "bolt task run test::test_profile"
 
       flags = {
-        '--nodes' => 'localhost',
+        '--targets' => 'localhost',
         '--modulepath' => "#{dir}/modules"
       }
 
@@ -43,7 +43,7 @@ test_name "bolt task run should execute tasks on localhost via local transport" 
     step "execute `bolt task run` on localhost via local transport" do
       bolt_command = "bolt task run test::whoami_nix greetings=hello"
       flags = {
-        '--nodes' => 'localhost',
+        '--targets' => 'localhost',
         '--modulepath' => "#{dir}/modules"
       }
 
@@ -59,7 +59,7 @@ test_name "bolt task run should execute tasks on localhost via local transport" 
 
       bolt_command = "bolt task run test::whoami_nix greetings=hello"
       flags = {
-        '--nodes' => 'localhost',
+        '--targets' => 'localhost',
         '--modulepath' => "#{local_user_homedir}/modules",
         '--run-as' => "'#{local_user}'"
       }

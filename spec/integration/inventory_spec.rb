@@ -50,11 +50,11 @@ describe 'running with an inventory file', reset_puppet_settings: true do
      '--password', conn[:password]]
   }
 
-  let(:run_command) { ['command', 'run', shell_cmd, '--nodes', target] + config_flags }
+  let(:run_command) { ['command', 'run', shell_cmd, '--targets', target] + config_flags }
 
   let(:run_plan) { ['plan', 'run', 'inventory', "command=#{shell_cmd}", "host=#{target}"] + config_flags }
 
-  let(:show_inventory) { ['inventory', 'show', '--nodes', target] + config_flags }
+  let(:show_inventory) { ['inventory', 'show', '--targets', target] + config_flags }
   let(:show_group) { %w[group show] + config_flags }
 
   around(:each) do |example|
@@ -235,7 +235,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     it 'computes facts and vars based on group hierarchy' do
-      plan = ['plan', 'run', 'add_group', '--nodes', 'add_me'] + config_flags
+      plan = ['plan', 'run', 'add_group', '--targets', 'add_me'] + config_flags
       expected_hash_pre = { 'top_level' => 'keep',
                             'preserve_hierarchy' => 'keep',
                             'parent' => 'keep',
@@ -256,14 +256,14 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     it 'errors when trying to add to non-existent group' do
-      plan = ['plan', 'run', 'add_group::x_fail_non_existent_group', '--nodes', 'add_me'] + config_flags
+      plan = ['plan', 'run', 'add_group::x_fail_non_existent_group', '--targets', 'add_me'] + config_flags
       result = run_cli_json(plan)
       expect(result['kind']).to eq('bolt.inventory/validation-error')
       expect(result['msg']).to match(/Group does_not_exist does not exist in inventory/)
     end
 
     it 'errors when trying to add new target with name that conflicts with group name' do
-      plan = ['plan', 'run', 'add_group::x_fail_group_name_exists', '--nodes', 'add_me'] + config_flags
+      plan = ['plan', 'run', 'add_group::x_fail_group_name_exists', '--targets', 'add_me'] + config_flags
       result = run_cli_json(plan)
       expect(result['kind']).to eq('bolt.inventory/validation-error')
       expect(result['msg']).to match(/Group foo conflicts with node of the same name for group/)
@@ -354,7 +354,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
         it 'uses tmpdir' do
           with_tempfile_containing('script', 'echo "`dirname $0`"', '.sh') do |f|
-            run_script = ['script', 'run', f.path, '--nodes', target] + config_flags
+            run_script = ['script', 'run', f.path, '--targets', target] + config_flags
             expect(run_one_node(run_script)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
           end
         end
@@ -380,7 +380,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
         it 'uses tmpdir' do
           with_tempfile_containing('script', 'echo "`dirname $0`"', '.sh') do |f|
-            run_script = ['script', 'run', f.path, '--nodes', target] + config_flags
+            run_script = ['script', 'run', f.path, '--targets', target] + config_flags
             expect(run_one_node(run_script)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
           end
         end

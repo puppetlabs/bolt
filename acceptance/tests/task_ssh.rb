@@ -21,7 +21,7 @@ test_name "C100550: \
   step "execute `bolt task run` via SSH" do
     bolt_command = "bolt task run test::hostname_nix"
     flags = {
-      '--nodes' => 'ssh_nodes',
+      '--targets' => 'ssh_nodes',
       '--modulepath' => "#{dir}/modules"
     }
 

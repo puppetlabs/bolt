@@ -19,7 +19,7 @@ test_name "C100549: \
 
   step "execute `bolt script run` via WinRM" do
     bolt_command = "bolt script run #{script} hello"
-    flags = { '--nodes' => 'winrm_nodes' }
+    flags = { '--targets' => 'winrm_nodes' }
 
     result = bolt_command_on(bolt, bolt_command, flags)
     winrm_nodes.each do |node|

@@ -17,7 +17,7 @@ test_name "bolt script run should execute script on localhost via local transpor
 
     step "execute powershell script via local transport without loading powershell profile" do
       bolt_command = "bolt script run #{script}"
-      flags = { '--nodes' => 'localhost' }
+      flags = { '--targets' => 'localhost' }
 
       inspect_profile_tracker = "\"if (Test-Path -Path #{profile_tracker.inspect}) " \
                                 "{ Get-Content -Path #{profile_tracker.inspect} }\""
@@ -40,7 +40,7 @@ test_name "bolt script run should execute script on localhost via local transpor
     step "execute `bolt script run` on localhost" do
       bolt_command = "bolt script run #{script} hello"
 
-      flags = { '--nodes' => 'localhost' }
+      flags = { '--targets' => 'localhost' }
 
       result = bolt_command_on(bolt, bolt_command, flags)
       message = "Unexpected output from the command:\n#{result.cmd}"
@@ -55,7 +55,7 @@ test_name "bolt script run should execute script on localhost via local transpor
 
       bolt_command = "bolt script run #{local_owned_script} hello"
 
-      flags = { '--nodes' => 'localhost', '--run-as' => "'#{local_user}'" }
+      flags = { '--targets' => 'localhost', '--run-as' => "'#{local_user}'" }
 
       result = bolt_command_on(bolt, bolt_command, flags)
       message = "Unexpected output from the command:\n#{result.cmd}"

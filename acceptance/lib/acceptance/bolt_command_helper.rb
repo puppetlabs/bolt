@@ -6,7 +6,7 @@ module Acceptance
     # @param [Beaker::Host] host the host to execute the command on
     # @param [String] command the command to execute on the bolt SUT
     # @param [Hash] flags the command flags to append to the command
-    # @option flags [String] '--nodes' the nodes to run on
+    # @option flags [String] '--targets' the nodes to run on
     # @option flags [String] '--user' the user to run the command as
     # @option flags [String] '--password' the password for the user
     # @option flags [nil] '--no-host-key-check' specify nil to use

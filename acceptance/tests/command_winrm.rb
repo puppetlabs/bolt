@@ -12,7 +12,7 @@ test_name "C100547: \
   step "execute `bolt command run` via WinRM" do
     command = '[System.Net.Dns]::GetHostByName(($env:computerName))'
     bolt_command = "bolt command run '#{command}'"
-    flags = { '--nodes' => 'winrm_nodes' }
+    flags = { '--targets' => 'winrm_nodes' }
 
     result = bolt_command_on(bolt, bolt_command, flags)
 

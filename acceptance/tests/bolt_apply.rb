@@ -39,7 +39,7 @@ test_name "bolt apply should apply manifest block on remote hosts via ssh and wi
   end
 
   step "execute `bolt apply -e <code>` with json output" do
-    bolt_command = "bolt apply -e \"notify { 'hello world': }\" --nodes #{targets.join(',')}"
+    bolt_command = "bolt apply -e \"notify { 'hello world': }\" --targets #{targets.join(',')}"
     flags = {
       '--format' => 'json'
     }
@@ -50,7 +50,7 @@ test_name "bolt apply should apply manifest block on remote hosts via ssh and wi
 
   step "execute `bolt apply -e <code>` with json output against localhost" do
     # TODO: Execute with '--run-as local_user' when BOLT-1283 is fixed
-    bolt_command = "bolt apply -e \"notify { 'hello world': }\" --nodes localhost"
+    bolt_command = "bolt apply -e \"notify { 'hello world': }\" --targets localhost"
     flags = {
       '--format' => 'json'
     }
@@ -65,7 +65,7 @@ test_name "bolt apply should apply manifest block on remote hosts via ssh and wi
     notify { "hello world": }
     MANIFEST
 
-    bolt_command = "bolt apply '#{dir}/test.pp' --nodes #{targets.join(',')}"
+    bolt_command = "bolt apply '#{dir}/test.pp' --targets #{targets.join(',')}"
     flags = {
       '--format' => 'json'
     }

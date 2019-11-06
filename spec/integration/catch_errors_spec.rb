@@ -23,7 +23,7 @@ describe "catch_errors", ssh: true do
     ['--format', 'json',
      '--configfile', fixture_path('configs', 'empty.yml'),
      '--modulepath', modulepath,
-     '--nodes', target] + transport_flags
+     '--targets', target] + transport_flags
   }
   let(:plan) { "catch_errors" }
 

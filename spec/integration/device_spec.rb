@@ -15,7 +15,7 @@ describe "devices" do
   include BoltSpec::Run
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
-  let(:config_flags) { %W[--format json --nodes #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
+  let(:config_flags) { %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
 
   describe 'over ssh', ssh: true do
     let(:uri) { conn_uri('ssh') }
@@ -69,7 +69,7 @@ describe "devices" do
 
       it 'runs a plan that collects facts' do
         with_tempfile_containing('inventory', YAML.dump(device_inventory), '.yaml') do |inv|
-          results = run_cli_json(%W[plan run device_test::facts --nodes device_targets
+          results = run_cli_json(%W[plan run device_test::facts --targets device_targets
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
           expect(results).not_to include("kind")
           name, facts = results.first
@@ -83,7 +83,7 @@ describe "devices" do
       it 'runs a plan that applies resources' do
         with_tempfile_containing('inventory', YAML.dump(device_inventory), '.yaml') do |inv|
           results = run_cli_json(%W[plan run device_test::set_a_val
-                                    --nodes device_targets
+                                    --targets device_targets
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
           expect(results).not_to include("kind")
 
@@ -94,7 +94,7 @@ describe "devices" do
           expect(content).to eq({ key1: "val1" }.to_json)
 
           resources = run_cli_json(%W[plan run device_test::resources
-                                      --nodes device_targets
+                                      --targets device_targets
                                       --modulepath #{modulepath} --inventoryfile #{inv.path}])
           expect(resources[0]['result']['resources'][0]).to eq("key1" =>
                                                                { "content" => "val1",

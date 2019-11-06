@@ -133,7 +133,7 @@ describe 'rerun' do
       allow(executor).to receive(:run_command)
         .with(targets, 'whoami', kind_of(Hash))
         .and_return(result_set)
-      run_cli(['command', 'run', 'whoami', '--nodes', target_spec.join(',')])
+      run_cli(['command', 'run', 'whoami', '--targets', target_spec.join(',')])
 
       expect(read_rerun).to eq(failure_array)
     end
@@ -142,7 +142,7 @@ describe 'rerun' do
       allow(executor).to receive(:run_command)
         .with(targets, 'whoami', kind_of(Hash))
         .and_return(result_set)
-      run_cli(['command', 'run', 'whoami', '--no-tty', '--no-save-rerun', '--nodes', target_spec.join(',')])
+      run_cli(['command', 'run', 'whoami', '--no-tty', '--no-save-rerun', '--targets', target_spec.join(',')])
 
       expect(read_rerun).to eq(['original result'])
     end
@@ -153,7 +153,7 @@ describe 'rerun' do
       allow(executor).to receive(:run_command)
         .with(targets, 'whoami', kind_of(Hash))
         .and_return(result_set)
-      run_cli(['command', 'run', 'whoami', '--nodes', target_spec.join(',')])
+      run_cli(['command', 'run', 'whoami', '--targets', target_spec.join(',')])
 
       expect(read_rerun).to eq(['original result'])
     end
@@ -185,7 +185,7 @@ describe 'rerun' do
       allow(pal).to receive(:in_plan_compiler)
       allow(pal).to receive(:with_bolt_executor)
         .and_return(Bolt::ResultSet.new([Bolt::ApplyResult.new(targets[0], error: { 'kind' => 'oops' })]))
-      run_cli(['apply', '--nodes', 'node1', '-e', 'include foo'])
+      run_cli(['apply', '--targets', 'node1', '-e', 'include foo'])
       expect(read_rerun).to eq([{ "status" => "failure", "target" => "node1" }])
     end
 
@@ -193,7 +193,7 @@ describe 'rerun' do
       allow(pal).to receive(:in_plan_compiler)
       allow(pal).to receive(:with_bolt_executor)
         .and_return(Bolt::ResultSet.new([Bolt::ApplyResult.new(targets[0], report: {})]))
-      run_cli(['apply', '--nodes', 'node1', '-e', 'include foo'])
+      run_cli(['apply', '--targets', 'node1', '-e', 'include foo'])
       expect(read_rerun).to eq([{ "status" => "success", "target" => "node1" }])
     end
   end

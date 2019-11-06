@@ -17,7 +17,7 @@ describe "when runnning over the winrm transport", winrm: true do
 
   context 'when using CLI options' do
     let(:config_flags) {
-      %W[--nodes #{uri} --no-ssl --no-ssl-verify --format json --modulepath #{modulepath}
+      %W[--targets #{uri} --no-ssl --no-ssl-verify --format json --modulepath #{modulepath}
          --password #{password}]
     }
 
@@ -99,8 +99,8 @@ describe "when runnning over the winrm transport", winrm: true do
       }
     }
     let(:uri) { (1..2).map { |i| "#{conn_uri('winrm')}?id=#{i}" }.join(',') }
-    let(:config_flags) { %W[--nodes #{uri}] }
-    let(:single_target_conf) { %W[--nodes #{conn_uri('winrm')}] }
+    let(:config_flags) { %W[--targets #{uri}] }
+    let(:single_target_conf) { %W[--targets #{conn_uri('winrm')}] }
     let(:interpreter_task) { 'sample::bolt_ruby' }
     let(:interpreter_ext) do
       { 'interpreters' => {

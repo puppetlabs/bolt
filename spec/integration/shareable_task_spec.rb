@@ -8,7 +8,7 @@ describe "Shareable tasks with files", bash: true do
   include BoltSpec::Integration
 
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
-  let(:config_flags) { %W[--format json --nodes localhost --modulepath #{modulepath}] }
+  let(:config_flags) { %W[--format json --targets localhost --modulepath #{modulepath}] }
 
   it 'runs a task with multiple files' do
     result = run_cli_json(%w[task run shareable] + config_flags)

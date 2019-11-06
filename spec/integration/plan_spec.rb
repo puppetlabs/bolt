@@ -30,7 +30,7 @@ describe "When a plan succeeds" do
   end
 
   it 'prints a placeholder if no result is returned', ssh: true do
-    result = run_cli(['plan', 'run', 'sample::single_task', '--nodes', target] + config_flags,
+    result = run_cli(['plan', 'run', 'sample::single_task', '--targets', target] + config_flags,
                      outputter: Bolt::Outputter::JSON)
     json = JSON.parse(result)[0]
     expect(json['node']).to eq(target.to_s)
@@ -38,7 +38,7 @@ describe "When a plan succeeds" do
   end
 
   it 'prints a placeholder if no result is returned', ssh: true do
-    result = run_cli(['plan', 'run', 'sample::single_task', '--nodes', target] + config_flags,
+    result = run_cli(['plan', 'run', 'sample::single_task', '--targets', target] + config_flags,
                      outputter: Bolt::Outputter::Human)
     expect(result).to match(/got passed the message: hi there/)
     expect(result).to match(/Successful on 1 node:/)
@@ -46,7 +46,7 @@ describe "When a plan succeeds" do
   end
 
   it 'runs a yaml plan', ssh: true do
-    result = run_cli(['plan', 'run', 'sample::yaml', '--nodes', target] + config_flags)
+    result = run_cli(['plan', 'run', 'sample::yaml', '--targets', target] + config_flags)
     expect(JSON.parse(result)).to eq('stdout' => "hello world\n", 'stderr' => '', 'exit_code' => 0)
   end
 
@@ -64,7 +64,7 @@ describe "When a plan succeeds" do
     it 'runs registers types defined in $Boltdir/.resource_types', ssh: true do
       # generate types based and save in boltdir (based on value of --configfile)
       run_cli(%w[puppetfile generate-types] + config_flags)
-      result = run_cli(['plan', 'run', 'resource_types', '--nodes', target] + config_flags)
+      result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)
       expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
     end
   end

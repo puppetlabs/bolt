@@ -21,7 +21,7 @@ test_name "C100548: \
   step "execute `bolt script run` via SSH" do
     bolt_command = "bolt script run #{script} hello"
 
-    flags = { '--nodes' => 'ssh_nodes' }
+    flags = { '--targets' => 'ssh_nodes' }
 
     result = bolt_command_on(bolt, bolt_command, flags)
     ssh_nodes.each do |node|

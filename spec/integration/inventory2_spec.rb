@@ -72,7 +72,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
      '--password', conn[:password]]
   }
 
-  let(:run_command) { ['command', 'run', shell_cmd, '--nodes', target] + config_flags }
+  let(:run_command) { ['command', 'run', shell_cmd, '--targets', target] + config_flags }
 
   let(:run_plan) { ['plan', 'run', 'inventory', "command=#{shell_cmd}", "host=#{target}"] + config_flags }
 
@@ -117,7 +117,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   context 'when running a plan' do
     let(:run_plan) { ['plan', 'run', 'inventory::get_host'] + config_flags }
     it 'can access the host' do
-      r = run_cli_json(run_plan + ['--nodes', 'hostless'])
+      r = run_cli_json(run_plan + ['--targets', 'hostless'])
       expect(r).to eq('result' => nil)
     end
   end
@@ -295,7 +295,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     it 'computes facts and vars based on group hierarchy' do
-      plan = ['plan', 'run', 'add_group::inventory2', '--nodes', 'add_me'] + config_flags
+      plan = ['plan', 'run', 'add_group::inventory2', '--targets', 'add_me'] + config_flags
       expected_hash_pre = { 'top_level' => 'keep',
                             'preserve_hierarchy' => 'keep',
                             'parent' => 'keep',
@@ -318,14 +318,14 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     it 'errors when trying to add to non-existent group' do
-      plan = ['plan', 'run', 'add_group::x_fail_non_existent_group', '--nodes', 'add_me'] + config_flags
+      plan = ['plan', 'run', 'add_group::x_fail_non_existent_group', '--targets', 'add_me'] + config_flags
       result = run_cli_json(plan)
       expect(result['kind']).to eq('bolt.inventory/validation-error')
       expect(result['msg']).to match(/Group does_not_exist does not exist in inventory/)
     end
 
     it 'errors when trying to add new target with name that conflicts with group name' do
-      plan = ['plan', 'run', 'add_group::x_fail_group_name_exists', '--nodes', 'add_me'] + config_flags
+      plan = ['plan', 'run', 'add_group::x_fail_group_name_exists', '--targets', 'add_me'] + config_flags
       result = run_cli_json(plan)
       expect(result['kind']).to eq('bolt.inventory/validation-error')
       expect(result['msg']).to match(/Group foo conflicts with target of the same name for group/)
@@ -362,7 +362,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     it 'passes the correct host to the task' do
-      task = ['task', 'run', 'remote', '--nodes', 'remote_target'] + config_flags
+      task = ['task', 'run', 'remote', '--targets', 'remote_target'] + config_flags
 
       result = run_one_node(task)
       expect(result['_target']).to include('host' => 'not.the.name')
@@ -440,7 +440,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
         it 'uses tmpdir' do
           with_tempfile_containing('script', 'echo "`dirname $0`"', '.sh') do |f|
-            run_script = ['script', 'run', f.path, '--nodes', target] + config_flags
+            run_script = ['script', 'run', f.path, '--targets', target] + config_flags
             expect(run_one_node(run_script)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
           end
         end
@@ -467,7 +467,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
         it 'uses tmpdir' do
           with_tempfile_containing('script', 'echo "`dirname $0`"', '.sh') do |f|
-            run_script = ['script', 'run', f.path, '--nodes', target] + config_flags
+            run_script = ['script', 'run', f.path, '--targets', target] + config_flags
             expect(run_one_node(run_script)['stdout'].strip).to match(/#{Regexp.escape(tmpdir)}/)
           end
         end
@@ -655,7 +655,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
       expect(STDOUT).to receive(:print).with("password please:").once
 
-      result = run_one_node(['command', 'run', shell_cmd, '--nodes', 'target-1'] + config_flags)
+      result = run_one_node(['command', 'run', shell_cmd, '--targets', 'target-1'] + config_flags)
       expect(result).to include('stdout' => "bolt\n")
     end
   end

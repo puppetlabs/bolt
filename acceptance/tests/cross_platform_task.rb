@@ -43,7 +43,7 @@ test_name "cross-platform tasks run on multiple kinds of nodes" do
   step "execute `bolt task run` via both SSH and WinRM" do
     bolt_command = "bolt task run test::hostname"
     flags = {
-      '--nodes' => 'all',
+      '--targets' => 'all',
       '--modulepath' => "#{dir}/modules"
     }
 
