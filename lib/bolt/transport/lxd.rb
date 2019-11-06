@@ -32,10 +32,11 @@ module Bolt
       def upload(target, source, destination, _options = {})
         with_connection(target) do |conn|
           conn.with_remote_tempdir do |dir|
-            basename = File.basename(destination)
+            # lxd can't upload dirs into another dirname, so tmpfile is basename of source for both dir and file
+            basename = File.basename(source)
             tmpfile = "#{dir}/#{basename}"
             if File.directory?(source)
-              conn.write_remote_directory(source, tmpfile)
+              conn.write_remote_directory(source, dir)
             else
               conn.write_remote_file(source, tmpfile)
             end

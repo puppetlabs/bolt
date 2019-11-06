@@ -46,20 +46,19 @@ describe Bolt::Transport::LXD, lxd: true do
 
   context 'with_connection' do
     it "fails with an unknown host" do
-      # Test fails differently on Windows due to issues in the lxd-api gem.
       expect {
         lxd.with_connection(Bolt::Target.new('not_a_target')) {}
-      }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name or ID matching \'not_a_target\'/)
+      }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name matching \'not_a_target\'/)
     end
   end
 
   context 'when url is specified' do
-    let(:transport_conf) { { 'service-url' => 'tcp://localhost:55555' } }
+    let(:transport_conf) { { 'service-url' => 'anotherremote' } }
 
     it 'uses the url' do
       expect {
         lxd.with_connection(target) {}
-      }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name or ID matching/)
+      }.to raise_error(Bolt::Node::ConnectError, /Could not find remote/)
     end
   end
 

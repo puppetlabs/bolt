@@ -108,9 +108,9 @@ shared_examples 'transport api' do
     end
 
     it "can return a non-zero exit status" do
-      command = if target.protocol == 'docker'
-                  # explicitly launch bash for Docker transport because Docker doesn't have
-                  # a default shell when you perform: docker exec
+      command = if target.protocol == 'docker' || target.protocol == 'lxd'
+                  # explicitly launch bash for Docker and LXD transport because they don't have
+                  # a default shell when you perform `exec`
                   "/bin/bash -c 'exit 1'"
                 else
                   "exit 1"

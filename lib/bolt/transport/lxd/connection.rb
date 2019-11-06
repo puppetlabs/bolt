@@ -16,6 +16,9 @@ module Bolt
         end
 
         def connect
+          # Check if the service-uri remote exists
+          output = execute_local_lxc_json_command(%w[remote list])
+          raise "Could not find remote '#{@lxd_remote}'" unless output.key?(@lxd_remote)
           # We don't actually have a connection, but we do need to
           # check that the container exists and is running.
           output = execute_local_lxc_json_command(%w[list])
@@ -56,8 +59,6 @@ module Bolt
           command_options << '--'
           command_options.concat(command)
 
-          @logger.debug { "Executing: exec #{command_options}" }
-
           stdout_str, stderr_str, status = execute_local_lxc_command(%w[exec], command_options, options[:stdin])
 
           # The actual result is the exitstatus not the process object
@@ -88,7 +89,7 @@ module Bolt
 
         def write_remote_directory(source, destination)
           @logger.debug { "Uploading #{source}, to #{destination}" }
-          _, stdout_str, status = execute_local_lxc_command(%w[file push], [source, "#{container_id}/#{destination}"])
+          _, stdout_str, status = execute_local_lxc_command(%w[file push], [source, "#{container_id}/#{destination}", '-r'])
           raise "Error writing directory to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
@@ -152,6 +153,7 @@ module Bolt
         # @return [String, String, Process::Status] The output of the command:  STDOUT, STDERR, Process Status
         # rubocop:enable Metrics/LineLength
         def execute_local_lxc_command(subcommands = [], command_options = [], redir_stdin = nil)
+
           env_hash = {}
 
           command_options = [] if command_options.nil?
@@ -160,6 +162,9 @@ module Bolt
           # Always use binary mode for any text data
           capture_options = { binmode: true }
           capture_options[:stdin_data] = redir_stdin unless redir_stdin.nil?
+
+          @logger.debug { "Executing: lxc #{lxc_command}" }
+
           stdout_str, stderr_str, status = Open3.capture3(env_hash, 'lxc', *lxc_command, capture_options)
           [stdout_str, stderr_str, status]
         end
@@ -171,7 +176,8 @@ module Bolt
         # @return [Object] Ruby object representation of the JSON string
         def execute_local_lxc_json_command(subcommands = [], command_options = [])
           command_options = [] if command_options.nil?
-          command_options = ['--format', 'json'].concat(command_options)
+          command_options << '--format'
+          command_options << 'json'
           stdout_str, _stderr_str, _status = execute_local_lxc_command(subcommands, command_options)
           JSON.parse(stdout_str)
         end

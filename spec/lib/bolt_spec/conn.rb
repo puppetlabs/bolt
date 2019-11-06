@@ -92,6 +92,27 @@ module BoltSpec
         ] }
     end
 
+    def lxd_inventory(root: false)
+      usernamepassword = root ? 'root' : 'bolt'
+      { 'version' => 2,
+        'groups' => [
+          { 'name' => 'ssh',
+            'targets' => [
+              { 'name' => 'ubuntunode',
+                'alias' => 'agentless',
+                'config' => { 'ssh' => { 'port' => '20022' } } },
+            ],
+            'config' => {
+              'ssh' => {
+                'host' => 'localhost',
+                'host-key-check' => false,
+                'user' => usernamepassword,
+                'password' => usernamepassword
+              }
+            } }
+        ] }
+    end
+
     def root_password
       'root'
     end
