@@ -81,7 +81,8 @@ module Bolt
 
         def write_remote_file(source, destination)
           @logger.debug { "Uploading #{source}, to #{destination}" }
-          _, stdout_str, status = execute_local_lxc_command(%w[file push], [source, "#{container_id}/#{destination}"])
+          path = "#{container_id}/#{destination}"
+          _, stdout_str, status = execute_local_lxc_command(%w[file push], [source, path])
           raise "Error writing file to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
@@ -89,7 +90,8 @@ module Bolt
 
         def write_remote_directory(source, destination)
           @logger.debug { "Uploading #{source}, to #{destination}" }
-          _, stdout_str, status = execute_local_lxc_command(%w[file push], [source, "#{container_id}/#{destination}", '-r'])
+          path = "#{container_id}/#{destination}"
+          _, stdout_str, status = execute_local_lxc_command(%w[file push], [source, path, '-r'])
           raise "Error writing directory to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
@@ -153,7 +155,6 @@ module Bolt
         # @return [String, String, Process::Status] The output of the command:  STDOUT, STDERR, Process Status
         # rubocop:enable Metrics/LineLength
         def execute_local_lxc_command(subcommands = [], command_options = [], redir_stdin = nil)
-
           env_hash = {}
 
           command_options = [] if command_options.nil?
