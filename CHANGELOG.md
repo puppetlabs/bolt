@@ -28,9 +28,9 @@
   
 ### Bug fixes
 
-* **Standardized configured paths to be relative to Boltdir** ([#1162](https://github.com/puppetlabs/bolt/issues/1162))
+* **Some configured paths were relative to Boltdir and some were relative to the current working directory** ([#1162](https://github.com/puppetlabs/bolt/issues/1162))
 
-  This fix standardizes all configured paths, including the modulepath, to be relative to the Boltdir. It only applies to file-based configs, not command line flags which expand relative to CWD. It is gated on the future config option, and will be available by default in Bolt 2.0.
+  This fix standardizes all configured paths, including the modulepath, to be relative to the Boltdir. It only applies to file-based configs, not command line flags which expand relative to the current working directory. It is gated on the future config option, and will be available by default in Bolt 2.0.
 
 ## 1.35.0
 
