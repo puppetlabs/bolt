@@ -9,7 +9,6 @@ module Bolt
     class Group2
       attr_accessor :name, :groups
 
-      # THESE are duplicates with the old groups for now.
       # Regex used to validate group names and target aliases.
       NAME_REGEX = /\A[a-z0-9_][a-z0-9_-]*\Z/.freeze
 
@@ -42,7 +41,6 @@ module Bolt
         @unresolved_targets = {}
         @resolved_targets = {}
 
-        # @target_objects = {}
         @aliases = {}
         @string_targets = []
 
@@ -57,7 +55,7 @@ module Bolt
           elsif target.is_a?(Hash)
             add_target_definition(target)
           else
-            raise ValidationError.new("Node entry must be a String or Hash, not #{target.class}", @name)
+            raise ValidationError.new("Target entry must be a String or Hash, not #{target.class}", @name)
           end
         end
 
@@ -166,10 +164,10 @@ module Bolt
 
       def add_target_definition(target)
         # This check ensures target lookup plugins do not returns bare strings.
-        # Remove it if we decide to allows task plugins to return string node
+        # Remove it if we decide to allows task plugins to return string Target
         # names.
         unless target.is_a?(Hash)
-          raise ValidationError.new("Node entry must be a Hash, not #{target.class}", @name)
+          raise ValidationError.new("Target entry must be a Hash, not #{target.class}", @name)
         end
 
         target['name'] = resolve_references(target['name']) if target.key?('name')
@@ -287,7 +285,7 @@ module Bolt
       end
 
       private def alias_target_conflict(name)
-        "Node name #{name} conflicts with alias of the same name"
+        "Target name #{name} conflicts with alias of the same name"
       end
 
       def validate_group_input(input)

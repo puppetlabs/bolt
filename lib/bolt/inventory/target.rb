@@ -44,7 +44,6 @@ module Bolt
       end
 
       def vars
-        # XXX Return vars from the cache
         group_cache['vars'].merge(@vars)
       end
 
@@ -57,7 +56,6 @@ module Bolt
       # rubocop:enable Naming/AccessorMethodName
 
       def facts
-        # XXX Return facts from the cache
         Bolt::Util.deep_merge(group_cache['facts'], @facts)
       end
 

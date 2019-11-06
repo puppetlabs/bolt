@@ -613,7 +613,7 @@ describe Bolt::Inventory::Group2 do
         }
       end
 
-      it { expect { group.validate }.to raise_error(/Node name target1 conflicts with alias of the same name/) }
+      it { expect { group.validate }.to raise_error(/Target name target1 conflicts with alias of the same name/) }
     end
 
     context 'conflict with a later target name' do
@@ -627,7 +627,7 @@ describe Bolt::Inventory::Group2 do
         }
       end
 
-      it { expect { group.validate }.to raise_error(/Node name target2 conflicts with alias of the same name/) }
+      it { expect { group.validate }.to raise_error(/Target name target2 conflicts with alias of the same name/) }
     end
 
     context 'conflict with its own target name' do
@@ -645,7 +645,7 @@ describe Bolt::Inventory::Group2 do
       end
 
       it 'raises an error' do
-        expect { group.validate }.to raise_error(/Node name target1 conflicts with alias of the same name/)
+        expect { group.validate }.to raise_error(/Target name target1 conflicts with alias of the same name/)
       end
     end
 
