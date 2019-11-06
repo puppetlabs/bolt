@@ -11,7 +11,7 @@ test_name "bolt command run should execute command on localhost via local transp
   step "execute `bolt command run` via local transport" do
     command = 'echo """hello from $(hostname)"""'
     bolt_command = "bolt command run '#{command}'"
-    flags = { '--nodes' => 'localhost' }
+    flags = { '--targets' => 'localhost' }
 
     result = bolt_command_on(bolt, bolt_command, flags)
 
@@ -23,7 +23,7 @@ test_name "bolt command run should execute command on localhost via local transp
   step "execute `bolt command run` via local transport using run-as" do
     command = 'whoami'
     bolt_command = "bolt command run '#{command}'"
-    flags = { '--nodes' => 'localhost', '--run-as' => "'#{local_user}'" }
+    flags = { '--targets' => 'localhost', '--run-as' => "'#{local_user}'" }
 
     result = bolt_command_on(bolt, bolt_command, flags)
 

@@ -19,7 +19,7 @@ test_name "Bolt file upload should copy local file to remote hosts via ssh" do
   step "execute `bolt file upload` via local transport" do
     source = dest = 'local_file.txt'
     bolt_command = "bolt file upload #{dir}/#{source} /tmp/#{dest}"
-    flags = { '--nodes' => 'localhost' }
+    flags = { '--targets' => 'localhost' }
     result = bolt_command_on(bolt, bolt_command, flags)
 
     message = "Unexpected output from the command:\n#{result.cmd}"
@@ -42,7 +42,7 @@ test_name "Bolt file upload should copy local file to remote hosts via ssh" do
     # previous test has root-owned copy, local user cannot overwrite it
     on(bolt, "rm -f /tmp/#{dest}")
     bolt_command = "bolt file upload #{local_user_homedir}/#{source} /tmp/#{dest}"
-    flags = { '--nodes' => 'localhost', '--run-as' => "'#{local_user}'" }
+    flags = { '--targets' => 'localhost', '--run-as' => "'#{local_user}'" }
     result = bolt_command_on(bolt, bolt_command, flags)
 
     message = "Unexpected output from the command:\n#{result.cmd}"

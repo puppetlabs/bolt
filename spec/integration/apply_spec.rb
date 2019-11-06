@@ -16,7 +16,7 @@ describe "apply" do
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
   let(:hiera_config) { File.join(__dir__, '../fixtures/configs/empty.yml') }
-  let(:config_flags) { %W[--format json --nodes #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
+  let(:config_flags) { %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
 
   describe 'over ssh', ssh: true do
     let(:uri) { conn_uri('ssh') }
@@ -142,7 +142,7 @@ describe "apply" do
 
       it 'runs a ruby task' do
         with_tempfile_containing('inventory', YAML.dump(agent_version_inventory), '.yaml') do |inv|
-          results = run_cli_json(%W[task run basic::ruby_task --nodes agent_targets
+          results = run_cli_json(%W[task run basic::ruby_task --targets agent_targets
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
           results['items'].each do |result|
             expect(result['status']).to eq('success')
@@ -153,7 +153,7 @@ describe "apply" do
 
       it 'runs an apply plan' do
         with_tempfile_containing('inventory', YAML.dump(agent_version_inventory), '.yaml') do |inv|
-          results = run_cli_json(%W[plan run basic::notify --nodes agent_targets
+          results = run_cli_json(%W[plan run basic::notify --targets agent_targets
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
           results.each do |result|
             expect(result['status']).to eq('success')
@@ -176,7 +176,7 @@ describe "apply" do
 
       it 'gets resources' do
         with_tempfile_containing('inventory', YAML.dump(agent_version_inventory), '.yaml') do |inv|
-          results = run_cli_json(%W[plan run basic::resources --nodes agent_targets
+          results = run_cli_json(%W[plan run basic::resources --targets agent_targets
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
           results.each do |result|
             expect(result['status']).to eq('success')
@@ -411,7 +411,7 @@ describe "apply" do
 
       it 'runs a ruby task' do
         with_tempfile_containing('bolt', YAML.dump(config), '.yaml') do |conf|
-          results = run_cli_json(%W[task run basic::ruby_task --nodes #{uri}
+          results = run_cli_json(%W[task run basic::ruby_task --targets #{uri}
                                     --configfile #{conf.path}])
           results['items'].each do |result|
             expect(result).to include('status' => 'success')
@@ -422,7 +422,7 @@ describe "apply" do
 
       it 'runs an apply plan' do
         with_tempfile_containing('bolt', YAML.dump(config), '.yaml') do |conf|
-          results = run_cli_json(%W[plan run basic::notify --nodes #{uri}
+          results = run_cli_json(%W[plan run basic::notify --targets #{uri}
                                     --configfile #{conf.path}])
           results.each do |result|
             expect(result).to include('status' => 'success')
@@ -457,7 +457,7 @@ describe "apply" do
 
       it 'runs a ruby task' do
         with_tempfile_containing('bolt', YAML.dump(config), '.yaml') do |conf|
-          results = run_cli_json(%W[task run basic::ruby_task --nodes #{uri}
+          results = run_cli_json(%W[task run basic::ruby_task --targets #{uri}
                                     --configfile #{conf.path}])
           results['items'].each do |result|
             expect(result).to include('status' => 'success')
@@ -468,7 +468,7 @@ describe "apply" do
 
       it 'runs an apply plan' do
         with_tempfile_containing('bolt', YAML.dump(config), '.yaml') do |conf|
-          results = run_cli_json(%W[plan run basic::notify --nodes #{uri}
+          results = run_cli_json(%W[plan run basic::notify --targets #{uri}
                                     --configfile #{conf.path}])
           results.each do |result|
             expect(result).to include('status' => 'success')

@@ -20,7 +20,7 @@ describe "when running over the docker transport", docker: true do
 
   context 'when using CLI options' do
     let(:config_flags) {
-      %W[--nodes #{uri} --no-host-key-check --format json --modulepath #{modulepath}]
+      %W[--targets #{uri} --no-host-key-check --format json --modulepath #{modulepath}]
     }
 
     it 'runs multiple commands' do
@@ -54,8 +54,8 @@ describe "when running over the docker transport", docker: true do
         } }
     end
 
-    let(:config_flags) { %W[--nodes #{uri}] }
-    let(:single_target_conf) { %W[--nodes #{conn_uri('docker')}] }
+    let(:config_flags) { %W[--targets #{uri}] }
+    let(:single_target_conf) { %W[--targets #{conn_uri('docker')}] }
     let(:interpreter_task) { 'sample::interpreter' }
     let(:interpreter_ext) do
       { 'interpreters' => {

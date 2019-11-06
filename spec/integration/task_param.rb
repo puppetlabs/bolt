@@ -9,7 +9,7 @@ describe "Passes the _task metaparameter" do
   include BoltSpec::Conn
 
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
-  let(:config_flags) { %W[--format json --nodes #{target} --modulepath #{modulepath}] }
+  let(:config_flags) { %W[--format json --targets #{target} --modulepath #{modulepath}] }
 
   describe 'over ssh', ssh: true do
     let(:target) { conn_uri('ssh', include_password: true) }

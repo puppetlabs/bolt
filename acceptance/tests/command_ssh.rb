@@ -12,7 +12,7 @@ test_name "C100546: \
   step "execute `bolt command run` via SSH" do
     command = 'echo """hello from $(hostname)"""'
     bolt_command = "bolt command run '#{command}'"
-    flags = { '--nodes' => 'ssh_nodes' }
+    flags = { '--targets' => 'ssh_nodes' }
 
     result = bolt_command_on(bolt, bolt_command, flags)
 

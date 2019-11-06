@@ -28,7 +28,7 @@ describe Bolt::Analytics do
     [
       '--configfile', fixture_path('configs', 'empty.yml'),
       '--modulepath', modulepath,
-      '--nodes', target,
+      '--targets', target,
       '--password', password,
       '--no-host-key-check',
       '--no-ssl',

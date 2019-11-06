@@ -15,7 +15,7 @@ describe "passes parsed AST to the apply_catalog task" do
   include BoltSpec::PuppetDB
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
-  let(:config_flags) { %W[--format json --nodes #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
+  let(:config_flags) { %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
 
   before(:each) do
     allow(Bolt::ApplyResult).to receive(:from_task_result) { |r| r }

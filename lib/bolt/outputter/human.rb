@@ -219,7 +219,7 @@ module Bolt
         # Building lots of strings...
         pretty_params = +""
         task_info = +""
-        usage = +"bolt task run --nodes <node-name> #{task['name']}"
+        usage = +"bolt task run --targets <node-name> #{task['name']}"
 
         task['metadata']['parameters']&.each do |k, v|
           pretty_params << "- #{k}: #{v['type'] || 'Any'}\n"

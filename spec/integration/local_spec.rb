@@ -20,16 +20,16 @@ describe "when running over the local transport" do
   context 'when using CLI options' do
     let(:echo) { "echo hi" }
     let(:config_flags) {
-      %W[--nodes localhost --format json --modulepath #{modulepath}]
+      %W[--targets localhost --format json --modulepath #{modulepath}]
     }
 
     it 'runs multiple commands' do
-      result = run_nodes(%W[command run #{echo} --nodes #{uri} --format json])
+      result = run_nodes(%W[command run #{echo} --targets #{uri} --format json])
       expect(result.map { |r| r['stdout'].strip }).to eq(%w[hi hi])
     end
 
     it 'reports errors when command fails' do
-      result = run_failed_nodes(%W[command run boop --nodes #{uri} --format json])
+      result = run_failed_nodes(%W[command run boop --targets #{uri} --format json])
       expect(result[0]['_error']).to be
     end
 
@@ -42,12 +42,12 @@ describe "when running over the local transport" do
 
   context 'when using CLI options on POSIX OS', bash: true do
     let(:config_flags) {
-      %W[--nodes #{uri} --format json --modulepath #{modulepath}]
+      %W[--targets #{uri} --format json --modulepath #{modulepath}]
     }
 
     it 'runs script with parameter', :reset_puppet_settings do
       with_tempfile_containing('script', "#!/usr/bin/env bash \n echo $1", '.sh') do |script|
-        results = run_cli_json(%W[script run #{script.path} param --nodes localhost])
+        results = run_cli_json(%W[script run #{script.path} param --targets localhost])
         results['items'].each do |result|
           expect(result['status']).to eq('success')
           expect(result['result']).to eq("stdout" => "param\n", "stderr" => "", "exit_code" => 0)
@@ -88,7 +88,7 @@ describe "when running over the local transport" do
 
   context 'runs as an escalated user', sudo: true do
     let(:config_flags) {
-      %W[--nodes #{uri} --format json --modulepath #{modulepath}] +
+      %W[--targets #{uri} --format json --modulepath #{modulepath}] +
         %W[--run-as #{sudo_user} --sudo-password #{sudo_password}]
     }
 
@@ -110,7 +110,7 @@ describe "when running over the local transport" do
 
   context 'when using CLI options on Windows OS', windows: true do
     let(:config_flags) {
-      %W[--nodes localhost --format json --modulepath #{modulepath}]
+      %W[--targets localhost --format json --modulepath #{modulepath}]
     }
 
     it 'runs powershell script with parameter', :reset_puppet_settings do

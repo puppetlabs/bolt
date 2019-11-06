@@ -20,7 +20,7 @@ test_name "C1005xx: \
   step "execute `bolt file upload` via SSH" do
     source = dest = 'C1005xx_file.txt'
     bolt_command = "bolt file upload #{dir}/#{source} /tmp/#{dest}"
-    flags = { '--nodes' => 'ssh_nodes' }
+    flags = { '--targets' => 'ssh_nodes' }
     result = bolt_command_on(bolt, bolt_command, flags)
 
     message = "Unexpected output from the command:\n#{result.cmd}"

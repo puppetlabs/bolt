@@ -221,7 +221,7 @@ describe 'using the task plugin' do
     context 'with a failing task' do
       it 'fails cleanly' do
         result = run_cli_json(['plan', 'run',
-                               'test_plan', '--nodes', 'agentless', '--boltdir', boltdir],
+                               'test_plan', '--targets', 'agentless', '--boltdir', boltdir],
                               rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
@@ -237,7 +237,7 @@ describe 'using the task plugin' do
 
       it 'fails cleanly' do
         result = run_cli_json(['plan', 'run',
-                               'test_plan', '--nodes', 'agentless', '--boltdir', boltdir],
+                               'test_plan', '--targets', 'agentless', '--boltdir', boltdir],
                               rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
@@ -253,7 +253,7 @@ describe 'using the task plugin' do
 
       it 'fails cleanly' do
         result = run_cli_json(['plan', 'run',
-                               'test_plan', '--nodes', 'agentless', '--boltdir', boltdir],
+                               'test_plan', '--targets', 'agentless', '--boltdir', boltdir],
                               rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")

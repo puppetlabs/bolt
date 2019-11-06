@@ -20,7 +20,7 @@ describe "CLI parses input" do
   it 'parses plan parameters' do
     params = ['string=foo',
               'string_bool="true"',
-              '--nodes', 'foo', '--nodes', 'bar',
+              '--targets', 'foo', '--targets', 'bar',
               'array=[1, 2, 3]',
               'hash={"this": "that"}']
     result = run_cli_json(%w[plan run parsing] + params + config_flags)
@@ -50,7 +50,7 @@ describe "CLI parses input" do
   it 'fails with invalid plan params' do
     params = ['string=foo',
               'string_bool="true"',
-              '--nodes', 'foo', '--nodes', 'bar',
+              '--targets', 'foo', '--targets', 'bar',
               'array=13',
               'hash={"this": "that"}']
     result = run_cli_json(%w[plan run parsing] + params + config_flags, rescue_exec: true)
@@ -60,7 +60,7 @@ describe "CLI parses input" do
   it 'parses plan parameters' do
     params = ['string=false',
               'string_bool=true',
-              '--nodes', 'foo,bar',
+              '--targets', 'foo,bar',
               'array=[13]',
               'hash={"this": "that"}']
     result = run_cli_json(%w[plan run parsing] + params + config_flags, rescue_exec: true)
@@ -78,7 +78,7 @@ describe "CLI parses input" do
       'string_bool="true"',
       'array=[1, 2, 3]'
     ]
-    result = run_one_node(['task', 'run', 'parsing', '--nodes', target] + params + config_flags)
+    result = run_one_node(['task', 'run', 'parsing', '--targets', target] + params + config_flags)
     expect(result).to eq("string_bool" => "true",
                          "array" => [1, 2, 3],
                          "_task" => "parsing")
@@ -90,13 +90,13 @@ describe "CLI parses input" do
       'array="123"',
       '_task="parsing"'
     ]
-    result = run_cli_json(['task', 'run', 'parsing', '--nodes', target] + params + config_flags, rescue_exec: true)
+    result = run_cli_json(['task', 'run', 'parsing', '--targets', target] + params + config_flags, rescue_exec: true)
     expect(result['_error']['msg']).to eq("Task parsing:\n parameter 'array' expects an Array value, got String")
   end
 
   it 'parses script parameters without munging task parameters', ssh: true do
     params = ['dont=split']
-    result = run_one_node(['script', 'run', script_path, '--nodes', target] + params + config_flags)
+    result = run_one_node(['script', 'run', script_path, '--targets', target] + params + config_flags)
     expect(result['stdout']).to match(/dont=split/)
   end
 end

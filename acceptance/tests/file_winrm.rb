@@ -28,7 +28,7 @@ test_name "C1005xx: \
     source = dest = 'C1005xx_file.txt'
     bolt_command = "bolt file upload '#{dir}/#{source}' '#{testdir}/#{dest}'"
 
-    flags = { '--nodes' => 'winrm_nodes' }
+    flags = { '--targets' => 'winrm_nodes' }
 
     result = bolt_command_on(bolt, bolt_command, flags)
     message = "Unexpected output from the command:\n#{result.cmd}"

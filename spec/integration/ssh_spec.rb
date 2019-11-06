@@ -21,7 +21,7 @@ describe "when runnning over the ssh transport", ssh: true do
 
   context 'when using CLI options' do
     let(:config_flags) {
-      %W[--nodes #{uri} --no-host-key-check --format json --modulepath #{modulepath} --password #{password}]
+      %W[--targets #{uri} --no-host-key-check --format json --modulepath #{modulepath} --password #{password}]
     }
 
     it 'runs a command' do
@@ -93,8 +93,8 @@ describe "when runnning over the ssh transport", ssh: true do
     end
 
     let(:uri) { (1..2).map { |i| "#{conn_uri('ssh')}?id=#{i}" }.join(',') }
-    let(:config_flags) { %W[--nodes #{uri}] }
-    let(:single_target_conf) { %W[--nodes #{conn_uri('ssh')}] }
+    let(:config_flags) { %W[--targets #{uri}] }
+    let(:single_target_conf) { %W[--targets #{conn_uri('ssh')}] }
     let(:interpreter_task) { 'sample::interpreter' }
     let(:interpreter_ext) do
       { 'interpreters' => {

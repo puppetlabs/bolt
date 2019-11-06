@@ -10,7 +10,7 @@ describe "errors gracefully attempting to apply a manifest block" do
   include BoltSpec::Integration
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
-  let(:config_flags) { %W[--format json --nodes #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
+  let(:config_flags) { %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
 
   describe 'over ssh', ssh: true do
     let(:uri) { conn_uri('ssh') }

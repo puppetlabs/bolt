@@ -15,8 +15,8 @@ Basic auth bolt:${BOLT_PASSWORD}
 
 EOF
 
-bundle exec bolt command run "whoami" --nodes winrm://omiserver.bolt.test:5985 --user bolt --password $BOLT_PASSWORD --no-ssl
-bundle exec bolt command run "whoami" --nodes winrm://omiserver.bolt.test:5986 --user bolt --password $BOLT_PASSWORD --no-ssl-verify
+bundle exec bolt command run "whoami" --targets winrm://omiserver.bolt.test:5985 --user bolt --password $BOLT_PASSWORD --no-ssl
+bundle exec bolt command run "whoami" --targets winrm://omiserver.bolt.test:5986 --user bolt --password $BOLT_PASSWORD --no-ssl-verify
 
 cat << EOF
 
@@ -61,7 +61,7 @@ Failed on omiserver.bolt.test:
 
 EOF
 
-bundle exec bolt command run "whoami" --nodes winrm://omiserver.bolt.test:5985 --no-ssl --debug --verbose --connect-timeout 9999
+bundle exec bolt command run "whoami" --targets winrm://omiserver.bolt.test:5985 --no-ssl --debug --verbose --connect-timeout 9999
 
 cat << EOF
 
@@ -82,4 +82,4 @@ Failed on omiserver.bolt.test:
 
 EOF
 
-bundle exec bolt command run "whoami" --nodes winrm://omiserver.bolt.test:5986 --no-ssl-verify --debug --verbose --connect-timeout 9999
+bundle exec bolt command run "whoami" --targets winrm://omiserver.bolt.test:5986 --no-ssl-verify --debug --verbose --connect-timeout 9999
