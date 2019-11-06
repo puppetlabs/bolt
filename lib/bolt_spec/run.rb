@@ -5,6 +5,7 @@ require 'bolt/config'
 require 'bolt/executor'
 require 'bolt/inventory'
 require 'bolt/pal'
+require 'bolt/plugin'
 require 'bolt/puppetdb'
 require 'bolt/util'
 
@@ -130,18 +131,28 @@ module BoltSpec
       # still be loaded
       def self.with_runner(config_data, inventory_data)
         Dir.mktmpdir do |boltdir_path|
-          config = Bolt::Config.new(Bolt::Boltdir.new(boltdir_path), config_data || {})
-          inventory = Bolt::Inventory.new(inventory_data || {}, config)
-          yield new(config, inventory)
+          runner = new(config_data, inventory_data, boltdir_path)
+          yield runner
         end
       end
 
-      attr_reader :config, :inventory
-
-      def initialize(config, inventory)
-        @config = config
-        @inventory = inventory
+      def initialize(config_data, inventory_data, boltdir_path)
+        @config_data = config_data || {}
+        @inventory_data = inventory_data || {}
+        @boltdir_path = boltdir_path
         @analytics = Bolt::Analytics::NoopClient.new
+      end
+
+      def config
+        @config ||= Bolt::Config.new(Bolt::Boltdir.new(@boltdir_path), @config_data)
+      end
+
+      def inventory
+        @inventory ||= Bolt::Inventory.create_version(@inventory_data, config, plugins)
+      end
+
+      def plugins
+        @plugins ||= Bolt::Plugin.setup(config, pal, puppetdb_client, @analytics)
       end
 
       def puppetdb_client

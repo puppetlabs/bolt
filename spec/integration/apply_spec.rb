@@ -25,33 +25,21 @@ describe "apply" do
     let(:tflags) { %W[--no-host-key-check --run-as root --sudo-password #{password}] }
 
     def root_config
-      { 'modulepath' => File.join(__dir__, '../fixtures/apply'),
-        'ssh' => {
-          'run-as' => 'root',
-          'sudo-password' => conn_info('ssh')[:password],
-          'host-key-check' => false
-        } }
+      { 'modulepath' => File.join(__dir__, '../fixtures/apply') }
     end
 
     def agent_version_inventory
-      { 'groups' => [
-        { 'name' => 'agent_targets',
-          'groups' => [
-            { 'name' => 'puppet_5',
-              'nodes' => [conn_uri('ssh', override_port: 20023)],
-              'config' => { 'ssh' => { 'port' => 20023 } } },
-            { 'name' => 'puppet_6',
-              'nodes' => [conn_uri('ssh', override_port: 20024)],
-              'config' => { 'ssh' => { 'port' => 20024 } } }
-          ],
-          'config' => {
-            'ssh' => { 'host' => conn_info('ssh')[:host],
-                       'host-key-check' => false,
-                       'user' => conn_info('ssh')[:user],
-                       'password' => conn_info('ssh')[:password],
-                       'key' => conn_info('ssh')[:key] }
-          } }
-      ] }
+      inventory = docker_inventory(root: true)
+      inventory['groups'] << {
+        'name' => 'agent_targets',
+        'groups' => [
+          { 'name' => 'puppet_5',
+            'targets' => ['puppet_5_node'] },
+          { 'name' => 'puppet_6',
+            'targets' => ['puppet_6_node'] }
+        ]
+      }
+      inventory
     end
 
     def lib_plugin_inventory
@@ -300,9 +288,9 @@ describe "apply" do
     context "with a puppet_agent installed" do
       before(:all) do
         # Deferred must use puppet >= 6
-        target = conn_uri('ssh')
-        install(target, inventory: conn_inventory)
-        result = run_task('puppet_agent::version', target, {}, config: root_config, inventory: conn_inventory)
+        target = 'puppet_6'
+        install(target, inventory: agent_version_inventory)
+        result = run_task('puppet_agent::version', target, {}, config: root_config, inventory: agent_version_inventory)
         major_version = result.first['result']['version'].split('.').first.to_i
         expect(major_version).to be >= 6
       end

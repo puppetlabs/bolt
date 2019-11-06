@@ -4,6 +4,7 @@ require 'bolt_spec/plans/mock_executor'
 require 'bolt/config'
 require 'bolt/inventory'
 require 'bolt/pal'
+require 'bolt/plugin'
 
 # These helpers are intended to be used for plan unit testing without calling
 # out to target nodes. It accomplishes this by replacing bolt's executor with a
@@ -158,6 +159,13 @@ module BoltSpec
       raise "RSpec.configuration.module_path not defined set up rspec puppet or define modulepath for this test"
     end
 
+    def plugins
+      @plugins ||= Bolt::Plugin.setup(config,
+                                      pal,
+                                      puppetdb_client,
+                                      Bolt::Analytics::NoopClient.new)
+    end
+
     # Override in your tests
     def config
       @config ||= begin
@@ -168,8 +176,12 @@ module BoltSpec
     end
 
     # Override in your tests
+    def inventory_data
+      {}
+    end
+
     def inventory
-      @inventory ||= Bolt::Inventory.new({})
+      @inventory ||= Bolt::Inventory.create_version(inventory_data, config, plugins)
     end
 
     # Provided as a class so expectations can be placed on it.
@@ -177,6 +189,10 @@ module BoltSpec
 
     def puppetdb_client
       @puppetdb_client ||= MockPuppetDBClient.new
+    end
+
+    def pal
+      @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.boltdir.resource_types)
     end
 
     def run_plan(name, params)

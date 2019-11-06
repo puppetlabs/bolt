@@ -23,7 +23,10 @@ module BoltSpec
         @calls += 1
         if @return_block
           # Merge arguments and options into params to match puppet function signature.
-          check_resultset(@return_block.call(targets: targets, task: task, params: arguments.merge(options)), task)
+          params = options.map { |k, v| ["_#{k}", v] }.to_h
+          params = params.merge(arguments)
+
+          check_resultset(@return_block.call(targets: targets, task: task, params: params), task)
         else
           Bolt::ResultSet.new(targets.map { |target| @data[target.name] || default_for(target) })
         end

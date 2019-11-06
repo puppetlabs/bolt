@@ -17,7 +17,7 @@ module BoltSpec
     # Nothing on the executor is 'public'
     class MockExecutor
       attr_reader :noop, :error_message
-      attr_accessor :run_as
+      attr_accessor :run_as, :transport_features
 
       def initialize(modulepath)
         @noop = false
@@ -27,6 +27,7 @@ module BoltSpec
         @modulepath = [modulepath].flatten.map { |path| File.absolute_path(path) }
         MOCKED_ACTIONS.each { |action| instance_variable_set(:"@#{action}_doubles", {}) }
         @stub_out_message = nil
+        @transport_features = ['puppet-agent']
       end
 
       def module_file_id(file)
@@ -168,12 +169,12 @@ module BoltSpec
 
       # Mocked for apply_prep
       def transport(_protocol)
-        # Always return a transport that includes the puppet-agent feature so version/install are skipped.
         Class.new do
-          def provided_features
-            ['puppet-agent']
+          attr_reader :provided_features
+          def initialize(features)
+            @provided_features = features
           end
-        end.new
+        end.new(transport_features)
       end
       # End apply_prep mocking
     end
