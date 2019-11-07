@@ -8,7 +8,7 @@ module Bolt
   module Transport
     class LXD < Base
       def self.options
-        %w[host service-url tmpdir interpreters shell-command tty]
+        %w[host service-url tmpdir interpreters shell-command]
       end
 
       def provided_features
@@ -52,8 +52,6 @@ module Bolt
       end
 
       def run_command(target, command, options = {})
-        options[:tty] = target.options['tty']
-
         if target.options['shell-command'] && !target.options['shell-command'].empty?
           # escape any double quotes in command
           command = command.gsub('"', '\"')

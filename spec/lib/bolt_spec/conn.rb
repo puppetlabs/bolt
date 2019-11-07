@@ -100,7 +100,7 @@ module BoltSpec
             'targets' => [
               { 'name' => 'ubuntunode',
                 'alias' => 'agentless',
-                'config' => { 'ssh' => { 'port' => '20022' } } }
+                'config' => { 'ssh' => { 'port' => '20032' } } }
             ],
             'config' => {
               'ssh' => {
