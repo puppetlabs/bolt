@@ -396,13 +396,13 @@ module Bolt
       end
       define('-p', '--password [PASSWORD]',
              'Password to authenticate with') do |password|
-        # TODO: Remove deprecation message
-        unless password
-          msg = "Optional parameter for --password is deprecated and no longer prompts for password. " \
-                "Use the prompt plugin instead to prompt for passwords."
-          raise Bolt::CLIError, msg
+        if password.nil?
+          STDOUT.print "Please enter your password: "
+          @options[:password] = STDIN.noecho(&:gets).chomp
+          STDOUT.puts
+        else
+          @options[:password] = password
         end
-        @options[:password] = password
       end
       define('--private-key KEY', 'Private ssh key to authenticate with') do |key|
         @options[:'private-key'] = key
@@ -423,13 +423,13 @@ module Bolt
       end
       define('--sudo-password [PASSWORD]',
              'Password for privilege escalation') do |password|
-        # TODO: Remove deprecation message
-        unless password
-          msg = "Optional parameter for --sudo-password is deprecated and no longer prompts for password. " \
-                "Use the prompt plugin instead to prompt for passwords."
-          raise Bolt::CLIError, msg
+        if password.nil?
+          STDOUT.print "Please enter your privilege escalation password: "
+          @options[:'sudo-password'] = STDIN.noecho(&:gets).chomp
+          STDOUT.puts
+        else
+          @options[:'sudo-password'] = password
         end
-        @options[:'sudo-password'] = password
       end
 
       separator "\nRun context:"
