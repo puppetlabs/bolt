@@ -50,8 +50,8 @@ Puppet::Functions.create_function(:apply_prep) do
   end
   # rubocop:enable Naming/AccessorMethodName
 
-  def run_task(targets, task, args = {})
-    executor.run_task(targets, task, args)
+  def run_task(targets, task, args = {}, options = {})
+    executor.run_task(targets, task, args, options)
   end
 
   # Returns true if the target has the puppet-agent feature defined, either from inventory or transport.

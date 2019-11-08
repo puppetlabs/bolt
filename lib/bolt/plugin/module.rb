@@ -158,20 +158,21 @@ module Bolt
         # opts are passed directly from inventory but all of the _ options are
         # handled previously. That may not always be the case so filter them
         # out now.
-        _meta, params = opts.partition { |key, _val| key.start_with?('_') }.map(&:to_h)
-        metaparams = {}
+        meta, params = opts.partition { |key, _val| key.start_with?('_') }.map(&:to_h)
+
         # Send config with `_config` when config is defined in bolt_plugin.json
         # Otherwise, merge config with params
         # TODO: remove @send_config when deprecated
         if @send_config
-          metaparams['_config'] = config if config?
+          validate_params(task, params)
+          params['_config'] = config if config?
         else
           params = @config ? config.merge(params) : params
+          validate_params(task, params)
         end
-        metaparams['_boltdir'] = @context.boltdir
+        params['_boltdir'] = @context.boltdir.to_s
 
-        validate_params(task, params)
-        [params, metaparams]
+        [params, meta]
       end
 
       def extract_task_parameter_schema
@@ -199,6 +200,7 @@ module Bolt
       end
 
       def run_task(task, opts)
+        opts = opts.reject { |key, _val| key.start_with?('_') }
         params, metaparams = process_params(task, opts)
         params = params.merge(metaparams)
 
@@ -271,11 +273,11 @@ module Bolt
 
         params, meta_params = process_params(task, opts)
 
-        # our metaparams are meant for the task not the executor
-        params = params.merge(meta_params)
+        options = {}
+        options[:run_as] = meta_params['_run_as'] if meta_params['_run_as']
 
         proc do
-          apply_prep.run_task([target], task, params).first
+          apply_prep.run_task([target], task, params, options).first
         end
       end
     end

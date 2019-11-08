@@ -48,13 +48,15 @@ module Bolt
 
       def puppet_library(opts, target, apply_prep)
         params = opts['parameters'] || {}
+        run_opts = {}
+        run_opts[:run_as] = opts['_run_as'] if opts['_run_as']
         begin
           task = apply_prep.get_task(opts['task'], params)
         rescue Bolt::Error => e
           raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, name, 'puppet_library')
         end
         proc do
-          apply_prep.run_task([target], task, params).first
+          apply_prep.run_task([target], task, params, run_opts).first
         end
       end
     end

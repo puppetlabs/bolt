@@ -222,11 +222,23 @@ plugin_hooks:
     stop_service: true
 ```
 
+The `puppet_agent::install` task will error if it's not run as root. To ensure
+this plugin to succeeds on non-root nodes set `_run_as: true` for the
+`puppet_agent` plugin.
+
+```yaml
+plugin_hooks:
+  puppet_library:
+    plugin: puppet_agent
+    _run_as: root
+```
+
 You can use the bootstrap task to connect all targets to a PE master instead:
 ```yaml
 plugin_hooks:
   puppet_library:
     plugin: task
+    _run_as: root
     task: 'bootstrap'
     parameters:
       master: 'puppet.example.com'

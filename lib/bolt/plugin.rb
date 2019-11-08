@@ -218,6 +218,9 @@ module Bolt
       Bolt::Util.postwalk_vals(data) do |value|
         reference?(value) ? resolve_references(resolve_single_reference(value)) : value
       end
+    rescue SystemStackError
+      raise Bolt::Error.new("Stack depth exceeded while recursively resolving references.",
+                            "bolt/recursive-reference-loop")
     end
 
     # Iteratively resolves "top-level" references until the result no longer
