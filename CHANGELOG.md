@@ -1,5 +1,13 @@
 # Changelog
 
+## Bolt 1.36.1
+
+## Bug fixes
+
+* **Allow optional `--password` and `--sudo-password` parameters** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
+
+  Optional parameters for `--password` and `--sudo-password` were prematurely removed. The previous behavior of prompting for a password when an argument is not specified for `--password` or `--sudo-password` has been added back. Arguments will be required in a future version.
+
 ## Bolt 1.36.0
 
 ### Deprecation
@@ -29,10 +37,6 @@
 * **Bolt issues a warning when inventory overrides a CLI option** ([#1341](https://github.com/puppetlabs/bolt/issues/1341))
 
   Bolt issues a warning when an option is set both on the CLI and in the inventory, whether the inventory loads from a file or from the `bolt_inventory` environment variable.
-
-* **New `resolve_references` plan function** ([#1365](https://github.com/puppetlabs/bolt/issues/1365))
-
-  The new plan function, `resolve_references`, accepts a hash of structured data and returns a hash of structured data with all plugin references resolved.
   
 ### Bug fixes
 

@@ -380,6 +380,14 @@ describe "Bolt::CLI" do
         cli = Bolt::CLI.new(%w[command run uptime --password opensesame --targets foo])
         expect(cli.parse).to include(password: 'opensesame')
       end
+
+      it "prompts the user for password if not specified" do
+        allow(STDIN).to receive(:noecho).and_return('opensesame')
+        allow(STDOUT).to receive(:print).with('Please enter your password: ')
+        allow(STDOUT).to receive(:puts)
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --password])
+        expect(cli.parse).to include(password: 'opensesame')
+      end
     end
 
     describe "key" do
@@ -521,6 +529,15 @@ describe "Bolt::CLI" do
     describe "sudo-password" do
       it "accepts a password" do
         cli = Bolt::CLI.new(%w[command run uptime --sudo-password opensez --run-as alibaba --targets foo])
+        expect(cli.parse).to include('sudo-password': 'opensez')
+      end
+
+      it "prompts the user for sudo-password if not specified" do
+        allow(STDIN).to receive(:noecho).and_return('opensez')
+        pw_prompt = 'Please enter your privilege escalation password: '
+        allow(STDOUT).to receive(:print).with(pw_prompt)
+        allow(STDOUT).to receive(:puts)
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --run-as alibaba --sudo-password])
         expect(cli.parse).to include('sudo-password': 'opensez')
       end
     end
