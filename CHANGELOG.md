@@ -1,6 +1,12 @@
 # Changelog
 
-## Bolt 1.36.1
+## Bolt 1.37.0
+
+## New features
+
+* **New `resolve_references` plan function** ([#1365](https://github.com/puppetlabs/bolt/issues/1365))
+
+  The new plan function, `resolve_references`, accepts a hash of structured data and returns a hash of structured data with all plugin references resolved.
 
 ## Bug fixes
 
