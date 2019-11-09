@@ -889,6 +889,29 @@ To define a parameter as sensitive within the JSON metadata, add the `"sensitive
 }
 ```
 
+#### Set default values
+
+You can set a default value for a parameter which will be used if the parameter isn't specified. The default value must be valid according to the parameter's `type`.
+
+Note that not every version of Bolt supports parameter defaults, so you should either make the parameter required or explicitly check for its presence in the task implementation.
+
+```json
+{
+  "description": "This task has a parameter with a default value",
+  "input_method": "stdin",
+  "parameters": {
+    "platform" : {
+      "description": "Which operating system to provision",
+      "type": "String[1]"
+    },
+    "count": {
+      "description": "How many instances to provision",
+      "type": "Integer",
+      "default": 1
+    }
+  }
+```
+
 ### Task metadata reference
 
 The following table shows task metadata keys, values, and default values.
