@@ -25,6 +25,16 @@
     "optional_hash": {
       "description": "Optional hash parameter",
       "type": "Optional[Hash]"
+    },
+    "default_string": {
+      "description": "String parameter with default",
+      "type": "String",
+      "default": "hello"
+    },
+    "optional_default_string": {
+      "description": "Optional String parameter with default",
+      "type": "Optional[String]",
+      "default": "goodbye"
     }
   }
 }

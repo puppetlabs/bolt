@@ -80,11 +80,14 @@ Puppet::Functions.create_function(:run_task) do
         raise Bolt::Error.unknown_task(task_name)
       end
 
+      task = Bolt::Task.new(task_signature.task_hash)
+
+      # Set the default value for any params that have one and were not provided
+      params = task.parameter_defaults.merge(params)
+
       task_signature.runnable_with?(params) do |mismatch_message|
         raise with_stack(:TYPE_MISMATCH, mismatch_message)
       end || (raise with_stack(:TYPE_MISMATCH, 'Task parameters do not match'))
-
-      task = Bolt::Task.new(task_signature.task_hash)
     end
 
     unless Puppet::Pops::Types::TypeFactory.data.instance?(params)
