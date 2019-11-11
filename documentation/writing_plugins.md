@@ -57,3 +57,63 @@ Bolt passes no parameters other than the metaparameters to a `createkeys` task. 
 **`puppet_library` tasks**
 
 Bolt uses a `puppet_library` plugin to make sure the Puppet library is available on a target when `apply_prep` is called.
+
+## Example
+The simplest example of a plugin is the [YAML plugin](https://github.com/puppetlabs/puppetlabs-yaml). The `resolve_reference` task simply loads YAML from a file and returns the data under the `value` key in a hash.
+
+```ruby
+
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../../ruby_task_helper/files/task_helper.rb"
+require 'yaml'
+
+class YAMLReference < TaskHelper
+  def task(**opts)
+    path = opts[:filepath]
+    boltdir = opts[:_boltdir]
+    full_path = if boltdir
+                  File.expand_path(path, boltdir)
+                else
+                  File.expand_path(path)
+                end
+    data = YAML.safe_load(File.read(full_path))
+    { value: data }
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  YAMLReference.run
+end
+```
+This task can, for example, be used to organize an inventory into multiple files. When the `_plugin` reference is encountered in the inventoryfile, the `filepath` is passed to the `yaml::resolve_reference` task and the data is read and injected into the inventory hierarchy.
+
+```yaml
+---
+# inventory.yaml
+version: 2
+groups:
+  - _plugin: yaml
+    filepath: inventory.d/first_group.yaml
+  - _plugin: yaml
+    filepath: invenotry.d/second_group.yaml
+```
+
+```yaml
+---
+# inventory.d/first_group.yaml
+name: first_group
+targets:
+  - one.example.com
+  - two.example.com
+```
+
+```yaml
+---
+# inventory.d/second_group.yaml
+name: second_group
+targets:
+  - three.example.com
+  - four.example.com
+```
