@@ -78,7 +78,7 @@ module Bolt
       def plugin_hooks
         # Merge plugin_hooks from the config file with any defined by the group
         # or assigned dynamically to the target
-        @inventory.plugins.default_plugin_hooks.merge(group_cache['plugin_hooks']).merge(@plugin_hooks)
+        @inventory.plugins.plugin_hooks.merge(group_cache['plugin_hooks']).merge(@plugin_hooks)
       end
 
       def set_config(key_or_key_path, value)

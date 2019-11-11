@@ -76,7 +76,29 @@ describe Bolt::Plugin do
           'param' => identity('foobar')
         }
       }
-      expect(plugins.default_plugin_hooks['puppet_library']).to eq('plugin' => 'my_hook', 'param' => 'foobar')
+      expect(plugins.plugin_hooks['puppet_library']).to eq('plugin' => 'my_hook', 'param' => 'foobar')
+    end
+
+    it 'allows the whole plugin_hooks value to be set with a reference' do
+      hooks = {
+        'another_hook' => {
+          'plugin' => 'my_hook',
+          'param' => identity('foobar')
+        }
+      }
+
+      config_data['plugin_hooks'] = identity(hooks)
+
+      expect(plugins.plugin_hooks).to eq(
+        'another_hook' => {
+          'plugin' => 'my_hook',
+          'param' => 'foobar'
+        },
+        'puppet_library' => {
+          'plugin' => 'puppet_agent',
+          'stop_service' => true
+        }
+      )
     end
   end
 end

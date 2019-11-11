@@ -71,7 +71,7 @@ module Bolt
       @save_rerun = true
       @puppetfile_config = {}
       @plugins = {}
-      @plugin_hooks = { 'puppet_library' => { 'plugin' => 'puppet_agent', 'stop_service' => true } }
+      @plugin_hooks = {}
 
       # add an entry for the default console logger
       @log = { 'console' => {} }
@@ -167,7 +167,7 @@ module Bolt
       @save_rerun = data['save-rerun'] if data.key?('save-rerun')
 
       @plugins = data['plugins'] if data.key?('plugins')
-      @plugin_hooks.merge!(data['plugin_hooks']) if data.key?('plugin_hooks')
+      @plugin_hooks = data['plugin_hooks'] if data.key?('plugin_hooks')
 
       %w[concurrency format puppetdb color].each do |key|
         send("#{key}=", data[key]) if data.key?(key)

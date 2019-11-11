@@ -137,16 +137,17 @@ module Bolt
         plugins.by_name(plugin)
       end
 
-      plugins.default_plugin_hooks = plugins.resolve_references(config.plugin_hooks)
+      plugins.plugin_hooks.merge!(plugins.resolve_references(config.plugin_hooks))
 
       plugins
     end
 
     RUBY_PLUGINS = %w[install_agent task pkcs7 prompt].freeze
     BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory puppetdb azure_inventory].freeze
+    DEFAULT_PLUGIN_HOOKS = { 'puppet_library' => { 'plugin' => 'puppet_agent', 'stop_service' => true } }.freeze
 
     attr_reader :pal, :plugin_context
-    attr_accessor :default_plugin_hooks
+    attr_accessor :plugin_hooks
 
     private_class_method :new
 
@@ -159,7 +160,7 @@ module Bolt
       @unknown = Set.new
       @resolution_stack = []
       @unresolved_plugin_configs = config.plugins.dup
-      @default_plugin_hooks = {}
+      @plugin_hooks = DEFAULT_PLUGIN_HOOKS.dup
     end
 
     def modules
