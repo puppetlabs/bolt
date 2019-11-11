@@ -129,6 +129,7 @@ module Bolt
       # Logger must be configured before checking path case, otherwise warnings will not display
       @config.check_path_case('modulepath', @config.modulepath)
 
+      parser.warnings.each { |warning| @logger.warn(warning[:msg]) }
       # After validation, initialize inventory and targets. Errors here are better to catch early.
       # After this step
       # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
