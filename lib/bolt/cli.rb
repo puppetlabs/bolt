@@ -37,7 +37,7 @@ module Bolt
                  'secret' => %w[encrypt decrypt createkeys],
                  'inventory' => %w[show],
                  'group' => %w[show],
-                 'project' => %w[init],
+                 'project' => %w[init migrate],
                  'apply' => %w[] }.freeze
 
     attr_reader :config, :options
@@ -368,7 +368,11 @@ module Bolt
 
       case options[:subcommand]
       when 'project'
-        code = initialize_project
+        if options[:action] == 'init'
+          code = initialize_project
+        elsif options[:action] == 'migrate'
+          code = migrate_project
+        end
       when 'plan'
         code = run_plan(options[:object], options[:task_options], options[:target_args], options)
       when 'puppetfile'
@@ -558,6 +562,52 @@ module Bolt
       outputter.print_message result
 
       ok ? 0 : 1
+    end
+
+    def migrate_project
+      if inventory.version == 2
+        ok = true
+      else
+        inventory_file = config.inventoryfile || config.boltdir.inventory_file
+
+        begin
+          Bolt::Util.file_stat(inventory_file)
+        rescue Errno::ENOENT
+          raise Bolt::FileError.new("The inventory file '#{inventory_file}' does not exist", inventory_file)
+        end
+
+        inv = YAML.safe_load(File.open(inventory_file))
+        migrate_group(inv)
+
+        ok = File.write(inventory_file, { 'version' => 2 }.merge(inv).to_yaml)
+      end
+
+      result = if ok
+                 "Successfully migrated Bolt project to latest version"
+               else
+                 "Could not migrate Bolt project to latest version"
+               end
+      outputter.print_message result
+
+      ok ? 0 : 1
+    end
+
+    # Walks an inventory hash and replaces all 'nodes' keys with 'targets' keys
+    # and all 'name' keys nested in a 'targets' hash with 'uri' keys. Data is
+    # modified in place.
+    def migrate_group(group)
+      if group.key?('nodes')
+        targets = group['nodes'].map do |target|
+          target['uri'] = target.delete('name') if target.is_a?(Hash)
+          target
+        end
+        group.delete('nodes')
+        group['targets'] = targets
+      end
+      (group['groups'] || []).each do |subgroup|
+        migrate_group(subgroup)
+      end
+      nil
     end
 
     def install_puppetfile(config, puppetfile, modulepath)

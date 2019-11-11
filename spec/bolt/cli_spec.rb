@@ -2152,21 +2152,73 @@ describe "Bolt::CLI" do
   end
 
   describe 'project' do
-    it 'init creates a new project at the specified path' do
-      Dir.mktmpdir do |dir|
-        file = File.join(dir, 'bolt.yaml')
-        cli = Bolt::CLI.new(%W[project init #{dir}])
-        cli.execute(cli.parse)
-        expect(File.file?(file)).to be
+    context 'migrate' do
+      let(:inventory_v1) do
+        {
+          "name" => "all",
+          "groups" => [{
+            "name" => "group1",
+            "nodes" => [{
+              "name" => "target1",
+              "facts" => {
+                "name" => "foo"
+              }
+            }]
+          }]
+        }
+      end
+      let(:inventory_v2) do
+        {
+          "version" => 2,
+          "name" => "all",
+          "groups" => [{
+            "name" => "group1",
+            "targets" => [{
+              "uri" => "target1",
+              "facts" => {
+                "name" => "foo"
+              }
+            }]
+          }]
+        }
+      end
+
+      it 'migrates inventory v1 to inventory v2' do
+        with_tempfile_containing('inventory', YAML.dump(inventory_v1)) do |file|
+          cli = Bolt::CLI.new(%W[project migrate --inventoryfile #{file.path}])
+          cli.execute(cli.parse)
+          expect(YAML.load_file(file)).to eq(inventory_v2)
+        end
+      end
+
+      it 'does nothing when using inventory v2' do
+        inventory_v1['version'] = 2
+        with_tempfile_containing('inventory', YAML.dump(inventory_v1)) do |file|
+          contents = File.read(file)
+          cli = Bolt::CLI.new(%W[project migrate --inventoryfile #{file.path}])
+          cli.execute(cli.parse)
+          expect(File.read(file)).to eq(contents)
+        end
       end
     end
 
-    it 'init creates a new project in the current working directory' do
-      Dir.mktmpdir do |dir|
-        file = File.join(dir, 'bolt.yaml')
-        cli = Bolt::CLI.new(%w[project init])
-        Dir.chdir(dir) { cli.execute(cli.parse) }
-        expect(File.file?(file)).to be
+    context 'init' do
+      it 'init creates a new project at the specified path' do
+        Dir.mktmpdir do |dir|
+          file = File.join(dir, 'bolt.yaml')
+          cli = Bolt::CLI.new(%W[project init #{dir}])
+          cli.execute(cli.parse)
+          expect(File.file?(file)).to be
+        end
+      end
+
+      it 'init creates a new project in the current working directory' do
+        Dir.mktmpdir do |dir|
+          file = File.join(dir, 'bolt.yaml')
+          cli = Bolt::CLI.new(%w[project init])
+          Dir.chdir(dir) { cli.execute(cli.parse) }
+          expect(File.file?(file)).to be
+        end
       end
     end
   end

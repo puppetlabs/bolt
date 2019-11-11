@@ -54,6 +54,9 @@ module Bolt
         when 'init'
           { flags: OPTIONS[:global],
             banner: PROJECT_INIT_HELP }
+        when 'migrate'
+          { flags: OPTIONS[:global] + %w[inventoryfile boltdir configfile],
+            banner: PROJECT_MIGRATE_HELP }
         else
           { flags: OPTIONS[:global],
             banner: PROJECT_HELP }
@@ -131,6 +134,7 @@ module Bolt
         bolt inventory show              Show the list of targets an action would run on
         bolt group show                  Show the list of groups in the inventory
         bolt project init                Create a new Bolt project
+        bolt project migrate             Migrate a Bolt project to the latest version
 
       Run `bolt <subcommand> --help` to view specific examples.
 
@@ -325,6 +329,7 @@ module Bolt
 
       Available actions are:
         init                     Create a new Bolt project
+        migrate                  Migrate a Bolt project to the latest version
 
       Available options are:
     PROJECT_HELP
@@ -337,6 +342,16 @@ module Bolt
 
       Available options are:
     PROJECT_INIT_HELP
+
+    PROJECT_MIGRATE_HELP = <<~PROJECT_MIGRATE_HELP
+      Usage: bolt project migrate
+
+      Migrate a Bolt project to the latest version.
+      Loads a Bolt project's inventory file and migrates it to the latest version. The
+      inventory file is modified in place and will not preserve comments or formatting.
+
+      Available options are:
+    PROJECT_MIGRATE_HELP
 
     attr_reader :warnings
     def initialize(options)
