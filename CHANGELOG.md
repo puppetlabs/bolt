@@ -8,6 +8,9 @@
 
   Bolt now accepts the `_run_as` metaparameter for puppet_library hooks. `_run_as` specifies which user the library install task will be executed as.
 
+* **Add `--password-prompt` and `--sudo-password-prompt` CLI flags** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
+  Two new flags have been added to support the case where the user would like to set a `password` or `sudo-password` from a prompt without using a plugin. Deprecations messages have been added when a value is not supplied for `--password` or `--sudo-password`.
+
 ## Bolt 1.37.0
 
 ## New features

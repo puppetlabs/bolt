@@ -387,6 +387,17 @@ describe "Bolt::CLI" do
         allow(STDOUT).to receive(:puts)
         cli = Bolt::CLI.new(%w[command run uptime --nodes foo --password])
         expect(cli.parse).to include(password: 'opensesame')
+        expect(@log_output.readlines.join).to match(/Optional parameter for --password is deprecated/)
+      end
+    end
+
+    describe "password-prompt" do
+      it "prompts the user for password" do
+        allow(STDIN).to receive(:noecho).and_return('opensesame')
+        allow(STDERR).to receive(:print).with('Please enter your password: ')
+        allow(STDERR).to receive(:puts)
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --password-prompt])
+        expect(cli.parse).to include(password: 'opensesame')
       end
     end
 
@@ -539,6 +550,17 @@ describe "Bolt::CLI" do
         allow(STDOUT).to receive(:puts)
         cli = Bolt::CLI.new(%w[command run uptime --nodes foo --run-as alibaba --sudo-password])
         expect(cli.parse).to include('sudo-password': 'opensez')
+        expect(@log_output.readlines.join).to match(/Optional parameter for --sudo-password is deprecated/)
+      end
+    end
+
+    describe "sudo password-prompt" do
+      it "prompts the user for escalation password" do
+        allow(STDIN).to receive(:noecho).and_return('opensesame')
+        allow(STDERR).to receive(:print).with('Please enter your privilege escalation password: ')
+        allow(STDERR).to receive(:puts)
+        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --sudo-password-prompt])
+        expect(cli.parse).to include('sudo-password': 'opensesame')
       end
     end
 

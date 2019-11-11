@@ -7,8 +7,8 @@ require 'optparse'
 module Bolt
   class BoltOptionParser < OptionParser
     OPTIONS = { inventory: %w[nodes targets query rerun description],
-                authentication: %w[user password private-key host-key-check ssl ssl-verify],
-                escalation: %w[run-as sudo-password],
+                authentication: %w[user password password-prompt private-key host-key-check ssl ssl-verify],
+                escalation: %w[run-as sudo-password sudo-password-prompt],
                 run_context: %w[concurrency inventoryfile save-rerun],
                 global_config_setters: %w[modulepath boltdir configfile],
                 transports: %w[transport connect-timeout tty],
@@ -338,10 +338,12 @@ module Bolt
       Available options are:
     PROJECT_INIT_HELP
 
+    attr_reader :warnings
     def initialize(options)
       super()
 
       @options = options
+      @warnings = []
 
       define('-n', '--nodes NODES',
              'Alias for --targets',
@@ -397,12 +399,20 @@ module Bolt
       define('-p', '--password [PASSWORD]',
              'Password to authenticate with') do |password|
         if password.nil?
+          msg = "Optional parameter for --password is deprecated and will no longer prompt for password. " \
+                "Use the prompt plugin or --password-prompt instead to prompt for passwords."
+          @warnings << { option: 'password', msg: msg }
           STDOUT.print "Please enter your password: "
           @options[:password] = STDIN.noecho(&:gets).chomp
           STDOUT.puts
         else
           @options[:password] = password
         end
+      end
+      define('--password-prompt', 'Prompt for user to input password') do |_password|
+        STDERR.print "Please enter your password: "
+        @options[:password] = STDIN.noecho(&:gets).chomp
+        STDERR.puts
       end
       define('--private-key KEY', 'Private ssh key to authenticate with') do |key|
         @options[:'private-key'] = key
@@ -424,12 +434,20 @@ module Bolt
       define('--sudo-password [PASSWORD]',
              'Password for privilege escalation') do |password|
         if password.nil?
+          msg = "Optional parameter for --sudo-password is deprecated and will no longer prompt for password. " \
+                "Use the prompt plugin or --sudo-password-prompt instead to prompt for passwords."
+          @warnings << { option: 'sudo-password', msg: msg }
           STDOUT.print "Please enter your privilege escalation password: "
           @options[:'sudo-password'] = STDIN.noecho(&:gets).chomp
           STDOUT.puts
         else
           @options[:'sudo-password'] = password
         end
+      end
+      define('--sudo-password-prompt', 'Prompt for user to input escalation password') do |_password|
+        STDERR.print "Please enter your privilege escalation password: "
+        @options[:'sudo-password'] = STDIN.noecho(&:gets).chomp
+        STDERR.puts
       end
 
       separator "\nRun context:"
