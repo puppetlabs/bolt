@@ -16,61 +16,31 @@ env:
     - KRB5_KDC=samba-ad.bolt.test
     - SMB_ADMIN_PASSWORD=B0ltrules!
     - KRB5_CONFIG=/tmp/krb5.conf
+jobs:
+  include:
+    - env: CHECK=rubocop
+    - env: CHECK=unit
+    - env: CHECK=modules
+    - env: CHECK=docs
+    - env: CHECK=integration
+      # Kerberos client for use with the Samba KDC in Docker
+      before_install: sudo apt-get install -yq krb5-user
 addons:
   # Ensure Travis resolves itself as the Samba KDC hosted in Docker
   hosts:
     - samba-ad.bolt.test
     - omiserver.bolt.test
-before_install:
-# Kerberos client for use with the Samba KDC in Docker
-- sudo apt-get install -yq krb5-user
-# Build / start Samba before other containers, since its fast
-- docker-compose -f spec/docker-compose.yml up -d --build samba-ad
-
 before_script:
 - $TRAVIS_BUILD_DIR/spec/fixtures/samba-ad/kerberos-client-config.sh
-- docker-compose -f spec/docker-compose.yml up -d --build
 - eval `ssh-agent`
 - cat Gemfile.lock
-- bundle exec r10k puppetfile install
   # Add users to test sudo on localhost
 - echo 'travis:travis' | sudo chpasswd
   # Undo travis sudoers config
 - sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
 - sudo sh -c "echo 'travis  ALL=(ALL) PASSWD:ALL' >> /etc/sudoers"
 script:
-- bundle exec rubocop || travis_terminate 1
-- bundle exec rake travisci
-- |
-  status=0
-  for i in 'boltlib' 'ctrl' 'file' 'out' 'system'; do
-    pushd bolt-modules/$i
-    if ! bundle exec rake spec; then
-      status=1
-    fi
-    popd
-  done
-  if [ $status -eq 1 ]; then
-    false
-  fi
-- |
-  status=0
-  for i in 'canary' 'aggregate' 'puppetdb_fact'; do
-    pushd modules/$i
-    if ! bundle exec rake spec; then
-      status=1
-    fi
-    popd
-  done
-  # fail this step if there were any failures
-  if [ $status -eq 1 ]; then
-    false
-  fi
-- |
-  if ! bundle exec rake generate_docs; then
-    false
-  fi
-- bundle exec rake puppetserver
+- bundle exec rake travis:$CHECK
 after_script:
 - |
   sync
