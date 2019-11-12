@@ -12,14 +12,14 @@ Puppet::Functions.create_function(:catch_errors) do
   #         otherwise the result will be returned
   # @example Catch errors for a block
   #   catch_errors() || {
-  #     run_command("whoami", $nodes)
-  #     run_command("adduser ryan", $nodes)
+  #     run_command("whoami", $targets)
+  #     run_command("adduser ryan", $targets)
   #   }
   # @example Catch parse errors for a block of code
   #   catch_errors(['bolt/parse-error']) || {
-  #    run_plan('canary', $nodes)
+  #    run_plan('canary', $targets)
   #    run_plan('other_plan)
-  #    apply($nodes) || {
+  #    apply($targets) || {
   #      notify { "Hello": }
   #    }
   #   }

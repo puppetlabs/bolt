@@ -13,8 +13,8 @@ Puppet::Functions.create_function(:without_default_logging) do
   # @example Suppress default logging for a series of functions
   #   without_default_logging() || {
   #     notice("Deploying on ${nodes}")
-  #     get_targets($nodes).each |$node| {
-  #       run_task(deploy, $node)
+  #     get_targets($targets).each |$target| {
+  #       run_task(deploy, $target)
   #     }
   #   }
   dispatch :without_default_logging do
