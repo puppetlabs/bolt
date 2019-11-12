@@ -749,7 +749,7 @@ describe "Bolt::CLI" do
       end
 
       it "accepts targets resulting from --query from puppetdb" do
-        cli = Bolt::CLI.new(%w[plan run foo --query nodes{}])
+        cli = Bolt::CLI.new(%w[command run foo --query nodes{}])
         allow(cli).to receive(:query_puppetdb_nodes).once.and_return(%w[foo bar])
         targets = [Bolt::Target.new('foo'), Bolt::Target.new('bar')]
         result = cli.parse
@@ -1560,38 +1560,89 @@ describe "Bolt::CLI" do
           cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
         end
 
-        it "uses the nodes passed using the --targets option(s) as the 'nodes' plan parameter" do
-          plan_params.clear
-          options[:target_args] = targets.map(&:host)
+        context 'with TargetSpec $nodes plan param' do
+          it "uses the nodes passed using the --targets option(s) as the 'nodes' plan parameter" do
+            plan_params.clear
+            options[:target_args] = targets.map(&:host)
 
-          expect(executor)
-            .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task')]))
+            expect(executor)
+              .to receive(:run_task)
+              .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
+              .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task')]))
 
-          expect(executor).to receive(:start_plan)
-          expect(executor).to receive(:log_plan)
-          expect(executor).to receive(:finish_plan)
+            expect(executor).to receive(:start_plan)
+            expect(executor).to receive(:log_plan)
+            expect(executor).to receive(:finish_plan)
 
-          cli.execute(options)
-          expect(JSON.parse(output.string)).to eq(
-            [{ 'node' => 'foo',
-               'target' => 'foo',
-               'status' => 'success',
-               'action' => 'task',
-               'object' => 'some_task',
-               'result' => { '_output' => 'yes' } }]
-          )
+            cli.execute(options)
+
+            expect(JSON.parse(output.string)).to eq(
+              [{ 'node' => 'foo',
+                 'target' => 'foo',
+                 'status' => 'success',
+                 'action' => 'task',
+                 'object' => 'some_task',
+                 'result' => { '_output' => 'yes' } }]
+            )
+          end
         end
 
-        it "errors when the --nodes option(s) and the 'nodes' plan parameter are both specified" do
-          options[:target_args] = targets.map(&:host)
+        context 'with TargetSpec $targets plan param' do
+          let(:plan_name) { 'sample::single_task_targets' }
+          it "uses the nodes passed using the --targets option(s) as the 'targets' plan parameter" do
+            plan_params.clear
+            options[:target_args] = targets.map(&:host)
 
-          expect { cli.execute(options) }.to raise_error(
-            /A plan's 'nodes' parameter may be specified using the --nodes option, (?x:
-             )but in that case it must not be specified as a separate nodes=<value> (?x:
-             )parameter nor included in the JSON data passed in the --params option/
-          )
+            expect(executor)
+              .to receive(:run_task)
+              .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
+              .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task')]))
+
+            expect(executor).to receive(:start_plan)
+            expect(executor).to receive(:log_plan)
+            expect(executor).to receive(:finish_plan)
+
+            cli.execute(options)
+
+            expect(JSON.parse(output.string)).to eq(
+              [{ 'node' => 'foo',
+                 'target' => 'foo',
+                 'status' => 'success',
+                 'action' => 'task',
+                 'object' => 'some_task',
+                 'result' => { '_output' => 'yes' } }]
+            )
+          end
+        end
+
+        it "errors when the --targets option(s) and the 'targets' plan parameter are both specified" do
+          options[:target_args] = targets.map(&:host)
+          options[:task_options] = { 'targets' => targets.map(&:host).join(',') }
+          regex = /A plan's 'targets' parameter may be specified using the --targets option/
+          expect { cli.execute(options) }.to raise_error(regex)
+        end
+
+        it "errors when the --targets option(s) and the 'targets' plan parameter are both specified" do
+          options[:target_args] = targets.map(&:host)
+          options[:task_options] = { 'targets' => targets.map(&:host).join(',') }
+          regex = /A plan's 'targets' parameter may be specified using the --targets option/
+          expect { cli.execute(options) }.to raise_error(regex)
+        end
+
+        context "when a plan has both $targets and $nodes neither is populated with --targets" do
+          let(:plan_name) { 'sample::targets_nodes' }
+          it "warns when --targets does not populate both $targets and $nodes" do
+            plan_params.clear
+            options[:target_args] = targets.map(&:host)
+
+            expect(executor).to receive(:start_plan)
+            expect(executor).to receive(:log_plan)
+            expect(executor).to receive(:finish_plan)
+
+            cli.execute(options)
+            regex = /Plan parameters include both 'nodes' and 'targets' with type 'TargetSpec'/
+            expect(@log_output.readlines.join).to match(regex)
+          end
         end
 
         it "formats results of a passing task" do

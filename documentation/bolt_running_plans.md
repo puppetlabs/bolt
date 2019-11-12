@@ -16,6 +16,8 @@ bolt plan run mymodule::myplan load_balancer=lb.myorg.com
 
 Note that, like `--nodes`, you can pass a comma-separated list of node names, wildcard patterns, or group names to a plan parameter that is passed to a run function or that the plan resolves using `get_targets`.
 
+When a plan has the parameter `$nodes` and the plan is invoked with either the `--nodes` or `--targets` CLI arguments the argument value will be passed as a plan parameter (for example `nodes=[value]`). Similarly, when a plan accepts a `TargetSpec $targets` parameter the value of `--nodes` or `--targets` is passed as the `targets=[value]` parameter. When a plan contains both a `$nodes` parameter and a `TargetSpec $targets` parameter, the value of the `--nodes` or `--targets` arguments will not be passed.
+
 **Tip:** Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](packaged_modules.md).
 
 **Related information**  
