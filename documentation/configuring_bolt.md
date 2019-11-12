@@ -16,7 +16,7 @@ Bolt config uses the following precedence, from highest precedence (cannot be ov
 -   **[Bolt configuration options](bolt_configuration_options.md)**  
 Your Bolt configuration file can contain global and transport options.
 -   **[Using Bolt with Puppet Enterprise](bolt_configure_orchestrator.md)**  
-If you're a Puppet Enterprise (PE) customer, you can configure Bolt to use the PE orchestrator and perform actions on managed nodes. Pairing PE with Bolt enables role-based access control, logging, and visual reports in the PE console.
+If you're a Puppet Enterprise (PE) customer, you can configure Bolt to use the PE orchestrator and perform actions on managed targets. Pairing PE with Bolt enables role-based access control, logging, and visual reports in the PE console.
 -   **[Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)**  
 Configure Bolt to connect to PuppetDB.
 

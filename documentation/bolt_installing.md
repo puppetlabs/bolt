@@ -124,7 +124,7 @@ You must have the command line tools for macOS and the Homebrew package manager 
 
 Use one of the supported *nix installation methods to install Bolt.
 
-**CAUTION:** These instructions include enabling the Puppet Tools repository. While Bolt can also be installed from the Puppet 6 or 5 platform repositories, adding these repositories to a Puppet-managed node, especially a PE master, might result in an unsupported version of a package like `puppet-agent` being installed. This can cause downtime, especially on a PE master.
+**CAUTION:** These instructions include enabling the Puppet Tools repository. While Bolt can also be installed from the Puppet 6 or 5 platform repositories, adding these repositories to a Puppet-managed target, especially a PE master, might result in an unsupported version of a package like `puppet-agent` being installed. This can cause downtime, especially on a PE master.
 
 ### Install Bolt on Debian or Ubuntu
 
@@ -275,8 +275,8 @@ Finished on localhost:
     BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
     VERSION_CODENAME=xenial
     UBUNTU_CODENAME=xenial
-Successful on 1 node: localhost
-Ran on 1 node in 0.00 seconds
+Successful on 1 target: localhost
+Ran on 1 target in 0.00 seconds
 ```
 
 As you can see from the above example, the `localhost` target is the *container* environment, not the *host* environment.
@@ -285,10 +285,11 @@ Typically you would want to run Bolt not against the container environment, but 
 
 ### Pass inventory as an environment variable
 
-If you only need to pass information on how to connect to target nodes, and not any custom module content, you can pass the inventory information by assigning it to an environment variable. This `inventory.yaml` file contains all the information needed for connecting to an example target node:
+If you only need to pass information on how to connect to targets, and not any custom module content, you can pass the inventory information by assigning it to an environment variable. This `inventory.yaml` file contains all the information needed for connecting to an example target:
 
 ```yaml
-nodes:
+version: 2
+targets:
   - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
     alias: docker-example
     config:
@@ -317,8 +318,8 @@ Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
       "family": "RedHat"
     }
   }
-Successful on 1 node: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-Ran on 1 node in 0.55 seconds
+Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+Ran on 1 target in 0.55 seconds
 ```
 
 ### Mount the host's Bolt project directory
@@ -355,10 +356,11 @@ log:
 
 **`inventory.yaml`**
 
-This lists a target node, and connection information for that node.
+This lists a target, and connection information for that target.
 
 ```yaml
-nodes:
+version: 2
+targets:
   - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
     alias: docker-example
     config:
@@ -388,8 +390,8 @@ Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
   Message: hi
   {
   }
-Successful on 1 node: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-Ran on 1 node in 0.56 seconds
+Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+Ran on 1 target in 0.56 seconds
 ```
 
 The `--mount` flag maps the Bolt project directory on the Docker host to `/Boltdir` in the container. The container is tagged as `puppet-bolt` and the rest of the command is all native to Bolt.
@@ -446,8 +448,8 @@ Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
   Message: hi
   {
   }
-Successful on 1 node: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-Ran on 1 node in 0.56 seconds
+Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+Ran on 1 target in 0.56 seconds
 ```
 
 ## Analytics data collection
@@ -462,8 +464,8 @@ Bolt collects data about how you use it. You can opt out of providing this data.
 -   User locale
 -   Operating system and version
 -   Transports used (SSH, WinRM, PCP) and number of targets
--   The number of nodes and groups defined in the Bolt inventory file
--   The number of nodes targeted with a Bolt command
+-   The number of targets and groups defined in the Bolt inventory file
+-   The number of targets targeted with a Bolt command
 -   The output format selected (human-readable, JSON)
 -   Whether the Bolt project directory was determined from the location of a `bolt.yaml` file or with the `--boltdir` flag
 -   The number of times Bolt tasks and plans are run (not including user-defined tasks or plans.)

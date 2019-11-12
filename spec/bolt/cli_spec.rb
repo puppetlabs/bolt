@@ -1242,7 +1242,7 @@ describe "Bolt::CLI" do
           cli.execute(options)
           json = JSON.parse(output.string)['plans']
           expect(json).to include(["aggregate::count"],
-                                  ["aggregate::nodes"],
+                                  ["aggregate::targets"],
                                   ["canary"],
                                   ["facts"],
                                   ["facts::info"],

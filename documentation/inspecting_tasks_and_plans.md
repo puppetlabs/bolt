@@ -1,12 +1,12 @@
 # Inspecting tasks and plans
 
-Before you run tasks or plans in your environment, inspect them to determine what effect they have on your target nodes.
+Before you run tasks or plans in your environment, inspect them to determine what effect they have on your targets.
 
 **Tip:** Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](packaged_modules.md).
 
 ## Run in no operation mode
 
-You can run some tasks in no-operation mode (`noop`) to view changes without taking any action on your target nodes. This way, you ensure the tasks perform as designed. If a task doesn't support no-operation mode, you get an error.
+You can run some tasks in no-operation mode (`noop`) to view changes without taking any action on your targets. This way, you ensure the tasks perform as designed. If a task doesn't support no-operation mode, you get an error.
 
 ```
 bolt task run package name=vim action=install --noop -n example.com

@@ -15,7 +15,7 @@ This list of packaged modules is available in a [Puppetfile](https://github.com/
 -   [package](https://forge.puppet.com/puppetlabs/package): Install, uninstall, update, and check the status of packages.
 -   [service](https://forge.puppet.com/puppetlabs/service): Manage and inspect the state of services.
 -   [puppet_conf](https://forge.puppet.com/puppetlabs/puppet_conf): Inspect and change the configuration options in the `puppet.conf` file.
--   [facts](https://forge.puppet.com/puppetlabs/facts): Retrieve facts from specified nodes.
+-   [facts](https://forge.puppet.com/puppetlabs/facts): Retrieve facts from specified targets.
 -   [puppet_agent](https://forge.puppet.com/puppetlabs/puppet_agent): Install Puppet Agent package.
 -   [reboot](https://forge.puppet.com/puppetlabs/reboot): Manage system reboots.
 
@@ -37,8 +37,8 @@ This list of packaged modules is available in a [Puppetfile](https://github.com/
 ### Bolt-specific modules that are not available on the Forge
 
 -   [aggregate](https://github.com/puppetlabs/bolt/tree/master/modules/aggregate): Aggregate task, script or command results.
--   [canary](https://github.com/puppetlabs/bolt/tree/master/modules/canary): Run action against a small number of nodes and only if it succeeds will it run on the rest.
--   [puppetdb_fact](https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb_fact): Collect facts for the specified nodes from the configured PuppetDB connection and stores the collected facts on the targets.
+-   [canary](https://github.com/puppetlabs/bolt/tree/master/modules/canary): Run action against a small number of targets and only if it succeeds will it run on the rest.
+-   [puppetdb_fact](https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb_fact): Collect facts for the specified targets from the configured PuppetDB connection and stores the collected facts on the targets.
 
 **Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
 

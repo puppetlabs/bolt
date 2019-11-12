@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-# empty task for pla
+# empty task for plan

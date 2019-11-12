@@ -28,8 +28,8 @@ Finished on localhost:
     BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
     VERSION_CODENAME=xenial
     UBUNTU_CODENAME=xenial
-Successful on 1 node: localhost
-Ran on 1 node in 0.00 seconds
+Successful on 1 target: localhost
+Ran on 1 target in 0.00 seconds
 ```
 
 In order to pass connection information and custom module content we need to share data from the host with the container. The following sections describe some ways to accomplish sharing data with the puppet-bolt container.
@@ -40,7 +40,8 @@ In the case where no custom module content is required for the Bolt action you w
 
 ```yaml
 ---
-nodes:
+version: 2
+targets:
   - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
     alias: docker-example
     config:
@@ -68,8 +69,8 @@ Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
       "family": "RedHat"
     }
   }
-Successful on 1 node: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-Ran on 1 node in 0.55 seconds
+Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+Ran on 1 target in 0.55 seconds
 ```
 
 ## Mount Bolt project directory from host 
@@ -106,7 +107,8 @@ Store information about targets. Note the absolute path to the private key is th
 
 ```yaml
 ---
-nodes:
+version: 2
+targets:
   - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
     alias: docker-example
     config:
@@ -135,8 +137,8 @@ Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
   Message: hi
   {
   }
-Successful on 1 node: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-Ran on 1 node in 0.56 seconds
+Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+Ran on 1 target in 0.56 seconds
 ```
 
 The `--mount` flag maps the Boltdir on the Docker host to `/Boltdir` in the container. The container is tagged as `puppet-bolt` and the rest of the invocation is all native to Bolt. 
@@ -192,6 +194,6 @@ Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
   Message: hi
   {
   }
-Successful on 1 node: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-Ran on 1 node in 0.56 seconds
+Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
+Ran on 1 target in 0.56 seconds
 ```

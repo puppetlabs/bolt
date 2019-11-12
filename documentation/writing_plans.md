@@ -47,13 +47,13 @@ Each plan name segment must begin with a lowercase letter and:
 
 You can specify parameters in your plan.
 
-Specify each parameter in your plan with its data type. For example, you might want parameters to specify which nodes to run different parts of your plan on.
+Specify each parameter in your plan with its data type. For example, you might want parameters to specify which targets to run different parts of your plan on.
 
-The following example shows node parameters specified as data type `TargetSpec`. This allows this parameter to be passed as a single URL, comma-separated URL list, Target data type, or Array of either. For more information about these data types, see the common data types table in the related metadata type topic.
+The following example shows target parameters specified as data type `TargetSpec`. This allows this parameter to be passed as a single URL, comma-separated URL list, Target data type, or Array of either. For more information about these data types, see the common data types table in the related metadata type topic.
 
-This allows the user to pass, for each parameter, either a node name or a URI that describes the protocol to use, the hostname, username, and password.
+This allows the user to pass, for each parameter, either a target name or a URI that describes the protocol to use, the hostname, username, and password.
 
-The plan then calls the `run_task` function, specifying which nodes to run the tasks on. The `Target` names are collected and stored in `$webserver_names` by iterating over the list of `Target` objects returned by `get_targets`. Task parameters are serialized to JSON format; therefore, extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
+The plan then calls the `run_task` function, specifying which targets to run the tasks on. The `Target` names are collected and stored in `$webserver_names` by iterating over the list of `Target` objects returned by `get_targets`. Task parameters are serialized to JSON format; therefore, extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
 
 ```
 plan mymodule::my_plan(
@@ -84,10 +84,10 @@ To illustrate this concept, consider this plan:
 
 ```
 plan test::parameter_passing (
-  TargetSpec $nodes,
+  TargetSpec $targets,
   Optional[String[1]] $example_nul = undef,
 ) {
-  return run_task('test::demo_undef_bash', $nodes, example_nul => $example_nul)
+  return run_task('test::demo_undef_bash', $targets, example_nul => $example_nul)
 }
 ```
 
@@ -117,8 +117,8 @@ Finished on localhost:
   {"example_nul":null,"_task":"test::demo_undef_bash"}
   {
   }
-Successful on 1 node: localhost
-Ran on 1 node
+Successful on 1 target: localhost
+Ran on 1 target
 ```
 
 The parameters `example_nul` and `_task` metadata are passed to the task as a JSON string over stdin.
@@ -137,9 +137,9 @@ Plans, unlike functions, are primarily run for side effects but they can optiona
 
 ```
 plan return_result(
-  $nodes
+  $targets
 ) {
-  return run_task('mytask', $nodes)
+  return run_task('mytask', $targets)
 }
 ```
 
@@ -185,10 +185,10 @@ Any plan that completes execution without an error is considered successful. The
 
 ### Failing plans
 
-If `upload_file`, `run_command`, `run_script`, or `run_task` are called without the `_catch_errors` option and they fail on any nodes, the plan itself fails. To fail a plan directly call the `fail_plan` function. Create a new error with a message and include the kind, details, or issue code, or pass an existing error to it.
+If `upload_file`, `run_command`, `run_script`, or `run_task` are called without the `_catch_errors` option and they fail on any targets, the plan itself fails. To fail a plan directly call the `fail_plan` function. Create a new error with a message and include the kind, details, or issue code, or pass an existing error to it.
 
 ```
-fail_plan('The plan is failing', 'mymodules/pear-shaped', {'failednodes' => $result.error_set.names})
+fail_plan('The plan is failing', 'mymodules/pear-shaped', {'failedtargets' => $result.error_set.names})
 # or
 fail_plan($errorobject)
 ```
@@ -268,20 +268,20 @@ Be aware of a few other Puppet behaviors in plans:
 
 Plan execution functions each return a result object that returns details about the execution.
 
-Each [execution function](plan_functions.md#) returns an object type `ResultSet`. For each node that the execution takes place on, this object contains a `Result` object. The [apply action](applying_manifest_blocks.md#) returns a `ResultSet` containing `ApplyResult` objects.
+Each [execution function](plan_functions.md#) returns an object type `ResultSet`. For each target that the execution takes place on, this object contains a `Result` object. The [apply action](applying_manifest_blocks.md#) returns a `ResultSet` containing `ApplyResult` objects.
 
 A `ResultSet` has the following methods:
 
--   `names()`: The `String` names (node URIs) of all nodes in the set as an `Array`.
+-   `names()`: The `String` names (target URIs) of all targets in the set as an `Array`.
 -   `empty()`: Returns `Boolean` if the execution result set is empty.
--   `count()`: Returns an `Integer` count of nodes.
+-   `count()`: Returns an `Integer` count of targets.
 -   `first()`: The first `Result` object, useful to unwrap single results.
 -   `find(String $target_name)`: Look up the `Result` for a specific target.
--   `error_set()`: A `ResultSet`containing only the results of failed nodes.
+-   `error_set()`: A `ResultSet`containing only the results of failed targets.
 -   `ok_set()`: A `ResultSet` containing only the successful results.
 -   `filter_set(block)`: Filters a `ResultSet` with the given block and returns a `ResultSet` object (where the [filter function](https://puppet.com/docs/puppet/latest/function.html#filter) returns an array or hash).
 -   `targets()`: An array of all the `Target` objects from every `Result`in the set.
--   `ok():` `Boolean` that is the same as `error_nodes.empty`.
+-   `ok():` `Boolean` that is the same as `error_targets.empty`.
 -   `to_data()`: An array of hashes representing either `Result` or `ApplyResults`.
 -   `[]`: Array indexing allows accessing a single `Result` (for example `$result[0]`) or an array of `Result`s (for example `$result[0,2]`)
 
@@ -310,12 +310,12 @@ An `ApplyResult` has the following methods:
 
 An instance of `ResultSet` is `Iterable` as if it were an `Array[Variant[Result, ApplyResult]]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the ResultSet returning each result.
 
-This example checks if a task ran correctly on all nodes. If it did not, the check fails:
+This example checks if a task ran correctly on all targets. If it did not, the check fails:
 
 ```
 $r = run_task('sometask', ..., '_catch_errors' => true)
 unless $r.ok {
-  fail("Running sometask failed on the nodes ${r.error_nodes.names}")
+  fail("Running sometask failed on the targets ${r.error_targets.names}")
 }
 ```
 
@@ -324,11 +324,11 @@ You can do iteration and checking if the result is an Error. This example output
 ```
 $r = run_task('sometask', ..., '_catch_errors' => true)
 $r.each |$result| {
-  $node = $result.target.name
+  $target = $result.target.name
   if $result.ok {
-    notice("${node} returned a value: ${result.value}")
+    notice("${target} returned a value: ${result.value}")
   } else {
-    notice("${node} errored with a message: ${result.error.message}")
+    notice("${target} errored with a message: ${result.error.message}")
   }
 }
 ```
@@ -373,23 +373,23 @@ run_task('task_with_secrets', ..., password => $pass.unwrap)
 
 ## Target objects
 
-The `Target` object represents a node and its specific connection options.
+The `Target` object represents a target and its specific connection options.
 
 The state of a target is stored in the inventory for the duration of a plan allowing you to collect facts or set vars for a target and retrieve them later. You can get a printable representation via the `name` function, as well as access components of the target: `protocol, host, port, user, password`.
 
 ### TargetSpec
 
-The execution function takes a parameter with the type alias TargetSpec. This alias accepts the pattern strings allowed by `--nodes`, a single Target object, or an Array of Targets and node patterns. Generally, use this type for plans that accept a set of targets as a parameter, to ensure clean interaction with the CLI and other plans. To operate on individual nodes, resolve it to a list via `get_targets`. For example, to loop over each node in a plan accept a `TargetSpec` argument, but call `get_targets` on it before looping.
+The execution function takes a parameter with the type alias TargetSpec. This alias accepts the pattern strings allowed by `--targets`, a single Target object, or an Array of Targets and target patterns. Generally, use this type for plans that accept a set of targets as a parameter, to ensure clean interaction with the CLI and other plans. To operate on individual targets, resolve it to a list via `get_targets`. For example, to loop over each target in a plan accept a `TargetSpec` argument, but call `get_targets` on it before looping.
 
 ```
-plan loop(TargetSpec $nodes) {
-  get_targets($nodes).each |$target| {
+plan loop(TargetSpec $targets) {
+  get_targets($targets).each |$target| {
     run_task('my_task', $target)
   }
 }
 ```
 
-If your plan accepts a single `TargetSpec` parameter you can call that parameter `nodes` so that it can be specified with the `--nodes` flag from the command line.
+If your plan accepts a single `TargetSpec` parameter you can call that parameter `targets` so that it can be specified with the `--targets` flag from the command line.
 
 ### Variables and facts on targets
 
@@ -408,10 +408,11 @@ plan vars(String $host) {
 
 Or set variables in the inventory file using the `vars` key at the group level.
 
-```
+```yaml
+version: 2
 groups:
-  - name: my_nodes
-    nodes:
+  - name: my_targets
+    targets:
       - localhost
     vars:
       operatingsystem: windows
@@ -432,14 +433,14 @@ The methods used to collect facts:
 This example collects facts with the facts plan and then uses those facts to decide which task to run on the targets.
 
 ```
-plan run_with_facts(TargetSpec $nodes) {
-  # This collects facts on nodes and updates the inventory
-  run_plan(facts, nodes => $nodes)
+plan run_with_facts(TargetSpec $targets) {
+  # This collects facts on targets and updates the inventory
+  run_plan(facts, targets => $targets)
 
-  $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
-  $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'Ubuntu' }
-  run_task(centos_task, $centos_nodes)
-  run_task(ubuntu_task, $ubuntu_nodes)
+  $centos_targets = get_targets($targets).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
+  $ubuntu_targets = get_targets($targets).filter |$n| { $n.facts['os']['name'] == 'Ubuntu' }
+  run_task(centos_task, $centos_targets)
+  run_task(ubuntu_task, $ubuntu_targets)
 }
 ```
 
@@ -448,20 +449,20 @@ plan run_with_facts(TargetSpec $nodes) {
 When targets are running a Puppet agent and sending facts to PuppetDB, you can use the `puppetdb_fact` plan to collect facts for them. This example collects facts with the `puppetdb_fact` plan, and then uses those facts to decide which task to run on the targets. You must configure the PuppetDB client before you run it.
 
 ```
-plan run_with_facts(TargetSpec $nodes) {
-  # This collects facts on nodes and update the inventory
-  run_plan(**puppetdb_fact**, nodes => $nodes)
+plan run_with_facts(TargetSpec $targets) {
+  # This collects facts on targets and update the inventory
+  run_plan(**puppetdb_fact**, targets => $targets)
 
-  $centos_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
-  $ubuntu_nodes = get_targets($nodes).filter |$n| { $n.facts['os']['name'] == 'Ubuntu' }
-  run_task(centos_task, $centos_nodes)
-  run_task(ubuntu_task, $ubuntu_nodes)
+  $centos_targets = get_targets($targets).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
+  $ubuntu_targets = get_targets($targets).filter |$n| { $n.facts['os']['name'] == 'Ubuntu' }
+  run_task(centos_task, $centos_targets)
+  run_task(ubuntu_task, $ubuntu_targets)
 }
 ```
 
 ### Collect general data from PuppetDB
 
-You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover nodes from PuppetDB and then run tasks on them. You'll have to configure the PuppetDB client before running it. You can learn how to [structure pql queries here](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html), and find [pql reference and examples here](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html)
+You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover targets from PuppetDB and then run tasks on them. You'll have to configure the PuppetDB client before running it. You can learn how to [structure pql queries here](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html), and find [pql reference and examples here](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html)
 
 ```
 plan pdb_discover {
@@ -469,8 +470,8 @@ plan pdb_discover {
   # extract the certnames into an array
   $names = $result.map |$r| { $r["certname"] }
   # wrap in url. You can skip this if the default transport is pcp
-  $nodes = $names.map |$n| { "pcp://${n}" }
-  run_task('my_task', $nodes)
+  $targets = $names.map |$n| { "pcp://${n}" }
+  run_task('my_task', $targets)
 }
 ```
 
@@ -498,13 +499,13 @@ Bolt logs actions that a plan takes on targets through the  `upload_file`,  `r
 run_task(my_task, $targets, "Better description", param1 => "val")
 ```
 
-If your plan contains many small actions you may want to suppress these messages and use explicit calls to the Puppet log functions instead. This can be accomplished by wrapping actions in a `without_default_logging` block which causes the action messages to be logged at info level instead of notice. For example to loop over a series of nodes without logging each action.
+If your plan contains many small actions you may want to suppress these messages and use explicit calls to the Puppet log functions instead. This can be accomplished by wrapping actions in a `without_default_logging` block which causes the action messages to be logged at info level instead of notice. For example to loop over a series of targets without logging each action.
 
 ```
-plan deploy( TargetSpec $nodes) {
+plan deploy( TargetSpec $targets) {
   without_default_logging() || {
-    get_targets($nodes).each |$node| {
-      run_task(deploy, $node)
+    get_targets($targets).each |$target| {
+      run_task(deploy, $target)
     }
   }
 }
@@ -513,13 +514,13 @@ plan deploy( TargetSpec $nodes) {
 To avoid complications with parser ambiguity, always call `without_default_logging` with `()` and empty block args `||`.
 
 ```
-without_default_logging() || { run_command('echo hi', $nodes) }
+without_default_logging() || { run_command('echo hi', $targets) }
 ```
 
 not
 
 ```
-without_default_logging { run_command('echo hi', $nodes) }
+without_default_logging { run_command('echo hi', $targets) }
 ```
 
 ## Example plans

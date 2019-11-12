@@ -22,15 +22,15 @@ ssh:
 ## Global configuration options
 
 -   `color`: Whether to use colored output when printing messages to the console.
--   `concurrency`: The number of threads to use when executing on remote nodes. Default is `100`.
+-   `concurrency`: The number of threads to use when executing on remote targets. Default is `100`.
 -   `format`: The format to use when printing results. Options are `human` and `json`. Default is `human`.
 -   `hiera-config`: Specify the path to your Hiera config. The default path is `hiera.yaml` inside the [Bolt project directory](bolt_project_directories.md#).
--   `interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the `.` character (`.py` and `py` both map to a task executable `task.py`) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. When a node's name is `localhost`, Ruby tasks run with the Bolt Ruby interpreter by default. This example demonstrates configuring Python tasks to run with a `python3` interpreter:
+-   `interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the `.` character (`.py` and `py` both map to a task executable `task.py`) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. When a target's name is `localhost`, Ruby tasks run with the Bolt Ruby interpreter by default. This example demonstrates configuring Python tasks to run with a `python3` interpreter:
     ```yaml
     interpreters:
       py: /usr/bin/python3
     ```
--   `inventoryfile`: The path to a structured data inventory file used to refer to groups of nodes on the command line and from plans. The default path for the inventory file is `inventory.yaml` inside the [Bolt project directory](bolt_project_directories.md#).
+-   `inventoryfile`: The path to a structured data inventory file used to refer to groups of targets on the command line and from plans. The default path for the inventory file is `inventory.yaml` inside the [Bolt project directory](bolt_project_directories.md#).
 -   `modulepath`: The module path for loading tasks and plan code. This is either an array of directories or a string containing a list of directories separated by the OS-specific `PATH` separator. The default path for modules is `modules:site-modules:site` inside the [Bolt project directory](bolt_project_directories.md#).
 -   `puppetfile`: A map containing options for the `bolt puppetfile install` command.
 -   `save-rerun`: Specify whether to update `.rerun.json` in the [Bolt project directory](bolt_project_directories.md#). If your target names include passwords, set this value to false to avoid writing passwords to disk.
@@ -134,7 +134,7 @@ When using the SSH transport, Bolt also interacts with the ssh-agent for SSH key
 
 -   `cacert`: The path to the CA certificate.
 -   `connect-timeout`: How long Bolt should wait when establishing connections.
--   `extensions`: List of file extensions that are accepted for scripts or tasks. Scripts with these file extensions rely on the target node's file type association to run. For example, if Python is installed on the system, a `.py` script runs with `python.exe`. The extensions .`ps1`, `.rb`, and `.pp` are always allowed and run via hard-coded executables.
+-   `extensions`: List of file extensions that are accepted for scripts or tasks. Scripts with these file extensions rely on the target's file type association to run. For example, if Python is installed on the system, a `.py` script runs with `python.exe`. The extensions .`ps1`, `.rb`, and `.pp` are always allowed and run via hard-coded executables.
 -   `file-protocol`: Which file transfer protocol to use. Either `winrm` or `smb`. Using `smb` is recommended for large file transfers. Default is `winrm`. **Note:** The SMB file protocol is experimental and is currently unsupported in conjunction with SSL, given that only SMB2 is currently implemented.
 -   `password`: Login password. Required unless using Kerberos.
 -   `port`: Connection port. Default is `5986`, or `5985` if `ssl: false`.
@@ -145,7 +145,7 @@ When using the SSH transport, Bolt also interacts with the ssh-agent for SSH key
 -   `tmpdir`: The directory to upload and execute temporary files on the target.
 -   `user`: Login user. Required unless using Kerberos.
 
-**Note:** Kerberos client support is experimental and is only supported when running Bolt from a Linux node against a Windows node. In the future, you will be able to use Kerberos when running Bolt from a macOS or Windows node.
+**Note:** Kerberos client support is experimental and is only supported when running Bolt from a Linux target against a Windows target. In the future, you will be able to use Kerberos when running Bolt from a macOS or Windows target.
 
 
 ## PCP transport configuration options

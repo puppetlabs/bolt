@@ -2,7 +2,7 @@
 
 Bolt tasks are similar to scripts, but they are kept in modules and can have metadata. This allows you to reuse and share them.
 
-You can write tasks in any programming language the target nodes run, such as Bash, PowerShell, or Python. A task can even be a compiled binary that runs on the target. Place your task in the `./tasks` directory of a module and add a metadata file to describe parameters and configure task behavior.
+You can write tasks in any programming language the targets run, such as Bash, PowerShell, or Python. A task can even be a compiled binary that runs on the target. Place your task in the `./tasks` directory of a module and add a metadata file to describe parameters and configure task behavior.
 
 For a task to run on remote *nix systems, it must include a shebang (`#!`) line at the top of the file to specify the interpreter.
 
@@ -151,7 +151,7 @@ For more information on securely passing user input, see the blog post [Stop usi
 
 Task names are named based on the filename of the task, the name of the module, and the path to the task within the module.
 
-You can write tasks in any language that runs on the target nodes. Give task files the extension for the language they are written in (such as `.rb` for Ruby), and place them in the top level of your module's `./tasks` directory.
+You can write tasks in any language that runs on the targets. Give task files the extension for the language they are written in (such as `.rb` for Ruby), and place them in the top level of your module's `./tasks` directory.
 
 Task names are composed of one or two name segments, indicating:
 
@@ -354,8 +354,8 @@ Finished on localhost:
   {
     "helper": "ruby"
   }
-Successful on 1 node: localhost
-Ran on 1 node in 0.12 seconds
+Successful on 1 target: localhost
+Ran on 1 target in 0.12 seconds
 ```
 
 ### Task helpers
@@ -400,8 +400,8 @@ Finished on localhost:
   {
     "greeting": "Hi, my name is Julia"
   }
-Successful on 1 node: localhost
-Ran on 1 node in 0.12 seconds
+Successful on 1 target: localhost
+Ran on 1 target in 0.12 seconds
 ```
 
 ### Ruby example
@@ -442,8 +442,8 @@ Finished on localhost:
   {
     "greeting": "Hi, my name is Robert'); DROP TABLE Students;--"
   }
-Successful on 1 node: localhost
-Ran on 1 node in 0.12 seconds
+Successful on 1 target: localhost
+Ran on 1 target in 0.12 seconds
 ```
 
 ## Writing remote tasks
@@ -489,7 +489,8 @@ To prevent accidentally running a normal task on a remote target and breaking it
 Add Slack as a remote target in your inventory file:
 
 ```yaml
-nodes:
+version: 2
+targets:
   - name: my_slack
     config:
       transport: remote
@@ -500,7 +501,7 @@ nodes:
 Finally, make `my_slack` a target that can run the `slack::message`:
 
 ```shell script
-bolt task run slack::message --nodes my_slack message="hello" channel=<slack channel id>
+bolt task run slack::message --targets my_slack message="hello" channel=<slack channel id>
 ```
 
 ## Defining parameters in tasks
@@ -556,7 +557,7 @@ if ($Name -eq $null -or $Name -eq "") {
 }
 ```
 
-To pass parameters in your task as environment variables (`PT_parameter`), you must set `input_method` in your task metadata to `environment`. To run Ruby tasks on Windows, the Puppet agent must be installed on the target nodes.
+To pass parameters in your task as environment variables (`PT_parameter`), you must set `input_method` in your task metadata to `environment`. To run Ruby tasks on Windows, the Puppet agent must be installed on the targets.
 
 ## Returning errors in tasks
 
@@ -663,7 +664,7 @@ json.dump(result, sys.stdout)
 
 To convert an existing script to a task, you can either write a task that wraps the script or you can add logic in your script to check for parameters in environment variables.
 
-If the script is already installed on the target nodes, you can write a task that wraps the script. In the task, read the script arguments as task parameters and call the script, passing the parameters as the arguments.
+If the script is already installed on the targets, you can write a task that wraps the script. In the task, read the script arguments as task parameters and call the script, passing the parameters as the arguments.
 
 If the script isn't installed or you want to make it into a cohesive task so that you can manage its version with code management tools, add code to your script to check for the environment variables, prefixed with `PT_`, and read them instead of arguments.
 
@@ -725,7 +726,7 @@ Given a script, `myscript.sh`, that accepts 2 positional args, `filename` and `v
     set -e
     
     script_file="$PT__installdir/script_example/files/myscript.sh"
-    # If this task is going to be run from windows nodes the wrapper must make sure it's exectutable
+    # If this task is going to be run from windows targets the wrapper must make sure it's exectutable
     chmod +x $script_file
     commandline=("$script_file" "$PT_filename" "$PT_version")
     # If the stderr output of the script is important redirect it to stdout.
@@ -966,7 +967,7 @@ To pass parameters individually to your task or plan, specify the parameter valu
 For example, to run the `mysql::sql` task to show tables from a database called `mydatabase`:
 
 ```shell script
-bolt task run mysql::sql database=mydatabase sql="SHOW TABLES" --nodes neptune --modules ~/modules
+bolt task run mysql::sql database=mydatabase sql="SHOW TABLES" --targets neptune --modules ~/modules
 ```
 
 To pass a string value that is valid JSON to a parameter that would accept both quote the string. For example to pass the string `true` to a parameter of type `Variant[String, Boolean]` use `'foo="true"'`. To pass a String value wrapped in `"` quote and escape it `'string="\"val\"'`. Alternatively, you can specify parameters as a single JSON object with the `--params` flag, passing either a JSON object or a path to a parameter file.
