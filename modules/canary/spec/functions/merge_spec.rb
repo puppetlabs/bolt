@@ -12,8 +12,8 @@ describe 'canary::merge' do
   end
 
   it 'can merge two resultspecs' do
-    r1 = %w[node1 node2].map { |u| make_result(u) }
-    r2 = ["node3"].map { |u| make_result(u) }
+    r1 = %w[target1 target2].map { |u| make_result(u) }
+    r2 = ["target3"].map { |u| make_result(u) }
 
     expected = Bolt::ResultSet.new(r1 + r2)
 

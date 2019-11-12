@@ -8,16 +8,16 @@ describe 'canary' do
 
   it 'runs targets in two groups' do
     expect_task('test_task').be_called_times(2).always_return({})
-    run_plan('canary', 'nodes' => 'foo,bar,baz', 'task' => 'test_task')
+    run_plan('canary', 'targets' => 'foo,bar,baz', 'task' => 'test_task')
   end
 
   it 'skips targets after a failure' do
     allow_task('test_task').be_called_times(1).error_with('kind' => 'task-failed', 'msg' => 'oops')
-    result = run_plan('canary', 'nodes' => 'foo,bar,baz', 'task' => 'test_task')
+    result = run_plan('canary', 'targets' => 'foo,bar,baz', 'task' => 'test_task')
     expect(result.value.kind).to(eq("bolt/run-failure"))
     expect(result.status).to(eq("failure"))
     kinds = result.value.details['result_set'].map { |r| r.error_hash['kind'] }.sort
-    expect(kinds).to eq(["canary/skipped-node", "canary/skipped-node", "task-failed"])
+    expect(kinds).to eq(["canary/skipped-target", "canary/skipped-target", "task-failed"])
   end
 
   it 'fails if a target fails' do
@@ -32,7 +32,7 @@ describe 'canary' do
         Bolt::ResultSet.new(results)
       end
     end
-    result = run_plan('canary', 'nodes' => 'foo,bar,baz', 'task' => 'test_task')
+    result = run_plan('canary', 'targets' => 'foo,bar,baz', 'task' => 'test_task')
     expect(result.status).to(eq("failure"))
   end
 end

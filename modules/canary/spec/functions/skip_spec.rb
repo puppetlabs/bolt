@@ -6,11 +6,11 @@ require 'bolt/result'
 require 'bolt/result_set'
 
 describe 'canary::skip' do
-  let(:target) { Bolt::Target.new("node1") }
+  let(:target) { Bolt::Target.new("target1") }
   let(:result) do
     Bolt::Result.new(target, error: {
                        'msg' => "Skipped #{target.name} because of a previous failure",
-                       'kind' => 'canary/skipped-node',
+                       'kind' => 'canary/skipped-target',
                        'details' => {}
                      })
   end
