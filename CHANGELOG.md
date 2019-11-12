@@ -4,6 +4,10 @@
 
 ### New features
 
+* **Addition of a YAML plugin** ([#1358](https://github.com/puppetlabs/bolt/issues/1358))
+
+  Bolt now includes a plugin to look up data from a YAML file.
+
 * **Support `_run_as` parameter for puppet_library hook** ([#1191](https://github.com/puppetlabs/bolt/issues/1191))
 
   Bolt now accepts the `_run_as` metaparameter for puppet_library hooks. `_run_as` specifies which user the library install task will be executed as.
