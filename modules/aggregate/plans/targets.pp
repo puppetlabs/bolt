@@ -1,8 +1,8 @@
-plan aggregate::nodes(
+plan aggregate::targets(
   Optional[String[0]] $task = undef,
   Optional[String[0]] $command = undef,
   Optional[String[0]] $script = undef,
-  TargetSpec $nodes,
+  TargetSpec $targets,
   Hash[String, Data] $params = {}
 ) {
 
@@ -24,12 +24,12 @@ plan aggregate::nodes(
   }
 
   $res = if ($task) {
-    run_task($task, $nodes, $params)
+    run_task($task, $targets, $params)
   } elsif ($command) {
-    run_command($command, $nodes, $params)
+    run_command($command, $targets, $params)
   } elsif ($script) {
-    run_script($script, $nodes, $params)
+    run_script($script, $targets, $params)
   }
 
-  return aggregate::nodes($res)
+  return aggregate::targets($res)
 }
