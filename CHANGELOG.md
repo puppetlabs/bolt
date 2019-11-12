@@ -8,6 +8,10 @@
 
   Bolt now includes a plugin to look up data from a YAML file.
 
+* **Pass value of `--targets` or `--nodes` to `TargetSpec $target` plan parameter** ([#1175](https://github.com/puppetlabs/bolt/issues/1175))
+
+  Bolt now passes the value of `--targets` or `--nodes` to plans with a `TargetSpec $targets` parameter.
+
 * **Support `_run_as` parameter for puppet_library hook** ([#1191](https://github.com/puppetlabs/bolt/issues/1191))
 
   Bolt now accepts the `_run_as` metaparameter for puppet_library hooks. `_run_as` specifies which user the library install task will be executed as.
