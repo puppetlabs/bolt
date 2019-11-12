@@ -31,8 +31,7 @@ describe Bolt::Plugin::Module do
 
   def capture_opts
     install_options = nil
-    allow(executor).to receive(:run_task) do |targets, task, arguments, options|
-      puts "handling #{task.name}\n %%%%% #{arguments}, \n &&&&&& #{options}"
+    allow(executor).to receive(:run_task) do |targets, task, _arguments, options|
       val = case task.name
             when "puppet_agent::install"
               install_options = options
