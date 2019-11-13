@@ -9,8 +9,6 @@ require 'bolt/util'
 # This is primarily a test of the cli but cli_spec is over 2k lines so I'm
 # keeping this separate.
 describe 'rerun' do
-  include BoltSpec::Files
-
   around(:each) do |example|
     Dir.mktmpdir do |boltdir|
       @boltdir = Bolt::Boltdir.new(boltdir)

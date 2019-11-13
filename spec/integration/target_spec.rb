@@ -6,7 +6,6 @@ require 'bolt_spec/integration'
 
 describe "when running a plan that creates targets", ssh: true do
   include BoltSpec::Conn
-  include BoltSpec::Files
   include BoltSpec::Integration
 
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }

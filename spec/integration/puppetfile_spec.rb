@@ -5,7 +5,6 @@ require 'bolt_spec/integration'
 require 'bolt_spec/files'
 
 describe "installing puppetfiles" do
-  include BoltSpec::Files
   include BoltSpec::Integration
 
   let(:synced_modules) { [] }

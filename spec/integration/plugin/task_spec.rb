@@ -6,7 +6,6 @@ require 'bolt_spec/files'
 require 'bolt_spec/integration'
 
 describe 'using the task plugin' do
-  include BoltSpec::Files
   include BoltSpec::Integration
   include BoltSpec::Conn
 
