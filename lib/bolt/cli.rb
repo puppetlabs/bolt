@@ -477,13 +477,27 @@ module Bolt
 
     def run_plan(plan_name, plan_arguments, nodes, options)
       unless nodes.empty?
-        if plan_arguments['nodes']
+        if plan_arguments['nodes'] || plan_arguments['targets']
+          key = plan_arguments.include?('nodes') ? 'nodes' : 'targets'
           raise Bolt::CLIError,
-                "A plan's 'nodes' parameter may be specified using the --nodes option, but in that " \
-                "case it must not be specified as a separate nodes=<value> parameter nor included " \
+                "A plan's '#{key}' parameter may be specified using the --#{key} option, but in that " \
+                "case it must not be specified as a separate #{key}=<value> parameter nor included " \
                 "in the JSON data passed in the --params option"
         end
-        plan_arguments['nodes'] = nodes.join(',')
+
+        plan_params = pal.get_plan_info(plan_name)['parameters']
+        target_param = plan_params.dig('targets', 'type') =~ /TargetSpec/
+        node_param = plan_params.include?('nodes')
+
+        if node_param && target_param
+          msg = "Plan parameters include both 'nodes' and 'targets' with type 'TargetSpec', " \
+                "neither will populated with the value for --nodes or --targets."
+          @logger.warn(msg)
+        elsif node_param
+          plan_arguments['nodes'] = nodes.join(',')
+        elsif target_param
+          plan_arguments['targets'] = nodes.join(',')
+        end
       end
 
       plan_context = { plan_name: plan_name,
