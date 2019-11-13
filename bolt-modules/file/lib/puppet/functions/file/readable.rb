@@ -16,6 +16,6 @@ Puppet::Functions.create_function(:'file::readable', Puppet::Functions::Internal
   def readable(scope, filename)
     Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
     found = Puppet::Parser::Files.find_file(filename, scope.compiler.environment)
-    found && File.readable?(found)
+    found ? File.readable?(found) : false
   end
 end
