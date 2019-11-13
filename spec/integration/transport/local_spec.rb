@@ -8,7 +8,7 @@ require 'bolt/util'
 require 'bolt_spec/transport'
 require 'bolt_spec/conn'
 
-require_relative 'shared_examples'
+require 'shared_examples/transport'
 
 describe Bolt::Transport::Local do
   include BoltSpec::Transport
