@@ -39,7 +39,7 @@ end
 
 desc "Run RSpec tests that require slow to start puppet containers"
 RSpec::Core::RakeTask.new(:puppetserver) do |t|
-  t.rspec_opts = '--tag puppetserver --tag puppetdb --tag omi --tag kerberos'
+  t.rspec_opts = '--tag puppetserver --tag puppetdb'
 end
 
 RuboCop::RakeTask.new(:rubocop) do |t|
