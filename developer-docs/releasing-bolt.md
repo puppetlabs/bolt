@@ -2,26 +2,8 @@
 
 Hello, fearless reader! This document details the release process for Bolt. Our current release cadence is weekly for both the bolt gem and bolt system package, usually on Wednesdays. Here's how we do it: 
 
-## The Day Before Release
-
-Create jira tickets for both the Bolt team and RE team for release. We use an internal tool called [Winston](https://github.com/puppetlabs/winston) to generate these tickets. Here's how to use it: 
-
-1. Clone [Winston](https://github.com/puppetlabs/winston) and `cd` into the directory 
-1. Run `bundle install` 
-1. If you've already cloned Winston, then **update from puppetlabs/winston#master**. There's been some activity around Winston lately so make sure your local version is up to date!
-1. Ask in the "release-new" hipchat room who should be the RE lead for this release 
-1. Determine who should be the Bolt lead for this release, as well as Docs lead. 
-1. In the Winston directory run 
-  ``` 
-  bundle exec rake bolt_release_tickets JIRA_USER=first.last BOLT_LEAD=first.last DOCS_LEAD=first.last RE_LEAD=first.last BOLT_VERSION=0.19.0 DATE=2018-04-12
-  ``` 
-  With updated version, date, and jira users. Note that the values for all of the leads and for the jira user are in the form of the jira username, which is typically lower-case `firstname.lastname`. 
-
-## The Day Of Release 
-
-You're ready to release! The tickets you created yesterday should detail how to release both the bolt gem and package step by step, but there are a few other things to make sure you do while releasing: 
-
-1. Notify the RE lead that you're ready to release, and ensure that everything is ready to go on their end. 
-1. Ensure that all tickets created by Winston are properly assigned, and on the Bolt kanban board. 
-1. Do the tickets. 
-1. Make sure that the correct version of bolt was released, and that it's published in the puppet5 repos and gem repos.
+1. Ensure the [CHANGELOG](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md) has been updated to include all of the relevant changes included in the release under the new version header and has been merged in to the master branch.
+2. Build and stage bolt packages with the [init_bolt-release job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_bolt-vanagon_bolt-release-init_bolt-release/) using all defaults except the new tag for Bolt. The version specified will be the new tag in the github repo.
+3. Once step 2 is done and you are ready to push the packages to public repositories, run the [release job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_ship-bolt_stage-foss-artifacts-all-repos/) with all default parameters except the new tag. This will also kick off the [docs publishing job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_ship-bolt_publish_docs/) which will build and publish the docs based on the new tag. Note that this job can be run against any REF as a stand-alone pipeline in the case where a change is needed outside of a tagged version. 
+4. After packages are made public update the [Homebrew tap](https://github.com/puppetlabs/homebrew-puppet) with the new version of bolt. This can be accomplished by running the rake task `rake 'brew:cask[puppet-bolt]'` and opening a PR with the changes. Make sure the PR passes the Travis integration tests and merge the PR. 
+5. Once packages are public alert the docs team in `#docs-edu-bolt` that a release announcement is ready to be published.
