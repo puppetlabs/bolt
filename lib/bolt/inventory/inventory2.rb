@@ -173,10 +173,12 @@ module Bolt
         existing_target = @targets.key?(new_target.name)
         @targets[new_target.name] = new_target
 
-        unless existing_target
+        if existing_target
+          clear_alia_from_group(@groups, new_target.name)
+        else
           add_to_group([new_target], 'all')
         end
-        # Insert target alias into groups that contain the target
+
         if (aliases = new_target.target_alias)
           aliases = [aliases] if aliases.is_a?(String)
           unless aliases.is_a?(Array)
@@ -184,18 +186,18 @@ module Bolt
             raise ValidationError.new(msg, @name)
           end
 
-          insert_alias_into_group(@groups, new_target.name, aliases)
+          @groups.insert_alia(new_target.name, aliases)
         end
 
         new_target
       end
 
-      def insert_alias_into_group(group, target_name, aliases)
+      def clear_alia_from_group(group, target_name)
         if group.all_target_names.include?(target_name)
-          group.insert_alia(target_name, aliases)
+          group.clear_alia(target_name)
         end
         group.groups.each do |grp|
-          insert_alias_into_group(grp, target_name, aliases)
+          clear_alia_from_group(grp, target_name)
         end
       end
 

@@ -751,11 +751,20 @@ describe Bolt::Inventory do
 
   context 'when using inventory show' do
     let(:data) {
-      { 'nodes' => [{
-        'name' => 'foo',
-        'alias' => %w[bar baz],
-        'config' => { 'ssh' => { 'disconnect-timeout' => 100 } },
-        'facts' => { 'foo' => 'bar' }
+      { 'groups' => [{
+        'name' => 'group1',
+        'nodes' => [{
+          'name' => 'foo',
+          'alias' => %w[bar]
+        }]
+      }, {
+        'name' => 'group2',
+        'nodes' => [{
+          'name' => 'foo',
+          'alias' => %w[baz],
+          'config' => { 'ssh' => { 'disconnect-timeout' => 100 } },
+          'facts' => { 'foo' => 'bar' }
+        }]
       }] }
     }
 

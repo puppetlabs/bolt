@@ -153,6 +153,10 @@ module Bolt
         end
       end
 
+      def clear_alia(target_name)
+        @aliases.reject! { |_alias, name| name == target_name }
+      end
+
       def data_merge(data1, data2)
         if data2.nil? || data1.nil?
           return data2 || data1
@@ -162,7 +166,8 @@ module Bolt
           'config' => Bolt::Util.deep_merge(data1['config'], data2['config']),
           'name' => data1['name'] || data2['name'],
           'uri' => data1['uri'] || data2['uri'],
-          'alias' => data1['alias'] || data2['alias'],
+          # Collect all aliases across all groups for each target uri
+          'alias' => [*data1['alias'], *data2['alias']],
           # Shallow merge instead of deep merge so that vars with a hash value
           # are assigned a new hash, rather than merging the existing value
           # with the value meant to replace it

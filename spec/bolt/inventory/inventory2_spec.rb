@@ -1273,11 +1273,20 @@ describe Bolt::Inventory::Inventory2 do
   context 'when using inventory show' do
     let(:data) {
       { 'version' => 2,
-        'targets' => [{
-          'uri' => 'foo',
-          'alias' => %w[bar baz],
-          'config' => { 'ssh' => { 'disconnect-timeout' => 100 } },
-          'facts' => { 'foo' => 'bar' }
+        'groups' => [{
+          'name' => 'group1',
+          'targets' => [{
+            'uri' => 'foo',
+            'alias' => %w[bar]
+          }]
+        }, {
+          'name' => 'group2',
+          'targets' => [{
+            'uri' => 'foo',
+            'alias' => %w[baz],
+            'config' => { 'ssh' => { 'disconnect-timeout' => 100 } },
+            'facts' => { 'foo' => 'bar' }
+          }]
         }] }
     }
 
@@ -1286,7 +1295,7 @@ describe Bolt::Inventory::Inventory2 do
     let(:expected_data) {
       { 'name' => 'foo',
         'uri' => 'foo',
-        'alias' => %w[bar baz],
+        'alias' => %w[baz bar],
         'config' => {
           'transport' => 'ssh',
           'ssh' => {

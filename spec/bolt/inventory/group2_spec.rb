@@ -490,6 +490,21 @@ describe Bolt::Inventory::Group2 do
       it { expect(group.target_aliases).to eq('alias1' => 'target1', 'alias2' => 'target1', 'alias3' => 'target2') }
     end
 
+    context 'multiple aliases in multiple groups' do
+      let(:data) do
+        {
+          'name' => 'root',
+          'groups' => [
+            { 'name' => 'group1', 'targets' => [{ 'name' => 'target', 'alias' => 'alias1' }] },
+            { 'name' => 'group2', 'targets' => [{ 'name' => 'target', 'alias' => 'alias2' }] }
+          ]
+        }
+      end
+
+      it { expect(group.target_aliases).to eq('alias1' => 'target', 'alias2' => 'target') }
+      it { expect(group.target_collect('target')['alias']).to eq(%w[alias2 alias1]) }
+    end
+
     context 'redundant targets' do
       let(:data) do
         {
