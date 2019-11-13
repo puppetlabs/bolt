@@ -11,7 +11,7 @@ You can read more about using bolt `apply` in Masterless Workflows in a [Blog Po
 You will deploy two web servers and a load balancer to distribute the traffic evenly between them with the following steps:
 
 - [Build a Project Specific Configuration Using a `Boltdir`](#build-a-boltdir)
-- [Build an Inventory to Organize Provisioned Nodes](#inventory)
+- [Build an Inventory to Organize Provisioned Targets](#inventory)
 - [Download Useful Module Content From Puppet Forge](#module-content)
 - [Write a Puppet Class to Abstract Nginx Web Server Configuration](#abstracting-the-server-setup)
 - [Write a Bolt Plan to `apply` Puppet Code and Orchestrate Deployment](#apply-the-puppet-code)
@@ -20,7 +20,7 @@ You will deploy two web servers and a load balancer to distribute the traffic ev
 
 For the following exercises you should have Bolt, Docker, and docker-compose installed. The following guides will help:
 
-- [Acquiring Nodes](../02-acquiring-nodes)
+- [Acquiring Targets](../02-acquiring-targets)
 - [Writing Advanced Plans](../09-writing-advanced-plans)
 
 
@@ -42,36 +42,36 @@ lesson11/
 └── docker-compose.yml
 ```
 
-## Acquire nodes
+## Acquire targets
 
-This lesson requires three nodes. Save the following file in your project directory as `docker-compose.yml`.
+This lesson requires three targets. Save the following file in your project directory as `docker-compose.yml`.
 
 ```yaml
 {% include lesson11/docker-compose.yml -%}
 ```
 
-Nodes can be obtained with the `docker-compose up -d` command.
+Targets can be obtained with the `docker-compose up -d` command.
 
-You can verify nodes are created with `docker ps`
+You can verify targets are created with `docker ps`
 ```
-8b7f33d8fde4        lab_node            "/usr/sbin/sshd -D"   About an hour ago   Up About an hour    0.0.0.0:20023->22/tcp                          11applymanifestcode_server_1_1
-90f6abe8dfc8        lab_node            "/usr/sbin/sshd -D"   About an hour ago   Up About an hour    0.0.0.0:20024->22/tcp                          11applymanifestcode_server_2_1
-26c47f8c4bad        lab_node            "/usr/sbin/sshd -D"   About an hour ago   Up About an hour    0.0.0.0:20022->22/tcp, 0.0.0.0:20080->80/tcp   lb
+8b7f33d8fde4        lab_target            "/usr/sbin/sshd -D"   About an hour ago   Up About an hour    0.0.0.0:20023->22/tcp                          11applymanifestcode_server_1_1
+90f6abe8dfc8        lab_target            "/usr/sbin/sshd -D"   About an hour ago   Up About an hour    0.0.0.0:20024->22/tcp                          11applymanifestcode_server_2_1
+26c47f8c4bad        lab_target            "/usr/sbin/sshd -D"   About an hour ago   Up About an hour    0.0.0.0:20022->22/tcp, 0.0.0.0:20080->80/tcp   lb
 ```
 
 ## Inventory
 
-Build an inventory to organize provisioned nodes. This will be the first configuration file in our new project specific `Boltdir`. 
+Build an inventory to organize provisioned targets. This will be the first configuration file in our new project specific `Boltdir`. 
 
-> **Note**: Example outputs in the lab are for nodes provisioned with Docker. 
+> **Note**: Example outputs in the lab are for targets provisioned with Docker. 
 
-If you provisioned your nodes with the docker-compose file provided with this exercise save the following in `Boltdir/inventory.yaml`.
+If you provisioned your targets with the docker-compose file provided with this exercise save the following in `Boltdir/inventory.yaml`.
 
 ```yaml
 {% include lesson11/Boltdir/inventory.yaml -%}
 ```
 
-Make sure your inventory is configured correctly and you can connect to all nodes. Run from within the project directory:
+Make sure your inventory is configured correctly and you can connect to all targets. Run from within the project directory:
 
 ```bash
 bolt command run 'echo hi' -n all
@@ -92,8 +92,8 @@ Finished on 127.0.0.1:
 Finished on localhost:
   STDOUT:
     hi
-Successful on 3 nodes: 0.0.0.0:20022,127.0.0.1:20023,localhost:20024
-Ran on 3 nodes in 0.2 sec
+Successful on 3 targets: 0.0.0.0:20022,127.0.0.1:20023,localhost:20024
+Ran on 3 targets in 0.2 sec
 ```
 
 ## Module Content
@@ -140,9 +140,9 @@ As we have seen in the lab, plan code belongs in the `plans` subdirectory. Save 
 
 Take note of the following features of the plan:
 
-1. This plan has three parameters, the server nodes, the load balancer nodes and a string to be statically served by our load balanced Nginx servers. 
-1. Notice the `apply_prep` function call. `apply_prep` is used to install packages needed by apply on remote nodes as well as to gather facts about the nodes.
-1. The first apply block configures the Nginx servers. The site content is defined by default to be "Hello from [node name]" where node name is a fact gathered by `apply_prep`. The `site_content` parameter can be configured in the bolt plan invocation. 
+1. This plan has three parameters, the server targets, the load balancer targets and a string to be statically served by our load balanced Nginx servers. 
+1. Notice the `apply_prep` function call. `apply_prep` is used to install packages needed by apply on remote targets as well as to gather facts about the targets.
+1. The first apply block configures the Nginx servers. The site content is defined by default to be "Hello from [target name]" where target name is a fact gathered by `apply_prep`. The `site_content` parameter can be configured in the bolt plan invocation. 
 1. The second apply block uses information about the Nginx servers to configure a load balancer to direct traffic between the two servers. 
 
 ```puppet
@@ -153,7 +153,7 @@ Verify the `nginx_install` plan is available to run using `bolt plan show`. You 
 
 ```
 aggregate::count
-aggregate::nodes
+aggregate::targets
 canary
 facts
 facts::info

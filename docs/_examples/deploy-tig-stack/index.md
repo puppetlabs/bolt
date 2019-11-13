@@ -22,15 +22,15 @@ project/
                     └── telegraf.json
 ```
 
-## Provisioning Nodes
+## Provisioning Targets
 
-To follow this example and deploy the TIG stack you'll need at least two nodes - one for the dashboard and one or more for the agents. You can use existing nodes in your system or create them using the provided `Vagrantfile`.
+To follow this example and deploy the TIG stack you'll need at least two targets - one for the dashboard and one or more for the agents. You can use existing targets in your system or create them using the provided `Vagrantfile`.
 
 ```shell
 {% include_relative Boltdir/Vagrantfile %}
 ```
 
-You should then generate the SSH configuration for both nodes, which will automatically be picked up by Bolt. Once you've generated SSH configuration, make sure you can SSH into the nodes.
+You should then generate the SSH configuration for both targets, which will automatically be picked up by Bolt. Once you've generated SSH configuration, make sure you can SSH into the targets.
 
 ```shell
 mkdir ~/.ssh
@@ -61,7 +61,7 @@ The `puppet-telegraf` module requires the `toml-rb` gem, so make sure to install
 
 ## Creating the Inventory File
 
-Next, you'll create an inventory file to specify which nodes to use as part of the plan. If you are using existing nodes in your system, replace `node0` and `node1` with your own nodes.
+Next, you'll create an inventory file to specify which targets to use as part of the plan. If you are using existing targets in your system, replace `target0` and `target1` with your own targets.
 
 ```yaml
 {% include_relative Boltdir/inventory.yaml -%}
@@ -69,13 +69,13 @@ Next, you'll create an inventory file to specify which nodes to use as part of t
 
 ## Examining the Plan
 
-Now that all of the required modules have been installed and the inventory file is populated with nodes, we'll take a look at the plan that will deploy the metrics visualization. In the `site/` directory, you'll find the following plan:
+Now that all of the required modules have been installed and the inventory file is populated with targets, we'll take a look at the plan that will deploy the metrics visualization. In the `site/` directory, you'll find the following plan:
 
 ```puppet
 {% include_relative Boltdir/site/tig/plans/init.pp -%}
 ```
 
-Plans let you compose different tasks together in meaningful ways and can have multiple steps, compute input, and process output. The first step in this plan installs the `puppet-agent` package and collects facts from each of the nodes in the inventory file.
+Plans let you compose different tasks together in meaningful ways and can have multiple steps, compute input, and process output. The first step in this plan installs the `puppet-agent` package and collects facts from each of the targets in the inventory file.
 
 Next, the first apply block will apply the `dashboard` manifest, which installs and configures both Grafana and InfluxDB. This manifest inherits a separate class called `tig::params`, which contains configuration parameters.
 
@@ -103,7 +103,7 @@ The last step in the plan returns results that you can use in other plans or sav
 
 ## Running the Plan
 
-You've downloaded and installed the required modules from the Puppet Forge, populated the inventory file with nodes, and set up configuration parameters in the `dashboard` and `telegraf` manifests. All that's left is to run the plan.
+You've downloaded and installed the required modules from the Puppet Forge, populated the inventory file with targets, and set up configuration parameters in the `dashboard` and `telegraf` manifests. All that's left is to run the plan.
 
 ```shell
 bolt plan run tig
@@ -113,11 +113,11 @@ The result of running the plan will look like this:
 
 ```
 Starting: plan tig
-Starting: install puppet and gather facts on node0, node1
+Starting: install puppet and gather facts on target0, target1
 Finished: install puppet and gather facts with 0 failures in 47.67 sec
-Starting: apply catalog on node0
+Starting: apply catalog on target0
 Finished: apply catalog with 0 failures in 65.3 sec
-Starting: apply catalog on node0, node1
+Starting: apply catalog on target0, target1
 Finished: apply catalog with 0 failures in 22.64 sec
 Finished: plan tig in 135.65 sec
 {

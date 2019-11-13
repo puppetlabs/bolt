@@ -1,9 +1,10 @@
 ---
+version: 2
 groups:
   - name: dashboard
-    nodes: [ node0 ]
+    targets: [ target0 ]
   - name: agents
-    nodes: [ node0, node1 ]
+    targets: [ target0, target1 ]
 config:
   ssh:
     host-key-check: false

@@ -12,7 +12,7 @@ In this exercise you will explore existing tasks, including several tasks that t
 Complete the following before you start this lesson:
 
 - [Installing Bolt](../01-installing-bolt)
-- [Setting Up Test Nodes](../02-acquiring-nodes)
+- [Setting Up Test Targets](../02-acquiring-targets)
 - [Running Commands](../03-running-commands)
 - [Running Scripts](../04-running-scripts)
 
@@ -56,7 +56,7 @@ Use bolt task show <task-name> to view details and parameters for a specific tas
 Install puppet agent with the `puppet_agent::install` task.
 
 ``` shell
-bolt task run puppet_agent::install --nodes linux --run-as root
+bolt task run puppet_agent::install --targets linux --run-as root
 ```
 
 The result:
@@ -74,8 +74,8 @@ Loading mirror speeds from cached hostfile
 No packages marked for update
 {
 }
-Successful on 3 nodes: node1,node2,node3
-Ran on 3 nodes in 68.71 seconds
+Successful on 3 targets: target1,target2,target3
+Ran on 3 targets in 68.71 seconds
 ```
 
 ## View and Use Parameters For a Specific Task
@@ -92,7 +92,7 @@ The result:
 package - Manage and inspect the state of packages
 
 USAGE:
-bolt task run --nodes <node-name> package action=<value> name=<value> version=<value> provider=<value>
+bolt task run --targets <target-name> package action=<value> name=<value> version=<value> provider=<value>
 
 PARAMETERS:
 - action: Enum[install, status, uninstall, upgrade]
@@ -111,51 +111,51 @@ built-in module
 Using parameters for the package task, check on the status of the bash package:
 
 ```shell
-bolt task run package action=status name=bash --nodes node1
+bolt task run package action=status name=bash --targets target1
 ```
 
 The result:
 
 ```    
-Started on node1...
-Finished on node1:
+Started on target1...
+Finished on target1:
   {
     "status": "up to date",
     "version": "4.2.46-30.el7"
   }
-Successful on 1 node: node1
-Ran on 1 node in 3.84 seconds
+Successful on 1 target: target1
+Ran on 1 target in 3.84 seconds
 ```
 
-Using parameters for the package task, install the vim package across all your nodes:
+Using parameters for the package task, install the vim package across all your targets:
 
 ```shell
-bolt task run package action=install name=vim --nodes linux --run-as root
+bolt task run package action=install name=vim --targets linux --run-as root
 ```
 
 The result:
 
 ```
-Started on node1...
-Started on node3...
-Started on node2...
-Finished on node1:
+Started on target1...
+Started on target3...
+Started on target2...
+Finished on target1:
   {
     "status": "present",
     "version": "2:7.4.160-4.el7"
   }
-Finished on node3:
+Finished on target3:
   {
     "status": "installed",
     "version": "2:7.4.160-4.el7"
   }
-Finished on node2:
+Finished on target2:
   {
     "status": "installed",
     "version": "2:7.4.160-4.el7"
   }
-Successful on 3 nodes: node1,node2,node3
-Ran on 3 nodes in 10.03 seconds
+Successful on 3 targets: target1,target2,target3
+Ran on 3 targets in 10.03 seconds
 ```
 
 # More Tips, Tricks and Ideas

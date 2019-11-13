@@ -1,5 +1,5 @@
-plan exercise9::catch_error (TargetSpec $nodes) {
-  $results = run_command('false', $nodes, _catch_errors => true)
+plan exercise9::catch_error (TargetSpec $targets) {
+  $results = run_command('false', $targets, _catch_errors => true)
   if $results.ok {
     out::message("The command succeeded")
   } else {

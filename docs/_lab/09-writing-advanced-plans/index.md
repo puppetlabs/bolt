@@ -14,7 +14,7 @@ In this exercise you will further explore Bolt Plans:
 Complete the following before you start this lesson:
 
 - [Installing Bolt](../01-installing-bolt)
-- [Setting Up Test Nodes](../02-acquiring-nodes)
+- [Setting Up Test Targets](../02-acquiring-targets)
 - [Writing Plans](../07-writing-plans)
 
 ## About Bolt's Plan Language
@@ -25,7 +25,7 @@ The Bolt Plan language is built on [Puppet language functions](https://puppet.co
 
 In the previous exercise you ran tasks and commands within the context of a plan. Now you will create a task that captures the return values and uses those values in subsequent steps. The ability to use the output of a task as the input to another task allows for creating much more complex and powerful plans. Real-world uses for this might include:
 
-* A plan that uses a task to check how long since a machine was last rebooted, and then runs another task to reboot the machine on nodes that have been up for more than a week.
+* A plan that uses a task to check how long since a machine was last rebooted, and then runs another task to reboot the machine on targets that have been up for more than a week.
 * A plan that uses a task to identify the operating system of a machine and then run a different task on each different operating system.
 
 Create a task that prints a JSON structure with an `answer` key with a value of true or false. Save the task as `Boltdir/site-modules/exercise9/tasks/yesorno.py`.
@@ -48,22 +48,22 @@ Functions used in this example:  [run_task](https://puppet.com/docs/bolt/1.x/pla
 Run the plan.
 
 ```bash
-bolt plan run exercise9::yesorno nodes=linux
+bolt plan run exercise9::yesorno targets=linux
 ```
 
 The result:
 
 ```plain
 Starting: plan exercise9::yesorno
-Starting: task exercise9::yesorno on node1, node2, node3
+Starting: task exercise9::yesorno on target1, target2, target3
 Finished: task exercise9::yesorno with 0 failures in 0.66 sec
-Starting: command 'uptime' on node2, node3
+Starting: command 'uptime' on target2, target3
 Finished: command 'uptime' with 0 failures in 0.39 sec
 Finished: plan exercise9::yesorno in 0.93 sec
 Plan completed successfully with no result
 ```
 
-Running the plan multiple times results in different output. As the return value of the task is random, the command runs on a different subset of nodes each time.
+Running the plan multiple times results in different output. As the return value of the task is random, the command runs on a different subset of targets each time.
 
 ## Write a Plan With Custom Ruby Functions
 
@@ -84,24 +84,24 @@ git clone https://github.com/puppetlabs/puppetlabs-stdlib ./Boltdir/modules/stdl
 Run the plan.
 
 ```bash
-bolt plan run exercise9::count_volumes nodes=linux
+bolt plan run exercise9::count_volumes targets=linux
 ```
 
 The result:
 
 ```plain
 Starting: plan exercise9::count_volumes
-Starting: command 'df' on node1, node2, node3
+Starting: command 'df' on target1, target2, target3
 Finished: command 'df' with 0 failures in 0.5 sec
 [
-  "node1 has 7 volumes",
-  "node2 has 7 volumes",
-  "node3 has 7 volumes"
+  "target1 has 7 volumes",
+  "target2 has 7 volumes",
+  "target3 has 7 volumes"
 ]
 Finished: plan exercise9::count_volumes in 0.55 sec
 ```
 
-Write a function to list the unique volumes across your nodes and save the function as `Boltdir/site-modules/exercise9/lib/puppet/functions/unique.rb`. A helpful function for this would be `unique`, but [puppetlabs-stdlib] includes a Puppet 3-compatible version that can't be used. Not all Puppet functions can be used with Bolt.
+Write a function to list the unique volumes across your targets and save the function as `Boltdir/site-modules/exercise9/lib/puppet/functions/unique.rb`. A helpful function for this would be `unique`, but [puppetlabs-stdlib] includes a Puppet 3-compatible version that can't be used. Not all Puppet functions can be used with Bolt.
 
 ```ruby
 {% include lesson1-10/Boltdir/site-modules/exercise9/lib/puppet/functions/unique.rb -%}
@@ -115,14 +115,14 @@ Write a plan that collects the last column of each line output by `df` (except t
 Run the plan.
 
 ```bash
-bolt plan run exercise9::unique_volumes nodes=linux
+bolt plan run exercise9::unique_volumes targets=linux
 ```
 
 The result:
 
 ```plain
 Starting: plan exercise9::unique_volumes
-Starting: command 'df' on node1, node2, node3
+Starting: command 'df' on target1, target2, target3
 Finished: command 'df' with 0 failures in 0.53 sec
 Starting: plan exercise9::unique_volumes in 0.55 sec
 [
@@ -142,7 +142,7 @@ For more information on writing custom functions, see [Puppet's custom function 
 
 By default, any task or command that fails causes a plan to abort immediately. You must add error handling to a plan to prevent it from stopping this way.
 
-Save the following plan as `Boltdir/site-modules/exercise9/plans/error.pp`. This plan runs a command that fails (`false`) and collects the result. It then uses the `ok` function to check if the command succeeded on every node, and prints a message based on that.
+Save the following plan as `Boltdir/site-modules/exercise9/plans/error.pp`. This plan runs a command that fails (`false`) and collects the result. It then uses the `ok` function to check if the command succeeded on every target, and prints a message based on that.
 
 ```puppet
 {% include lesson1-10/Boltdir/site-modules/exercise9/plans/error.pp -%}
@@ -151,19 +151,19 @@ Save the following plan as `Boltdir/site-modules/exercise9/plans/error.pp`. This
 Run the plan.
 
 ```bash
-bolt plan run exercise9::error nodes=linux
+bolt plan run exercise9::error targets=linux
 ```
 
 The result:
 
 ```plain
 Starting: plan exercise9::error
-Starting: command 'false' on node1, node2, node3
+Starting: command 'false' on target1, target2, target3
 Finished: command 'false' with 3 failures in 0.53 sec
 Starting: plan exercise9::error in 0.54 sec
 {
   "kind": "bolt/run-failure",
-  "msg": "Plan aborted: run_command 'false' failed on 3 nodes",
+  "msg": "Plan aborted: run_command 'false' failed on 3 targets",
   "details": {
     "action": "run_command",
     "object": "false",
@@ -183,14 +183,14 @@ Save the following new plan as `Boltdir/site-modules/exercise9/plans/catch_error
 Run the plan and execute the `out::message` statement.
 
 ```bash
-bolt plan run exercise9::catch_error nodes=linux
+bolt plan run exercise9::catch_error targets=linux
 ```
 
 The result:
 
 ```plain
 Starting: plan exercise9::catch_error
-Starting: command 'false' on node1, node2, node3
+Starting: command 'false' on target1, target2, target3
 Finished: command 'false' with 3 failures in 0.47 sec
 The command failed
 Starting: plan exercise9::catch_error in 0.48 sec
