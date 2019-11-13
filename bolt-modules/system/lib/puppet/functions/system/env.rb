@@ -7,7 +7,7 @@ Puppet::Functions.create_function(:'system::env') do
   #   system::env('USER')
   dispatch :env do
     required_param 'String', :name
-    return_type 'String'
+    return_type 'Optional[String]'
   end
 
   def env(name)
