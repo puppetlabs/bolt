@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt Next
+## Bolt 1.38.0
 
 ### New features
 
@@ -16,22 +16,22 @@
 
   Bolt now accepts the `_run_as` metaparameter for puppet_library hooks. `_run_as` specifies which user the library install task will be executed as.
 
-* **Add `--password-prompt` and `--sudo-password-prompt` CLI flags** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
-  Two new flags have been added to support the case where the user would like to set a `password` or `sudo-password` from a prompt without using a plugin. Deprecations messages have been added when a value is not supplied for `--password` or `--sudo-password`.
+* **Added `--password-prompt` and `--sudo-password-prompt` to CLI flags** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
+  Two new flags have been added to support users who would like to set a `password` or `sudo-password` from a prompt without using a plugin. A deprecation message will appear when a value is not supplied for `--password` or `--sudo-password`.
 
 * **Subcommand `project migrate` new to the CLI** ([#1377](https://github.com/puppetlabs/bolt/issues/1377))
 
-  The CLI now provides the subcommand `project migrate` which migrates Bolt projects to the latest version. When migrating a project, the [inventory file](https://puppet.com/docs/bolt/latest/inventory_file.html) will be changed from `v1` to `v2`. Changes are made in place and will not preserve comments or formatting.
+  The CLI now provides the subcommand `project migrate` which migrates Bolt projects to the latest version. When migrating a project the [inventory file](https://puppet.com/docs/bolt/latest/inventory_file.html) will be changed from `v1` to `v2`. Changes are made in place and will not preserve comments or formatting.
 
 ## Bug fixes
 
-* **Support unset environment variables with system::env** ([#1414](https://github.com/puppetlabs/bolt/issues/1414))
+* **Bolt issued an error for unset environment variables with `system::env`** ([#1414](https://github.com/puppetlabs/bolt/issues/1414))
 
-  The `system::env` function will no longer error when the environment variable is unset.
+  The `system::env` function no longer errors when the environment variable is unset.
 
-* **Always return boolean results from file::exists and file::readable** ([#1415](https://github.com/puppetlabs/bolt/pull/1415))
+* **Results from `file::exists` and `file::readable` errored** ([#1415](https://github.com/puppetlabs/bolt/pull/1415))
 
-  The `file::exists` and `file::readable` functions will no longer error when the file path is specified relative to a module and the file doesn't exist.
+  The `file::exists` and `file::readable` functions no longer error when the file path is specified relative to a module and the file doesn't exist.
 
 
 ## Bolt 1.37.0
