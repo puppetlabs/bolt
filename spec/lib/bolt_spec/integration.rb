@@ -13,6 +13,7 @@ module BoltSpec
       # prevent tests from reading users config
       allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(Bolt::Boltdir.new(Dir.mktmpdir))
       allow(cli).to receive(:puppetdb_client).and_return(pdb_client)
+      allow(cli).to receive(:analytics).and_return(Bolt::Analytics::NoopClient.new)
 
       output =  StringIO.new
       outputter = outputter.new(false, false, false, output)
