@@ -34,12 +34,12 @@ end
 desc "Run RSpec tests for TravisCI that don't require WinRM"
 RSpec::Core::RakeTask.new(:travisci) do |t|
   t.rspec_opts = '--tag ~winrm --tag ~appveyor_agents --tag ~puppetserver --tag ~puppetdb ' \
-  '--tag ~omi --tag ~windows --tag ~kerberos'
+  '--tag ~omi --tag ~windows --tag ~kerberos --tag ~expensive'
 end
 
-desc "Run RSpec tests that require slow to start puppet containers"
+desc "Run RSpec tests that are slow or require slow to start containers for setup"
 RSpec::Core::RakeTask.new(:puppetserver) do |t|
-  t.rspec_opts = '--tag puppetserver --tag puppetdb'
+  t.rspec_opts = '--tag puppetserver --tag puppetdb --tag expensive'
 end
 
 RuboCop::RakeTask.new(:rubocop) do |t|
@@ -80,6 +80,7 @@ namespace :travis do
   task :integration do
     sh "docker-compose -f spec/docker-compose.yml build --parallel"
     sh "docker-compose -f spec/docker-compose.yml up -d"
+    sh "r10k puppetfile install"
     # Wait for containers to be started
     result = 15.times do
       ready = sh('[ -z "$(docker ps -q --filter=health=starting)" ]') { |ok, _| ok }
