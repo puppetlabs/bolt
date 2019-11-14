@@ -131,7 +131,8 @@ module Bolt
       plugins
     end
 
-    BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory puppetdb azure_inventory].freeze
+    BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory
+                         puppetdb azure_inventory yaml].freeze
 
     attr_reader :pal, :plugin_context
 
