@@ -99,9 +99,12 @@ module Bolt
                   "option or param=value pairs, not both"
           end
           options[:params_parsed] = true
-        else
+        elsif task_options.any?
           options[:params_parsed] = false
           options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
+        else
+          options[:params_parsed] = true
+          options[:task_options] = {}
         end
       end
       options[:leftovers] = remaining
