@@ -653,7 +653,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       allow(STDIN).to receive(:noecho).and_return('bolt').once
       allow(STDOUT).to receive(:puts)
 
-      expect(STDOUT).to receive(:print).with("password please:").once
+      expect(STDOUT).to receive(:print).with("password please: ").once
 
       result = run_one_node(['command', 'run', shell_cmd, '--targets', 'target-1'] + config_flags)
       expect(result).to include('stdout' => "bolt\n")

@@ -21,7 +21,7 @@ describe Bolt::Plugin::Prompt do
   it 'concurrent delay prompts for data on STDOUT when executed' do
     allow(STDIN).to receive(:noecho).and_return(password)
     allow(STDOUT).to receive(:puts)
-    expect(STDOUT).to receive(:print).with("#{prompt_data['message']}:")
+    expect(STDOUT).to receive(:print).with("#{prompt_data['message']}: ")
 
     val = subject.resolve_reference(prompt_data)
     expect(val).to eq(password)
@@ -34,7 +34,7 @@ describe Bolt::Plugin::Prompt do
 
     allow(STDIN).to receive(:noecho).and_return(password)
     allow(STDERR).to receive(:puts)
-    expect(STDERR).to receive(:print).with("#{prompt_data['message']}:")
+    expect(STDERR).to receive(:print).with("#{prompt_data['message']}: ")
 
     val = subject.resolve_reference(prompt_data)
     expect(val).to eq(password)

@@ -20,7 +20,7 @@ module Bolt
 
       def resolve_reference(opts)
         # rubocop:disable Style/GlobalVars
-        $future ? STDERR.print("#{opts['message']}:") : STDOUT.print("#{opts['message']}:")
+        $future ? STDERR.print("#{opts['message']}: ") : STDOUT.print("#{opts['message']}: ")
         value = STDIN.noecho(&:gets).chomp
         $future ? STDERR.puts : STDOUT.puts
         # rubocop:enable Style/GlobalVars

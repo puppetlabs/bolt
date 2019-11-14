@@ -204,6 +204,10 @@ module Bolt
         File.stat(File.expand_path(path))
       end
 
+      def snake_name_to_class_name(snake_name)
+        snake_name.split('_').map(&:capitalize).join
+      end
+
       def class_name_to_file_name(cls_name)
         # Note this turns Bolt::CLI -> 'bolt/cli' not 'bolt/c_l_i'
         # this won't handle Bolt::Inventory2Foo

@@ -244,3 +244,14 @@ plugin_hooks:
       master: 'puppet.example.com'
       cacert_content: <CERT>
 ```
+
+You can also configure `plugin_hooks` using `_plugin` references:
+
+```yaml
+plugin_hooks:
+  puppet_library:
+    plugin: puppet_agent
+    version:
+      _plugin: prompt
+      message: "Which version of Puppet do you want to install?"
+```

@@ -17,11 +17,17 @@
   Bolt now accepts the `_run_as` metaparameter for puppet_library hooks. `_run_as` specifies which user the library install task will be executed as.
 
 * **Added `--password-prompt` and `--sudo-password-prompt` to CLI flags** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
+
   Two new flags have been added to support users who would like to set a `password` or `sudo-password` from a prompt without using a plugin. A deprecation message will appear when a value is not supplied for `--password` or `--sudo-password`.
 
 * **Subcommand `project migrate` new to the CLI** ([#1377](https://github.com/puppetlabs/bolt/issues/1377))
 
   The CLI now provides the subcommand `project migrate` which migrates Bolt projects to the latest version. When migrating a project the [inventory file](https://puppet.com/docs/bolt/latest/inventory_file.html) will be changed from `v1` to `v2`. Changes are made in place and will not preserve comments or formatting.
+
+* **Plugin support in `bolt.yml`** ([#1381](https://github.com/puppetlabs/bolt/pull/1381))
+
+  Plugin configuration can now be set by looking up data from other plugins. For example, the password for one plugin can be queried from another plugin.
+
 
 ## Bug fixes
 

@@ -94,6 +94,26 @@ plugins:
     private-key: ~/bolt_private_key.pem
 ```
 
+Plugin configuration can be derived from other plugins using `_plugin` references. For example, you can encrypt the credentials used to configure the `vault` plugin.
+
+```
+plugins:
+  vault:
+    auth:
+      token:
+        _plugin: pkcs7
+        encrypted_value: |
+              ENC[PKCS7,MIIBiQYJKoZIhvcNAQcDoIIBejCCAXYCAQAxggEhMIIBHQIBADAFMAACAQEw
+              DQYJKoZIhvcNAQEBBQAEggEARQNZqnN8ByTelBjokvkgOemMxyjmblWga8g6
+              y0nYfmA5Hdqj1nC/wIJTZafbmfzCEtUQZ+Hf70YPV04OYy7PU1WtYp0u/B0t
+              YCX7GgWHoXUSrEV+YtGyIpoa/pStvzzP12CBIaXwGh62TP6ZSbRnr/q/pnfk
+              mOx6HghUoNXfKBLW+sq8KgyNN1DJDTl0KubHVLnJvTc1jjHX7YK+qxV4eb3B
+              yklwuaDziPd+pipQOcUfjMnVW45THRUzE06iI8Q+DqVGA7/RsTEdG0HGtj5h
+              P7i5wLUdZ2AhYBkP1sacW7yiUjqwPjwMwx0T/xn/DqVW02QOjFgqsaSwi1CD
+              MOA3pDBMBgkqhkiG9w0BBwEwHQYJYIZIAWUDBAEqBBC87Iy6lvqGicslM6si
+              994ogCDRAeJgS/0HTaFdhjdxC8CmMCADl7qVgxKDf1ztpXznyg==]
+```
+
 ## Bundled plugins
 
 Bolt ships with a few plugins out of the box: task, puppetdb, terraform, azure_inventory, aws ec2, prompt, pkcs7, and vault.

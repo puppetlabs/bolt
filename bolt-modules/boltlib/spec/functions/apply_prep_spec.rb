@@ -14,7 +14,7 @@ describe 'apply_prep' do
   include PuppetlabsSpec::Fixtures
   let(:applicator) { mock('Bolt::Applicator') }
   let(:executor) { Bolt::Executor.new(1, Bolt::Analytics::NoopClient.new) }
-  let(:plugins) { Bolt::Plugin.new(nil, nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins) { Bolt::Plugin.setup(Bolt::Config.default, nil, nil, Bolt::Analytics::NoopClient.new) }
   let(:plugin_result) { {} }
   let(:task_hook) { proc { |_opts, target, _fun| proc { Bolt::Result.new(target, value: plugin_result) } } }
   let(:inventory) { Bolt::Inventory.create_version({}, nil, plugins) }
@@ -171,7 +171,7 @@ describe 'apply_prep' do
 
       let(:config) { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
       let(:pal) { nil }
-      let(:plugins) { Bolt::Plugin.new(config, pal, Bolt::Analytics::NoopClient.new) }
+      let(:plugins) { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
       let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
       let(:target) { inventory.get_target(hostname) }
       let(:targets) { inventory.get_targets(hostname) }
