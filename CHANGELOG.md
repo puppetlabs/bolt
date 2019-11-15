@@ -1,5 +1,13 @@
 # Changelog
 
+## Bolt Next
+
+### Bug fixes
+
+* **`bolt inventory show --detail` now displays all target aliases** ([#1379](https://github.com/puppetlabs/bolt/issues/1379))
+
+  Bolt now displays aliases from all groups, where a target is a member, in the output for `bolt inventory show --detail`. Previously, only the rightmost alias appeared in the output.
+
 ## Bolt 1.38.0
 
 ### New features
@@ -38,7 +46,6 @@
 * **Results from `file::exists` and `file::readable` errored** ([#1415](https://github.com/puppetlabs/bolt/pull/1415))
 
   The `file::exists` and `file::readable` functions no longer error when the file path is specified relative to a module and the file doesn't exist.
-
 
 ## Bolt 1.37.0
 
