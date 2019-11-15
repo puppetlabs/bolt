@@ -108,6 +108,10 @@ module Bolt
           raise ValidationError.new("No name or uri for target: #{target}", @name)
         end
 
+        unless t_name.is_a? String
+          raise ValidationError.new("Target name must be a String, not #{t_name.class}", @name)
+        end
+
         unless t_name.ascii_only?
           raise ValidationError.new("Target name must be ASCII characters: #{target}", @name)
         end
