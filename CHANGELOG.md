@@ -6,7 +6,7 @@
 
 * **Addition of a YAML plugin** ([#1358](https://github.com/puppetlabs/bolt/issues/1358))
 
-  Bolt now includes a plugin to look up data from a YAML file.
+  Bolt now includes a plugin to look up data from a YAML file. This allows you to compose multiple YAML files into a single bolt inventory file. This is useful to breakup a large monolithic inventory file or to load user specific data like credentials from outside the project directory.
 
 * **Pass value of `--targets` or `--nodes` to `TargetSpec $target` plan parameter** ([#1175](https://github.com/puppetlabs/bolt/issues/1175))
 
