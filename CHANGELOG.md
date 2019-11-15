@@ -8,6 +8,10 @@
 
   Bolt now displays aliases from all groups, where a target is a member, in the output for `bolt inventory show --detail`. Previously, only the rightmost alias appeared in the output.
 
+* **Plugins now ignore command-line flags** ([#1382](https://github.com/puppetlabs/bolt/issues/1382))
+
+  When running plugins locally to populate config or inventory information, command-line flags such as `--run-as` will no longer be applied to the local transport.
+
 ## Bolt 1.38.0
 
 ### New features
