@@ -4,7 +4,7 @@
 
 ### Bug fixes
 
-* **`bolt inventory show -- detail` now displays all target aliases** ([#1379](https://github.com/puppetlabs/bolt/issues/1379))
+* **`bolt inventory show --detail` now displays all target aliases** ([#1379](https://github.com/puppetlabs/bolt/issues/1379))
 
   Bolt now displays aliases from all groups, where a target is a member, in the output for `bolt inventory show --detail`. Previously, only the rightmost alias appeared in the output.
 
