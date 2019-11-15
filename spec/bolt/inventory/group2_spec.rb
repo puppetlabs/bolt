@@ -210,6 +210,19 @@ describe Bolt::Inventory::Group2 do
     end
   end
 
+  context 'where a target name is not a string' do
+    let(:data) do
+      {
+        'name' => 'group1',
+        'targets' => [{ 'name' => ['foo'] }]
+      }
+    end
+
+    it 'raises an error' do
+      expect { group.validate }.to raise_error(Bolt::Inventory::ValidationError, /Target name must be a String/)
+    end
+  end
+
   context 'where a group name conflicts with a prior target name' do
     let(:data) do
       {
