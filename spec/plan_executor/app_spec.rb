@@ -8,7 +8,6 @@ require 'json'
 require 'rack/test'
 
 describe "PlanExecutor::App" do
-  include BoltSpec::Conn
   include Rack::Test::Methods
 
   let(:plan_name) { 'basic' }

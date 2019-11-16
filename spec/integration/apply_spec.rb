@@ -7,7 +7,7 @@ require 'bolt_spec/integration'
 require 'bolt_spec/puppet_agent'
 require 'bolt_spec/run'
 
-describe "apply" do
+describe "apply", expensive: true do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration

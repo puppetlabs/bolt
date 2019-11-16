@@ -12,7 +12,7 @@ require 'bolt/config'
 require 'bolt/target'
 require 'bolt/util'
 
-require_relative 'shared_examples'
+require 'shared_examples/transport'
 
 describe Bolt::Transport::SSH do
   include BoltSpec::Conn

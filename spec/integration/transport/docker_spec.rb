@@ -6,7 +6,7 @@ require 'bolt_spec/transport'
 require 'bolt/transport/docker'
 require 'bolt/target'
 
-require_relative 'shared_examples'
+require 'shared_examples/transport'
 
 describe Bolt::Transport::Docker, docker: true do
   include BoltSpec::Conn

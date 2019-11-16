@@ -10,6 +10,8 @@ require 'bolt/target'
 require 'open3'
 require 'orchestrator_client'
 
+require 'shared_examples/transport'
+
 describe Bolt::Transport::Orch, orchestrator: true do
   include BoltSpec::Files
   include BoltSpec::Sensitive

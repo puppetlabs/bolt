@@ -11,66 +11,23 @@ env:
     - DOCKER_REGISTRY=pe-and-platform
     - BOLT_SUDO_USER=true
     - secure: Gk8LaACXYEVpv5LIWEMOuH3sJP4CzB2aSvE1BUcfDWkI+Hdgr2by3w/nGbKpyVD+v2H8r0zXyVrbCJ/qzx2gCRxqKJ2GKJEsrStT+8z3BXRRRzwkThIBVyWKk9b9bTt8AE0G94I3BE4gJyIPfbX5XxnKcg7nJZGOmubZpUPQX+2SXSfy9EbtY9iismwK7LGtWv6l90cK2eSLZGvdsSKPo7cylOldXfdYIyeBtvsIL1juBaiINX52Zgt371+nX53fDSYOKdIDLuhNqX3zpNOuIJ9DUj4E7IJA7+XhHy77zL98VjHtPo5H4fmKyZ2k+xbYqOydc5OPGguKequsnyDo5npktDrkbswnjWMXNDu+wImAd+IwHG2lTamsAnOGQ+E6g2oK0R5fUL26XJ3lBnTRrsLDnlrvqYqFxt3MCR+o5+DnTirSVQJfrRVsIKTucWHlYLTOUWkVDrLavJqIbWHytEbMf/BXUcovlQzSgfu5/Y1GkUJBnthtbiZfTImmBLcrqKDD4PnDmvC1v9Z5KR78MYu7lFTe5C4STj2aR6bwvqjiPKm6kYG5etOFEyRJ+CbqD2QsdF2N6Ww/RFWovqVqQIWuGdhumDUTdmQAiiPxl12M0+kIH6NugpBD3gt4RT0sni/T+booDw6b3Ts4WJ8FW1/LPWdy7gVo9yOCL4FhjOw=
-    # specify explicitly, even though docker-compose.yml has same defaults
-    - KRB5_REALM=BOLT.TEST
-    - KRB5_KDC=samba-ad.bolt.test
-    - SMB_ADMIN_PASSWORD=B0ltrules!
-    - KRB5_CONFIG=/tmp/krb5.conf
-addons:
-  # Ensure Travis resolves itself as the Samba KDC hosted in Docker
-  hosts:
-    - samba-ad.bolt.test
-    - omiserver.bolt.test
-before_install:
-# Kerberos client for use with the Samba KDC in Docker
-- sudo apt-get install -yq krb5-user
-# Build / start Samba before other containers, since its fast
-- docker-compose -f spec/docker-compose.yml up -d --build samba-ad
-
+jobs:
+  include:
+    - env: CHECK=rubocop
+    - env: CHECK=unit
+    - env: CHECK=modules
+    - env: CHECK=docs
+    - env: CHECK=integration
 before_script:
-- $TRAVIS_BUILD_DIR/spec/fixtures/samba-ad/kerberos-client-config.sh
-- docker-compose -f spec/docker-compose.yml up -d --build
 - eval `ssh-agent`
 - cat Gemfile.lock
-- bundle exec r10k puppetfile install
   # Add users to test sudo on localhost
 - echo 'travis:travis' | sudo chpasswd
   # Undo travis sudoers config
 - sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
 - sudo sh -c "echo 'travis  ALL=(ALL) PASSWD:ALL' >> /etc/sudoers"
 script:
-- bundle exec rubocop || travis_terminate 1
-- bundle exec rake travisci
-- |
-  status=0
-  for i in 'boltlib' 'ctrl' 'file' 'out' 'system'; do
-    pushd bolt-modules/$i
-    if ! bundle exec rake spec; then
-      status=1
-    fi
-    popd
-  done
-  if [ $status -eq 1 ]; then
-    false
-  fi
-- |
-  status=0
-  for i in 'canary' 'aggregate' 'puppetdb_fact'; do
-    pushd modules/$i
-    if ! bundle exec rake spec; then
-      status=1
-    fi
-    popd
-  done
-  # fail this step if there were any failures
-  if [ $status -eq 1 ]; then
-    false
-  fi
-- |
-  if ! bundle exec rake generate_docs; then
-    false
-  fi
-- bundle exec rake puppetserver
+- bundle exec rake travis:$CHECK
 after_script:
 - |
   sync

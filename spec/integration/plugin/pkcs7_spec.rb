@@ -5,7 +5,6 @@ require 'bolt_spec/files'
 require 'bolt_spec/integration'
 
 describe 'using the pkcs7 plugin' do
-  include BoltSpec::Files
   include BoltSpec::Integration
 
   def with_boltdir(config: nil, inventory: nil)

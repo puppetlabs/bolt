@@ -10,8 +10,6 @@ require 'bolt_spec/run'
 describe 'running with an inventory file', reset_puppet_settings: true, ssh: true do
   include BoltSpec::Config
   include BoltSpec::Conn
-  include BoltSpec::Files
-  include BoltSpec::Integration
   include BoltSpec::Run
 
   let(:conn) { conn_info('ssh') }

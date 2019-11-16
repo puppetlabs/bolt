@@ -143,17 +143,16 @@ PS
     end
   end
 
-  context "connecting over SSL", winrm: true, omi: true do
+  context "connecting over SSL", winrm: true do
     # In order to run vagrant and docker targets simultaniously for local dev, use 4598{5,6} to avoid port conflict
-    let(:omi_target) { make_target(port_: 45986, conf: ssl_config) }
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
     it "can test whether the target is available" do
-      expect(winrm.connected?(omi_target)).to eq(true)
+      expect(winrm.connected?(target)).to eq(true)
     end
 
     it "executes a command on a host" do
-      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
+      expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
 
     # winrm gem doesn't fully support OMI server, so disable this test
@@ -180,14 +179,7 @@ PS
       target.options.delete('cacert')
       target.options['ssl-verify'] = false
 
-      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
-    end
-
-    it "ignores invalid cacert when ssl: false" do
-      target.options['cacert'] = 'does not exist'
-      target.options['ssl'] = false
-
-      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
+      expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
   end
 
@@ -211,10 +203,11 @@ PS
     end
   end
 
-  context "authenticating with Kerberos", kerberos: true do
+  context "authenticating with Kerberos", kerberos: true, omi: true do
     before(:all) do
       # disable all tests on Windows for now
       skip('Windows Active Directory tickets are different') if Bolt::Util.windows?
+      skip("WinRM gem and OMI server have a protocol negotiation bug")
 
       @kerb_user = 'Administrator'
       @kerb_realm = ENV['KRB5_REALM'] || 'BOLT.TEST'
@@ -241,12 +234,10 @@ PS
     end
 
     it "executes a command on a host over HTTP" do
-      pending("WinRM gem and OMI server have a protocol negotiation bug")
       expect(winrm.run_command(omi_http_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
     end
 
     it "executes a command on a host over HTTPS" do
-      pending("WinRM gem and OMI server have a protocol negotiation bug")
       expect(winrm.run_command(omi_https_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
     end
   end

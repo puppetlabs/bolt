@@ -1,6 +1,6 @@
 FROM puppet/puppetserver-standalone
 
-ARG hostname="bolt-server"
+ARG hostname="boltserver"
 ENV PUPPETSERVER_HOSTNAME "$hostname"
 
 
