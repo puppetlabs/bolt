@@ -51,7 +51,7 @@ module Bolt
       private :serial_executor
 
       def empty_inventory
-        @empty_inventory ||= Bolt::Inventory::Inventory2.new({}, @config, plugins: @plugins)
+        @empty_inventory ||= Bolt::Inventory::Inventory2.new({}, plugins: @plugins)
       end
       private :empty_inventory
 
