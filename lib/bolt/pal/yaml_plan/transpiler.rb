@@ -48,7 +48,6 @@ module Bolt
           plan_string
         end
 
-        # Save me from all these rescue statements...
         def parse_plan
           begin
             file_contents = File.read(@plan_path)
@@ -57,18 +56,7 @@ module Bolt
             raise Bolt::FileError.new(msg, @plan_path)
           end
 
-          begin
-            result = Bolt::PAL::YamlPlan::Loader.parse_plan(file_contents, @plan_path)
-          rescue Error => e
-            raise ConvertError.new("Failed to convert yaml plan: #{e.message}", @plan_path)
-          end
-
-          unless result.is_a?(Hash)
-            type = result.class.name
-            raise ArgumentError, "The data loaded from #{source_ref} does not contain an object - its type is #{type}"
-          end
-
-          Bolt::PAL::YamlPlan.new(@modulename, result).freeze
+          Bolt::PAL::YamlPlan::Loader.from_string(@modulename, file_contents, @plan_path)
         end
 
         def validate_path

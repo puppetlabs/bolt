@@ -53,7 +53,7 @@ module Bolt
           PuppetVisitor.create_visitor.accept(parse_tree)
         end
 
-        def self.create(loader, typed_name, source_ref, yaml_string)
+        def self.from_string(name, yaml_string, source_ref)
           result = parse_plan(yaml_string, source_ref)
           unless result.is_a?(Hash)
             type = result.class.name
@@ -61,11 +61,14 @@ module Bolt
           end
 
           begin
-            plan_definition = YamlPlan.new(typed_name, result).freeze
+            YamlPlan.new(name, result).freeze
           rescue Bolt::Error => e
             raise Puppet::ParseError.new(e.message, source_ref)
           end
+        end
 
+        def self.create(loader, typed_name, source_ref, yaml_string)
+          plan_definition = from_string(typed_name.name, yaml_string, source_ref)
           created = create_function_class(plan_definition)
           closure_scope = nil
 

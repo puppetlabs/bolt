@@ -50,7 +50,7 @@ describe Bolt::PAL::YamlPlan::Transpiler do
 
     it 'errors on duplicate step names' do
       expect { transpiler.transpile(plan_path) }
-        .to raise_error(Bolt::Error, /#{error}/)
+        .to raise_error(Puppet::ParseError, /#{error}/)
     end
   end
 

@@ -4,7 +4,7 @@ module Bolt
   class PAL
     class YamlPlan
       class Parameter
-        attr_reader :name, :value, :type_expr
+        attr_reader :name, :value, :type_expr, :description
 
         PARAMETER_KEYS = Set['type', 'default', 'description']
 
@@ -15,6 +15,7 @@ module Bolt
           @name = param
           @value = definition['default']
           @type_expr = Puppet::Pops::Types::TypeParser.singleton.parse(definition['type']) if definition['type']
+          @description = definition['description']
         end
 
         def validate_param(param, definition)

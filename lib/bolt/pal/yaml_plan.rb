@@ -6,16 +6,17 @@ require 'bolt/pal/yaml_plan/step'
 module Bolt
   class PAL
     class YamlPlan
-      PLAN_KEYS = Set['parameters', 'steps', 'return', 'version']
+      PLAN_KEYS = Set['parameters', 'steps', 'return', 'version', 'description']
       VAR_NAME_PATTERN = /\A[a-z_][a-z0-9_]*\z/.freeze
 
-      attr_reader :name, :parameters, :steps, :return
+      attr_reader :name, :parameters, :steps, :return, :description
 
       def initialize(name, plan)
         # Top-level plan keys aren't allowed to be Puppet code, so force them
         # all to strings.
         plan = Bolt::Util.walk_keys(plan) { |key| stringify(key) }
         @name = name.freeze
+        @description = stringify(plan['description']) if plan['description']
 
         params_hash = stringify(plan.fetch('parameters', {}))
         # Ensure params is a hash
