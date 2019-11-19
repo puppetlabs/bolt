@@ -2,6 +2,12 @@
 
 ## Bolt Next
 
+### New features
+
+* **Task metadata can now specify parameter defaults** ([#1394](https://github.com/puppetlabs/bolt/pull/1394))
+
+  Parameter defaults can be set in the task metadata file and will be used if no value is supplied for the parameter.
+
 ### Bug fixes
 
 * **`bolt inventory show --detail` now displays all target aliases** ([#1379](https://github.com/puppetlabs/bolt/issues/1379))

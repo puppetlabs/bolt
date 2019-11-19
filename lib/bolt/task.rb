@@ -42,6 +42,12 @@ module Bolt
       metadata['parameters']
     end
 
+    def parameter_defaults
+      (parameters || {}).each_with_object({}) do |(name, param_spec), defaults|
+        defaults[name] = param_spec['default'] if param_spec.key?('default')
+      end
+    end
+
     def supports_noop
       metadata['supports_noop']
     end

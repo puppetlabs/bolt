@@ -223,6 +223,7 @@ module Bolt
 
         task['metadata']['parameters']&.each do |k, v|
           pretty_params << "- #{k}: #{v['type'] || 'Any'}\n"
+          pretty_params << "    Default: #{v['default'].inspect}\n" if v.key?('default')
           pretty_params << "    #{v['description']}\n" if v['description']
           usage << if v['type'].is_a?(Puppet::Pops::Types::POptionalType)
                      " [#{k}=<value>]"

@@ -96,6 +96,39 @@ describe 'run_task' do
       is_expected.to run.with_params('test::yes', hostname).and_return(result_set)
     end
 
+    it 'uses the default if a parameter is not specified' do
+      executable = File.join(tasks_root, 'params.sh')
+      args = {
+        'mandatory_string' => 'str',
+        'mandatory_integer' => 10,
+        'mandatory_boolean' => true
+      }
+
+      expected_args = args.merge('default_string' => 'hello', 'optional_default_string' => 'goodbye')
+      executor.expects(:run_task).with([target], mock_task(executable, 'stdin'), expected_args, {})
+              .returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
+
+      is_expected.to run.with_params('Test::Params', hostname, args)
+    end
+
+    it 'does not use the default if a parameter is specified' do
+      executable = File.join(tasks_root, 'params.sh')
+      args = {
+        'mandatory_string' => 'str',
+        'mandatory_integer' => 10,
+        'mandatory_boolean' => true,
+        'default_string' => 'something',
+        'optional_default_string' => 'something else'
+      }
+
+      executor.expects(:run_task).with([target], mock_task(executable, 'stdin'), args, {})
+              .returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
+
+      is_expected.to run.with_params('Test::Params', hostname, args)
+    end
+
     it 'when called with no destinations - does not invoke bolt' do
       executor.expects(:run_task).never
       inventory.expects(:get_targets).with([]).returns([])
