@@ -11,6 +11,7 @@ describe 'resolve_references' do
   let(:pdb_client) { Bolt::PuppetDB::Client.new({}) }
   let(:analytics) { Bolt::Analytics::NoopClient.new }
   let(:plugins) { Bolt::Plugin.setup(config, pal, pdb_client, analytics) }
+  let(:executor) { Bolt::Executor.new }
   let(:inventory) { Bolt::Inventory.new({}, plugins: plugins) }
   let(:tasks_enabled) { true }
 
@@ -33,7 +34,7 @@ describe 'resolve_references' do
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.override(bolt_inventory: inventory) do
+    Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       example.run
     end
   end
