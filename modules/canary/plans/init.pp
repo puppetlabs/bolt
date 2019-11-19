@@ -24,7 +24,7 @@
 #
 # @example Run a command
 #   run_plan(canary, command => 'whoami', nodes => $mynodes)
-
+#
 plan canary(
   Optional[String[0]] $task = undef,
   Optional[String[0]] $command = undef,
