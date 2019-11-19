@@ -4,6 +4,10 @@ title: Bolt Hands-on Lab
 
 ## Introduction
 
+Bolt is an open source orchestration tool that automates the manual work it takes to maintain your infrastructure. Use Bolt to automate tasks that you perform on an as-needed basis or as part of a greater orchestration workflow. For example, you can use Bolt to patch and update systems, troubleshoot servers, deploy applications, or stop and restart services. Bolt can be installed on your local workstation and connects directly to remote nodes with SSH or WinRM, so you are not required to install any agent software.
+
+## About This Lab
+
 This repository contains a step-by-step introduction to [Bolt](https://github.com/puppetlabs/bolt) and to the Bolt Tasks ecosystem. It's designed to be followed in order, with each exercise introducing the basic concepts. If you complete all of the exercises you should be well on your way to understanding how you can use Bolt and Bolt Tasks to help manage your infrastructure.
 
 [Watch Intro Video](https://www.youtube.com/watch?v=9Z7nYlspUJw){: .btn}
