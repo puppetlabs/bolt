@@ -85,6 +85,11 @@ module Bolt
       end
     end
 
+    def self.from_apply_block(applyresult)
+      target = Bolt::ApplyTarget.new(applyresult.target.detail.merge(applyresult.target.to_h))
+      new(target, error: applyresult.error, report: applyresult.report)
+    end
+
     def initialize(target, error: nil, report: nil)
       @target = target
       @value = {}

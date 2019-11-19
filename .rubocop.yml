@@ -95,3 +95,7 @@ Lint/HandleExceptions:
 # Enforce LF line endings, even when on Windows
 Layout/EndOfLine:
   EnforcedStyle: lf
+
+Lint/AmbiguousOperator:
+  Exclude:
+    - lib/bolt/apply_target.rb

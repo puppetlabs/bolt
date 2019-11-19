@@ -8,6 +8,8 @@ require 'open3'
 require 'bolt/error'
 require 'bolt/task'
 require 'bolt/apply_result'
+require 'bolt/apply_target'
+require 'bolt/util'
 require 'bolt/util/puppet_log_level'
 
 module Bolt
@@ -83,7 +85,37 @@ module Bolt
     def compile(target, ast, plan_vars)
       trusted = Puppet::Context::TrustedInformation.new('local', target.name, {})
       facts = @inventory.facts(target).merge('bolt' => true)
+      # Convert all targets to ApplyTargets
+      # This needs to happen here so we can serialize *Result* objects as pcore
+      # types, which contain targets
+      vars = @inventory.vars(target).merge(plan_vars)
 
+      # TODO: How much of a performance hit is this?
+      vars = Bolt::Util.walk_vals(vars) do |var|
+        if var.is_a?(Bolt::Target2)
+          Bolt::ApplyTarget.new(var.detail.merge(var.to_h))
+        elsif var.is_a?(Bolt::Result)
+          Bolt::Result.from_apply_block(var)
+        elsif var.is_a?(Bolt::ResultSet)
+          Bolt::ResultSet.from_apply_block(var)
+        elsif var.is_a?(Bolt::ApplyResult)
+          Bolt::ApplyResult.from_apply_block(var)
+        else
+          var
+        end
+      end
+
+      # TODO: How do we make loaders available here with concurrent threads?
+      Puppet.lookup(:loaders).private_environment_loader.load(:type, 'applytarget')
+      Puppet.lookup(:loaders).private_environment_loader.load(:type, 'result')
+      Puppet.lookup(:loaders).private_environment_loader.load(:type, 'resultset')
+      Puppet.lookup(:loaders).private_environment_loader.load(:type, 'applyresult')
+      # Serialize as pcore for *Result* objects
+      vars = Puppet::Pops::Serialization::ToDataConverter.convert(vars,
+                                                                  rich_data: true,
+                                                                  symbol_as_string: true,
+                                                                  type_by_reference: true,
+                                                                  local_reference: false)
       catalog_input = {
         code_ast: ast,
         modulepath: @modulepath,
@@ -92,7 +124,7 @@ module Bolt
         target: {
           name: target.name,
           facts: facts,
-          variables: @inventory.vars(target).merge(plan_vars),
+          variables: vars,
           trusted: trusted.to_h
         },
         inventory: @inventory.data_hash
@@ -181,7 +213,7 @@ module Bolt
 
       r = @executor.log_action('apply catalog', targets) do
         futures = targets.map do |target|
-          Concurrent::Future.execute(executor: @pool) do
+          Concurrent::Future.execute(executor: :immediate) do
             @executor.with_node_logging("Compiling manifest block", [target]) do
               compile(target, ast, plan_vars)
             end

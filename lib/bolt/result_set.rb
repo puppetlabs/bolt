@@ -12,6 +12,24 @@ module Bolt
       include(Puppet::Pops::Types::IteratorProducer)
     end
 
+    def self.from_apply_block(resultset)
+      results = resultset.results.map do |result|
+        Bolt::Result.from_apply_block(result)
+      end
+      new(results)
+    end
+
+    #    def self._pcore_init_from_hash(init_hash); end
+    #
+    #    def _pcore_init_from_hash(init_hash)
+    #      # What the fuck
+    #      Bolt::ResultSet.new(init_hash['results'])
+    #    end
+    #
+    #    def _pcore_init_hash
+    #      { results: @results }
+    #    end
+
     def iterator
       if Object.const_defined?(:Puppet) && Puppet.const_defined?(:Pops) &&
          self.class.included_modules.include?(Puppet::Pops::Types::Iterable)

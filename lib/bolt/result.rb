@@ -73,6 +73,32 @@ module Bolt
       new(target, value: value)
     end
 
+    def self.from_apply_block(result)
+      target = Bolt::ApplyTarget.new(result.target.detail.merge(result.target.to_h))
+      new(target,
+          error: result.error,
+          message: result.message,
+          value: result.value,
+          action: result.action,
+          object: result.object)
+    end
+
+    # These seem to give me back hash objects instead of ResultSet objects when deserialized
+    #    def self._pcore_init_from_hash(init_hash); end
+    #
+    #    def _pcore_init_from_hash(init_hash)
+    #      initialize(init_hash.delete('target'), init_hash.transform_keys(&:to_sym))
+    #    end
+    #
+    #    def _pcore_init_hash
+    #      { target: @target,
+    #        error: @value['_error'],
+    #        message: @value['_output'],
+    #        value: @value,
+    #        action: @action,
+    #        object: @object }
+    #    end
+
     def initialize(target, error: nil, message: nil, value: nil, action: nil, object: nil)
       @target = target
       @value = value || {}
