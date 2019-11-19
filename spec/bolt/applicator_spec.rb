@@ -46,7 +46,8 @@ describe Bolt::Applicator do
           certname: uri,
           extensions: {},
           hostname: uri,
-          domain: nil
+          domain: nil,
+          external: {}
         }
       },
       inventory: {
