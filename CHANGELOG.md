@@ -8,6 +8,10 @@
 
   `bolt plan show` now uses Puppet Strings to parse plan documentation to show plan and parameter descriptions and parameter defaults.
 
+* **Added `target_mapping` field in `puppetdb` inventory plugin** ([#1408](https://github.com/puppetlabs/bolt/pull/1408))
+
+  The `puppetdb` inventory plugin has a new `target_mapping` field that accepts a hash of target configuration options and the facts to populate them with.
+
 ## Bolt 1.39.0
 
 ### New features

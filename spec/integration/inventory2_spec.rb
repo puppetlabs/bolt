@@ -479,7 +479,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   context 'with pdb lookups', ssh: true, puppetdb: true do
     let(:shell_cmd) { 'whoami' }
     let(:ssh_config) { {} }
-    let(:addtl_inv) { {} }
+    let(:addtl_mapping) { {} }
     let(:facts) { {} }
 
     before(:each) do
@@ -499,10 +499,12 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           {
             _plugin: 'puppetdb',
             query: 'inventory { facts.fact1 = true }',
-            config: {
-              ssh: ssh_config
-            }
-          }.merge(addtl_inv)
+            target_mapping: {
+              config: {
+                ssh: ssh_config
+              }
+            }.merge(addtl_mapping)
+          }
         ],
         config: {
           transport: conn[:protocol],
@@ -535,7 +537,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           } }
         end
 
-        let(:addtl_inv) do
+        let(:addtl_mapping) do
           { name: 'facts.name_fact',
             uri: 'facts.uri_fact' }
         end
@@ -569,7 +571,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           } }
         end
 
-        let(:addtl_inv) do
+        let(:addtl_mapping) do
           { name: 'facts.name_fact',
             uri: 'facts.uri_fact' }
         end
