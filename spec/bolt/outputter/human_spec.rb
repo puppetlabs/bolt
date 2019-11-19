@@ -85,9 +85,9 @@ describe "Bolt::Outputter::Human" do
 
   it "formats a table" do
     outputter.print_table([%w[a b], %w[c1 d]])
-    expect(output.string).to eq(<<-TABLE)
-a    b
-c1   d
+    expect(output.string).to eq(<<~TABLE)
+      a    b
+      c1   d
     TABLE
   end
 
@@ -109,19 +109,19 @@ c1   d
       }
     }
     outputter.print_task_info(task)
-    expect(output.string).to eq(<<-TASK_OUTPUT)
+    expect(output.string).to eq(<<~TASK_OUTPUT)
 
-cinnamon_roll - A delicious sweet bun
+      cinnamon_roll - A delicious sweet bun
 
-USAGE:
-bolt task run --targets <node-name> cinnamon_roll icing=<value>
+      USAGE:
+      bolt task run --targets <node-name> cinnamon_roll icing=<value>
 
-PARAMETERS:
-- icing: Cream cheese
-    Rich, tangy, sweet
+      PARAMETERS:
+      - icing: Cream cheese
+          Rich, tangy, sweet
 
-MODULE:
-/path/to/cinnamony/goodness
+      MODULE:
+      /path/to/cinnamony/goodness
     TASK_OUTPUT
   end
 
@@ -147,21 +147,21 @@ MODULE:
       }
     }
     outputter.print_task_info(task)
-    expect(output.string).to eq(<<-TASK_OUTPUT)
+    expect(output.string).to eq(<<~TASK_OUTPUT)
 
-sticky_bun - A delicious sweet bun with nuts
+      sticky_bun - A delicious sweet bun with nuts
 
-USAGE:
-bolt task run --targets <node-name> sticky_bun glaze=<value> pecans=<value>
+      USAGE:
+      bolt task run --targets <node-name> sticky_bun glaze=<value> pecans=<value>
 
-PARAMETERS:
-- glaze: Sticky
-    Sweet
-- pecans: Data
-    The best kind of nut
+      PARAMETERS:
+      - glaze: Sticky
+          Sweet
+      - pecans: Data
+          The best kind of nut
 
-MODULE:
-/this/test/is/making/me/hungry
+      MODULE:
+      /this/test/is/making/me/hungry
     TASK_OUTPUT
   end
 
@@ -173,15 +173,15 @@ MODULE:
       'metadata' => {}
     }
     outputter.print_task_info(task)
-    expect(output.string).to eq(<<-TASK_OUTPUT)
+    expect(output.string).to eq(<<~TASK_OUTPUT)
 
-monkey_bread
+      monkey_bread
 
-USAGE:
-bolt task run --targets <node-name> monkey_bread
+      USAGE:
+      bolt task run --targets <node-name> monkey_bread
 
-MODULE:
-built-in module
+      MODULE:
+      built-in module
     TASK_OUTPUT
   end
 
@@ -211,19 +211,19 @@ built-in module
       }
     }
     outputter.print_plan_info(plan)
-    expect(output.string).to eq(<<-PLAN_OUTPUT)
+    expect(output.string).to eq(<<~PLAN_OUTPUT)
 
-planity_plan
+      planity_plan
 
-USAGE:
-bolt plan run planity_plan foo=<value> [baz=<value>]
+      USAGE:
+      bolt plan run planity_plan foo=<value> [baz=<value>]
 
-PARAMETERS:
-- foo: Bar
-- baz: Bar
+      PARAMETERS:
+      - foo: Bar
+      - baz: Bar
 
-MODULE:
-plans/plans/plans/plans
+      MODULE:
+      plans/plans/plans/plans
     PLAN_OUTPUT
   end
 

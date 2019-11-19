@@ -54,6 +54,13 @@ describe "Bolt::CLI" do
     allow(Bolt::Util).to receive(:read_config_file).and_return(file_content)
   end
 
+  # These tests may pick up local config that includes `future = true`
+  after :each do
+    # rubocop:disable Style/GlobalVars
+    $future = nil
+    # rubocop:enable Style/GlobalVars
+  end
+
   context "without a config file" do
     let(:boltdir) { Bolt::Boltdir.new('.') }
     before(:each) do

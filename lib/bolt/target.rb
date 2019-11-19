@@ -20,6 +20,7 @@ module Bolt
     # rubocop:disable Lint/UnusedMethodArgument
     def self.from_asserted_args(uri = nil,
                                 name = nil,
+                                safe_name = nil,
                                 target_alias = nil,
                                 config = nil,
                                 facts = nil,

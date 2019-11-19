@@ -4,10 +4,9 @@ require 'bolt/error'
 
 # Get a single target from inventory if it exists, otherwise create a new Target.
 #
-# **NOTE:** Calling `get_target` inside an `apply` block with a
-# version 2 inventory creates a new Target object.
-# `get_target('all')` returns an empty array.
+# **NOTE:** Calling `get_target('all')` returns an empty array.
 # **NOTE:** Only compatible with inventory v2
+# **NOTE:** Not available in apply block when `future` is true
 Puppet::Functions.create_function(:get_target) do
   # @param name A Target name.
   # @return A single target, either new or from inventory.

@@ -18,6 +18,9 @@ describe "errors gracefully attempting to apply a manifest block" do
     let(:tflags) { %w[--no-host-key-check] }
 
     it 'prints a helpful error if Puppet is not present' do
+      uninstall = '/opt/puppetlabs/bin/puppet resource package puppet-agent ensure=absent'
+      run_cli_json(%W[command run #{uninstall} --run-as root --sudo-password #{password}] + config_flags)
+
       result = run_cli_json(%w[plan run basic::class] + config_flags)
       error = result['details']['result_set'][0]['result']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
