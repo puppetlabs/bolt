@@ -156,7 +156,7 @@ module Bolt
       end
 
       # collect plan vars and merge them over target vars
-      plan_vars = scope.to_hash
+      plan_vars = scope.to_hash(true, true)
       %w[trusted server_facts facts].each { |k| plan_vars.delete(k) }
 
       targets = @inventory.get_targets(args[0])
