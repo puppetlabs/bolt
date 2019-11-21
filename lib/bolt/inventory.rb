@@ -140,6 +140,22 @@ module Bolt
       end
     end
 
+    def remove_from_group(target, desired_group)
+      unless target.length == 1
+        raise ValidationError.new("'remove_from_group' expects a single Target, got #{target.length}", nil)
+      end
+
+      if desired_group == 'all'
+        raise ValidationError.new("Cannot remove Target from Group 'all'", nil)
+      end
+
+      if group_names.include?(desired_group)
+        remove_node(@groups, target.first, desired_group)
+      else
+        raise ValidationError.new("Group #{desired_group} does not exist in inventory", nil)
+      end
+    end
+
     def set_var(target, var_hash)
       set_vars_from_hash(target.name, var_hash)
     end
@@ -328,6 +344,18 @@ module Bolt
       end
     end
     private :set_plugin_hooks
+
+    def remove_node(current_group, target, desired_group)
+      if current_group.name == desired_group
+        current_group.nodes.delete(target.name)
+      end
+      current_group.groups.each do |child_group|
+        # If target was in current group, remove it from all child groups
+        desired_group = child_group.name if current_group.name == desired_group
+        remove_node(child_group, target, desired_group)
+      end
+    end
+    private :remove_node
 
     def add_node(current_group, target, desired_group, track = { 'all' => nil })
       if current_group.name == desired_group

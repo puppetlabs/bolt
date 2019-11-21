@@ -20,6 +20,10 @@
 
   Parameter defaults can be set in the task metadata file and will be used if no value is supplied for the parameter.
 
+* **New `remove_from_group` plan function** ([#1418](https://github.com/puppetlabs/bolt/issues/1418))
+
+  The new plan function, `remove_from_group`, allows you to remove a target from an inventory group during plan execution.
+
 ### Bug fixes
 
 * **`bolt inventory show --detail` did not display all target aliases** ([#1379](https://github.com/puppetlabs/bolt/issues/1379))
