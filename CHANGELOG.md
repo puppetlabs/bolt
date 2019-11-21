@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt Next
+## Bolt 1.39.0
 
 ### New features
 
@@ -10,17 +10,17 @@
 
 ### Bug fixes
 
-* **`bolt inventory show --detail` now displays all target aliases** ([#1379](https://github.com/puppetlabs/bolt/issues/1379))
+* **`bolt inventory show --detail` did not display all target aliases** ([#1379](https://github.com/puppetlabs/bolt/issues/1379))
 
   Bolt now displays aliases from all groups, where a target is a member, in the output for `bolt inventory show --detail`. Previously, only the rightmost alias appeared in the output.
 
-* **Plugins now ignore command-line flags** ([#1382](https://github.com/puppetlabs/bolt/issues/1382))
+* **Plugins did not ignore command line flags** ([#1382](https://github.com/puppetlabs/bolt/issues/1382))
 
-  When running plugins locally to populate config or inventory information, command-line flags such as `--run-as` will no longer be applied to the local transport.
+  When running plugins locally to populate config or inventory information, command line flags such as `--run-as` will no longer be applied to the local transport.
 
 * **Optional plan parameters referenced in `apply` blocks issued warning** ([#1288](https://github.com/puppetlabs/bolt/issues/1288))
 
-    Previously plan parameters that were explicitly set to `undef` (optional parameters) that were referenced in an `apply` block resulted in a warning message when applying puppet code. The warning is no longer issued when optional parameters are referenced.
+    Previously, plan parameters that were explicitly set to `undef` (optional parameters) and were referenced in an `apply` block resulted in a warning message when applying Puppet code. The warning is no longer issued when optional parameters are referenced.
 
 ## Bolt 1.38.0
 
@@ -28,7 +28,7 @@
 
 * **Addition of a YAML plugin** ([#1358](https://github.com/puppetlabs/bolt/issues/1358))
 
-  Bolt now includes a plugin to look up data from a YAML file. This allows you to compose multiple YAML files into a single bolt inventory file. This is useful to breakup a large monolithic inventory file or to load user specific data like credentials from outside the project directory.
+  Bolt now includes a plugin to look up data from a YAML file which allows multiple YAML files to be composed into a single Bolt inventory file. This is useful to breakup a large monolithic inventory file or to load user specific data, like credentials, from outside the project directory.
 
 * **Pass value of `--targets` or `--nodes` to `TargetSpec $target` plan parameter** ([#1175](https://github.com/puppetlabs/bolt/issues/1175))
 
