@@ -2,6 +2,12 @@
 
 ## Bolt Next
 
+### New features
+
+* **CLI help text updated to be more consistent with other Puppet tools** ([#1441](https://github.com/puppetlabs/bolt/issues/1441))
+
+  Bolt's help text has been reformatted to be more consistent with the formatting in other Puppet tools.
+
 ### Bug fixes
 
 * **Default PuppetDB config lookup used hardcoded path in Windows** ([#1427](https://github.com/puppetlabs/bolt/pull/1427))

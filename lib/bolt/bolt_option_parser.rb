@@ -23,30 +23,54 @@ module Bolt
         { flags: ACTION_OPTS + %w[noop execute compile-concurrency],
           banner: APPLY_HELP }
       when 'command'
-        { flags: ACTION_OPTS,
-          banner: COMMAND_HELP }
+        case action
+        when 'run'
+          { flags: ACTION_OPTS,
+            banner: COMMAND_RUN_HELP }
+        else
+          { flags: OPTIONS[:global],
+            banner: COMMAND_HELP }
+        end
       when 'file'
-        { flags: ACTION_OPTS + %w[tmpdir],
-          banner: FILE_HELP }
+        case action
+        when 'upload'
+          { flags: ACTION_OPTS + %w[tmpdir],
+            banner: FILE_UPLOAD_HELP }
+        else
+          { flags: OPTIONS[:global],
+            banner: FILE_HELP }
+        end
       when 'inventory'
-        { flags: OPTIONS[:inventory] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile detail],
-          banner: INVENTORY_HELP }
+        case action
+        when 'show'
+          { flags: OPTIONS[:inventory] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile detail],
+            banner: INVENTORY_SHOW_HELP }
+        else
+          { flags: OPTIONS[:global],
+            banner: INVENTORY_HELP }
+        end
       when 'group'
-        { flags: OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
-          banner: GROUP_HELP }
+        case action
+        when 'show'
+          { flags: OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
+            banner: GROUP_SHOW_HELP }
+        else
+          { flags: OPTIONS[:global],
+            banner: GROUP_HELP }
+        end
       when 'plan'
         case action
         when 'convert'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: PLAN_CONVERT_HELP }
-        when 'show'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: PLAN_SHOW_HELP }
         when 'run'
           { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir],
             banner: PLAN_RUN_HELP }
+        when 'show'
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
+            banner: PLAN_SHOW_HELP }
         else
-          { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir],
+          { flags: OPTIONS[:global],
             banner: PLAN_HELP }
         end
       when 'project'
@@ -73,25 +97,43 @@ module Bolt
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: PUPPETFILE_GENERATETYPES_HELP }
         else
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
+          { flags: OPTIONS[:global],
             banner: PUPPETFILE_HELP }
         end
       when 'script'
-        { flags: ACTION_OPTS + %w[tmpdir],
-          banner: SCRIPT_HELP }
+        case action
+        when 'run'
+          { flags: ACTION_OPTS + %w[tmpdir],
+            banner: SCRIPT_RUN_HELP }
+        else
+          { flags: OPTIONS[:global],
+            banner: SCRIPT_HELP }
+        end
       when 'secret'
-        { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin],
-          banner: SECRET_HELP }
+        case action
+        when 'createkeys'
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin],
+            banner: SECRET_CREATEKEYS_HELP }
+        when 'decrypt'
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin],
+            banner: SECRET_DECRYPT_HELP }
+        when 'encrypt'
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin],
+            banner: SECRET_ENCRYPT_HELP }
+        else
+          { flags: OPTIONS[:global],
+            banner: SECRET_HELP }
+        end
       when 'task'
         case action
-        when 'show'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: TASK_SHOW_HELP }
         when 'run'
           { flags: ACTION_OPTS + %w[params tmpdir],
             banner: TASK_RUN_HELP }
+        when 'show'
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
+            banner: TASK_SHOW_HELP }
         else
-          { flags: ACTION_OPTS + %w[params tmpdir],
+          { flags: OPTIONS[:global],
             banner: TASK_HELP }
         end
       else
@@ -100,258 +142,454 @@ module Bolt
       end
     end
 
-    def self.examples(cmd, desc)
-      <<~EXAMP
-      #{desc} a Windows host via WinRM, providing for the password
-        bolt #{cmd} -n winrm://winhost -u Administrator -p
-      #{desc} the local machine, a Linux host via SSH, and hosts from a group specified in an inventory file
-        bolt #{cmd} -n localhost,nixhost,node_group
-      #{desc} Windows hosts queried from PuppetDB via WinRM as a domain user, prompting for the password
-        bolt #{cmd} -q 'inventory[certname] { facts.os.family = "windows" }' --transport winrm -u 'domain\\Administrator' -p
-      EXAMP
-    end
-
     BANNER = <<~HELP
-      Usage: bolt <subcommand> <action>
+      NAME
+          bolt
 
-      Available subcommands:
-        bolt command run <command>       Run a command remotely
-        bolt file upload <src> <dest>    Upload a local file or directory
-        bolt script run <script>         Upload a local script and run it remotely
-        bolt task show                   Show list of available tasks
-        bolt task show <task>            Show documentation for task
-        bolt task run <task> [params]    Run a Puppet task
-        bolt plan convert <plan_path>    Convert a YAML plan to a Puppet plan
-        bolt plan show                   Show list of available plans
-        bolt plan show <plan>            Show details for plan
-        bolt plan run <plan> [params]    Run a Puppet task plan
-        bolt apply <manifest>            Apply Puppet manifest code
-        bolt puppetfile install          Install modules from a Puppetfile into a Boltdir
-        bolt puppetfile show-modules     List modules available to Bolt
-        bolt secret createkeys           Create new encryption keys
-        bolt secret encrypt <plaintext>  Encrypt a value
-        bolt secret decrypt <encrypted>  Decrypt a value
-        bolt inventory show              Show the list of targets an action would run on
-        bolt group show                  Show the list of groups in the inventory
-        bolt project init                Create a new Bolt project
-        bolt project migrate             Migrate a Bolt project to the latest version
+      USAGE
+          bolt <subcommand> [action] [options]
 
-      Run `bolt <subcommand> --help` to view specific examples.
+      DESCRIPTION
+          Bolt is an orchestration tool that automates the manual work it takes to
+          maintain your infrastructure.
 
-      Available options are:
-    HELP
-
-    TASK_HELP = <<~HELP
-      Usage: bolt task <action> <task> [parameters]
-
-      Available actions are:
-        show                             Show list of available tasks
-        show <task>                      Show documentation for task
-        run <task>                       Run a Puppet task
-
-      Parameters are of the form <parameter>=<value>.
-
-      #{examples('task run facts', 'run facter on')}
-      Available options are:
-    HELP
-
-    TASK_SHOW_HELP = <<~HELP
-      Usage: bolt task show <task>
-
-      Available actions are:
-        show                             Show list of available tasks
-        show <task>                      Show documentation for task
-
-      Available options are:
-    HELP
-
-    TASK_RUN_HELP = <<~HELP
-      Usage: bolt task run <task> [parameters]
-
-      Parameters are of the form <parameter>=<value>.
-
-      #{examples('task run facts', 'run facter on')}
-      Available options are:
-    HELP
-
-    COMMAND_HELP = <<~HELP
-      Usage: bolt command <action> <command>
-
-      Available actions are:
-        run                              Run a command remotely
-
-      #{examples('command run hostname', 'run hostname on')}
-      Available options are:
-    HELP
-
-    SCRIPT_HELP = <<~HELP
-      Usage: bolt script <action> <script> [[arg1] ... [argN]]
-
-      Available actions are:
-        run                              Upload a local script and run it remotely
-
-      #{examples('script run my_script.ps1 some args', 'run a script on')}
-      Available options are:
-    HELP
-
-    PLAN_HELP = <<~HELP
-      Usage: bolt plan <action> <plan> [parameters]
-
-      Available actions are:
-        convert <plan_path>              Convert a YAML plan to a Puppet plan
-        show                             Show list of available plans
-        show <plan>                      Show details for plan
-        run                              Run a Puppet task plan
-
-      Parameters are of the form <parameter>=<value>.
-
-      #{examples('plan run canary command=hostname', 'run the canary plan on')}
-      Available options are:
-    HELP
-
-    PLAN_CONVERT_HELP = <<~HELP
-      Usage: bolt plan convert <plan_path>
-
-      Available options are:
-    HELP
-
-    PLAN_SHOW_HELP = <<~HELP
-      Usage: bolt plan show <plan>
-
-      Available actions are:
-        show                             Show list of available plans
-        show <plan>                      Show details for plan
-
-      Available options are:
-    HELP
-
-    PLAN_RUN_HELP = <<~HELP
-      Usage: bolt plan run <plan> [parameters]
-
-      Parameters are of the form <parameter>=<value>.
-
-      #{examples('plan run canary command=hostname', 'run the canary plan on')}
-      Available options are:
-    HELP
-
-    FILE_HELP = <<~HELP
-      Usage: bolt file <action>
-
-      Available actions are:
-        upload <src> <dest>              Upload local file or directory <src> to <dest> on each node
-
-      #{examples('file upload /tmp/source /etc/profile.d/login.sh', 'upload a file to')}
-      Available options are:
-    HELP
-
-    PUPPETFILE_HELP = <<~HELP
-      Usage: bolt puppetfile <action>
-
-      Available actions are:
-        install                          Install modules from a Puppetfile into a Boltdir
-        show-modules                     List modules available to Bolt
-        generate-types                   Generate type references to register in Plans
-
-      Install modules into the local Boltdir
-        bolt puppetfile install
-
-      Available options are:
-    HELP
-
-    PUPPETFILE_INSTALL_HELP = <<~HELP
-      Usage: bolt puppetfile install
-
-      Install modules into the local Boltdir
-        bolt puppetfile install
-
-      Available options are:
-    HELP
-
-    PUPPETFILE_SHOWMODULES_HELP = <<~HELP
-      Usage: bolt puppetfile show-modules
-
-      List modules available to Bolt
-        bolt puppetfile show-modules
-
-      Available options are:
-    HELP
-
-    PUPPETFILE_GENERATETYPES_HELP = <<~HELP
-      Usage: bolt puppetfile generate-types
-
-      Generate type references to register in Plans
-        bolt puppetfile generate-types
-
-      Available options are:
+      SUBCOMMANDS
+          apply             Apply Puppet manifest code
+          command           Run a command remotely
+          file              Upload a local file or directory
+          group             Show the list of groups in the inventory
+          inventory         Show the list of targets an action would run on
+          plan              Convert, show, and run Bolt plans
+          project           Create and migrate Bolt projects
+          puppetfile        Install and list modules and generate type references
+          script            Upload a local script and run it remotely
+          secret            Create encryption keys and encrypt and decrypt values
+          task              Show and run Bolt tasks
     HELP
 
     APPLY_HELP = <<~HELP
-      Usage: bolt apply <manifest.pp>
+      NAME
+          apply
 
-      #{examples('apply site.pp', 'apply a manifest on')}
-        bolt apply site.pp --nodes foo.example.com,bar.example.com
+      USAGE
+          bolt apply <manifest.pp> [options]
 
-      Available options are:
+      DESCRIPTION
+          Apply Puppet manifest code on the specified targets.
+
+      EXAMPLES
+          bolt apply manifest.pp --targets target1,target2
     HELP
 
-    SECRET_HELP = <<~SECRET_HELP
-      Usage: bolt secret <action> <value>
-      Manage secrets for inventory and hiera data.
+    COMMAND_HELP = <<~HELP
+      NAME
+          command
 
-      Available actions are:
-        createkeys               Create new encryption keys
-        encrypt                  Encrypt a value
-        decrypt                  Decrypt a value
+      USAGE
+          bolt command <action> [options]
 
-      Available options are:
-    SECRET_HELP
+      DESCRIPTION
+          Run a command on the specified targets.
 
-    INVENTORY_HELP = <<~INVENTORY_HELP
-      Usage: bolt inventory <action>
+      ACTIONS
+          run         Run a command on the specified targets.
+    HELP
 
-      Available actions are:
-        show                     Show the list of targets an action would run on
+    COMMAND_RUN_HELP = <<~HELP
+      NAME
+          run
 
-      Available options are:
-    INVENTORY_HELP
+      USAGE
+          bolt command run <command> [options]
 
-    GROUP_HELP = <<~GROUP_HELP
-      Usage: bolt group <action>
+      DESCRIPTION
+          Run a command on the specified targets.
 
-      Available actions are:
-        show                     Show the list of groups in the inventory
+      EXAMPLES
+          bolt command run 'uptime' -t target1,target2
+    HELP
 
-      Available options are:
-    GROUP_HELP
+    FILE_HELP = <<~HELP
+      NAME
+          file
 
-    PROJECT_HELP = <<~PROJECT_HELP
-      Usage: bolt project <action>
+      USAGE
+          bolt file <action> [options]
 
-      Available actions are:
-        init                     Create a new Bolt project
-        migrate                  Migrate a Bolt project to the latest version
+      DESCRIPTION
+          Upload a local file or directory
 
-      Available options are:
-    PROJECT_HELP
+      ACTIONS
+          upload        Upload a local file or directory
+    HELP
 
-    PROJECT_INIT_HELP = <<~PROJECT_INIT_HELP
-      Usage: bolt project init [directory]
+    FILE_UPLOAD_HELP = <<~HELP
+      NAME
+          upload
 
-      Create a new Bolt project.
-      Specify a directory to create the Bolt project in. Defaults to the current working directory.
+      USAGE
+          bolt file upload <src> <dest> [options]
 
-      Available options are:
-    PROJECT_INIT_HELP
+      DESCRIPTION
+          Upload a local file or directory.
 
-    PROJECT_MIGRATE_HELP = <<~PROJECT_MIGRATE_HELP
-      Usage: bolt project migrate
+      EXAMPLES
+          bolt file upload /tmp/source /etc/profile.d/login.sh -t target1
+    HELP
 
-      Migrate a Bolt project to the latest version.
-      Loads a Bolt project's inventory file and migrates it to the latest version. The
-      inventory file is modified in place and will not preserve comments or formatting.
+    GROUP_HELP = <<~HELP
+      NAME
+          group
 
-      Available options are:
-    PROJECT_MIGRATE_HELP
+      USAGE
+          bolt group <action> [options]
+
+      DESCRIPTION
+          Show the list of groups in the inventory.
+
+      ACTIONS
+          show          Show the list of groups in the inventory
+    HELP
+
+    GROUP_SHOW_HELP = <<~HELP
+      NAME
+          show
+
+      USAGE
+          bolt group show [options]
+
+      DESCRIPTION
+          Show the list of groups in the inventory.
+    HELP
+
+    INVENTORY_HELP = <<~HELP
+      NAME
+          inventory
+
+      USAGE
+          bolt inventory <action> [options]
+
+      DESCRIPTION
+          Show the list of targets an action would run on.
+
+      ACTIONS
+          show          Show the list of targets an action would run on
+    HELP
+
+    INVENTORY_SHOW_HELP = <<~HELP
+      NAME
+          show
+
+      USAGE
+          bolt inventory show [options]
+
+      DESCRIPTION
+          Show the list of targets an action would run on.
+    HELP
+
+    PLAN_HELP = <<~HELP
+      NAME
+          plan
+
+      USAGE
+          bolt plan <action> [parameters] [options]
+
+      DESCRIPTION
+          Convert, show, and run Bolt plans.
+
+      ACTIONS
+          convert       Convert a YAML plan to a Bolt plan
+          run           Run a plan on the specified targets
+          show          Show available plans and plan documentation
+    HELP
+
+    PLAN_CONVERT_HELP = <<~HELP
+      NAME
+          convert
+
+      USAGE
+          bolt plan convert <path> [options]
+
+      DESCRIPTION
+          Convert a YAML plan to a Bolt plan.
+
+          Converting a YAML plan may result in a plan that is syntactically
+          correct but has different behavior. Always verify a converted plan's
+          functionality.
+
+      EXAMPLES
+          bolt plan convert path/to/plan/myplan.yaml
+    HELP
+
+    PLAN_RUN_HELP = <<~HELP
+      NAME
+          run
+
+      USAGE
+          bolt plan run <plan> [parameters] [options]
+
+      DESCRIPTION
+          Run a plan on the specified targets.
+
+      EXAMPLES
+          bolt plan run canary --targets target1,target2 command=hostname
+    HELP
+
+    PLAN_SHOW_HELP = <<~HELP
+      NAME
+          show
+
+      USAGE
+          bolt plan show [plan] [options]
+
+      DESCRIPTION
+          Show available plans and plan documentation.
+
+          Omitting the name of a plan will display a list of plans available
+          in the Bolt project.
+
+          Providing the name of a plan will display detailed documentation for
+          the plan, including a list of available parameters.
+
+      EXAMPLES
+          Display a list of available tasks
+            bolt plan show
+          Display documentation for the canary task
+            bolt plan show aggregate::count
+    HELP
+
+    PROJECT_HELP = <<~HELP
+      NAME
+          project
+
+      USAGE
+          bolt project <action> [options]
+
+      DESCRIPTION
+          Create and migrate Bolt projects
+
+      ACTIONS
+          init              Create a new Bolt project
+          migrate           Migrate a Bolt project to the latest version
+    HELP
+
+    PROJECT_INIT_HELP = <<~HELP
+      NAME
+          init
+
+      USAGE
+          bolt project init [directory] [options]
+
+      DESCRIPTION
+          Create a new Bolt project.
+
+          Specify a directory to create a Bolt project in. Defaults to the
+          curent working directory.
+
+      EXAMPLES
+          Create a new Bolt project in the current working directory.
+            bolt project init
+          Create a new Bolt project at a specified path.
+            bolt project init ~/path/to/project
+    HELP
+
+    PROJECT_MIGRATE_HELP = <<~HELP
+      NAME
+          migrate
+
+      USAGE
+          bolt project migrate [options]
+
+      DESCRIPTION
+          Migrate a Bolt project to the latest version.
+
+          Loads a Bolt project's inventory file and migrates it to the latest version. The
+          inventory file is modified in place and will not preserve comments or formatting.
+    HELP
+
+    PUPPETFILE_HELP = <<~HELP
+      NAME
+          puppetfile
+
+      USAGE
+          bolt puppetfile <action> [options]
+
+      DESCRIPTION
+          Install and list modules and generate type references
+
+      ACTIONS
+          generate-types        Generate type references to register in plans
+          install               Install modules from a Puppetfile into a Boltdir
+          show-modules          List modules available to the Bolt project
+    HELP
+
+    PUPPETFILE_GENERATETYPES_HELP = <<~HELP
+      NAME
+          generate-types
+
+      USAGE
+          bolt puppetfile generate-types [options]
+
+      DESCRIPTION
+          Generate type references to register in plans.
+    HELP
+
+    PUPPETFILE_INSTALL_HELP = <<~HELP
+      NAME
+          install
+
+      USAGE
+          bolt puppetfile install [options]
+
+      DESCRIPTION
+          Install modules from a Puppetfile into a Boltdir
+    HELP
+
+    PUPPETFILE_SHOWMODULES_HELP = <<~HELP
+      NAME
+          show-modules
+
+      USAGE
+          bolt puppetfile show-modules [options]
+
+      DESCRIPTION
+          List modules available to the Bolt project.
+    HELP
+
+    SCRIPT_HELP = <<~HELP
+      NAME
+          script
+
+      USAGE
+          bolt script <action> [options]
+
+      DESCRIPTION
+          Run a script on the specified targets.
+
+      ACTIONS
+          run         Run a script on the specified targets.
+    HELP
+
+    SCRIPT_RUN_HELP = <<~HELP
+      NAME
+          run
+
+      USAGE
+          bolt script run <script> [arguments] [options]
+
+      DESCRIPTION
+          Run a script on the specified targets.
+
+          Arguments passed to a script are passed literally and are not interpolated
+          by the shell. Any arguments containing spaces or special characters should
+          be quoted.
+
+      EXAMPLES
+          bolt script run myscript.sh 'echo hello' --targets target1,target2
+    HELP
+
+    SECRET_HELP = <<~HELP
+      NAME
+          secret
+
+      USAGE
+          bolt secret <action> [options]
+
+      DESCRIPTION
+          Create encryption keys and encrypt and decrypt values.
+
+      ACTIONS
+          createkeys           Create new encryption keys
+          encrypt              Encrypt a value
+          decrypt              Decrypt a value
+    HELP
+
+    SECRET_CREATEKEYS_HELP = <<~HELP
+      NAME
+          createkeys
+
+      USAGE
+          bolt secret createkeys [options]
+
+      DESCRIPTION
+          Create new encryption keys.
+    HELP
+
+    SECRET_DECRYPT_HELP = <<~HELP
+      NAME
+          decrypt
+
+      USAGE
+          bolt secret decrypt <ciphertext> [options]
+
+      DESCRIPTION
+          Decrypt a value.
+    HELP
+
+    SECRET_ENCRYPT_HELP = <<~HELP
+      NAME
+          encrypt
+
+      USAGE
+        bolt secret encrypt <plaintext> [options]
+
+      DESCRIPTION
+          Encrypt a value.
+    HELP
+
+    TASK_HELP = <<~HELP
+      NAME
+          task
+
+      USAGE
+          bolt task <action> [options]
+
+      DESCRIPTION
+          Show and run Bolt tasks.
+
+      ACTIONS
+          run          Run a Bolt task
+          show         Show available tasks and task documentation
+    HELP
+
+    TASK_RUN_HELP = <<~HELP
+      NAME
+          run
+
+      USAGE
+          bolt task run <task> [parameters] [options]
+
+      DESCRIPTION
+          Run a task on the specified targets.
+
+          Parameters take the form <parameter>=<value>.
+
+      EXAMPLES
+          bolt task run package --targets target1,target2 action=status name=bash
+    HELP
+
+    TASK_SHOW_HELP = <<~HELP
+      NAME
+          show
+
+      USAGE
+          bolt task show [task] [options]
+
+      DESCRIPTION
+          Show available tasks and task documentation.
+
+          Omitting the name of a task will display a list of tasks available
+          in the Bolt project.
+
+          Providing the name of a task will display detailed documentation for
+          the task, including a list of available parameters.
+
+      EXAMPLES
+          Display a list of available tasks
+            bolt task show
+          Display documentation for the canary task
+            bolt task show canary
+    HELP
 
     attr_reader :warnings
     def initialize(options)
@@ -360,6 +598,7 @@ module Bolt
       @options = options
       @warnings = []
 
+      separator "\nINVENTORY OPTIONS"
       define('-n', '--nodes NODES',
              'Alias for --targets',
              'Deprecated in favor of --targets') do |nodes|
@@ -407,7 +646,7 @@ module Bolt
         @options[:detail] = detail
       end
 
-      separator "\nAuthentication:"
+      separator "\nAUTHENTICATION OPTIONS"
       define('-u', '--user USER', 'User to authenticate as') do |user|
         @options[:user] = user
       end
@@ -442,7 +681,7 @@ module Bolt
         @options[:'ssl-verify'] = ssl_verify
       end
 
-      separator "\nEscalation:"
+      separator "\nESCALATION OPTIONS"
       define('--run-as USER', 'User to run as using privilege escalation') do |user|
         @options[:'run-as'] = user
       end
@@ -465,7 +704,7 @@ module Bolt
         STDERR.puts
       end
 
-      separator "\nRun context:"
+      separator "\nRUN CONTEXT OPTIONS"
       define('-c', '--concurrency CONCURRENCY', Integer,
              'Maximum number of simultaneous connections (default: 100)') do |concurrency|
         @options[:concurrency] = concurrency
@@ -502,7 +741,7 @@ module Bolt
         @options[:'save-rerun'] = save
       end
 
-      separator "\nTransports:"
+      separator "\nTRANSPORT OPTIONS"
       define('--transport TRANSPORT', TRANSPORTS.keys.map(&:to_s),
              "Specify a default transport: #{TRANSPORTS.keys.join(', ')}") do |t|
         @options[:transport] = t
@@ -517,7 +756,7 @@ module Bolt
         @options[:tmpdir] = tmpdir
       end
 
-      separator "\nDisplay:"
+      separator "\nDISPLAY OPTIONS"
       define('--format FORMAT', 'Output format to use: human or json') do |format|
         @options[:format] = format
       end
@@ -531,7 +770,7 @@ module Bolt
         @options[:trace] = true
       end
 
-      separator "\nGlobal:"
+      separator "\nGLOBAL OPTIONS"
       define('-h', '--help', 'Display help') do |_|
         @options[:help] = true
       end
