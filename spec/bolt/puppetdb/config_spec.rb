@@ -194,10 +194,10 @@ describe Bolt::PuppetDB::Config do
       Bolt::PuppetDB::Config.load_config(nil, {})
     end
 
-    it "on windows OS loads from default location when filename is nil" do
+    it "on windows OS loads from default location when filename is nil", :winrm do
       allow(Bolt::Util).to receive(:windows?).and_return(true)
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user])
-      expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:win_global])
+      expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config.default_windows_config)
       Bolt::PuppetDB::Config.load_config(nil, {})
     end
 

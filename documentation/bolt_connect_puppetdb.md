@@ -57,7 +57,7 @@ puppetdb:
   key: /etc/puppetlabs/puppet/ssl/private_keys/my-host.example.com.pem
 ```
 
-If PE is installed and PuppetDB is not defined in a config file, Bolt uses the PuppetDB config defined in either: `$HOME/.puppetlabs/client-tools/puppetdb.conf`or `/etc/puppetlabs/client-tools/puppetdb.conf` (Windows: `C:\ProgramData\PuppetLabs\client-tools\puppetdb.conf`).
+If PE is installed and PuppetDB is not defined in a config file, Bolt uses the PuppetDB config defined in either: `$HOME/.puppetlabs/client-tools/puppetdb.conf`or `/etc/puppetlabs/client-tools/puppetdb.conf` (Windows: `%CSIDL_COMMON_APPDATA%\PuppetLabs\client-tools\puppetdb.conf`).
 
 **Important:** Bolt does not merge config files into a conf.d format the way that pe-client-tools does.
 

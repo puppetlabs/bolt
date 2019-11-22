@@ -9,19 +9,22 @@ module Bolt
       if !ENV['HOME'].nil?
         DEFAULT_TOKEN = File.expand_path('~/.puppetlabs/token')
         DEFAULT_CONFIG = { user: File.expand_path('~/.puppetlabs/client-tools/puppetdb.conf'),
-                           global: '/etc/puppetlabs/client-tools/puppetdb.conf',
-                           win_global: 'C:/ProgramData/PuppetLabs/client-tools/puppetdb.conf' }.freeze
+                           global: '/etc/puppetlabs/client-tools/puppetdb.conf' }.freeze
       else
         DEFAULT_TOKEN = Bolt::Util.windows? ? 'nul' : '/dev/null'
         DEFAULT_CONFIG = { user: '/etc/puppetlabs/puppet/puppetdb.conf',
-                           global: '/etc/puppetlabs/puppet/puppetdb.conf',
-                           win_global: 'C:/ProgramData/PuppetLabs/client-tools/puppetdb.conf' }.freeze
+                           global: '/etc/puppetlabs/puppet/puppetdb.conf' }.freeze
 
+      end
+
+      def self.default_windows_config
+        require 'win32/dir'
+        File.expand_path(File.join(Dir::COMMON_APPDATA, 'PuppetLabs/client-tools/puppetdb.conf'))
       end
 
       def self.load_config(filename, options, boltdir_path = nil)
         config = {}
-        global_path = Bolt::Util.windows? ? DEFAULT_CONFIG[:win_global] : DEFAULT_CONFIG[:global]
+        global_path = Bolt::Util.windows? ? default_windows_config : DEFAULT_CONFIG[:global]
         if filename
           if File.exist?(filename)
             config = JSON.parse(File.read(filename))
