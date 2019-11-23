@@ -8,6 +8,10 @@
 
   `bolt plan show` now uses Puppet Strings to parse plan documentation to show plan and parameter descriptions and parameter defaults.
 
+* **New `remove_from_group` plan function** ([#1418](https://github.com/puppetlabs/bolt/issues/1418))
+
+  The new plan function, `remove_from_group`, allows you to remove a target from an inventory group during plan execution.
+
 * **Added `target_mapping` field in `puppetdb` inventory plugin** ([#1408](https://github.com/puppetlabs/bolt/pull/1408))
 
   The `puppetdb` inventory plugin has a new `target_mapping` field that accepts a hash of target configuration options and the facts to populate them with.
@@ -19,10 +23,6 @@
 * **Task metadata can now specify parameter defaults** ([#1394](https://github.com/puppetlabs/bolt/pull/1394))
 
   Parameter defaults can be set in the task metadata file and will be used if no value is supplied for the parameter.
-
-* **New `remove_from_group` plan function** ([#1418](https://github.com/puppetlabs/bolt/issues/1418))
-
-  The new plan function, `remove_from_group`, allows you to remove a target from an inventory group during plan execution.
 
 ### Bug fixes
 

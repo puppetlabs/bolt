@@ -144,6 +144,7 @@ module Bolt
 
       def remove_target(target)
         @resolved_targets.delete(target.name)
+        @unresolved_targets.delete(target.name)
       end
 
       def add_target(target)

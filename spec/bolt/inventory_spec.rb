@@ -794,4 +794,29 @@ describe Bolt::Inventory do
       expect(target.detail).to eq(expected_data)
     end
   end
+
+  describe 'remove_from_group' do
+    let(:data) {
+      {
+        'groups' => [{
+          'name' => 'test',
+          'nodes' => ['target'],
+          'features' => ['foo']
+        }, {
+          'name' => 'other',
+          'features' => ['bak']
+        }],
+        'features' => ['bar']
+      }
+    }
+
+    let(:inventory) { Bolt::Inventory.new(data) }
+
+    it 'removes target from a group and disinherits config' do
+      target = get_target(inventory, 'target')
+      expect(target.features).to match_array(%w[foo bar])
+      inventory.remove_from_group([target], 'test')
+      expect(target.features).to match_array(%w[bar])
+    end
+  end
 end

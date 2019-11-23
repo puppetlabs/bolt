@@ -1217,6 +1217,28 @@ describe Bolt::Inventory::Inventory2 do
     end
   end
 
+  describe 'remove_from_group' do
+    let(:data) {
+      {
+        'groups' => [{
+          'name' => 'test',
+          'targets' => ['target'],
+          'features' => ['foo']
+        }],
+        'features' => ['bar']
+      }
+    }
+
+    let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+
+    it 'removes target from a group and disinherits config' do
+      target = get_target(inventory, 'target')
+      expect(target.features).to match_array(%w[foo bar])
+      inventory.remove_from_group([target], 'test')
+      expect(target.features).to match_array(%w[bar])
+    end
+  end
+
   context 'with lookup_targets plugins' do
     let(:data) {
       {

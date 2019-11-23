@@ -14,7 +14,7 @@ Puppet::Functions.create_function(:remove_from_group) do
   # @example Remove Target from group.
   #   remove_from_group('foo@example.com', 'group1')
   # @example Remove failing Targets from the rest of a plan
-  #   $result = run_command(uptime, my_group)
+  #   $result = run_command(uptime, my_group, '_catch_errors' => true)
   #   $result.error_set.targets.each |$t| { remove_from_group($t, my_group) }
   #   run_command(next_command, my_group) # does not target the failing nodes.
   dispatch :remove_from_group do

@@ -139,11 +139,15 @@ module Bolt
       def remove_target(current_group, target, desired_group)
         if current_group.name == desired_group
           current_group.remove_target(target)
+          target.invalidate_group_cache!
         end
         current_group.groups.each do |child_group|
           # If target was in current group, remove it from all child groups
-          desired_group = child_group.name if current_group.name == desired_group
-          remove_target(child_group, target, desired_group)
+          if current_group.name == desired_group
+            remove_target(child_group, target, child_group.name)
+          else
+            remove_target(child_group, target, desired_group)
+          end
         end
       end
       private :remove_target

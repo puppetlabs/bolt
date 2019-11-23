@@ -150,6 +150,7 @@ module Bolt
       end
 
       if group_names.include?(desired_group)
+        invalidate_group_cache!(target.first)
         remove_node(@groups, target.first, desired_group)
       else
         raise ValidationError.new("Group #{desired_group} does not exist in inventory", nil)
@@ -345,13 +346,18 @@ module Bolt
     end
     private :set_plugin_hooks
 
-    def remove_node(current_group, target, desired_group)
+    def remove_node(current_group, target, desired_group, track = { 'all' => nil })
+      # Remove the target from the group
       if current_group.name == desired_group
         current_group.nodes.delete(target.name)
+      # If the target remains in the group, add the group data to the cache
+      elsif current_group.node_names.include?(target.name)
+        add_group_data_to_cache(current_group, target, track)
       end
       current_group.groups.each do |child_group|
         # If target was in current group, remove it from all child groups
         desired_group = child_group.name if current_group.name == desired_group
+        track[child_group.name] = current_group
         remove_node(child_group, target, desired_group)
       end
     end
@@ -363,24 +369,7 @@ module Bolt
         t_name = target.name
         # Add target to nodes hash
         current_group.nodes[t_name] = { 'name' => t_name }.merge(target.options)
-        # Inherit facts, vars, and features from hierarchy
-        current_group_data = { facts: current_group.facts,
-                               vars: current_group.vars,
-                               features: current_group.features,
-                               plugin_hooks: current_group.plugin_hooks }
-        data = inherit_data(track, current_group.name, current_group_data)
-        set_facts(t_name, @target_facts[t_name] ? data[:facts].merge(@target_facts[t_name]) : data[:facts])
-        set_vars_from_hash(t_name, @target_vars[t_name] ? data[:vars].merge(@target_vars[t_name]) : data[:vars])
-        data[:features].each do |feature|
-          set_feature(target, feature)
-        end
-        hook_data = @config.plugin_hooks.merge(data[:plugin_hooks])
-        hash = if @target_plugin_hooks[t_name]
-                 hook_data.merge(@target_plugin_hooks[t_name])
-               else
-                 hook_data
-               end
-        set_plugin_hooks(t_name, hash)
+        add_group_data_to_cache(current_group, target, track)
         return true
       end
       # Recurse on children Groups if not desired_group
@@ -390,6 +379,28 @@ module Bolt
       end
     end
     private :add_node
+
+    def add_group_data_to_cache(current_group, target, track)
+      t_name = target.name
+      current_group_data = { facts: current_group.facts,
+                             vars: current_group.vars,
+                             features: current_group.features,
+                             plugin_hooks: current_group.plugin_hooks }
+      data = inherit_data(track, current_group.name, current_group_data)
+      set_facts(t_name, @target_facts[t_name] ? data[:facts].merge(@target_facts[t_name]) : data[:facts])
+      set_vars_from_hash(t_name, @target_vars[t_name] ? data[:vars].merge(@target_vars[t_name]) : data[:vars])
+      data[:features].each do |feature|
+        set_feature(target, feature)
+      end
+      hook_data = @config.plugin_hooks.merge(data[:plugin_hooks])
+      hash = if @target_plugin_hooks[t_name]
+               hook_data.merge(@target_plugin_hooks[t_name])
+             else
+               hook_data
+             end
+      set_plugin_hooks(t_name, hash)
+    end
+    private :add_group_data_to_cache
 
     def inherit_data(track, name, data)
       unless track[name].nil?
@@ -402,5 +413,13 @@ module Bolt
       data
     end
     private :inherit_data
+
+    def invalidate_group_cache!(target)
+      @target_facts.delete(target.name)
+      @target_features.delete(target.name)
+      @target_vars.delete(target.name)
+      @target_plugin_hooks.delete(target.name)
+    end
+    private :invalidate_group_cache!
   end
 end
