@@ -51,8 +51,8 @@ describe 'run_plan' do
         is_expected.to run.with_params('test::run_me', '_run_as' => 'bar').and_return('worked2')
       end
 
-      it 'run_plan(name, nodes, hash) where nodes is the "nodes" parameter to the plan' do
-        is_expected.to run.with_params('test::run_me_nodes', 'node1,node2').and_return('node1,node2')
+      it 'run_plan(name, targets, hash) where targets is the "targets" parameter to the plan' do
+        is_expected.to run.with_params('test::run_me_targets', 'target1,target2').and_return('target1,target2')
       end
     end
 
@@ -85,13 +85,13 @@ describe 'run_plan' do
                           .and_raise_error(/expects an Integer value/)
       end
 
-      it 'failing with argument error if given nodes positional argument and nodes named argument' do
-        is_expected.to run.with_params('test::run_me_nodes', 'node1', 'nodes' => 'node2')
+      it 'failing with argument error if given targets positional argument and targets named argument' do
+        is_expected.to run.with_params('test::run_me_targets', 'target1', 'targets' => 'target2')
                           .and_raise_error(ArgumentError)
       end
 
-      it 'failing with parse error if given nodes positional argument for plan without nodes parameter' do
-        is_expected.to run.with_params('test::run_me', 'node1')
+      it 'failing with parse error if given targets positional argument for plan without targets parameter' do
+        is_expected.to run.with_params('test::run_me', 'target1')
                           .and_raise_error(Puppet::ParseError)
       end
     end

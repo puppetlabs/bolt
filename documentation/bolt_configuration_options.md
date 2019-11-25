@@ -228,7 +228,7 @@ plugin_hooks:
 ```
 
 The `puppet_agent::install` task will error if it's not run as root. To ensure
-this plugin to succeeds on non-root nodes set `_run_as: true` for the
+this plugin to succeeds on non-root targets set `_run_as: true` for the
 `puppet_agent` plugin.
 
 ```yaml

@@ -107,7 +107,7 @@ describe 'apply_prep' do
       executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(failed_results)
 
       is_expected.to run.with_params(hostnames).and_raise_error(
-        Bolt::RunFailure, "Plan aborted: run_task 'puppet_agent::version' failed on 2 nodes"
+        Bolt::RunFailure, "Plan aborted: run_task 'puppet_agent::version' failed on 2 targets"
       )
     end
 
@@ -121,7 +121,7 @@ describe 'apply_prep' do
       executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(results)
 
       is_expected.to run.with_params(hostnames).and_raise_error(
-        Bolt::RunFailure, "Plan aborted: run_task 'custom_facts_task' failed on #{targets.count} nodes"
+        Bolt::RunFailure, "Plan aborted: run_task 'custom_facts_task' failed on #{targets.count} targets"
       )
     end
 

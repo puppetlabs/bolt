@@ -124,7 +124,7 @@ describe 'run_script' do
         is_expected.to run.with_params('test/uploads/hostname.sh', [hostname, hostname2]).and_return(result_set)
       end
 
-      context 'when a script fails on one node' do
+      context 'when a script fails on one target' do
         let(:result2) { Bolt::Result.new(target2, error: { 'message' => hostname2 }) }
 
         it 'errors by default' do
@@ -146,7 +146,7 @@ describe 'run_script' do
       end
     end
 
-    it 'without nodes - does not invoke bolt' do
+    it 'without targets - does not invoke bolt' do
       executor.expects(:run_script).never
       inventory.expects(:get_targets).with([]).returns([])
 

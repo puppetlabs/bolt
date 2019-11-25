@@ -17,7 +17,7 @@ describe 'puppetdb_fact' do
   context 'it calls puppetdb_facts' do
     let(:facts) { { 'a.com' => {}, 'b.com' => {} } }
 
-    it 'with list of nodes' do
+    it 'with list of targets' do
       pdb_client.expects(:facts_for_node).with(facts.keys).returns(facts)
 
       is_expected.to run.with_params(facts.keys).and_return(facts)

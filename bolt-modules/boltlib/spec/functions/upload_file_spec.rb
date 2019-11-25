@@ -128,7 +128,7 @@ describe 'upload_file' do
                           .and_return(result_set)
       end
 
-      context 'when upload fails on one node' do
+      context 'when upload fails on one target' do
         let(:result2) { Bolt::Result.new(target2, error: { 'msg' => 'oops' }) }
 
         it 'errors by default' do
@@ -151,7 +151,7 @@ describe 'upload_file' do
       end
     end
 
-    it 'without nodes - does not invoke bolt' do
+    it 'without targets - does not invoke bolt' do
       executor.expects(:upload_file).never
       inventory.expects(:get_targets).with([]).returns([])
 

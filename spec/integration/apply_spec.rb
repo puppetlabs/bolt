@@ -228,7 +228,7 @@ describe "apply", expensive: true do
           with_tempfile_containing('inventory', YAML.dump(error_plugin_inventory), '.yaml') do |inv|
             result = run_cli_json(%W[plan run prep -i #{inv.path}] + config_flags)
             expect(result['kind']).to eq('bolt/run-failure')
-            expect(result['msg']).to eq("Plan aborted: apply_prep failed on 3 nodes")
+            expect(result['msg']).to eq("Plan aborted: apply_prep failed on 3 targets")
 
             result_set = result['details']['result_set']
             task_error = result_set.select { |h| h['node'] == 'error' }[0]['result']['_error']

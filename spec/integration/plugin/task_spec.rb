@@ -224,7 +224,7 @@ describe 'using the task plugin' do
                               rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
-        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 nodes/)
+        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
         expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
           /The task failed with exit code 1/
         )
@@ -240,7 +240,7 @@ describe 'using the task plugin' do
                               rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
-        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 nodes/)
+        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
         expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
           /Invalid parameters for Task sample::params/
         )
@@ -256,7 +256,7 @@ describe 'using the task plugin' do
                               rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
-        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 nodes/)
+        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
         expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
           /Task 'non_existent_task' could not be found/
         )
