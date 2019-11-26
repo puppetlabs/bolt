@@ -11,7 +11,8 @@ module Bolt
         end
       end
 
-      TARGET_OPTS = %w[uri name config].freeze
+      TEMPLATE_OPTS = %w[uri name config].freeze
+      PLUGIN_OPTS = %w[_plugin query target_mapping].freeze
 
       def initialize(pdb_client)
         @puppetdb_client = pdb_client
@@ -45,8 +46,19 @@ module Bolt
         targets = @puppetdb_client.query_certnames(opts['query'])
         facts = []
 
-        target_opts = opts.select { |k, _| TARGET_OPTS.include?(k) }
-        Bolt::Util.walk_vals(target_opts) do |value|
+        template = opts.delete('target_mapping') || {}
+
+        keys = Set.new(TEMPLATE_OPTS) & opts.keys
+        unless keys.empty?
+          raise Bolt::ValidationError, "PuppetDB plugin expects keys #{keys.to_a} to be set under 'target_mapping'"
+        end
+
+        keys = Set.new(opts.keys) - PLUGIN_OPTS
+        unless keys.empty?
+          raise Bolt::ValidationError, "Unknown keys in PuppetDB plugin: #{keys.to_a}"
+        end
+
+        Bolt::Util.walk_vals(template) do |value|
           # This is done in parts instead of in place so that we only need to
           # make one puppetDB query
           if value.is_a?(String)
@@ -61,7 +73,7 @@ module Bolt
 
         targets.map do |certname|
           target_data = fact_values[certname]
-          target = resolve_facts(target_opts, certname, target_data) || {}
+          target = resolve_facts(template, certname, target_data) || {}
           target['uri'] = certname unless target['uri'] || target['name']
 
           target

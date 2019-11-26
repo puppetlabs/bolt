@@ -52,12 +52,37 @@ describe Bolt::Plugin::Puppetdb do
     context "with a name configured" do
       let(:opts) do
         { "query" => '',
-          "name" => 'facts.name_fact' }
+          "target_mapping" => { "name" => 'facts.name_fact' } }
       end
 
       it "sets the uri to the specified name" do
         expect(plugin.resolve_reference(opts))
           .to eq([{ "name" => "thefakeslimcertname" }])
+      end
+    end
+
+    context "with misplaced config keys" do
+      let(:opts) do
+        { "query" => '',
+          "name" => 'facts.name_fact' }
+      end
+
+      it "raises a validation error" do
+        expect { plugin.resolve_reference(opts) }
+          .to raise_error(/PuppetDB plugin expects keys \["name"\]/)
+      end
+    end
+
+    context "with unknown keys" do
+      let(:opts) do
+        { "query" => '',
+          "target_mapping" => {},
+          "bad_key" => '' }
+      end
+
+      it "raises a validation error" do
+        expect { plugin.resolve_reference(opts) }
+          .to raise_error(/Unknown keys in PuppetDB plugin: \["bad_key"\]/)
       end
     end
   end

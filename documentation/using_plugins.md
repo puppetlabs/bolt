@@ -180,14 +180,13 @@ json.dump({'value': secret}, sys.stdout)
 
 ## PuppetDB
 
-The PuppetDB plugin supports looking up targets from PuppetDB. It takes a `query` field, which is
-either a string containing a [PQL](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html)
-query or an array containing a [PuppetDB
-AST](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html) format query. The query
-determines which targets should be included in the group. If `name` or `uri` is not specified with
-a [fact lookup](#fact-lookup) then the `[certname]` for each target in the query result will be used as the `uri`
-for the new target. Read the [Migrating to Version 2](inventory_file_v2.md#migrating-to-version-2)
-section for more details on `uri` and `name` keys.
+The PuppetDB plugin supports looking up targets from PuppetDB. It accepts the following fields:
+
+- `_plugin`: The value of `_plugin` must be `puppetdb`.
+- `query`: A string containing a [PQL](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html) query or an array containing a [PuppetDB AST](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html) format query.
+- `target_mapping`: A hash of target attributes (`name`, `uri`, `config`) to populate with fact lookup values. 
+
+The query determines which targets should be included in the group. If `name` or `uri` is not specified under `target_mapping` with a [fact lookup](#fact-lookup) then the `[certname]` for each target in the query result will be used as the `uri` for the new target. Read the [Migrating to Version 2](inventory_file_v2.md#migrating-to-version-2) section for more details on `uri` and `name` keys.
 
 ```
 groups:
@@ -209,7 +208,7 @@ Make sure you have [configured PuppetDB](bolt_connect_puppetdb.md)
 
 ### Fact Lookup
 
-If target-specific configuration is required the PuppetDB plugin can be used to lookup configuration values for the `name`, `uri`, and `config` inventory options for each target. The fact lookup values can be either `certname` to reference the `[certname]` of the target or a [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference fact value. Dot notation is required for both structured and unstructured facts.
+If target-specific configuration is required the PuppetDB plugin can be used to lookup configuration values for the `name`, `uri`, and `config` inventory options for each target. These values can be set in the `target_mapping` field. The fact lookup values can be either `certname` to reference the `[certname]` of the target or a [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference fact value. Dot notation is required for both structured and unstructured facts.
 
 **Note:** If the `name` or `uri` values are set to a lookup the PuppetDB plugin will **not** set the `uri` to the certname of the target.
 
@@ -222,10 +221,11 @@ groups:
     targets:
       - _plugin: puppetdb
         query: "inventory[certname] { facts.osfamily = 'RedHat' }"
-        config:
-          ssh:
-            # Lookup config from PuppetDB facts
-            user: facts.identity.user
+        target_mapping:
+          config:
+            ssh:
+              # Lookup config from PuppetDB facts
+              user: facts.identity.user
     # And include static config
     config:
       ssh:
@@ -241,11 +241,12 @@ groups:
     targets:
       - _plugin: puppetdb
         query: "inventory[certname] { facts.osfamily = 'RedHat' }"
-        name: certname
-        config:
-          ssh:
-            # Lookup config from PuppetDB facts
-            hostname: facts.networking.interfaces.en0.ipaddress
+        target_mapping:
+          name: certname
+          config:
+            ssh:
+              # Lookup config from PuppetDB facts
+              hostname: facts.networking.interfaces.en0.ipaddress
 ```
 ## YAML
 
