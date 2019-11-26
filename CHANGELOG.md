@@ -1,5 +1,13 @@
 # Changelog
 
+## Bolt Next
+
+### New features
+
+* **`bolt plan show` shows plan and parameter descriptions** ([#1442](https://github.com/puppetlabs/bolt/pull/1442))
+
+  `bolt plan show` now uses Puppet Strings to parse plan documentation to show plan and parameter descriptions and parameter defaults.
+
 ## Bolt 1.39.0
 
 ### New features

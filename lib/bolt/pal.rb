@@ -299,38 +299,78 @@ module Bolt
       end
     end
 
-    # This converts a plan signature object into a format used by the outputter.
-    # Must be called from within bolt compiler to pickup type aliases used in the plan signature.
-    def plan_hash(plan_name, plan)
-      elements = plan.params_type.elements || []
-      parameters = elements.each_with_object({}) do |param, acc|
-        type = if param.value_type.is_a?(Puppet::Pops::Types::PTypeAliasType)
-                 param.value_type.name
-               else
-                 param.value_type.to_s
-               end
-        acc[param.name] = { 'type' => type }
-        acc[param.name]['default_value'] = nil if param.key_type.is_a?(Puppet::Pops::Types::POptionalType)
-      end
-      {
-        'name' => plan_name,
-        'parameters' => parameters
-      }
-    end
-    private :plan_hash
-
     def get_plan_info(plan_name)
-      plan_info = in_bolt_compiler do |compiler|
-        plan = compiler.plan_signature(plan_name)
-        hash = plan_hash(plan_name, plan) if plan
-        hash['module'] = plan.instance_variable_get(:@plan_func).loader.parent.path if plan
-        hash
+      plan_sig = in_bolt_compiler do |compiler|
+        compiler.plan_signature(plan_name)
       end
 
-      if plan_info.nil?
+      if plan_sig.nil?
         raise Bolt::Error.unknown_plan(plan_name)
       end
-      plan_info
+
+      mod = plan_sig.instance_variable_get(:@plan_func).loader.parent.path
+
+      # If it's a Puppet language plan, use strings to extract data. The only
+      # way to tell is to check which filename exists in the module.
+      plan_file = plan_name.split('::', 2)[1] || 'init'
+      pp_path = File.join(mod, 'plans', "#{plan_file}.pp")
+      if File.exist?(pp_path)
+        require 'puppet-strings'
+        require 'puppet-strings/yard'
+        PuppetStrings::Yard.setup!
+        YARD::Logger.instance.level = :error
+        YARD.parse(pp_path)
+
+        plan = YARD::Registry.at("puppet_plans::#{plan_name}")
+
+        description = if plan.tag(:summary)
+                        plan.tag(:summary).text
+                      elsif !plan.docstring.empty?
+                        plan.docstring
+                      end
+
+        defaults = plan.parameters.reject { |_, value| value.nil? }.to_h
+        parameters = plan.tags(:param).each_with_object({}) do |param, params|
+          name = param.name
+          params[name] = { 'type' => param.types.first }
+          params[name]['default_value'] = defaults[name] if defaults.key?(name)
+          params[name]['description'] = param.text unless param.text.empty?
+        end
+
+        {
+          'name' => plan_name,
+          'description' => description,
+          'parameters' => parameters,
+          'module' => mod
+        }
+
+      # If it's a YAML plan, fall back to limited data
+      else
+        yaml_path = File.join(mod, 'plans', "#{plan_file}.yaml")
+        plan_content = File.read(yaml_path)
+        plan = Bolt::PAL::YamlPlan::Loader.from_string(plan_name, plan_content, yaml_path)
+
+        parameters = plan.parameters.each_with_object({}) do |param, params|
+          name = param.name
+          type_str = case param.type_expr
+                     when Puppet::Pops::Types::PTypeReferenceType
+                       param.type_expr.type_string
+                     when nil
+                       'Any'
+                     else
+                       param.type_expr
+                     end
+          params[name] = { 'type' => type_str }
+          params[name]['default_value'] = param.value
+          params[name]['description'] = param.description if param.description
+        end
+        {
+          'name' => plan_name,
+          'description' => plan.description,
+          'parameters' => parameters,
+          'module' => mod
+        }
+      end
     end
 
     def convert_plan(plan_path)

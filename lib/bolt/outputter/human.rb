@@ -257,15 +257,18 @@ module Bolt
         plan_info = +""
         usage = +"bolt plan run #{plan['name']}"
 
-        plan['parameters']&.each do |name, p|
+        plan['parameters'].each do |name, p|
           pretty_params << "- #{name}: #{p['type']}\n"
+          pretty_params << "    Default: #{p['default_value']}\n" unless p['default_value'].nil?
+          pretty_params << "    #{p['description']}\n" if p['description']
           usage << (p.include?('default_value') ? " [#{name}=<value>]" : " #{name}=<value>")
         end
 
         plan_info << "\n#{plan['name']}"
+        plan_info << " - #{plan['description']}" if plan['description']
         plan_info << "\n\n"
         plan_info << "USAGE:\n#{usage}\n\n"
-        plan_info << "PARAMETERS:\n#{pretty_params}\n" if plan['parameters']
+        plan_info << "PARAMETERS:\n#{pretty_params}\n" unless plan['parameters'].empty?
         plan_info << "MODULE:\n"
 
         path = plan['module']

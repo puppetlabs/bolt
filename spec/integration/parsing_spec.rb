@@ -36,13 +36,14 @@ describe "CLI parses input" do
 
     expect(result).to eq(
       "name" => "parsing",
+      "description" => nil,
       "module_dir" => File.absolute_path(File.join(__dir__, '..', 'fixtures', 'modules', 'parsing')),
       "parameters" => {
         "string" => { "type" => "String" },
         "string_bool" => { "type" => "Variant[String, Boolean]" },
         "nodes" => { "type" => "TargetSpec" },
-        "array" => { "type" => "Optional[Array]", "default_value" => nil },
-        "hash" => { "type" => "Optional[Hash]", "default_value" => nil }
+        "array" => { "type" => "Optional[Array]", "default_value" => 'undef' },
+        "hash" => { "type" => "Optional[Hash]", "default_value" => 'undef' }
       }
     )
   end

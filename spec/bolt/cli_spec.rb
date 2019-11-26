@@ -1165,17 +1165,21 @@ describe "Bolt::CLI" do
           json = JSON.parse(output.string)
           expect(json).to eq(
             "name" => "sample::optional_params_task",
+            "description" => "Demonstrates plans with optional parameters",
             "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
             "parameters" => {
               "param_mandatory" => {
-                "type" => "String"
+                "type" => "String",
+                "description" => "A mandatory parameter"
               },
               "param_optional" => {
-                "type" => "Optional[String]"
+                "type" => "Optional[String]",
+                "description" => "An optional parameter"
               },
               "param_with_default_value" => {
                 "type" => "String",
-                "default_value" => nil
+                "description" => "A parameter with a default value",
+                "default_value" => "'foo'"
               }
             }
           )
@@ -1192,18 +1196,20 @@ describe "Bolt::CLI" do
           json = JSON.parse(output.string)
           expect(json).to eq(
             "name" => "sample::yaml",
+            "description" => nil,
             "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
             "parameters" => {
               "nodes" => {
-                "type" => "TargetSpec"
+                "type" => "TargetSpec",
+                "default_value" => nil
               },
               "param_optional" => {
                 "type" => "Optional[String]",
-                "default_value" => nil
+                "default_value" => 'undef'
               },
               "param_with_default_value" => {
                 "type" => "String",
-                "default_value" => nil
+                "default_value" => 'hello'
               }
             }
           )
