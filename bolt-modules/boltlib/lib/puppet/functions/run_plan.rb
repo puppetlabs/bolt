@@ -20,6 +20,14 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
   end
 
   # Run a plan, specifying $nodes as a positional argument.
+  #
+  # When running a plan with a $nodes parameter, the second positional argument will always specify
+  # the $nodes parameter. When running a plan with a $targets parameter and no $nodes parameter, the
+  # second positional argument specifies the $targets parameter.
+  #
+  # Deprecation Warning: Starting with Bolt 2.0, a plan with both a $nodes and $targets parameter
+  # cannot specify either parameter using the second positional argument and will result in the plan
+  # failing to run.
   # @param plan_name The plan to run.
   # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
@@ -35,16 +43,14 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
   end
 
   def run_plan_with_targetspec(scope, plan_name, targets, args = {})
-    unless args['nodes'].nil?
-      raise ArgumentError,
-            "A plan's 'nodes' parameter may be specified as the second positional argument to " \
-            "run_plan(), but in that case 'nodes' must not be specified in the named arguments " \
-            "hash."
-    end
-    run_plan(scope, plan_name, args.merge('nodes' => targets))
+    run_inner_plan(scope, plan_name, targets, args)
   end
 
   def run_plan(scope, plan_name, args = {})
+    run_inner_plan(scope, plan_name, nil, args)
+  end
+
+  def run_inner_plan(scope, plan_name, targets, args = {})
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_plan')
@@ -87,10 +93,13 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     # If a TargetSpec parameter is passed, ensure it is in inventory
     inventory = Puppet.lookup(:bolt_inventory)
 
+    param_types = closure.parameters.each_with_object({}) do |param, param_acc|
+      param_acc[param.name] = extract_parameter_types(param.type_expr)&.flatten
+    end
+
+    targets_to_param(targets, params, param_types, executor) if targets
+
     if inventory.version > 1
-      param_types = closure.parameters.each_with_object({}) do |param, param_acc|
-        param_acc[param.name] = extract_parameter_types(param.type_expr).flatten
-      end
       params.each do |param, value|
         # Note the safe lookup operator is needed to handle case where a parameter is passed to a
         # plan that the plan is not expecting
@@ -157,6 +166,56 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     # Each element can be handled by a resolver above
     elsif defined?(type_expr.element_type)
       extract_parameter_types(type_expr.element_type)
+    end
+  end
+
+  def targets_to_param(targets, params, param_types, executor)
+    nodes_param = param_types.include?('nodes')
+    targets_param = param_types['targets']&.any? { |p| p.match?(/TargetSpec/) }
+
+    # Both a 'TargetSpec $nodes' and 'TargetSpec $targets' parameter are present in the plan
+    # 1.x behavior: Populate $nodes and warn user that this will error in 2.x
+    # 2.x behavior: Error
+    if nodes_param && targets_param
+      # rubocop:disable Style/GlobalVars
+      if $future
+        raise ArgumentError,
+              "A plan with both a $nodes and $targets parameter cannot have either parameter specified " \
+              "as the second positional argument to run_plan()."
+      else
+        msg = <<~WARNING
+              Deprecation Warning: A plan with both a $nodes and $targets parameter can only specify
+              the $nodes parameter as the second positional argument to run_plan(). Starting in
+              Bolt 2.0, a plan with both a $nodes and $targets parameter will not be able to specify
+              either parameter as the second positional argument to run_plan() and will result in the
+              plan failing.
+              WARNING
+        executor.deprecation(msg)
+      end
+      # rubocop:enable Style/GlobalVars
+    end
+
+    # Always populate a $nodes parameter over $targets
+    if nodes_param
+      if params['nodes']
+        raise ArgumentError,
+              "A plan's 'nodes' parameter may be specified as the second positional argument to " \
+              "run_plan(), but in that case 'nodes' must not be specified in the named arguments " \
+              "hash."
+      end
+      params['nodes'] = targets
+    # If there is only a $targets parameter, then populate it
+    elsif targets_param
+      if params['targets']
+        raise ArgumentError,
+              "A plan's 'targets' parameter may be specified as the second positional argument to " \
+              "run_plan(), but in that case 'targets' must not be specified in the named arguments " \
+              "hash."
+      end
+      params['targets'] = targets
+    # If a plan has neither parameter, just fall back to $nodes
+    else
+      params['nodes'] = targets
     end
   end
 end
