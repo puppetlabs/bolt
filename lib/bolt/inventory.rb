@@ -212,7 +212,7 @@ module Bolt
       }
       data = Bolt::Util.deep_merge(defaults, data)
       # If features is an empty array deep_merge won't add the puppet-agent
-      data['features'] << 'puppet-agent' if data['features'].empty?
+      data['features'] += ['puppet-agent'] if data['features'].empty?
       data
     end
 
