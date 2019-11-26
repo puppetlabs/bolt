@@ -22,10 +22,6 @@ group(:test) do
   gem "rubocop", '~> 0.61', require: false
 end
 
-group(:development) do
-  gem "puppet-strings", "~> 2.0"
-end
-
 group(:packaging) do
   gem 'packaging', '~> 0.99.35'
 end
