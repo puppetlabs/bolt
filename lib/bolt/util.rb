@@ -176,7 +176,7 @@ module Bolt
         rescue TypeError
           # unclonable (TrueClass, Fixnum, ...)
           cloned[obj.object_id] = obj
-          return obj
+          obj
         else
           cloned[obj.object_id] = cl
           cloned[cl.object_id] = cl
@@ -195,7 +195,7 @@ module Bolt
             cl.instance_variable_set(var, v_cl)
           end
 
-          return cl
+          cl
         end
       end
 

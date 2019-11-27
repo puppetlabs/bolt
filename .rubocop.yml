@@ -38,7 +38,7 @@ Style/StderrPuts:
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
-Layout/IndentHeredoc:
+Layout/HeredocIndentation:
   Enabled: false
 
 Layout/ClosingHeredocIndentation:
@@ -88,7 +88,7 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Enabled: false
 
-Lint/HandleExceptions:
+Lint/SuppressedException:
   Exclude:
     - lib/bolt/transport/local/shell.rb
 
