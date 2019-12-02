@@ -76,6 +76,18 @@ You can test your configuration with the following plan, which returns a list of
 
 ```
 plan pdb_test {
+  returns(puppetdb_query("nodes[certname] {}"))
+}
+```
+
+## Practical Usage
+
+In practice it is common to extract inventory from PuppetDB dynamically and use them
+in a plan. The following is an example of doing that using the `puppetdb_query()` function
+directly. This method works, but requires data munging to be effective.
+
+```
+plan puppetdb_query_targets {
   # query PuppetDB for a list of node certnames
   # this returns an array of objects, each object containing a "certname" parameter:
   # [ {"certname": "node1"}, {"certname": "node2"} ]
@@ -88,6 +100,26 @@ plan pdb_test {
   
   # transform the arary of certnames into an array of Targets
   $targets = get_targets($certnames)
+  
+  # gather facts about all of the nodes
+  run_task('facts', $targets)
+}
+```
+
+Alternatively, the [PuppetDB inventory plugin](using_plugins.md) can be used to execute
+a query and return Targets. This avoids the data munging from the previous example:
+
+```
+plan puppetdb_plugin_targets {
+  # Resolves "references" from the PuppetDB inventory plugin using the specified PQL query.
+  $refs = {
+    '_plugin' => 'puppetdb',
+    'query'   => 'nodes[certname] {}',
+  }
+  $references = resolve_references($refs)
+  
+  # maps the results into a list of Target objects
+  $targets = $references.map |$r| { Target.new($r) }
   
   # gather facts about all of the nodes
   run_task('facts', $targets)
