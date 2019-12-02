@@ -1,5 +1,21 @@
 # Changelog
 
+## Bolt 1.41.0
+
+### New features
+
+* **Added `target_mapping` field in `terraform` and `aws_inventory` inventory plugins** ([#1404](https://github.com/puppetlabs/bolt/issues/1404))
+
+  The `terraform` and `aws_inventory` inventory plugins have a new `target_mapping` field which accepts a hash of target configuration options and the lookup values to populate them with.
+
+* **Ruby helper library for inventory plugins** ([#1404](https://github.com/puppetlabs/bolt/issues/1404))
+
+    A new library has been added to help write inventory plugins in Ruby:
+
+    * https://github.com/puppetlabs/puppetlabs-ruby_plugin_helper
+
+    Use this library to map lookup values to a target's configuration options in a `resolve_references` task.
+    
 ## Bolt 1.40.0
 
 ### New features
