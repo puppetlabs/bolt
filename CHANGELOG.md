@@ -1,16 +1,16 @@
 # Changelog
 
-## Bolt Next
+## Bolt 1.40.0
 
 ### New features
 
-* **`bolt plan show` shows plan and parameter descriptions** ([#1442](https://github.com/puppetlabs/bolt/pull/1442))
+* **`bolt plan show` displays plan and parameter descriptions** ([#1442](https://github.com/puppetlabs/bolt/pull/1442))
 
-  `bolt plan show` now uses Puppet Strings to parse plan documentation to show plan and parameter descriptions and parameter defaults.
+  `bolt plan show` now uses Puppet Strings to parse plan documentation and show plan and parameter descriptions as well as parameter defaults.
 
 * **Added `target_mapping` field in `puppetdb` inventory plugin** ([#1408](https://github.com/puppetlabs/bolt/pull/1408))
 
-  The `puppetdb` inventory plugin has a new `target_mapping` field that accepts a hash of target configuration options and the facts to populate them with.
+  The `puppetdb` inventory plugin has a new `target_mapping` field which accepts a hash of target configuration options and the facts to populate them with.
 
 ## Bolt 1.39.0
 
