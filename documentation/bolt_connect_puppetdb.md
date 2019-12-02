@@ -76,7 +76,7 @@ You can test your configuration with the following plan, which returns a list of
 
 ```
 plan pdb_test {
-  returns(puppetdb_query("nodes[certname] {}"))
+  return(puppetdb_query("nodes[certname] {}"))
 }
 ```
 
