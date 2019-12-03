@@ -1,5 +1,13 @@
 # Changelog
 
+## Bolt Next
+
+### Bug fixes
+
+* **Default PuppetDB config lookup used hardcoded path in Windows** ([#1427](https://github.com/puppetlabs/bolt/pull/1427))
+
+  Bolt will now lookup the default PuppetDB config at `%COMMON_APPDATA%\PuppetLabs\client-tools\puppetdb.conf` instead of the hardcoded path `C:\ProgramData\PuppetLabs\client-tools\puppetdb.conf`.
+
 ## Bolt 1.41.0
 
 ### New features
