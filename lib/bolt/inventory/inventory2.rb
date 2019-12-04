@@ -136,6 +136,22 @@ module Bolt
       end
       private :expand_targets
 
+      def remove_target(current_group, target, desired_group)
+        if current_group.name == desired_group
+          current_group.remove_target(target)
+          target.invalidate_group_cache!
+        end
+        current_group.groups.each do |child_group|
+          # If target was in current group, remove it from all child groups
+          if current_group.name == desired_group
+            remove_target(child_group, target, child_group.name)
+          else
+            remove_target(child_group, target, desired_group)
+          end
+        end
+      end
+      private :remove_target
+
       def add_target(current_group, target, desired_group)
         if current_group.name == desired_group
           current_group.add_target(target)
@@ -198,6 +214,22 @@ module Bolt
         end
         group.groups.each do |grp|
           clear_alia_from_group(grp, target_name)
+        end
+      end
+
+      def remove_from_group(target, desired_group)
+        unless target.length == 1
+          raise ValidationError.new("'remove_from_group' expects a single Target, got #{target.length}", nil)
+        end
+
+        if desired_group == 'all'
+          raise ValidationError.new("Cannot remove Target from Group 'all'", nil)
+        end
+
+        if group_names.include?(desired_group)
+          remove_target(@groups, @targets[target.first.name], desired_group)
+        else
+          raise ValidationError.new("Group #{desired_group} does not exist in inventory", nil)
         end
       end
 

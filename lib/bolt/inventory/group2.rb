@@ -142,6 +142,11 @@ module Bolt
         @unresolved_targets[t_name] = target
       end
 
+      def remove_target(target)
+        @resolved_targets.delete(target.name)
+        @unresolved_targets.delete(target.name)
+      end
+
       def add_target(target)
         @resolved_targets[target.name] = { 'name' => target.name }
       end
