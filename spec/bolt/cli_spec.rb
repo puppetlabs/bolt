@@ -104,7 +104,7 @@ describe "Bolt::CLI" do
           expect {
             cli.parse
           }.to raise_error(Bolt::CLIExit)
-        }.to output(/Usage: bolt/).to_stdout
+        }.to output(/USAGE.*bolt/m).to_stdout
       end
 
       it "accepts --help" do
@@ -113,7 +113,7 @@ describe "Bolt::CLI" do
           expect {
             cli.parse
           }.to raise_error(Bolt::CLIExit)
-        }.to output(/Usage: bolt/).to_stdout
+        }.to output(/USAGE.*bolt/m).to_stdout
       end
 
       context 'listing actions with help' do
@@ -123,7 +123,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/Available actions are:.*run/m).to_stdout
+          }.to output(/ACTIONS.*run/m).to_stdout
         end
 
         it 'accepts script' do
@@ -132,7 +132,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/Available actions are:.*run/m).to_stdout
+          }.to output(/ACTIONS.*run/m).to_stdout
         end
 
         it 'accepts task' do
@@ -141,7 +141,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/Available actions are:.*show.*run/m).to_stdout
+          }.to output(/ACTIONS.*run.*show/m).to_stdout
         end
 
         it 'accepts plan' do
@@ -150,7 +150,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/Available actions are:.*show.*run/m).to_stdout
+          }.to output(/ACTIONS.*run.*show/m).to_stdout
         end
 
         it 'accepts file' do
@@ -159,7 +159,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/Available actions are:.*upload/m).to_stdout
+          }.to output(/ACTIONS.*upload/m).to_stdout
         end
 
         it 'accepts puppetfile' do
@@ -168,7 +168,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/Available actions are:.*install.*show-modules/m).to_stdout
+          }.to output(/ACTIONS.*install.*show-modules/m).to_stdout
         end
 
         it 'accepts inventory' do
@@ -177,7 +177,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/Available actions are:.*show/m).to_stdout
+          }.to output(/ACTIONS.*show/m).to_stdout
         end
 
         it 'excludes invalid subcommand flags' do
@@ -204,7 +204,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/Usage: bolt apply <manifest.pp>/m).to_stdout
+          }.to output(/USAGE.*bolt apply <manifest.pp>/m).to_stdout
         end
       end
     end
