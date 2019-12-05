@@ -97,7 +97,7 @@
   Plugin configuration can now be set by looking up data from other plugins. For example, the password for one plugin can be queried from another plugin.
 
 
-## Bug fixes
+### Bug fixes
 
 * **Bolt issued an error for unset environment variables with `system::env`** ([#1414](https://github.com/puppetlabs/bolt/issues/1414))
 
@@ -109,13 +109,13 @@
 
 ## Bolt 1.37.0
 
-## New features
+### New features
 
 * **New `resolve_references` plan function** ([#1365](https://github.com/puppetlabs/bolt/issues/1365))
 
   The new plan function, `resolve_references`, accepts a hash of structured data and returns a hash of structured data with all plugin references resolved.
 
-## Bug fixes
+### Bug fixes
 
 * **Allow optional `--password` and `--sudo-password` parameters** ([#1269](https://github.com/puppetlabs/bolt/issues/1269))
 
