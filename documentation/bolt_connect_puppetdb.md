@@ -79,3 +79,49 @@ plan pdb_test {
   return(puppetdb_query("nodes[certname] {}"))
 }
 ```
+
+## Practical Usage
+
+In practice, it is common to extract inventory from PuppetDB dynamically to use
+in a plan. The following is an example using the `puppetdb_query()` function
+directly. This method works but requires data munging to be effective.
+
+```
+plan puppetdb_query_targets {
+  # query PuppetDB for a list of node certnames
+  # this returns an array of objects, each object containing a "certname" parameter:
+  # [ {"certname": "node1"}, {"certname": "node2"} ]
+  $query_results = puppetdb_query("nodes[certname] {}")
+  
+  # since puppetdb_query() returns the JSON results from the API call, we need to transform this
+  # data into Targets to use it in one of the run_*() functions.
+  # extract the "certname" values, so now we have an array of hostnames
+  $certnames = $query_results.map |$r| { $r['certname'] }
+  
+  # transform the arary of certnames into an array of Targets
+  $targets = get_targets($certnames)
+  
+  # gather facts about all of the nodes
+  run_task('facts', $targets)
+}
+```
+
+Alternatively, the [PuppetDB inventory plugin](using_plugins.md) can be used to execute
+a query and return Targets. This avoids the data munging from the previous example:
+
+```
+plan puppetdb_plugin_targets {
+  # Resolves "references" from the PuppetDB inventory plugin using the specified PQL query.
+  $refs = {
+    '_plugin' => 'puppetdb',
+    'query'   => 'nodes[certname] {}',
+  }
+  $references = resolve_references($refs)
+  
+  # maps the results into a list of Target objects
+  $targets = $references.map |$r| { Target.new($r) }
+  
+  # gather facts about all of the nodes
+  run_task('facts', $targets)
+}
+```
