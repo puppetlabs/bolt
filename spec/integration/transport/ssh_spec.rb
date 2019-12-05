@@ -469,4 +469,15 @@ describe Bolt::Transport::SSH do
       expect { ssh.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
     end
   end
+
+  context "user supplied script directory" do
+    let(:config) do
+      mk_config("host-key-check" => false, "sudo-password" => password, "run-as" => "root",
+                user: user, password: password, "script-dir" => "123456", interpreters: { sh: "/bin/sh" })
+    end
+    let(:target) { make_target }
+    it "executes a command on a host", ssh: true do
+      expect(ssh.run_command(target, "pwd")["stdout"]).to eq("/home/bolt\n")
+    end
+  end
 end
