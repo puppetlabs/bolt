@@ -8,6 +8,10 @@
 
   Bolt's help text has been reformatted to be more consistent with the formatting in other Puppet tools.
 
+* **Packages for Debian 10** ([GH-1444](https://github.com/puppetlabs/bolt/issues/1444))
+
+  Bolt packages are now available for Debian 10.
+
 ### Bug fixes
 
 * **Default PuppetDB config lookup used hardcoded path in Windows** ([#1427](https://github.com/puppetlabs/bolt/pull/1427))
