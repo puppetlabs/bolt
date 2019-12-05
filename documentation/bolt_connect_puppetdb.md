@@ -82,9 +82,9 @@ plan pdb_test {
 
 ## Practical Usage
 
-In practice it is common to extract inventory from PuppetDB dynamically and use them
-in a plan. The following is an example of doing that using the `puppetdb_query()` function
-directly. This method works, but requires data munging to be effective.
+In practice, it is common to extract inventory from PuppetDB dynamically to use
+in a plan. The following is an example using the `puppetdb_query()` function
+directly. This method works but requires data munging to be effective.
 
 ```
 plan puppetdb_query_targets {
