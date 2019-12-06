@@ -377,6 +377,26 @@ describe Bolt::Transport::SSH do
     end
   end
 
+  context "with no sudo-password", sudo: true, ssh: true do
+    let(:config) {
+      mk_config('host-key-check' => false, 'password' => password, 'run-as' => 'root',
+                user: user, password: password)
+    }
+    let(:target) { make_target }
+    after(:each) {
+      # rubocop:disable Style/GlobalVars
+      $future = nil
+      # rubocop:enable Style/GlobalVars
+    }
+
+    it "uses password as sudo-password when future is set" do
+      # rubocop:disable Style/GlobalVars
+      $future = true
+      # rubocop:enable Style/GlobalVars
+      expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
+    end
+  end
+
   context "with a bad private-key option" do
     include BoltSpec::Logger
 

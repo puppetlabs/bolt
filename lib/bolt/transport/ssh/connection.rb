@@ -34,6 +34,11 @@ module Bolt
           @transport_logger = transport_logger
           @logger.debug("Initializing ssh connection to #{@target.safe_name}")
 
+          @sudo_password = @target.options['sudo-password']
+          # rubocop:disable Style/GlobalVars
+          @sudo_password ||= @target.options['password'] if $future
+          # rubocop:enable Style/GlobalVars
+
           if target.options['private-key']&.instance_of?(String)
             begin
               Bolt::Util.validate_file('ssh key', target.options['private-key'])
@@ -148,8 +153,8 @@ module Bolt
 
         def handled_sudo(channel, data, stdin)
           if data.lines.include?(Sudoable.sudo_prompt)
-            if target.options['sudo-password']
-              channel.send_data("#{target.options['sudo-password']}\n")
+            if @sudo_password
+              channel.send_data("#{@sudo_password}\n")
               channel.wait
               return true
             else
