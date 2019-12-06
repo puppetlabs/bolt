@@ -12,6 +12,10 @@
 
   Bolt packages are now available for Debian 10.
 
+* **SSH transport sets `sudo-password` to the same value as `password` by default** ([#1425](https://github.com/puppetlabs/bolt/issues/1425))
+
+  If `sudo-password` is not set when using `run-as`, Bolt will set the value of `sudo-password` to match the value of `password`. This behavior is gated on the future config option, and will be available by default in Bolt 2.0.
+  
 ### Bug fixes
 
 * **Default PuppetDB config lookup used hardcoded path in Windows** ([#1427](https://github.com/puppetlabs/bolt/pull/1427))
