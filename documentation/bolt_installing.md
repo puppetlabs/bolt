@@ -128,7 +128,7 @@ Use one of the supported *nix installation methods to install Bolt.
 
 ### Install Bolt on Debian or Ubuntu
 
-Packaged versions of Bolt are available for Debian 8 and 9 and Ubuntu 16.04 and 18.04.
+Packaged versions of Bolt are available for Debian 8-10 and Ubuntu 16.04 and 18.04.
 
 The Puppet Tools repository for the APT package management system is [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the convention `puppet-tools-release-<VERSION CODE NAME>.deb`. For example, the release package for Puppet Tools on Debian 8 “Jessie” is `puppet-tools-release-jessie.deb`.
 
@@ -144,6 +144,13 @@ The Puppet Tools repository for the APT package management system is [https://ap
         ```shell script
         wget https://apt.puppet.com/puppet-tools-release-stretch.deb
         sudo dpkg -i puppet-tools-release-stretch.deb
+        sudo apt-get update 
+        sudo apt-get install puppet-bolt
+        ```
+    -   Debian 10
+        ```shell script
+        wget https://apt.puppet.com/puppet-tools-release-buster.deb
+        sudo dpkg -i puppet-tools-release-buster.deb
         sudo apt-get update 
         sudo apt-get install puppet-bolt
         ```
@@ -169,7 +176,7 @@ The Puppet Tools repository for the APT package management system is [https://ap
 
 ### Install Bolt on RHEL, SLES, or Fedora
 
-Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12, and Fedora 28 and 29.
+Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7, SUSE Linux Enterprise Server 12, and Fedora 28-30.
 
 The Puppet Tools repository for the YUM package management system is [http://yum.puppet.com/puppet-tools/](http://yum.puppet.com/puppet-tools/). Packages are named using the convention `puppet-tools-release-<OS ABBREVIATION>-<OS VERSION>.noarch.rpm`. For example, the release package for Puppet Tools on Linux 7 is `puppet-tools-release-el-7.noarch.rpm`.
 
