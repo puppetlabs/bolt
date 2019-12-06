@@ -126,7 +126,8 @@ module Bolt
 
           if escalate
             if use_sudo
-              sudo_flags = ["sudo", "-k", "-S", "-u", run_as, "-p", Sudoable.sudo_prompt]
+              sudo_exec = target.options['sudo-executable'] || "sudo"
+              sudo_flags = [sudo_exec, "-k", "-S", "-u", run_as, "-p", Sudoable.sudo_prompt]
               sudo_flags += ["-E"] if options[:environment]
               sudo_str = Shellwords.shelljoin(sudo_flags)
             else

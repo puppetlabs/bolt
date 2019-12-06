@@ -30,6 +30,10 @@
 
   If `sudo-password` is not set when using `run-as`, Bolt will set the value of `sudo-password` to match the value of `password`. This behavior is gated on the future config option, and will be available by default in Bolt 2.0.
   
+* **Add `sudo-executable` transport configuration option** ([#1200](https://github.com/puppetlabs/bolt/issues/1200))
+
+  When using `run-as`, the `sudo-executable` transport configuration option can be used to specify an executable to use to run as another user. This option can be set in a `local` or `ssh` config map or with the `--sudo-executable` flag on the CLI. This feature is experimental.
+
 ### Bug fixes
 
 * **Default PuppetDB config lookup used hardcoded path in Windows** ([#1427](https://github.com/puppetlabs/bolt/pull/1427))

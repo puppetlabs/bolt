@@ -194,10 +194,10 @@ module Bolt
           use_sudo = escalate && @target.options['run-as-command'].nil?
 
           command_str = inject_interpreter(options[:interpreter], command)
-
           if escalate
             if use_sudo
-              sudo_flags = ["sudo", "-S", "-u", run_as, "-p", Sudoable.sudo_prompt]
+              sudo_exec = target.options['sudo-executable'] || "sudo"
+              sudo_flags = [sudo_exec, "-S", "-u", run_as, "-p", Sudoable.sudo_prompt]
               sudo_flags += ["-E"] if options[:environment]
               sudo_str = Shellwords.shelljoin(sudo_flags)
             else

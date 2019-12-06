@@ -337,6 +337,23 @@ describe Bolt::Transport::SSH do
     end
   end
 
+  context "with non-sudo executable", sudo: true do
+    let(:config) {
+      mk_config('host-key-check' => false, 'sudo-executable' => 'fake',
+                'run-as' => user, user: bash_user, password: bash_password)
+    }
+    let(:target) { make_target }
+
+    it 'uses the correct executable' do
+      allow_any_instance_of(Net::SSH::Connection::Channel).to receive(:wait).and_return('')
+      expect_any_instance_of(Net::SSH::Connection::Channel).to receive(:exec)
+        .with("fake -S -u bolt -p \\[sudo\\]\\ Bolt\\ needs\\ to\\ run\\ as\\ another\\ "\
+              "user,\\ password:\\  whoami")
+
+      ssh.run_command(target, 'whoami')
+    end
+  end
+
   context "with sudo with task interpreter set", sudo: true, ssh: true do
     let(:config) {
       mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
