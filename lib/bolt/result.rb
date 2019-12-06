@@ -8,9 +8,8 @@ module Bolt
     attr_reader :target, :value, :action, :object
 
     def self.from_exception(target, exception)
-      @exception = exception
-      if @exception.is_a?(Bolt::Error)
-        error = @exception.to_h
+      if exception.is_a?(Bolt::Error)
+        error = exception.to_h
       else
         error = {
           'kind' => 'puppetlabs.tasks/exception-error',
