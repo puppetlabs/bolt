@@ -312,8 +312,10 @@ module Bolt
 
       # If it's a Puppet language plan, use strings to extract data. The only
       # way to tell is to check which filename exists in the module.
-      plan_file = plan_name.split('::', 2)[1] || 'init'
-      pp_path = File.join(mod, 'plans', "#{plan_file}.pp")
+      plan_subpath = File.join(plan_name.split('::').drop(1))
+      plan_subpath = 'init' if plan_subpath.empty?
+
+      pp_path = File.join(mod, 'plans', "#{plan_subpath}.pp")
       if File.exist?(pp_path)
         require 'puppet-strings'
         require 'puppet-strings/yard'
@@ -346,7 +348,7 @@ module Bolt
 
       # If it's a YAML plan, fall back to limited data
       else
-        yaml_path = File.join(mod, 'plans', "#{plan_file}.yaml")
+        yaml_path = File.join(mod, 'plans', "#{plan_subpath}.yaml")
         plan_content = File.read(yaml_path)
         plan = Bolt::PAL::YamlPlan::Loader.from_string(plan_name, plan_content, yaml_path)
 

@@ -45,6 +45,22 @@ describe "When a plan succeeds" do
     expect(result).to match(/Ran on 1 node/)
   end
 
+  it 'runs a puppet plan from a subdir', ssh: true do
+    result = run_cli(%W[plan run sample::subdir::command --targets #{target}] + config_flags)
+
+    json = JSON.parse(result)[0]
+    expect(json['result']['stdout']).to eq("From subdir\n")
+  end
+
+  it 'runs a yaml plan from a subdir of plans', ssh: true do
+    result = run_cli(%W[plan run yaml::subdir::init --targets #{target}] + config_flags)
+
+    json = JSON.parse(result)[0]
+    expect(json['node']).to eq(target)
+    expect(json['status']).to eq('success')
+    expect(json['result']).to eq("stdout" => "I am a yaml plan\n", "stderr" => "", "exit_code" => 0)
+  end
+
   it 'runs a yaml plan', ssh: true do
     result = run_cli(['plan', 'run', 'sample::yaml', '--targets', target] + config_flags)
     expect(JSON.parse(result)).to eq('stdout' => "hello world\n", 'stderr' => '', 'exit_code' => 0)

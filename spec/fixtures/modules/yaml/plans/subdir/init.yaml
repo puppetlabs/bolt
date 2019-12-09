@@ -1,0 +1,10 @@
+parameters:
+  targets:
+    type: TargetSpec
+
+steps:
+  - name: run_command
+    command: echo I am a yaml plan
+    target: $targets
+
+return: $run_command
