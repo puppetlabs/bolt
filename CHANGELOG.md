@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt Next
+## Bolt 1.42.0
 
 ### New features
 
@@ -22,9 +22,9 @@
 
   Bolt will now lookup the default PuppetDB config at `%COMMON_APPDATA%\PuppetLabs\client-tools\puppetdb.conf` instead of the hardcoded path `C:\ProgramData\PuppetLabs\client-tools\puppetdb.conf`.
 
-* **Bolt could not find plans in subdirectories of `plans` directory**
+* **Bolt could not find plans in subdirectories of `plans` directory** ([#1473](https://github.com/puppetlabs/bolt/pull/1473))
 
-  Bolt will now correctly search for subdir paths under the `plans` directory for plan names when determining if the plan is a Puppet plan or yaml plan.
+  Bolt now searchs for subdir paths, under the `plans` directory, for plan names when determining if the plan is a Puppet or YAML plan.
 
 ## Bolt 1.41.0
 
