@@ -24,7 +24,7 @@
 
 * **Bolt could not find plans in subdirectories of `plans` directory** ([#1473](https://github.com/puppetlabs/bolt/pull/1473))
 
-  Bolt now searchs for subdir paths, under the `plans` directory, for plan names when determining if the plan is a Puppet or YAML plan.
+  Bolt now searches for subdir paths, under the `plans` directory, for plan names when determining if the plan is a Puppet or YAML plan.
 
 ## Bolt 1.41.0
 
