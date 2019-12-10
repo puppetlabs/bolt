@@ -338,5 +338,9 @@ module Bolt
     ensure
       publish_event(type: :enable_default_output)
     end
+
+    def deprecation(msg)
+      @logger.warn msg
+    end
   end
 end

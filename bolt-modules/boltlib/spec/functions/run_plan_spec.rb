@@ -131,4 +131,41 @@ describe 'run_plan' do
       is_expected.to run.with_params('test::targetspec_params', params).and_return(expected_targets)
     end
   end
+
+  context 'with a plan with a $targets parameter' do
+    it 'fails when given positional argument and targets named argument' do
+      is_expected.to run.with_params('test::run_me_targets', 'target1', 'targets' => 'target2')
+                        .and_raise_error(ArgumentError)
+    end
+
+    it 'specifies the $targets parameter using the second positional argument' do
+      is_expected.to run.with_params('test::run_me_targets', 'target1')
+                        .and_return('target1')
+    end
+  end
+
+  context 'with a plan with both a $nodes and $targets parameter' do
+    context 'with $future set' do
+      after(:each) do
+        # rubocop:disable Style/GlobalVars
+        $future = nil
+        # rubocop:enable Style/GlobalVars
+      end
+
+      it 'fails when using the second positional argument' do
+        # rubocop:disable Style/GlobalVars
+        $future = true
+        # rubocop:enable Style/GlobalVars
+        is_expected.to run.with_params('test::run_me_nodes_and_targets', 'target1')
+                          .and_raise_error(ArgumentError)
+      end
+    end
+
+    context 'with $future unset' do
+      it 'specifies the $nodes parameter using the second positional argument' do
+        is_expected.to run.with_params('test::run_me_nodes_and_targets', 'target1', 'targets' => 'target2')
+                          .and_return('target1')
+      end
+    end
+  end
 end
