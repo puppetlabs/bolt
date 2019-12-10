@@ -3,6 +3,7 @@
 [![Travis Status](https://travis-ci.org/puppetlabs/bolt.svg?branch=master)](https://travis-ci.org/puppetlabs/bolt)
 [![Appveyor Status](https://ci.appveyor.com/api/projects/status/m7dhiwxk455mkw2d/branch/master?svg=true)](https://ci.appveyor.com/project/puppetlabs/bolt/branch/master)
 [![Gem Version](https://badge.fury.io/rb/bolt.svg)](https://badge.fury.io/rb/bolt)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fpuppetlabs%2Fbolt.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fpuppetlabs%2Fbolt?ref=badge_shield)
 
 <div name="logo">
   <img src="resources/bolt-logo-dark.png"
@@ -67,3 +68,6 @@ We welcome error reports and pull requests to Bolt. See
 
 The gem is available as open source under the terms of the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fpuppetlabs%2Fbolt.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fpuppetlabs%2Fbolt?ref=badge_large)
