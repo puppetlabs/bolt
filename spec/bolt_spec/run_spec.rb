@@ -107,18 +107,25 @@ describe "BoltSpec::Run", ssh: true do
       } }
     end
 
+    def agent_inventory
+      { 'groups' => conn_inventory['groups'],
+        'features' => ['puppet-agent'] }
+    end
+
+    let(:bolt_inventory) { agent_inventory }
+
     before(:all) do
-      result = run_task('puppet_agent::version', 'ssh', {}, inventory: conn_inventory, config: root_config)
+      result = run_task('puppet_agent::version', 'ssh', {}, inventory: agent_inventory, config: root_config)
       expect(result.first['status']).to eq('success')
       unless result.first['result']['version']
-        result = run_task('puppet_agent::install', 'ssh', {}, inventory: conn_inventory, config: root_config)
+        result = run_task('puppet_agent::install', 'ssh', {}, inventory: agent_inventory, config: root_config)
       end
       expect(result.first['status']).to eq('success')
     end
 
     after(:all) do
       uninstall = '/opt/puppetlabs/bin/puppet resource package puppet-agent ensure=absent'
-      run_command(uninstall, 'ssh', inventory: conn_inventory, config: root_config)
+      run_command(uninstall, 'ssh', inventory: agent_inventory, config: root_config)
     end
 
     describe 'apply_manifest' do

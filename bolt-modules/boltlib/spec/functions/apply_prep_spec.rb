@@ -60,11 +60,13 @@ describe 'apply_prep' do
     end
 
     it 'sets feature and gathers facts' do
-      versions = Bolt::ResultSet.new(unknown_targets.map { |t| Bolt::Result.new(t, value: { 'version' => '5.0.0' }) })
-      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(versions)
-
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
       executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(facts)
+
+      plugins.expects(:get_hook)
+             .twice
+             .with("puppet_agent", :puppet_library)
+             .returns(task_hook)
 
       is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
       targets.each do |target|
@@ -74,15 +76,11 @@ describe 'apply_prep' do
     end
 
     it 'installs the agent if not present' do
-      versions = Bolt::ResultSet.new(
-        unknown_targets.zip(['yes', nil]).map { |t, v| Bolt::Result.new(t, value: { 'version' => v }) }
-      )
-      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(versions)
-
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
       executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(facts)
 
       plugins.expects(:get_hook)
+             .twice
              .with("puppet_agent", :puppet_library)
              .returns(task_hook)
 
@@ -93,32 +91,16 @@ describe 'apply_prep' do
       end
     end
 
-    it 'fails if version task is not found' do
-      Puppet::Pal::ScriptCompiler.any_instance.expects(:task_signature).with('puppet_agent::version')
-      is_expected.to run.with_params(hostnames).and_raise_error(
-        Bolt::Error, "Task 'puppet_agent::version' could not be found"
-      )
-    end
-
-    it 'fails if version check fails' do
-      failed_results = Bolt::ResultSet.new(
-        unknown_targets.map { |t| Bolt::Result.new(t, error: { 'msg' => 'could not get version' }) }
-      )
-      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(failed_results)
-
-      is_expected.to run.with_params(hostnames).and_raise_error(
-        Bolt::RunFailure, "Plan aborted: run_task 'puppet_agent::version' failed on 2 targets"
-      )
-    end
-
     it 'fails if fact gathering fails' do
-      versions = Bolt::ResultSet.new(unknown_targets.map { |t| Bolt::Result.new(t, value: { 'version' => '5.0.0' }) })
-      executor.expects(:run_task).with(unknown_targets, version_task, anything, anything).returns(versions)
-
       results = Bolt::ResultSet.new(
         targets.map { |t| Bolt::Result.new(t, error: { 'msg' => 'could not gather facts' }) }
       )
       executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(results)
+
+      plugins.expects(:get_hook)
+             .twice
+             .with("puppet_agent", :puppet_library)
+             .returns(task_hook)
 
       is_expected.to run.with_params(hostnames).and_raise_error(
         Bolt::RunFailure, "Plan aborted: run_task 'custom_facts_task' failed on #{targets.count} targets"
@@ -144,9 +126,6 @@ describe 'apply_prep' do
       let(:target) { inventory.get_targets(hostname)[0] }
 
       it 'installs the agent if not present' do
-        version = Bolt::ResultSet.new([Bolt::Result.new(target, value: { 'version' => nil })])
-        executor.expects(:run_task).with([target], version_task, anything, anything).returns(version)
-
         facts = Bolt::ResultSet.new([Bolt::Result.new(target, value: fact)])
         executor.expects(:run_task).with([target], custom_facts_task, includes('plugins')).returns(facts)
 
@@ -177,9 +156,6 @@ describe 'apply_prep' do
       let(:targets) { inventory.get_targets(hostname) }
 
       it 'installs the agent if not present' do
-        version = Bolt::ResultSet.new([Bolt::Result.new(target, value: { 'version' => nil })])
-        executor.expects(:run_task).with([target], version_task, anything, anything).returns(version)
-
         facts = Bolt::ResultSet.new([Bolt::Result.new(target, value: fact)])
         executor.expects(:run_task).with([target], custom_facts_task, includes('plugins')).returns(facts)
 

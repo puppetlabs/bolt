@@ -10,6 +10,12 @@
   depends on features that aren't in this version of Bolt, so Bolt will now
   print a warning if it sees such keys.
 
+* **`apply_prep` plan function ensures Puppet agent version** ([#1208](https://github.com/puppetlabs/bolt/issues/1208))
+
+  The `apply_prep` plan function now attempts to install the specified version of the Puppet agent on a target 
+  even when a version of the agent is already installed. If the specified version of the agent cannot be installed, 
+  then `apply_prep` will error.
+
 ## Bolt 1.47.0
 
 ### Deprecations and removals
