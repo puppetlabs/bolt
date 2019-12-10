@@ -2,16 +2,12 @@
 
 require 'bolt/task'
 
-# Installs the puppet-agent package on targets if needed, then collects facts,
+# Installs the puppet-agent package on targets, then collects facts,
 # including any custom facts found in Bolt's modulepath. The package is
 # installed using either the configured plugin or the `task` plugin with the
 # `puppet_agent::install` task.
 #
-# Agent detection will be skipped if the target includes the 'puppet-agent' feature, either as a
-# property of its transport (PCP) or by explicitly setting it as a feature in Bolt's inventory.
-#
-# If Bolt does not detect an agent on the target using the 'puppet_agent::version' task,
-# it will install the agent using either the configured plugin or the
+# It will install the agent using either the configured plugin or the
 # task plugin.
 #
 # **NOTE:** Not available in apply block
@@ -78,55 +74,37 @@ Puppet::Functions.create_function(:apply_prep) do
 
     executor.log_action('install puppet and gather facts', targets) do
       executor.without_default_logging do
-        # Skip targets that include the puppet-agent feature, as we know an agent will be available.
-        agent_targets, unknown_targets = targets.partition { |target| agent?(target, executor, inventory) }
-        agent_targets.each { |target| Puppet.debug "Puppet Agent feature declared for #{target.name}" }
-        unless unknown_targets.empty?
-          # Ensure Puppet is installed
-          version_task = get_task('puppet_agent::version')
-          versions = run_task(unknown_targets, version_task)
-          raise Bolt::RunFailure.new(versions, 'run_task', 'puppet_agent::version') unless versions.ok?
-          need_install, installed = versions.partition { |r| r['version'].nil? }
-          installed.each do |r|
-            Puppet.debug "Puppet Agent #{r['version']} installed on #{r.target.name}"
-            set_agent_feature(r.target)
-          end
+        # lazy-load expensive gem code
+        require 'concurrent'
+        pool = Concurrent::ThreadPoolExecutor.new
 
-          unless need_install.empty?
-            need_install_targets = need_install.map(&:target)
-            # lazy-load expensive gem code
-            require 'concurrent'
-            pool = Concurrent::ThreadPoolExecutor.new
-
-            hooks = need_install_targets.map do |t|
-              begin
-                opts = t.plugin_hooks&.fetch('puppet_library').dup
-                plugin_name = opts.delete('plugin')
-                hook = inventory.plugins.get_hook(plugin_name, :puppet_library)
-                { 'target' => t,
-                  'hook_proc' => hook.call(opts, t, self) }
-              rescue StandardError => e
-                Bolt::Result.from_exception(t, e)
-              end
-            end
-
-            hook_errors, ok_hooks = hooks.partition { |h| h.is_a?(Bolt::Result) }
-
-            futures = ok_hooks.map do |hash|
-              Concurrent::Future.execute(executor: pool) do
-                hash['hook_proc'].call
-              end
-            end
-
-            results = futures.zip(ok_hooks).map do |f, hash|
-              f.value || Bolt::Result.from_exception(hash['target'], f.reason)
-            end
-            set = Bolt::ResultSet.new(results + hook_errors)
-            raise Bolt::RunFailure.new(set.error_set, 'apply_prep') unless set.ok
-
-            need_install_targets.each { |target| set_agent_feature(target) }
+        hooks = targets.map do |t|
+          begin
+            opts = t.plugin_hooks&.fetch('puppet_library').dup
+            plugin_name = opts.delete('plugin')
+            hook = inventory.plugins.get_hook(plugin_name, :puppet_library)
+            { 'target' => t,
+              'hook_proc' => hook.call(opts, t, self) }
+          rescue StandardError => e
+            Bolt::Result.from_exception(t, e)
           end
         end
+
+        hook_errors, ok_hooks = hooks.partition { |h| h.is_a?(Bolt::Result) }
+
+        futures = ok_hooks.map do |hash|
+          Concurrent::Future.execute(executor: pool) do
+            hash['hook_proc'].call
+          end
+        end
+
+        results = futures.zip(ok_hooks).map do |f, hash|
+          f.value || Bolt::Result.from_exception(hash['target'], f.reason)
+        end
+        set = Bolt::ResultSet.new(results + hook_errors)
+        raise Bolt::RunFailure.new(set.error_set, 'apply_prep') unless set.ok
+
+        targets.each { |target| set_agent_feature(target) unless agent?(target, executor, inventory) }
 
         # Gather facts, including custom facts
         plugins = applicator.build_plugin_tarball do |mod|
