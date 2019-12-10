@@ -1,6 +1,5 @@
 # Default to Bolt team
 * @puppetlabs/bolt
 
-/documentation @K8med @puppetlabs/bolt
+/documentation @hestonhoffman @puppetlabs/bolt
 /lib/bolt_server @puppetlabs/skeletor
-CHANGELOG.md @K8med @puppetlabs/bolt
