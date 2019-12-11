@@ -52,6 +52,9 @@ ssh:
 -   `run-as-command`: The command to elevate permissions. Bolt appends the user and command strings to the configured run as a command before running it on the target. This command must not require an interactive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified. The run-as command must be specified as an array.
 -   `sudo-password`: Password to use when changing users via `run-as`.
 -   `tmpdir`: The directory to upload and execute temporary files on the target.
+-   `script-dir`: The subdirectory of the tmpdir to use in place of a randomized subdirectory for
+    uploading and executing temporary files on the target. It's expected that this directory already
+    exists as a subdir of `tmpdir`, which is either configured or defaults to `/tmp`.
 -   `tty`: Request a pseudo tty for the SSH session. This option is generally only used in conjunction with the `run_as` option when the sudoers policy requires a `tty`. Default is `false`.
 -   `user`: Login user. Default is `root`.
 

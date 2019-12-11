@@ -48,6 +48,12 @@ module Bolt
             raise Bolt::ValidationError, error_msg
           end
         end
+
+        if (dir_opt = options['script-dir'])
+          unless dir_opt.is_a?(String) && !dir_opt.empty?
+            raise Bolt::ValidationError, "script-dir option must be a non-empty string"
+          end
+        end
       end
 
       def initialize

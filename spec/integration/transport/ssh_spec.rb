@@ -470,14 +470,21 @@ describe Bolt::Transport::SSH do
     end
   end
 
-  context "user supplied script directory" do
+  context "with specific tempdir using script-dir option" do
+    let(:script_dir) { "123456" }
     let(:config) do
-      mk_config("host-key-check" => false, "sudo-password" => password, "run-as" => "root",
-                user: user, password: password, "script-dir" => "123456", interpreters: { sh: "/bin/sh" })
+      mk_config("host-key-check" => false, "sudo-password" => password,
+                "run-as" => "root", user: user, password: password,
+                "script-dir" => script_dir, interpreters: { sh: "/bin/sh" })
     end
     let(:target) { make_target }
-    it "executes a command on a host", ssh: true do
-      expect(ssh.run_command(target, "pwd")["stdout"]).to eq("/home/bolt\n")
+
+    it "uploads scripts to the specified directory", ssh: true do
+      cmd = 'cd $( dirname $0) && pwd'
+      with_tempfile_containing('dir', cmd, '.sh') do |script|
+        result = ssh.run_script(target, script.path, nil)
+        expect(result.value['stdout']).to eq("/tmp/123456\n")
+      end
     end
   end
 end
