@@ -7,6 +7,7 @@ module Bolt
     class Sudoable < Base
       class Connection
         attr_accessor :target
+
         def initialize(target)
           @target = target
           @run_as = nil
@@ -38,7 +39,8 @@ module Bolt
 
         def make_tempdir
           tmpdir = @target.options.fetch('tmpdir', '/tmp')
-          tmppath = "#{tmpdir}/#{SecureRandom.uuid}"
+          script_dir = @target.options.fetch('script-dir', SecureRandom.uuid)
+          tmppath = File.join(tmpdir, script_dir)
           command = ['mkdir', '-m', 700, tmppath]
 
           result = execute(command)

@@ -10,7 +10,7 @@ module Bolt
     class SSH < Sudoable
       def self.options
         %w[host port user password sudo-password private-key host-key-check
-           connect-timeout disconnect-timeout tmpdir run-as tty run-as-command proxyjump interpreters]
+           connect-timeout disconnect-timeout tmpdir script-dir run-as tty run-as-command proxyjump interpreters]
       end
 
       def self.default_options
@@ -46,6 +46,12 @@ module Bolt
           unless timeout_value.is_a?(Integer) || timeout_value.nil?
             error_msg = "#{timeout} value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
             raise Bolt::ValidationError, error_msg
+          end
+        end
+
+        if (dir_opt = options['script-dir'])
+          unless dir_opt.is_a?(String) && !dir_opt.empty?
+            raise Bolt::ValidationError, "script-dir option must be a non-empty string"
           end
         end
       end

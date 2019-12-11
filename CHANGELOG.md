@@ -8,6 +8,12 @@
 
   When running a plan with a `$targets` parameter with the `run_plan` plan function, the second positional argument can be used to specify the `$targets` parameter. If a plan has a `$nodes` parameter, the second positional argument will only specify the `$nodes` parameter.
 
+* **Add `script-dir` option for specifying predictable subpath to the tmpdir**
+
+  When uploading files to remote targets, Bolt uploads them to a tmpdir which includes a randomized
+  directory name. The `script-dir` option sets a predictable subdirectory for `tmpdir` where files
+  will be uploaded.
+
 ## Bolt 1.42.0
 
 ### New features
