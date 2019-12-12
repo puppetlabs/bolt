@@ -85,6 +85,13 @@ module Bolt
       end
     end
 
+    # Other pcore methods are inherited from Result
+    def _pcore_init_hash
+      { 'target' => @target,
+        'error' => value['_error'],
+        'report' => value['report'] }
+    end
+
     def initialize(target, error: nil, report: nil)
       @target = target
       @value = {}

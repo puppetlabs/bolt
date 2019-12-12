@@ -4,6 +4,13 @@
 
 ### New features
 
+* **Plan language objects available inside apply blocks** ([#1244](https://github.com/puppetlabs/bolt/issues/1244))
+
+  Previously, plan language objects (Result, ApplyResult, ResultSet, and Target) were not available
+  inside apply blocks as objects, only as flat data. They're now accessible as read-only objects,
+  where functions that modify the object (such as `$target.set_var`) are not available but functions
+  that read data (such as `$target.vars`) can be used.
+
 * **`run_plan` plan function will specify a plan's `$targets` parameter using the second positional argument** ([#1446](https://github.com/puppetlabs/bolt/issues/1446))
 
   When running a plan with a `$targets` parameter with the `run_plan` plan function, the second positional argument can be used to specify the `$targets` parameter. If a plan has a `$nodes` parameter, the second positional argument will only specify the `$nodes` parameter.

@@ -27,10 +27,11 @@ describe "passes parsed AST to the apply_catalog task" do
     }
   end
 
-  def get_notifies(result)
+  def get_notifies(result, future = false)
     expect(result).not_to include('kind')
     expect(result[0]).to include('status' => 'success')
-    result[0]['result']['report']['catalog']['resources'].select { |r| r['type'] == 'Notify' }
+    key = future ? 'value' : 'result'
+    result[0][key]['report']['catalog']['resources'].select { |r| r['type'] == 'Notify' }
   end
 
   # SSH only required to simplify capturing stdin passed to the task. WinRM omitted as slower and unnecessary.
@@ -265,8 +266,8 @@ describe "passes parsed AST to the apply_catalog task" do
           expect(notify[1]['title']).to eq("Target 1 Facts: {operatingsystem => Ubuntu, added => fact}")
           expect(notify[2]['title']).to eq("Target 1 Vars: {environment => production, features => [puppet-agent]}")
           res = "Target 0 Config: {connect-timeout => 11, " \
-                "tty => false, load-config => true, disconnect-timeout => 5, password => bolt, " \
-                "host-key-check => false}"
+            "tty => false, load-config => true, disconnect-timeout => 5, password => bolt, " \
+            "host-key-check => false}"
           expect(notify[3]['title']).to eq(res)
           expect(notify[4]['title']).to eq("Target 1 Password: secret")
         end
@@ -302,6 +303,75 @@ describe "passes parsed AST to the apply_catalog task" do
           notify = get_notifies(result)
           expect(notify[0]['title']).to eq("Num Targets: 0")
           expect(notify[1]['title']).to eq("Target Name: foo")
+        end
+      end
+    end
+
+    context 'with Bolt plan datatypes' do
+      let(:config) { File.join(__dir__, '../fixtures/configs/future.yml') }
+      let(:inventory) { File.join(__dir__, '../fixtures/apply/inventory_2.yaml') }
+      let(:tflags) { %W[--no-host-key-check --configfile #{config} --inventoryfile #{inventory} --run-as root] }
+
+      it 'serializes ResultSet objects in apply blocks' do
+        result = run_cli_json(%w[plan run puppet_types::resultset] + config_flags)
+        notify = get_notifies(result, true)
+        expect(notify[0]['title']).to eq("ResultSet target names: [ssh://bolt@localhost:20022]")
+      end
+
+      it 'serializes Result objects in apply blocks' do
+        result = run_cli_json(%w[plan run puppet_types::result] + config_flags)
+        notify = get_notifies(result, true)
+        expect(notify[0]['title']).to eq("Result value: root\n")
+        expect(notify[1]['title']).to eq("Result target name: ssh://bolt@localhost:20022")
+      end
+
+      it 'serializes ApplyResult objects in apply blocks' do
+        result = run_cli_json(%w[plan run puppet_types::applyresult] + config_flags)
+        notify = get_notifies(result, true)
+        expect(notify[0]['title']).to eq("ApplyResult resource: /home/bolt/tmp")
+      end
+
+      it 'serializes Target objects as ApplyTargets in apply blocks' do
+        result = run_cli_json(%w[plan run puppet_types::target] + config_flags)
+        notify = get_notifies(result, true)
+        expect(notify[0]['title']).to eq("ApplyTarget protocol: ssh")
+      end
+
+      it 'serializes Error objects in apply blocks' do
+        result = run_cli_json(%w[plan run puppet_types::error] + config_flags)
+        notify = get_notifies(result, true)
+        expect(notify[0]['title']).to eq("ApplyResult resource: The command failed with exit code 1")
+      end
+
+      context 'when calling invalid functions in apply' do
+        it 'errors when get_targets is called' do
+          result = run_cli_json(%w[plan run puppet_types::get_targets] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-failure')
+          error = result['details']['result_set'][0]['value']['_error']
+          expect(error['kind']).to eq('bolt/apply-error')
+          expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+          expect(@log_output.readlines)
+            .to include(/The function 'get_targets' is not callable within an apply block/)
+        end
+
+        it 'errors when get_target is called' do
+          result = run_cli_json(%w[plan run puppet_types::get_target] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-failure')
+          error = result['details']['result_set'][0]['value']['_error']
+          expect(error['kind']).to eq('bolt/apply-error')
+          expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+          expect(@log_output.readlines)
+            .to include(/The function 'get_target' is not callable within an apply block/)
+        end
+
+        it 'errors when Target.new is called' do
+          result = run_cli_json(%w[plan run puppet_types::target_new] + config_flags)
+          expect(result['kind']).to eq('bolt/apply-failure')
+          error = result['details']['result_set'][0]['value']['_error']
+          expect(error['kind']).to eq('bolt/apply-error')
+          expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
+          expect(@log_output.readlines)
+            .to include(/Target objects cannot be instantiated inside apply blocks/)
         end
       end
     end

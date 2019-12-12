@@ -91,7 +91,6 @@ In addition to the standard Puppet functions available to a catalog, such as `lo
 
 -   [`puppetdb_query`](plan_functions.md#)
 -   [`puppetdb_facts`](plan_functions.md#)
--   [`get_targets`](plan_functions.md#)
 -   [`facts`](plan_functions.md#)
 -   [`vars`](plan_functions.md#)
 

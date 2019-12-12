@@ -12,6 +12,18 @@ module Bolt
       include(Puppet::Pops::Types::IteratorProducer)
     end
 
+    def self._pcore_init_from_hash
+      raise "ResultSet shouldn't be instantiated from a pcore_init class method. How did this get called?"
+    end
+
+    def _pcore_init_from_hash(init_hash)
+      initialize(init_hash['results'])
+    end
+
+    def _pcore_init_hash
+      { 'results' => @results }
+    end
+
     def iterator
       if Object.const_defined?(:Puppet) && Puppet.const_defined?(:Pops) &&
          self.class.included_modules.include?(Puppet::Pops::Types::Iterable)

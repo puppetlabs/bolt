@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
+require 'bolt/apply_target'
 require 'bolt/config'
+require 'bolt/error'
 require 'bolt/inventory'
+require 'bolt/apply_inventory'
 require 'bolt/pal'
 require 'bolt/puppetdb'
 require 'bolt/util'
@@ -65,17 +68,29 @@ module Bolt
       target = request['target']
       pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
       options = request['puppet_config'] || {}
+
       with_puppet_settings(request['hiera_config']) do
         Puppet[:rich_data] = true
         Puppet[:node_name_value] = target['name']
-        Puppet::Pal.in_tmp_environment('bolt_catalog',
-                                       modulepath: request["modulepath"] || [],
-                                       facts: target["facts"] || {},
-                                       variables: target["variables"] || {}) do |pal|
+        env_conf = { modulepath: request['modulepath'] || [],
+                     facts: target['facts'] || {} }
+        env_conf[:variables] = request['future'] ? {} : target['variables']
+        Puppet::Pal.in_tmp_environment('bolt_catalog', env_conf) do |pal|
+          inv = if request['future']
+                  Bolt::ApplyInventory.new(request['config'])
+                else
+                  setup_inventory(request['inventory'])
+                end
           Puppet.override(bolt_pdb_client: pdb_client,
-                          bolt_inventory: setup_inventory(request['inventory'])) do
+                          bolt_inventory: inv) do
             Puppet.lookup(:pal_current_node).trusted_data = target['trusted']
             pal.with_catalog_compiler do |compiler|
+              if request['future']
+                # This needs to happen inside the catalog compiler so loaders are initialized for loading
+                vars = Puppet::Pops::Serialization::FromDataConverter.convert(request['plan_vars'])
+                pal.send(:add_variables, compiler.send(:topscope), vars.merge(target['variables']))
+              end
+
               # Configure language strictness in the CatalogCompiler. We want Bolt to be able
               # to compile most Puppet 4+ manifests, so we default to allowing deprecated functions.
               Puppet[:strict] = options['strict'] || :warning
