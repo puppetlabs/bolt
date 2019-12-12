@@ -2,26 +2,26 @@
 
 Use Bolt commands to connect directly to the systems where you want to execute commands, run scripts, and upload files.
 
-## Run a command on remote nodes
+## Run a command on remote targets
 
-Specify the command you want to run and which nodes to run it on.
+Specify the command you want to run and which targets to run it on.
 
 When you have credentials on remote systems, you can use Bolt to run commands across those systems.
 
--   To run a command on a list of nodes:
+-   To run a command on a list of targets:
     ```shell script
-    bolt command run <COMMAND> --nodes <NODE NAME>,<NODE NAME>,<NODE NAME>
+    bolt command run <COMMAND> --targets <TARGET NAME>,<TARGET NAME>,<TARGET NAME>
     ```
--   To run a command on WinRM nodes, indicate the WinRM protocol in the nodes string:
+-   To run a command on WinRM targets, indicate the WinRM protocol in the targets string:
     ```shell script
-    bolt command run <COMMAND> --nodes winrm://<WINDOWS.NODE> --user <USERNAME> --password <PASSWORD>
+    bolt command run <COMMAND> --targets winrm://<WINDOWS.TARGET> --user <USERNAME> --password <PASSWORD>
     ```
 -   To run a command that contains spaces or shell special characters, wrap the command in single quotation marks:
     ```shell script
-    bolt command run 'echo $HOME' --nodes web5.mydomain.edu,web6.mydomain.edu
+    bolt command run 'echo $HOME' --targets web5.mydomain.edu,web6.mydomain.edu
     ```
     ```shell script
-    bolt command run "netstat -an | grep 'tcp.*LISTEN'" --nodes web5.mydomain.edu,web6.mydomain.edu
+    bolt command run "netstat -an | grep 'tcp.*LISTEN'" --targets web5.mydomain.edu,web6.mydomain.edu
     ```
 -   To run a cross-platform command:
     ```shell script
@@ -37,24 +37,24 @@ When you run one-line commands that include redirection or pipes, pass `bash` or
 
 Using a shell ensures that the one-liner is run as a single command and that it works correctly with `run-as`. For example, instead of `bolt command run "echo foo > /root/foo" --run-as root`, use `bolt command run "bash -c 'echo foo > /root/foo'" --run-as root`.
 
-## Run a script on remote nodes
+## Run a script on remote targets
 
-Specify the script you want to run and which nodes to run it on.
+Specify the script you want to run and which targets to run it on.
 
 Use the `bolt script run` command to run existing scripts that you use or to combine the commands that you regularly run as part of sequence. When you run a script with Bolt, the script is transferred into a temporary directory on the remote system, run on that system, and then deleted.
 
 You can run scripts in any language as long as the appropriate interpreter is installed on the remote system. This includes Bash, PowerShell, or Python.
 
--   To run a script, specify the path to the script, and which nodes to run it on:
+-   To run a script, specify the path to the script, and which targets to run it on:
     ```shell script
-    bolt script run <PATH/TO/SCRIPT> --nodes <NODE NAME>,<NODE NAME>,<NODE NAME>
+    bolt script run <PATH/TO/SCRIPT> --targets <TARGET NAME>,<TARGET NAME>,<TARGET NAME>
     ```
     ```shell script
-    bolt script run ../myscript.sh --nodes web5.mydomain.edu,web6.mydomain.edu
+    bolt script run ../myscript.sh --targets web5.mydomain.edu,web6.mydomain.edu
     ```
--   When executing on WinRM nodes, include the WinRM protocol in the nodes string:
+-   When executing on WinRM targets, include the WinRM protocol in the targets string:
     ```shell script
-    bolt script run <PATH/TO/SCRIPT> --nodes winrm://<NODE NAME> --user <USERNAME> --password <PASSWORD>
+    bolt script run <PATH/TO/SCRIPT> --targets winrm://<TARGET NAME> --user <USERNAME> --password <PASSWORD>
     ```
 -   To pass arguments to a script, specify them after the command. If an argument contain spaces or special characters, you must quote it:
     ```shell script
@@ -81,18 +81,18 @@ winrm:
    extensions: [.py, .pl]
 ```
 
-## Upload files or directories to remote nodes
+## Upload files or directories to remote targets
 
-Use Bolt to copy files or directories to remote nodes.
+Use Bolt to copy files or directories to remote targets.
 
 **Note:** Most transports are not optimized for file copying, so this command is best limited to small files.
 
--   To upload a file or directory to a remote node, run the `bolt file upload` command. Specify the local path to the file or directory, the destination location, and the target nodes.
+-   To upload a file or directory to a remote target, run the `bolt file upload` command. Specify the local path to the file or directory, the destination location, and the targets.
 
     ```
-    bolt file upload <SOURCE> <DESTINATION> --nodes <NODE NAME>,<NODE NAME>
+    bolt file upload <SOURCE> <DESTINATION> --targets <TARGET NAME>,<TARGET NAME>
     ```
     
     ```
-    bolt file upload my_file.txt /tmp/remote_file.txt --nodes web5.mydomain.edu,web6.mydomain.edu
+    bolt file upload my_file.txt /tmp/remote_file.txt --targets web5.mydomain.edu,web6.mydomain.edu
     ```

@@ -82,7 +82,7 @@ Secret plugins encrypt and decrypt sensitive values in data. The `bolt secret en
 
 ## Puppet library plugins
 
-Puppet library plugins install Puppet libraries on target nodes when a plan calls `apply_prep`.
+Puppet library plugins install Puppet libraries on targets when a plan calls `apply_prep`.
 
 ## Configuring plugins
 

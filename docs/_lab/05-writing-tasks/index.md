@@ -15,14 +15,14 @@ In this exercise you will write your first Bolt Tasks for use with Bolt.
 Complete the following before you start this lesson:
 
 - [Installing Bolt](../01-installing-bolt)
-- [Setting Up Test Nodes](../02-acquiring-nodes)
+- [Setting Up Test Targets](../02-acquiring-targets)
 - [Running Commands](../03-running-commands)
 - [Running Scripts](../04-running-scripts)
 
 
 ## How Do Tasks Work?
 
-Tasks are scripts with optional metadata, and can be implemented in any language that runs on your target nodes. Tasks are stored and shared in Puppet modules. By giving your script metadata and including it in a Puppet module, tasks make scripts easy to reuse and share. You can upload and download tasks in modules from the [Puppet Forge](https://forge.puppet.com/), run them from GitHub, or use them locally to organize your regularly used commands.
+Tasks are scripts with optional metadata, and can be implemented in any language that runs on your targets. Tasks are stored and shared in Puppet modules. By giving your script metadata and including it in a Puppet module, tasks make scripts easy to reuse and share. You can upload and download tasks in modules from the [Puppet Forge](https://forge.puppet.com/), run them from GitHub, or use them locally to organize your regularly used commands.
 
 Tasks are stored in the `tasks` directory of a module, a module being a directory with a unique name. You can have several tasks per module, but the `init` task is special and runs by default if you do not specify a task name.
 
@@ -43,19 +43,19 @@ By default, Bolt will search both the `modules` and `site-modules` directories i
 Run the exercise5 task. Note the `message` argument. This will be expanded to the `PT_message` environment variable expected by our task. By naming parameters explicitly it's easier for others to use your tasks.
 
 ```shell
-bolt task run exercise5 message=hello --nodes node1
+bolt task run exercise5 message=hello --targets target1
 ```
 
 The result:
 
 ```
-Started on node1...
-Finished on node1:
+Started on target1...
+Finished on target1:
   localhost.localdomain received the message: hello
   {
   }
-Successful on 1 node: node1
-Ran on 1 node in 0.99 seconds
+Successful on 1 target: target1
+Ran on 1 target in 0.99 seconds
 ```
 
 Run the Bolt command with a different value for `message` and see how the output changes.
@@ -63,7 +63,7 @@ Run the Bolt command with a different value for `message` and see how the output
 
 ## Write Your First Task in PowerShell
 
-If you're targeting Windows nodes then you might prefer to implement the task in PowerShell. 
+If you're targeting Windows targets then you might prefer to implement the task in PowerShell. 
 
 Save the following as `Boltdir/site-modules/exercise5/tasks/print.ps1`:
 
@@ -74,7 +74,7 @@ Save the following as `Boltdir/site-modules/exercise5/tasks/print.ps1`:
 Run the exercise5 task. Note that since the task is not named `init`, you must prepend the name of the task with the name of its module like so `module::task`.
 
 ```shell
-bolt task run exercise5::print message="hello powershell" --nodes windows
+bolt task run exercise5::print message="hello powershell" --targets windows
 ```
 
 The result:
@@ -85,8 +85,8 @@ Finished on localhost:
   Nano received the message: hello powershell
   {
   }
-Successful on 1 node: winrm://localhost:55985
-Ran on 1 node in 3.87 seconds
+Successful on 1 target: winrm://localhost:55985
+Ran on 1 target in 3.87 seconds
 ```
 
 **Note:**
@@ -98,7 +98,7 @@ Ran on 1 node in 3.87 seconds
 
 ## Write Your First Task in Python
 
-When running a task, Bolt assumes that the required runtime is already available on the target nodes. For the following examples to work, Python 2 or 3 must be installed on the target nodes. This task will also work on Windows system with Python 2 or 3 installed.
+When running a task, Bolt assumes that the required runtime is already available on the targets. For the following examples to work, Python 2 or 3 must be installed on the targets. This task will also work on Windows system with Python 2 or 3 installed.
 
 Save the following as `Boltdir/site-modules/exercise5/tasks/gethost.py`:
 
@@ -109,22 +109,22 @@ Save the following as `Boltdir/site-modules/exercise5/tasks/gethost.py`:
 Run the task using the command `bolt task run <task-name>`.
 
 ```shell
-bolt task run exercise5::gethost host=google.com --nodes linux
+bolt task run exercise5::gethost host=google.com --targets linux
 ```
 
 The result:
 
 ```
-Started on node1...
-Finished on node1:
+Started on target1...
+Finished on target1:
   google.com is available at 172.217.3.206 on localhost.localdomain
   {
     "host": "google.com",
     "hostname": "localhost.localdomain",
     "ipaddr": "172.217.3.206"
   }
-Successful on 1 node: node1
-Ran on 1 node in 0.97 seconds
+Successful on 1 target: target1
+Ran on 1 target in 0.97 seconds
 ```
 
 ## Next Steps

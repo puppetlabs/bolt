@@ -41,4 +41,4 @@ lesson1-10/
 
 Now that you have Bolt installed and have created a Bolt project directory you can move on to:
 
-[Setting Up Test Nodes](../02-acquiring-nodes)
+[Setting Up Test Targets](../02-acquiring-targets)

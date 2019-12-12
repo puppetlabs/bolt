@@ -113,7 +113,7 @@ describe 'run_command' do
         is_expected.to run.with_params(command, [target, target2]).and_return(result_set)
       end
 
-      context 'when a command fails on one node' do
+      context 'when a command fails on one target' do
         let(:result2) { Bolt::Result.new(target2, error: { 'message' => hostname2 }) }
 
         it 'errors by default' do
@@ -134,7 +134,7 @@ describe 'run_command' do
       end
     end
 
-    it 'without nodes - does not invoke bolt' do
+    it 'without targets - does not invoke bolt' do
       executor.expects(:run_command).never
       inventory.expects(:get_targets).with([]).returns([])
 

@@ -8,7 +8,7 @@ Bolt can authenticate with PuppetDB through an SSL client certificate or a PE RB
 
 ## Client certificate
 
-Add the certname for the certificate you want to authenticate with to /`etc/puppetlabs/puppetdb/certificate-whitelist`. This certificate has full access to all PuppetDB API endpoints and can read all data, push new data, or run commands on PuppetDB. To test the certificate you run the following curl command.
+Add the certname for the certificate you want to authenticate with to `/etc/puppetlabs/puppetdb/certificate-whitelist`. This certificate has full access to all PuppetDB API endpoints and can read all data, push new data, or run commands on PuppetDB. To test the certificate you run the following curl command.
 
 ```
 curl -X GET $SERVER_URL/pdb/query/v4 --data-urlencode 'query=nodes[certname] {}' --cert $CERT_PATH --key $KEY_PATH --cacert $CACERT_PATH

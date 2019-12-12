@@ -7,8 +7,8 @@ time: Approximately 20 minutes
 In this exercise you will further explore Bolt Plans by writing a
 multi-stage plan to deploy a sample application.
 
-The sample application for this lesson consists of four nodes. It has a
-single database node, two application servers, and a single load balancer in front of
+The sample application for this lesson consists of four targets. It has a
+single database target, two application servers, and a single load balancer in front of
 them. When a new version of the application is released the following steps must be carried out:
 
 1. Install application code on the application and database servers. `my_app::install`
@@ -25,57 +25,58 @@ them. When a new version of the application is released the following steps must
 ## Prerequisites
 
 For the following exercises you should have Bolt installed and have four
-Linux nodes available. The following guides will help:
+Linux targets available. The following guides will help:
 
-- [Acquiring Nodes](../02-acquiring-nodes)
+- [Acquiring Targets](../02-acquiring-targets)
 - [Writing Tasks](../05-writing-tasks)
 - [Writing Advanced Plans](../09-writing-advanced-plans)
 
-## Acquire nodes 
+## Acquire targets 
 
-This lesson requires four nodes. If you set up nodes in [Lesson 2](../02-acquiring-nodes), you need to provision an extra node.
+This lesson requires four targets. If you set up targets in [Lesson 2](../02-acquiring-targets), you need to provision an extra target.
 
-### Provision Extra Nodes on Vagrant
-If you set up nodes in Vagrant in Lesson 2, run:
-
-```bash
-NODES=4 vagrant up
-```
-> Note: Vagrantfile looks for environment variable `NODES` for number of centos nodes to provision.
-> Set environment variable based on your shell, for example in bash: `export NODES=4`. 
-
-Update your SSH config to include the new node.
+### Provision Extra Targets on Vagrant
+If you set up targets in Vagrant in Lesson 2, run:
 
 ```bash
-vagrant ssh-config --host node4 | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
+TARGETS=4 vagrant up
+```
+> Note: Vagrantfile looks for environment variable `TARGETS` for number of centos targets to provision.
+> Set environment variable based on your shell, for example in bash: `export TARGETS=4`. 
+
+Update your SSH config to include the new target.
+
+```bash
+vagrant ssh-config --host target4 | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
 ```
 
-### Provision Extra Nodes on Docker
-If you set up nodes in Docker in Lesson 2, run:
+### Provision Extra Targets on Docker
+If you set up targets in Docker in Lesson 2, run:
 
 ```bash
 docker-compose up --scale ssh=4 -d
 ```
 
-Update your SSH config to include the new node.
+Update your SSH config to include the new target.
 
 
 ## Set up inventory file
-Set up an inventory file to more easily map the nodes to their role in the application. Save this file in `Boltdir`'s *parent directory*.
+Set up an inventory file to more easily map the targets to their role in the application. Save this file in `Boltdir`'s *parent directory*.
 
-Assign one node to the load balancer (lb) group, one to the database (db) group and the other two to the application (app) group.
+Assign one target to the load balancer (lb) group, one to the database (db) group and the other two to the application (app) group.
 
 ```yaml
 ---
+version: 2
 groups:
   - name: lb
-    nodes:
+    targets:
       - "0.0.0.0:32771"
   - name: db
-    nodes:
+    targets:
       - "0.0.0.0:32770"
   - name: app
-    nodes:
+    targets:
       - "0.0.0.0:32768"
       - "0.0.0.0:32769"
 config:
@@ -86,13 +87,13 @@ config:
     user: root
 ```
 
-If you configured your nodes using Vagrant, your inventory file may look like this:
+If you configured your targets using Vagrant, your inventory file may look like this:
 
 ```yaml
 {% include lesson1-10/inventory.yaml -%}
 ```
 
-Make sure your inventory is configured correctly and you can connect to all nodes. Run:
+Make sure your inventory is configured correctly and you can connect to all targets. Run:
 
 ```bash
 bolt command run 'echo hi' -n db,app,lb --inventoryfile ./inventory.yaml
@@ -151,17 +152,17 @@ The result (when simulated load is below threshold)
 
 ```plain
 Starting: plan my_app::deploy
-Starting: Check load before starting deploy on node1
+Starting: Check load before starting deploy on target1
 Finished: Check load before starting deploy with 0 failures in 0.89 sec
-Starting: Install 1.0.2 of the application on node3, node4, node2
+Starting: Install 1.0.2 of the application on target3, target4, target2
 Finished: Install 1.0.2 of the application with 0 failures in 0.89 sec
-Starting: task my_app::migrate on node2
+Starting: task my_app::migrate on target2
 Finished: task my_app::migrate with 0 failures in 0.85 sec
-Deploying to node3, currently ok with 4 open connections.
-Deploy complete on Target('node3', {"connect-timeout"=>10, "tty"=>false, "host-key-check"=>false}).
-Deploying to node4, currently ok with 10 open connections.
-Deploy complete on Target('node4', {"connect-timeout"=>10, "tty"=>false, "host-key-check"=>false}).
-Starting: Clean up old versions on node2, node3, node4
+Deploying to target3, currently ok with 4 open connections.
+Deploy complete on Target('target3', {"connect-timeout"=>10, "tty"=>false, "host-key-check"=>false}).
+Deploying to target4, currently ok with 10 open connections.
+Deploy complete on Target('target4', {"connect-timeout"=>10, "tty"=>false, "host-key-check"=>false}).
+Starting: Clean up old versions on target2, target3, target4
 Finished: Clean up old versions with 0 failures in 0.88 sec
 Finished: plan my_app::deploy in 4.35 sec
 Plan completed successfully with no result
@@ -171,7 +172,7 @@ The result (when simulated load is above threshold)
 
 ```plain
 Starting: plan my_app::deploy
-Starting: Check load before starting deploy on node1
+Starting: Check load before starting deploy on target1
 Finished: Check load before starting deploy with 0 failures in 0.89 sec
 Finished: plan my_app::deploy in 0.90 sec
 {
@@ -199,7 +200,7 @@ plan my_app::deploy(
   with the Pattern Type.
 - `$app_servers`, `$db_servers`, and `$lb_server`, three TargetSpec parameters
    for the different tiers of the application. The TargetSpec type any String,
-   Target or Array. By using this type we allow the command line to pass node URL
+   Target or Array. By using this type we allow the command line to pass target URL
    strings, group name strings or allow another plan or JSON parameters to
    pass arrays of urls or targets.
 - `$instance` the name of the instance of this application in the load balancer.
@@ -312,7 +313,7 @@ notice about which server is going to be deployed to next.
 
 ### Suppress default log messages
 
-Bolt logs every action on each node, which results in 5 messages for each node.
+Bolt logs every action on each target, which results in 5 messages for each target.
 By default these messages are logged at the `notice` level and can make it hard
 to see the more useful `notice` messages that the plan logs directly. You can
 wrap code in a `without_default_logging` block to make the automatic messages

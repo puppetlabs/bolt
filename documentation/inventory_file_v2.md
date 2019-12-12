@@ -101,12 +101,12 @@ When a plan parameter has the type `TargetSpec`, Bolt includes values for that p
 
 For example:
 ```
-plan auto_add(TargetSpec $nodes) {
+plan auto_add(TargetSpec $targets) {
   return get_targets('all')
 }
 ```
 
-The `auto_add` plan returns all of the targets in the `all` group. If the value of `$nodes` resolves to a `String` that does not match a `Target` name, a group name, a `Target` alias or a target regex, it creates a new `Target` and adds it to the `all` group.
+The `auto_add` plan returns all of the targets in the `all` group. If the value of `$targets` resolves to a `String` that does not match a `Target` name, a group name, a `Target` alias or a target regex, it creates a new `Target` and adds it to the `all` group.
 
 ## `Target` reference
 
@@ -158,9 +158,9 @@ plan unsafe_name(){
 
 In the `unsafe_name` plan, a `Target` is instantiated with the `name` set to the full `uri` that contains the sensitive password and thus the `safe_name` contains the password.
 
-## Creating a node with a human-readable name and IP address
+## Creating a target with a human-readable name and IP address
 
-With version 2 of the inventory you can create a node with a human readable
+With version 2 of the inventory you can create a target with a human readable
 name even when an ip address is used for connecting. This can be accomplished
 either by setting both a `uri` and `name` or by setting `host` in the transport
 config in addition to the `name`.

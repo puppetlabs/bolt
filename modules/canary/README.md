@@ -9,7 +9,7 @@
 
 ## Description
 
-This module provides the canary plan. This plan allows you to run another task, script, or command in canary mode. First the action will be executed on a small number of nodes and only if it succeeds will it run on the rest. Failure Result objects are generated for any node the plan skips and a ResultSet is returned so the plan can be called from another plan in place of the run function that it wraps.
+This module provides the canary plan. This plan allows you to run another task, script, or command in canary mode. First the action will be executed on a small number of targets and only if it succeeds will it run on the rest. Failure Result objects are generated for any target the plan skips and a ResultSet is returned so the plan can be called from another plan in place of the run function that it wraps.
 
 ## Requirements
 
@@ -20,18 +20,18 @@ This module is compatible with the version of Puppet Bolt it ships with.
 To run the canary plan with a simple command run
 
 ```
-bolt plan run canary command='echo hi' --nodes node1.example.com,node2.example.com
+bolt plan run canary command='echo hi' --targets target1.example.com,target2.example.com
 ```
 
 To see it handling failures run
 
 ```
-bolt plan run canary command='exit 1' --nodes node1.example.com,node2.example.com
+bolt plan run canary command='exit 1' --targets target1.example.com,target2.example.com
 ```
 
 To run the canary plan from another plan run
 ```
-run_plan(canary, nodes => $nodes, task => 'my_app::upgrade', params => { 'version' = => '1.0.4' } )
+run_plan(canary, targets => $targets, task => 'my_app::upgrade', params => { 'version' = => '1.0.4' } )
 ```
 
 ### Parameters
@@ -45,8 +45,8 @@ run_plan(canary, nodes => $nodes, task => 'my_app::upgrade', params => { 'versio
 
 **params** - A hash of params and options to pass to the `run` function
 
-**canary_size** - How many nodes should be included in the canary group. default: 1
+**canary_size** - How many targets should be included in the canary group. default: 1
 
 ## Reference
 
-This plan returns a single ResultSet. The Result will be used for any node the plan attempted to execute on. If the node was skipped an error with the kind `canary/skipped-node` will be generated.
+This plan returns a single ResultSet. The Result will be used for any target the plan attempted to execute on. If the target was skipped an error with the kind `canary/skipped-target` will be generated.

@@ -15,7 +15,7 @@ describe 'puppetdb_query' do
   end
 
   context 'it calls puppetdb_facts' do
-    it 'with list of nodes' do
+    it 'with list of targets' do
       query = 'inventory {}'
       result = [1, 2, 3]
       pdb_client.expects(:make_query).with(query).returns(result)

@@ -61,7 +61,8 @@ module Bolt
         'result_set' => result_set
       }
       object_msg = " '#{object}'" if object
-      message = "Plan aborted: #{action}#{object_msg} failed on #{result_set.error_set.length} nodes"
+      message = "Plan aborted: #{action}#{object_msg} failed on #{result_set.error_set.length} target"
+      message += "s" unless result_set.error_set.length == 1
       super(message, 'bolt/run-failure', details)
       @result_set = result_set
       @error_code = 2

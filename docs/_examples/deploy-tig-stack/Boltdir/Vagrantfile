@@ -1,16 +1,16 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-NODES = 2
+TARGETS = 2
 
-Vagrant.configure(NODES) do |config|
+Vagrant.configure(TARGETS) do |config|
   config.vm.box = "centos/7"
   config.ssh.forward_agent = true
 
-  NODES.times do |i|
-    config.vm.define "node#{i}" do |node|
-      node.vm.hostname = "node#{i}"
-      node.vm.network :private_network, ip: "10.0.0.#{100 + i}"
+  TARGETS.times do |i|
+    config.vm.define "target#{i}" do |target|
+      target.vm.hostname = "target#{i}"
+      target.vm.network :private_network, ip: "10.0.0.#{100 + i}"
     end
   end
 end

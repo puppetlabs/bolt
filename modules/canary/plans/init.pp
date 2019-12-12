@@ -1,11 +1,11 @@
 # @summary
-#   Run a task, command or script on canary nodes before running it on all nodes.
+#   Run a task, command or script on canary targets before running it on all targets.
 #
-# This plan accepts a action and a $nodes parameter. The action can be the name
+# This plan accepts a action and a $targets parameter. The action can be the name
 # of a task, a script or a command to run. It will run the action on a canary
-# group of nodes and only continue to the rest of the nodes if it succeeds on
-# all canaries. This returns a ResultSet object with a Result for every node.
-# Any skipped nodes will have a 'canary/skipped-node' error kind.
+# group of targets and only continue to the rest of the targets if it succeeds on
+# all canaries. This returns a ResultSet object with a Result for every target.
+# Any skipped targets will have a 'canary/skipped-target' error kind.
 #
 # @param task
 #  The name of the task to run. Mutually exclusive with command and script.
@@ -13,7 +13,7 @@
 #   The command to run. Mutually exclusive with task and script.
 # @param script
 #   The script to run. Mutually exclusive with task and command.
-# @param nodes
+# @param targets
 #   The target to run on.
 # @param params
 #   The parameters to use for the task.
@@ -23,13 +23,13 @@
 # @return ResultSet a merged resultset from running the action on all targets
 #
 # @example Run a command
-#   run_plan(canary, command => 'whoami', nodes => $mynodes)
+#   run_plan(canary, command => 'whoami', targets => $mytargets)
 #
 plan canary(
   Optional[String[0]] $task = undef,
   Optional[String[0]] $command = undef,
   Optional[String[0]] $script = undef,
-  TargetSpec $nodes,
+  TargetSpec $targets,
   Hash[String, Data] $params = {},
   Integer $canary_size = 1
 ) {
@@ -51,7 +51,7 @@ plan canary(
     fail_plan("Must specify only one command, script, or task to run", 'canary/invalid-params')
   }
 
-  [$canaries, $rest] = canary::random_split(get_targets($nodes), $canary_size)
+  [$canaries, $rest] = canary::random_split(get_targets($targets), $canary_size)
   $catch_params = $params + { '_catch_errors' => true }
 
   if ($task) {

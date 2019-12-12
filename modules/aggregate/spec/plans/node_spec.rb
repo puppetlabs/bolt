@@ -23,3 +23,4 @@ describe 'aggregate::nodes' do
     expect(result.value).to eq({})
   end
 end
+

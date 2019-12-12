@@ -36,7 +36,7 @@ plan my_app::deploy(
 
   run_task('my_app::migrate', $db_server)
 
-  # Don't log every action on each node only important messages
+  # Don't log every action on each target only important messages
   without_default_logging() || {
     # Expand group references or globs before iterating
     get_targets($app_servers).each |$server| {

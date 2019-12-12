@@ -1,33 +1,33 @@
 ---
-title: Setting Up Test Nodes
+title: Setting Up Test Targets
 difficulty: Basic
 time: Approximately 5 minutes
 ---
 
-In this exercise you will create nodes that you can use to experiment with Bolt. You can also use existing nodes in your system if you prefer.
+In this exercise you will create targets that you can use to experiment with Bolt. You can also use existing targets in your system if you prefer.
 
-- [Existing Nodes](#existing-nodes)
+- [Existing Targets](#existing-targets)
 - [Using Vagrant](#using-vagrant)
 - [Using Docker](#using-docker)
 - [Creating an Inventory File](#creating-an-inventory-file)
 
 ## Prerequisites
-To use an attached configuration file to set up test nodes, you must have one of the following installed on your machine:
+To use an attached configuration file to set up test targets, you must have one of the following installed on your machine:
 
 - [Vagrant](https://www.vagrantup.com/)
 - [Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
 - [Docker for Windows](https://docs.docker.com/docker-for-windows/install/)
 
-## Existing Nodes
+## Existing Targets
 
-If you already have, or can easily launch, a few Linux or Windows nodes then you're all set. These nodes must be accessible via SSH or WinRM; if you can  access them via an SSH or WinRM client then Bolt can, too.
+If you already have, or can easily launch, a few Linux or Windows targets then you're all set. These targets must be accessible via SSH or WinRM; if you can  access them via an SSH or WinRM client then Bolt can, too.
 
 ## Using Vagrant
 **Note:** These instructions assume that you are familiar with Vagrant and have a suitable hypervisor configured.
 
-The attached Vagrantfile configures three CentOS 7 nodes and a Windows (Nano Server) node.
+The attached Vagrantfile configures three CentOS 7 targets and a Windows (Nano Server) target.
 
-Save the following code as `Vagrantfile`. To configure a different number of nodes, change the `NODES` environment variable.
+Save the following code as `Vagrantfile`. To configure a different number of targets, change the `TARGETS` environment variable.
 
 ```ruby
 {% include lesson1-10/Vagrantfile -%}
@@ -48,14 +48,14 @@ mkdir ~/.ssh
 vagrant ssh-config >> ~/.ssh/config
 ```
 
-By saving this SSH configuration file, you can use the node name, rather than the IP address. When passing nodes to Bolt in the following exercises with Linux you will use `--nodes node1,node2`.
+By saving this SSH configuration file, you can use the target name, rather than the IP address. When passing targets to Bolt in the following exercises with Linux you will use `--targets target1,target2`.
 
-Make sure you can SSH into all of your nodes. If you've used the vagrant nodes before you may have to remove entries from `~/.ssh/known_hosts`.
+Make sure you can SSH into all of your targets. If you've used the vagrant targets before you may have to remove entries from `~/.ssh/known_hosts`.
 
 ```bash
-ssh node1
-ssh node2
-ssh node3
+ssh target1
+ssh target2
+ssh target3
 ```
 
 ## Using Docker
@@ -80,8 +80,8 @@ View a list of running containers: `docker-compose ps`. The result should be sim
 ```
         Name                 Command        State           Ports
 -------------------------------------------------------------------------
-2acquiringnodes_ssh_1   /usr/sbin/sshd -D   Up      0.0.0.0:32768->22/tcp
-2acquiringnodes_ssh_2   /usr/sbin/sshd -D   Up      0.0.0.0:32769->22/tcp
+2acquiringtargets_ssh_1   /usr/sbin/sshd -D   Up      0.0.0.0:32768->22/tcp
+2acquiringtargets_ssh_2   /usr/sbin/sshd -D   Up      0.0.0.0:32769->22/tcp
 ```
 
 Note the `Ports` column. We are forwarding a local port to the SSH server running in the container. Using the example above, you can SSH to `127.0.0.1:32768`.
@@ -92,13 +92,13 @@ If you have a local SSH client, test the connection. Change the port to one you 
 ssh root@127.0.0.1 -p 32768
 ```
 
-Make sure you can log into all the nodes before moving on. You may have to remove some entries from `~/.ssh/known_hosts`
+Make sure you can log into all the targets before moving on. You may have to remove some entries from `~/.ssh/known_hosts`
 
-When passing nodes to Bolt in the next section you will use `--nodes 127.0.0.1:32768,127.0.0.1:32769`, replacing the ports with those you see when you run the `docker-compose ps` command.
+When passing targets to Bolt in the next section you will use `--targets 127.0.0.1:32768,127.0.0.1:32769`, replacing the ports with those you see when you run the `docker-compose ps` command.
 
 ## Creating an Inventory File
 
-In Bolt, you can use an inventory file to store information about your nodes. For example, you can organize your nodes into groups or set up connection information for nodes or node groups. In this lab, you'll make use of the groups defined in the following inventory file.
+In Bolt, you can use an inventory file to store information about your targets. For example, you can organize your targets into groups or set up connection information for targets or target groups. In this lab, you'll make use of the groups defined in the following inventory file.
 
 The inventory file is a yaml file stored by default at `inventory.yaml` inside the Bolt project directory. Save the following at `Boltdir/inventory.yaml`:
 
@@ -106,12 +106,12 @@ The inventory file is a yaml file stored by default at `inventory.yaml` inside t
 {% include lesson1-10/Boltdir/inventory.yaml -%}
 ```
 
-While an inventory file is not necessary for running Bolt, it does make referencing the test nodes and setting some configuration options a little easier. Instead of targetting each individual node by using `--nodes node1,node2,node3` you can target them at all once by using their group name like so `--nodes linux`.
+While an inventory file is not necessary for running Bolt, it does make referencing the test targets and setting some configuration options a little easier. Instead of targetting each individual target by using `--targets target1,target2,target3` you can target them at all once by using their group name like so `--targets linux`.
 
 You can read more about the inventory file in the [official documentation](https://puppet.com/docs/bolt/latest/inventory_file.html).
 
 ## Next Steps
 
-Now that you have set up test nodes to use with Bolt you can move on to:
+Now that you have set up test targets to use with Bolt you can move on to:
 
 [Running Commands](../03-running-commands)

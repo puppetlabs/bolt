@@ -8,8 +8,8 @@ require 'bolt/plan_result'
 describe "Bolt::Outputter::Human" do
   let(:output) { StringIO.new }
   let(:outputter) { Bolt::Outputter::Human.new(false, false, false, output) }
-  let(:target) { Bolt::Target.new('node1') }
-  let(:target2) { Bolt::Target.new('node2') }
+  let(:target) { Bolt::Target.new('target1') }
+  let(:target2) { Bolt::Target.new('target2') }
   let(:results) {
     Bolt::ResultSet.new(
       [
@@ -27,7 +27,7 @@ describe "Bolt::Outputter::Human" do
   it "allows empty items" do
     outputter.print_head
     outputter.print_summary(Bolt::ResultSet.new([]), 2.0)
-    expect(output.string).to eq("Ran on 0 nodes in 2.0 sec\n")
+    expect(output.string).to eq("Ran on 0 targets in 2.0 sec\n")
   end
 
   it "prints status" do
@@ -35,16 +35,16 @@ describe "Bolt::Outputter::Human" do
     results.each do |result|
       outputter.print_result(result)
     end
-    expect(outputter).to receive(:colorize).with(:red, 'Failed on 1 node: node2').and_call_original
+    expect(outputter).to receive(:colorize).with(:red, 'Failed on 1 target: target2').and_call_original
     outputter.print_summary(results, 10.0)
     lines = output.string
-    expect(lines).to match(/Finished on node1/)
-    expect(lines).to match(/Failed on node2/)
+    expect(lines).to match(/Finished on target1/)
+    expect(lines).to match(/Failed on target2/)
     expect(lines).to match(/oops/)
     summary = lines.split("\n")[-3..-1]
-    expect(summary[0]).to eq('Successful on 1 node: node1')
-    expect(summary[1]).to eq('Failed on 1 node: node2')
-    expect(summary[2]).to eq('Ran on 2 nodes in 10.0 sec')
+    expect(summary[0]).to eq('Successful on 1 target: target1')
+    expect(summary[1]).to eq('Failed on 1 target: target2')
+    expect(summary[2]).to eq('Ran on 2 targets in 10.0 sec')
   end
 
   context 'with multiple successes' do
@@ -60,8 +60,8 @@ describe "Bolt::Outputter::Human" do
     it 'prints success, omits failure' do
       outputter.print_summary(results, 0.0)
       summary = output.string.split("\n")
-      expect(summary[0]).to eq('Successful on 2 nodes: node1,node2')
-      expect(summary[1]).to eq('Ran on 2 nodes in 0.0 sec')
+      expect(summary[0]).to eq('Successful on 2 targets: target1,target2')
+      expect(summary[1]).to eq('Ran on 2 targets in 0.0 sec')
     end
   end
 
@@ -78,8 +78,8 @@ describe "Bolt::Outputter::Human" do
     it 'prints success, omits failure' do
       outputter.print_summary(results, 0.0)
       summary = output.string.split("\n")
-      expect(summary[0]).to eq('Failed on 2 nodes: node1,node2')
-      expect(summary[1]).to eq('Ran on 2 nodes in 0.0 sec')
+      expect(summary[0]).to eq('Failed on 2 targets: target1,target2')
+      expect(summary[1]).to eq('Ran on 2 targets in 0.0 sec')
     end
   end
 
@@ -251,8 +251,8 @@ plans/plans/plans/plans
 
   it "formats unwrapped ExecutionResult from a plan" do
     result = [
-      { 'node' => 'node1', 'status' => 'finished', 'result' => { '_output' => 'yes' } },
-      { 'node' => 'node2', 'status' => 'failed', 'result' =>
+      { 'target' => 'target1', 'status' => 'finished', 'result' => { '_output' => 'yes' } },
+      { 'target' => 'target2', 'status' => 'failed', 'result' =>
         { '_error' => { 'message' => 'The command failed with exit code 2',
                         'kind' => 'puppetlabs.tasks/command-error',
                         'issue_code' => 'COMMAND_ERROR',

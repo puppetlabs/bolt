@@ -25,3 +25,4 @@ describe 'aggregate::nodes' do
     is_expected.to run.with_params(input).and_return(expected)
   end
 end
+

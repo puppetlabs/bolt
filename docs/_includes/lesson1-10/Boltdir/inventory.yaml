@@ -1,13 +1,14 @@
 ---
 # Inventory file for Bolt Hands-on Lab
+version: 2
 groups:
   - name: linux
-    nodes:
-    - node1
-    - node2
-    - node3
+    targets:
+    - target1
+    - target2
+    - target3
   - name: windows
-    nodes:
+    targets:
     - winrm://localhost:55985
 config:
   ssh:

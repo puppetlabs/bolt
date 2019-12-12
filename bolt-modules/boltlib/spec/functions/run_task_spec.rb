@@ -206,7 +206,7 @@ describe 'run_task' do
     context 'with multiple destinations' do
       let(:result_set) { Bolt::ResultSet.new([result, result2]) }
 
-      it 'nodes can be specified as repeated nested arrays and strings and combine into one list of nodes' do
+      it 'targets can be specified as repeated nested arrays and strings and combine into one list of targets' do
         executable = File.join(tasks_root, 'meta.sh')
 
         executor.expects(:run_task).with([target, target2], mock_task(executable, 'environment'), default_args, {})
@@ -217,7 +217,7 @@ describe 'run_task' do
                           .and_return(result_set)
       end
 
-      it 'nodes can be specified as repeated nested arrays and Targets and combine into one list of nodes' do
+      it 'targets can be specified as repeated nested arrays and Targets and combine into one list of targets' do
         executable = File.join(tasks_root, 'meta.sh')
 
         executor.expects(:run_task).with([target, target2], mock_task(executable, 'environment'), default_args, {})
@@ -228,7 +228,7 @@ describe 'run_task' do
                           .and_return(result_set)
       end
 
-      context 'when a command fails on one node' do
+      context 'when a command fails on one target' do
         let(:failresult) { Bolt::Result.new(target2, error: { 'msg' => 'oops' }) }
         let(:result_set) { Bolt::ResultSet.new([result, failresult]) }
 

@@ -14,6 +14,10 @@
   directory name. The `script-dir` option sets a predictable subdirectory for `tmpdir` where files
   will be uploaded.
 
+* **Bundled content updated to use `$targets` parameter** ([#1376](https://github.com/puppetlabs/bolt/issues/1376))
+
+  Plans that are part of the `canary`, `puppetdb_fact`, and `aggregate` modules have been updated to use a `$targets` parameter instead of `$nodes`. The `aggregate::nodes` plan still uses a `$nodes` parameter, but the module now includes a `aggregate::targets` plan that uses a `$targets` parameter.
+
 ## Bolt 1.42.0
 
 ### New features

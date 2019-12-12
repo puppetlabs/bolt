@@ -1,8 +1,8 @@
-plan puppetdb_fact(TargetSpec $nodes) {
-  $targets = get_targets($nodes)
-  $certnames = $targets.map |$target| { $target.host }
+plan puppetdb_fact(TargetSpec $targets) {
+  $targs = get_targets($targets)
+  $certnames = $targs.map |$target| { $target.host }
   $pdb_facts = puppetdb_fact($certnames)
-  $targets.each |$target| {
+  $targs.each |$target| {
     add_facts($target, $pdb_facts[$target.host])
   }
 

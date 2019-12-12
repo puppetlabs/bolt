@@ -41,8 +41,8 @@ describe "When a plan succeeds" do
     result = run_cli(['plan', 'run', 'sample::single_task', '--targets', target] + config_flags,
                      outputter: Bolt::Outputter::Human)
     expect(result).to match(/got passed the message: hi there/)
-    expect(result).to match(/Successful on 1 node:/)
-    expect(result).to match(/Ran on 1 node/)
+    expect(result).to match(/Successful on 1 target:/)
+    expect(result).to match(/Ran on 1 target/)
   end
 
   it 'runs a puppet plan from a subdir', ssh: true do

@@ -1,10 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-$nodes_count = 3
+$targets_count = 3
 
-if ENV['NODES'].to_i > 0 && ENV['NODES']
-  $nodes_count = ENV['NODES'].to_i
+if ENV['TARGETS'].to_i > 0 && ENV['TARGETS']
+  $targets_count = ENV['TARGETS'].to_i
 end
 
 Vagrant.configure('2') do |config|
@@ -12,8 +12,8 @@ Vagrant.configure('2') do |config|
   config.ssh.forward_agent = true
   config.vm.network "private_network", type: "dhcp"
 
-  (1..$nodes_count).each do |i|
-    config.vm.define "node#{i}"
+  (1..$targets_count).each do |i|
+    config.vm.define "target#{i}"
   end
 
   config.vm.define :windows do |windows|

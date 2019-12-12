@@ -10,7 +10,7 @@ In this exercise you will write a task with metadata.
 Complete the following before you start this lesson:
 
 - [Installing Bolt](../01-installing-bolt)
-- [Acquiring Nodes](../02-acquiring-nodes)
+- [Acquiring Targets](../02-acquiring-targets)
 - [Writing Tasks](../05-writing-tasks)
 
 ## About Task Metadata
@@ -62,7 +62,7 @@ The result:
 exercise8::great_metadata - An exercise in writing great metadata
 
 USAGE:
-bolt task run --nodes <node-name> exercise8::great_metadata name=<value> recursive=<value> action=<value> timeout=<value>
+bolt task run --targets <target-name> exercise8::great_metadata name=<value> recursive=<value> action=<value> timeout=<value>
 
 PARAMETERS:
 - name: String
@@ -85,7 +85,7 @@ Bolt can use the types that you have specified in your metadata to validate para
 Run your task and pass the following parameters as a JSON string.
 
 ```shell
-bolt task run exercise8::great_metadata --nodes linux --params '{"name":"Popeye","action":"spinach","recursive":true}'
+bolt task run exercise8::great_metadata --targets linux --params '{"name":"Popeye","action":"spinach","recursive":true}'
 ```
 
 The result:
@@ -98,14 +98,14 @@ Task exercise8::great_metadata:
 Correct the value for the action parameter and run the task again.
 
 ```shell
-bolt task run exercise8::great_metadata --nodes node1 --params '{"name":"Popeye","action":"start","recursive":true}'
+bolt task run exercise8::great_metadata --targets target1 --params '{"name":"Popeye","action":"start","recursive":true}'
 ```
 
 The result:
 
 ```plain
-Started on node1...
-Finished on node1:
+Started on target1...
+Finished on target1:
   {
     "message": "\nCongratulations on writing your metadata!  Here are\nthe keys and the values that you passed to this task.\n",
     "parameters": [
@@ -131,8 +131,8 @@ Finished on node1:
       }
     ]
   }
-Successful on 1 node: node1
-Ran on 1 node in 0.97 seconds
+Successful on 1 target: target1
+Ran on 1 target in 0.97 seconds
 ```
 
 ## Creating a Task That Supports no-operation Mode (noop)
@@ -154,38 +154,38 @@ Save the following file to `Boltdir/site-modules/exercise8/tasks/file.py`. This 
 Test the task with the `--noop` flag.
 
 ```shell
-bolt task run exercise8::file --nodes node1 content=Hello_World filename=/tmp/hello_world --noop
+bolt task run exercise8::file --targets target1 content=Hello_World filename=/tmp/hello_world --noop
 ```
 
 The result:
 
 ```plain
-Started on node1...
-Finished on node1:
+Started on target1...
+Finished on target1:
   {
     "_noop": true,
     "success": true
   }
-Successful on 1 node: node1
-Ran on 1 node in 0.96 seconds
+Successful on 1 target: target1
+Ran on 1 target in 0.96 seconds
 ```
 
 Run the task again without `--noop` and see the task create the file successfully.
 
 ```shell
-bolt task run exercise8::file --nodes node1 content=Hello_World filename=/tmp/hello_world
+bolt task run exercise8::file --targets target1 content=Hello_World filename=/tmp/hello_world
 ```
 
 The result:
 
 ```plain
-Started on node1...
-Finished on node1:
+Started on target1...
+Finished on target1:
   {
     "success": true
   }
-Successful on 1 node: node1
-Ran on 1 node in 0.98 seconds
+Successful on 1 target: target1
+Ran on 1 target in 0.98 seconds
 ```
 
 ## Next Steps

@@ -1,4 +1,4 @@
-plan aggregate::count(
+plan aggregate::targets(
   Optional[String[0]] $task = undef,
   Optional[String[0]] $command = undef,
   Optional[String[0]] $script = undef,
@@ -31,5 +31,5 @@ plan aggregate::count(
     run_script($script, $targets, $params)
   }
 
-  return aggregate::count($res)
+  return aggregate::targets($res)
 }

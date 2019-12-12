@@ -33,3 +33,4 @@ plan aggregate::nodes(
 
   return aggregate::nodes($res)
 }
+

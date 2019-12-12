@@ -167,7 +167,7 @@ module Bolt
       def print_summary(results, elapsed_time = nil)
         ok_set = results.ok_set
         unless ok_set.empty?
-          @stream.puts format('Successful on %<size>d node%<plural>s: %<names>s',
+          @stream.puts format('Successful on %<size>d target%<plural>s: %<names>s',
                               size: ok_set.size,
                               plural: ok_set.size == 1 ? '' : 's',
                               names: ok_set.targets.map(&:safe_name).join(','))
@@ -176,13 +176,13 @@ module Bolt
         error_set = results.error_set
         unless error_set.empty?
           @stream.puts colorize(:red,
-                                format('Failed on %<size>d node%<plural>s: %<names>s',
+                                format('Failed on %<size>d target%<plural>s: %<names>s',
                                        size: error_set.size,
                                        plural: error_set.size == 1 ? '' : 's',
                                        names: error_set.targets.map(&:safe_name).join(',')))
         end
 
-        total_msg = format('Ran on %<size>d node%<plural>s',
+        total_msg = format('Ran on %<size>d target%<plural>s',
                            size: results.size,
                            plural: results.size == 1 ? '' : 's')
         total_msg << " in #{duration_to_string(elapsed_time)}" unless elapsed_time.nil?

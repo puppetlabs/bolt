@@ -14,10 +14,10 @@ This repository contains a step-by-step introduction to [Bolt](https://github.co
 
 ## Prerequisites
 
-These exercises will help you get Bolt installed and make sure you have a few nodes to target with tasks and commands. 
+These exercises will help you get Bolt installed and make sure you have a few targets to target with tasks and commands. 
 
 - [Installing Bolt](lab/01-installing-bolt)
-- [Acquiring Nodes](lab/02-acquiring-nodes)
+- [Acquiring Targets](lab/02-acquiring-targets)
 
 ## Exercises
 
