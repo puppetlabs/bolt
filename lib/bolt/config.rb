@@ -42,6 +42,12 @@ module Bolt
 
     PUPPETFILE_OPTIONS = %w[proxy forge].freeze
 
+    DEFAULT_CONFIG_PATHS = [
+      Bolt::Util.windows? ? 'C:\\Program Files\\Puppet Labs\\Bolt\\bolt.yaml' : '/etc/puppetlabs/bolt/bolt.yaml',
+      File.expand_path('.puppetlabs/etc/bolt/bolt.yaml', Bolt::Util.windows? ? ENV['USERPROFILE'] : '~'),
+      File.expand_path('.puppetlabs/bolt.yaml', Bolt::Util.windows? ? ENV['USERPROFILE'] : '~')
+    ].freeze
+
     def self.default
       new(Bolt::Boltdir.new('.'), {})
     end
@@ -81,6 +87,16 @@ module Bolt
       TRANSPORTS.each do |key, transport|
         @transports[key] = transport.default_options
       end
+
+      default_config_data = {}
+      DEFAULT_CONFIG_PATHS.each do |default_config_file|
+        begin
+          default_config_data.merge!(Bolt::Util.read_config_file(default_config_file, [], 'default config') || {})
+        rescue Bolt::FileError => e
+          @logger.debug(e.message)
+        end
+      end
+      config_data = default_config_data.merge(config_data)
 
       update_from_file(config_data)
       apply_overrides(overrides)
