@@ -36,7 +36,7 @@ module Bolt
                   :puppetfile_config, :plugins, :plugin_hooks, :future
     attr_writer :modulepath
 
-    TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions
+    TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions sudo-executable
                            private-key tty tmpdir user connect-timeout disconnect-timeout
                            cacert token-file service-url interpreters file-protocol smb-port realm].freeze
 

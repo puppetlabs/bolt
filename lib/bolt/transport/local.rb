@@ -4,7 +4,7 @@ module Bolt
   module Transport
     class Local < Sudoable
       def self.options
-        %w[tmpdir interpreters sudo-password run-as run-as-command]
+        %w[tmpdir interpreters sudo-password run-as run-as-command sudo-executable]
       end
 
       def provided_features

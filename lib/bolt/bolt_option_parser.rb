@@ -8,7 +8,7 @@ module Bolt
   class BoltOptionParser < OptionParser
     OPTIONS = { inventory: %w[nodes targets query rerun description],
                 authentication: %w[user password password-prompt private-key host-key-check ssl ssl-verify],
-                escalation: %w[run-as sudo-password sudo-password-prompt],
+                escalation: %w[run-as sudo-password sudo-password-prompt sudo-executable],
                 run_context: %w[concurrency inventoryfile save-rerun],
                 global_config_setters: %w[modulepath boltdir configfile],
                 transports: %w[transport connect-timeout tty],
@@ -702,6 +702,10 @@ module Bolt
         STDERR.print "Please enter your privilege escalation password: "
         @options[:'sudo-password'] = STDIN.noecho(&:gets).chomp
         STDERR.puts
+      end
+      define('--sudo-executable EXEC', "Specify an executable for running as another user.",
+             "This option is experimental.") do |exec|
+        @options[:'sudo-executable'] = exec
       end
 
       separator "\nRUN CONTEXT OPTIONS"

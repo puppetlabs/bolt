@@ -9,7 +9,7 @@ module Bolt
   module Transport
     class SSH < Sudoable
       def self.options
-        %w[host port user password sudo-password private-key host-key-check
+        %w[host port user password sudo-password private-key host-key-check sudo-executable
            connect-timeout disconnect-timeout tmpdir script-dir run-as tty run-as-command proxyjump interpreters]
       end
 
