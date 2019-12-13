@@ -12,6 +12,7 @@ require 'bolt/transport/local_windows'
 require 'bolt/transport/docker'
 require 'bolt/transport/remote'
 require 'bolt/util'
+require 'win32/dir' if Bolt::Util.windows?
 
 module Bolt
   TRANSPORTS = {
@@ -43,25 +44,51 @@ module Bolt
     PUPPETFILE_OPTIONS = %w[proxy forge].freeze
 
     DEFAULT_CONFIG_PATHS = [
-      Bolt::Util.windows? ? 'C:\\Program Files\\Puppet Labs\\Bolt\\bolt.yaml' : '/etc/puppetlabs/bolt/bolt.yaml',
-      File.expand_path('.puppetlabs/etc/bolt/bolt.yaml', Bolt::Util.windows? ? ENV['USERPROFILE'] : '~'),
-      File.expand_path('.puppetlabs/bolt.yaml', Bolt::Util.windows? ? ENV['USERPROFILE'] : '~')
+      File.expand_path('bolt.yaml',
+                       Bolt::Util.windows? ? "#{Dir::PROGRAM_FILES}/Puppet Labs/Bolt" : '/etc/puppetlabs/bolt'),
+      File.expand_path('.puppetlabs/bolt.yaml', Bolt::Util.windows? ? Dir::PROFILE : '~')
     ].freeze
 
     def self.default
-      new(Bolt::Boltdir.new('.'), {})
+      new(Bolt::Boltdir.new('.'), merged_config_data({}))
     end
 
     def self.from_boltdir(boltdir, overrides = {})
-      data = Bolt::Util.read_config_file(nil, [boltdir.config_file], 'config') || {}
+      data = merged_config_data(Bolt::Util.read_config_file(nil, [boltdir.config_file], 'config') || {})
       new(boltdir, data, overrides)
     end
 
     def self.from_file(configfile, overrides = {})
       boltdir = Bolt::Boltdir.new(Pathname.new(configfile).expand_path.dirname)
-      data = Bolt::Util.read_config_file(configfile, [], 'config') || {}
-
+      data = merged_config_data(Bolt::Util.read_config_file(configfile, [], 'config') || {})
       new(boltdir, data, overrides)
+    end
+
+    def self.future_requested?(config_data = {})
+      return false if config_data['future'] == false
+      (config_data['future'] == true || ENV['BOLT_FUTURE'] =~ /\A(yes|true)\Z/i ? true : false)
+    end
+
+    def self.merged_config_data(data = {})
+      return data unless future_requested?(data)
+      default_config_data.merge(data)
+    end
+
+    def self.default_config_data
+      default_config_data = {}
+      DEFAULT_CONFIG_PATHS.each do |default_config_file|
+        begin
+          # TODO: decide on merging policy
+          default_config_data.merge!(Bolt::Util.read_config_file(default_config_file, [], 'default config') || {})
+        rescue Bolt::FileError => e
+          # NOTE: Logging seems useless from a class method like this.
+          #       Logging options like :debug and :append are processed in
+          #       #initialize and #apply_overrides, so a debug message here
+          #       will probably never be seen.
+          Logging.logger[self].debug(e.message)
+        end
+      end
+      default_config_data
     end
 
     def initialize(boltdir, config_data, overrides = {})
@@ -87,16 +114,6 @@ module Bolt
       TRANSPORTS.each do |key, transport|
         @transports[key] = transport.default_options
       end
-
-      default_config_data = {}
-      DEFAULT_CONFIG_PATHS.each do |default_config_file|
-        begin
-          default_config_data.merge!(Bolt::Util.read_config_file(default_config_file, [], 'default config') || {})
-        rescue Bolt::FileError => e
-          @logger.debug(e.message)
-        end
-      end
-      config_data = default_config_data.merge(config_data)
 
       update_from_file(config_data)
       apply_overrides(overrides)
@@ -152,7 +169,7 @@ module Bolt
     end
 
     def update_from_file(data)
-      @future = data['future'] == true
+      @future = self.class.future_requested?(data)
 
       if data['log'].is_a?(Hash)
         update_logs(data['log'])
