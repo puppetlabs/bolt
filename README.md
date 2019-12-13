@@ -1,69 +1,48 @@
-# Bolt
+[![Travis Status](https://img.shields.io/travis/puppetlabs/bolt?logo=travis)](https://travis-ci.org/puppetlabs/bolt)
+[![Appveyor Status](https://img.shields.io/appveyor/ci/puppetlabs/bolt?logo=appveyor)](https://ci.appveyor.com/project/puppetlabs/bolt/branch/master)
+[![Version](https://img.shields.io/github/v/tag/puppetlabs/bolt?label=version)](./CHANGELOG.md)
+[![Platforms](https://img.shields.io/badge/platforms-linux%20%7C%20windows%20%7C%20macos-lightgrey)](./documentation/bolt_installing.md)
+[![License](https://img.shields.io/github/license/puppetlabs/bolt)](./LICENSE)
 
-[![Travis Status](https://travis-ci.org/puppetlabs/bolt.svg?branch=master)](https://travis-ci.org/puppetlabs/bolt)
-[![Appveyor Status](https://ci.appveyor.com/api/projects/status/m7dhiwxk455mkw2d/branch/master?svg=true)](https://ci.appveyor.com/project/puppetlabs/bolt/branch/master)
-[![Gem Version](https://badge.fury.io/rb/bolt.svg)](https://badge.fury.io/rb/bolt)
+<p align="center">
+  <img src="resources/bolt-logo-dark.png" width="50%" alt="bolt logo"/>
+</p>
 
-<div name="logo">
-  <img src="resources/bolt-logo-dark.png"
-  style="display: block; margin-left: auto; margin-right: auto;"
-  width="50%"
-  alt="bolt logo">
-</div>
+Bolt is an open source orchestration tool that automates the manual work it takes to maintain your infrastructure. Use Bolt to automate tasks that you perform on an as-needed basis or as part of a greater orchestration workflow. For example, you can use Bolt to patch and update systems, troubleshoot servers, deploy applications, or stop and restart services. Bolt can be installed on your local workstation and connects directly to remote targets with SSH or WinRM, so you are not required to install any agent software.
 
-Bolt is a Ruby command-line tool for executing commands, scripts, and tasks on remote systems using SSH and WinRM.
+### Bring order to the chaos with orchestration
 
-* Executes commands on remote *nix and Windows systems.
-* Distributes and execute scripts, such as Bash, PowerShell, Python.
-* Scales to more than 1000 concurrent connections.
-* Supports industry standard protocols (SSH/SCP, WinRM/PSRP) and authentication methods (password, publickey).
+Run simple plans to rid yourself of the headaches of orchestrating complex workflows. Create and share Bolt plans to easily expand across your application stack.
 
-> For a step-by-step introduction to Bolt, see our [hands-on-lab](https://puppetlabs.github.io/bolt/).
+### Use what you have to automate simple tasks or complex workflows
 
-Additionally the Bolt project includes:
+Get going with your existing scripts and plans, including YAML, PowerShell, Bash, Python or Ruby, or reuse content from the [Puppet Forge](https://forge.puppet.com).
 
-* [bolt-server](developer-docs/bolt-api-servers.md), an experimental HTTP API for executing tasks over SSH and WinRM.
-* bolt-inventory-pdb, a command-line tool for generating an inventory file from a template containing PuppetDB queries.
+### Get up and running with Bolt even faster
 
-> Installing bolt from a gem is not recommended since core modules will not be available. Please [install bolt](https://puppet.com/docs/bolt/latest/bolt_installing.md) as a package
+Speed up your Bolt knowledge with a step-by-step introduction to basic Bolt functionality with a [hands-on lab](http://bolt.guide) and [self-paced training](https://puppet.com/learning-training/kits/intro-to-bolt).
+
+More information and documentation is available on the [Bolt website](https://puppet.com/docs/bolt/latest/bolt.html).
 
 ## Supported platforms
 
-* Linux, OSX, Windows
-* Ruby 2.3+
+Bolt can be installed on Linux, Windows, and macOS. For complete installation details, see the [installation docs](./documentation/bolt_installing.md).
 
-> For complete usage and installation details, see the [Puppet Bolt docs](https://puppet.com/docs/bolt).
->
-> For contributing information, including alternate installation methods and running from source code, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+For alternate installation methods and running from source code, see our [contributing guidelines](https://github.com/puppetlabs/bolt/blob/master/CONTRIBUTING.md).
 
-* [Install](https://puppet.com/docs/bolt/latest/bolt_installing.html)
-* [Bolt Commands](https://puppet.com/docs/bolt/latest/bolt_command_reference.html)
-* [Configure](https://puppet.com/docs/bolt/latest/configuring_bolt.html)
-    * [Node-specific Configuration with the Inventory File](https://puppet.com/docs/bolt/latest/inventory_file.html)
-    * [Connect to PuppetDB](https://puppet.com/docs/bolt/latest/bolt_connect_puppetdb.html)
-* [Puppet Tasks and Plans](https://puppet.com/docs/bolt/latest/writing_tasks_and_plans.html)
-    * [Inspecting Tasks and Plans](https://puppet.com/docs/bolt/latest/inspecting_tasks_and_plans.html)
-    * [Running Tasks](https://puppet.com/docs/bolt/latest/bolt_running_tasks.html)
-    * [Running Plans](https://puppet.com/docs/bolt/latest/bolt_running_plans.html)
-    * [Installing Tasks and Plans](https://puppet.com/docs/bolt/latest/installing_tasks_from_the_forge.html)
-    * [Writing Tasks](https://puppet.com/docs/bolt/latest/writing_tasks.html)
-    * [Writing Plans](https://puppet.com/docs/bolt/latest/writing_plans.html)
-* [Applying Manifest Blocks in Plans](https://puppet.com/docs/bolt/latest/applying_manifest_blocks.html)
+## Getting help
 
-## Getting Help
+Join [#bolt](https://slack.puppet.com/) on the Puppet Community slack to chat with Bolt developers and the community.
 
-* [#bolt on Slack](https://slack.puppet.com/) - Join the Bolt developers and community
+## Contributing
+
+We welcome error reports and pull requests to Bolt. See our [contributing guidelines](./CONTRIBUTING.md) for how to help.
 
 ## Kudos
 
 Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing Puppet to use the `bolt` gem name.
 
-## Contributing
-
-We welcome error reports and pull requests to Bolt. See
-[CONTRIBUTING.md](./CONTRIBUTING.md) for how to help.
-
 ## License
 
-The gem is available as open source under the terms of the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+Bolt is available as open source under the terms of the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license.
 
