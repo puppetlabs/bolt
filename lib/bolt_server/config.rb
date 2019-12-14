@@ -21,6 +21,7 @@ module BoltServer
     def defaults
       super.merge(
         'port' => 62658,
+        'status-port' => 62657,
         'concurrency' => 100,
         'cache-dir' => "/opt/puppetlabs/server/data/bolt-server/cache",
         'file-server-conn-timeout' => 120

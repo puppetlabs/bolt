@@ -47,3 +47,24 @@ unless config['whitelist'].nil?
 end
 
 app impl
+
+#### Metrics/Status
+
+control_token = 'none'
+control_url_https = bind_addr.sub(config['port'].to_s, config['status-port'].to_s).sub('force_peer', 'none')
+
+# Start either the default Puma Control/Status app (if it supports our 'auth_actions' feature)
+# or start our custom Puma Status app via our custom 'stats' app/plugin (shipped in the Bolt gem).
+
+if defined? auth_actions
+  control_actions = 'gc-stats,stats'
+  activate_control_app control_url_https, auth_token: control_token, auth_actions: control_actions
+else
+  begin
+    plugin 'stats'
+    stats_url control_url_https
+    stats_token control_token
+  rescue UnknownPlugin
+    puts '* Status endpoint disabled'
+  end
+end

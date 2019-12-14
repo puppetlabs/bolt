@@ -6,8 +6,9 @@ require 'bolt/error'
 module BoltServer
   class BaseConfig
     def config_keys
-      %w[host port ssl-cert ssl-key ssl-ca-cert
-         ssl-cipher-suites loglevel logfile whitelist]
+      %w[host port status-port
+         ssl-cert ssl-key ssl-ca-cert ssl-cipher-suites
+         loglevel logfile whitelist]
     end
 
     def env_keys
