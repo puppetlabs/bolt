@@ -214,10 +214,8 @@ nodes:
   - remote://my_aws_account
 ```
 
-- **[Inventory file version 2](inventory_file_v2.md#)**  
-Version 2 of the inventory file is experimental and might experience breaking changes in future releases.
 - **[Generating inventory files](inventory_file_generating.md)**  
- Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries.
+  Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries.
 
 **Related information**  
 

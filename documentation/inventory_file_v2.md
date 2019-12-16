@@ -1,10 +1,14 @@
 # Inventory file version 2
 
-Version 2 of the inventory file is experimental and might experience breaking changes in future releases.
-
 ## Migrating to version 2
 
-Version 2 of the inventory file changes some terms and syntax. To convert to version 2, you must make these changes.
+Version 2 of the inventory file changes some terms and syntax. To convert to version 2, you must make these changes. This can be done manually by changing fields in the inventory file or by running `bolt project migrate` at the root of your [Boltdir](bolt_project_directories.md#).
+
+In version 1 of the inventory file, Bolt treated the `name` field of a node as its URI. This made it impossible to specify a `name` that did not include the hostname of a target, which proved limiting for remote targets. In version 2, the optional `uri` field sets the URI for a target. Any connection information from the URI, such as a user specified by `user@uri` can't be overridden with other configuration methods. If the `uri` is set, it's used as the default value for the `name` key. Every target requires a `name`, so either the `name` or `uri` field must be set.
+
+If there is a bare string in the target's array, Bolt tries to resolve the string to a target defined elsewhere in the inventory. If no target has a name or alias matching the string, Bolt creates a new target with the string as its URI.
+
+### Manual migration
 
 **`version: 2`**
 
@@ -18,9 +22,11 @@ In order to standardize terminology across Bolt and capture the breadth of possi
 
 Changing the `name` key to `uri` results in an inventory file that matches the behavior of version 1.
 
-In version 1 of the inventory file, Bolt treated the `name` field of a node as its URI. This made it impossible to specify a `name` that did not include the hostname of a target, which proved limiting for remote targets. In version 2, the optional `uri` field sets the URI for a target. Any connection information from the URI, such as a user specified by `user@uri` can't be overridden with other configuration methods. If the `uri` is set, it's used as the default value for the `name` key. Every target requires a `name`, so either the `name` or `uri` field must be set.
+### Automatic migration
 
-If there is a bare string in the target's array, Bolt tries to resolve the string to a target defined elsewhere in the inventory. If no target has a name or alias matching the string, Bolt creates a new target with the string as its URI.
+An inventory file can be automatically migrated using the command `bolt project migrate`. This command will target the inventory file for a Bolt project and will modify it in place.
+
+> **Note:** When automatically migrating an inventory file, formatting and comments are not preserved.
 
 ### Migrating plans
 
