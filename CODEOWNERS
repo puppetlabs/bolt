@@ -3,3 +3,4 @@
 
 /documentation @hestonhoffman @puppetlabs/bolt
 /lib/bolt_server @puppetlabs/skeletor
+/spec/bolt_server @puppetlabs/skeletor
