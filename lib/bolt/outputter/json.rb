@@ -36,9 +36,17 @@ module Bolt
         @stream.puts "],\n"
         @preceding_item = false
         @items_open = false
-        @stream.puts format('"target_count": %<size>d, "elapsed_time": %<elapsed>d }',
-                            size: results.size,
-                            elapsed: elapsed_time)
+        # rubocop:disable Style/GlobalVars
+        if $future
+          @stream.puts format('"target_count": %<size>d, "elapsed_time": %<elapsed>d }',
+                              size: results.size,
+                              elapsed: elapsed_time)
+        else
+          @stream.puts format('"node_count": %<size>d, "elapsed_time": %<elapsed>d }',
+                              size: results.size,
+                              elapsed: elapsed_time)
+        end
+        # rubocop:enable Style/GlobalVars
       end
 
       def print_table(results)
