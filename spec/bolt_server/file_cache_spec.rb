@@ -149,7 +149,7 @@ describe BoltServer::FileCache, puppetserver: true do
     it 'will create and run the purge timer' do
       expect(file_cache.instance_variable_get(:@purge)).to be_a(Concurrent::TimerTask)
       expect(file_cache.instance_variable_get(:@cache_dir_mutex)).to eq(other_mutex)
-      expect(other_mutex).to receive(:with_write_lock)
+      expect(other_mutex).to receive(:with_write_lock).at_most(2).times
 
       file_cache
       sleep 2 # allow time for the purge timer to fire
