@@ -61,7 +61,14 @@ You can run scripts in any language as long as the appropriate interpreter is in
     bolt script run myscript.sh 'echo hello'
     ```
     Argument values are passed literally and are not interpolated by the shell on the remote host. If you run `bolt script run myscript.sh 'echo $HOME'`, then the script receives the argument `'echo $HOME'`, rather than any interpolated value.
-
+-   To pass arguments prefixed with `-` to a script, use the following syntax:
+    ```shell script
+    bolt script run <BOLT_ARGUMENTS> <SCRIPT_NAME> -- <SCRIPT_ARGUMENTS>
+    ```
+    For example, 
+    ```shell script
+    bolt script run -t targets -u user myscript.sh -- --script-param --foo bar
+    ```
 
 ### Requirements for scripts run on remote \*nix systems
 
