@@ -6,6 +6,8 @@
 
 * **Support for the `bolt-inventory-pdb` command will be dropped in Bolt 2.0.** Users can use the [puppetdb inventory plugin](https://puppet.com/docs/bolt/latest/using_plugins.html#puppetdb) with a v2 inventory file to lookup targets from PuppetDB.
 
+* **Support for the v1 inventory files will be dropped in Bolt 2.0.** Inventory files [can be migrated](https://puppet.com/docs/bolt/latest/migrating_inventory_files.html) automatically using the `bolt project migrate` command.
+
 ### New features
 
 * **Packages for Fedora 31** ([#1373](https://github.com/puppetlabs/bolt/issues/1373))
