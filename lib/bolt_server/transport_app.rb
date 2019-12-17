@@ -188,6 +188,11 @@ module BoltServer
       [200, GC.stat.to_json]
     end
 
+    get '/admin/status' do
+      stats = Puma.stats
+      [200, stats.is_a?(Hash) ? stats.to_json : stats]
+    end
+
     get '/500_error' do
       raise 'Unexpected error'
     end
