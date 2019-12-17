@@ -2,6 +2,12 @@
 
 ## Bolt NEXT
 
+### New features
+
+* **New `file::join` plan function** ([#837](https://github.com/puppetlabs/bolt/issues/837))
+
+  The new plan function, `file::join`, allows you to join file paths using the separator `/`.
+
 ### Bug fixes
 
 * **The ssh configuration option `key-data` was not compatible with the `future` flag** ([#1504](https://github.com/puppetlabs/bolt/issues/1504))
