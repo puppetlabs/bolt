@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt Next
+## Bolt 1.43.0
 
 ### New features
 
@@ -17,13 +17,15 @@
 
 * **Add `script-dir` option for specifying predictable subpath to the tmpdir**
 
-  When uploading files to remote targets, Bolt uploads them to a tmpdir which includes a randomized
-  directory name. The `script-dir` option sets a predictable subdirectory for `tmpdir` where files
-  will be uploaded.
+  When uploading files to remote targets, Bolt uploads them to a tmpdir which includes a randomized directory name. The `script-dir` option sets a predictable subdirectory for `tmpdir` where files will be uploaded.
 
 * **Bundled content updated to use `$targets` parameter** ([#1376](https://github.com/puppetlabs/bolt/issues/1376))
 
   Plans that are part of the `canary`, `puppetdb_fact`, and `aggregate` modules have been updated to use a `$targets` parameter instead of `$nodes`. The `aggregate::nodes` plan still uses a `$nodes` parameter, but the module now includes a `aggregate::targets` plan that uses a `$targets` parameter.
+
+* **Add `sudo-executable` transport configuration option** ([#1200](https://github.com/puppetlabs/bolt/issues/1200))
+
+  When using `run-as`, the `sudo-executable` transport configuration option can be used to specify an executable to use to run as another user. This option can be set in a `local` or `ssh` config map or with the `--sudo-executable` flag on the CLI. This feature is experimental.
 
 ## Bolt 1.42.0
 
@@ -41,10 +43,6 @@
 
   If `sudo-password` is not set when using `run-as`, Bolt will set the value of `sudo-password` to match the value of `password`. This behavior is gated on the future config option, and will be available by default in Bolt 2.0.
   
-* **Add `sudo-executable` transport configuration option** ([#1200](https://github.com/puppetlabs/bolt/issues/1200))
-
-  When using `run-as`, the `sudo-executable` transport configuration option can be used to specify an executable to use to run as another user. This option can be set in a `local` or `ssh` config map or with the `--sudo-executable` flag on the CLI. This feature is experimental.
-
 ### Bug fixes
 
 * **Default PuppetDB config lookup used hardcoded path in Windows** ([#1427](https://github.com/puppetlabs/bolt/pull/1427))
