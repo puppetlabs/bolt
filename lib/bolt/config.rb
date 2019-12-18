@@ -223,7 +223,7 @@ module Bolt
           if @future
             to_expand = %w[private-key cacert token-file] & selected.keys
             to_expand.each do |opt|
-              selected[opt] = File.expand_path(selected[opt], @boltdir.path) if opt.is_a?(String)
+              selected[opt] = File.expand_path(selected[opt], @boltdir.path) if selected[opt].is_a?(String)
             end
           end
 
