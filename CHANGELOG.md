@@ -24,6 +24,8 @@
 
 * **Support for the v1 inventory files will be dropped in Bolt 2.0.** Inventory files [can be migrated](https://puppet.com/docs/bolt/latest/migrating_inventory_files.html) automatically using the `bolt project migrate` command.
 
+* **Support for plan method `Target.new(<uri>, <options>)` will be dropped in Bolt 2.0.** The plan method `Target.new(<options>)`, where `options` is a hash of target data and config, should be used instead. See [the docs](https://puppet.com/docs/bolt/latest/writing_plans.html#creating-target-objects) for more information and examples.
+
 ### New features
 
 * **Packages for Fedora 31** ([#1373](https://github.com/puppetlabs/bolt/issues/1373))

@@ -72,7 +72,8 @@ module Bolt
       end
     end
 
-    attr_reader :plugins, :config
+    attr_reader :plugins, :config, :logger
+    attr_accessor :hash_deprecation_issued, :args_deprecation_issued
 
     def initialize(data, config = nil, plugins: nil, target_vars: {},
                    target_facts: {}, target_features: {}, target_plugin_hooks: {})
