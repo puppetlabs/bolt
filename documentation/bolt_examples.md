@@ -59,7 +59,7 @@ To run Bolt commands against multiple targets at once, you need to provide infor
           transport: winrm
           winrm:
             user: Administrator
-            Password: <ADD PASSWORD>
+            password: <ADD PASSWORD>
     ```
 
     **Note:** To have Bolt securely prompt for a password, use the `--password-prompt` flag without supplying any value. This prevents the password from appearing in a process listing or on the console. Alternatively you can use the [``prompt` plugin`](inventory_file_v2.md#) to set configuration values via a prompt.
@@ -124,3 +124,226 @@ To convert the `restart_service.ps1` script to a task, giving you the ability to
     ![](bolt_PS_3.png)
 
     **Note:** `--targets windows` refers to the name of the group of targets that you specified in your inventory file. For more information, see [Specify targets](bolt_options.md#).
+
+
+## Deploy a package with Bolt and Chocolatey
+
+You can use Bolt with Chocolatey to deploy a package on a Windows node by writing a [Bolt plan](writing_plans.md) that installs Chocolatey and uses Puppet's Chocolatey package provider to install a package. This is all done using content from the [Puppet Forge](https://forge.puppet.com).
+
+**Before you begin** 
+
+- Install [Bolt](https://puppet.com/docs/bolt/latest/bolt_installing.html) and [Puppet Development Kit (PDK)](https://www.puppet.com/docs/pdk/1.x/pdk_install.html).
+- Ensure you have Powershell and Windows Remote Management (WinRM) access.
+
+In this example, you:
+
+- Build a project-specific configuration using a Bolt project directory and PDK.
+- Download module content from the Puppet Forge.
+- Write a Bolt plan to apply Puppet code and orchestrate the deployment of a package resource using the Chocolatey provider.
+
+### 1. Build a project-specific configuration
+
+Bolt runs in the context of a [Bolt project directory](bolt_project_directories.md). This directory contains all of the configuration, code, and data loaded by Bolt.
+
+1. Create a module called `bolt_choco_example`
+
+```
+mkdir bolt_choco_example
+```
+
+1. Add a `bolt.yaml` file to the `puppet_choco_tap` directory:
+
+```
+New-Item -Type File -Path .\puppet_choco_tap\bolt.yaml
+```
+
+Adding a `bolt.yaml` file (even if it's empty),  makes the containing directory a Bolt project directory when you run Bolt from it. This is where Bolt loads code and configuration from.
+
+1. Create an inventory file to store information about your targets. This is stored as `inventory.yaml` by default in the project directory. Add the following code: 
+
+```
+groups:
+  - name: windows
+    targets:
+      - chocowin0.classroom.puppet.com
+      - chocowin1.classroom.puppet.com
+    config:
+      transport: winrm
+      winrm:
+        user: Administrator
+        password: <ADD PASSWORD>
+```
+
+1. To make sure that your inventory is configured correctly and that you can connect to all the targets, run the following command from inside the project directory: 
+
+```
+bolt command run 'echo hi' --targets windows
+```
+
+**Note:** The `--targets windows` argument refers to the target group defined in the inventory file.
+
+You should get the following output:
+
+```
+Started on x.x.x.x...
+Started on localhost...
+Finished on localhost:
+  STDOUT:
+    hi
+Finished on 0.0.0.0:
+  STDOUT:
+    hi
+Finished on 127.0.0.1:
+  STDOUT:
+    hi
+Successful on 3 targets: 0.0.0.0:20022,localhost
+Ran on 3 targets in 0.20 seconds
+```
+
+### 2. Download the Chocolatey module
+
+Bolt uses a [Puppetfile](https://puppet.com/docs/pe/latest/puppetfile.html) to install module content from the Forge. A `Puppetfile` is a formatted text file that specifies the modules and data you want in each environment.
+
+1. Create a file named `Puppetfile` in the project directory, with the modules needed for this example:
+
+```     
+mod 'puppetlabs-chocolatey', '4.1.0'
+mod 'puppetlabs-stdlib', '4.13.1'
+mod 'puppetlabs-powershell', '2.3.0'
+mod 'puppetlabs-registry', '2.1.0'
+ ```
+
+Note that you can install modules from a number of different sources. For more information, see the [Puppetfile README](https://github.com/puppetlabs/r10k/blob/master/doc/puppetfile.mkd#examples).
+
+1. From inside the project directory, install the required modules:
+
+```
+bolt puppetfile install
+```
+
+After it runs, you can see a `modules` directory inside the project directory, containing the modules you specified in the `Puppetfile`.
+
+### 3. Write a Bolt plan to apply Puppet code
+
+Write a Bolt plan to orchestrate the deployment of a package resource using the Chocolatey provider. Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
+
+1. Create a `site-modules` directory. This is where you will add local code and modules.
+
+1. Inside the `site-modules` directory, create a new module called `puppet_choco_tap`.
+
+   ```
+   pdk new module puppet_choco_tap
+   ```
+
+1. Inside the `puppet_choco_tap` module, create a plans directory with a Bolt plan at `/plans/installer.pp`.
+
+The folder tree should look like this:
+
+```
+bolt_choco_example
+└── site-modules
+    └── puppet_choco_tap
+        └── plans
+            └── installer.pp 
+```
+
+1. Create a plan called `puppet_choco_tap::installer` by copying the following code into the `installer.pp` file::
+
+```
+plan puppet_choco_tap::installer(
+  TargetSpec $targets,
+  String $package,
+  Variant[Enum['absent', 'present'], String ] $ensure = 'present',
+){
+  apply_prep($targets)
+
+  apply($targets){
+    include chocolatey
+
+    package { $package :
+      ensure    => $ensure,
+      provider  => 'chocolatey',
+      }
+    }
+  }
+}
+```
+Take note of the following features of the plan:
+
+- It has three parameters: the list of targets to install the package on, a `package` string for the package name, and the `ensure` state of the package which allows for version, absent or present.
+- It has the `apply_prep` function call, which is used to install modules needed by `apply` on targets as well as to gather facts about the targets.
+- `include chocolatey` installs the Chocolatey package manager. The Chocolatey provider is also deployed as a library with the Puppet agent in `apply_prep`.
+- The [package resource](https://puppet.com/docs/puppet/latest/types/package.html) ensures a package's state using the Chocolatey provider.
+
+1. To verify that the `puppet_choco_tap::installer` plan is available, run the following command
+   inside the `bolt_choco_example` directory:
+
+```
+bolt plan show
+```
+
+The output should look like:
+
+```
+facts
+facts::info
+puppet_choco_tap::installer
+puppetdb_fact
+```
+
+1. Run the plan with the `bolt plan run` command: 
+
+```
+bolt plan run puppet_choco_tap::installer package=frogsay --targets=windows
+```
+
+The output looks like this:
+
+```
+Starting: plan puppet_choco_tap::installer
+Starting: install puppet and gather facts on chocowin0.classroom.puppet.com, chocowin1.classroom.puppet.com
+Finished: install puppet and gather facts with 0 failures in 22.11 sec
+Starting: apply catalog on chocowin0.classroom.puppet.com, chocowin1.classroom.puppet.com
+Finished: apply catalog with 0 failures in 18.77 sec
+Starting: apply catalog on chocowin0.classroom.puppet.com, chocowin1.classroom.puppet.com
+Finished: apply catalog with 0 failures in 33.74 sec
+Finished: plan puppet_choco_tap::installer in 74.63 sec
+```
+
+1. To check that the installation worked, run the following `frogsay` command: 
+
+```        
+bolt command run 'frogsay ribbit' --targets=windows 
+```
+
+The result will vary on each server, and will look something like this:
+
+```
+Started on chocowin1.classroom.puppet.com...
+Started on chocowin0.classroom.puppet.com...
+Finished on chocowin0.classroom.puppet.com:
+  STDOUT:
+    
+            DO NOT PAINT OVER FROG.
+            /
+      @..@
+     (----)
+    ( >__< )
+    ^^ ~~ ^^
+Finished on chocowin1.classroom.puppet.com:
+  STDOUT:
+    
+            TO PREVENT THE RISK OF FIRE OR ELECTRIC SHOCK, DO NOT ENGAGE WITH FROG
+            WHILE AUTOMATIC UPDATES ARE BEING INSTALLED.
+            /
+      @..@
+     (----)
+    ( >__< )
+    ^^ ~~ ^^
+Successful on 2 targets: chocowin0.classroom.puppet.com,chocowin1.classroom.puppet.com
+Ran on 2 targets in 3.15 seconds
+```
+
+That’s it! In this one plan, you have both installed Chocolatey and deployed the package to two targets. You can do the same thing on any number of targets by editing the inventory file. Note that Chocolatey will remain installed on your machine.
+
+After you have installed your package, with the help of Bolt, you can use Chocolatey to automate all of the package management tasks for upgrades or uninstalls. You can use Puppet Enterprise to guarantee state across all of your nodes and handle configuration drift — and make sure no one accidentally uninstalls the package that you just installed.
