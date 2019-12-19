@@ -281,6 +281,20 @@ describe Bolt::Config do
         .to eq(File.expand_path('secret/key', boltdir.path))
     end
 
+    it "does not attempt to expand private-key when key-data is specified" do
+      key_data = { 'key-data' => 'key content' }
+      data = {
+        'ssh' => {
+          'private-key' => key_data
+        },
+        'future' => true
+      }
+
+      config = Bolt::Config.new(boltdir, data)
+      expect(config.transports[:ssh]['private-key'])
+        .to eq(key_data)
+    end
+
     it "expands inventoryfile relative to boltdir" do
       data = {
         'inventoryfile' => 'targets.yml',

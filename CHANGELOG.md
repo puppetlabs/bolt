@@ -1,5 +1,13 @@
 # Changelog
 
+## Bolt NEXT
+
+### Bug fixes
+
+* **The ssh configuration option `key-data` was not compatible with the `future` flag** ([#1504](https://github.com/puppetlabs/bolt/issues/1504))
+
+  Bolt no longer attempts to expand a `private-key` configuration `Hash` when `key-data` is being used in conjunction with the `future` setting.
+
 ## Bolt 1.43.0
 
 ### New features
