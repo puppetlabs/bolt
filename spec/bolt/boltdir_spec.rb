@@ -45,6 +45,19 @@ describe Bolt::Boltdir do
 
         expect(Bolt::Boltdir.find_boltdir(pwd)).to eq(boltdir)
       end
+
+      it 'loads config from bolt.yml inside a Boltdir if bolt.yml exists' do
+        pwd = boltdir_path
+        FileUtils.touch(pwd + 'bolt.yml')
+        boltdir = Bolt::Boltdir.find_boltdir(pwd)
+        expect(boltdir.config_file.basename.to_s).to eq('bolt.yml')
+      end
+
+      it 'loads config from bolt.yaml inside a Boltdir if no config exists' do
+        pwd = boltdir_path
+        boltdir = Bolt::Boltdir.find_boltdir(pwd)
+        expect(boltdir.config_file.basename.to_s).to eq('bolt.yaml')
+      end
     end
 
     describe "when using a control repo-style Boltdir" do
@@ -52,6 +65,20 @@ describe Bolt::Boltdir do
         pwd = @tmpdir
         FileUtils.touch(pwd + 'bolt.yaml')
         expect(Bolt::Boltdir.find_boltdir(pwd)).to eq(Bolt::Boltdir.new(pwd))
+      end
+
+      it 'uses the current directory if it has a bolt.yml' do
+        pwd = @tmpdir
+        FileUtils.touch(pwd + 'bolt.yml')
+        expect(Bolt::Boltdir.find_boltdir(pwd)).to eq(Bolt::Boltdir.new(pwd))
+      end
+
+      it 'prefers a bolt.yaml over bolt.yml' do
+        pwd = @tmpdir
+        FileUtils.touch(pwd + 'bolt.yml')
+        FileUtils.touch(pwd + 'bolt.yaml')
+        boltdir = Bolt::Boltdir.find_boltdir(pwd)
+        expect(boltdir.config_file.basename.to_s).to eq('bolt.yaml')
       end
 
       it 'ignores non-Boltdir children with bolt.yaml' do
@@ -78,6 +105,33 @@ describe Bolt::Boltdir do
       end
     end
 
+    describe 'loading inventory files' do
+      it 'loads inventory.yaml from the boltdir' do
+        pwd = @tmpdir
+        FileUtils.touch(pwd + 'bolt.yml')
+        FileUtils.touch(pwd + 'inventory.yaml')
+        boltdir = Bolt::Boltdir.find_boltdir(pwd)
+        expect(boltdir.inventory_file.basename.to_s).to eq('inventory.yaml')
+      end
+
+      it 'loads inventory.yml from the boltdir' do
+        pwd = @tmpdir
+        FileUtils.touch(pwd + 'bolt.yml')
+        FileUtils.touch(pwd + 'inventory.yml')
+        boltdir = Bolt::Boltdir.find_boltdir(pwd)
+        expect(boltdir.inventory_file.basename.to_s).to eq('inventory.yml')
+      end
+
+      it 'prefers inventory.yaml' do
+        pwd = @tmpdir
+        FileUtils.touch(pwd + 'bolt.yml')
+        FileUtils.touch(pwd + 'inventory.yml')
+        FileUtils.touch(pwd + 'inventory.yaml')
+        boltdir = Bolt::Boltdir.find_boltdir(pwd)
+        expect(boltdir.inventory_file.basename.to_s).to eq('inventory.yaml')
+      end
+    end
+
     describe 'when setting a type' do
       it 'sets type to embedded when a Boltdir is used' do
         pwd = boltdir_path.parent
@@ -87,6 +141,13 @@ describe Bolt::Boltdir do
       it 'sets type to local when a bolt.yaml is used' do
         pwd = @tmpdir
         FileUtils.touch(pwd + 'bolt.yaml')
+
+        expect(Bolt::Boltdir.find_boltdir(pwd).type).to eq('local')
+      end
+
+      it 'sets type to local when a bolt.yaml is used' do
+        pwd = @tmpdir
+        FileUtils.touch(pwd + 'bolt.yml')
 
         expect(Bolt::Boltdir.find_boltdir(pwd).type).to eq('local')
       end
