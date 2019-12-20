@@ -10,7 +10,8 @@ There are three types of project directories that you can use depending on how y
 
 ### Local project directory
 
-Bolt treats a directory containing a `bolt.yaml` file as a project directory. Use this type of directory to track and share management code in a dedicated repository.
+Bolt treats a directory containing a `bolt.yaml` or `bolt.yml` file as a project directory. Use this
+type of directory to track and share management code in a dedicated repository.
 
 **Tip:** You can use an existing control repo as a Bolt project directory by adding a `bolt.yaml` file to it and configuring the `modulepath` to match the `modulepath` in `environment.conf`.
 
