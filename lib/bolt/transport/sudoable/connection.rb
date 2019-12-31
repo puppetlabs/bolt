@@ -87,9 +87,9 @@ module Bolt
         # using the wrapper or when the task does not require stdin data.
         def build_sudoable_command_str(command_str, sudo_str, sudo_id, options)
           if options[:stdin] && !options[:wrapper]
-            "#{sudo_str} #{prepend_sudo_success(sudo_id, command_str)}"
+            "#{sudo_str} #{prepend_sudo_success(sudo_id, command_str)}".lstrip
           else
-            "#{sudo_str} #{command_str}"
+            "#{sudo_str} #{command_str}".lstrip
           end
         end
 

@@ -73,11 +73,14 @@ describe "when runnning over the ssh transport", ssh: true do
       expect(result['_output'].strip).to eq("somemessage with noop")
     end
 
-    it 'escalates privileges when passed --run-as' do
+    it 'escalates privileges when passed --run-as as root' do
       result = run_one_node(%W[command run #{whoami} --run-as root --sudo-password #{password}] + config_flags)
       expect(result['stdout'].strip).to eq("root")
+    end
+
+    it 'escalates privileges to bolt when passed --run-as as bolt' do
       result = run_one_node(%W[command run #{whoami} --run-as #{user} --sudo-password #{password}] + config_flags)
-      expect(result['stdout'].strip).to eq(user)
+      expect(result['stdout'].strip).to eq('bolt')
     end
   end
 
@@ -85,11 +88,15 @@ describe "when runnning over the ssh transport", ssh: true do
     let(:config) do
       { 'format' => 'json',
         'modulepath' => modulepath,
-        'ssh' => {
+        'ssh' => ssh_conf }
+    end
+
+    let(:ssh_conf) do
+      {
           'user' => user,
           'password' => password,
           'host-key-check' => false
-        } }
+        }
     end
 
     let(:uri) { (1..2).map { |i| "#{conn_uri('ssh')}?id=#{i}" }.join(',') }
@@ -105,6 +112,45 @@ describe "when runnning over the ssh transport", ssh: true do
       { 'interpreters' => {
         'py' => '/usr/bin/python3'
       } }
+    end
+    
+    describe 'non privileged user' do
+      let(:ssh_conf) do
+        {
+          'user' => user,
+          'password' => password,
+          'host-key-check' => false,
+          'run_as' => nil,
+          'run_as_command' => 'sudo'
+        }
+      end
+
+      it 'with run_as_command when run_as user is not specified' do
+        # sudo -S 
+      end
+
+      it 'with run_as_command when run_as user is specified' do
+        # sudo -S -u <run_as>  # not bolt user
+      end
+
+      it 'with run_as_command when run_as and user are identical' do
+        #sudo -S -u bolt_user  # as bolt_user
+        # this only works when the run_as_command is specified
+        # ideally the user does not need to switch but we still need to run sudo
+        cmd = 'touch /dev'
+        with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+          result = run_one_node(%W[command run #{cmd} --configfile #{conf.path} --sudo-password #{password}] + config_flags)
+          expect(result['exit_code']).to eq(0)
+        end
+      end
+
+      it 'uses default run_as_command when override is empty or nil' do
+        cmd = 'touch /dev'
+        with_tempfile_containing('conf', YAML.dump(config)) do |conf|
+          result = run_one_node(%W[command run #{cmd} --configfile #{conf.path} --sudo-password #{password}] + config_flags)
+          expect(result['exit_code']).to eq(0)
+        end
+      end
     end
 
     it 'runs multiple commands' do

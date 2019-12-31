@@ -35,7 +35,6 @@ module Bolt
           @logger.debug("Initializing ssh connection to #{@target.safe_name}")
 
           @sudo_password = @target.options['sudo-password']
-          # rubocop:disable Style/GlobalVars
           @sudo_password ||= @target.options['password'] if $future
           # rubocop:enable Style/GlobalVars
 
@@ -189,23 +188,45 @@ module Bolt
 
         def execute(command, sudoable: false, **options)
           result_output = Bolt::Node::Output.new
-          run_as = options[:run_as] || self.run_as
-          escalate = sudoable && run_as && @user != run_as
-          use_sudo = escalate && @target.options['run-as-command'].nil?
+          run_as = options.fetch(:run_as, self.run_as || @user)
 
-          command_str = inject_interpreter(options[:interpreter], command)
-          if escalate
-            if use_sudo
-              sudo_exec = target.options['sudo-executable'] || "sudo"
-              sudo_flags = [sudo_exec, "-S", "-u", run_as, "-p", Sudoable.sudo_prompt]
-              sudo_flags += ["-E"] if options[:environment]
-              sudo_str = Shellwords.shelljoin(sudo_flags)
-            else
-              sudo_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
-            end
-            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options)
+          # if the run_as user is blank or nil, no escalation is required
+          # if the users don't match escalation is required
+          # if the users match, escalation is required, which is kinda dumb but
+          #   sudoable is always true for ssh transport which forces us to enable escalation as another user
+          #   which is this case is the same user
+          # 
+          escalation_required = @user != run_as || ! run_as.to_s.empty?
+
+          escalate = sudoable && escalation_required
+          # makes it possible to use clones of sudo if they are simply vendor forks of sudo
+          priv_exec_cmd = @target.options['run-as-command'].nil? ? 'sudo' : @target.options['run-as-command']
+          # use sudo if we need to escalate or run command using sudo without esculation
+          use_sudo = sudoable && priv_exec_cmd.include?('sudo') # might be one of suexec, dzdo, or sudo
+          use_priv_exec = use_sudo || !@target.options['run-as-command'].to_s.empty?
+          base_command_str = inject_interpreter(options[:interpreter], command)
+          # Either run the command as the run_as user via sudo 
+          # or run the command as is via sudo directly via current user
+          if use_sudo 
+            # this path is used for sudo or sudo forks only
+            priv_cmd_flags = [priv_exec_cmd, "-S"] 
+            priv_cmd_flags += ["-u", run_as] if escalate
+            priv_cmd_flags += ["-p", Sudoable.sudo_prompt]
+            priv_cmd_flags += ["-E"] if options[:environment]
+          elsif use_priv_exec
+            # this path is used for non sudo privilege esculation commands
+            priv_cmd_flags = [priv_exec_cmd]
+            priv_cmd_flags += [run_as] if escalation_required
+          else 
+            priv_cmd_flags = []
           end
 
+          priv_cmd_str = Shellwords.shelljoin(priv_cmd_flags)
+          command_str = if priv_cmd_str.empty?
+            base_command_str
+          else 
+            build_sudoable_command_str(base_command_str, priv_cmd_str, @sudo_id, options)
+          end
           # Including the environment declarations in the shelljoin will escape
           # the = sign, so we have to handle them separately.
           if options[:environment]
