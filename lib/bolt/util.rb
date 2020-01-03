@@ -171,10 +171,21 @@ module Bolt
       def deep_clone(obj, cloned = {})
         return cloned[obj.object_id] if cloned.include?(obj.object_id)
 
+        # The `defined?` method will not reliably find the Java::JavaLang::CloneNotSupportedException constant
+        # presumably due to some sort of optimization that short-cuts doing a bunch of Java introspection.
+        # Java::JavaLang::<...> IS defining the constant (via const_missing or const_get magic perhaps) so
+        # it is safe to reference it in the error_types array when a JRuby interpreter is evaluating the code
+        # (detected by RUBY_PLATFORM == `java`). SO instead of conditionally adding the CloneNotSupportedException
+        # constant to the error_types array based on `defined?` detecting the Java::JavaLang constant it is added
+        # based on detecting a JRuby interpreter.
+        # TypeError handles unclonable Ruby ojbects (TrueClass, Fixnum, ...)
+        # CloneNotSupportedException handles uncloneable Java objects (JRuby only)
+        error_types = [TypeError]
+        error_types << Java::JavaLang::CloneNotSupportedException if RUBY_PLATFORM == 'java'
+
         begin
           cl = obj.clone
-        rescue TypeError
-          # unclonable (TrueClass, Fixnum, ...)
+        rescue *error_types
           cloned[obj.object_id] = obj
           obj
         else
