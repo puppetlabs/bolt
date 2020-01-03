@@ -169,7 +169,7 @@ module Bolt
       # references to the same object and prevents endless recursion.
       # Credit to Jan Molic via https://github.com/rubyworks/facets/blob/master/LICENSE.txt
       def deep_clone(obj, cloned = {})
-        cloned[obj.object_id] if cloned.include?(obj.object_id)
+        return cloned[obj.object_id] if cloned.include?(obj.object_id)
 
         begin
           cl = obj.clone
