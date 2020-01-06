@@ -664,7 +664,8 @@ module Bolt
       @pal ||= Bolt::PAL.new(config.modulepath,
                              config.hiera_config,
                              config.boltdir.resource_types,
-                             config.compile_concurrency)
+                             config.compile_concurrency,
+                             config.trusted_external)
     end
 
     def convert_plan(plan)

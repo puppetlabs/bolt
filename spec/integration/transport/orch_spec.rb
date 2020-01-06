@@ -189,7 +189,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
         expect(node_results[1].error_hash).to eq(
           'kind' => 'puppetlabs.tasks/skipped-node',
-          'msg' => "Node node2 was skipped",
+          'msg' => "Target node2 was skipped",
           'details' => {}
         )
       end

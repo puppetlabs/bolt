@@ -15,6 +15,7 @@ describe "passes parsed AST to the apply_catalog task" do
   include BoltSpec::PuppetDB
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
+  let(:trusted_external) { File.join(__dir__, '../fixtures/scripts/trusted_external_facts.sh') }
   let(:config_flags) { %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
 
   before(:each) do
@@ -61,6 +62,25 @@ describe "passes parsed AST to the apply_catalog task" do
         "trusted {authenticated => local, certname => #{uri}, extensions => {}, "\
         "hostname => #{uri}, domain => , external => {}}"
       )
+    end
+
+    it 'uses trusted external facts' do
+      with_tempfile_containing('bolt', YAML.dump("trusted-external-command" => trusted_external), '.yaml') do |conf|
+        result = run_cli_json(%W[plan run basic::trusted --configfile #{conf.path}] + config_flags)
+        notify = get_notifies(result)
+        expect(notify.count).to eq(1)
+        expect(notify[0]['title']).to eq(
+          "trusted {authenticated => local, certname => #{uri}, extensions => {}, "\
+          "hostname => #{uri}, domain => , external => {hot => cocoa, pepper => mint}}"
+        )
+      end
+    end
+
+    it 'errors if trusted external facts path does not exist' do
+      with_tempfile_containing('bolt', YAML.dump("trusted-external-command" => '/absent.sh'), '.yaml') do |conf|
+        expect { run_cli_json(%W[plan run basic::trusted --configfile #{conf.path}] + config_flags) }
+          .to raise_error(Bolt::FileError, %r{The trusted-external-command '/absent.sh' does not exist})
+      end
     end
 
     it 'uses target vars' do

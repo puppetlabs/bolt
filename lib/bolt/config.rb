@@ -33,7 +33,7 @@ module Bolt
   class Config
     attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
                   :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir,
-                  :puppetfile_config, :plugins, :plugin_hooks, :future
+                  :puppetfile_config, :plugins, :plugin_hooks, :future, :trusted_external
     attr_writer :modulepath
 
     TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions sudo-executable
@@ -162,6 +162,9 @@ module Bolt
       end
 
       @hiera_config = File.expand_path(data['hiera-config'], @boltdir.path) if data.key?('hiera-config')
+      @trusted_external = if data.key?('trusted-external-command')
+                            File.expand_path(data['trusted-external-command'], @boltdir.path)
+                          end
       @compile_concurrency = data['compile-concurrency'] if data.key?('compile-concurrency')
 
       @save_rerun = data['save-rerun'] if data.key?('save-rerun')
@@ -291,6 +294,7 @@ module Bolt
       end
 
       Bolt::Util.validate_file('hiera-config', @hiera_config) if @hiera_config
+      Bolt::Util.validate_file('trusted-external-command', @trusted_external) if @trusted_external
 
       unless @transport.nil? || Bolt::TRANSPORTS.include?(@transport.to_sym)
         raise UnknownTransportError, @transport

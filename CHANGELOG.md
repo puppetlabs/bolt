@@ -8,6 +8,13 @@
 
   The new plan function, `file::join`, allows you to join file paths using the separator `/`.
 
+* **Support trusted external facts** ([#1431](https://github.com/puppetlabs/bolt/issues/1431))
+
+  A new Bolt configuration option `trusted-external-command` configures the path to the executable
+  on the Bolt controller to run to retrieve trusted external facts. If configured, trusted external
+  facts are available when running Bolt. This feature is experimental in both Puppet and Bolt, and
+  this API may change or be removed.
+
 ### Bug fixes
 
 * **The ssh configuration option `key-data` was not compatible with the `future` flag** ([#1504](https://github.com/puppetlabs/bolt/issues/1504))
