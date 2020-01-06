@@ -1,7 +1,9 @@
 version: "3"
 services:
   boltserver:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.bolt-server
     ports:
       - "62658:62658"
 networks:
