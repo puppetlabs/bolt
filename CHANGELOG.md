@@ -8,14 +8,6 @@
 
   Bolt no longer attempts to expand a `private-key` configuration `Hash` when `key-data` is being used in conjunction with the `future` setting.
 
-### New features
-
-* **Support .yml extension for Bolt config and inventory** ([#1500](https://github.com/puppetlabs/bolt/issues/1500))
-
-  Bolt will now read config and inventory from `bolt.yml` and `inventory.yml` in the Boltdir. Bolt
-  will also treat `bolt.yml` as the root of a local-type project directory. If both `.yaml` and `.yml`
-  extensions are present, `.yaml` is preferred.
-
 ## Bolt 1.43.0
 
 ### New features
