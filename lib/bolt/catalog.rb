@@ -97,6 +97,7 @@ module Bolt
               Puppet[:strict_variables] = options['strict_variables'] || false
               ast = Puppet::Pops::Serialization::FromDataConverter.convert(pal_main)
               compiler.evaluate(ast)
+              compiler.instance_variable_get(:@internal_compiler).send(:evaluate_ast_node)
               compiler.compile_additions
               compiler.with_json_encoding(&:encode)
             end

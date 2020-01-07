@@ -365,6 +365,14 @@ describe "apply", expensive: true do
           expect(result['report']['resource_statuses']).to include('Notify[hello world]')
         end
 
+        it "applies a node definition" do
+          results = run_cli_json(['apply', '-e', 'node default { notify { "hello world": } }'] + config_flags)
+          result = results[0]['result']
+          expect(result).not_to include('kind')
+          expect(result['report']).to include('status' => 'changed')
+          expect(result['report']['resource_statuses']).to include('Notify[hello world]')
+        end
+
         it "fails if the manifest doesn't parse" do
           expect { run_cli_json(['apply', '-e', 'include(basic'] + config_flags) }
             .to raise_error(/Syntax error/)
