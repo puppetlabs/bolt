@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt NEXT
+## Bolt 1.44.0
 
 ### New features
 
