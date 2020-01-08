@@ -438,13 +438,12 @@ If successful, this will return
 ## Running Bolt Server in a container
 *Recommended*
 
-From your checkout of bolt, start the spec docker-compose to run
-puppet-server and some targets then run the top level compose to start
-bolt-server connected to that network.
+From your checkout of bolt, start the spec docker-compose to run puppet-server and some targets then
+run the bolt server docker compose file to start bolt-server connected to that network.
 
 ```
 docker-compose -f spec/docker-compose.yml up -d --build
-docker-compose up --build
+docker-compose -f ./docker-compose-bolt-server.yml up --build
 ```
 
 Setup your environment for running commands with
