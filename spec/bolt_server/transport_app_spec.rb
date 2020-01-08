@@ -69,6 +69,20 @@ describe "BoltServer::TransportApp" do
         )
     end
 
+    describe '/plans' do
+      let(:path) { "/plans?environment=production" }
+      let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
+
+      it 'returns properly from /plans' do
+        expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+        expect(fake_pal).to receive(:list_plans).and_return(['abc'])
+        expect(fake_pal).to receive(:get_plan_info).with('abc').and_return('name' => 'abc')
+        get(path)
+        metadata = JSON.parse(last_response.body)
+        expect(metadata).to include('abc' => { 'name' => 'abc' })
+      end
+    end
+
     describe '/ssh/*' do
       let(:path) { "/ssh/#{action}" }
       let(:target) { conn_info('ssh') }

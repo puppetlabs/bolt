@@ -10,6 +10,10 @@ require 'bolt/task/puppet_server'
 require 'json'
 require 'json-schema'
 
+# These are only needed for the `/plans` endpoint.
+require 'puppet'
+require 'bolt_server/pe/pal'
+
 module BoltServer
   class TransportApp < Sinatra::Base
     # This disables Sinatra's error page generation
@@ -44,6 +48,9 @@ module BoltServer
       @executor = Bolt::Executor.new(0)
 
       @file_cache = BoltServer::FileCache.new(@config).setup
+
+      # This is needed until the PAL is threadsafe.
+      @pal_mutex = Mutex.new
 
       super(nil)
     end
@@ -271,6 +278,20 @@ module BoltServer
 
       aggregate = body['target'].nil?
       [200, result_set_to_status_hash(result_set, aggregate: aggregate).to_json]
+    end
+
+    get '/plans' do
+      @pal_mutex.synchronize do
+        environment = params['environment']
+        if environment.nil?
+          [400, '`environment` is a required argument']
+        else
+          pal = BoltServer::PE::PAL.new({}, params['environment'] || 'production')
+          plans = pal.list_plans.flatten
+          plan_info = plans.each_with_object({}) { |plan_name, acc| acc[plan_name] = pal.get_plan_info(plan_name) }
+          [200, plan_info.to_json]
+        end
+      end
     end
 
     error 404 do
