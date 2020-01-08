@@ -197,13 +197,13 @@ module Bolt
           if escalate
             if use_sudo
               sudo_exec = target.options['sudo-executable'] || "sudo"
-              sudo_flags = [sudo_exec, "-S", "-u", run_as, "-p", Sudoable.sudo_prompt]
+              sudo_flags = [sudo_exec, "-S", "-H", "-u", run_as, "-p", Sudoable.sudo_prompt]
               sudo_flags += ["-E"] if options[:environment]
               sudo_str = Shellwords.shelljoin(sudo_flags)
             else
               sudo_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
             end
-            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options)
+            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options.merge(reset_cwd: true))
           end
 
           # Including the environment declarations in the shelljoin will escape
