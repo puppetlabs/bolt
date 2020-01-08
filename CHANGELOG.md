@@ -1,5 +1,13 @@
 # Changelog
 
+## Bolt Next
+
+### New features
+
+* **Packages for Fedora 31** ([#1373](https://github.com/puppetlabs/bolt/issues/1373))
+
+  Bolt packages are now available for Fedora 31.
+
 ## Bolt 1.44.0
 
 ### New features
