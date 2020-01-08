@@ -36,7 +36,7 @@ module Bolt
 
           @sudo_password = @target.options['sudo-password']
           # rubocop:disable Style/GlobalVars
-          @sudo_password ||= @target.options['password'] if $future
+          @sudo_password ||= @target.password if $future
           # rubocop:enable Style/GlobalVars
 
           if target.options['private-key']&.instance_of?(String)
