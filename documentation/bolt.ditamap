@@ -34,6 +34,7 @@
     <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
     <topicref href="inventory_file.md" format="markdown"/>
     <topicref href="inventory_file_v2.md" format="markdown">
+        <topicref href="migrating_inventory_files.md" format="markdown"/> 
         <topicref href="using_plugins.md" format="markdown"/>
         <topicref href="writing_plugins.md" format="markdown"/>
     </topicref>
