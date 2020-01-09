@@ -96,7 +96,26 @@ module Bolt
               Puppet[:strict] = options['strict'] || :warning
               Puppet[:strict_variables] = options['strict_variables'] || false
               ast = Puppet::Pops::Serialization::FromDataConverter.convert(pal_main)
+              # This will be a Program when running via `bolt apply`, but will
+              # only be a subset of the AST when compiling an apply block in a
+              # plan. In that case, we need to discover the definitions (which
+              # would ordinarily be stored on the Program) and construct a Program object.
+              unless ast.is_a?(Puppet::Pops::Model::Program)
+                # Node definitions must be at the top level of the apply block.
+                # That means the apply body either a) consists of just a
+                # NodeDefinition, b) consists of a BlockExpression which may
+                # contain NodeDefinitions, or c) doesn't contain NodeDefinitions.
+                definitions = if ast.is_a?(Puppet::Pops::Model::BlockExpression)
+                                ast.statements.select { |st| st.is_a?(Puppet::Pops::Model::NodeDefinition) }
+                              elsif ast.is_a?(Puppet::Pops::Model::NodeDefinition)
+                                [ast]
+                              else
+                                []
+                              end
+                ast = Puppet::Pops::Model::Factory.PROGRAM(ast, definitions, ast.locator).model
+              end
               compiler.evaluate(ast)
+              compiler.instance_variable_get(:@internal_compiler).send(:evaluate_ast_node)
               compiler.compile_additions
               compiler.with_json_encoding(&:encode)
             end

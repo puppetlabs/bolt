@@ -8,6 +8,10 @@
 
   The new plan function, `file::join`, allows you to join file paths using the separator `/`.
 
+* **Node definitions are supported when applying manifest code** ([#1338](https://github.com/puppetlabs/bolt/issues/1338))
+
+  Node definitions can now be used with `bolt apply` and within apply blocks in plans. This makes it easier to reuse existing Puppet codebases with Bolt.
+
 ### Bug fixes
 
 * **The ssh configuration option `key-data` was not compatible with the `future` flag** ([#1504](https://github.com/puppetlabs/bolt/issues/1504))
