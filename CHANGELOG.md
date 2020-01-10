@@ -10,7 +10,7 @@
 
 * **Node definitions are supported when applying manifest code** ([#1338](https://github.com/puppetlabs/bolt/issues/1338))
 
-  Node definitions can now be used with `bolt apply` and within apply blocks in plans. This makes it easier to reuse existing Puppet codebases with Bolt.
+  Node definitions can now be used with `bolt apply` (but not yet with `apply()` blocks in plans). This makes it easier to reuse existing Puppet codebases with Bolt.
 
 ## Bolt 1.44.0
 
