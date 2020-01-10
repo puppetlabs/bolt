@@ -8,6 +8,10 @@
 
   Bolt packages are now available for Fedora 31.
 
+* **Node definitions are supported when applying manifest code** ([#1338](https://github.com/puppetlabs/bolt/issues/1338))
+
+  Node definitions can now be used with `bolt apply` and within apply blocks in plans. This makes it easier to reuse existing Puppet codebases with Bolt.
+
 ## Bolt 1.44.0
 
 ### New features
@@ -15,10 +19,6 @@
 * **New `file::join` plan function** ([#837](https://github.com/puppetlabs/bolt/issues/837))
 
   The new plan function, `file::join`, allows you to join file paths using the separator `/`.
-
-* **Node definitions are supported when applying manifest code** ([#1338](https://github.com/puppetlabs/bolt/issues/1338))
-
-  Node definitions can now be used with `bolt apply` and within apply blocks in plans. This makes it easier to reuse existing Puppet codebases with Bolt.
 
 ### Bug fixes
 
