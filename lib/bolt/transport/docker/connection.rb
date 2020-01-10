@@ -157,14 +157,14 @@ module Bolt
                        .map { |str| JSON.parse(str) }
         end
 
-        # rubocop:disable Metrics/LineLength
+        # rubocop:disable Layout/LineLength
         # Executes a Docker CLI command
         #
         # @param subcommand [String] The docker subcommand to run e.g. 'inspect' for `docker inspect`
         # @param command_options [Array] Additional command options e.g. ['--size'] for `docker inspect --size`
         # @param redir_stdin [IO] IO object which will be use to as STDIN in the docker command. Default is nil, which does not perform redirection
         # @return [String, String, Process::Status] The output of the command:  STDOUT, STDERR, Process Status
-        # rubocop:enable Metrics/LineLength
+        # rubocop:enable Layout/LineLength
         def execute_local_docker_command(subcommand, command_options = [], redir_stdin = nil)
           env_hash = {}
           # Set the DOCKER_HOST if we are using a non-default service-url

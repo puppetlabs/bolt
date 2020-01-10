@@ -53,9 +53,9 @@ module Bolt
 
       unless missing_keys.empty?
         if result['_output']
-          # rubocop:disable Metrics/LineLength
+          # rubocop:disable Layout/LineLength
           msg = "Report result contains an '_output' key. Catalog application may have printed extraneous output to stdout: #{result['_output']}"
-          # rubocop:enable Metrics/LineLength
+          # rubocop:enable Layout/LineLength
         else
           msg = "Report did not contain all expected keys missing: #{missing_keys.join(' ,')}"
         end
