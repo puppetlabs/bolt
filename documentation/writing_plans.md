@@ -391,6 +391,84 @@ plan loop(TargetSpec $targets) {
 
 If your plan accepts a single `TargetSpec` parameter you can call that parameter `targets` so that it can be specified with the `--targets` flag from the command line.
 
+### Creating Target objects
+
+Creating Target objects in a plan means they are part of the in-memory inventory - they can be
+referenced and run alongside targets that are loaded from the inventory file, but their data is not
+saved between plan runs. They only exist for the lifecycle of the plan run.
+
+There are two main ways you may want to instantiate Target objects within a plan: getting a Target
+that may already exist, or making a new Target object that clobbers any existing Targets with the
+same name. 
+
+To get or create a Target use the `get_target` function. This takes a single URI and returns a
+single Target object with the same name if it already exists in the inventory, otherwise it will
+create the Target and return it. Similarly `get_targets` takes an array of URIs, gets or creates
+each Target, and returns an array of Target objects. Some transport options can be [configured in
+the URI string](https://puppet.com/docs/bolt/latest/configuring_bolt.html), but if this isn't
+sufficient you can use
+[set_config](https://puppet.com/docs/bolt/latest/plan_functions.html#set-config) to set config on
+gotten Targets.
+
+To create a new Target that clobbers an existing target with the same name use `Target.new()`, which
+takes a data hash with the same keys as [inventory target
+definitions](https://puppet.com/docs/bolt/latest/inventory_file_v2.html#target-object). You can use
+this to configure more options for the target than are available in the URI alone, but it is a
+destructive action: if you try to create a Target with the same name as Target that already exists
+in the inventory (either from in-memory or from the file), the old Target will be completely
+destroyed and replaced with the new Target object.
+
+All new targets are added to the 'all' inventory group, and no other groups. See [modifying Target
+objects](#modifying-target-objects) for information on modifying group membership.
+
+```
+plan create_targets(
+  TargetSpec $targetspecs
+) {
+  # Create a single Target object
+  $target1 = get_target('ssh://user:password@myhostname.com:8022')
+  $target2 = get_target('2hostname2handle')
+
+  # Create an array of Target objects
+  $target_list = get_targets('host1', 'host2', 'hostred', 'hostblue')
+  # This also accepts TargetSpec objects
+  $listy_list = get_targets($targetspecs)
+  # And inventory group names
+  $listerine = get_targets('all')
+
+  # Create a Target object with options
+  $opts_hash = {'uri' => 'myuri',
+                'name' => 'nodename',
+                'config' => {
+                  'transport' => 'ssh',
+                  'ssh' => {
+                    'host-key-check' => false
+                  }
+                }
+              }
+  $with_opts = Target.new($opts_hash)
+
+  # All of these target vars can be operated on
+  run_command('hostname', $target1)
+}
+```
+
+### Modifying Target objects
+
+There are a handful of functions available to modify existing target objects inside a plan:
+
+* [add_facts](https://puppet.com/docs/bolt/latest/plan_functions.html#add-facts)
+* [add_to_group](https://puppet.com/docs/bolt/latest/plan_functions.html#add-to-group)
+* [remove_from_group])https://puppet.com/docs/bolt/latest/plan_functions.html#remove-from-group)
+* [set_config](https://puppet.com/docs/bolt/latest/plan_functions.html#set-config)
+* [set_feature](https://puppet.com/docs/bolt/latest/plan_functions.html#set-feature)
+* [set_var](https://puppet.com/docs/bolt/latest/plan_functions.html#set-var)
+
+These can be used to add facts, transport specific configuration options, features, and variables to
+Target objects, as well as add or remove objects from existing [inventory
+groups](https://puppet.com/docs/bolt/latest/inventory_file.html). Targets are modified in-memory
+for the lifecycle of the plan, so are not saved between plan runs.
+
 ### Variables and facts on targets
 
 When Bolt runs, it loads transport config values, variables, and facts from the inventory. These can be accessed with the `$target.facts()` and `$target.vars()` functions. During the course of a plan, you can update the facts or variables for any target. Facts usually come from running `facter` or another fact collection application on the target or from a fact store like PuppetDB. Variables are computed externally or assigned directly.
