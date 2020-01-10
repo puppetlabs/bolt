@@ -44,6 +44,9 @@ Layout/HeredocIndentation:
 Layout/ClosingHeredocIndentation:
   Enabled: false
 
+Layout/LineLength:
+  Max: 120
+
 Style/GuardClause:
   Enabled: false
 
@@ -72,9 +75,6 @@ Metrics/ClassLength:
 
 Metrics/CyclomaticComplexity:
   Enabled: false
-
-Metrics/LineLength:
-  Max: 120
 
 Metrics/MethodLength:
   Enabled: false
