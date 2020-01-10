@@ -180,6 +180,26 @@ module BoltServer
       [@executor.run_script(target, file_location, body['arguments'])]
     end
 
+    def in_pe_pal_env(environment)
+      if environment.nil?
+        [400, '`environment` is a required argument']
+      else
+        @pal_mutex.synchronize do
+          begin
+            pal = BoltServer::PE::PAL.new({}, environment)
+            yield pal
+          rescue Puppet::Environments::EnvironmentNotFound
+            [400, {
+              "class" => 'bolt/unknown-environment',
+              "message" => "Environment #{environment} not found"
+            }.to_json]
+          rescue Bolt::Error => e
+            [400, e.to_json]
+          end
+        end
+      end
+    end
+
     get '/' do
       200
     end
@@ -280,16 +300,32 @@ module BoltServer
       [200, result_set_to_status_hash(result_set, aggregate: aggregate).to_json]
     end
 
+    # Fetches the metadata for a single plan
+    #
+    # @param environment [String] the environment to fetch the plan from
+    get '/plans/:module_name/:plan_name' do
+      in_pe_pal_env(params['environment']) do |pal|
+        plan_info = pal.get_plan_info("#{params[:module_name]}::#{params[:plan_name]}")
+        [200, plan_info.to_json]
+      end
+    end
+
+    # Fetches the list of plans for an environment, optionally fetching all metadata for each plan
+    #
+    # @param environment [String] the environment to fetch the list of plans from
+    # @param metadata [Boolean] Set to true to fetch all metadata for each plan. Defaults to false
     get '/plans' do
-      @pal_mutex.synchronize do
-        environment = params['environment']
-        if environment.nil?
-          [400, '`environment` is a required argument']
-        else
-          pal = BoltServer::PE::PAL.new({}, params['environment'] || 'production')
-          plans = pal.list_plans.flatten
+      in_pe_pal_env(params['environment']) do |pal|
+        plans = pal.list_plans.flatten
+        if params['metadata']
           plan_info = plans.each_with_object({}) { |plan_name, acc| acc[plan_name] = pal.get_plan_info(plan_name) }
           [200, plan_info.to_json]
+        else
+          # We structure this array of plans to be an array of hashes so that it matches the structure
+          # returned by the puppetserver API that serves data like this. Structuring the output this way
+          # makes switching between puppetserver and bolt-server easier, which makes changes to switch
+          # to bolt-server smaller/simpler.
+          [200, plans.map { |plan| { 'name' => plan } }.to_json]
         end
       end
     end
