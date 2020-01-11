@@ -8,6 +8,7 @@ require 'bolt_server/config'
 require 'bolt_server/transport_app'
 require 'json'
 require 'rack/test'
+require 'puppet/environments'
 
 describe "BoltServer::TransportApp" do
   include BoltSpec::BoltServer
@@ -69,17 +70,59 @@ describe "BoltServer::TransportApp" do
         )
     end
 
-    describe '/plans' do
-      let(:path) { "/plans?environment=production" }
+    describe '/plans/:module_name/:plan_name' do
+      let(:path) { "/plans/foo/bar?environment=production" }
       let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
 
       it 'returns properly from /plans' do
         expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-        expect(fake_pal).to receive(:list_plans).and_return(['abc'])
-        expect(fake_pal).to receive(:get_plan_info).with('abc').and_return('name' => 'abc')
+        expect(fake_pal).to receive(:get_plan_info).with('foo::bar').and_return('name' => 'foo::bar')
         get(path)
         metadata = JSON.parse(last_response.body)
-        expect(metadata).to include('abc' => { 'name' => 'abc' })
+        expect(metadata).to eq('name' => 'foo::bar')
+      end
+
+      it 'returns 400 if an unknown plan error is thrown' do
+        expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+        expect(fake_pal).to receive(:get_plan_info).with('foo::bar').and_raise(Bolt::Error.unknown_plan('foo::bar'))
+        get(path)
+        expect(last_response.status).to eq(400)
+      end
+    end
+
+    describe '/plans' do
+      let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
+
+      describe 'when metadata=false' do
+        let(:path) { "/plans?environment=production" }
+        it 'returns just the list of plan names when metadata=false' do
+          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:list_plans).and_return([['abc'], ['def']])
+          get(path)
+          metadata = JSON.parse(last_response.body)
+          expect(metadata).to eq([{ 'name' => 'abc' }, { 'name' => 'def' }])
+        end
+
+        it 'returns 400 if an environment not found error is thrown' do
+          # Actually creating the EnvironmentNotFound error with puppet is difficult to do without
+          # puppet actually loaded with settings, so just stub out the error type
+          stub_const("Puppet::Environments::EnvironmentNotFound", StandardError)
+          expect(BoltServer::PE::PAL).to receive(:new).and_raise(Puppet::Environments::EnvironmentNotFound)
+          get(path)
+          expect(last_response.status).to eq(400)
+        end
+      end
+
+      describe 'when metadata=true' do
+        let(:path) { "/plans?environment=production&metadata=true" }
+        it 'returns all metadata for each plan when metadata=true' do
+          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:list_plans).and_return(['abc'])
+          expect(fake_pal).to receive(:get_plan_info).with('abc').and_return('name' => 'abc')
+          get(path)
+          metadata = JSON.parse(last_response.body)
+          expect(metadata).to eq('abc' => { 'name' => 'abc' })
+        end
       end
     end
 
