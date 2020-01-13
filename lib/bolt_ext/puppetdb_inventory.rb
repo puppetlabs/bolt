@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'bolt/puppetdb'
+require 'bolt/logger'
 require 'json'
 require 'optparse'
 require 'yaml'
@@ -10,6 +11,8 @@ module Bolt
   class PuppetDBInventory
     class CLI
       def initialize(args)
+        Bolt::Logger.initialize_logging
+        @logger = Logging.logger[self]
         @args = args
         @cli_opts = {}
         @parser = build_parser
@@ -66,6 +69,17 @@ query results.
       end
 
       def run
+        Bolt::Logger.configure({ "console" => {} }, true)
+        msg = <<~MSG
+          Deprecation Warning: Starting with Bolt 2.0, inventory file v1 and the
+          bolt-inventory-pdb command will no longer be supported. Use a v2 inventory
+          file instead with the PuppetDB plugin to lookup targets from PuppetDB.
+
+          v1 inventory files can be automatically migrated to v2 using 'bolt project migrate'.
+          Inventory files are modified in place and will not preserve formatting or comments.
+        MSG
+        @logger.warn(msg)
+
         positional_args = @parser.permute(@args)
 
         if @show_help

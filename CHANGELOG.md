@@ -2,6 +2,10 @@
 
 ## Bolt Next
 
+### Deprecations
+
+* **Support for the `bolt-inventory-pdb` command will be dropped in Bolt 2.0.** Users can use the [puppetdb inventory plugin](https://puppet.com/docs/bolt/latest/using_plugins.html#puppetdb) with a v2 inventory file to lookup targets from PuppetDB.
+
 ### New features
 
 * **Packages for Fedora 31** ([#1373](https://github.com/puppetlabs/bolt/issues/1373))
