@@ -90,6 +90,8 @@ module Bolt
 
       @groups.resolve_aliases(@groups.node_aliases)
       collect_groups
+
+      deprecation unless @data.empty?
     end
 
     def validate
@@ -99,6 +101,17 @@ module Bolt
     def version
       1
     end
+
+    def deprecation
+      msg = <<~MSG
+        Deprecation Warning: Starting with Bolt 2.0, inventory file v1 will no longer
+        be supported. v1 inventory files can be automatically migrated to v2 using
+        'bolt project migrate'. Inventory files are modified in place and will not
+        preserve formatting or comments.
+      MSG
+      @logger.warn(msg)
+    end
+    private :deprecation
 
     def collect_groups
       # Provide a lookup map for finding a group by name
