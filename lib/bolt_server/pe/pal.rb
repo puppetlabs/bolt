@@ -80,9 +80,9 @@ module BoltServer
           # so that we can have full control over all the entries in modulepath. In the future
           # it's likely we will need to preceed _both_ Bolt::PAL::BOLTLIB_PATH _and_
           # Bolt::PAL::MODULES_PATH which would be more complex if we tried to use @modulepath since
-          # we need to interject a path between *modulepath_dirs and Bolt::PAL::MODULES_PATH
+          # we need to append our modulepaths and exclude modules shiped in bolt gem code
           @original_modulepath = modulepath_dirs
-          @modulepath = [PE_BOLTLIB_PATH, Bolt::PAL::BOLTLIB_PATH, *modulepath_dirs, Bolt::PAL::MODULES_PATH]
+          @modulepath = [PE_BOLTLIB_PATH, Bolt::PAL::BOLTLIB_PATH, *modulepath_dirs]
         end
       end
     end
