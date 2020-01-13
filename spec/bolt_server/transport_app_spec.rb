@@ -71,15 +71,24 @@ describe "BoltServer::TransportApp" do
     end
 
     describe '/plans/:module_name/:plan_name' do
-      let(:path) { "/plans/foo/bar?environment=production" }
+      let(:path) { '/plans/foo/bar?environment=production' }
       let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
+      let(:init_plan) { '/plans/foo/init?environment=production' }
 
-      it 'returns properly from /plans' do
+      it '/plans/:module_name/:plan_name handles module::plan_name' do
         expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
         expect(fake_pal).to receive(:get_plan_info).with('foo::bar').and_return('name' => 'foo::bar')
         get(path)
         metadata = JSON.parse(last_response.body)
         expect(metadata).to eq('name' => 'foo::bar')
+      end
+
+      it '/plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
+        expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+        expect(fake_pal).to receive(:get_plan_info).with('foo').and_return('name' => 'foo')
+        get(init_plan)
+        metadata = JSON.parse(last_response.body)
+        expect(metadata).to eq('name' => 'foo')
       end
 
       it 'returns 400 if an unknown plan error is thrown' do
