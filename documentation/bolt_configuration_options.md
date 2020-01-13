@@ -25,6 +25,7 @@ ssh:
 -   `concurrency`: The number of threads to use when executing on remote targets. Default is `100`.
 -   `format`: The format to use when printing results. Options are `human` and `json`. Default is `human`.
 -   `hiera-config`: Specify the path to your Hiera config. The default path is `hiera.yaml` inside the [Bolt project directory](bolt_project_directories.md#).
+-   `trusted-external-command`: Specify the path to an executable on the Bolt controller that can produce [external trusted facts](https://puppet.com/docs/puppet/latest/release_notes_puppet.html#puppet-new-features-x.10.1). **Note:** external trusted facts are experimental in both Puppet and Bolt, and this API may change or be removed.
 -   `interpreters`: A map of an extension name to the absolute path of an executable, enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the `.` character (`.py` and `py` both map to a task executable `task.py`) and the extension is case sensitive. The transports that support interpreter configuration are `docker`, `local`, `ssh`, and `winrm`. When a target's name is `localhost`, Ruby tasks run with the Bolt Ruby interpreter by default. This example demonstrates configuring Python tasks to run with a `python3` interpreter:
     ```yaml
     interpreters:

@@ -39,7 +39,7 @@ module Bolt
 
     attr_reader :modulepath
 
-    def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors)
+    def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors, trusted_external = nil)
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happens in tests
       self.class.load_puppet
@@ -47,6 +47,7 @@ module Bolt
       @original_modulepath = modulepath
       @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
       @hiera_config = hiera_config
+      @trusted_external = trusted_external
       @max_compiles = max_compiles
       @resource_types = resource_types
 
@@ -211,6 +212,7 @@ module Bolt
         Puppet.settings.send(:clear_everything_for_tests)
         Puppet.initialize_settings(cli)
         Puppet::GettextConfig.create_default_text_domain
+        Puppet[:trusted_external_command] = @trusted_external
         self.class.configure_logging
         yield
       end

@@ -82,7 +82,11 @@ module Bolt
     end
 
     def compile(target, ast, plan_vars)
-      trusted = Puppet::Context::TrustedInformation.new('local', target.name, {})
+      # This simplified Puppet node object is what .local uses to determine the
+      # certname of the target
+      node = Puppet::Node.from_data_hash('name' => target.name,
+                                         'parameters' => { 'clientcert' => target.name })
+      trusted = Puppet::Context::TrustedInformation.local(node)
       facts = @inventory.facts(target).merge('bolt' => true)
 
       catalog_input = {
@@ -131,7 +135,11 @@ module Bolt
     end
 
     def future_compile(target, catalog_input)
-      trusted = Puppet::Context::TrustedInformation.new('local', target.name, {})
+      # This simplified Puppet node object is what .local uses to determine the
+      # certname of the target
+      node = Puppet::Node.from_data_hash('name' => target.name,
+                                         'parameters' => { 'clientcert' => target.name })
+      trusted = Puppet::Context::TrustedInformation.local(node)
       catalog_input[:target] = {
         name: target.name,
         facts: @inventory.facts(target).merge('bolt' => true),

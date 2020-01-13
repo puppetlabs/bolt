@@ -81,7 +81,7 @@ module Bolt
               target,
               value: { '_error' => {
                 'kind' => 'puppetlabs.tasks/skipped-node',
-                'msg' => "Node #{target.safe_name} was skipped",
+                'msg' => "Target #{target.safe_name} was skipped",
                 'details' => {}
               } },
               action: 'task', object: task_name
