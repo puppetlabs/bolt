@@ -95,3 +95,7 @@ Lint/SuppressedException:
 # Enforce LF line endings, even when on Windows
 Layout/EndOfLine:
   EnforcedStyle: lf
+
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: [key, table]
+  EnforcedColonStyle: [key, table]

@@ -21,8 +21,18 @@ module Bolt
 
       attr_writer :plan_context
 
+      OPTIONS = {
+        "cacert"            => "The path to the CA certificate.",
+        "host"              => "Host name.",
+        "job-poll-interval" => "Set interval to poll orchestrator for job status.",
+        "job-poll-timeout"  => "Set time to wait for orchestrator job status.",
+        "service-url"       => "The URL of the orchestrator API.",
+        "task-environment"  => "The environment the orchestrator loads task code from.",
+        "token-file"        => "The path to the token file."
+      }.freeze
+
       def self.options
-        %w[host service-url cacert token-file task-environment job-poll-interval job-poll-timeout]
+        OPTIONS.keys
       end
 
       def self.default_options

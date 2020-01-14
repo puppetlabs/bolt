@@ -36,11 +36,69 @@ module Bolt
                   :puppetfile_config, :plugins, :plugin_hooks, :future, :trusted_external
     attr_writer :modulepath
 
-    TRANSPORT_OPTIONS = %i[password run-as sudo-password extensions sudo-executable
-                           private-key tty tmpdir user connect-timeout disconnect-timeout
-                           cacert token-file service-url interpreters file-protocol smb-port realm].freeze
+    OPTIONS = {
+      "color"                    => "Whether to use colored output when printing messages to the console.",
+      "compile-concurrency"      => "The maximum number of simultaneous manifest block compiles.",
+      "concurrency"              => "The number of threads to use when executing on remote targets.",
+      "format"                   => "The format to use when printing results. Options are `human` and `json`.",
+      "hiera-config"             => "The path to your Hiera config.",
+      "interpreters"             => "A map of an extension name to the absolute path of an executable, "\
+                                    "enabling you to override the shebang defined in a task executable. The "\
+                                    "extension can optionally be specified with the `.` character (`.py` and "\
+                                    "`py` both map to a task executable `task.py`) and the extension is case "\
+                                    "sensitive. The transports that support interpreter configuration are "\
+                                    "`docker`, `local`, `ssh`, and `winrm`. When a target's name is `localhost`, "\
+                                    "Ruby tasks run with the Bolt Ruby interpreter by default.",
+      "inventoryfile"            => "The path to a structured data inventory file used to refer to groups of "\
+                                    "targets on the command line and from plans.",
+      "log"                      => "The configuration of the logfile output. Configuration can be set for "\
+                                    "`console` and the path to a log file, such as `~/.puppetlabs/bolt/debug.log`.",
+      "modulepath"               => "The module path for loading tasks and plan code. This is either an array "\
+                                    "of directories or a string containing a list of directories separated by the "\
+                                    "OS-specific PATH separator.",
+      "plugin_hooks"             => "Which plugins a specific hook should use.",
+      "puppetfile"               => "A map containing options for the `bolt puppetfile install` command.",
+      "save-rerun"               => "Whether to update `.rerun.json` in the Bolt project directory. If "\
+                                    "your target names include passwords, set this value to `false` to avoid "\
+                                    "writing passwords to disk.",
+      "transport"                => "The default transport to use when the transport for a target is not "\
+                                    "specified in the URL or inventory.",
+      "trusted-external-command" => "The path to an executable on the Bolt controller that can produce "\
+                                    "external trusted facts. **External trusted facts are experimental in both "\
+                                    "Puppet and Bolt and this API may change or be removed.**",
+      "future"                   => "Whether to use new, breaking changes. This allows testing if Bolt content "\
+                                    "is compatible with expected future behavior."
+    }.freeze
 
-    PUPPETFILE_OPTIONS = %w[proxy forge].freeze
+    DEFAULT_OPTIONS = {
+      "color" => true,
+      "concurrency" => 100,
+      "compile-concurrency" => "Number of cores",
+      "format" => "human",
+      "hiera-config" => "Boltdir/hiera.yaml",
+      "inventoryfile" => "Boltdir/inventory.yaml",
+      "modulepath" => ["Boltdir/modules", "Boltdir/site-modules", "Boltdir/site"],
+      "save-rerun" => true,
+      "future" => false
+    }.freeze
+
+    PUPPETFILE_OPTIONS = {
+      "forge" => "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations "\
+                 "only, and a `baseurl` setting to specify a different Forge host.",
+      "proxy" => "The HTTP proxy to use for Git and Forge operations."
+    }.freeze
+
+    LOG_OPTIONS = {
+      "append" => "Add output to an existing log file. Available only for logs output to a "\
+                  "filepath.",
+      "level"  => "The type of information in the log. Either `debug`, `info`, `notice`, "\
+                  "`warn`, or `error`."
+    }.freeze
+
+    DEFAULT_LOG_OPTIONS = {
+      "append" => true,
+      "level"  => "`warn` for console, `notice` for file"
+    }.freeze
 
     def self.default
       new(Bolt::Boltdir.new('.'), {})
@@ -194,8 +252,10 @@ module Bolt
       @compile_concurrency = options[:'compile-concurrency'] if options[:'compile-concurrency']
 
       TRANSPORTS.each_key do |transport|
+        # Get the options first since transport is modified in the next line
+        transport_options = TRANSPORTS[transport]::OPTIONS.keys.map(&:to_sym)
         transport = @transports[transport]
-        TRANSPORT_OPTIONS.each do |key|
+        transport_options.each do |key|
           if options[key]
             transport[key.to_s] = Bolt::Util.walk_keys(options[key], &:to_s)
           end
