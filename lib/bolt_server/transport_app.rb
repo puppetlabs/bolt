@@ -305,7 +305,13 @@ module BoltServer
     # @param environment [String] the environment to fetch the plan from
     get '/plans/:module_name/:plan_name' do
       in_pe_pal_env(params['environment']) do |pal|
-        plan_info = pal.get_plan_info("#{params[:module_name]}::#{params[:plan_name]}")
+        # Handle case where plan name is simply module name with special `init.pp` plan
+        plan_name = if params[:plan_name] == 'init'
+                      params[:module_name]
+                    else
+                      "#{params[:module_name]}::#{params[:plan_name]}"
+                    end
+        plan_info = pal.get_plan_info(plan_name)
         [200, plan_info.to_json]
       end
     end
