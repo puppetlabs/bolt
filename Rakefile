@@ -2,7 +2,6 @@
 
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
-require "rubocop/rake_task"
 require "bolt/cli"
 
 require "puppet-strings"
@@ -42,12 +41,8 @@ RSpec::Core::RakeTask.new(:puppetserver) do |t|
   t.rspec_opts = '--tag puppetserver --tag puppetdb --tag expensive'
 end
 
-RuboCop::RakeTask.new(:rubocop) do |t|
-  t.options = ['--display-cop-names', '--display-style-guide', '--parallel']
-end
-
 desc "Run tests and style checker"
-task test: %w[spec rubocop]
+task test: %w[spec]
 
 task :default do
   system "rake --tasks"
@@ -58,7 +53,6 @@ def format_links(text)
 end
 
 namespace :travis do
-  task rubocop: :rubocop
   task :unit do
     sh "docker-compose -f spec/docker-compose.yml build --parallel ubuntu_node puppet_5_node puppet_6_node"
     sh "docker-compose -f spec/docker-compose.yml up -d ubuntu_node puppet_5_node puppet_6_node"
