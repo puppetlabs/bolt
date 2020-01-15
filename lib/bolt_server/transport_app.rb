@@ -200,6 +200,19 @@ module BoltServer
       end
     end
 
+    def pe_plan_info(pal, module_name, plan_name)
+      # Handle case where plan name is simply module name with special `init.pp` plan
+      plan_name = if plan_name == 'init' || plan_name.nil?
+                    module_name
+                  else
+                    "#{module_name}::#{plan_name}"
+                  end
+      plan_info = pal.get_plan_info(plan_name)
+      # Path to module is meaningless in PE
+      plan_info.delete('module')
+      plan_info
+    end
+
     get '/' do
       200
     end
@@ -305,13 +318,7 @@ module BoltServer
     # @param environment [String] the environment to fetch the plan from
     get '/plans/:module_name/:plan_name' do
       in_pe_pal_env(params['environment']) do |pal|
-        # Handle case where plan name is simply module name with special `init.pp` plan
-        plan_name = if params[:plan_name] == 'init'
-                      params[:module_name]
-                    else
-                      "#{params[:module_name]}::#{params[:plan_name]}"
-                    end
-        plan_info = pal.get_plan_info(plan_name)
+        plan_info = pe_plan_info(pal, params[:module_name], params[:plan_name])
         [200, plan_info.to_json]
       end
     end
@@ -324,7 +331,11 @@ module BoltServer
       in_pe_pal_env(params['environment']) do |pal|
         plans = pal.list_plans.flatten
         if params['metadata']
-          plan_info = plans.each_with_object({}) { |plan_name, acc| acc[plan_name] = pal.get_plan_info(plan_name) }
+          plan_info = plans.each_with_object({}) do |full_name, acc|
+            # Break apart module name from plan name
+            module_name, plan_name = full_name.split('::', 2)
+            acc[full_name] = pe_plan_info(pal, module_name, plan_name)
+          end
           [200, plan_info.to_json]
         else
           # We structure this array of plans to be an array of hashes so that it matches the structure

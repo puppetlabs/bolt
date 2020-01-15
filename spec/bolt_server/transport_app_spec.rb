@@ -60,6 +60,15 @@ describe "BoltServer::TransportApp" do
   end
 
   describe 'transport routes' do
+    def mock_plan_info(full_name)
+      module_name, _plan_name = full_name.split('::', 2)
+      {
+        'name' => full_name,
+        'description' => 'foo',
+        'parameters' => {},
+        'module' => "/opt/puppetlabs/puppet/modules/#{module_name}"
+      }
+    end
     let(:action) { 'run_task' }
     let(:result) { double(Bolt::Result, status_hash: { status: 'test_status' }) }
 
@@ -71,31 +80,55 @@ describe "BoltServer::TransportApp" do
     end
 
     describe '/plans/:module_name/:plan_name' do
-      let(:path) { '/plans/foo/bar?environment=production' }
       let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
-      let(:init_plan) { '/plans/foo/init?environment=production' }
 
-      it '/plans/:module_name/:plan_name handles module::plan_name' do
-        expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-        expect(fake_pal).to receive(:get_plan_info).with('foo::bar').and_return('name' => 'foo::bar')
-        get(path)
-        metadata = JSON.parse(last_response.body)
-        expect(metadata).to eq('name' => 'foo::bar')
+      context 'with module_name::plan_name' do
+        let(:path) { '/plans/foo/bar?environment=production' }
+        let(:plan_name) { 'foo::bar' }
+        let(:metadata) { mock_plan_info(plan_name) }
+        let(:expected_response) {
+          {
+            'name' => metadata['name'],
+            'description' => metadata['description'],
+            'parameters' => metadata['parameters']
+          }
+        }
+        it '/plans/:module_name/:plan_name handles module::plan_name' do
+          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
+          get(path)
+          resp = JSON.parse(last_response.body)
+          expect(resp).to eq(expected_response)
+        end
       end
 
-      it '/plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
-        expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-        expect(fake_pal).to receive(:get_plan_info).with('foo').and_return('name' => 'foo')
-        get(init_plan)
-        metadata = JSON.parse(last_response.body)
-        expect(metadata).to eq('name' => 'foo')
+      context 'with module_name' do
+        let(:init_plan) { '/plans/foo/init?environment=production' }
+        let(:plan_name) { 'foo' }
+        let(:metadata) { mock_plan_info(plan_name) }
+        let(:expected_response) {
+          {
+            'name' => metadata['name'],
+            'description' => metadata['description'],
+            'parameters' => metadata['parameters']
+          }
+        }
+        it '/plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
+          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
+          get(init_plan)
+          resp = JSON.parse(last_response.body)
+          expect(resp).to eq(expected_response)
+        end
       end
-
-      it 'returns 400 if an unknown plan error is thrown' do
-        expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-        expect(fake_pal).to receive(:get_plan_info).with('foo::bar').and_raise(Bolt::Error.unknown_plan('foo::bar'))
-        get(path)
-        expect(last_response.status).to eq(400)
+      context 'with non-existant plan' do
+        let(:path) { '/plans/foo/bar?environment=production' }
+        it 'returns 400 if an unknown plan error is thrown' do
+          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:get_plan_info).with('foo::bar').and_raise(Bolt::Error.unknown_plan('foo::bar'))
+          get(path)
+          expect(last_response.status).to eq(400)
+        end
       end
     end
 
@@ -123,14 +156,25 @@ describe "BoltServer::TransportApp" do
       end
 
       describe 'when metadata=true' do
-        let(:path) { "/plans?environment=production&metadata=true" }
+        let(:path) { '/plans?environment=production&metadata=true' }
+        let(:plan_name) { 'abc' }
+        let(:metadata) { mock_plan_info(plan_name) }
+        let(:expected_response) {
+          {
+            metadata['name'] => {
+              'name' => metadata['name'],
+              'description' => metadata['description'],
+              'parameters' => metadata['parameters']
+            }
+          }
+        }
         it 'returns all metadata for each plan when metadata=true' do
           expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-          expect(fake_pal).to receive(:list_plans).and_return(['abc'])
-          expect(fake_pal).to receive(:get_plan_info).with('abc').and_return('name' => 'abc')
+          expect(fake_pal).to receive(:list_plans).and_return([plan_name])
+          expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
           get(path)
-          metadata = JSON.parse(last_response.body)
-          expect(metadata).to eq('abc' => { 'name' => 'abc' })
+          resp = JSON.parse(last_response.body)
+          expect(resp).to eq(expected_response)
         end
       end
     end
