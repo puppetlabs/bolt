@@ -1,0 +1,99 @@
+name: Windows
+
+on:
+  pull_request:
+    type: [opened, reopened, edited]
+
+env:
+  BOLT_WINRM_USER: roddypiper
+  BOLT_WINRM_HOST: localhost
+  BOLT_WINRM_PORT: 5985
+  BOLT_WINRM_SSL_PORT: 5986
+  BOLT_WINRM_SMB_PORT: 445
+  RUBY_VERSION: 25-x64
+  
+jobs:
+
+  agentful:
+    name: Agentful
+    runs-on: windows-latest
+    env:
+      WINDOWS_AGENTS: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.5.x
+      - name: Cache gems
+        id: gems
+        uses: actions/cache@v1
+        with:
+          path: .bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+      - name: Cache modules
+        id: modules
+        uses: actions/cache@v1
+        with:
+          path: modules
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/Puppetfile') }}
+      - name: Install bundler
+        run: |
+          gem install bundler
+          bundle config --local path .bundle
+      - name: Install gems
+        if: steps.gems.outputs.cache-hit != 'true'
+        run: bundle install --jobs 4 --retry 3
+      - name: Install modules
+        if: steps.modules.outputs.cache-hit != 'true'
+        run: bundle exec r10k puppetfile install
+      - name: Pre-test setup
+        shell: powershell
+        run: |
+          . scripts\ci.ps1
+          Set-ActiveRubyFromPuppet
+      - name: Run tests
+        shell: powershell
+        run: bundle exec rake integration:windows_agents
+
+  agentless:
+    name: Agentless
+    runs-on: windows-latest
+    env:
+      BOLT_WINDOWS: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.5.x
+      - name: Cache gems
+        id: gems
+        uses: actions/cache@v1
+        with:
+          path: .bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+      - name: Cache modules
+        id: modules
+        uses: actions/cache@v1
+        with:
+          path: modules
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/Puppetfile') }}
+      - name: Install bundler
+        run: |
+          gem install bundler
+          bundle config --local path .bundle
+      - name: Install gems
+        if: steps.gems.outputs.cache-hit != 'true'
+        run: bundle install --jobs 4 --retry 3
+      - name: Install modules
+        if: steps.modules.outputs.cache-hit != 'true'
+        run: bundle exec r10k puppetfile install
+      - name: Pre-test setup
+        shell: powershell
+        run: '& scripts\ci.ps1'
+      - name: Run tests
+        shell: powershell
+        run: bundle exec rake windows_ci

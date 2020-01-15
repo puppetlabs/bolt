@@ -120,9 +120,9 @@ To exclude tests that rely on Vagrant, run:
 
     $ bundle exec rake unit
 
-Windows includes additional tests that require a full Windows Server VM to run; we run them in AppVeyor. If you need to run the tests locally set `APPVEYOR_AGENTS=true`, re-run `vagrant up` to create a `Windows Server 2016 Core` VM, and run tests with
+Windows includes additional tests that require a full Windows Server VM to run. If you need to run the tests locally set `WINDOWS_AGENTS=true`, re-run `vagrant up` to create a `Windows Server 2016 Core` VM, and run tests with
 
-    $ BOLT_WINRM_PORT=35985 BOLT_WINRM_SMB_PORT=3445 BOLT_WINRM_USER=vagrant BOLT_WINRM_PASSWORD=vagrant bundle exec rake integration:appveyor_agents
+    $ BOLT_WINRM_PORT=35985 BOLT_WINRM_SMB_PORT=3445 BOLT_WINRM_USER=vagrant BOLT_WINRM_PASSWORD=vagrant bundle exec rake integration:windows_agents
 
 ### `rubocop` on Windows
 

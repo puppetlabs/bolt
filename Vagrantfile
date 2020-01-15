@@ -48,7 +48,7 @@ Vagrant.configure('2') do |config|
     end
   end
 
-  if ENV['APPVEYOR_AGENTS']
+  if ENV['WINDOWS_AGENTS']
     config.vm.define :windows_full do |windows|
       windows.vm.box = "jacqinthebox/windowsserver2016core"
       windows.vm.guest = :windows

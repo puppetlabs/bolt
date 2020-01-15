@@ -389,7 +389,7 @@ describe "apply", expensive: true do
     end
   end
 
-  describe 'over winrm on Appveyor with Puppet Agents', appveyor_agents: true do
+  describe 'over winrm on Windows with Puppet Agents', windows_agents: true do
     let(:uri) { conn_uri('winrm') }
     let(:password) { conn_info('winrm')[:password] }
     let(:user) { conn_info('winrm')[:user] }
