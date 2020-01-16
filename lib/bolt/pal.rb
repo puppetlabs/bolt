@@ -280,14 +280,14 @@ module Bolt
       end
     end
 
-    def get_task_info(task_name)
+    def get_task(task_name)
       task = task_signature(task_name)
 
       if task.nil?
         raise Bolt::Error.unknown_task(task_name)
       end
 
-      task.task_hash.reject { |k, _| k == 'parameters' }
+      Bolt::Task.from_task_signature(task)
     end
 
     def list_plans

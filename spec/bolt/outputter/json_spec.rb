@@ -41,37 +41,46 @@ describe "Bolt::Outputter::JSON" do
   end
 
   it "formats a task" do
-    task = {
-      'name' => 'cinnamon roll',
-      'module' => '/path/to/cinnamony/goodness',
-      'files' => [{ 'name' => 'cinnamon.rb',
-                    'path' => '/path/to/cinnamony/goodness/tasks/cinnamon.rb' },
-                  { 'name' => 'roll.sh',
-                    'path' => '/path/to/wrong/module/tasks/roll.sh' }],
-      'metadata' => {
-        'description' => 'A delicious sweet bun',
-        'parameters' => {
-          'icing' => {
-            'type' => 'Cream cheese',
-            'description' => 'Rich, tangy, sweet'
-          }
+    name = 'cinnamon roll'
+    files = [{ 'name' => 'cinnamon.rb',
+               'path' => '/path/to/cinnamony/goodness/tasks/cinnamon.rb' },
+             { 'name' => 'roll.sh',
+               'path' => '/path/to/wrong/module/tasks/roll.sh' }]
+    metadata = {
+      'description' => 'A delicious sweet bun',
+      'parameters' => {
+        'icing' => {
+          'type' => 'Cream cheese',
+          'description' => 'Rich, tangy, sweet'
         }
       }
     }
-    outputter.print_task_info(task)
-    expect(JSON.parse(output.string)).to eq(task)
+
+    result = {
+      'name' => name,
+      'files' => files,
+      'metadata' => metadata,
+      'module_dir' => '/path/to/cinnamony/goodness'
+    }
+    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
+    expect(JSON.parse(output.string)).to eq(result)
   end
 
   it "prints builtin for builtin modules" do
-    task = {
-      'name' => 'monkey bread',
-      'files' => [{ 'name' => 'monkey_bread.rb',
-                    'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }],
-      'metadata' => {}
+    name = 'monkey bread'
+    files = [{ 'name' => 'monkey_bread.rb',
+               'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }]
+    metadata = {}
+
+    result = {
+      'name' => name,
+      'files' => files,
+      'metadata' => metadata,
+      'module_dir' => 'built-in module'
     }
-    outputter.print_task_info(task)
-    task['module_dir'] = 'built-in module'
-    expect(JSON.parse(output.string)).to eq(task)
+
+    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
+    expect(JSON.parse(output.string)).to eq(result)
   end
 
   it "formats a plan" do

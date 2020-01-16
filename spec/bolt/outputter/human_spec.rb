@@ -92,23 +92,21 @@ describe "Bolt::Outputter::Human" do
   end
 
   it "formats a task" do
-    task = {
-      'name' => 'cinnamon_roll',
-      'files' => [{ 'name' => 'cinnamon.rb',
-                    'path' => '/path/to/cinnamony/goodness/tasks/cinnamon.rb' },
-                  { 'name' => 'roll.sh',
-                    'path' => '/path/to/wrong/module/tasks/roll.sh' }],
-      'metadata' => {
-        'description' => 'A delicious sweet bun',
-        'parameters' => {
-          'icing' => {
-            'type' => 'Cream cheese',
-            'description' => 'Rich, tangy, sweet'
-          }
+    name = 'cinnamon_roll'
+    files = [{ 'name' => 'cinnamon.rb',
+               'path' => '/path/to/cinnamony/goodness/tasks/cinnamon.rb' },
+             { 'name' => 'roll.sh',
+               'path' => '/path/to/wrong/module/tasks/roll.sh' }]
+    metadata = {
+      'description' => 'A delicious sweet bun',
+      'parameters' => {
+        'icing' => {
+          'type' => 'Cream cheese',
+          'description' => 'Rich, tangy, sweet'
         }
       }
     }
-    outputter.print_task_info(task)
+    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
     expect(output.string).to eq(<<~TASK_OUTPUT)
 
       cinnamon_roll - A delicious sweet bun
@@ -126,27 +124,25 @@ describe "Bolt::Outputter::Human" do
   end
 
   it 'converts Data (undef) to Any' do
-    task = {
-      'name' => 'sticky_bun',
-      'files' => [{ 'name' => 'sticky.rb',
-                    'path' => '/this/test/is/making/me/hungry/tasks/sticky.rb' },
-                  { 'name' => 'bun.sh',
-                    'path' => '/path/to/wrong/module/tasks/bun.sh' }],
-      'metadata' => {
-        'description' => 'A delicious sweet bun with nuts',
-        'parameters' => {
-          'glaze' => {
-            'type' => 'Sticky',
-            'description' => 'Sweet'
-          },
-          'pecans' => {
-            'description' => 'The best kind of nut',
-            'type' => 'Data'
-          }
+    name = 'sticky_bun'
+    files = [{ 'name' => 'sticky.rb',
+               'path' => '/this/test/is/making/me/hungry/tasks/sticky.rb' },
+             { 'name' => 'bun.sh',
+               'path' => '/path/to/wrong/module/tasks/bun.sh' }]
+    metadata = {
+      'description' => 'A delicious sweet bun with nuts',
+      'parameters' => {
+        'glaze' => {
+          'type' => 'Sticky',
+          'description' => 'Sweet'
+        },
+        'pecans' => {
+          'description' => 'The best kind of nut',
+          'type' => 'Data'
         }
       }
     }
-    outputter.print_task_info(task)
+    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
     expect(output.string).to eq(<<~TASK_OUTPUT)
 
       sticky_bun - A delicious sweet bun with nuts
@@ -166,13 +162,11 @@ describe "Bolt::Outputter::Human" do
   end
 
   it 'prints module path as builtin for builtin modules' do
-    task = {
-      'name' => 'monkey_bread',
-      'files' => [{ 'name' => 'monkey_bread.rb',
-                    'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }],
-      'metadata' => {}
-    }
-    outputter.print_task_info(task)
+    name = 'monkey_bread'
+    files = [{ 'name' => 'monkey_bread.rb',
+               'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }]
+    metadata = {}
+    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
     expect(output.string).to eq(<<~TASK_OUTPUT)
 
       monkey_bread

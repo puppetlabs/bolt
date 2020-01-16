@@ -222,9 +222,9 @@ module Bolt
         # Building lots of strings...
         pretty_params = +""
         task_info = +""
-        usage = +"bolt task run --targets <node-name> #{task['name']}"
+        usage = +"bolt task run --targets <node-name> #{task.name}"
 
-        task['metadata']['parameters']&.each do |k, v|
+        task.parameters&.each do |k, v|
           pretty_params << "- #{k}: #{v['type'] || 'Any'}\n"
           pretty_params << "    Default: #{v['default'].inspect}\n" if v.key?('default')
           pretty_params << "    #{v['description']}\n" if v['description']
@@ -235,16 +235,16 @@ module Bolt
                    end
         end
 
-        usage << " [--noop]" if task['metadata']['supports_noop']
+        usage << " [--noop]" if task.supports_noop
 
-        task_info << "\n#{task['name']}"
-        task_info << " - #{task['metadata']['description']}" if task['metadata']['description']
+        task_info << "\n#{task.name}"
+        task_info << " - #{task.description}" if task.description
         task_info << "\n\n"
         task_info << "USAGE:\n#{usage}\n\n"
         task_info << "PARAMETERS:\n#{pretty_params}\n" unless pretty_params.empty?
         task_info << "MODULE:\n"
 
-        path = task['files'][0]['path'].chomp("/tasks/#{task['files'][0]['name']}")
+        path = task.files.first['path'].chomp("/tasks/#{task.files.first['name']}")
         task_info << if path.start_with?(Bolt::PAL::MODULES_PATH)
                        "built-in module"
                      else
