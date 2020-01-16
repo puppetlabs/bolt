@@ -17,6 +17,7 @@ describe "apply", expensive: true do
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
   let(:hiera_config) { File.join(__dir__, '../fixtures/configs/empty.yml') }
   let(:config_flags) { %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
+  let(:apply_settings) { { 'show_diff' => true } }
 
   describe 'over ssh', ssh: true do
     let(:uri) { conn_uri('ssh') }
@@ -334,6 +335,22 @@ describe "apply", expensive: true do
           logs = run_cli_json(%W[plan run basic::run_as_apply user=#{user}] + config_flags)
           expect(logs.first['message']).to eq(conn_info('ssh')[:user])
         end
+
+        it 'respects show_diff configuration' do
+          show_diff = { "show_diff" => true }
+          diff_string = <<~DIFF
+            @@ -1 +1 @@
+            -Silly string
+            \\ No newline at end of file
+            +Silly string (get it?)
+            \\ No newline at end of file
+            DIFF
+          with_tempfile_containing('bolt', YAML.dump("apply_settings" => show_diff), '.yaml') do |conf|
+            result = run_cli_json(%W[plan run settings::show_diff --configfile #{conf.path}] + config_flags).first
+            expect(result['status']).to eq('success')
+            expect(result['result']['report']['logs'][0]['message']).to include(diff_string)
+          end
+        end
       end
 
       context "bolt apply command" do
@@ -384,6 +401,22 @@ describe "apply", expensive: true do
           expect(result).to include('_error')
           expect(result['_error']['kind']).to eq('bolt/apply-error')
           expect(result['_error']['msg']).to match(/failed to compile/)
+        end
+
+        it 'respects show_diff configuration' do
+          show_diff = { "show_diff" => true }
+          diff_string = <<~DIFF
+            @@ -1 +1 @@
+            -Silly string
+            \\ No newline at end of file
+            +Silly string (get it?)
+            \\ No newline at end of file
+            DIFF
+          with_tempfile_containing('bolt', YAML.dump("apply_settings" => show_diff), '.yaml') do |conf|
+            result = run_cli_json(%W[plan run settings::show_diff --configfile #{conf.path}] + config_flags).first
+            expect(result['status']).to eq('success')
+            expect(result['result']['report']['logs'][0]['message']).to include(diff_string)
+          end
         end
       end
     end

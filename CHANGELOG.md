@@ -16,6 +16,12 @@
   even when a version of the agent is already installed. If the specified version of the agent cannot be installed, 
   then `apply_prep` will error.
 
+* **Add show_diff configuration option** ([#1433](https://github.com/puppetlabs/bolt/issue/1433))
+
+  Users can now configure the `show_diff` [Puppet
+  setting](https://puppet.com/docs/puppet/latest/configuration.html#showdiff) in their Bolt
+  configuration file, which will be respected when applying Puppet code via Bolt.
+
 ## Bolt 1.47.0
 
 ### Deprecations and removals

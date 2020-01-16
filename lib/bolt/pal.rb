@@ -39,7 +39,8 @@ module Bolt
 
     attr_reader :modulepath
 
-    def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors, trusted_external = nil)
+    def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors,
+                   trusted_external = nil, apply_settings = {})
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happens in tests
       self.class.load_puppet
@@ -48,6 +49,7 @@ module Bolt
       @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
       @hiera_config = hiera_config
       @trusted_external = trusted_external
+      @apply_settings = apply_settings
       @max_compiles = max_compiles
       @resource_types = resource_types
 
@@ -175,7 +177,8 @@ module Bolt
           @original_modulepath,
           pdb_client,
           @hiera_config,
-          @max_compiles
+          @max_compiles,
+          @apply_settings
         )
       }
       Puppet.override(opts, &block)

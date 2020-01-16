@@ -665,7 +665,8 @@ module Bolt
                              config.hiera_config,
                              config.boltdir.resource_types,
                              config.compile_concurrency,
-                             config.trusted_external)
+                             config.trusted_external,
+                             config.apply_settings)
     end
 
     def convert_plan(plan)

@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
 require 'base64'
+require 'bolt/apply_result'
+require 'bolt/apply_target'
+require 'bolt/config'
+require 'bolt/error'
+require 'bolt/task'
+require 'bolt/util/puppet_log_level'
 require 'find'
 require 'json'
 require 'logging'
 require 'open3'
-require 'bolt/error'
-require 'bolt/task'
-require 'bolt/apply_result'
-require 'bolt/apply_target'
-require 'bolt/util/puppet_log_level'
 
 module Bolt
   class Applicator
-    def initialize(inventory, executor, modulepath, plugin_dirs, pdb_client, hiera_config, max_compiles)
+    def initialize(inventory, executor, modulepath, plugin_dirs, pdb_client, hiera_config, max_compiles, apply_settings)
       # lazy-load expensive gem code
       require 'concurrent'
 
@@ -23,6 +24,7 @@ module Bolt
       @plugin_dirs = plugin_dirs
       @pdb_client = pdb_client
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
+      @apply_settings = apply_settings || {}
 
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
       @logger = Logging.logger[self]
@@ -270,6 +272,7 @@ module Bolt
               arguments = {
                 'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
                 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
+                'apply_settings' => @apply_settings,
                 '_task' => catalog_apply_task.name,
                 '_noop' => options[:noop]
               }

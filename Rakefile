@@ -95,6 +95,7 @@ namespace :docs do
     @global = { options: Bolt::Config::OPTIONS, defaults: Bolt::Config::DEFAULT_OPTIONS }
     @log = { options: Bolt::Config::LOG_OPTIONS, defaults: Bolt::Config::DEFAULT_LOG_OPTIONS }
     @puppetfile = { options: Bolt::Config::PUPPETFILE_OPTIONS }
+    @apply = { options: Bolt::Config::APPLY_SETTINGS, defaults: Bolt::Config::DEFAULT_APPLY_SETTINGS }
 
     Bolt::TRANSPORTS.each do |name, transport|
       @transports[:options][name.to_s] = transport::OPTIONS
