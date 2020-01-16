@@ -77,8 +77,13 @@ module Bolt
         # a random string is echoed to stderr indicating that the stdin is available
         # for task input data because the sudo password has already either been
         # provided on stdin or was not needed.
-        def prepend_sudo_success(sudo_id, command_str)
+        def prepend_sudo_success(sudo_id, command_str, reset_cwd)
+          command_str = "cd && #{command_str}" if reset_cwd
           "sh -c 'echo #{sudo_id} 1>&2; #{command_str}'"
+        end
+
+        def prepend_chdir(command_str)
+          "sh -c 'cd && #{command_str}'"
         end
 
         # A helper to build up a single string that contains all of the options for
@@ -87,7 +92,9 @@ module Bolt
         # using the wrapper or when the task does not require stdin data.
         def build_sudoable_command_str(command_str, sudo_str, sudo_id, options)
           if options[:stdin] && !options[:wrapper]
-            "#{sudo_str} #{prepend_sudo_success(sudo_id, command_str)}"
+            "#{sudo_str} #{prepend_sudo_success(sudo_id, command_str, options[:reset_cwd])}"
+          elsif options[:reset_cwd]
+            "#{sudo_str} #{prepend_chdir(command_str)}"
           else
             "#{sudo_str} #{command_str}"
           end

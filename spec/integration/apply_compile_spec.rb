@@ -376,7 +376,7 @@ describe "passes parsed AST to the apply_catalog task" do
       it 'serializes Error objects in apply blocks' do
         result = run_cli_json(%w[plan run puppet_types::error] + config_flags)
         notify = get_notifies(result, true)
-        expect(notify[0]['title']).to eq("ApplyResult resource: The command failed with exit code 1")
+        expect(notify[0]['title']).to eq("ApplyResult resource: The command failed with exit code 127")
       end
 
       context 'when calling invalid functions in apply' do

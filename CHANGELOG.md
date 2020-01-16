@@ -1,5 +1,15 @@
 # Changelog
 
+## Bolt NEXT
+
+### Bug fixes
+
+* **SSH commands will run from the home directory of the run-as user, not the connected user** ([#1518](https://github.com/puppetlabs/bolt/pull/1518))
+
+  Connecting via SSH and then switching users will now run as though it had
+  connected as the new user in the first place, using that user's home
+  directory as the working directory.
+
 ## Bolt 1.45.0
 
 ### Deprecations

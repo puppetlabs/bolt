@@ -320,6 +320,13 @@ describe Bolt::Transport::SSH do
       ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
     end
 
+    it "runs from the run-as user's home directory" do
+      stdout = ssh.run_command(target, 'pwd; echo $HOME', run_as: 'root')['stdout']
+      pwd, homedir = stdout.lines.map(&:chomp)
+      expect(pwd).to match(/root/)
+      expect(homedir).to match(/root/)
+    end
+
     it "runs a task that expects big data on stdin" do
       with_task_containing('tasks_test', stdin_task, 'stdin') do |task|
         expect(ssh).not_to receive(:make_wrapper_stringio)
@@ -347,8 +354,8 @@ describe Bolt::Transport::SSH do
     it 'uses the correct executable' do
       allow_any_instance_of(Net::SSH::Connection::Channel).to receive(:wait).and_return('')
       expect_any_instance_of(Net::SSH::Connection::Channel).to receive(:exec)
-        .with("fake -S -u bolt -p \\[sudo\\]\\ Bolt\\ needs\\ to\\ run\\ as\\ another\\ "\
-              "user,\\ password:\\  whoami")
+        .with("fake -S -H -u bolt -p \\[sudo\\]\\ Bolt\\ needs\\ to\\ run\\ as\\ another\\ "\
+              "user,\\ password:\\  sh -c 'cd && whoami'")
 
       ssh.run_command(target, 'whoami')
     end
