@@ -8,17 +8,16 @@ Plans can use any combination of [Bolt functions](plan_functions.md#) or [built-
 
 **Related information**  
 
-[Converting YAML plans to Puppet language plans](writing_yaml_plans.md#)
+- [Converting YAML plans to Puppet language plans](writing_yaml_plans.md#)
 
 ## Naming plans
 
-Plan names are named based on the filename of the plan, the name of the module containing the plan, and the path to the plan within the module.
+Plan names are based on the filename of the plan, the name of the module containing the plan, and the path to the plan within the module.
 
 Place plan files in your module's `./plans` directory, using these file extensions:
 
 -   Puppet plans — `.pp`
 -   YAML plans — `.yaml`, not `.yml`
-
 
 Plan names are composed of two or more name segments, indicating:
 
@@ -27,20 +26,20 @@ Plan names are composed of two or more name segments, indicating:
 -   The path within the module, if the plan is in a subdirectory of `./plans`.
 
 
-For example, given a module called `mymodule` with a plan defined in `./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. A plan defined in `./mymodule/plans/service/myplan.pp`would be `mymodule::service::myplan`. This name is how you refer to the plan when you run commands.
+For example, given a module called `mymodule` with a plan defined in `./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. A plan defined in `./mymodule/plans/service/myplan.pp` would be `mymodule::service::myplan`. This name is how you refer to the plan when you run commands.
 
-The plan filename `init` is special: the plan it defines is referenced using the module name only. For example, in a module called `mymodule`, the plan defined in `init.pp` is the `mymodule` plan.
+The plan filename `init` is special. You reference an `init` plan using the module name only. For example, in a module called `mymodule`, the plan defined in `init.pp` is the `mymodule` plan.
 
 Avoid giving plans the same names as constructs in the Puppet language. Although plans do not share their namespace with other language constructs, giving plans these names makes your code difficult to read.
 
 Each plan name segment must begin with a lowercase letter and:
 
--   May include lowercase letters.
--   May include digits.
--   May include underscores.
+-   Can include lowercase letters.
+-   Can include digits.
+-   Can include underscores.
 -   Must not be a [reserved word](https://docs.puppet.com/puppet/5.3/lang_reserved.html).
 -   Must not have the same name as any Puppet data types.
--   Namespace segments must match the following regular expression `\A[a-z][a-z0-9_]*\Z`
+-   Namespace segments must match the regular expression: `\A[a-z][a-z0-9_]*\Z`.
 
 
 ## Defining plan parameters
@@ -49,16 +48,14 @@ You can specify parameters in your plan.
 
 Specify each parameter in your plan with its data type. For example, you might want parameters to specify which targets to run different parts of your plan on.
 
-The following example shows target parameters specified as data type `TargetSpec`. This allows this parameter to be passed as a single URL, comma-separated URL list, Target data type, or Array of either. For more information about these data types, see the common data types table in the related metadata type topic.
+The following example shows target parameters specified as data type `TargetSpec`. `TargetSpec` accepts the pattern strings allowed by `--targets`, a single target object, or an array of targets and target patterns. Using `TargetSpec` allows you to pass, for each parameter, either a target name or a URI that describes the protocol to use, the hostname, the username, and the password.
 
-This allows the user to pass, for each parameter, either a target name or a URI that describes the protocol to use, the hostname, username, and password.
-
-The plan then calls the `run_task` function, specifying which targets to run the tasks on. The `Target` names are collected and stored in `$webserver_names` by iterating over the list of `Target` objects returned by `get_targets`. Task parameters are serialized to JSON format; therefore, extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
+The plan then calls the `run_task` function, specifying which targets to run the tasks on. The target names are collected and stored in `$webserver_names` by iterating over the list of target objects returned by `get_targets`. Task parameters are serialized to JSON format; therefore, extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
 
 ```
 plan mymodule::my_plan(
   TargetSpec $load_balancer,
-  TargetSpec  $webservers,
+  TargetSpec $webservers,
 ) {
 
   # Extract the Target name from $webservers
@@ -71,7 +68,7 @@ plan mymodule::my_plan(
  }
 ```
 
-To execute this plan from the command line, pass the parameters as `<PARAMETER>=<VALUE>`. The `Targetspec` accepts either an array as json or a comma separated string of target names.
+To execute this plan from the command line, pass the parameters as `<PARAMETER>=<VALUE>`. The `Targetspec` accepts either an array as JSON, or a comma separated string of target names.
 
 ```
 bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com webservers='["kermit.myorg.com","gonzo.myorg.com"]'
@@ -101,7 +98,7 @@ echo "Stdin:"
 cat -
 ```
 
-By default, the task expects parameters passed as a JSON string on stdin to be accessible in prefixed environment variables.
+By default, the task expects parameters passed as a JSON string on standard input (stdin) to be accessible in prefixed environment variables.
 
 Consider the output of running the plan against localhost:
 
@@ -127,13 +124,13 @@ Similarly, parameters are made available to the task as environment variables wh
 
 **Related information**  
 
-[Task metadata types](writing_tasks.md#)
+- [Task metadata types](writing_tasks.md#)
 
 ## Returning results from plans
 
 Use plans to return results that you can use in other plans or save for use outside of Bolt.
 
-Plans, unlike functions, are primarily run for side effects but they can optionally return a result. To return a result from a plan use the `return` function. Any plan that does not call the `return` function returns `undef`.
+Plans, unlike functions, are primarily run for side effects, but they can optionally return a result. To return a result from a plan, use the `return` function. Any plan that does not call the `return` function returns `undef`.
 
 ```
 plan return_result(
@@ -143,7 +140,7 @@ plan return_result(
 }
 ```
 
-The result of a plan must match the `PlanResult` type alias. This roughly includes JSON types as well as the Plan language types which have well defined JSON representations in Bolt.
+The result of a plan must match the `PlanResult` type alias. This roughly includes JSON types as well as the plan language types which have well defined JSON representations in Bolt.
 
 -   `Undef`
 -   `String`
@@ -154,7 +151,7 @@ The result of a plan must match the `PlanResult` type alias. This roughly includ
 -   `ResultSet`
 -   `Error`
 -   `Array` with only `PlanResult`
--   Hash with `String` keys and `PlanResult` values
+-   `Hash` with `String` keys and `PlanResult` values
 
 or
 
@@ -169,7 +166,7 @@ To return an error if your plan fails, call the `fail_plan` function.
 
 Specify parameters to provide details about the failure.
 
-For example, if called with `run_plan('mymodule::myplan')`, this would return an error to the caller.
+For example, if called with `run_plan('mymodule::myplan')`, this would return an error to the caller:
 
 ```
 plan mymodule::myplan {
@@ -181,11 +178,11 @@ plan mymodule::myplan {
 
 Indicators that a plan has run successfully or failed.
 
-Any plan that completes execution without an error is considered successful. The `bolt` command exits 0 and any calling plans continue execution. If any calls to `run_` functions fail **without** `_catch_errors` then the plan halts execution and is considered a failure. Any calling plans also halt until a `run_plan` call with `_catch_errors` or a `catch_errors` block is reached. If one isn't reached, the `bolt` command will exit 2. When writing a plan if you have reason to believe it has failed, you can fail the plan with the `fail_plan` function. This causes the bolt command to exit 2 and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors` or in a `catch_errors` block.
+Any plan that completes execution without an error is considered successful. The `bolt` command exits `0` and any calling plans continue execution. If any calls to `run_` functions fail **without** `_catch_errors` then the plan halts execution and is considered a failure. Any calling plans also halt until a `run_plan` call with `_catch_errors` or a `catch_errors` block is reached. If one isn't reached, the `bolt` command will exit `2`. When writing a plan, if you have reason to believe it has failed, you can fail the plan with the `fail_plan` function. This causes the bolt command to exit `2` and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors` or in a `catch_errors` block.
 
 ### Failing plans
 
-If `upload_file`, `run_command`, `run_script`, or `run_task` are called without the `_catch_errors` option and they fail on any targets, the plan itself fails. To fail a plan directly call the `fail_plan` function. Create a new error with a message and include the kind, details, or issue code, or pass an existing error to it.
+If `upload_file`, `run_command`, `run_script`, or `run_task` are called without the `_catch_errors` option and they fail on any targets, the plan itself fails. To fail a plan directly, call the `fail_plan` function. Create an error with a message and include the kind, details, or issue code, or pass an existing error to it.
 
 ```
 fail_plan('The plan is failing', 'mymodules/pear-shaped', {'failedtargets' => $result.error_set.names})
@@ -195,7 +192,10 @@ fail_plan($errorobject)
 
 ### Catching errors in plans
 
-Bolt includes a `catch_errors` function that executes a block of code and returns the error if an error is raised, or returns the result of the block if no errors are raised. You might get an `Error` object returned if you call `run_plan` with `_catch_errors`, use a `catch_errors` block, or call the `error` method on a result.
+Bolt includes a `catch_errors` function that executes a block of code and returns the error if an error is raised, or returns the result of the block if no errors are raised. You might get an `Error` object returned if you: 
+- call `run_plan` with `_catch_errors`. 
+- use a `catch_errors` block.
+- call the `error` method on a result.
 
 The `Error` data type includes:
 
@@ -205,9 +205,9 @@ The `Error` data type includes:
 -   `issue_code`: A unique code for the message that can be used for translation.
 
 
-Use the `Error` data type in a case expression to match against different kind of errors. To recover from certain errors, while failing on or ignoring others, set up your plan to include conditionals based on errors that occur while your plan runs. For example, you can set up a plan to retry a task when a timeout error occurs, but to fail when there is an authentication error.
+Use the `Error` data type in a case expression to match against different kinds of errors. To recover from certain errors, while failing on or ignoring others, set up your plan to include conditionals based on errors that occur while your plan runs. For example, you can set up a plan to retry a task when a timeout error occurs, but to fail when there is an authentication error.
 
-Below, the first plan continues whether it succeeds or fails with a`mymodule/not-serious`error. Other errors cause the plan to fail.
+Below, the first plan continues whether it succeeds or fails with a `mymodule/not-serious` error. Other errors cause the plan to fail.
 
 ```
 plan mymodule::handle_errors {
@@ -241,21 +241,21 @@ plan test (String[1] $role) {
 
 ## Puppet and Ruby functions in plans
 
-You can define and call Puppet language and Ruby functions in plans.
+You can define and call Puppet language functions and Ruby functions in plans.
 
 This is useful for packaging common general logic in your plan. You can also call the plan functions, such as `run_task` or `run_plan`, from within a function.
 
 Not all Puppet language constructs are allowed in plans. The following constructs are not allowed:
 
--   Defined types.
--   Classes.
+-   Defined types
+-   Classes
 -   Resource expressions, such as `file { title: mode => '0777' }`
 -   Resource default expressions, such as `File { mode => '0666' }`
 -   Resource overrides, such as `File['/tmp/foo'] { mode => '0444' }`
 -   Relationship operators: `-> <- ~> <~`
--   Functions that operate on a catalog: `include`, `require`, `contain`, `create_resources`.
+-   Functions that operate on a catalog: `include`, `require`, `contain`, `create_resources`
 -   Collector expressions, such as `SomeType <| |>`, `SomeType <<| |>>`
--   ERB templates are not supported. Use EPP instead.
+-   ERB templates are not supported. Use EPP instead
 
 Be aware of a few other Puppet behaviors in plans:
 
@@ -277,13 +277,13 @@ A `ResultSet` has the following methods:
 -   `count()`: Returns an `Integer` count of targets.
 -   `first()`: The first `Result` object, useful to unwrap single results.
 -   `find(String $target_name)`: Look up the `Result` for a specific target.
--   `error_set()`: A `ResultSet`containing only the results of failed targets.
+-   `error_set()`: A `ResultSet` containing only the results of failed targets.
 -   `ok_set()`: A `ResultSet` containing only the successful results.
 -   `filter_set(block)`: Filters a `ResultSet` with the given block and returns a `ResultSet` object (where the [filter function](https://puppet.com/docs/puppet/latest/function.html#filter) returns an array or hash).
--   `targets()`: An array of all the `Target` objects from every `Result`in the set.
+-   `targets()`: An array of all the `Target` objects from every `Result` in the set.
 -   `ok():` `Boolean` that is the same as `error_targets.empty`.
 -   `to_data()`: An array of hashes representing either `Result` or `ApplyResults`.
--   `[]`: Array indexing allows accessing a single `Result` (for example `$result[0]`) or an array of `Result`s (for example `$result[0,2]`)
+-   `[]`: Array indexing allows accessing a single `Result` (for example `$result[0]`) or an array of results (for example `$result[0,2]`)
 
 
 A `Result` has the following methods:
@@ -308,7 +308,7 @@ An `ApplyResult` has the following methods:
 -   `action()`: String representation of result type (apply).
 
 
-An instance of `ResultSet` is `Iterable` as if it were an `Array[Variant[Result, ApplyResult]]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the ResultSet returning each result.
+An instance of `ResultSet` is `Iterable` as if it were an `Array[Variant[Result, ApplyResult]]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the `ResultSet` returning each result.
 
 This example checks if a task ran correctly on all targets. If it did not, the check fails:
 
@@ -333,7 +333,7 @@ $r.each |$result| {
 }
 ```
 
-Similarly, you can iterate over the array of hashes returned by calling `to_data` on a`ResultSet` and access hash values. For example:
+Similarly, you can iterate over the array of hashes returned by calling `to_data` on a `ResultSet` and access hash values. For example:
 
 ```
 $r = run_command('whoami', 'localhost,local://0.0.0.0')
@@ -369,17 +369,17 @@ run_task('task_with_secrets', ..., password => $pass.unwrap)
 
 **Related information**  
 
-[Adding parameters to metadata](writing_tasks.md#)
+- [Adding parameters to metadata](writing_tasks.md#)
 
 ## Target objects
 
-The `Target` object represents a target and its specific connection options.
+The target object represents a target and its specific connection options.
 
-The state of a target is stored in the inventory for the duration of a plan allowing you to collect facts or set vars for a target and retrieve them later. You can get a printable representation via the `name` function, as well as access components of the target: `protocol, host, port, user, password`.
+The state of a target is stored in the inventory for the duration of a plan, allowing you to collect facts or set variables for a target and retrieve them later. You can get a printable representation via the `name` function, as well as access components of the target: `protocol, host, port, user, password`.
 
-### TargetSpec
+### `TargetSpec`
 
-The execution function takes a parameter with the type alias TargetSpec. This alias accepts the pattern strings allowed by `--targets`, a single Target object, or an Array of Targets and target patterns. Generally, use this type for plans that accept a set of targets as a parameter, to ensure clean interaction with the CLI and other plans. To operate on individual targets, resolve it to a list via `get_targets`. For example, to loop over each target in a plan accept a `TargetSpec` argument, but call `get_targets` on it before looping.
+The execution function takes a parameter with the type alias `TargetSpec`. This alias accepts the pattern strings allowed by `--targets`, a single target object, or an array of targets and target patterns. Generally, use this type for plans that accept a set of targets as a parameter, to ensure clean interaction with the CLI and other plans. To operate on individual targets, resolve it to a list via `get_targets`. For example, to loop over each target in a plan, accept a `TargetSpec` argument, but call `get_targets` on it before looping.
 
 ```
 plan loop(TargetSpec $targets) {
@@ -389,36 +389,35 @@ plan loop(TargetSpec $targets) {
 }
 ```
 
-If your plan accepts a single `TargetSpec` parameter you can call that parameter `targets` so that it can be specified with the `--targets` flag from the command line.
+If your plan accepts a single `TargetSpec` parameter, you can call that parameter `targets` so that it can be specified with the `--targets` flag from the command line.
 
-### Creating Target objects
+### Creating target objects
 
-Creating Target objects in a plan means they are part of the in-memory inventory - they can be
+Creating target objects in a plan means they are part of the in-memory inventory - they can be
 referenced and run alongside targets that are loaded from the inventory file, but their data is not
-saved between plan runs. They only exist for the lifecycle of the plan run.
+saved between plan runs. They only exist for the life cycle of the plan run.
 
-There are two main ways you may want to instantiate Target objects within a plan: getting a Target
-that may already exist, or making a new Target object that clobbers any existing Targets with the
+There are two main ways you may want to instantiate target objects within a plan: getting a target
+that may already exist, or making a new target object that clobbers any existing targets with the
 same name. 
 
-To get or create a Target use the `get_target` function. This takes a single URI and returns a
-single Target object with the same name if it already exists in the inventory, otherwise it will
-create the Target and return it. Similarly `get_targets` takes an array of URIs, gets or creates
-each Target, and returns an array of Target objects. Some transport options can be [configured in
+To get or create a target, use the `get_target` function. This takes a single URI and returns a
+single target object with the same name if it already exists in the inventory, otherwise it will
+create the target and return it. Similarly `get_targets` takes an array of URIs, gets or creates
+each target, and returns an array of target objects. Some transport options can be [configured in
 the URI string](https://puppet.com/docs/bolt/latest/configuring_bolt.html), but if this isn't
 sufficient you can use
-[set_config](https://puppet.com/docs/bolt/latest/plan_functions.html#set-config) to set config on
-gotten Targets.
+[set_config](https://puppet.com/docs/bolt/latest/plan_functions.html#set-config) to set configuration options on the targets.
 
-To create a new Target that clobbers an existing target with the same name use `Target.new()`, which
+Use `Target.new()` to create a target that clobbers an existing target with the same name. `Target.new()`
 takes a data hash with the same keys as [inventory target
 definitions](https://puppet.com/docs/bolt/latest/inventory_file_v2.html#target-object). You can use
 this to configure more options for the target than are available in the URI alone, but it is a
-destructive action: if you try to create a Target with the same name as Target that already exists
-in the inventory (either from in-memory or from the file), the old Target will be completely
-destroyed and replaced with the new Target object.
+destructive action: if you try to create a target with the same name as a target that already exists
+in the inventory (either from in-memory or from the file), the old target will be completely
+destroyed and replaced with the new target.
 
-All new targets are added to the 'all' inventory group, and no other groups. See [modifying Target
+All new targets are added to the `all` inventory group, and no other groups. See [modifying target
 objects](#modifying-target-objects) for information on modifying group membership.
 
 ```
@@ -453,25 +452,25 @@ plan create_targets(
 }
 ```
 
-### Modifying Target objects
+### Modifying target objects
 
 There are a handful of functions available to modify existing target objects inside a plan:
 
 * [add_facts](https://puppet.com/docs/bolt/latest/plan_functions.html#add-facts)
 * [add_to_group](https://puppet.com/docs/bolt/latest/plan_functions.html#add-to-group)
-* [remove_from_group])https://puppet.com/docs/bolt/latest/plan_functions.html#remove-from-group)
+* [remove_from_group](https://puppet.com/docs/bolt/latest/plan_functions.html#remove-from-group)
 * [set_config](https://puppet.com/docs/bolt/latest/plan_functions.html#set-config)
 * [set_feature](https://puppet.com/docs/bolt/latest/plan_functions.html#set-feature)
 * [set_var](https://puppet.com/docs/bolt/latest/plan_functions.html#set-var)
 
 These can be used to add facts, transport specific configuration options, features, and variables to
-Target objects, as well as add or remove objects from existing [inventory
+target objects, as well as add or remove objects from existing [inventory
 groups](https://puppet.com/docs/bolt/latest/inventory_file.html). Targets are modified in-memory
-for the lifecycle of the plan, so are not saved between plan runs.
+for the life cycle of the plan and are not saved between plan runs.
 
 ### Variables and facts on targets
 
-When Bolt runs, it loads transport config values, variables, and facts from the inventory. These can be accessed with the `$target.facts()` and `$target.vars()` functions. During the course of a plan, you can update the facts or variables for any target. Facts usually come from running `facter` or another fact collection application on the target or from a fact store like PuppetDB. Variables are computed externally or assigned directly.
+When Bolt runs, it loads transport configuration values, variables, and facts from the inventory. These can be accessed with the `$target.facts()` and `$target.vars()` functions. During the course of a plan, you can update the facts or variables for any target. Facts usually come from running `facter` or another fact collection application on the target, or from a fact store like PuppetDB. Variables are computed externally or assigned directly.
 
 Set variables in a plan using `$target.set_var`:
 
@@ -500,7 +499,7 @@ groups:
 
 ### Collect facts from the targets
 
-The facts plan connects to the target and discovers facts. It then stores these facts on the targets in the inventory for later use.
+The facts plan connects to the target and discovers facts. It stores these facts on the targets in the inventory for later use.
 
 The methods used to collect facts:
 
@@ -508,7 +507,7 @@ The methods used to collect facts:
 -   On `winrm` targets, it runs a PowerShell script.
 -   On `pcp` or targets where the Puppet agent is present, it runs Facter.
 
-This example collects facts with the facts plan and then uses those facts to decide which task to run on the targets.
+This example collects facts with the facts plan and uses those facts to decide which task to run on the targets.
 
 ```
 plan run_with_facts(TargetSpec $targets) {
@@ -524,7 +523,7 @@ plan run_with_facts(TargetSpec $targets) {
 
 ### Collect facts from PuppetDB
 
-When targets are running a Puppet agent and sending facts to PuppetDB, you can use the `puppetdb_fact` plan to collect facts for them. This example collects facts with the `puppetdb_fact` plan, and then uses those facts to decide which task to run on the targets. You must configure the PuppetDB client before you run it.
+When targets are running a Puppet agent and sending facts to PuppetDB, you can use the `puppetdb_fact` plan to collect facts for them. This example collects facts with the `puppetdb_fact` plan, and uses those facts to decide which task to run on the targets. You must configure the PuppetDB client before you run it.
 
 ```
 plan run_with_facts(TargetSpec $targets) {
@@ -540,7 +539,7 @@ plan run_with_facts(TargetSpec $targets) {
 
 ### Collect general data from PuppetDB
 
-You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example you can discover targets from PuppetDB and then run tasks on them. You'll have to configure the PuppetDB client before running it. You can learn how to [structure pql queries here](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html), and find [pql reference and examples here](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html)
+You can use the `puppetdb_query` function in plans to make direct queries to PuppetDB. For example, you can discover targets from PuppetDB and run tasks on them. You'll have to configure the PuppetDB client before running it. You can learn how to structure Puppet Query Language (PQL) queries using [the PQL tutorial](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html). For information, see [the PQL reference guide](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html).
 
 ```
 plan pdb_discover {
@@ -555,7 +554,7 @@ plan pdb_discover {
 
 **Related information**  
 
-[Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
+- [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
 
 ## Plan logging
 
@@ -571,13 +570,13 @@ To generate log messages from a plan, use the Puppet log function that correspon
 
 ### Default action logging
 
-Bolt logs actions that a plan takes on targets through the  `upload_file`,  `run_command`, `run_script`, or `run_task`  functions. By default it logs a notice level message when an action starts and another when it completes. If you pass a description to the function, that is used in place of the generic log message.
+Bolt logs actions that a plan takes on targets through the  `upload_file`,  `run_command`, `run_script`, or `run_task` functions. By default, it logs a notice level message when an action starts and another when it completes. If you pass a description to the function, that is used in place of the generic log message.
 
 ```
 run_task(my_task, $targets, "Better description", param1 => "val")
 ```
 
-If your plan contains many small actions you may want to suppress these messages and use explicit calls to the Puppet log functions instead. This can be accomplished by wrapping actions in a `without_default_logging` block which causes the action messages to be logged at info level instead of notice. For example to loop over a series of targets without logging each action.
+If your plan contains many small actions, you might want to suppress these messages and use explicit calls to the Puppet log functions instead. This can be accomplished by wrapping actions in a `without_default_logging` block, which causes the action messages to be logged at info level instead of notice. For example to loop over a series of targets without logging each action:
 
 ```
 plan deploy( TargetSpec $targets) {
@@ -603,7 +602,7 @@ without_default_logging { run_command('echo hi', $targets) }
 
 ## Example plans
 
-Check out some example plans for inspiration writing your own.
+Check out some examples for inspiration on writing your own plans.
 
 |Resource|Description|Level|
 |--------|-----------|-----|
