@@ -70,7 +70,7 @@ describe "apply", expensive: true do
           'name' => 'success',
           'plugin_hooks' => {
             'puppet_library' => {
-              'plugin' => 'install_agent'
+              'plugin' => 'puppet_agent'
             }
           }
         }, {
@@ -213,7 +213,7 @@ describe "apply", expensive: true do
           uninstall(ssh_node)
         end
 
-        it 'with install_agent plugin configured installs the agent' do
+        it 'with puppet_agent plugin configured installs the agent' do
           with_tempfile_containing('inventory', YAML.dump(lib_plugin_inventory), '.yaml') do |inv|
             result = run_cli_json(%W[plan run prep -i #{inv.path}] + config_flags)
             expect(result).not_to include('kind')
