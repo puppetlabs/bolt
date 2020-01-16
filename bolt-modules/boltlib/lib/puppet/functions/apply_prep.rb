@@ -41,7 +41,7 @@ Puppet::Functions.create_function(:apply_prep) do
       raise Bolt::ValidationError, "Invalid parameters for #{errors.join("\n")}"
     end
 
-    Bolt::Task.new(tasksig.task_hash)
+    Bolt::Task.from_task_signature(tasksig)
   end
 
   # rubocop:disable Naming/AccessorMethodName

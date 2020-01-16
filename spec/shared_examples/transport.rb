@@ -296,7 +296,7 @@ QUOTED
     it "runs a task requires 'shell'" do
       with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
         reqs = [os_context[:supported_req]]
-        task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => reqs }]
+        task.metadata['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => reqs }]
         expect(runner.run_task(target, task, arguments).message)
           .to eq("Hello from task\nGoodbye\n")
       end
@@ -305,7 +305,7 @@ QUOTED
     it "runs a task with the implementation's input method" do
       with_task_containing('tasks_test', contents, 'stdin', os_context[:extension]) do |task|
         reqs = [os_context[:supported_req]]
-        task['metadata']['implementations'] = [{
+        task.metadata['implementations'] = [{
           'name' => 'tasks_test', 'requirements' => reqs, 'input_method' => 'environment'
         }]
         expect(runner.run_task(target, task, arguments).message.chomp)
@@ -316,20 +316,20 @@ QUOTED
     it "errors when a task only requires an unsupported requirement" do
       with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
         reqs = [os_context[:unsupported_req]]
-        task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => reqs }]
+        task.metadata['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => reqs }]
         expect {
           runner.run_task(target, task, arguments)
         }.to raise_error(Bolt::NoImplementationError,
-                         "No suitable implementation of #{task['name']} for #{target.name}")
+                         "No suitable implementation of #{task.name} for #{target.name}")
       end
     end
 
     it "errors when a task only requires an unknown requirement" do
       with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
-        task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
+        task.metadata['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
         expect {
           runner.run_task(target, task, arguments)
-        }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
+        }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
       end
     end
   end
@@ -340,17 +340,17 @@ QUOTED
 
     it "puts files at _installdir" do
       with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
-        task['metadata']['files'] = []
+        task.metadata['files'] = []
         expected_files = %w[files/foo files/bar/baz lib/puppet_x/file.rb tasks/init]
         expected_files.each do |file|
-          task['metadata']['files'] << "tasks_test/#{file}"
-          task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
+          task.metadata['files'] << "tasks_test/#{file}"
+          task.files << { 'name' => "tasks_test/#{file}", 'path' => task.files[0]['path'] }
         end
 
         files = runner.run_task(target, task, arguments).message.split("\n")
         files = files.each_with_object([]) { |file, acc| acc << file.gsub(/\\\\?/, "/") } if Bolt::Util.windows?
 
-        expected_files = ["tasks/#{File.basename(task['files'][0]['path'])}"] + expected_files
+        expected_files = ["tasks/#{File.basename(task.files[0]['path'])}"] + expected_files
         expect(files.count).to eq(expected_files.count)
         files.sort.zip(expected_files.sort).each do |file, expected_file|
           expect(file).to match(%r{/tasks_test/#{expected_file}$})
@@ -360,16 +360,16 @@ QUOTED
 
     it "includes files from the selected implementation" do
       with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
-        task['metadata']['implementations'] = [
+        task.metadata['implementations'] = [
           { 'name' => 'tasks_test.alt', 'requirements' => ['foobar'], 'files' => ['tasks_test/files/no'] },
           { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
         ]
-        task['metadata']['files'] = ['other_mod/lib/puppet_x/']
-        task_path = task['files'][0]['path']
-        task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task_path }
-        task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task_path }
-        task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task_path }
-        task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task_path }
+        task.metadata['files'] = ['other_mod/lib/puppet_x/']
+        task_path = task.files[0]['path']
+        task.files << { 'name' => 'tasks_test/files/yes', 'path' => task_path }
+        task.files << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task_path }
+        task.files << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task_path }
+        task.files << { 'name' => 'tasks_test/files/no', 'path' => task_path }
 
         files = runner.run_task(target, task, arguments).message.split("\n").sort
         files = files.each_with_object([]) { |file, acc| acc << file.gsub(/\\\\?/, "/") } if Bolt::Util.windows?
@@ -387,10 +387,10 @@ QUOTED
     it 'fails to run' do
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin', os_context[:extension]) do |task|
-        task['metadata']['remote'] = true
+        task.metadata['remote'] = true
         expect do
           runner.run_task(target, task, arguments)
-        end.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
+        end.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
       end
     end
   end
@@ -415,7 +415,7 @@ QUOTED
     it 'passes the correct _target' do
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin', os_context[:extension]) do |task|
-        task['metadata']['remote'] = true
+        task.metadata['remote'] = true
         result = remote_runner.run_task(remote_target, task, arguments).value
         expect(result).to include('message_one' => 'Hello from task')
         expect(result['_target']).to include("name" => "foo://user:pass@example.com/path/to?query=hey")
@@ -427,7 +427,7 @@ QUOTED
     it 'runs when there is a remote implementation' do
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin', os_context[:extension]) do |task|
-        task['metadata']['implementations'] = [{ 'name' => 'tasks_test_stdin', 'remote' => true }]
+        task.metadata['implementations'] = [{ 'name' => 'tasks_test_stdin', 'remote' => true }]
         result = remote_runner.run_task(remote_target, task, arguments).value
         expect(result).to include('message_one' => 'Hello from task')
         expect(result['_target']).to include("name" => "foo://user:pass@example.com/path/to?query=hey")
@@ -441,17 +441,17 @@ QUOTED
         expect {
           remote_runner.run_task(remote_target, task, {})
         }.to raise_error(Bolt::NoImplementationError,
-                         "No suitable implementation of #{task['name']} for #{target.name}")
+                         "No suitable implementation of #{task.name} for #{target.name}")
       end
     end
 
     it "errors when there is no remote implementation" do
       with_task_containing('tasks_test_stdin', os_context[:stdin_task], 'stdin') do |task|
-        task['metadata']['implementations'] = [{ 'name' => 'tasks_test_stdin' }]
+        task.metadata['implementations'] = [{ 'name' => 'tasks_test_stdin' }]
         expect {
           remote_runner.run_task(remote_target, task, {})
         }.to raise_error(Bolt::NoImplementationError,
-                         "No suitable implementation of #{task['name']} for #{target.name}")
+                         "No suitable implementation of #{task.name} for #{target.name}")
       end
     end
   end

@@ -50,7 +50,7 @@ module Bolt
                        { 'name' => 'custom_facts.rb' },
                        { 'name' => 'custom_facts.rb', 'remote' => true }
                      ] }
-        Bolt::Task.new(name: 'apply_helpers::custom_facts', files: [file], metadata: metadata)
+        Bolt::Task.new('apply_helpers::custom_facts', metadata, [file])
       end
     end
 
@@ -63,7 +63,7 @@ module Bolt
                                                { 'name' => 'apply_catalog.rb' },
                                                { 'name' => 'apply_catalog.rb', 'remote' => true }
                                              ] }
-                                Bolt::Task.new(name: 'apply_helpers::apply_catalog', files: [file], metadata: metadata)
+                                Bolt::Task.new('apply_helpers::apply_catalog', metadata, [file])
                               end
     end
 
@@ -77,7 +77,7 @@ module Bolt
                        { 'name' => 'query_resources.rb', 'remote' => true }
                      ] }
 
-        Bolt::Task.new(name: 'apply_helpers::query_resources', files: [file], metadata: metadata)
+        Bolt::Task.new('apply_helpers::query_resources', metadata, [file])
       end
     end
 

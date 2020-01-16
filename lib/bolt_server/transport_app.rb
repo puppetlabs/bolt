@@ -101,7 +101,8 @@ module BoltServer
       error = validate_schema(@schemas["action-run_task"], body)
       return [], error unless error.nil?
 
-      task = Bolt::Task::PuppetServer.new(body['task'], @file_cache)
+      task_data = body['task']
+      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
       parameters = body['parameters'] || {}
       [@executor.run_task(target, task, parameters), nil]
     end

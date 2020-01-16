@@ -83,7 +83,7 @@ module Bolt
           raise Bolt::Error.unknown_task(task_name) unless tasksig
 
           Bolt::Task::Run.validate_params(tasksig, params) if params
-          Bolt::Task.new(tasksig.task_hash)
+          Bolt::Task.from_task_signature(tasksig)
         end
       end
 

@@ -16,7 +16,7 @@ describe Bolt::Task do
     }
     let(:implementations) { [] }
     let(:metadata) { { 'implementations' => implementations } }
-    let(:task) { Bolt::Task.new(name: 'foo', files: files, metadata: metadata) }
+    let(:task) { Bolt::Task.new('foo', metadata, files) }
 
     before :each do
       allow(target).to receive(:feature_set).and_return(Set.new(['powershell']))

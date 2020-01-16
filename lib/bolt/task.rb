@@ -8,30 +8,29 @@ module Bolt
     end
   end
 
-  # Represents a Task.
-  # @file and @files are mutually exclusive.
-  # @name [String] name of the task
-  # @file [Hash, nil] containing `filename` and `file_content`
-  # @files [Array<Hash>] where each entry includes `name` and `path`
-  # @metadata [Hash] task metadata
-  Task = Struct.new(
-    :name,
-    :file,
-    :files,
-    :metadata
-  ) do
-    attr_reader :remote
+  class Task
 
-    def initialize(task, remote: false)
-      super(nil, nil, [], {})
+    attr_reader :name, :files, :metadata, :remote
 
+    # name [String] name of the task
+    # files [Array<Hash>] where each entry includes `name` and `path`
+    # metadata [Hash] task metadata
+    def initialize(name, metadata = {}, files = [], remote = false)
+      @name = name
+      @metadata = metadata
+      @files = files
       @remote = remote
+      @logger = Logging.logger[self]
 
-      task.reject { |k, _| k == 'parameters' }.each { |k, v| self[k] = v }
+    end
+
+    def self.from_task_signature(task_sig)
+      hash = task_sig.task_hash
+      new(hash['name'], hash.fetch('metadata', {}), hash.fetch('files', []))
     end
 
     def remote_instance
-      self.class.new(to_h.each_with_object({}) { |(k, v), h| h[k.to_s] = v }, remote: true)
+      self.class.new(@name, @metadata, @files, true)
     end
 
     def description
@@ -117,6 +116,24 @@ module Bolt
       end
 
       impl
+    end
+
+    def eql?(other)
+      self.class == other.class &&
+        @name == other.name &&
+        @metadata == other.metadata &&
+        @files == other.files &&
+        @remote == other.remote
+    end
+
+    alias == :eql?
+
+    def to_h
+      {
+        name: @name,
+        files: @files,
+        metadata: @metadata
+      }
     end
   end
 end

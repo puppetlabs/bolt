@@ -72,7 +72,7 @@ Puppet::Functions.create_function(:run_task) do
     # Don't bother loading the local task definition if all targets use the 'pcp' transport.
     if !targets.empty? && targets.all? { |t| t.transport == 'pcp' }
       # create a fake task
-      task = Bolt::Task.new(name: task_name, files: [{ 'name' => '', 'path' => '' }])
+      task = Bolt::Task.new(task_name, {}, [{ 'name' => '', 'path' => '' }])
     else
       # TODO: use the compiler injection once PUP-8237 lands
       task_signature = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler).task_signature(task_name)
@@ -80,7 +80,7 @@ Puppet::Functions.create_function(:run_task) do
         raise Bolt::Error.unknown_task(task_name)
       end
 
-      task = Bolt::Task.new(task_signature.task_hash)
+      task = Bolt::Task.from_task_signature(task_signature)
 
       # Set the default value for any params that have one and were not provided
       params = task.parameter_defaults.merge(params)
