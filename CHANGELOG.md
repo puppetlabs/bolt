@@ -2,6 +2,12 @@
 
 ## Bolt NEXT
 
+### Deprecations and removals
+
+* **The install_agent plugin has been officially removed.** The `install_agent` plugin was
+  deprecated in version 1.35 in favor of the `puppet_agent` plugin, and is now removed. The plugins
+  have the exact same behavior.
+
 ### Bug fixes
 
 * **SSH commands will run from the home directory of the run-as user, not the connected user** ([#1518](https://github.com/puppetlabs/bolt/pull/1518))
@@ -12,7 +18,7 @@
 
 ## Bolt 1.45.0
 
-### Deprecations
+### Deprecations and removals
 
 * **Support for the `bolt-inventory-pdb` command will be dropped in Bolt 2.0.** Users can use the [puppetdb inventory plugin](https://puppet.com/docs/bolt/latest/using_plugins.html#puppetdb) with a v2 inventory file to lookup targets from PuppetDB.
 
