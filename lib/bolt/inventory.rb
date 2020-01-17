@@ -72,8 +72,7 @@ module Bolt
       end
     end
 
-    attr_reader :plugins, :config, :logger
-    attr_accessor :hash_deprecation_issued, :args_deprecation_issued
+    attr_reader :plugins, :config
 
     def initialize(data, config = nil, plugins: nil, target_vars: {},
                    target_facts: {}, target_features: {}, target_plugin_hooks: {})
@@ -435,17 +434,5 @@ module Bolt
       @target_plugin_hooks.delete(target.name)
     end
     private :invalidate_group_cache!
-
-    # Logs deprecation warning for Target.new(<uri>, <options>)
-    def target_deprecation
-      return if @deprecation_issued
-
-      @deprecation_issued = true
-      msg = <<~MSG
-        Deprecation Warning: Starting with Bolt 2.0, 'Target.new(<uri>, <options>)' will no
-        longer be supported. Use 'Target.new(<options>)' instead.
-      MSG
-      @logger.warn(msg)
-    end
   end
 end

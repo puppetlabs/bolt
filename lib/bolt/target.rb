@@ -157,34 +157,32 @@ module Bolt
 
     # Satisfies the Puppet datatypes API
     def self.from_asserted_hash(hash)
-      inv = Puppet.lookup(:bolt_inventory)
-
-      if hash['uri'] && hash['options'] && inv.hash_deprecation_issued.nil?
-        inv.hash_deprecation_issued = true
+      if hash['uri'] && hash['options']
+        logger = Logging.logger[self]
         msg = <<~MSG
-          Deprecation Warning: Starting with Bolt 2.0, using 'Target.new' with an 'options' hash key will no
-          will no longer be supported. Use 'Target.new(<config>)', where 'config' is a hash with the same
-          structure used to define targets in the inventory V2 file. For more information see 
-          https://puppet.com/docs/bolt/latest/writing_plans.html#creating-target-objects
+          #{Puppet::Pops::PuppetStack.top_of_stack.join(':')}
+            Deprecation Warning: Starting with Bolt 2.0, using 'Target.new' with an 'options' hash key will no
+            will no longer be supported. Use 'Target.new(<config>)', where 'config' is a hash with the same
+            structure used to define targets in the inventory V2 file. For more information see
+            https://puppet.com/docs/bolt/latest/writing_plans.html#creating-target-objects
         MSG
-        inv.logger.warn(msg)
+        logger.warn(msg)
       end
-      
+
       new(hash['uri'], hash['options'])
     end
 
     def self.from_asserted_args(uri, options = nil)
-      inv = Puppet.lookup(:bolt_inventory)
-      
-      if options && inv.args_deprecation_issued.nil?
-        inv.args_deprecation_issued = true
+      if options
+        logger = Logging.logger[self]
         msg = <<~MSG
-          Deprecation Warning: Starting with Bolt 2.0, 'Target.new(<uri>, <options>)' will no
-          longer be supported. Use 'Target.new(<config>)', where 'config' is a hash with the same 
-          structure used to define targets in the inventory V2 file. For more information see 
-          https://puppet.com/docs/bolt/latest/writing_plans.html#creating-target-objects
+          #{Puppet::Pops::PuppetStack.top_of_stack.join(':')}
+            Deprecation Warning: Starting with Bolt 2.0, 'Target.new(<uri>, <options>)' will no
+            longer be supported. Use 'Target.new(<config>)', where 'config' is a hash with the same
+            structure used to define targets in the inventory V2 file. For more information see
+            https://puppet.com/docs/bolt/latest/writing_plans.html#creating-target-objects
         MSG
-        inv.logger.warn(msg)
+        logger.warn(msg)
       end
 
       new(uri, options)
