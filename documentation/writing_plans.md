@@ -379,7 +379,7 @@ The state of a target is stored in the inventory for the duration of a plan, all
 
 ### `TargetSpec`
 
-The execution function takes a parameter with the type alias `TargetSpec`. This alias accepts the pattern strings allowed by `--targets`, a single target object, or an array of targets and target patterns. Generally, use this type for plans that accept a set of targets as a parameter, to ensure clean interaction with the CLI and other plans. To operate on individual targets, resolve it to a list via `get_targets`. For example, to loop over each target in a plan, accept a `TargetSpec` argument, but call `get_targets` on it before looping.
+The execution function takes a parameter with the type alias `TargetSpec`. `TargetSpec` accepts a URI string, a target object, or an array of URI strings and Target objects. Generally, use this type for plans that accept a set of targets as a parameter, to ensure clean interaction with the CLI and other plans. To operate on individual targets, resolve it to a list via `get_targets`. For example, to loop over each target in a plan, accept a `TargetSpec` argument, but call `get_targets` on it before looping.
 
 ```
 plan loop(TargetSpec $targets) {
@@ -397,8 +397,8 @@ Creating target objects in a plan means they are part of the in-memory inventory
 referenced and run alongside targets that are loaded from the inventory file, but their data is not
 saved between plan runs. They only exist for the life cycle of the plan run.
 
-There are two main ways you may want to instantiate target objects within a plan: getting a target
-that may already exist, or making a new target object that clobbers any existing targets with the
+There are two main ways you might want to instantiate target objects within a plan: getting a target
+that might already exist, or making a new target object that clobbers any existing targets with the
 same name. 
 
 To get or create a target, use the `get_target` function. This takes a single URI and returns a
