@@ -10,7 +10,7 @@ extend Acceptance::BoltSetupHelper
 desc "Generate Beaker Host config"
 rototiller_task :host_config do |task|
   unless ENV['BEAKER_HOSTS']
-    task.add_env(name: 'BOLT_CONTROLLER', default: 'debian9-64')
+    task.add_env(name: 'BOLT_CONTROLLER', default: 'debian10-64')
     task.add_env(name: 'BOLT_NODES',
                  default: 'centos7-64,osx1012-64,windows10ent-64')
     ns = [ENV['BOLT_CONTROLLER'], ENV['BOLT_NODES']].join(',')
