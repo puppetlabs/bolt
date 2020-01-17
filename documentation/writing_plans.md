@@ -48,7 +48,7 @@ You can specify parameters in your plan.
 
 Specify each parameter in your plan with its data type. For example, you might want parameters to specify which targets to run different parts of your plan on.
 
-The following example shows target parameters specified as data type `TargetSpec`. `TargetSpec` accepts the pattern strings allowed by `--targets`, a single target object, or an array of targets and target patterns. Using `TargetSpec` allows you to pass, for each parameter, either a target name or a URI that describes the protocol to use, the hostname, the username, and the password.
+The following example shows target parameters specified as data type `TargetSpec`. `TargetSpec` accepts a URI string, a target object, or an array of URI strings and Target objects. Using `TargetSpec` allows you to pass, for each parameter, either a target object by name or a URI string. URI strings must include a hostname, and can also set the protocol, the username, the password, and the port to use using the format `protocol://user:password@hostname:port`.
 
 The plan then calls the `run_task` function, specifying which targets to run the tasks on. The target names are collected and stored in `$webserver_names` by iterating over the list of target objects returned by `get_targets`. Task parameters are serialized to JSON format; therefore, extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
 
