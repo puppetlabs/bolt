@@ -8,6 +8,16 @@
   deprecated in version 1.35 in favor of the `puppet_agent` plugin, and is now removed. The plugins
   have the exact same behavior.
 
+* **Support for plan method `Target.new(<uri>, <options>)` will be dropped in Bolt 2.0.** Use 
+  `Target.new(<config>)`, where `config` is a hash with the same structure used to define targets in 
+  the inventory V2 file. See [the docs](https://puppet.com/docs/bolt/latest/writing_plans.html#creating-target-objects) 
+  for more information and examples.
+
+* **Support for `options` key in the hash parameter for `Target.new()` plan function will be dropped in Bolt 2.0.** Use 
+  `Target.new(<config>)`, where `config` is a hash with the same structure used to define targets in 
+  the inventory V2 file. See [the docs](https://puppet.com/docs/bolt/latest/writing_plans.html#creating-target-objects) 
+  for more information and examples.
+
 ### Bug fixes
 
 * **SSH commands will run from the home directory of the run-as user, not the connected user** ([#1518](https://github.com/puppetlabs/bolt/pull/1518))
