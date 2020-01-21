@@ -1,5 +1,10 @@
 {
   "parameters": {
     "value": { "type": "Any" }
-  }
+  },
+  "input_method": "stdin",
+  "implementations": [
+    {"name": "resolve_reference.ps1", "requirements": ["powershell"]},
+    {"name": "resolve_reference.sh", "requirements": ["shell"]}
+  ]
 }
