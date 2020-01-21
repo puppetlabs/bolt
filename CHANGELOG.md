@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt NEXT
+## Bolt 1.46.0
 
 ### Deprecations and removals
 
