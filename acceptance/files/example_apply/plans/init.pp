@@ -1,12 +1,12 @@
 plan example_apply (
-  TargetSpec $nodes,
+  TargetSpec $targets,
   String $filepath,
   Boolean $noop = false,
   Optional[String] $run_as = undef,
 ) {
-  $nodes.apply_prep
+  $targets.apply_prep
 
-  return apply($nodes, _noop => $noop, _run_as => $run_as, _catch_errors => true) {
+  return apply($targets, _noop => $noop, _run_as => $run_as, _catch_errors => true) {
     file { $filepath:
       ensure => directory,
     } -> file { "${filepath}/hello.txt":
