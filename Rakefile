@@ -96,6 +96,22 @@ namespace :travis do
 end
 
 namespace :docs do
+  desc "Generate markdown docs for Bolt's transport configuration options"
+  task :config_reference do
+    @transports = { options: {}, defaults: {} }
+    @global = { options: Bolt::Config::OPTIONS, defaults: Bolt::Config::DEFAULT_OPTIONS }
+    @log = { options: Bolt::Config::LOG_OPTIONS, defaults: Bolt::Config::DEFAULT_LOG_OPTIONS }
+    @puppetfile = { options: Bolt::Config::PUPPETFILE_OPTIONS }
+
+    Bolt::TRANSPORTS.each do |name, transport|
+      @transports[:options][name.to_s] = transport::OPTIONS
+      @transports[:defaults][name.to_s] = transport&.default_options
+    end
+
+    renderer = ERB.new(File.read('documentation/bolt_configuration_reference.md.erb'), nil, '-')
+    File.write('documentation/bolt_configuration_reference.md', renderer.result)
+  end
+
   desc "Generate markdown docs for Bolt's command line options"
   task :cli_reference do
     parser = Bolt::BoltOptionParser.new({})
@@ -198,7 +214,7 @@ namespace :docs do
     File.write('documentation/plan_functions.md', renderer.result)
   end
 
-  task all: %i[cli_reference function_reference]
+  task all: %i[cli_reference function_reference config_reference]
 end
 
 desc 'Generate all markdown docs'

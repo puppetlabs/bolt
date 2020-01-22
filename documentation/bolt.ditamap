@@ -29,7 +29,7 @@
     <topicref href="configuring_bolt.md" format="markdown">
         <topicref href="bolt_project_directories.md" format="markdown"/>
     </topicref>
-    <topicref href="bolt_configuration_options.md" format="markdown"/>
+    <topicref href="bolt_configuration_reference.md" format="markdown"/>
     <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
     <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
     <topicref href="inventory_file.md" format="markdown"/>

@@ -6,6 +6,10 @@ require 'bolt/transport/base'
 module Bolt
   module Transport
     class Remote < Base
+      OPTIONS = {
+        "run-on" => "The proxy target that the task executes on."
+      }.freeze
+
       # The options for the remote transport not defined.
       def self.filter_options(unfiltered)
         unfiltered

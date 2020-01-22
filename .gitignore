@@ -71,3 +71,4 @@ modules/aws_inventory
 locales/
 documentation/plan_functions.md
 documentation/bolt_command_reference.md
+documentation/bolt_configuration_reference.md

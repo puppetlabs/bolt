@@ -12,8 +12,25 @@ require 'bolt/util'
 module Bolt
   module Transport
     class LocalWindows < Base
+      OPTIONS = {
+        "interpreters"   => "A map of an extension name to the absolute path of an executable, "\
+                            "enabling you to override the shebang defined in a task executable. The "\
+                            "extension can optionally be specified with the `.` character (`.py` and "\
+                            "`py` both map to a task executable `task.py`) and the extension is case "\
+                            "sensitive. When a target's name is `localhost`, Ruby tasks run with the "\
+                            "Bolt Ruby interpreter by default.",
+        "run-as"         => "A different user to run commands as after login.",
+        "run-as-command" => "The command to elevate permissions. Bolt appends the user and command "\
+                            "strings to the configured `run-as-command` before running it on the target. "\
+                            "This command must not require an interactive password prompt, and the "\
+                            "`sudo-password` option is ignored when `run-as-command` is specified. The "\
+                            "`run-as-command` must be specified as an array.",
+        "sudo-password"  => "Password to use when changing users via `run-as`.",
+        "tmpdir"         => "The directory to copy and execute temporary files."
+      }.freeze
+
       def self.options
-        %w[tmpdir interpreters run-as run-as-command sudo-password]
+        OPTIONS.keys
       end
 
       def provided_features
