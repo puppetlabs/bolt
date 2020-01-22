@@ -25,10 +25,11 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
     scp_to(bolt, File.join(fixtures, 'example_apply'), "#{dir}/modules/example_apply")
   end
 
-  bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=#{targets}"
+  bolt_command = "bolt plan run example_apply filepath=#{filepath}"
   flags = {
     '--modulepath' => modulepath(File.join(dir, 'modules')),
-    '--format' => 'json'
+    '--format' => 'json',
+    '-t' => targets
   }
 
   teardown do
@@ -94,7 +95,7 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
   end
 
   step "puppet service should be stopped" do
-    service_command = "bolt plan run example_apply::puppet_status -n #{targets}"
+    service_command = "bolt plan run example_apply::puppet_status"
     result = bolt_command_on(bolt, service_command, flags)
 
     assert_equal(0, result.exit_code,
@@ -120,7 +121,6 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
   end
 
   step "apply as non-root user" do
-    restricted_filepath = '/etc/puppetlabs/test'
     user = 'apply_nonroot'
 
     step 'create nonroot user on targets' do
@@ -131,6 +131,15 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
       teardown do
         on(ssh_nodes, "/opt/puppetlabs/bin/puppet resource file $(echo ~#{user}) ensure=absent")
         on(ssh_nodes, "/opt/puppetlabs/bin/puppet resource user #{user} ensure=absent")
+      end
+    end
+
+    step 'create nonroot user-owned directory on targets' do
+      filepath = "/tmp/mydir"
+      on(ssh_nodes, "/opt/puppetlabs/bin/puppet resource file #{filepath} ensure=directory owner=#{user}")
+
+      teardown do
+        on(ssh_nodes, "/opt/puppetlabs/bin/puppet resource file #{filepath} ensure=absent")
       end
     end
 
@@ -145,7 +154,7 @@ FILE
       end
     end
 
-    bolt_command = "bolt plan run example_apply filepath=#{restricted_filepath} nodes=#{targets}"
+    bolt_command = "bolt plan run example_apply filepath=#{filepath}"
 
     step "execute `bolt plan run run_as=#{user}` via SSH with json output" do
       result = bolt_command_on(bolt, bolt_command + " run_as=#{user}", flags)
@@ -160,15 +169,20 @@ FILE
       end
 
       ssh_nodes.each do |node|
-        # Verify that node succeeded
         host = node.hostname
-        result = json.select { |n| n['node'] == host }
-        assert_equal('failure', result[0]['status'],
-                     "The task did not fail on #{host}")
-        assert_match(/Permission denied/, result[0]['result']['_error']['msg'])
+        result = json.select { |n| n['node'] == host }.first
+        assert_equal('success', result['status'],
+                     "The task failed on #{host}")
 
-        # Verify that files were not created on the target
-        on(node, "cat #{restricted_filepath}/hello.txt", acceptable_exit_codes: [1])
+        stat = if node['platform'] =~ /osx/
+                 "stat -f %Su #{filepath}/hello.txt"
+               else
+                 "stat -c %U #{filepath}/hello.txt"
+               end
+        owner_result = bolt_command_on(bolt, "bolt command run \"#{stat}\" -t #{host} --format json")
+        # It's times like this I think I'm just a highly paid data parser
+        owner = JSON.parse(owner_result.stdout)['items'].first['result']['stdout'].strip
+        assert_equal(user, owner, "The file created in the apply block is not owned by the run_as user")
       end
     end
   end

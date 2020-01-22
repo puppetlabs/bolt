@@ -21,10 +21,11 @@ test_name "bolt plan run should apply manifest block on remote hosts via winrm" 
     scp_to(bolt, File.join(fixtures, 'example_apply'), "#{dir}/modules/example_apply")
   end
 
-  bolt_command = "bolt plan run example_apply filepath=#{filepath} nodes=winrm_nodes"
+  bolt_command = "bolt plan run example_apply filepath=#{filepath}"
   flags = {
     '--modulepath' => modulepath(File.join(dir, 'modules')),
-    '--format' => 'json'
+    '--format' => 'json',
+    '-t' => "winrm_nodes"
   }
 
   teardown do
@@ -90,10 +91,11 @@ test_name "bolt plan run should apply manifest block on remote hosts via winrm" 
   end
 
   step "puppet service should be stopped" do
-    service_command = 'bolt plan run example_apply::puppet_status -n winrm_nodes'
+    service_command = 'bolt plan run example_apply::puppet_status'
     flags = {
       '--modulepath' => modulepath(File.join(dir, 'modules')),
-      '--format' => 'json'
+      '--format' => 'json',
+      '-t' => "winrm_nodes"
     }
 
     result = bolt_command_on(bolt, service_command, flags)

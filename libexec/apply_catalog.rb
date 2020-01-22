@@ -39,7 +39,8 @@ begin
 
   Tempfile.open('plugins.tar.gz') do |plugins|
     File.binwrite(plugins, Base64.decode64(args['plugins']))
-    Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, Etc.getlogin || Etc.getpwuid.name)
+    user = Etc.getpwuid.nil? ? Etc.getlogin : Etc.getpwuid.name
+    Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, user)
   end
 
   env = Puppet.lookup(:environments).get('production')
