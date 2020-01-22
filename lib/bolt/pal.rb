@@ -291,17 +291,35 @@ module Bolt
     end
 
     def list_plans
+      require 'puppet-strings'
+      require 'puppet-strings/yard'
       in_bolt_compiler do |compiler|
         errors = []
         plans = compiler.list_plans(nil, errors).map { |plan| [plan.name] }.sort
         errors.each do |error|
           @logger.warn(error.details['original_error'])
         end
-        plans
+        plans.reject { |plan| private_plan?(plan.first) }
       end
     end
 
-    def get_plan_info(plan_name)
+    def private_plan?(plan_name)
+      pp_path = plan_location(plan_name)[:path]
+      if File.exist?(pp_path)
+        PuppetStrings::Yard.setup!
+        YARD::Logger.instance.level = :error
+        YARD.parse(pp_path)
+
+        plan = YARD::Registry.at("puppet_plans::#{plan_name}")
+
+        private_plan = plan.tag(:private) && plan.tag(:private).text == 'true'
+      else
+        private_plan = false
+      end
+      private_plan
+    end
+
+    def plan_location(plan_name)
       plan_sig = in_bolt_compiler do |compiler|
         compiler.plan_signature(plan_name)
       end
@@ -317,13 +335,17 @@ module Bolt
       plan_subpath = File.join(plan_name.split('::').drop(1))
       plan_subpath = 'init' if plan_subpath.empty?
 
-      pp_path = File.join(mod, 'plans', "#{plan_subpath}.pp")
-      if File.exist?(pp_path)
+      { path: File.join(mod, 'plans', "#{plan_subpath}.pp"), mod: mod }
+    end
+
+    def get_plan_info(plan_name)
+      plan_loc = plan_location(plan_name)
+      if File.exist?(plan_loc[:path])
         require 'puppet-strings'
         require 'puppet-strings/yard'
         PuppetStrings::Yard.setup!
         YARD::Logger.instance.level = :error
-        YARD.parse(pp_path)
+        YARD.parse(plan_loc[:path])
 
         plan = YARD::Registry.at("puppet_plans::#{plan_name}")
 
@@ -345,12 +367,12 @@ module Bolt
           'name' => plan_name,
           'description' => description,
           'parameters' => parameters,
-          'module' => mod
+          'module' => plan_loc[:mod]
         }
 
       # If it's a YAML plan, fall back to limited data
       else
-        yaml_path = File.join(mod, 'plans', "#{plan_subpath}.yaml")
+        yaml_path = plan_loc[:path].sub(/\.pp?/, '.yaml')
         plan_content = File.read(yaml_path)
         plan = Bolt::PAL::YamlPlan::Loader.from_string(plan_name, plan_content, yaml_path)
 
@@ -372,7 +394,7 @@ module Bolt
           'name' => plan_name,
           'description' => plan.description,
           'parameters' => parameters,
-          'module' => mod
+          'module' => plan_loc[:mod]
         }
       end
     end
