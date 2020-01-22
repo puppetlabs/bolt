@@ -5,6 +5,14 @@ require 'bolt/config'
 
 describe Bolt::Config do
   let(:boltdir) { Bolt::Boltdir.new(File.join(Dir.tmpdir, rand(1000).to_s)) }
+  let(:system_path) {
+    if Bolt::Util.windows?
+      Pathname.new(File.join(Dir::COMMON_APPDATA, 'PuppetLabs', 'bolt', 'etc', 'bolt.yaml'))
+    else
+      Pathname.new(File.join('/etc', 'puppetlabs', 'bolt', 'bolt.yaml'))
+    end
+  }
+  let(:user_path) { Pathname.new(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')) }
 
   describe "when initializing" do
     it "accepts string values for config data" do
@@ -72,6 +80,8 @@ describe Bolt::Config do
 
     it "loads from the boltdir config file if present" do
       expect(Bolt::Util).to receive(:read_config_file).with(nil, [boltdir.config_file], 'config')
+      expect(Bolt::Util).to receive(:read_config_file).with(nil, [system_path], 'config')
+      expect(Bolt::Util).to receive(:read_config_file).with(nil, [user_path], 'config')
 
       Bolt::Config.from_boltdir(boltdir)
     end
@@ -82,6 +92,8 @@ describe Bolt::Config do
 
     it 'loads from the specified config file' do
       expect(Bolt::Util).to receive(:read_config_file).with(path, [], 'config')
+      expect(Bolt::Util).to receive(:read_config_file).with(nil, [system_path], 'config')
+      expect(Bolt::Util).to receive(:read_config_file).with(nil, [user_path], 'config')
 
       Bolt::Config.from_file(path)
     end
@@ -304,6 +316,129 @@ describe Bolt::Config do
       config = Bolt::Config.new(boltdir, data)
       expect(config.inventoryfile)
         .to eq(File.expand_path('targets.yml', boltdir.path))
+    end
+  end
+
+  describe 'merging config files' do
+    let(:project_config) {
+      {
+        'transport' => 'remote',
+        'ssh' => {
+          'user' => 'bolt',
+          'password' => 'bolt'
+        },
+        'plugins' => {
+          'vault' => {
+            'auth' => {
+              'method' => 'userpass',
+              'user' => 'bolt',
+              'pass' => 'bolt'
+            }
+          }
+        },
+        'plugin_hooks' => {
+          'puppet_library' => {
+            'plugin' => 'puppet_agent',
+            '_run_as' => 'root'
+          }
+        }
+      }
+    }
+
+    let(:user_config) {
+      {
+        'transport' => 'winrm',
+        'concurrency' => 5,
+        'ssh' => {
+          'user' => 'puppet',
+          'private-key' => '/path/to/key'
+        },
+        'plugins' => {
+          'aws_inventory' => {
+            'credentials' => '~/aws/credentials'
+          }
+        },
+        'plugin_hooks' => {
+          'puppet_library' => {
+            'plugin' => 'task',
+            'task' => 'bootstrap'
+          },
+          'fake_hook' => {
+            'plugin' => 'fake_plugin'
+          }
+        }
+      }
+    }
+
+    let(:system_config) {
+      {
+        'ssh' => {
+          'password' => 'puppet',
+          'private-key' => {
+            'key-data' => 'supersecretkey'
+          }
+        },
+        'plugins' => {
+          'vault' => {
+            'server_url' => 'http://example.com',
+            'cacert' => '/path/to/cert',
+            'auth' => {
+              'method' => 'token',
+              'token' => 'supersecrettoken'
+            }
+          }
+        },
+        'log' => {
+          '~/.puppetlabs/debug.log' => {
+            'level' => 'debug',
+            'append' => false
+          }
+        }
+      }
+    }
+
+    let(:config) { Bolt::Config.new(boltdir, project_config, {}, [{ data: system_config }, { data: user_config }]) }
+
+    it 'performs a depth 2 shallow merge on plugins' do
+      expect(config.plugins).to eq(
+        'vault' => {
+          'server_url' => 'http://example.com',
+          'cacert' => '/path/to/cert',
+          'auth' => {
+            'method' => 'userpass',
+            'user' => 'bolt',
+            'pass' => 'bolt'
+          }
+        },
+        'aws_inventory' => {
+          'credentials' => '~/aws/credentials'
+        }
+      )
+    end
+
+    it 'performs a deep merge on transport config' do
+      expect(config.transports[:ssh]).to include(
+        'user' => 'bolt',
+        'password' => 'bolt',
+        'private-key' => '/path/to/key'
+      )
+    end
+
+    it 'overwrites non-hash values' do
+      expect(config.transport).to eq('remote')
+      expect(config.concurrency).to eq(5)
+    end
+
+    it 'performs a shallow merge on hash values' do
+      expect(config.plugin_hooks).to eq(
+        'puppet_library' => {
+          'plugin' => 'puppet_agent',
+          '_run_as' => 'root'
+        },
+        'fake_hook' => {
+          'plugin' => 'fake_plugin'
+        }
+      )
     end
   end
 end
