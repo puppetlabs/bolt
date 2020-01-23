@@ -96,12 +96,15 @@ module Bolt
           end
         end
 
-        if result.message
-          @stream.puts(remove_trail(indent(2, result.message)))
-        end
+        # Only print results if there's something other than empty string and hash
+        if result.value.empty? || (result.value.keys == ['_output'] && !result.message?)
+          @stream.puts(indent(2, "#{result.action.capitalize} completed successfully with no result"))
+        else
+          # Only print messages that have something other than whitespace
+          if result.message?
+            @stream.puts(remove_trail(indent(2, result.message)))
+          end
 
-        # There is more information to output
-        if result.generic_value
           # Use special handling if the result looks like a command or script result
           if result.generic_value.keys == %w[stdout stderr exit_code]
             unless result['stdout'].strip.empty?
@@ -112,7 +115,7 @@ module Bolt
               @stream.puts(indent(2, "STDERR:"))
               @stream.puts(indent(4, result['stderr']))
             end
-          else
+          elsif result.generic_value.any?
             @stream.puts(indent(2, ::JSON.pretty_generate(result.generic_value)))
           end
         end

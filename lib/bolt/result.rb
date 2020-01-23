@@ -95,7 +95,6 @@ module Bolt
       @value = value || {}
       @action = action
       @object = object
-      @value_set = !value.nil?
       if error && !error.is_a?(Hash)
         raise "TODO: how did we get a string error"
       end
@@ -105,6 +104,10 @@ module Bolt
 
     def message
       @value['_output']
+    end
+
+    def message?
+      message && !message.strip.empty?
     end
 
     def status_hash
@@ -121,9 +124,7 @@ module Bolt
     end
 
     def generic_value
-      if @value_set
-        value.reject { |k, _| %w[_error _output].include? k }
-      end
+      value.reject { |k, _| %w[_error _output].include? k }
     end
 
     def eql?(other)
