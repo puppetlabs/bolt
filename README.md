@@ -1,5 +1,6 @@
-[![Travis Status](https://img.shields.io/travis/puppetlabs/bolt?logo=travis)](https://travis-ci.org/puppetlabs/bolt)
-[![Appveyor Status](https://img.shields.io/appveyor/ci/puppetlabs/bolt?logo=appveyor)](https://ci.appveyor.com/project/puppetlabs/bolt/branch/master)
+[![Modules Status](https://github.com/puppetlabs/bolt/workflows/Modules/badge.svg)](https://github.com/puppetlabs/bolt/actions)
+[![Linux Status](https://github.com/puppetlabs/bolt/workflows/Linux/badge.svg)](https://github.com/puppetlabs/bolt/actions)
+[![Windows Status](https://github.com/puppetlabs/bolt/workflows/Windows/badge.svg)](https://github.com/puppetlabs/bolt/actions)
 [![Version](https://img.shields.io/github/v/tag/puppetlabs/bolt?label=version)](./CHANGELOG.md)
 [![Platforms](https://img.shields.io/badge/platforms-linux%20%7C%20windows%20%7C%20macos-lightgrey)](./documentation/bolt_installing.md)
 [![License](https://img.shields.io/github/license/puppetlabs/bolt)](./LICENSE)

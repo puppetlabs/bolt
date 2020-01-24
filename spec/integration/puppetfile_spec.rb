@@ -8,9 +8,20 @@ describe "installing puppetfiles" do
   include BoltSpec::Integration
 
   let(:synced_modules) { [] }
-  let(:root) { Dir.mktmpdir }
-  let(:boltdir) { File.join(root, 'Boltdir') }
-  let(:module_source) { Dir.mktmpdir }
+  let(:boltdir) { File.join(@root, 'Boltdir') }
+
+  # Usually temp dirs would just be created under the system temp dir,
+  # but this doesn't work on Windows images on GitHub Actions. Creating a
+  # temp dir in the current working dir gets around this issue.
+  around(:each) do |example|
+    Dir.mktmpdir(nil, Dir.pwd) do |root|
+      Dir.mktmpdir(nil, Dir.pwd) do |module_source|
+        @root = Pathname.new(root)
+        @module_source = Pathname.new(module_source)
+        example.run
+      end
+    end
+  end
 
   def git(*args)
     _output, status = Open3.capture2('git', *args)
@@ -18,7 +29,7 @@ describe "installing puppetfiles" do
   end
 
   def make_module(name, tasks, plans)
-    mod = File.join(module_source, name)
+    mod = File.join(@module_source, name)
     FileUtils.mkdir_p(File.join(mod, 'tasks'))
     FileUtils.mkdir_p(File.join(mod, 'plans'))
     Dir.chdir(mod) do
@@ -44,15 +55,17 @@ describe "installing puppetfiles" do
     File.write(File.join(boltdir, 'Puppetfile'), <<-PUPPETFILE)
     forge 'https://forge.example.com'
 
-    mod 'tester-foo', git: 'file://#{module_source}/foo', ref: 'master'
-    mod 'tester-bar', git: 'file://#{module_source}/bar', ref: 'master'
+    mod 'tester-foo', git: 'file://#{@module_source}/foo', ref: 'master'
+    mod 'tester-bar', git: 'file://#{@module_source}/bar', ref: 'master'
     PUPPETFILE
 
     result = JSON.parse(run_cli(%W[puppetfile install --boltdir #{boltdir}]))
 
     expect(result['success']).to eq(true)
-    expect(result['puppetfile']).to eq(File.join(boltdir, 'Puppetfile'))
-    expect(result['moduledir']).to eq(File.join(boltdir, 'modules'))
+    # Check that the files are identical instead of comparing the paths, since paths
+    # use a different separator on Windows
+    expect(File.identical?(result['puppetfile'], File.join(boltdir, 'Puppetfile'))).to be
+    expect(File.identical?(result['moduledir'], File.join(boltdir, 'modules'))).to be
     expect(Dir.exist?(File.join(boltdir, '.resource_types')))
 
     result = JSON.parse(run_cli(%W[task show --boltdir #{boltdir}]))

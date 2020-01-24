@@ -1,0 +1,64 @@
+name: Modules
+
+on:
+  pull_request:
+    type: [opened, reopened, edited]
+
+env:
+  BOLT_SUDO_USER: true
+
+jobs:
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.5.x'
+      - name: Install bundler
+        run: |
+          gem install bundler
+          bundle config path vendor/bundle
+      - name: Cache gems
+        id: cache
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+      - name: Install gems
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: bundle install --jobs 4 --retry 3
+      - name: Run module tests
+        run: bundle exec rake ci:modules
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    env:
+      BOLT_WINDOWS: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.5.x
+      - name: Install bundler
+        run: |
+          gem install bundler
+          bundle config path vendor/bundle
+      - name: Cache gems
+        id: cache
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+      - name: Install gems
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: bundle install --jobs 4 --retry 3
+      - name: Run module tests
+        run: bundle exec rake ci:modules

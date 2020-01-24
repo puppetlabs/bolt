@@ -20,25 +20,25 @@ RSpec::Core::RakeTask.new(:spec)
 desc "Run RSpec tests that don't require VM fixtures or a particular shell"
 RSpec::Core::RakeTask.new(:unit) do |t|
   t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~winrm ' \
-                 '--tag ~appveyor_agents --tag ~puppetserver --tag ~puppetdb ' \
+                 '--tag ~windows_agents --tag ~puppetserver --tag ~puppetdb ' \
                  '--tag ~omi --tag ~kerberos'
 end
 
-desc "Run RSpec tests for AppVeyor that don't require SSH, Bash, Appveyor Puppet Agents, or orchestrator"
-RSpec::Core::RakeTask.new(:appveyor) do |t|
-  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~appveyor_agents ' \
+desc "Run RSpec tests for Windows that don't require SSH, Bash, Windows Puppet Agents, or orchestrator"
+RSpec::Core::RakeTask.new(:windows_ci) do |t|
+  t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~bash --tag ~windows_agents ' \
          '--tag ~orchestrator --tag ~puppetserver --tag ~puppetdb --tag ~omi ' \
          '--tag ~kerberos'
 end
 
-desc "Run RSpec tests for TravisCI that don't require WinRM"
-RSpec::Core::RakeTask.new(:travisci) do |t|
-  t.rspec_opts = '--tag ~winrm --tag ~appveyor_agents --tag ~puppetserver --tag ~puppetdb ' \
+desc "Run RSpec tests for CI that don't require WinRM"
+RSpec::Core::RakeTask.new(:fast) do |t|
+  t.rspec_opts = '--tag ~winrm --tag ~windows_agents --tag ~puppetserver --tag ~puppetdb ' \
   '--tag ~omi --tag ~windows --tag ~kerberos --tag ~expensive'
 end
 
 desc "Run RSpec tests that are slow or require slow to start containers for setup"
-RSpec::Core::RakeTask.new(:puppetserver) do |t|
+RSpec::Core::RakeTask.new(:slow) do |t|
   t.rspec_opts = '--tag puppetserver --tag puppetdb --tag expensive'
 end
 
@@ -57,16 +57,18 @@ def format_links(text)
   text.gsub(/{([^}]+)}/, '[`\1`](#\1)')
 end
 
-namespace :travis do
-  task rubocop: :rubocop
-  task :unit do
-    sh "docker-compose -f spec/docker-compose.yml build --parallel ubuntu_node puppet_5_node puppet_6_node"
-    sh "docker-compose -f spec/docker-compose.yml up -d ubuntu_node puppet_5_node puppet_6_node"
-    sh "r10k puppetfile install"
-    Rake::Task['travisci'].invoke
+namespace :ci do
+  task :fast do
+    Rake::Task['fast'].invoke
   end
+
+  task :slow do
+    Rake::Task['slow'].invoke
+  end
+
   task :modules do
     success = true
+    # Test core modules
     %w[boltlib ctrl file out system].each do |mod|
       Dir.chdir("#{__dir__}/bolt-modules/#{mod}") do
         sh 'rake spec' do |ok, _|
@@ -74,24 +76,15 @@ namespace :travis do
         end
       end
     end
+    # Test modules
+    %w[canary aggregate puppetdb_fact].each do |mod|
+      Dir.chdir("#{__dir__}/modules/#{mod}") do
+        sh 'rake spec' do |ok, _|
+          success = false unless ok
+        end
+      end
+    end
     raise "Module tests failed" unless success
-  end
-  task docs: :generate_docs
-  task :integration do
-    sh "docker-compose -f spec/docker-compose.yml build --parallel"
-    sh "docker-compose -f spec/docker-compose.yml up -d"
-    sh "r10k puppetfile install"
-    # Wait for containers to be started
-    result = 15.times do
-      ready = sh('[ -z "$(docker ps -q --filter=health=starting)" ]') { |ok, _| ok }
-      break :ready if ready
-      sleep(5)
-    end
-    if result == :ready
-      Rake::Task['puppetserver'].invoke
-    else
-      raise "Containers did not properly start"
-    end
   end
 end
 
@@ -246,9 +239,9 @@ namespace :integration do
     t.rspec_opts = '--tag windows'
   end
 
-  desc 'Run tests that require Puppet Agents configured with Appveyor'
-  RSpec::Core::RakeTask.new(:appveyor_agents) do |t|
-    t.rspec_opts = '--tag appveyor_agents'
+  desc 'Run tests that require Puppet Agents configured with Windows'
+  RSpec::Core::RakeTask.new(:windows_agents) do |t|
+    t.rspec_opts = '--tag windows_agents'
   end
 
   desc 'Run tests that require OMI docker container'

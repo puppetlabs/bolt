@@ -75,10 +75,10 @@ function Grant-WinRMHttpsAccess($certThumbprint)
 {
   $winRMArgs = @{
     ResourceURI = 'winrm/config/Listener'
-    SelectorSet = @{ Address = '*'; Transport = 'HTTPS' }
+    SelectorSet = @{ Address = '*'; Transport = 'HTTPS'; }
     ValueSet    = @{ Hostname = 'boltserver'; CertificateThumbprint = $certThumbprint }
   }
-  $instance = New-WSManInstance @winRMArgs
+  $instance = Set-WSManInstance @winRMArgs
   Write-Information ($instance | Format-List | Out-String)
 }
 
@@ -147,3 +147,12 @@ function Set-ActiveRubyFromPuppet
 
   [System.Environment]::SetEnvironmentVariable('Path', $path, [System.EnvironmentVariableTarget]::Machine)
 }
+
+$Pass = New-RandomPassword
+$User = @{ UserName = $ENV:BOLT_WINRM_USER; Password = $Pass }
+New-LocalAdmin @User
+Enable-PSRemoting
+Set-WSManQuickConfig -Force
+Set-WinRMHostConfiguration
+Test-WinRMConfiguration @User | Out-Null
+Write-Output "::set-env name=BOLT_WINRM_PASSWORD::$pass"

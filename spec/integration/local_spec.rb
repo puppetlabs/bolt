@@ -12,7 +12,7 @@ describe "when running over the local transport" do
   let(:uri) { 'localhost,local://foo' }
   let(:user) { ENV['USER'] }
   let(:sudo_user) { 'root' }
-  let(:sudo_password) { 'travis' }
+  let(:sudo_password) { 'runner' }
   let(:stdin_task) { "sample::stdin" }
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }

@@ -85,7 +85,7 @@ In Bolt testing atop Docker containers, [Samba server](https://www.samba.org/) i
 
 This environment is intended to support multiple environments:
 
-* [TravisCI automated testing](#travisCI-automated-testing)
+* [GitHub Actions automated testing](#github-actions-automated-testing)
 * [Local development](#local-development)
 
 #### Container Setup
@@ -162,9 +162,9 @@ Useful tooling on the instance includes:
 * [`pwsh`](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-linux?view=powershell-6) - PowerShell 6
 * [`omicli`](https://github.com/microsoft/omi/blob/master/Unix/cli/examples.txt) - client tool used to verify basic OMI server functionality
 
-#### TravisCI automated testing
+#### GitHub Actions automated testing
 
-At present, Travis setup will:
+At present, GitHub Actions setup will:
 
 * Ensure that it can refer to itself as `samba-ad.bolt.test` and `omiserver.bolt.test` (the same name that the containers refer to themselves inside the Docker UDN)
 * Install the Kerberos client package
@@ -176,7 +176,7 @@ Despite having a correctly setup environment where OMI server can authenticate a
 
 #### Local development
 
-To run tests locally on Linux or OSX requires that the local Kerberos client be configured in the same way that Travis is, which includes:
+To run tests locally on Linux or OSX requires that the local Kerberos client be configured in the same way that CI is, which includes:
 
 * making sure `/etc/krb5.conf` is configured for realm
 * the DNS name of `samba-ad.bolt.test` resolves, which requires adding it to `/etc/hosts` as `127.0.0.1 samba-ad.bolt.test`

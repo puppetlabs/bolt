@@ -1,0 +1,22 @@
+name: Linting
+
+on:
+  pull_request:
+    type: [opened, reopened, edited]
+
+jobs:
+
+  rubocop:
+    name: Rubocop
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.5.x'
+      - name: Install rubocop
+        run: gem install rubocop
+      - name: Run rubocop
+        run: rubocop --display-cop-names --display-style-guide --parallel
