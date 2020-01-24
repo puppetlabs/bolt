@@ -9,7 +9,7 @@ env:
 
 jobs:
 
-  unit:
+  fast:
     name: Fast
     runs-on: ubuntu-latest
     steps:
@@ -42,10 +42,10 @@ jobs:
           docker-compose -f spec/docker-compose.yml build --parallel ubuntu_node puppet_5_node puppet_6_node
           docker-compose -f spec/docker-compose.yml up -d ubuntu_node puppet_5_node puppet_6_node
           bundle exec r10k puppetfile install
-      - name: Run unit tests
+      - name: Run tests with minimal container infrastructure
         run: bundle exec rake ci:fast
 
-  integration:
+  slow:
     name: Slow
     runs-on: ubuntu-latest
     steps:
@@ -75,5 +75,5 @@ jobs:
           docker-compose -f spec/docker-compose.yml build --parallel
           docker-compose -f spec/docker-compose.yml up -d
           bundle exec r10k puppetfile install
-      - name: Run integration tests
+      - name: Run tests with expensive containers
         run: bundle exec rake ci:slow
