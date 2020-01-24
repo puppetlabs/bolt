@@ -1,5 +1,14 @@
 # Changelog
 
+## Bolt Next
+
+### New features
+
+* **Remove empty strings and objects from results in human output** ([#1544](https://github.com/puppetlabs/bolt/issues/1544))
+
+  Human formatted results no longer show empty strings or JSON objects. When a result only has an `_options` key, and the value
+  is an empty string or whitespace, a message will be displayed saying the action completed successfully with no result.
+
 ## Bolt 1.46.0
 
 ### Deprecations and removals

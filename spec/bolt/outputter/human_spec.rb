@@ -13,8 +13,8 @@ describe "Bolt::Outputter::Human" do
   let(:results) {
     Bolt::ResultSet.new(
       [
-        Bolt::Result.new(target, message: "ok"),
-        Bolt::Result.new(target2, error: { 'msg' => 'oops' })
+        Bolt::Result.new(target, message: "ok", action: 'action'),
+        Bolt::Result.new(target2, error: { 'msg' => 'oops' }, action: 'action')
       ]
     )
   }
