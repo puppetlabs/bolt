@@ -9,6 +9,9 @@ module Bolt
   end
 
   class Task
+    METADATA_KEYS = %w[description extensions files implementations
+                       input_method parameters private puppet_task_version
+                       remote supports_noop].freeze
 
     attr_reader :name, :files, :metadata, :remote
 
@@ -22,6 +25,7 @@ module Bolt
       @remote = remote
       @logger = Logging.logger[self]
 
+      validate_metadata
     end
 
     def self.from_task_signature(task_sig)
@@ -134,6 +138,16 @@ module Bolt
         files: @files,
         metadata: @metadata
       }
+    end
+
+    def validate_metadata
+      unknown_keys = metadata.keys - METADATA_KEYS
+
+      if unknown_keys.any?
+        msg = "Metadata for task '#{@name}' contains unknown keys: #{unknown_keys.join(', ')}."
+        msg += " This could be a typo in the task metadata or may result in incorrect behavior."
+        @logger.warn(msg)
+      end
     end
   end
 end
