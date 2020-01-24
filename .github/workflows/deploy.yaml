@@ -17,4 +17,4 @@ jobs:
     steps:
     - name: Deploy container
       if: github.ref == 'refs/heads/master'
-      run: scripts/deploy.sh
+      run: ./scripts/deploy.sh
