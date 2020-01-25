@@ -9,6 +9,10 @@
   Human formatted results no longer show empty strings or JSON objects. When a result only has an `_options` key, and the value
   is an empty string or whitespace, a message will be displayed saying the action completed successfully with no result.
 
+- **Support `_description` parameter for `apply` blocks** ([#1537](https://github.com/puppetlabs/bolt/issues/1537))
+
+  `apply` blocks in plans now support a `_description` parameter that gives the block a description that is displayed in plan output.
+
 ## Bolt 1.46.0
 
 ### Deprecations and removals

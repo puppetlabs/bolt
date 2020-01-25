@@ -250,7 +250,9 @@ module Bolt
       end
       # rubocop:enable Style/GlobalVars
 
-      r = @executor.log_action('apply catalog', targets) do
+      description = options[:description] || 'apply catalog'
+
+      r = @executor.log_action(description, targets) do
         futures = targets.map do |target|
           Concurrent::Future.execute(executor: @pool) do
             @executor.with_node_logging("Compiling manifest block", [target]) do

@@ -35,6 +35,7 @@ After the catalog compiles and is executed successfully on all targets, `apply` 
 The `apply` action supports the following options:
 
 -   `_catch_errors => true` returns a `ResultSet` including failed results, rather than failing the plan.
+-   `_description => <DESCRIPTION>` adds a description to the apply block, allowing you to distinguish apply blocks.
 -   `_noop => true` applies the manifest block in Puppet no-operation mode, returning a report of the changes it would make, but takes no action.
 -   `_run_as => <USER>` applies the manifest block as the specified user. (This option is for transports that allow a user to run commands under a different username.)
     ```
