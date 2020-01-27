@@ -1,15 +1,6 @@
 # Changelog
 
-## Bolt Next
-
-### New features
-
-* **Remove empty strings and objects from results in human output** ([#1544](https://github.com/puppetlabs/bolt/issues/1544))
-
-  Human formatted results no longer show empty strings or JSON objects. When a result only has an `_options` key, and the value
-  is an empty string or whitespace, a message will be displayed saying the action completed successfully with no result.
-
-## Bolt 1.46.0
+## Bolt 1.47.0
 
 ### Deprecations and removals
 
@@ -26,6 +17,13 @@
   `Target.new(<config>)`, where `config` is a hash with the same structure used to define targets in 
   the inventory V2 file. See [the docs](https://puppet.com/docs/bolt/latest/writing_plans.html#creating-target-objects) 
   for more information and examples.
+
+### New features
+
+* **Remove empty strings and objects from results in human output** ([#1544](https://github.com/puppetlabs/bolt/issues/1544))
+
+  Human formatted results no longer show empty strings or JSON objects. When a result only has an `_options` key, and the value
+  is an empty string or whitespace, a message will be displayed saying the action completed successfully with no result.
 
 ### Bug fixes
 
