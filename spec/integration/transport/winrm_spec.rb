@@ -738,7 +738,7 @@ PS
 
       it "runs a task requires 'shell'" do
         with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['powershell'] }]
+          task.metadata['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['powershell'] }]
           expect(winrm.run_task(target, task, arguments).message.chomp)
             .to eq('Hello from task Goodbye')
         end
@@ -746,7 +746,7 @@ PS
 
       it "runs a task with the implementation's input method" do
         with_task_containing('tasks_test', contents, 'stdin', '.ps1') do |task|
-          task['metadata']['implementations'] = [{
+          task.metadata['implementations'] = [{
             'name' => 'tasks_test', 'requirements' => ['powershell'], 'input_method' => 'environment'
           }]
           expect(winrm.run_task(target, task, arguments).message.chomp)
@@ -756,19 +756,19 @@ PS
 
       it "errors when a task only requires an unsupported requirement" do
         with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }]
+          task.metadata['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }]
           expect {
             winrm.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
         end
       end
 
       it "errors when a task only requires an unknown requirement" do
         with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
-          task['metadata']['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
+          task.metadata['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => ['foobar'] }]
           expect {
             winrm.run_task(target, task, arguments)
-          }.to raise_error("No suitable implementation of #{task['name']} for #{target.name}")
+          }.to raise_error("No suitable implementation of #{task.name} for #{target.name}")
         end
       end
     end
@@ -781,15 +781,15 @@ PS
 
       it "puts files at _installdir" do
         with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
-          task['metadata']['files'] = []
+          task.metadata['files'] = []
           expected_files = %w[files/foo files/bar/baz lib/puppet_x/file.rb tasks/init]
           expected_files.each do |file|
-            task['metadata']['files'] << "tasks_test/#{file}"
-            task['files'] << { 'name' => "tasks_test/#{file}", 'path' => task['files'][0]['path'] }
+            task.metadata['files'] << "tasks_test/#{file}"
+            task.files << { 'name' => "tasks_test/#{file}", 'path' => task.files[0]['path'] }
           end
 
           files = winrm.run_task(target, task, arguments).message.split("\n").map(&:strip).reject(&:empty?)
-          expected_files = ["tasks/#{File.basename(task['files'][0]['path'])}"] + expected_files
+          expected_files = ["tasks/#{File.basename(task.files[0]['path'])}"] + expected_files
           expect(files.count).to eq(expected_files.count)
           files.sort.zip(expected_files.sort).each do |file, expected_file|
             expect(file).to match(/\\tasks_test\\#{expected_file.gsub(%r{/}, '\\\\\\')}$/)
@@ -799,16 +799,16 @@ PS
 
       it "includes files from the selected implementation" do
         with_task_containing('tasks_test', contents, 'environment', '.ps1') do |task|
-          task['metadata']['implementations'] = [
+          task.metadata['implementations'] = [
             { 'name' => 'tasks_test.alt', 'requirements' => ['foobar'], 'files' => ['tasks_test/files/no'] },
             { 'name' => 'tasks_test', 'requirements' => [], 'files' => ['tasks_test/files/yes'] }
           ]
-          task['metadata']['files'] = ['other_mod/lib/puppet_x/']
-          task_path = task['files'][0]['path']
-          task['files'] << { 'name' => 'tasks_test/files/yes', 'path' => task_path }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task_path }
-          task['files'] << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task_path }
-          task['files'] << { 'name' => 'tasks_test/files/no', 'path' => task_path }
+          task.metadata['files'] = ['other_mod/lib/puppet_x/']
+          task_path = task.files[0]['path']
+          task.files << { 'name' => 'tasks_test/files/yes', 'path' => task_path }
+          task.files << { 'name' => 'other_mod/lib/puppet_x/a.rb', 'path' => task_path }
+          task.files << { 'name' => 'other_mod/lib/puppet_x/b.rb', 'path' => task_path }
+          task.files << { 'name' => 'tasks_test/files/no', 'path' => task_path }
 
           files = winrm.run_task(target, task, arguments).message.split("\n").map(&:strip).reject(&:empty?).sort
           expect(files.count).to eq(4)

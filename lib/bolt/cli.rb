@@ -448,7 +448,7 @@ module Bolt
     end
 
     def show_task(task_name)
-      outputter.print_task_info(pal.get_task_info(task_name))
+      outputter.print_task_info(pal.get_task(task_name))
     end
 
     def list_tasks

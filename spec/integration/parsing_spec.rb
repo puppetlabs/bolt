@@ -95,6 +95,13 @@ describe "CLI parses input" do
     expect(result['_error']['msg']).to eq("Task parsing:\n parameter 'array' expects an Array value, got String")
   end
 
+  it 'warns when metadata is invalid' do
+    params = ['string="catdog"']
+    run_cli(['task', 'run', 'sample::invalid', '--targets', target] + params + config_flags)
+    logs = @log_output.readlines
+    expect(logs).to include(/WARN  Bolt::Task : Metadata for task 'sample::invalid' contains unknown keys: anything/)
+  end
+
   it 'parses script parameters without munging task parameters', ssh: true do
     params = ['dont=split']
     result = run_one_node(['script', 'run', script_path, '--targets', target] + params + config_flags)

@@ -4,21 +4,18 @@ module Bolt
   class Task
     class PuppetServer < Bolt::Task
       def remote_instance
-        self.class.new(to_h.each_with_object({}) { |(k, v), h| h[k.to_s] = v },
-                       @file_cache,
-                       remote: true)
+        self.class.new(@name, @metadata, @files, @file_cache, true)
       end
 
-      def initialize(task, file_cache, **opts)
-        super(task, **opts)
+      def initialize(name, metadata, files, file_cache, remote = false)
+        super(name, metadata, files, remote)
         @file_cache = file_cache
-        update_file_data(task)
+        update_file_data
       end
 
       # puppetserver file entries have 'filename' rather then 'name'
-      def update_file_data(task_data)
-        task_data['files'].each { |f| f['name'] = f['filename'] }
-        task_data
+      def update_file_data
+        @files.each { |f| f['name'] = f['filename'] }
       end
 
       def file_path(file_name)

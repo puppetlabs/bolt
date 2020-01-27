@@ -24,7 +24,7 @@ describe "passes parsed AST to the apply_catalog task" do
       path = File.join(__dir__, "../fixtures/apply/#{apply_task}")
       impl = { 'name' => apply_task, 'path' => path }
       metadata = { 'supports_noop' => true, 'input_method' => 'environment' }
-      Bolt::Task.new(name: 'apply_catalog', files: [impl], metadata: metadata)
+      Bolt::Task.new('apply_catalog', metadata, [impl])
     }
   end
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## Bolt NEXT
+
+### New features
+
+* **Warning when task metadata has unknown keys** ([#1542](https://github.com/puppetlabs/bolt/pull/1542))
+
+  Unexpected keys in task metadata may signal either a typo or a task that
+  depends on features that aren't in this version of Bolt, so Bolt will now
+  print a warning if it sees such keys.
+
 ## Bolt 1.47.0
 
 ### Deprecations and removals

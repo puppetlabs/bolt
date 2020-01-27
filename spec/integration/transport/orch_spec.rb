@@ -325,7 +325,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     context "when implementations are provided" do
       let(:files) { [{ 'name' => 'tasks_test', 'path' => '/who/cares' }] }
       let(:implementations) { [{ 'name' => 'tasks_test', 'requirements' => ['shell'] }] }
-      let(:mtask) { Bolt::Task.new(name: 'foo', files: files, metadata: { 'implementations' => implementations }) }
+      let(:mtask) { Bolt::Task.new('foo', { 'implementations' => implementations }, files) }
 
       it "runs a task" do
         allow(mock_client).to receive(:run_task).and_return(results)
@@ -340,7 +340,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
     context "when files are provided", ssh: true do
       let(:files) { [{ 'name' => 'tasks_test', 'path' => '/who/cares' }] }
-      let(:mtask) { Bolt::Task.new(name: 'foo', files: files, metadata: { 'files' => %w[a b] }) }
+      let(:mtask) { Bolt::Task.new('foo', { 'files' => %w[a b] }, files) }
 
       it "runs a task" do
         allow(mock_client).to receive(:run_task).and_return(results)

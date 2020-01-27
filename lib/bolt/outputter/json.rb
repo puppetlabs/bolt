@@ -55,13 +55,13 @@ module Bolt
       alias print_module_list print_table
 
       def print_task_info(task)
-        path = task['files'][0]['path'].chomp("/tasks/#{task['files'][0]['name']}")
-        task['module_dir'] = if path.start_with?(Bolt::PAL::MODULES_PATH)
-                               "built-in module"
-                             else
-                               path
-                             end
-        @stream.puts task.to_json
+        path = task.files.first['path'].chomp("/tasks/#{task.files.first['name']}")
+        module_dir = if path.start_with?(Bolt::PAL::MODULES_PATH)
+                       "built-in module"
+                     else
+                       path
+                     end
+        @stream.puts task.to_h.merge(module_dir: module_dir).to_json
       end
 
       def print_tasks(tasks, modulepath)

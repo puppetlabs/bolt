@@ -25,7 +25,7 @@ module BoltSpec
 
     def mock_task(name, executable = name, input_method = nil)
       files = [{ 'name' => name, 'path' => executable }]
-      Bolt::Task.new(name: name, files: files, metadata: { 'input_method' => input_method })
+      Bolt::Task.new(name, { 'input_method' => input_method }, files)
     end
 
     def task_type(name, executable = nil, input_method = nil)

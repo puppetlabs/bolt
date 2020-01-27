@@ -27,7 +27,7 @@ describe 'get_resources' do
   context 'with targets' do
     let(:hostnames) { %w[a.b.com winrm://x.y.com pcp://foo] }
     let(:targets) { hostnames.map { |h| Bolt::Target.new(h) } }
-    let(:query_resources_task) { Bolt::Task.new(name: 'query_resources_task') }
+    let(:query_resources_task) { Bolt::Task.new('query_resources_task') }
 
     before(:each) do
       applicator.stubs(:build_plugin_tarball).returns(:tarball)

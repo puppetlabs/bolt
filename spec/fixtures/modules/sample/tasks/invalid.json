@@ -1,0 +1,11 @@
+{
+  "description": "Task with invalid metadata",
+  "input_method": "stdin",
+  "parameters": {
+    "string": {
+      "description": "Mandatory string parameter",
+      "type": "String[1, 10]"
+    }
+  },
+  "anything": true
+}

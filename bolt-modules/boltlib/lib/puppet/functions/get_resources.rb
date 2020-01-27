@@ -30,7 +30,7 @@ Puppet::Functions.create_function(:get_resources) do
     tasksig = script_compiler.task_signature(name)
     raise Bolt::Error.new("#{name} could not be found", 'bolt/get-resources') unless tasksig
 
-    task = Bolt::Task.new(tasksig.task_hash)
+    task = Bolt::Task.from_task_signature(tasksig)
     results = executor.run_task(targets, task, args)
     raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok?
     results
