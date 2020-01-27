@@ -107,29 +107,23 @@ describe "BoltSpec::Run", ssh: true do
       } }
     end
 
-    def agent_inventory
-      { 'groups' => conn_inventory['groups'],
-        'features' => ['puppet-agent'] }
-    end
-
-    let(:bolt_inventory) { agent_inventory }
-
     before(:all) do
-      result = run_task('puppet_agent::version', 'ssh', {}, inventory: agent_inventory, config: root_config)
+      result = run_task('puppet_agent::version', 'ssh', {}, inventory: conn_inventory, config: root_config)
       expect(result.first['status']).to eq('success')
       unless result.first['result']['version']
-        result = run_task('puppet_agent::install', 'ssh', {}, inventory: agent_inventory, config: root_config)
+        result = run_task('puppet_agent::install', 'ssh', {}, inventory: conn_inventory, config: root_config)
       end
       expect(result.first['status']).to eq('success')
     end
 
     after(:all) do
       uninstall = '/opt/puppetlabs/bin/puppet resource package puppet-agent ensure=absent'
-      run_command(uninstall, 'ssh', inventory: agent_inventory, config: root_config)
+      run_command(uninstall, 'ssh', inventory: conn_inventory, config: root_config)
     end
 
     describe 'apply_manifest' do
       it 'should apply a manifest file' do
+        bolt_inventory['features'] = ['puppet-agent']
         with_tempfile_containing('manifest', "notify { 'hello world': }", '.pp') do |manifest|
           results = apply_manifest(manifest.path, 'ssh')
           results.each do |result|
@@ -137,28 +131,35 @@ describe "BoltSpec::Run", ssh: true do
             expect(result.dig('result', 'report', 'resource_statuses')).to include('Notify[hello world]')
           end
         end
+        bolt_inventory.delete('features')
       end
 
       it 'should apply a manifest code block' do
+        bolt_inventory['features'] = ['puppet-agent']
         results = apply_manifest("notify { 'hello world': }", 'ssh', execute: true)
         results.each do |result|
           expect(result['status']).to eq('success')
           expect(result.dig('result', 'report', 'resource_statuses')).to include('Notify[hello world]')
         end
+        bolt_inventory.delete('features')
       end
 
       it 'should raise an error when manifest file does not exist' do
+        bolt_inventory['features'] = ['puppet-agent']
         expect do
           apply_manifest("missing.na", 'ssh')
         end.to raise_error(Bolt::FileError)
+        bolt_inventory.delete('features')
       end
 
       it 'should return a failure' do
+        bolt_inventory['features'] = ['puppet-agent']
         results = apply_manifest("fail()", 'ssh', execute: true)
         results.each do |result|
           expect(result['status']).to eq('failure')
           expect(result.dig('result', '_error', 'kind')).to eq('bolt/apply-error')
         end
+        bolt_inventory.delete('features')
       end
     end
   end

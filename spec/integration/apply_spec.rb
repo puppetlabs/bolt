@@ -453,7 +453,7 @@ describe "apply", expensive: true do
     context "when running against puppet 6" do
       before(:all) do
         result = run_task('puppet_agent::install', conn_uri('winrm'),
-                          { 'collection' => 'puppet6' }, config: config)
+                          { 'collection' => 'puppet6', 'version' => 'latest' }, config: config)
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
 
