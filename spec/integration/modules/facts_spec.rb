@@ -20,7 +20,7 @@ describe "running the facts plan" do
 
   describe 'over ssh', ssh: true do
     it 'gathers os facts' do
-      result = run_plan('facts', { "nodes" => 'ssh' }, config: config_data, inventory: inventory)
+      result = run_plan('facts', { "targets" => 'ssh' }, config: config_data, inventory: inventory)
 
       expect(result['value'].size).to eq(1)
       data = result['value'][0]
@@ -35,7 +35,7 @@ describe "running the facts plan" do
 
   describe 'over winrm', winrm: true do
     it 'gathers os facts' do
-      result = run_plan('facts', { "nodes" => 'winrm' }, config: config_data, inventory: inventory)
+      result = run_plan('facts', { "targets" => 'winrm' }, config: config_data, inventory: inventory)
 
       expect(result['value'].size).to eq(1)
       data = result['value'][0]

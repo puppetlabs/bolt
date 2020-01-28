@@ -1,10 +1,10 @@
-plan basic(TargetSpec $nodes) {
-  $result = run_plan('facts', nodes => $nodes)
+plan basic(TargetSpec $targets) {
+  $result = run_plan('facts', targets => $targets)
   if !$result.ok {
     return $result
   }
 
-  return apply($nodes) {
+  return apply($targets) {
     file { '/root/test/':
       ensure => directory,
     } -> file { '/root/test/hello.txt':
