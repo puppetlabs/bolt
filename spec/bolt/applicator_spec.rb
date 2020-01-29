@@ -20,7 +20,7 @@ describe Bolt::Applicator do
   end
   let(:pdb_client) { Bolt::PuppetDB::Client.new(config) }
   let(:modulepath) { [Bolt::PAL::BOLTLIB_PATH, Bolt::PAL::MODULES_PATH] }
-  let(:applicator) { Bolt::Applicator.new(inventory, executor, modulepath, [], pdb_client, nil, 2) }
+  let(:applicator) { Bolt::Applicator.new(inventory, executor, modulepath, [], pdb_client, nil, 2, {}) }
   let(:ast) { { 'resources' => [] } }
 
   let(:report) {

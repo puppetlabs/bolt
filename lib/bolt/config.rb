@@ -34,10 +34,12 @@ module Bolt
   class Config
     attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
                   :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir,
-                  :puppetfile_config, :plugins, :plugin_hooks, :future, :trusted_external
+                  :puppetfile_config, :plugins, :plugin_hooks, :future, :trusted_external,
+                  :apply_settings
     attr_writer :modulepath
 
     OPTIONS = {
+      "apply_settings"           => "A map of Puppet settings to use when applying Puppet code",
       "color"                    => "Whether to use colored output when printing messages to the console.",
       "compile-concurrency"      => "The maximum number of simultaneous manifest block compiles.",
       "concurrency"              => "The number of threads to use when executing on remote targets.",
@@ -101,6 +103,16 @@ module Bolt
       "level"  => "`warn` for console, `notice` for file"
     }.freeze
 
+    APPLY_SETTINGS = {
+      "show_diff" => "Whether to log and report a contextual diff when files are being replaced. "\
+                     "See [Puppet documentation](https://puppet.com/docs/puppet/latest/configuration.html#showdiff) "\
+                     "for details"
+    }.freeze
+
+    DEFAULT_APPLY_SETTINGS = {
+      "show_diff" => false
+    }.freeze
+
     def self.default
       new(Bolt::Boltdir.new('.'), {})
     end
@@ -131,6 +143,7 @@ module Bolt
       @puppetfile_config = {}
       @plugins = {}
       @plugin_hooks = {}
+      @apply_settings = {}
 
       # add an entry for the default console logger
       @log = { 'console' => {} }
@@ -224,14 +237,16 @@ module Bolt
       @trusted_external = if data.key?('trusted-external-command')
                             File.expand_path(data['trusted-external-command'], @boltdir.path)
                           end
+
+      if data.key?('apply_settings')
+        @apply_settings = data['apply_settings'].select { |k, _| APPLY_SETTINGS.keys.include?(k) }
+      end
+
       @compile_concurrency = data['compile-concurrency'] if data.key?('compile-concurrency')
 
       @save_rerun = data['save-rerun'] if data.key?('save-rerun')
 
-      @plugins = data['plugins'] if data.key?('plugins')
-      @plugin_hooks = data['plugin_hooks'] if data.key?('plugin_hooks')
-
-      %w[concurrency format puppetdb color].each do |key|
+      %w[concurrency format puppetdb color plugins plugin_hooks].each do |key|
         send("#{key}=", data[key]) if data.key?(key)
       end
 

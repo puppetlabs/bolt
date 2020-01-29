@@ -127,7 +127,7 @@ module Bolt
       when 'task'
         case action
         when 'run'
-          { flags: ACTION_OPTS + %w[params tmpdir],
+          { flags: ACTION_OPTS + %w[params tmpdir noop],
             banner: TASK_RUN_HELP }
         when 'show'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
@@ -627,7 +627,7 @@ module Bolt
              "'success' nodes that succeeded in the last run.") do |rerun|
         @options[:rerun] = rerun
       end
-      define('--noop', 'Execute a task that supports it in noop mode') do |_|
+      define('--noop', 'See what changes Bolt will make without actually executing the changes') do |_|
         @options[:noop] = true
       end
       define('--description DESCRIPTION',
