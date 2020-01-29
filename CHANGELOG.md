@@ -22,6 +22,12 @@
   setting](https://puppet.com/docs/puppet/latest/configuration.html#showdiff) in their Bolt
   configuration file, which will be respected when applying Puppet code via Bolt.
 
+### Bug fixes
+
+* **Require a message when using the prompt plugin** ([#1568](https://github.com/puppetlabs/bolt/issue/1568))
+
+  The `prompt` plugin now requires a `message` option.
+
 ## Bolt 1.47.0
 
 ### Deprecations and removals
