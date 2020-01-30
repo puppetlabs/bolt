@@ -26,6 +26,10 @@
 
   Bolt now includes a plugin to look up data from an environment variable.
 
+* **Support `_description` parameter for `apply` blocks** ([#1537](https://github.com/puppetlabs/bolt/issues/1537))
+
+  `apply` blocks in plans now support a `_description` parameter that gives the block a description that is displayed in plan output.
+
 ### Bug fixes
 
 * **Require a message when using the prompt plugin** ([#1568](https://github.com/puppetlabs/bolt/issue/1568))
