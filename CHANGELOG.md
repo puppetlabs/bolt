@@ -22,6 +22,10 @@
   setting](https://puppet.com/docs/puppet/latest/configuration.html#showdiff) in their Bolt
   configuration file, which will be respected when applying Puppet code via Bolt.
 
+* **Add `env_var` plugin** ([#1564](https://github.com/puppetlabs/bolt/issue/1564))
+
+  Bolt now includes a plugin to look up data from an environment variable.
+
 ## Bolt 1.47.0
 
 ### Deprecations and removals
