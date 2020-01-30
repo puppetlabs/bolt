@@ -51,7 +51,10 @@ module BoltServer
         basemodulepath = plan_executor_config['basemodulepath'] || "#{codedir}/modules:/opt/puppetlabs/puppet/modules"
 
         with_pe_pal_init_settings(codedir, environmentpath, basemodulepath) do
+          modulepath_dirs = []
+          modulepath_setting_from_bolt = nil
           environment = Puppet.lookup(:environments).get!(environment_name)
+          path_to_env = environment.configuration.path_to_env
 
           # In the instance where the environment is "production" but no production dir
           # exists, the lookup will succeed, but the configuration will be mostly empty.
@@ -64,17 +67,28 @@ module BoltServer
           # environment: _technically_ that environment always exists, but if the dir
           # isn't there it won't find the module and fail with "plan not found" rather
           # than "environment doesn't exist"
-          if environment.configuration.path_to_env
-            bolt_config = File.join(environment.configuration.path_to_env, 'bolt.yaml')
+          if path_to_env
+            bolt_yaml = File.join(environment.configuration.path_to_env, 'bolt.yaml')
+            modulepath_setting_from_bolt = Bolt::Util.read_optional_yaml_hash(bolt_yaml, 'config')['modulepath']
           end
-          # If we find a bolt.yaml config in the environment root, we load that instead of
-          # environment.conf to find the modulepath. modulepath will be the _only_ setting
-          # that will work from bolt.yaml in plans in PE.
-          modulepath_dirs = if bolt_config && File.exist?(bolt_config)
-                              Bolt::Util.read_config_file(bolt_config)['modulepath'].split(File::PATH_SEPARATOR)
-                            else
-                              environment.modulepath
-                            end
+
+          # If we loaded a bolt.yaml in the environment root and it contained a modulepath setting:
+          # we will use that modulepath rather than the one loaded through puppet. modulepath will
+          # be the _only_ setting that will work from bolt.yaml in plans in PE.
+          if modulepath_setting_from_bolt
+            modulepath_setting_from_bolt.split(File::PATH_SEPARATOR).each do |path|
+              if Pathname.new(path).absolute? && File.exist?(path)
+                modulepath_dirs << path
+              elsif File.exist?(File.join(path_to_env, path))
+                modulepath_dirs << File.join(path_to_env, path)
+              end
+            end
+
+            # Append the basemodulepath to include "built-in" modules.
+            modulepath_dirs.concat(basemodulepath.split(File::PATH_SEPARATOR))
+          else
+            modulepath_dirs = environment.modulepath
+          end
 
           # A new modulepath is created from scratch (rather than using super's @modulepath)
           # so that we can have full control over all the entries in modulepath. In the future
