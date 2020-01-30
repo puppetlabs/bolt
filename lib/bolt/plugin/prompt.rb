@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'concurrent/delay'
 module Bolt
   class Plugin
     class Prompt
@@ -11,7 +10,7 @@ module Bolt
       end
 
       def hooks
-        [:resolve_reference]
+        %i[resolve_reference validate_resolve_reference]
       end
 
       def validate_resolve_reference(opts)
