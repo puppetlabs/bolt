@@ -38,6 +38,35 @@ It is a module-based plugin available on the Puppet Forge and is installed with
 Bolt. [View the documentation on the forge](https://forge.puppet.com/puppetlabs/azure_inventory).
 
 
+### Environment variable
+
+The `env_var` plugin allows users to read values stored in environment variables and load
+them into an inventory or configuration file.
+
+#### Available fields
+
+The following fields are available to the `env_var` plugin.
+
+| Key | Description | Type | Default |
+| --- | ----------- | ---- | ------- |
+| `var` | The name of the environment variable to read from. | `String` | None |
+
+#### Example usage
+
+Looking up a value from an environment variable in an inventory file:
+
+```yaml
+version: 2
+targets:
+  - target1.example.com
+config:
+  ssh:
+    user: bolt
+    password:
+      _plugin: env_var
+      var: BOLT_PASSWORD
+```
+
 ### Prompt
 
 The `prompt` plugin allows users to interactively enter sensitive configuration
