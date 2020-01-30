@@ -21,13 +21,13 @@ You can place `bolt.yaml` configuration files at the following paths, from highe
   
   The `bolt.yaml` file in a project directory applies settings to that project specifically. Matching settings at the project level override those at the user and system-wide levels.
 
-  `boltdir/bolt.yaml` or `<MY_PROJECT_NAME>/bolt.yaml`
+  `Boltdir/bolt.yaml` or `<MY_PROJECT_NAME>/bolt.yaml`
 
   > **Note:** The project configuration file is loaded from the [Bolt project directory](bolt_project_directories.md). The default project directory is `~/.puppetlabs/bolt/`.
 
 - **User**
   
-  The `bolt.yaml` file at the user level applies settings only to that user. Matching settings at the user level are overridden by project-level settings, but take precedent over system-wide settings.  
+  The `bolt.yaml` file at the user level applies settings only to that user. Matching settings at the user level are overridden by project-level settings, but take precedence over system-wide settings.  
 
   `~/.puppetlabs/etc/bolt/bolt.yaml`
 

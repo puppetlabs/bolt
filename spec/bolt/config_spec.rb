@@ -12,7 +12,7 @@ describe Bolt::Config do
       Pathname.new(File.join('/etc', 'puppetlabs', 'bolt', 'bolt.yaml'))
     end
   }
-  let(:user_path) { Pathname.new(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')) }
+  let(:user_path) { Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml'))) }
 
   describe "when initializing" do
     it "accepts string values for config data" do
@@ -397,7 +397,13 @@ describe Bolt::Config do
       }
     }
 
-    let(:config) { Bolt::Config.new(boltdir, project_config, {}, [{ data: system_config }, { data: user_config }]) }
+    let(:config) {
+      Bolt::Config.new(boltdir, [
+                         { data: system_config },
+                         { data: user_config },
+                         { data: project_config }
+                       ])
+    }
 
     it 'performs a depth 2 shallow merge on plugins' do
       expect(config.plugins).to eq(

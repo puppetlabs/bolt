@@ -37,6 +37,7 @@ module Bolt
                   :puppetfile_config, :plugins, :plugin_hooks, :future, :trusted_external,
                   :apply_settings
     attr_writer :modulepath
+    attr_reader :config_files
 
     OPTIONS = {
       "apply_settings"           => "A map of Puppet settings to use when applying Puppet code",
@@ -113,14 +114,27 @@ module Bolt
     end
 
     def self.from_boltdir(boltdir, overrides = {})
-      data = Bolt::Util.read_config_file(nil, [boltdir.config_file], 'config') || {}
-      new(boltdir, data, overrides, load_defaults)
+      data = {
+        filepath: boltdir.config_file,
+        data: Bolt::Util.read_config_file(nil, [boltdir.config_file], 'config')
+      }
+
+      data = load_defaults.push(data).select { |config| config[:data]&.any? }
+
+      new(boltdir, data, overrides)
     end
 
     def self.from_file(configfile, overrides = {})
       boltdir = Bolt::Boltdir.new(Pathname.new(configfile).expand_path.dirname)
-      data = Bolt::Util.read_config_file(configfile, [], 'config') || {}
-      new(boltdir, data, overrides, load_defaults)
+
+      data = {
+        filepath: boltdir.config_file,
+        data: Bolt::Util.read_config_file(configfile, [], 'config')
+      }
+
+      data = load_defaults.push(data).select { |config| config[:data]&.any? }
+
+      new(boltdir, data, overrides)
     end
 
     def self.load_defaults
@@ -134,17 +148,15 @@ module Bolt
                     end
       user_path = Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')))
 
-      system_data = Bolt::Util.read_config_file(nil, [system_path], 'config') || {}
-      user_data = Bolt::Util.read_config_file(nil, [user_path], 'config') || {}
-
-      data = []
-      data << { filepath: system_path, data: system_data } unless system_data.empty?
-      data << { filepath: user_path, data: user_data } unless user_data.empty?
-
-      data
+      [{ filepath: system_path, data: Bolt::Util.read_config_file(nil, [system_path], 'config') },
+       { filepath: user_path, data: Bolt::Util.read_config_file(nil, [user_path], 'config') }]
     end
 
-    def initialize(boltdir, config_data, overrides = {}, defaults = [])
+    def initialize(boltdir, config_data, overrides = {})
+      unless config_data.is_a?(Array)
+        config_data = [{ filepath: boltdir.config_file, data: config_data }]
+      end
+
       @logger = Logging.logger[self]
 
       @boltdir = boltdir
@@ -158,11 +170,7 @@ module Bolt
       @puppetfile_config = {}
       @plugins = {}
       @plugin_hooks = {}
-<<<<<<< HEAD
       @apply_settings = {}
-=======
-      @config_files = []
->>>>>>> (GH-608) Add support for multiple configuration files
 
       # add an entry for the default console logger
       @log = { 'console' => {} }
@@ -173,15 +181,37 @@ module Bolt
         @transports[key] = transport.default_options
       end
 
-      defaults.each do |default|
-        @config_files << default[:filepath]
-        update_from_file(default[:data])
-      end
+      @config_files = config_data.map { |config| config[:filepath] }
 
+      config_data = merge_config_data(config_data)
       update_from_file(config_data)
+
       apply_overrides(overrides)
 
       validate
+    end
+
+    # Merge configuration
+    # Precedence from highest to lowest is: project, user-level, system-wide
+    def merge_config_data(config_data)
+      config_data.inject({}) do |acc, config|
+        acc.merge(config[:data]) do |key, val1, val2|
+          case key
+          # Plugin config is shallow merged for each plugin
+          when 'plugins'
+            val1.merge(val2) { |_, v1, v2| v1.merge(v2) }
+          # Transports are deep merged
+          when *TRANSPORTS.keys.map(&:to_s)
+            Bolt::Util.deep_merge(val1, val2)
+          # Hash values are shallow mergeed
+          when 'puppetdb', 'plugin_hooks', 'apply_settings', 'log'
+            val1.merge(val2)
+          # All other values are overwritten
+          else
+            val2
+          end
+        end
+      end
     end
 
     def overwrite_transport_data(transport, transports)
@@ -238,10 +268,6 @@ module Bolt
         update_logs(data['log'])
       end
 
-      if data['plugins'].is_a?(Hash)
-        update_plugins(data['plugins'])
-      end
-
       # Expand paths relative to the Boltdir. Any settings that came from the
       # CLI will already be absolute, so the expand will be skipped.
       if data.key?('modulepath')
@@ -274,31 +300,13 @@ module Bolt
 
       @save_rerun = data['save-rerun'] if data.key?('save-rerun')
 
-<<<<<<< HEAD
       %w[concurrency format puppetdb color plugins plugin_hooks].each do |key|
-=======
-      @plugin_hooks.merge!(data['plugin_hooks']) if data.key?('plugin_hooks')
-
-      %w[concurrency format puppetdb color].each do |key|
->>>>>>> (GH-608) Add support for multiple configuration files
         send("#{key}=", data[key]) if data.key?(key)
       end
 
       update_transports(data)
     end
     private :update_from_file
-
-    # Shallow merge config for individual plugins
-    def update_plugins(data)
-      data.each_pair do |plugin, config|
-        if @plugins[plugin]
-          @plugins[plugin].merge!(config)
-        else
-          @plugins[plugin] = config
-        end
-      end
-    end
-    private :update_plugins
 
     def apply_overrides(options)
       %i[concurrency transport format trace modulepath inventoryfile color].each do |key|
@@ -447,13 +455,6 @@ module Bolt
       path.chars.map do |l|
         l =~ /[A-Za-z]/ ? "[#{l.upcase}#{l.downcase}]" : l
       end.join
-    end
-
-    def config_loaded
-      msg = <<~MSG
-        Loaded configuration from: '#{[*@config_files, boltdir.config_file].join("', '")}'
-      MSG
-      @logger.debug(msg)
     end
   end
 end

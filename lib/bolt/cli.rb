@@ -133,7 +133,7 @@ module Bolt
       @config.check_path_case('modulepath', @config.modulepath)
 
       # Log the file paths for loaded config files
-      @config.config_loaded
+      config_loaded
 
       parser.warnings.each { |warning| @logger.warn(warning[:msg]) }
       # After validation, initialize inventory and targets. Errors here are better to catch early.
@@ -720,6 +720,13 @@ module Bolt
       end
 
       content
+    end
+
+    def config_loaded
+      msg = <<~MSG
+        Loaded configuration from: '#{config.config_files.join("', '")}'
+      MSG
+      @logger.debug(msg)
     end
   end
 end
