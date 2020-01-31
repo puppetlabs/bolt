@@ -116,7 +116,7 @@ module Bolt
     def self.from_boltdir(boltdir, overrides = {})
       data = {
         filepath: boltdir.config_file,
-        data: Bolt::Util.read_config_file(nil, [boltdir.config_file], 'config')
+        data: Bolt::Util.read_optional_yaml_hash(boltdir.config_file, 'config')
       }
 
       data = load_defaults.push(data).select { |config| config[:data]&.any? }
@@ -129,9 +129,8 @@ module Bolt
 
       data = {
         filepath: boltdir.config_file,
-        data: Bolt::Util.read_config_file(configfile, [], 'config')
+        data: Bolt::Util.read_yaml_hash(configfile, 'config')
       }
-
       data = load_defaults.push(data).select { |config| config[:data]&.any? }
 
       new(boltdir, data, overrides)
@@ -148,8 +147,8 @@ module Bolt
                     end
       user_path = Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')))
 
-      [{ filepath: system_path, data: Bolt::Util.read_config_file(nil, [system_path], 'config') },
-       { filepath: user_path, data: Bolt::Util.read_config_file(nil, [user_path], 'config') }]
+      [{ filepath: system_path, data: Bolt::Util.read_optional_yaml_hash(system_path, 'config') },
+       { filepath: user_path, data: Bolt::Util.read_optional_yaml_hash(user_path, 'config') }]
     end
 
     def initialize(boltdir, config_data, overrides = {})
@@ -182,7 +181,6 @@ module Bolt
       end
 
       @config_files = config_data.map { |config| config[:filepath] }
-
       config_data = merge_config_data(config_data)
       update_from_file(config_data)
 
@@ -376,7 +374,7 @@ module Bolt
     end
 
     def default_inventoryfile
-      [@boltdir.inventory_file]
+      @boltdir.inventory_file
     end
 
     def rerunfile

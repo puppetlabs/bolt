@@ -62,7 +62,7 @@ describe Bolt::Util do
     end
   end
 
-  context "when parsing a invalid file" do
+  context "when parsing a yaml file with read_yaml_hash" do
     it "raises an error with line and column number if the YAML has a syntax error" do
       contents = <<-YAML
       ---
@@ -75,9 +75,39 @@ describe Bolt::Util do
 
       with_tempfile_containing('config_file_test', contents) do |file|
         expect {
-          Bolt::Util.read_config_file(file, nil, 'inventory')
+          Bolt::Util.read_yaml_hash(file, 'inventory')
         }.to raise_error(Bolt::FileError, /Error at line 2 column 14/)
       end
+    end
+
+    it "returns an empty hash when the yaml file is empty" do
+      with_tempfile_containing('empty', '') do |file|
+        expect(Bolt::Util.read_yaml_hash(file, 'config')).to eq({})
+      end
+    end
+
+    it "errors when file does not exist and is required" do
+      expect {
+        Bolt::Util.read_yaml_hash('does-not-exist', 'config')
+      }.to raise_error(Bolt::FileError)
+    end
+
+    it "errors when a non-hash object is read from a yaml file" do
+      contents = <<-YAML
+      ---
+      foo
+      YAML
+      with_tempfile_containing('config_file_test', contents) do |file|
+        expect {
+          Bolt::Util.read_yaml_hash(file, 'inventory')
+        }.to raise_error(Bolt::FileError, /should be a Hash or empty, not String/)
+      end
+    end
+  end
+
+  context "when parsing a yaml file with read_optional_yaml_hash" do
+    it "returns an empty hash when the yaml file does not exist" do
+      expect(Bolt::Util.read_optional_yaml_hash('does-not-exist', 'config')).to eq({})
     end
   end
 end

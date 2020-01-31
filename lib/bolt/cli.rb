@@ -277,15 +277,13 @@ module Bolt
                            Bolt::Inventory::ENVIRONMENT_VAR
                          elsif @config.inventoryfile && Bolt::Util.file_stat(@config.inventoryfile)
                            @config.inventoryfile
-                         elsif (inventory_file = @config.default_inventoryfile.find do |file|
-                                  begin
-                                    Bolt::Util.file_stat(file)
-                                  rescue Errno::ENOENT
-                                    false
-                                  end
-                                end
-                               )
-                           inventory_file
+                         else
+                           begin
+                             Bolt::Util.file_stat(@config.default_inventoryfile)
+                             @config.default_inventoryfile
+                           rescue Errno::ENOENT
+                             nil
+                           end
                          end
 
       inventory_cli_opts = %i[authentication escalation transports].each_with_object([]) do |key, acc|

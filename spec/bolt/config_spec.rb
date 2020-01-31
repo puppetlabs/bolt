@@ -76,12 +76,10 @@ describe Bolt::Config do
   end
 
   describe "::from_boltdir" do
-    let(:default_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt.yaml')) }
-
     it "loads from the boltdir config file if present" do
-      expect(Bolt::Util).to receive(:read_config_file).with(nil, [boltdir.config_file], 'config')
-      expect(Bolt::Util).to receive(:read_config_file).with(nil, [system_path], 'config')
-      expect(Bolt::Util).to receive(:read_config_file).with(nil, [user_path], 'config')
+      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(boltdir.config_file, 'config')
+      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(system_path, 'config')
+      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(user_path, 'config')
 
       Bolt::Config.from_boltdir(boltdir)
     end
@@ -91,9 +89,9 @@ describe Bolt::Config do
     let(:path) { File.expand_path('/path/to/config') }
 
     it 'loads from the specified config file' do
-      expect(Bolt::Util).to receive(:read_config_file).with(path, [], 'config')
-      expect(Bolt::Util).to receive(:read_config_file).with(nil, [system_path], 'config')
-      expect(Bolt::Util).to receive(:read_config_file).with(nil, [user_path], 'config')
+      expect(Bolt::Util).to receive(:read_yaml_hash).with(path, 'config')
+      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(system_path, 'config')
+      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(user_path, 'config')
 
       Bolt::Config.from_file(path)
     end

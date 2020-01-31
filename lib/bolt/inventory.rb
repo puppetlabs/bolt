@@ -52,7 +52,11 @@ module Bolt
           raise Bolt::ParseError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
         end
       else
-        data = Bolt::Util.read_config_file(config.inventoryfile, config.default_inventoryfile, 'inventory')
+        data = if config.inventoryfile
+                 Bolt::Util.read_yaml_hash(config.inventoryfile, 'inventory')
+               else
+                 Bolt::Util.read_optional_yaml_hash(config.default_inventoryfile, 'inventory')
+               end
       end
 
       inventory = create_version(data, config, plugins)
