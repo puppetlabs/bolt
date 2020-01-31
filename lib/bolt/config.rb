@@ -37,6 +37,7 @@ module Bolt
                   :puppetfile_config, :plugins, :plugin_hooks, :future, :trusted_external,
                   :apply_settings
     attr_writer :modulepath
+    attr_reader :config_files
 
     OPTIONS = {
       "apply_settings"           => "A map of Puppet settings to use when applying Puppet code",
@@ -45,13 +46,6 @@ module Bolt
       "concurrency"              => "The number of threads to use when executing on remote targets.",
       "format"                   => "The format to use when printing results. Options are `human` and `json`.",
       "hiera-config"             => "The path to your Hiera config.",
-      "interpreters"             => "A map of an extension name to the absolute path of an executable, "\
-                                    "enabling you to override the shebang defined in a task executable. The "\
-                                    "extension can optionally be specified with the `.` character (`.py` and "\
-                                    "`py` both map to a task executable `task.py`) and the extension is case "\
-                                    "sensitive. The transports that support interpreter configuration are "\
-                                    "`docker`, `local`, `ssh`, and `winrm`. When a target's name is `localhost`, "\
-                                    "Ruby tasks run with the Bolt Ruby interpreter by default.",
       "inventoryfile"            => "The path to a structured data inventory file used to refer to groups of "\
                                     "targets on the command line and from plans.",
       "log"                      => "The configuration of the logfile output. Configuration can be set for "\
@@ -60,6 +54,8 @@ module Bolt
                                     "of directories or a string containing a list of directories separated by the "\
                                     "OS-specific PATH separator.",
       "plugin_hooks"             => "Which plugins a specific hook should use.",
+      "plugins"                  => "A map of plugins and their configuration data.",
+      "puppetdb"                 => "A map containing options for configuring the Bolt PuppetDB client.",
       "puppetfile"               => "A map containing options for the `bolt puppetfile install` command.",
       "save-rerun"               => "Whether to update `.rerun.json` in the Bolt project directory. If "\
                                     "your target names include passwords, set this value to `false` to avoid "\
@@ -118,18 +114,49 @@ module Bolt
     end
 
     def self.from_boltdir(boltdir, overrides = {})
-      data = Bolt::Util.read_config_file(nil, [boltdir.config_file], 'config') || {}
+      data = {
+        filepath: boltdir.config_file,
+        data: Bolt::Util.read_config_file(nil, [boltdir.config_file], 'config')
+      }
+
+      data = load_defaults.push(data).select { |config| config[:data]&.any? }
+
       new(boltdir, data, overrides)
     end
 
     def self.from_file(configfile, overrides = {})
       boltdir = Bolt::Boltdir.new(Pathname.new(configfile).expand_path.dirname)
-      data = Bolt::Util.read_config_file(configfile, [], 'config') || {}
+
+      data = {
+        filepath: boltdir.config_file,
+        data: Bolt::Util.read_config_file(configfile, [], 'config')
+      }
+
+      data = load_defaults.push(data).select { |config| config[:data]&.any? }
 
       new(boltdir, data, overrides)
     end
 
+    def self.load_defaults
+      # Lazy-load expensive gem code
+      require 'win32/dir' if Bolt::Util.windows?
+
+      system_path = if Bolt::Util.windows?
+                      Pathname.new(File.join(Dir::COMMON_APPDATA, 'PuppetLabs', 'bolt', 'etc', 'bolt.yaml'))
+                    else
+                      Pathname.new(File.join('/etc', 'puppetlabs', 'bolt', 'bolt.yaml'))
+                    end
+      user_path = Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')))
+
+      [{ filepath: system_path, data: Bolt::Util.read_config_file(nil, [system_path], 'config') },
+       { filepath: user_path, data: Bolt::Util.read_config_file(nil, [user_path], 'config') }]
+    end
+
     def initialize(boltdir, config_data, overrides = {})
+      unless config_data.is_a?(Array)
+        config_data = [{ filepath: boltdir.config_file, data: config_data }]
+      end
+
       @logger = Logging.logger[self]
 
       @boltdir = boltdir
@@ -154,10 +181,37 @@ module Bolt
         @transports[key] = transport.default_options
       end
 
+      @config_files = config_data.map { |config| config[:filepath] }
+
+      config_data = merge_config_data(config_data)
       update_from_file(config_data)
+
       apply_overrides(overrides)
 
       validate
+    end
+
+    # Merge configuration
+    # Precedence from highest to lowest is: project, user-level, system-wide
+    def merge_config_data(config_data)
+      config_data.inject({}) do |acc, config|
+        acc.merge(config[:data]) do |key, val1, val2|
+          case key
+          # Plugin config is shallow merged for each plugin
+          when 'plugins'
+            val1.merge(val2) { |_, v1, v2| v1.merge(v2) }
+          # Transports are deep merged
+          when *TRANSPORTS.keys.map(&:to_s)
+            Bolt::Util.deep_merge(val1, val2)
+          # Hash values are shallow mergeed
+          when 'puppetdb', 'plugin_hooks', 'apply_settings', 'log'
+            val1.merge(val2)
+          # All other values are overwritten
+          else
+            val2
+          end
+        end
+      end
     end
 
     def overwrite_transport_data(transport, transports)
