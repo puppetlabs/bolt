@@ -38,7 +38,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
       it 'runs an echo task using a private key' do
         private_key = ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0]
         private_key_content = File.read(private_key)
-        target = conn_target('ssh', options: { 'private-key-content' => private_key_content })
+        target = conn_target('ssh', options: { 'private-key' => { 'key-data' => private_key_content } })
         body = build_task_request('sample::echo',
                                   target,
                                   "message": "Hello!")
@@ -64,7 +64,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
         expect(files.count).to eq(4)
         expect(files[0]).to match(%r{^174 .*/shareable/tasks/unknown_file.json$})
         expect(files[1]).to match(%r{^236 .*/shareable/tasks/list.sh})
-        expect(files[2]).to match(%r{^310 .*/results/lib/puppet/functions/results/make_result.rb$})
+        expect(files[2]).to match(%r{^398 .*/results/lib/puppet/functions/results/make_result.rb$})
         expect(files[3]).to match(%r{^43 .*/error/tasks/fail.sh$})
       end
     end

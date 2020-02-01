@@ -42,7 +42,7 @@ describe "when runnning over the ssh transport", ssh: true do
         result = run_failed_node(%W[command run #{whoami}] + config_flags)
         expect(result['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
         expect(result['_error']['msg']).to match(
-          /Failed to connect to localhost: Connection refused/
+          /Failed to connect to #{uri}: Connection refused/
         )
       end
     end

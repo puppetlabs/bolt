@@ -584,21 +584,14 @@ module Bolt
     end
 
     def migrate_project
-      if inventory.version == 2
-        ok = true
+      inventory_file = config.inventoryfile || config.boltdir.inventory_file
+      data = Bolt::Util.read_yaml_hash(inventory_file, 'inventory')
+
+      if collect_vals(data, 'nodes').compact.any?
+        migrate_group(data)
+        ok = File.write(inventory_file, data.to_yaml)
       else
-        inventory_file = config.inventoryfile || config.boltdir.inventory_file
-
-        begin
-          Bolt::Util.file_stat(inventory_file)
-        rescue Errno::ENOENT
-          raise Bolt::FileError.new("The inventory file '#{inventory_file}' does not exist", inventory_file)
-        end
-
-        inv = YAML.safe_load(File.open(inventory_file))
-        migrate_group(inv)
-
-        ok = File.write(inventory_file, { 'version' => 2 }.merge(inv).to_yaml)
+        ok = true
       end
 
       result = if ok
@@ -609,6 +602,18 @@ module Bolt
       outputter.print_message result
 
       ok ? 0 : 1
+    end
+
+    # Collect any values with the matching key
+    # This will be needed to properly migrate inventory files since v2 files
+    # no longer require a 'version' key
+    def collect_vals(data, key)
+      case data
+      when Array
+        data.flat_map { |d| collect_vals(d, key) }
+      when Hash
+        [data['nodes']] + collect_vals(data.values, key).compact
+      end
     end
 
     # Walks an inventory hash and replaces all 'nodes' keys with 'targets' keys

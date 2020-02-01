@@ -10,8 +10,8 @@ require 'bolt/target'
 
 describe Bolt::Catalog do
   let(:uri) { 'catalog' }
-  let(:target) { Bolt::Target.new(uri) }
-  let(:inventory) { Bolt::Inventory.new(nil) }
+  let(:target) { inventory.get_target(uri) }
+  let(:inventory) { Bolt::Inventory.empty }
   let(:executor) { Bolt::Executor.new }
   let(:pdb_config) do
     Bolt::PuppetDB::Config.new('server_urls' => 'https://localhost:8081',

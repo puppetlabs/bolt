@@ -12,7 +12,7 @@ describe 'resolve_references' do
   let(:analytics) { Bolt::Analytics::NoopClient.new }
   let(:plugins) { Bolt::Plugin.setup(config, pal, pdb_client, analytics) }
   let(:executor) { Bolt::Executor.new }
-  let(:inventory) { Bolt::Inventory.new({}, plugins: plugins) }
+  let(:inventory) { Bolt::Inventory.create_version({}, config, plugins) }
   let(:tasks_enabled) { true }
 
   let(:references) do

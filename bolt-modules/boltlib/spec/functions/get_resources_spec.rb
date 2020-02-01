@@ -12,7 +12,7 @@ describe 'get_resources' do
   include PuppetlabsSpec::Fixtures
   let(:applicator) { mock('Bolt::Applicator') }
   let(:executor) { Bolt::Executor.new }
-  let(:inventory) { Bolt::Inventory.new({}) }
+  let(:inventory) { Bolt::Inventory.empty }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
@@ -26,7 +26,7 @@ describe 'get_resources' do
 
   context 'with targets' do
     let(:hostnames) { %w[a.b.com winrm://x.y.com pcp://foo] }
-    let(:targets) { hostnames.map { |h| Bolt::Target.new(h) } }
+    let(:targets) { hostnames.map { |h| inventory.get_target(h) } }
     let(:query_resources_task) { Bolt::Task.new('query_resources_task') }
 
     before(:each) do

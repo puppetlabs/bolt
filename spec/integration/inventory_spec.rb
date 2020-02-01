@@ -5,25 +5,46 @@ require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/puppetdb'
 
 describe 'running with an inventory file', reset_puppet_settings: true do
   include BoltSpec::Config
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::PuppetDB
 
   let(:conn) { conn_info('ssh') }
   let(:inventory) do
-    { nodes: [
-      { name: conn[:host],
+    { targets: [
+      { uri: conn[:host],
         config: {
           transport: conn[:protocol],
           conn[:protocol] => {
             user: conn[:user],
             port: conn[:port]
           }
+        } },
+      { name: 'uriless',
+        config: {
+          transport: conn[:protocol],
+          conn[:protocol] => {
+            host: conn[:host],
+            user: conn[:user],
+            port: conn[:port]
+          }
+        } },
+      { name: 'hostless',
+        config: {
+          transport: conn[:protocol]
         } }
     ],
+      groups: [{
+        name: "group1",
+        targets: [
+          conn[:host]
+        ]
+      }],
       config: {
         ssh: { 'host-key-check' => false },
         winrm: { ssl: false, 'ssl-verify' => false }
@@ -54,9 +75,6 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
   let(:run_plan) { ['plan', 'run', 'inventory', "command=#{shell_cmd}", "host=#{target}"] + config_flags }
 
-  let(:show_inventory) { ['inventory', 'show', '--targets', target] + config_flags }
-  let(:show_group) { %w[group show] + config_flags }
-
   around(:each) do |example|
     with_tempfile_containing('inventory', inventory.to_json, '.yml') do |f|
       @inventoryfile = f.path
@@ -70,12 +88,20 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       expect(result).to be
     end
 
+    context 'with a uriless target' do
+      let(:target) { 'uriless' }
+      it 'connects to run a command' do
+        result = run_one_node(run_command)
+        expect(result).to be
+      end
+    end
+
     it 'connects to run a plan' do
       expect(run_cli_json(run_plan)[0]).to include('status' => 'success')
     end
 
     context 'with a group' do
-      let(:target) { 'all' }
+      let(:target) { 'group1' }
 
       it 'runs a command' do
         expect(run_one_node(run_command)).to be
@@ -84,6 +110,14 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       it 'runs a plan using a group' do
         expect(run_cli_json(run_plan)[0]['status']).to eq('success')
       end
+    end
+  end
+
+  context 'when running a plan' do
+    let(:run_plan) { ['plan', 'run', 'inventory::get_host'] + config_flags }
+    it 'can access the host' do
+      r = run_cli_json(run_plan + ['--targets', 'hostless'])
+      expect(r).to eq('result' => nil)
     end
   end
 
@@ -155,6 +189,30 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
   end
 
+  context 'when creating targets from a plan with empty inventory', ssh: true do
+    let(:conn) { conn_info('ssh') }
+    let(:inventory) { {} }
+
+    it 'creates new targets with both target.new and get_target' do
+      new_target_info = { 'new_target_hash' => {
+        'transport' => conn[:protocol],
+        'ssh' => {
+          'host' => conn[:host],
+          'user' => conn[:user],
+          'port' => conn[:port],
+          'password' => conn[:password],
+          'host-key-check' => false
+        }
+      } }
+      plan = ['plan', 'run', 'inventory::new_target', '--params', new_target_info.to_json] + config_flags
+      result = run_cli_json(plan)
+      expect(result['expected_host_key_fail'].count).to eq(1)
+      expect(result['expected_host_key_fail'].first['result']['_error']['issue_code']).to eq('HOST_KEY_ERROR')
+      expect(result['expected_success'].count).to eq(2)
+      result['expected_success'].each { |r| expect(r['status']).to eq('success') }
+    end
+  end
+
   context 'when adding targets to a group in a plan', ssh: true do
     let(:conn) { conn_info('ssh') }
     let(:inventory) do
@@ -162,7 +220,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         groups: [
           {
             name: 'foo',
-            nodes: [
+            targets: [
               {
                 name: 'foo_1'
               }
@@ -183,9 +241,9 @@ describe 'running with an inventory file', reset_puppet_settings: true do
             groups: [
               {
                 name: 'add_me',
-                nodes: [
+                targets: [
                   {
-                    name: conn[:host]
+                    uri: conn[:host]
                   }
                 ],
                 config: {
@@ -206,9 +264,9 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           },
           {
             name: 'bar',
-            nodes: [
+            targets: [
               {
-                name: 'bar_1',
+                uri: 'bar_1',
                 vars: { bar_1_var: 'dont_overwrite' }
               }
             ],
@@ -235,24 +293,26 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
 
     it 'computes facts and vars based on group hierarchy' do
-      plan = ['plan', 'run', 'add_group', '--targets', 'add_me'] + config_flags
+      plan = ['plan', 'run', 'add_group::inventory2', '--targets', 'add_me'] + config_flags
       expected_hash_pre = { 'top_level' => 'keep',
                             'preserve_hierarchy' => 'keep',
                             'parent' => 'keep',
                             'override_parent' => 'discard',
                             'added_group' => 'keep' }
-      expected_hash_post = expected_hash_pre.merge('override_parent' => 'keep', 'plan_context' => 'keep')
+
+      expected_hash_post = expected_hash_pre.merge('override_parent' => 'keep',
+                                                   'plan_context' => 'keep')
       result = run_cli_json(plan)
-      expect(result['addme_group'])
-        .to eq(["Target('#{conn[:host]}', {\"user\"=>\"#{conn[:user]}\", \"port\"=>#{conn[:port]}})",
-                "Target('0.0.0.0:20024', {\"user\"=>\"bolt\", \"port\"=>20022})"])
+
+      expect(result).to include('addme_group' => [conn[:host], '0.0.0.0:20024'])
       expect(result['existing_facts']).to eq(expected_hash_pre)
       expect(result['existing_vars']).to eq(expected_hash_pre)
       expect(result['added_facts']).to eq(expected_hash_post)
       expect(result['added_vars']).to eq(expected_hash_post)
       expect(result['target_not_overwritten']).to eq("dont_overwrite")
-      expect(result['target_not_duplicated']).to eq(["Target('bar_1', {})"])
-      expect(result['target_to_all_group']).to include("Target('add_to_all', {})")
+      expect(result['target_not_duplicated']).to eq(["bar_1"])
+      expect(result['target_to_all_group']).to include('add_to_all')
+      expect(result['target_by_alias']).to eq('0.0.0.0:20024')
     end
 
     it 'errors when trying to add to non-existent group' do
@@ -266,7 +326,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       plan = ['plan', 'run', 'add_group::x_fail_group_name_exists', '--targets', 'add_me'] + config_flags
       result = run_cli_json(plan)
       expect(result['kind']).to eq('bolt.inventory/validation-error')
-      expect(result['msg']).to match(/Group foo conflicts with node of the same name for group/)
+      expect(result['msg']).to match(/Group foo conflicts with target of the same name for group/)
       expect(result['details']).to eq("path" => ["foo"])
     end
   end
@@ -283,6 +343,27 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     let(:shell_cmd) { "whoami" }
 
     include_examples 'basic inventory'
+  end
+
+  context 'when running over remote with bash shell', bash: true do
+    let(:inventory) do
+      { targets: [
+        { name: 'remote_target',
+          config: {
+            transport: 'remote',
+            remote: {
+              host: 'not.the.name'
+            }
+          } }
+      ] }
+    end
+
+    it 'passes the correct host to the task' do
+      task = ['task', 'run', 'remote', '--targets', 'remote_target'] + config_flags
+
+      result = run_one_node(task)
+      expect(result['_target']).to include('host' => 'not.the.name')
+    end
   end
 
   context 'when running over local with bash shell', bash: true do
@@ -327,7 +408,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           # Ensure that we try to connect to a *closed* port, to avoid spurious "success"
           port = TCPServer.open(0) { |socket| socket.addr[1] }
           config = { transport: 'ssh', ssh: { port: port } }
-          { nodes: ['localhost'], config: config }
+          { targets: ['localhost'], config: config }
         end
 
         it 'fails to connect' do
@@ -341,7 +422,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         let(:shell_cmd) { 'pwd' }
         let(:inventory) do
           {
-            nodes: ['localhost'],
+            targets: ['localhost'],
             config: {
               transport: 'local',
               local: { tmpdir: tmpdir }
@@ -360,12 +441,12 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         end
       end
 
-      context 'with localhost specifying tmpdir via node' do
+      context 'with localhost specifying tmpdir via target' do
         let(:tmpdir) { '/tmp/foo' }
         let(:shell_cmd) { 'pwd' }
         let(:inventory) do
           {
-            nodes: [{
+            targets: [{
               name: 'localhost',
               config: {
                 transport: 'local',
@@ -388,33 +469,188 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     end
   end
 
-  context 'when showing inventory' do
-    it 'lists targets an action would run on' do
-      expect(run_cli_json(show_inventory)['targets'][0]).to include(target)
+  # TODO: these tests require docker so they may as well require ssh for now
+  context 'with pdb lookups', ssh: true, puppetdb: true do
+    let(:shell_cmd) { 'whoami' }
+    let(:ssh_config) { {} }
+    let(:addtl_mapping) { {} }
+    let(:facts) { {} }
+
+    before(:each) do
+      allow_any_instance_of(Bolt::CLI).to receive(:puppetdb_client).and_return(pdb_client)
+
+      push_facts(facts)
+    end
+
+    after(:each) do
+      clear_facts(facts)
+    end
+
+    let(:inventory) do
+      {
+        "targets" => [
+          {
+            _plugin: 'puppetdb',
+            query: 'inventory { facts.fact1 = true }',
+            target_mapping: {
+              config: {
+                ssh: ssh_config
+              }
+            }.merge(addtl_mapping)
+          }
+        ],
+        config: {
+          transport: conn[:protocol],
+          conn[:protocol] => {
+            host: conn[:host],
+            user: conn[:user],
+            port: conn[:port],
+            'host-key-check' => false
+          }
+        }
+      }
+    end
+
+    it 'runs a plan' do
+      result = run_cli_json(run_plan)
+      expect(result).not_to include('kind')
+      expect(result.length).to eq(1)
+      expect(result[0]).to include('status' => 'success', 'target' => conn[:host])
+    end
+
+    context 'applies config to dynamic inventory' do
+      context 'with name and uri set' do
+        let(:target) { 'myhostname' }
+        let(:facts) do
+          { conn[:host] => {
+            'fact1' => true,
+            'identity' => { 'user' => conn[:second_user] },
+            'uri_fact' => conn[:host],
+            'name_fact' => target
+          } }
+        end
+
+        let(:addtl_mapping) do
+          { name: 'facts.name_fact',
+            uri: 'facts.uri_fact' }
+        end
+
+        let(:ssh_config) do
+          { user: 'facts.identity.user',
+            password: 'facts.identity.user' }
+        end
+
+        it 'runs a plan' do
+          result = run_cli_json(run_plan)
+          expect(result).not_to include('kind')
+          expect(result.length).to eq(1)
+          expect(result[0]).to include('status' => 'success', 'target' => 'myhostname')
+        end
+
+        it 'handles structured facts' do
+          result = run_cli_json(run_command)
+          expect(result).not_to include('kind')
+          expect(result['items'][0]['result']['stdout']).to eq("#{conn[:second_user]}\n")
+        end
+      end
+
+      context 'on another node' do
+        let(:target) { 'bullseye' }
+        let(:facts) do
+          { conn[:host] => {
+            'uri_fact' => conn[:host],
+            'name_fact' => target,
+            'fact1' => true
+          } }
+        end
+
+        let(:addtl_mapping) do
+          { name: 'facts.name_fact',
+            uri: 'facts.uri_fact' }
+        end
+
+        it 'uses fact-based name' do
+          result = run_cli_json(run_command)
+          expect(result).not_to include('kind')
+          expect(result['items'][0]['target']).to eq(target)
+        end
+      end
+
+      context 'when a fact is not set' do
+        let(:facts) do
+          { conn[:host] => {
+            'fact1' => true
+          } }
+        end
+
+        let(:ssh_config) { { user: 'facts.identity.user' } }
+
+        it 'sets config to nil' do
+          result = run_cli_json(run_command)
+          expect(result['items'][0]['result']['_error']['msg'])
+            .to include("Authentication failed for user #{conn[:system_user]}")
+          expect(@log_output.readlines).to include(/Could not find fact/)
+        end
+      end
+
+      context 'on a non-queried node' do
+        # Are curly braces : rspec :: parens : lisps?
+        let(:facts) { { conn[:host] => { 'identity' => { 'user' => 'fake' } } } }
+
+        it 'does not load fact-lookup config' do
+          result = run_cli_json(run_command)
+          expect(result).not_to include('kind')
+          # If puppetdb config loaded this would be fake
+          expect(result['items'][0]['result']['stdout']).to eq("#{conn[:user]}\n")
+        end
+      end
     end
   end
 
-  context 'when showing groups' do
+  context 'with prompt inventory_config_lookups', ssh: true do
     let(:inventory) do
-      { groups:
-          [
-            { name: 'foogroup',
-              nodes: [
-                { name: conn[:host],
-                  config: {
-                    transport: conn[:protocol],
-                    conn[:protocol] => {
-                      user: conn[:user],
-                      port: conn[:port]
-                    }
-                  } }
-              ] }
-          ] }
+      {
+        targets: [
+          {
+            name: 'target-1',
+            config: {
+              transport: 'ssh',
+              ssh: {
+                password: { _plugin: 'prompt', message: 'password please' },
+                user: conn[:user],
+                host: conn[:host],
+                port: conn[:port],
+                'host-key-check': false
+              }
+            }
+          },
+          {
+            name: 'target-2',
+            config: {
+              transport: 'ssh',
+              ssh: {
+                password: { _plugin: 'prompt', message: 'password please' },
+                user: conn[:user],
+                host: conn[:host],
+                port: conn[:port],
+                'host-key-check': false
+              }
+            }
+          }
+        ]
+      }
     end
 
-    it 'lists groups in inventory' do
-      expect(run_cli_json(show_group)['groups']).to include('all')
-      expect(run_cli_json(show_group)['groups']).to include('foogroup')
+    let(:shell_cmd) { 'whoami' }
+
+    it 'sets a password from a prompt and only executes a single concurrent delay' do
+      allow(STDIN).to receive(:noecho).and_return('bolt').once
+      allow(STDOUT).to receive(:puts)
+
+      expect(STDOUT).to receive(:print).with("password please: ").once
+
+      result = run_one_node(['command', 'run', shell_cmd, '--targets', 'target-1'] + config_flags)
+      expect(result).to include('stdout' => "bolt\n")
     end
   end
 end

@@ -19,6 +19,7 @@ module Bolt
                                 "`py` both map to a task executable `task.py`) and the extension is case "\
                                 "sensitive. When a target's name is `localhost`, Ruby tasks run with the "\
                                 "Bolt Ruby interpreter by default.",
+        "load-config"        => "Whether to load system SSH configuration.",
         "password"           => "Login password.",
         "port"               => "Connection port.",
         "private-key"        => "Either the path to the private key file to use for authentication, or a "\

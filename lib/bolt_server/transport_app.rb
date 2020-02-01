@@ -262,7 +262,16 @@ module BoltServer
         opts['private-key'] = { 'key-data' => private_key_content }
       end
 
-      Bolt::Target.new(target_hash['hostname'], opts)
+      data = {
+        'uri' => target_hash['hostname'],
+        'config' => {
+          'transport' => 'ssh',
+          'ssh' => opts
+        }
+      }
+
+      inventory = Bolt::Inventory.empty
+      Bolt::Target.from_hash(data, inventory)
     end
 
     post '/ssh/:action' do
@@ -291,7 +300,16 @@ module BoltServer
       }
 
       opts = target_hash.clone.merge(overrides)
-      Bolt::Target.new(target_hash['hostname'], opts)
+
+      data = {
+        'uri' => target_hash['hostname'],
+        'config' => {
+          'winrm' => opts
+        }
+      }
+
+      inventory = Bolt::Inventory.empty
+      Bolt::Target.from_hash(data, inventory)
     end
 
     post '/winrm/:action' do

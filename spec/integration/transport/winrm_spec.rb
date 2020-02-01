@@ -8,7 +8,7 @@ require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/winrm'
 require 'bolt/config'
-require 'bolt/target'
+require 'bolt/inventory'
 require 'winrm'
 
 describe Bolt::Transport::WinRM do
@@ -39,6 +39,9 @@ describe Bolt::Transport::WinRM do
   let(:ssl_config) { mk_config(cacert: cacert_path, user: user, password: password) }
   let(:winrm) { Bolt::Transport::WinRM.new }
   let(:winrm_ssl) { Bolt::Transport::WinRM.new }
+  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient) }
+  let(:data) { { 'transport' => 'winrm' } }
+  let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
   let(:echo_script) { <<PS }
 foreach ($i in $args)
 {
@@ -47,7 +50,14 @@ foreach ($i in $args)
 PS
 
   def make_target(host_: host, port_: port, conf: config)
-    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf.transport_conf)
+    t = inventory.get_target("#{host_}:#{port_}")
+    update_target(t, conf.transports[conf.transport.to_sym])
+    t
+  end
+
+  def update_target(targ, conf)
+    transport_config = targ.options.merge(conf)
+    targ.inventory_target.set_config(targ.transport, transport_config)
   end
 
   let(:target) { make_target }
@@ -176,8 +186,7 @@ PS
     end
 
     it "skips verification with ssl-verify: false" do
-      target.options.delete('cacert')
-      target.options['ssl-verify'] = false
+      update_target(target, 'ssl-verify' => false)
 
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
@@ -248,7 +257,7 @@ PS
     end
 
     it "returns false if the target is not available", winrm: true do
-      expect(winrm.connected?(Bolt::Target.new('winrm://unknownfoo'))).to eq(false)
+      expect(winrm.connected?(inventory.get_target('winrm://unknownfoo'))).to eq(false)
     end
 
     it "executes a command on a host", winrm: true do
@@ -1159,7 +1168,7 @@ OUTPUT
   end
 
   context 'when there is no host in the target' do
-    let(:target) { Bolt::Target.new(nil, "name" => "hostless") }
+    let(:target) { Bolt::Inventory::Target.new({ "name" => "hostless" }, inventory) }
 
     it 'errors' do
       expect { winrm.run_command(target, 'whoami') }.to raise_error(/does not have a host/)

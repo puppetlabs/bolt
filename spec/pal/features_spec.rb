@@ -3,12 +3,15 @@
 require 'spec_helper'
 require 'bolt_spec/files'
 require 'bolt_spec/pal'
+require 'bolt_spec/config'
 require 'bolt/pal'
-require 'bolt/inventory'
+require 'bolt/inventory/inventory'
+require 'bolt/plugin'
 
 describe 'set_features function' do
   include BoltSpec::Files
   include BoltSpec::PAL
+  include BoltSpec::Config
 
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
@@ -22,8 +25,9 @@ describe 'set_features function' do
       'vars' => { 'pb' => 'jelly', 'mac' => 'cheese' }
     }
   }
-  let(:inventory) { Bolt::Inventory.new(data) }
   let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, analytics) }
+  let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
   let(:target) { inventory.get_targets('example')[0] }
 
   it 'adds the feature to the target' do

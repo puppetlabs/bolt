@@ -4,14 +4,19 @@ require 'bolt/error'
 require 'bolt/util'
 
 module Bolt
-  class Target2
+  class Target
     attr_accessor :inventory
+
+    # Target.new from a data hash
+    def self.from_hash(hash, inventory)
+      target = inventory.create_target_from_hash(hash)
+      new(target.name, inventory)
+    end
 
     # Target.new from a plan initialized with a hash
     def self.from_asserted_hash(hash)
       inventory = Puppet.lookup(:bolt_inventory)
-      target = inventory.create_target_from_plan(hash)
-      new(target.name, inventory)
+      from_hash(hash, inventory)
     end
 
     # TODO: Disallow any positional argument other than URI.
@@ -145,221 +150,5 @@ module Bolt
       self.class.equal?(other.class) && @name == other.name
     end
     alias == eql?
-  end
-
-  class Target
-    attr_reader :options
-    # CODEREVIEW: this feels wrong. The altertative is threading inventory through the
-    # executor to the RemoteTransport
-    attr_accessor :uri, :inventory
-
-    PRINT_OPTS ||= %w[host user port protocol].freeze
-
-    # Satisfies the Puppet datatypes API
-    def self.from_asserted_hash(hash)
-      if hash['uri'] && hash['options']
-        logger = Logging.logger[self]
-        msg = <<~MSG
-          #{Puppet::Pops::PuppetStack.top_of_stack.join(':')}
-            Deprecation Warning: Starting with Bolt 2.0, using 'Target.new' with an 'options' hash key will no
-            will no longer be supported. Use 'Target.new(<config>)', where 'config' is a hash with the same
-            structure used to define targets in the inventory V2 file. For more information see
-            https://puppet.com/docs/bolt/latest/writing_plans.html#creating-target-objects
-        MSG
-        logger.warn(msg)
-      end
-
-      new(hash['uri'], hash['options'])
-    end
-
-    def self.from_asserted_args(uri, options = nil)
-      if options
-        logger = Logging.logger[self]
-        msg = <<~MSG
-          #{Puppet::Pops::PuppetStack.top_of_stack.join(':')}
-            Deprecation Warning: Starting with Bolt 2.0, 'Target.new(<uri>, <options>)' will no
-            longer be supported. Use 'Target.new(<config>)', where 'config' is a hash with the same
-            structure used to define targets in the inventory V2 file. For more information see
-            https://puppet.com/docs/bolt/latest/writing_plans.html#creating-target-objects
-        MSG
-        logger.warn(msg)
-      end
-
-      new(uri, options)
-    end
-
-    # URI can be passes as nil
-    def initialize(uri, options = nil)
-      # lazy-load expensive gem code
-      require 'addressable/uri'
-
-      @uri = uri
-      @uri_obj = parse(uri)
-      @options = options || {}
-      @options.freeze
-
-      if @options['user']
-        @user = @options['user']
-      end
-
-      if @options['password']
-        @password = @options['password']
-      end
-
-      if @options['port']
-        @port = @options['port']
-      end
-
-      if @options['protocol']
-        @protocol = @options['protocol']
-      end
-
-      if @options['host']
-        @host = @options['host']
-      end
-
-      # WARNING: name should never be updated
-      @name = @options['name'] || @uri
-    end
-
-    def update_conf(conf)
-      @protocol = conf[:transport]
-
-      t_conf = conf[:transports][transport.to_sym] || {}
-      # Override url methods
-      @user = t_conf['user']
-      @password = t_conf['password']
-      @port = t_conf['port']
-      @host = t_conf['host']
-
-      # Preserve everything in options so we can easily create copies of a Target.
-      @options = t_conf.merge(@options)
-
-      self
-    end
-
-    def parse(string)
-      if string.nil?
-        nil
-      elsif string =~ %r{^[^:]+://}
-        Addressable::URI.parse(string)
-      else
-        # Initialize with an empty scheme to ensure we parse the hostname correctly
-        Addressable::URI.parse("//#{string}")
-      end
-    rescue Addressable::URI::InvalidURIError => e
-      raise Bolt::ParseError, "Could not parse target URI: #{e.message}"
-    end
-    private :parse
-
-    def features
-      if @inventory
-        @inventory.features(self)
-      else
-        Set.new
-      end
-    end
-    alias feature_set features
-
-    def plugin_hooks
-      if @inventory
-        @inventory.plugin_hooks(self)
-      else
-        {}
-      end
-    end
-
-    def vars
-      @inventory.vars(self)
-    end
-
-    def facts
-      @inventory.facts(self)
-    end
-
-    def target_alias
-      @inventory.target_alias(self)
-    end
-
-    # TODO: WHAT does equality mean here?
-    # should we just compare names? is there something else that is meaninful?
-    def eql?(other)
-      if self.class.equal?(other.class)
-        @uri ? @uri == other.uri : @name == other.name
-      else
-        false
-      end
-    end
-    alias == eql?
-
-    def hash
-      @uri.hash ^ @options.hash
-    end
-
-    def to_s
-      opts = @options.select { |k, _| PRINT_OPTS.include? k }
-      "Target('#{@uri}', #{opts})"
-    end
-
-    def to_h
-      options.merge(
-        'name' => name,
-        'uri' => uri,
-        'protocol' => protocol,
-        'user' => user,
-        'password' => password,
-        'host' => host,
-        'port' => port
-      )
-    end
-
-    def detail
-      {
-        'name' => name,
-        'alias' => target_alias,
-        'config' => {
-          'transport' => transport,
-          transport => options
-        },
-        'vars' => vars,
-        'facts' => facts,
-        'features' => features.to_a,
-        'plugin_hooks' => plugin_hooks
-      }
-    end
-
-    def host
-      @uri_obj&.hostname || @host
-    end
-    alias safe_name host
-
-    def name
-      @name || @uri
-    end
-
-    def remote?
-      @uri_obj&.scheme == 'remote' || @protocol == 'remote'
-    end
-
-    def port
-      @uri_obj&.port || @port
-    end
-
-    # transport is separate from protocol for remote targets.
-    def transport
-      remote? ? 'remote' : protocol
-    end
-
-    def protocol
-      @uri_obj&.scheme || @protocol
-    end
-
-    def user
-      Addressable::URI.unencode_component(@uri_obj&.user) || @user
-    end
-
-    def password
-      Addressable::URI.unencode_component(@uri_obj&.password) || @password
-    end
   end
 end

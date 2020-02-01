@@ -31,7 +31,7 @@ describe 'apply_prep' do
 
   context 'with targets' do
     let(:hostnames) { %w[a.b.com winrm://x.y.com pcp://foo] }
-    let(:targets) { hostnames.map { |h| Bolt::Target.new(h) } }
+    let(:targets) { hostnames.map { |h| inventory.get_target(h) } }
     let(:unknown_targets) { targets.reject { |target| target.protocol == 'pcp' } }
     let(:fact) { { 'osfamily' => 'none' } }
     let(:custom_facts_task) { Bolt::Task.new('custom_facts_task') }
@@ -111,7 +111,7 @@ describe 'apply_prep' do
       let(:hostname) { 'agentless' }
       let(:data) {
         {
-          'nodes' => [{
+          'targets' => [{
             'name' => hostname,
             'plugin_hooks' => {
               'puppet_library' => {
@@ -143,7 +143,6 @@ describe 'apply_prep' do
       let(:hostname) { 'agentless' }
       let(:data) {
         {
-          'version' => 2,
           'targets' => [{ 'uri' => hostname }]
         }
       }
@@ -172,7 +171,7 @@ describe 'apply_prep' do
 
   context 'with only pcp targets' do
     let(:hostnames) { %w[pcp://foo pcp://bar] }
-    let(:targets) { hostnames.map { |h| Bolt::Target.new(h) } }
+    let(:targets) { hostnames.map { |h| inventory.get_target(h) } }
     let(:fact) { { 'osfamily' => 'none' } }
     let(:custom_facts_task) { Bolt::Task.new('custom_facts_task') }
 
@@ -195,7 +194,7 @@ describe 'apply_prep' do
 
   context 'with targets assigned the puppet-agent feature' do
     let(:hostnames) { %w[foo bar] }
-    let(:targets) { hostnames.map { |h| Bolt::Target.new(h) } }
+    let(:targets) { hostnames.map { |h| inventory.get_target(h) } }
     let(:fact) { { 'osfamily' => 'none' } }
     let(:custom_facts_task) { Bolt::Task.new('custom_facts_task') }
 

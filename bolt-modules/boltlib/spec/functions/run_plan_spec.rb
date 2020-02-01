@@ -9,7 +9,7 @@ describe 'run_plan' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
   let(:tasks_enabled) { true }
-  let(:inventory) { Bolt::Inventory.new({}) }
+  let(:inventory) { Bolt::Inventory.empty }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
@@ -113,23 +113,16 @@ describe 'run_plan' do
     end
   end
 
-  context 'with inventory v2' do
-    let(:config) { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
-    let(:pal) { nil }
-    let(:plugins) { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
-    let(:inventory) { Bolt::Inventory.create_version({ 'version' => 2 }, config, plugins) }
-
-    it 'parameters with type TargetSpec are added to inventory' do
-      params = { 'ts' => 'ts',
-                 'optional_ts' => 'optional_ts',
-                 'variant_ts' => 'variant_ts',
-                 'array_ts' => ['array_ts'],
-                 'nested_ts' => 'nested_ts',
-                 'string' => 'string',
-                 'typeless' => 'typeless' }
-      expected_targets = %w[ts optional_ts variant_ts array_ts nested_ts]
-      is_expected.to run.with_params('test::targetspec_params', params).and_return(expected_targets)
-    end
+  it 'parameters with type TargetSpec are added to inventory' do
+    params = { 'ts' => 'ts',
+               'optional_ts' => 'optional_ts',
+               'variant_ts' => 'variant_ts',
+               'array_ts' => ['array_ts'],
+               'nested_ts' => 'nested_ts',
+               'string' => 'string',
+               'typeless' => 'typeless' }
+    expected_targets = %w[ts optional_ts variant_ts array_ts nested_ts]
+    is_expected.to run.with_params('test::targetspec_params', params).and_return(expected_targets)
   end
 
   context 'with a plan with a $targets parameter' do

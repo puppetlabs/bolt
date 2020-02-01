@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
+require 'spec_helper'
+require 'bolt/inventory'
+
 describe 'add_to_group' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
-  let(:inventory) { Bolt::Inventory.new({}) }
-  let(:target) { Bolt::Target.new('example') }
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:target) { inventory.get_target('example') }
   let(:group) { 'all' }
   let(:tasks_enabled) { true }
 

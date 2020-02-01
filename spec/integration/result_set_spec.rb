@@ -36,10 +36,11 @@ describe "when running a plan that manipulates an execution result", ssh: true d
 
     context 'filters result sets' do
       it 'includes target when filter is true' do
+        safe_uri = conn_uri('ssh')
         params = { target: uri }.to_json
         run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
         expect(@log_output.readlines)
-          .to include("NOTICE  Puppet : Filtered set: [Target('#{uri}', {})]\n")
+          .to include("NOTICE  Puppet : Filtered set: [#{safe_uri}]\n")
       end
 
       it 'excludes target when filter is false' do

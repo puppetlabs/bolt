@@ -3,29 +3,34 @@
 require 'spec_helper'
 require 'bolt_spec/files'
 require 'bolt_spec/pal'
+require 'bolt_spec/config'
 
 require 'bolt/pal'
-require 'bolt/inventory'
+require 'bolt/inventory/inventory'
+require 'bolt/plugin'
 
 describe 'ResultSet DataType' do
   include BoltSpec::Files
   include BoltSpec::PAL
+  include BoltSpec::Config
 
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
   let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new) }
+
   let(:result_code) do
-    <<-PUPPET
-$result_set = results::make_result_set( {
-  'pcp://example1.com' => {'key' => 'value' },
-  'example2.com' => { 'key' => 'value' } } )
-PUPPET
+    <<~PUPPET
+      $result_set = results::make_result_set( {
+        'pcp://example1.com' => {'key' => 'value' },
+        'example2.com' => { 'key' => 'value' } } )
+    PUPPET
   end
 
   def result_set(attr)
     code = result_code + attr
-    peval(code, pal, nil, Bolt::Inventory.new({}))
+    peval(code, pal, nil, Bolt::Inventory::Inventory.new({}, plugins: plugins))
   end
 
   it 'should be ok' do

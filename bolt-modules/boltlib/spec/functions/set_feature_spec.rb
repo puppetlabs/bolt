@@ -15,7 +15,8 @@ describe 'set_feature' do
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
-      inventory.expects(:version).returns(1)
+      inventory.stubs(:version).returns(2)
+      inventory.stubs(:target_implementation_class).returns(Bolt::Target)
       example.run
     end
   end
