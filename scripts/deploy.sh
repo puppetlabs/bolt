@@ -1,7 +1,4 @@
 #!/bin/bash
-# Make sure this happens before set -x
-echo "$DOCKER_TOKEN" | docker login -u TOKEN --password-stdin $REGISTRY_HOST
-
 set -x
 set -e
 
