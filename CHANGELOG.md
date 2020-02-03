@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt NEXT
+## Bolt 1.48.0
 
 ### New features
 
@@ -30,16 +30,16 @@
 
   `apply` blocks in plans now support a `_description` parameter that gives the block a description that is displayed in plan output.
 
-### Bug fixes
-
-* **Require a message when using the prompt plugin** ([#1568](https://github.com/puppetlabs/bolt/issue/1568))
-
-  The `prompt` plugin now requires a `message` option.
-
 * **Support for system-wide and user-level configuration files** ([#608](https://github.com/puppetlabs/bolt/issues/608))
 
   Bolt now supports system-wide and user configuration files, in addition to the existing project configuration file.
   File precedence and merge strategy can be found in the [Bolt configuration docs](https://puppet.com/docs/bolt/latest/configuring_bolt.html).
+
+### Bug fixes
+
+* **Require a message when using the prompt plugin** ([#1568](https://github.com/puppetlabs/bolt/issue/1568))
+
+  The `prompt` plugin now correctly requires a `message` option.
 
 ## Bolt 1.47.0
 
