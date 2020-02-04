@@ -118,11 +118,11 @@ module Bolt
     end
 
     def transport
-      inventory_target.protocol
+      inventory_target.transport
     end
 
     def protocol
-      inventory_target.protocol
+      inventory_target.protocol || inventory_target.transport
     end
 
     def user

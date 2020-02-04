@@ -143,12 +143,26 @@ module Bolt
         @uri_obj.port || transport_config['port']
       end
 
+      # For remote targets, protocol is the value of the URI scheme. For
+      # non-remote targets, there is no protocol.
       def protocol
-        transport
+        if remote?
+          @uri_obj.scheme
+        end
       end
 
+      # For remote targets, the transport is always 'remote'. Otherwise, it
+      # will be either the URI scheme or set explicitly.
       def transport
-        @uri_obj.scheme || transport_config_cache['transport']
+        if remote?
+          'remote'
+        else
+          @uri_obj.scheme || transport_config_cache['transport']
+        end
+      end
+
+      def remote?
+        @uri_obj.scheme == 'remote' || transport_config_cache['transport'] == 'remote'
       end
 
       def user

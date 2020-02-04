@@ -231,8 +231,8 @@ describe Bolt::Inventory::Inventory2 do
         expect(inventory.get_targets('all')).to eq([])
       end
 
-      it 'should have the default protocol' do
-        expect(target.protocol).to eq('ssh')
+      it 'should have the default transport' do
+        expect(target.transport).to eq('ssh')
       end
     end
 
@@ -247,8 +247,8 @@ describe Bolt::Inventory::Inventory2 do
       }
       let(:target) { inventory.get_targets('notarget')[0] }
 
-      it 'should have use protocol' do
-        expect(target.protocol).to eq('winrm')
+      it 'should have the correct transport' do
+        expect(target.transport).to eq('winrm')
       end
 
       it 'should not use ssl' do
@@ -298,7 +298,7 @@ describe Bolt::Inventory::Inventory2 do
           expect(targets).to eq(ts)
         end
 
-        it 'should fail for unknown protocols' do
+        it 'should fail for unknown URI schemes' do
           expect {
             inventory.get_targets('z://foo')
           }.to raise_error(Bolt::UnknownTransportError, %r{Unknown transport z found for z://foo})
@@ -633,12 +633,12 @@ describe Bolt::Inventory::Inventory2 do
 
         it 'uses the configured transport' do
           target = get_target(inventory, 'target')
-          expect(target.protocol).to eq('winrm')
+          expect(target.transport).to eq('winrm')
         end
 
         it 'only uses configured options for ssh' do
           target = get_target(inventory, 'ssh://target')
-          expect(target.protocol).to eq('ssh')
+          expect(target.transport).to eq('ssh')
           expect(target.user).to eq('messh')
           expect(target.password).to eq('youssh')
           expect(target.port).to eq('12345ssh')
@@ -660,7 +660,7 @@ describe Bolt::Inventory::Inventory2 do
 
         it 'only uses configured options for winrm' do
           target = get_target(inventory, 'winrm://target')
-          expect(target.protocol).to eq('winrm')
+          expect(target.transport).to eq('winrm')
           expect(target.user).to eq('mewinrm')
           expect(target.password).to eq('youwinrm')
           expect(target.port).to eq('12345winrm')
@@ -680,7 +680,7 @@ describe Bolt::Inventory::Inventory2 do
 
         it 'only uses configured options for pcp' do
           target = get_target(inventory, 'pcp://target')
-          expect(target.protocol).to eq('pcp')
+          expect(target.transport).to eq('pcp')
           expect(target.user).to be nil
           expect(target.password).to be nil
           expect(target.port).to be nil
@@ -711,7 +711,7 @@ describe Bolt::Inventory::Inventory2 do
           }.to raise_error(Bolt::Inventory::ValidationError, "'#{names}' refers to 3 targets")
         end
 
-        it 'should fail for unknown protocols' do
+        it 'should fail for unknown URI schemes' do
           expect {
             inventory.get_target('z://foo')
           }.to raise_error(Bolt::UnknownTransportError, %r{Unknown transport z found for z://foo})
@@ -952,13 +952,13 @@ describe Bolt::Inventory::Inventory2 do
 
         it 'uses the configured transport' do
           target = inventory.get_target('target')
-          expect(target.protocol).to eq('winrm')
+          expect(target.transport).to eq('winrm')
           expect(target.config).to eq(data['config'])
         end
 
         it 'only uses configured options for ssh' do
           target = inventory.get_target('ssh://target')
-          expect(target.protocol).to eq('ssh')
+          expect(target.transport).to eq('ssh')
           expect(target.user).to eq('messh')
           expect(target.password).to eq('youssh')
           expect(target.port).to eq('12345ssh')
@@ -980,7 +980,7 @@ describe Bolt::Inventory::Inventory2 do
 
         it 'only uses configured options for winrm' do
           target = inventory.get_target('winrm://target')
-          expect(target.protocol).to eq('winrm')
+          expect(target.transport).to eq('winrm')
           expect(target.user).to eq('mewinrm')
           expect(target.password).to eq('youwinrm')
           expect(target.port).to eq('12345winrm')
@@ -1000,7 +1000,7 @@ describe Bolt::Inventory::Inventory2 do
 
         it 'only uses configured options for pcp' do
           target = inventory.get_target('pcp://target')
-          expect(target.protocol).to eq('pcp')
+          expect(target.transport).to eq('pcp')
           expect(target.user).to be nil
           expect(target.password).to be nil
           expect(target.port).to be nil
@@ -1025,7 +1025,7 @@ describe Bolt::Inventory::Inventory2 do
 
       it 'adds magic config options' do
         target = get_target(inventory, 'localhost')
-        expect(target.protocol).to eq('local')
+        expect(target.transport).to eq('local')
         expect(target.options['interpreters']).to include('.rb' => RbConfig.ruby)
         expect(target.features).to include('puppet-agent')
       end
@@ -1046,7 +1046,7 @@ describe Bolt::Inventory::Inventory2 do
 
       it 'does not override config options' do
         target = get_target(inventory, 'localhost')
-        expect(target.protocol).to eq('local')
+        expect(target.transport).to eq('local')
         expect(target.options['interpreters']).to include('.rb' => '/foo/ruby')
         expect(target.features).to include('puppet-agent')
       end
@@ -1067,7 +1067,7 @@ describe Bolt::Inventory::Inventory2 do
       let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
       it 'does not set magic config' do
         target = get_target(inventory, 'localhost')
-        expect(target.protocol).to eq('ssh')
+        expect(target.transport).to eq('ssh')
         expect(target.options['interpreters']).to include('.rb' => '/foo/ruby')
         expect(target.features).to include('puppet-agent')
       end
@@ -1114,11 +1114,11 @@ describe Bolt::Inventory::Inventory2 do
 
       it 'sets config on a target' do
         target = inventory.get_target('target')
-        expect(target.protocol).to eq('ssh')
+        expect(target.transport).to eq('ssh')
         expect(target.password).to eq('sshpass')
         expect(target.config).to eq(expected_config)
         inventory.set_config(target, 'transport', 'local')
-        expect(target.protocol).to eq('local')
+        expect(target.transport).to eq('local')
         expect(target.config).to eq(expected_config.merge('transport' => 'local'))
       end
 
@@ -1147,7 +1147,7 @@ describe Bolt::Inventory::Inventory2 do
         expect(target.options).to eq(expected_options)
         expect(target.config).to eq(expected_config)
         inventory.set_config(target, '', 'transport' => 'winrm', 'winrm' => { 'password' => 'winrmpass' })
-        expect(target.protocol).to eq('winrm')
+        expect(target.transport).to eq('winrm')
         expect(target.password).to eq('winrmpass')
         winrm_conf = { "password" => "winrmpass",
                        "ssl" => true,
@@ -1206,7 +1206,7 @@ describe Bolt::Inventory::Inventory2 do
 
       it 'adds target to a group and inherets config' do
         target = inventory.get_target('new-target')
-        expect(target.protocol).to eq('ssh')
+        expect(target.transport).to eq('ssh')
         expect(target.options).to include('disconnect-timeout' => 5)
         expect(target.config).to eq({})
         inventory.add_to_group([target], 'test')
