@@ -1,8 +1,12 @@
 name: Docs
 
 on:
+  push:
+    branches: [master]
+    paths-ignore: ['*.md']
   pull_request:
     type: [opened, reopened, edited]
+    paths-ignore: ['*.md']
 
 jobs:
 
