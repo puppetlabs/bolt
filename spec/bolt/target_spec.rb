@@ -235,7 +235,7 @@ describe Bolt::Target2 do
       expect(target.password).to eq(password)
     end
 
-    it "accepts userinfo when using the default protocol" do
+    it "accepts userinfo when not specifying a scheme" do
       target = inventory.get_target("#{user}:#{password}@neptune")
       expect(target.user).to eq(user)
       expect(target.password).to eq(password)
@@ -312,7 +312,7 @@ describe Bolt::Target2 do
       expect(target.password).to eq(unencoded)
     end
 
-    it "does not default the port without a protocol" do
+    it "does not default the port without a scheme" do
       target = inventory.get_target('pluto')
       expect(target.host).to eq('pluto')
       expect(target.port).to be_nil
@@ -326,7 +326,7 @@ describe Bolt::Target2 do
     describe "with winrm" do
       it "accepts 'winrm://host:port'" do
         target = inventory.get_target('winrm://neptune:55985')
-        expect(target.protocol).to eq('winrm')
+        expect(target.transport).to eq('winrm')
         expect(target.host).to eq('neptune')
         expect(target.port).to eq(55985)
       end
@@ -335,21 +335,21 @@ describe Bolt::Target2 do
     describe "with ssh" do
       it "accepts 'ssh://host:port'" do
         target = inventory.get_target('ssh://pluto:2224')
-        expect(target.protocol).to eq('ssh')
+        expect(target.transport).to eq('ssh')
         expect(target.host).to eq('pluto')
         expect(target.port).to eq(2224)
       end
 
       it "does not default the ssh port" do
         target = inventory.get_target('ssh://pluto')
-        expect(target.protocol).to eq('ssh')
+        expect(target.transport).to eq('ssh')
         expect(target.host).to eq('pluto')
         expect(target.port).to be_nil
       end
 
-      it "accepts 'host:port' without a protocol" do
+      it "accepts 'host:port' without a scheme" do
         target = inventory.get_target('pluto:2224')
-        expect(target.protocol).to eq('ssh')
+        expect(target.transport).to eq('ssh')
         expect(target.host).to eq('pluto')
         expect(target.port).to eq(2224)
       end
@@ -358,14 +358,14 @@ describe Bolt::Target2 do
     describe "with pcp" do
       it "accepts 'pcp://pluto:666'" do
         target = inventory.get_target('pcp://pluto:666')
-        expect(target.protocol).to eq('pcp')
+        expect(target.transport).to eq('pcp')
         expect(target.host).to eq('pluto')
         expect(target.port).to eq(666)
       end
 
       it "accepts 'pcp://pluto' without a port" do
         target = inventory.get_target('pcp://pluto')
-        expect(target.protocol).to eq('pcp')
+        expect(target.transport).to eq('pcp')
         expect(target.host).to eq('pluto')
         expect(target.port).to be_nil
       end
