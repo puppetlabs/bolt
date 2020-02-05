@@ -41,9 +41,9 @@ describe "when running a plan using run_as", ssh: true do
     non_root = 'test'
     output = run_plan('test::run_as_user', target: uri, user: non_root)
     parsed = JSON.parse(output)[0]
-    expect(parsed['result']['stdout']).to eq("#{non_root}\n")
+    expect(parsed['value']['stdout']).to eq("#{non_root}\n")
     expect(parsed['status']).to eq('success')
-    expect(parsed['result']['exit_code']).to eq(0)
+    expect(parsed['value']['exit_code']).to eq(0)
   end
 
   context 'as a non-root user' do
@@ -55,9 +55,9 @@ describe "when running a plan using run_as", ssh: true do
       non_root = 'test'
       output = run_plan('test::run_as_user', target: uri, user: non_root)
       parsed = JSON.parse(output)[0]
-      expect(parsed['result']['stdout']).to eq("#{non_root}\n")
+      expect(parsed['value']['stdout']).to eq("#{non_root}\n")
       expect(parsed['status']).to eq('success')
-      expect(parsed['result']['exit_code']).to eq(0)
+      expect(parsed['value']['exit_code']).to eq(0)
     end
   end
 
@@ -75,9 +75,9 @@ describe "when running a plan using run_as", ssh: true do
         config_array = config_flags + %W[--configfile #{conf.path}]
         output = run_cli(['plan', 'run', 'test::run_as_user', "--params", params.to_json] + config_array)
         parsed = JSON.parse(output)[0]
-        expect(parsed['result']['stdout']).to eq("#{non_root}\n")
+        expect(parsed['value']['stdout']).to eq("#{non_root}\n")
         expect(parsed['status']).to eq('success')
-        expect(parsed['result']['exit_code']).to eq(0)
+        expect(parsed['value']['exit_code']).to eq(0)
       end
     end
   end

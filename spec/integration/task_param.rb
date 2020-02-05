@@ -16,7 +16,7 @@ describe "Passes the _task metaparameter" do
 
     it 'prints the _task metaparameter in a task' do
       result = run_cli_json(%w[task run task_param --no-host-key-check] + config_flags)
-      expect(result['items'][0]['result']['_output']).to eq("Running task task_param\n")
+      expect(result['items'][0]['value']['_output']).to eq("Running task task_param\n")
     end
   end
 
@@ -25,7 +25,7 @@ describe "Passes the _task metaparameter" do
 
     it 'prints the _task metaparameter in a task' do
       result = run_cli_json(%w[task run task_param::win --no-ssl] + config_flags)
-      expect(result['items'][0]['result']['_output']).to eq("Running task task_param::win\r\n")
+      expect(result['items'][0]['value']['_output']).to eq("Running task task_param::win\r\n")
     end
   end
 end

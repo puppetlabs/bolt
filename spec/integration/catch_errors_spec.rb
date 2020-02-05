@@ -35,7 +35,7 @@ describe "catch_errors", ssh: true do
 
   it 'returns a ResultSet' do
     result = run_cli_json(%W[plan run #{plan}] + config_flags)
-    error = result['details']['result_set'].first['result']['_error']
+    error = result['details']['result_set'].first['value']['_error']
     expect(error['kind']).to eq('puppetlabs.tasks/task-error')
     expect(error['msg']).to match(/failed with exit code 1/)
   end
@@ -44,7 +44,7 @@ describe "catch_errors", ssh: true do
     params = { fail: false }.to_json
     result = run_cli_json(%W[plan run #{plan} --params #{params}] + config_flags).first
     expect(result['status']).to eq('success')
-    expect(result['result']['stdout'].strip).to eq("Unepic unfailure")
+    expect(result['value']['stdout'].strip).to eq("Unepic unfailure")
   end
 
   context "with typed errors" do

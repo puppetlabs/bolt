@@ -50,7 +50,7 @@ describe "when running over the local transport" do
         results = run_cli_json(%W[script run #{script.path} param --targets localhost])
         results['items'].each do |result|
           expect(result['status']).to eq('success')
-          expect(result['result']).to eq("stdout" => "param\n", "stderr" => "", "exit_code" => 0)
+          expect(result['value']).to eq("stdout" => "param\n", "stderr" => "", "exit_code" => 0)
         end
       end
     end
@@ -80,7 +80,7 @@ describe "when running over the local transport" do
       it 'exposes environment variables during apply' do
         result = run_cli_json(%w[plan run env_var::get_var] + config_flags)
         expect(result).not_to include('kind')
-        event = result.first['result']['report']['resource_statuses']['Notify[gettingvar]']['events'].first
+        event = result.first['value']['report']['resource_statuses']['Notify[gettingvar]']['events'].first
         expect(event).to include('message' => "defined 'message' as 'testing this'")
       end
     end
@@ -102,7 +102,7 @@ describe "when running over the local transport" do
         results = run_cli_json(%W[script run #{script.path} hello] + config_flags)
         results['items'].each do |result|
           expect(result['status']).to eq('success')
-          expect(result['result']).to eq("stdout" => "hello\n", "stderr" => "", "exit_code" => 0)
+          expect(result['value']).to eq("stdout" => "hello\n", "stderr" => "", "exit_code" => 0)
         end
       end
     end
@@ -118,7 +118,7 @@ describe "when running over the local transport" do
         results = run_cli_json(%W[script run #{script.path} param --targets localhost])
         results['items'].each do |result|
           expect(result['status']).to eq('success')
-          expect(result['result']).to eq("stdout" => "param\n", "stderr" => "", "exit_code" => 0)
+          expect(result['value']).to eq("stdout" => "param\n", "stderr" => "", "exit_code" => 0)
         end
       end
     end
@@ -129,7 +129,7 @@ describe "when running over the local transport" do
         results = run_cli_json(%W[script run #{script.path} param --targets localhost])
         results['items'].each do |result|
           expect(result['status']).to eq('success')
-          expect(result['result']).to eq("stdout" => "Ruby\nparam\n", "stderr" => "", "exit_code" => 0)
+          expect(result['value']).to eq("stdout" => "Ruby\nparam\n", "stderr" => "", "exit_code" => 0)
         end
       end
     end

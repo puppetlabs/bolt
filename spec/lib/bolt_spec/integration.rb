@@ -57,7 +57,7 @@ module BoltSpec
       if result['_error'] || result['items'].any? { |r| r['status'] != 'success' }
         expect(result).to eq("Should have succeed on node" => true)
       end
-      result['items'].map { |r| r['result'] }
+      result['items'].map { |r| r['value'] }
     end
 
     def run_one_node(arguments)
@@ -67,7 +67,7 @@ module BoltSpec
     def run_failed_nodes(arguments)
       result = run_cli_json(arguments)
       expect(result['_error'] || result['items'].all? { |r| r['status'] != 'success' })
-      result['items'].map { |r| r['result'] }
+      result['items'].map { |r| r['value'] }
     end
 
     def run_failed_node(arguments)

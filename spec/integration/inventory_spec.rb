@@ -207,7 +207,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       plan = ['plan', 'run', 'inventory::new_target', '--params', new_target_info.to_json] + config_flags
       result = run_cli_json(plan)
       expect(result['expected_host_key_fail'].count).to eq(1)
-      expect(result['expected_host_key_fail'].first['result']['_error']['issue_code']).to eq('HOST_KEY_ERROR')
+      expect(result['expected_host_key_fail'].first['value']['_error']['issue_code']).to eq('HOST_KEY_ERROR')
       expect(result['expected_success'].count).to eq(2)
       result['expected_success'].each { |r| expect(r['status']).to eq('success') }
     end
@@ -550,7 +550,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
         it 'handles structured facts' do
           result = run_cli_json(run_command)
           expect(result).not_to include('kind')
-          expect(result['items'][0]['result']['stdout']).to eq("#{conn[:second_user]}\n")
+          expect(result['items'][0]['value']['stdout']).to eq("#{conn[:second_user]}\n")
         end
       end
 
@@ -587,7 +587,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
         it 'sets config to nil' do
           result = run_cli_json(run_command)
-          expect(result['items'][0]['result']['_error']['msg'])
+          expect(result['items'][0]['value']['_error']['msg'])
             .to include("Authentication failed for user #{conn[:system_user]}")
           expect(@log_output.readlines).to include(/Could not find fact/)
         end
@@ -601,7 +601,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           result = run_cli_json(run_command)
           expect(result).not_to include('kind')
           # If puppetdb config loaded this would be fake
-          expect(result['items'][0]['result']['stdout']).to eq("#{conn[:user]}\n")
+          expect(result['items'][0]['value']['stdout']).to eq("#{conn[:user]}\n")
         end
       end
     end

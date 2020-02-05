@@ -1586,12 +1586,11 @@ describe "Bolt::CLI" do
             cli.execute(options)
 
             expect(JSON.parse(output.string)).to eq(
-              [{ 'node' => 'foo',
-                 'target' => 'foo',
+              [{ 'target' => 'foo',
                  'status' => 'success',
                  'action' => 'task',
                  'object' => 'some_task',
-                 'result' => { '_output' => 'yes' } }]
+                 'value' => { '_output' => 'yes' } }]
             )
           end
         end
@@ -1614,12 +1613,11 @@ describe "Bolt::CLI" do
             cli.execute(options)
 
             expect(JSON.parse(output.string)).to eq(
-              [{ 'node' => 'foo',
-                 'target' => 'foo',
+              [{ 'target' => 'foo',
                  'status' => 'success',
                  'action' => 'task',
                  'object' => 'some_task',
-                 'result' => { '_output' => 'yes' } }]
+                 'value' => { '_output' => 'yes' } }]
             )
           end
         end
@@ -1666,12 +1664,11 @@ describe "Bolt::CLI" do
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
-            [{ 'node' => 'foo',
-               'target' => 'foo',
+            [{ 'target' => 'foo',
                'status' => 'success',
                'action' => 'task',
                'object' => 'some_task',
-               'result' => { '_output' => 'yes' } }]
+               'value' => { '_output' => 'yes' } }]
           )
         end
 
@@ -1703,12 +1700,11 @@ describe "Bolt::CLI" do
           expect(JSON.parse(output.string)).to eq(
             [
               {
-                'node' => 'foo',
                 'target' => 'foo',
                 'status' => 'failure',
                 'action' => 'task',
                 'object' => 'some_task',
-                'result' => {
+                'value' => {
                   "_output" => "no",
                   "_error" => {
                     "msg" => "The task failed with exit code 1",

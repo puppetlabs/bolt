@@ -420,9 +420,9 @@ describe "BoltServer::TransportApp" do
         expect(last_response.status).to eq(200)
         result = JSON.parse(last_response.body)
         expect(result['status']).to eq('success')
-        expect(result['result']).to be_a(Array)
-        expect(result['result'].length).to eq(1)
-        expect(result['result'].first['status']).to eq('success')
+        expect(result['value']).to be_a(Array)
+        expect(result['value'].length).to eq(1)
+        expect(result['value'].first['status']).to eq('success')
       end
 
       context 'when the checks succeed, but at least one node failed' do
@@ -476,7 +476,7 @@ describe "BoltServer::TransportApp" do
 
           result = JSON.parse(last_response.body)
           expect(result).to include('status' => 'success')
-          expect(result['result']['_output']).to match(/got passed the message: Hello!/)
+          expect(result['value']['_output']).to match(/got passed the message: Hello!/)
         end
 
         it 'overrides host-key-check default', :ssh do
@@ -540,7 +540,7 @@ describe "BoltServer::TransportApp" do
 
           result = JSON.parse(last_response.body)
           expect(result).to include('status' => 'success')
-          expect(result['result']['_output']).to match(/INPUT.*Hello!/)
+          expect(result['value']['_output']).to match(/INPUT.*Hello!/)
         end
 
         it 'errors if multiple targets are supplied', :winrm do
