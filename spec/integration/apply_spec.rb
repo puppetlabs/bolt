@@ -207,7 +207,10 @@ describe "apply", expensive: true do
       end
 
       context 'with plugin configured' do
-        let(:config_flags) { %W[--format json -n all --password #{password} --modulepath #{modulepath}] + tflags }
+        let(:config_flags) {
+          %W[--format json --targets all --password #{password}
+             --modulepath #{modulepath}] + tflags
+        }
         let(:ssh_node) { conn_uri('ssh', include_password: true) }
 
         before(:each) do

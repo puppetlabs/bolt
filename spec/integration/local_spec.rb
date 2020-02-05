@@ -115,7 +115,7 @@ describe "when running over the local transport" do
 
     it 'runs powershell script with parameter', :reset_puppet_settings do
       with_tempfile_containing('script', "Write-Host $args", '.ps1') do |script|
-        results = run_cli_json(%W[script run #{script.path} param -n localhost])
+        results = run_cli_json(%W[script run #{script.path} param --targets localhost])
         results['items'].each do |result|
           expect(result['status']).to eq('success')
           expect(result['result']).to eq("stdout" => "param\n", "stderr" => "", "exit_code" => 0)
@@ -126,7 +126,7 @@ describe "when running over the local transport" do
     it 'runs ruby script with parameter', :reset_puppet_settings do
       ruby_script = "puts 'Ruby' \n ARGV.each {|a| puts a}"
       with_tempfile_containing('script', ruby_script, '.rb') do |script|
-        results = run_cli_json(%W[script run #{script.path} param -n localhost])
+        results = run_cli_json(%W[script run #{script.path} param --targets localhost])
         results['items'].each do |result|
           expect(result['status']).to eq('success')
           expect(result['result']).to eq("stdout" => "Ruby\nparam\n", "stderr" => "", "exit_code" => 0)

@@ -80,28 +80,28 @@ describe "Bolt::CLI" do
     end
 
     it "generates an error message if an unknown subcommand is given" do
-      cli = Bolt::CLI.new(%w[-n bolt1 bolt2 command run whoami])
+      cli = Bolt::CLI.new(%w[--targets bolt1 bolt2 command run whoami])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /Expected subcommand 'bolt2' to be one of/)
     end
 
     it "generates an error message if an unknown action is given" do
-      cli = Bolt::CLI.new(%w[-n bolt1 command oops whoami])
+      cli = Bolt::CLI.new(%w[--targets bolt1 command oops whoami])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /Expected action 'oops' to be one of/)
     end
 
     it "generates an error message is no action is given and one is expected" do
-      cli = Bolt::CLI.new(%w[-n bolt1 command])
+      cli = Bolt::CLI.new(%w[--targets bolt1 command])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /Expected an action/)
     end
 
     it "works without an action if no action is expected" do
-      cli = Bolt::CLI.new(%w[-n bolt1 apply file.pp])
+      cli = Bolt::CLI.new(%w[--targets bolt1 apply file.pp])
       expect {
         cli.parse
       }.not_to raise_error
@@ -326,13 +326,6 @@ describe "Bolt::CLI" do
           cli.parse
         }.to raise_error(Bolt::CLIError, /Option '--targets' needs a parameter/)
       end
-
-      it "generates an error if nodes and targets are specified" do
-        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --targets bar])
-        expect {
-          cli.parse
-        }.to raise_error(Bolt::CLIError, /Only one targeting option/)
-      end
     end
 
     describe "query" do
@@ -395,7 +388,7 @@ describe "Bolt::CLI" do
         allow(STDIN).to receive(:noecho).and_return('opensesame')
         allow(STDOUT).to receive(:print).with('Please enter your password: ')
         allow(STDOUT).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --password])
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --password])
         expect(cli.parse).to include(password: 'opensesame')
         expect(@log_output.readlines.join).to match(/Optional parameter for --password is deprecated/)
       end
@@ -406,7 +399,7 @@ describe "Bolt::CLI" do
         allow(STDIN).to receive(:noecho).and_return('opensesame')
         allow(STDERR).to receive(:print).with('Please enter your password: ')
         allow(STDERR).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --password-prompt])
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --password-prompt])
         expect(cli.parse).to include(password: 'opensesame')
       end
     end
@@ -558,7 +551,7 @@ describe "Bolt::CLI" do
         pw_prompt = 'Please enter your privilege escalation password: '
         allow(STDOUT).to receive(:print).with(pw_prompt)
         allow(STDOUT).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --run-as alibaba --sudo-password])
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --run-as alibaba --sudo-password])
         expect(cli.parse).to include('sudo-password': 'opensez')
         expect(@log_output.readlines.join).to match(/Optional parameter for --sudo-password is deprecated/)
       end
@@ -569,7 +562,7 @@ describe "Bolt::CLI" do
         allow(STDIN).to receive(:noecho).and_return('opensesame')
         allow(STDERR).to receive(:print).with('Please enter your privilege escalation password: ')
         allow(STDERR).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --sudo-password-prompt])
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --sudo-password-prompt])
         expect(cli.parse).to include('sudo-password': 'opensesame')
       end
     end
@@ -721,14 +714,14 @@ describe "Bolt::CLI" do
 
     describe 'task' do
       it "errors without a task" do
-        cli = Bolt::CLI.new(%w[task run -n example.com --modulepath .])
+        cli = Bolt::CLI.new(%w[task run --targets example.com --modulepath .])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Must specify/)
       end
 
       it "errors if task is a parameter" do
-        cli = Bolt::CLI.new(%w[task run -n example.com --modulepath . p1=v1])
+        cli = Bolt::CLI.new(%w[task run --targets example.com --modulepath . p1=v1])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Invalid task/)

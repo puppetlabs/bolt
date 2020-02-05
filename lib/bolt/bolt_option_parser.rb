@@ -6,7 +6,7 @@ require 'optparse'
 
 module Bolt
   class BoltOptionParser < OptionParser
-    OPTIONS = { inventory: %w[nodes targets query rerun description],
+    OPTIONS = { inventory: %w[targets query rerun description],
                 authentication: %w[user password password-prompt private-key host-key-check ssl ssl-verify],
                 escalation: %w[run-as sudo-password sudo-password-prompt sudo-executable],
                 run_context: %w[concurrency inventoryfile save-rerun],
@@ -599,17 +599,11 @@ module Bolt
       @warnings = []
 
       separator "\nINVENTORY OPTIONS"
-      define('-n', '--nodes NODES',
-             'Alias for --targets',
-             'Deprecated in favor of --targets') do |nodes|
-        @options [:nodes] ||= []
-        @options[:nodes] << get_arg_input(nodes)
-      end
       define('-t', '--targets TARGETS',
              'Identifies the targets of command.',
              'Enter a comma-separated list of target URIs or group names.',
              "Or read a target list from an input file '@<file>' or stdin '-'.",
-             'Example: --targets localhost,node_group,ssh://nix.com:23,winrm://windows.puppet.com',
+             'Example: --targets localhost,target_group,ssh://nix.com:23,winrm://windows.puppet.com',
              'URI format is [protocol://]host[:port]',
              "SSH is the default protocol; may be #{TRANSPORTS.keys.join(', ')}",
              'For Windows targets, specify the winrm:// protocol if it has not be configured',
@@ -621,10 +615,10 @@ module Bolt
       define('-q', '--query QUERY', 'Query PuppetDB to determine the targets') do |query|
         @options[:query] = query
       end
-      define('--rerun FILTER', 'Retry on nodes from the last run',
-             "'all' all nodes that were part of the last run.",
-             "'failure' nodes that failed in the last run.",
-             "'success' nodes that succeeded in the last run.") do |rerun|
+      define('--rerun FILTER', 'Retry on targets from the last run',
+             "'all' all targets that were part of the last run.",
+             "'failure' targets that failed in the last run.",
+             "'success' targets that succeeded in the last run.") do |rerun|
         @options[:rerun] = rerun
       end
       define('--noop', 'See what changes Bolt will make without actually executing the changes') do |_|
@@ -753,7 +747,7 @@ module Bolt
       define('--connect-timeout TIMEOUT', Integer, 'Connection timeout (defaults vary)') do |timeout|
         @options[:'connect-timeout'] = timeout
       end
-      define('--[no-]tty', 'Request a pseudo TTY on nodes that support it') do |tty|
+      define('--[no-]tty', 'Request a pseudo TTY on targets that support it') do |tty|
         @options[:tty] = tty
       end
       define('--tmpdir DIR', 'The directory to upload and execute temporary files on the target') do |tmpdir|
