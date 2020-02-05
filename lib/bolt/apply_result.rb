@@ -130,5 +130,9 @@ module Bolt
     def report
       @value['report']
     end
+
+    def generic_value
+      {}
+    end
   end
 end
