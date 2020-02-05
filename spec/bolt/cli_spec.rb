@@ -51,7 +51,8 @@ describe "Bolt::CLI" do
   end
 
   def stub_config(file_content = {})
-    allow(Bolt::Util).to receive(:read_config_file).and_return(file_content)
+    allow(Bolt::Util).to receive(:read_yaml_hash).and_return(file_content)
+    allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return(file_content)
   end
 
   # These tests may pick up local config that includes `future = true`
@@ -66,7 +67,8 @@ describe "Bolt::CLI" do
     before(:each) do
       allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(boltdir)
       allow_any_instance_of(Bolt::Boltdir).to receive(:resource_types)
-      allow(Bolt::Util).to receive(:read_config_file).and_return({})
+      allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
+      allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return({})
     end
 
     it "generates an error message if an unknown argument is given" do

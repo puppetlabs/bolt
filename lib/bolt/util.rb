@@ -3,38 +3,30 @@
 module Bolt
   module Util
     class << self
-      def read_config_file(path, default_paths = nil, file_name = 'file')
+      def read_yaml_hash(path, file_name)
         require 'yaml'
 
         logger = Logging.logger[self]
-        path_passed = path
-        if path.nil? && default_paths
-          found_default = default_paths.select { |p| File.exist?(p) }
-          if found_default.size > 1
-            logger.warn "Found #{file_name}s at #{found_default.join(', ')}, using the first"
-          end
-          # Use first found, fall back to first default and try to load even if it didn't exist
-          path = found_default.first || default_paths.first
-        end
-
         path = File.expand_path(path)
-        content = File.open(path, "r:UTF-8") { |f| YAML.safe_load(f.read) }
+        content = File.open(path, "r:UTF-8") { |f| YAML.safe_load(f.read) } || {}
+        unless content.is_a?(Hash)
+          msg = "Invalid content for #{file_name} file: #{path} should be a Hash or empty, not #{content.class}"
+          raise Bolt::FileError.new(msg, path)
+        end
         logger.debug("Loaded #{file_name} from #{path}")
         content
       rescue Errno::ENOENT
-        msg = "Could not read #{file_name} file: #{path}"
-        if path_passed
-          raise Bolt::FileError.new(msg, path)
-        else
-          logger.debug(msg)
-          nil
-        end
+        raise Bolt::FileError.new("Could not read #{file_name} file: #{path}", path)
       rescue Psych::Exception => e
         raise Bolt::FileError.new("Could not parse #{file_name} file: #{path}\n"\
                                   "Error at line #{e.line} column #{e.column}", path)
       rescue IOError, SystemCallError => e
         raise Bolt::FileError.new("Could not read #{file_name} file: #{path}\n"\
                                   "error: #{e}", path)
+      end
+
+      def read_optional_yaml_hash(path, file_name)
+        File.exist?(path) ? read_yaml_hash(path, file_name) : {}
       end
 
       # Accepts a path with either 'plans' or 'tasks' in it and determines
