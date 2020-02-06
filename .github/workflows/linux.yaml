@@ -3,10 +3,10 @@ name: Linux
 on:
   push:
     branches: [master]
-    paths-ignore: ['*.md']
+    paths-ignore: ['*.md', '*.erb']
   pull_request:
     type: [opened, reopened, edited]
-    paths-ignore: ['*.md']
+    paths-ignore: ['*.md', '*.erb']
 
 env:
   BOLT_SUDO_USER: true
