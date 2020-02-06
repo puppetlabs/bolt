@@ -130,7 +130,10 @@ module Bolt
       # Log the file paths for loaded config files
       config_loaded
 
+      # Display warnings created during parser and config initialization
       parser.warnings.each { |warning| @logger.warn(warning[:msg]) }
+      config.warnings.each { |warning| @logger.warn(warning[:msg]) }
+
       # After validation, initialize inventory and targets. Errors here are better to catch early.
       # After this step
       # options[:target_args] will contain a string/array version of the targetting options this is passed to plans

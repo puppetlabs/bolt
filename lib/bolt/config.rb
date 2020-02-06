@@ -34,10 +34,10 @@ module Bolt
   class Config
     attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
                   :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir,
-                  :puppetfile_config, :plugins, :plugin_hooks, :future, :trusted_external,
+                  :puppetfile_config, :plugins, :plugin_hooks, :trusted_external,
                   :apply_settings
     attr_writer :modulepath
-    attr_reader :config_files
+    attr_reader :config_files, :warnings
 
     OPTIONS = {
       "apply_settings"           => "A map of Puppet settings to use when applying Puppet code",
@@ -64,9 +64,7 @@ module Bolt
                                     "specified in the URL or inventory.",
       "trusted-external-command" => "The path to an executable on the Bolt controller that can produce "\
                                     "external trusted facts. **External trusted facts are experimental in both "\
-                                    "Puppet and Bolt and this API may change or be removed.**",
-      "future"                   => "Whether to use new, breaking changes. This allows testing if Bolt content "\
-                                    "is compatible with expected future behavior."
+                                    "Puppet and Bolt and this API may change or be removed.**"
     }.freeze
 
     DEFAULT_OPTIONS = {
@@ -77,8 +75,7 @@ module Bolt
       "hiera-config" => "Boltdir/hiera.yaml",
       "inventoryfile" => "Boltdir/inventory.yaml",
       "modulepath" => ["Boltdir/modules", "Boltdir/site-modules", "Boltdir/site"],
-      "save-rerun" => true,
-      "future" => false
+      "save-rerun" => true
     }.freeze
 
     PUPPETFILE_OPTIONS = {
@@ -170,6 +167,7 @@ module Bolt
       @plugins = {}
       @plugin_hooks = {}
       @apply_settings = {}
+      @warnings = []
 
       # add an entry for the default console logger
       @log = { 'console' => {} }
@@ -256,7 +254,10 @@ module Bolt
     end
 
     def update_from_file(data)
-      @future = data['future'] == true
+      if data['future']
+        msg = "Configuration option 'future' no longer exposes future behavior."
+        @warnings << { option: 'future', msg: msg }
+      end
 
       if data['log'].is_a?(Hash)
         update_logs(data['log'])
