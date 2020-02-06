@@ -47,7 +47,7 @@ describe Bolt::Transport::WinRM do
     conf['connect-timeout'] ||= 20
     conf
   end
-  
+
   def make_target(host_: host, port_: port, conf: config)
     hash = {
       'uri' => "#{host_}:#{port_}",
