@@ -644,18 +644,9 @@ module Bolt
       define('-u', '--user USER', 'User to authenticate as') do |user|
         @options[:user] = user
       end
-      define('-p', '--password [PASSWORD]',
+      define('-p', '--password PASSWORD',
              'Password to authenticate with') do |password|
-        if password.nil?
-          msg = "Optional parameter for --password is deprecated and will no longer prompt for password. " \
-                "Use the prompt plugin or --password-prompt instead to prompt for passwords."
-          @warnings << { option: 'password', msg: msg }
-          STDOUT.print "Please enter your password: "
-          @options[:password] = STDIN.noecho(&:gets).chomp
-          STDOUT.puts
-        else
-          @options[:password] = password
-        end
+        @options[:password] = password
       end
       define('--password-prompt', 'Prompt for user to input password') do |_password|
         STDERR.print "Please enter your password: "
@@ -679,18 +670,9 @@ module Bolt
       define('--run-as USER', 'User to run as using privilege escalation') do |user|
         @options[:'run-as'] = user
       end
-      define('--sudo-password [PASSWORD]',
+      define('--sudo-password PASSWORD',
              'Password for privilege escalation') do |password|
-        if password.nil?
-          msg = "Optional parameter for --sudo-password is deprecated and will no longer prompt for password. " \
-                "Use the prompt plugin or --sudo-password-prompt instead to prompt for passwords."
-          @warnings << { option: 'sudo-password', msg: msg }
-          STDOUT.print "Please enter your privilege escalation password: "
-          @options[:'sudo-password'] = STDIN.noecho(&:gets).chomp
-          STDOUT.puts
-        else
-          @options[:'sudo-password'] = password
-        end
+        @options[:'sudo-password'] = password
       end
       define('--sudo-password-prompt', 'Prompt for user to input escalation password') do |_password|
         STDERR.print "Please enter your privilege escalation password: "
