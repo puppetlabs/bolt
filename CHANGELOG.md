@@ -13,6 +13,10 @@
 
 ### New features
 
+* **Add Kerberos support for SSH transport**
+
+  Users can now authenticate with Kerberos when using the SSH transport.
+
 * **Warning when task metadata has unknown keys** ([#1542](https://github.com/puppetlabs/bolt/pull/1542))
 
   Unexpected keys in task metadata may signal either a typo or a task that
