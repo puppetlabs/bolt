@@ -234,11 +234,7 @@ module Bolt
     def normalize_log(target)
       return target if target == 'console'
       target = target[5..-1] if target.start_with?('file:')
-      if @future
-        'file:' + File.expand_path(target, @boltdir.path)
-      else
-        'file:' + File.expand_path(target)
-      end
+      'file:' + File.expand_path(target, @boltdir.path)
     end
 
     def update_logs(logs)
@@ -351,11 +347,11 @@ module Bolt
       TRANSPORTS.each do |key, impl|
         if data[key.to_s]
           selected = impl.filter_options(data[key.to_s])
-          if @future
-            to_expand = %w[private-key cacert token-file] & selected.keys
-            to_expand.each do |opt|
-              selected[opt] = File.expand_path(selected[opt], @boltdir.path) if selected[opt].is_a?(String)
-            end
+
+          # Expand file paths relative to the Boltdir
+          to_expand = %w[private-key cacert token-file] & selected.keys
+          to_expand.each do |opt|
+            selected[opt] = File.expand_path(selected[opt], @boltdir.path) if selected[opt].is_a?(String)
           end
 
           @transports[key] = Bolt::Util.deep_merge(@transports[key], selected)

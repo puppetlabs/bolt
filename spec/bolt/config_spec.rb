@@ -179,10 +179,9 @@ describe Bolt::Config do
       expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
     end
 
-    it "expands the private-key hash with 'future' set" do
+    it "expands the private-key hash" do
       data = {
-        'ssh' => { 'private-key' => 'my-private-key' },
-        'future' => true
+        'ssh' => { 'private-key' => 'my-private-key' }
       }
       config = Bolt::Config.new(boltdir, data)
       expect(config.transports[:ssh]['private-key']).to eq(File.expand_path('my-private-key', boltdir.path))
@@ -241,7 +240,7 @@ describe Bolt::Config do
       config = {
         'winrm' => { 'ssl' => true, 'cacert' => 'does not exist' }
       }
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::FileError, /'does not exist'/)
+      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::FileError, /does not exist/)
     end
 
     it "ignores invalid cacert file when 'ssl' is false" do
@@ -260,8 +259,7 @@ describe Bolt::Config do
         .and_return(true)
 
       data = {
-        'winrm' => { 'ssl' => true, 'cacert' => 'ssl/ca.pem' },
-        'future' => true
+        'winrm' => { 'ssl' => true, 'cacert' => 'ssl/ca.pem' }
       }
 
       config = Bolt::Config.new(boltdir, data)
@@ -271,8 +269,7 @@ describe Bolt::Config do
 
     it "expands token-file relative to boltdir" do
       data = {
-        'pcp' => { 'token-file' => 'token' },
-        'future' => true
+        'pcp' => { 'token-file' => 'token' }
       }
 
       config = Bolt::Config.new(boltdir, data)
@@ -282,8 +279,7 @@ describe Bolt::Config do
 
     it "expands private-key relative to boltdir" do
       data = {
-        'ssh' => { 'private-key' => 'secret/key' },
-        'future' => true
+        'ssh' => { 'private-key' => 'secret/key' }
       }
 
       config = Bolt::Config.new(boltdir, data)
@@ -294,10 +290,7 @@ describe Bolt::Config do
     it "does not attempt to expand private-key when key-data is specified" do
       key_data = { 'key-data' => 'key content' }
       data = {
-        'ssh' => {
-          'private-key' => key_data
-        },
-        'future' => true
+        'ssh' => { 'private-key' => key_data }
       }
 
       config = Bolt::Config.new(boltdir, data)
@@ -307,8 +300,7 @@ describe Bolt::Config do
 
     it "expands inventoryfile relative to boltdir" do
       data = {
-        'inventoryfile' => 'targets.yml',
-        'future' => true
+        'inventoryfile' => 'targets.yml'
       }
 
       config = Bolt::Config.new(boltdir, data)
