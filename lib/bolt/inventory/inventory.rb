@@ -270,9 +270,7 @@ module Bolt
 
       def add_facts(target, new_facts = {})
         @targets[target.name].add_facts(new_facts)
-        # rubocop:disable Style/GlobalVars
-        $future ? target : facts(target)
-        # rubocop:enable Style/GlobalVars
+        target
       end
 
       def facts(target)
