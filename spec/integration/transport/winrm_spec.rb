@@ -101,13 +101,13 @@ describe Bolt::Transport::WinRM do
     it "adheres to the specified timeout" do
       TCPServer.open(0) do |socket|
         port = socket.addr[1]
-        config.transports[:winrm]['connect-timeout'] = 2
+        conf = config.merge('connect-timeout' => 2)
 
         Timeout.timeout(3) do
           expect_node_error(Bolt::Node::ConnectError,
                             'CONNECT_ERROR',
                             /Timeout after \d+ seconds connecting to/) do
-            winrm.with_connection(make_target(host_: host, port_: port, conf: config)) {}
+            winrm.with_connection(make_target(host_: host, port_: port, conf: conf)) {}
           end
         end
       end
@@ -328,9 +328,16 @@ describe Bolt::Transport::WinRM do
     # when ruby_smb gem adds SMB v3 support, this will pass
     # test should be refactored to supply an SSL flag for winrm + smb and remove other SSL test
     it "will fail to upload a file with SMB with a host that requires SSL", winrm: true do
-      expect {
-        mk_config(ssl: true, user: user, password: password, 'file-protocol': 'smb', 'smb-port': smb_port)
-      }.to raise_error(Bolt::ValidationError)
+      conf = {
+        'winrm' => {
+          'ssl' => true,
+          'user' => user,
+          'password' => password,
+          'file-protocol' => 'smb',
+          'smb-port' => smb_port
+        }
+      }
+      expect { Bolt::Config.new(boltdir, conf) }.to raise_error(Bolt::ValidationError)
     end
 
     it "catches winrm-fs upload error", winrm: true do

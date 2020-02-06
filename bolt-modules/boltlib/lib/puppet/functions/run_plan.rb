@@ -174,8 +174,10 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       raise ArgumentError,
             "A plan with both a $nodes and $targets parameter cannot have either parameter specified " \
             "as the second positional argument to run_plan()."
+    end
+
     # Always populate a $nodes parameter over $targets
-    elsif nodes_param
+    if nodes_param
       if params['nodes']
         raise ArgumentError,
               "A plan's 'nodes' parameter may be specified as the second positional argument to " \

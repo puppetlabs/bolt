@@ -2034,7 +2034,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
         cli.parse
-        expect(cli.config.transports[:ssh]['private-key']).to eq('/bar/foo')
+        expect(cli.config.transports[:ssh]['private-key']).to match(%r{/bar/foo\z})
       end
     end
 
@@ -2109,7 +2109,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
         cli.parse
-        expect(cli.config.transports[:pcp]['token-file']).to eql('/path/to/token')
+        expect(cli.config.transports[:pcp]['token-file']).to match(%r{/path/to/token\z})
       end
     end
 
@@ -2117,8 +2117,8 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check --no-ssl])
         cli.parse
-        expect(cli.config.transports[:pcp]['cacert']).to eql('/path/to/cacert')
-        expect(cli.config.transports[:winrm]['cacert']).to eql('/path/to/winrm-cacert')
+        expect(cli.config.transports[:pcp]['cacert']).to match(%r{/path/to/cacert\z})
+        expect(cli.config.transports[:winrm]['cacert']).to match(%r{/path/to/winrm-cacert\z})
       end
     end
 

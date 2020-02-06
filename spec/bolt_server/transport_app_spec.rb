@@ -420,9 +420,9 @@ describe "BoltServer::TransportApp" do
         expect(last_response.status).to eq(200)
         result = JSON.parse(last_response.body)
         expect(result['status']).to eq('success')
-        expect(result['value']).to be_a(Array)
-        expect(result['value'].length).to eq(1)
-        expect(result['value'].first['status']).to eq('success')
+        expect(result['result']).to be_a(Array)
+        expect(result['result'].length).to eq(1)
+        expect(result['result'].first['status']).to eq('success')
       end
 
       context 'when the checks succeed, but at least one node failed' do

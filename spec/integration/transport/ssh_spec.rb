@@ -386,23 +386,6 @@ describe Bolt::Transport::SSH do
     end
   end
 
-  context "as bash user with no password", sudo: true do
-    let(:config) {
-      mk_config('host-key-check' => false, 'run-as' => 'root', user: bash_user, password: bash_password)
-    }
-    let(:target) { make_target }
-
-    it "returns a failed result when a temporary directory is created" do
-      contents = "#!/bin/sh\nwhoami"
-      with_tempfile_containing('script test', contents) do |file|
-        expect {
-          ssh.run_script(target, file.path, [])
-        }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{bash_user} was not provided for #{target.safe_name}")
-      end
-    end
-  end
-
   context "with no sudo-password", sudo: true, ssh: true do
     let(:config) {
       mk_config('host-key-check' => false, 'password' => password, 'run-as' => 'root',

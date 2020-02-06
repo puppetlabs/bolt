@@ -428,7 +428,7 @@ describe Bolt::Config do
       expect(config.transports[:ssh]).to include(
         'user' => 'bolt',
         'password' => 'bolt',
-        'private-key' => '/path/to/key'
+        'private-key' => %r{/path/to/key\z}
       )
     end
 

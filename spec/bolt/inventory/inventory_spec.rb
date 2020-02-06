@@ -642,19 +642,19 @@ describe Bolt::Inventory::Inventory do
           expect(target.user).to eq('messh')
           expect(target.password).to eq('youssh')
           expect(target.port).to eq('12345ssh')
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'connect-timeout' => 3,
             'disconnect-timeout' => 5,
             'tty' => true,
             'host-key-check' => false,
-            'private-key' => "anything",
             'tmpdir' => "/ssh",
             'run-as' => "root",
             'sudo-password' => "nothing",
             'password' => 'youssh',
             'port' => '12345ssh',
             "load-config" => true,
-            'user' => 'messh'
+            'user' => 'messh',
+            'private-key' => /anything\z/
           )
         end
 
@@ -664,17 +664,17 @@ describe Bolt::Inventory::Inventory do
           expect(target.user).to eq('mewinrm')
           expect(target.password).to eq('youwinrm')
           expect(target.port).to eq('12345winrm')
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'connect-timeout' => 5,
             'ssl' => false,
             'ssl-verify' => false,
             'tmpdir' => "/winrm",
-            'cacert' => "winrm.pem",
             'extensions' => ".py",
             'password' => 'youwinrm',
             'port' => '12345winrm',
             'user' => 'mewinrm',
-            'file-protocol' => 'winrm'
+            'file-protocol' => 'winrm',
+            'cacert' => /winrm.pem\z/
           )
         end
 
@@ -684,11 +684,11 @@ describe Bolt::Inventory::Inventory do
           expect(target.user).to be nil
           expect(target.password).to be nil
           expect(target.port).to be nil
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'task-environment' => "prod",
             'service-url' => "https://master",
-            'cacert' => "pcp.pem",
-            'token-file' => "token"
+            'cacert' => /pcp.pem\z/,
+            'token-file' => /token\z/
           )
         end
       end
@@ -962,12 +962,12 @@ describe Bolt::Inventory::Inventory do
           expect(target.user).to eq('messh')
           expect(target.password).to eq('youssh')
           expect(target.port).to eq('12345ssh')
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'connect-timeout' => 3,
             'disconnect-timeout' => 5,
             'tty' => true,
             'host-key-check' => false,
-            'private-key' => "anything",
+            'private-key' => /anything\z/,
             'tmpdir' => "/ssh",
             'run-as' => "root",
             'sudo-password' => "nothing",
@@ -984,12 +984,12 @@ describe Bolt::Inventory::Inventory do
           expect(target.user).to eq('mewinrm')
           expect(target.password).to eq('youwinrm')
           expect(target.port).to eq('12345winrm')
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'connect-timeout' => 5,
             'ssl' => false,
             'ssl-verify' => false,
             'tmpdir' => "/winrm",
-            'cacert' => "winrm.pem",
+            'cacert' => /winrm.pem\z/,
             'extensions' => ".py",
             'password' => 'youwinrm',
             'port' => '12345winrm',
@@ -1004,11 +1004,11 @@ describe Bolt::Inventory::Inventory do
           expect(target.user).to be nil
           expect(target.password).to be nil
           expect(target.port).to be nil
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'task-environment' => "prod",
             'service-url' => "https://master",
-            'cacert' => "pcp.pem",
-            'token-file' => "token"
+            'cacert' => /pcp.pem\z/,
+            'token-file' => /token\z/
           )
         end
       end
