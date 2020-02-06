@@ -214,9 +214,6 @@ nodes:
   - remote://my_aws_account
 ```
 
-- **[Generating inventory files](inventory_file_generating.md)**  
-  Use the `bolt-inventory-pdb` script to generate inventory files based on PuppetDB queries.
-
 **Related information**  
 
 [Naming tasks](writing_tasks.md#)
