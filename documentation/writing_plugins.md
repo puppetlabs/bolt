@@ -92,7 +92,6 @@ This task can, for example, be used to organize an inventory into multiple files
 ```yaml
 ---
 # inventory.yaml
-version: 2
 groups:
   - _plugin: yaml
     filepath: inventory.d/first_group.yaml
