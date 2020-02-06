@@ -19,14 +19,6 @@ describe Bolt::Transport::WinRM do
   include BoltSpec::Task
 
   let(:boltdir) { Bolt::Boltdir.new('.') }
-
-  def mk_config(conf)
-    stringified = conf.each_with_object({}) { |(k, v), coll| coll[k.to_s] = v }
-    # The default of 10 seconds seems to be too short to always succeed in AppVeyor.
-    stringified['connect-timeout'] ||= 20
-    Bolt::Config.new(boltdir, 'transport' => 'winrm', 'winrm' => stringified)
-  end
-
   let(:host) { conn_info('winrm')[:host] }
   let(:port) { conn_info('winrm')[:port] }
   let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 25986 }
@@ -40,27 +32,37 @@ describe Bolt::Transport::WinRM do
   let(:winrm) { Bolt::Transport::WinRM.new }
   let(:winrm_ssl) { Bolt::Transport::WinRM.new }
   let(:plugins) { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient) }
-  let(:data) { { 'transport' => 'winrm' } }
-  let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
-  let(:echo_script) { <<PS }
-foreach ($i in $args)
-{
-    Write-Host $i
-}
-PS
+  let(:transport) { 'winrm' }
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:target) { make_target }
+  let(:echo_script) { <<~PS }
+      foreach ($i in $args)
+      {
+          Write-Host $i
+      }
+    PS
 
+  def mk_config(conf)
+    conf = Bolt::Util.walk_keys(conf, &:to_s)
+    conf['connect-timeout'] ||= 20
+    conf
+  end
+  
   def make_target(host_: host, port_: port, conf: config)
-    t = inventory.get_target("#{host_}:#{port_}")
-    update_target(t, conf.transports[conf.transport.to_sym])
-    t
+    hash = {
+      'uri' => "#{host_}:#{port_}",
+      'config' => {
+        'transport' => transport,
+        transport => conf
+      }
+    }
+    Bolt::Target.from_hash(hash, inventory)
   end
 
   def update_target(targ, conf)
     transport_config = targ.options.merge(conf)
     targ.inventory_target.set_config(targ.transport, transport_config)
   end
-
-  let(:target) { make_target }
 
   def stub_winrm_to_raise(klass, message)
     shell = double('powershell')

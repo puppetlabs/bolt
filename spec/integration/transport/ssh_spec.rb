@@ -20,11 +20,6 @@ describe Bolt::Transport::SSH do
   include BoltSpec::Files
   include BoltSpec::Task
 
-  def mk_config(conf)
-    conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(Bolt::Boltdir.new('.'), 'ssh' => conf)
-  end
-
   let(:hostname) { conn_info('ssh')[:host] }
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
@@ -46,14 +41,18 @@ describe Bolt::Transport::SSH do
   let(:env_task) { "#!/bin/sh\necho $PT_data" }
   let(:inventory) { Bolt::Inventory.empty }
   let(:transport_conf) { {} }
+  let(:target) { make_target }
+
+  def mk_config(conf)
+    conf = Bolt::Util.walk_keys(conf, &:to_s)
+    Bolt::Config.new(Bolt::Boltdir.new('.'), 'ssh' => conf)
+  end
 
   def make_target(host_: hostname, port_: port, conf: config)
     t = inventory.get_target("#{host_}:#{port_}")
     t.inventory_target.set_config('ssh', conf.transports[conf.transport.to_sym].merge(transport_conf))
     t
   end
-
-  let(:target) { make_target }
 
   context 'with ssh', ssh: true do
     let(:target) { make_target(conf: no_host_key_check) }
