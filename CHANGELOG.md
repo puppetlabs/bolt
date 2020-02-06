@@ -1,5 +1,14 @@
 # Changelog
 
+## Bolt Next
+
+### Bug fixes
+
+* **Remove apply result hash from human output** ([#1585](https://github.com/puppetlabs/bolt/issues/1585))
+
+  Apply result hashes will no longer be displayed when using human output. Instead, a metrics message
+  will be shown.
+
 ## Bolt 1.48.0
 
 ### New features
