@@ -2258,11 +2258,8 @@ describe "Bolt::CLI" do
       end
 
       it 'does nothing when using inventory v2' do
-        with_tempfile_containing('inventory', YAML.dump(inventory_v2)) do |file|
-          cli = Bolt::CLI.new(%W[project migrate --inventoryfile #{file.path}])
-          expect(cli).not_to receive(:migrate_group)
-          cli.execute(cli.parse)
-        end
+        cli = Bolt::CLI.new([])
+        expect(cli.migrate_group(inventory_v2)).to eq(false)
       end
     end
 

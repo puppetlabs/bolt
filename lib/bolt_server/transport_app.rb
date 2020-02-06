@@ -255,7 +255,7 @@ module BoltServer
         'load-config' => false
       }
 
-      opts = defaults.merge(target_hash.clone).merge(overrides)
+      opts = defaults.merge(target_hash).merge(overrides)
 
       if opts['private-key-content']
         private_key_content = opts.delete('private-key-content')
@@ -295,15 +295,17 @@ module BoltServer
     end
 
     def make_winrm_target(target_hash)
-      overrides = {
-        'protocol' => 'winrm'
+      defaults = {
+        'ssl' => false,
+        'ssl-verify' => false
       }
 
-      opts = target_hash.clone.merge(overrides)
+      opts = defaults.merge(target_hash)
 
       data = {
         'uri' => target_hash['hostname'],
         'config' => {
+          'transport' => 'winrm',
           'winrm' => opts
         }
       }

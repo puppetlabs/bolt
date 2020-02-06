@@ -70,7 +70,7 @@ describe Bolt::Transport::Docker, docker: true do
   context 'when there is no host in the target' do
     # Directly create an inventory target, since Inventory#get_target doesn't allow
     # for passing config and would set the host as the name passed to it
-    let(:target) { Bolt::Inventory::Target.new({ 'name' => 'hostless' }, inventory) }
+    let(:target) { Bolt::Target.from_hash({ 'name' => 'hostless' }, inventory) }
 
     it 'errors' do
       expect { docker.run_command(target, 'whoami') }.to raise_error(/does not have a host/)

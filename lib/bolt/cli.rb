@@ -584,43 +584,31 @@ module Bolt
     end
 
     def migrate_project
-      inventory_file = config.inventoryfile || config.boltdir.inventory_file
+      inventory_file = config.inventoryfile || config.default_inventoryfile
       data = Bolt::Util.read_yaml_hash(inventory_file, 'inventory')
 
-      if collect_vals(data, 'nodes').compact.any?
-        migrate_group(data)
-        ok = File.write(inventory_file, data.to_yaml)
-      else
-        ok = true
-      end
+      migrated = migrate_group(data)
+      ok = File.write(inventory_file, data.to_yaml) if migrated
 
-      result = if ok
-                 "Successfully migrated Bolt project to latest version"
+      result = if migrated && ok
+                 "Successfully migrated Bolt project to latest version."
+               elsif !migrated
+                 "Bolt project already on latest version. Nothing to do."
                else
-                 "Could not migrate Bolt project to latest version"
+                 "Could not migrate Bolt project to latest version."
                end
       outputter.print_message result
 
       ok ? 0 : 1
     end
 
-    # Collect any values with the matching key
-    # This will be needed to properly migrate inventory files since v2 files
-    # no longer require a 'version' key
-    def collect_vals(data, key)
-      case data
-      when Array
-        data.flat_map { |d| collect_vals(d, key) }
-      when Hash
-        [data['nodes']] + collect_vals(data.values, key).compact
-      end
-    end
-
     # Walks an inventory hash and replaces all 'nodes' keys with 'targets' keys
     # and all 'name' keys nested in a 'targets' hash with 'uri' keys. Data is
     # modified in place.
     def migrate_group(group)
+      migrated = false
       if group.key?('nodes')
+        migrated = true
         targets = group['nodes'].map do |target|
           target['uri'] = target.delete('name') if target.is_a?(Hash)
           target
@@ -629,9 +617,9 @@ module Bolt
         group['targets'] = targets
       end
       (group['groups'] || []).each do |subgroup|
-        migrate_group(subgroup)
+        migrated ||= migrate_group(subgroup)
       end
-      nil
+      migrated
     end
 
     def install_puppetfile(config, puppetfile, modulepath)

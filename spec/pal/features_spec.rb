@@ -19,15 +19,8 @@ describe 'set_features function' do
   let(:analytics) { Bolt::Analytics::NoopClient.new }
   let(:executor) { Bolt::Executor.new(1, analytics) }
 
-  let(:data) {
-    {
-      'nodes' => %w[example],
-      'vars' => { 'pb' => 'jelly', 'mac' => 'cheese' }
-    }
-  }
   let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
-  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, analytics) }
-  let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+  let(:inventory) { Bolt::Inventory.empty }
   let(:target) { inventory.get_targets('example')[0] }
 
   it 'adds the feature to the target' do
