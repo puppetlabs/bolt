@@ -34,10 +34,7 @@ module Bolt
           @transport_logger = transport_logger
           @logger.debug("Initializing ssh connection to #{@target.safe_name}")
 
-          @sudo_password = @target.options['sudo-password']
-          # rubocop:disable Style/GlobalVars
-          @sudo_password ||= @target.password if $future
-          # rubocop:enable Style/GlobalVars
+          @sudo_password = @target.options['sudo-password'] || @target.password
 
           if target.options['private-key']&.instance_of?(String)
             begin
