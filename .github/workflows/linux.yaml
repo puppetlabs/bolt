@@ -3,10 +3,10 @@ name: Linux
 on:
   push:
     branches: [master]
-    paths-ignore: ['*.md']
+    paths-ignore: ['*.md', '*.erb']
   pull_request:
     type: [opened, reopened, edited]
-    paths-ignore: ['*.md']
+    paths-ignore: ['*.md', '*.erb']
 
 env:
   BOLT_SUDO_USER: true
@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
       - name: Install gems
         if: steps.cache.outputs.cache-hit != 'true'
         run: bundle install --jobs 4 --retry 3
@@ -68,7 +68,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
       - name: Install gems
         if: steps.cache.outputs.cache-hit != 'true'
         run: bundle install --jobs 4 --retry 3

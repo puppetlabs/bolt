@@ -3,10 +3,10 @@ name: Windows
 on:
   push:
     branches: [master]
-    paths-ignore: ['*.md']
+    paths-ignore: ['*.md', '*.erb']
   pull_request:
     type: [opened, reopened, edited]
-    paths-ignore: ['*.md']
+    paths-ignore: ['*.md', '*.erb']
 
 env:
   BOLT_WINRM_USER: roddypiper
@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: .bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
       - name: Cache modules
         id: modules
         uses: actions/cache@v1
@@ -78,7 +78,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: .bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
       - name: Cache modules
         id: modules
         uses: actions/cache@v1
