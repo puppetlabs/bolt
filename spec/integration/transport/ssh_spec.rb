@@ -409,16 +409,8 @@ describe Bolt::Transport::SSH do
                 user: user, password: password)
     }
     let(:target) { make_target }
-    after(:each) {
-      # rubocop:disable Style/GlobalVars
-      $future = nil
-      # rubocop:enable Style/GlobalVars
-    }
 
-    it "uses password as sudo-password when future is set" do
-      # rubocop:disable Style/GlobalVars
-      $future = true
-      # rubocop:enable Style/GlobalVars
+    it "uses password as sudo-password" do
       expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
     end
   end

@@ -138,27 +138,9 @@ describe 'run_plan' do
   end
 
   context 'with a plan with both a $nodes and $targets parameter' do
-    context 'with $future set' do
-      after(:each) do
-        # rubocop:disable Style/GlobalVars
-        $future = nil
-        # rubocop:enable Style/GlobalVars
-      end
-
-      it 'fails when using the second positional argument' do
-        # rubocop:disable Style/GlobalVars
-        $future = true
-        # rubocop:enable Style/GlobalVars
-        is_expected.to run.with_params('test::run_me_nodes_and_targets', 'target1')
-                          .and_raise_error(ArgumentError)
-      end
-    end
-
-    context 'with $future unset' do
-      it 'specifies the $nodes parameter using the second positional argument' do
-        is_expected.to run.with_params('test::run_me_nodes_and_targets', 'target1', 'targets' => 'target2')
-                          .and_return('target1')
-      end
+    it 'fails when using the second positional argument' do
+      is_expected.to run.with_params('test::run_me_nodes_and_targets', 'target1')
+                        .and_raise_error(ArgumentError)
     end
   end
 end

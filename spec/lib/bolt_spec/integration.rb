@@ -33,11 +33,6 @@ module BoltSpec
         cli.execute(opts)
       end
       output.string
-    ensure
-      # Ensure that $future global is unset
-      # rubocop:disable Style/GlobalVars
-      $future = nil
-      # rubocop:enable Style/GlobalVars
     end
 
     def run_cli_json(arguments, **opts)

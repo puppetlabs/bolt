@@ -8,11 +8,6 @@ describe Bolt::Plugin::Prompt do
   let(:prompt_data) { { '_plugin' => 'prompt', 'message' => 'Password Please' } }
   let(:invalid_prompt_data) { { '_plugin' => 'prompt' } }
   let(:password) { 'opensesame' }
-  after(:each) do
-    # rubocop:disable Style/GlobalVars
-    $future = nil
-    # rubocop:enable Style/GlobalVars
-  end
 
   it 'raises a validation error when no prompt message is provided' do
     expect { subject.validate_resolve_reference(invalid_prompt_data) }.to raise_error(Bolt::ValidationError)

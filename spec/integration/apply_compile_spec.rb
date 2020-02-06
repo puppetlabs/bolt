@@ -310,9 +310,8 @@ describe "passes parsed AST to the apply_catalog task" do
     end
 
     context 'with Bolt plan datatypes' do
-      let(:config) { File.join(__dir__, '../fixtures/configs/future.yml') }
       let(:inventory) { File.join(__dir__, '../fixtures/apply/inventory.yaml') }
-      let(:tflags) { %W[--no-host-key-check --configfile #{config} --inventoryfile #{inventory} --run-as root] }
+      let(:tflags) { %W[--no-host-key-check --inventoryfile #{inventory} --run-as root] }
 
       it 'serializes ResultSet objects in apply blocks' do
         result = run_cli_json(%w[plan run puppet_types::resultset] + config_flags)
