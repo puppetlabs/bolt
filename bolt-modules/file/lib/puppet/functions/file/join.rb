@@ -3,6 +3,7 @@
 # Join file paths.
 Puppet::Functions.create_function(:'file::join') do
   # @param paths The paths to join.
+  # @return The joined file path.
   # @example Join file paths
   #   file::join('./path', 'to/files')
   dispatch :join do

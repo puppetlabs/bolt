@@ -7,12 +7,15 @@ require 'bolt/task'
 # Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 # This function does nothing if the list of targets is empty.
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:run_task) do
   # Run a task.
   # @param task_name The task to run.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as', '_noop'.
+  # @param args A hash of arguments to the task. Can also include additional options.
+  # @option args [Boolean] _catch_errors Whether to catch raised errors.
+  # @option args [String] _run_as User to run as using privilege escalation.
+  # @option args [Boolean] _noop Run the task in noop mode if available.
   # @return A list of results, one entry per target.
   # @example Run a task as root
   #   run_task('facts', $targets, '_run_as' => 'root')
@@ -27,7 +30,10 @@ Puppet::Functions.create_function(:run_task) do
   # @param task_name The task to run.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.
-  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as', '_noop'.
+  # @param args A hash of arguments to the task. Can also include additional options.
+  # @option args [Boolean] _catch_errors Whether to catch raised errors.
+  # @option args [String] _run_as User to run as using privilege escalation.
+  # @option args [Boolean] _noop Run the task in noop mode if available.
   # @return A list of results, one entry per target.
   # @example Run a task
   #   run_task('facts', $targets, 'Gather OS facts')

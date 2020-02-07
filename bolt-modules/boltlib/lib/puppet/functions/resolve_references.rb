@@ -2,7 +2,7 @@
 
 require 'bolt/error'
 
-# Evaulates all _plugin references in a hash and returns the resolved reference data.
+# Evaluates all `_plugin` references in a hash and returns the resolved reference data.
 Puppet::Functions.create_function(:resolve_references) do
   # Resolve references.
   # @param references A hash of reference data to resolve.

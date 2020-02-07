@@ -3,6 +3,7 @@
 # Read a file and return its contents.
 Puppet::Functions.create_function(:'file::read', Puppet::Functions::InternalFunction) do
   # @param filename Absolute path or Puppet file path.
+  # @return The file's contents.
   # @example Read a file from disk
   #   file::read('/tmp/i_dumped_this_here')
   # @example Read a file from the modulepath

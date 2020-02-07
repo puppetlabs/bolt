@@ -2,10 +2,11 @@
 
 require 'bolt/error'
 
-# Set configuration options on a target
+# Set configuration options on a target.
 #
-# **NOTE:** Not available in apply block
-# **NOTE:** Only compatible with inventory v2
+# > **Note:** Not available in apply block
+#
+# > **Note:** Only compatible with inventory v2
 Puppet::Functions.create_function(:set_config) do
   # @param target The Target object to configure. See {get_targets}.
   # @param key_or_key_path The configuration setting to update.

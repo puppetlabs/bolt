@@ -5,18 +5,18 @@ require 'bolt/error'
 # Sets a particular feature to present on a target.
 #
 # Features are used to determine what implementation of a task should be run.
-# Currently supported features are
-# - powershell
-# - shell
-# - puppet-agent
+# Supported features are:
+# - `powershell`
+# - `shell`
+# - `puppet-agent`
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:set_feature) do
   # @param target The Target object to add features to. See {get_targets}.
   # @param feature The string identifying the feature.
   # @param value Whether the feature is supported.
   # @return The target with the updated feature
-  # @example Add the puppet-agent feature to a target
+  # @example Add the `puppet-agent` feature to a target
   #   set_feature($target, 'puppet-agent', true)
   dispatch :set_feature do
     param 'Target', :target

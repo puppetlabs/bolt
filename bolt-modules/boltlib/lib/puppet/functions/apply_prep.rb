@@ -2,15 +2,15 @@
 
 require 'bolt/task'
 
-# Installs the puppet-agent package on targets if needed, then collects facts,
+# Installs the `puppet-agent` package on targets if needed, then collects facts,
 # including any custom facts found in Bolt's modulepath. The package is
 # installed using either the configured plugin or the `task` plugin with the
 # `puppet_agent::install` task.
 #
-# Agent installation will be skipped if the target includes the 'puppet-agent' feature, either as a
+# Agent installation will be skipped if the target includes the `puppet-agent` feature, either as a
 # property of its transport (PCP) or by explicitly setting it as a feature in Bolt's inventory.
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:apply_prep) do
   # @param targets A pattern or array of patterns identifying a set of targets.
   # @example Prepare targets by name.

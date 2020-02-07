@@ -4,11 +4,13 @@ require 'bolt/error'
 
 # Runs the `plan` referenced by its name. A plan is autoloaded from `$MODULEROOT/plans`.
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction) do
   # Run a plan
   # @param plan_name The plan to run.
-  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
+  # @param args A hash of arguments to the plan. Can also include additional options.
+  # @option args [Boolean] _catch_errors Whether to catch raised errors.
+  # @option args [String] _run_as User to run as using privilege escalation.
   # @return [PlanResult] The result of running the plan. Undef if plan does not explicitly return results.
   # @example Run a plan
   #   run_plan('canary', 'command' => 'false', 'targets' => $targets, '_catch_errors' => true)
@@ -19,19 +21,21 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     return_type 'Boltlib::PlanResult'
   end
 
-  # Run a plan, specifying $nodes or $targets as a positional argument.
+  # Run a plan, specifying `$nodes` or `$targets` as a positional argument.
   #
-  # When running a plan with a $nodes parameter, the second positional argument will always specify
-  # the $nodes parameter. When running a plan with a $targets parameter and no $nodes parameter, the
-  # second positional argument specifies the $targets parameter.
+  # When running a plan with a `$nodes` parameter, the second positional argument will always specify
+  # the `$nodes` parameter. When running a plan with a `$targets `parameter and no `$nodes` parameter, the
+  # second positional argument specifies the `$targets` parameter.
   #
-  # Deprecation Warning: Starting with Bolt 2.0, a plan with both a $nodes and $targets parameter
-  # cannot specify either parameter using the second positional argument and will result in the plan
-  # failing to run.
+  # > **Deprecation Warning**: Starting with Bolt 2.0, a plan with both a `$nodes` and `$targets` parameter
+  # > cannot specify either parameter using the second positional argument and will result in the plan
+  # > failing to run.
   #
   # @param plan_name The plan to run.
-  # @param args Arguments to the plan. Can also include additional options: '_catch_errors', '_run_as'.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param args A hash of arguments to the plan. Can also include additional options.
+  # @option args [Boolean] _catch_errors Whether to catch raised errors.
+  # @option args [String] _run_as User to run as using privilege escalation.
   # @return [PlanResult] The result of running the plan. Undef if plan does not explicitly return results.
   # @example Run a plan
   #   run_plan('canary', $targets, 'command' => 'false')

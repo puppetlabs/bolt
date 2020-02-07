@@ -5,14 +5,16 @@ require 'bolt/error'
 # Uploads the given file or directory to the given set of targets and returns the result from each upload.
 # This function does nothing if the list of targets is empty.
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunction) do
   # Upload a file or directory.
   # @param source A source path, either an absolute path or a modulename/filename selector for a
   #               file or directory in $MODULEROOT/files.
   # @param destination An absolute path on the target(s).
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @param options A hash of additional options.
+  # @option options [Boolean] _catch_errors Whether to catch raised errors.
+  # @option options [String] _run_as User to run as using privilege escalation.
   # @return A list of results, one entry per target.
   # @example Upload a local file to Linux targets and change owner to 'root'
   #   upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, '_run_as' => 'root')
@@ -33,7 +35,9 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
   # @param destination An absolute path on the target(s).
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.
-  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @param options A hash of additional options.
+  # @option options [Boolean] _catch_errors Whether to catch raised errors.
+  # @option options [String] _run_as User to run as using privilege escalation.
   # @return A list of results, one entry per target.
   # @example Upload a file
   #   upload_file('/var/tmp/payload.tgz', '/tmp/payload.tgz', $targets, 'Uploading payload to unpack')

@@ -3,14 +3,16 @@
 # Uploads the given script to the given set of targets and returns the result of having each target execute the script.
 # This function does nothing if the list of targets is empty.
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFunction) do
   # Run a script.
   # @param script Path to a script to run on target. May be an absolute path or a modulename/filename selector for a
   #               file in $MODULEROOT/files.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param options Specify an array of arguments to the 'arguments' key to be passed to the script.
-  #                Additional options: '_catch_errors', '_run_as'.
+  # @param options A hash of additional options.
+  # @option options [Array[String]] arguments An array of arguments to be passed to the script.
+  # @option args [Boolean] _catch_errors Whether to catch raised errors.
+  # @option args [String] _run_as User to run as using privilege escalation.
   # @return A list of results, one entry per target.
   # @example Run a local script on Linux targets as 'root'
   #   run_script('/var/tmp/myscript', $targets, '_run_as' => 'root')
@@ -29,8 +31,10 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
   #               file in $MODULEROOT/files.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.
-  # @param options Specify an array of arguments to the 'arguments' key to be passed to the script.
-  #                Additional options: '_catch_errors', '_run_as'.
+  # @param options A hash of additional options.
+  # @option options [Array[String]] arguments An array of arguments to be passed to the script.
+  # @option args [Boolean] _catch_errors Whether to catch raised errors.
+  # @option args [String] _run_as User to run as using privilege escalation.
   # @return A list of results, one entry per target.
   # @example Run a script
   #   run_script('/var/tmp/myscript', $targets, 'Downloading my application')

@@ -4,7 +4,7 @@
 # output of the block if no errors are raised. Accepts an optional list of
 # error kinds to catch.
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:catch_errors) do
   # @param error_types An array of error types to catch
   # @param block The block of steps to catch errors on

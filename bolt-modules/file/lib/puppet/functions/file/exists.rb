@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-# check if a file exists
+# Check if a file exists.
 Puppet::Functions.create_function(:'file::exists', Puppet::Functions::InternalFunction) do
   # @param filename Absolute path or Puppet file path.
+  # @return Whether the file exists.
   # @example Check a file on disk
   #   file::exists('/tmp/i_dumped_this_here')
   # @example check a file from the modulepath

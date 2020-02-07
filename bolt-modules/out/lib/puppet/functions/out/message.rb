@@ -5,7 +5,7 @@
 # This will print a message to stdout when using the human output format,
 # and print to stderr when using the json output format
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:'out::message') do
   # Output a message.
   # @param message The message to output.

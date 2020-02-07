@@ -2,9 +2,9 @@
 
 require 'bolt/error'
 
-# Sets a variable { key => value } for a target.
+# Sets a variable `{ key => value }` for a target.
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:set_var) do
   # @param target The Target object to set the variable for. See {get_targets}.
   # @param key The key for the variable.
