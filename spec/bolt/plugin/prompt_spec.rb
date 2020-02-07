@@ -13,7 +13,7 @@ describe Bolt::Plugin::Prompt do
     expect { subject.validate_resolve_reference(invalid_prompt_data) }.to raise_error(Bolt::ValidationError)
   end
 
-  it 'concurrent delay prompts for data on STDERR when executed' do
+  it 'prompts for data on STDERR when executed' do
     allow(STDIN).to receive(:noecho).and_return(password)
     allow(STDERR).to receive(:puts)
     expect(STDERR).to receive(:print).with("#{prompt_data['message']}: ")

@@ -53,15 +53,6 @@ module Bolt
       end
     end
 
-    def setup_inventory(inventory)
-      config = Bolt::Config.default
-      plugins = Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new)
-      config.overwrite_transport_data(inventory['config']['transport'],
-                                      Bolt::Util.symbolize_top_level_keys(inventory['config']['transports']))
-
-      Bolt::Inventory.create_version(inventory['data'], config, plugins)
-    end
-
     def compile_catalog(request)
       pal_main = request['code_ast'] || request['code_string']
       target = request['target']

@@ -183,12 +183,10 @@ module Bolt
                                                                        type_by_reference: true,
                                                                        local_reference: false)
 
-      pdb_client_hash = @pdb_client.respond_to?(:config) ? @pdb_client.config.to_hash : {}
-
       scope = {
         code_ast: ast,
         modulepath: @modulepath,
-        pdb_config: pdb_client_hash,
+        pdb_config: @pdb_client.config.to_hash,
         hiera_config: @hiera_config,
         plan_vars: plan_vars,
         # This data isn't available on the target config hash

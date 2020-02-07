@@ -14,7 +14,7 @@ Puppet::Functions.create_function(:add_facts) do
   dispatch :add_facts do
     param 'Target', :target
     param 'Hash', :facts
-    return_type 'Variant[Target, Hash[String, Data]]'
+    return_type 'Target'
   end
 
   def add_facts(target, facts)

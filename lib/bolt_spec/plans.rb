@@ -185,10 +185,16 @@ module BoltSpec
     end
 
     # Provided as a class so expectations can be placed on it.
-    class MockPuppetDBClient; end
+    class MockPuppetDBClient
+      attr_reader :config
+
+      def initialize(config)
+        @config = config
+      end
+    end
 
     def puppetdb_client
-      @puppetdb_client ||= MockPuppetDBClient.new
+      @puppetdb_client ||= MockPuppetDBClient.new(Bolt::PuppetDB::Config.new({}))
     end
 
     def pal
