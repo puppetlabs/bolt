@@ -207,7 +207,7 @@ module Bolt
 
           # This should be handled by `get_targets`
           if @name == 'localhost'
-            group_data = Bolt::Inventory.localhost_defaults(group_data)
+            group_data = Bolt::Inventory::Inventory.localhost_defaults(group_data)
           end
 
           @group_cache = group_data

@@ -14,22 +14,14 @@ describe 'get_target' do
     Puppet[:tasks] = tasks_enabled
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       inventory.stubs(:version).returns(2)
-      inventory.stubs(:target_implementation_class).returns(Bolt::Target2)
+      inventory.stubs(:target_implementation_class).returns(Bolt::Target)
       example.run
     end
   end
 
-  context 'with inventory v1' do
-    it 'fails and reports that set_config is not available with inventory v1' do
-      inventory.stubs(:version).returns(1)
-      is_expected.to run
-        .with_params('foo').and_raise_error(/Plan language function 'get_target' cannot be used/)
-    end
-  end
-
-  context 'with inventory v2' do
+  context 'with inventory' do
     let(:hostname) { 'foo.example.com ' }
-    let(:target) { Bolt::Target2.new(nil, hostname) }
+    let(:target) { Bolt::Target.new(hostname, nil) }
     let(:groupname) { 'all' }
 
     it 'with given uri' do

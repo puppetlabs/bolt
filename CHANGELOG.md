@@ -1,5 +1,13 @@
 # Changelog
 
+## Bolt 2.0
+
+### Removals
+
+* **Inventory v1 has been removed** ([#1567](https://github.com/puppetlabs/bolt/issues/1567))
+
+  Inventory v1 is no longer supported by Bolt and has been removed. The inventory now defaults to v2.
+
 ## Bolt 1.48.0
 
 ### New features

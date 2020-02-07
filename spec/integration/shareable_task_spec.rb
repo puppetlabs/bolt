@@ -16,7 +16,7 @@ describe "Shareable tasks with files", bash: true do
     expect(files.count).to eq(4)
     expect(files[0]).to match(%r{^174 .*/shareable/tasks/unknown_file.json$})
     expect(files[1]).to match(%r{^236 .*/shareable/tasks/list.sh})
-    expect(files[2]).to match(%r{^310 .*/results/lib/puppet/functions/results/make_result.rb$})
+    expect(files[2]).to match(%r{^398 .*/results/lib/puppet/functions/results/make_result.rb$})
     expect(files[3]).to match(%r{^43 .*/error/tasks/fail.sh$})
   end
 

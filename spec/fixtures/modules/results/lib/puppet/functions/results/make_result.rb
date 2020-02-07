@@ -8,7 +8,9 @@ Puppet::Functions.create_function(:'results::make_result') do
   end
 
   def create(uri, value)
-    target = Bolt::Target.new(uri)
+    inventory = Puppet.lookup(:bolt_inventory)
+    inventory.get_target(uri)
+    target = Bolt::Target.new(uri, inventory)
     Bolt::Result.new(target, value: value)
   end
 end

@@ -12,7 +12,8 @@ require 'yaml'
 describe "Bolt::CLI" do
   include BoltSpec::Files
   include BoltSpec::Task
-  let(:target) { Bolt::Target.new('foo') }
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:target) { inventory.get_target('foo') }
 
   before(:each) do
     outputter = Bolt::Outputter::Human.new(false, false, false, StringIO.new)
@@ -1526,7 +1527,7 @@ describe "Bolt::CLI" do
             end
 
             context "when all targets use the PCP transport" do
-              let(:target) { Bolt::Target.new('pcp://foo') }
+              let(:target) { inventory.get_target('pcp://foo') }
               let(:task_t) { task_type(task_name, /\A\z/, nil) }
 
               it "runs the task even when it is not installed locally" do
@@ -2235,7 +2236,6 @@ describe "Bolt::CLI" do
       end
       let(:inventory_v2) do
         {
-          "version" => 2,
           "name" => "all",
           "groups" => [{
             "name" => "group1",
@@ -2258,13 +2258,8 @@ describe "Bolt::CLI" do
       end
 
       it 'does nothing when using inventory v2' do
-        inventory_v1['version'] = 2
-        with_tempfile_containing('inventory', YAML.dump(inventory_v1)) do |file|
-          contents = File.read(file)
-          cli = Bolt::CLI.new(%W[project migrate --inventoryfile #{file.path}])
-          cli.execute(cli.parse)
-          expect(File.read(file)).to eq(contents)
-        end
+        cli = Bolt::CLI.new([])
+        expect(cli.migrate_group(inventory_v2)).to eq(false)
       end
     end
 

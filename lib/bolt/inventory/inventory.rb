@@ -1,25 +1,24 @@
 # frozen_string_literal: true
 
-require 'bolt/inventory/group2'
+require 'bolt/inventory/group'
 require 'bolt/inventory/target'
 
 module Bolt
   class Inventory
-    class Inventory2
+    class Inventory
       attr_reader :targets, :plugins, :config
-      # This uses "targets" in the message instead of "nodes"
       class WildcardError < Bolt::Error
         def initialize(target)
           super("Found 0 targets matching wildcard pattern #{target}", 'bolt.inventory/wildcard-error')
         end
       end
 
-      def initialize(data, config = nil, plugins: nil)
+      def initialize(data, config = nil, plugins:)
         @logger = Logging.logger[self]
         # Config is saved to add config options to targets
         @config = config || Bolt::Config.default
         @data = data || {}
-        @groups = Group2.new(@data.merge('name' => 'all'), plugins)
+        @groups = Group.new(@data.merge('name' => 'all'), plugins)
         @plugins = plugins
         @group_lookup = {}
         # The targets hash is the canonical source for all targets in inventory
@@ -37,7 +36,7 @@ module Bolt
       end
 
       def target_implementation_class
-        Bolt::Target2
+        Bolt::Target
       end
 
       def collect_groups
@@ -84,6 +83,20 @@ module Bolt
         }
       end
 
+      def self.localhost_defaults(data)
+        defaults = {
+          'config' => {
+            'transport' => 'local',
+            'local' => { 'interpreters' => { '.rb' => RbConfig.ruby } }
+          },
+          'features' => ['puppet-agent']
+        }
+        data = Bolt::Util.deep_merge(defaults, data)
+        # If features is an empty array deep_merge won't add the puppet-agent
+        data['features'] += ['puppet-agent'] if data['features'].empty?
+        data
+      end
+
       #### PRIVATE ####
       def group_data_for(target_name)
         @groups.group_collect(target_name)
@@ -115,7 +128,7 @@ module Bolt
       private :resolve_name
 
       def expand_targets(targets)
-        if targets.is_a? Bolt::Target2
+        if targets.is_a? Bolt::Target
           targets
         elsif targets.is_a? Array
           targets.map { |tish| expand_targets(tish) }
@@ -125,11 +138,11 @@ module Bolt
             ts = resolve_name(name)
             ts.map do |t|
               # If the target doesn't exist, evaluate it from the inventory.
-              # Then return a Bolt::Target2.
+              # Then return a Bolt::Target.
               unless @targets.key?(t)
                 @targets[t] = create_target_from_inventory(t)
               end
-              Bolt::Target2.new(t, self)
+              Bolt::Target.new(t, self)
             end
           end
         end
@@ -182,8 +195,8 @@ module Bolt
 
       # Add a brand new target, overriding any existing target with the same
       # name. This method does not honor target config from the inventory. This
-      # is used when Target.new is called from a plan.
-      def create_target_from_plan(data)
+      # is used when Target.new is called from a plan or with a data hash.
+      def create_target_from_hash(data)
         # If target already exists, delete old and replace with new, otherwise add to new to all group
         new_target = Bolt::Inventory::Target.new(data, self)
         existing_target = @targets.key?(new_target.name)

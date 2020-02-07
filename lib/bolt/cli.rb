@@ -584,27 +584,18 @@ module Bolt
     end
 
     def migrate_project
-      if inventory.version == 2
-        ok = true
-      else
-        inventory_file = config.inventoryfile || config.boltdir.inventory_file
+      inventory_file = config.inventoryfile || config.default_inventoryfile
+      data = Bolt::Util.read_yaml_hash(inventory_file, 'inventory')
 
-        begin
-          Bolt::Util.file_stat(inventory_file)
-        rescue Errno::ENOENT
-          raise Bolt::FileError.new("The inventory file '#{inventory_file}' does not exist", inventory_file)
-        end
+      migrated = migrate_group(data)
+      ok = File.write(inventory_file, data.to_yaml) if migrated
 
-        inv = YAML.safe_load(File.open(inventory_file))
-        migrate_group(inv)
-
-        ok = File.write(inventory_file, { 'version' => 2 }.merge(inv).to_yaml)
-      end
-
-      result = if ok
-                 "Successfully migrated Bolt project to latest version"
+      result = if migrated && ok
+                 "Successfully migrated Bolt project to latest version."
+               elsif !migrated
+                 "Bolt project already on latest version. Nothing to do."
                else
-                 "Could not migrate Bolt project to latest version"
+                 "Could not migrate Bolt project to latest version."
                end
       outputter.print_message result
 
@@ -615,7 +606,9 @@ module Bolt
     # and all 'name' keys nested in a 'targets' hash with 'uri' keys. Data is
     # modified in place.
     def migrate_group(group)
+      migrated = false
       if group.key?('nodes')
+        migrated = true
         targets = group['nodes'].map do |target|
           target['uri'] = target.delete('name') if target.is_a?(Hash)
           target
@@ -624,9 +617,9 @@ module Bolt
         group['targets'] = targets
       end
       (group['groups'] || []).each do |subgroup|
-        migrate_group(subgroup)
+        migrated ||= migrate_group(subgroup)
       end
-      nil
+      migrated
     end
 
     def install_puppetfile(config, puppetfile, modulepath)

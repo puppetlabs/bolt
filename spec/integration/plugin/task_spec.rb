@@ -59,16 +59,15 @@ describe 'using the task plugin' do
     }
 
     let(:inventory) {
-      { 'version' => 2,
-        'targets' => [
-          { 'uri' => 'node1',
-            'config' => {
-              'ssh' => {
-                'user' => 'me',
-                'password' => plugin
-              }
-            } }
-        ] }
+      { 'targets' => [
+        { 'uri' => 'node1',
+          'config' => {
+            'ssh' => {
+              'user' => 'me',
+              'password' => plugin
+            }
+          } }
+      ] }
     }
 
     it 'supports a config lookup' do
@@ -137,8 +136,7 @@ describe 'using the task plugin' do
     }
 
     let(:inventory) {
-      { 'version' => 2,
-        'targets' => [plugin] }
+      { 'targets' => [plugin] }
     }
     it 'supports a target lookup' do
       output = run_cli(['plan', 'run', 'test_plan', '--boltdir', boltdir])

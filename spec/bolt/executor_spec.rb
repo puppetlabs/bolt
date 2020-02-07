@@ -5,6 +5,7 @@ require 'bolt_spec/task'
 require 'bolt_spec/event_collector'
 require 'bolt/executor'
 require 'bolt/target'
+require 'bolt/inventory'
 
 describe "Bolt::Executor" do
   include BoltSpec::Task
@@ -35,7 +36,8 @@ describe "Bolt::Executor" do
     }
   end
 
-  let(:targets) { [Bolt::Target.new("target1"), Bolt::Target.new("target2")] }
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:targets) { inventory.get_targets(%w[target1 target2]) }
   let(:node_results) { mock_node_results }
   let(:ssh) { executor.transport('ssh') }
 
@@ -313,8 +315,8 @@ describe "Bolt::Executor" do
 
     context 'with batched execution with more than one target' do
       let(:pcp) { executor.transport('pcp') }
-      let(:target_1) { Bolt::Target.new('pcp://node1').update_conf(Bolt::Config.default.transport_conf) }
-      let(:target_2) { Bolt::Target.new('pcp://node2').update_conf(Bolt::Config.default.transport_conf) }
+      let(:target_1) { inventory.get_target('pcp://node1') }
+      let(:target_2) { inventory.get_target('pcp://node2') }
       let(:targets) { [target_1, target_2] }
 
       it 'partitions failures and successes by batch' do
@@ -396,7 +398,7 @@ describe "Bolt::Executor" do
 
   context "targets with different protocols" do
     let(:targets) {
-      [Bolt::Target.new('ssh://node1'), Bolt::Target.new('winrm://node2'), Bolt::Target.new('pcp://node3')]
+      inventory.get_targets(['ssh://node1', 'winrm://node2', 'pcp://node3'])
     }
 
     it "returns ensures that every target has a result, no matter what" do
@@ -415,7 +417,7 @@ describe "Bolt::Executor" do
 
   context "with concurrency 2" do
     let(:targets) {
-      [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
+      inventory.get_targets(%w[node1 node2 node3])
     }
 
     let(:executor) { Bolt::Executor.new(2, analytics) }
@@ -459,7 +461,7 @@ describe "Bolt::Executor" do
 
   context "with concurrency 0" do
     let(:targets) {
-      [Bolt::Target.new('node1'), Bolt::Target.new('node2')]
+      inventory.get_targets(%w[node1 node2])
     }
 
     let(:executor) { Bolt::Executor.new(0) }
@@ -487,10 +489,7 @@ describe "Bolt::Executor" do
 
   context 'reporting analytics data' do
     let(:targets) {
-      [Bolt::Target.new('ssh://node1'),
-       Bolt::Target.new('ssh://node2'),
-       Bolt::Target.new('winrm://node3'),
-       Bolt::Target.new('pcp://node4')]
+      inventory.get_targets(['ssh://node1', 'ssh://node2', 'winrm://node3', 'pcp://node4'])
     }
 
     it 'reports one event for each transport used' do

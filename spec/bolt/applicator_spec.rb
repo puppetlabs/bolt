@@ -10,8 +10,8 @@ require 'bolt/target'
 
 describe Bolt::Applicator do
   let(:uri) { 'foobar' }
-  let(:target) { Bolt::Target.new(uri) }
-  let(:inventory) { Bolt::Inventory.new(nil) }
+  let(:target) { inventory.get_target(uri) }
+  let(:inventory) { Bolt::Inventory.empty }
   let(:executor) { Bolt::Executor.new }
   let(:config) do
     Bolt::PuppetDB::Config.new('server_urls' => 'https://localhost:8081',
@@ -103,6 +103,7 @@ describe Bolt::Applicator do
     expect(@log_output.readlines).to eq(
       [
         " DEBUG  Bolt::Executor : Started with 1 max thread(s)\n",
+        " DEBUG  Bolt::Inventory::Inventory : Did not find config for #{target.uri} in inventory\n",
         " DEBUG  Bolt::Applicator : #{target.uri}: A message\n",
         "NOTICE  Bolt::Applicator : #{target.uri}: Stuff happened\n"
       ]
@@ -164,7 +165,7 @@ describe Bolt::Applicator do
         '/tmp/sure' => []
       }.map { |name, events| { "File[#{name}]" => { 'failed' => !events.empty?, 'events' => events } } }
 
-      targets = [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
+      targets = inventory.get_targets(%w[node1 node2 node3])
       results = targets.zip(resources, %w[failed failed success]).map do |target, res, status|
         Bolt::Result.new(target, value: { 'status' => status, 'resource_statuses' => res, 'metrics' => {} })
       end
@@ -197,7 +198,7 @@ describe Bolt::Applicator do
         end
       end
 
-      targets = [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
+      targets = inventory.get_targets(%w[node1 node2 node3])
       allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task) do |_, batch|
         Bolt::Result.new(batch.first, value: report)
       end
@@ -281,6 +282,7 @@ describe Bolt::Applicator do
       expect(@log_output.readlines).to eq(
         [
           " DEBUG  Bolt::Executor : Started with 1 max thread(s)\n",
+          " DEBUG  Bolt::Inventory::Inventory : Did not find config for #{target.uri} in inventory\n",
           " DEBUG  Bolt::Applicator : #{target.uri}: A message\n",
           "NOTICE  Bolt::Applicator : #{target.uri}: Stuff happened\n"
         ]
@@ -349,7 +351,7 @@ describe Bolt::Applicator do
           '/tmp/sure' => []
         }.map { |name, events| { "File[#{name}]" => { 'failed' => !events.empty?, 'events' => events } } }
 
-        targets = [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
+        targets = inventory.get_targets(%w[node1 node2 node3])
         results = targets.zip(resources, %w[failed failed success]).map do |target, res, status|
           Bolt::Result.new(target, value: { 'status' => status, 'resource_statuses' => res, 'metrics' => {} })
         end
@@ -382,7 +384,7 @@ describe Bolt::Applicator do
           end
         end
 
-        targets = [Bolt::Target.new('node1'), Bolt::Target.new('node2'), Bolt::Target.new('node3')]
+        targets = inventory.get_targets(%w[node1 node2 node3])
         allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task) do |_, batch|
           Bolt::Result.new(batch.first, value: report)
         end

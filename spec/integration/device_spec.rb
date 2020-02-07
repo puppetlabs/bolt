@@ -27,8 +27,8 @@ describe "devices" do
     def agent_version_inventory
       { 'groups' => [
         { 'name' => 'agent_targets',
-          'nodes' => [
-            { 'name' => "ssh://#{conn_info('ssh')[:host]}",
+          'targets' => [
+            { 'uri' => "ssh://#{conn_info('ssh')[:host]}",
               'alias' => 'puppet_6',
               'config' => { 'ssh' => { 'port' => '20024' } } }
           ] }
@@ -42,8 +42,8 @@ describe "devices" do
 
     let(:device_inventory) do
       device_group = { 'name' => 'device_targets',
-                       'nodes' => [
-                         { 'name' => 'fake_device1',
+                       'targets' => [
+                         { 'uri' => 'fake_device1',
                            'config' => {
                              'transport' => 'remote',
                              'remote' => {

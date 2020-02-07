@@ -26,7 +26,6 @@ describe "running the facts plan" do
       data = result['value'][0]
 
       expect(data['status']).to eq('success')
-      expect(data['result'].size).to eq(1)
       expect(data['result']['os']['name']).to be
       expect(data['result']['os']['family']).to match(/RedHat|Debian/)
       expect(data['result']['os']['release']).to be
@@ -41,7 +40,6 @@ describe "running the facts plan" do
       data = result['value'][0]
 
       expect(data['status']).to eq('success')
-      expect(data['result'].size).to eq(1)
       expect(data['result']['os']['name']).to eq('windows')
       expect(data['result']['os']['family']).to eq('windows')
       expect(data['result']['os']['release']).to be

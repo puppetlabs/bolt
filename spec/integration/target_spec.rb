@@ -43,7 +43,7 @@ describe "when running a plan that creates targets", ssh: true do
                  host: info[:host] }.to_json
       run_cli(['plan', 'run', 'results::test_printing', "--params", params] + config_flags)
       logs = @log_output.readlines.join('')
-      regex = Regexp.new(Regexp.quote('Connected to Target(\'localhost\', {"user"=>"bolt", "port"=>20022})'))
+      regex = Regexp.new(Regexp.quote("Connected to #{info[:host]}"))
       expect(logs).to match(regex)
     end
   end

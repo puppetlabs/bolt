@@ -8,25 +8,15 @@ describe 'set_config' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('inventory') }
-  let(:target) { Bolt::Target2.new(nil, 'example') }
+  let(:target) { Bolt::Target.new('example') }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
       inventory.stubs(:version).returns(2)
-      inventory.stubs(:target_implementation_class).returns(Bolt::Target2)
+      inventory.stubs(:target_implementation_class).returns(Bolt::Target)
       example.run
-    end
-  end
-
-  context 'with inventory v1' do
-    let(:target) { Bolt::Target.new('target1') }
-    it 'fails and reports that set_config is not available with inventoy v1' do
-      inventory.stubs(:version).returns(1)
-      is_expected.to run
-        .with_params(target, 'ssh', 'name' => 'foo')
-        .and_raise_error(/Plan language function 'set_config' cannot be used/)
     end
   end
 

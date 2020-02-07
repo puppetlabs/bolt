@@ -14,8 +14,8 @@ describe 'running with an inventory file', reset_puppet_settings: true, ssh: tru
 
   let(:conn) { conn_info('ssh') }
   let(:inventory) do
-    { 'nodes' => [
-      { 'name' => conn[:host],
+    { 'targets' => [
+      { 'uri' => conn[:host],
         'config' => {
           'transport' => conn[:protocol],
           conn[:protocol] => {
@@ -24,14 +24,14 @@ describe 'running with an inventory file', reset_puppet_settings: true, ssh: tru
             'password' => conn[:password]
           }
         } },
-      { 'name' => 'remote://simple.example.com',
+      { 'uri' => 'remote://simple.example.com',
         'config' => {
           'remote' => {
             'run-on' => conn[:host],
             'token' => 'token_val'
           }
         } },
-      { 'name' => 'https://www.example.com',
+      { 'uri' => 'https://www.example.com',
         'config' => {
           'transport' => 'remote',
           'remote' => { 'run-on': conn[:host] }

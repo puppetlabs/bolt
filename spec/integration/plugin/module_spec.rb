@@ -39,7 +39,7 @@ describe 'using module based plugins' do
     PLAN
   end
 
-  let(:inventory) { { "version" => 2 } }
+  let(:inventory) { {} }
 
   around(:each) do |example|
     with_boltdir(inventory: inventory, config: config, plan: plan) do |boltdir|
@@ -59,16 +59,15 @@ describe 'using module based plugins' do
     }
 
     let(:inventory) {
-      { 'version' => 2,
-        'targets' => [
-          { 'uri' => 'node1',
-            'config' => {
-              'ssh' => {
-                'user' => 'me',
-                'password' => plugin
-              }
-            } }
-        ] }
+      { 'targets' => [
+        { 'uri' => 'node1',
+          'config' => {
+            'ssh' => {
+              'user' => 'me',
+              'password' => plugin
+            }
+          } }
+      ] }
     }
 
     it 'supports a config lookup' do
@@ -135,16 +134,15 @@ describe 'using module based plugins' do
     }
 
     let(:inventory) {
-      { 'version' => 2,
-        'targets' => [
-          { 'uri' => 'node1',
-            'config' => {
-              'transport' => 'remote',
-              'remote' => {
-                'data' => plugin
-              }
-            } }
-        ] }
+      { 'targets' => [
+        { 'uri' => 'node1',
+          'config' => {
+            'transport' => 'remote',
+            'remote' => {
+              'data' => plugin
+            }
+          } }
+      ] }
     }
 
     let(:plan) do

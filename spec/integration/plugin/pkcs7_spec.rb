@@ -127,19 +127,18 @@ describe 'using the pkcs7 plugin' do
   end
 
   it 'decrypts an inventory file' do
-    inventory = { 'version' => 2,
-                  'targets' => [
-                    { 'uri' => 'node1',
-                      'config' => {
-                        'ssh' => {
-                          'user' => 'me',
-                          'password' => {
-                            '_plugin' => 'pkcs7',
-                            'encrypted_value' => encrypted_ssshhh
-                          }
-                        }
-                      } }
-                  ] }
+    inventory = { 'targets' => [
+      { 'uri' => 'node1',
+        'config' => {
+          'ssh' => {
+            'user' => 'me',
+            'password' => {
+              '_plugin' => 'pkcs7',
+              'encrypted_value' => encrypted_ssshhh
+            }
+          }
+        } }
+    ] }
     plan = <<~PLAN
       plan passw() {
         return(get_targets('node1')[0].password)

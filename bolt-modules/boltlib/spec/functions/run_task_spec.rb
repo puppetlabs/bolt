@@ -27,7 +27,7 @@ end
 describe 'run_task' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
-  let(:inventory) { mock('Bolt::Inventory') }
+  let(:inventory) { Bolt::Inventory.empty }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
@@ -35,7 +35,6 @@ describe 'run_task' do
     executor.stubs(:noop).returns(false)
 
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
-      inventory.stubs(:version).returns(1)
       example.run
     end
   end
@@ -48,8 +47,8 @@ describe 'run_task' do
     let(:hostname) { 'a.b.com' }
     let(:hostname2) { 'x.y.com' }
     let(:message) { 'the message' }
-    let(:target) { Bolt::Target.new(hostname) }
-    let(:target2) { Bolt::Target.new(hostname2) }
+    let(:target) { inventory.get_target(hostname) }
+    let(:target2) { inventory.get_target(hostname2) }
     let(:result) { Bolt::Result.new(target, value: { '_output' => message }) }
     let(:result2) { Bolt::Result.new(target2, value: { '_output' => message }) }
     let(:result_set) { Bolt::ResultSet.new([result]) }
@@ -329,12 +328,8 @@ describe 'run_task' do
   context 'it validates the task parameters' do
     let(:task_name) { 'Test::Params' }
     let(:hostname) { 'a.b.com' }
-    let(:target) { Bolt::Target.new(hostname) }
+    let(:target) { inventory.get_target(hostname) }
     let(:task_params) { {} }
-
-    before :each do
-      inventory.expects(:get_targets).with(hostname).returns([target])
-    end
 
     it 'errors when unknown parameters are specified' do
       task_params.merge!(
