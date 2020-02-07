@@ -100,7 +100,7 @@ targets:
 
 When searching for a target's configuration data, Bolt matches a target's URI with its name. Bolt uses depth-first search and uses the first value it finds.
 
-The `config` values for a target object, such as `host`, `transport`, and `port`, take precedent and override any `config` values at the group level. Bolt merges non-`config` data in the target object, such as `alias`, `facts`, and `vars`, with data in the group object.
+The `config` values for a target object, such as `host`, `transport`, and `port`, take precedent and override any `config` values at the group level. Bolt merges non-`config` data in the target object, such as `features`, `facts`, and `vars`, with data in the group object.
 
 ```yaml
 version: 2
@@ -129,8 +129,8 @@ groups:
     config: 
       ssh: 
         password: password
-    facts: 
-      operatingsystem: CentOS
+facts: 
+  operatingsystem: CentOS
 
 ```
 

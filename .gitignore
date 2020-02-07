@@ -23,6 +23,7 @@
 /.bundle/
 /vendor/bundle
 /lib/bundler/man/
+/vendored/
 
 Gemfile.lock
 Gemfile.local
