@@ -2,27 +2,25 @@
 
 require 'spec_helper'
 require 'bolt/executor'
-require 'bolt/target'
+require 'bolt/inventory'
 
 describe 'set_var' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
-  let(:inventory) { mock('inventory') }
-  let(:target) { Bolt::Target.new('example') }
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:target) { inventory.get_target('example') }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
-      inventory.stubs(:version).returns(2)
-      inventory.stubs(:target_implementation_class).returns(Bolt::Target)
       example.run
     end
   end
 
   it 'should set a variable on a target' do
-    inventory.expects(:set_var).with(target, 'a' => 'b').returns(target)
     is_expected.to run.with_params(target, 'a', 'b').and_return(target)
+    expect(target.vars).to include('a' => 'b')
   end
 
   it 'errors when passed invalid data types' do
@@ -33,8 +31,6 @@ describe 'set_var' do
 
   it 'reports the call to analytics' do
     executor.expects(:report_function_call).with('set_var')
-    inventory.expects(:set_var).with(target, 'a' => 'b').returns(target)
-
     is_expected.to run.with_params(target, 'a', 'b').and_return(target)
   end
 
