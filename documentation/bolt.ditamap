@@ -1,34 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
 <map id="boltmap" title="Bolt">
-    <topicref href="bolt.md" format="markdown">
-        <topicref href="CHANGELOG.md" format="markdown"/>
+    <topicref href="bolt.md" format="markdown" linking="targetonly">
+        <topicref navtitle="Changelog" href="https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md" format="markdown" scope="external" />
         <topicref href="bolt_versioning.md" format="markdown"/>
+        <topicref href="migrating_inventory_files.md" format="markdown"/> <!-- Insert Upgrading to Bolt 2.0 here -->
         <topicref href="bolt_known_issues.md" format="markdown"/>
     </topicref>
-    <topicref href="bolt_installing.md" format="markdown"/>
-    <topicref href="running_bolt.md" format="markdown">
-        <topicref href="running_bolt_commands.md" format="markdown"/>
-        <topicref href="bolt_options.md" format="markdown"/>
-        <topicref href="bolt_command_reference.md" format="markdown"/>
+    <topicref href="bolt_installing.md" format="markdown" linking="targetonly">
+        <topicref href="running_bolt_in_docker.md" format="markdown"/>
     </topicref>
     <topicref href="getting_started_with_bolt.md" format="markdown"/>
-    <topicref href="writing_tasks_and_plans.md" format="markdown">
-        <topicref href="inspecting_tasks_and_plans.md" format="markdown"/>
-        <topicref href="bolt_running_tasks.md" format="markdown"/>
-        <topicref href="bolt_running_plans.md" format="markdown"/>
-        <topicref href="bolt_installing_modules.md" format="markdown"/>
-        <topicref href="directory_structure.md" format="markdown"/>
-        <topicref href="writing_tasks.md" format="markdown"/>
-        <topicref href="writing_plans.md" format="markdown">
-            <topicref href="plan_functions.md" format="markdown"/>
-            <topicref href="applying_manifest_blocks.md" format="markdown"/>
-        </topicref>
-        <topicref href="writing_yaml_plans.md" format="markdown"/>
-    </topicref>
-    <topicref href="configuring_bolt.md" format="markdown">
+    <topicref href="configuring_bolt.md" format="markdown" linking="targetonly">
         <topicref href="bolt_project_directories.md" format="markdown"/>
+        <topicref href="inventory_file_v2.md" format="markdown" linking="targetonly"> 
+            <topicref href="using_plugins.md" format="markdown"/>
+            <topicref href="writing_plugins.md" format="markdown"/>
+        </topicref>
+        <topicref href="bolt_installing_modules.md" format="markdown">
+            <topicmeta>
+                <shortdesc>Tasks and plans are packaged in Puppet modules, so you can install them as you would any module and manage them with a Puppetfile.</shortdesc>
+            </topicmeta>
+        </topicref>
+        <topicref href="directory_structure.md" format="markdown">
+            <topicmeta>
+                <shortdesc>Puppet tasks, plans, functions, classes and types must exist inside a Puppet, module in order for Bolt to load them. Bolt loads modules by searching for module directories on the modulepath.</shortdesc>
+            </topicmeta>
+        </topicref>
     </topicref>
+    <topicref href="running_bolt_commands.md" format="markdown" linking="targetonly"/>
+    <topicref href="plans.md" format="markdown">
+        <topicref href="inspecting_plans.md" format="markdown">
+            <topicmeta>
+                <shortdesc>Before you run a plan in your environment, inspect the plan to determine what effect it will have on your targets.</shortdesc>
+            </topicmeta>
+        </topicref>
+        <topicref href="bolt_running_plans.md" format="markdown">
+            <topicmeta>
+                <shortdesc>Bolt can run plans, allowing multiple scripts, tasks and Bolt commands to be tied together.</shortdesc>
+            </topicmeta>
+        </topicref>
+        <topicref href="writing_yaml_plans.md" format="markdown">
+            <topicmeta>
+                <shortdesc>YAML plans run a list of steps in order, which allows you to define simple workflows. Steps can contain embedded Puppet code expressions to add logic where necessary.</shortdesc>
+            </topicmeta>
+        </topicref>
+        <topicref href="writing_plans.md" format="markdown">
+            <topicmeta>
+                <shortdesc>Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.</shortdesc>
+            </topicmeta>
+            <topicref href="applying_manifest_blocks.md" format="markdown"/>
+        </topicref>       
+    </topicref>
+<<<<<<< HEAD
     <topicref href="bolt_configuration_reference.md" format="markdown"/>
     <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
     <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
@@ -36,6 +60,35 @@
         <topicref href="migrating_inventory_files.md" format="markdown"/> 
         <topicref href="using_plugins.md" format="markdown"/>
         <topicref href="writing_plugins.md" format="markdown"/>
+=======
+    
+    <topicref href="tasks.md" format="markdown">
+        <topicmeta>
+            <shortdesc>Before you run a task in your environment, inspect the task to determine what effect it will have on your targets.</shortdesc>
+        </topicmeta>
+        <topicref href="inspecting_tasks.md" format="markdown"/>
+        <topicref href="bolt_running_tasks.md" format="markdown">
+            <topicmeta>
+                <shortdesc>Bolt can run Puppet tasks on remote targets without requiring any Puppet infrastructure.</shortdesc>
+            </topicmeta>
+        </topicref>
+        <topicref href="writing_tasks.md" format="markdown">
+            <topicmeta>
+                <shortdesc>Bolt tasks are similar to scripts, but they are kept in modules and can have metadata. This allows you to reuse and share them.</shortdesc>
+            </topicmeta>
+        </topicref>
+>>>>>>> Refresh WIP
     </topicref>
+    
+    
     <topicref href="bolt_examples.md" format="markdown"/>
+    <topichead navtitle="Using Bolt with Puppet">
+        <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
+        <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
+    </topichead>
+    <topichead navtitle="Reference">
+        <topicref href="bolt_command_reference.md" format="markdown"/>
+        <topicref href="plan_functions.md" format="markdown"/>
+        <topicref href="bolt_configuration_reference.md" format="markdown"/>
+    </topichead>
 </map>

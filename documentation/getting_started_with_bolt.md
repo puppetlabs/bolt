@@ -1,4 +1,4 @@
-# Self-paced training
+# Getting started with Bolt
 
 Using hands-on exercises, discover how Bolt can help you manage your infrastructure.
 

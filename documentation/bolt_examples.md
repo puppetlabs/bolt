@@ -1,4 +1,4 @@
-# Bolt examples
+# Automating Windows targets
 
 Bolt lets you automate almost any task you can think of. These are some of the common scenarios we've come across.
 
@@ -65,7 +65,7 @@ To run Bolt commands against multiple targets at once, you need to provide infor
 
     You now have an inventory file where you can store information about your targets.
 
-    You can also configure a variety of options for Bolt in `bolt.yaml`, including global and transport options. For more information, see [Bolt configuration options](bolt_configuration_options.md).
+    You can also configure a variety of options for Bolt in `bolt.yaml`, including global and transport options. For more information, see [Bolt configuration options](bolt_configuration_reference.md).
 
 
 ### 3. Convert your script to a Bolt task

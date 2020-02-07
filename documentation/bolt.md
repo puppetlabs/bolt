@@ -2,53 +2,80 @@
 
 Bolt is an open source orchestration tool that automates the manual work it takes to maintain your infrastructure. Use Bolt to automate tasks that you perform on an as-needed basis or as part of a greater orchestration workflow. For example, you can use Bolt to patch and update systems, troubleshoot servers, deploy applications, or stop and restart services. Bolt can be installed on your local workstation and connects directly to remote targets with SSH or WinRM, so you are not required to install any agent software.
 
-<img src="bolt-logo-dark.png" width="420" />
+<img src="bolt-logo-dark.png" width="420" /><br/>
 
-## Helpful Bolt docs links
+<table>
+ <tr>
+   <th>Helpful Bolt docs links</th>
+   <th>Other useful places</th>
+ </tr>
+ <tr>
+   <td>
+    <p>Install Bolt
+        <ul>
+        <li><a class="xref" href="bolt_installing.md">Installing Bolt</a> - Follow the installation instructions for your operating system: *nix, macOS, or Windows.</li>
+        </ul>
+    </p>  
+    <p>Make one-time changes to your remote targets
+        <ul>
+        <li><a class="xref" href="running_bolt_commands.md">Run a command</a></li>
+        <li><a class="xref" href="running_bolt_commands.md">Run a script</a></li>
+        <li><a class="xref" href="running_bolt_commands.md">Upload files</a></li>
+        </ul>
+    </p> 
+    <p>Automate your workflow with existing tasks and plans
+        <ul>
+        <li><a class="xref" href="bolt_running_tasks.md">Running tasks</a></li>
+        <li><a class="xref" href="bolt_running_plans.md">Running plans</a></li>
+        </ul>
+    </p>
+    <p>Create your own tasks and plans
+        <ul>
+        <li><a class="xref" href="writing_tasks.md">Writing tasks</a></li>
+        <li><a class="xref" href="writing_plans.md">Writing plans in Puppet language</a></li>
+        <li><a class="xref" href="writing_yaml_plans.md">Writing plans in YAML</a></li>
+        <li><a class="xref" href="writing_plans.md">Example plans</a></li>
+        <li><a class="xref" href="applying_manifest_blocks.md">Applying manifest blocks</a></li>
+        </ul> 
+    </p>
+   </td>
+   <td>
+    <p>Learn the basics
+        <ul>
+        <li><a class="xref" target="_blank" href="https://puppetlabs.github.io/bolt/">Hands-on lab</a> - Using a GitHub repository with sample files and code examples, install and run Bolt in a safe environment.</li>
+        <li><a class="xref" target="_blank" href="https://learn.puppet.com/course/puppet-orchestration-bolt-and-tasks?_ga=2.158319738.1526297716.1533055277-261802629.1531434605">Online training</a> - Learn how to use Bolt to run a command, a script, and a task.</li>
+        </ul>
+    </p>
+    <p>Watch Bolt development
+        <ul>
+        <li><a class="xref" target="_blank" href="https://github.com/puppetlabs/bolt">Bolt project on GitHub</a></li>
+        </ul>
+    </p>
+    <p>Docs for related Puppet products
+        <ul>
+        <li><a class="xref" target="_blank" href="https://puppet.com/docs/puppet/latest/index.html">Open source Puppet</a></li>
+        <li><a class="xref" target="_blank" href="https://puppet.com/docs/pe/latest/pe_user_guide.html">Puppet Enterprise</a></li>
+        <li><a class="xref" target="_blank" href="https://puppet.com/docs/pdk/latest/pdk.html">Puppet Development Kit</a></li>
+        </ul>
+    </p>
+    <p>Why and how people are using Bolt
+        <ul>
+        <li><a class="xref" target="_blank" href="https://puppet.com/resources/webinar/product-spotlight-webinar-puppet-taskstm">Product Spotlight Webinar: Puppet Tasks</a></li>
+        <li><a class="xref" target="_blank" href="https://puppet.com/blog/combining-powershell-bolt-and-puppet-tasks-part-1">Combining PowerShell, Bolt and Puppet Tasks</a></li>
+        </ul>
+    </p>
+    <p>Share and contribute
+        <ul>
+        <li><a class="xref" target="_blank" href="https://slack.puppet.com">Join us on Slack</a> - Join the #bolt channel.</li>
+        <li><a class="xref" target="_blank" href="https://twitter.com/puppetize/">Follow us on Twitter</a></li>
+        <li><a class="xref" target="_blank" href="https://puppet.com/community">Engage with the Puppet community</a> - Share what you know and get help from other users and employees.</li>
+        <li><a class="xref" target="_blank" href="https://forge.puppet.com">Puppet Forge</a> - Find modules you can use, and contribute modules you've made to the community.</li>
+        <li><a class="xref" target="_blank" href="https://github.com/puppetlabs/">Open source projects from Puppet on GitHub</a></li>
+        </ul>
+    </p>        
+   </td>
+ </tr>
+</table>
 
-### Install Bolt
-+ [Installing Bolt](bolt_installing.md#) - Follow the installation instructions for your operating system: *nix, macOS, or Windows.<br/>
 
-### Make one-time changes to your remote targets
-+ [Run a command](running_bolt_commands.md#)
-+ [Run a script](running_bolt_commands.md#)
-+ [Upload files](running_bolt_commands.md#)
-
-### Automate your workflow with existing tasks and plans
-+ [Running tasks](bolt_running_tasks.md#)
-+ [Running plans](bolt_running_plans.md#)
-
-### Create your own tasks and plans
-+ [Writing tasks](writing_tasks.md#)
-+ [Writing plans in Puppet language](writing_plans.md#)
-+ [Writing plans in YAML](writing_yaml_plans.md#)
-+ [Example plans](writing_plans.md#)
-+ [Applying manifest blocks](applying_manifest_blocks.md#)
-
-## Other useful places
-
-### Learn the basics
-+ [Hands-on lab](https://puppetlabs.github.io/bolt/) - Using a GitHub repository with sample files and code examples, install and run Bolt in a safe environment.
-+ [Online training](https://learn.puppet.com/course/puppet-orchestration-bolt-and-tasks?_ga=2.158319738.1526297716.1533055277-261802629.1531434605) - Learn how to use Bolt to run a command, a script, and a task.
- 
-### Watch Bolt development
-+ [Bolt project on GitHub](https://github.com/puppetlabs/bolt)
-
-### Docs for related Puppet products
-+ [Open source Puppet](https://puppet.com/docs/puppet/latest/index.html)
-+ [Puppet Enterprise](https://puppet.com/docs/pe/latest/pe_user_guide.html)
-+ [Puppet Development Kit](https://puppet.com/docs/pdk/latest/pdk.html)
-
-### Why and how people are using Bolt
-+ [Product Spotlight Webinar: Puppet Tasks](https://puppet.com/resources/webinar/product-spotlight-webinar-puppet-taskstm)
-+ [Combining PowerShell, Bolt and Puppet Tasks](https://puppet.com/blog/combining-powershell-bolt-and-puppet-tasks-part-1)
-
-### Share and contribute
-+ [Join us on Slack](https://slack.puppet.com/) - Join the \#bolt channel.
-+ [Follow us on Twitter](https://twitter.com/puppetize/)
-+ [Engage with the Puppet community](https://puppet.com/community) - Share what you know and get help from other users and employees.
-+ [Puppet Forge](https://forge.puppet.com) - Find modules you can use, and contribute modules you've made to the community.
-+ [Open source projects from Puppet on GitHub](https://github.com/puppetlabs/)
-
-To send us feedback or let us know about a docs error, [open a ticket](https://tickets.puppetlabs.com/browse/DOCUMENT/?selectedTab=com.atlassian.jira.jira-projects-plugin:summary-panel) \(you'll need a Jira account\) or [email the docs team](mailto:docs@puppet.com).
-
+To send us feedback or let us know about a docs error, [open a ticket](https://tickets.puppetlabs.com/browse/DOCUMENT/?selectedTab=com.atlassian.jira.jira-projects-plugin:summary-panel) (you'll need a Jira account) or [email the docs team](mailto:docs@puppet.com).

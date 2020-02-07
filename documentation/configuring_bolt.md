@@ -143,7 +143,7 @@ plugins:
   
   Bolt runs in the context of a project directory or a `Boltdir`. This directory contains all of the configuration, code, and data loaded by Bolt.
 
-- **[Bolt configuration options](bolt_configuration_options.md)**  
+- **[Bolt configuration options](bolt_configuration_reference.md)**  
 
   Your Bolt configuration file can contain global and transport options.
 
