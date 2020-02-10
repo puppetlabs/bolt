@@ -34,50 +34,50 @@ describe "running YAML plans", ssh: true do
   it 'runs a command' do
     result = run_plan('yaml::command', nodes: target)
 
-    expect(result.first['node']).to eq(target)
+    expect(result.first['target']).to eq(target)
     expect(result.first['status']).to eq('success')
-    expect(result.first['result']).to eq("stdout" => "hello world\n", "stderr" => "", "exit_code" => 0)
+    expect(result.first['value']).to eq("stdout" => "hello world\n", "stderr" => "", "exit_code" => 0)
   end
 
   it 'runs a task' do
     result = run_plan('yaml::task', nodes: target)
 
-    expect(result.first['node']).to eq(target)
+    expect(result.first['target']).to eq(target)
     expect(result.first['status']).to eq('success')
-    expect(result.first['result']).to eq('_output' => "hello world\n")
+    expect(result.first['value']).to eq('_output' => "hello world\n")
   end
 
   it 'runs a script' do
     result = run_plan('yaml::script', nodes: target)
 
-    expect(result.first['node']).to eq(target)
+    expect(result.first['target']).to eq(target)
     expect(result.first['status']).to eq('success')
-    expect(result.first['result']['stdout']).to eq("foo bar baz\n")
+    expect(result.first['value']['stdout']).to eq("foo bar baz\n")
   end
 
   it 'uploads a file' do
     result = run_plan('yaml::upload', nodes: target)
 
-    expect(result.first['node']).to eq(target)
+    expect(result.first['target']).to eq(target)
     expect(result.first['status']).to eq('success')
-    expect(result.first['result']['_output']).to match(/Uploaded .*test.sh/)
+    expect(result.first['value']['_output']).to match(/Uploaded .*test.sh/)
   end
 
   it 'runs another plan' do
     result = run_plan('yaml::delegate', nodes: target)
 
-    expect(result.first['node']).to eq(target)
+    expect(result.first['target']).to eq(target)
     expect(result.first['status']).to eq('success')
-    expect(result.first['result']).to eq('_output' => "hello world\n")
+    expect(result.first['value']).to eq('_output' => "hello world\n")
   end
 
   it 'applies resources' do
     result = run_plan('yaml::resources', nodes: target)
 
-    expect(result.first['node']).to eq(target)
+    expect(result.first['target']).to eq(target)
     expect(result.first['status']).to eq('success')
 
-    resources = result.first['result']['report']['resource_statuses']
+    resources = result.first['value']['report']['resource_statuses']
 
     expect(resources['Notify[hello world]']['changed']).to eq(true)
     expect(resources['Notify[goodbye]']['changed']).to eq(true)
@@ -88,12 +88,12 @@ describe "running YAML plans", ssh: true do
 
     expect(result['kind']).to eq('bolt/apply-failure')
     node_result = result.dig('details', 'result_set').first
-    expect(node_result['node']).to eq(target)
+    expect(node_result['target']).to eq(target)
     expect(node_result['status']).to eq('failure')
 
-    expect(node_result.dig('result', '_error', 'kind')).to eq('bolt/resource-failure')
+    expect(node_result.dig('value', '_error', 'kind')).to eq('bolt/resource-failure')
 
-    resources = node_result['result']['report']['resource_statuses']
+    resources = node_result['value']['report']['resource_statuses']
 
     # The file resource will fail so the second notify is skipped
     expect(resources['Notify[hello world]']['changed']).to eq(true)
@@ -105,10 +105,10 @@ describe "running YAML plans", ssh: true do
   it 'applies an empty catalog if no resources are specified' do
     result = run_plan('yaml::empty_resources', nodes: target)
 
-    expect(result.first['node']).to eq(target)
+    expect(result.first['target']).to eq(target)
     expect(result.first['status']).to eq('success')
 
-    resources = result.first['result']['report']['resource_statuses']
+    resources = result.first['value']['report']['resource_statuses']
     expect(resources).to be_empty
   end
 

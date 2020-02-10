@@ -12,7 +12,7 @@ describe "Shareable tasks with files", bash: true do
 
   it 'runs a task with multiple files' do
     result = run_cli_json(%w[task run shareable] + config_flags)
-    files = result['items'][0]['result']['_output'].split("\n").map(&:strip).sort
+    files = result['items'][0]['value']['_output'].split("\n").map(&:strip).sort
     expect(files.count).to eq(4)
     expect(files[0]).to match(%r{^174 .*/shareable/tasks/unknown_file.json$})
     expect(files[1]).to match(%r{^236 .*/shareable/tasks/list.sh})

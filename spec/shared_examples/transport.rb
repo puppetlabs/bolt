@@ -649,18 +649,6 @@ SHELL
                          "Sudo password for user #{user} not recognized on #{target.safe_name}")
       end
     end
-
-    context "with no password" do
-      let(:config) { mk_config('host-key-check' => false, 'run-as' => 'root', user: user, password: password) }
-      let(:target) { make_target }
-
-      it "returns a failed result" do
-        expect {
-          runner.run_command(target, 'whoami')
-        }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{user} was not provided for #{target.safe_name}")
-      end
-    end
   end
 
   context "using a custom run-as-command" do

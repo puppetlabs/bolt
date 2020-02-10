@@ -486,7 +486,6 @@ plan vars(String $host) {
 Or set variables in the inventory file using the `vars` key at the group level.
 
 ```yaml
-version: 2
 groups:
   - name: my_targets
     targets:

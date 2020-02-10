@@ -28,11 +28,10 @@ describe "passes parsed AST to the apply_catalog task" do
     }
   end
 
-  def get_notifies(result, future = false)
+  def get_notifies(result)
     expect(result).not_to include('kind')
     expect(result[0]).to include('status' => 'success')
-    key = future ? 'value' : 'result'
-    result[0][key]['report']['catalog']['resources'].select { |r| r['type'] == 'Notify' }
+    result[0]['value']['report']['catalog']['resources'].select { |r| r['type'] == 'Notify' }
   end
 
   # SSH only required to simplify capturing stdin passed to the task. WinRM omitted as slower and unnecessary.
@@ -126,7 +125,7 @@ describe "passes parsed AST to the apply_catalog task" do
 
     it 'applies a complex type from the modulepath' do
       result = run_cli_json(%w[plan run basic::type] + config_flags)
-      report = result[0]['result']['report']
+      report = result[0]['value']['report']
       warn = report['catalog']['resources'].select { |r| r['type'] == 'Warn' }
       expect(warn.count).to eq(1)
     end
@@ -134,7 +133,7 @@ describe "passes parsed AST to the apply_catalog task" do
     it 'evaluates a node definition matching the node name' do
       pending "puppet does not allow node definitions in plans"
       result = run_cli_json(%w[plan run basic::node_definition] + config_flags)
-      report = result[0]['result']['report']
+      report = result[0]['value']['report']
       warn = report['catalog']['resources'].select { |r| r['type'] == 'Warn' }
       expect(warn.count).to eq(1)
     end
@@ -142,7 +141,7 @@ describe "passes parsed AST to the apply_catalog task" do
     it 'evaluates a default node definition if none matches the node name' do
       pending "puppet does not allow node definitions in plans"
       result = run_cli_json(%w[plan run basic::node_default] + config_flags)
-      report = result[0]['result']['report']
+      report = result[0]['value']['report']
       warn = report['catalog']['resources'].select { |r| r['type'] == 'Warn' }
       expect(warn.count).to eq(1)
     end
@@ -164,7 +163,7 @@ describe "passes parsed AST to the apply_catalog task" do
     it 'fails immediately on a compile error' do
       result = run_cli_json(%w[plan run basic::catch_error catch=false] + config_flags)
       expect(result['kind']).to eq('bolt/apply-failure')
-      error = result['details']['result_set'][0]['result']['_error']
+      error = result['details']['result_set'][0]['value']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
       expect(@log_output.readlines)
@@ -182,7 +181,7 @@ describe "passes parsed AST to the apply_catalog task" do
     it 'errors calling run_task' do
       result = run_cli_json(%w[plan run basic::disabled] + config_flags)
       expect(result['kind']).to eq('bolt/apply-failure')
-      error = result['details']['result_set'][0]['result']['_error']
+      error = result['details']['result_set'][0]['value']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
       expect(@log_output.readlines)
@@ -202,7 +201,7 @@ describe "passes parsed AST to the apply_catalog task" do
       it 'calls puppetdb_query' do
         result = run_cli_json(%w[plan run basic::pdb_query] + config_flags)
         expect(result['kind']).to eq('bolt/apply-failure')
-        error = result['details']['result_set'][0]['result']['_error']
+        error = result['details']['result_set'][0]['value']['_error']
         expect(error['kind']).to eq('bolt/apply-error')
         expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
         expect(@log_output.readlines).to include(/Failed to connect to all PuppetDB server_urls/)
@@ -211,7 +210,7 @@ describe "passes parsed AST to the apply_catalog task" do
       it 'calls puppetdb_fact' do
         result = run_cli_json(%w[plan run basic::pdb_fact] + config_flags)
         expect(result['kind']).to eq('bolt/apply-failure')
-        error = result['details']['result_set'][0]['result']['_error']
+        error = result['details']['result_set'][0]['value']['_error']
         expect(error['kind']).to eq('bolt/apply-error')
         expect(error['msg']).to match(/Apply failed to compile for #{uri}/)
         expect(@log_output.readlines).to include(/Failed to connect to all PuppetDB server_urls/)
@@ -308,50 +307,40 @@ describe "passes parsed AST to the apply_catalog task" do
           expect(result['msg']).to match(/Apply failed to compile for/)
         end
       end
-
-      it 'targets in inventory can be queried' do
-        with_tempfile_containing('conf', YAML.dump(inventory)) do |conf|
-          result = run_cli_json(%W[plan run basic::inventory_lookup --configfile #{conf.path}] + config_flags)
-          notify = get_notifies(result)
-          expect(notify[0]['title']).to eq("Num Targets: 0")
-          expect(notify[1]['title']).to eq("Target Name: foo")
-        end
-      end
     end
 
     context 'with Bolt plan datatypes' do
-      let(:config) { File.join(__dir__, '../fixtures/configs/future.yml') }
       let(:inventory) { File.join(__dir__, '../fixtures/apply/inventory.yaml') }
-      let(:tflags) { %W[--no-host-key-check --configfile #{config} --inventoryfile #{inventory} --run-as root] }
+      let(:tflags) { %W[--no-host-key-check --inventoryfile #{inventory} --run-as root] }
 
       it 'serializes ResultSet objects in apply blocks' do
         result = run_cli_json(%w[plan run puppet_types::resultset] + config_flags)
-        notify = get_notifies(result, true)
+        notify = get_notifies(result)
         expect(notify[0]['title']).to eq("ResultSet target names: [ssh://bolt@localhost:20022]")
       end
 
       it 'serializes Result objects in apply blocks' do
         result = run_cli_json(%w[plan run puppet_types::result] + config_flags)
-        notify = get_notifies(result, true)
+        notify = get_notifies(result)
         expect(notify[0]['title']).to eq("Result value: root\n")
         expect(notify[1]['title']).to eq("Result target name: ssh://bolt@localhost:20022")
       end
 
       it 'serializes ApplyResult objects in apply blocks' do
         result = run_cli_json(%w[plan run puppet_types::applyresult] + config_flags)
-        notify = get_notifies(result, true)
+        notify = get_notifies(result)
         expect(notify[0]['title']).to eq("ApplyResult resource: /home/bolt/tmp")
       end
 
       it 'serializes Target objects as ApplyTargets in apply blocks' do
         result = run_cli_json(%w[plan run puppet_types::target] + config_flags)
-        notify = get_notifies(result, true)
+        notify = get_notifies(result)
         expect(notify[0]['title']).to eq("ApplyTarget protocol: ssh")
       end
 
       it 'serializes Error objects in apply blocks' do
         result = run_cli_json(%w[plan run puppet_types::error] + config_flags)
-        notify = get_notifies(result, true)
+        notify = get_notifies(result)
         expect(notify[0]['title']).to eq("ApplyResult resource: The command failed with exit code 127")
       end
 

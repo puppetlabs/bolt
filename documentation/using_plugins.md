@@ -56,7 +56,6 @@ The following fields are available to the `env_var` plugin.
 Looking up a value from an environment variable in an inventory file:
 
 ```yaml
-version: 2
 targets:
   - target1.example.com
 config:
@@ -89,7 +88,6 @@ The following fields are available to the `prompt` plugin.
 Prompting for a password in an inventory file:
 
 ```yaml
-version: 2
 targets:
   - target1.example.com
 config:
@@ -123,7 +121,6 @@ The following fields are available to the `puppetdb` plugin.
 Lookup targets with the fact `osfamily: RedHat`, and set the hostname with the fact `networking.interfaces.en0.ipaddress`:
 
 ```yaml
-version: 2
 targets:
   - _plugin: puppetdb
     query: "inventory[certname] { facts.osfamily = 'RedHat' }"
@@ -171,7 +168,6 @@ The following fields are available to the `task` plugin:
 Loading targets with a `my_json_file::targets` task and a password with a `my_db::secret_lookup` task:
 
 ```yaml
-version: 2
 targets:
   - _plugin: task
     task: my_json_file::targets
@@ -263,7 +259,6 @@ The following fields are available to the pkcs7 plugin in a configuration file:
 Encrypt a password in an inventory file:
 
 ```yaml
-version: 2
 targets:
   - uri: target1.example.com
     config:

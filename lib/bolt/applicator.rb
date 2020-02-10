@@ -83,60 +83,7 @@ module Bolt
       end
     end
 
-    def compile(target, ast, plan_vars)
-      # This simplified Puppet node object is what .local uses to determine the
-      # certname of the target
-      node = Puppet::Node.from_data_hash('name' => target.name,
-                                         'parameters' => { 'clientcert' => target.name })
-      trusted = Puppet::Context::TrustedInformation.local(node)
-      facts = @inventory.facts(target).merge('bolt' => true)
-
-      catalog_input = {
-        code_ast: ast,
-        modulepath: @modulepath,
-        pdb_config: @pdb_client.config.to_hash,
-        hiera_config: @hiera_config,
-        target: {
-          name: target.name,
-          facts: facts,
-          variables: @inventory.vars(target).merge(plan_vars),
-          trusted: trusted.to_h
-        },
-        inventory: @inventory.data_hash
-      }
-
-      bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
-      old_path = ENV['PATH']
-      ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}#{File::PATH_SEPARATOR}#{old_path}"
-      out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
-      ENV['PATH'] = old_path
-
-      # stderr may contain formatted logs from Puppet's logger or other errors.
-      # Print them in order, but handle them separately. Anything not a formatted log is assumed
-      # to be an error message.
-      logs = err.lines.map do |l|
-        begin
-          JSON.parse(l)
-        rescue StandardError
-          l
-        end
-      end
-      logs.each do |log|
-        if log.is_a?(String)
-          @logger.error(log.chomp)
-        else
-          log.map { |k, v| [k.to_sym, v] }.each do |level, msg|
-            bolt_level = Bolt::Util::PuppetLogLevel::MAPPING[level]
-            @logger.send(bolt_level, "#{target.name}: #{msg.chomp}")
-          end
-        end
-      end
-
-      raise(ApplyError, target.name) unless stat.success?
-      JSON.parse(out)
-    end
-
-    def future_compile(target, catalog_input)
+    def compile(target, catalog_input)
       # This simplified Puppet node object is what .local uses to determine the
       # certname of the target
       node = Puppet::Node.from_data_hash('name' => target.name,
@@ -148,9 +95,6 @@ module Bolt
         variables: @inventory.vars(target),
         trusted: trusted.to_h
       }
-      # rubocop:disable Style/GlobalVars
-      catalog_input[:future] = $future
-      # rubocop:enable Style/GlobalVars
 
       bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
       old_path = ENV['PATH']
@@ -232,25 +176,22 @@ module Bolt
     def apply_ast(raw_ast, targets, options, plan_vars = {})
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(raw_ast, rich_data: true, symbol_to_string: true)
 
-      # rubocop:disable Style/GlobalVars
-      if $future
-        # Serialize as pcore for *Result* objects
-        plan_vars = Puppet::Pops::Serialization::ToDataConverter.convert(plan_vars,
-                                                                         rich_data: true,
-                                                                         symbol_as_string: true,
-                                                                         type_by_reference: true,
-                                                                         local_reference: false)
-        scope = {
-          code_ast: ast,
-          modulepath: @modulepath,
-          pdb_config: @pdb_client.config.to_hash,
-          hiera_config: @hiera_config,
-          plan_vars: plan_vars,
-          # This data isn't available on the target config hash
-          config: @inventory.config.transport_data_get
-        }
-      end
-      # rubocop:enable Style/GlobalVars
+      # Serialize as pcore for *Result* objects
+      plan_vars = Puppet::Pops::Serialization::ToDataConverter.convert(plan_vars,
+                                                                       rich_data: true,
+                                                                       symbol_as_string: true,
+                                                                       type_by_reference: true,
+                                                                       local_reference: false)
+
+      scope = {
+        code_ast: ast,
+        modulepath: @modulepath,
+        pdb_config: @pdb_client.config.to_hash,
+        hiera_config: @hiera_config,
+        plan_vars: plan_vars,
+        # This data isn't available on the target config hash
+        config: @inventory.config.transport_data_get
+      }
 
       description = options[:description] || 'apply catalog'
 
@@ -258,9 +199,7 @@ module Bolt
         futures = targets.map do |target|
           Concurrent::Future.execute(executor: @pool) do
             @executor.with_node_logging("Compiling manifest block", [target]) do
-              # rubocop:disable Style/GlobalVars
-              $future ? future_compile(target, scope) : compile(target, ast, plan_vars)
-              # rubocop:enable Style/GlobalVars
+              compile(target, scope)
             end
           end
         end

@@ -8,13 +8,13 @@ require 'bolt/error'
 Puppet::Functions.create_function(:add_facts) do
   # @param target A target.
   # @param facts A hash of fact names to values that may include structured facts.
-  # @return The target's new facts or a `Target` object if the `future` flag is set to true
+  # @return A `Target` object.
   # @example Adding facts to a target
   #   add_facts($target, { 'os' => { 'family' => 'windows', 'name' => 'windows' } })
   dispatch :add_facts do
     param 'Target', :target
     param 'Hash', :facts
-    return_type 'Variant[Target, Hash[String, Data]]'
+    return_type 'Target'
   end
 
   def add_facts(target, facts)

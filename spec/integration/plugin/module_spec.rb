@@ -280,7 +280,7 @@ describe 'using module based plugins' do
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
-        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+        expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
           /Plugin identity does not support puppet_library/
         )
       end
@@ -300,7 +300,7 @@ describe 'using module based plugins' do
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
-        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(/Unknown plugin:/)
+        expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(/Unknown plugin:/)
       end
     end
 
@@ -318,7 +318,7 @@ describe 'using module based plugins' do
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
-        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+        expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
           /The task failed with exit code 1/
         )
       end

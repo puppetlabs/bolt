@@ -122,11 +122,6 @@ module Bolt
                   Bolt::Config.from_boltdir(boltdir, options)
                 end
 
-      # Set $future global if configured
-      # rubocop:disable Style/GlobalVars
-      $future = @config.future
-      # rubocop:enable Style/GlobalVars
-
       Bolt::Logger.configure(config.log, config.color)
 
       # Logger must be configured before checking path case, otherwise warnings will not display
@@ -135,7 +130,10 @@ module Bolt
       # Log the file paths for loaded config files
       config_loaded
 
+      # Display warnings created during parser and config initialization
       parser.warnings.each { |warning| @logger.warn(warning[:msg]) }
+      config.warnings.each { |warning| @logger.warn(warning[:msg]) }
+
       # After validation, initialize inventory and targets. Errors here are better to catch early.
       # After this step
       # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
@@ -154,12 +152,6 @@ module Bolt
         options[:verbose] = options[:subcommand] != 'plan'
       end
 
-      # TODO: Remove deprecation warning
-      if options[:nodes]
-        @logger.warn("Deprecation Warning: The --nodes command line option has been " \
-                     "deprecated in favor of --targets.")
-      end
-
       warn_inventory_overrides_cli(options)
       options
     rescue Bolt::Error => e
@@ -168,23 +160,23 @@ module Bolt
     end
 
     def update_targets(options)
-      target_opts = options.keys.select { |opt| %i[query rerun nodes targets].include?(opt) }
-      target_string = "'--nodes', '--targets', '--rerun', or '--query'"
+      target_opts = options.keys.select { |opt| %i[query rerun targets].include?(opt) }
+      target_string = "'--targets', '--rerun', or '--query'"
       if target_opts.length > 1
         raise Bolt::CLIError, "Only one targeting option #{target_string} may be specified"
       elsif target_opts.empty? && options[:subcommand] != 'plan'
         raise Bolt::CLIError, "Command requires a targeting option: #{target_string}"
       end
 
-      nodes = if options[:query]
-                query_puppetdb_nodes(options[:query])
-              elsif options[:rerun]
-                rerun.get_targets(options[:rerun])
-              else
-                options[:targets] || options[:nodes] || []
-              end
-      options[:target_args] = nodes
-      options[:targets] = inventory.get_targets(nodes)
+      targets = if options[:query]
+                  query_puppetdb_nodes(options[:query])
+                elsif options[:rerun]
+                  rerun.get_targets(options[:rerun])
+                else
+                  options[:targets] || []
+                end
+      options[:target_args] = targets
+      options[:targets] = inventory.get_targets(targets)
     end
 
     def validate(options)

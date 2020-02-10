@@ -56,13 +56,6 @@ describe "Bolt::CLI" do
     allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return(file_content)
   end
 
-  # These tests may pick up local config that includes `future = true`
-  after :each do
-    # rubocop:disable Style/GlobalVars
-    $future = nil
-    # rubocop:enable Style/GlobalVars
-  end
-
   context "without a config file" do
     let(:boltdir) { Bolt::Boltdir.new('.') }
     before(:each) do
@@ -80,28 +73,28 @@ describe "Bolt::CLI" do
     end
 
     it "generates an error message if an unknown subcommand is given" do
-      cli = Bolt::CLI.new(%w[-n bolt1 bolt2 command run whoami])
+      cli = Bolt::CLI.new(%w[--targets bolt1 bolt2 command run whoami])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /Expected subcommand 'bolt2' to be one of/)
     end
 
     it "generates an error message if an unknown action is given" do
-      cli = Bolt::CLI.new(%w[-n bolt1 command oops whoami])
+      cli = Bolt::CLI.new(%w[--targets bolt1 command oops whoami])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /Expected action 'oops' to be one of/)
     end
 
     it "generates an error message is no action is given and one is expected" do
-      cli = Bolt::CLI.new(%w[-n bolt1 command])
+      cli = Bolt::CLI.new(%w[--targets bolt1 command])
       expect {
         cli.parse
       }.to raise_error(Bolt::CLIError, /Expected an action/)
     end
 
     it "works without an action if no action is expected" do
-      cli = Bolt::CLI.new(%w[-n bolt1 apply file.pp])
+      cli = Bolt::CLI.new(%w[--targets bolt1 apply file.pp])
       expect {
         cli.parse
       }.not_to raise_error
@@ -326,13 +319,6 @@ describe "Bolt::CLI" do
           cli.parse
         }.to raise_error(Bolt::CLIError, /Option '--targets' needs a parameter/)
       end
-
-      it "generates an error if nodes and targets are specified" do
-        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --targets bar])
-        expect {
-          cli.parse
-        }.to raise_error(Bolt::CLIError, /Only one targeting option/)
-      end
     end
 
     describe "query" do
@@ -390,15 +376,6 @@ describe "Bolt::CLI" do
         cli = Bolt::CLI.new(%w[command run uptime --password opensesame --targets foo])
         expect(cli.parse).to include(password: 'opensesame')
       end
-
-      it "prompts the user for password if not specified" do
-        allow(STDIN).to receive(:noecho).and_return('opensesame')
-        allow(STDOUT).to receive(:print).with('Please enter your password: ')
-        allow(STDOUT).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --password])
-        expect(cli.parse).to include(password: 'opensesame')
-        expect(@log_output.readlines.join).to match(/Optional parameter for --password is deprecated/)
-      end
     end
 
     describe "password-prompt" do
@@ -406,7 +383,7 @@ describe "Bolt::CLI" do
         allow(STDIN).to receive(:noecho).and_return('opensesame')
         allow(STDERR).to receive(:print).with('Please enter your password: ')
         allow(STDERR).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --password-prompt])
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --password-prompt])
         expect(cli.parse).to include(password: 'opensesame')
       end
     end
@@ -552,16 +529,6 @@ describe "Bolt::CLI" do
         cli = Bolt::CLI.new(%w[command run uptime --sudo-password opensez --run-as alibaba --targets foo])
         expect(cli.parse).to include('sudo-password': 'opensez')
       end
-
-      it "prompts the user for sudo-password if not specified" do
-        allow(STDIN).to receive(:noecho).and_return('opensez')
-        pw_prompt = 'Please enter your privilege escalation password: '
-        allow(STDOUT).to receive(:print).with(pw_prompt)
-        allow(STDOUT).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --run-as alibaba --sudo-password])
-        expect(cli.parse).to include('sudo-password': 'opensez')
-        expect(@log_output.readlines.join).to match(/Optional parameter for --sudo-password is deprecated/)
-      end
     end
 
     describe "sudo password-prompt" do
@@ -569,7 +536,7 @@ describe "Bolt::CLI" do
         allow(STDIN).to receive(:noecho).and_return('opensesame')
         allow(STDERR).to receive(:print).with('Please enter your privilege escalation password: ')
         allow(STDERR).to receive(:puts)
-        cli = Bolt::CLI.new(%w[command run uptime --nodes foo --sudo-password-prompt])
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --sudo-password-prompt])
         expect(cli.parse).to include('sudo-password': 'opensesame')
       end
     end
@@ -721,14 +688,14 @@ describe "Bolt::CLI" do
 
     describe 'task' do
       it "errors without a task" do
-        cli = Bolt::CLI.new(%w[task run -n example.com --modulepath .])
+        cli = Bolt::CLI.new(%w[task run --targets example.com --modulepath .])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Must specify/)
       end
 
       it "errors if task is a parameter" do
-        cli = Bolt::CLI.new(%w[task run -n example.com --modulepath . p1=v1])
+        cli = Bolt::CLI.new(%w[task run --targets example.com --modulepath . p1=v1])
         expect {
           cli.parse
         }.to raise_error(Bolt::CLIError, /Invalid task/)
@@ -1593,12 +1560,11 @@ describe "Bolt::CLI" do
             cli.execute(options)
 
             expect(JSON.parse(output.string)).to eq(
-              [{ 'node' => 'foo',
-                 'target' => 'foo',
+              [{ 'target' => 'foo',
                  'status' => 'success',
                  'action' => 'task',
                  'object' => 'some_task',
-                 'result' => { '_output' => 'yes' } }]
+                 'value' => { '_output' => 'yes' } }]
             )
           end
         end
@@ -1621,12 +1587,11 @@ describe "Bolt::CLI" do
             cli.execute(options)
 
             expect(JSON.parse(output.string)).to eq(
-              [{ 'node' => 'foo',
-                 'target' => 'foo',
+              [{ 'target' => 'foo',
                  'status' => 'success',
                  'action' => 'task',
                  'object' => 'some_task',
-                 'result' => { '_output' => 'yes' } }]
+                 'value' => { '_output' => 'yes' } }]
             )
           end
         end
@@ -1673,12 +1638,11 @@ describe "Bolt::CLI" do
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
-            [{ 'node' => 'foo',
-               'target' => 'foo',
+            [{ 'target' => 'foo',
                'status' => 'success',
                'action' => 'task',
                'object' => 'some_task',
-               'result' => { '_output' => 'yes' } }]
+               'value' => { '_output' => 'yes' } }]
           )
         end
 
@@ -1710,12 +1674,11 @@ describe "Bolt::CLI" do
           expect(JSON.parse(output.string)).to eq(
             [
               {
-                'node' => 'foo',
                 'target' => 'foo',
                 'status' => 'failure',
                 'action' => 'task',
                 'object' => 'some_task',
-                'result' => {
+                'value' => {
                   "_output" => "no",
                   "_error" => {
                     "msg" => "The task failed with exit code 1",
@@ -2071,7 +2034,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
         cli.parse
-        expect(cli.config.transports[:ssh]['private-key']).to eq('/bar/foo')
+        expect(cli.config.transports[:ssh]['private-key']).to match(%r{/bar/foo\z})
       end
     end
 
@@ -2146,7 +2109,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
         cli.parse
-        expect(cli.config.transports[:pcp]['token-file']).to eql('/path/to/token')
+        expect(cli.config.transports[:pcp]['token-file']).to match(%r{/path/to/token\z})
       end
     end
 
@@ -2154,8 +2117,8 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check --no-ssl])
         cli.parse
-        expect(cli.config.transports[:pcp]['cacert']).to eql('/path/to/cacert')
-        expect(cli.config.transports[:winrm]['cacert']).to eql('/path/to/winrm-cacert')
+        expect(cli.config.transports[:pcp]['cacert']).to match(%r{/path/to/cacert\z})
+        expect(cli.config.transports[:winrm]['cacert']).to match(%r{/path/to/winrm-cacert\z})
       end
     end
 

@@ -20,11 +20,6 @@ describe Bolt::Transport::SSH do
   include BoltSpec::Files
   include BoltSpec::Task
 
-  def mk_config(conf)
-    conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(Bolt::Boltdir.new('.'), 'ssh' => conf)
-  end
-
   let(:hostname) { conn_info('ssh')[:host] }
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
@@ -46,14 +41,18 @@ describe Bolt::Transport::SSH do
   let(:env_task) { "#!/bin/sh\necho $PT_data" }
   let(:inventory) { Bolt::Inventory.empty }
   let(:transport_conf) { {} }
+  let(:target) { make_target }
+
+  def mk_config(conf)
+    conf = Bolt::Util.walk_keys(conf, &:to_s)
+    Bolt::Config.new(Bolt::Boltdir.new('.'), 'ssh' => conf)
+  end
 
   def make_target(host_: hostname, port_: port, conf: config)
     t = inventory.get_target("#{host_}:#{port_}")
     t.inventory_target.set_config('ssh', conf.transports[conf.transport.to_sym].merge(transport_conf))
     t
   end
-
-  let(:target) { make_target }
 
   context 'with ssh', ssh: true do
     let(:target) { make_target(conf: no_host_key_check) }
@@ -387,39 +386,14 @@ describe Bolt::Transport::SSH do
     end
   end
 
-  context "as bash user with no password", sudo: true do
-    let(:config) {
-      mk_config('host-key-check' => false, 'run-as' => 'root', user: bash_user, password: bash_password)
-    }
-    let(:target) { make_target }
-
-    it "returns a failed result when a temporary directory is created" do
-      contents = "#!/bin/sh\nwhoami"
-      with_tempfile_containing('script test', contents) do |file|
-        expect {
-          ssh.run_script(target, file.path, [])
-        }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{bash_user} was not provided for #{target.safe_name}")
-      end
-    end
-  end
-
   context "with no sudo-password", sudo: true, ssh: true do
     let(:config) {
       mk_config('host-key-check' => false, 'password' => password, 'run-as' => 'root',
                 user: user, password: password)
     }
     let(:target) { make_target }
-    after(:each) {
-      # rubocop:disable Style/GlobalVars
-      $future = nil
-      # rubocop:enable Style/GlobalVars
-    }
 
-    it "uses password as sudo-password when future is set" do
-      # rubocop:disable Style/GlobalVars
-      $future = true
-      # rubocop:enable Style/GlobalVars
+    it "uses password as sudo-password" do
       expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
     end
   end

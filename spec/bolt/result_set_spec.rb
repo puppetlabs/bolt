@@ -7,8 +7,8 @@ require 'bolt/result'
 require 'bolt/target'
 
 describe Bolt::Result do
-  let(:target1) { "node1" }
-  let(:target2) { "node1" }
+  let(:target1) { "target1" }
+  let(:target2) { "target1" }
   let(:result_val1) { { 'key' => 'val1' } }
   let(:result_val2) { { 'key' => 'val2', '_error' => { 'kind' => 'bolt/oops' } } }
   let(:result_set) do
@@ -18,18 +18,16 @@ describe Bolt::Result do
                         ])
   end
   let(:expected) {
-    [{ "node" => "node1",
-       "target" => "node1",
+    [{ "target" => "target1",
        "action" => nil,
        "object" => nil,
        "status" => "success",
-       "result" => { "key" => "val1" } },
-     { "node" => "node1",
-       "target" => "node1",
+       "value" => { "key" => "val1" } },
+     { "target" => "target1",
        "action" => nil,
        "object" => nil,
        "status" => "failure",
-       "result" => { "key" => "val2", "_error" => { "kind" => "bolt/oops" } } }]
+       "value" => { "key" => "val2", "_error" => { "kind" => "bolt/oops" } } }]
   }
 
   it 'is enumerable' do
@@ -45,7 +43,7 @@ describe Bolt::Result do
   end
 
   it 'filter_set returns a ResultSet' do
-    expect(result_set.filter_set { |r| r['node'] == 'node1' }).to be_a(Bolt::ResultSet)
+    expect(result_set.filter_set { |r| r['target'] == 'target1' }).to be_a(Bolt::ResultSet)
   end
 
   it 'is array indexible' do

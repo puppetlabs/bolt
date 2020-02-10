@@ -40,6 +40,7 @@ describe Bolt::Catalog do
       'modulepath' => [],
       'pdb_config' => pdb_config.to_hash,
       'hiera_config' => nil,
+      'plan_vars' => {},
       'target' => {
         'name' => uri,
         'facts' => {},

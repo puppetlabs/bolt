@@ -33,7 +33,7 @@ describe "When a plan succeeds" do
     result = run_cli(['plan', 'run', 'sample::single_task', '--targets', target] + config_flags,
                      outputter: Bolt::Outputter::JSON)
     json = JSON.parse(result)[0]
-    expect(json['node']).to eq(target.to_s)
+    expect(json['target']).to eq(target.to_s)
     expect(json['status']).to eq('success')
   end
 
@@ -49,16 +49,16 @@ describe "When a plan succeeds" do
     result = run_cli(%W[plan run sample::subdir::command --targets #{target}] + config_flags)
 
     json = JSON.parse(result)[0]
-    expect(json['result']['stdout']).to eq("From subdir\n")
+    expect(json['value']['stdout']).to eq("From subdir\n")
   end
 
   it 'runs a yaml plan from a subdir of plans', ssh: true do
     result = run_cli(%W[plan run yaml::subdir::init --targets #{target}] + config_flags)
 
     json = JSON.parse(result)[0]
-    expect(json['node']).to eq(target)
+    expect(json['target']).to eq(target)
     expect(json['status']).to eq('success')
-    expect(json['result']).to eq("stdout" => "I am a yaml plan\n", "stderr" => "", "exit_code" => 0)
+    expect(json['value']).to eq("stdout" => "I am a yaml plan\n", "stderr" => "", "exit_code" => 0)
   end
 
   it 'runs a yaml plan', ssh: true do

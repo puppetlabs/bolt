@@ -2,28 +2,26 @@
 
 require 'spec_helper'
 require 'bolt/executor'
-require 'bolt/target'
+require 'bolt/inventory'
 
 describe 'add_facts' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
-  let(:inventory) { mock('inventory') }
-  let(:target) { Bolt::Target.new('example') }
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:target) { inventory.get_target('example') }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
     Puppet.override(bolt_executor: executor, bolt_inventory: inventory) do
-      inventory.stubs(:version).returns(2)
-      inventory.stubs(:target_implementation_class).returns(Bolt::Target)
       example.run
     end
   end
 
   it 'should set a fact on a target' do
     data = { 'a' => 'b', 'c' => 'd' }
-    inventory.expects(:add_facts).with(target, data).returns(data)
-    is_expected.to run.with_params(target, data).and_return(data)
+    is_expected.to run.with_params(target, data).and_return(target)
+    expect(target.facts).to eq(data)
   end
 
   it 'errors when passed invalid data types' do
@@ -34,8 +32,6 @@ describe 'add_facts' do
 
   it 'reports the call to analytics' do
     executor.expects(:report_function_call).with('add_facts')
-    inventory.expects(:add_facts).returns({})
-
     is_expected.to run.with_params(target, {})
   end
 
