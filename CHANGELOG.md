@@ -1,6 +1,12 @@
 # Changelog
 
-## Bolt Next
+## Bolt 1.49.0
+
+### New features
+
+* **Add Kerberos support for SSH transport**
+
+  Users can now authenticate with Kerberos when using the SSH transport.
 
 ### Bug fixes
 
@@ -12,10 +18,6 @@
 ## Bolt 1.48.0
 
 ### New features
-
-* **Add Kerberos support for SSH transport**
-
-  Users can now authenticate with Kerberos when using the SSH transport.
 
 * **Warning when task metadata has unknown keys** ([#1542](https://github.com/puppetlabs/bolt/pull/1542))
 
