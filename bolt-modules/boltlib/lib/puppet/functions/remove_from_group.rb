@@ -5,9 +5,9 @@ require 'bolt/error'
 # Removes a target from the specified inventory group.
 #
 # The target is removed from all child groups and all parent groups where the target has
-# not been explicitly defined. A target cannot be removed from the 'all' group.
+# not been explicitly defined. A target cannot be removed from the `all` group.
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:remove_from_group) do
   # @param target A pattern identifying a single target.
   # @param group The name of the group to remove the target from.

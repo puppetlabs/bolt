@@ -4,8 +4,8 @@ require 'bolt/error'
 
 # Collects facts based on a list of certnames.
 #
-# * If a node is not found in PuppetDB, it's included in the returned hash with empty facts hash.
-# * Otherwise the node is included in the hash with a value that is a hash of it's facts.
+# If a node is not found in PuppetDB, it's included in the returned hash with an empty facts hash.
+# Otherwise, the node is included in the hash with a value that is a hash of its facts.
 Puppet::Functions.create_function(:puppetdb_fact) do
   # @param certnames Array of certnames.
   # @return A hash of certname to facts hash for each matched Target.

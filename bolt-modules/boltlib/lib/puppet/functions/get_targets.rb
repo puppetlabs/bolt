@@ -5,7 +5,7 @@ require 'bolt/error'
 # Parses common ways of referring to targets and returns an array of Targets.
 # `get_targets('all')` returns an empty array.
 #
-# **NOTE:** Not available in apply block when `future` is true
+# > **Note:** Not available in apply block when `future` is true
 Puppet::Functions.create_function(:get_targets) do
   # @param names A pattern or array of patterns identifying a set of targets.
   # @return A list of unique Targets resolved from any target URIs and groups.

@@ -4,11 +4,15 @@ require 'bolt/util'
 
 # Wait until all targets accept connections.
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:wait_until_available) do
   # Wait until targets are available.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param options Additional options: 'description', 'wait_time', 'retry_interval', '_catch_errors'.
+  # @param options A hash of additional options.
+  # @option options [String] description A description for logging. (default: 'wait until available')
+  # @option options [Numeric] wait_time The time to wait. (default: 120)
+  # @option options [Numeric] retry_interval The interval to wait before retrying. (default: 1)
+  # @option options [Boolean] _catch_errors Whether to catch raised errors.
   # @return A list of results, one entry per target. Successful results have no value.
   # @example Wait for targets
   #   wait_until_available($targets, wait_time => 300)

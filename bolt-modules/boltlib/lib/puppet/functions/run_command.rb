@@ -5,12 +5,14 @@ require 'bolt/error'
 # Runs a command on the given set of targets and returns the result from each command execution.
 # This function does nothing if the list of targets is empty.
 #
-# **NOTE:** Not available in apply block
+# > **Note:** Not available in apply block
 Puppet::Functions.create_function(:run_command) do
   # Run a command.
   # @param command A command to run on target.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
-  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @param options A hash of additional options.
+  # @option options [Boolean] _catch_errors Whether to catch raised errors.
+  # @option options [String] _run_as User to run as using privilege escalation.
   # @return A list of results, one entry per target.
   # @example Run a command on targets
   #   run_command('hostname', $targets, '_catch_errors' => true)
@@ -25,7 +27,9 @@ Puppet::Functions.create_function(:run_command) do
   # @param command A command to run on target.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.
-  # @param options Additional options: '_catch_errors', '_run_as'.
+  # @param options A hash of additional options.
+  # @option options [Boolean] _catch_errors Whether to catch raised errors.
+  # @option options [String] _run_as User to run as using privilege escalation.
   # @return A list of results, one entry per target.
   # @example Run a command on targets
   #   run_command('hostname', $targets, 'Get hostname')

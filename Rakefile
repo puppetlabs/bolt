@@ -182,7 +182,6 @@ namespace :docs do
       overloads = func['docstring']['tags'].select { |tag| tag['tag_name'] == 'overload' }
       sig_tags = overloads.map { |overload| overload['docstring']['tags'] }
       sig_tags = [func['docstring']['tags']] if sig_tags.empty?
-
       func['signatures'] = func['signatures'].zip(sig_tags).map do |sig, tags|
         sig['text'] = sig['docstring']['text']
         sects = sig['docstring']['tags'].group_by { |t| t['tag_name'] }
@@ -193,6 +192,12 @@ namespace :docs do
         sig['params'] = sects['param'].map do |param|
           param['text'] = format_links(param['text'])
           param
+        end
+        if sects['option']
+          sig['options'] = sects['option'].map do |option|
+            option['opt_text'] = format_links(option['opt_text'])
+            option
+          end
         end
 
         # get examples from overload docstring; puppet-strings should probably do this.

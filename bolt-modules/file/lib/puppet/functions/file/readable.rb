@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-# check if a file is readable
+# Check if a file is readable.
 Puppet::Functions.create_function(:'file::readable', Puppet::Functions::InternalFunction) do
   # @param filename Absolute path or Puppet file path.
+  # @return Whether the file is readable.
   # @example Check a file on disk
   #   file::readable('/tmp/i_dumped_this_here')
   # @example check a file from the modulepath

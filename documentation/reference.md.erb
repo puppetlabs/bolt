@@ -14,19 +14,33 @@
 <%= sig['signature'] %>
 ```
 
+<% if sig['returns'] -%>
+#### Returns
 <% for ret in sig['returns'] -%>
-*Returns:* `<%= ret['types'].first %>` <%= ret['text'] %>
+`<%= ret['types'].first %>` <%= ret['text'] %>
+<% end -%>
 <% end -%>
 
+#### Parameters
 <% for param in sig['params'] -%>
 * **<%= param['name'] %>** `<%= param['types'].first %>` <%= param['text'] %>
 <% end -%>
 
+<% if sig['options'] -%>
+#### Additional options
+<% for option in sig['options'] -%>
+* **<%= option['opt_name'] %>** `<%= option['opt_types'].first %>` <%= option['opt_text'] %>
+<% end -%>
+<% end -%>
+
+<% if sig['examples'] -%>
+#### Examples
 <% for example in sig['examples'] -%>
-**Example:** <%= example['name'] %>
+<%= example['name'] %>
 ```
 <%= example['text'] %>
 ```
+<% end -%>
 <% end -%>
 <% end %>
 <% end %>
