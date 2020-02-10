@@ -186,17 +186,15 @@ module BoltServer
         [400, '`environment` is a required argument']
       else
         @pal_mutex.synchronize do
-          begin
-            pal = BoltServer::PE::PAL.new({}, environment)
-            yield pal
-          rescue Puppet::Environments::EnvironmentNotFound
-            [400, {
-              "class" => 'bolt/unknown-environment',
-              "message" => "Environment #{environment} not found"
-            }.to_json]
-          rescue Bolt::Error => e
-            [400, e.to_json]
-          end
+          pal = BoltServer::PE::PAL.new({}, environment)
+          yield pal
+        rescue Puppet::Environments::EnvironmentNotFound
+          [400, {
+            "class" => 'bolt/unknown-environment',
+            "message" => "Environment #{environment} not found"
+          }.to_json]
+        rescue Bolt::Error => e
+          [400, e.to_json]
         end
       end
     end

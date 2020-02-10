@@ -295,12 +295,10 @@ module Bolt
         end
 
         @groups.each do |g|
-          begin
-            g.validate(used_group_names, used_target_names, used_aliases)
-          rescue ValidationError => e
-            e.add_parent(@name)
-            raise e
-          end
+          g.validate(used_group_names, used_target_names, used_aliases)
+        rescue ValidationError => e
+          e.add_parent(@name)
+          raise e
         end
 
         nil

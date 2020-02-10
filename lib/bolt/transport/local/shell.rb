@@ -164,15 +164,13 @@ module Bolt
 
             # Read from out and err
             ready_read&.each do |stream|
-              begin
-                # Check for sudo prompt
-                read_streams[stream] << if use_sudo
-                                          check_sudo(stream, inp, t.pid, options[:stdin])
-                                        else
-                                          stream.readpartial(CHUNK_SIZE)
-                                        end
-              rescue EOFError
-              end
+              # Check for sudo prompt
+              read_streams[stream] << if use_sudo
+                                        check_sudo(stream, inp, t.pid, options[:stdin])
+                                      else
+                                        stream.readpartial(CHUNK_SIZE)
+                                      end
+            rescue EOFError
             end
 
             # select will either return an empty array if there are no
@@ -204,10 +202,8 @@ module Bolt
           # Read any remaining data in the pipe. Do not wait for
           # EOF in case the pipe is inherited by a child process.
           read_streams.each do |stream, _|
-            begin
-              loop { read_streams[stream] << stream.read_nonblock(CHUNK_SIZE) }
-            rescue Errno::EAGAIN, EOFError
-            end
+            loop { read_streams[stream] << stream.read_nonblock(CHUNK_SIZE) }
+          rescue Errno::EAGAIN, EOFError
           end
           result_output.stdout << read_streams[out]
           result_output.stderr << read_streams[err]
