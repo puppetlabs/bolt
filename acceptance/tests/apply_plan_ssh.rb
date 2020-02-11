@@ -36,30 +36,6 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
     on(ssh_nodes, "rm -rf #{filepath}")
   end
 
-  step "execute `bolt plan run noop=true` via SSH with json output" do
-    result = bolt_command_on(bolt, bolt_command + ' noop=true', flags)
-    assert_equal(0, result.exit_code,
-                 "Bolt did not exit with exit code 0")
-
-    begin
-      json = JSON.parse(result.stdout)
-    rescue JSON::ParserError
-      assert_equal("Output should be JSON", result.string,
-                   "Output should be JSON")
-    end
-
-    ssh_nodes.each do |node|
-      # Verify that node succeeded
-      host = node.hostname
-      result = json.select { |n| n['node'] == host }
-      assert_equal('success', result[0]['status'],
-                   "The task did not succeed on #{host}")
-
-      # Verify that files were not created on the target
-      on(node, "cat #{filepath}/hello.txt", acceptable_exit_codes: [1])
-    end
-  end
-
   step "execute `bolt plan run` via SSH with json output" do
     result = bolt_command_on(bolt, bolt_command, flags)
     assert_equal(0, result.exit_code,
@@ -75,12 +51,12 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
     ssh_nodes.each do |node|
       # Verify that node succeeded
       host = node.hostname
-      result = json.select { |n| n['node'] == host }
+      result = json.select { |n| n['target'] == host }
       assert_equal('success', result[0]['status'],
                    "The task did not succeed on #{host}")
 
       # Verify the custom type was invoked
-      logs = result[0]['result']['report']['logs']
+      logs = result[0]['value']['report']['logs']
       warnings = logs.select { |l| l['level'] == 'warning' }
       assert_equal(1, warnings.count)
       assert_equal('Writing a MOTD!', warnings[0]['message'])
@@ -111,12 +87,12 @@ test_name "bolt plan run should apply manifest block on remote hosts via ssh" do
     ssh_nodes.each do |node|
       # Verify that node succeeded
       host = node.hostname
-      result = json.select { |n| n['node'] == host }
+      result = json.select { |n| n['target'] == host }
       assert_equal('success', result[0]['status'],
                    "The task did not succeed on #{host}")
 
-      assert_match(/stopped|absent/, result[0]['result']['status'], "Puppet must be stopped")
-      assert_equal('false', result[0]['result']['enabled'], "Puppet must be disabled")
+      assert_match(/stopped|absent/, result[0]['value']['status'], "Puppet must be stopped")
+      assert_equal('false', result[0]['value']['enabled'], "Puppet must be disabled")
     end
   end
 
@@ -170,7 +146,7 @@ FILE
 
       ssh_nodes.each do |node|
         host = node.hostname
-        result = json.select { |n| n['node'] == host }.first
+        result = json.select { |n| n['target'] == host }.first
         assert_equal('success', result['status'],
                      "The task failed on #{host}")
 
@@ -181,7 +157,7 @@ FILE
                end
         owner_result = bolt_command_on(bolt, "bolt command run \"#{stat}\" -t #{host} --format json")
         # It's times like this I think I'm just a highly paid data parser
-        owner = JSON.parse(owner_result.stdout)['items'].first['result']['stdout'].strip
+        owner = JSON.parse(owner_result.stdout)['items'].first['value']['stdout'].strip
         assert_equal(user, owner, "The file created in the apply block is not owned by the run_as user")
       end
     end

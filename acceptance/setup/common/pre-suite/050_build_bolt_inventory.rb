@@ -30,8 +30,8 @@ test_name "build bolt inventory file" do
 
   inventory = {
     'groups' => [
-      { 'name' => 'ssh_nodes', 'nodes' => ssh_nodes.map(&:hostname), 'config' => ssh_config },
-      { 'name' => 'winrm_nodes', 'nodes' => winrm_nodes.map(&:hostname), 'config' => winrm_config }
+      { 'name' => 'ssh_nodes', 'targets' => ssh_nodes.map(&:hostname), 'config' => ssh_config },
+      { 'name' => 'winrm_nodes', 'targets' => winrm_nodes.map(&:hostname), 'config' => winrm_config }
     ]
   }
 
