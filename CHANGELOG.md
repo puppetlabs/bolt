@@ -13,6 +13,14 @@
   Plugins can no longer set config in their `bolt_plugin.json`. Config is instead inferred from task
   parameters, with config values passed as parameters to the task.
 
+### New features
+
+* **Better output for errors in plans** ([#1607](https://github.com/puppetlabs/bolt/pull/1607))
+
+  Plans that fail due to an unhandled error now print output the same as if the
+  error were caught and then returned. Failures during compilation of `apply()`
+  blocks now provide clean error messages.
+
 ## Bolt 1.48.0
 
 ### New features

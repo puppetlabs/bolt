@@ -102,27 +102,30 @@ module Bolt
       out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
       ENV['PATH'] = old_path
 
-      # stderr may contain formatted logs from Puppet's logger or other errors.
-      # Print them in order, but handle them separately. Anything not a formatted log is assumed
-      # to be an error message.
-      logs = err.lines.map do |l|
-        JSON.parse(l)
-      rescue StandardError
-        l
-      end
-      logs.each do |log|
-        if log.is_a?(String)
-          @logger.error(log.chomp)
-        else
-          log.map { |k, v| [k.to_sym, v] }.each do |level, msg|
-            bolt_level = Bolt::Util::PuppetLogLevel::MAPPING[level]
-            @logger.send(bolt_level, "#{target.name}: #{msg.chomp}")
-          end
-        end
+      # Any messages logged by Puppet will be on stderr as JSON hashes, so we
+      # parse those and store them here. Any message on stderr that is not
+      # properly JSON formatted is assumed to be an error message.  If
+      # compilation was successful, we print the logs as they may include
+      # important warnings. If compilation failed, we don't print the logs as
+      # they are likely redundant with the error that caused the failure, which
+      # will be handled separately.
+      logs = err.lines.map do |line|
+        JSON.parse(line)
+      rescue JSON::ParserError
+        { 'level' => 'err', 'message' => line }
       end
 
-      raise(ApplyError, target.name) unless stat.success?
-      JSON.parse(out)
+      result = JSON.parse(out)
+      if stat.success?
+        logs.each do |log|
+          bolt_level = Bolt::Util::PuppetLogLevel::MAPPING[log['level'].to_sym]
+          message = log['message'].chomp
+          @logger.send(bolt_level, "#{target.name}: #{message}")
+        end
+        result
+      else
+        raise ApplyError.new(target.name, result['message'])
+      end
     end
 
     def validate_hiera_config(hiera_config)
@@ -206,27 +209,39 @@ module Bolt
           @executor.queue_execute([target]) do |transport, batch|
             @executor.with_node_logging("Applying manifest block", batch) do
               catalog = future.value
-              raise future.reason if future.rejected?
-
-              arguments = {
-                'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
-                'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
-                'apply_settings' => @apply_settings,
-                '_task' => catalog_apply_task.name,
-                '_noop' => options[:noop]
-              }
-
-              callback = proc do |event|
-                if event[:type] == :node_result
-                  event = event.merge(result: ApplyResult.from_task_result(event[:result]))
+              if future.rejected?
+                batch.map do |batch_target|
+                  # If an unhandled exception occurred, wrap it in an ApplyError
+                  error = if future.reason.is_a?(Bolt::ApplyError)
+                            future.reason
+                          else
+                            Bolt::ApplyError.new(batch_target, future.reason.message)
+                          end
+                  result = Bolt::ApplyResult.new(batch_target, error: error.to_h)
+                  @executor.publish_event(type: :node_result, result: result)
+                  result
                 end
-                @executor.publish_event(event)
-              end
-              # Respect the run_as default set on the executor
-              options[:run_as] = @executor.run_as if @executor.run_as && !options.key?(:run_as)
+              else
+                arguments = {
+                  'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
+                  'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
+                  'apply_settings' => @apply_settings,
+                  '_task' => catalog_apply_task.name,
+                  '_noop' => options[:noop]
+                }
 
-              results = transport.batch_task(batch, catalog_apply_task, arguments, options, &callback)
-              Array(results).map { |result| ApplyResult.from_task_result(result) }
+                callback = proc do |event|
+                  if event[:type] == :node_result
+                    event = event.merge(result: ApplyResult.from_task_result(event[:result]))
+                  end
+                  @executor.publish_event(event)
+                end
+                # Respect the run_as default set on the executor
+                options[:run_as] = @executor.run_as if @executor.run_as && !options.key?(:run_as)
+
+                results = transport.batch_task(batch, catalog_apply_task, arguments, options, &callback)
+                Array(results).map { |result| ApplyResult.from_task_result(result) }
+              end
             end
           end
         end

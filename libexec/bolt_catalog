@@ -41,12 +41,26 @@ elsif command == "compile"
             else
               JSON.parse(STDIN.read)
             end
-  catalog = Bolt::Catalog.new.compile_catalog(request)
-  # This seems to be a string in ruby 2.3
-  if catalog.is_a?(String)
-    catalog = JSON.parse(catalog)
+  begin
+    catalog = Bolt::Catalog.new.compile_catalog(request)
+    # This seems to be a string in ruby 2.3
+    if catalog.is_a?(String)
+      catalog = JSON.parse(catalog)
+    end
+    puts JSON.pretty_generate(catalog)
+  rescue Puppet::PreformattedError => e
+    message = if e.cause
+                location_info = Puppet::Util::Errors.error_location_with_space(e.file, e.line, e.pos)
+                "#{e.cause.message}#{location_info}"
+              else
+                e.message
+              end
+    puts({ message: message }.to_json)
+    exit 1
+  rescue StandardError => e
+    puts({ message: e.message }.to_json)
+    exit 1
   end
-  puts JSON.pretty_generate(catalog)
 else
   puts "USAGE: run 'bolt_catalog compile' with a request on STDIN " \
        "or 'bolt_catalog parse manifest.pp' to generate JSON AST"
