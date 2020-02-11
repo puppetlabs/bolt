@@ -29,12 +29,12 @@ test_name "bolt apply should apply manifest block on remote hosts via ssh and wi
     targets.each do |node|
       # Verify that node succeeded
       host = node == 'localhost' ? 'localhost' : node.hostname
-      result = json.find { |n| n['node'] == host }
+      result = json.find { |n| n['target'] == host }
       assert_equal('success', result['status'],
                    "The task did not succeed on #{host}")
 
       # Verify the notify was processed
-      assert_includes(result.dig('result', 'report', 'resource_statuses'), 'Notify[hello world]')
+      assert_includes(result.dig('value', 'report', 'resource_statuses'), 'Notify[hello world]')
     end
   end
 
