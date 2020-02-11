@@ -56,11 +56,9 @@ module Bolt
       def finish_plan(result)
         if result.is_a? Bolt::PlanResult
           @connections.each_value do |conn|
-            begin
-              conn.finish_plan(result)
-            rescue StandardError => e
-              @logger.debug("Failed to finish plan on #{conn.key}: #{e.message}")
-            end
+            conn.finish_plan(result)
+          rescue StandardError => e
+            @logger.debug("Failed to finish plan on #{conn.key}: #{e.message}")
           end
         end
       end

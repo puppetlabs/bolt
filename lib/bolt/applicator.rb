@@ -106,11 +106,9 @@ module Bolt
       # Print them in order, but handle them separately. Anything not a formatted log is assumed
       # to be an error message.
       logs = err.lines.map do |l|
-        begin
-          JSON.parse(l)
-        rescue StandardError
-          l
-        end
+        JSON.parse(l)
+      rescue StandardError
+        l
       end
       logs.each do |log|
         if log.is_a?(String)

@@ -358,12 +358,10 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     around :each do |example|
-      begin
-        Puppet.push_context(apply_executor: applicator)
-        example.run
-      ensure
-        Puppet.pop_context
-      end
+      Puppet.push_context(apply_executor: applicator)
+      example.run
+    ensure
+      Puppet.pop_context
     end
 
     it 'builds and applies a manifest' do
