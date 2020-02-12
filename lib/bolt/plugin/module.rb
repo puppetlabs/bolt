@@ -170,7 +170,8 @@ module Bolt
           params = @config ? config.merge(params) : params
           validate_params(task, params)
         end
-        params['_boltdir'] = @context.boltdir.to_s
+
+        meta['_boltdir'] = @context.boltdir.to_s
 
         [params, meta]
       end
