@@ -36,17 +36,16 @@ module Bolt
       def setup
         @data = load_data
         @hook_map = find_hooks(@data['hooks'] || {})
-        # If there is a config section in bolt_plugin.json, validate against that and send
-        # validated values nested under `_config` key. Otherwise validate againsts the intersection
-        # of all task schemas.
-        # TODO: remove @send_config when deprecated
-        schema = if @data['config']
-                   @send_config = true
-                   @data['config']
-                 else
-                   extract_task_parameter_schema
-                 end
-        @config_schema = process_schema(schema)
+        @config_schema = process_schema(extract_task_parameter_schema)
+
+        # Raise an error if there is config in the plugin data
+        if @data['config']
+          msg = <<~MSG
+            'config' key is not allowed in 'bolt_plugin.json'. Plugin config is inferred from
+            task parameters.
+          MSG
+          raise InvalidPluginData.new(name, msg)
+        end
 
         validate_config(@config, @config_schema)
       end
@@ -57,10 +56,6 @@ module Bolt
 
       def hooks
         (@hook_map.keys + [:validate_resolve_reference]).uniq
-      end
-
-      def config?
-        @data.include?('config') && !@data['config'].empty?
       end
 
       def load_data
@@ -159,17 +154,9 @@ module Bolt
         # handled previously. That may not always be the case so filter them
         # out now.
         meta, params = opts.partition { |key, _val| key.start_with?('_') }.map(&:to_h)
+        params = @config ? config.merge(params) : params
+        validate_params(task, params)
 
-        # Send config with `_config` when config is defined in bolt_plugin.json
-        # Otherwise, merge config with params
-        # TODO: remove @send_config when deprecated
-        if @send_config
-          validate_params(task, params)
-          params['_config'] = config if config?
-        else
-          params = @config ? config.merge(params) : params
-          validate_params(task, params)
-        end
         params['_boltdir'] = @context.boltdir.to_s
 
         [params, meta]
@@ -232,16 +219,11 @@ module Bolt
       end
 
       def validate_resolve_reference(opts)
-        # Send config with `_config` when config is defined in bolt_plugin.json
-        # Otherwise, merge config with params
-        # TODO: remove @send_config when deprecated
-        if @send_config
-          params = opts.reject { |k, _v| k.start_with?('_') }
-        else
-          merged = @config.merge(opts)
-          params = merged.reject { |k, _v| k.start_with?('_') }
-        end
+        # Merge config with params
+        merged = @config.merge(opts)
+        params = merged.reject { |k, _v| k.start_with?('_') }
         sig = @hook_map[:resolve_reference]['task']
+
         if sig
           validate_params(sig, params)
         end

@@ -126,13 +126,6 @@ describe 'using module based plugins' do
   end
 
   context 'when a plugin requires config' do
-    let(:plugin) {
-      {
-        '_plugin' => 'conf_plug',
-        'value' => "ssshhh"
-      }
-    }
-
     let(:inventory) {
       { 'targets' => [
         { 'uri' => 'node1',
@@ -153,25 +146,6 @@ describe 'using module based plugins' do
       PLAN
     end
 
-    it 'fails when configuration is incorrect' do
-      result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir], rescue_exec: true)
-
-      expect(result).to include('kind' => "bolt/validation-error")
-      expect(result['msg']).to match(/conf_plug plugin expects a String for key required_key/)
-    end
-
-    context 'with correct config' do
-      let(:plugin_config) { { 'conf_plug' => { 'required_key' => 'foo' } } }
-
-      it 'passes _config to the task' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir])
-
-        expect(result['remote']['data']).to include('_config' => plugin_config['conf_plug'])
-        expect(result['remote']['data']).to include('_boltdir' => boltdir)
-        expect(result['remote']['data']).to include('value' => 'ssshhh')
-      end
-    end
-
     context 'with values specified in both bolt.yaml and inventory.yaml' do
       context 'and merging config' do
         let(:plugin) { { '_plugin' => 'task_conf_plug', 'optional_key' => 'keep' } }
@@ -180,7 +154,6 @@ describe 'using module based plugins' do
         it 'merges parameters set in config and does not pass _config' do
           result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir])
 
-          expect(result['remote']['data']).not_to include('_config' => plugin_config['conf_plug'])
           expect(result['remote']['data']).to include('_boltdir' => boltdir)
           expect(result['remote']['data']).to include('required_key' => 'foo')
           expect(result['remote']['data']).to include('optional_key' => 'keep')
@@ -194,7 +167,6 @@ describe 'using module based plugins' do
         it 'treats all required values from task paramter metadata as optional' do
           result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir])
 
-          expect(result['remote']['data']).not_to include('_config' => plugin_config['conf_plug'])
           expect(result['remote']['data']).to include('_boltdir' => boltdir)
           expect(result['remote']['data']).to include('required_key' => 'foo')
           expect(result['remote']['data']).to include('optional_key' => 'bar')

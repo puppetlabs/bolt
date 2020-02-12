@@ -66,6 +66,10 @@ describe Bolt::Plugin do
 
       expect { plugins }.to raise_error(/The 'plugins' setting cannot be set by a plugin reference/)
     end
+
+    it 'fails if bolt_plugin.json has a config key' do
+      expect { plugins.add_module_plugin('conf_plug') }.to raise_error(/'config' key is not allowed/)
+    end
   end
 
   context 'loading plugin_hooks' do

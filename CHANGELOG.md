@@ -8,6 +8,11 @@
 
   Inventory v1 is no longer supported by Bolt and has been removed. The inventory now defaults to v2.
 
+* **Support for `config` key in a plugin's `bolt_plugin.json` has been removed** ([#1598](https://github.com/puppetlabs/bolt/issues/1598))
+
+  Plugins can no longer define config from the `bolt_plugin.json`. Plugins will now only infer config from task parameters
+  and pass config values as regular parameters.
+
 ## Bolt 1.48.0
 
 ### New features
