@@ -14,7 +14,7 @@ describe Bolt::Inventory do
 
   context 'with BOLT_INVENTORY set' do
     let(:inventory) { Bolt::Inventory.from_config(config, plugins) }
-    let(:target) { inventory.get_targets('node1')[0] }
+    let(:target) { inventory.get_targets('target1')[0] }
 
     before(:each) do
       ENV['BOLT_INVENTORY'] = inventory_env.to_yaml
@@ -25,7 +25,7 @@ describe Bolt::Inventory do
     context 'with valid config' do
       let(:inventory_env) {
         {
-          'nodes' => ['node1'],
+          'targets' => ['target1'],
           'config' => {
             'transport' => 'winrm'
           }

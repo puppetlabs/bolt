@@ -239,6 +239,15 @@ module Bolt
           raise ValidationError.new(msg, @name)
         end
 
+        if input.key?('nodes')
+          msg = <<~MSG.chomp
+                Found 'nodes' key in group #{@name}. This looks like a v1 inventory file, which is
+                no longer supported by Bolt. Migrate to a v2 inventory file automatically using
+                'bolt project migrate'.
+                MSG
+          raise ValidationError.new(msg, nil)
+        end
+
         unless (unexpected_keys = input.keys - GROUP_KEYS).empty?
           msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in group #{@name}"
           @logger.warn(msg)

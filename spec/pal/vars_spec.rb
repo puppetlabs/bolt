@@ -18,7 +18,7 @@ describe 'Vars function' do
 
   let(:data) {
     {
-      'nodes' => %w[example],
+      'targets' => %w[example],
       'vars' => { 'pb' => 'jelly', 'mac' => 'cheese' }
     }
   }

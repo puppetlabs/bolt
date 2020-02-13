@@ -751,6 +751,12 @@ describe Bolt::Inventory::Group do
         Bolt::Inventory::Group.new({ 'name' => 'foo', 'unexpected' => 1 }, plugins)
       end
 
+      it 'errors on deprecated nodes key' do
+        expect {
+          Bolt::Inventory::Group.new({ 'name' => 'foo', 'nodes' => [{ 'uri' => 'example.com' }] }, plugins)
+        }.to raise_error(/Found 'nodes' key/)
+      end
+
       it 'logs unexpected group config keys' do
         expect(mock_logger).to receive(:warn).with(/in config for group foo/)
         Bolt::Inventory::Group.new({ 'name' => 'foo', 'config' => { 'unexpected' => 1 } }, plugins)
