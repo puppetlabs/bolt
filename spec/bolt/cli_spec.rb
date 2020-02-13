@@ -573,6 +573,13 @@ describe "Bolt::CLI" do
       end
     end
 
+    describe "filter" do
+      it "raises an error when a filter has illegal characters" do
+        cli = Bolt::CLI.new(%w[plan show --filter JSON])
+        expect { cli.parse }.to raise_error(Bolt::CLIError, /Illegal characters in filter string/)
+      end
+    end
+
     describe "transport" do
       it "defaults to 'ssh'" do
         cli = Bolt::CLI.new(%w[command run --targets foo whoami])
