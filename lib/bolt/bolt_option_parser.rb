@@ -67,7 +67,7 @@ module Bolt
           { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir],
             banner: PLAN_RUN_HELP }
         when 'show'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[filter format],
             banner: PLAN_SHOW_HELP }
         else
           { flags: OPTIONS[:global],
@@ -130,7 +130,7 @@ module Bolt
           { flags: ACTION_OPTS + %w[params tmpdir noop],
             banner: TASK_RUN_HELP }
         when 'show'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[filter format],
             banner: TASK_SHOW_HELP }
         else
           { flags: OPTIONS[:global],
@@ -761,6 +761,14 @@ module Bolt
       end
 
       separator "\nDISPLAY OPTIONS"
+      define('--filter FILTER', 'Filter tasks and plans by a matching substring') do |filter|
+        unless /^[a-z0-9_:]+$/.match(filter)
+          msg = "Illegal characters in filter string '#{filter}'. Filters must match a legal "\
+                "task or plan name."
+          raise Bolt::CLIError, msg
+        end
+        @options[:filter] = filter
+      end
       define('--format FORMAT', 'Output format to use: human or json') do |format|
         @options[:format] = format
       end

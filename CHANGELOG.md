@@ -1,5 +1,14 @@
 # Changelog
 
+## Bolt Next
+
+### New features
+
+* **Filter tasks and plans by substring** ([#1596](https://github.com/puppetlabs/bolt/issues/1596))
+
+  Users can now filter available tasks and plans when using `bolt task show` and `bolt plan show` by
+  using the `--filter` CLI option. This option accepts a substring to match task and plan names against.
+
 ## Bolt 1.49.0
 
 ### New features
