@@ -11,9 +11,9 @@
 
 ### Bug fixes
 
-* **Bundled `resolve_references` tasks set to private** ([#1599](https://github.com/puppetlabs/bolt/issues/1599))
+* **Bundled `resolve_reference` tasks set to private** ([#1599](https://github.com/puppetlabs/bolt/issues/1599))
 
-  `resolve_references` tasks in bundled content have been set to private and will no longer appear when
+  `resolve_reference` tasks in bundled content have been set to private and will no longer appear when
   using `bolt task show`.
 
 ## Bolt 1.49.0
