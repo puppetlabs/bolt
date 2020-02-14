@@ -9,6 +9,13 @@
   Users can now filter available tasks and plans when using `bolt task show` and `bolt plan show` by
   using the `--filter` CLI option. This option accepts a substring to match task and plan names against.
 
+### Bug fixes
+
+* **Bundled `resolve_reference` tasks set to private** ([#1599](https://github.com/puppetlabs/bolt/issues/1599))
+
+  `resolve_reference` tasks in bundled content have been set to private and will no longer appear when
+  using `bolt task show`.
+
 ## Bolt 1.49.0
 
 ### New features
