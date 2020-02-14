@@ -100,7 +100,7 @@ targets:
 
 When searching for a target's configuration data, Bolt matches a target's URI with its name. Bolt uses depth-first search and uses the first value it finds.
 
-The `config` values for a target object, such as `host`, `transport`, and `port`, take precedent and override any `config` values at the group level. Bolt merges non-`config` data in the target object, such as `alias`, `facts`, and `vars`, with data in the group object.
+The `config` values for a target object, such as `host`, `transport`, and `port`, take precedent and override any `config` values at the group level. Bolt merges non-`config` data in the target object, such as `facts`, and `vars`, with data in the group object.
 
 ```yaml
 version: 2
@@ -112,7 +112,7 @@ groups:
         config:
           ssh:
             user: puppet
-        facts: 
+        facts:
           hardwaremodel: x86_64
       - name: myothertarget
         uri: target2.example.com
@@ -126,16 +126,16 @@ groups:
         config:
           ssh:
             password: bolt
-    config: 
-      ssh: 
+    config:
+      ssh:
         password: password
-    facts: 
+    facts:
       operatingsystem: CentOS
 
 ```
 
 In the example above,  `mytarget` in `group1` contains the fact, `hardwaremodel:
-x86_64.` There is also a top-level fact, `operatingsystem: CentOS`. 
+x86_64.` The fact `operatingsystem: CentOS` is set in `group2` which also contains `mytarget`.
 
 Running `bolt inventory show -t group1 --detail` returns both facts for `mytarget`:
 
@@ -169,7 +169,7 @@ Inventory files are not context-aware. Any data set for a target, whether in a t
   ]
 }
 ```
-> **Note**: The password for mytarget is defined at the target level in `group2`, and overrides the password set at the group level. 
+> **Note**: The password for mytarget is defined at the target level in `group2`, and overrides the password set at the group level.
 
 ## Plugins
 
@@ -230,7 +230,7 @@ groups:
 
 ### Detailed inventory file
 
-The following inventory file contains a more detailed hierarchy of groups and targets. As with all inventory files, it has a top-level group named `all`, which refers to all targets in the inventory. The `all` group has two subgroups named `ssh_nodes` and `win_nodes`. 
+The following inventory file contains a more detailed hierarchy of groups and targets. As with all inventory files, it has a top-level group named `all`, which refers to all targets in the inventory. The `all` group has two subgroups named `ssh_nodes` and `win_nodes`.
 
 The `ssh_nodes` group has two subgroups - `webservers` and `memcached` - and sets the default transport for targets in the group to the SSH protocol. It also specifies a few configuration options for the SSH transport. Each of the subgroups lists the targets in the group and the `memcached` group has additional SSH transport configuration for its targets.
 
