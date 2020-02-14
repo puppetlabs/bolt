@@ -15,6 +15,10 @@
   Users can now filter available tasks and plans when using `bolt task show` and `bolt plan show` by
   using the `--filter` CLI option. This option accepts a substring to match task and plan names against.
 
+* **New `write_file` plan function** ([#1597](https://github.com/puppetlabs/bolt/issues/1597))
+
+  The new plan function, `write_file`, allows you to write content to a file on the given targets.
+
 ### Bug fixes
 
 * **Bundled `resolve_reference` tasks set to private** ([#1599](https://github.com/puppetlabs/bolt/issues/1599))
