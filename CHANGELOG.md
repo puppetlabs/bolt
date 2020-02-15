@@ -2,6 +2,12 @@
 
 ## Bolt Next
 
+### New features
+
+* **New `write_file` plan function** ([#1597](https://github.com/puppetlabs/bolt/issues/1597))
+
+  The new plan function, `write_file`, allows you to write content to a file on the given targets.
+
 ### Bug fixes
 
 * **Fixed performance regression with large inventory files** ([#1627](https://github.com/puppetlabs/bolt/pull/1627))
