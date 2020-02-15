@@ -122,7 +122,7 @@ To convert the `restart_service.ps1` script to a task, giving you the ability to
 
     ![](bolt_PS_3.png)
 
-    **Note:** `--targets windows` refers to the name of the group of targets that you specified in your inventory file. For more information, see [Specify targets](bolt_options.md#).
+    **Note:** `--targets windows` refers to the name of the group of targets that you specified in your inventory file. For more information, see [Specify targets](running_bolt_commands.md#adding-options-to-bolt-commands).
 
 
 ## Deploy a package with Bolt and Chocolatey

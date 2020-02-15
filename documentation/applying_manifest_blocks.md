@@ -173,7 +173,7 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
 
 [NGINX](https://www.nginx.com/resources/glossary/nginx/)
 
-[Specify targets](bolt_options.md#)
+[Specify targets](running_bolt_commands.md#adding-options-to-bolt-commands)
 
 [Project directories](bolt_project_directories.md#)
 
@@ -254,7 +254,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 
 [IIS](https://www.iis.net)
 
-[Specify targets](bolt_options.md#)
+[Specify targets](running_bolt_commands.md#adding-options-to-bolt-commands)
 
 [Project directories](bolt_project_directories.md#)
 
