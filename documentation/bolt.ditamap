@@ -4,7 +4,7 @@
     <topicref href="bolt.md" format="markdown" linking="targetonly">
         <topicref navtitle="Changelog" href="https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md" format="markdown" scope="external" />
         <topicref href="bolt_versioning.md" format="markdown"/>
-        <topicref href="migrating_inventory_files.md" format="markdown">   
+        <topicref href="migrating_inventory_files.md" format="markdown"/>   
         <topicref href="bolt_known_issues.md" format="markdown"/>
     </topicref>
     <topicref href="bolt_installing.md" format="markdown" linking="targetonly">
