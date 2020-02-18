@@ -83,15 +83,13 @@ Puppet::Functions.create_function(:apply_prep) do
           pool = Concurrent::ThreadPoolExecutor.new
 
           hooks = need_install_targets.map do |t|
-            begin
-              opts = t.plugin_hooks&.fetch('puppet_library').dup
-              plugin_name = opts.delete('plugin')
-              hook = inventory.plugins.get_hook(plugin_name, :puppet_library)
-              { 'target' => t,
-                'hook_proc' => hook.call(opts, t, self) }
-            rescue StandardError => e
-              Bolt::Result.from_exception(t, e)
-            end
+            opts = t.plugin_hooks&.fetch('puppet_library').dup
+            plugin_name = opts.delete('plugin')
+            hook = inventory.plugins.get_hook(plugin_name, :puppet_library)
+            { 'target' => t,
+              'hook_proc' => hook.call(opts, t, self) }
+          rescue StandardError => e
+            Bolt::Result.from_exception(t, e)
           end
 
           hook_errors, ok_hooks = hooks.partition { |h| h.is_a?(Bolt::Result) }

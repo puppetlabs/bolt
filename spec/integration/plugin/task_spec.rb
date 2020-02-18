@@ -59,16 +59,15 @@ describe 'using the task plugin' do
     }
 
     let(:inventory) {
-      { 'version' => 2,
-        'targets' => [
-          { 'uri' => 'node1',
-            'config' => {
-              'ssh' => {
-                'user' => 'me',
-                'password' => plugin
-              }
-            } }
-        ] }
+      { 'targets' => [
+        { 'uri' => 'node1',
+          'config' => {
+            'ssh' => {
+              'user' => 'me',
+              'password' => plugin
+            }
+          } }
+      ] }
     }
 
     it 'supports a config lookup' do
@@ -137,8 +136,7 @@ describe 'using the task plugin' do
     }
 
     let(:inventory) {
-      { 'version' => 2,
-        'targets' => [plugin] }
+      { 'targets' => [plugin] }
     }
     it 'supports a target lookup' do
       output = run_cli(['plan', 'run', 'test_plan', '--boltdir', boltdir])
@@ -225,7 +223,7 @@ describe 'using the task plugin' do
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
-        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+        expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
           /The task failed with exit code 1/
         )
       end
@@ -241,7 +239,7 @@ describe 'using the task plugin' do
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
-        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+        expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
           /Invalid parameters for Task sample::params/
         )
       end
@@ -257,7 +255,7 @@ describe 'using the task plugin' do
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
-        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+        expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
           /Task 'non_existent_task' could not be found/
         )
       end

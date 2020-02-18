@@ -31,7 +31,7 @@ describe "BoltSpec::Run", ssh: true do
       result = run_task('sample::echo', 'non_existent_node', '_catch_errors' => true)
 
       expect(result[0]['status']).to eq('failure')
-      expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
+      expect(result[0]['value']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
     end
   end
 
@@ -45,7 +45,7 @@ describe "BoltSpec::Run", ssh: true do
       result = run_command('echo hello', 'non_existent_node', options: { catch_errors: true })
 
       expect(result[0]['status']).to eq('failure')
-      expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
+      expect(result[0]['value']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
     end
   end
 
@@ -55,14 +55,14 @@ describe "BoltSpec::Run", ssh: true do
     it 'should run a command on a node with an argument', ssh: true do
       result = run_script(script, 'ssh', ['hi'])
       expect(result[0]['status']).to eq('success')
-      expect(result[0]['result']['stdout']).to match(/arg: hi/)
+      expect(result[0]['value']['stdout']).to match(/arg: hi/)
     end
 
     it 'should accept _catch_errors' do
       result = run_script('missing.sh', 'non_existent_node', nil, options: { catch_errors: true })
 
       expect(result[0]['status']).to eq('failure')
-      expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
+      expect(result[0]['value']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
     end
   end
 
@@ -79,7 +79,7 @@ describe "BoltSpec::Run", ssh: true do
       result = run_script('missing.sh', 'non_existent_node', nil, options: { catch_errors: true })
 
       expect(result[0]['status']).to eq('failure')
-      expect(result[0]['result']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
+      expect(result[0]['value']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
     end
   end
 
@@ -110,7 +110,7 @@ describe "BoltSpec::Run", ssh: true do
     before(:all) do
       result = run_task('puppet_agent::version', 'ssh', {}, inventory: conn_inventory, config: root_config)
       expect(result.first['status']).to eq('success')
-      unless result.first['result']['version']
+      unless result.first['value']['version']
         result = run_task('puppet_agent::install', 'ssh', {}, inventory: conn_inventory, config: root_config)
       end
       expect(result.first['status']).to eq('success')
@@ -128,7 +128,7 @@ describe "BoltSpec::Run", ssh: true do
           results = apply_manifest(manifest.path, 'ssh')
           results.each do |result|
             expect(result['status']).to eq('success')
-            expect(result.dig('result', 'report', 'resource_statuses')).to include('Notify[hello world]')
+            expect(result.dig('value', 'report', 'resource_statuses')).to include('Notify[hello world]')
           end
         end
         bolt_inventory.delete('features')
@@ -139,7 +139,7 @@ describe "BoltSpec::Run", ssh: true do
         results = apply_manifest("notify { 'hello world': }", 'ssh', execute: true)
         results.each do |result|
           expect(result['status']).to eq('success')
-          expect(result.dig('result', 'report', 'resource_statuses')).to include('Notify[hello world]')
+          expect(result.dig('value', 'report', 'resource_statuses')).to include('Notify[hello world]')
         end
         bolt_inventory.delete('features')
       end
@@ -157,7 +157,7 @@ describe "BoltSpec::Run", ssh: true do
         results = apply_manifest("fail()", 'ssh', execute: true)
         results.each do |result|
           expect(result['status']).to eq('failure')
-          expect(result.dig('result', '_error', 'kind')).to eq('bolt/apply-error')
+          expect(result.dig('value', '_error', 'kind')).to eq('bolt/apply-error')
         end
         bolt_inventory.delete('features')
       end

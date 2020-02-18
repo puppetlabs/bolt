@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/util'
+require 'bolt/inventory'
 
 module BoltSpec
   module Conn
@@ -48,13 +49,16 @@ module BoltSpec
     end
 
     def conn_target(transport, include_password: false, options: nil)
-      Bolt::Target.new(conn_uri(transport, include_password: include_password), options)
+      inventory = Bolt::Inventory.empty
+      target = inventory.get_target(conn_uri(transport, include_password: include_password))
+      inventory.set_config(target, transport, options) if options
+      target
     end
 
     def conn_inventory
       groups = %w[ssh winrm].map do |transport|
         { "name" => transport,
-          "nodes" => [conn_uri(transport)],
+          "targets" => [conn_uri(transport)],
           "config" => {
             transport => Bolt::Util.walk_keys(conn_info(transport), &:to_s)
           } }

@@ -19,7 +19,8 @@ describe Bolt::Transport::Local do
   let(:password) { 'runner' }
   let(:transport) { :local }
   let(:os_context) { Bolt::Util.windows? ? windows_context : posix_context }
-  let(:target) { Bolt::Target.new('local://localhost', transport_conf) }
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:target) { inventory.get_target('localhost') }
 
   it 'is always connected' do
     expect(runner.connected?(target)).to eq(true)
@@ -117,9 +118,8 @@ describe Bolt::Transport::Local do
     end
 
     context 'with run-as', sudo: true do
-      let(:config) {
-        mk_config('sudo-password' => password, 'run-as' => 'root')
-      }
+      let(:config_data) { { 'sudo-password' => password, 'run-as' => 'root' } }
+      let(:config) { mk_config(config_data) }
       let(:target) { make_target }
 
       it "runs with large input and output" do

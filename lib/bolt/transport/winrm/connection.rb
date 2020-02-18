@@ -276,7 +276,7 @@ module Bolt
           if Dir.exist?(source)
             tree.open_directory(directory: dest, write: true, disposition: ::RubySMB::Dispositions::FILE_OPEN_IF)
 
-            (Dir.entries(source) - ['.', '..']).each do |child|
+            Dir.children(source).each do |child|
               child_dest = dest + '\\' + child
               write_remote_file_smb_recursive(tree, File.join(source, child), child_dest)
             end

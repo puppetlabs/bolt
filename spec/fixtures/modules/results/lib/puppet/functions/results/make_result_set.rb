@@ -8,7 +8,9 @@ Puppet::Functions.create_function(:'results::make_result_set') do
 
   def create(input)
     results = input.map do |uri, result|
-      target = Bolt::Target.new(uri)
+      inventory = Puppet.lookup(:bolt_inventory)
+      inventory.get_target(uri)
+      target = Bolt::Target.new(uri, inventory)
       Bolt::Result.new(target, value: result)
     end
     Bolt::ResultSet.new(results)

@@ -16,10 +16,10 @@ describe 'remove_from_group' do
   let(:data) do
     { 'groups' => [
       { 'name' => parent,
-        'nodes' => [target1],
+        'targets' => [target1],
         'groups' => [
           { 'name' => child,
-            'nodes' => [target1, target2] }
+            'targets' => [target1, target2] }
         ] }
     ] }
   end
@@ -50,7 +50,7 @@ describe 'remove_from_group' do
     end
   end
 
-  shared_examples('removing target from a group') do
+  context 'removing target from a group' do
     it 'errors when removing multiple targets' do
       is_expected.to run.with_params(%w[foo bar], 'group1')
                         .and_raise_error(Bolt::Inventory::ValidationError,
@@ -86,25 +86,5 @@ describe 'remove_from_group' do
       targets = inventory.get_targets(parent).map(&:name)
       expect(targets).to include(target1)
     end
-  end
-
-  describe 'using inventory version 2' do
-    let(:data) do
-      { 'version' => 2,
-        'groups' => [
-          { 'name' => parent,
-            'targets' => [target1],
-            'groups' => [
-              { 'name' => child,
-                'targets' => [target1, target2] }
-            ] }
-        ] }
-    end
-
-    include_examples 'removing target from a group'
-  end
-
-  describe 'using inventory version 1' do
-    include_examples 'removing target from a group'
   end
 end

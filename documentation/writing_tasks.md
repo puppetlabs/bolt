@@ -489,7 +489,6 @@ To prevent accidentally running a normal task on a remote target and breaking it
 Add Slack as a remote target in your inventory file:
 
 ```yaml
-version: 2
 targets:
   - name: my_slack
     config:

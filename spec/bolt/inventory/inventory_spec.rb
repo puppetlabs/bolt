@@ -5,7 +5,7 @@ require 'bolt_spec/config'
 require 'bolt/inventory'
 require 'bolt/plugin'
 
-describe Bolt::Inventory::Inventory2 do
+describe Bolt::Inventory::Inventory do
   include BoltSpec::Config
 
   def get_target(inventory, name, alia = nil)
@@ -33,7 +33,7 @@ describe Bolt::Inventory::Inventory2 do
   let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
 
   it 'creates simple inventory' do
-    expect(inventory.class).to eq(Bolt::Inventory::Inventory2)
+    expect(inventory.class).to eq(Bolt::Inventory::Inventory)
   end
 
   it 'gets a uri target from the inventory' do
@@ -169,17 +169,17 @@ describe Bolt::Inventory::Inventory2 do
 
     describe :validate do
       it 'accepts empty inventory' do
-        expect(Bolt::Inventory::Inventory2.new({}, plugins: plugins).validate).to be_nil
+        expect(Bolt::Inventory::Inventory.new({}, plugins: plugins).validate).to be_nil
       end
 
       it 'accepts non-empty inventory' do
-        expect(Bolt::Inventory::Inventory2.new(data, plugins: plugins).validate).to be_nil
+        expect(Bolt::Inventory::Inventory.new(data, plugins: plugins).validate).to be_nil
       end
 
       it 'fails with unnamed groups' do
         data = { 'groups' => [{}] }
         expect {
-          Bolt::Inventory::Inventory2.new(data, plugins: plugins).validate
+          Bolt::Inventory::Inventory.new(data, plugins: plugins).validate
         }.to raise_error(Bolt::Inventory::ValidationError, /Group does not have a name/)
       end
 
@@ -187,32 +187,32 @@ describe Bolt::Inventory::Inventory2 do
         data = { 'targets' => [{ 'name' => '' }] }
 
         expect {
-          Bolt::Inventory::Inventory2.new(data, plugins: plugins)
+          Bolt::Inventory::Inventory.new(data, plugins: plugins)
         }.to raise_error(Bolt::Inventory::ValidationError, /No name or uri for target/)
       end
 
       it 'fails with duplicate groups' do
         data = { 'groups' => [{ 'name' => 'group1' }, { 'name' => 'group1' }] }
         expect {
-          Bolt::Inventory::Inventory2.new(data, plugins: plugins).validate
+          Bolt::Inventory::Inventory.new(data, plugins: plugins).validate
         }.to raise_error(Bolt::Inventory::ValidationError, /Tried to redefine group group1/)
       end
     end
 
     describe :collect_groups do
       it 'finds the all group with an empty inventory' do
-        inventory = Bolt::Inventory::Inventory2.new({}, plugins: plugins)
+        inventory = Bolt::Inventory::Inventory.new({}, plugins: plugins)
         expect(inventory.get_targets('all')).to eq([])
       end
 
       it 'finds the all group with a non-empty inventory' do
-        inventory = Bolt::Inventory::Inventory2.new(data, plugins: plugins)
+        inventory = Bolt::Inventory::Inventory.new(data, plugins: plugins)
         targets = inventory.get_targets('all')
         expect(targets.size).to eq(9)
       end
 
       it 'finds targets in a subgroup' do
-        inventory = Bolt::Inventory::Inventory2.new(data, plugins: plugins)
+        inventory = Bolt::Inventory::Inventory.new(data, plugins: plugins)
         targets = inventory.get_targets('group2')
         target_names = targets.map(&:name)
         expect(target_names).to eq(%w[target6 target7 ssh://target8 target9])
@@ -220,7 +220,7 @@ describe Bolt::Inventory::Inventory2 do
     end
 
     context 'with an empty config' do
-      let(:inventory) { Bolt::Inventory::Inventory2.new({}, config, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new({}, config, plugins: plugins) }
       let(:target) { inventory.get_targets('notarget')[0] }
 
       it 'should accept an empty file' do
@@ -238,12 +238,12 @@ describe Bolt::Inventory::Inventory2 do
 
     context 'with config' do
       let(:inventory) {
-        Bolt::Inventory::Inventory2.new({}, config('transport' => 'winrm',
-                                                   'winrm' => {
-                                                     'ssl' => false,
-                                                     'ssl-verify' => false
-                                                   }),
-                                        plugins: plugins)
+        Bolt::Inventory::Inventory.new({}, config('transport' => 'winrm',
+                                                  'winrm' => {
+                                                    'ssl' => false,
+                                                    'ssl-verify' => false
+                                                  }),
+                                       plugins: plugins)
       }
       let(:target) { inventory.get_targets('notarget')[0] }
 
@@ -262,7 +262,7 @@ describe Bolt::Inventory::Inventory2 do
 
     describe 'get_targets' do
       context 'empty inventory' do
-        let(:inventory) { Bolt::Inventory::Inventory2.new({}, config, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new({}, config, plugins: plugins) }
 
         it 'should parse a single target URI' do
           name = 'notarget'
@@ -306,7 +306,7 @@ describe Bolt::Inventory::Inventory2 do
       end
 
       context 'non-empty inventory' do
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         it 'should parse an array of target URI and group name' do
           targets = inventory.get_targets(%w[a group1]).map(&:name)
@@ -327,13 +327,13 @@ describe Bolt::Inventory::Inventory2 do
         it 'should fail if wildcard selector matches nothing' do
           expect {
             inventory.get_targets('*target')
-          }.to raise_error(Bolt::Inventory::Inventory2::WildcardError,
+          }.to raise_error(Bolt::Inventory::Inventory::WildcardError,
                            /Found 0 targets matching wildcard pattern \*target/)
         end
       end
 
       context 'with data in the group' do
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         it 'should use value from lowest target definition' do
           expect(get_target(inventory, 'target4').user).to eq('me')
@@ -382,7 +382,7 @@ describe Bolt::Inventory::Inventory2 do
             ]
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         it 'should initialize' do
           expect(inventory).to be
@@ -430,7 +430,7 @@ describe Bolt::Inventory::Inventory2 do
             }
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         it 'should return group config for string targets' do
           target = get_target(inventory, 'target1')
@@ -452,7 +452,7 @@ describe Bolt::Inventory::Inventory2 do
       end
 
       context 'with config errors in data' do
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         context 'host-key-check' do
           let(:data) {
@@ -558,7 +558,7 @@ describe Bolt::Inventory::Inventory2 do
             }
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         it 'should return group config for an alias' do
           target = get_target(inventory, 'target2', 'alias1')
@@ -621,7 +621,7 @@ describe Bolt::Inventory::Inventory2 do
           }
         }
         let(:conf) { Bolt::Config.default }
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, conf, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, conf, plugins: plugins) }
 
         it 'should not modify existing config' do
           get_target(inventory, 'ssh://target')
@@ -642,19 +642,19 @@ describe Bolt::Inventory::Inventory2 do
           expect(target.user).to eq('messh')
           expect(target.password).to eq('youssh')
           expect(target.port).to eq('12345ssh')
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'connect-timeout' => 3,
             'disconnect-timeout' => 5,
             'tty' => true,
             'host-key-check' => false,
-            'private-key' => "anything",
             'tmpdir' => "/ssh",
             'run-as' => "root",
             'sudo-password' => "nothing",
             'password' => 'youssh',
             'port' => '12345ssh',
             "load-config" => true,
-            'user' => 'messh'
+            'user' => 'messh',
+            'private-key' => /anything\z/
           )
         end
 
@@ -664,17 +664,17 @@ describe Bolt::Inventory::Inventory2 do
           expect(target.user).to eq('mewinrm')
           expect(target.password).to eq('youwinrm')
           expect(target.port).to eq('12345winrm')
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'connect-timeout' => 5,
             'ssl' => false,
             'ssl-verify' => false,
             'tmpdir' => "/winrm",
-            'cacert' => "winrm.pem",
             'extensions' => ".py",
             'password' => 'youwinrm',
             'port' => '12345winrm',
             'user' => 'mewinrm',
-            'file-protocol' => 'winrm'
+            'file-protocol' => 'winrm',
+            'cacert' => /winrm.pem\z/
           )
         end
 
@@ -684,11 +684,11 @@ describe Bolt::Inventory::Inventory2 do
           expect(target.user).to be nil
           expect(target.password).to be nil
           expect(target.port).to be nil
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'task-environment' => "prod",
             'service-url' => "https://master",
-            'cacert' => "pcp.pem",
-            'token-file' => "token"
+            'cacert' => /pcp.pem\z/,
+            'token-file' => /token\z/
           )
         end
       end
@@ -696,7 +696,7 @@ describe Bolt::Inventory::Inventory2 do
 
     describe 'get_target' do
       context 'empty inventory' do
-        let(:inventory) { Bolt::Inventory::Inventory2.new({}, config, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new({}, config, plugins: plugins) }
 
         it 'should parse a single target URI' do
           name = 'notarget'
@@ -719,7 +719,7 @@ describe Bolt::Inventory::Inventory2 do
       end
 
       context 'non-empty inventory' do
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         it 'a target that does not exists in inventory is created and added to the all group' do
           existing_target_names = inventory.get_targets('all').map(&:name)
@@ -744,7 +744,7 @@ describe Bolt::Inventory::Inventory2 do
       end
 
       context 'with data in the group' do
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         it 'should use value from lowest target definition' do
           expect(inventory.get_target('target4').user).to eq('me')
@@ -788,7 +788,7 @@ describe Bolt::Inventory::Inventory2 do
             ]
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         it 'should return {} for a string target' do
           target = inventory.get_target('target1')
@@ -832,7 +832,7 @@ describe Bolt::Inventory::Inventory2 do
             }
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         it 'should return group config for string targets' do
           target = inventory.get_target('target1')
@@ -881,7 +881,7 @@ describe Bolt::Inventory::Inventory2 do
             }
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
         it 'should return group config for an alias' do
           target = inventory.get_target('alias1')
@@ -940,7 +940,7 @@ describe Bolt::Inventory::Inventory2 do
           }
         }
         let(:conf) { Bolt::Config.default }
-        let(:inventory) { Bolt::Inventory::Inventory2.new(data, conf, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, conf, plugins: plugins) }
 
         it 'should not modify existing config' do
           inventory.get_target('ssh://target')
@@ -962,12 +962,12 @@ describe Bolt::Inventory::Inventory2 do
           expect(target.user).to eq('messh')
           expect(target.password).to eq('youssh')
           expect(target.port).to eq('12345ssh')
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'connect-timeout' => 3,
             'disconnect-timeout' => 5,
             'tty' => true,
             'host-key-check' => false,
-            'private-key' => "anything",
+            'private-key' => /anything\z/,
             'tmpdir' => "/ssh",
             'run-as' => "root",
             'sudo-password' => "nothing",
@@ -984,12 +984,12 @@ describe Bolt::Inventory::Inventory2 do
           expect(target.user).to eq('mewinrm')
           expect(target.password).to eq('youwinrm')
           expect(target.port).to eq('12345winrm')
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'connect-timeout' => 5,
             'ssl' => false,
             'ssl-verify' => false,
             'tmpdir' => "/winrm",
-            'cacert' => "winrm.pem",
+            'cacert' => /winrm.pem\z/,
             'extensions' => ".py",
             'password' => 'youwinrm',
             'port' => '12345winrm',
@@ -1004,11 +1004,11 @@ describe Bolt::Inventory::Inventory2 do
           expect(target.user).to be nil
           expect(target.password).to be nil
           expect(target.port).to be nil
-          expect(target.options).to eq(
+          expect(target.options).to include(
             'task-environment' => "prod",
             'service-url' => "https://master",
-            'cacert' => "pcp.pem",
-            'token-file' => "token"
+            'cacert' => /pcp.pem\z/,
+            'token-file' => /token\z/
           )
         end
       end
@@ -1021,7 +1021,7 @@ describe Bolt::Inventory::Inventory2 do
         { 'targets' => ['localhost'] }
       }
 
-      let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
       it 'adds magic config options' do
         target = get_target(inventory, 'localhost')
@@ -1042,7 +1042,7 @@ describe Bolt::Inventory::Inventory2 do
             }
           } }
       }
-      let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
       it 'does not override config options' do
         target = get_target(inventory, 'localhost')
@@ -1064,7 +1064,7 @@ describe Bolt::Inventory::Inventory2 do
           }
         }] }
       }
-      let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
       it 'does not set magic config' do
         target = get_target(inventory, 'localhost')
         expect(target.transport).to eq('ssh')
@@ -1092,7 +1092,7 @@ describe Bolt::Inventory::Inventory2 do
           'config' => { 'ssh' => { 'disconnect-timeout' => 11 } }
         }] }
       }
-      let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
       let(:expected_options) {
         { "connect-timeout" => 10,
           "tty" => false,
@@ -1162,28 +1162,13 @@ describe Bolt::Inventory::Inventory2 do
   end
 
   describe 'add_facts' do
-    context 'with and without $future flag' do
-      let(:target) { inventory.get_target('foo') }
-      let(:facts) { { 'foo' => 'bar' } }
-      after(:each) do
-        # rubocop:disable Style/GlobalVars
-        $future = nil
-        # rubocop:enable Style/GlobalVars
-      end
+    let(:target) { inventory.get_target('foo') }
+    let(:facts) { { 'foo' => 'bar' } }
 
-      it 'returns facts hash when $future flag is not set' do
-        result = inventory.add_facts(target, facts)
-        expect(result).to eq(facts)
-      end
-
-      it 'returns Target object when $future flag is set' do
-        # rubocop:disable Style/GlobalVars
-        $future = true
-        # rubocop:enable Style/GlobalVars
-        result = inventory.add_facts(target, facts)
-        expect(target).to eq(result)
-        expect(result.facts).to eq(facts)
-      end
+    it 'returns Target object' do
+      result = inventory.add_facts(target, facts)
+      expect(target).to eq(result)
+      expect(result.facts).to eq(facts)
     end
   end
 
@@ -1202,7 +1187,7 @@ describe Bolt::Inventory::Inventory2 do
         }] }
       }
 
-      let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
       it 'adds target to a group and inherets config' do
         target = inventory.get_target('new-target')
@@ -1229,7 +1214,7 @@ describe Bolt::Inventory::Inventory2 do
       }
     }
 
-    let(:inventory) { Bolt::Inventory::Inventory2.new(data, plugins: plugins) }
+    let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
 
     it 'removes target from a group and disinherits config' do
       target = get_target(inventory, 'target')
@@ -1246,7 +1231,7 @@ describe Bolt::Inventory::Inventory2 do
         'groups' => [
           { 'name' => 'group1',
             'targets' => [
-              { 'name' => 'node1',
+              { 'name' => 'target1',
                 'config' => { 'transport' => 'winrm' } }
             ] },
           { 'name' => 'group2',
@@ -1255,7 +1240,7 @@ describe Bolt::Inventory::Inventory2 do
             ] },
           { 'name' => 'group3',
             'targets' => [
-              { 'name' => 'node2',
+              { 'name' => 'target2',
                 'config' => { 'transport' => 'winrm' } }
             ] }
         ]
@@ -1264,9 +1249,9 @@ describe Bolt::Inventory::Inventory2 do
 
     let(:lookup) {
       [
-        { 'name' => 'node1',
+        { 'name' => 'target1',
           'config' => { 'transport' => 'remote' } },
-        { 'name' => 'node2',
+        { 'name' => 'target2',
           'config' => { 'transport' => 'remote' } }
       ]
     }
@@ -1282,12 +1267,12 @@ describe Bolt::Inventory::Inventory2 do
     end
 
     it 'does not override a preceding definition' do
-      target = get_target(inventory, 'node1')
+      target = get_target(inventory, 'target1')
       expect(target.transport).to eq('winrm')
     end
 
     it 'does override a later defintion' do
-      target = get_target(inventory, 'node2')
+      target = get_target(inventory, 'target2')
       expect(target.transport).to eq('remote')
     end
   end

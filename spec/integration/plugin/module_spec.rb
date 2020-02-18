@@ -39,7 +39,7 @@ describe 'using module based plugins' do
     PLAN
   end
 
-  let(:inventory) { { "version" => 2 } }
+  let(:inventory) { {} }
 
   around(:each) do |example|
     with_boltdir(inventory: inventory, config: config, plan: plan) do |boltdir|
@@ -59,16 +59,15 @@ describe 'using module based plugins' do
     }
 
     let(:inventory) {
-      { 'version' => 2,
-        'targets' => [
-          { 'uri' => 'node1',
-            'config' => {
-              'ssh' => {
-                'user' => 'me',
-                'password' => plugin
-              }
-            } }
-        ] }
+      { 'targets' => [
+        { 'uri' => 'node1',
+          'config' => {
+            'ssh' => {
+              'user' => 'me',
+              'password' => plugin
+            }
+          } }
+      ] }
     }
 
     it 'supports a config lookup' do
@@ -135,16 +134,15 @@ describe 'using module based plugins' do
     }
 
     let(:inventory) {
-      { 'version' => 2,
-        'targets' => [
-          { 'uri' => 'node1',
-            'config' => {
-              'transport' => 'remote',
-              'remote' => {
-                'data' => plugin
-              }
-            } }
-        ] }
+      { 'targets' => [
+        { 'uri' => 'node1',
+          'config' => {
+            'transport' => 'remote',
+            'remote' => {
+              'data' => plugin
+            }
+          } }
+      ] }
     }
 
     let(:plan) do
@@ -155,23 +153,11 @@ describe 'using module based plugins' do
       PLAN
     end
 
-    it 'fails when configuration is incorrect' do
+    it 'fails when config key is present in bolt_plugin.json' do
       result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir], rescue_exec: true)
 
-      expect(result).to include('kind' => "bolt/validation-error")
-      expect(result['msg']).to match(/conf_plug plugin expects a String for key required_key/)
-    end
-
-    context 'with correct config' do
-      let(:plugin_config) { { 'conf_plug' => { 'required_key' => 'foo' } } }
-
-      it 'passes _config to the task' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', boltdir])
-
-        expect(result['remote']['data']).to include('_config' => plugin_config['conf_plug'])
-        expect(result['remote']['data']).to include('_boltdir' => boltdir)
-        expect(result['remote']['data']).to include('value' => 'ssshhh')
-      end
+      expect(result).to include('kind' => "bolt/invalid-plugin-data")
+      expect(result['msg']).to match(/Found unsupported key 'config'/)
     end
 
     context 'with values specified in both bolt.yaml and inventory.yaml' do
@@ -282,7 +268,7 @@ describe 'using module based plugins' do
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
-        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+        expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
           /Plugin identity does not support puppet_library/
         )
       end
@@ -302,7 +288,7 @@ describe 'using module based plugins' do
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
-        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(/Unknown plugin:/)
+        expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(/Unknown plugin:/)
       end
     end
 
@@ -320,7 +306,7 @@ describe 'using module based plugins' do
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
-        expect(result['details']['result_set'][0]['result']['_error']['msg']).to match(
+        expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
           /The task failed with exit code 1/
         )
       end

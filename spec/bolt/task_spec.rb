@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt/target'
+require 'bolt/inventory'
 require 'bolt/task'
 
 describe Bolt::Task do
   describe "#select_implementation" do
-    let(:target) { Bolt::Target.new('example') }
+    let(:inventory) { Bolt::Inventory.empty }
+    let(:target) { inventory.get_target('example') }
     let(:files) {
       [
         { 'name' => 'foo.sh',  'path' => '/foo.sh' },

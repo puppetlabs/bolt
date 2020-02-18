@@ -476,7 +476,7 @@ describe "BoltServer::TransportApp" do
 
           result = JSON.parse(last_response.body)
           expect(result).to include('status' => 'success')
-          expect(result['result']['_output']).to match(/got passed the message: Hello!/)
+          expect(result['value']['_output']).to match(/got passed the message: Hello!/)
         end
 
         it 'overrides host-key-check default', :ssh do
@@ -540,7 +540,7 @@ describe "BoltServer::TransportApp" do
 
           result = JSON.parse(last_response.body)
           expect(result).to include('status' => 'success')
-          expect(result['result']['_output']).to match(/INPUT.*Hello!/)
+          expect(result['value']['_output']).to match(/INPUT.*Hello!/)
         end
 
         it 'errors if multiple targets are supplied', :winrm do

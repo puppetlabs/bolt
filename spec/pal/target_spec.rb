@@ -3,24 +3,28 @@
 require 'spec_helper'
 require 'bolt_spec/files'
 require 'bolt_spec/pal'
+require 'bolt_spec/config'
 
 require 'bolt/pal'
 require 'bolt/inventory'
+require 'bolt/plugin'
 
 describe 'Target DataType' do
   include BoltSpec::Files
   include BoltSpec::PAL
+  include BoltSpec::Config
 
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
   let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new) }
 
   let(:target_code) { "$target = Target('pcp://user1:pass1@example.com:33')\n" }
 
   def target(attr)
     code = target_code + attr
-    peval(code, pal, nil, Bolt::Inventory.new({}))
+    peval(code, pal, nil, Bolt::Inventory::Inventory.new({}, plugins: plugins))
   end
 
   it 'should expose uri' do
@@ -49,9 +53,5 @@ describe 'Target DataType' do
 
   it 'should expose password' do
     expect(target('$target.password')).to eq('pass1')
-  end
-
-  it 'should expose options' do
-    expect(target('$target.options')).to eq({})
   end
 end

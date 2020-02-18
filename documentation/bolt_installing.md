@@ -293,7 +293,6 @@ Typically you would want to run Bolt not against the container environment, but 
 If you only need to pass information on how to connect to targets, and not any custom module content, you can pass the inventory information by assigning it to an environment variable. This `inventory.yaml` file contains all the information needed for connecting to an example target:
 
 ```yaml
-version: 2
 targets:
   - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
     alias: docker-example
@@ -364,7 +363,6 @@ log:
 This lists a target, and connection information for that target.
 
 ```yaml
-version: 2
 targets:
   - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
     alias: docker-example

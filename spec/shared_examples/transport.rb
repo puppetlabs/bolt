@@ -62,8 +62,15 @@ def mk_config(conf)
   conf_object
 end
 
-def make_target(target_: host_and_port, conf: config)
-  Bolt::Target.new(target_, transport_conf).update_conf(conf.transport_conf)
+def make_target
+  target = inventory.get_target(host_and_port)
+  update_target(target, config.transports[config.transport.to_sym])
+  target
+end
+
+def update_target(targ, conf)
+  transport_config = targ.options.merge(conf)
+  targ.inventory_target.set_config(targ.transport, transport_config)
 end
 
 # Shared examples for Transports.
@@ -182,14 +189,14 @@ shared_examples 'transport api' do
                              "'double single'",
                              "double \"double\" double",
                              "double 'single' double"])['stdout']
-        ).to eq(<<QUOTED)
-nospaces
-with spaces
-"double double"
-'double single'
-double "double" double
-double 'single' double
-QUOTED
+        ).to eq(<<~QUOTED)
+                  nospaces
+                  with spaces
+                  "double double"
+                  'double single'
+                  double "double" double
+                  double 'single' double
+                QUOTED
       end
     end
 
@@ -397,13 +404,17 @@ QUOTED
 
   context 'when used by the remote transport' do
     let(:remote_target) do
-      # TODO: remove the config here. it is a workaround for BOLT-943
-      inventory = Bolt::Inventory.new('config' => { transport.to_s => target.options })
-      inventory.add_to_group([target], 'all')
-      remote_target = Bolt::Target.new('foo://user:pass@example.com/path/to?query=hey',
-                                       'run-on' => target.name, 'type' => 'adevice')
-      remote_target.inventory = inventory
-      remote_target
+      hash = {
+        'uri' => 'foo://user:pass@example.com/path/to?query=hey',
+        'config' => {
+          'transport' => 'remote',
+          'remote' => {
+            'run-on' => target.name,
+            'type' => 'advice'
+          }
+        }
+      }
+      Bolt::Target.from_hash(hash, inventory)
     end
 
     let(:remote_runner) do
@@ -419,7 +430,7 @@ QUOTED
         result = remote_runner.run_task(remote_target, task, arguments).value
         expect(result).to include('message_one' => 'Hello from task')
         expect(result['_target']).to include("name" => "foo://user:pass@example.com/path/to?query=hey")
-        expect(result['_target']).to include('type' => 'adevice')
+        expect(result['_target']).to include('type' => 'advice')
         expect(result['_target']).to include('host' => 'example.com')
       end
     end
@@ -431,7 +442,7 @@ QUOTED
         result = remote_runner.run_task(remote_target, task, arguments).value
         expect(result).to include('message_one' => 'Hello from task')
         expect(result['_target']).to include("name" => "foo://user:pass@example.com/path/to?query=hey")
-        expect(result['_target']).to include('type' => 'adevice')
+        expect(result['_target']).to include('type' => 'advice')
         expect(result['_target']).to include('host' => 'example.com')
       end
     end
@@ -458,9 +469,9 @@ QUOTED
 
   context 'when tmpdir is specified' do
     let(:tmpdir) { File.join(os_context[:destination_dir], 'mytempdir') }
-    let(:transport_conf) { { 'tmpdir' => tmpdir } }
 
     it "errors when tmpdir doesn't exist" do
+      update_target(target, 'tmpdir' => tmpdir)
       with_tempfile_containing('script dir', 'dummy script') do |file|
         expect {
           runner.run_script(target, file.path, [])
@@ -470,12 +481,10 @@ QUOTED
 
     context 'with tmpdir' do
       around(:each) do |example|
-        # Required because the Local transport changes to the tmpdir before running commands.
-        safe_target = Bolt::Target.new(target.uri, target.options.reject { |opt| opt == 'tmpdir' })
         # This assumes that the thing running the tests is the
         # same platform as the thing we're running the task on
         use_windows = Bolt::Util.windows?
-        if safe_target.transport == "docker"
+        if target.transport == "docker"
           # Only support linux containers with the docker transport
           use_windows = false
         end
@@ -487,9 +496,14 @@ QUOTED
           mkdir = "mkdir #{tmpdir}"
           rmdir = "#{os_context[:rm_cmd]} #{tmpdir}"
         end
-        runner.run_command(safe_target, mkdir)
+
+        runner.run_command(target, mkdir)
+        # Once the tempdir is created the target can be configured to upload scripts to it
+        update_target(target, 'tmpdir' => tmpdir)
         example.run
-        runner.run_command(safe_target, rmdir)
+        # Required because the Local transport changes to the tmpdir before running commands
+        update_target(target, 'tmpdir' => nil)
+        runner.run_command(target, rmdir)
       end
 
       it 'uploads a script to the specified tmpdir' do
@@ -632,19 +646,7 @@ SHELL
         expect {
           runner.run_command(target, 'whoami')
         }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{user} not recognized on #{safe_name}")
-      end
-    end
-
-    context "with no password" do
-      let(:config) { mk_config('host-key-check' => false, 'run-as' => 'root', user: user, password: password) }
-      let(:target) { make_target }
-
-      it "returns a failed result" do
-        expect {
-          runner.run_command(target, 'whoami')
-        }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{user} was not provided for #{safe_name}")
+                         "Sudo password for user #{user} not recognized on #{target.safe_name}")
       end
     end
   end

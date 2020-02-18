@@ -9,7 +9,7 @@ describe 'run_plan' do
   include PuppetlabsSpec::Fixtures
   let(:executor) { Bolt::Executor.new }
   let(:tasks_enabled) { true }
-  let(:inventory) { Bolt::Inventory.new({}) }
+  let(:inventory) { Bolt::Inventory.empty }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
@@ -113,23 +113,16 @@ describe 'run_plan' do
     end
   end
 
-  context 'with inventory v2' do
-    let(:config) { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
-    let(:pal) { nil }
-    let(:plugins) { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
-    let(:inventory) { Bolt::Inventory.create_version({ 'version' => 2 }, config, plugins) }
-
-    it 'parameters with type TargetSpec are added to inventory' do
-      params = { 'ts' => 'ts',
-                 'optional_ts' => 'optional_ts',
-                 'variant_ts' => 'variant_ts',
-                 'array_ts' => ['array_ts'],
-                 'nested_ts' => 'nested_ts',
-                 'string' => 'string',
-                 'typeless' => 'typeless' }
-      expected_targets = %w[ts optional_ts variant_ts array_ts nested_ts]
-      is_expected.to run.with_params('test::targetspec_params', params).and_return(expected_targets)
-    end
+  it 'parameters with type TargetSpec are added to inventory' do
+    params = { 'ts' => 'ts',
+               'optional_ts' => 'optional_ts',
+               'variant_ts' => 'variant_ts',
+               'array_ts' => ['array_ts'],
+               'nested_ts' => 'nested_ts',
+               'string' => 'string',
+               'typeless' => 'typeless' }
+    expected_targets = %w[ts optional_ts variant_ts array_ts nested_ts]
+    is_expected.to run.with_params('test::targetspec_params', params).and_return(expected_targets)
   end
 
   context 'with a plan with a $targets parameter' do
@@ -145,27 +138,9 @@ describe 'run_plan' do
   end
 
   context 'with a plan with both a $nodes and $targets parameter' do
-    context 'with $future set' do
-      after(:each) do
-        # rubocop:disable Style/GlobalVars
-        $future = nil
-        # rubocop:enable Style/GlobalVars
-      end
-
-      it 'fails when using the second positional argument' do
-        # rubocop:disable Style/GlobalVars
-        $future = true
-        # rubocop:enable Style/GlobalVars
-        is_expected.to run.with_params('test::run_me_nodes_and_targets', 'target1')
-                          .and_raise_error(ArgumentError)
-      end
-    end
-
-    context 'with $future unset' do
-      it 'specifies the $nodes parameter using the second positional argument' do
-        is_expected.to run.with_params('test::run_me_nodes_and_targets', 'target1', 'targets' => 'target2')
-                          .and_return('target1')
-      end
+    it 'fails when using the second positional argument' do
+      is_expected.to run.with_params('test::run_me_nodes_and_targets', 'target1')
+                        .and_raise_error(ArgumentError)
     end
   end
 end

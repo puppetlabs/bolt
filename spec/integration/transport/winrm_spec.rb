@@ -8,7 +8,7 @@ require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/winrm'
 require 'bolt/config'
-require 'bolt/target'
+require 'bolt/inventory'
 require 'winrm'
 
 describe Bolt::Transport::WinRM do
@@ -19,14 +19,6 @@ describe Bolt::Transport::WinRM do
   include BoltSpec::Task
 
   let(:boltdir) { Bolt::Boltdir.new('.') }
-
-  def mk_config(conf)
-    stringified = conf.each_with_object({}) { |(k, v), coll| coll[k.to_s] = v }
-    # The default of 10 seconds seems to be too short to always succeed in AppVeyor.
-    stringified['connect-timeout'] ||= 20
-    Bolt::Config.new(boltdir, 'transport' => 'winrm', 'winrm' => stringified)
-  end
-
   let(:host) { conn_info('winrm')[:host] }
   let(:port) { conn_info('winrm')[:port] }
   let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 25986 }
@@ -39,18 +31,38 @@ describe Bolt::Transport::WinRM do
   let(:ssl_config) { mk_config(cacert: cacert_path, user: user, password: password) }
   let(:winrm) { Bolt::Transport::WinRM.new }
   let(:winrm_ssl) { Bolt::Transport::WinRM.new }
-  let(:echo_script) { <<PS }
-foreach ($i in $args)
-{
-    Write-Host $i
-}
-PS
+  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient) }
+  let(:transport) { 'winrm' }
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:target) { make_target }
+  let(:echo_script) { <<~PS }
+      foreach ($i in $args)
+      {
+          Write-Host $i
+      }
+    PS
 
-  def make_target(host_: host, port_: port, conf: config)
-    Bolt::Target.new("#{host_}:#{port_}").update_conf(conf.transport_conf)
+  def mk_config(conf)
+    conf = Bolt::Util.walk_keys(conf, &:to_s)
+    conf['connect-timeout'] ||= 20
+    conf
   end
 
-  let(:target) { make_target }
+  def make_target(host_: host, port_: port, conf: config)
+    hash = {
+      'uri' => "#{host_}:#{port_}",
+      'config' => {
+        'transport' => transport,
+        transport => conf
+      }
+    }
+    Bolt::Target.from_hash(hash, inventory)
+  end
+
+  def update_target(targ, conf)
+    transport_config = targ.options.merge(conf)
+    targ.inventory_target.set_config(targ.transport, transport_config)
+  end
 
   def stub_winrm_to_raise(klass, message)
     shell = double('powershell')
@@ -89,13 +101,13 @@ PS
     it "adheres to the specified timeout" do
       TCPServer.open(0) do |socket|
         port = socket.addr[1]
-        config.transports[:winrm]['connect-timeout'] = 2
+        conf = config.merge('connect-timeout' => 2)
 
         Timeout.timeout(3) do
           expect_node_error(Bolt::Node::ConnectError,
                             'CONNECT_ERROR',
                             /Timeout after \d+ seconds connecting to/) do
-            winrm.with_connection(make_target(host_: host, port_: port, conf: config)) {}
+            winrm.with_connection(make_target(host_: host, port_: port, conf: conf)) {}
           end
         end
       end
@@ -176,8 +188,7 @@ PS
     end
 
     it "skips verification with ssl-verify: false" do
-      target.options.delete('cacert')
-      target.options['ssl-verify'] = false
+      update_target(target, 'ssl-verify' => false)
 
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
@@ -248,7 +259,7 @@ PS
     end
 
     it "returns false if the target is not available", winrm: true do
-      expect(winrm.connected?(Bolt::Target.new('winrm://unknownfoo'))).to eq(false)
+      expect(winrm.connected?(inventory.get_target('winrm://unknownfoo'))).to eq(false)
     end
 
     it "executes a command on a host", winrm: true do
@@ -317,9 +328,16 @@ PS
     # when ruby_smb gem adds SMB v3 support, this will pass
     # test should be refactored to supply an SSL flag for winrm + smb and remove other SSL test
     it "will fail to upload a file with SMB with a host that requires SSL", winrm: true do
-      expect {
-        mk_config(ssl: true, user: user, password: password, 'file-protocol': 'smb', 'smb-port': smb_port)
-      }.to raise_error(Bolt::ValidationError)
+      conf = {
+        'winrm' => {
+          'ssl' => true,
+          'user' => user,
+          'password' => password,
+          'file-protocol' => 'smb',
+          'smb-port' => smb_port
+        }
+      }
+      expect { Bolt::Config.new(boltdir, conf) }.to raise_error(Bolt::ValidationError)
     end
 
     it "catches winrm-fs upload error", winrm: true do
@@ -1159,7 +1177,7 @@ OUTPUT
   end
 
   context 'when there is no host in the target' do
-    let(:target) { Bolt::Target.new(nil, "name" => "hostless") }
+    let(:target) { Bolt::Inventory::Target.new({ "name" => "hostless" }, inventory) }
 
     it 'errors' do
       expect { winrm.run_command(target, 'whoami') }.to raise_error(/does not have a host/)

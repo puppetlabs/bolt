@@ -34,8 +34,8 @@ module BoltSpec
       case target.protocol
       when 'ssh'
         req['host-key-check'] = false
-        if target.options['private-key-content']
-          req['private-key-content'] = target.options['private-key-content']
+        if target.options.dig('private-key', 'key-data')
+          req['private-key-content'] = target.options.dig('private-key', 'key-data')
         elsif target.options['private-key']
           req['private-key-content'] = File.read(target.options['private-key'])
         end

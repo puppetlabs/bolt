@@ -7,8 +7,9 @@ require 'bolt/cli'
 describe "Bolt::Outputter::JSON" do
   let(:output) { StringIO.new }
   let(:outputter) { Bolt::Outputter::JSON.new(false, false, false, output) }
-  let(:target1) { Bolt::Target.new('node1') }
-  let(:target2) { Bolt::Target.new('node2') }
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:target1) { inventory.get_target('target1') }
+  let(:target2) { inventory.get_target('target2') }
   let(:results) { { node1: Bolt::Result.new(target1, value: { 'msg' => "ok" }) } }
 
   it "starts items in head" do

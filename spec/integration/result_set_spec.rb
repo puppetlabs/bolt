@@ -36,10 +36,11 @@ describe "when running a plan that manipulates an execution result", ssh: true d
 
     context 'filters result sets' do
       it 'includes target when filter is true' do
+        safe_uri = conn_uri('ssh')
         params = { target: uri }.to_json
         run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
         expect(@log_output.readlines)
-          .to include("NOTICE  Puppet : Filtered set: [Target('#{uri}', {})]\n")
+          .to include("NOTICE  Puppet : Filtered set: [#{safe_uri}]\n")
       end
 
       it 'excludes target when filter is false' do
@@ -64,23 +65,18 @@ describe "when running a plan that manipulates an execution result", ssh: true d
       end
     end
 
-    context 'with $future flag' do
-      it 'exposes `status` method for result and renames `result` to `value`' do
-        with_tempfile_containing('conf', { future: true }.to_json) do |conf|
-          params = { nodes: uri }.to_json
-          additional_flags = config_flags + ['--configfile', conf.path.to_s]
-          result = run_cli(['plan', 'run', 'results::test_result', "--params", params] + additional_flags)
-          expect(@log_output.readlines)
-            .to include("NOTICE  Puppet : Result status: success\n")
-          expect(JSON.parse(result).first).to include('value')
-        end
-      end
+    it 'exposes `status` method for result and renames `result` to `value`' do
+      params = { nodes: uri }.to_json
+      result = run_cli(['plan', 'run', 'results::test_result', "--params", params] + config_flags)
+      expect(@log_output.readlines)
+        .to include("NOTICE  Puppet : Result status: success\n")
+      expect(JSON.parse(result).first).to include('value')
     end
+  end
 
-    it 'exposes errrors for results' do
-      params = { target: uri }.to_json
-      output = run_cli(['plan', 'run', 'results::test_error', "--params", params] + config_flags)
-      expect(output.strip).to eq('"The task failed with exit code 1:\n"')
-    end
+  it 'exposes errrors for results' do
+    params = { target: uri }.to_json
+    output = run_cli(['plan', 'run', 'results::test_error', "--params", params] + config_flags)
+    expect(output.strip).to eq('"The task failed with exit code 1:\n"')
   end
 end

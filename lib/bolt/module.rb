@@ -8,10 +8,10 @@ module Bolt
     def self.discover(modulepath)
       modulepath.each_with_object({}) do |path, mods|
         next unless File.exist?(path) && File.directory?(path)
-        (Dir.entries(path) - %w[. ..])
-          .map { |dir| File.join(path, dir) }
-          .select { |dir| File.directory?(dir) }
-          .each do |dir|
+        Dir.children(path)
+           .map { |dir| File.join(path, dir) }
+           .select { |dir| File.directory?(dir) }
+           .each do |dir|
           module_name = File.basename(dir)
           if module_name =~ MODULE_NAME_REGEX
             # Puppet will load some objects from shadowed modules but this won't

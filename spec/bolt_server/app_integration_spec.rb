@@ -32,13 +32,13 @@ describe "BoltServer::TransportApp", puppetserver: true do
         expect(last_response.status).to eq(200)
         result = JSON.parse(last_response.body)
         expect(result).to include('status' => 'success')
-        expect(result['result']['_output'].chomp).to match(/\w+ got passed the message: Hello!/)
+        expect(result['value']['_output'].chomp).to match(/\w+ got passed the message: Hello!/)
       end
 
       it 'runs an echo task using a private key' do
         private_key = ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0]
         private_key_content = File.read(private_key)
-        target = conn_target('ssh', options: { 'private-key-content' => private_key_content })
+        target = conn_target('ssh', options: { 'private-key' => { 'key-data' => private_key_content } })
         body = build_task_request('sample::echo',
                                   target,
                                   "message": "Hello!")
@@ -48,7 +48,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
         expect(last_response.status).to eq(200)
         result = JSON.parse(last_response.body)
         expect(result).to include('status' => 'success')
-        expect(result['result']['_output'].chomp).to match(/\w+ got passed the message: Hello!/)
+        expect(result['value']['_output'].chomp).to match(/\w+ got passed the message: Hello!/)
       end
 
       it 'runs a shareable task' do
@@ -60,11 +60,11 @@ describe "BoltServer::TransportApp", puppetserver: true do
         expect(last_response.status).to eq(200)
         result = JSON.parse(last_response.body)
         expect(result).to include('status' => 'success')
-        files = result['result']['_output'].split("\n").map(&:strip).sort
+        files = result['value']['_output'].split("\n").map(&:strip).sort
         expect(files.count).to eq(4)
         expect(files[0]).to match(%r{^174 .*/shareable/tasks/unknown_file.json$})
         expect(files[1]).to match(%r{^236 .*/shareable/tasks/list.sh})
-        expect(files[2]).to match(%r{^310 .*/results/lib/puppet/functions/results/make_result.rb$})
+        expect(files[2]).to match(%r{^398 .*/results/lib/puppet/functions/results/make_result.rb$})
         expect(files[3]).to match(%r{^43 .*/error/tasks/fail.sh$})
       end
     end
@@ -81,9 +81,9 @@ describe "BoltServer::TransportApp", puppetserver: true do
         expect(last_response.status).to eq(200)
         result = JSON.parse(last_response.body)
         expect(result).to include('status' => 'success')
-        expect(result['result']["exit_code"]).to eq(0)
-        expect(result['result']["stderr"]).to be_empty
-        expect(result['result']["stdout"]).to eq("hi\n")
+        expect(result['value']["exit_code"]).to eq(0)
+        expect(result['value']["stderr"]).to be_empty
+        expect(result['value']["stdout"]).to eq("hi\n")
       end
 
       it 'fails reliably' do
@@ -95,8 +95,8 @@ describe "BoltServer::TransportApp", puppetserver: true do
         expect(last_response.status).to eq(200)
         result = JSON.parse(last_response.body)
         expect(result).to include('status' => 'failure')
-        expect(result['result']["exit_code"]).to eq(127)
-        expect(result['result']["stderr"]).to match(/not-a-command/)
+        expect(result['value']["exit_code"]).to eq(127)
+        expect(result['value']["stderr"]).to match(/not-a-command/)
       end
     end
 
@@ -115,7 +115,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
           result = JSON.parse(last_response.body)
           expect(result).to include('status' => 'success')
           expect(result).to include('action' => 'upload')
-          expect(result['result']['_output'])
+          expect(result['value']['_output'])
             .to match(%r{Uploaded .*cache/#{job_id}' to 'localhost:#{destination}'})
 
           # Inspect results
@@ -124,8 +124,8 @@ describe "BoltServer::TransportApp", puppetserver: true do
 
           post('/ssh/run_command', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
           result = JSON.parse(last_response.body)
-          expect(result['result']['stdout']).to match(/test-file.sh/)
-          expect(result['result']['stdout']).to match(/sub-file.sh/)
+          expect(result['value']['stdout']).to match(/test-file.sh/)
+          expect(result['value']['stdout']).to match(/sub-file.sh/)
         ensure
           # Cleanup after running
           body = build_command_request("rm -rf #{destination}",
@@ -148,7 +148,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
           result = JSON.parse(last_response.body)
           expect(result).to include('status' => 'success')
           expect(result).to include('action' => 'upload')
-          expect(result['result']['_output'])
+          expect(result['value']['_output'])
             .to match(%r{Uploaded .*cache/#{job_id}/test-file.sh' to 'localhost:#{destination}'})
 
           # Inspect results
@@ -157,7 +157,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
 
           post('/ssh/run_command', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
           result = JSON.parse(last_response.body)
-          expect(result['result']['stdout']).to match(/single_file_test.sh/)
+          expect(result['value']['stdout']).to match(/single_file_test.sh/)
         ensure
           # Cleanup after running
           body = build_command_request("rm -rf #{destination}",
@@ -178,7 +178,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
         result = JSON.parse(last_response.body)
         expect(result).to include('status' => 'success')
         expect(result).to include('action' => 'script')
-        expect(result['result']['stdout'])
+        expect(result['value']['stdout'])
           .to match(/hi!/)
           .and match(/test-file\.sh/)
           .and match(/--arg/)
@@ -193,7 +193,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
         result = JSON.parse(last_response.body)
         expect(result).to include('status' => 'success')
         expect(result).to include('action' => 'script')
-        expect(result['result']['stdout'])
+        expect(result['value']['stdout'])
           .to match(/hi!/)
           .and match(/test-file\.sh/)
       end
