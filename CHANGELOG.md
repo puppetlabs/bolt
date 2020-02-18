@@ -1,8 +1,14 @@
 # Changelog
 
-## Bolt Next
+## Bolt 2.0.0
 
 ### New features
+
+* **Better output for errors in plans** ([#1607](https://github.com/puppetlabs/bolt/pull/1607))
+
+  Plans that fail due to an unhandled error now print output the same as if the
+  error were caught and then returned. Failures during compilation of `apply()`
+  blocks now provide clean error messages.
 
 * **Filter tasks and plans by substring** ([#1596](https://github.com/puppetlabs/bolt/issues/1596))
 
@@ -15,6 +21,77 @@
 
   `resolve_reference` tasks in bundled content have been set to private and will no longer appear when
   using `bolt task show`.
+
+### Backward incompatible changes
+
+Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and configuration files.
+
+#### Output changes
+
+* JSON output now has `target_count` instead of `node_count`
+
+* JSON result objects now have `target` and `value` keys instead of `node` and `result`
+
+* The `prompt` plugin now prompts on stderr instead of stdout
+
+#### CLI changes
+
+* `--nodes` is removed in favor of `--targets`
+
+* `--password` and `--sudo-password` now require an argument
+
+  These used to optionally take an argument and would prompt otherwise. Now they require an argument and the new options `--password-prompt` and `--sudo-password-prompt` can be used to trigger a prompt.
+
+#### Plan language changes
+
+* `add_facts()` now returns the Target passed to it
+
+  Previously, this function returned the Target's set of facts.
+
+* `Target.new` no longer accepts an `options` key
+
+  Both `Target.new("options" => ...)` and `Target.new($uri, "options" => ...)` are now disallowed. `Target.new` now accepts *either* a string argument which is the URI or a hash argument shaped like a target in the inventory file.
+
+* Puppet datatypes are available in `apply()` blocks
+
+  These types include `Target`, `Result`, `ResultSet` and `Error`. They previously showed up in `apply()` blocks as strings or hashes.
+
+* `get_target()` and `get_targets()` are no longer allowed in `apply()` blocks
+
+  To access targets in an `apply()` block, call `get_target()` or `get_targets()` outside the block and assign the result to a variable.
+
+* `run_plan(plan::name, $targets)` will fail if the plan has both a `$nodes` and `$targets` parameter
+
+  If a plan has parameters called both `$nodes` and `$targets`, they must be set explicitly using named arguments.
+
+#### Config changes
+
+* `sudo-password` now defaults to the value of `password` if unspecified
+
+* PuppetDB cert, key, cacert and token file paths are expanded relative to the Boltdir instead of the current working directory
+
+* Inventory v1 has been removed ([#1567](https://github.com/puppetlabs/bolt/issues/1567))
+
+  Inventory v1 is no longer supported by Bolt and has been removed. The inventory now defaults to v2.
+
+* The `future` flag is no longer honored ([#1590](https://github.com/puppetlabs/bolt/pull/1590))
+
+  All "future" behavior is now the only behavior.
+
+* **Support for `config` key in a plugin's `bolt_plugin.json` has been removed** ([#1598](https://github.com/puppetlabs/bolt/issues/1598))
+
+  Plugins can no longer set config in their `bolt_plugin.json`. Config is instead inferred from task
+  parameters, with config values passed as parameters to the task.
+
+#### Removals
+
+* Support for Ruby 2.3 and 2.4 has been dropped
+
+  Ruby 2.5 is now the minimum Ruby version.. This only affects gem installs, as OS packages of Bolt contain their own Ruby.
+
+* `bolt-inventory-pdb` command has been removed
+
+  Use the `puppetdb` plugin in an inventory file to replicate this functionality in a more dynamic way.
 
 ## Bolt 1.49.0
 

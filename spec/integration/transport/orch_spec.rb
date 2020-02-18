@@ -6,7 +6,7 @@ require 'bolt_spec/sensitive'
 require 'bolt_spec/task'
 require 'bolt/transport/orch'
 require 'bolt/plan_result'
-require 'bolt/target'
+require 'bolt/inventory'
 require 'open3'
 require 'orchestrator_client'
 
@@ -18,13 +18,11 @@ describe Bolt::Transport::Orch, orchestrator: true do
   include BoltSpec::Task
 
   let(:hostname) { "localhost" }
-  let(:target) do
-    Bolt::Target.new(hostname).update_conf(Bolt::Config.default.transport_conf)
-  end
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:target) { inventory.get_target(hostname) }
 
   let(:targets) do
-    [Bolt::Target.new('pcp://node1').update_conf(Bolt::Config.default.transport_conf),
-     Bolt::Target.new('node2').update_conf(Bolt::Config.default.transport_conf)]
+    inventory.get_targets(['pcp://node1', 'node2'])
   end
 
   let(:mock_client) { instance_double("OrchestratorClient", run_task: results) }
@@ -87,7 +85,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
 
     it "sets environment" do
-      targets.first.options['task-environment'] = 'development'
+      update_target(targets.first, 'task-environment' => 'development')
       body = conn.build_request(targets, mtask, {})
       expect(body[:environment]).to eq('development')
     end
@@ -197,11 +195,14 @@ describe Bolt::Transport::Orch, orchestrator: true do
   end
 
   describe :batches do
+    let(:targets) { inventory.get_targets(%w[pcp://a pcp://b pcp://c pcp://d]) }
+
     it "splits targets in different environments into separate batches" do
-      targets = [Bolt::Target.new('a', 'task-environment' => 'production'),
-                 Bolt::Target.new('b', 'task-environment' => 'development'),
-                 Bolt::Target.new('c', 'task-environment' => 'test'),
-                 Bolt::Target.new('d', 'task-environment' => 'development')]
+      update_target(targets[0], 'task-environment' => 'production')
+      update_target(targets[1], 'task-environment' => 'development')
+      update_target(targets[2], 'task-environment' => 'test')
+      update_target(targets[3], 'task-environment' => 'development')
+
       batches = Set.new([[targets[0]],
                          [targets[1], targets[3]],
                          [targets[2]]])
@@ -209,10 +210,10 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
 
     it "splits targets with different urls into separate batches" do
-      targets = [Bolt::Target.new('a'),
-                 Bolt::Target.new('b', 'service-url' => 'master2'),
-                 Bolt::Target.new('c', 'service-url' => 'master3'),
-                 Bolt::Target.new('d', 'service-url' => 'master2')]
+      update_target(targets[1], 'service-url' => 'master2')
+      update_target(targets[2], 'service-url' => 'master3')
+      update_target(targets[3], 'service-url' => 'master2')
+
       batches = Set.new([[targets[0]],
                          [targets[1], targets[3]],
                          [targets[2]]])
@@ -220,10 +221,10 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
 
     it "splits targets with different tokens into separate batches" do
-      targets = [Bolt::Target.new('a'),
-                 Bolt::Target.new('b', 'token-file' => 'token2'),
-                 Bolt::Target.new('c', 'token-file' => 'token3'),
-                 Bolt::Target.new('d', 'token-file' => 'token2')]
+      update_target(targets[1], 'token-file' => 'token2')
+      update_target(targets[2], 'token-file' => 'token3')
+      update_target(targets[3], 'token-file' => 'token2')
+
       batches = Set.new([[targets[0]],
                          [targets[1], targets[3]],
                          [targets[2]]])

@@ -44,73 +44,70 @@ describe "apply", expensive: true do
     end
 
     def lib_plugin_inventory
-      { 'version' => 2,
-        'targets' => [{
-          'uri' => conn_uri('ssh'),
-          'plugin_hooks' => {
-            'puppet_library' => {
-              'plugin' => 'puppet_agent'
-            }
+      { 'targets' => [{
+        'uri' => conn_uri('ssh'),
+        'plugin_hooks' => {
+          'puppet_library' => {
+            'plugin' => 'puppet_agent'
           }
-        }] }
+        }
+      }] }
     end
 
     def error_plugin_inventory
-      { 'version' => 2,
-        'targets' => [{
-          'uri' => conn_uri('ssh'),
-          'name' => 'error',
-          'plugin_hooks' => {
-            'puppet_library' => {
-              'plugin' => 'task',
-              'task' => 'prep::error'
+      { 'targets' => [{
+        'uri' => conn_uri('ssh'),
+        'name' => 'error',
+        'plugin_hooks' => {
+          'puppet_library' => {
+            'plugin' => 'task',
+            'task' => 'prep::error'
+          }
+        }
+      }, {
+        'uri' => conn_uri('ssh'),
+        'name' => 'success',
+        'plugin_hooks' => {
+          'puppet_library' => {
+            'plugin' => 'puppet_agent'
+          }
+        }
+      }, {
+        # These fail the puppet_agent::version check if they're fake. Seems
+        # like more effort than it's worth to mock them
+        'uri' => conn_uri('ssh'),
+        'name' => 'badparams',
+        'plugin_hooks' => {
+          'puppet_library' => {
+            'plugin' => 'task',
+            'task' => 'puppet_agent::install',
+            'parameters' => {
+              'collection' => 'The act or process of collecting.'
             }
           }
-        }, {
-          'uri' => conn_uri('ssh'),
-          'name' => 'success',
-          'plugin_hooks' => {
-            'puppet_library' => {
-              'plugin' => 'puppet_agent'
-            }
+        }
+      }, {
+        'uri' => conn_uri('ssh'),
+        'name' => 'badplugin',
+        'plugin_hooks' => {
+          'puppet_library' => {
+            'plugin' => 'what plugin?'
           }
-        }, {
-          # These fail the puppet_agent::version check if they're fake. Seems
-          # like more effort than it's worth to mock them
-          'uri' => conn_uri('ssh'),
-          'name' => 'badparams',
-          'plugin_hooks' => {
-            'puppet_library' => {
-              'plugin' => 'task',
-              'task' => 'puppet_agent::install',
-              'parameters' => {
-                'collection' => 'The act or process of collecting.'
-              }
-            }
-          }
-        }, {
-          'uri' => conn_uri('ssh'),
-          'name' => 'badplugin',
-          'plugin_hooks' => {
-            'puppet_library' => {
-              'plugin' => 'what plugin?'
-            }
-          }
-        }] }
+        }
+      }] }
     end
 
     def task_plugin_inventory
-      { 'version' => 2,
-        'targets' => [{
-          'uri' => conn_uri('ssh'),
-          'plugin_hooks' => {
-            'puppet_library' => {
-              'plugin' => 'task',
-              'task' => 'puppet_agent::install',
-              'parameters' => { 'version' => '6.2.0' }
-            }
+      { 'targets' => [{
+        'uri' => conn_uri('ssh'),
+        'plugin_hooks' => {
+          'puppet_library' => {
+            'plugin' => 'task',
+            'task' => 'puppet_agent::install',
+            'parameters' => { 'version' => '6.2.0' }
           }
-        }],
+        }
+      }],
         'config' => root_config }
     end
 
@@ -127,7 +124,7 @@ describe "apply", expensive: true do
         result = run_task('puppet_agent::version', 'puppet_5', {}, inventory: agent_version_inventory)
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
-        expect(result[0]['result']['version']).to match(/^5/)
+        expect(result[0]['value']['version']).to match(/^5/)
 
         # install puppet6
         result = run_task('puppet_agent::install', 'puppet_6', { 'collection' => 'puppet6' },
@@ -138,7 +135,7 @@ describe "apply", expensive: true do
         result = run_task('puppet_agent::version', 'puppet_6', {}, inventory: agent_version_inventory)
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
-        expect(result[0]['result']['version']).to match(/^6/)
+        expect(result[0]['value']['version']).to match(/^6/)
       end
 
       it 'runs a ruby task' do
@@ -147,7 +144,7 @@ describe "apply", expensive: true do
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
           results['items'].each do |result|
             expect(result['status']).to eq('success')
-            expect(result['result']).to eq('ruby' => 'Hi')
+            expect(result['value']).to eq('ruby' => 'Hi')
           end
         end
       end
@@ -158,7 +155,7 @@ describe "apply", expensive: true do
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
           results.each do |result|
             expect(result['status']).to eq('success')
-            report = result['result']['report']
+            report = result['value']['report']
             expect(report['resource_statuses']).to include("Notify[Apply: Hi!]")
           end
         end
@@ -169,7 +166,7 @@ describe "apply", expensive: true do
           results = run_cli_json(%W[plan run prep --configfile #{conf.path}] + config_flags)
           results.each do |result|
             expect(result['status']).to eq('success')
-            report = result['result']['report']
+            report = result['value']['report']
             expect(report['resource_statuses']).to include("Notify[Hello #{uri}]")
           end
         end
@@ -181,7 +178,7 @@ describe "apply", expensive: true do
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
           results.each do |result|
             expect(result['status']).to eq('success')
-            resources = result['result']['resources']
+            resources = result['value']['resources']
             expect(resources.map { |r| r['type'] }.uniq).to eq(%w[User File])
             expect(resources.select { |r| r['title'] == user && r['type'] == 'User' }.count).to eq(1)
             expect(resources.select { |r| r['title'] == '/tmp' && r['type'] == 'File' }.count).to eq(1)
@@ -195,7 +192,7 @@ describe "apply", expensive: true do
         results = run_command(is_boltdir, 'agent_targets', inventory: inventory_data)
         results.each do |result|
           expect(result['status']).to eq('success')
-          expect(result['result']['stdout']).to match(/not found/)
+          expect(result['value']['stdout']).to match(/not found/)
         end
       end
     end
@@ -207,7 +204,10 @@ describe "apply", expensive: true do
       end
 
       context 'with plugin configured' do
-        let(:config_flags) { %W[--format json -n all --password #{password} --modulepath #{modulepath}] + tflags }
+        let(:config_flags) {
+          %W[--format json --targets all --password #{password}
+             --modulepath #{modulepath}] + tflags
+        }
         let(:ssh_node) { conn_uri('ssh', include_password: true) }
 
         before(:each) do
@@ -220,7 +220,7 @@ describe "apply", expensive: true do
             expect(result).not_to include('kind')
             expect(result.count).to eq(1)
             expect(result[0]['status']).to eq('success')
-            report = result[0]['result']['report']
+            report = result[0]['value']['report']
             expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
           end
         end
@@ -232,15 +232,15 @@ describe "apply", expensive: true do
             expect(result['msg']).to eq("Plan aborted: apply_prep failed on 3 targets")
 
             result_set = result['details']['result_set']
-            task_error = result_set.select { |h| h['node'] == 'error' }[0]['result']['_error']
+            task_error = result_set.select { |h| h['target'] == 'error' }[0]['value']['_error']
             expect(task_error['kind']).to eq('puppetlabs.tasks/task-error')
             expect(task_error['msg']).to include("The task failed with exit code 1")
 
-            param_error = result_set.select { |h| h['node'] == 'badparams' }[0]['result']['_error']
+            param_error = result_set.select { |h| h['target'] == 'badparams' }[0]['value']['_error']
             expect(param_error['kind']).to eq('bolt/plugin-error')
             expect(param_error['msg']).to include("Invalid parameters for Task puppet_agent::install")
 
-            plugin_error = result_set.select { |h| h['node'] == 'badplugin' }[0]['result']['_error']
+            plugin_error = result_set.select { |h| h['target'] == 'badplugin' }[0]['value']['_error']
             expect(plugin_error['kind']).to eq('bolt/unknown-plugin')
             expect(plugin_error['msg']).to include("Unknown plugin: 'what plugin?'")
           end
@@ -252,12 +252,12 @@ describe "apply", expensive: true do
             expect(result).not_to include('kind')
             expect(result.count).to eq(1)
             expect(result[0]['status']).to eq('success')
-            report = result[0]['result']['report']
+            report = result[0]['value']['report']
             expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
             result = run_cli_json(%W[task run puppet_agent::version -i #{inv.path}] + config_flags)['items']
             expect(result.count).to eq(1)
             expect(result[0]).to include('status' => 'success')
-            expect(result[0]['result']['version']).to match(/^6\.2/)
+            expect(result[0]['value']['version']).to match(/^6\.2/)
           end
         end
       end
@@ -267,7 +267,7 @@ describe "apply", expensive: true do
         expect(result).not_to include('kind')
         expect(result.count).to eq(1)
         expect(result[0]['status']).to eq('success')
-        report = result[0]['result']['report']
+        report = result[0]['value']['report']
         expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
 
         # Includes agent facts from apply_prep
@@ -281,7 +281,7 @@ describe "apply", expensive: true do
         result = run_cli_json(%w[plan run prep] + config_flags)
         expect(result.count).to eq(1)
         expect(result[0]['status']).to eq('success')
-        report = result[0]['result']['report']
+        report = result[0]['value']['report']
         expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
       end
     end
@@ -292,7 +292,7 @@ describe "apply", expensive: true do
         target = 'puppet_6'
         install(target, inventory: agent_version_inventory)
         result = run_task('puppet_agent::version', target, {}, config: root_config, inventory: agent_version_inventory)
-        major_version = result.first['result']['version'].split('.').first.to_i
+        major_version = result.first['value']['version'].split('.').first.to_i
         expect(major_version).to be >= 6
       end
 
@@ -300,7 +300,7 @@ describe "apply", expensive: true do
         it 'errors when there are resource failures' do
           result = run_cli_json(%w[plan run basic::failure] + config_flags, rescue_exec: true)
           expect(result).to include('kind' => 'bolt/apply-failure')
-          error = result['details']['result_set'][0]['result']['_error']
+          error = result['details']['result_set'][0]['value']['_error']
           expect(error['kind']).to eq('bolt/resource-failure')
           expect(error['msg']).to match(/Resources failed to apply/)
         end
@@ -312,8 +312,8 @@ describe "apply", expensive: true do
           result = run_cli_json(%w[plan run basic::class] + config_flags)
           expect(result).not_to include('kind')
           expect(result[0]).to include('status' => 'success')
-          expect(result[0]['result']['_output']).to eq('changed: 1, failed: 0, unchanged: 0 skipped: 0, noop: 0')
-          resources = result[0]['result']['report']['resource_statuses']
+          expect(result[0]['value']['_output']).to eq('changed: 1, failed: 0, unchanged: 0 skipped: 0, noop: 0')
+          resources = result[0]['value']['report']['resource_statuses']
           expect(resources).to include('Notify[hello world]')
         end
 
@@ -321,7 +321,7 @@ describe "apply", expensive: true do
           result = run_cli_json(%w[plan run basic::defer] + config_flags)
           expect(result).not_to include('kind')
           expect(result[0]['status']).to eq('success')
-          resources = result[0]['result']['report']['resource_statuses']
+          resources = result[0]['value']['report']['resource_statuses']
 
           local_pid = resources['Notify[local pid]']['events'][0]['desired_value'][/(\d+)/, 1]
           raise 'local pid was not found' if local_pid.nil?
@@ -348,7 +348,7 @@ describe "apply", expensive: true do
           with_tempfile_containing('bolt', YAML.dump("apply_settings" => show_diff), '.yaml') do |conf|
             result = run_cli_json(%W[plan run settings::show_diff --configfile #{conf.path}] + config_flags).first
             expect(result['status']).to eq('success')
-            expect(result['result']['report']['logs'][0]['message']).to include(diff_string)
+            expect(result['value']['report']['logs'][0]['message']).to include(diff_string)
           end
         end
       end
@@ -357,7 +357,7 @@ describe "apply", expensive: true do
         it "applies a manifest" do
           with_tempfile_containing('manifest', 'include basic', '.pp') do |manifest|
             results = run_cli_json(['apply', manifest.path] + config_flags)
-            result = results[0]['result']
+            result = results[0]['value']
             expect(result).not_to include('kind')
             expect(result['report']).to include('status' => 'changed')
             expect(result['report']['resource_statuses']).to include('Notify[hello world]')
@@ -367,7 +367,7 @@ describe "apply", expensive: true do
         it "applies with noop" do
           with_tempfile_containing('manifest', 'include basic', '.pp') do |manifest|
             results = run_cli_json(['apply', manifest.path, '--noop'] + config_flags)
-            result = results[0]['result']
+            result = results[0]['value']
             expect(result).not_to include('kind')
             expect(result['report']).to include('status' => 'unchanged', 'noop' => true)
             expect(result['report']['resource_statuses']).to include('Notify[hello world]')
@@ -376,7 +376,7 @@ describe "apply", expensive: true do
 
         it "applies a snippet of code" do
           results = run_cli_json(['apply', '-e', 'include basic'] + config_flags)
-          result = results[0]['result']
+          result = results[0]['value']
           expect(result).not_to include('kind')
           expect(result['report']).to include('status' => 'changed')
           expect(result['report']['resource_statuses']).to include('Notify[hello world]')
@@ -384,7 +384,7 @@ describe "apply", expensive: true do
 
         it "applies a node definition" do
           results = run_cli_json(['apply', '-e', 'node default { notify { "hello world": } }'] + config_flags)
-          result = results[0]['result']
+          result = results[0]['value']
           expect(result).not_to include('kind')
           expect(result['report']).to include('status' => 'changed')
           expect(result['report']['resource_statuses']).to include('Notify[hello world]')
@@ -397,7 +397,7 @@ describe "apply", expensive: true do
 
         it "fails if the manifest doesn't compile" do
           results = run_cli_json(['apply', '-e', 'include shmasic'] + config_flags)
-          result = results[0]['result']
+          result = results[0]['value']
           expect(result).to include('_error')
           expect(result['_error']['kind']).to eq('bolt/apply-error')
           expect(result['_error']['msg']).to match(/failed to compile/)
@@ -415,7 +415,7 @@ describe "apply", expensive: true do
           with_tempfile_containing('bolt', YAML.dump("apply_settings" => show_diff), '.yaml') do |conf|
             result = run_cli_json(%W[plan run settings::show_diff --configfile #{conf.path}] + config_flags).first
             expect(result['status']).to eq('success')
-            expect(result['result']['report']['logs'][0]['message']).to include(diff_string)
+            expect(result['value']['report']['logs'][0]['message']).to include(diff_string)
           end
         end
       end
@@ -447,7 +447,7 @@ describe "apply", expensive: true do
         result = run_task('puppet_agent::version', conn_uri('winrm'), {}, config: config)
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
-        expect(result[0]['result']['version']).to match(/^5/)
+        expect(result[0]['value']['version']).to match(/^5/)
       end
 
       it 'runs a ruby task' do
@@ -456,7 +456,7 @@ describe "apply", expensive: true do
                                     --configfile #{conf.path}])
           results['items'].each do |result|
             expect(result).to include('status' => 'success')
-            expect(result['result']).to eq('ruby' => 'Hi')
+            expect(result['value']).to eq('ruby' => 'Hi')
           end
         end
       end
@@ -467,7 +467,7 @@ describe "apply", expensive: true do
                                     --configfile #{conf.path}])
           results.each do |result|
             expect(result).to include('status' => 'success')
-            report = result['result']['report']
+            report = result['value']['report']
             expect(report['resource_statuses']).to include("Notify[Apply: Hi!]")
           end
         end
@@ -478,7 +478,7 @@ describe "apply", expensive: true do
         results = run_command(is_boltdir, conn_uri('winrm'), config: config)
         results.each do |result|
           expect(result).to include('status' => 'success')
-          expect(result['result']['stdout']).to match(/not found/)
+          expect(result['value']['stdout']).to match(/not found/)
         end
       end
     end
@@ -493,7 +493,7 @@ describe "apply", expensive: true do
         result = run_task('puppet_agent::version', conn_uri('winrm'), {}, config: config)
         expect(result.count).to eq(1)
         expect(result[0]).to include('status' => 'success')
-        expect(result[0]['result']['version']).to match(/^6/)
+        expect(result[0]['value']['version']).to match(/^6/)
       end
 
       it 'runs a ruby task' do
@@ -502,7 +502,7 @@ describe "apply", expensive: true do
                                     --configfile #{conf.path}])
           results['items'].each do |result|
             expect(result).to include('status' => 'success')
-            expect(result['result']).to eq('ruby' => 'Hi')
+            expect(result['value']).to eq('ruby' => 'Hi')
           end
         end
       end
@@ -513,7 +513,7 @@ describe "apply", expensive: true do
                                     --configfile #{conf.path}])
           results.each do |result|
             expect(result).to include('status' => 'success')
-            report = result['result']['report']
+            report = result['value']['report']
             expect(report['resource_statuses']).to include("Notify[Apply: Hi!]")
           end
         end
@@ -524,7 +524,7 @@ describe "apply", expensive: true do
         results = run_command(is_boltdir, conn_uri('winrm'), config: config)
         results.each do |result|
           expect(result).to include('status' => 'success')
-          expect(result['result']['stdout']).to match(/not found/)
+          expect(result['value']['stdout']).to match(/not found/)
         end
       end
     end

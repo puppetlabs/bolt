@@ -346,16 +346,21 @@ module Bolt
       # @param [Bolt::PlanResult] plan_result A PlanResult object
       def print_plan_result(plan_result)
         value = plan_result.value
-        if value.nil?
+        case value
+        when nil
           @stream.puts("Plan completed successfully with no result")
-        elsif value.is_a? Bolt::ApplyFailure
-          @stream.puts(colorize(:red, value.message))
-        elsif value.is_a? Bolt::ResultSet
-          value.each { |result| print_result(result) }
-          print_summary(value)
+        when Bolt::ApplyFailure, Bolt::RunFailure
+          print_result_set(value.result_set)
+        when Bolt::ResultSet
+          print_result_set(value)
         else
           @stream.puts(::JSON.pretty_generate(plan_result, quirks_mode: true))
         end
+      end
+
+      def print_result_set(result_set)
+        result_set.each { |result| print_result(result) }
+        print_summary(result_set)
       end
 
       def print_puppetfile_result(success, puppetfile, moduledir)

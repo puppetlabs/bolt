@@ -101,8 +101,8 @@ module Bolt
   end
 
   class ApplyError < Error
-    def initialize(target)
-      super("Apply failed to compile for #{target}", 'bolt/apply-error')
+    def initialize(target, msg)
+      super("Apply failed to compile for #{target}: #{msg}", 'bolt/apply-error')
     end
   end
 

@@ -111,16 +111,13 @@ module Bolt
     end
 
     def status_hash
-      # DEPRECATION: node in status hashes is deprecated and should be removed in 2.0
-      base = {
+      {
         target: @target.name,
         action: action,
         object: object,
-        status: status
+        status: status,
+        value: @value
       }
-      # rubocop:disable Style/GlobalVars
-      $future ? base.merge(value: @value) : base.merge(result: @value, node: @target.name)
-      # rubocop:enable Style/GlobalVars
     end
 
     def generic_value

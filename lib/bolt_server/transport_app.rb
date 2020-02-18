@@ -186,17 +186,15 @@ module BoltServer
         [400, '`environment` is a required argument']
       else
         @pal_mutex.synchronize do
-          begin
-            pal = BoltServer::PE::PAL.new({}, environment)
-            yield pal
-          rescue Puppet::Environments::EnvironmentNotFound
-            [400, {
-              "class" => 'bolt/unknown-environment',
-              "message" => "Environment #{environment} not found"
-            }.to_json]
-          rescue Bolt::Error => e
-            [400, e.to_json]
-          end
+          pal = BoltServer::PE::PAL.new({}, environment)
+          yield pal
+        rescue Puppet::Environments::EnvironmentNotFound
+          [400, {
+            "class" => 'bolt/unknown-environment',
+            "message" => "Environment #{environment} not found"
+          }.to_json]
+        rescue Bolt::Error => e
+          [400, e.to_json]
         end
       end
     end
@@ -255,14 +253,23 @@ module BoltServer
         'load-config' => false
       }
 
-      opts = defaults.merge(target_hash.clone).merge(overrides)
+      opts = defaults.merge(target_hash).merge(overrides)
 
       if opts['private-key-content']
         private_key_content = opts.delete('private-key-content')
         opts['private-key'] = { 'key-data' => private_key_content }
       end
 
-      Bolt::Target.new(target_hash['hostname'], opts)
+      data = {
+        'uri' => target_hash['hostname'],
+        'config' => {
+          'transport' => 'ssh',
+          'ssh' => opts
+        }
+      }
+
+      inventory = Bolt::Inventory.empty
+      Bolt::Target.from_hash(data, inventory)
     end
 
     post '/ssh/:action' do
@@ -286,12 +293,23 @@ module BoltServer
     end
 
     def make_winrm_target(target_hash)
-      overrides = {
-        'protocol' => 'winrm'
+      defaults = {
+        'ssl' => false,
+        'ssl-verify' => false
       }
 
-      opts = target_hash.clone.merge(overrides)
-      Bolt::Target.new(target_hash['hostname'], opts)
+      opts = defaults.merge(target_hash)
+
+      data = {
+        'uri' => target_hash['hostname'],
+        'config' => {
+          'transport' => 'winrm',
+          'winrm' => opts
+        }
+      }
+
+      inventory = Bolt::Inventory.empty
+      Bolt::Target.from_hash(data, inventory)
     end
 
     post '/winrm/:action' do

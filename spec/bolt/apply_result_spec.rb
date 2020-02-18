@@ -87,12 +87,11 @@ describe Bolt::ApplyResult do
 
   describe 'exposes methods for examining data' do
     let(:expected) {
-      { "node" => "target",
-        "target" => "target",
+      { "target" => "target",
         "action" => "apply",
         "object" => nil,
         "status" => "success",
-        "result" => { "report" => result_value } }
+        "value" => { "report" => result_value } }
     }
 
     it 'with to_json' do

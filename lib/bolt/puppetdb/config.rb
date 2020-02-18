@@ -71,13 +71,11 @@ module Bolt
       def expand_paths
         %w[cacert cert key token].each do |file|
           next unless @settings[file]
-          # rubocop:disable Style/GlobalVars
-          @settings[file] = if $future && @boltdir_path
+          @settings[file] = if @boltdir_path
                               File.expand_path(@settings[file], @boltdir_path)
                             else
                               File.expand_path(@settings[file])
                             end
-          # rubocop:enable Style/GlobalVars
         end
       end
 

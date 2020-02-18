@@ -69,14 +69,14 @@ plan test::winrm_retry_plan($nodes) {
     failed_node = json['result'].select { |n| n['status'] == 'failure' }
     assert(!failed_node.empty?, "No nodes failed on the first task run")
     assert(failed_node.length < 2, "More than 1 node failed the first task run")
-    assert_equal(winrm_nodes[0].hostname, failed_node[0]['node'],
+    assert_equal(winrm_nodes[0].hostname, failed_node[0]['target'],
                  "The hostname #{winrm_nodes[0].hostname} is not correct")
 
     # Verify that the second node succeeded on the first run
     if winrm_nodes.length > 1
       winrm_nodes[1..-1].each do |node|
         host = node.hostname
-        result = json['result'].select { |n| n['node'] == host }
+        result = json['value'].select { |n| n['target'] == host }
         assert_equal('success', result[0]['status'],
                      "The task did not succeed on #{node.hostname}")
       end
@@ -86,7 +86,7 @@ plan test::winrm_retry_plan($nodes) {
 
     # Verify that the retry run succeeded with expected nodes
     assert_equal(1, json['retry'].length, "More than 1 node was retried")
-    assert_equal(winrm_nodes[0].hostname, json['retry'][0]['node'],
+    assert_equal(winrm_nodes[0].hostname, json['retry'][0]['target'],
                  "The retry run did not run on #{winrm_nodes[0].hostname}")
     assert_equal('success', json['retry'][0]['status'],
                  "The retry run did not succeed")

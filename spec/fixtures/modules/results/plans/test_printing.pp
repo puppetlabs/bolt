@@ -4,6 +4,13 @@ plan results::test_printing(
   String $password,
   Integer $port
 ) {
-  $target = Target($host, {'user' => $user, 'password' => $password, 'port' => $port})
-  notice("Connected to ${target}")
+  $config = {
+    'local' => {
+      'user' => $user,
+      'password' => $password,
+      'port' => $port
+    }
+  }
+  $target = Target.new({'name' => $host, 'config' => $config})
+  notice("Connected to ${target.name}")
 }

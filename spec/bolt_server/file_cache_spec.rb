@@ -13,11 +13,9 @@ describe BoltServer::FileCache, puppetserver: true do
   include BoltSpec::BoltServer
 
   before(:all) do
-    begin
-      get_task_data('sample::echo')
-    rescue StandardError => e
-      raise "Could not get sample::echo from puppetserver. Tests will fail: #{e}"
-    end
+    get_task_data('sample::echo')
+  rescue StandardError => e
+    raise "Could not get sample::echo from puppetserver. Tests will fail: #{e}"
   end
 
   before(:each) do

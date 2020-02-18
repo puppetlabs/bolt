@@ -9,7 +9,7 @@ require 'bolt_spec/logger'
 require 'bolt_spec/transport'
 require 'bolt/transport/ssh'
 require 'bolt/config'
-require 'bolt/target'
+require 'bolt/inventory'
 require 'bolt/util'
 
 require 'shared_examples/transport'
@@ -19,11 +19,6 @@ describe Bolt::Transport::SSH do
   include BoltSpec::Errors
   include BoltSpec::Files
   include BoltSpec::Task
-
-  def mk_config(conf)
-    conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(Bolt::Boltdir.new('.'), 'ssh' => conf)
-  end
 
   let(:hostname) { conn_info('ssh')[:host] }
   let(:user) { conn_info('ssh')[:user] }
@@ -38,18 +33,26 @@ describe Bolt::Transport::SSH do
   let(:config) { mk_config(user: user, password: password) }
   let(:no_host_key_check) { mk_config('host-key-check' => false, user: user, password: password) }
   let(:no_user_config) { mk_config('host-key-check' => false, user: nil, password: password) }
+  let(:no_load_config) { mk_config('host-key-check' => false, user: nil, password: password, 'load-config' => false) }
   let(:ssh) { Bolt::Transport::SSH.new }
-  let(:transport_conf) { {} }
   let(:task_input_size) { 100000 }
   let(:big_task_input) { "f" * task_input_size }
   let(:stdin_task) { "#!/bin/sh\ngrep data" }
   let(:env_task) { "#!/bin/sh\necho $PT_data" }
+  let(:inventory) { Bolt::Inventory.empty }
+  let(:transport_conf) { {} }
+  let(:target) { make_target }
 
-  def make_target(host_: hostname, port_: port, conf: config)
-    Bolt::Target.new("#{host_}:#{port_}", transport_conf).update_conf(conf.transport_conf)
+  def mk_config(conf)
+    conf = Bolt::Util.walk_keys(conf, &:to_s)
+    Bolt::Config.new(Bolt::Boltdir.new('.'), 'ssh' => conf)
   end
 
-  let(:target) { make_target }
+  def make_target(host_: hostname, port_: port, conf: config)
+    t = inventory.get_target("#{host_}:#{port_}")
+    t.inventory_target.set_config('ssh', conf.transports[conf.transport.to_sym].merge(transport_conf))
+    t
+  end
 
   context 'with ssh', ssh: true do
     let(:target) { make_target(conf: no_host_key_check) }
@@ -216,9 +219,8 @@ describe Bolt::Transport::SSH do
     it "doesn't read system config if load_config is false" do
       allow(Etc).to receive(:getlogin).and_return('bolt')
       expect(Net::SSH::Config).not_to receive(:for)
-
       transport_conf['load-config'] = false
-      config_user = ssh.with_connection(make_target(conf: no_user_config), &:user)
+      config_user = ssh.with_connection(make_target(conf: no_load_config), &:user)
       expect(config_user).to be('bolt')
     end
   end
@@ -272,7 +274,7 @@ describe Bolt::Transport::SSH do
     end
 
     it "returns false if the target is not available", ssh: true do
-      expect(ssh.connected?(Bolt::Target.new('unknownfoo'))).to eq(false)
+      expect(ssh.connected?(inventory.get_target('unknownfoo'))).to eq(false)
     end
   end
 
@@ -384,39 +386,14 @@ describe Bolt::Transport::SSH do
     end
   end
 
-  context "as bash user with no password", sudo: true do
-    let(:config) {
-      mk_config('host-key-check' => false, 'run-as' => 'root', user: bash_user, password: bash_password)
-    }
-    let(:target) { make_target }
-
-    it "returns a failed result when a temporary directory is created" do
-      contents = "#!/bin/sh\nwhoami"
-      with_tempfile_containing('script test', contents) do |file|
-        expect {
-          ssh.run_script(target, file.path, [])
-        }.to raise_error(Bolt::Node::EscalateError,
-                         "Sudo password for user #{bash_user} was not provided for #{safe_name}")
-      end
-    end
-  end
-
   context "with no sudo-password", sudo: true, ssh: true do
     let(:config) {
       mk_config('host-key-check' => false, 'password' => password, 'run-as' => 'root',
                 user: user, password: password)
     }
     let(:target) { make_target }
-    after(:each) {
-      # rubocop:disable Style/GlobalVars
-      $future = nil
-      # rubocop:enable Style/GlobalVars
-    }
 
-    it "uses password as sudo-password when future is set" do
-      # rubocop:disable Style/GlobalVars
-      $future = true
-      # rubocop:enable Style/GlobalVars
+    it "uses password as sudo-password" do
       expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
     end
   end
@@ -487,7 +464,7 @@ describe Bolt::Transport::SSH do
   end
 
   context 'when there is no host in the target' do
-    let(:target) { Bolt::Target.new(nil, "name" => "hostless") }
+    let(:target) { Bolt::Inventory::Target.new({ 'name' => 'hostless' }, inventory) }
 
     it 'errors' do
       expect { ssh.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
@@ -499,7 +476,7 @@ describe Bolt::Transport::SSH do
     let(:config) do
       mk_config("host-key-check" => false, "sudo-password" => password,
                 "run-as" => "root", user: user, password: password,
-                "script-dir" => script_dir, interpreters: { sh: "/bin/sh" })
+                "script-dir" => script_dir, "interpreters" => { sh: "/bin/sh" })
     end
     let(:target) { make_target }
 

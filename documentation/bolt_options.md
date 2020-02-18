@@ -70,7 +70,6 @@ To specify targets from an inventory file, reference targets by target name, a g
 
 This inventory file defines two top-level groups: elastic_search and web_app.
 ```yaml
-version: 2
 groups:
   - name: elastic_search
     targets:
@@ -98,6 +97,7 @@ Available transports are:
 -   `local`
 -   `docker`
 -   `pcp`
+-   `remote`
 
 Pass the `--transport` option after the targets list:
 ```

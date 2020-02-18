@@ -96,32 +96,30 @@ module Bolt
           # Pass this argument through to avoid retaining a reference to a
           # local variable that will change on the next iteration of the loop.
           @pool.post(batch_promises) do |result_promises|
-            begin
-              results = yield transport, batch
-              Array(results).each do |result|
-                result_promises[result.target].set(result)
-              end
-            # NotImplementedError can be thrown if the transport is not implemented improperly
-            rescue StandardError, NotImplementedError => e
-              result_promises.each do |target, promise|
-                # If an exception happens while running, the result won't be logged
-                # by the CLI. Log a warning, as this is probably a problem with the transport.
-                # If batch_* commands are used from the Base transport, then exceptions
-                # normally shouldn't reach here.
-                @logger.warn(e)
-                promise.set(Bolt::Result.from_exception(target, e))
-              end
-            ensure
-              # Make absolutely sure every promise gets a result to avoid a
-              # deadlock. Use whatever exception is causing this block to
-              # execute, or generate one if we somehow got here without an
-              # exception and some promise is still missing a result.
-              result_promises.each do |target, promise|
-                next if promise.fulfilled?
-                error = $ERROR_INFO || Bolt::Error.new("No result was returned for #{target.uri}",
-                                                       "puppetlabs.bolt/missing-result-error")
-                promise.set(Bolt::Result.from_exception(target, error))
-              end
+            results = yield transport, batch
+            Array(results).each do |result|
+              result_promises[result.target].set(result)
+            end
+          # NotImplementedError can be thrown if the transport is not implemented improperly
+          rescue StandardError, NotImplementedError => e
+            result_promises.each do |target, promise|
+              # If an exception happens while running, the result won't be logged
+              # by the CLI. Log a warning, as this is probably a problem with the transport.
+              # If batch_* commands are used from the Base transport, then exceptions
+              # normally shouldn't reach here.
+              @logger.warn(e)
+              promise.set(Bolt::Result.from_exception(target, e))
+            end
+          ensure
+            # Make absolutely sure every promise gets a result to avoid a
+            # deadlock. Use whatever exception is causing this block to
+            # execute, or generate one if we somehow got here without an
+            # exception and some promise is still missing a result.
+            result_promises.each do |target, promise|
+              next if promise.fulfilled?
+              error = $ERROR_INFO || Bolt::Error.new("No result was returned for #{target.uri}",
+                                                     "puppetlabs.bolt/missing-result-error")
+              promise.set(Bolt::Result.from_exception(target, error))
             end
           end
           batch_promises.values
@@ -286,16 +284,14 @@ module Bolt
       log_action(description, targets) do
         batch_execute(targets) do |transport, batch|
           with_node_logging('Waiting until available', batch) do
-            begin
-              wait_until(wait_time, retry_interval) { transport.batch_connected?(batch) }
-              batch.map { |target| Result.new(target) }
-            rescue TimeoutError => e
-              available, unavailable = batch.partition { |target| transport.batch_connected?([target]) }
-              (
-                available.map { |target| Result.new(target) } +
-                unavailable.map { |target| Result.from_exception(target, e) }
-              )
-            end
+            wait_until(wait_time, retry_interval) { transport.batch_connected?(batch) }
+            batch.map { |target| Result.new(target) }
+          rescue TimeoutError => e
+            available, unavailable = batch.partition { |target| transport.batch_connected?([target]) }
+            (
+              available.map { |target| Result.new(target) } +
+              unavailable.map { |target| Result.from_exception(target, e) }
+            )
           end
         end
       end
@@ -337,10 +333,6 @@ module Bolt
       yield
     ensure
       publish_event(type: :enable_default_output)
-    end
-
-    def deprecation(msg)
-      @logger.warn msg
     end
   end
 end

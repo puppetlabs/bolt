@@ -40,7 +40,6 @@ In the case where no custom module content is required for the Bolt action you w
 
 ```yaml
 ---
-version: 2
 targets:
   - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
     alias: docker-example
@@ -107,7 +106,6 @@ Store information about targets. Note the absolute path to the private key is th
 
 ```yaml
 ---
-version: 2
 targets:
   - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
     alias: docker-example

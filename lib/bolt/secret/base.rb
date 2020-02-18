@@ -34,12 +34,6 @@ module Bolt
       alias resolve_reference secret_decrypt
 
       def validate_resolve_reference(opts)
-        # TODO: Remove deprecation warning
-        if opts.include?('encrypted-value')
-          msg = "Parsing error: The 'encrypted-value' key is deprecated and can no longer be used. " \
-                "In your Bolt config files, please use 'encrypted_value' instead."
-          raise Bolt::ValidationError, msg
-        end
         decode(opts['encrypted_value'])
       end
     end

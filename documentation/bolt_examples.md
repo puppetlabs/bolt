@@ -49,7 +49,6 @@ To run Bolt commands against multiple targets at once, you need to provide infor
 1.  Inside the `bolt-guide` directory, use a text editor to create an `inventory.yaml` file.
 1.  Inside the new `inventory.yaml` file, add the following content, listing the fully qualified domain names of the targets you want to run the script on, and replacing the credentials in the `winrm` section with those appropriate for your target:
     ```yaml
-    version: 2
     groups:
       - name: windows
         targets:

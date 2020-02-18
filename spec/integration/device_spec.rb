@@ -27,8 +27,8 @@ describe "devices" do
     def agent_version_inventory
       { 'groups' => [
         { 'name' => 'agent_targets',
-          'nodes' => [
-            { 'name' => "ssh://#{conn_info('ssh')[:host]}",
+          'targets' => [
+            { 'uri' => "ssh://#{conn_info('ssh')[:host]}",
               'alias' => 'puppet_6',
               'config' => { 'ssh' => { 'port' => '20024' } } }
           ] }
@@ -42,8 +42,8 @@ describe "devices" do
 
     let(:device_inventory) do
       device_group = { 'name' => 'device_targets',
-                       'nodes' => [
-                         { 'name' => 'fake_device1',
+                       'targets' => [
+                         { 'uri' => 'fake_device1',
                            'config' => {
                              'transport' => 'remote',
                              'remote' => {
@@ -87,16 +87,16 @@ describe "devices" do
                                     --modulepath #{modulepath} --inventoryfile #{inv.path}])
           expect(results).not_to include("kind")
 
-          report = results[0]['result']['report']
+          report = results[0]['value']['report']
           expect(report['resource_statuses']).to include("Fake_device[key1]")
 
-          content = run_command("cat '#{device_path}'", 'puppet_6', inventory: device_inventory)[0]['result']['stdout']
+          content = run_command("cat '#{device_path}'", 'puppet_6', inventory: device_inventory)[0]['value']['stdout']
           expect(content).to eq({ key1: "val1" }.to_json)
 
           resources = run_cli_json(%W[plan run device_test::resources
                                       --targets device_targets
                                       --modulepath #{modulepath} --inventoryfile #{inv.path}])
-          expect(resources[0]['result']['resources'][0]).to eq("key1" =>
+          expect(resources[0]['value']['resources'][0]).to eq("key1" =>
                                                                { "content" => "val1",
                                                                  "ensure" => "present",
                                                                  "merge" => false })

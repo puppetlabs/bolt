@@ -80,7 +80,7 @@ module Bolt
             declarations = @normalized_resources.map do |resource|
               type = resource['type'].is_a?(EvaluableString) ? resource['type'].value : resource['type']
               title = Bolt::Util.to_code(resource['title'])
-              parameters = Bolt::Util.map_vals(resource['parameters']) do |val|
+              parameters = resource['parameters'].transform_values do |val|
                 Bolt::Util.to_code(val)
               end
 

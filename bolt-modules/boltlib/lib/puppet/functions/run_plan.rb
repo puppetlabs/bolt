@@ -23,13 +23,8 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
 
   # Run a plan, specifying `$nodes` or `$targets` as a positional argument.
   #
-  # When running a plan with a `$nodes` parameter, the second positional argument will always specify
-  # the `$nodes` parameter. When running a plan with a `$targets `parameter and no `$nodes` parameter, the
-  # second positional argument specifies the `$targets` parameter.
-  #
-  # > **Deprecation Warning**: Starting with Bolt 2.0, a plan with both a `$nodes` and `$targets` parameter
-  # > cannot specify either parameter using the second positional argument and will result in the plan
-  # > failing to run.
+  # > **Note:** When running a plan with both a `$nodes` and `$targets` parameter, and using the second
+  # positional argument, the plan will fail.
   #
   # @param plan_name The plan to run.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
@@ -102,7 +97,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       param_acc[param.name] = extract_parameter_types(param.type_expr)&.flatten
     end
 
-    targets_to_param(targets, params, param_types, executor) if targets
+    targets_to_param(targets, params, param_types) if targets
 
     if inventory.version > 1
       params.each do |param, value|
@@ -174,30 +169,15 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     end
   end
 
-  def targets_to_param(targets, params, param_types, executor)
+  def targets_to_param(targets, params, param_types)
     nodes_param = param_types.include?('nodes')
     targets_param = param_types['targets']&.any? { |p| p.match?(/TargetSpec/) }
 
     # Both a 'TargetSpec $nodes' and 'TargetSpec $targets' parameter are present in the plan
-    # 1.x behavior: Populate $nodes and warn user that this will error in 2.x
-    # 2.x behavior: Error
     if nodes_param && targets_param
-      # rubocop:disable Style/GlobalVars
-      if $future
-        raise ArgumentError,
-              "A plan with both a $nodes and $targets parameter cannot have either parameter specified " \
-              "as the second positional argument to run_plan()."
-      else
-        msg = <<~WARNING
-              Deprecation Warning: A plan with both a $nodes and $targets parameter can only specify
-              the $nodes parameter as the second positional argument to run_plan(). Starting in
-              Bolt 2.0, a plan with both a $nodes and $targets parameter will not be able to specify
-              either parameter as the second positional argument to run_plan() and will result in the
-              plan failing.
-              WARNING
-        executor.deprecation(msg)
-      end
-      # rubocop:enable Style/GlobalVars
+      raise ArgumentError,
+            "A plan with both a $nodes and $targets parameter cannot have either parameter specified " \
+            "as the second positional argument to run_plan()."
     end
 
     # Always populate a $nodes parameter over $targets

@@ -46,7 +46,7 @@ module Bolt
       end
 
       # Merge the config hash with inventory config
-      config = Bolt::Util.deep_merge(config, @config)
+      config = Bolt::Util.deep_merge(config, @config || {})
       transport = config['transport'] || 'ssh'
       t_conf = config['transports'][transport] || {}
       uri_obj = parse_uri(uri)

@@ -1,0 +1,7 @@
+{
+    "parameters": {
+        "optional_config": {
+            "type": "Optional[String]"
+        }
+    }
+}

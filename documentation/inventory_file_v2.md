@@ -4,13 +4,13 @@ Use an inventory file to store information about your targets and arrange them i
 
 The command `bolt inventory show -t <TARGET> --detail` provides a quick way to view the resolved values for a target or group of targets.
 
-> **Note**: Version 1 inventory files are deprecated. If you're using version 1 inventory files, make sure you've migrated them to version 2 before the release of Bolt 2.0. For more information on migrating to version 2, see [Migrating your inventory files to version 2](./migrating_inventory_files.md).
+> **Note**: Version 1 inventory files are deprecated. If you're using version 1 inventory files, make sure to migrate them to version 2. For more information on migrating to version 2, see [Migrating your inventory files to version 2](./migrating_inventory_files.md).
 
 ## Inventory file structure
 
 ### Top-level fields
 
-The top level of an inventory file acts as the implicit `all` group and has similar fields as a `groups` object. Using a version 2 inventory file requires `version: 2` at the top level.
+The top level of an inventory file acts as the implicit `all` group and has similar fields as a `groups` object.
 
 The following fields are available at the top level of a version 2 inventory file:
 
@@ -22,8 +22,6 @@ The following fields are available at the top level of a version 2 inventory fil
 | `groups` | A list of targets and groups and their associated configuration. Optional. | `Array[Group]` |
 | `targets` | A list of targets and their associated configuration. Optional. | `Array[Target]` |
 | `vars` | The vars for the `all` group. Optional. | `Hash` |
-| `version` | The version of the inventory file. <br>**Required in Bolt versions 1.x.** <br>Default: 1 | `Integer` |
-
 
 ### Group object
 
@@ -41,7 +39,6 @@ A group lists a set of `targets` and `groups` and their associated configuration
 
 An example of an inventory file with two groups named `linux` and `windows`:
 ```yaml
-version: 2
 groups:
   - name: linux
     targets:
@@ -74,7 +71,6 @@ You can specify a target with the string representation of a URI, or as a hash w
 An example of targets specified with the string representations of their URIs:
 
 ```yaml
-version: 2
 targets:
   - target1.example.com
   - target2.example.com
@@ -83,7 +79,6 @@ targets:
 An example of targets specified with hashes:
 
 ```yaml
-version: 2
 targets:
   - uri: target1.example.com
     alias: target1
@@ -103,7 +98,6 @@ When searching for a target's configuration data, Bolt matches a target's URI wi
 The `config` values for a target object, such as `host`, `transport`, and `port`, take precedent and override any `config` values at the group level. Bolt merges non-`config` data in the target object, such as `facts` and `vars`, with data in the group object.
 
 ```yaml
-version: 2
 groups:
   - name: group1
     targets:
@@ -210,7 +204,6 @@ The `linux` group lists its targets and sets the default transport for the targe
 The `windows` group lists its targets and sets the default transport for the targets to the WinRM protocol.
 
 ```yaml
-version: 2
 groups:
   - name: linux
     targets:
@@ -237,7 +230,6 @@ The `ssh_nodes` group has two subgroups - `webservers` and `memcached` - and set
 The `win_nodes` group also has two subgroups - `domaincontrollers` and `testservers` - and sets the default transport for targets in the group to the WinRM protocol. It also specifies a few configuration options for the WinRM transport. Each of the subgroups lists the targets in the group and the `testservers` group has additional WinRM transport configuration for its targets.
 
 ```yaml
-version: 2
 groups:
   - name: ssh_nodes
     groups:
@@ -294,7 +286,6 @@ The following inventory file uses several bundled plugins.
 The `inventory.yaml` file:
 
 ```yaml
-version: 2
 groups:
   - _plugin: yaml
     filepath: inventory/aws_inventory.yaml

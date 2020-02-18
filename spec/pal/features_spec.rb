@@ -3,12 +3,15 @@
 require 'spec_helper'
 require 'bolt_spec/files'
 require 'bolt_spec/pal'
+require 'bolt_spec/config'
 require 'bolt/pal'
-require 'bolt/inventory'
+require 'bolt/inventory/inventory'
+require 'bolt/plugin'
 
 describe 'set_features function' do
   include BoltSpec::Files
   include BoltSpec::PAL
+  include BoltSpec::Config
 
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
@@ -16,14 +19,8 @@ describe 'set_features function' do
   let(:analytics) { Bolt::Analytics::NoopClient.new }
   let(:executor) { Bolt::Executor.new(1, analytics) }
 
-  let(:data) {
-    {
-      'nodes' => %w[example],
-      'vars' => { 'pb' => 'jelly', 'mac' => 'cheese' }
-    }
-  }
-  let(:inventory) { Bolt::Inventory.new(data) }
   let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:inventory) { Bolt::Inventory.empty }
   let(:target) { inventory.get_targets('example')[0] }
 
   it 'adds the feature to the target' do

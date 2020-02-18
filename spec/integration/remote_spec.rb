@@ -14,8 +14,8 @@ describe 'running with an inventory file', reset_puppet_settings: true, ssh: tru
 
   let(:conn) { conn_info('ssh') }
   let(:inventory) do
-    { 'nodes' => [
-      { 'name' => conn[:host],
+    { 'targets' => [
+      { 'uri' => conn[:host],
         'config' => {
           'transport' => conn[:protocol],
           conn[:protocol] => {
@@ -24,14 +24,14 @@ describe 'running with an inventory file', reset_puppet_settings: true, ssh: tru
             'password' => conn[:password]
           }
         } },
-      { 'name' => 'remote://simple.example.com',
+      { 'uri' => 'remote://simple.example.com',
         'config' => {
           'remote' => {
             'run-on' => conn[:host],
             'token' => 'token_val'
           }
         } },
-      { 'name' => 'https://www.example.com',
+      { 'uri' => 'https://www.example.com',
         'config' => {
           'transport' => 'remote',
           'remote' => { 'run-on': conn[:host] }
@@ -49,7 +49,7 @@ describe 'running with an inventory file', reset_puppet_settings: true, ssh: tru
   it 'runs a remote task' do
     result = run_task('remote', 'remote://simple.example.com', {}, config: config, inventory: inventory).first
     expect(result).to include('status' => 'success')
-    expect(result['result']['_target']).to include(
+    expect(result['value']['_target']).to include(
       'uri' => 'remote://simple.example.com',
       'host' => 'simple.example.com',
       'token' => 'token_val'
@@ -59,7 +59,7 @@ describe 'running with an inventory file', reset_puppet_settings: true, ssh: tru
   it 'runs a remote task with the https protocol' do
     result = run_task('remote', 'https://www.example.com', {}, config: config, inventory: inventory).first
     expect(result).to include('status' => 'success')
-    expect(result['result']['_target']).to include(
+    expect(result['value']['_target']).to include(
       'uri' => 'https://www.example.com',
       'host' => 'www.example.com',
       'protocol' => 'https'
