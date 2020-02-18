@@ -471,7 +471,7 @@ describe Bolt::Inventory::Inventory do
           let(:data) {
             {
               'targets' => ['target'],
-              'config' => { 'winrm' => { 'connect-timeout' => '10' } }
+              'config' => { 'transport' => 'winrm', 'winrm' => { 'connect-timeout' => '10' } }
             }
           }
 
@@ -497,7 +497,7 @@ describe Bolt::Inventory::Inventory do
           let(:data) {
             {
               'targets' => ['target'],
-              'config' => { 'winrm' => { 'ssl' => 'true' } }
+              'config' => { 'transport' => 'winrm', 'winrm' => { 'ssl' => 'true' } }
             }
           }
 
@@ -510,7 +510,7 @@ describe Bolt::Inventory::Inventory do
           let(:data) {
             {
               'targets' => ['target'],
-              'config' => { 'winrm' => { 'ssl-verify' => 'true' } }
+              'config' => { 'transport' => 'winrm', 'winrm' => { 'ssl-verify' => 'true' } }
             }
           }
 
@@ -600,7 +600,7 @@ describe Bolt::Inventory::Inventory do
             'run-as' => 'root',
             'tty' => true,
             'sudo-password' => 'nothing',
-            'extensions' => '.py',
+            'extensions' => ['.py'],
             'service-url' => 'https://master',
             'cacert' => transport + '.pem',
             'token-file' => 'token',
@@ -623,12 +623,16 @@ describe Bolt::Inventory::Inventory do
         let(:conf) { Bolt::Config.default }
         let(:inventory) { Bolt::Inventory::Inventory.new(data, conf, plugins: plugins) }
 
+        before(:each) do
+          allow(Bolt::Util).to receive(:validate_file).and_return(true)
+        end
+
         it 'should not modify existing config' do
           get_target(inventory, 'ssh://target')
           expect(conf.transport).to eq('ssh')
-          expect(conf.transports[:ssh]['host-key-check']).to be nil
-          expect(conf.transports[:winrm]['ssl']).to be true
-          expect(conf.transports[:winrm]['ssl-verify']).to be true
+          expect(conf.transports['ssh']['host-key-check']).to be nil
+          expect(conf.transports['winrm']['ssl']).to be true
+          expect(conf.transports['winrm']['ssl-verify']).to be true
         end
 
         it 'uses the configured transport' do
@@ -669,7 +673,7 @@ describe Bolt::Inventory::Inventory do
             'ssl' => false,
             'ssl-verify' => false,
             'tmpdir' => "/winrm",
-            'extensions' => ".py",
+            'extensions' => [".py"],
             'password' => 'youwinrm',
             'port' => '12345winrm',
             'user' => 'mewinrm',
@@ -919,7 +923,7 @@ describe Bolt::Inventory::Inventory do
             'run-as' => 'root',
             'tty' => true,
             'sudo-password' => 'nothing',
-            'extensions' => '.py',
+            'extensions' => ['.py'],
             'service-url' => 'https://master',
             'cacert' => transport + '.pem',
             'token-file' => 'token',
@@ -942,12 +946,16 @@ describe Bolt::Inventory::Inventory do
         let(:conf) { Bolt::Config.default }
         let(:inventory) { Bolt::Inventory::Inventory.new(data, conf, plugins: plugins) }
 
+        before(:each) do
+          allow(Bolt::Util).to receive(:validate_file).and_return(true)
+        end
+
         it 'should not modify existing config' do
           inventory.get_target('ssh://target')
           expect(conf.transport).to eq('ssh')
-          expect(conf.transports[:ssh]['load-config']).to be true
-          expect(conf.transports[:winrm]['ssl']).to be true
-          expect(conf.transports[:winrm]['ssl-verify']).to be true
+          expect(conf.transports['ssh']['load-config']).to be true
+          expect(conf.transports['winrm']['ssl']).to be true
+          expect(conf.transports['winrm']['ssl-verify']).to be true
         end
 
         it 'uses the configured transport' do
@@ -990,7 +998,7 @@ describe Bolt::Inventory::Inventory do
             'ssl-verify' => false,
             'tmpdir' => "/winrm",
             'cacert' => /winrm.pem\z/,
-            'extensions' => ".py",
+            'extensions' => [".py"],
             'password' => 'youwinrm',
             'port' => '12345winrm',
             'user' => 'mewinrm',

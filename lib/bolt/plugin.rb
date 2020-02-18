@@ -126,7 +126,7 @@ module Bolt
       # we can just add it first.
       plugins.add_plugin(Bolt::Plugin::Puppetdb.new(pdb_client))
 
-      # Initialize any plugins referenced in config. This will also indirectly
+      # Initialize any plugins referenced in plugin config. This will also indirectly
       # initialize any plugins they depend on.
       if plugins.reference?(config.plugins)
         msg = "The 'plugins' setting cannot be set by a plugin reference"
@@ -138,6 +138,11 @@ module Bolt
       end
 
       plugins.plugin_hooks.merge!(plugins.resolve_references(config.plugin_hooks))
+
+      # Resolve transport configuration plugin references
+      config.transports.each_value do |transport|
+        transport.config = plugins.resolve_references(transport.config)
+      end
 
       plugins
     end

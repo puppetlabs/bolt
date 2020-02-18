@@ -221,6 +221,8 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
 
     it "splits targets with different tokens into separate batches" do
+      allow(Bolt::Util).to receive(:validate_file).and_return(true)
+
       update_target(targets[1], 'token-file' => 'token2')
       update_target(targets[2], 'token-file' => 'token3')
       update_target(targets[3], 'token-file' => 'token2')

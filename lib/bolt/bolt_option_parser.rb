@@ -720,7 +720,7 @@ module Bolt
       define('--puppetfile FILEPATH',
              'Specify a Puppetfile to use when installing modules. (default: ~/.puppetlabs/bolt/Puppetfile)',
              'Modules are installed in the current Boltdir.') do |path|
-        @options[:puppetfile] = Pathname.new(File.expand_path(path))
+        @options[:puppetfile_path] = Pathname.new(File.expand_path(path))
       end
       define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|
         @options[:'save-rerun'] = save

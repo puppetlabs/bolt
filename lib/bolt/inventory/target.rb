@@ -101,28 +101,8 @@ module Bolt
       end
 
       def invalidate_config_cache!
-        @transport_config_cache = nil
-      end
-
-      # Computing the transport config is expensive as it requires cloning the
-      # base config, so we cache the effective config
-      def transport_config_cache
-        if @transport_config_cache.nil?
-          merged_config = Bolt::Util.deep_merge(group_cache['config'], @config)
-          base_config = @inventory.config
-          transport_data = Bolt::Util.deep_clone(base_config.transports)
-          Bolt::Config.update_transport_hash(base_config.boltdir.path, transport_data, merged_config)
-          transport = merged_config['transport'] || base_config.transport
-          Bolt::TRANSPORTS.each do |name, impl|
-            impl.validate(transport_data[name])
-          end
-          @transport_config_cache = {
-            'transport' => transport,
-            'transports' => transport_data
-          }
-        end
-
-        @transport_config_cache
+        @transport = nil
+        @transport_config = nil
       end
 
       # Validate the target. This implicitly also primes the group and config
@@ -135,6 +115,8 @@ module Bolt
         unless transport.nil? || Bolt::TRANSPORTS.include?(transport.to_sym)
           raise Bolt::UnknownTransportError.new(transport, uri)
         end
+
+        transport_config
       end
 
       def host
@@ -156,15 +138,23 @@ module Bolt
       # For remote targets, the transport is always 'remote'. Otherwise, it
       # will be either the URI scheme or set explicitly.
       def transport
-        if remote?
-          'remote'
-        else
-          @uri_obj.scheme || transport_config_cache['transport']
+        if @transport.nil?
+          config_transport = @config['transport'] ||
+                             group_cache.dig('config', 'transport') ||
+                             @inventory.config.transport
+
+          @transport = if @uri_obj.scheme == 'remote' || config_transport == 'remote'
+                         'remote'
+                       else
+                         @uri_obj.scheme || config_transport
+                       end
         end
+
+        @transport
       end
 
       def remote?
-        @uri_obj.scheme == 'remote' || transport_config_cache['transport'] == 'remote'
+        transport == 'remote'
       end
 
       def user
@@ -182,7 +172,14 @@ module Bolt
       # We only want to look up transport config keys for the configured
       # transport
       def transport_config
-        transport_config_cache['transports'][transport.to_sym]
+        if @transport_config.nil?
+          config = @inventory.config.transports[transport]
+          config = config.merge(group_cache.dig('config', transport)) if group_cache.dig('config', transport)
+          config = config.merge(@config[transport]) if @config[transport]
+          @transport_config = config
+        end
+
+        @transport_config.config
       end
 
       def config

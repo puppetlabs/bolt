@@ -714,7 +714,7 @@ module Bolt
     end
 
     def config_loaded
-      msg = <<~MSG
+      msg = <<~MSG.chomp
         Loaded configuration from: '#{config.config_files.join("', '")}'
       MSG
       @logger.debug(msg)
