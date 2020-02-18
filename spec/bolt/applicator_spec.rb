@@ -71,8 +71,8 @@ describe Bolt::Applicator do
 
   it 'logs messages returned on stderr' do
     logs = [
-      { debug: 'A message' },
-      { notice: 'Stuff happened' }
+      { level: 'debug', message: 'A message' },
+      { level: 'notice', message: 'Stuff happened' }
     ]
 
     expect(Open3).to receive(:capture3)
@@ -127,7 +127,7 @@ describe Bolt::Applicator do
       expect(resultset).not_to be_ok
       expect(resultset.count).to eq(1)
       expect(resultset.first).not_to be_ok
-      expect(resultset.first.error_hash['msg']).to eq('Something weird happened')
+      expect(resultset.first.error_hash['msg']).to match(/Something weird happened/)
     end
 
     it 'fails if the report signals failure' do

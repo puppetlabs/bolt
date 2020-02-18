@@ -10,6 +10,6 @@ Puppet::Util::Log.newdesttype :stderr do
   def handle(msg)
     str = msg.respond_to?(:multiline) ? msg.multiline : msg.to_s
     str = msg.source == "Puppet" ? str : "#{msg.source}: #{str}"
-    warn({ msg.level => str }.to_json)
+    warn({ level: msg.level, message: str }.to_json)
   end
 end
