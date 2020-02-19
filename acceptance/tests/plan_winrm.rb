@@ -76,7 +76,7 @@ plan test::winrm_retry_plan($nodes) {
     if winrm_nodes.length > 1
       winrm_nodes[1..-1].each do |node|
         host = node.hostname
-        result = json['value'].select { |n| n['target'] == host }
+        result = json['result'].select { |n| n['target'] == host }
         assert_equal('success', result[0]['status'],
                      "The task did not succeed on #{node.hostname}")
       end
