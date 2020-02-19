@@ -149,7 +149,7 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS.
     ```
 **Note:** If you get a "Command not found error" when you try to run Bolt, make sure you've added the `opt/puppetlabs/bin` PATH to `~/.bashrc` or the relevant profile for the shell you're using.  
 
-#### Updating Bolt
+#### Upgrading Bolt with macOS installer
 
 If you installed Bolt using the macOS installer, download the DMG again and repeat the installation steps to install the latest version.
 

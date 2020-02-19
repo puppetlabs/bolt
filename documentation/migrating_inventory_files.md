@@ -2,7 +2,7 @@
 
 Welcome to Bolt 2.0! 
 
-You can read about new features and changes in our [Bolt 2.0 blog post](https://example.com).
+You can read about new features and changes in our [Bolt 2.0 blog post](https://puppet.com/blog/introducing-bolt-2-0/).
 
 **Before you upgrade:**
 - Take a look at the [Changelog](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md).
