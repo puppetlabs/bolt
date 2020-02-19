@@ -2,6 +2,10 @@
 
 ## Bolt 2.0.0
 
+### Deprecations and removals
+
+* **WARNING:** Support for macOS 10.11, 10.12, 10.13, and Fedora 28, 29 will be dropped in the near future.
+
 ### New features
 
 * **Better output for errors in plans** ([#1607](https://github.com/puppetlabs/bolt/pull/1607))

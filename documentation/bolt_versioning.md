@@ -1,4 +1,4 @@
-# Bolt versions
+# Bolt versioning
 
 Bolt follows [semantic versioning](https://semver.org/) guidelines.
 
