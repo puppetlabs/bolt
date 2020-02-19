@@ -1,4 +1,4 @@
-# Inventory file version 2
+# Inventory files
 
 Use an inventory file to store information about your targets and arrange them into groups. Grouping your targets lets you aim your Bolt commands at the group instead of having to reference each target individually.
 
@@ -184,11 +184,11 @@ Bolt ships with several plugins.
 | ------ | ----------- | ---- |
 | `aws_inventory` | Generate targets from AWS EC2 instances. | [aws_inventory](https://forge.puppet.com/puppetlabs/aws_inventory) |
 | `azure_inventory` | Generate targets from Azure VMs and VM scale sets. | [azure_inventory](https://forge.puppet.com/puppetlabs/azure_inventory) |
-| `env_var` | Read a value from an environment variable. | [Using plugins](using_pugins.html#env_var) |
-| `pkcs7` | Use encrypted values for sensitive data. | [Using plugins](using_plugins.html#pkcs7) |
-| `prompt` | Prompt users to enter sensitive configuration information instead of storing it in a file. | [Using plugins](using_plugins.html#prompt) |
-| `puppetdb` | Query PuppetDB for a group of targets. | [Using plugins](using_plugins.html#puppetdb) |
-| `task` | Use a task to load targets, configuration, or other data. | [Using plugins](using_plugins.html#task) |
+| `env_var` | Read a value from an environment variable. | [Using plugins](using_plugins.md#env_var) |
+| `pkcs7` | Use encrypted values for sensitive data. | [Using plugins](using_plugins.md#pkcs7) |
+| `prompt` | Prompt users to enter sensitive configuration information instead of storing it in a file. | [Using plugins](using_plugins.md#prompt) |
+| `puppetdb` | Query PuppetDB for a group of targets. | [Using plugins](using_plugins.md#puppetdb) |
+| `task` | Use a task to load targets, configuration, or other data. | [Using plugins](using_plugins.md#task) |
 | `terraform` | Generate targets from local and remote Terraform state files. | [terraform](https://forge.puppet.com/puppetlabs/terraform) |
 | `vault` | Set values by accessing secrets from a Key/Value engine on a Hashicorp Vault server. | [vault](https://forge.puppet.com/puppetlabs/vault) |
 | `yaml` | Compose multiple YAML files into a single file. | [yaml](https://forge.puppet.com/puppetlabs/yaml) |

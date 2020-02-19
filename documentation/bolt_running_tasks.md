@@ -21,7 +21,7 @@ To run the main module task defined in `init`, refer to the task by the module n
 bolt task run package action=status name=vim --targets neptune --modulepath ~/modules
 ```
 
-**Tip:** Bolt ships with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](packaged_modules.md).
+**Tip:** Bolt ships with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](bolt_installing_modules.md).
 
 
 ## Passing structured data

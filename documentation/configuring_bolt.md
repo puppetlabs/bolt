@@ -46,7 +46,7 @@ You can place `bolt.yaml` configuration files at the following paths, from highe
 Bolt uses the following precedence when interpolating configuration settings, from highest precedence to lowest:
 
   - Target URI (i.e. ssh://user:password@hostname:port)
-  - [Inventory file](inventory_file.md) options
+  - [Inventory file](inventory_file_v2.md) options
   - [Command line flags](bolt_command_reference.md)
   - Project configuration file
   - User configuration file
@@ -143,7 +143,7 @@ plugins:
   
   Bolt runs in the context of a project directory or a `Boltdir`. This directory contains all of the configuration, code, and data loaded by Bolt.
 
-- **[Bolt configuration options](bolt_configuration_options.md)**  
+- **[Bolt configuration options](bolt_configuration_reference.md)**  
 
   Your Bolt configuration file can contain global and transport options.
 

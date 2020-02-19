@@ -1,8 +1,6 @@
-# Inspecting tasks and plans
+# Inspecting tasks
 
-Before you run tasks or plans in your environment, inspect them to determine what effect they have on your targets.
-
-**Tip:** Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](packaged_modules.md).
+Before you run a task in your environment, inspect the task to determine what effect it has on your targets.
 
 ## Run in no operation mode
 
@@ -26,20 +24,4 @@ View parameters and other details for a task, including whether a task supports 
 
 ```
 bolt task show <TASK NAME>
-```
-
-## Discover plans
-
-View a list of what plans are installed on the current module path:
-
-```
-bolt plan show
-```
-
-## Show documentation for a plan
-
-View parameters and other details for a plan, including whether a plan supports `--noop`:
-
-```
-bolt plan show <PLAN NAME>
 ```

@@ -15,26 +15,33 @@
 ```
 
 <% if sig['returns'] -%>
-#### Returns
+
+**Returns**
+
 <% for ret in sig['returns'] -%>
 `<%= ret['types'].first %>` <%= ret['text'] %>
 <% end -%>
 <% end -%>
 
-#### Parameters
+**Parameters**
+
 <% for param in sig['params'] -%>
 * **<%= param['name'] %>** `<%= param['types'].first %>` <%= param['text'] %>
 <% end -%>
 
 <% if sig['options'] -%>
-#### Additional options
+
+**Additional options**
+
 <% for option in sig['options'] -%>
 * **<%= option['opt_name'] %>** `<%= option['opt_types'].first %>` <%= option['opt_text'] %>
 <% end -%>
 <% end -%>
 
 <% if sig['examples'] -%>
-#### Examples
+
+**Examples**
+
 <% for example in sig['examples'] -%>
 <%= example['name'] %>
 ```

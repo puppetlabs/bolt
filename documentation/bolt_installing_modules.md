@@ -1,4 +1,4 @@
-# Installing modules
+# Modules
 
 Tasks and plans are packaged in Puppet modules, so you can install them as you would any module and manage them with a Puppetfile. 
 
@@ -55,7 +55,7 @@ This list of packaged modules is available in a [Puppetfile](https://github.com/
 
 [Puppet Forge](https://forge.puppet.com/)
 
-[Bolt configuration options](bolt_configuration_options.md)
+[Bolt configuration options](bolt_configuration_reference.md)
 
 ## Configure Bolt to download and install modules
 

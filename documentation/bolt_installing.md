@@ -6,41 +6,61 @@ Have questions? Get in touch. We're in #bolt on the [Puppet community Slack](htt
 
 **Tip:** Bolt uses an internal version of Puppet that supports tasks and plans, so you do not need to install Puppet. If you use Bolt on a machine that has Puppet installed, Bolt uses its internal version of Puppet and does not conflict with the Puppet version you have installed.
 
-**Note:** Bolt automatically collects data about how you use it. If you want to opt out of providing this data, you can do so. For more information see, [Analytics data collection](bolt_installing.md#)
+**Note:** Bolt automatically collects data about how you use it. If you want to opt out of providing this data, you can do so. For more information see, [Analytics data collection](bolt_installing.md#analytics-data-collection)
 
-## Install Bolt on Windows
+## Installing Bolt on Windows
 
 Use one of the supported Windows installation methods to install Bolt.
 
-### Install Bolt with MSI 
+### Install Bolt with Windows Installer (MSI) 
 
-Use the MSI installer package to install Bolt on Windows.
-
+Use the MSI installer package to install Bolt on Windows:
 1.  Download the [Bolt installer package](https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi).
 1.  Double-click the MSI file and run the installer.
-1.  Run a Bolt command and get started.
+1.  Open PowerShell and run a Bolt command.
     ```
     bolt --help
     ```
 
-If you see an error message instead of the expected output, you probably need to follow one or both of the additional steps below. See [Add the Bolt module to PowerShell](bolt_installing.md#) and [Change execution policy restrictions](bolt_installing.md#).
+If you see an error message instead of the expected output, you probably need to follow one or both of the additional steps below. See [Add the Bolt module to PowerShell](bolt_installing.md#add-the-bolt-module-to-powershell) and [Change execution policy restrictions](bolt_installing.md#change-execution-policy-restrictions).
+
+#### Upgrading Bolt with the MSI
+
+If you installed Bolt using the MSI, download the MSI again and repeat the installation steps to install the latest version.
+
+#### Uninstalling Bolt with the MSI
+
+If you installed Bolt using the MSI, you can uninstall it from Windows **Apps & Features**:
+1. Press **Windows+X**, **F** to open **Apps & Features**.
+2. Search for `Puppet Bolt`, select it, and click **Uninstall**.
 
 ### Install Bolt with Chocolatey
 
-Use the package manager Chocolatey to install Bolt on Windows.
+You must have the [Chocolatey package manager](https://chocolatey.org/docs/installation) installed.
 
-You must have the Chocolatey package manager installed.
-
-1.  Download and install the bolt package.
+1.  Download and install the bolt package:
     ```
     choco install puppet-bolt
     ```
-1.  Run a Bolt command and get started.
+2.  Run a Bolt command and get started:
     ```
     bolt --help
     ```
 
-If you see an error message instead of the expected output, you probably need to follow one or both of the additional steps below. See [Add the Bolt module to PowerShell](bolt_installing.md#) and [Change execution policy restrictions](bolt_installing.md#).
+If you see an error message instead of the expected output, you probably need to follow one or both of the additional steps below. See [Add the Bolt module to PowerShell](bolt_installing.md#add-the-bolt-module-to-powershell) and [Change execution policy restrictions](bolt_installing.md#change-execution-policy-restrictions).
+
+#### Upgrading Bolt with Chocolatey
+
+Use the following command to upgrade Bolt:
+```
+choco upgrade puppet-bolt
+```
+
+#### Uninstalling Bolt with Chocolatey
+Use the following command to uninstall Bolt:
+```
+choco uninstall puppet-bolt
+```
 
 ### Add the Bolt module to PowerShell
 
@@ -73,11 +93,8 @@ For more information, run 'Import-Module PuppetBolt'.
                 n
                 + FullyQualifiedErrorId : CouldNotAutoloadMatchingModule
 ```
-1.  Run PowerShell as an administrator:
-    ```
-    Windows-X, a
-    ```
-1.  Set your script execution policy to at least `RemoteSigned`:
+1.  Press **Windows+X**, **A** to run PowerShell as an administrator.
+2.  Set your script execution policy to at least `RemoteSigned`:
     ```
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
     ```
@@ -87,6 +104,32 @@ For more information, run 'Import-Module PuppetBolt'.
 ## Install Bolt on macOS
 
 Use one of the supported macOS installation methods to install Bolt.
+
+### Install Bolt with Homebrew
+
+You must have the command line tools for macOS and the [Homebrew package manager](https://brew.sh/) installed.
+
+Download and install the Bolt package:
+    
+```
+brew cask install puppetlabs/puppet/puppet-bolt
+```
+
+#### Upgrading Bolt with Homebrew
+
+To upgrade Bolt, use the following command:
+
+```
+brew cask upgrade puppet-bolt
+```
+
+#### Uninstalling Bolt with Homebrew
+
+To uninstall Bolt with homebrew, use the following command: 
+
+```
+brew cask uninstall puppet-bolt
+```
 
 ### Install Bolt with macOS installer 
 
@@ -100,25 +143,15 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS.
     - 10.13 (High Sierra) [https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg)
     - 10.14 (Mojave) [https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg)
 1.  Double-click the `puppet-bolt-latest.dmg` file to mount it and then double-click `puppet-bolt-[version]-installer.pkg` to run the installer.
-1.  Run a Bolt command and get started.
+1.  Open Terminal and run a Bolt command and get started.
     ```
     bolt --help
     ```
+**Note:** If you get a "Command not found error" when you try to run Bolt, make sure you've added the `opt/puppetlabs/bin` PATH to `~/.bashrc` or the relevant profile for the shell you're using.  
 
-### Install Bolt with Homebrew
+#### Upgrading Bolt with macOS installer
 
-Use the package manager Homebrew to install Bolt on macOS.
-
-You must have the command line tools for macOS and the Homebrew package manager installed.
-
-1.  Download and install the Bolt package.
-    ```
-    brew cask install puppetlabs/puppet/puppet-bolt
-    ```
-2.  Run a Bolt command and get started.
-    ```
-    bolt --help
-    ```
+If you installed Bolt using the macOS installer, download the DMG again and repeat the installation steps to install the latest version.
 
 ## Install Bolt on *nix
 
@@ -132,7 +165,7 @@ Packaged versions of Bolt are available for Debian 8-10 and Ubuntu 16.04 and 18.
 
 The Puppet Tools repository for the APT package management system is [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the convention `puppet-tools-release-<VERSION CODE NAME>.deb`. For example, the release package for Puppet Tools on Debian 8 “Jessie” is `puppet-tools-release-jessie.deb`.
 
-1.  Download and install the software and its dependencies. Use the commands appropriate to your system.
+1.  Download and install the software and its dependencies. Use the commands appropriate to your system:
     -   Debian 8
         ```shell script
         wget https://apt.puppet.com/puppet-tools-release-jessie.deb
@@ -169,10 +202,27 @@ The Puppet Tools repository for the APT package management system is [https://ap
         sudo apt-get install puppet-bolt
         ```
 
-1.  Run a Bolt command and get started.
+2.  Run a Bolt command and get started.
     ```
     bolt --help
     ```
+
+#### Upgrading Bolt on Debian and Ubuntu
+
+To upgrade Bolt on Debian and Ubuntu, use the following commands:
+
+```shell script
+sudo apt-get update
+sudo apt install puppet-bolt
+```
+
+#### Uninstalling Bolt on Debian and Ubuntu
+
+To uninstall Bolt on Debian and Ubuntu, use the following command: 
+
+```shell script
+sudo apt remove puppet-bolt
+```
 
 ### Install Bolt on RHEL, SLES, or Fedora
 
@@ -226,6 +276,45 @@ The Puppet Tools repository for the YUM package management system is [http://yum
     bolt --help
     ```
 
+#### Upgrading Bolt on RHEL, SLES, or Fedora
+
+To upgrade Bolt on RHEL, use the following command:
+
+```shell script
+sudo yum install puppet-bolt
+```
+
+To upgrade Bolt on SUSE Linux Enterprise Server 12, use the following command:
+
+```shell script
+sudo zypper update puppet-bolt
+```
+
+To upgrade Bolt on Fedora, use the following command:
+```
+sudo dnf upgrade puppet-bolt
+```
+
+#### Uninstalling Bolt on RHEL, SLES, or Fedora
+
+To uninstall Bolt on RHEL use the following command:
+
+```shell script
+sudo yum remove puppet-bolt
+```
+
+To uninstall Bolt on SUSE Linux Enterprise Server 12, use the following command:
+
+```shell script
+sudo zypper remove puppet-bolt
+```
+
+To uninstall Bolt on Fedora use the following command:
+
+```shell script
+sudo dnf remove puppet-bolt
+```
+
 ## Install gems with Bolt packages
 
 Bolt packages include their own copy of Ruby.
@@ -244,216 +333,9 @@ To install a gem for use with Bolt, use the command appropriate to your operatin
 
 ## Install Bolt as a gem
 
+To install Bolt reliably and with all dependencies, use one of the Bolt installation packages instead of a gem. 
+
 Starting with Bolt 0.20.0, gem installations no longer include core task modules.
-
-To install Bolt reliably and with all dependencies, use one of the Bolt installation packages instead of a gem.
-
-## Running Bolt from a Docker image
-
-Bolt is available on Docker Hub, as an image called `puppet-bolt`. There are a number of ways to run Bolt from a Docker image.
-
-### Downloading the image
-
-Docker Hub contains different versions of Bolt, with tags corresponding to Bolt system package and Rubygem versions. The newest version has a `latest` tag.
-
-You can download the latest image with this command:
-```
-docker pull puppet/puppet-bolt
-```
-
-### Running Bolt from a Docker image
-
-When running Bolt from a Docker image, Docker creates a container and executes the Bolt command within that container. Running Bolt in this way is simple:
-```console
-$ docker run puppet/puppet-bolt command run 'cat /etc/os-release' -t localhost
-Started on localhost...
-Finished on localhost:
-  STDOUT:
-    NAME="Ubuntu"
-    VERSION="16.04.6 LTS (Xenial Xerus)"
-    ID=ubuntu
-    ID_LIKE=debian
-    PRETTY_NAME="Ubuntu 16.04.6 LTS"
-    VERSION_ID="16.04"
-    HOME_URL="http://www.ubuntu.com/"
-    SUPPORT_URL="http://help.ubuntu.com/"
-    BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
-    VERSION_CODENAME=xenial
-    UBUNTU_CODENAME=xenial
-Successful on 1 target: localhost
-Ran on 1 target in 0.00 seconds
-```
-
-As you can see from the above example, the `localhost` target is the *container* environment, not the *host* environment.
-
-Typically you would want to run Bolt not against the container environment, but against a different computer. To do this, you must pass information to the Bolt container about how to connect to the target computer. You might also want to pass the container some custom module content for Bolt to use. The next sections describe three different techniques for sharing this kind of information between the host and the Docker container.
-
-### Pass inventory as an environment variable
-
-If you only need to pass information on how to connect to targets, and not any custom module content, you can pass the inventory information by assigning it to an environment variable. This `inventory.yaml` file contains all the information needed for connecting to an example target:
-
-```yaml
-targets:
-  - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-    alias: docker-example
-    config:
-      transport: ssh
-      ssh:
-        user: root
-        password: secret-password
-        host-key-check: false
-```
-
-Here is an example of running the built-in `facts` task against the target listed in inventory. Note that the command passes the contents of the inventory file via an environment variable:
-
-```console
-$ docker run --env "BOLT_INVENTORY=$(cat Boltdir/inventory.yaml)" \
-puppet/puppet-bolt task run facts -t docker-example
-Started on pnz2rzpxfzp95hh.delivery.puppetlabs.net...
-Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
-  {
-    "os": {
-      "name": "CentOS",
-      "release": {
-        "full": "7.2",
-        "major": "7",
-        "minor": "2"
-      },
-      "family": "RedHat"
-    }
-  }
-Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-Ran on 1 target in 0.55 seconds
-```
-
-### Mount the host's Bolt project directory
-
-Another way of passing information is to make your Bolt project directory (Boltdir) available to the container. Here is the directory structure of a typical Boltdir:
-
-```console
-$ tree
-.
-└── Boltdir
-     ├── bolt.yaml
-     ├── inventory.yaml
-     ├── keys
-     │    └── id_rsa-acceptance
-     └── site-modules
-           └── docker_task
-                 └── tasks
-                       └── init.sh
-
-5 directories, 4 files
-```
-
-Here is sample content from relevant files in the Boltdir above.
-
-**`bolt.yaml`**
-
-This is a basic Bolt configuration file.
-
-```yaml
-log:
-  console:
-    level: notice
-```
-
-**`inventory.yaml`**
-
-This lists a target, and connection information for that target.
-
-```yaml
-targets:
-  - name: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-    alias: docker-example
-    config:
-      transport: ssh
-      ssh:
-        user: root
-        private-key: /Boltdir/keys/id_rsa-acceptance
-        host-key-check: false
-```
-
-**`init.sh`**
-
-This is a shell task that prints the contents of the `message` parameter.
-
-```shell script
-#!/bin/bash
-echo "Message: ${PT_message}"
-```
-
-This command executes the Bolt task above within a Docker container, using a shared Boltdir to pass information to the container:
-
-```console
-$ docker run --mount type=bind,source=/path/to/Boltdir,destination=/Boltdir \
-puppet/puppet-bolt task run docker_task message=hi -t docker-example
-Started on pnz2rzpxfzp95hh.delivery.puppetlabs.net...
-Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
-  Message: hi
-  {
-  }
-Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-Ran on 1 target in 0.56 seconds
-```
-
-The `--mount` flag maps the Bolt project directory on the Docker host to `/Boltdir` in the container. The container is tagged as `puppet-bolt` and the rest of the command is all native to Bolt.
-
-### Building on top of the `puppet-bolt` Docker image
-
-You can also extend the `puppet-bolt` image and copy in data that will always be available for that image.
-
-For example, create a file called `Dockerfile` in this location within your Boltdir:
-
-```console
-$ tree
-    .
-    └── Boltdir
-          ├── bolt.yaml
-          ├── Dockerfile
-          ├── inventory.yaml
-          ├── keys
-          │    └── id_rsa-acceptance
-          └── site-modules
-                └── docker_task
-                      └── tasks
-                            └── init.sh
-    
-    5 directories, 5 files
-```
-
-Give the Dockerfile the following content:
-
-```
-FROM puppet/puppet-bolt
-COPY . /Boltdir
-```
-
-Now you can build a Docker image with your custom module content and tag it `my-extended-puppet-bolt` with this command:
-
-```console
-$ docker build . -t my-extended-puppet-bolt
-Sending build context to Docker daemon  10.75kB
-Step 1/2 : FROM puppet-bolt
- ---> 5d8d2c1166fc
-Step 2/2 : COPY . /Boltdir
- ---> 03162d29a1ee
-Successfully built 03162d29a1ee
-Successfully tagged my-extended-puppet-bolt:latest
-```
-
-You can run that container with the custom module content and connection information available inside the container:
-
-```console
-$ docker run my-extended-puppet-bolt task run docker_task message=hi -t docker-example
-Started on pnz2rzpxfzp95hh.delivery.puppetlabs.net...
-Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
-  Message: hi
-  {
-  }
-Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
-Ran on 1 target in 0.56 seconds
-```
 
 ## Analytics data collection
 

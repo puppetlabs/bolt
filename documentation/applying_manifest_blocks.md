@@ -24,7 +24,7 @@ Behind the scenes, Bolt compiles the code in your manifest block (the code wrapp
 
 -   Facts gathered from the targets or set in your inventory.
 -   Local variables in the plan, such as `$site_content`.
--   [`Vars`](inventory_file.md#title-1541705359297) set in your inventory.
+-   [`Vars`](inventory_file_v2.md#title-1541705359297) set in your inventory.
 
 Like the code compiled with the `puppet apply` function, all the variables are generated. As a result, you can reuse code between Bolt and Puppet. Bolt then copies custom module content from the Bolt modulepath to the targets and applies the catalog using Puppet.
 
@@ -173,7 +173,7 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
 
 [NGINX](https://www.nginx.com/resources/glossary/nginx/)
 
-[Specify targets](bolt_options.md#)
+[Specify targets](running_bolt_commands.md#adding-options-to-bolt-commands)
 
 [Project directories](bolt_project_directories.md#)
 
@@ -254,7 +254,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 
 [IIS](https://www.iis.net)
 
-[Specify targets](bolt_options.md#)
+[Specify targets](running_bolt_commands.md#adding-options-to-bolt-commands)
 
 [Project directories](bolt_project_directories.md#)
 

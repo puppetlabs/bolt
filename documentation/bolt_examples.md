@@ -1,4 +1,4 @@
-# Bolt examples
+# Automating Windows targets
 
 Bolt lets you automate almost any task you can think of. These are some of the common scenarios we've come across.
 
@@ -44,10 +44,10 @@ First, we’ll use Bolt to run the script as-is on a single target.
 
 ### 2. Create an inventory file to store information about your targets
 
-To run Bolt commands against multiple targets at once, you need to provide information about the environment by creating an [inventory file](inventory_file.md). The inventory file is a YAML file that contains a list of targets and target specific data.
+To run Bolt commands against multiple targets at once, you need to provide information about the environment by creating an [inventory file](inventory_file_v2.md). The inventory file is a YAML file that contains a list of targets and target specific data.
 
 1.  Inside the `bolt-guide` directory, use a text editor to create an `inventory.yaml` file.
-1.  Inside the new `inventory.yaml` file, add the following content, listing the fully qualified domain names of the targets you want to run the script on, and replacing the credentials in the `winrm` section with those appropriate for your target:
+2.  Inside the new `inventory.yaml` file, add the following content, listing the fully qualified domain names of the targets you want to run the script on, and replacing the credentials in the `winrm` section with those appropriate for your target:
     ```yaml
     groups:
       - name: windows
@@ -65,7 +65,7 @@ To run Bolt commands against multiple targets at once, you need to provide infor
 
     You now have an inventory file where you can store information about your targets.
 
-    You can also configure a variety of options for Bolt in `bolt.yaml`, including global and transport options. For more information, see [Bolt configuration options](bolt_configuration_options.md).
+    You can also configure a variety of options for Bolt in `bolt.yaml`, including global and transport options. For more information, see [Bolt configuration options](bolt_configuration_reference.md).
 
 
 ### 3. Convert your script to a Bolt task
@@ -122,7 +122,7 @@ To convert the `restart_service.ps1` script to a task, giving you the ability to
 
     ![](bolt_PS_3.png)
 
-    **Note:** `--targets windows` refers to the name of the group of targets that you specified in your inventory file. For more information, see [Specify targets](bolt_options.md#).
+    **Note:** `--targets windows` refers to the name of the group of targets that you specified in your inventory file. For more information, see [Specify targets](running_bolt_commands.md#adding-options-to-bolt-commands).
 
 
 ## Deploy a package with Bolt and Chocolatey
