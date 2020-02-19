@@ -85,7 +85,7 @@ groups:
 
 **Related information**  
 
-[Inventory file](inventory_file.md)
+[Inventory file](inventory_file_v2.md)
 
 ## Set a default transport
 

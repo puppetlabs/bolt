@@ -44,10 +44,10 @@ First, we’ll use Bolt to run the script as-is on a single target.
 
 ### 2. Create an inventory file to store information about your targets
 
-To run Bolt commands against multiple targets at once, you need to provide information about the environment by creating an [inventory file](inventory_file.md). The inventory file is a YAML file that contains a list of targets and target specific data.
+To run Bolt commands against multiple targets at once, you need to provide information about the environment by creating an [inventory file](inventory_file_v2.md). The inventory file is a YAML file that contains a list of targets and target specific data.
 
 1.  Inside the `bolt-guide` directory, use a text editor to create an `inventory.yaml` file.
-1.  Inside the new `inventory.yaml` file, add the following content, listing the fully qualified domain names of the targets you want to run the script on, and replacing the credentials in the `winrm` section with those appropriate for your target:
+2.  Inside the new `inventory.yaml` file, add the following content, listing the fully qualified domain names of the targets you want to run the script on, and replacing the credentials in the `winrm` section with those appropriate for your target:
     ```yaml
     groups:
       - name: windows

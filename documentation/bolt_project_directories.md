@@ -88,7 +88,7 @@ The default paths for all Bolt configuration, code, and data are relative to the
 |---------|-----------|
 |[`bolt.yaml`](bolt_configuration_reference.md)|Contains configuration options for Bolt.|
 |`hiera.yaml`|Contains the Hiera config to use for target-specific data when using `apply`.|
-|[`inventory.yaml`](inventory_file.md)|Contains a list of known targets and target specific data.|
+|[`inventory.yaml`](inventory_file_v2.md)|Contains a list of known targets and target specific data.|
 |[`Puppetfile`](bolt_installing_modules.md#)|Specifies which modules to install for the project.|
 |[`modules/`](bolt_installing_modules.md#)|The directory where modules from the `Puppetfile` are installed. In most cases, do not edit these modules locally.|
 |[`site-modules`](bolt_installing_modules.md)|Local modules that are edited and versioned with the project directory.|

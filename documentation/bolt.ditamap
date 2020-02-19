@@ -2,7 +2,7 @@
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
 <map id="boltmap" title="Bolt">
     <topicref href="bolt.md" format="markdown" linking="targetonly">
-        <topicref navtitle="Changelog" href="https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md" format="markdown" scope="external" />
+        <topicref navtitle="Changelog" href="https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md" format="html" scope="external" />
         <topicref href="bolt_versioning.md" format="markdown"/>
         <topicref href="migrating_inventory_files.md" format="markdown"/>   
         <topicref href="bolt_known_issues.md" format="markdown"/>
@@ -51,17 +51,7 @@
             </topicmeta>
             <topicref href="applying_manifest_blocks.md" format="markdown"/>
         </topicref>       
-    </topicref>
-<<<<<<< HEAD
-    <topicref href="bolt_configuration_reference.md" format="markdown"/>
-    <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
-    <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
-    <topicref href="inventory_file_v2.md" format="markdown">
-        <topicref href="migrating_inventory_files.md" format="markdown"/> 
-        <topicref href="using_plugins.md" format="markdown"/>
-        <topicref href="writing_plugins.md" format="markdown"/>
-=======
-    
+    </topicref>    
     <topicref href="tasks.md" format="markdown">
         <topicmeta>
             <shortdesc>Before you run a task in your environment, inspect the task to determine what effect it will have on your targets.</shortdesc>
@@ -77,7 +67,6 @@
                 <shortdesc>Bolt tasks are similar to scripts, but they are kept in modules and can have metadata. This allows you to reuse and share them.</shortdesc>
             </topicmeta>
         </topicref>
->>>>>>> Refresh WIP
     </topicref>
     
     

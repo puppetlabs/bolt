@@ -175,7 +175,6 @@ To specify targets from an inventory file, reference targets by target name, a g
 
 This inventory file defines two top-level groups: elastic_search and web_app.
 ```yaml
-version: 2
 groups:
   - name: elastic_search
     targets:
@@ -191,7 +190,7 @@ groups:
 
 **Related information**  
 
-[Inventory file](inventory_file.md)
+[Inventory file](inventory_file_v2.md)
 
 ### Set a default transport
 
