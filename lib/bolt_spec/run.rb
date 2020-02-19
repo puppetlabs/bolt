@@ -131,7 +131,7 @@ module BoltSpec
       # still be loaded
       def self.with_runner(config_data, inventory_data)
         Dir.mktmpdir do |boltdir_path|
-          runner = new(config_data, inventory_data, boltdir_path)
+          runner = new(Bolt::Util.deep_clone(config_data), Bolt::Util.deep_clone(inventory_data), boltdir_path)
           yield runner
         end
       end
