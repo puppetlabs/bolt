@@ -189,6 +189,9 @@ module Bolt
       end
 
       def resolve_string_targets(aliases, known_targets)
+        # Use a single copy of this because recomputing it for every target is
+        # prohibitively expensive for large groups
+        cached_local_targets = local_targets
         @string_targets.each do |string_target|
           # If this is the name of a target defined elsewhere, then insert the
           # target into this group as just a name. Otherwise, add a new target
@@ -197,20 +200,21 @@ module Bolt
             @unresolved_targets[string_target] = { 'name' => string_target }
           # If this is an alias for an existing target, then add it to this group
           elsif (canonical_name = aliases[string_target])
-            if local_targets.include?(canonical_name)
+            if cached_local_targets.include?(canonical_name)
               @logger.warn("Ignoring duplicate target in #{@name}: #{canonical_name}")
             else
               @unresolved_targets[canonical_name] = { 'name' => canonical_name }
+              cached_local_targets << canonical_name
             end
           # If it's not the name or alias of an existing target, then make a
           # new target using the string as the URI
-          elsif local_targets.include?(string_target)
+          elsif cached_local_targets.include?(string_target)
             @logger.warn("Ignoring duplicate target in #{@name}: #{string_target}")
           else
             @unresolved_targets[string_target] = { 'uri' => string_target }
+            cached_local_targets << string_target
           end
         end
-
         @groups.each { |g| g.resolve_string_targets(aliases, known_targets) }
       end
 
