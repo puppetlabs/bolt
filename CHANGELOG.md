@@ -1,5 +1,12 @@
 # Changelog
 
+## Bolt Next
+
+### Deprecations and removals
+
+* **WARNING**: Starting with this release, new Bolt packages are not available for macOS 10.11, 10.12,
+  10.13, and Fedora 28, 29.
+
 ## Bolt 2.0.0
 
 ### Deprecations and removals
