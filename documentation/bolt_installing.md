@@ -138,9 +138,6 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS.
 1.  Download the Bolt installer package for your macOS version.
     
     **Tip:** To find the macOS version number on your Mac, go to the Apple () menu in the corner of your screen and choose **About This Mac**.
-    - 10.11 (El Capitan) [https://downloads.puppet.com/mac/puppet6/10.11/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.11/x86_64/puppet-bolt-latest.dmg)
-    - 10.12 (Sierra) [https://downloads.puppet.com/mac/puppet6/10.12/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.12/x86_64/puppet-bolt-latest.dmg)
-    - 10.13 (High Sierra) [https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.13/x86_64/puppet-bolt-latest.dmg)
     - 10.14 (Mojave) [https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg)
 1.  Double-click the `puppet-bolt-latest.dmg` file to mount it and then double-click `puppet-bolt-[version]-installer.pkg` to run the installer.
 1.  Open Terminal and run a Bolt command and get started.
@@ -250,16 +247,6 @@ The Puppet Tools repository for the YUM package management system is [http://yum
         ```shell script
         sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-sles-12.noarch.rpm
         sudo zypper install puppet-bolt
-        ```
-    -   Fedora 28
-        ```shell script
-        sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-28.noarch.rpm
-        sudo dnf install puppet-bolt
-        ```
-    -   Fedora 29
-        ```shell script
-        sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-29.noarch.rpm
-        sudo dnf install puppet-bolt
         ```
     -   Fedora 30
         ```shell script
