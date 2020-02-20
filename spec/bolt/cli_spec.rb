@@ -517,6 +517,16 @@ describe "Bolt::CLI" do
       end
     end
 
+    describe "puppetfile" do
+      let(:puppetfile) { File.expand_path('/path/to/Puppetfile') }
+      let(:cli) { Bolt::CLI.new(%W[puppetfile install --puppetfile #{puppetfile}]) }
+
+      it 'uses a specified Puppetfile' do
+        cli.parse
+        expect(cli.config.puppetfile.to_s).to eq(puppetfile)
+      end
+    end
+
     describe "sudo" do
       it "supports running as a user" do
         cli = Bolt::CLI.new(%w[command run --targets foo whoami --run-as root])

@@ -8,11 +8,22 @@
 
   The new plan function, `write_file`, allows you to write content to a file on the given targets.
 
+* **Add `--puppetfile` option for `puppetfile install` command** ([#1612](https://github.com/puppetlabs/bolt/issues/1612))
+
+  The `puppetfile install` command now supports a `--puppetfile` option that accepts a relative or absolute path
+  to a Puppetfile.
+
 ### Bug fixes
 
 * **Fixed performance regression with large inventory files** ([#1627](https://github.com/puppetlabs/bolt/pull/1627))
 
   Large inventory groups were taking a long time to validate and should now be faster.
+
+* **Modifications to an inventory when using `run_plan` are validated correctly** ([#1627](https://github.com/puppetlabs/bolt/pull/1627))
+
+  When using `run_plan(..., _catch_errors => true)` and making invalid modifications to the inventory, errors would
+  be caught but the modifications would still be made to the inventory. Modifications to the inventory are now
+  validated prior to applying them to the inventory.
 
 ## Bolt 2.0.1
 
@@ -31,12 +42,6 @@
 
   The `project migrate` command now correctly replaces all `nodes` keys in an inventory file with `targets`. 
   Previously, only the first group in an array of groups was having its `nodes` key replaced.
-
-* **Modifications to an inventory when using `run_plan` are validated correctly** ([#1627](https://github.com/puppetlabs/bolt/pull/1627))
-
-  When using `run_plan(..., _catch_errors => true)` and making invalid modifications to the inventory, errors would
-  be caught but the modifications would still be made to the inventory. Modifications to the inventory are now
-  validated prior to applying them to the inventory.
 
 ## Bolt 2.0.0
 
