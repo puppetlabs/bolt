@@ -7,6 +7,12 @@
 * **WARNING**: Starting with this release, new Bolt packages are not available for macOS 10.11, 10.12,
   10.13, and Fedora 28, 29.
 
+### Bug fixes
+
+* **Fixed a performance regression with large inventory files** ([#1625](https://github.com/puppetlabs/bolt/pull/1607)]
+
+  Large inventory groups were taking a long time to load and should now be much faster.
+
 ## Bolt 2.0.0
 
 ### Deprecations and removals
