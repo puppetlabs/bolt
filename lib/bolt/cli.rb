@@ -583,7 +583,10 @@ module Bolt
       inventory_file = config.inventoryfile || config.default_inventoryfile
       data = Bolt::Util.read_yaml_hash(inventory_file, 'inventory')
 
+      data.delete('version') if data['version'] != 2
+
       migrated = migrate_group(data)
+
       ok = File.write(inventory_file, data.to_yaml) if migrated
 
       result = if migrated && ok
@@ -613,7 +616,8 @@ module Bolt
         group['targets'] = targets
       end
       (group['groups'] || []).each do |subgroup|
-        migrated ||= migrate_group(subgroup)
+        migrated_group = migrate_group(subgroup)
+        migrated ||= migrated_group
       end
       migrated
     end

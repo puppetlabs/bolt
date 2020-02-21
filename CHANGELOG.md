@@ -13,6 +13,11 @@
 
   Large inventory groups were taking a long time to load and should now be much faster.
 
+* **`project migrate` command correctly migrates version 1 inventory files** ([#1623](https://github.com/puppetlabs/bolt/issues/1623))
+
+  The `project migrate` command now correctly replaces all `nodes` keys in an inventory file with `targets`. 
+  Previously, only the first group in an array of groups was having its `nodes` key replaced.
+
 ## Bolt 2.0.0
 
 ### Deprecations and removals

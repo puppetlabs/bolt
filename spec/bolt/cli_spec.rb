@@ -2192,30 +2192,55 @@ describe "Bolt::CLI" do
     context 'migrate' do
       let(:inventory_v1) do
         {
+          "version" => 1,
           "name" => "all",
-          "groups" => [{
-            "name" => "group1",
-            "nodes" => [{
-              "name" => "target1",
-              "facts" => {
-                "name" => "foo"
-              }
-            }]
-          }]
+          "groups" => [
+            {
+              "name" => "group1",
+              "nodes" => [
+                {
+                  "name" => "target1",
+                  "facts" => {
+                    "name" => "foo"
+                  }
+                }
+              ]
+            },
+            {
+              "name" => "group2",
+              "nodes" => [
+                {
+                  "name" => "target2"
+                }
+              ]
+            }
+          ]
         }
       end
       let(:inventory_v2) do
         {
           "name" => "all",
-          "groups" => [{
-            "name" => "group1",
-            "targets" => [{
-              "uri" => "target1",
-              "facts" => {
-                "name" => "foo"
-              }
-            }]
-          }]
+          "groups" => [
+            {
+              "name" => "group1",
+              "targets" => [
+                {
+                  "uri" => "target1",
+                  "facts" => {
+                    "name" => "foo"
+                  }
+                }
+              ]
+            },
+            {
+              "name" => "group2",
+              "targets" => [
+                {
+                  "uri" => "target2"
+                }
+              ]
+            }
+          ]
         }
       end
 
