@@ -1324,4 +1324,59 @@ describe Bolt::Inventory::Inventory do
       expect(target.detail).to eq(expected_data)
     end
   end
+
+  describe 'creating a target from a hash' do
+    let(:data) do
+      {
+        'groups' => [
+          {
+            'name' => 'group1',
+            'targets' => [
+              {
+                'name' => 'target1',
+                'alias' => ['alias1']
+              }
+            ]
+          }
+        ]
+      }
+    end
+
+    it 'errors when there is a group/target name conflict' do
+      hash = { 'name' => 'group1' }
+      expect { inventory.create_target_from_hash(hash) }.to raise_error(
+        Bolt::Inventory::ValidationError, /Target name group1 conflicts with group of the same name/
+      )
+      expect(inventory.target_names).not_to include('group1')
+    end
+
+    it 'errors when there is a group/alias conflict' do
+      hash = { 'name' => 'target2', 'alias' => ['group1'] }
+      expect { inventory.create_target_from_hash(hash) }.to raise_error(
+        Bolt::Inventory::ValidationError, /Alias group1 conflicts with group of the same name/
+      )
+      expect(inventory.target_names).not_to include('target2')
+    end
+
+    it 'errors when there is a target/alias conflict' do
+      hash = { 'name' => 'target2', 'alias' => ['target1'] }
+      expect { inventory.create_target_from_hash(hash) }.to raise_error(
+        Bolt::Inventory::ValidationError, /Alias target1 conflicts with target of the same name/
+      )
+      expect(inventory.target_names).not_to include('target2')
+    end
+
+    it 'errors when there is an alias conflict between targets' do
+      hash = { 'name' => 'target2', 'alias' => ['alias1'] }
+      expect { inventory.create_target_from_hash(hash) }.to raise_error(
+        Bolt::Inventory::ValidationError, /Alias alias1 refers to multiple targets: target1 and target2/
+      )
+      expect(inventory.target_names).not_to include('target2')
+    end
+
+    it 'overwrites an existing target with the same alias' do
+      hash = { 'name' => 'target2', 'alias' => ['alias2'] }
+      expect { inventory.create_target_from_hash(hash) }.not_to raise_error
+    end
+  end
 end
