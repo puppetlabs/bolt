@@ -18,7 +18,7 @@ Bolt is an open source orchestration tool that automates the manual work it take
     </p>  
     <p><a class="xref" href="migrating_inventory_files.md">Upgrading to Bolt 2.0</a>
         <ul>
-            <li><a class="xref" href="migrating_inventory_files.md#migrating-inventory-files-from-version-1-to-version-2">Migrating inventory files from version 1 to version 2</li>
+            <li><a class="xref" href="migrating_inventory_files.md#migrating-inventory-files-from-version-1-to-version-2">Migrating inventory files from version 1 to version 2</a></li>
         </ul>
     </p>
     <p>Make one-time changes to your remote targets
