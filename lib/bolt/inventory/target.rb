@@ -109,14 +109,16 @@ module Bolt
       def transport_config_cache
         if @transport_config_cache.nil?
           merged_config = Bolt::Util.deep_merge(group_cache['config'], @config)
-          # Use the base config to ensure we handle the config validation and
-          # munging correctly
-          config = @inventory.config.deep_clone
-          config.update_from_inventory(merged_config)
-          config.validate
+          base_config = @inventory.config
+          transport_data = Bolt::Util.deep_clone(base_config.transports)
+          Bolt::Config.update_transport_hash(base_config.boltdir.path, transport_data, merged_config)
+          transport = merged_config['transport'] || base_config.transport
+          Bolt::TRANSPORTS.each do |name, impl|
+            impl.validate(transport_data[name])
+          end
           @transport_config_cache = {
-            'transport' => config.transport_conf[:transport],
-            'transports' => config.transport_conf[:transports]
+            'transport' => transport,
+            'transports' => transport_data
           }
         end
 
