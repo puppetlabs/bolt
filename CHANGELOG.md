@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt Next
+## Bolt 2.0.1
 
 ### Deprecations and removals
 
@@ -9,9 +9,9 @@
 
 ### Bug fixes
 
-* **Fixed a performance regression with large inventory files** ([#1625](https://github.com/puppetlabs/bolt/pull/1607)]
+* **Fixed a performance regression with large inventory files** ([#1625](https://github.com/puppetlabs/bolt/pull/1607))
 
-  Large inventory groups were taking a long time to load and should now be much faster.
+  Large inventory groups were taking a long time to load and should now be faster.
 
 * **`project migrate` command correctly migrates version 1 inventory files** ([#1623](https://github.com/puppetlabs/bolt/issues/1623))
 
