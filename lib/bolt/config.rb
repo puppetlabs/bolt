@@ -223,12 +223,6 @@ module Bolt
       Bolt::Util.deep_clone(self)
     end
 
-    def normalize_interpreters(interpreters)
-      Bolt::Util.walk_keys(interpreters) do |key|
-        key.chars[0] == '.' ? key : '.' + key
-      end
-    end
-
     def normalize_log(target)
       return target if target == 'console'
       target = target[5..-1] if target.start_with?('file:')
@@ -345,6 +339,11 @@ module Bolt
     end
 
     def update_transports(data)
+      self.class.update_transport_hash(@boltdir.path, @transports, data)
+      @transport = data['transport'] if data.key?('transport')
+    end
+
+    def self.update_transport_hash(boltdir, existing, data)
       TRANSPORTS.each do |key, impl|
         if data[key.to_s]
           selected = impl.filter_options(data[key.to_s])
@@ -352,17 +351,21 @@ module Bolt
           # Expand file paths relative to the Boltdir
           to_expand = %w[private-key cacert token-file] & selected.keys
           to_expand.each do |opt|
-            selected[opt] = File.expand_path(selected[opt], @boltdir.path) if selected[opt].is_a?(String)
+            selected[opt] = File.expand_path(selected[opt], boltdir) if selected[opt].is_a?(String)
           end
 
-          @transports[key] = Bolt::Util.deep_merge(@transports[key], selected)
+          existing[key] = Bolt::Util.deep_merge(existing[key], selected)
         end
-        if @transports[key]['interpreters']
-          @transports[key]['interpreters'] = normalize_interpreters(@transports[key]['interpreters'])
+        if existing[key]['interpreters']
+          existing[key]['interpreters'] = normalize_interpreters(existing[key]['interpreters'])
         end
       end
+    end
 
-      @transport = data['transport'] if data.key?('transport')
+    def self.normalize_interpreters(interpreters)
+      Bolt::Util.walk_keys(interpreters) do |key|
+        key.chars[0] == '.' ? key : '.' + key
+      end
     end
 
     def transport_conf
