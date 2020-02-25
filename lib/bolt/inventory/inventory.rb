@@ -168,7 +168,6 @@ module Bolt
       def add_target(current_group, target, desired_group)
         if current_group.name == desired_group
           current_group.add_target(target)
-          @groups.validate
           target.invalidate_group_cache!
           return true
         end
@@ -200,6 +199,8 @@ module Bolt
         # If target already exists, delete old and replace with new, otherwise add to new to all group
         new_target = Bolt::Inventory::Target.new(data, self)
         existing_target = @targets.key?(new_target.name)
+
+        validate_target_from_hash(new_target)
         @targets[new_target.name] = new_target
 
         if existing_target
@@ -208,17 +209,43 @@ module Bolt
           add_to_group([new_target], 'all')
         end
 
-        if (aliases = new_target.target_alias)
-          aliases = [aliases] if aliases.is_a?(String)
-          unless aliases.is_a?(Array)
-            msg = "Alias entry on #{t_name} must be a String or Array, not #{aliases.class}"
-            raise ValidationError.new(msg, @name)
-          end
-
-          @groups.insert_alia(new_target.name, aliases)
+        if new_target.target_alias
+          @groups.insert_alia(new_target.name, Array(new_target.target_alias))
         end
 
         new_target
+      end
+
+      def validate_target_from_hash(target)
+        groups = Set.new(group_names)
+        targets = target_names
+
+        # Make sure there are no group name conflicts
+        if groups.include?(target.name)
+          raise ValidationError.new("Target name #{target.name} conflicts with group of the same name", nil)
+        end
+
+        # Validate any aliases
+        if (aliases = target.target_alias)
+          unless aliases.is_a?(Array) || aliases.is_a?(String)
+            msg = "Alias entry on #{t_name} must be a String or Array, not #{aliases.class}"
+            raise ValidationError.new(msg, @name)
+          end
+        end
+
+        # Make sure there are no conflicts with the new target aliases
+        used_aliases = @groups.target_aliases
+        Array(target.target_alias).each do |alia|
+          if groups.include?(alia)
+            raise ValidationError.new("Alias #{alia} conflicts with group of the same name", nil)
+          elsif targets.include?(alia)
+            raise ValidationError.new("Alias #{alia} conflicts with target of the same name", nil)
+          elsif used_aliases[alia] && used_aliases[alia] != target.name
+            raise ValidationError.new(
+              "Alias #{alia} refers to multiple targets: #{used_aliases[alia]} and #{target.name}", nil
+            )
+          end
+        end
       end
 
       def clear_alia_from_group(group, target_name)
@@ -249,9 +276,6 @@ module Bolt
       def add_to_group(targets, desired_group)
         if group_names.include?(desired_group)
           targets.each do |target|
-            if group_names.include?(target.name)
-              raise ValidationError.new("Group #{target.name} conflicts with target of the same name", target.name)
-            end
             # Add the inventory copy of the target
             add_target(@groups, @targets[target.name], desired_group)
           end
