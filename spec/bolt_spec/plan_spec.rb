@@ -274,4 +274,34 @@ describe "BoltSpec::Plans" do
         .to raise_error(RuntimeError, /Expected out::message to be called 1 times with parameters #{other_message}/)
     end
   end
+
+  context 'with plan calling sub-plan' do
+    let(:plan_name) { 'plans::plan_calling_plan' }
+    let(:sub_plan_name) { 'plans::command' }
+
+    it 'allows with params' do
+      allow_plan(sub_plan_name).with_params('targets' => targets)
+      result = run_plan(plan_name, 'targets' => targets)
+      expect(result).to be_ok
+    end
+
+    it 'expects with params' do
+      expect_plan(sub_plan_name).with_params('targets' => targets)
+      result = run_plan(plan_name, 'targets' => targets)
+      expect(result).to be_ok
+    end
+
+    it 'errors when not expected' do
+      expect_plan(sub_plan_name).not_be_called
+      expect { run_plan(plan_name, 'targets' => targets) }
+        .to raise_error(RuntimeError, /Expected plans::command to be called 0 times/)
+    end
+
+    it 'errors with wrong params' do
+      params = { 'bad_expected' => 'params' }
+      expect_plan(sub_plan_name).with_params(params)
+      expect { run_plan(plan_name, 'targets' => targets) }
+        .to raise_error(RuntimeError, /Expected plans::command to be called 1 times with parameters #{params}/)
+    end
+  end
 end

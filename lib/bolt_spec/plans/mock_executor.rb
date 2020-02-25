@@ -3,6 +3,7 @@
 require 'bolt_spec/plans/action_stubs'
 require 'bolt_spec/plans/publish_stub'
 require 'bolt/error'
+require 'bolt/executor'
 require 'bolt/result_set'
 require 'bolt/result'
 require 'pathname'
@@ -10,7 +11,7 @@ require 'set'
 
 module BoltSpec
   module Plans
-    MOCKED_ACTIONS = %i[command script task upload].freeze
+    MOCKED_ACTIONS = %i[command plan script task upload].freeze
 
     class UnexpectedInvocation < ArgumentError; end
 
@@ -28,6 +29,7 @@ module BoltSpec
         MOCKED_ACTIONS.each { |action| instance_variable_set(:"@#{action}_doubles", {}) }
         @stub_out_message = nil
         @transport_features = ['puppet-agent']
+        @executor_real = Bolt::Executor.new
       end
 
       def module_file_id(file)
@@ -92,6 +94,21 @@ module BoltSpec
           targets = targets.map(&:name)
           @error_message = "Unexpected call to 'upload_file(#{source}, #{destination}, #{targets}, #{options})'"
           raise UnexpectedInvocation, @error_message
+        end
+        result
+      end
+
+      def run_plan(scope, plan, params)
+        result = nil
+        plan_name = plan.closure_name
+        if @plan_doubles.key?(plan_name)
+          doub = @plan_doubles[plan_name]
+          result = doub.process(scope, plan, params)
+        else
+          # the plan wasn't mocked out, we need to run it with a normal executor
+          # this allows us to call the BoltSpec::Plans.run_plan() function and other
+          # plans like normal puppet language.
+          result = @executor_real.run_plan(scope, plan, params)
         end
         result
       end

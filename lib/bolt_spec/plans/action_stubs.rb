@@ -160,6 +160,7 @@ module BoltSpec
 end
 
 require_relative 'action_stubs/command_stub'
+require_relative 'action_stubs/plan_stub'
 require_relative 'action_stubs/script_stub'
 require_relative 'action_stubs/task_stub'
 require_relative 'action_stubs/upload_stub'

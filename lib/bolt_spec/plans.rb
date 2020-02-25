@@ -212,7 +212,7 @@ module BoltSpec
       begin
         executor.assert_call_expectations
       rescue StandardError => e
-        raise "#{e.message}\nPlan result: #{result}"
+        raise "#{e.message}\nPlan result: #{result}\n#{e.backtrace.join("\n")}"
       end
 
       result
@@ -231,6 +231,10 @@ module BoltSpec
       end
 
       # This stub will catch any action call if there are no stubs specifically for that task
+      # This is not OK for plans
+      #
+      # Don't allow_any_plan functions because we need to allow the first run_plan() call
+      next if action == 'plan'
       define_method :"allow_any_#{action}" do
         executor.send(:"stub_#{action}", :default).add_stub
       end
