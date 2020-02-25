@@ -40,113 +40,6 @@ rescue Puppet::Error => e
 end
 ```
 
-## Secure coding practices for tasks
-
-Use secure coding practices when you write tasks and help protect your system.
-
-**Note:** The information in this topic covers basic coding practices for writing secure tasks. It is not an exhaustive list.
-
-One of the methods attackers use to gain access to your systems is remote code execution, where by running an allowed script they gain access to other parts of the system and can make arbitrary changes. Because Bolt executes scripts across your infrastructure, it is important to be aware of certain vulnerabilities, and to code tasks in a way that guards against remote code execution.
-
-Adding task metadata that validates input is one way to reduce vulnerability. When you require an enumerated (`enum`) or other non-string types, you prevent improper data from being entered. An arbitrary string parameter does not have this assurance.
-
-For example, if your task has a parameter that selects from several operational modes that are passed to a shell command, instead of
-
-```
-String $mode = 'file'
-```
-
-use
-
-```
-Enum[file,directory,link,socket] $mode = file
-```
-
-If your task has a parameter that identifies a file on disk, ensure that a user can't specify a relative path that takes them into areas where they shouldn't be. Reject file names that have slashes.
-
-Instead of
-
-```
-String $path
-```
-
-use
-
-```
-Pattern[/\A[^\/\\]*\z/] $path
-```
-
-In addition to these task restrictions, different scripting languages each have their own ways to validate user input.
-
-### PowerShell
-
-In PowerShell, code injection exploits calls that specifically evaluate code. Do not call `Invoke-Expression` or `Add-Type` with user input. These commands evaluate strings as C# code.
-
-Reading sensitive files or overwriting critical files can be less obvious. If you plan to allow users to specify a file name or path, use `Resolve-Path` to verify that the path doesn't go outside the locations you expect the task to access. Use `Split-Path -Parent $path` to check that the resolved path has the desired path as a parent.
-
-For more information, see [PowerShell Scripting](https://docs.microsoft.com/en-us/powershell/scripting/PowerShell-Scripting?view=powershell-6) and [Powershell's Security Guiding Principles](https://blogs.msdn.microsoft.com/powershell/2008/09/30/powershells-security-guiding-principles/).
-
-### Bash
-
-In Bash and other command shells, shell command injection takes advantage of poor shell implementations. Put quotation marks around arguments to prevent the vulnerable shells from evaluating them.
-
-Because the `eval` command evaluates all arguments with string substitution, avoid using it with user input; however you can use `eval` with sufficient quoting to prevent substituted variables from being executed.
-
-Instead of
-
-```shell script
-eval "echo $input"
-```
-
-use
-
-```shell script
-eval "echo '$input'"
-```
-
-These are operating system-specific tools to validate file paths: `realpath` or `readlink -f`.
-
-### Python
-
-In Python malicious code can be introduced through commands like `eval`, `exec`, `os.system`, `os.popen`, and `subprocess.call` with `shell=True`. Use `subprocess.call` with `shell=False` when you include user input in a command or escape variables.
-
-Instead of
-
-```python
-os.system('echo '+input)
-
-```
-
-use
-
-```python
-subprocess.check_output(['echo', input])
-```
-
-Resolve file paths with `os.realpath` and confirm them to be within another path by looping over `os.path.dirname` and comparing to the desired path.
-
-For more information on the vulnerabilities of Python or how to escape variables, see Kevin London's blog post on [Dangerous Python Functions](https://www.kevinlondon.com/2015/07/26/dangerous-python-functions.html).
-
-### Ruby
-
-In Ruby, command injection is introduced through commands like `eval`, `exec`, `system`, backtick (``) or `%x()` execution, or the Open3 module. You can safely call these functions with user input by passing the input as additional arguments instead of a single string.
-
-Instead of
-
-```ruby
-system("echo #{flag1} #{flag2}")
-```
-
-use
-
-```ruby
-system('echo', flag1, flag2)
-```
-
-Resolve file paths with `Pathname#realpath`, and confirm them to be within another path by looping over `Pathname#parent` and comparing to the desired path.
-
-For more information on securely passing user input, see the blog post [Stop using backtick to run shell command in Ruby](https://www.hilman.io/blog/2016/01/stop-using-backtick-to-run-shell-command-in-ruby/).
-
 ## Naming tasks
 
 Task names are named based on the filename of the task, the name of the module, and the path to the task within the module.
@@ -225,8 +118,6 @@ The following features are defined by default:
 ## Sharing executables
 
 Multiple task implementations can refer to the same executable file.
-
-
 
 Executables can access the `_task` metaparameter, which contains the task name. For example, the following creates the tasks `service::stop` and `service::start`, which live in the executable but appear as two separate tasks.
 
@@ -446,63 +337,6 @@ Successful on 1 target: localhost
 Ran on 1 target in 0.12 seconds
 ```
 
-## Writing remote tasks
-
-Some targets are hard or impossible to execute tasks on directly. In these cases, you can write a task that runs on a proxy target and remotely interacts with the real target.
-
-For example, a network device might have a limited shell environment or a cloud service might be driven only by HTTP APIs. By writing a remote task, Bolt allows you to specify connection information for remote targets in their inventory file and injects them into the `_target` metaparam.
-
-This example shows how to write a task that posts messages to Slack and reads connection information from `inventory.yaml`:
-
-```ruby
-#!/usr/bin/env ruby
-# modules/slack/tasks/message.rb
-
-require 'json'
-require 'net/http'
-
-params = JSON.parse(STDIN.read)
-# the slack API token is passed in from inventory
-token = params['_target']['token']
-		
-uri = URI('https://slack.com/api/chat.postMessage')
-http = Net::HTTP.new(uri.host, uri.port)
-http.use_ssl = true
-
-req = Net::HTTP::Post.new(uri, 'Content-type' => 'application/json')
-req['Authorization'] = "Bearer #{params['_target']['token']}"
-req.body = { channel: params['channel'], text: params['message'] }.to_json
-
-resp = http.request(req)
-
-puts resp.body
-```
-
-To prevent accidentally running a normal task on a remote target and breaking its configuration, Bolt won't run a task on a remote target unless its metadata defines it as remote:
-
-```json
-{
-  "remote": true
-}
-```
-
-Add Slack as a remote target in your inventory file:
-
-```yaml
-targets:
-  - name: my_slack
-    config:
-      transport: remote
-      remote:
-        token: <SLACK_API_TOKEN>
-```
-
-Finally, make `my_slack` a target that can run the `slack::message`:
-
-```shell script
-bolt task run slack::message --targets my_slack message="hello" channel=<slack channel id>
-```
-
 ## Defining parameters in tasks
 
 Allow your task to accept parameters as either environment variables or as a JSON hash on standard input.
@@ -558,54 +392,6 @@ if ($Name -eq $null -or $Name -eq "") {
 
 To pass parameters in your task as environment variables (`PT_parameter`), you must set `input_method` in your task metadata to `environment`. To run Ruby tasks on Windows, the Puppet agent must be installed on the targets.
 
-## Returning errors in tasks
-
-To return a detailed error message if your task fails, include an `Error` object in the task's result.
-
-When a task exits non-zero, the task runner checks for an error key `_error`. If one is not present, the task runner generates a generic error and adds it to the result. If there is no text on `stdout` but text is present on `stderr`, the `stderr` text is included in the message.
-
-```json
-{ "_error": {
-    "msg": "Task exited 1:\nSomething on stderr",
-    "kind": "puppetlabs.tasks/task-error",
-    "details": { "exitcode": 1 }
-}
-```
-
-An error object includes the following keys:
-
--   **msg** - A human readable string that appears in the UI.
--   **kind** - A standard string for machines to handle. You may share kinds between your modules or namespace kinds per module.
--   **details** - An object of structured data about the tasks.
-
-Tasks can provide more details about the failure by including their own error object in the result at `_error`.
-
-```ruby
-#!/opt/puppetlabs/puppet/bin/ruby
-
-require 'json'
-
-begin
-  params = JSON.parse(STDIN.read)
-  result = {}
-  result['result'] = params['dividend'] / params['divisor']
-
-rescue ZeroDivisionError
-  result[:_error] = { msg: "Cannot divide by zero",
-                      # namespace the error to this module
-                      kind: "puppetlabs-example_modules/dividebyzero",
-                      details: { divisor: divisor },
-                    }
-rescue Exception => e
-  result[:_error] = { msg: e.message,
-                     kind: "puppetlabs-example_modules/unknown",
-                     details: { class: e.class.to_s },
-                   }
-end
-
-puts result.to_json
-```
-
 ## Structured input and output
 
 If you have a task that has many options, returns a lot of information, or is part of a task plan, consider using structured input and output with your task.
@@ -659,6 +445,54 @@ result = { "major": sys.version_info.major, "minor": sys.version_info.minor }
 json.dump(result, sys.stdout)
 ```
 
+### Returning errors in tasks
+
+To return a detailed error message if your task fails, include an `Error` object in the task's result.
+
+When a task exits non-zero, the task runner checks for an error key `_error`. If one is not present, the task runner generates a generic error and adds it to the result. If there is no text on `stdout` but text is present on `stderr`, the `stderr` text is included in the message.
+
+```json
+{ "_error": {
+    "msg": "Task exited 1:\nSomething on stderr",
+    "kind": "puppetlabs.tasks/task-error",
+    "details": { "exitcode": 1 }
+}
+```
+
+An error object includes the following keys:
+
+-   **msg** - A human readable string that appears in the UI.
+-   **kind** - A standard string for machines to handle. You may share kinds between your modules or namespace kinds per module.
+-   **details** - An object of structured data about the tasks.
+
+Tasks can provide more details about the failure by including their own error object in the result at `_error`.
+
+```ruby
+#!/opt/puppetlabs/puppet/bin/ruby
+
+require 'json'
+
+begin
+  params = JSON.parse(STDIN.read)
+  result = {}
+  result['result'] = params['dividend'] / params['divisor']
+
+rescue ZeroDivisionError
+  result[:_error] = { msg: "Cannot divide by zero",
+                      # namespace the error to this module
+                      kind: "puppetlabs-example_modules/dividebyzero",
+                      details: { divisor: divisor },
+                    }
+rescue Exception => e
+  result[:_error] = { msg: e.message,
+                     kind: "puppetlabs-example_modules/unknown",
+                     details: { class: e.class.to_s },
+                   }
+end
+
+puts result.to_json
+```
+
 ## Converting scripts to tasks
 
 To convert an existing script to a task, you can either write a task that wraps the script or you can add logic in your script to check for parameters in environment variables.
@@ -693,6 +527,104 @@ if [ -z "$PT_filename" ]; then
 else
   filename=~/myfile
 fi
+```
+
+## Task metadata
+
+Task metadata files describe task parameters, validate input, and control how the task runner executes the task.
+
+Your task must have metadata to be published and shared on the Forge. Specify task metadata in a JSON file with the naming convention `<TASKNAME>.json` . Place this file in the module's `./tasks` folder along with your task file.
+
+For example, the module `puppetlabs-mysql` includes the `mysql::sql` task with the metadata file, `sql.json`.
+
+```json
+{
+  "description": "Allows you to execute arbitrary SQL",
+  "input_method": "stdin",
+  "parameters": {
+    "database": {
+      "description": "Database to connect to",
+      "type": "Optional[String[1]]"
+    },
+    "user": {
+      "description": "The user",
+      "type": "Optional[String[1]]"
+    },
+    "password": {
+      "description": "The password",
+      "type": "Optional[String[1]]",
+      "sensitive": true
+    },
+     "sql": {
+      "description": "The SQL you want to execute",
+      "type": "String[1]"
+    }
+  }
+}
+```
+
+### Adding parameters to metadata
+
+To document and validate task parameters, add the parameters to the task metadata as JSON object, `parameters`.
+
+If a task includes `parameters` in its metadata, the task runner rejects any parameters input to the task that aren't defined in the metadata.
+
+In the `parameter` object, give each parameter a description and specify its Puppet type. For a complete list of types, see the [types documentation](https://docs.puppet.com/puppet/latest/lang_data_type.html).
+
+For example, the following code in a metadata file describes a `provider` parameter:
+
+```json
+"provider": {
+  "description": "The provider to use to manage or inspect the service, defaults to the system service manager",
+  "type": "Optional[String[1]]"
+ }
+```
+
+#### Define sensitive parameters
+
+You can define task parameters as sensitive, for example, passwords and API keys. These values are masked when they appear in logs and API responses. When you want to view these values, set the log file to `level: debug`.
+
+To define a parameter as sensitive within the JSON metadata, add the `"sensitive": true` property.
+
+```json
+{
+  "description": "This task has a sensitive property denoted by its metadata",
+  "input_method": "stdin",
+  "parameters": {
+    "user": {
+      "description": "The user",
+      "type": "String[1]"
+    },
+    "password": {
+      "description": "The password",
+      "type": "String[1]",
+      "sensitive": true
+    }
+  }
+}
+```
+
+#### Set default values
+
+You can set a default value for a parameter which will be used if the parameter isn't specified. The default value must be valid according to the parameter's `type`.
+
+Note that not every version of Bolt supports parameter defaults, so you should either make the parameter required or explicitly check for its presence in the task implementation.
+
+```json
+{
+  "description": "This task has a parameter with a default value",
+  "input_method": "stdin",
+  "parameters": {
+    "platform" : {
+      "description": "Which operating system to provision",
+      "type": "String[1]"
+    },
+    "count": {
+      "description": "How many instances to provision",
+      "type": "Integer",
+      "default": 1
+    }
+  }
 ```
 
 ### Wrapping an existing script
@@ -814,109 +746,11 @@ print(json.dumps(result))
 exit(exitcode)
 ```
 
-## Task metadata
-
-Task metadata files describe task parameters, validate input, and control how the task runner executes the task.
-
-Your task must have metadata to be published and shared on the Forge. Specify task metadata in a JSON file with the naming convention `<TASKNAME>.json` . Place this file in the module's `./tasks` folder along with your task file.
-
-For example, the module `puppetlabs-mysql` includes the `mysql::sql` task with the metadata file, `sql.json`.
-
-```json
-{
-  "description": "Allows you to execute arbitrary SQL",
-  "input_method": "stdin",
-  "parameters": {
-    "database": {
-      "description": "Database to connect to",
-      "type": "Optional[String[1]]"
-    },
-    "user": {
-      "description": "The user",
-      "type": "Optional[String[1]]"
-    },
-    "password": {
-      "description": "The password",
-      "type": "Optional[String[1]]",
-      "sensitive": true
-    },
-     "sql": {
-      "description": "The SQL you want to execute",
-      "type": "String[1]"
-    }
-  }
-}
-```
-
-### Adding parameters to metadata
-
-To document and validate task parameters, add the parameters to the task metadata as JSON object, `parameters`.
-
-If a task includes `parameters` in its metadata, the task runner rejects any parameters input to the task that aren't defined in the metadata.
-
-In the `parameter` object, give each parameter a description and specify its Puppet type. For a complete list of types, see the [types documentation](https://docs.puppet.com/puppet/latest/lang_data_type.html).
-
-For example, the following code in a metadata file describes a `provider` parameter:
-
-```json
-"provider": {
-  "description": "The provider to use to manage or inspect the service, defaults to the system service manager",
-  "type": "Optional[String[1]]"
- }
-```
-
-#### Define sensitive parameters
-
-You can define task parameters as sensitive, for example, passwords and API keys. These values are masked when they appear in logs and API responses. When you want to view these values, set the log file to `level: debug`.
-
-To define a parameter as sensitive within the JSON metadata, add the `"sensitive": true` property.
-
-```json
-{
-  "description": "This task has a sensitive property denoted by its metadata",
-  "input_method": "stdin",
-  "parameters": {
-    "user": {
-      "description": "The user",
-      "type": "String[1]"
-    },
-    "password": {
-      "description": "The password",
-      "type": "String[1]",
-      "sensitive": true
-    }
-  }
-}
-```
-
-#### Set default values
-
-You can set a default value for a parameter which will be used if the parameter isn't specified. The default value must be valid according to the parameter's `type`.
-
-Note that not every version of Bolt supports parameter defaults, so you should either make the parameter required or explicitly check for its presence in the task implementation.
-
-```json
-{
-  "description": "This task has a parameter with a default value",
-  "input_method": "stdin",
-  "parameters": {
-    "platform" : {
-      "description": "Which operating system to provision",
-      "type": "String[1]"
-    },
-    "count": {
-      "description": "How many instances to provision",
-      "type": "Integer",
-      "default": 1
-    }
-  }
-```
-
-### Task metadata reference
+## Task metadata reference
 
 The following table shows task metadata keys, values, and default values.
 
-#### **Task metadata**
+### Task metadata fields
 
 |Metadata key|Description|Value|Default|
 |------------|-----------|-----|-------|
@@ -957,32 +791,167 @@ Some types supported by Puppet can not be represented as JSON, such as `Hash[Int
 
 [Data type syntax](https://puppet.com/docs/puppet/latest/lang_data_type.html)
 
-## Specifying parameters
+## Writing remote tasks
 
-Parameters for tasks can be passed to the `bolt` command as CLI arguments or as a JSON hash.
+Some targets are hard or impossible to execute tasks on directly. In these cases, you can write a task that runs on a proxy target and remotely interacts with the real target.
 
-To pass parameters individually to your task or plan, specify the parameter value on the command line in the format `<PARAMETER>=<VALUE>`. Pass multiple parameters as a space-separated list. Bolt attempts to parse each parameter value as JSON and compares that to the parameter type specified by the task or plan. If the parsed value matches the type, it is used; otherwise, the original string is used.
+For example, a network device might have a limited shell environment or a cloud service might be driven only by HTTP APIs. By writing a remote task, Bolt allows you to specify connection information for remote targets in their inventory file and injects them into the `_target` metaparam.
 
-For example, to run the `mysql::sql` task to show tables from a database called `mydatabase`:
+This example shows how to write a task that posts messages to Slack and reads connection information from `inventory.yaml`:
 
-```shell script
-bolt task run mysql::sql database=mydatabase sql="SHOW TABLES" --targets neptune --modules ~/modules
+```ruby
+#!/usr/bin/env ruby
+# modules/slack/tasks/message.rb
+
+require 'json'
+require 'net/http'
+
+params = JSON.parse(STDIN.read)
+# the slack API token is passed in from inventory
+token = params['_target']['token']
+		
+uri = URI('https://slack.com/api/chat.postMessage')
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
+
+req = Net::HTTP::Post.new(uri, 'Content-type' => 'application/json')
+req['Authorization'] = "Bearer #{params['_target']['token']}"
+req.body = { channel: params['channel'], text: params['message'] }.to_json
+
+resp = http.request(req)
+
+puts resp.body
 ```
 
-To pass a string value that is valid JSON to a parameter that would accept both quote the string. For example to pass the string `true` to a parameter of type `Variant[String, Boolean]` use `'foo="true"'`. To pass a String value wrapped in `"` quote and escape it `'string="\"val\"'`. Alternatively, you can specify parameters as a single JSON object with the `--params` flag, passing either a JSON object or a path to a parameter file.
-
-To specify parameters as JSON, use the parameters flag followed by the JSON:
- 
-```
---params '{"name": "openssl"}'`
-```
-
-To set parameters in a file, specify parameters in JSON format in a file, such as `params.json`. For example, create a `params.json` file that contains the following JSON:
+To prevent accidentally running a normal task on a remote target and breaking its configuration, Bolt won't run a task on a remote target unless its metadata defines it as remote:
 
 ```json
 {
-  "name":"openssl"
+  "remote": true
 }
 ```
 
-Then specify the path to that file (starting with an at symbol, `@`) on the command line with the parameters flag: `--params @params.json`
+Add Slack as a remote target in your inventory file:
+
+```yaml
+targets:
+  - name: my_slack
+    config:
+      transport: remote
+      remote:
+        token: <SLACK_API_TOKEN>
+```
+
+Finally, make `my_slack` a target that can run the `slack::message`:
+
+```shell script
+bolt task run slack::message --targets my_slack message="hello" channel=<slack channel id>
+```
+
+## Secure coding practices for tasks
+
+Use secure coding practices when you write tasks and help protect your system.
+
+**Note:** The information in this topic covers basic coding practices for writing secure tasks. It is not an exhaustive list.
+
+One of the methods attackers use to gain access to your systems is remote code execution, where by running an allowed script they gain access to other parts of the system and can make arbitrary changes. Because Bolt executes scripts across your infrastructure, it is important to be aware of certain vulnerabilities, and to code tasks in a way that guards against remote code execution.
+
+Adding task metadata that validates input is one way to reduce vulnerability. When you require an enumerated (`enum`) or other non-string types, you prevent improper data from being entered. An arbitrary string parameter does not have this assurance.
+
+For example, if your task has a parameter that selects from several operational modes that are passed to a shell command, instead of
+
+```
+String $mode = 'file'
+```
+
+use
+
+```
+Enum[file,directory,link,socket] $mode = file
+```
+
+If your task has a parameter that identifies a file on disk, ensure that a user can't specify a relative path that takes them into areas where they shouldn't be. Reject file names that have slashes.
+
+Instead of
+
+```
+String $path
+```
+
+use
+
+```
+Pattern[/\A[^\/\\]*\z/] $path
+```
+
+In addition to these task restrictions, different scripting languages each have their own ways to validate user input.
+
+### PowerShell
+
+In PowerShell, code injection exploits calls that specifically evaluate code. Do not call `Invoke-Expression` or `Add-Type` with user input. These commands evaluate strings as C# code.
+
+Reading sensitive files or overwriting critical files can be less obvious. If you plan to allow users to specify a file name or path, use `Resolve-Path` to verify that the path doesn't go outside the locations you expect the task to access. Use `Split-Path -Parent $path` to check that the resolved path has the desired path as a parent.
+
+For more information, see [PowerShell Scripting](https://docs.microsoft.com/en-us/powershell/scripting/PowerShell-Scripting?view=powershell-6) and [Powershell's Security Guiding Principles](https://blogs.msdn.microsoft.com/powershell/2008/09/30/powershells-security-guiding-principles/).
+
+### Bash
+
+In Bash and other command shells, shell command injection takes advantage of poor shell implementations. Put quotation marks around arguments to prevent the vulnerable shells from evaluating them.
+
+Because the `eval` command evaluates all arguments with string substitution, avoid using it with user input; however you can use `eval` with sufficient quoting to prevent substituted variables from being executed.
+
+Instead of
+
+```shell script
+eval "echo $input"
+```
+
+use
+
+```shell script
+eval "echo '$input'"
+```
+
+These are operating system-specific tools to validate file paths: `realpath` or `readlink -f`.
+
+### Python
+
+In Python malicious code can be introduced through commands like `eval`, `exec`, `os.system`, `os.popen`, and `subprocess.call` with `shell=True`. Use `subprocess.call` with `shell=False` when you include user input in a command or escape variables.
+
+Instead of
+
+```python
+os.system('echo '+input)
+
+```
+
+use
+
+```python
+subprocess.check_output(['echo', input])
+```
+
+Resolve file paths with `os.realpath` and confirm them to be within another path by looping over `os.path.dirname` and comparing to the desired path.
+
+For more information on the vulnerabilities of Python or how to escape variables, see Kevin London's blog post on [Dangerous Python Functions](https://www.kevinlondon.com/2015/07/26/dangerous-python-functions.html).
+
+### Ruby
+
+In Ruby, command injection is introduced through commands like `eval`, `exec`, `system`, backtick (``) or `%x()` execution, or the Open3 module. You can safely call these functions with user input by passing the input as additional arguments instead of a single string.
+
+Instead of
+
+```ruby
+system("echo #{flag1} #{flag2}")
+```
+
+use
+
+```ruby
+system('echo', flag1, flag2)
+```
+
+Resolve file paths with `Pathname#realpath`, and confirm them to be within another path by looping over `Pathname#parent` and comparing to the desired path.
+
+For more information on securely passing user input, see the blog post [Stop using backtick to run shell command in Ruby](https://www.hilman.io/blog/2016/01/stop-using-backtick-to-run-shell-command-in-ruby/).
+
