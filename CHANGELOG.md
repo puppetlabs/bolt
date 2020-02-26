@@ -14,6 +14,12 @@
 
   Large inventory groups were taking a long time to validate and should now be faster.
 
+* **Modifications to an inventory when using `run_plan` are validated correctly** ([#1627](https://github.com/puppetlabs/bolt/pull/1627))
+
+  When using `run_plan(..., _catch_errors => true)` and making invalid modifications to the inventory, errors would
+  be caught but the modifications would still be made to the inventory. Modifications to the inventory are now
+  validated prior to applying them to the inventory.
+
 ## Bolt 2.0.1
 
 ### Deprecations and removals
@@ -31,12 +37,6 @@
 
   The `project migrate` command now correctly replaces all `nodes` keys in an inventory file with `targets`. 
   Previously, only the first group in an array of groups was having its `nodes` key replaced.
-
-* **Modifications to an inventory when using `run_plan` are validated correctly** ([#1627](https://github.com/puppetlabs/bolt/pull/1627))
-
-  When using `run_plan(..., _catch_errors => true)` and making invalid modifications to the inventory, errors would
-  be caught but the modifications would still be made to the inventory. Modifications to the inventory are now
-  validated prior to applying them to the inventory.
 
 ## Bolt 2.0.0
 
