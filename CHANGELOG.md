@@ -8,6 +8,11 @@
 
   The new plan function, `write_file`, allows you to write content to a file on the given targets.
 
+* **Add `--puppetfile` option for `puppetfile install` command** ([#1612](https://github.com/puppetlabs/bolt/issues/1612))
+
+  The `puppetfile install` command now supports a `--puppetfile` option that accepts a relative or absolute path
+  to a Puppetfile.
+
 ### Bug fixes
 
 * **Fixed performance regression with large inventory files** ([#1627](https://github.com/puppetlabs/bolt/pull/1627))

@@ -88,7 +88,7 @@ module Bolt
       when 'puppetfile'
         case action
         when 'install'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[puppetfile],
             banner: PUPPETFILE_INSTALL_HELP }
         when 'show-modules'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
@@ -706,7 +706,7 @@ module Bolt
         @options[:boltdir] = path
       end
       define('--configfile FILEPATH',
-             'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml). ' \
+             'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml).',
              'Directory containing bolt.yaml will be used as the Boltdir.') do |path|
         @options[:configfile] = path
       end
@@ -715,7 +715,12 @@ module Bolt
         if ENV.include?(Bolt::Inventory::ENVIRONMENT_VAR)
           raise Bolt::CLIError, "Cannot pass inventory file when #{Bolt::Inventory::ENVIRONMENT_VAR} is set"
         end
-        @options[:inventoryfile] = File.expand_path(path)
+        @options[:inventoryfile] = Pathname.new(File.expand_path(path))
+      end
+      define('--puppetfile FILEPATH',
+             'Specify a Puppetfile to use when installing modules. (default: ~/.puppetlabs/bolt/Puppetfile)',
+             'Modules are installed in the current Boltdir.') do |path|
+        @options[:puppetfile] = Pathname.new(File.expand_path(path))
       end
       define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|
         @options[:'save-rerun'] = save

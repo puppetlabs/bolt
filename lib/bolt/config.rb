@@ -302,6 +302,8 @@ module Bolt
         send("#{key}=", options[key]) if options.key?(key)
       end
 
+      @puppetfile = options[:puppetfile] if options.key?(:puppetfile)
+
       @save_rerun = options[:'save-rerun'] if options.key?(:'save-rerun')
 
       if options[:debug]
@@ -386,7 +388,7 @@ module Bolt
     end
 
     def puppetfile
-      @boltdir.puppetfile
+      @puppetfile || @boltdir.puppetfile
     end
 
     def modulepath
