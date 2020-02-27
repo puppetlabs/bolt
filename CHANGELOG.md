@@ -13,6 +13,12 @@
   The `puppetfile install` command now supports a `--puppetfile` option that accepts a relative or absolute path
   to a Puppetfile.
 
+* **Update reboot plan parameter `nodes` to `targets`** ([puppetlabs-reboot#223](https://github.com/puppetlabs/puppetlabs-reboot/pull/223))
+
+  Users who explicitly set the `nodes` parameter will need to update the parameter name to
+  `targets`. Calling the `reboot` plan with `-t` or `run_plan('reboot', $mytargets)` behaves the same
+  as before and does not require an update.
+
 ### Bug fixes
 
 * **Fixed performance regression with large inventory files** ([#1627](https://github.com/puppetlabs/bolt/pull/1627))
