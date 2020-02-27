@@ -24,6 +24,11 @@
   When using `run_plan(..., _catch_errors => true)` and making invalid modifications to the inventory, errors would
   be caught but the modifications would still be made to the inventory. Modifications to the inventory are now
   validated prior to applying them to the inventory.
+  
+* **Upgrade reboot module** ([#1634](https://github.com/puppetlabs/bolt/issues/1634))
+
+  Bolt had pinned an old version of the `puppetlabs-reboot` module that was not compatible with
+  Bolt `2.0`. This fix upgrades the `puppetlabs-reboot` module to a version that is compatible.
 
 ## Bolt 2.0.1
 
