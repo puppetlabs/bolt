@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'bolt/plan_result'
 require 'bolt/result'
 require 'bolt/util'
 
@@ -85,6 +86,13 @@ module BoltSpec
           raise "Return block for #{object} did not return a Bolt::ResultSet"
         end
         result_set
+      end
+
+      def check_plan_result(plan_result, plan_clj)
+        unless plan_result.is_a?(Bolt::PlanResult)
+          raise "Return block for #{plan_clj.closure_name} did not return a Bolt::PlanResult"
+        end
+        plan_result
       end
 
       # Below here are the intended 'public' methods of the stub

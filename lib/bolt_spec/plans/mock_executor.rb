@@ -30,6 +30,8 @@ module BoltSpec
         @stub_out_message = nil
         @transport_features = ['puppet-agent']
         @executor_real = Bolt::Executor.new
+        # plans that are allowed to be executed by the @executor_real
+        @allowed_exec_plans = {}
       end
 
       def module_file_id(file)
@@ -98,17 +100,30 @@ module BoltSpec
         result
       end
 
-      def run_plan(scope, plan, params)
+      def with_plan_allowed_exec(plan_name, params)
+        @allowed_exec_plans[plan_name] = params
+        result = yield
+        @allowed_exec_plans.delete(plan_name)
+        result
+      end
+
+      def run_plan(scope, plan_clj, params)
         result = nil
-        plan_name = plan.closure_name
-        if @plan_doubles.key?(plan_name)
+        plan_name = plan_clj.closure_name
+        if @allowed_exec_plans.key?(plan_name) && @allowed_exec_plans[plan_name] == params
+          # This plan's name + params was explicitly allowed to be executed
+          # run it with the real executor.
+          # We require this functionality so that the BoltSpec::Plans.run_plan()
+          # function can kick off the initial plan. In reality, no other plans should
+          # be in this hash.
+          result = @executor_real.run_plan(scope, plan_clj, params)
+        elsif @plan_doubles.key?(plan_name)
           doub = @plan_doubles[plan_name]
-          result = doub.process(scope, plan, params)
-        else
-          # the plan wasn't mocked out, we need to run it with a normal executor
-          # this allows us to call the BoltSpec::Plans.run_plan() function and other
-          # plans like normal puppet language.
-          result = @executor_real.run_plan(scope, plan, params)
+          result = doub.process(scope, plan_clj, params)
+        end
+        if result == false
+          @error_message = "Unexpected call to 'run_plan(#{plan_name}, #{params})'"
+          raise UnexpectedInvocation, @error_message
         end
         result
       end
