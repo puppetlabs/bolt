@@ -1179,6 +1179,30 @@ describe "Bolt::CLI" do
           )
         end
 
+        it "warns when yard doc parameters do not match the plan signature parameters" do
+          plan_name = 'sample::documented_param_typo'
+          options = {
+            subcommand: 'plan',
+            action: 'show',
+            object: plan_name
+          }
+          cli.execute(options)
+          json = JSON.parse(output.string)
+          expect(json).to eq(
+            "name" => plan_name,
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
+            "description" => nil,
+            "parameters" => {
+              "oops" => {
+                "type" => "String",
+                "default_value" => "typo"
+              }
+            }
+          )
+          expected_log = /The documented parameter 'not_oops' does not exist in plan signature/m
+          expect(@log_output.readlines.join).to match(expected_log)
+        end
+
         it "shows an individual yaml plan data" do
           plan_name = 'sample::yaml'
           options = {

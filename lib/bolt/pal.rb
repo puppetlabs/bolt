@@ -336,11 +336,16 @@ module Bolt
                       end
 
         defaults = plan.parameters.reject { |_, value| value.nil? }.to_h
+        signature_params = Set.new(plan.parameters.map(&:first))
         parameters = plan.tags(:param).each_with_object({}) do |param, params|
           name = param.name
-          params[name] = { 'type' => param.types.first }
-          params[name]['default_value'] = defaults[name] if defaults.key?(name)
-          params[name]['description'] = param.text unless param.text.empty?
+          if signature_params.include?(name)
+            params[name] = { 'type' => param.types.first }
+            params[name]['default_value'] = defaults[name] if defaults.key?(name)
+            params[name]['description'] = param.text unless param.text.empty?
+          else
+            @logger.warn("The documented parameter '#{name}' does not exist in plan signature")
+          end
         end
 
         {
