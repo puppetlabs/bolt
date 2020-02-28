@@ -3,10 +3,10 @@ name: Windows
 on:
   push:
     branches: [master]
-    paths-ignore: ['**/*.md', '**/*.erb']
+    paths-ignore: ['**.md', '**.erb']
   pull_request:
     type: [opened, reopened, edited]
-    paths-ignore: ['**/*.md', '**/*.erb']
+    paths-ignore: ['**.md', '**.erb']
 
 env:
   BOLT_WINRM_USER: roddypiper

@@ -116,7 +116,7 @@ module Bolt
           raise ValidationError.new("Target name must be ASCII characters: #{target}", @name)
         end
 
-        if local_targets.include?(t_name)
+        if contains_target?(t_name)
           @logger.warn("Ignoring duplicate target in #{@name}: #{target}")
           return
         end
@@ -189,9 +189,6 @@ module Bolt
       end
 
       def resolve_string_targets(aliases, known_targets)
-        # Use a single copy of this because recomputing it for every target is
-        # prohibitively expensive for large groups
-        cached_local_targets = local_targets
         @string_targets.each do |string_target|
           # If this is the name of a target defined elsewhere, then insert the
           # target into this group as just a name. Otherwise, add a new target
@@ -200,19 +197,17 @@ module Bolt
             @unresolved_targets[string_target] = { 'name' => string_target }
           # If this is an alias for an existing target, then add it to this group
           elsif (canonical_name = aliases[string_target])
-            if cached_local_targets.include?(canonical_name)
+            if contains_target?(canonical_name)
               @logger.warn("Ignoring duplicate target in #{@name}: #{canonical_name}")
             else
               @unresolved_targets[canonical_name] = { 'name' => canonical_name }
-              cached_local_targets << canonical_name
             end
           # If it's not the name or alias of an existing target, then make a
           # new target using the string as the URI
-          elsif cached_local_targets.include?(string_target)
+          elsif contains_target?(string_target)
             @logger.warn("Ignoring duplicate target in #{@name}: #{string_target}")
           else
             @unresolved_targets[string_target] = { 'uri' => string_target }
-            cached_local_targets << string_target
           end
         end
         @groups.each { |g| g.resolve_string_targets(aliases, known_targets) }
@@ -364,6 +359,10 @@ module Bolt
         Set.new(@unresolved_targets.keys) + Set.new(@resolved_targets.keys)
       end
 
+      def contains_target?(target_name)
+        @unresolved_targets.key?(target_name) || @resolved_targets.key?(target_name)
+      end
+
       # Returns all targets contained within the group, which includes targets from subgroups.
       def all_targets
         @groups.inject(local_targets) do |acc, g|
@@ -404,7 +403,7 @@ module Bolt
 
         # If this group has the target or one of the child groups has the
         # target, return the data, otherwise return nil
-        if child_result || local_targets.include?(target_name)
+        if child_result || contains_target?(target_name)
           # Children override the parent
           data_merge(group_data, child_result)
         end

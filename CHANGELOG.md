@@ -2,6 +2,37 @@
 
 ## Bolt Next
 
+### New features
+
+* **New `write_file` plan function** ([#1597](https://github.com/puppetlabs/bolt/issues/1597))
+
+  The new plan function, `write_file`, allows you to write content to a file on the given targets.
+
+* **Add `--puppetfile` option for `puppetfile install` command** ([#1612](https://github.com/puppetlabs/bolt/issues/1612))
+
+  The `puppetfile install` command now supports a `--puppetfile` option that accepts a relative or absolute path
+  to a Puppetfile.
+
+* **Update reboot plan parameter `nodes` to `targets`** ([puppetlabs-reboot#223](https://github.com/puppetlabs/puppetlabs-reboot/pull/223))
+
+  Users who explicitly set the `nodes` parameter will need to update the parameter name to
+  `targets`. Calling the `reboot` plan with `-t` or `run_plan('reboot', $mytargets)` behaves the same
+  as before and does not require an update.
+
+### Bug fixes
+
+* **Fixed performance regression with large inventory files** ([#1627](https://github.com/puppetlabs/bolt/pull/1627))
+
+  Large inventory groups were taking a long time to validate and should now be faster.
+
+* **Modifications to an inventory when using `run_plan` are validated correctly** ([#1627](https://github.com/puppetlabs/bolt/pull/1627))
+
+  When using `run_plan(..., _catch_errors => true)` and making invalid modifications to the inventory, errors would
+  be caught but the modifications would still be made to the inventory. Modifications to the inventory are now
+  validated prior to applying them to the inventory.
+
+## Bolt 2.0.1
+
 ### Deprecations and removals
 
 * **WARNING**: Starting with this release, new Bolt packages are not available for macOS 10.11, 10.12,
@@ -9,9 +40,9 @@
 
 ### Bug fixes
 
-* **Fixed a performance regression with large inventory files** ([#1625](https://github.com/puppetlabs/bolt/pull/1607)]
+* **Fixed a performance regression with large inventory files** ([#1625](https://github.com/puppetlabs/bolt/pull/1625))
 
-  Large inventory groups were taking a long time to load and should now be much faster.
+  Large inventory groups were taking a long time to load and should now be faster.
 
 * **`project migrate` command correctly migrates version 1 inventory files** ([#1623](https://github.com/puppetlabs/bolt/issues/1623))
 

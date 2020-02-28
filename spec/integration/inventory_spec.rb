@@ -326,8 +326,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       plan = ['plan', 'run', 'add_group::x_fail_group_name_exists', '--targets', 'add_me'] + config_flags
       result = run_cli_json(plan)
       expect(result['kind']).to eq('bolt.inventory/validation-error')
-      expect(result['msg']).to match(/Group foo conflicts with target of the same name for group/)
-      expect(result['details']).to eq("path" => ["foo"])
+      expect(result['msg']).to match(/Target name foo conflicts with group of the same name/)
     end
   end
 

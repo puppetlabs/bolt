@@ -517,6 +517,16 @@ describe "Bolt::CLI" do
       end
     end
 
+    describe "puppetfile" do
+      let(:puppetfile) { File.expand_path('/path/to/Puppetfile') }
+      let(:cli) { Bolt::CLI.new(%W[puppetfile install --puppetfile #{puppetfile}]) }
+
+      it 'uses a specified Puppetfile' do
+        cli.parse
+        expect(cli.config.puppetfile.to_s).to eq(puppetfile)
+      end
+    end
+
     describe "sudo" do
       it "supports running as a user" do
         cli = Bolt::CLI.new(%w[command run --targets foo whoami --run-as root])
@@ -1170,6 +1180,30 @@ describe "Bolt::CLI" do
               }
             }
           )
+        end
+
+        it "warns when yard doc parameters do not match the plan signature parameters" do
+          plan_name = 'sample::documented_param_typo'
+          options = {
+            subcommand: 'plan',
+            action: 'show',
+            object: plan_name
+          }
+          cli.execute(options)
+          json = JSON.parse(output.string)
+          expect(json).to eq(
+            "name" => plan_name,
+            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
+            "description" => nil,
+            "parameters" => {
+              "oops" => {
+                "type" => "String",
+                "default_value" => "typo"
+              }
+            }
+          )
+          expected_log = /The documented parameter 'not_oops' does not exist in plan signature/m
+          expect(@log_output.readlines.join).to match(expected_log)
         end
 
         it "shows an individual yaml plan data" do
