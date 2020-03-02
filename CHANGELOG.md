@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt Next
+## Bolt 2.1.0
 
 ### New features
 
@@ -18,6 +18,10 @@
   Users who explicitly set the `nodes` parameter will need to update the parameter name to
   `targets`. Calling the `reboot` plan with `-t` or `run_plan('reboot', $mytargets)` behaves the same
   as before and does not require an update.
+
+* **Package Bolt for MacOS 10.15** ([#1445](https://github.com/puppetlabs/bolt/issues/1445))
+
+  Bolt packages are now available for MacOS 10.15.
 
 ### Bug fixes
 
