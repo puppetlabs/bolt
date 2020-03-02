@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt Next
+## Bolt 2.1.0
 
 ### New features
 
