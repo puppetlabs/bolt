@@ -55,7 +55,9 @@ jobs:
         run: '& scripts\ci.ps1'
       - name: Run tests
         shell: powershell
-        run: bundle exec rake integration:windows_agents
+        run: |
+          $env:BOLT_WINRM_HOST = docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" spec_windows_agent
+          bundle exec rake integration:windows_agents
 
   agentless:
     name: Agentless
@@ -96,4 +98,6 @@ jobs:
         run: '& scripts\ci.ps1'
       - name: Run tests
         shell: powershell
-        run: bundle exec rake windows_ci
+        run: |
+          $env:BOLT_WINRM_HOST = docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" spec_windows_node
+          bundle exec rake windows_ci

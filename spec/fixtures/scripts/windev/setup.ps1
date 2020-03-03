@@ -12,7 +12,7 @@ rm -force c:\secpol.cfg -confirm:$false
 
 # add the bolt user account
 New-LocalUser -Name $User -Password (ConvertTo-SecureString -String $Password -Force -AsPlainText)
-#Add-LocalGroupMember -Group 'Remote Management Users' -Member $User
+Add-LocalGroupMember -Group 'Remote Management Users' -Member $User
 Add-LocalGroupMember -Group 'Administrators' -Member $User
 
 # Enable WinRM
