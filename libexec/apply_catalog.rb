@@ -28,7 +28,9 @@ Puppet[:report] = false
 
 # Make sure to apply the catalog
 Puppet[:noop] = args['_noop'] || false
-args['apply_settings'].each do |setting, value|
+
+apply_settings = args['apply_settings'] || {}
+apply_settings.each do |setting, value|
   Puppet[setting.to_sym] = value
 end
 

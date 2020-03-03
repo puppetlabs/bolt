@@ -225,10 +225,11 @@ module Bolt
                 arguments = {
                   'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
                   'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
-                  'apply_settings' => @apply_settings,
                   '_task' => catalog_apply_task.name,
                   '_noop' => options[:noop]
                 }
+
+                arguments.merge!({ 'apply_settings' => @apply_settings }) unless @apply_settings.empty?
 
                 callback = proc do |event|
                   if event[:type] == :node_result
