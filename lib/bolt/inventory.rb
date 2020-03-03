@@ -60,25 +60,26 @@ module Bolt
                end
       end
 
-      inventory = create_version(data, config, plugins)
+      inventory = create_version(data, config.transport, config.transports, plugins)
       inventory.validate
       inventory
     end
 
-    def self.create_version(data, config, plugins)
+    def self.create_version(data, transport, transports, plugins)
       version = (data || {}).delete('version') { 2 }
       case version
       when 2
-        Bolt::Inventory::Inventory.new(data, config, plugins: plugins)
+        Bolt::Inventory::Inventory.new(data, transport, transports, plugins)
       else
         raise ValidationError.new("Unsupported version #{version} specified in inventory", nil)
       end
     end
 
     def self.empty
-      config = Bolt::Config.default
+      config  = Bolt::Config.default
       plugins = Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient)
-      create_version({}, config, plugins)
+
+      create_version({}, config.transport, config.transports, plugins)
     end
   end
 end

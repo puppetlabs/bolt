@@ -6,24 +6,31 @@ require 'bolt/inventory/target'
 module Bolt
   class Inventory
     class Inventory
-      attr_reader :targets, :plugins, :config
+      attr_reader :targets, :plugins, :config, :transport
       class WildcardError < Bolt::Error
         def initialize(target)
           super("Found 0 targets matching wildcard pattern #{target}", 'bolt.inventory/wildcard-error')
         end
       end
 
-      def initialize(data, config = nil, plugins:)
-        @logger = Logging.logger[self]
-        # Config is saved to add config options to targets
-        @config = config || Bolt::Config.default
-        @data = data || {}
-        @groups = Group.new(@data.merge('name' => 'all'), plugins)
-        @plugins = plugins
+      # TODO: Pass transport config instead of config object
+      def initialize(data, transport, transports, plugins)
+        @logger       = Logging.logger[self]
+        @data         = data || {}
+        @transport    = transport
+        @config       = transports
+        @plugins      = plugins
+        @groups       = Group.new(@data.merge('name' => 'all'), plugins)
         @group_lookup = {}
-        # The targets hash is the canonical source for all targets in inventory
-        @targets = {}
+        @targets      = {}
+
+        # Resolve plugin references from transport config
+        config.each_value do |t|
+          t.config = plugins.resolve_references(t.config)
+        end
+
         @groups.resolve_string_targets(@groups.target_aliases, @groups.all_targets)
+
         collect_groups
       end
 
@@ -69,18 +76,6 @@ module Bolt
           raise ValidationError.new("'#{target}' refers to #{target_array.count} targets", nil)
         end
         target_array.first
-      end
-
-      def data_hash
-        {
-          data: {},
-          target_hash: {
-            target_vars: {},
-            target_facts: {},
-            target_features: {}
-          },
-          config: @config.transport_data_get
-        }
       end
 
       def self.localhost_defaults(data)
@@ -282,6 +277,10 @@ module Bolt
         else
           raise ValidationError.new("Group #{desired_group} does not exist in inventory", nil)
         end
+      end
+
+      def transport_data_get
+        { transport: transport, transports: config }
       end
 
       def set_var(target, var_hash)

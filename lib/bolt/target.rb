@@ -76,7 +76,7 @@ module Bolt
     end
 
     def to_h
-      options.merge(
+      options.to_h.merge(
         'name' => name,
         'uri' => uri,
         'protocol' => protocol,
@@ -92,7 +92,10 @@ module Bolt
         'name' => name,
         'uri' => uri,
         'alias' => target_alias,
-        'config' => Bolt::Util.deep_merge(config, 'transport' => transport, transport => options),
+        'config' => {
+          'transport' => transport,
+          transport => options.to_h
+        },
         'vars' => vars,
         'features' => features,
         'facts' => facts,

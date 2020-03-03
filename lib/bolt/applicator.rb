@@ -191,7 +191,7 @@ module Bolt
         hiera_config: @hiera_config,
         plan_vars: plan_vars,
         # This data isn't available on the target config hash
-        config: @inventory.config.transport_data_get
+        config: @inventory.transport_data_get
       }
 
       description = options[:description] || 'apply catalog'

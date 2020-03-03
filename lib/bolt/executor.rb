@@ -10,8 +10,25 @@ require 'bolt/result'
 require 'bolt/config'
 require 'bolt/result_set'
 require 'bolt/puppetdb'
+# Load transports
+require 'bolt/transport/ssh'
+require 'bolt/transport/winrm'
+require 'bolt/transport/orch'
+require 'bolt/transport/local'
+require 'bolt/transport/local_windows'
+require 'bolt/transport/docker'
+require 'bolt/transport/remote'
 
 module Bolt
+  TRANSPORTS = {
+    ssh: Bolt::Transport::SSH,
+    winrm: Bolt::Transport::WinRM,
+    pcp: Bolt::Transport::Orch,
+    local: Bolt::Util.windows? ? Bolt::Transport::LocalWindows : Bolt::Transport::Local,
+    docker: Bolt::Transport::Docker,
+    remote: Bolt::Transport::Remote
+  }.freeze
+
   class Executor
     attr_reader :noop, :transports
     attr_accessor :run_as
