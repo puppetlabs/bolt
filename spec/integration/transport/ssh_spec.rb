@@ -20,44 +20,49 @@ describe Bolt::Transport::SSH do
   include BoltSpec::Files
   include BoltSpec::Task
 
-  let(:hostname) { conn_info('ssh')[:host] }
-  let(:user) { conn_info('ssh')[:user] }
-  let(:password) { conn_info('ssh')[:password] }
-  let(:bash_user) { 'test' }
-  let(:bash_password) { 'test' }
-  let(:port) { conn_info('ssh')[:port] }
-  let(:host_and_port) { "#{hostname}:#{port}" }
-  let(:safe_name) { hostname.to_s }
-  let(:key) { conn_info('ssh')[:key] }
-  let(:command) { "pwd" }
-  let(:config) { mk_config(user: user, password: password) }
-  let(:no_host_key_check) { mk_config('host-key-check' => false, user: user, password: password) }
-  let(:no_user_config) { mk_config('host-key-check' => false, user: nil, password: password) }
-  let(:no_load_config) { mk_config('host-key-check' => false, user: nil, password: password, 'load-config' => false) }
-  let(:ssh) { Bolt::Transport::SSH.new }
-  let(:task_input_size) { 100000 }
-  let(:big_task_input) { "f" * task_input_size }
-  let(:stdin_task) { "#!/bin/sh\ngrep data" }
-  let(:env_task) { "#!/bin/sh\necho $PT_data" }
-  let(:inventory) { Bolt::Inventory.empty }
-  let(:transport_conf) { {} }
-  let(:target) { make_target }
+  let(:hostname)          { conn_info('ssh')[:host] }
+  let(:safe_name)         { hostname.to_s }
+  let(:port)              { conn_info('ssh')[:port] }
+  let(:host_and_port)     { "#{hostname}:#{port}" }
+  let(:user)              { conn_info('ssh')[:user] }
+  let(:password)          { conn_info('ssh')[:password] }
+  let(:bash_user)         { 'test' }
+  let(:bash_password)     { 'test' }
+  let(:key)               { conn_info('ssh')[:key] }
+  let(:command)           { "pwd" }
 
-  def mk_config(conf)
+  let(:no_host_key_check) { { 'host-key-check' => false, user: user, password: password } }
+  let(:no_user_config)    { { 'host-key-check' => false, password: password } }
+  let(:no_load_config)    { { 'host-key-check' => false, password: password, 'load-config' => false } }
+
+  let(:ssh)               { Bolt::Transport::SSH.new }
+  let(:task_input_size)   { 100000 }
+  let(:big_task_input)    { "f" * task_input_size }
+  let(:stdin_task)        { "#!/bin/sh\ngrep data" }
+  let(:env_task)          { "#!/bin/sh\necho $PT_data" }
+
+  let(:config)            { make_config }
+  let(:boltdir)           { Bolt::Boltdir.new('.') }
+  let(:plugins)           { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new) }
+  let(:inventory)         { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
+  let(:target)            { make_target }
+
+  let(:transport_config)  { {} }
+
+  def make_config(conf: transport_config)
     conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(Bolt::Boltdir.new('.'), 'ssh' => conf)
+    Bolt::Config.new(boltdir, 'ssh' => conf)
   end
+  alias_method :mk_config, :make_config
 
-  def make_target(host_: hostname, port_: port, conf: config)
-    t = inventory.get_target("#{host_}:#{port_}")
-    t.inventory_target.set_config('ssh', conf.transports[conf.transport.to_sym].merge(transport_conf))
-    t
+  def make_target(host_: hostname, port_: port)
+    inventory.get_target("#{host_}:#{port_}")
   end
 
   context 'with ssh', ssh: true do
-    let(:target) { make_target(conf: no_host_key_check) }
-    let(:transport) { :ssh }
-    let(:os_context) { posix_context }
+    let(:transport_config) { no_host_key_check }
+    let(:os_context)       { posix_context }
+    let(:transport)        { :ssh }
 
     include BoltSpec::Transport
 
@@ -80,6 +85,8 @@ describe Bolt::Transport::SSH do
 
   context "when connecting", ssh: true do
     it "passes proxyjump options" do
+      transport_config['proxyjump'] = 'jump.example.com'
+
       allow(Net::SSH)
         .to receive(:start)
         .with(anything,
@@ -87,7 +94,6 @@ describe Bolt::Transport::SSH do
               hash_including(
                 proxy: instance_of(Net::SSH::Proxy::Jump)
               ))
-      target = make_target(conf: mk_config(proxyjump: 'jump.example.com'))
       ssh.with_connection(target) {}
     end
 
@@ -103,6 +109,8 @@ describe Bolt::Transport::SSH do
     end
 
     it "downgrades to lenient if host-key-check is false" do
+      transport_config.merge!(no_host_key_check)
+
       allow(Net::SSH)
         .to receive(:start)
         .with(anything,
@@ -110,7 +118,7 @@ describe Bolt::Transport::SSH do
               hash_including(
                 verify_host_key: instance_of(Net::SSH::Verifiers::Never)
               ))
-      ssh.with_connection(make_target(conf: no_host_key_check)) {}
+      ssh.with_connection(target) {}
     end
 
     it "defers to SSH config if host-key-check is unset" do
@@ -126,6 +134,8 @@ describe Bolt::Transport::SSH do
     end
 
     it "ignores SSH config if host-key-check is set" do
+      transport_config.merge!(no_host_key_check)
+
       expect(Net::SSH::Config).to receive(:for).and_return(strict_host_key_checking: true)
       allow(Net::SSH)
         .to receive(:start)
@@ -134,7 +144,7 @@ describe Bolt::Transport::SSH do
               hash_including(
                 verify_host_key: instance_of(Net::SSH::Verifiers::Never)
               ))
-      ssh.with_connection(make_target(conf: no_host_key_check)) {}
+      ssh.with_connection(target) {}
     end
 
     it "rejects the connection if host key verification fails" do
@@ -146,6 +156,8 @@ describe Bolt::Transport::SSH do
     end
 
     it "raises ConnectError if authentication fails" do
+      transport_config.merge!(no_host_key_check)
+
       allow(Net::SSH)
         .to receive(:start)
         .and_raise(Net::SSH::AuthenticationFailed,
@@ -153,7 +165,7 @@ describe Bolt::Transport::SSH do
       expect_node_error(Bolt::Node::ConnectError,
                         'AUTH_ERROR',
                         /Authentication failed for foo@bar.com/) do
-        ssh.with_connection(make_target(conf: no_host_key_check)) {}
+        ssh.with_connection(target) {}
       end
     end
 
@@ -196,45 +208,54 @@ describe Bolt::Transport::SSH do
       TCPServer.open(0) do |server|
         port = server.addr[1]
 
-        timeout = mk_config('connect-timeout' => 2, user: 'bad', password: 'password')
+        transport_config.merge!('connect-timeout' => 2, 'user' => 'bad', 'password' => 'password')
 
         exec_time = Time.now
         expect {
-          ssh.with_connection(make_target(port_: port, conf: timeout)) {}
+          ssh.with_connection(make_target(port_: port)) {}
         }.to raise_error(Bolt::Node::ConnectError)
         expect(Time.now - exec_time).to be > 2
       end
     end
 
     it "uses Net::SSH config when no user is specified" do
+      transport_config.merge!(no_user_config)
+
       expect(Net::SSH::Config)
         .to receive(:for)
         .at_least(:once)
         .with(hostname, any_args)
         .and_return(user: user)
 
-      ssh.with_connection(make_target(conf: no_user_config)) {}
+      ssh.with_connection(target) {}
     end
 
     it "doesn't read system config if load_config is false" do
+      transport_config.merge!(no_load_config)
+
       allow(Etc).to receive(:getlogin).and_return('bolt')
       expect(Net::SSH::Config).not_to receive(:for)
-      transport_conf['load-config'] = false
-      config_user = ssh.with_connection(make_target(conf: no_load_config), &:user)
+      transport_config['load-config'] = false
+      config_user = ssh.with_connection(target, &:user)
       expect(config_user).to be('bolt')
     end
   end
 
   context "when executing with private key" do
-    let(:config) { mk_config('host-key-check' => false, 'private-key' => key, user: user, port_: port) }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'private-key'    => key,
+        'user'           => user,
+        'port'           => port
+      }
+    end
 
     it "executes a command on a host", ssh: true do
       expect(ssh.run_command(target, command).value['stdout']).to eq("/home/#{user}\n")
     end
 
     it "can upload a file to a host", ssh: true do
-      target = make_target
-
       contents = "kljhdfg"
       remote_path = '/tmp/upload-test'
       with_tempfile_containing('upload-test', contents) do |file|
@@ -254,11 +275,14 @@ describe Bolt::Transport::SSH do
   end
 
   context "when executing with private key data" do
-    let(:config) do
-      key_data = File.open(key, 'r', &:read)
-      mk_config('host-key-check' => false,
-                'private-key' => { 'key-data' => key_data },
-                user: user, port_: port)
+    let(:key_data) { File.open(key, 'r', &:read) }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'private-key'    => { 'key-data' => key_data },
+        'user'           => user,
+        'port'           => port
+      }
     end
 
     it "executes a command on a host", ssh: true do
@@ -267,7 +291,7 @@ describe Bolt::Transport::SSH do
   end
 
   context "when executing" do
-    let(:target) { make_target(conf: no_host_key_check) }
+    let(:transport_config) { no_host_key_check }
 
     it "can test whether the target is available", ssh: true do
       expect(ssh.connected?(target)).to eq(true)
@@ -281,11 +305,14 @@ describe Bolt::Transport::SSH do
   # Local transport doesn't have concept of 'user'
   # so this test only applies to ssh
   context "with sudo as non-root", sudo: true do
-    let(:config) {
-      mk_config('host-key-check' => false, 'sudo-password' => bash_password, 'run-as' => user,
-                user: bash_user, password: bash_password)
-    }
-    let(:target) { make_target }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'run-as'         => user,
+        'user'           => bash_user,
+        'password'       => bash_password
+      }
+    end
 
     it 'runs as that user' do
       expect(ssh.run_command(target, 'whoami')['stdout'].chomp).to eq(user)
@@ -347,11 +374,15 @@ describe Bolt::Transport::SSH do
   end
 
   context "with non-sudo executable", sudo: true do
-    let(:config) {
-      mk_config('host-key-check' => false, 'sudo-executable' => 'fake',
-                'run-as' => user, user: bash_user, password: bash_password)
-    }
-    let(:target) { make_target }
+    let(:transport_config) do
+      {
+        'host-key-check'  => false,
+        'sudo-executable' => 'fake',
+        'run-as'          => user,
+        'user'            => bash_user,
+        'password'        => bash_password
+      }
+    end
 
     it 'uses the correct executable' do
       allow_any_instance_of(Net::SSH::Connection::Channel).to receive(:wait).and_return('')
@@ -364,10 +395,15 @@ describe Bolt::Transport::SSH do
   end
 
   context "with sudo with task interpreter set", sudo: true, ssh: true do
-    let(:config) {
-      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                user: user, password: password, interpreters: { sh: '/bin/sh' })
-    }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'run-as'         => 'root',
+        'user'           => user,
+        'password'       => password,
+        'interpreters'   => { 'sh' => '/bin/sh' }
+      }
+    end
 
     it "runs a task that expects big data on stdin" do
       expect(ssh).not_to receive(:make_wrapper_stringio)
@@ -387,11 +423,14 @@ describe Bolt::Transport::SSH do
   end
 
   context "with no sudo-password", sudo: true, ssh: true do
-    let(:config) {
-      mk_config('host-key-check' => false, 'password' => password, 'run-as' => 'root',
-                user: user, password: password)
-    }
-    let(:target) { make_target }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'password'       => password,
+        'run-as'         => 'root',
+        'user'           => user
+      }
+    end
 
     it "uses password as sudo-password" do
       expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
@@ -401,9 +440,13 @@ describe Bolt::Transport::SSH do
   context "with a bad private-key option" do
     include BoltSpec::Logger
 
-    let(:config) do
-      mk_config('host-key-check' => false, 'private-key' => '/bad/path/to/key',
-                user: user, password: password)
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'private-key'    => '/bad/path/to/key',
+        'user'           => user,
+        'password'       => password
+      }
     end
 
     it "warns but succeeds when the private-key is missing", ssh: true do
@@ -414,10 +457,15 @@ describe Bolt::Transport::SSH do
   end
 
   context "requesting a pty", sudo: true, ssh: true do
-    let(:config) {
-      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                tty: true, user: user, password: password)
-    }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'run-as'         => 'root',
+        'tty'            => true,
+        'user'           => user,
+        'password'       => password
+      }
+    end
 
     it "can execute a command when a tty is requested" do
       expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
@@ -441,10 +489,16 @@ describe Bolt::Transport::SSH do
   end
 
   context "when requesting a pty with task interpreter set", sudo: true, ssh: true do
-    let(:config) {
-      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                tty: true, user: user, password: password, interpreters: { sh: '/bin/sh' })
-    }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'run-as'         => 'root',
+        'tty'            => true,
+        'user'           => user,
+        'password'       => password,
+        'interpreters'   => { 'sh' => '/bin/sh' }
+      }
+    end
 
     it "runs a task that expects big data on stdin" do
       expect(ssh).to receive(:make_wrapper_stringio).and_call_original
@@ -473,12 +527,16 @@ describe Bolt::Transport::SSH do
 
   context "with specific tempdir using script-dir option" do
     let(:script_dir) { "123456" }
-    let(:config) do
-      mk_config("host-key-check" => false, "sudo-password" => password,
-                "run-as" => "root", user: user, password: password,
-                "script-dir" => script_dir, "interpreters" => { sh: "/bin/sh" })
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'run-as'         => 'root',
+        'user'           => user,
+        'password'       => password,
+        'script-dir'     => script_dir,
+        'interpreters'   => { 'sh' => '/bin/sh' }
+      }
     end
-    let(:target) { make_target }
 
     it "uploads scripts to the specified directory", ssh: true do
       cmd = 'cd $( dirname $0) && pwd'

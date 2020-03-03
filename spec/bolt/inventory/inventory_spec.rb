@@ -15,12 +15,14 @@ describe Bolt::Inventory::Inventory do
     targets[0]
   end
 
-  let(:pal) { nil } # Not used
-  let(:plugins) { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
-  let(:target_name) { "example.com" }
+  let(:pal)          { nil }
+  let(:plugins)      { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
+  let(:target_name)  { "example.com" }
   let(:target_entry) { target_name }
-  let(:targets) { [target_entry] }
-  let(:groups) { [] }
+  let(:targets)      { [target_entry] }
+  let(:groups)       { [] }
+  let(:transports)   { config.transports }
+  let(:transport)    { config.transport }
 
   let(:data) do
     {
@@ -30,7 +32,7 @@ describe Bolt::Inventory::Inventory do
     }
   end
 
-  let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
+  let(:inventory) { Bolt::Inventory.create_version(data, transport, transports, plugins) }
 
   it 'creates simple inventory' do
     expect(inventory.class).to eq(Bolt::Inventory::Inventory)
@@ -114,7 +116,7 @@ describe Bolt::Inventory::Inventory do
           'ssh' => {
             'user' => 'you',
             'host-key-check' => false,
-            'port' => '2222'
+            'port' => 2222
           }
         },
         'groups' => [
@@ -169,17 +171,17 @@ describe Bolt::Inventory::Inventory do
 
     describe :validate do
       it 'accepts empty inventory' do
-        expect(Bolt::Inventory::Inventory.new({}, plugins: plugins).validate).to be_nil
+        expect(Bolt::Inventory::Inventory.new({}, transport, transports, plugins).validate).to be_nil
       end
 
       it 'accepts non-empty inventory' do
-        expect(Bolt::Inventory::Inventory.new(data, plugins: plugins).validate).to be_nil
+        expect(Bolt::Inventory::Inventory.new(data, transport, transports, plugins).validate).to be_nil
       end
 
       it 'fails with unnamed groups' do
         data = { 'groups' => [{}] }
         expect {
-          Bolt::Inventory::Inventory.new(data, plugins: plugins).validate
+          Bolt::Inventory::Inventory.new(data, transport, transports, plugins).validate
         }.to raise_error(Bolt::Inventory::ValidationError, /Group does not have a name/)
       end
 
@@ -187,32 +189,32 @@ describe Bolt::Inventory::Inventory do
         data = { 'targets' => [{ 'name' => '' }] }
 
         expect {
-          Bolt::Inventory::Inventory.new(data, plugins: plugins)
+          Bolt::Inventory::Inventory.new(data, transport, transports, plugins)
         }.to raise_error(Bolt::Inventory::ValidationError, /No name or uri for target/)
       end
 
       it 'fails with duplicate groups' do
         data = { 'groups' => [{ 'name' => 'group1' }, { 'name' => 'group1' }] }
         expect {
-          Bolt::Inventory::Inventory.new(data, plugins: plugins).validate
+          Bolt::Inventory::Inventory.new(data, transport, transports, plugins).validate
         }.to raise_error(Bolt::Inventory::ValidationError, /Tried to redefine group group1/)
       end
     end
 
     describe :collect_groups do
       it 'finds the all group with an empty inventory' do
-        inventory = Bolt::Inventory::Inventory.new({}, plugins: plugins)
+        inventory = Bolt::Inventory::Inventory.new({}, transport, transports, plugins)
         expect(inventory.get_targets('all')).to eq([])
       end
 
       it 'finds the all group with a non-empty inventory' do
-        inventory = Bolt::Inventory::Inventory.new(data, plugins: plugins)
+        inventory = Bolt::Inventory::Inventory.new(data, transport, transports, plugins)
         targets = inventory.get_targets('all')
         expect(targets.size).to eq(9)
       end
 
       it 'finds targets in a subgroup' do
-        inventory = Bolt::Inventory::Inventory.new(data, plugins: plugins)
+        inventory = Bolt::Inventory::Inventory.new(data, transport, transports, plugins)
         targets = inventory.get_targets('group2')
         target_names = targets.map(&:name)
         expect(target_names).to eq(%w[target6 target7 ssh://target8 target9])
@@ -220,7 +222,7 @@ describe Bolt::Inventory::Inventory do
     end
 
     context 'with an empty config' do
-      let(:inventory) { Bolt::Inventory::Inventory.new({}, config, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new({}, transport, transports, plugins) }
       let(:target) { inventory.get_targets('notarget')[0] }
 
       it 'should accept an empty file' do
@@ -237,15 +239,18 @@ describe Bolt::Inventory::Inventory do
     end
 
     context 'with config' do
-      let(:inventory) {
-        Bolt::Inventory::Inventory.new({}, config('transport' => 'winrm',
-                                                  'winrm' => {
-                                                    'ssl' => false,
-                                                    'ssl-verify' => false
-                                                  }),
-                                       plugins: plugins)
-      }
-      let(:target) { inventory.get_targets('notarget')[0] }
+      let(:data) do
+        {
+          'transport' => 'winrm',
+          'winrm' => {
+            'ssl'        => false,
+            'ssl-verify' => false
+          }
+        }
+      end
+      let(:config)    { Bolt::Config.new(Bolt::Boltdir.new('.'), data) }
+      let(:inventory) { Bolt::Inventory::Inventory.new({}, config.transport, config.transports, plugins) }
+      let(:target)    { inventory.get_targets('notarget')[0] }
 
       it 'should have the correct transport' do
         expect(target.transport).to eq('winrm')
@@ -262,7 +267,7 @@ describe Bolt::Inventory::Inventory do
 
     describe 'get_targets' do
       context 'empty inventory' do
-        let(:inventory) { Bolt::Inventory::Inventory.new({}, config, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new({}, transport, transports, plugins) }
 
         it 'should parse a single target URI' do
           name = 'notarget'
@@ -306,7 +311,7 @@ describe Bolt::Inventory::Inventory do
       end
 
       context 'non-empty inventory' do
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         it 'should parse an array of target URI and group name' do
           targets = inventory.get_targets(%w[a group1]).map(&:name)
@@ -333,22 +338,22 @@ describe Bolt::Inventory::Inventory do
       end
 
       context 'with data in the group' do
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         it 'should use value from lowest target definition' do
           expect(get_target(inventory, 'target4').user).to eq('me')
         end
 
         it 'should use values from the lowest group' do
-          expect(get_target(inventory, 'target4').options).to include('host-key-check' => true)
+          expect(get_target(inventory, 'target4').options.to_h).to include('host-key-check' => true)
         end
 
         it 'should include values from parents' do
-          expect(get_target(inventory, 'target4').port).to eq('2222')
+          expect(get_target(inventory, 'target4').port).to eq(2222)
         end
 
         it 'should use values from the first group' do
-          expect(get_target(inventory, 'target6').options).to include('host-key-check' => true)
+          expect(get_target(inventory, 'target6').options.to_h).to include('host-key-check' => true)
         end
 
         it 'should prefer values from a target over an earlier group' do
@@ -376,31 +381,31 @@ describe Bolt::Inventory::Inventory do
                 'config' => {
                   'ssh' => {
                     'data' => true,
-                    'port' => '2224'
+                    'port' => 2224
                   }
                 } }
             ]
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         it 'should initialize' do
           expect(inventory).to be
         end
 
         it 'should return {} for a string target' do
-          expect(get_target(inventory, 'target1').options).to include(ssh_target_option_defaults)
+          expect(get_target(inventory, 'target1').options.to_h).to include(ssh_target_option_defaults)
         end
 
         it 'should return {} for a hash target with no config' do
-          expect(get_target(inventory, 'target2').options).to include(ssh_target_option_defaults)
+          expect(get_target(inventory, 'target2').options.to_h).to include(ssh_target_option_defaults)
         end
 
         it 'should return config for the target' do
           target = get_target(inventory, 'target3')
-          expect(target.options).to eq(ssh_target_option_defaults.merge('port' => '2224',
-                                                                        'load-config' => true))
-          expect(target.port).to eq('2224')
+          expect(target.options.to_h).to eq(ssh_target_option_defaults.merge('port' => 2224,
+                                                                             'load-config' => true))
+          expect(target.port).to eq(2224)
         end
 
         it 'should return the raw target for an unknown target' do
@@ -430,29 +435,29 @@ describe Bolt::Inventory::Inventory do
             }
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         it 'should return group config for string targets' do
           target = get_target(inventory, 'target1')
-          expect(target.options).to include('host-key-check' => false)
+          expect(target.options.to_h).to include('host-key-check' => false)
           expect(target.user).to eq('you')
         end
 
         it 'should return group config for array targets' do
           target = get_target(inventory, 'target2')
-          expect(target.options).to include('host-key-check' => false)
+          expect(target.options.to_h).to include('host-key-check' => false)
           expect(target.user).to eq('you')
         end
 
         it 'should merge config for from targets' do
           target = get_target(inventory, 'target3')
-          expect(target.options).to include('host-key-check' => false)
+          expect(target.options.to_h).to include('host-key-check' => false)
           expect(target.user).to eq('me')
         end
       end
 
       context 'with config errors in data' do
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         context 'host-key-check' do
           let(:data) {
@@ -471,7 +476,7 @@ describe Bolt::Inventory::Inventory do
           let(:data) {
             {
               'targets' => ['target'],
-              'config' => { 'winrm' => { 'connect-timeout' => '10' } }
+              'config' => { 'transport' => 'winrm', 'winrm' => { 'connect-timeout' => '10' } }
             }
           }
 
@@ -497,7 +502,7 @@ describe Bolt::Inventory::Inventory do
           let(:data) {
             {
               'targets' => ['target'],
-              'config' => { 'winrm' => { 'ssl' => 'true' } }
+              'config' => { 'transport' => 'winrm', 'winrm' => { 'ssl' => 'true' } }
             }
           }
 
@@ -510,7 +515,7 @@ describe Bolt::Inventory::Inventory do
           let(:data) {
             {
               'targets' => ['target'],
-              'config' => { 'winrm' => { 'ssl-verify' => 'true' } }
+              'config' => { 'transport' => 'winrm', 'winrm' => { 'ssl-verify' => 'true' } }
             }
           }
 
@@ -558,17 +563,17 @@ describe Bolt::Inventory::Inventory do
             }
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         it 'should return group config for an alias' do
           target = get_target(inventory, 'target2', 'alias1')
-          expect(target.options).to include('host-key-check' => false)
+          expect(target.options.to_h).to include('host-key-check' => false)
           expect(target.user).to eq('you')
         end
 
         it 'should merge config from targets' do
           target = get_target(inventory, 'target3', 'alias3')
-          expect(target.options).to include('host-key-check' => false)
+          expect(target.options.to_h).to include('host-key-check' => false)
           expect(target.user).to eq('me')
         end
 
@@ -590,7 +595,7 @@ describe Bolt::Inventory::Inventory do
           {
             'user' => 'me' + transport,
             'password' => 'you' + transport,
-            'port' => '12345' + transport,
+            'port' => 12345,
             'private-key' => 'anything',
             'ssl' => false,
             'ssl-verify' => false,
@@ -600,7 +605,7 @@ describe Bolt::Inventory::Inventory do
             'run-as' => 'root',
             'tty' => true,
             'sudo-password' => 'nothing',
-            'extensions' => '.py',
+            'extensions' => ['.py'],
             'service-url' => 'https://master',
             'cacert' => transport + '.pem',
             'token-file' => 'token',
@@ -621,14 +626,18 @@ describe Bolt::Inventory::Inventory do
           }
         }
         let(:conf) { Bolt::Config.default }
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, conf, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
+
+        before(:each) do
+          allow(Bolt::Util).to receive(:validate_file).and_return(true)
+        end
 
         it 'should not modify existing config' do
           get_target(inventory, 'ssh://target')
           expect(conf.transport).to eq('ssh')
-          expect(conf.transports[:ssh]['host-key-check']).to be nil
-          expect(conf.transports[:winrm]['ssl']).to be true
-          expect(conf.transports[:winrm]['ssl-verify']).to be true
+          expect(conf.transports['ssh']['host-key-check']).to be nil
+          expect(conf.transports['winrm']['ssl']).to be true
+          expect(conf.transports['winrm']['ssl-verify']).to be true
         end
 
         it 'uses the configured transport' do
@@ -641,8 +650,8 @@ describe Bolt::Inventory::Inventory do
           expect(target.transport).to eq('ssh')
           expect(target.user).to eq('messh')
           expect(target.password).to eq('youssh')
-          expect(target.port).to eq('12345ssh')
-          expect(target.options).to include(
+          expect(target.port).to eq(12345)
+          expect(target.options.to_h).to include(
             'connect-timeout' => 3,
             'disconnect-timeout' => 5,
             'tty' => true,
@@ -651,7 +660,7 @@ describe Bolt::Inventory::Inventory do
             'run-as' => "root",
             'sudo-password' => "nothing",
             'password' => 'youssh',
-            'port' => '12345ssh',
+            'port' => 12345,
             "load-config" => true,
             'user' => 'messh',
             'private-key' => /anything\z/
@@ -663,15 +672,15 @@ describe Bolt::Inventory::Inventory do
           expect(target.transport).to eq('winrm')
           expect(target.user).to eq('mewinrm')
           expect(target.password).to eq('youwinrm')
-          expect(target.port).to eq('12345winrm')
-          expect(target.options).to include(
+          expect(target.port).to eq(12345)
+          expect(target.options.to_h).to include(
             'connect-timeout' => 5,
             'ssl' => false,
             'ssl-verify' => false,
             'tmpdir' => "/winrm",
-            'extensions' => ".py",
+            'extensions' => [".py"],
             'password' => 'youwinrm',
-            'port' => '12345winrm',
+            'port' => 12345,
             'user' => 'mewinrm',
             'file-protocol' => 'winrm',
             'cacert' => /winrm.pem\z/
@@ -684,7 +693,7 @@ describe Bolt::Inventory::Inventory do
           expect(target.user).to be nil
           expect(target.password).to be nil
           expect(target.port).to be nil
-          expect(target.options).to include(
+          expect(target.options.to_h).to include(
             'task-environment' => "prod",
             'service-url' => "https://master",
             'cacert' => /pcp.pem\z/,
@@ -696,7 +705,7 @@ describe Bolt::Inventory::Inventory do
 
     describe 'get_target' do
       context 'empty inventory' do
-        let(:inventory) { Bolt::Inventory::Inventory.new({}, config, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new({}, transport, transports, plugins) }
 
         it 'should parse a single target URI' do
           name = 'notarget'
@@ -719,7 +728,7 @@ describe Bolt::Inventory::Inventory do
       end
 
       context 'non-empty inventory' do
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         it 'a target that does not exists in inventory is created and added to the all group' do
           existing_target_names = inventory.get_targets('all').map(&:name)
@@ -744,22 +753,22 @@ describe Bolt::Inventory::Inventory do
       end
 
       context 'with data in the group' do
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         it 'should use value from lowest target definition' do
           expect(inventory.get_target('target4').user).to eq('me')
         end
 
         it 'should use values from the left most group' do
-          expect(inventory.get_target('target4').options).to include('host-key-check' => true)
+          expect(inventory.get_target('target4').options.to_h).to include('host-key-check' => true)
         end
 
         it 'should include values from parents' do
-          expect(inventory.get_target('target4').port).to eq('2222')
+          expect(inventory.get_target('target4').port).to eq(2222)
         end
 
         it 'should use values from the first group' do
-          expect(inventory.get_target('target6').options).to include('host-key-check' => true)
+          expect(inventory.get_target('target6').options.to_h).to include('host-key-check' => true)
         end
 
         it 'should prefer values from a target over an earlier group' do
@@ -782,32 +791,32 @@ describe Bolt::Inventory::Inventory do
                 'config' => {
                   'ssh' => {
                     'data' => true,
-                    'port' => '2224'
+                    'port' => 2224
                   }
                 } }
             ]
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         it 'should return {} for a string target' do
           target = inventory.get_target('target1')
-          expect(target.options).to include(ssh_target_option_defaults)
+          expect(target.options.to_h).to include(ssh_target_option_defaults)
           expect(target.config).to eq({})
         end
 
         it 'should return {} for a hash target with no config' do
           target = inventory.get_target('target2')
-          expect(target.options).to include(ssh_target_option_defaults)
+          expect(target.options.to_h).to include(ssh_target_option_defaults)
           expect(target.config).to eq({})
         end
 
         it 'should return config for the target' do
           target = inventory.get_target('target3')
-          expect(target.options).to eq(ssh_target_option_defaults.merge('port' => '2224',
-                                                                        "load-config" => true))
-          expect(target.port).to eq('2224')
-          expect(target.config).to eq("ssh" => { "data" => true, "port" => "2224" })
+          expect(target.options.to_h).to eq(ssh_target_option_defaults.merge('port' => 2224,
+                                                                             "load-config" => true))
+          expect(target.port).to eq(2224)
+          expect(target.config).to eq("ssh" => { "data" => true, "port" => 2224 })
         end
       end
 
@@ -832,25 +841,25 @@ describe Bolt::Inventory::Inventory do
             }
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         it 'should return group config for string targets' do
           target = inventory.get_target('target1')
-          expect(target.options).to include('host-key-check' => false)
+          expect(target.options.to_h).to include('host-key-check' => false)
           expect(target.user).to eq('you')
           expect(target.config).to eq("ssh" => { "user" => "you", "host-key-check" => false })
         end
 
         it 'should return group config for hash targets' do
           target = inventory.get_target('target2')
-          expect(target.options).to include('host-key-check' => false)
+          expect(target.options.to_h).to include('host-key-check' => false)
           expect(target.user).to eq('you')
           expect(target.config).to eq("ssh" => { "user" => "you", "host-key-check" => false })
         end
 
         it 'should merge config for from targets' do
           target = inventory.get_target('target3')
-          expect(target.options).to include('host-key-check' => false)
+          expect(target.options.to_h).to include('host-key-check' => false)
           expect(target.user).to eq('me')
           expect(target.config).to eq("ssh" => { "user" => "me", "host-key-check" => false })
         end
@@ -881,18 +890,18 @@ describe Bolt::Inventory::Inventory do
             }
           }
         }
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
         it 'should return group config for an alias' do
           target = inventory.get_target('alias1')
-          expect(target.options).to include('host-key-check' => false)
+          expect(target.options.to_h).to include('host-key-check' => false)
           expect(target.user).to eq('you')
           expect(target.config).to eq("ssh" => { "user" => "you", "host-key-check" => false })
         end
 
         it 'should merge config from targets' do
           target = inventory.get_target('alias3')
-          expect(target.options).to include('host-key-check' => false)
+          expect(target.options.to_h).to include('host-key-check' => false)
           expect(target.config).to eq("ssh" => { "user" => "me", "host-key-check" => false })
         end
 
@@ -909,7 +918,7 @@ describe Bolt::Inventory::Inventory do
           {
             'user' => 'me' + transport,
             'password' => 'you' + transport,
-            'port' => '12345' + transport,
+            'port' => 12345,
             'private-key' => 'anything',
             'ssl' => false,
             'ssl-verify' => false,
@@ -919,7 +928,7 @@ describe Bolt::Inventory::Inventory do
             'run-as' => 'root',
             'tty' => true,
             'sudo-password' => 'nothing',
-            'extensions' => '.py',
+            'extensions' => ['.py'],
             'service-url' => 'https://master',
             'cacert' => transport + '.pem',
             'token-file' => 'token',
@@ -940,14 +949,18 @@ describe Bolt::Inventory::Inventory do
           }
         }
         let(:conf) { Bolt::Config.default }
-        let(:inventory) { Bolt::Inventory::Inventory.new(data, conf, plugins: plugins) }
+        let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
+
+        before(:each) do
+          allow(Bolt::Util).to receive(:validate_file).and_return(true)
+        end
 
         it 'should not modify existing config' do
           inventory.get_target('ssh://target')
           expect(conf.transport).to eq('ssh')
-          expect(conf.transports[:ssh]['load-config']).to be true
-          expect(conf.transports[:winrm]['ssl']).to be true
-          expect(conf.transports[:winrm]['ssl-verify']).to be true
+          expect(conf.transports['ssh']['load-config']).to be true
+          expect(conf.transports['winrm']['ssl']).to be true
+          expect(conf.transports['winrm']['ssl-verify']).to be true
         end
 
         it 'uses the configured transport' do
@@ -961,8 +974,8 @@ describe Bolt::Inventory::Inventory do
           expect(target.transport).to eq('ssh')
           expect(target.user).to eq('messh')
           expect(target.password).to eq('youssh')
-          expect(target.port).to eq('12345ssh')
-          expect(target.options).to include(
+          expect(target.port).to eq(12345)
+          expect(target.options.to_h).to include(
             'connect-timeout' => 3,
             'disconnect-timeout' => 5,
             'tty' => true,
@@ -972,7 +985,7 @@ describe Bolt::Inventory::Inventory do
             'run-as' => "root",
             'sudo-password' => "nothing",
             'password' => 'youssh',
-            'port' => '12345ssh',
+            'port' => 12345,
             "load-config" => true,
             'user' => 'messh'
           )
@@ -983,16 +996,16 @@ describe Bolt::Inventory::Inventory do
           expect(target.transport).to eq('winrm')
           expect(target.user).to eq('mewinrm')
           expect(target.password).to eq('youwinrm')
-          expect(target.port).to eq('12345winrm')
-          expect(target.options).to include(
+          expect(target.port).to eq(12345)
+          expect(target.options.to_h).to include(
             'connect-timeout' => 5,
             'ssl' => false,
             'ssl-verify' => false,
             'tmpdir' => "/winrm",
             'cacert' => /winrm.pem\z/,
-            'extensions' => ".py",
+            'extensions' => [".py"],
             'password' => 'youwinrm',
-            'port' => '12345winrm',
+            'port' => 12345,
             'user' => 'mewinrm',
             'file-protocol' => 'winrm'
           )
@@ -1004,7 +1017,7 @@ describe Bolt::Inventory::Inventory do
           expect(target.user).to be nil
           expect(target.password).to be nil
           expect(target.port).to be nil
-          expect(target.options).to include(
+          expect(target.options.to_h).to include(
             'task-environment' => "prod",
             'service-url' => "https://master",
             'cacert' => /pcp.pem\z/,
@@ -1021,7 +1034,7 @@ describe Bolt::Inventory::Inventory do
         { 'targets' => ['localhost'] }
       }
 
-      let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
       it 'adds magic config options' do
         target = get_target(inventory, 'localhost')
@@ -1042,7 +1055,7 @@ describe Bolt::Inventory::Inventory do
             }
           } }
       }
-      let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
       it 'does not override config options' do
         target = get_target(inventory, 'localhost')
@@ -1064,7 +1077,7 @@ describe Bolt::Inventory::Inventory do
           }
         }] }
       }
-      let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
       it 'does not set magic config' do
         target = get_target(inventory, 'localhost')
         expect(target.transport).to eq('ssh')
@@ -1092,7 +1105,7 @@ describe Bolt::Inventory::Inventory do
           'config' => { 'ssh' => { 'disconnect-timeout' => 11 } }
         }] }
       }
-      let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
       let(:expected_options) {
         { "connect-timeout" => 10,
           "tty" => false,
@@ -1124,7 +1137,7 @@ describe Bolt::Inventory::Inventory do
 
       it 'overrides a default value not specified in inventory' do
         target = inventory.get_target('target')
-        expect(target.options).to eq(expected_options)
+        expect(target.options.to_h).to eq(expected_options)
         expect(target.config).to eq(expected_config)
         inventory.set_config(target, %w[ssh tty], true)
         expected_config['ssh']['tty'] = true
@@ -1133,18 +1146,18 @@ describe Bolt::Inventory::Inventory do
 
       it 'sets a nested config value without disrupting other values' do
         target = inventory.get_target('target')
-        expect(target.options).to eq(expected_options)
+        expect(target.options.to_h).to eq(expected_options)
         expect(target.config).to eq(expected_config)
         inventory.set_config(target, ['ssh', 'interpreters', '.py'], '/foo/python')
         expected_options["interpreters"].merge!(".py" => "/foo/python")
         expected_config['ssh']['interpreters'].merge!(".py" => "/foo/python")
-        expect(target.options).to eq(expected_options)
+        expect(target.options.to_h).to eq(expected_options)
         expect(target.config).to eq(expected_config)
       end
 
       it 'overrides entire config when an key_or_key_path is an empty string' do
         target = inventory.get_target('target')
-        expect(target.options).to eq(expected_options)
+        expect(target.options.to_h).to eq(expected_options)
         expect(target.config).to eq(expected_config)
         inventory.set_config(target, '', 'transport' => 'winrm', 'winrm' => { 'password' => 'winrmpass' })
         expect(target.transport).to eq('winrm')
@@ -1154,7 +1167,7 @@ describe Bolt::Inventory::Inventory do
                        "ssl-verify" => true,
                        "file-protocol" => "winrm",
                        "connect-timeout" => 10 }
-        expect(target.options).to include(winrm_conf)
+        expect(target.options.to_h).to include(winrm_conf)
         expected_config['transport'] = 'winrm'
         expected_config['winrm'] = { 'winrm' => { 'password' => 'winrmpass' } }
       end
@@ -1187,15 +1200,15 @@ describe Bolt::Inventory::Inventory do
         }] }
       }
 
-      let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+      let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
       it 'adds target to a group and inherets config' do
         target = inventory.get_target('new-target')
         expect(target.transport).to eq('ssh')
-        expect(target.options).to include('disconnect-timeout' => 5)
+        expect(target.options.to_h).to include('disconnect-timeout' => 5)
         expect(target.config).to eq({})
         inventory.add_to_group([target], 'test')
-        expect(target.options).to include('disconnect-timeout' => 11)
+        expect(target.options.to_h).to include('disconnect-timeout' => 11)
         expect(target.config).to eq('ssh' => { 'disconnect-timeout' => 11 })
         expect(inventory.get_targets('test').map(&:name)).to eq(%w[target new-target])
       end
@@ -1214,7 +1227,7 @@ describe Bolt::Inventory::Inventory do
       }
     }
 
-    let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+    let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
 
     it 'removes target from a group and disinherits config' do
       target = get_target(inventory, 'target')
@@ -1297,7 +1310,7 @@ describe Bolt::Inventory::Inventory do
         }] }
     }
 
-    let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
+    let(:inventory) { Bolt::Inventory.create_version(data, transport, transports, plugins) }
     let(:target) { get_target(inventory, 'foo') }
     let(:expected_data) {
       { 'name' => 'foo',

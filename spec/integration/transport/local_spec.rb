@@ -13,14 +13,23 @@ require 'shared_examples/transport'
 describe Bolt::Transport::Local do
   include BoltSpec::Transport
 
-  let(:host_and_port) { "localhost" }
-  let(:safe_name) { host_and_port }
-  let(:user) { 'runner' }
-  let(:password) { 'runner' }
-  let(:transport) { :local }
-  let(:os_context) { Bolt::Util.windows? ? windows_context : posix_context }
-  let(:inventory) { Bolt::Inventory.empty }
-  let(:target) { inventory.get_target('localhost') }
+  let(:transport)     { :local }
+  let(:host_and_port) { 'localhost' }
+  let(:safe_name)     { host_and_port }
+  let(:user)          { 'runner' }
+  let(:password)      { 'runner' }
+  let(:os_context)    { Bolt::Util.windows? ? windows_context : posix_context }
+  let(:config)        { make_config }
+  let(:boltdir)       { Bolt::Boltdir.new('.') }
+  let(:plugins)       { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new) }
+  let(:inventory)     { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
+  let(:target)        { make_target }
+
+  let(:transport_config) { {} }
+
+  def make_target
+    inventory.get_target(host_and_port)
+  end
 
   it 'is always connected' do
     expect(runner.connected?(target)).to eq(true)
@@ -40,10 +49,12 @@ describe Bolt::Transport::Local do
     include_examples 'with sudo'
 
     context "overriding with '_run_as'" do
-      let(:config) {
-        mk_config('sudo-password' => password, 'run-as' => 'root')
-      }
-      let(:target) { make_target }
+      let(:transport_config) do
+        {
+          'sudo-password' => password,
+          'run-as'        => 'root'
+        }
+      end
 
       it "can override run_as for command via an option" do
         expect(runner.run_command(target, 'whoami', run_as: user)['stdout']).to eq("#{user}\n")
@@ -78,10 +89,11 @@ describe Bolt::Transport::Local do
     end
 
     context "as user with no password" do
-      let(:config) {
-        mk_config('run-as' => 'root')
-      }
-      let(:target) { make_target }
+      let(:transport_config) do
+        {
+          'run-as' => 'root'
+        }
+      end
 
       it "returns a failed result when a temporary directory is created" do
         contents = "#!/bin/sh\nwhoami"
@@ -118,9 +130,12 @@ describe Bolt::Transport::Local do
     end
 
     context 'with run-as', sudo: true do
-      let(:config_data) { { 'sudo-password' => password, 'run-as' => 'root' } }
-      let(:config) { mk_config(config_data) }
-      let(:target) { make_target }
+      let(:transport_config) do
+        {
+          'sudo-password' => password,
+          'run-as'        => 'root'
+        }
+      end
 
       it "runs with large input and output" do
         with_task_containing('big_kahuna', ruby_task, 'stdin', '.rb') do |task|
@@ -156,30 +171,6 @@ describe Bolt::Transport::Local do
           # Ensure the strings are the same
           expect(result['input'][-1024..-1]).to eq(str)
         end
-      end
-    end
-  end
-
-  context 'on windows hosts', windows: true do
-    context 'with run-as configured' do
-      let(:config) { mk_config('run-as' => 'root') }
-      let(:target) { make_target }
-
-      it "warns when trying to use run-as" do
-        runner.run_command(target, os_context[:stdout_command][0])
-        logs = @log_output.readlines
-        expect(logs).to include(/WARN  Bolt::Transport::LocalWindows : run-as is not supported/)
-      end
-    end
-
-    context 'with empty config' do
-      let(:config) { mk_config({}) }
-      let(:target) { make_target }
-
-      it "warns when trying to use _run_as" do
-        runner.run_command(target, os_context[:stdout_command][0], run_as: user)
-        logs = @log_output.readlines
-        expect(logs).to include(/WARN  Bolt::Transport::LocalWindows : run-as is not supported/)
       end
     end
   end

@@ -55,22 +55,18 @@ def windows_context
   }
 end
 
-def mk_config(conf)
+def make_config(conf: transport_config)
   conf = Bolt::Util.walk_keys(conf, &:to_s)
-  conf_object = Bolt::Config.new(Bolt::Boltdir.new('.'), transport.to_s => conf)
-  conf_object.transport = transport.to_s
-  conf_object
+  Bolt::Config.new(boltdir, transport.to_s => conf)
 end
 
 def make_target
-  target = inventory.get_target(host_and_port)
-  update_target(target, config.transports[config.transport.to_sym])
-  target
+  inventory.get_target(host_and_port)
 end
 
-def update_target(targ, conf)
-  transport_config = targ.options.merge(conf)
-  targ.inventory_target.set_config(targ.transport, transport_config)
+def set_config(target, config)
+  merged = target.options.merge(config).to_h
+  target.inventory_target.set_config(transport.to_s, merged)
 end
 
 # Shared examples for Transports.
@@ -471,7 +467,8 @@ shared_examples 'transport api' do
     let(:tmpdir) { File.join(os_context[:destination_dir], 'mytempdir') }
 
     it "errors when tmpdir doesn't exist" do
-      update_target(target, 'tmpdir' => tmpdir)
+      set_config(target, 'tmpdir' => tmpdir)
+
       with_tempfile_containing('script dir', 'dummy script') do |file|
         expect {
           runner.run_script(target, file.path, [])
@@ -499,10 +496,10 @@ shared_examples 'transport api' do
 
         runner.run_command(target, mkdir)
         # Once the tempdir is created the target can be configured to upload scripts to it
-        update_target(target, 'tmpdir' => tmpdir)
+        set_config(target, 'tmpdir' => tmpdir)
         example.run
         # Required because the Local transport changes to the tmpdir before running commands
-        update_target(target, 'tmpdir' => nil)
+        set_config(target, 'tmpdir' => nil)
         runner.run_command(target, rmdir)
       end
 
@@ -577,11 +574,15 @@ end
 # - safe_name: expected target safe_name
 shared_examples 'with sudo', sudo: true do
   context "with sudo" do
-    let(:config) {
-      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                user: user, password: password)
-    }
-    let(:target) { make_target }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'sudo-password'  => password,
+        'run-as'         => 'root',
+        'user'           => user,
+        'password'       => password
+      }
+    end
 
     it "can execute a command" do
       expect(runner.run_command(target, 'whoami')['stdout']).to eq("root\n")
@@ -636,11 +637,15 @@ SHELL
     end
 
     context "with an incorrect password" do
-      let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => 'nonsense', 'run-as' => 'root',
-                  user: user, password: password)
-      }
-      let(:target) { make_target }
+      let(:transport_config) do
+        {
+          'host-key-check' => false,
+          'sudo-password'  => 'nonsense',
+          'run-as'         => 'root',
+          'user'           => user,
+          'password'       => password
+        }
+      end
 
       it "returns a failed result" do
         expect {
@@ -652,12 +657,16 @@ SHELL
   end
 
   context "using a custom run-as-command" do
-    let(:config) {
-      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                user: user, password: password,
-                'run-as-command' => ["sudo", "-nkSEu"])
-    }
-    let(:target) { make_target }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'sudo-password'  => password,
+        'run-as'         => 'root',
+        'user'           => user,
+        'password'       => password,
+        'run-as-command' => ['sudo', '-nkSEu']
+      }
+    end
 
     it "can fail to execute with sudo -n" do
       expect(runner.run_command(target, 'whoami')['stderr']).to match("sudo: a password is required")

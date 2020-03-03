@@ -12,12 +12,13 @@ require 'bolt/task'
 
 describe 'apply_prep' do
   include PuppetlabsSpec::Fixtures
-  let(:applicator) { mock('Bolt::Applicator') }
-  let(:executor) { Bolt::Executor.new(1, Bolt::Analytics::NoopClient.new) }
-  let(:plugins) { Bolt::Plugin.setup(Bolt::Config.default, nil, nil, Bolt::Analytics::NoopClient.new) }
+  let(:applicator)    { mock('Bolt::Applicator') }
+  let(:config)        { Bolt::Config.default }
+  let(:executor)      { Bolt::Executor.new(1, Bolt::Analytics::NoopClient.new) }
+  let(:plugins)       { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new) }
   let(:plugin_result) { {} }
-  let(:task_hook) { proc { |_opts, target, _fun| proc { Bolt::Result.new(target, value: plugin_result) } } }
-  let(:inventory) { Bolt::Inventory.create_version({}, nil, plugins) }
+  let(:task_hook)     { proc { |_opts, target, _fun| proc { Bolt::Result.new(target, value: plugin_result) } } }
+  let(:inventory)     { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
@@ -30,14 +31,14 @@ describe 'apply_prep' do
   end
 
   context 'with targets' do
-    let(:hostnames) { %w[a.b.com winrm://x.y.com pcp://foo] }
-    let(:targets) { hostnames.map { |h| inventory.get_target(h) } }
-    let(:unknown_targets) { targets.reject { |target| target.protocol == 'pcp' } }
-    let(:fact) { { 'osfamily' => 'none' } }
+    let(:hostnames)         { %w[a.b.com winrm://x.y.com pcp://foo] }
+    let(:targets)           { hostnames.map { |h| inventory.get_target(h) } }
+    let(:unknown_targets)   { targets.reject { |target| target.protocol == 'pcp' } }
+    let(:fact)              { { 'osfamily' => 'none' } }
     let(:custom_facts_task) { Bolt::Task.new('custom_facts_task') }
-    let(:version_task) { Bolt::Task.new('puppet_agent::version') }
-    let(:install_task) { Bolt::Task.new('puppet_agent::install') }
-    let(:service_task) { Bolt::Task.new('service') }
+    let(:version_task)      { Bolt::Task.new('puppet_agent::version') }
+    let(:install_task)      { Bolt::Task.new('puppet_agent::install') }
+    let(:service_task)      { Bolt::Task.new('service') }
 
     before(:each) do
       applicator.stubs(:build_plugin_tarball).returns(:tarball)
@@ -122,8 +123,8 @@ describe 'apply_prep' do
           }]
         }
       }
-      let(:inventory) { Bolt::Inventory.create_version(data, nil, plugins) }
-      let(:target) { inventory.get_targets(hostname)[0] }
+      let(:inventory) { Bolt::Inventory.create_version(data, config.transport, config.transports, plugins) }
+      let(:target)    { inventory.get_targets(hostname)[0] }
 
       it 'installs the agent if not present' do
         facts = Bolt::ResultSet.new([Bolt::Result.new(target, value: fact)])
@@ -147,12 +148,12 @@ describe 'apply_prep' do
         }
       }
 
-      let(:config) { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
-      let(:pal) { nil }
-      let(:plugins) { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
-      let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
-      let(:target) { inventory.get_target(hostname) }
-      let(:targets) { inventory.get_targets(hostname) }
+      let(:config)    { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
+      let(:pal)       { nil }
+      let(:plugins)   { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
+      let(:inventory) { Bolt::Inventory.create_version(data, config.transport, config.transports, plugins) }
+      let(:target)    { inventory.get_target(hostname) }
+      let(:targets)   { inventory.get_targets(hostname) }
 
       it 'installs the agent if not present' do
         facts = Bolt::ResultSet.new([Bolt::Result.new(target, value: fact)])
@@ -170,9 +171,9 @@ describe 'apply_prep' do
   end
 
   context 'with only pcp targets' do
-    let(:hostnames) { %w[pcp://foo pcp://bar] }
-    let(:targets) { hostnames.map { |h| inventory.get_target(h) } }
-    let(:fact) { { 'osfamily' => 'none' } }
+    let(:hostnames)         { %w[pcp://foo pcp://bar] }
+    let(:targets)           { hostnames.map { |h| inventory.get_target(h) } }
+    let(:fact)              { { 'osfamily' => 'none' } }
     let(:custom_facts_task) { Bolt::Task.new('custom_facts_task') }
 
     before(:each) do
@@ -193,9 +194,9 @@ describe 'apply_prep' do
   end
 
   context 'with targets assigned the puppet-agent feature' do
-    let(:hostnames) { %w[foo bar] }
-    let(:targets) { hostnames.map { |h| inventory.get_target(h) } }
-    let(:fact) { { 'osfamily' => 'none' } }
+    let(:hostnames)         { %w[foo bar] }
+    let(:targets)           { hostnames.map { |h| inventory.get_target(h) } }
+    let(:fact)              { { 'osfamily' => 'none' } }
     let(:custom_facts_task) { Bolt::Task.new('custom_facts_task') }
 
     before(:each) do

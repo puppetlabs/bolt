@@ -43,38 +43,6 @@ describe Bolt::Config do
     end
   end
 
-  describe "deep_clone" do
-    let(:config) { Bolt::Config.default }
-    let(:conf) { config.deep_clone }
-
-    {
-      concurrency: -1,
-      transport: 'anything',
-      format: 'other'
-    }.each do |k, v|
-      it "updates #{k} in the copy to #{v}" do
-        conf.send("#{k}=", v)
-        expect(conf.send(k)).to eq(v)
-        expect(config.send(k)).not_to eq(v)
-      end
-    end
-
-    [
-      { ssh: 'host-key-check' },
-      { winrm: 'ssl' },
-      { winrm: 'ssl-verify' },
-      { pcp: 'foo' }
-    ].each do |hash|
-      hash.each do |transport, key|
-        it "updates #{transport} #{key} in the copy to false" do
-          conf.transports[transport][key] = false
-          expect(conf.transports[transport][key]).to eq(false)
-          expect(config.transports[transport][key]).not_to eq(false)
-        end
-      end
-    end
-  end
-
   describe "::from_boltdir" do
     it "loads from the boltdir config file if present" do
       expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(boltdir.config_file, 'config')
@@ -120,7 +88,7 @@ describe Bolt::Config do
       }
 
       expect { Bolt::Config.new(boltdir, config) }.to raise_error(
-        /level of log file:.* must be one of: debug, info, notice, warn, error, fatal, any; received foo/
+        /level of log file:.* must be one of debug, info, notice, warn, error, fatal, any; received foo/
       )
     end
 
@@ -132,172 +100,12 @@ describe Bolt::Config do
       }
 
       expect { Bolt::Config.new(boltdir, config) } .to raise_error(
-        /append flag of log file:.* must be a Boolean, received foo/
+        /append flag of log file:.* must be a Boolean, received Symbol :foo/
       )
-    end
-
-    it "accepts integers for connection-timeout" do
-      config = {
-        'transports' => {
-          'ssh' => { 'connect-timeout' => 42 },
-          'winrm' => { 'connect-timeout' => 999 },
-          'pcp' => {}
-        }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
-    end
-
-    it "does not accept values that are not integers" do
-      config = {
-        'ssh' => { 'connect-timeout' => '42s' }
-      }
-
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::ValidationError)
-    end
-
-    it "accepts a boolean for host-key-check" do
-      config = {
-        'ssh' => { 'host-key-check' => false }
-      }
-
-      expect {
-        Bolt::Config.new(boltdir, config)
-      }.not_to raise_error
-    end
-
-    it "does not accept host-key-check that is not a boolean" do
-      config = {
-        'ssh' => { 'host-key-check' => 'false' }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::ValidationError)
-    end
-
-    it "accepts a private-key hash" do
-      config = {
-        'ssh' => { 'private-key' => { 'key-data' => "foo" } }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
-    end
-
-    it "expands the private-key hash" do
-      data = {
-        'ssh' => { 'private-key' => 'my-private-key' }
-      }
-      config = Bolt::Config.new(boltdir, data)
-      expect(config.transports[:ssh]['private-key']).to eq(File.expand_path('my-private-key', boltdir.path))
-    end
-
-    it "does not accept a private-key hash without data" do
-      config = {
-        'ssh' => { 'private-key' => { 'not-data' => "foo" } }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::ValidationError)
-    end
-
-    it "does accepts an array for run-as-command" do
-      config = {
-        'ssh' => { 'run-as-command' => ['sudo -n'] }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
-    end
-
-    it "does not accept a non-array for run-as-command" do
-      config = {
-        'ssh' => { 'run-as-command' => 'sudo -n' }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::ValidationError)
-    end
-
-    it "accepts a boolean for ssl" do
-      config = {
-        'winrm' => { 'ssl' => false }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
-    end
-
-    it "does not accept ssl that is not a boolean" do
-      config = {
-        'winrm' => { 'ssl' => 'false' }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::ValidationError)
-    end
-
-    it "accepts a boolean for ssl-verify" do
-      config = {
-        'winrm' => { 'ssl-verify' => false }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
-    end
-
-    it "does not accept ssl-verify that is not a boolean" do
-      config = {
-        'winrm' => { 'ssl-verify' => 'false' }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::ValidationError)
-    end
-
-    it "validates cacert file exists when 'ssl' is true" do
-      config = {
-        'winrm' => { 'ssl' => true, 'cacert' => 'does not exist' }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(Bolt::FileError, /does not exist/)
-    end
-
-    it "ignores invalid cacert file when 'ssl' is false" do
-      config = {
-        'winrm' => { 'ssl' => false, 'cacert' => 'does not exist' }
-      }
-      expect { Bolt::Config.new(boltdir, config) }.not_to raise_error
     end
   end
 
   describe 'expanding paths' do
-    it "expands cacert relative to boltdir" do
-      expect(Bolt::Util)
-        .to receive(:validate_file)
-        .with('cacert', File.expand_path('ssl/ca.pem', boltdir.path))
-        .and_return(true)
-
-      data = {
-        'winrm' => { 'ssl' => true, 'cacert' => 'ssl/ca.pem' }
-      }
-
-      config = Bolt::Config.new(boltdir, data)
-      expect(config.transports[:winrm]['cacert'])
-        .to eq(File.expand_path('ssl/ca.pem', boltdir.path))
-    end
-
-    it "expands token-file relative to boltdir" do
-      data = {
-        'pcp' => { 'token-file' => 'token' }
-      }
-
-      config = Bolt::Config.new(boltdir, data)
-      expect(config.transports[:pcp]['token-file'])
-        .to eq(File.expand_path('token', boltdir.path))
-    end
-
-    it "expands private-key relative to boltdir" do
-      data = {
-        'ssh' => { 'private-key' => 'secret/key' }
-      }
-
-      config = Bolt::Config.new(boltdir, data)
-      expect(config.transports[:ssh]['private-key'])
-        .to eq(File.expand_path('secret/key', boltdir.path))
-    end
-
-    it "does not attempt to expand private-key when key-data is specified" do
-      key_data = { 'key-data' => 'key content' }
-      data = {
-        'ssh' => { 'private-key' => key_data }
-      }
-
-      config = Bolt::Config.new(boltdir, data)
-      expect(config.transports[:ssh]['private-key'])
-        .to eq(key_data)
-    end
-
     it "expands inventoryfile relative to boltdir" do
       data = {
         'inventoryfile' => 'targets.yml'
@@ -408,6 +216,7 @@ describe Bolt::Config do
     }
 
     it 'performs a depth 2 shallow merge on plugins' do
+      allow(Bolt::Util).to receive(:validate_file).and_return(true)
       expect(config.plugins).to eq(
         'vault' => {
           'server_url' => 'http://example.com',
@@ -425,7 +234,8 @@ describe Bolt::Config do
     end
 
     it 'performs a deep merge on transport config' do
-      expect(config.transports[:ssh]).to include(
+      allow(Bolt::Util).to receive(:validate_file).and_return(true)
+      expect(config.transports['ssh'].config).to include(
         'user' => 'bolt',
         'password' => 'bolt',
         'private-key' => %r{/path/to/key\z}
@@ -433,11 +243,13 @@ describe Bolt::Config do
     end
 
     it 'overwrites non-hash values' do
+      allow(Bolt::Util).to receive(:validate_file).and_return(true)
       expect(config.transport).to eq('remote')
       expect(config.concurrency).to eq(5)
     end
 
     it 'performs a shallow merge on hash values' do
+      allow(Bolt::Util).to receive(:validate_file).and_return(true)
       expect(config.plugin_hooks).to eq(
         'puppet_library' => {
           'plugin' => 'puppet_agent',

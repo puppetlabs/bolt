@@ -18,23 +18,23 @@ describe Bolt::Transport::WinRM do
   include BoltSpec::Sensitive
   include BoltSpec::Task
 
-  let(:boltdir) { Bolt::Boltdir.new('.') }
-  let(:host) { conn_info('winrm')[:host] }
-  let(:port) { conn_info('winrm')[:port] }
-  let(:ssl_port) { ENV['BOLT_WINRM_SSL_PORT'] || 25986 }
-  let(:smb_port) { ENV['BOLT_WINRM_SMB_PORT'] || 2445 }
-  let(:user) { conn_info('winrm')[:user] }
-  let(:password) { conn_info('winrm')[:password] }
-  let(:command) { "[Environment]::UserName" }
-  let(:config) { mk_config(ssl: false, user: user, password: password) }
+  let(:boltdir)     { Bolt::Boltdir.new('.') }
+  let(:host)        { conn_info('winrm')[:host] }
+  let(:port)        { conn_info('winrm')[:port] }
+  let(:ssl_port)    { ENV['BOLT_WINRM_SSL_PORT'].to_i || 25986 }
+  let(:smb_port)    { ENV['BOLT_WINRM_SMB_PORT'].to_i || 2445 }
+  let(:user)        { conn_info('winrm')[:user] }
+  let(:password)    { conn_info('winrm')[:password] }
+  let(:command)     { "[Environment]::UserName" }
+  let(:config)      { mk_config(ssl: false, user: user, password: password) }
   let(:cacert_path) { 'spec/fixtures/ssl/ca.pem' }
-  let(:ssl_config) { mk_config(cacert: cacert_path, user: user, password: password) }
-  let(:winrm) { Bolt::Transport::WinRM.new }
-  let(:winrm_ssl) { Bolt::Transport::WinRM.new }
-  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient) }
-  let(:transport) { 'winrm' }
-  let(:inventory) { Bolt::Inventory.empty }
-  let(:target) { make_target }
+  let(:ssl_config)  { mk_config(cacert: cacert_path, user: user, password: password) }
+  let(:winrm)       { Bolt::Transport::WinRM.new }
+  let(:winrm_ssl)   { Bolt::Transport::WinRM.new }
+  let(:plugins)     { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient) }
+  let(:transport)   { 'winrm' }
+  let(:inventory)   { Bolt::Inventory.empty }
+  let(:target)      { make_target }
   let(:echo_script) { <<~PS }
       foreach ($i in $args)
       {
@@ -59,9 +59,9 @@ describe Bolt::Transport::WinRM do
     Bolt::Target.from_hash(hash, inventory)
   end
 
-  def update_target(targ, conf)
-    transport_config = targ.options.merge(conf)
-    targ.inventory_target.set_config(targ.transport, transport_config)
+  def set_config(target, config)
+    merged = target.options.merge(config).to_h
+    target.inventory_target.set_config(transport.to_s, merged)
   end
 
   def stub_winrm_to_raise(klass, message)
@@ -188,7 +188,7 @@ describe Bolt::Transport::WinRM do
     end
 
     it "skips verification with ssl-verify: false" do
-      update_target(target, 'ssl-verify' => false)
+      set_config(target, 'ssl-verify' => false)
 
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
@@ -444,14 +444,14 @@ describe Bolt::Transport::WinRM do
                             '\'a b\'',
                             "a 'b' c",
                             'a \'b\' c'])['stdout']
-        ).to eq(<<QUOTED)
-nospaces\r
-with spaces\r
-'a b'\r
-'a b'\r
-a 'b' c\r
-a 'b' c\r
-QUOTED
+        ).to eq(<<~QUOTED)
+                  nospaces\r
+                  with spaces\r
+                  'a b'\r
+                  'a b'\r
+                  a 'b' c\r
+                  a 'b' c\r
+                QUOTED
       end
     end
 
@@ -464,12 +464,12 @@ QUOTED
                             '"a b"',
                             "a \"b\" c",
                             'a "b" c'])['stdout']
-        ).to eq(<<QUOTED)
-"a b"\r
-"a b"\r
-a "b" c\r
-a "b" c\r
-QUOTED
+        ).to eq(<<~QUOTED)
+                  "a b"\r
+                  "a b"\r
+                  a "b" c\r
+                  a "b" c\r
+                QUOTED
       end
     end
 
@@ -479,10 +479,10 @@ QUOTED
       with_tempfile_containing('script-sensitive-winrm', echo_script, '.ps1') do |file|
         expect(
           winrm.run_script(target, file.path, arguments)['stdout']
-        ).to eq(<<QUOTED)
-non-sensitive-arg\r
-$ecret!\r
-QUOTED
+        ).to eq(<<~QUOTED)
+                  non-sensitive-arg\r
+                  $ecret!\r
+                QUOTED
       end
     end
 
@@ -492,9 +492,9 @@ QUOTED
           winrm.run_script(target,
                            file.path,
                            ['echo $env:path'])['stdout']
-        ).to eq(<<SHELLWORDS)
-echo $env:path\r
-SHELLWORDS
+        ).to eq(<<~SHELLWORDS)
+                  echo $env:path\r
+                SHELLWORDS
       end
     end
 
@@ -524,7 +524,7 @@ SHELLWORDS
     end
 
     context 'with a batch file' do
-      let(:config) { mk_config(ssl: false, extensions: 'bat', user: user, password: password) }
+      let(:config) { mk_config(ssl: false, extensions: ['bat'], user: user, password: password) }
 
       it "does not reorder output with lots of lines", winrm: true do
         contents = <<-BAT
@@ -584,14 +584,14 @@ SHELLWORDS
     end
 
     it "supports the powershell input method", winrm: true do
-      contents = <<-PS
+      contents = <<~PS
         param ($Name, $Age, $Height)
 
         Write-Host @"
-Name: $Name ($(if ($Name -ne $null) { $Name.GetType().Name } else { 'null' }))
-Age: $Age ($(if ($Age -ne $null) { $Age.GetType().Name } else { 'null' }))
-Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'null' }))
-"@
+        Name: $Name ($(if ($Name -ne $null) { $Name.GetType().Name } else { 'null' }))
+        Age: $Age ($(if ($Age -ne $null) { $Age.GetType().Name } else { 'null' }))
+        Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'null' }))
+        "@
       PS
       # note that the order of the entries in this hash is not the same as
       # the order of the task parameters
@@ -620,7 +620,7 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
     end
 
     it "succeeds when the environment input method is used to pass unexpected parameters to a task", winrm: true do
-      contents = <<-PS
+      contents = <<~PS
         param (
           [Parameter()]
           [String]$foo
@@ -628,9 +628,9 @@ Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'nul
 
         $bar = $env:PT_bar
         Write-Host @"
-foo: $foo ($(if ($foo -ne $null) { $foo.GetType().Name } else { 'null' }))
-bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
-"@
+        foo: $foo ($(if ($foo -ne $null) { $foo.GetType().Name } else { 'null' }))
+        bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
+        "@
       PS
       arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
       with_task_containing('task-params-test-winrm', contents, 'environment', '.ps1') do |task|
@@ -673,10 +673,10 @@ bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
     end
 
     it "can run a task passing input on stdin", winrm: true do
-      contents = <<PS
-$line = [Console]::In.ReadLine()
-Write-Host $line
-PS
+      contents = <<~PS
+        $line = [Console]::In.ReadLine()
+        Write-Host $line
+      PS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_task_containing('tasks-test-stdin-winrm', contents, 'stdin', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).value)
@@ -685,9 +685,9 @@ PS
     end
 
     it "can run a task passing input on environment", winrm: true do
-      contents = <<PS
-Write-Host "$env:PT_message_one $env:PT_message_two"
-PS
+      contents = <<~PS
+        Write-Host "$env:PT_message_one $env:PT_message_two"
+      PS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_task_containing('tasks-test-both-winrm', contents, 'environment', '.ps1') do |task|
         expect(
@@ -707,29 +707,29 @@ PS
     end
 
     it "can run a task with Sensitive params via environment", winrm: true do
-      contents = <<PS
-Write-Host "$env:PT_sensitive_string"
-Write-Host "$env:PT_sensitive_array"
-Write-Host "$env:PT_sensitive_hash"
-PS
+      contents = <<~PS
+        Write-Host "$env:PT_sensitive_string"
+        Write-Host "$env:PT_sensitive_array"
+        Write-Host "$env:PT_sensitive_hash"
+      PS
       deep_hash = { 'k' => make_sensitive('v') }
       arguments = { 'sensitive_string' => make_sensitive('$ecret!'),
                     'sensitive_array' => make_sensitive([1, 2, make_sensitive(3)]),
                     'sensitive_hash' => make_sensitive(deep_hash) }
       with_task_containing('tasks_test_sensitive', contents, 'both', '.ps1') do |task|
-        expect(winrm.run_task(target, task, arguments).message).to eq(<<QUOTED)
-$ecret!\r
-[1,2,3]\r
-{"k":"v"}\r
-QUOTED
+        expect(winrm.run_task(target, task, arguments).message).to eq(<<~QUOTED)
+          $ecret!\r
+          [1,2,3]\r
+          {"k":"v"}\r
+        QUOTED
       end
     end
 
     it "can run a task with Sensitive params via stdin", winrm: true do
-      contents = <<PS
-$line = [Console]::In.ReadLine()
-Write-Host $line
-PS
+      contents = <<~PS
+        $line = [Console]::In.ReadLine()
+        Write-Host $line
+      PS
       arguments = { 'sensitive_string' => make_sensitive('$ecret!') }
       with_task_containing('tasks_test_sensitive', contents, 'stdin', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).value)
@@ -738,10 +738,10 @@ PS
     end
 
     it "defaults to powershell input method when executing .ps1", winrm: true do
-      contents = <<PS
-param ($message_one, $message_two)
-Write-Host "$message_one $message_two"
-PS
+      contents = <<~PS
+        param ($message_one, $message_two)
+        Write-Host "$message_one $message_two"
+      PS
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_task_containing('tasks-test-both-winrm', contents, nil, '.ps1') do |task|
         expect(
@@ -964,9 +964,9 @@ PS
       end
 
       it "can apply a powershell-based task", winrm: true do
-        contents = <<PS
-Write-Output "42"
-PS
+        contents = <<~PS
+          Write-Output "42"
+        PS
         expect_any_instance_of(Bolt::Transport::WinRM::Connection)
           .to receive(:execute_process)
           .with('powershell.exe',
@@ -1009,11 +1009,11 @@ PS
       end
 
       it "can apply a puppet manifest for a '.pp' script", winrm: true do
-        stdout = <<OUTPUT
-Notice: Scope(Class[main]): hi
-Notice: Compiled catalog for x.y.z in environment production in 0.04 seconds
-Notice: Applied catalog in 0.04 seconds
-OUTPUT
+        stdout = <<~OUTPUT
+          Notice: Scope(Class[main]): hi
+          Notice: Compiled catalog for x.y.z in environment production in 0.04 seconds
+          Notice: Applied catalog in 0.04 seconds
+        OUTPUT
         output = Bolt::Node::Output.new
         output.stdout << stdout
         output.exit_code = 0
@@ -1075,7 +1075,7 @@ OUTPUT
       end
 
       context "with extensions specified" do
-        let(:config) { mk_config(ssl: false, extensions: 'py', user: user, password: password) }
+        let(:config) { mk_config(ssl: false, extensions: ['py'], user: user, password: password) }
 
         it "can apply an arbitrary script", winrm: true do
           expect_any_instance_of(Bolt::Transport::WinRM::Connection)
