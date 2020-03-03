@@ -9,11 +9,8 @@ on:
     paths-ignore: ['**.md', '**.erb']
 
 env:
-  BOLT_WINRM_USER: roddypiper
-  BOLT_WINRM_HOST: localhost
-  BOLT_WINRM_PORT: 5985
-  BOLT_WINRM_SSL_PORT: 5986
   BOLT_WINRM_SMB_PORT: 445
+  BOLT_RSPEC_TESTING: true
   RUBY_VERSION: 25-x64
   
 jobs:
@@ -23,6 +20,7 @@ jobs:
     runs-on: windows-latest
     env:
       WINDOWS_AGENTS: true
+      BOLT_WINRM_PORT: 35985
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -54,9 +52,7 @@ jobs:
         run: bundle exec r10k puppetfile install
       - name: Pre-test setup
         shell: powershell
-        run: |
-          . scripts\ci.ps1
-          Set-ActiveRubyFromPuppet
+        run: '& scripts\ci.ps1'
       - name: Run tests
         shell: powershell
         run: bundle exec rake integration:windows_agents

@@ -1,0 +1,17 @@
+version: "3"
+services:
+  windows_node:
+    build:
+      context: .
+      dockerfile: Dockerfile.windev
+    ports:
+      - "25985:5985"
+      - "25986:5986"
+
+  windows_agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.winagent
+    ports:
+      - "35985:5985"
+      - "35986:5986"

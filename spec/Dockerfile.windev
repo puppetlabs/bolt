@@ -1,0 +1,6 @@
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+COPY fixtures/ssl/cert.pfx ./
+COPY fixtures/scripts/windev/setup.ps1 ./
+RUN powershell ./setup.ps1
+CMD ["powershell", "Start-Sleep", "-s 1000000"]

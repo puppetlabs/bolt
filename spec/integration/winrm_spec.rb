@@ -14,6 +14,7 @@ describe "when runnning over the winrm transport", winrm: true do
   let(:uri) { conn_uri('winrm') }
   let(:password) { conn_info('winrm')[:password] }
   let(:user) { conn_info('winrm')[:user] }
+  let(:cacert) { File.join(__dir__, '../fixtures/ssl/ca.pem') }
 
   context 'when using CLI options' do
     let(:config_flags) {
@@ -95,6 +96,7 @@ describe "when runnning over the winrm transport", winrm: true do
           'password' => password,
           'ssl' => false,
           'ssl-verify' => false
+          # 'cacert' => cacert
         }
       }
     }

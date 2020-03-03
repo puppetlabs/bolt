@@ -156,6 +156,11 @@ describe Bolt::Transport::WinRM do
   end
 
   context "connecting over SSL", winrm: true do
+    before do
+      puts "Disabled until SSL support is added to testing infrastructure"
+      pending
+    end
+
     # In order to run vagrant and docker targets simultaniously for local dev, use 4598{5,6} to avoid port conflict
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
@@ -195,6 +200,11 @@ describe Bolt::Transport::WinRM do
   end
 
   context "connecting over SSL to OMI container ", omi: true do
+    before do
+      puts "Disabled until SSL support is added to testing infrastructure"
+      pending
+    end
+
     # In order to run vagrant and docker targets simultaniously for local dev, use 4598{5,6} to avoid port conflict
     let(:omi_target) { make_target(port_: 45986, conf: ssl_config) }
 
@@ -328,6 +338,11 @@ describe Bolt::Transport::WinRM do
     # when ruby_smb gem adds SMB v3 support, this will pass
     # test should be refactored to supply an SSL flag for winrm + smb and remove other SSL test
     it "will fail to upload a file with SMB with a host that requires SSL", winrm: true do
+      before do
+        puts "Disabled until SSL support is added to testing infrastructure"
+        pending
+      end
+
       conf = {
         'winrm' => {
           'ssl' => true,
