@@ -12,27 +12,6 @@ require 'bolt/util'
 module Bolt
   module Transport
     class LocalWindows < Base
-      OPTIONS = {
-        "interpreters"   => "A map of an extension name to the absolute path of an executable, "\
-                            "enabling you to override the shebang defined in a task executable. The "\
-                            "extension can optionally be specified with the `.` character (`.py` and "\
-                            "`py` both map to a task executable `task.py`) and the extension is case "\
-                            "sensitive. When a target's name is `localhost`, Ruby tasks run with the "\
-                            "Bolt Ruby interpreter by default.",
-        "run-as"         => "A different user to run commands as after login.",
-        "run-as-command" => "The command to elevate permissions. Bolt appends the user and command "\
-                            "strings to the configured `run-as-command` before running it on the target. "\
-                            "This command must not require an interactive password prompt, and the "\
-                            "`sudo-password` option is ignored when `run-as-command` is specified. The "\
-                            "`run-as-command` must be specified as an array.",
-        "sudo-password"  => "Password to use when changing users via `run-as`.",
-        "tmpdir"         => "The directory to copy and execute temporary files."
-      }.freeze
-
-      def self.options
-        OPTIONS.keys
-      end
-
       def provided_features
         ['powershell']
       end
@@ -40,13 +19,6 @@ module Bolt
       def default_input_method(executable)
         input_method ||= Powershell.powershell_file?(executable) ? 'powershell' : 'both'
         input_method
-      end
-
-      def self.validate(options)
-        logger = Logging.logger[self]
-        if options['sudo-password'] || options['run-as'] || options['run-as-command'] || options[:run_as]
-          logger.warn("run-as is not supported for Windows hosts using the local transport")
-        end
       end
 
       def in_tmpdir(base)
@@ -98,14 +70,12 @@ module Bolt
         result_output
       end
 
-      def upload(target, source, destination, options = {})
-        self.class.validate(options)
+      def upload(target, source, destination, _options = {})
         copy_file(source, destination)
         Bolt::Result.for_upload(target, source, destination)
       end
 
-      def run_command(target, command, options = {})
-        self.class.validate(options)
+      def run_command(target, command, _options = {})
         in_tmpdir(target.options['tmpdir']) do |dir|
           output = execute(command, dir: dir)
           Bolt::Result.for_command(target,
@@ -116,8 +86,7 @@ module Bolt
         end
       end
 
-      def run_script(target, script, arguments, options = {})
-        self.class.validate(options)
+      def run_script(target, script, arguments, _options = {})
         with_tmpscript(File.absolute_path(script), target.options['tmpdir']) do |file, dir|
           logger.debug "Running '#{file}' with #{arguments.to_json}"
 
@@ -141,8 +110,7 @@ module Bolt
         end
       end
 
-      def run_task(target, task, arguments, options = {})
-        self.class.validate(options)
+      def run_task(target, task, arguments, _options = {})
         implementation = select_implementation(target, task)
         executable = implementation['path']
         input_method = implementation['input_method']

@@ -6,26 +6,6 @@ require 'bolt/transport/base'
 module Bolt
   module Transport
     class Remote < Base
-      OPTIONS = {
-        "run-on" => "The proxy target that the task executes on."
-      }.freeze
-
-      # The options for the remote transport not defined.
-      def self.filter_options(unfiltered)
-        unfiltered
-      end
-
-      def self.default_options
-        { 'run-on' => 'localhost' }
-      end
-
-      def self.validate(options)
-        # This will fail when validating global config
-        # unless options['device-type']
-        #  raise Bolt::ValidationError, 'Must specify device-type for devices'
-        # end
-      end
-
       # TODO: this should have access to inventory so target doesn't have to
       def initialize(executor)
         super()
