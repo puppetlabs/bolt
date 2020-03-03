@@ -7,7 +7,7 @@ Remove-NetNat -Confirm:$false
 
 # Create the new network
 Write-Output "Creating spec_default docker network..."
-& cmd /c --% docker network create spec_default --driver nat 2>&1
+& cmd /c --% docker network create spec_default --driver nat --subnet=172.28.0.0/16 2>&1
 
 Enable-PSRemoting
 Set-Item WSMan:\localhost\Client\TrustedHosts -Value '*' -Force

@@ -7,6 +7,9 @@ services:
     ports:
       - "25985:5985"
       - "25986:5986"
+    networks:
+      test_net:
+        ipv4_address: 172.28.1.1
 
   windows_agent:
     build:
@@ -15,3 +18,11 @@ services:
     ports:
       - "35985:5985"
       - "35986:5986"
+    networks:
+      test_net:
+        ipv4_address: 172.28.1.2
+
+networks:
+  test_net:
+    external:
+      name: spec_default
