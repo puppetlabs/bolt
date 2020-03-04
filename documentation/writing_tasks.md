@@ -59,9 +59,7 @@ Each task or plan name segment must begin with a lowercase letter and:
 -   Namespace segments must match the regular expression: `\A[a-z][a-z0-9_]*\Z`
 -   The file extension must not use the reserved extensions `.md` or `.json`.
 
-### `init`
-
-The task filename `init` is special: the task it defines is referenced using the module name only. For example, in the `puppetlabs-service` module, the task defined in `init.rb` is the `service` task.
+> **Note:** The task filename `init` is special: the task it defines is referenced using the module name only. For example, in the `puppetlabs-service` module, the task defined in `init.rb` is the `service` task.
 
 ## Task metadata
 
