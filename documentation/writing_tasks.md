@@ -449,7 +449,7 @@ For instance, consider a module with the following files:
   - sql.json
 ```
 
-This task has a task metadata file (`sql.json`), two implementation metadata files (`sql_linux.json`, and `sql_windows.json`), and two executables (`sql_linux.sh` and `sql_windows.ps1`). The executables have distinct names and are compatible with older task runners such as Puppet Enterprise 2018.1 and earlier. The implementation metadata files document how to use the implementation directly, or mark the implementation as private to hide it from UI lists.
+This task has a task metadata file (`sql.json`), two implementation metadata files (`sql_linux.json`, and `sql_windows.json`), and two executables (`sql_linux.sh` and `sql_windows.ps1`). The implementation metadata files document how to use the implementation directly, or mark the implementation as private to hide it from UI lists.
 
 For example, the `sql_linux.json` implementation metadata file contains the following:
 
