@@ -76,7 +76,7 @@ module Bolt
       when 'project'
         case action
         when 'init'
-          { flags: OPTIONS[:global],
+          { flags: OPTIONS[:global] + %w[modules],
             banner: PROJECT_INIT_HELP }
         when 'migrate'
           { flags: OPTIONS[:global] + %w[inventoryfile boltdir configfile],
@@ -391,6 +391,8 @@ module Bolt
             bolt project init
           Create a new Bolt project at a specified path.
             bolt project init ~/path/to/project
+          Create a new Bolt project with existing modules.
+            bolt project init --modules puppetlabs-apt,puppetlabs-ntp
     HELP
 
     PROJECT_MIGRATE_HELP = <<~HELP
@@ -761,6 +763,13 @@ module Bolt
       end
       define('--trace', 'Display error stack traces') do |_|
         @options[:trace] = true
+      end
+
+      separator "\nADDITIONAL OPTIONS"
+      define('--modules MODULES',
+             'A comma-separated list of modules to install from the Puppet Forge',
+             'when initializing a project. Resolves and installs all dependencies.') do |modules|
+        @options[:modules] = modules.split(',')
       end
 
       separator "\nGLOBAL OPTIONS"

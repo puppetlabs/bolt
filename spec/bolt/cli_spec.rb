@@ -529,6 +529,15 @@ describe "Bolt::CLI" do
       end
     end
 
+    describe "modules" do
+      let(:modules) { 'puppetlabs-apt,puppetlabs-stdlib' }
+      let(:cli)     { Bolt::CLI.new(%W[project init --modules #{modules}]) }
+
+      it 'accepts a comma-separated list of modules' do
+        expect(cli.parse).to include(modules: %w[puppetlabs-apt puppetlabs-stdlib])
+      end
+    end
+
     describe "sudo" do
       it "supports running as a user" do
         cli = Bolt::CLI.new(%w[command run --targets foo whoami --run-as root])
@@ -2299,7 +2308,7 @@ describe "Bolt::CLI" do
     end
 
     context 'init' do
-      it 'init creates a new project at the specified path' do
+      it 'creates a new project at the specified path' do
         Dir.mktmpdir do |dir|
           file = File.join(dir, 'bolt.yaml')
           cli = Bolt::CLI.new(%W[project init #{dir}])
@@ -2308,12 +2317,70 @@ describe "Bolt::CLI" do
         end
       end
 
-      it 'init creates a new project in the current working directory' do
+      it 'creates a new project in the current working directory' do
         Dir.mktmpdir do |dir|
           file = File.join(dir, 'bolt.yaml')
           cli = Bolt::CLI.new(%w[project init])
           Dir.chdir(dir) { cli.execute(cli.parse) }
           expect(File.file?(file)).to be
+        end
+      end
+
+      it 'warns when a bolt.yaml already exists' do
+        Dir.mktmpdir do |dir|
+          config = File.join(dir, 'bolt.yaml')
+          cli    = Bolt::CLI.new(%W[project init #{dir}])
+
+          FileUtils.touch(config)
+          cli.execute(cli.parse)
+
+          expect(@log_output.readlines).to include(/Found existing project directory at #{dir}/)
+        end
+      end
+
+      context 'with modules' do
+        it 'creates a Puppetfile and installs modules with dependencies' do
+          # Create the tmpdir relative to the current dir to handle issues with tempfiles on Windows CI
+          Dir.mktmpdir(nil, Dir.pwd) do |dir|
+            puppetfile = File.join(dir, 'Puppetfile')
+            modulepath = File.join(dir, 'modules')
+
+            cli = Bolt::CLI.new(%W[project init #{dir} --modules puppetlabs-apt])
+            cli.execute(cli.parse)
+
+            expect(File.file?(puppetfile)).to be
+            expect(File.read(puppetfile).split("\n")).to match_array([/mod 'puppetlabs-apt'/,
+                                                                      /mod 'puppetlabs-stdlib'/,
+                                                                      /mod 'puppetlabs-translate'/])
+
+            expect(Dir.exist?(modulepath)).to be
+            expect(Dir.children(modulepath)).to match_array(%w[apt stdlib translate])
+          end
+        end
+
+        it 'errors when there is an existing Puppetfile' do
+          Dir.mktmpdir do |dir|
+            puppetfile = File.join(dir, 'Puppetfile')
+            config     = File.join(dir, 'bolt.yaml')
+
+            FileUtils.touch(puppetfile)
+
+            cli = Bolt::CLI.new(%W[project init #{dir} --modules puppetlabs-stdlib])
+            expect { cli.execute(cli.parse) }.to raise_error(Bolt::CLIError)
+            expect(File.file?(config)).not_to be
+          end
+        end
+
+        it 'errors with unknown module names' do
+          Dir.mktmpdir do |dir|
+            puppetfile = File.join(dir, 'Puppetfile')
+            config     = File.join(dir, 'bolt.yaml')
+
+            cli = Bolt::CLI.new(%W[project init #{dir} --modules puppetlabs-fakemodule])
+            expect { cli.execute(cli.parse) }.to raise_error(Bolt::ValidationError)
+            expect(File.file?(config)).not_to be
+            expect(File.file?(puppetfile)).not_to be
+          end
         end
       end
     end
