@@ -60,6 +60,11 @@ module Bolt
                end
       end
 
+      # Resolve plugin references from transport config
+      config.transports.each_value do |t|
+        t.input = plugins.resolve_references(t.input)
+      end
+
       inventory = create_version(data, config.transport, config.transports, plugins)
       inventory.validate
       inventory
@@ -67,6 +72,7 @@ module Bolt
 
     def self.create_version(data, transport, transports, plugins)
       version = (data || {}).delete('version') { 2 }
+
       case version
       when 2
         Bolt::Inventory::Inventory.new(data, transport, transports, plugins)

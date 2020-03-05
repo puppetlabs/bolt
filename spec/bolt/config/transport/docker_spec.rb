@@ -4,8 +4,8 @@ require 'spec_helper'
 require 'bolt/config/transport/docker'
 require 'shared_examples/transport_config'
 
-describe Bolt::Config::Docker do
-  let(:transport) { Bolt::Config::Docker }
+describe Bolt::Config::Transport::Docker do
+  let(:transport) { Bolt::Config::Transport::Docker }
   let(:data) { { 'host' => 'example.com' } }
   let(:merge_data) { { 'tmpdir' => '/path/to/tmpdir' } }
 

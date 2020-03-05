@@ -4,8 +4,8 @@ require 'spec_helper'
 require 'bolt/config/transport/winrm'
 require 'shared_examples/transport_config'
 
-describe Bolt::Config::WinRM do
-  let(:transport) { Bolt::Config::WinRM }
+describe Bolt::Config::Transport::WinRM do
+  let(:transport) { Bolt::Config::Transport::WinRM }
   let(:data) { { 'user' => 'bolt' } }
   let(:merge_data) { { 'password' => 'bolt' } }
 
@@ -63,7 +63,7 @@ describe Bolt::Config::WinRM do
 
       it 'ignores cacert when ssl is false' do
         data['cacert'] = 'path/to/cacert'
-        data['ssl'] = false
+        data['ssl']    = false
         expect { transport.new(data) }.not_to raise_error
       end
     end

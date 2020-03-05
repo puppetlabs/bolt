@@ -235,7 +235,7 @@ describe Bolt::Config do
 
     it 'performs a deep merge on transport config' do
       allow(Bolt::Util).to receive(:validate_file).and_return(true)
-      expect(config.transports['ssh'].config).to include(
+      expect(config.transports['ssh'].to_h).to include(
         'user' => 'bolt',
         'password' => 'bolt',
         'private-key' => %r{/path/to/key\z}

@@ -11,7 +11,6 @@ require 'bolt/config/transport/ssh'
 require 'bolt/config/transport/winrm'
 require 'bolt/config/transport/orch'
 require 'bolt/config/transport/local'
-require 'bolt/config/transport/local_windows'
 require 'bolt/config/transport/docker'
 require 'bolt/config/transport/remote'
 
@@ -27,12 +26,12 @@ module Bolt
     attr_reader :config_files, :warnings, :data, :transports, :boltdir
 
     TRANSPORT_CONFIG = {
-      'ssh'    => Bolt::Config::SSH,
-      'winrm'  => Bolt::Config::WinRM,
-      'pcp'    => Bolt::Config::Orch,
-      'local'  => Bolt::Util.windows? ? Bolt::Config::LocalWindows : Bolt::Config::Local,
-      'docker' => Bolt::Config::Docker,
-      'remote' => Bolt::Config::Remote
+      'ssh'    => Bolt::Config::Transport::SSH,
+      'winrm'  => Bolt::Config::Transport::WinRM,
+      'pcp'    => Bolt::Config::Transport::Orch,
+      'local'  => Bolt::Config::Transport::Local,
+      'docker' => Bolt::Config::Transport::Docker,
+      'remote' => Bolt::Config::Transport::Remote
     }.freeze
 
     OPTIONS = {
@@ -175,29 +174,29 @@ module Bolt
         config[:data]
       end
 
-      override_data = transform_overrides(overrides)
+      override_data = normalize_overrides(overrides)
 
-      @data = merge_config_data(default_data, *loaded_data, override_data)
+      @data = merge_config_layers(default_data, *loaded_data, override_data)
 
       TRANSPORT_CONFIG.each do |transport, config|
         @transports[transport] = config.new(@data.delete(transport), @boltdir.path)
       end
 
-      update_data
+      finalize_data
       validate
     end
 
     # Transforms CLI options into a config hash that can be merged with
     # default and loaded config.
-    def transform_overrides(options)
-      opts = options.dup.transform_keys(&:to_s)
+    def normalize_overrides(options)
+      opts = options.transform_keys(&:to_s)
 
       # Pull out config options
       overrides = opts.slice(*OPTIONS.keys)
 
       # Pull out transport config options
       TRANSPORT_CONFIG.each do |transport, config|
-        overrides[transport] = opts.slice(*config.options)
+        overrides[transport] = opts.slice(*config.options.keys)
       end
 
       # Set console log to debug if in debug mode
@@ -214,9 +213,9 @@ module Bolt
       overrides
     end
 
-    # Merge configuration from all sources into a single hash
-    # Precedence from highest to lowest is: CLI overrides, project, user-level, system-wide, defaults
-    def merge_config_data(*config_data)
+    # Merge configuration from all sources into a single hash. Precedence from lowest to highest:
+    # defaults, system-wide, user-level, project-level, CLI overrides
+    def merge_config_layers(*config_data)
       config_data.inject({}) do |acc, config|
         acc.merge(config) do |key, val1, val2|
           case key
@@ -241,7 +240,7 @@ module Bolt
       Bolt::Util.deep_clone(self)
     end
 
-    private def update_data
+    private def finalize_data
       if @data['log'].is_a?(Hash)
         @data['log'] = update_logs(@data['log'])
       end
@@ -260,7 +259,7 @@ module Bolt
       end
 
       %w[hiera-config inventoryfile trusted-external-command].each do |opt|
-        @data[opt] = File.expand_path(@data[opt], @boltdir.path) if @data[opt]
+        @data[opt] = File.expand_path(@data[opt], @boltdir.path) if @data.key?(opt)
       end
 
       # Filter hashes to only include valid options
@@ -283,13 +282,13 @@ module Bolt
                        .transform_keys(&:to_sym)
 
         if (v = acc[name][:level])
-          unless Bolt::Logger.valid_level?(v)
-            raise Bolt::ValidationError,
-                  "level of log #{name} must be one of #{Bolt::Logger.levels.join(', ')}; received #{v}"
-          end
           unless v.is_a?(String) || v.is_a?(Symbol)
             raise Bolt::ValidationError,
                   "level of log #{name} must be a String or Symbol, received #{v.class} #{v.inspect}"
+          end
+          unless Bolt::Logger.valid_level?(v)
+            raise Bolt::ValidationError,
+                  "level of log #{name} must be one of #{Bolt::Logger.levels.join(', ')}; received #{v}"
           end
         end
 
@@ -345,14 +344,13 @@ module Bolt
 
     # Recursively searches a data structure for plugin references
     private def references?(input)
-      reference = false
       if input.is_a?(Hash)
-        reference = input.key?('_plugin')
-        input.each_value { |v| reference ||= references?(v) }
+        input.key?('_plugin') || input.values.any? { |v| references?(v) }
       elsif input.is_a?(Array)
-        input.each { |v| reference ||= references?(v) }
+        input.any? { |v| references?(v) }
+      else
+        false
       end
-      reference
     end
 
     def default_inventoryfile

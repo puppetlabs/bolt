@@ -111,7 +111,7 @@ Transport configuration options can be set in both the configuration file and in
 | Option | Description | Type | Default |
 | ------ | ----------- | ---- | ------- |
 <% options.each do |option, data| -%>
-| `<%= option %>` | <%= data[:desc] %> | <%= data[:type] %> | <%= @transports[:defaults][transport][option].to_s || "" %> |
+| `<%= option %>` | <%= data[:desc] %> | <%= data[:type] == TrueClass ? 'Boolean' : data[:type] %> | <%= @transports[:defaults][transport][option].to_s || "" %> |
 <% end %>
 
 <% if transport == 'ssh' %>

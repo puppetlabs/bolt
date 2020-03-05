@@ -4,8 +4,8 @@ require 'spec_helper'
 require 'bolt/config/transport/orch'
 require 'shared_examples/transport_config'
 
-describe Bolt::Config::Orch do
-  let(:transport) { Bolt::Config::Orch }
+describe Bolt::Config::Transport::Orch do
+  let(:transport) { Bolt::Config::Transport::Orch }
   let(:data) { { 'host' => 'example.com' } }
   let(:merge_data) { { 'service-url' => 'api.example.com' } }
 

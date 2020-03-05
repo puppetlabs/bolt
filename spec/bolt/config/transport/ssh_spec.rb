@@ -4,8 +4,8 @@ require 'spec_helper'
 require 'bolt/config/transport/ssh'
 require 'shared_examples/transport_config'
 
-describe Bolt::Config::SSH do
-  let(:transport) { Bolt::Config::SSH }
+describe Bolt::Config::Transport::SSH do
+  let(:transport) { Bolt::Config::Transport::SSH }
   let(:data) { { 'user' => 'bolt' } }
   let(:merge_data) { { 'password' => 'bolt' } }
 

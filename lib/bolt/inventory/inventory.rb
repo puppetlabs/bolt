@@ -24,11 +24,6 @@ module Bolt
         @group_lookup = {}
         @targets      = {}
 
-        # Resolve plugin references from transport config
-        config.each_value do |t|
-          t.config = plugins.resolve_references(t.config)
-        end
-
         @groups.resolve_string_targets(@groups.target_aliases, @groups.all_targets)
 
         collect_groups
@@ -280,7 +275,7 @@ module Bolt
       end
 
       def transport_data_get
-        { transport: transport, transports: config }
+        { transport: transport, transports: config.transform_values(&:to_h) }
       end
 
       def set_var(target, var_hash)

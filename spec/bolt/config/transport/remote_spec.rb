@@ -4,8 +4,8 @@ require 'spec_helper'
 require 'bolt/config/transport/remote'
 require 'shared_examples/transport_config'
 
-describe Bolt::Config::Remote do
-  let(:transport) { Bolt::Config::Remote }
+describe Bolt::Config::Transport::Remote do
+  let(:transport) { Bolt::Config::Transport::Remote }
   let(:data) { { 'run-on' => 'proxy1.com' } }
   let(:merge_data) { { 'tmpdir' => 'proxy2.com' } }
 

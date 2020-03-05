@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/util'
-require 'bolt/config/transport'
+require 'bolt/config/transport/base'
 
 shared_examples 'transport config' do
   let(:boltdir) { File.expand_path(__dir__) }
@@ -15,7 +15,7 @@ shared_examples 'transport config' do
   end
 
   it 'sets default options' do
-    expect(transport.new.config).to eq(transport::DEFAULTS)
+    expect(transport.new.to_h).to eq(transport::DEFAULTS)
   end
 
   it 'validates when initializing' do
@@ -29,27 +29,28 @@ shared_examples 'transport config' do
     config.merge(merge_data)
   end
 
-  it 'errors when setting config something other than a Hash' do
+  it 'errors when setting config something other than a Hash or config' do
     config = transport.new
-    expect { config.config = ['data'] }.to raise_error(Bolt::ValidationError)
+    expect { config.input = ['data'] }.to raise_error(Bolt::ValidationError)
   end
 
-  it 'errors when merging something other than a Hash' do
+  it 'errors when merging something other than a Hash or config' do
     config = transport.new
     expect { config.merge(['data']) }.to raise_error(Bolt::ValidationError)
   end
 
-  it 'allows for overriding config completely' do
+  it 'allows for overriding input' do
     config = transport.new
-    config.config = data
-    expect(config.config).to eq(data)
+    expect(config).to receive(:validate)
+    config.input = data
+    expect(config.input).to eq(data)
   end
 end
 
 shared_examples 'filters options' do
   it 'filters invalid options' do
     data['foo'] = 'bar'
-    expect(transport.new(data).config).not_to include('foo' => 'bar')
+    expect(transport.new(data).to_h).not_to include('foo' => 'bar')
   end
 end
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## Bolt Next
+
+### New features
+
+* **Support plugins in `bolt.yaml` transport configuration** ([#1591](https://github.com/puppetlabs/bolt/issues/1591))
+
+  Plugins can now be used to configure transports in a `bolt.yaml` file. Bolt will also provide more helpful
+  error messages when a plugin is used in an unsupported location.
+
 ## Bolt 2.1.0
 
 ### New features
