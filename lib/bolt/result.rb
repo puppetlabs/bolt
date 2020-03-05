@@ -78,7 +78,7 @@ module Bolt
 
     def _pcore_init_from_hash(init_hash)
       opts = init_hash.reject { |k, _v| k == 'target' }
-      initialize(init_hash['target'], opts.map { |k, v| [k.to_sym, v] }.to_h)
+      initialize(init_hash['target'], opts.transform_keys(&:to_sym))
     end
 
     def _pcore_init_hash

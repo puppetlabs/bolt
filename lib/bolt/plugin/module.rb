@@ -91,7 +91,7 @@ module Bolt
       end
 
       def validate_config(config, config_schema)
-        config.keys.each do |key|
+        config.each_key do |key|
           msg = "Config for #{name} plugin contains unexpected key #{key}"
           raise Bolt::ValidationError, msg unless config_schema.include?(key)
         end

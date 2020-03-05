@@ -58,7 +58,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     end
 
     arguments = options['arguments'] || []
-    options = options.select { |opt| opt.start_with?('_') }.map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+    options = options.select { |opt| opt.start_with?('_') }.transform_keys { |k| k.sub(/^_/, '').to_sym }
     options[:description] = description if description
 
     executor = Puppet.lookup(:bolt_executor)
