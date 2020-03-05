@@ -151,7 +151,7 @@ module Bolt
       if args.count > 1
         type1 = Puppet.lookup(:pal_script_compiler).type('Hash[String, Data]')
         Puppet::Pal.assert_type(type1, args[1], 'apply options')
-        options = args[1].map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+        options = args[1].transform_keys { |k| k.sub(/^_/, '').to_sym }
       end
 
       plan_vars = scope.to_hash(true, true)

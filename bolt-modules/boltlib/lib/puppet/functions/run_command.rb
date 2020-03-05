@@ -51,7 +51,7 @@ Puppet::Functions.create_function(:run_command) do
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'run_command')
     end
 
-    options = options.map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+    options = options.transform_keys { |k| k.sub(/^_/, '').to_sym }
     options[:description] = description if description
 
     executor = Puppet.lookup(:bolt_executor)

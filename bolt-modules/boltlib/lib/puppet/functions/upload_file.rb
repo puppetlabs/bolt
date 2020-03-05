@@ -61,7 +61,7 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'upload_file')
     end
 
-    options = options.select { |opt| opt.start_with?('_') }.map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+    options = options.select { |opt| opt.start_with?('_') }.transform_keys { |k| k.sub(/^_/, '').to_sym }
     options[:description] = description if description
 
     executor = Puppet.lookup(:bolt_executor)

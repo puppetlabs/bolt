@@ -36,7 +36,7 @@ module BoltSpec
 
       def with_params(params)
         @invocation[:options] = params.select { |k, _v| k.start_with?('_') }
-                                      .map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+                                      .transform_keys { |k| k.sub(/^_/, '').to_sym }
         self
       end
     end

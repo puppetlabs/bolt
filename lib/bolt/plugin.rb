@@ -133,7 +133,7 @@ module Bolt
         raise PluginError.new(msg, 'bolt/plugin-error')
       end
 
-      config.plugins.keys.each do |plugin|
+      config.plugins.each_key do |plugin|
         plugins.by_name(plugin)
       end
 
@@ -263,9 +263,9 @@ module Bolt
       if data.is_a?(Array)
         data.flat_map { |elem| resolve_top_level_references(elem) }
       elsif reference?(data)
-        partially_resolved = data.map do |k, v|
-          [k, resolve_references(v)]
-        end.to_h
+        partially_resolved = data.transform_values do |v|
+          resolve_references(v)
+        end
         fully_resolved = resolve_single_reference(partially_resolved)
         # The top-level reference may have returned more references, so repeat the process
         resolve_top_level_references(fully_resolved)
