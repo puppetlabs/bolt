@@ -4,15 +4,13 @@ require 'logging'
 require 'shellwords'
 require 'bolt/node/errors'
 require 'bolt/node/output'
-require 'bolt/transport/sudoable/connection'
 require 'bolt/util'
 
 module Bolt
   module Transport
-    class SSH < Sudoable
-      class Connection < Sudoable::Connection
+    class SSH
+      class Connection
         attr_reader :logger, :user, :target
-        attr_writer :run_as
 
         def initialize(target, transport_logger)
           # lazy-load expensive gem code
@@ -20,21 +18,17 @@ module Bolt
           require 'net/ssh/proxy/jump'
 
           raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
-          @sudo_id = SecureRandom.uuid
 
           @target = target
           @load_config = target.options['load-config']
 
           ssh_config = @load_config ? Net::SSH::Config.for(target.host) : {}
           @user = @target.user || ssh_config[:user] || Etc.getlogin
-          @run_as = nil
           @strict_host_key_checking = ssh_config[:strict_host_key_checking]
 
           @logger = Logging.logger[@target.safe_name]
           @transport_logger = transport_logger
           @logger.debug("Initializing ssh connection to #{@target.safe_name}")
-
-          @sudo_password = @target.options['sudo-password'] || @target.password
 
           if target.options['private-key']&.instance_of?(String)
             begin
@@ -148,61 +142,8 @@ module Bolt
           end
         end
 
-        def handled_sudo(channel, data, stdin)
-          if data.lines.include?(Sudoable.sudo_prompt)
-            if @sudo_password
-              channel.send_data("#{@sudo_password}\n")
-              channel.wait
-              return true
-            else
-              # Cancel the sudo prompt to prevent later commands getting stuck
-              channel.close
-              raise Bolt::Node::EscalateError.new(
-                "Sudo password for user #{@user} was not provided for #{target.safe_name}",
-                'NO_PASSWORD'
-              )
-            end
-          elsif data =~ /^#{@sudo_id}/
-            if stdin
-              channel.send_data(stdin)
-              channel.eof!
-            end
-            return true
-          elsif data =~ /^#{@user} is not in the sudoers file\./
-            @logger.debug { data }
-            raise Bolt::Node::EscalateError.new(
-              "User #{@user} does not have sudo permission on #{target.safe_name}",
-              'SUDO_DENIED'
-            )
-          elsif data =~ /^Sorry, try again\./
-            @logger.debug { data }
-            raise Bolt::Node::EscalateError.new(
-              "Sudo password for user #{@user} not recognized on #{target.safe_name}",
-              'BAD_PASSWORD'
-            )
-          end
-          false
-        end
-
-        def execute(command, sudoable: false, **options)
+        def execute(command_str, **options)
           result_output = Bolt::Node::Output.new
-          run_as = options[:run_as] || self.run_as
-          escalate = sudoable && run_as && @user != run_as
-          use_sudo = escalate && @target.options['run-as-command'].nil?
-
-          command_str = inject_interpreter(options[:interpreter], command)
-          if escalate
-            if use_sudo
-              sudo_exec = target.options['sudo-executable'] || "sudo"
-              sudo_flags = [sudo_exec, "-S", "-H", "-u", run_as, "-p", Sudoable.sudo_prompt]
-              sudo_flags += ["-E"] if options[:environment]
-              sudo_str = Shellwords.shelljoin(sudo_flags)
-            else
-              sudo_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
-            end
-            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options.merge(reset_cwd: true))
-          end
-
           # Including the environment declarations in the shelljoin will escape
           # the = sign, so we have to handle them separately.
           if options[:environment]
@@ -211,8 +152,6 @@ module Bolt
             end
             command_str = "#{env_decls.join(' ')} #{command_str}"
           end
-
-          @logger.debug { "Executing: #{command_str}" }
 
           session_channel = @session.open_channel do |channel|
             # Request a pseudo tty
@@ -227,16 +166,12 @@ module Bolt
               end
 
               channel.on_data do |_, data|
-                unless use_sudo && handled_sudo(channel, data, options[:stdin])
-                  result_output.stdout << data
-                end
+                result_output.stdout << data
                 @logger.debug { "stdout: #{data.strip}" }
               end
 
               channel.on_extended_data do |_, _, data|
-                unless use_sudo && handled_sudo(channel, data, options[:stdin])
-                  result_output.stderr << data
-                end
+                result_output.stderr << data
                 @logger.debug { "stderr: #{data.strip}" }
               end
 
@@ -244,7 +179,7 @@ module Bolt
                 result_output.exit_code = data.read_long
               end
               # A wrapper is used to direct stdin when elevating privilage or using tty
-              if options[:stdin] && !use_sudo && !options[:wrapper]
+              if options[:stdin]
                 channel.send_data(options[:stdin])
                 channel.eof!
               end
@@ -252,11 +187,6 @@ module Bolt
           end
           session_channel.wait
 
-          if result_output.exit_code == 0
-            @logger.debug { "Command returned successfully" }
-          else
-            @logger.info { "Command failed with exit code #{result_output.exit_code}" }
-          end
           result_output
         rescue StandardError
           @logger.debug { "Command aborted" }
@@ -294,6 +224,11 @@ module Bolt
               Net::SSH::Verifiers::Lenient.new
             end
           end
+        end
+
+        def shell
+          # SSH only supports bash for now. Later, this will detect the correct shell.
+          @shell ||= Bolt::Shell::Bash.new(target, self)
         end
       end
     end
