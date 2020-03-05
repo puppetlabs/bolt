@@ -24,8 +24,8 @@ module BoltSpec
         @stubs.each { |s| s.assert_called(object) }
       end
 
-      def add_stub
-        stub = Plans.const_get(@action_stub).new
+      def add_stub(inventory = nil)
+        stub = Plans.const_get(@action_stub).new(false, inventory)
         @stubs.unshift stub
         stub
       end
@@ -34,7 +34,7 @@ module BoltSpec
     class ActionStub
       attr_reader :invocation
 
-      def initialize(expect = false)
+      def initialize(expect = false, inventory = nil)
         @calls = 0
         @expect = expect
         @expected_calls = nil
@@ -42,6 +42,7 @@ module BoltSpec
         @invocation = {}
         # return value
         @data = { default: {} }
+        @inventory = inventory
       end
 
       def assert_called(object)
@@ -56,7 +57,10 @@ module BoltSpec
           end
           message = "Expected #{object} to be called #{times} times"
           message += " with targets #{@invocation[:targets]}" if @invocation[:targets]
-          message += " with parameters #{parameters}" if parameters
+          if parameters
+            parameters_str = JSON.parse(parameters.to_json)
+            message += " with parameters #{parameters_str}"
+          end
           raise message
         end
       end
@@ -135,7 +139,10 @@ module BoltSpec
       def return_for_targets(data)
         data.each_with_object(@data) do |(target, result), hsh|
           raise "Mocked results must be hashes: #{target}: #{result}" unless result.is_a? Hash
-          hsh[target] = result_for(Bolt::Target.new(target), Bolt::Util.walk_keys(result, &:to_sym))
+          # set the inventory from the BoltSpec::Plans, otherwise if we try to convert
+          # this target to a string, it will fail to string conversion because the
+          # inventory is nil
+          hsh[target] = result_for(Bolt::Target.new(target, @inventory), Bolt::Util.walk_keys(result, &:to_sym))
         end
         raise "Cannot set return values and return block." if @return_block
         @data_set = true

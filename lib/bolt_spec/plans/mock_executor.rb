@@ -120,9 +120,15 @@ module BoltSpec
         elsif @plan_doubles.key?(plan_name)
           doub = @plan_doubles[plan_name]
           result = doub.process(scope, plan_clj, params)
-        end
-        if result == false
-          @error_message = "Unexpected call to 'run_plan(#{plan_name}, #{params})'"
+          # the throw here is how Puppet exits out of a closure and returns a result
+          # it throws this special symbol with a result object that is captured by
+          # the run_plan Puppet function
+          throw :return, result
+        else
+          # convert to JSON and back so that we get the ruby representation with all keys and
+          # values converted to a string .to_s instead of their ruby object notation
+          params_str = JSON.parse(params.to_json)
+          @error_message = "Unexpected call to 'run_plan(#{plan_name}, #{params_str})'"
           raise UnexpectedInvocation, @error_message
         end
         result

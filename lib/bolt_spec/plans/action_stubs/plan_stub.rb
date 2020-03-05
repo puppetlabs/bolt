@@ -21,7 +21,7 @@ module BoltSpec
         if @return_block
           check_plan_result(@return_block.call(plan: plan, params: params), plan)
         else
-          default_for(nil)
+          Bolt::PlanResult.new(nil, 'success')
         end
       end
 

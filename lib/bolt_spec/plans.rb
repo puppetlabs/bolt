@@ -223,7 +223,7 @@ module BoltSpec
     MOCKED_ACTIONS.each do |action|
       # Allowed action stubs can be called up to be_called_times number of times
       define_method :"allow_#{action}" do |object|
-        executor.send(:"stub_#{action}", object).add_stub
+        executor.send(:"stub_#{action}", object).add_stub(inventory)
       end
 
       # Expected action stubs must be called exactly the expected number of times
@@ -234,11 +234,8 @@ module BoltSpec
 
       # This stub will catch any action call if there are no stubs specifically for that task
       # This is not OK for plans
-      #
-      # Don't allow_any_plan functions because we need to allow the first run_plan() call
-      next if action == 'plan'
       define_method :"allow_any_#{action}" do
-        executor.send(:"stub_#{action}", :default).add_stub
+        executor.send(:"stub_#{action}", :default).add_stub(inventory)
       end
     end
 

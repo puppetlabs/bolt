@@ -303,5 +303,12 @@ describe "BoltSpec::Plans" do
       expect { run_plan(plan_name, 'targets' => targets) }
         .to raise_error(RuntimeError, /Expected plans::command to be called 1 times with parameters #{params}/)
     end
+
+    it 'errors if unexpected plan is called' do
+      # TODO: need to add a flag to enable this behavior instead of it being the default
+      err = "Unexpected call to 'run_plan(plans::command, {\"targets\"=>[\"foo\", \"bar\"]})'"
+      expect { run_plan(plan_name, 'targets' => targets) }
+        .to raise_error(RuntimeError, err)
+    end
   end
 end
