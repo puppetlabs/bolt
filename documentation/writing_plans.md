@@ -355,7 +355,7 @@ Task parameters defined as sensitive are masked when they appear in plans.
 You define a task parameter as sensitive with the metadata property `"sensitive": true`. When a task runs, the values for these sensitive parameters are masked.
 
 ```
-run_task('task_with_secrets', ..., password => '$ecret!')
+run_task('task_with_secrets', ..., password => 'hunter2')
 ```
 
 ### Working with the sensitive function
@@ -363,7 +363,7 @@ run_task('task_with_secrets', ..., password => '$ecret!')
 In Puppet you use the `Sensitive` function to mask data in output logs. Because plans are written in Puppet DSL, you can use this type freely. The `run_task()` function does not allow parameters of `Sensitive` function to be passed. When you need to pass a sensitive value to a task, you must unwrap it prior to calling `run_task()`.
 
 ```
-$pass = Sensitive('$ecret!')
+$pass = Sensitive('hunter2')
 run_task('task_with_secrets', ..., password => $pass.unwrap)
 ```
 
