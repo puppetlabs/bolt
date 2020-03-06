@@ -44,8 +44,8 @@ module Bolt
           'connect-timeout' => 10,
           'ssl' => true,
           'ssl-verify' => true,
-          'file-protocol' => 'winrm'
-          'basic_auth_only' => false,
+          'file-protocol' => 'winrm',
+          'basic-auth-only' => false
         }
       end
 
