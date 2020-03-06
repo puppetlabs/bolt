@@ -523,6 +523,19 @@ describe Bolt::Inventory::Inventory do
             expect { inventory.get_targets('target') }.to raise_error(Bolt::ValidationError)
           end
         end
+        
+        context 'basic-auth-only' do
+          let(:data) {
+            {
+              'targets' => ['target'],
+              'config' => { 'winrm' => { 'basic-auth-only' => 'true' } }
+            }
+          }
+
+          it 'fails validation' do
+            expect { inventory.get_targets('target') }.to raise_error(Bolt::ValidationError)
+          end
+        end
 
         context 'transport' do
           let(:data) {
