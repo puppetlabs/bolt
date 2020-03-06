@@ -5,6 +5,7 @@ $LOAD_PATH.unshift(File.expand_path(File.join(__dir__, '..', 'spec', 'lib')))
 
 require 'bolt'
 require 'bolt/inventory'
+require 'bolt/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/bolt_server'
 
@@ -27,7 +28,9 @@ class Client
   include BoltSpec::BoltServer
 
   def initialize
-    @inventory = Bolt::Inventory.new(conn_inventory.merge(easy_config))
+    config = Bolt::Config.default
+    plugins = Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new)
+    @inventory = Bolt::Inventory::Inventory.new(conn_inventory.merge(easy_config), config, plugins: plugins)
   end
 
   def easy_config
