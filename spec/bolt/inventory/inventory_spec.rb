@@ -523,7 +523,7 @@ describe Bolt::Inventory::Inventory do
             expect { inventory.get_targets('target') }.to raise_error(Bolt::ValidationError)
           end
         end
-        
+
         context 'basic-auth-only' do
           let(:data) {
             {
