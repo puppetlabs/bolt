@@ -622,7 +622,8 @@ describe Bolt::Inventory::Inventory do
             'service-url' => 'https://master',
             'cacert' => transport + '.pem',
             'token-file' => 'token',
-            'task-environment' => 'prod'
+            'task-environment' => 'prod',
+            'basic-auth-only' => true
           }
         end
 
@@ -648,9 +649,10 @@ describe Bolt::Inventory::Inventory do
         it 'should not modify existing config' do
           get_target(inventory, 'ssh://target')
           expect(conf.transport).to eq('ssh')
-          expect(conf.transports['ssh']['host-key-check']).to be nil
-          expect(conf.transports['winrm']['ssl']).to be true
-          expect(conf.transports['winrm']['ssl-verify']).to be true
+          expect(conf.transports[:ssh]['host-key-check']).to be nil
+          expect(conf.transports[:winrm]['ssl']).to be true
+          expect(conf.transports[:winrm]['ssl-verify']).to be true
+          expect(conf.transports[:winrm]['basic-auth-only]).to be false
         end
 
         it 'uses the configured transport' do
@@ -696,7 +698,8 @@ describe Bolt::Inventory::Inventory do
             'port' => 12345,
             'user' => 'mewinrm',
             'file-protocol' => 'winrm',
-            'cacert' => /winrm.pem\z/
+            'cacert' => /winrm.pem\z/,
+            'basic-auth-only' => true
           )
         end
 
