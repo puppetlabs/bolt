@@ -652,7 +652,7 @@ describe Bolt::Inventory::Inventory do
           expect(conf.transports[:ssh]['host-key-check']).to be nil
           expect(conf.transports[:winrm]['ssl']).to be true
           expect(conf.transports[:winrm]['ssl-verify']).to be true
-          expect(conf.transports[:winrm]['basic-auth-only]).to be false
+          expect(conf.transports[:winrm]['basic-auth-only']).to be false
         end
 
         it 'uses the configured transport' do
