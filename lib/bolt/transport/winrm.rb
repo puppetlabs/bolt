@@ -63,7 +63,7 @@ module Bolt
         unless !!ssl_flag == ssl_flag
           raise Bolt::ValidationError, 'ssl option must be a Boolean true or false'
         end
-        
+
         basic_auth_only_flag = options['basic-auth-only']
         unless !!basic_auth_only_flag == basic_auth_only_flag
           raise Bolt::ValidationError, 'basic-auth-only option must be a Boolean true or false'
