@@ -50,6 +50,7 @@ module Bolt
                       retry_limit: 1,
                       transport: transport,
                       ca_trust_path: cacert,
+                      basic_auth_only: target.options['basic-auth-only'],
                       realm: target.options['realm'],
                       no_ssl_peer_verification: !target.options['ssl-verify'] }
 
