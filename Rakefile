@@ -263,5 +263,10 @@ namespace :integration do
   end
 end
 
+desc 'Generate changelog'
+task :changelog, [:version] do |_t, args|
+  sh "./scripts/generate_changelog.rb #{args[:version]}"
+end
+
 spec = Gem::Specification.find_by_name 'gettext-setup'
 load "#{spec.gem_dir}/lib/tasks/gettext.rake"

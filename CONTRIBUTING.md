@@ -37,6 +37,19 @@ License Agreement before we can accept your pull request: https://cla.puppet.com
 1. Add the puppetlabs repo as an upstream - `git remote add upstream git@github.com:puppetlabs/bolt`
 1. Make a new branch off of master - `git checkout -b mybranchname`
 1. Commit your changes and add a useful commit message, including what specifically you changed and why - `git commit`
+    * If your changes are user-facing, add a release note to the end of a commit message. Release notes should begin
+      with a label indicating what kind of change you are making. Valid labels include `!feature`, `!bug`, `!deprecation`,
+      and `!removal`. 
+      
+      Release notes should follow this format:
+
+      ```
+      !label
+
+      * **Descriptive title of changes** ([#issue_number](issue_url))
+
+        Descriptive summary of changes.
+      ```
 1. Push your changes to your branch on your fork - `git push origin mybranchname`
 1. Open a PR against master at https://github.com/puppetlabs/bolt
 
