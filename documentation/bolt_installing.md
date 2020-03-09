@@ -4,7 +4,7 @@ Packaged versions of Bolt are available for many modern Linux distributions, as 
 
 > **What about Puppet?** You don't need to install Puppet to use Bolt. If you have Puppet installed on your machine, Bolt uses its internal version of Puppet and does not conflict with the Puppet version you have installed.
 
-> **Note:** Bolt automatically collects data about how you use it. If you want to opt out of providing this data, you can do so. For more information see, [Analytics data collection](bolt_installing.md#analytics-data-collection)
+> **Note:** Bolt automatically collects data about how you use it. If you want to opt out of providing this data, you can do so. For more information, see [Analytics data collection](bolt_installing.md#analytics-data-collection)
 
 Have questions? Get in touch. We're in #bolt on the [Puppet community Slack](https://slack.puppet.com/).
 
