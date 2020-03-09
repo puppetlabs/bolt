@@ -8,7 +8,7 @@ require 'bolt/util'
 
 module Bolt
   module Transport
-    class SSH
+    class SSH < Simple
       class Connection
         attr_reader :logger, :user, :target
 

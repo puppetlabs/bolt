@@ -7,7 +7,7 @@ require 'bolt/util'
 
 module Bolt
   module Transport
-    class Local
+    class Local < Simple
       class Connection
         attr_accessor :user, :logger, :target
 
@@ -21,7 +21,7 @@ module Bolt
         end
 
         def shell(target)
-          Bolt::Shell::Bash.new(target, self)
+          @shell ||= Bolt::Shell::Bash.new(target, self)
         end
 
         def copy_file(source, dest)
