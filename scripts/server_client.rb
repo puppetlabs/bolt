@@ -30,7 +30,12 @@ class Client
   def initialize
     config = Bolt::Config.default
     plugins = Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new)
-    @inventory = Bolt::Inventory::Inventory.new(conn_inventory.merge(easy_config), config, plugins: plugins)
+    @inventory = Bolt::Inventory::Inventory.new(
+      conn_inventory.merge(easy_config),
+      config.transport,
+      config.transports,
+      plugins
+    )
   end
 
   def easy_config

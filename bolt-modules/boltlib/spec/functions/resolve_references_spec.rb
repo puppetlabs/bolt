@@ -5,14 +5,14 @@ require 'bolt/plugin'
 
 describe 'resolve_references' do
   include PuppetlabsSpec::Fixtures
-  let(:boltdir) { Bolt::Boltdir.new('./spec/fixtures') }
-  let(:config) { Bolt::Config.new(boltdir, {}) }
-  let(:pal) { Bolt::PAL.new(config.modulepath, config.hiera_config, config.boltdir.resource_types) }
-  let(:pdb_client) { Bolt::PuppetDB::Client.new({}) }
-  let(:analytics) { Bolt::Analytics::NoopClient.new }
-  let(:plugins) { Bolt::Plugin.setup(config, pal, pdb_client, analytics) }
-  let(:executor) { Bolt::Executor.new }
-  let(:inventory) { Bolt::Inventory.create_version({}, config, plugins) }
+  let(:boltdir)       { Bolt::Boltdir.new('./spec/fixtures') }
+  let(:config)        { Bolt::Config.new(boltdir, {}) }
+  let(:pal)           { Bolt::PAL.new(config.modulepath, config.hiera_config, config.boltdir.resource_types) }
+  let(:pdb_client)    { Bolt::PuppetDB::Client.new({}) }
+  let(:analytics)     { Bolt::Analytics::NoopClient.new }
+  let(:plugins)       { Bolt::Plugin.setup(config, pal, pdb_client, analytics) }
+  let(:executor)      { Bolt::Executor.new }
+  let(:inventory)     { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
   let(:tasks_enabled) { true }
 
   let(:references) do

@@ -17,29 +17,24 @@ describe Bolt::Transport::Orch, orchestrator: true do
   include BoltSpec::Sensitive
   include BoltSpec::Task
 
-  let(:hostname) { "localhost" }
-  let(:inventory) { Bolt::Inventory.empty }
-  let(:target) { inventory.get_target(hostname) }
-
-  let(:targets) do
-    inventory.get_targets(['pcp://node1', 'node2'])
-  end
-
+  let(:transport)   { 'pcp' }
+  let(:hostname)    { 'localhost' }
+  let(:inventory)   { Bolt::Inventory.empty }
+  let(:target)      { make_target }
+  let(:targets)     { inventory.get_targets(['pcp://node1', 'node2']) }
   let(:mock_client) { instance_double("OrchestratorClient", run_task: results) }
 
-  let(:orch) { Bolt::Transport::Orch.new }
+  let(:orch)        { Bolt::Transport::Orch.new }
 
   let(:results) do
     [{ 'name' => 'localhost', 'state' => result_state, 'result' => result }]
   end
 
-  let(:mtask) { mock_task('foo', 'foo/tasks/init', 'input') }
-  let(:params) { { 'param' => 'val' } }
-
+  let(:mtask)        { mock_task('foo', 'foo/tasks/init', 'input') }
+  let(:params)       { { 'param' => 'val' } }
   let(:result_state) { 'finished' }
-  let(:result) { { '_output' => 'ok' } }
-
-  let(:base_path) { File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..')) }
+  let(:result)       { { '_output' => 'ok' } }
+  let(:base_path)    { File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..')) }
 
   before(:each) do
     allow(OrchestratorClient).to receive(:new).and_return(mock_client)
@@ -85,7 +80,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
 
     it "sets environment" do
-      update_target(targets.first, 'task-environment' => 'development')
+      set_config(targets.first, 'task-environment' => 'development')
       body = conn.build_request(targets, mtask, {})
       expect(body[:environment]).to eq('development')
     end
@@ -198,10 +193,10 @@ describe Bolt::Transport::Orch, orchestrator: true do
     let(:targets) { inventory.get_targets(%w[pcp://a pcp://b pcp://c pcp://d]) }
 
     it "splits targets in different environments into separate batches" do
-      update_target(targets[0], 'task-environment' => 'production')
-      update_target(targets[1], 'task-environment' => 'development')
-      update_target(targets[2], 'task-environment' => 'test')
-      update_target(targets[3], 'task-environment' => 'development')
+      set_config(targets[0], 'task-environment' => 'production')
+      set_config(targets[1], 'task-environment' => 'development')
+      set_config(targets[2], 'task-environment' => 'test')
+      set_config(targets[3], 'task-environment' => 'development')
 
       batches = Set.new([[targets[0]],
                          [targets[1], targets[3]],
@@ -210,9 +205,9 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
 
     it "splits targets with different urls into separate batches" do
-      update_target(targets[1], 'service-url' => 'master2')
-      update_target(targets[2], 'service-url' => 'master3')
-      update_target(targets[3], 'service-url' => 'master2')
+      set_config(targets[1], 'service-url' => 'master2')
+      set_config(targets[2], 'service-url' => 'master3')
+      set_config(targets[3], 'service-url' => 'master2')
 
       batches = Set.new([[targets[0]],
                          [targets[1], targets[3]],
@@ -221,9 +216,11 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
 
     it "splits targets with different tokens into separate batches" do
-      update_target(targets[1], 'token-file' => 'token2')
-      update_target(targets[2], 'token-file' => 'token3')
-      update_target(targets[3], 'token-file' => 'token2')
+      allow(Bolt::Util).to receive(:validate_file).and_return(true)
+
+      set_config(targets[1], 'token-file' => 'token2')
+      set_config(targets[2], 'token-file' => 'token3')
+      set_config(targets[3], 'token-file' => 'token2')
 
       batches = Set.new([[targets[0]],
                          [targets[1], targets[3]],

@@ -74,11 +74,11 @@ module BoltSpec
             'targets' => [
               { 'name' => 'ubuntu_node',
                 'alias' => 'agentless',
-                'config' => { 'ssh' => { 'port' => '20022' } } },
+                'config' => { 'ssh' => { 'port' => 20022 } } },
               { 'name' => 'puppet_5_node',
-                'config' => { 'ssh' => { 'port' => '20023' } } },
+                'config' => { 'ssh' => { 'port' => 20023 } } },
               { 'name' => 'puppet_6_node',
-                'config' => { 'ssh' => { 'port' => '20024' } } }
+                'config' => { 'ssh' => { 'port' => 20024 } } }
             ],
             'config' => {
               'ssh' => {

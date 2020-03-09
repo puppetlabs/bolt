@@ -148,7 +148,7 @@ module BoltSpec
       end
 
       def inventory
-        @inventory ||= Bolt::Inventory.create_version(@inventory_data, config, plugins)
+        @inventory ||= Bolt::Inventory.create_version(@inventory_data, config.transport, config.transports, plugins)
       end
 
       def plugins

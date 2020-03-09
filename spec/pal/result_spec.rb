@@ -17,7 +17,7 @@ describe 'Result DataType' do
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:pal)     { Bolt::PAL.new(modulepath, nil, nil) }
   let(:plugins) { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new) }
 
   let(:result_code) do
@@ -28,7 +28,7 @@ describe 'Result DataType' do
 
   def result_attr(attr)
     code = result_code + attr
-    peval(code, pal, nil, Bolt::Inventory::Inventory.new({}, plugins: plugins))
+    peval(code, pal, nil, Bolt::Inventory::Inventory.new({}, config.transport, config.transports, plugins))
   end
 
   it 'should expose target' do

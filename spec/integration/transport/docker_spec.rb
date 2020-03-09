@@ -12,17 +12,20 @@ describe Bolt::Transport::Docker, docker: true do
   include BoltSpec::Conn
   include BoltSpec::Transport
 
-  let(:hostname) { conn_info('docker')[:host] }
-  let(:docker) { Bolt::Transport::Docker.new }
-  let(:inventory) { Bolt::Inventory.empty }
-  let(:target) { inventory.get_target(target_data['uri']) }
-  let(:target_data) {
-    { 'uri' => "docker://#{hostname}",
-      'config' => { 'docker' => transport_conf } }
-  }
+  let(:transport)        { 'docker' }
+  let(:hostname)         { conn_info('docker')[:host] }
+  let(:uri)              { "docker://#{hostname}" }
+  let(:docker)           { Bolt::Transport::Docker.new }
+  let(:inventory)        { Bolt::Inventory.empty }
+  let(:target)           { make_target }
+  let(:transport_config) { {} }
+
+  def make_target
+    inventory.get_target(uri)
+  end
 
   context 'with docker' do
-    let(:transport) { :docker }
+    let(:transport)  { :docker }
     let(:os_context) { posix_context }
 
     it "can test whether the target is available" do
@@ -60,7 +63,7 @@ describe Bolt::Transport::Docker, docker: true do
 
   context 'when url is specified' do
     it 'uses the url' do
-      update_target(target, 'service-url' => 'tcp://localhost:55555')
+      set_config(target, 'service-url' => 'tcp://localhost:55555')
       expect {
         docker.with_connection(target) {}
       }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name or ID matching/)

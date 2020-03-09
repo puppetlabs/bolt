@@ -42,24 +42,6 @@ module Bolt
 
       attr_reader :logger
 
-      # Returns options this transport supports
-      def self.options
-        raise NotImplementedError,
-              "self.options() or self.filter_options(unfiltered) must be implemented by the transport class"
-      end
-
-      def self.default_options
-        {}
-      end
-
-      def self.filter_options(unfiltered)
-        unfiltered.select { |k| options.include?(k) }
-      end
-
-      def self.validate(_options)
-        raise NotImplementedError, "self.validate() must be implemented by the transport class"
-      end
-
       def initialize
         @logger = Logging.logger[self]
       end

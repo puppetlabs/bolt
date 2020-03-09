@@ -97,9 +97,9 @@ namespace :docs do
     @puppetfile = { options: Bolt::Config::PUPPETFILE_OPTIONS }
     @apply = { options: Bolt::Config::APPLY_SETTINGS, defaults: Bolt::Config::DEFAULT_APPLY_SETTINGS }
 
-    Bolt::TRANSPORTS.each do |name, transport|
-      @transports[:options][name.to_s] = transport::OPTIONS
-      @transports[:defaults][name.to_s] = transport&.default_options
+    Bolt::Config::TRANSPORT_CONFIG.each do |name, transport|
+      @transports[:options][name] = transport::OPTIONS
+      @transports[:defaults][name] = transport::DEFAULTS
     end
 
     renderer = ERB.new(File.read('documentation/bolt_configuration_reference.md.erb'), nil, '-')

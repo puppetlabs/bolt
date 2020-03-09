@@ -238,6 +238,17 @@ module Bolt
       def symbolize_top_level_keys(hsh)
         hsh.each_with_object({}) { |(k, v), h| k.is_a?(String) ? h[k.to_sym] = v : h[k] = v }
       end
+
+      # Recursively searches a data structure for plugin references
+      def references?(input)
+        if input.is_a?(Hash)
+          input.key?('_plugin') || input.values.any? { |v| references?(v) }
+        elsif input.is_a?(Array)
+          input.any? { |v| references?(v) }
+        else
+          false
+        end
+      end
     end
   end
 end
