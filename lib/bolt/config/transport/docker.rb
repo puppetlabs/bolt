@@ -32,7 +32,7 @@ module Bolt
         private def validate
           super
 
-          if @config['interpreters'] && !reference?(@config['interpreters'])
+          if @config['interpreters']
             @config['interpreters'] = normalize_interpreters(@config['interpreters'])
           end
         end

@@ -31,12 +31,12 @@ module Bolt
         private def validate
           super
 
-          if @config['cacert'] && !reference?(@config['cacert'])
+          if @config['cacert']
             @config['cacert'] = File.expand_path(@config['cacert'], @boltdir)
             Bolt::Util.validate_file('cacert', @config['cacert'])
           end
 
-          if @config['token-file'] && !reference?(@config['token-file'])
+          if @config['token-file']
             @config['token-file'] = File.expand_path(@config['token-file'], @boltdir)
             Bolt::Util.validate_file('token-file', @config['token-file'])
           end

@@ -14,6 +14,7 @@ describe Bolt::Config::Transport::WinRM do
 
   context 'using plugins' do
     let(:plugin_data) { { 'password' => { '_plugin' => 'foo' } } }
+    let(:resolved_data) { { 'password' => 'foo' } }
 
     include_examples 'plugins'
   end

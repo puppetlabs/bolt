@@ -11,37 +11,46 @@ module Bolt
 
         def initialize(data = {}, boltdir = nil)
           assert_hash_or_config(data)
-          @input   = reference?(data) ? data : filter(data)
-          @config  = Bolt::Util.deep_merge(defaults, @input)
-          @boltdir = boltdir
-          validate
+          @input    = data
+          @resolved = !Bolt::Util.references?(input)
+          @config   = resolved? ? Bolt::Util.deep_merge(defaults, filter(input)) : defaults
+          @boltdir  = boltdir
+
+          validate if resolved?
         end
 
+        # Accessor methods
+        # These are mostly all wrappers for same-named Hash methods, but they all
+        # require that the config options be fully-resolved before accessing data
         def [](key)
-          @config[key]
+          resolved_config[key]
         end
 
         def to_h
-          @config
+          resolved_config
         end
 
         def fetch(*args)
-          @config.fetch(*args)
+          resolved_config.fetch(*args)
         end
 
         def include?(args)
-          @config.include?(args)
+          resolved_config.include?(args)
         end
 
         def dig(*keys)
-          @config.dig(*keys)
+          resolved_config.dig(*keys)
         end
 
-        def input=(data)
-          assert_hash_or_config(data)
-          @input  = data
-          @config = Bolt::Util.deep_merge(defaults, @input)
-          validate
+        private def resolved_config
+          unless resolved?
+            raise Bolt::Error.new(
+              "Unable to access transport config, #{self.class} has unresolved config: #{input.inspect}",
+              'bolt/unresolved-transport-config'
+            )
+          end
+
+          @config
         end
 
         # Merges the original input data with the provided data, which is either a hash
@@ -54,6 +63,20 @@ module Bolt
           end
 
           self.class.new(merged, @boltdir)
+        end
+
+        # Resolve any references in the input data, then remerge it with the defaults
+        # and validate all values
+        def resolve(plugins)
+          @input    = plugins.resolve_references(input)
+          @config   = Bolt::Util.deep_merge(defaults, filter(input))
+          @resolved = true
+
+          validate
+        end
+
+        def resolved?
+          @resolved
         end
 
         def self.options
@@ -88,12 +111,6 @@ module Bolt
           end
         end
 
-        # Checks whether a config option contains a plugin reference, which
-        # should always be a valid input
-        private def reference?(value)
-          value.is_a?(Hash) && value.key?('_plugin')
-        end
-
         # Validation defaults to just asserting the option types
         private def validate
           assert_type
@@ -101,10 +118,6 @@ module Bolt
 
         # Validates that each option is the correct type. Types are loaded from the OPTIONS hash.
         private def assert_type
-          # It's possible for the input to be a plugin reference, so we shouldn't validate
-          # any of the types here. Once the reference is resolved it will be validated.
-          return if reference?(@input)
-
           @config.each_pair do |opt, val|
             next unless (type = self.class.options.dig(opt, :type))
 
@@ -116,7 +129,7 @@ module Bolt
                       "#{opt} must be a Boolean true or false, received #{val.class} #{val.inspect}"
               end
             else
-              unless val.nil? || val.is_a?(type) || reference?(val)
+              unless val.nil? || val.is_a?(type)
                 raise Bolt::ValidationError,
                       "#{opt} must be a #{type}, received #{val.class} #{val.inspect}"
               end

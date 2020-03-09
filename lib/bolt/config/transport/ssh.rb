@@ -77,9 +77,7 @@ module Bolt
           super
 
           if (key_opt = @config['private-key'])
-            unless key_opt.instance_of?(String) ||
-                   (key_opt.instance_of?(Hash) && key_opt.include?('key-data')) ||
-                   reference?(key_opt)
+            unless key_opt.instance_of?(String) || (key_opt.instance_of?(Hash) && key_opt.include?('key-data'))
               raise Bolt::ValidationError,
                     "private-key option must be a path to a private key file or a Hash containing the 'key-data', "\
                     "received #{key_opt.class} #{key_opt}"
@@ -90,12 +88,12 @@ module Bolt
             end
           end
 
-          if @config['interpreters'] && !reference?(@config['interpreters'])
+          if @config['interpreters']
             @config['interpreters'] = normalize_interpreters(@config['interpreters'])
           end
 
           if (run_as_cmd = @config['run-as-command'])
-            unless reference?(run_as_cmd) || run_as_cmd.all? { |n| n.is_a?(String) }
+            unless run_as_cmd.all? { |n| n.is_a?(String) }
               raise Bolt::ValidationError,
                     "run-as-command must be an Array of Strings, received #{run_as_cmd.class} #{run_as_cmd.inspect}"
             end

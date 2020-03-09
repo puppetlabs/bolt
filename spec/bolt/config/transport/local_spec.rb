@@ -5,10 +5,11 @@ require 'bolt/config/transport/local'
 require 'shared_examples/transport_config'
 
 describe Bolt::Config::Transport::Local do
-  let(:transport)   { Bolt::Config::Transport::Local }
-  let(:data)        { { 'interpreters' => { 'rb' => '/path/to/ruby' } } }
-  let(:merge_data)  { { 'interpreters' => { 'py' => '/path/to/python' } } }
-  let(:plugin_data) { { 'tmpdir' => { '_plugin' => 'foo' } } }
+  let(:transport)     { Bolt::Config::Transport::Local }
+  let(:data)          { { 'interpreters' => { 'rb' => '/path/to/ruby' } } }
+  let(:merge_data)    { { 'interpreters' => { 'py' => '/path/to/python' } } }
+  let(:plugin_data)   { { 'tmpdir' => { '_plugin' => 'foo' } } }
+  let(:resolved_data) { { 'tmpdir' => 'foo' } }
 
   context 'on Windows' do
     before(:each) do

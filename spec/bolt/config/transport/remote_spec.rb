@@ -12,7 +12,8 @@ describe Bolt::Config::Transport::Remote do
   include_examples 'transport config'
 
   context 'using plugins' do
-    let(:plugin_data) { { 'run-on' => { '_plugin' => 'foo' } } }
+    let(:plugin_data)   { { 'run-on' => { '_plugin' => 'foo' } } }
+    let(:resolved_data) { { 'run-on' => 'foo' } }
 
     include_examples 'plugins'
   end

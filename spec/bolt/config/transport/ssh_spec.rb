@@ -13,7 +13,8 @@ describe Bolt::Config::Transport::SSH do
   include_examples 'filters options'
 
   context 'using plugins' do
-    let(:plugin_data) { { 'password' => { '_plugin' => 'foo' } } }
+    let(:plugin_data)   { { 'password' => { '_plugin' => 'foo' } } }
+    let(:resolved_data) { { 'password' => 'foo' } }
 
     include_examples 'plugins'
   end

@@ -56,12 +56,12 @@ module Bolt
         private def validate
           super
 
-          if @config['interpreters'] && !reference?(@config['interpreters'])
+          if @config['interpreters']
             @config['interpreters'] = normalize_interpreters(@config['interpreters'])
           end
 
           if (run_as_cmd = @config['run-as-command'])
-            unless reference?(run_as_cmd) || run_as_cmd.all? { |n| n.is_a?(String) }
+            unless run_as_cmd.all? { |n| n.is_a?(String) }
               raise Bolt::ValidationError,
                     "run-as-command must be an Array of Strings, received #{run_as_cmd.class} #{run_as_cmd.inspect}"
             end

@@ -64,13 +64,13 @@ module Bolt
               raise Bolt::ValidationError, "SMB file transfers are not allowed with SSL enabled"
             end
 
-            if @config['cacert'] && !reference?(@config['cacert'])
+            if @config['cacert']
               @config['cacert'] = File.expand_path(@config['cacert'], @boltdir)
               Bolt::Util.validate_file('cacert', @config['cacert'])
             end
           end
 
-          if @config['interpreters'] && !reference?(@config['interpreters'])
+          if @config['interpreters']
             @config['interpreters'] = normalize_interpreters(@config['interpreters'])
           end
         end

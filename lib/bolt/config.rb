@@ -307,7 +307,7 @@ module Bolt
 
       keys = OPTIONS.keys - %w[plugins plugin_hooks]
       keys.each do |key|
-        next unless references?(@data[key])
+        next unless Bolt::Util.references?(@data[key])
         valid_keys = TRANSPORT_CONFIG.keys + %w[plugins plugin_hooks]
         raise Bolt::ValidationError,
               "Found unsupported key _plugin in config setting #{key}. Plugins are only available in "\
@@ -339,17 +339,6 @@ module Bolt
 
       unless TRANSPORT_CONFIG.include?(transport)
         raise UnknownTransportError, transport
-      end
-    end
-
-    # Recursively searches a data structure for plugin references
-    private def references?(input)
-      if input.is_a?(Hash)
-        input.key?('_plugin') || input.values.any? { |v| references?(v) }
-      elsif input.is_a?(Array)
-        input.any? { |v| references?(v) }
-      else
-        false
       end
     end
 

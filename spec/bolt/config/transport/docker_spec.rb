@@ -13,7 +13,8 @@ describe Bolt::Config::Transport::Docker do
   include_examples 'filters options'
 
   context 'using plugins' do
-    let(:plugin_data) { { 'host' => { '_plugin' => 'foo' } } }
+    let(:plugin_data)   { { 'host' => { '_plugin' => 'foo' } } }
+    let(:resolved_data) { { 'host' => 'foo' } }
 
     include_examples 'plugins'
   end

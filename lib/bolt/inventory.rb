@@ -62,7 +62,7 @@ module Bolt
 
       # Resolve plugin references from transport config
       config.transports.each_value do |t|
-        t.input = plugins.resolve_references(t.input)
+        t.resolve(plugins) unless t.resolved?
       end
 
       inventory = create_version(data, config.transport, config.transports, plugins)
