@@ -20,7 +20,7 @@ module Bolt
           @logger = Logging.logger[self]
         end
 
-        def shell(target)
+        def shell
           @shell ||= Bolt::Shell::Bash.new(target, self)
         end
 
@@ -47,7 +47,7 @@ module Bolt
         end
 
         def execute(command, **options)
-          command_arr = options[:environment].nil? ? [command_str] : [options[:environment], command_str]
+          command_arr = options[:environment].nil? ? Array(command) : [options[:environment], *command]
 
           # Prepare the variables!
           result_output = Bolt::Node::Output.new

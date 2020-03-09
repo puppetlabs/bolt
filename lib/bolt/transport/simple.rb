@@ -3,13 +3,14 @@
 require 'logging'
 require 'bolt/result'
 require 'bolt/shell'
+require 'bolt/transport/base'
 
 module Bolt
   module Transport
     # A simple transport has a single connection per target and delegates its
     # operation to a target-specific shell.
     class Simple < Base
-      def with_connection(&_blk)
+      def with_connection(target)
         raise NotImplementedError, "with_connection() must be implemented by the transport class"
       end
 

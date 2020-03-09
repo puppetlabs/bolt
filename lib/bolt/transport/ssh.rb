@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/node/errors'
-require 'bolt/transport/thin'
+require 'bolt/transport/simple'
 
 module Bolt
   module Transport

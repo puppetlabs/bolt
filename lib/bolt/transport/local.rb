@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/transport/base'
+require 'bolt/transport/simple'
 
 module Bolt
   module Transport
