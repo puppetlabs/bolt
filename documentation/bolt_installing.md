@@ -2,11 +2,11 @@
 
 Packaged versions of Bolt are available for many modern Linux distributions, as well as macOS and Windows.
 
+> **What about Puppet?** You don't need to install Puppet to use Bolt. If you have Puppet installed on your machine, Bolt uses its internal version of Puppet and does not conflict with the Puppet version you have installed.
+
+> **Note:** Bolt automatically collects data about how you use it. If you want to opt out of providing this data, you can do so. For more information see, [Analytics data collection](bolt_installing.md#analytics-data-collection)
+
 Have questions? Get in touch. We're in #bolt on the [Puppet community Slack](https://slack.puppet.com/).
-
-**Tip:** Bolt uses an internal version of Puppet that supports tasks and plans, so you do not need to install Puppet. If you use Bolt on a machine that has Puppet installed, Bolt uses its internal version of Puppet and does not conflict with the Puppet version you have installed.
-
-**Note:** Bolt automatically collects data about how you use it. If you want to opt out of providing this data, you can do so. For more information see, [Analytics data collection](bolt_installing.md#analytics-data-collection)
 
 ## Installing Bolt on Windows
 
@@ -101,7 +101,7 @@ For more information, run 'Import-Module PuppetBolt'.
     For more information about PowerShell execution policies, see Microsoft's documentation about [execution policies](http://go.microsoft.com/fwlink/?LinkID=135170) and [how to set them](https://msdn.microsoft.com/en-us/powershell/reference/5.1/microsoft.powershell.security/set-executionpolicy).
 
 
-## Install Bolt on macOS
+## Installing Bolt on macOS
 
 Use one of the supported macOS installation methods to install Bolt.
 
@@ -137,7 +137,7 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS.
 
 1.  Download the Bolt installer package for your macOS version.
     
-    **Tip:** To find the macOS version number on your Mac, go to the Apple () menu in the corner of your screen and choose **About This Mac**.
+    > **Tip:** To find the macOS version number on your Mac, go to the Apple () menu in the corner of your screen and choose **About This Mac**.
     - 10.14 (Mojave) [https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg)
     - 10.15 (Catalina) [https://downloads.puppet.com/mac/puppet/10.15/x86_64/puppet-bolt-latest.dmg](https://https://downloads.puppet.com/mac/puppet/10.15/x86_64/puppet-bolt-latest.dmg)
 1.  Double-click the `puppet-bolt-latest.dmg` file to mount it and then double-click `puppet-bolt-[version]-installer.pkg` to run the installer.
@@ -145,17 +145,17 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS.
     ```
     bolt --help
     ```
-**Note:** If you get a "Command not found error" when you try to run Bolt, make sure you've added the `opt/puppetlabs/bin` PATH to `~/.bashrc` or the relevant profile for the shell you're using.  
+> **Note:** If you get a "Command not found error" when you try to run Bolt, make sure you've added the `opt/puppetlabs/bin` PATH to `~/.bashrc` or the relevant profile for the shell you're using.  
 
 #### Upgrading Bolt with macOS installer
 
 If you installed Bolt using the macOS installer, download the DMG again and repeat the installation steps to install the latest version.
 
-## Install Bolt on *nix
+## Installing Bolt on *nix
 
 Use one of the supported *nix installation methods to install Bolt.
 
-**CAUTION:** These instructions include enabling the Puppet Tools repository. While Bolt can also be installed from the Puppet 6 or 5 platform repositories, adding these repositories to a Puppet-managed target, especially a PE master, might result in an unsupported version of a package like `puppet-agent` being installed. This can cause downtime, especially on a PE master.
+> **CAUTION:** These instructions include enabling the Puppet Tools repository. While Bolt can also be installed from the Puppet 6 or 5 platform repositories, adding these repositories to a Puppet-managed target, especially a PE master, might result in an unsupported version of a package like `puppet-agent` being installed. This can cause downtime, especially on a PE master.
 
 ### Install Bolt on Debian or Ubuntu
 
