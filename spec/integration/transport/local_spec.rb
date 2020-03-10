@@ -35,14 +35,6 @@ describe Bolt::Transport::Local do
     expect(runner.connected?(target)).to eq(true)
   end
 
-  it 'provides platform specific features' do
-    if Bolt::Util.windows?
-      expect(runner.provided_features).to eq(['powershell'])
-    else
-      expect(runner.provided_features).to eq(['shell'])
-    end
-  end
-
   include_examples 'transport api'
 
   context 'running as another user', sudo: true do
@@ -177,17 +169,8 @@ describe Bolt::Transport::Local do
 
   context 'file errors' do
     before(:each) do
-      allow_any_instance_of(Bolt::Transport::Local).to receive(:upload).and_raise(
+      allow_any_instance_of(Bolt::Transport::Local::Connection).to receive(:copy_file).and_raise(
         Bolt::Node::FileError.new("no write", "WRITE_ERROR")
-      )
-      allow_any_instance_of(Bolt::Transport::LocalWindows).to receive(:upload).and_raise(
-        Bolt::Node::FileError.new("no write", "WRITE_ERROR")
-      )
-      allow_any_instance_of(Bolt::Transport::LocalWindows).to receive(:in_tmpdir).and_raise(
-        Bolt::Node::FileError.new("no write", "WRITE_ERROR")
-      )
-      allow_any_instance_of(Bolt::Transport::Local::Shell).to receive(:with_tempdir).and_raise(
-        Bolt::Node::FileError.new("no tmpdir", "TEMDIR_ERROR")
       )
     end
 
