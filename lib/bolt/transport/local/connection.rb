@@ -27,23 +27,18 @@ module Bolt
         def copy_file(source, dest)
           @logger.debug { "Uploading #{source}, to #{dest}" }
           if source.is_a?(StringIO)
-            File.open("tempfile", "w") { |f| f.write(source.read) }
-            execute(['mv', 'tempfile', dest])
+            Tempfile.create(File.basename(dest)) do |f|
+              f.write(source.read)
+              FileUtils.mv(t, dest)
+            end
           else
             # Mimic the behavior of `cp --remove-destination`
             # since the flag isn't supported on MacOS
-            result = execute(['rm', '-rf', dest])
-            if result.exit_code != 0
-              message = "Could not remove existing file #{dest}: #{result.stderr.string}"
-              raise Bolt::Node::FileError.new(message, 'REMOVE_ERROR')
-            end
-
-            result = execute(['cp', '-r', source, dest])
-            if result.exit_code != 0
-              message = "Could not copy file to #{dest}: #{result.stderr.string}"
-              raise Bolt::Node::FileError.new(message, 'COPY_ERROR')
-            end
+            FileUtils.cp_r(src, dest, remove_destination: true)
           end
+        rescue StandardError => e
+          message = "Could not copy file to #{dest}: #{e}"
+          raise Bolt::Node::FileError.new(message, 'COPY_ERROR')
         end
 
         def execute(command, **options)
