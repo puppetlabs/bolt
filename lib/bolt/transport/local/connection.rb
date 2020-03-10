@@ -34,7 +34,7 @@ module Bolt
           else
             # Mimic the behavior of `cp --remove-destination`
             # since the flag isn't supported on MacOS
-            FileUtils.cp_r(src, dest, remove_destination: true)
+            FileUtils.cp_r(source, dest, remove_destination: true)
           end
         rescue StandardError => e
           message = "Could not copy file to #{dest}: #{e}"
