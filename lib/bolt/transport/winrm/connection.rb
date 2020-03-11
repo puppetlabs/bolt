@@ -5,11 +5,9 @@ require 'bolt/node/output'
 
 module Bolt
   module Transport
-    class WinRM < Base
+    class WinRM < Simple
       class Connection
         attr_reader :logger, :target
-
-        DEFAULT_EXTENSIONS = ['.ps1', '.rb', '.pp'].freeze
 
         def initialize(target, transport_logger)
           raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
@@ -19,9 +17,6 @@ module Bolt
           @port = @target.port || default_port
           @user = @target.user
           # Build set of extensions from extensions config as well as interpreters
-          extensions = [target.options['extensions'] || []].flatten.map { |ext| ext[0] != '.' ? '.' + ext : ext }
-          extensions += target.options['interpreters'].keys if target.options['interpreters']
-          @extensions = DEFAULT_EXTENSIONS.to_set.merge(extensions)
 
           @logger = Logging.logger[@target.safe_name]
           logger.debug("Initializing winrm connection to #{@target.safe_name}")
@@ -104,15 +99,6 @@ module Bolt
           @logger.debug { "Closed session" }
         end
 
-        def shell_init
-          return nil if @shell_initialized
-          result = execute(Powershell.shell_init)
-          if result.exit_code != 0
-            raise BaseError.new("Could not initialize shell: #{result.stderr.string}", "SHELL_INIT_ERROR")
-          end
-          @shell_initialized = true
-        end
-
         def execute(command)
           result_output = Bolt::Node::Output.new
 
@@ -136,35 +122,23 @@ module Bolt
           raise
         end
 
-        def execute_process(path = '', arguments = [], stdin = nil)
-          execute(Powershell.execute_process(path, arguments, stdin))
-        end
-
-        def mkdirs(dirs)
-          result = execute(Powershell.mkdirs(dirs))
-          if result.exit_code != 0
-            message = "Could not create directories: #{result.stderr}"
-            raise Bolt::Node::FileError.new(message, 'MKDIR_ERROR')
-          end
-        end
-
-        def write_remote_file(source, destination)
+        def copy_file(source, destination)
           @logger.debug { "Uploading #{source}, to #{destination}" }
           if target.options['file-protocol'] == 'smb'
-            write_remote_file_smb(source, destination)
+            copy_file_smb(source, destination)
           else
-            write_remote_file_winrm(source, destination)
+            copy_file_winrm(source, destination)
           end
         end
 
-        def write_remote_file_winrm(source, destination)
+        def copy_file_winrm(source, destination)
           fs = ::WinRM::FS::FileManager.new(@connection)
           fs.upload(source, destination)
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
 
-        def write_remote_file_smb(source, destination)
+        def copy_file_smb(source, destination)
           # lazy-load expensive gem code
           require 'ruby_smb'
 
@@ -184,7 +158,7 @@ module Bolt
           client = smb_client_login
           tree = client.tree_connect(path)
           begin
-            write_remote_file_smb_recursive(tree, source, dest)
+            copy_file_smb_recursive(tree, source, dest)
           ensure
             tree.disconnect!
           end
@@ -194,35 +168,8 @@ module Bolt
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
 
-        def make_tempdir
-          find_parent = target.options['tmpdir'] ? "\"#{target.options['tmpdir']}\"" : '[System.IO.Path]::GetTempPath()'
-          result = execute(Powershell.make_tempdir(find_parent))
-          if result.exit_code != 0
-            raise Bolt::Node::FileError.new("Could not make tempdir: #{result.stderr}", 'TEMPDIR_ERROR')
-          end
-          result.stdout.string.chomp
-        end
-
-        def with_remote_tempdir
-          dir = make_tempdir
-          yield dir
-        ensure
-          execute(Powershell.rmdir(dir))
-        end
-
-        def validate_extensions(ext)
-          unless @extensions.include?(ext)
-            raise Bolt::Node::FileError.new("File extension #{ext} is not enabled, "\
-                                "to run it please add to 'winrm: extensions'", 'FILETYPE_ERROR')
-          end
-        end
-
-        def write_remote_executable(dir, file, filename = nil)
-          filename ||= File.basename(file)
-          validate_extensions(File.extname(filename))
-          remote_path = "#{dir}\\#{filename}"
-          write_remote_file(file, remote_path)
-          remote_path
+        def shell
+          @shell ||= Bolt::Shell::Powershell.new(target, self)
         end
 
         private
@@ -272,13 +219,13 @@ module Bolt
           )
         end
 
-        def write_remote_file_smb_recursive(tree, source, dest)
+        def copy_file_smb_recursive(tree, source, dest)
           if Dir.exist?(source)
             tree.open_directory(directory: dest, write: true, disposition: ::RubySMB::Dispositions::FILE_OPEN_IF)
 
             Dir.children(source).each do |child|
               child_dest = dest + '\\' + child
-              write_remote_file_smb_recursive(tree, File.join(source, child), child_dest)
+              copy_file_smb_recursive(tree, File.join(source, child), child_dest)
             end
             return
           end

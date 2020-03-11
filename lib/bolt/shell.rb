@@ -2,6 +2,14 @@
 
 module Bolt
   class Shell
+    attr_reader :target, :conn, :logger
+
+    def initialize(target, conn)
+      @target = target
+      @conn = conn
+      @logger = Logging.logger[@target.safe_name]
+    end
+
     def run_command(*_args)
       raise NotImplementedError, "run_command() must be implemented by the shell class"
     end

@@ -70,22 +70,6 @@ module Bolt
         result_output
       end
 
-      def upload(target, source, destination, _options = {})
-        copy_file(source, destination)
-        Bolt::Result.for_upload(target, source, destination)
-      end
-
-      def run_command(target, command, _options = {})
-        in_tmpdir(target.options['tmpdir']) do |dir|
-          output = execute(command, dir: dir)
-          Bolt::Result.for_command(target,
-                                   output.stdout.string,
-                                   output.stderr.string,
-                                   output.exit_code,
-                                   'command', command)
-        end
-      end
-
       def run_script(target, script, arguments, _options = {})
         with_tmpscript(File.absolute_path(script), target.options['tmpdir']) do |file, dir|
           logger.debug "Running '#{file}' with #{arguments.to_json}"
@@ -116,69 +100,67 @@ module Bolt
         input_method = implementation['input_method']
         extra_files = implementation['files']
 
-        in_tmpdir(target.options['tmpdir']) do |dir|
-          if extra_files.empty?
-            script = File.join(dir, File.basename(executable))
-          else
-            arguments['_installdir'] = dir
-            script_dest = File.join(dir, task.tasks_dir)
-            FileUtils.mkdir_p([script_dest] + extra_files.map { |file| File.join(dir, File.dirname(file['name'])) })
+        if extra_files.empty?
+          script = File.join(dir, File.basename(executable))
+        else
+          arguments['_installdir'] = dir
+          script_dest = File.join(dir, task.tasks_dir)
+          FileUtils.mkdir_p([script_dest] + extra_files.map { |file| File.join(dir, File.dirname(file['name'])) })
 
-            script = File.join(script_dest, File.basename(executable))
-            extra_files.each do |file|
-              dest = File.join(dir, file['name'])
-              copy_file(file['path'], dest)
-              File.chmod(0o750, dest)
-            end
+          script = File.join(script_dest, File.basename(executable))
+          extra_files.each do |file|
+            dest = File.join(dir, file['name'])
+            copy_file(file['path'], dest)
+            File.chmod(0o750, dest)
           end
-
-          copy_file(executable, script)
-          File.chmod(0o750, script)
-
-          interpreter = select_interpreter(script, target.options['interpreters'])
-          interpreter_debug = interpreter ? " using '#{interpreter}' interpreter" : nil
-          # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
-          logger.debug("Running '#{script}' with #{arguments.to_json}#{interpreter_debug}")
-          unwrapped_arguments = unwrap_sensitive_args(arguments)
-
-          stdin = Bolt::Task::STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
-          if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
-            environment_params = envify_params(unwrapped_arguments).each_with_object([]) do |(arg, val), list|
-              list << Powershell.set_env(arg, val)
-            end
-            environment_params = environment_params.join("\n") + "\n"
-          else
-            environment_params = ""
-          end
-
-          if Powershell.powershell_file?(script) && stdin.nil?
-            command = Powershell.run_ps_task(arguments, script, input_method)
-            command = environment_params + Powershell.shell_init + command
-            interpreter ||= ['powershell.exe', *Powershell.ps_args]
-            output =
-              if input_method == 'powershell'
-                execute(command, dir: dir, interpreter: interpreter)
-              else
-                execute(command, dir: dir, stdin: stdin, interpreter: interpreter)
-              end
-          end
-          unless output
-            if interpreter
-              env = Bolt::Task::ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
-              output = execute(script, stdin: stdin, env: env, dir: dir, interpreter: interpreter)
-            else
-              path, args = *Powershell.process_from_extension(script)
-              command = args.unshift(path).join(' ')
-              command = environment_params + Powershell.shell_init + command
-              output = execute(command, dir: dir, stdin: stdin, interpreter: 'powershell.exe')
-            end
-          end
-          Bolt::Result.for_task(target,
-                                output.stdout.string,
-                                output.stderr.string,
-                                output.exit_code,
-                                task.name)
         end
+
+        copy_file(executable, script)
+        File.chmod(0o750, script)
+
+        interpreter = select_interpreter(script, target.options['interpreters'])
+        interpreter_debug = interpreter ? " using '#{interpreter}' interpreter" : nil
+        # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
+        logger.debug("Running '#{script}' with #{arguments.to_json}#{interpreter_debug}")
+        unwrapped_arguments = unwrap_sensitive_args(arguments)
+
+        stdin = Bolt::Task::STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
+        if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
+          environment_params = envify_params(unwrapped_arguments).each_with_object([]) do |(arg, val), list|
+            list << Powershell.set_env(arg, val)
+          end
+          environment_params = environment_params.join("\n") + "\n"
+        else
+          environment_params = ""
+        end
+
+        if Powershell.powershell_file?(script) && stdin.nil?
+          command = Powershell.run_ps_task(arguments, script, input_method)
+          command = environment_params + Powershell.shell_init + command
+          interpreter ||= ['powershell.exe', *Powershell.ps_args]
+          output =
+            if input_method == 'powershell'
+              execute(command, dir: dir, interpreter: interpreter)
+            else
+              execute(command, dir: dir, stdin: stdin, interpreter: interpreter)
+            end
+        end
+        unless output
+          if interpreter
+            env = Bolt::Task::ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
+            output = execute(script, stdin: stdin, env: env, dir: dir, interpreter: interpreter)
+          else
+            path, args = *Powershell.process_from_extension(script)
+            command = args.unshift(path).join(' ')
+            command = environment_params + Powershell.shell_init + command
+            output = execute(command, dir: dir, stdin: stdin, interpreter: 'powershell.exe')
+          end
+        end
+        Bolt::Result.for_task(target,
+                              output.stdout.string,
+                              output.stderr.string,
+                              output.exit_code,
+                              task.name)
       end
 
       def connected?(_targets)

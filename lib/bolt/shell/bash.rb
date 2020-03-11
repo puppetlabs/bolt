@@ -6,17 +6,13 @@ require 'shellwords'
 module Bolt
   class Shell
     class Bash < Shell
-      attr_reader :target, :conn, :logger
-
       def initialize(target, conn)
-        @target = target
+        super
+
         @run_as = nil
-        @conn = conn
 
         @sudo_id = SecureRandom.uuid
         @sudo_password = @target.options['sudo-password'] || @target.password
-
-        @logger = Logging.logger[@target.safe_name]
       end
 
       def provided_features
