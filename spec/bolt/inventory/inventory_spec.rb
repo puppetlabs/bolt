@@ -528,7 +528,7 @@ describe Bolt::Inventory::Inventory do
           let(:data) {
             {
               'targets' => ['target'],
-              'config' => { 'winrm' => { 'basic-auth-only' => 'true' } }
+              'config' => { 'transport' => 'winrm', 'winrm' => { 'basic-auth-only' => 'true' } }
             }
           }
 
@@ -610,7 +610,7 @@ describe Bolt::Inventory::Inventory do
             'password' => 'you' + transport,
             'port' => 12345,
             'private-key' => 'anything',
-            'ssl' => false,
+            'ssl' => true,
             'ssl-verify' => false,
             'host-key-check' => false,
             'connect-timeout' => transport.size,
@@ -649,10 +649,10 @@ describe Bolt::Inventory::Inventory do
         it 'should not modify existing config' do
           get_target(inventory, 'ssh://target')
           expect(conf.transport).to eq('ssh')
-          expect(conf.transports[:ssh]['host-key-check']).to be nil
-          expect(conf.transports[:winrm]['ssl']).to be true
-          expect(conf.transports[:winrm]['ssl-verify']).to be true
-          expect(conf.transports[:winrm]['basic-auth-only']).to be false
+          expect(conf.transports['ssh']['host-key-check']).to be nil
+          expect(conf.transports['winrm']['ssl']).to be true
+          expect(conf.transports['winrm']['ssl-verify']).to be true
+          expect(conf.transports['winrm']['basic-auth-only']).to be false
         end
 
         it 'uses the configured transport' do
@@ -690,7 +690,7 @@ describe Bolt::Inventory::Inventory do
           expect(target.port).to eq(12345)
           expect(target.options.to_h).to include(
             'connect-timeout' => 5,
-            'ssl' => false,
+            'ssl' => true,
             'ssl-verify' => false,
             'tmpdir' => "/winrm",
             'extensions' => [".py"],

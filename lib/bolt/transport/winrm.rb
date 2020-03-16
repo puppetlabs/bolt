@@ -7,48 +7,6 @@ require 'bolt/transport/powershell'
 module Bolt
   module Transport
     class WinRM < Base
-      OPTIONS = {
-        "cacert"          => "The path to the CA certificate.",
-        "connect-timeout" => "How long Bolt should wait when establishing connections.",
-        "extensions"      => "List of file extensions that are accepted for scripts or tasks. "\
-                              "Scripts with these file extensions rely on the target's file type "\
-                              "association to run. For example, if Python is installed on the system, "\
-                              "a `.py` script runs with `python.exe`. The extensions `.ps1`, `.rb`, and "\
-                              "`.pp` are always allowed and run via hard-coded executables.",
-        "file-protocol"   => "Which file transfer protocol to use. Either `winrm` or `smb`. Using `smb` is "\
-                              "recommended for large file transfers.",
-        "host"            => "Host name.",
-        "interpreters"    => "A map of an extension name to the absolute path of an executable, "\
-                              "enabling you to override the shebang defined in a task executable. The "\
-                              "extension can optionally be specified with the `.` character (`.py` and "\
-                              "`py` both map to a task executable `task.py`) and the extension is case "\
-                              "sensitive. When a target's name is `localhost`, Ruby tasks run with the "\
-                              "Bolt Ruby interpreter by default.",
-        "password"        => "Login password. **Required unless using Kerberos.**",
-        "port"            => "Connection port.",
-        "realm"           => "Kerberos realm (Active Directory domain) to authenticate against.",
-        "smb-port"        => "With file-protocol set to smb, this is the port to establish a connection on.",
-        "ssl"             => "When true, Bolt uses secure https connections for WinRM.",
-        "ssl-verify"      => "When true, verifies the targets certificate matches the cacert.",
-        "tmpdir"          => "The directory to upload and execute temporary files on the target.",
-        "user"            => "Login user. **Required unless using Kerberos.**",
-        "basic-auth-only" => "Force basic authentication."
-      }.freeze
-
-      def self.options
-        OPTIONS.keys
-      end
-
-      def self.default_options
-        {
-          'connect-timeout' => 10,
-          'ssl' => true,
-          'ssl-verify' => true,
-          'file-protocol' => 'winrm',
-          'basic-auth-only' => false
-        }
-      end
-
       def provided_features
         ['powershell']
       end
@@ -56,37 +14,6 @@ module Bolt
       def default_input_method(executable)
         input_method ||= Powershell.powershell_file?(executable) ? 'powershell' : 'both'
         input_method
-      end
-
-      def self.validate(options)
-        ssl_flag = options['ssl']
-        unless !!ssl_flag == ssl_flag
-          raise Bolt::ValidationError, 'ssl option must be a Boolean true or false'
-        end
-
-        basic_auth_only_flag = options['basic-auth-only']
-        unless !!basic_auth_only_flag == basic_auth_only_flag
-          raise Bolt::ValidationError, 'basic-auth-only option must be a Boolean true or false'
-        end
-
-        if ssl_flag && (options['file-protocol'] == 'smb')
-          raise Bolt::ValidationError, 'SMB file transfers are not allowed with SSL enabled'
-        end
-
-        if ssl_flag && (ca_path = options['cacert'])
-          Bolt::Util.validate_file('cacert', ca_path)
-        end
-
-        ssl_verify_flag = options['ssl-verify']
-        unless !!ssl_verify_flag == ssl_verify_flag
-          raise Bolt::ValidationError, 'ssl-verify option must be a Boolean true or false'
-        end
-
-        timeout_value = options['connect-timeout']
-        unless timeout_value.is_a?(Integer) || timeout_value.nil?
-          error_msg = "connect-timeout value must be an Integer, received #{timeout_value}:#{timeout_value.class}"
-          raise Bolt::ValidationError, error_msg
-        end
       end
 
       def initialize
