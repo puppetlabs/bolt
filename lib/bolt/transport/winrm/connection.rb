@@ -49,6 +49,7 @@ module Bolt
                       password: target.options['realm'] ? 'dummy' : target.password,
                       retry_limit: 1,
                       transport: transport,
+                      basic_auth_only: target.options['basic-auth-only'],
                       ca_trust_path: cacert,
                       realm: target.options['realm'],
                       no_ssl_peer_verification: !target.options['ssl-verify'] }

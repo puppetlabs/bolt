@@ -8,6 +8,8 @@ module Bolt
     module Transport
       class WinRM < Base
         OPTIONS = {
+          "basic-auth-only" => { type: TrueClass,
+                                 desc: "Force basic authentication. This option is only available when using SSL." },
           "cacert"          => { type: String,
                                  desc: "The path to the CA certificate." },
           "connect-timeout" => { type: Integer,
@@ -50,6 +52,7 @@ module Bolt
         }.freeze
 
         DEFAULTS = {
+          "basic-auth-only" => false,
           "connect-timeout" => 10,
           "ssl"             => true,
           "ssl-verify"      => true,
@@ -68,6 +71,10 @@ module Bolt
               @config['cacert'] = File.expand_path(@config['cacert'], @boltdir)
               Bolt::Util.validate_file('cacert', @config['cacert'])
             end
+          end
+
+          if !@config['ssl'] && @config['basic-auth-only']
+            raise Bolt::ValidationError, "Basic auth is only allowed when using SSL"
           end
 
           if @config['interpreters']

@@ -1,5 +1,13 @@
 # Changelog
 
+## Bolt NEXT
+
+### New features
+
+* **Enable basic-auth-only option for WinRM when using SSL** ([#1658](https://github.com/puppetlabs/bolt/pulls/1658)
+
+  Users can now use WinRM Basic authentication when SSL is configured.
+
 ## Bolt 2.2.0
 
 ### New features

@@ -524,6 +524,19 @@ describe Bolt::Inventory::Inventory do
           end
         end
 
+        context 'basic-auth-only' do
+          let(:data) {
+            {
+              'targets' => ['target'],
+              'config' => { 'transport' => 'winrm', 'winrm' => { 'basic-auth-only' => 'true' } }
+            }
+          }
+
+          it 'fails validation' do
+            expect { inventory.get_targets('target') }.to raise_error(Bolt::ValidationError)
+          end
+        end
+
         context 'transport' do
           let(:data) {
             {
@@ -597,7 +610,7 @@ describe Bolt::Inventory::Inventory do
             'password' => 'you' + transport,
             'port' => 12345,
             'private-key' => 'anything',
-            'ssl' => false,
+            'ssl' => true,
             'ssl-verify' => false,
             'host-key-check' => false,
             'connect-timeout' => transport.size,
@@ -609,7 +622,8 @@ describe Bolt::Inventory::Inventory do
             'service-url' => 'https://master',
             'cacert' => transport + '.pem',
             'token-file' => 'token',
-            'task-environment' => 'prod'
+            'task-environment' => 'prod',
+            'basic-auth-only' => true
           }
         end
 
@@ -638,6 +652,7 @@ describe Bolt::Inventory::Inventory do
           expect(conf.transports['ssh']['host-key-check']).to be nil
           expect(conf.transports['winrm']['ssl']).to be true
           expect(conf.transports['winrm']['ssl-verify']).to be true
+          expect(conf.transports['winrm']['basic-auth-only']).to be false
         end
 
         it 'uses the configured transport' do
@@ -675,7 +690,7 @@ describe Bolt::Inventory::Inventory do
           expect(target.port).to eq(12345)
           expect(target.options.to_h).to include(
             'connect-timeout' => 5,
-            'ssl' => false,
+            'ssl' => true,
             'ssl-verify' => false,
             'tmpdir' => "/winrm",
             'extensions' => [".py"],
@@ -683,7 +698,8 @@ describe Bolt::Inventory::Inventory do
             'port' => 12345,
             'user' => 'mewinrm',
             'file-protocol' => 'winrm',
-            'cacert' => /winrm.pem\z/
+            'cacert' => /winrm.pem\z/,
+            'basic-auth-only' => true
           )
         end
 

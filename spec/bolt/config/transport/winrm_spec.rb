@@ -29,7 +29,7 @@ describe Bolt::Config::Transport::WinRM do
       end
     end
 
-    %w[cacert file-protocol host password realm tmpdir user].each do |opt|
+    %w[cacert file-protocol host password realm tmpdir user basic-auth-only].each do |opt|
       it "#{opt} errors with wrong type" do
         data[opt] = 100
         expect { transport.new(data) }.to raise_error(Bolt::ValidationError)
@@ -50,6 +50,14 @@ describe Bolt::Config::Transport::WinRM do
       it 'errors when using smb with ssl enabled' do
         data['ssl'] = true
         data['file-protocol'] = 'smb'
+        expect { transport.new(data) }.to raise_error(Bolt::ValidationError)
+      end
+    end
+
+    context 'basic-auth-only' do
+      it 'errors when not using ssl' do
+        data['ssl'] = false
+        data['basic-auth-only'] = true
         expect { transport.new(data) }.to raise_error(Bolt::ValidationError)
       end
     end
