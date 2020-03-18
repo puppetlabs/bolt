@@ -564,19 +564,116 @@ module Bolt
       0
     end
 
+    # Initializes a specified directory as a Bolt project and installs any modules
+    # specified by the user, along with their dependencies
     def initialize_project
-      path = File.expand_path(options[:object] || Dir.pwd)
-      FileUtils.mkdir_p(path)
-      ok = FileUtils.touch(File.join(path, 'bolt.yaml'))
+      boltdir    = Pathname.new(File.expand_path(options[:object] || Dir.pwd))
+      config     = boltdir + 'bolt.yaml'
+      puppetfile = boltdir + 'Puppetfile'
+      modulepath = [boltdir + 'modules']
 
-      result = if ok
-                 "Successfully created Bolt project directory at #{path}"
-               else
-                 "Could not create Bolt project directory at #{path}"
-               end
-      outputter.print_message result
+      # If modules were specified, first check if there is already a Puppetfile at the project
+      # directory, erroring if there is. If there is no Puppetfile, generate the Puppetfile
+      # content by resolving the specified modules and all their dependencies.
+      # We generate the Puppetfile first so that any errors in resolving modules and their
+      # dependencies are caught early and do not create a project directory.
+      if options[:modules]
+        if puppetfile.exist?
+          raise Bolt::CLIError,
+                "Found existing Puppetfile at #{puppetfile}, unable to initialize project with "\
+                "#{options[:modules].join(', ')}"
+        else
+          puppetfile_specs = resolve_puppetfile_specs
+        end
+      end
 
-      ok ? 0 : 1
+      # Warn the user if the project directory already exists. We don't error here since users
+      # might not have installed any modules yet.
+      if config.exist?
+        @logger.warn "Found existing project directory at #{boltdir}"
+      end
+
+      # Create the project directory
+      FileUtils.mkdir_p(boltdir)
+
+      # Bless the project directory as a boltdir
+      if FileUtils.touch(config)
+        outputter.print_message "Successfully created Bolt project at #{boltdir}"
+      else
+        raise Bolt::FileError.new("Could not create Bolt project directory at #{boltdir}", nil)
+      end
+
+      # Write the generated Puppetfile to the fancy new boltdir
+      if puppetfile_specs
+        File.write(puppetfile, puppetfile_specs.join("\n"))
+        outputter.print_message "Successfully created Puppetfile at #{puppetfile}"
+        # Install the modules from our shiny new Puppetfile
+        if install_puppetfile({}, puppetfile, modulepath)
+          outputter.print_message "Successfully installed #{options[:modules].join(', ')}"
+        else
+          raise Bolt::CLIError, "Could not install #{options[:modules].join(', ')}"
+        end
+      end
+
+      0
+    end
+
+    # Resolves Puppetfile specs from user-specified modules and dependencies resolved
+    # by the puppetfile-resolver gem.
+    def resolve_puppetfile_specs
+      require 'puppetfile-resolver'
+
+      # Build the document model from the module names, defaulting to the latest version of each module
+      model = PuppetfileResolver::Puppetfile::Document.new('')
+      options[:modules].each do |mod_name|
+        model.add_module(
+          PuppetfileResolver::Puppetfile::ForgeModule.new(mod_name).tap { |mod| mod.version = :latest }
+        )
+      end
+
+      # Make sure the Puppetfile model is valid
+      unless model.valid?
+        raise Bolt::ValidationError,
+              "Unable to resolve dependencies for #{options[:modules].join(', ')}"
+      end
+
+      # Create the resolver using the Puppetfile model. nil disables Puppet version restrictions.
+      resolver = PuppetfileResolver::Resolver.new(model, nil)
+
+      # Configure and resolve the dependency graph
+      result = resolver.resolve(
+        cache:                 nil,
+        ui:                    nil,
+        module_paths:          [],
+        allow_missing_modules: true
+      )
+
+      # Validate that the modules exist
+      missing_graph = result.specifications.select do |_name, spec|
+        spec.instance_of? PuppetfileResolver::Models::MissingModuleSpecification
+      end
+
+      if missing_graph.any?
+        titles = model.modules.each_with_object({}) do |mod, acc|
+          acc[mod.name] = mod.title
+        end
+
+        names = titles.values_at(*missing_graph.keys)
+        plural = names.count == 1 ? '' : 's'
+
+        raise Bolt::ValidationError,
+              "Unknown module name#{plural} #{names.join(', ')}"
+      end
+
+      # Filter the dependency graph to only include module specifications
+      spec_graph = result.specifications.select do |_name, spec|
+        spec.instance_of? PuppetfileResolver::Models::ModuleSpecification
+      end
+
+      # Map specification models to a Puppetfile specification
+      spec_graph.values.map do |spec|
+        "mod '#{spec.owner}-#{spec.name}', '#{spec.version}'"
+      end
     end
 
     def migrate_project
