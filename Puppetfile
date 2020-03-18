@@ -24,9 +24,9 @@ mod 'puppetlabs-zone_core', '1.0.3'
 # Useful additional modules
 mod 'puppetlabs-package', '1.1.0'
 mod 'puppetlabs-puppet_conf', '0.6.0'
-mod 'puppetlabs-python_task_helper', '0.3.0'
+mod 'puppetlabs-python_task_helper', '0.4.0'
 mod 'puppetlabs-reboot', '3.0.0'
-mod 'puppetlabs-ruby_task_helper', '0.4.0'
+mod 'puppetlabs-ruby_task_helper', '0.5.1'
 mod 'puppetlabs-ruby_plugin_helper', '0.1.0'
 
 # Plugin modules
