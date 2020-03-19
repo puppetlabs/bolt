@@ -6,7 +6,7 @@ require 'open3'
 require 'tmpdir'
 require 'bolt/node/output'
 require 'bolt/transport/base'
-require 'bolt/transport/powershell'
+require 'bolt/shell/powershell'
 require 'bolt/util'
 
 module Bolt

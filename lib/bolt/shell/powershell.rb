@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/shell/powershell/snippets'
+
 module Bolt
   class Shell
     class Powershell < Shell
@@ -102,19 +104,19 @@ module Bolt
           else
             "@'\n#{stdin}\n'@ | & #{quoted_path} #{quoted_args}"
           end
-        conn.execute(Snippets.execute_process(exec_cmd))
+        Snippets.execute_process(exec_cmd)
       end
 
       def mkdirs(dirs)
         mkdir_command = "mkdir -Force #{dirs.uniq.sort.join(',')}"
-        result = execute(mkdir_command)
+        result = conn.execute(mkdir_command)
         if result.exit_code != 0
           message = "Could not create directories: #{result.stderr}"
           raise Bolt::Node::FileError.new(message, 'MKDIR_ERROR')
         end
       end
 
-      def make_tempdir(parent)
+      def make_tempdir
         find_parent = target.options['tmpdir'] ? "\"#{target.options['tmpdir']}\"" : '[System.IO.Path]::GetTempPath()'
         result = conn.execute(Snippets.make_tempdir(find_parent))
         if result.exit_code != 0
@@ -124,7 +126,7 @@ module Bolt
       end
 
       def rmdir(dir)
-        execute(Snippets.rmdir(dir))
+        conn.execute(Snippets.rmdir(dir))
       end
 
       def with_remote_tempdir
@@ -139,9 +141,9 @@ module Bolt
         # must create new powershell.exe process like other interpreters
         # fortunately, using PS with stdin input_method should never happen
         if input_method == 'powershell'
-          execute(Snippets.ps_task(task_path, arguments))
+          Snippets.ps_task(task_path, arguments)
         else
-          execute(Snippets.try_catch(task_path))
+          Snippets.try_catch(task_path)
         end
       end
 
@@ -195,51 +197,54 @@ module Bolt
 
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
-        with_connection(target) do |conn|
-          with_remote_tempdir do |dir|
-            if extra_files.empty?
-              task_dir = dir
-            else
-              # TODO: optimize upload of directories
-              arguments['_installdir'] = dir
-              task_dir = File.join(dir, task.tasks_dir)
-              mkdirs([task_dir] + extra_files.map { |file| File.join(dir, File.dirname(file['name'])) })
-              extra_files.each do |file|
-                conn.copy_file(file['path'], File.join(dir, file['name']))
-              end
+        with_remote_tempdir do |dir|
+          if extra_files.empty?
+            task_dir = dir
+          else
+            # TODO: optimize upload of directories
+            arguments['_installdir'] = dir
+            task_dir = File.join(dir, task.tasks_dir)
+            mkdirs([task_dir] + extra_files.map { |file| File.join(dir, File.dirname(file['name'])) })
+            extra_files.each do |file|
+              conn.copy_file(file['path'], File.join(dir, file['name']))
             end
-
-            remote_task_path = write_executable(task_dir, executable)
-
-            if Bolt::Task::STDIN_METHODS.include?(input_method)
-              stdin = JSON.dump(arguments)
-            end
-
-            if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
-              envify_params(arguments).each do |(arg, val)|
-                set_env(arg, cal)
-              end
-            end
-
-            shell_init
-            output =
-              if Powershell.powershell_file?(remote_task_path) && stdin.nil?
-                run_ps_task(remote_task_path, arguments, input_method)
-              else
-                if (interpreter = select_interpreter(remote_task_path, target.options['interpreters']))
-                  path = interpreter
-                  args = [remote_task_path]
-                else
-                  path, args = *Powershell.process_from_extension(remote_task_path)
-                end
-                execute_process(path, args, stdin)
-              end
-
-            Bolt::Result.for_task(target, output.stdout.string,
-                                  output.stderr.string,
-                                  output.exit_code,
-                                  task.name)
           end
+
+          remote_task_path = write_executable(task_dir, executable)
+
+          shell_init
+
+          if Bolt::Task::STDIN_METHODS.include?(input_method)
+            stdin = JSON.dump(arguments)
+          end
+
+          command = String.new
+
+          if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
+            envify_params(arguments).each do |(arg, val)|
+              command << set_env(arg, cal)
+            end
+          end
+
+          output =
+            if powershell_file?(remote_task_path) && stdin.nil?
+              command << run_ps_task(remote_task_path, arguments, input_method)
+              conn.execute(command)
+            else
+              if (interpreter = select_interpreter(remote_task_path, target.options['interpreters']))
+                path = interpreter
+                args = [remote_task_path]
+              else
+                path, args = *process_from_extension(remote_task_path)
+              end
+              command << execute_process(path, args, stdin)
+              conn.execute(command)
+            end
+
+          Bolt::Result.for_task(target, output.stdout.string,
+                                output.stderr.string,
+                                output.exit_code,
+                                task.name)
         end
       end
 

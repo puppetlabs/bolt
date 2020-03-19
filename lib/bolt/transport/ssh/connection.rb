@@ -228,7 +228,8 @@ module Bolt
 
         def shell
           # SSH only supports bash for now. Later, this will detect the correct shell.
-          @shell ||= Bolt::Shell::Bash.new(target, self)
+          #@shell ||= Bolt::Shell::Bash.new(target, self)
+          @shell ||= Bolt::Shell::Powershell.new(target, self)
         end
       end
     end
