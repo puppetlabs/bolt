@@ -145,6 +145,13 @@ module Bolt
             end
           rescue Bolt::Error => e
             e
+          rescue Puppet::DataBinding::LookupError => e
+            if /Undefined variable/.match(e.message)
+              message = "Interpolations are not supported in lookups outside of an apply block: #{e.message}"
+              PALError.new(message)
+            else
+              PALError.from_preformatted_error(e)
+            end
           rescue Puppet::PreformattedError => e
             PALError.from_preformatted_error(e)
           rescue StandardError => e
@@ -215,6 +222,7 @@ module Bolt
         Puppet.initialize_settings(cli)
         Puppet::GettextConfig.create_default_text_domain
         Puppet[:trusted_external_command] = @trusted_external
+        Puppet.settings[:hiera_config] = @hiera_config
         self.class.configure_logging
         yield
       end
