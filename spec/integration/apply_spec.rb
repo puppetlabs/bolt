@@ -431,6 +431,7 @@ describe "apply", expensive: true do
       { 'modulepath' => File.join(__dir__, '../fixtures/apply'),
         'winrm' => {
           'ssl' => false,
+          'connect-timeout' => 30,
           'ssl-verify' => false,
           'user' => conn_info('winrm')[:user],
           'password' => conn_info('winrm')[:password]

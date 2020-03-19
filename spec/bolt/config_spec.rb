@@ -51,6 +51,26 @@ describe Bolt::Config do
 
       Bolt::Config.from_boltdir(boltdir)
     end
+
+    context "when loading user level config fails" do
+      let(:user_path) do
+        Pathname.new(File.expand_path(['~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml'].join(File::SEPARATOR)))
+      end
+
+      it "doesn't load user level config and continues" do
+        allow(File).to receive(:join).and_call_original
+        allow(File)
+          .to receive(:join)
+          .with('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')
+          .and_raise(ArgumentError, "couldn't find login name -- expanding `~'")
+
+        expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(boltdir.config_file, 'config')
+        expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(system_path, 'config')
+        expect(Bolt::Util).not_to receive(:read_optional_yaml_hash).with(user_path, 'config')
+
+        Bolt::Config.from_boltdir(boltdir)
+      end
+    end
   end
 
   describe "::from_file" do
