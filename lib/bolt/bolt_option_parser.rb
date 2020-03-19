@@ -64,7 +64,7 @@ module Bolt
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: PLAN_CONVERT_HELP }
         when 'run'
-          { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir],
+          { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir hiera-config],
             banner: PLAN_RUN_HELP }
         when 'show'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[filter format],
@@ -715,6 +715,10 @@ module Bolt
              'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml).',
              'Directory containing bolt.yaml will be used as the Boltdir.') do |path|
         @options[:configfile] = path
+      end
+      define('--hiera-config FILEPATH',
+             'Specify where to load Hiera config from (default: ~/.puppetlabs/bolt/hiera.yaml)') do |path|
+        @options[:'hiera-config'] = path
       end
       define('-i', '--inventoryfile FILEPATH',
              'Specify where to load inventory from (default: ~/.puppetlabs/bolt/inventory.yaml)') do |path|
