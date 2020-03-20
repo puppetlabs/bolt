@@ -234,7 +234,8 @@ module Bolt
                               []
                             end
 
-          output = [*env_assignments, command].join("\n")
+          command = [*env_assignments, command].join("\n")
+          output = conn.execute(command)
 
           Bolt::Result.for_task(target, output.stdout.string,
                                 output.stderr.string,
