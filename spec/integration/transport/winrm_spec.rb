@@ -44,7 +44,7 @@ describe Bolt::Transport::WinRM do
 
   def mk_config(conf)
     conf = Bolt::Util.walk_keys(conf, &:to_s)
-    conf['connect-timeout'] ||= 20
+    conf['connect-timeout'] ||= 30
     conf
   end
 

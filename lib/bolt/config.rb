@@ -137,10 +137,15 @@ module Bolt
                     else
                       Pathname.new(File.join('/etc', 'puppetlabs', 'bolt', 'bolt.yaml'))
                     end
-      user_path = Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')))
+      user_path = begin
+                    Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')))
+                  rescue ArgumentError
+                    nil
+                  end
 
-      [{ filepath: system_path, data: Bolt::Util.read_optional_yaml_hash(system_path, 'config') },
-       { filepath: user_path, data: Bolt::Util.read_optional_yaml_hash(user_path, 'config') }]
+      confs = [{ filepath: system_path, data: Bolt::Util.read_optional_yaml_hash(system_path, 'config') }]
+      confs << { filepath: user_path, data: Bolt::Util.read_optional_yaml_hash(user_path, 'config') } if user_path
+      confs
     end
 
     def initialize(boltdir, config_data, overrides = {})

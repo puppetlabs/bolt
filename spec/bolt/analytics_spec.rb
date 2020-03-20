@@ -23,6 +23,17 @@ describe Bolt::Analytics do
     expect(subject.build_client).to be_instance_of(Bolt::Analytics::NoopClient)
   end
 
+  it 'creates a NoopClient if reading config fails' do
+    allow(File).to receive(:expand_path).and_call_original
+    allow(File)
+      .to receive(:expand_path)
+      .with('~/.puppetlabs/bolt/analytics.yaml')
+      .and_raise(ArgumentError, "couldn't find login name -- expanding `~'")
+    expect(subject).not_to receive(:write_config)
+
+    expect(subject.build_client).to be_instance_of(Bolt::Analytics::NoopClient)
+  end
+
   it 'creates a regular Client if analytics is not disabled' do
     expect(subject.build_client).to be_instance_of(Bolt::Analytics::Client)
   end
