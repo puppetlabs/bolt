@@ -227,9 +227,9 @@ module Bolt
         end
 
         def shell
-          # SSH only supports bash for now. Later, this will detect the correct shell.
-          #@shell ||= Bolt::Shell::Bash.new(target, self)
-          @shell ||= Bolt::Shell::Powershell.new(target, self)
+          return @shell if @shell
+          is_pwsh = execute("$PSVersionTable.PSVersion").exit_code.zero?
+          @shell = is_pwsh ? Bolt::Shell::Powershell.new(target, self) : @shell = Bolt::Shell::Bash.new(target, self)
         end
       end
     end
