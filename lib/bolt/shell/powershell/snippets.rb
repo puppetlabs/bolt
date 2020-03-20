@@ -6,7 +6,7 @@ module Bolt
           def execute_process(command)
             <<~PS
             $OutputEncoding = [Console]::OutputEncoding
-            #{exec_cmd}
+            #{command}
             if (-not $? -and ($LASTEXITCODE -eq $null)) { exit 1 }
             exit $LASTEXITCODE
             PS

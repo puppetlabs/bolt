@@ -71,11 +71,7 @@ module Bolt
       end
 
       def set_env(arg, val)
-        cmd = "[Environment]::SetEnvironmentVariable('#{arg}', @'\n#{val}\n'@)"
-        result = conn.execute(cmd)
-        if result.exit_code != 0
-          raise Bolt::Node::EnvironmentVarError.new(arg, val)
-        end
+        "[Environment]::SetEnvironmentVariable('#{arg}', @'\n#{val}\n'@)"
       end
 
       def quote_string(string)
@@ -218,18 +214,18 @@ module Bolt
             stdin = JSON.dump(arguments)
           end
 
-          command = String.new
+          command = StringIO.new
 
           if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
             envify_params(arguments).each do |(arg, val)|
-              command << set_env(arg, cal)
+              command.puts set_env(arg, val)
             end
           end
 
           output =
             if powershell_file?(remote_task_path) && stdin.nil?
-              command << run_ps_task(remote_task_path, arguments, input_method)
-              conn.execute(command)
+              command.puts run_ps_task(remote_task_path, arguments, input_method)
+              conn.execute(command.string)
             else
               if (interpreter = select_interpreter(remote_task_path, target.options['interpreters']))
                 path = interpreter
@@ -237,8 +233,8 @@ module Bolt
               else
                 path, args = *process_from_extension(remote_task_path)
               end
-              command << execute_process(path, args, stdin)
-              conn.execute(command)
+              command.puts execute_process(path, args, stdin)
+              conn.execute(command.string)
             end
 
           Bolt::Result.for_task(target, output.stdout.string,
