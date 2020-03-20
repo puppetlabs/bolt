@@ -208,8 +208,6 @@ module Bolt
 
           remote_task_path = write_executable(task_dir, executable)
 
-          shell_init
-
           if Bolt::Task::STDIN_METHODS.include?(input_method)
             stdin = JSON.dump(arguments)
           end
@@ -234,8 +232,7 @@ module Bolt
                               []
                             end
 
-          command = [*env_assignments, command].join("\n")
-          output = conn.execute(command)
+          output = conn.execute([shell_init, *env_assignments, command].join("\n"))
 
           Bolt::Result.for_task(target, output.stdout.string,
                                 output.stderr.string,

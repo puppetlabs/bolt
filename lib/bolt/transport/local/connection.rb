@@ -21,7 +21,11 @@ module Bolt
         end
 
         def shell
-          @shell ||= Bolt::Shell::Bash.new(target, self)
+          @shell ||= if Bolt::Util.windows?
+                       Bolt::Shell::Powershell.new(target, self)
+                     else
+                       Bolt::Shell::Bash.new(target, self)
+                     end
         end
 
         def copy_file(source, dest)

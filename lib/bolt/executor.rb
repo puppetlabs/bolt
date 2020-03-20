@@ -24,7 +24,8 @@ module Bolt
     ssh: Bolt::Transport::SSH,
     winrm: Bolt::Transport::WinRM,
     pcp: Bolt::Transport::Orch,
-    local: Bolt::Util.windows? ? Bolt::Transport::LocalWindows : Bolt::Transport::Local,
+    #local: Bolt::Util.windows? ? Bolt::Transport::LocalWindows : Bolt::Transport::Local,
+    local: Bolt::Transport::Local,
     docker: Bolt::Transport::Docker,
     remote: Bolt::Transport::Remote
   }.freeze
