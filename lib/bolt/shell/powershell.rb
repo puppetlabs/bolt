@@ -214,28 +214,27 @@ module Bolt
             stdin = JSON.dump(arguments)
           end
 
-          command = StringIO.new
+          command = if powershell_file?(remote_task_path) && stdin.nil?
+                      run_ps_task(remote_task_path, arguments, input_method)
+                    else
+                      if (interpreter = select_interpreter(remote_task_path, target.options['interpreters']))
+                        path = interpreter
+                        args = [remote_task_path]
+                      else
+                        path, args = *process_from_extension(remote_task_path)
+                      end
+                      execute_process(path, args, stdin)
+                    end
 
-          if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
-            envify_params(arguments).each do |(arg, val)|
-              command.puts set_env(arg, val)
-            end
-          end
+          env_assignments = if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
+                              envify_params(arguments).map do |(arg, val)|
+                                set_env(arg, val)
+                              end
+                            else
+                              []
+                            end
 
-          output =
-            if powershell_file?(remote_task_path) && stdin.nil?
-              command.puts run_ps_task(remote_task_path, arguments, input_method)
-              conn.execute(command.string)
-            else
-              if (interpreter = select_interpreter(remote_task_path, target.options['interpreters']))
-                path = interpreter
-                args = [remote_task_path]
-              else
-                path, args = *process_from_extension(remote_task_path)
-              end
-              command.puts execute_process(path, args, stdin)
-              conn.execute(command.string)
-            end
+          output = [*env_assignments, command].join("\n")
 
           Bolt::Result.for_task(target, output.stdout.string,
                                 output.stderr.string,
