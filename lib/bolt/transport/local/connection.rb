@@ -12,6 +12,7 @@ module Bolt
         attr_accessor :user, :logger, :target
 
         CHUNK_SIZE = 4096
+        PS_ARGS = %w[-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass].freeze
 
         def initialize(target)
           @target = target
@@ -47,6 +48,11 @@ module Bolt
 
         def execute(command, **options)
           command_arr = options[:environment].nil? ? Array(command) : [options[:environment], *command]
+
+          # All commands are executed via powershell for now
+          if Bolt::Util.windows?
+            command_arr = ['powershell.exe', *PS_ARGS, *command_arr]
+          end
 
           # Prepare the variables!
           result_output = Bolt::Node::Output.new
