@@ -143,13 +143,6 @@ module Bolt
         end
       end
 
-      def shell_init
-        result = conn.execute(Snippets.shell_init)
-        if result.exit_code != 0
-          raise BaseError.new("Could not initialize shell: #{result.stderr.string}", "SHELL_INIT_ERROR")
-        end
-      end
-
       def upload(source, destination, _options = {})
         conn.copy_file(source, destination)
         Bolt::Result.for_upload(target, source, destination)
@@ -232,7 +225,7 @@ module Bolt
                               []
                             end
 
-          output = conn.execute([shell_init, *env_assignments, command].join("\n"))
+          output = conn.execute([Snippets.shell_init, *env_assignments, command].join("\n"))
 
           Bolt::Result.for_task(target, output.stdout.string,
                                 output.stderr.string,
