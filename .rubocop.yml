@@ -13,7 +13,7 @@ AllCops:
 # modifier if/unless.
 Style/HashEachMethods:
   Enabled: true
-
+  
 Style/HashTransformKeys:
   Enabled: true
 
@@ -55,6 +55,8 @@ Layout/ClosingHeredocIndentation:
 
 Layout/LineLength:
   Max: 120
+  Exclude: 
+    - Rakefile
 
 Style/GuardClause:
   Enabled: false

@@ -1,0 +1,21 @@
+plugin_intro: |
+  # 3rd Party Bolt Plugin list
+
+  Below is a plugin list of all documented 3rd party bolt plugins.  If you have created a plugin please add your plugin
+  to the resources/plugins.yaml list and run the rake task `plugin_list` to regenerate the list with your info.  Submit a PR with the updated files so others can see your plugin information. 
+
+plugin_table_header: "|Name|Url|Author|Category|Description|Tags|Requirements|\n| --- | --- | --- | --- | --- | --- | --- |"
+plugins:
+  inventory:
+    ad_inventory:
+      name: 'AD Inventory'
+      url: 'https://github.com/glennsarti/bolt_ad_inventory'
+      author:  glennsarti
+      desc: 'Bolt Plugin for getting inventory from Active Directory'
+      tags: 
+        - windows
+        - Active Directory
+        - Inventory
+      requirements:
+        - bolt 1.x
+  
