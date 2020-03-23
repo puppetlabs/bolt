@@ -99,10 +99,14 @@ module Bolt
           @logger.debug { "Closed session" }
         end
 
-        def execute(command)
+        def execute(command, **options)
           result_output = Bolt::Node::Output.new
 
           @logger.debug { "Executing command: #{command}" }
+
+          if options[:stdin]
+            command = "@'\n#{options[:stdin]}\n'@ | { #{command} }"
+          end
 
           output = @session.run(command) do |stdout, stderr|
             result_output.stdout << stdout

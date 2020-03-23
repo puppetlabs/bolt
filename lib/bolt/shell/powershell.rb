@@ -86,7 +86,7 @@ module Bolt
         remote_path
       end
 
-      def execute_process(path, arguments, stdin = nil)
+      def execute_process(path, arguments)
         quoted_args = arguments.map { |arg| quote_string(arg) }.join(' ')
 
         quoted_path = if path =~ /^'.*'$/ || path =~ /^".*"$/
@@ -94,12 +94,7 @@ module Bolt
                       else
                         quote_string(path)
                       end
-        exec_cmd =
-          if stdin.nil?
-            "& #{quoted_path} #{quoted_args}"
-          else
-            "@'\n#{stdin}\n'@ | & #{quoted_path} #{quoted_args}"
-          end
+        exec_cmd = "& #{quoted_path} #{quoted_args}"
         Snippets.execute_process(exec_cmd)
       end
 
@@ -215,7 +210,7 @@ module Bolt
                       else
                         path, args = *process_from_extension(remote_task_path)
                       end
-                      execute_process(path, args, stdin)
+                      execute_process(path, args)
                     end
 
           env_assignments = if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
@@ -226,7 +221,7 @@ module Bolt
                               []
                             end
 
-          output = conn.execute([Snippets.shell_init, *env_assignments, command].join("\n"))
+          output = conn.execute([Snippets.shell_init, *env_assignments, command].join("\n"), stdin: stdin)
 
           Bolt::Result.for_task(target, output.stdout.string,
                                 output.stderr.string,
