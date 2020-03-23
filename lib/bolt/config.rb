@@ -50,6 +50,9 @@ module Bolt
                                     "OS-specific PATH separator.",
       "plugin_hooks"             => "Which plugins a specific hook should use.",
       "plugins"                  => "A map of plugins and their configuration data.",
+      "project-name"             => "The namespace for project artifacts. Setting this also opts the user into "\
+                                    "experimental project loading. This can only be configured in project-level "\
+                                    "config files.",
       "puppetdb"                 => "A map containing options for configuring the Bolt PuppetDB client.",
       "puppetfile"               => "A map containing options for the `bolt puppetfile install` command.",
       "save-rerun"               => "Whether to update `.rerun.json` in the Bolt project directory. If "\
@@ -143,8 +146,18 @@ module Bolt
                     nil
                   end
 
-      confs = [{ filepath: system_path, data: Bolt::Util.read_optional_yaml_hash(system_path, 'config') }]
-      confs << { filepath: user_path, data: Bolt::Util.read_optional_yaml_hash(user_path, 'config') } if user_path
+      confs = [{
+        filepath: system_path,
+        data: Bolt::Util.read_optional_yaml_hash(system_path, 'config')&.reject { |k, _| k == 'project-name' }
+      }]
+
+      if user_path
+        confs << {
+          filepath: user_path,
+          data: Bolt::Util.read_optional_yaml_hash(user_path, 'config')&.reject { |k, _| k == 'project-name' }
+        }
+      end
+
       confs
     end
 
@@ -421,6 +434,14 @@ module Bolt
 
     def plugin_hooks
       @data['plugin_hooks']
+    end
+
+    def project_name
+      @data['project-name']
+    end
+
+    def project
+      project_name.nil? ? nil : Struct.new("Project", :name, :path).new(project_name, @boltdir.path.to_s)
     end
 
     def trusted_external

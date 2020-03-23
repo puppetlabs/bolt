@@ -766,7 +766,8 @@ module Bolt
                              config.project.resource_types,
                              config.compile_concurrency,
                              config.trusted_external,
-                             config.apply_settings)
+                             config.apply_settings,
+                             config.project)
     end
 
     def convert_plan(plan)

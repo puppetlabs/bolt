@@ -1,0 +1,4 @@
+{
+  "description": "An example task that uses the ruby helper library",
+  "files": ["helpers/files/marco.sh"]
+}
