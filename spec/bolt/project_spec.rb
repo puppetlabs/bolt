@@ -28,11 +28,28 @@ describe Bolt::Project do
       expect(project.plans).to eq(nil)
     end
 
-    describe "validate" do
+    describe "with invalid tasks config" do
       let(:config) { { 'tasks' => 'foo' } }
 
-      it "validates config" do
+      it "raises an error" do
         expect { Bolt::Project.new(pwd) }.to raise_error(/'tasks' in project.yaml must be an array/)
+      end
+    end
+
+    describe "with invalid name config" do
+      let(:config) { { 'name' => '_invalid' } }
+
+      it "raises an error" do
+        expect { Bolt::Project.new(pwd) }.to raise_error(/Invalid module name '_invalid'/)
+      end
+    end
+
+    describe "with namespaced project names" do
+      let(:config) { { 'name' => 'puppetlabs-foo' } }
+
+      it "strips namespace and hyphen" do
+        project = Bolt::Project.new(pwd)
+        expect(project.name).to eq('foo')
       end
     end
   end

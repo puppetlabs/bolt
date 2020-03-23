@@ -982,7 +982,15 @@ describe "Bolt::CLI" do
         end
 
         it "only includes tasks set in project.yaml" do
-          proj = double('project', type: '', resource_types: '', tasks: ['facts'])
+          mocks = {
+            type: '',
+            resource_types: '',
+            tasks: ['facts'],
+            load_as_module?: true,
+            name: nil,
+            to_h: {}
+          }
+          proj = double('project', mocks)
           allow(cli.config).to receive(:project).and_return(proj)
           options = {
             subcommand: 'task',

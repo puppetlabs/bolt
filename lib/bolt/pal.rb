@@ -62,9 +62,9 @@ module Bolt
       # If the project name is the same as one of the builtin modules raise a warning
       bolt_mods = Dir.children(BOLTLIB_PATH)
       if @project && bolt_mods.include?(@project.name)
-        msg = "The project #{@project.name} will not load top-level content as it has a reserved name: #{bolt_mods}"
+        msg = "The project #{@project.name} will not load as a module because the name conflicts "\
+          "with a builtin Bolt module of the same name"
         @logger.warn(msg)
-        # Override config and don't load the project
         @project = nil
       end
 
@@ -146,14 +146,13 @@ module Bolt
       # TODO: If we always call this inside a bolt_executor we can remove this here
       setup
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: @modulepath, facts: {}) do |pal|
-        Puppet.override(bolt_project: @project) do
+        Puppet.override(bolt_project: @project,
+                        yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
           pal.with_script_compiler do |compiler|
             alias_types(compiler)
             register_resource_types(Puppet.lookup(:loaders)) if @resource_types
             begin
-              Puppet.override(yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
-                yield compiler
-              end
+              yield compiler
             rescue Bolt::Error => e
               e
             rescue Puppet::DataBinding::LookupError => e
@@ -165,7 +164,7 @@ module Bolt
               end
             rescue Puppet::PreformattedError => e
               if e.issue_code == :UNKNOWN_VARIABLE &&
-                  %w[facts trusted server_facts settings].include?(e.arguments[:name])
+                 %w[facts trusted server_facts settings].include?(e.arguments[:name])
                 message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope "\
                   "unless explicitly defined. (file: #{e.file}, line: #{e.line}, column: #{e.pos})"
                 PALError.new(message)
