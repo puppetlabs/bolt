@@ -950,6 +950,12 @@ describe Bolt::Transport::WinRM do
         output
       end
 
+      before :each do
+        success = Bolt::Node::Output.new
+        success.exit_code = 0
+        allow_any_instance_of(Bolt::Transport::WinRM::Connection).to receive(:execute).and_return(success)
+      end
+
       it "can apply a powershell-based task", winrm: true do
         contents = <<~PS
           Write-Output "42"
