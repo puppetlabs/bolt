@@ -162,13 +162,14 @@ module Bolt
         arguments = unwrap_sensitive_args(arguments)
         with_remote_tempdir do |dir|
           remote_path = write_executable(dir, script)
-          if powershell_file?(remote_path)
-            output = conn.execute(Snippets.run_script(arguments, remote_path))
-          else
-            path, args = *process_from_extension(remote_path)
-            args += escape_arguments(arguments)
-            output = execute_process(path, args)
-          end
+          command = if powershell_file?(remote_path)
+                      Snippets.run_script(arguments, remote_path)
+                    else
+                      path, args = *process_from_extension(remote_path)
+                      args += escape_arguments(arguments)
+                      execute_process(path, args)
+                    end
+          output = conn.execute(command)
           Bolt::Result.for_command(target,
                                    output.stdout.string,
                                    output.stderr.string,
