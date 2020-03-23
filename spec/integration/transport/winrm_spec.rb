@@ -955,11 +955,8 @@ describe Bolt::Transport::WinRM do
           Write-Output "42"
         PS
         expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('powershell.exe',
-                ['-NoProfile', '-NonInteractive', '-NoLogo',
-                 '-ExecutionPolicy', 'Bypass', '-File', /^".*"$/],
-                anything)
+          .to receive(:execute)
+          .with(/powershell.exe -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File ".*"/)
           .and_return(output)
         with_task_containing('task-ps1-winrm', contents, 'stdin', '.ps1') do |task|
           expect(
@@ -970,9 +967,8 @@ describe Bolt::Transport::WinRM do
 
       it "can apply a ruby-based script", winrm: true do
         expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('ruby.exe',
-                ['-S', /^".*"$/])
+          .to receive(:execute)
+          .with(/ruby.exe -S ".*"/)
           .and_return(output)
         with_tempfile_containing('script-rb-winrm', "puts 42", '.rb') do |file|
           expect(
@@ -983,10 +979,8 @@ describe Bolt::Transport::WinRM do
 
       it "can apply a ruby-based task", winrm: true do
         expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('ruby.exe',
-                ['-S', /^".*"$/],
-                anything)
+          .to receive(:execute)
+          .with(/ruby.exe -S ".*"/)
           .and_return(output)
         with_task_containing('task-rb-winrm', "puts 42", 'stdin', '.rb') do |task|
           expect(
@@ -1006,9 +1000,8 @@ describe Bolt::Transport::WinRM do
         output.exit_code = 0
 
         expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('puppet.bat',
-                ['apply', /^".*"$/])
+          .to receive(:execute)
+          .with(/puppet.bat apply ".*"/)
           .and_return(output)
         contents = "notice('hi')"
         with_tempfile_containing('script-pp-winrm', contents, '.pp') do |file|
@@ -1020,10 +1013,8 @@ describe Bolt::Transport::WinRM do
 
       it "can apply a puppet manifest for a '.pp' task", winrm: true do
         expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('puppet.bat',
-                ['apply', /^".*"$/],
-                anything)
+          .to receive(:execute)
+          .with(/puppet.bat apply ".*"/)
           .and_return(output)
         with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
           expect(
@@ -1034,9 +1025,8 @@ describe Bolt::Transport::WinRM do
 
       it "does not apply an arbitrary script", winrm: true do
         allow_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('cmd.exe',
-                ['/c', /^".*"$/])
+          .to receive(:execute)
+          .with(/cmd.exe \/c ".*"/)
           .and_return(output)
         with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
           expect {
@@ -1048,10 +1038,8 @@ describe Bolt::Transport::WinRM do
 
       it "does not apply an arbitrary script as a task", winrm: true do
         allow_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('cmd.exe',
-                ['/c', /^".*"$/],
-                anything)
+          .to receive(:execute)
+          .with(/cmd.exe \/c ".*"/)
           .and_return(output)
         with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
           expect {
@@ -1066,9 +1054,8 @@ describe Bolt::Transport::WinRM do
 
         it "can apply an arbitrary script", winrm: true do
           expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-            .to receive(:execute_process)
-            .with('cmd.exe',
-                  ['/c', /^".*"$/])
+            .to receive(:execute)
+            .with(/cmd.exe \/c ".*"/)
             .and_return(output)
           with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
             expect(
@@ -1079,10 +1066,8 @@ describe Bolt::Transport::WinRM do
 
         it "can apply an arbitrary script as a task", winrm: true do
           expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-            .to receive(:execute_process)
-            .with('cmd.exe',
-                  ['/c', /^".*"$/],
-                  anything)
+            .to receive(:execute)
+            .with(/cmd.exe \/c ".*"/)
             .and_return(output)
           with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
             expect(
