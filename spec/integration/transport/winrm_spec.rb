@@ -560,19 +560,6 @@ describe Bolt::Transport::WinRM do
       end
     end
 
-    it 'errors if environment variables cannot be set', winrm: true do
-      contents = 'Write-Host "$env:PT_message"'
-      arguments = { message: "it's a hello world" }
-      expect_any_instance_of(
-        Bolt::Transport::WinRM::Connection
-      ).to receive(:execute).at_least(:once).and_wrap_original do |m, *args|
-        args.first =~ /SetEnvironmentVariable/ ? double('result', exit_code: 1) : m.call(*args)
-      end
-      with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
-        expect { winrm.run_task(target, task, arguments) }.to raise_error(Bolt::Node::EnvironmentVarError)
-      end
-    end
-
     it "ignores run_as", winrm: true do
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { message_one: 'task is running',
