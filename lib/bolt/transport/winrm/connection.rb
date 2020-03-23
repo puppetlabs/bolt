@@ -104,10 +104,6 @@ module Bolt
 
           @logger.debug { "Executing command: #{command}" }
 
-          if options[:stdin]
-            command = "@'\n#{options[:stdin]}\n'@ | & { #{command} }"
-          end
-
           output = @session.run(command) do |stdout, stderr|
             result_output.stdout << stdout
             @logger.debug { "stdout: #{stdout}" }
