@@ -5,7 +5,7 @@ module Bolt
         class << self
           def execute_process(command)
             <<~PS
-            $OutputEncoding = [Console]::OutputEncoding
+            $OutputEncoding = New-Object System.Text.UTF8Encoding $False
             #{command}
             if (-not $? -and ($LASTEXITCODE -eq $null)) { exit 1 }
             exit $LASTEXITCODE
