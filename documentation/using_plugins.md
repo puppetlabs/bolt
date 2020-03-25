@@ -125,7 +125,7 @@ targets:
   - _plugin: puppetdb
     query: "inventory[certname] { facts.osfamily = 'RedHat' }"
     target_mapping:
-      name: certname
+      name: facts.trusted.certname
       config:
         ssh:
           hostname: facts.networking.interfaces.en0.ipaddress
