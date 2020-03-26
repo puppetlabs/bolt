@@ -46,7 +46,7 @@ module Bolt
           raise Bolt::Node::FileError.new(message, 'COPY_ERROR')
         end
 
-        def execute(command, **options)
+        def execute(command, **options, &blk)
           command_arr = options[:environment].nil? ? Array(command) : [options[:environment], *command]
 
           # All commands are executed via powershell for now

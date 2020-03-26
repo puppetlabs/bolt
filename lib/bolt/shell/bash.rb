@@ -260,7 +260,67 @@ module Bolt
         end
 
         # TODO Handle sudo
-        result_output = conn.execute(command_str, options)
+        stdin, stdout, stderr, th = conn.execute(command_str, options)
+        result_output = Bolt::Node::Output.new
+        buffers = { stdout => result_output.stdout,
+                    stderr => result_output.stderr }
+        out_th = Thread.new do
+          chunk_size = 4096
+          output = String.new
+          # Send stdin right away if we're not using sudo.
+          if !use_sudo
+            send_stdin(stdin, options[:stdin] || "")
+          # Otherwise we need to exercise a bit more care
+          else
+            sent_sudo_password = false
+            sudo_done = false
+            while !sudo_done do
+              ready_streams, *_ = select([stdout, stderr], [], [])
+              ready_streams.each do |stream|
+                lines = stream.readpartial(chunk_size).lines
+                # If we haven't sent the sudo password, look for the prompt
+                if !sent_sudo_password && lines.include?(sudo_prompt)
+                  lines.delete(sudo_prompt)
+                  unless @sudo_password
+                    # Close stdin to avoid blocking future commands
+                    # XXX: This may be insufficient to cause sudo to exit...
+                    stdin.close
+                    raise Bolt::Node::EscalateError.new(
+                      "Sudo password for user #{conn.user} was not provided for #{target.safe_name}",
+                      'NO_PASSWORD'
+                    )
+                  end
+
+                  stdin.puts @sudo_password
+                  sent_sudo_password = true
+
+                  unless options[:stdin]
+                    stdin.close
+                    sudo_done = true
+                  end
+                elsif lines.include?(@sudo_id)
+                  lines.delete(@sudo_id)
+                  send_stdin(stdin, options[:stdin])
+                  sudo_done = true
+                else
+                  handle_sudo_errors(lines)
+                  output.concat(*lines)
+                end
+              end
+            end
+          end
+
+          # And read the rest
+          # XXX: This might still need to be a readpartial loop
+          buffers.each do |stream, buffer|
+            while !stream.eof?
+              buffer << stream.readpartial(chunk_size)
+            end
+          end
+        end
+        result_output.exit_code = th.value
+        out_th.join
+
         @logger.debug { "Executing: #{command_str}" }
 
         if result_output.exit_code == 0
@@ -274,40 +334,27 @@ module Bolt
         raise
       end
 
-      def handled_sudo(channel, data, stdin)
-        if data.lines.include?(sudo_prompt)
-          if @sudo_password
-            channel.send_data("#{@sudo_password}\n")
-            channel.wait
-            return true
-          else
-            # Cancel the sudo prompt to prevent later commands getting stuck
-            channel.close
-            raise Bolt::Node::EscalateError.new(
-              "Sudo password for user #{conn.user} was not provided for #{target.safe_name}",
-              'NO_PASSWORD'
-            )
-          end
-        elsif data =~ /^#{@sudo_id}/
-          if stdin
-            channel.send_data(stdin)
-            channel.eof!
-          end
-          return true
-        elsif data =~ /^#{conn.user} is not in the sudoers file\./
-          @logger.debug { data }
+      def send_stdin(stream, content)
+        chunk_size = 4096
+        idx = 0
+        while idx < content.length
+          idx += stream.write(content[idx, chunk_size])
+        end
+        stream.close
+      end
+
+      def handle_sudo_errors(lines)
+        if lines.any? { |line| line =~ /^#{conn.user} is not in the sudoers file\./ }
           raise Bolt::Node::EscalateError.new(
             "User #{conn.user} does not have sudo permission on #{target.safe_name}",
             'SUDO_DENIED'
           )
-        elsif data =~ /^Sorry, try again\./
-          @logger.debug { data }
+        elsif lines.any? { |line| line =~ /^Sorry, try again\./ }
           raise Bolt::Node::EscalateError.new(
             "Sudo password for user #{conn.user} not recognized on #{target.safe_name}",
             'BAD_PASSWORD'
           )
         end
-        false
       end
 
       def sudo_prompt

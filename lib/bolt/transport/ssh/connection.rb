@@ -143,7 +143,6 @@ module Bolt
         end
 
         def execute(command_str, **options)
-          result_output = Bolt::Node::Output.new
           # Including the environment declarations in the shelljoin will escape
           # the = sign, so we have to handle them separately.
           if options[:environment]
@@ -153,44 +152,79 @@ module Bolt
             command_str = "#{env_decls.join(' ')} #{command_str}"
           end
 
-          session_channel = @session.open_channel do |channel|
-            # Request a pseudo tty
-            channel.request_pty if target.options['tty']
+          in_rd, in_wr = IO.pipe
+          out_rd, out_wr = IO.pipe
+          err_rd, err_wr = IO.pipe
+          th = Thread.new do
+            exit_code = nil
+            session_channel = @session.open_channel do |channel|
+              # Request a pseudo tty
+              channel.request_pty if target.options['tty']
 
-            channel.exec(command_str) do |_, success|
-              unless success
-                raise Bolt::Node::ConnectError.new(
-                  "Could not execute command: #{command_str.inspect}",
-                  'EXEC_ERROR'
-                )
-              end
+              channel.exec(command_str) do |_, success|
+                unless success
+                  raise Bolt::Node::ConnectError.new(
+                    "Could not execute command: #{command_str.inspect}",
+                    'EXEC_ERROR'
+                  )
+                end
 
-              channel.on_data do |_, data|
-                result_output.stdout << data
-                @logger.debug { "stdout: #{data.strip}" }
-              end
+                channel.on_data do |_, data|
+                  out_wr << data
+                end
 
-              channel.on_extended_data do |_, _, data|
-                result_output.stderr << data
-                @logger.debug { "stderr: #{data.strip}" }
-              end
+                channel.on_extended_data do |_, _, data|
+                  err_wr << data
+                end
 
-              channel.on_request("exit-status") do |_, data|
-                result_output.exit_code = data.read_long
-              end
-              # A wrapper is used to direct stdin when elevating privilage or using tty
-              if options[:stdin]
-                channel.send_data(options[:stdin])
-                channel.eof!
+                channel.on_request("exit-status") do |_, data|
+                  exit_code = data.read_long
+                end
               end
             end
+            write_th = Thread.new do
+              chunk_size = 4096
+              eof = false
+              while !eof do
+                @session.loop(0.1) do
+                  session_channel.active? && select([in_rd], [], [], 0).nil?
+                end
+                if in_rd.eof?
+                  session_channel.eof!
+                  break
+                else
+                  to_write = in_rd.readpartial(chunk_size)
+                  session_channel.send_data(to_write)
+                end
+              end
+              session_channel.wait
+            end
+            write_th.join
+            in_rd.close
+            out_wr.close
+            err_wr.close
+            exit_code
           end
-          session_channel.wait
-
-          result_output
+          return in_wr, out_rd, err_rd, th
         rescue StandardError
           @logger.debug { "Command aborted" }
           raise
+        end
+
+        def execute_simple(command)
+          stdin, stdout, stderr, th = execute(command)
+          stdin.close
+
+          result = Bolt::Node::Output.new
+          result.stdout << stdout.read
+          result.stderr << stderr.read
+          result.exit_code = th.value
+
+          stdout.close
+          stderr.close
+          stdin.close
+
+          result
         end
 
         def copy_file(source, destination)
@@ -228,7 +262,7 @@ module Bolt
 
         def shell
           return @shell if @shell
-          is_pwsh = execute("$PSVersionTable.PSVersion").exit_code.zero?
+          is_pwsh = execute_simple("$PSVersionTable.PSVersion").exit_code.zero?
           @shell = is_pwsh ? Bolt::Shell::Powershell.new(target, self) : @shell = Bolt::Shell::Bash.new(target, self)
         end
       end
