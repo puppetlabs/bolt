@@ -129,6 +129,10 @@ module Bolt
       inventory_target.transport
     end
 
+    def transport_config
+      inventory_target.transport_config.to_h
+    end
+
     def protocol
       inventory_target.protocol || inventory_target.transport
     end

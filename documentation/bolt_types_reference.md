@@ -82,7 +82,7 @@ The following functions are available to `Target` objects:
 
 | Function | Type returned | Description | Note |
 |---|---|---|---|
-| `config` | `Hash[String, Data]` | The inventory configuration for the target. | This function does not return default configuration values or configuration set in a `bolt.yaml` file. It only returns the configuration set in an `inventory.yaml` file or the configuration set during a plan using the `Target.new` or `set_config()` functions. |
+| `config` | `Hash[String, Data]` | The inventory configuration for the target. | This function does not return default configuration values or configuration set in a `bolt.yaml` file. It only returns the configuration set in an `inventory.yaml` file or set in a plan using the `Target.new` or `set_config()` functions. |
 | `facts` | `Hash[String, Data]` | The target's facts. | This function does not lookup facts for a target and only returns the facts specified in an `inventory.yaml` file or set on a target during a plan run. |
 | `features` | `Array[String]` | The target's features. ||
 | `host` | `String` | The target's hostname. ||
