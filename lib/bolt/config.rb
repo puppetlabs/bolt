@@ -339,7 +339,7 @@ module Bolt
         raise Bolt::ValidationError, "Unsupported format: '#{format}'"
       end
 
-      Bolt::Util.validate_file('hiera-config', @data['hiera_config']) if @data['hiera_config']
+      Bolt::Util.validate_file('hiera-config', @data['hiera-config']) if @data['hiera-config']
       Bolt::Util.validate_file('trusted-external-command', trusted_external) if trusted_external
 
       unless TRANSPORT_CONFIG.include?(transport)
