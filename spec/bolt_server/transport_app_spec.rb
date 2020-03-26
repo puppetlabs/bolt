@@ -206,7 +206,8 @@ describe "BoltServer::TransportApp" do
 
         result = JSON.parse(last_response.body)
         regex = %r{The property '#/target' of type object matched more than one of the required schemas}
-        expect(result['details'].join).to match(regex)
+        expect(result['value']['_error']['details'].join).to match(regex)
+        expect(result['status']).to eq('failure')
       end
 
       it 'fails if no authorization is present' do
