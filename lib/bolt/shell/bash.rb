@@ -6,6 +6,8 @@ require 'shellwords'
 module Bolt
   class Shell
     class Bash < Shell
+      CHUNK_SIZE = 4096
+
       def initialize(target, conn)
         super
 
@@ -126,6 +128,70 @@ module Bolt
                                 output.stderr.string,
                                 output.exit_code,
                                 task.name)
+        end
+      end
+
+      # If prompted for sudo password, send password to stdin and return an
+      # empty string. Otherwise, check for sudo errors and raise Bolt error.
+      # If sudo_id is detected, that means the task needs to have stdin written.
+      # If error is not sudo-related, return the stderr string to be added to
+      # node output
+      def handle_sudo(stdin, err, sudo_stdin)
+        if err.include?(sudo_prompt)
+          # A wild sudo prompt has appeared!
+          if @sudo_password
+            stdin.write("#{@sudo_password}\n")
+            ''
+          else
+            raise Bolt::Node::EscalateError.new(
+              "Sudo password for user #{conn.user} was not provided for localhost",
+              'NO_PASSWORD'
+            )
+          end
+        elsif err =~ /^#{@sudo_id}/
+          if sudo_stdin
+            stdin.write("#{sudo_stdin}\n")
+            stdin.close
+          end
+          ''
+        else
+          handle_sudo_errors(err, stdin)
+        end
+      end
+
+      # See if there's a sudo prompt in the output
+      # If not, return the output
+      def check_sudo(out, inp, stdin)
+        buffer = out.readpartial(CHUNK_SIZE)
+        # Split on newlines, including the newline
+        lines = buffer.split(/(?<=[\n])/)
+        # handle_sudo will return the line if it is not a sudo prompt or error
+        lines.map! { |line| handle_sudo(inp, line, stdin) }
+        lines.join("")
+      # If stream has reached EOF, no password prompt is expected
+      # return an empty string
+      rescue EOFError
+        ''
+      end
+
+      def handle_sudo_errors(err, stdin)
+        if err =~ /^#{conn.user} is not in the sudoers file\./
+          @logger.debug { err }
+          raise Bolt::Node::EscalateError.new(
+            "User #{conn.user} does not have sudo permission on localhost",
+            'SUDO_DENIED'
+          )
+        elsif err =~ /^Sorry, try again\./
+          @logger.debug { err }
+          # Close stdin to allow future commands to run
+          stdin.close
+          raise Bolt::Node::EscalateError.new(
+            "Sudo password for user #{conn.user} not recognized on localhost",
+            'BAD_PASSWORD'
+          )
+        else
+          # No need to raise an error - just return the string
+          err
         end
       end
 
@@ -258,70 +324,76 @@ module Bolt
           end
           command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options.merge(reset_cwd: true))
         end
+        @logger.debug { "Executing: #{command_str}" }
 
-        # TODO Handle sudo
-        stdin, stdout, stderr, th = conn.execute(command_str, options)
+        in_buffer = !use_sudo && options[:stdin] ? options[:stdin] : ''
+        # Chunks of this size will be read in one iteration
+        index = 0
+        timeout = 0.1
+
+        inp, out, err, t = conn.execute(command_str, options)
         result_output = Bolt::Node::Output.new
-        buffers = { stdout => result_output.stdout,
-                    stderr => result_output.stderr }
-        out_th = Thread.new do
-          chunk_size = 4096
-          output = String.new
-          # Send stdin right away if we're not using sudo.
-          if !use_sudo
-            send_stdin(stdin, options[:stdin] || "")
-          # Otherwise we need to exercise a bit more care
-          else
-            sent_sudo_password = false
-            sudo_done = false
-            while !sudo_done do
-              ready_streams, *_ = select([stdout, stderr], [], [])
-              ready_streams.each do |stream|
-                lines = stream.readpartial(chunk_size).lines
-                # If we haven't sent the sudo password, look for the prompt
-                if !sent_sudo_password && lines.include?(sudo_prompt)
-                  lines.delete(sudo_prompt)
-                  unless @sudo_password
-                    # Close stdin to avoid blocking future commands
-                    # XXX: This may be insufficient to cause sudo to exit...
-                    stdin.close
-                    raise Bolt::Node::EscalateError.new(
-                      "Sudo password for user #{conn.user} was not provided for #{target.safe_name}",
-                      'NO_PASSWORD'
-                    )
-                  end
+        read_streams = { out => String.new,
+                         err => String.new }
+        write_stream = in_buffer.empty? ? [] : [inp]
 
-                  stdin.puts @sudo_password
-                  sent_sudo_password = true
+        # See if there's a sudo prompt
+        if use_sudo
+          ready_read = select([err], nil, nil, timeout * 5)
+          read_streams[err] << check_sudo(err, inp, options[:stdin]) if ready_read
+        end
 
-                  unless options[:stdin]
-                    stdin.close
-                    sudo_done = true
-                  end
-                elsif lines.include?(@sudo_id)
-                  lines.delete(@sudo_id)
-                  send_stdin(stdin, options[:stdin])
-                  sudo_done = true
-                else
-                  handle_sudo_errors(lines)
-                  output.concat(*lines)
-                end
+        # True while the process is running or waiting for IO input
+        while t.alive?
+          # See if we can read from out or err, or write to in
+          ready_read, ready_write, = select(read_streams.keys, write_stream, nil, timeout)
+
+          # Read from out and err
+          ready_read&.each do |stream|
+            # Check for sudo prompt
+            read_streams[stream] << if use_sudo
+                                      check_sudo(stream, inp, options[:stdin])
+                                    else
+                                      stream.readpartial(CHUNK_SIZE)
+                                    end
+          rescue EOFError
+          end
+
+          # select will either return an empty array if there are no
+          # writable streams or nil if no IO object is available before the
+          # timeout is reached.
+          writable = if ready_write.respond_to?(:empty?)
+                       !ready_write.empty?
+                     else
+                       !ready_write.nil?
+                     end
+
+          begin
+            if writable && index < in_buffer.length
+              to_print = in_buffer[index..-1]
+              written = inp.write_nonblock to_print
+              index += written
+
+              if index >= in_buffer.length && !write_stream.empty?
+                inp.close
+                write_stream = []
               end
             end
-          end
-
-          # And read the rest
-          # XXX: This might still need to be a readpartial loop
-          buffers.each do |stream, buffer|
-            while !stream.eof?
-              buffer << stream.readpartial(chunk_size)
-            end
+            # If a task has stdin as an input_method but doesn't actually
+            # read from stdin, the task may return and close the input stream
+          rescue Errno::EPIPE
+            write_stream = []
           end
         end
-        result_output.exit_code = th.value
-        out_th.join
-
-        @logger.debug { "Executing: #{command_str}" }
+        # Read any remaining data in the pipe. Do not wait for
+        # EOF in case the pipe is inherited by a child process.
+        read_streams.each do |stream, _|
+          loop { read_streams[stream] << stream.read_nonblock(CHUNK_SIZE) }
+        rescue Errno::EAGAIN, EOFError
+        end
+        result_output.stdout << read_streams[out]
+        result_output.stderr << read_streams[err]
+        result_output.exit_code = t.value.respond_to?(:exitstatus) ? t.value.exitstatus : t.value
 
         if result_output.exit_code == 0
           @logger.debug { "Command returned successfully" }
@@ -332,29 +404,6 @@ module Bolt
       rescue StandardError
         @logger.debug { "Command aborted" }
         raise
-      end
-
-      def send_stdin(stream, content)
-        chunk_size = 4096
-        idx = 0
-        while idx < content.length
-          idx += stream.write(content[idx, chunk_size])
-        end
-        stream.close
-      end
-
-      def handle_sudo_errors(lines)
-        if lines.any? { |line| line =~ /^#{conn.user} is not in the sudoers file\./ }
-          raise Bolt::Node::EscalateError.new(
-            "User #{conn.user} does not have sudo permission on #{target.safe_name}",
-            'SUDO_DENIED'
-          )
-        elsif lines.any? { |line| line =~ /^Sorry, try again\./ }
-          raise Bolt::Node::EscalateError.new(
-            "Sudo password for user #{conn.user} not recognized on #{target.safe_name}",
-            'BAD_PASSWORD'
-          )
-        end
       end
 
       def sudo_prompt

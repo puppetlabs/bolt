@@ -185,16 +185,23 @@ module Bolt
             write_th = Thread.new do
               chunk_size = 4096
               eof = false
-              while !eof do
-                @session.loop(0.1) do
-                  session_channel.active? && select([in_rd], [], [], 0).nil?
+              active = true
+              readable = false
+              while active && !eof do
+                loop_result = @session.loop(0.1) do
+                  active = session_channel.active?
+                  readable = select([in_rd], [], [], 0)
+                  # Loop as long as the channel is still live and there's nothing to be written
+                  active && !readable
                 end
-                if in_rd.eof?
-                  session_channel.eof!
-                  break
-                else
-                  to_write = in_rd.readpartial(chunk_size)
-                  session_channel.send_data(to_write)
+                if readable
+                  if in_rd.eof?
+                    session_channel.eof!
+                    eof = true
+                  else
+                    to_write = in_rd.readpartial(chunk_size)
+                    session_channel.send_data(to_write)
+                  end
                 end
               end
               session_channel.wait
