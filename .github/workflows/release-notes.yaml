@@ -1,0 +1,19 @@
+name: Release Notes
+
+on:
+  pull_request:
+    type: [opened, reopened, edited]
+    paths-ignore: ['*.md', '**.md', '**.erb']
+
+jobs:
+
+  release-notes:
+    name: Release Notes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+      - name: Check for release notes
+        uses: rulesets/rulesets@v1.0.0-beta
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
