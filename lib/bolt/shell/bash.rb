@@ -144,7 +144,7 @@ module Bolt
             ''
           else
             raise Bolt::Node::EscalateError.new(
-              "Sudo password for user #{conn.user} was not provided for localhost",
+              "Sudo password for user #{conn.user} was not provided for #{target}",
               'NO_PASSWORD'
             )
           end
@@ -178,7 +178,7 @@ module Bolt
         if err =~ /^#{conn.user} is not in the sudoers file\./
           @logger.debug { err }
           raise Bolt::Node::EscalateError.new(
-            "User #{conn.user} does not have sudo permission on localhost",
+            "User #{conn.user} does not have sudo permission on #{target}",
             'SUDO_DENIED'
           )
         elsif err =~ /^Sorry, try again\./
@@ -186,7 +186,7 @@ module Bolt
           # Close stdin to allow future commands to run
           stdin.close
           raise Bolt::Node::EscalateError.new(
-            "Sudo password for user #{conn.user} not recognized on localhost",
+            "Sudo password for user #{conn.user} not recognized on #{target}",
             'BAD_PASSWORD'
           )
         else
@@ -322,6 +322,7 @@ module Bolt
           else
             sudo_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
           end
+          # XXX: We don't want to reset_cwd for the local transport
           command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options.merge(reset_cwd: true))
         end
         @logger.debug { "Executing: #{command_str}" }

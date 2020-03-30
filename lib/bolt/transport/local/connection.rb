@@ -54,13 +54,6 @@ module Bolt
             command_arr = ['powershell.exe', *PS_ARGS, *command_arr]
           end
 
-          # Prepare the variables!
-          result_output = Bolt::Node::Output.new
-          in_buffer = options[:stdin] || ''
-          # Chunks of this size will be read in one iteration
-          index = 0
-          timeout = 0.1
-
           inp, out, err, t = Open3.popen3(*command_arr)
         end
       end
