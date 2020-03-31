@@ -116,13 +116,23 @@ The following fields are available to the `puppetdb` plugin.
 | **`query`** | A string containing a [PQL query](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html) or an array containing a [PuppetDB AST format query](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html).<br> **Required.** | `String` | None |
 | `target_mapping` | A hash of target attributes (`name`, `uri`, `config`) to populate with fact lookup values. | `Hash` | None |
 
+#### Available fact paths
+
+The following values/patterns are available to use for looking up facts in the `target_mapping` field:
+
+| Key | Description |
+| --- | ----------- |
+| `certname` | The certname of the node returned from PuppetDB. This is short hand for doing: `facts.trusted.certname`. |
+| `facts.*` | [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference fact value. Dot notation is required for both structured and unstructured facts. |
+
 #### Example usage
 
 Lookup targets with the fact `osfamily: RedHat` and setting:
  * The alias with the fact `hostname`
- * The hostname with the fact `networking.interfaces.en0.ipaddress`
+ * The name with the fact `certname`
  * A target fact called `custom_fact` with the `custom_fact` from PuppetDB
  * A feature from the fact `custom_feature`
+ * The SSH hostname with the fact `networking.interfaces.en0.ipaddress`
  * The puppetversion var from the fact `puppetversion`
 
 ```yaml

@@ -1,5 +1,15 @@
 # Changelog
 
+## Bolt 2.3.1 (2020-03-30)
+
+### Bug fixes
+
+* **Validate that a specified Hiera config file exists**
+([#1692](https://github.com/puppetlabs/bolt/pull/1692))
+
+  Bolt was not properly validating that a Hiera config file specified
+  with the `hiera-config` option in a `bolt.yaml` existed.
+
 ## Bolt 2.3.0 (2020-03-23)
 
 ### New features

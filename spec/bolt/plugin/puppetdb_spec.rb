@@ -178,6 +178,18 @@ describe Bolt::Plugin::Puppetdb do
       end
     end
 
+    context "when using 'certname' as a facts path" do
+      let(:opts) do
+        { "query" => '',
+          "target_mapping" => { "name" => 'certname' } }
+      end
+
+      it "sets the name to the certname" do
+        expect(plugin.resolve_reference(opts))
+          .to eq([{ "name" => "therealslimcertname" }])
+      end
+    end
+
     context "with misplaced config keys" do
       let(:opts) do
         { "query" => '',
@@ -218,6 +230,36 @@ describe Bolt::Plugin::Puppetdb do
       it "raises an error" do
         expect { plugin.resolve_facts(config, certname, data) }
           .to raise_error(Bolt::Plugin::Puppetdb::FactLookupError, /be a string/)
+      end
+    end
+
+    context "with 'certname' as fact path" do
+      let(:certname) { 'hostname.domain.tld' }
+      let(:config) do
+        { 'name' => 'certname' }
+      end
+
+      context " with no fact_values" do
+        let(:data) { nil }
+
+        it "returns the certname" do
+          expect(plugin.resolve_facts(config, certname, data))
+            .to eq({ 'name' => 'hostname.domain.tld' })
+        end
+      end
+
+      context " with fact_values" do
+        let(:data) do
+          { certname => [{
+            'path' => [1],
+            'value' => 'the loneliest number'
+          }] }
+        end
+
+        it "returns the certname" do
+          expect(plugin.resolve_facts(config, certname, data))
+            .to eq({ 'name' => 'hostname.domain.tld' })
+        end
       end
     end
 
