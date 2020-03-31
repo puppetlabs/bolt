@@ -9,19 +9,7 @@ require 'bolt/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/bolt_server'
 
-task = ARGV[0]
-target = ARGV[1]
-params = ARGV[2] || '{}'
-
-unless task && target
-  puts(<<~MSG)
-      Fetch task data from the dev puppetserver container and run a task through the local bolt-server
-      USAGE: bundle exec scripts/server_client.rb sample::echo ssh '{"message": "hey"}'
-    MSG
-  exit 1
-end
-
-params = JSON.parse(params)
+require 'optparse'
 
 class Client
   include BoltSpec::Conn
@@ -48,11 +36,7 @@ class Client
     @inventory.get_targets(target).first
   end
 
-  def run_task(task_name, target_name, params, base_uri: 'https://localhost:62658')
-    target = target(target_name)
-    body = build_task_request(task_name, target, params)
-
-    uri = URI("#{base_uri}/#{target.protocol}/run_task")
+  def execute_request(uri, body)
     req = Net::HTTP::Post.new(uri)
     req.body = JSON.generate(body)
     req.add_field('CONTENT_TYPE', 'text/json')
@@ -65,8 +49,62 @@ class Client
       puts "Could not parse: #{resp.body}"
     end
   end
+
+  def run_task(task_name, target_name, params, base_uri: 'https://localhost:62658')
+    target = target(target_name)
+    body = build_task_request(task_name, target, params)
+
+    uri = URI("#{base_uri}/#{target.protocol}/run_task")
+    execute_request(uri, body)
+  end
+
+  def run_command(command, target_name, base_uri: 'https://localhost:62658')
+    target = target(target_name)
+    body = build_command_request(command, target)
+
+    uri = URI("#{base_uri}/#{target.protocol}/apply")
+    execute_request(uri, body)
+  end
+
+  def apply_catalog(apply_request, target_name, base_uri: 'https://localhost:62658')
+    target = target(target_name)
+    req = if File.exist?(apply_request)
+            JSON.parse(apply_request)
+          else
+            catalog = cross_platform_catalog(target.name)
+            apply_catalog_entry(catalog)
+          end
+    body = req.merge({ 'target' => target2request(target) })
+
+    uri = URI("#{base_uri}/#{target.protocol}/apply_catalog")
+    execute_request(uri, body)
+  end
 end
 
-client = Client.new
+OptionParser.new do |opts|
+  banner = "USAGE: bundle exec scripts/server_client.rb sample::echo ssh '{\"message\": \"hey\"}' -a run_task"
+  opts.banner = banner
 
-puts JSON.pretty_generate(client.run_task(task, target, params))
+  object = ARGV[0]
+  target = ARGV[1]
+  client = Client.new
+
+  unless object && target
+    puts "Action object or target positional parameters are missing"
+    puts banner
+    exit 1
+  end
+
+  opts.on("-a", "--action ENUM", %i[run_task run_command apply], "Run action") do |action|
+    case action
+    when :run_task
+      params = ARGV[2] || '{}'
+      params = JSON.parse(params)
+      puts JSON.pretty_generate(client.run_task(object, target, params))
+    when :run_command
+      puts JSON.pretty_generate(client.run_command(object, target))
+    when :apply
+      puts JSON.pretty_generate(client.apply_catalog(object, target))
+    end
+  end
+end.parse!

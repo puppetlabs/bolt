@@ -153,5 +153,88 @@ module BoltSpec
         'targets' => targets.map { |target| target2request(target) }
       }
     end
+
+    def apply_catalog_entry(catalog, apply_options: { noop: false })
+      catalog.merge({ apply_options: apply_options })
+    end
+
+    # Apply a notify resource. Even though this does not affect any change on the target, it is platform independent
+    # and does not rely on any plugin libs which makes it a good smoke test across any target.
+    def cross_platform_catalog(certname, environment = 'production')
+      {
+        "catalog" => {
+          "tags" => [
+            "settings"
+          ],
+          "name" => certname,
+          "version" => 1581636379,
+          "code_id" => nil,
+          "catalog_uuid" => "5a4372c6-253f-46df-be99-3c40c9922423",
+          "catalog_format" => 1,
+          "environment" => environment,
+          "resources" => [
+            {
+              "type" => "Stage",
+              "title" => "main",
+              "tags" => %w[
+                stage
+                class
+              ],
+              "exported" => false,
+              "parameters" => {
+                "name" => "main"
+              }
+            },
+            {
+              "type" => "Class",
+              "title" => "Settings",
+              "tags" => %w[
+                class
+                settings
+              ],
+              "exported" => false
+            },
+            {
+              "type" => "Class",
+              "title" => "main",
+              "tags" => [
+                "class"
+              ],
+              "exported" => false,
+              "parameters" => {
+                "name" => "main"
+              }
+            },
+            {
+              "type" => "Notify",
+              "title" => "hello world",
+              "tags" => %w[
+                notify
+                class
+              ],
+              "line" => 1,
+              "exported" => false
+            }
+          ],
+          "edges" => [
+            {
+              "source" => "Stage[main]",
+              "target" => "Class[Settings]"
+            },
+            {
+              "source" => "Stage[main]",
+              "target" => "Class[main]"
+            },
+            {
+              "source" => "Class[main]",
+              "target" => "Notify[hello world]"
+            }
+          ],
+          "classes" => [
+            "settings"
+          ]
+        }
+      }
+    end
   end
 end

@@ -3,8 +3,10 @@
 require 'sinatra'
 require 'addressable/uri'
 require 'bolt'
+require 'bolt/apply_result'
 require 'bolt/error'
 require 'bolt/inventory'
+require 'bolt/result_set'
 require 'bolt/target'
 require 'bolt_server/file_cache'
 require 'bolt/task/puppet_server'
@@ -53,7 +55,19 @@ module BoltServer
       # This is needed until the PAL is threadsafe.
       @pal_mutex = Mutex.new
 
+      @apply_task = construct_apply_task
       super(nil)
+    end
+
+    def construct_apply_task
+      libexec = File.join(Gem::Specification.find_by_name('bolt').gem_dir, 'libexec')
+      path = File.join(libexec, 'bolt_server_apply.rb')
+      file = { 'name' => 'bolt_server_apply.rb', 'path' => path }
+      metadata = { 'supports_noop' => true, 'input_method' => 'stdin',
+                   'implementations' => [
+                     { 'name' => 'bolt_server_apply.rb' }
+                   ] }
+      Bolt::Task.new("apply_helpers::bolt_server_apply", metadata, [file])
     end
 
     def scrub_stack_trace(result)
@@ -182,6 +196,15 @@ module BoltServer
       [@executor.run_script(target, file_location, body['arguments'])]
     end
 
+    def apply_catalog(target, body)
+      # TODO: sync plugins to env cahce, tar them up, base-64 encode and pass to task
+      body['apply_options'] ||= {}
+      body['action'] = 'apply'
+      results = @executor.run_task(target, @apply_task, body)
+      apply_results = Bolt::ResultSet.new([Bolt::ApplyResult.from_task_result(results[0])])
+      [apply_results, nil]
+    end
+
     def in_pe_pal_env(environment)
       if environment.nil?
         [400, '`environment` is a required argument']
@@ -243,6 +266,7 @@ module BoltServer
       run_task
       run_script
       upload_file
+      apply_catalog
     ].freeze
 
     def make_ssh_target(target_hash)
