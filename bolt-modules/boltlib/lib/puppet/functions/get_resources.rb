@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/task'
+require 'bolt/pal/issues'
 
 # Query the state of resources on a list of targets using resource definitions in Bolt's modulepath.
 # The results are returned as a list of hashes representing each resource.

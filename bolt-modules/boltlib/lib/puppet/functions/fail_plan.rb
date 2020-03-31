@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/error'
+require 'bolt/pal/issues'
 
 # Raises a `Bolt::PlanFailure` exception to signal to callers that the plan failed.
 #

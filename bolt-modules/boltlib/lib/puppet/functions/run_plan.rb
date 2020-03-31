@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/error'
+require 'bolt/pal/issues'
 
 # Runs the `plan` referenced by its name. A plan is autoloaded from `$MODULEROOT/plans`.
 #

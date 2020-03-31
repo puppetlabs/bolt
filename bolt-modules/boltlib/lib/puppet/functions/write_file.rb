@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'tempfile'
+require 'bolt/pal/issues'
 
 # Write contents to a file on the given set of targets.
 #

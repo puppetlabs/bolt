@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/pal/issues'
+
 # Uploads the given script to the given set of targets and returns the result of having each target execute the script.
 # This function does nothing if the list of targets is empty.
 #

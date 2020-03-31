@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/pal/issues'
+
 # Define a block where default logging is suppressed.
 #
 # Messages for actions within this block will be logged at `info` level instead

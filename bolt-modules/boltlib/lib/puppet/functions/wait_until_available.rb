@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/util'
+require 'bolt/pal/issues'
 
 # Wait until all targets accept connections.
 #

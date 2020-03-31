@@ -3,6 +3,7 @@
 require 'bolt/error'
 require 'bolt/pal'
 require 'bolt/task'
+require 'bolt/pal/issues'
 
 # Runs a given instance of a `Task` on the given set of targets and returns the result from each.
 # This function does nothing if the list of targets is empty.

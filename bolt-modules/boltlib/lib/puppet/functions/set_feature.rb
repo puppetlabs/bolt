@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/error'
+require 'bolt/pal/issues'
 
 # Sets a particular feature to present on a target.
 #

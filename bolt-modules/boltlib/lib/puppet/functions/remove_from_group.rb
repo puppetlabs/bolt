@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/error'
+require 'bolt/pal/issues'
 
 # Removes a target from the specified inventory group.
 #

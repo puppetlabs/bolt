@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/pal/issues'
+
 # Output a message for the user.
 #
 # This will print a message to stdout when using the human output format,

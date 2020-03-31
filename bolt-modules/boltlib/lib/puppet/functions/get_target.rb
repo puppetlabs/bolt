@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/error'
+require 'bolt/pal/issues'
 
 # Get a single target from inventory if it exists, otherwise create a new Target.
 #

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/error'
+require 'bolt/pal/issues'
 
 # Evaluates all `_plugin` references in a hash and returns the resolved reference data.
 Puppet::Functions.create_function(:resolve_references) do

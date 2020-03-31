@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/task'
+require 'bolt/pal/issues'
 
 # Installs the `puppet-agent` package on targets if needed, then collects facts,
 # including any custom facts found in Bolt's modulepath. The package is

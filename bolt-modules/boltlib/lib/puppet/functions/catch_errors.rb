@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/pal/issues'
+
 # Catches errors in a given block and returns them. This will return the
 # output of the block if no errors are raised. Accepts an optional list of
 # error kinds to catch.

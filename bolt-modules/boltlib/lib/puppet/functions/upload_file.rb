@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/error'
+require 'bolt/pal/issues'
 
 # Uploads the given file or directory to the given set of targets and returns the result from each upload.
 # This function does nothing if the list of targets is empty.
