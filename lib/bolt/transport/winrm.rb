@@ -102,11 +102,11 @@ module Bolt
 
             remote_task_path = conn.write_remote_executable(task_dir, executable)
 
-            if STDIN_METHODS.include?(input_method)
+            if Bolt::Task::STDIN_METHODS.include?(input_method)
               stdin = JSON.dump(arguments)
             end
 
-            if ENVIRONMENT_METHODS.include?(input_method)
+            if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
               envify_params(arguments).each do |(arg, val)|
                 cmd = Powershell.set_env(arg, val)
                 result = conn.execute(cmd)

@@ -174,23 +174,4 @@ describe Bolt::Transport::Local do
       end
     end
   end
-
-  context 'file errors' do
-    before(:each) do
-      allow_any_instance_of(Bolt::Transport::Local).to receive(:upload).and_raise(
-        Bolt::Node::FileError.new("no write", "WRITE_ERROR")
-      )
-      allow_any_instance_of(Bolt::Transport::LocalWindows).to receive(:upload).and_raise(
-        Bolt::Node::FileError.new("no write", "WRITE_ERROR")
-      )
-      allow_any_instance_of(Bolt::Transport::LocalWindows).to receive(:in_tmpdir).and_raise(
-        Bolt::Node::FileError.new("no write", "WRITE_ERROR")
-      )
-      allow_any_instance_of(Bolt::Transport::Local::Shell).to receive(:with_tempdir).and_raise(
-        Bolt::Node::FileError.new("no tmpdir", "TEMDIR_ERROR")
-      )
-    end
-
-    include_examples 'transport failures'
-  end
 end

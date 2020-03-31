@@ -141,8 +141,8 @@ module Bolt
           logger.debug("Running '#{script}' with #{arguments.to_json}#{interpreter_debug}")
           unwrapped_arguments = unwrap_sensitive_args(arguments)
 
-          stdin = STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
-          if ENVIRONMENT_METHODS.include?(input_method)
+          stdin = Bolt::Task::STDIN_METHODS.include?(input_method) ? JSON.dump(unwrapped_arguments) : nil
+          if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
             environment_params = envify_params(unwrapped_arguments).each_with_object([]) do |(arg, val), list|
               list << Powershell.set_env(arg, val)
             end
@@ -164,7 +164,7 @@ module Bolt
           end
           unless output
             if interpreter
-              env = ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
+              env = Bolt::Task::ENVIRONMENT_METHODS.include?(input_method) ? envify_params(unwrapped_arguments) : nil
               output = execute(script, stdin: stdin, env: env, dir: dir, interpreter: interpreter)
             else
               path, args = *Powershell.process_from_extension(script)

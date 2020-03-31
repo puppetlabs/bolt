@@ -4,15 +4,13 @@ require 'logging'
 require 'shellwords'
 require 'bolt/node/errors'
 require 'bolt/node/output'
-require 'bolt/transport/sudoable/connection'
 require 'bolt/util'
 
 module Bolt
   module Transport
-    class SSH < Sudoable
-      class Connection < Sudoable::Connection
+    class SSH < Simple
+      class Connection
         attr_reader :logger, :user, :target
-        attr_writer :run_as
 
         def initialize(target, transport_logger)
           # lazy-load expensive gem code
@@ -20,21 +18,17 @@ module Bolt
           require 'net/ssh/proxy/jump'
 
           raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
-          @sudo_id = SecureRandom.uuid
 
           @target = target
           @load_config = target.options['load-config']
 
           ssh_config = @load_config ? Net::SSH::Config.for(target.host) : {}
           @user = @target.user || ssh_config[:user] || Etc.getlogin
-          @run_as = nil
           @strict_host_key_checking = ssh_config[:strict_host_key_checking]
 
           @logger = Logging.logger[@target.safe_name]
           @transport_logger = transport_logger
           @logger.debug("Initializing ssh connection to #{@target.safe_name}")
-
-          @sudo_password = @target.options['sudo-password'] || @target.password
 
           if target.options['private-key']&.instance_of?(String)
             begin
@@ -148,61 +142,7 @@ module Bolt
           end
         end
 
-        def handled_sudo(channel, data, stdin)
-          if data.lines.include?(Sudoable.sudo_prompt)
-            if @sudo_password
-              channel.send_data("#{@sudo_password}\n")
-              channel.wait
-              return true
-            else
-              # Cancel the sudo prompt to prevent later commands getting stuck
-              channel.close
-              raise Bolt::Node::EscalateError.new(
-                "Sudo password for user #{@user} was not provided for #{target.safe_name}",
-                'NO_PASSWORD'
-              )
-            end
-          elsif data =~ /^#{@sudo_id}/
-            if stdin
-              channel.send_data(stdin)
-              channel.eof!
-            end
-            return true
-          elsif data =~ /^#{@user} is not in the sudoers file\./
-            @logger.debug { data }
-            raise Bolt::Node::EscalateError.new(
-              "User #{@user} does not have sudo permission on #{target.safe_name}",
-              'SUDO_DENIED'
-            )
-          elsif data =~ /^Sorry, try again\./
-            @logger.debug { data }
-            raise Bolt::Node::EscalateError.new(
-              "Sudo password for user #{@user} not recognized on #{target.safe_name}",
-              'BAD_PASSWORD'
-            )
-          end
-          false
-        end
-
-        def execute(command, sudoable: false, **options)
-          result_output = Bolt::Node::Output.new
-          run_as = options[:run_as] || self.run_as
-          escalate = sudoable && run_as && @user != run_as
-          use_sudo = escalate && @target.options['run-as-command'].nil?
-
-          command_str = inject_interpreter(options[:interpreter], command)
-          if escalate
-            if use_sudo
-              sudo_exec = target.options['sudo-executable'] || "sudo"
-              sudo_flags = [sudo_exec, "-S", "-H", "-u", run_as, "-p", Sudoable.sudo_prompt]
-              sudo_flags += ["-E"] if options[:environment]
-              sudo_str = Shellwords.shelljoin(sudo_flags)
-            else
-              sudo_str = Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
-            end
-            command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options.merge(reset_cwd: true))
-          end
-
+        def execute(command_str, **options)
           # Including the environment declarations in the shelljoin will escape
           # the = sign, so we have to handle them separately.
           if options[:environment]
@@ -212,55 +152,69 @@ module Bolt
             command_str = "#{env_decls.join(' ')} #{command_str}"
           end
 
-          @logger.debug { "Executing: #{command_str}" }
+          in_rd, in_wr = IO.pipe
+          out_rd, out_wr = IO.pipe
+          err_rd, err_wr = IO.pipe
+          th = Thread.new do
+            exit_code = nil
+            session_channel = @session.open_channel do |channel|
+              # Request a pseudo tty
+              channel.request_pty if target.options['tty']
 
-          session_channel = @session.open_channel do |channel|
-            # Request a pseudo tty
-            channel.request_pty if target.options['tty']
-
-            channel.exec(command_str) do |_, success|
-              unless success
-                raise Bolt::Node::ConnectError.new(
-                  "Could not execute command: #{command_str.inspect}",
-                  'EXEC_ERROR'
-                )
-              end
-
-              channel.on_data do |_, data|
-                unless use_sudo && handled_sudo(channel, data, options[:stdin])
-                  result_output.stdout << data
+              channel.exec(command_str) do |_, success|
+                unless success
+                  raise Bolt::Node::ConnectError.new(
+                    "Could not execute command: #{command_str.inspect}",
+                    'EXEC_ERROR'
+                  )
                 end
-                @logger.debug { "stdout: #{data.strip}" }
-              end
 
-              channel.on_extended_data do |_, _, data|
-                unless use_sudo && handled_sudo(channel, data, options[:stdin])
-                  result_output.stderr << data
+                channel.on_data do |_, data|
+                  out_wr << data
                 end
-                @logger.debug { "stderr: #{data.strip}" }
-              end
 
-              channel.on_request("exit-status") do |_, data|
-                result_output.exit_code = data.read_long
-              end
-              # A wrapper is used to direct stdin when elevating privilage or using tty
-              if options[:stdin] && !use_sudo && !options[:wrapper]
-                channel.send_data(options[:stdin])
-                channel.eof!
+                channel.on_extended_data do |_, _, data|
+                  err_wr << data
+                end
+
+                channel.on_request("exit-status") do |_, data|
+                  exit_code = data.read_long
+                end
               end
             end
+            write_th = Thread.new do
+              chunk_size = 4096
+              eof = false
+              active = true
+              readable = false
+              while active && !eof
+                @session.loop(0.1) do
+                  active = session_channel.active?
+                  readable = select([in_rd], [], [], 0)
+                  # Loop as long as the channel is still live and there's nothing to be written
+                  active && !readable
+                end
+                if readable
+                  if in_rd.eof?
+                    session_channel.eof!
+                    eof = true
+                  else
+                    to_write = in_rd.readpartial(chunk_size)
+                    session_channel.send_data(to_write)
+                  end
+                end
+              end
+              session_channel.wait
+            end
+            write_th.join
+            exit_code
+          ensure
+            write_th.terminate
+            in_rd.close
+            out_wr.close
+            err_wr.close
           end
-          session_channel.wait
-
-          if result_output.exit_code == 0
-            @logger.debug { "Command returned successfully" }
-          else
-            @logger.info { "Command failed with exit code #{result_output.exit_code}" }
-          end
-          result_output
-        rescue StandardError
-          @logger.debug { "Command aborted" }
-          raise
+          [in_wr, out_rd, err_rd, th]
         end
 
         def copy_file(source, destination)
@@ -294,6 +248,16 @@ module Bolt
               Net::SSH::Verifiers::Lenient.new
             end
           end
+        end
+
+        def shell
+          @shell ||= Bolt::Shell::Bash.new(target, self)
+        end
+
+        # This is used by the Bash shell to decide whether to `cd` before
+        # executing commands as a run-as user
+        def reset_cwd?
+          true
         end
       end
     end

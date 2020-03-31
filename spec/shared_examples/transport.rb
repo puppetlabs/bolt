@@ -514,55 +514,6 @@ shared_examples 'transport api' do
   end
 end
 
-# Shared failure tests for Transports
-#
-# Requires uploading files and making tempdir to be stubbed to throw Bolt::Node::FileError.
-shared_examples 'transport failures' do
-  context "when it can't upload a file" do
-    it 'returns an error result for upload' do
-      with_tempfile_containing('upload-test', 'dummy file') do |file|
-        expect {
-          runner.upload(target, file.path, "/upload-test")
-        }.to raise_error(Bolt::Node::FileError)
-      end
-    end
-
-    it 'returns an error result for run_script' do
-      with_tempfile_containing('script test', 'dummy script') do |file|
-        expect {
-          runner.run_script(target, file.path, [])
-        }.to raise_error(Bolt::Node::FileError)
-      end
-    end
-
-    it 'returns an error result for run_task' do
-      with_task_containing('tasks_test', 'dummy task', 'environment') do |task|
-        expect {
-          runner.run_task(target, task, {})
-        }.to raise_error(Bolt::Node::FileError)
-      end
-    end
-  end
-
-  context "when it can't create a tempfile" do
-    it 'errors when it tries to run a script' do
-      with_tempfile_containing('script test', 'dummy script') do |file|
-        expect {
-          runner.run_script(target, file.path, []).error_hash['msg']
-        }.to raise_error(Bolt::Node::FileError)
-      end
-    end
-
-    it "errors when it tries to run a task" do
-      with_task_containing('tasks_test', 'dummy task', 'environment') do |task|
-        expect {
-          runner.run_task(target, task, {})
-        }.to raise_error(Bolt::Node::FileError)
-      end
-    end
-  end
-end
-
 # Shared run_as and sudo tests
 #
 # Requires the following variables
