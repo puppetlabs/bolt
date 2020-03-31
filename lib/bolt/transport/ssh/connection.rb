@@ -142,16 +142,7 @@ module Bolt
           end
         end
 
-        def execute(command_str, **options)
-          # Including the environment declarations in the shelljoin will escape
-          # the = sign, so we have to handle them separately.
-          if options[:environment]
-            env_decls = options[:environment].map do |env, val|
-              "#{env}=#{Shellwords.shellescape(val)}"
-            end
-            command_str = "#{env_decls.join(' ')} #{command_str}"
-          end
-
+        def execute(command_str)
           in_rd, in_wr = IO.pipe
           out_rd, out_wr = IO.pipe
           err_rd, err_wr = IO.pipe

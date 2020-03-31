@@ -113,19 +113,19 @@ describe Bolt::Shell::Bash do
 
   describe "#run_command" do
     it "runs a command" do
-      expect(connection).to receive(:execute).with('echo hello world', {})
+      expect(connection).to receive(:execute).with('echo hello world')
       shell.run_command('echo hello world')
     end
 
     it "runs a command as the run-as user set on the target" do
       inventory.set_config(target, target.transport, 'run-as' => 'soandso')
-      expect(connection).to receive(:execute).with(/sudo .* -u soandso .* whoami/, {})
+      expect(connection).to receive(:execute).with(/sudo .* -u soandso .* whoami/)
       shell.run_command('whoami')
     end
 
     it "runs a command as the run-as user passed as an option" do
       inventory.set_config(target, 'ssh', 'run-as' => 'soandso')
-      expect(connection).to receive(:execute).with(/sudo .* -u suchandsuch .* whoami/, {})
+      expect(connection).to receive(:execute).with(/sudo .* -u suchandsuch .* whoami/)
 
       shell.run_command('whoami', run_as: 'suchandsuch')
     end
@@ -167,7 +167,7 @@ describe Bolt::Shell::Bash do
     end
 
     it "runs with the specified interpreter" do
-      expect(connection).to receive(:execute).with('/path/to/my/ruby /path/to/my/script.rb', anything)
+      expect(connection).to receive(:execute).with('/path/to/my/ruby /path/to/my/script.rb')
       shell.execute('/path/to/my/script.rb', interpreter: "/path/to/my/ruby")
     end
   end
@@ -175,14 +175,14 @@ describe Bolt::Shell::Bash do
   describe "when using run-as" do
     it "uses an alternate sudo-executable" do
       inventory.set_config(target, 'ssh', 'run-as' => 'soandso', 'sudo-executable' => 'mysudo')
-      expect(connection).to receive(:execute).with(/mysudo .* -u soandso .* whoami/, {})
+      expect(connection).to receive(:execute).with(/mysudo .* -u soandso .* whoami/)
 
       shell.run_command('whoami')
     end
 
     it "uses a run-as-comand" do
       inventory.set_config(target, 'ssh', 'run-as' => 'soandso', 'run-as-command' => %w[my run-as command])
-      expect(connection).to receive(:execute).with(/my run-as command soandso .* whoami/, {})
+      expect(connection).to receive(:execute).with(/my run-as command soandso .* whoami/)
 
       shell.run_command('whoami')
     end

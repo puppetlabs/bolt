@@ -43,10 +43,8 @@ module Bolt
           raise Bolt::Node::FileError.new(message, 'COPY_ERROR')
         end
 
-        def execute(command, **options)
-          command_arr = options[:environment].nil? ? Array(command) : [options[:environment], *command]
-
-          Open3.popen3(*command_arr)
+        def execute(command)
+          Open3.popen3(command)
         end
 
         # This is used by the Bash shell to decide whether to `cd` before

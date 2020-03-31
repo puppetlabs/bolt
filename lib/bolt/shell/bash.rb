@@ -271,11 +271,11 @@ module Bolt
       # provided on stdin or was not needed.
       def prepend_sudo_success(sudo_id, command_str)
         command_str = "cd && #{command_str}" if conn.reset_cwd?
-        "sh -c 'echo #{sudo_id} 1>&2; #{command_str}'"
+        "sh -c #{Shellwords.shellescape("echo #{sudo_id} 1>&2; #{command_str}")}"
       end
 
       def prepend_chdir(command_str)
-        "sh -c 'cd && #{command_str}'"
+        "sh -c #{Shellwords.shellescape("cd && #{command_str}")}"
       end
 
       # A helper to build up a single string that contains all of the options for
@@ -311,6 +311,14 @@ module Bolt
         use_sudo = escalate && @target.options['run-as-command'].nil?
 
         command_str = inject_interpreter(options[:interpreter], command)
+
+        if options[:environment]
+          env_decls = options[:environment].map do |env, val|
+            "#{env}=#{Shellwords.shellescape(val)}"
+          end
+          command_str = "#{env_decls.join(' ')} #{command_str}"
+        end
+
         if escalate
           if use_sudo
             sudo_exec = target.options['sudo-executable'] || "sudo"
@@ -322,6 +330,7 @@ module Bolt
           end
           command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options)
         end
+
         @logger.debug { "Executing: #{command_str}" }
 
         in_buffer = !use_sudo && options[:stdin] ? options[:stdin] : ''
@@ -329,7 +338,7 @@ module Bolt
         index = 0
         timeout = 0.1
 
-        inp, out, err, t = conn.execute(command_str, options)
+        inp, out, err, t = conn.execute(command_str)
         result_output = Bolt::Node::Output.new
         read_streams = { out => String.new,
                          err => String.new }
