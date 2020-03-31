@@ -102,7 +102,7 @@ config:
 
 The `puppetdb` plugin queries PuppetDB for a group of targets. 
 
-If target-specific configuration is required, the `puppetdb` plugin can be used to lookup configuration values for the `name`, `uri`, and `config` inventory options for each target. These values can be set in the `target_mapping` field. The fact lookup values can be either `certname` to reference the `[certname]` of the target, or a [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference fact value. Dot notation is required for both structured and unstructured facts.
+If target-specific configuration is required, the `puppetdb` plugin can be used to lookup configuration values for the `alias`, `config`, `facts`, `features`, `name`, `uri` and `vars` inventory options for each target. These values can be set in the `target_mapping` field. The fact lookup values can be either `certname` to reference the `[certname]` of the target, or a [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference a fact value. Dot notation is required for both structured and unstructured facts.
 
 #### Available fields
 
@@ -127,17 +127,30 @@ The following values/patterns are available to use for looking up facts in the `
 
 #### Example usage
 
-Lookup targets with the fact `osfamily: RedHat`, set the `name` with the fact `certname`, and set the hostname with the fact `networking.interfaces.en0.ipaddress`:
+Lookup targets with the fact `osfamily: RedHat` and setting:
+ * The alias with the fact `hostname`
+ * The name with the fact `certname`
+ * A target fact called `custom_fact` with the `custom_fact` from PuppetDB
+ * A feature from the fact `custom_feature`
+ * The SSH hostname with the fact `networking.interfaces.en0.ipaddress`
+ * The puppetversion var from the fact `puppetversion`
 
 ```yaml
 targets:
   - _plugin: puppetdb
     query: "inventory[certname] { facts.osfamily = 'RedHat' }"
     target_mapping:
+      alias: facts.hostname
       name: certname
+      facts:
+        custom_fact: facts.custom_fact
+      features:
+        - facts.custom_feature
       config:
         ssh:
           hostname: facts.networking.interfaces.en0.ipaddress
+      vars:
+        puppetversion: facts.puppetversion
 ```
 
 

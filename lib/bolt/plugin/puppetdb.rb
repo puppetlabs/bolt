@@ -11,7 +11,7 @@ module Bolt
         end
       end
 
-      TEMPLATE_OPTS = %w[uri name config].freeze
+      TEMPLATE_OPTS = %w[alias config facts features name uri vars].freeze
       PLUGIN_OPTS = %w[_plugin query target_mapping].freeze
 
       def initialize(pdb_client)
