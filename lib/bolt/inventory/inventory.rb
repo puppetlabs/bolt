@@ -50,6 +50,10 @@ module Bolt
         @group_lookup.keys
       end
 
+      def group_names_for(target_name)
+        group_data_for(target_name).fetch('groups', [])
+      end
+
       def target_names
         @groups.all_targets
       end
