@@ -102,7 +102,7 @@ config:
 
 The `puppetdb` plugin queries PuppetDB for a group of targets. 
 
-If target-specific configuration is required, the `puppetdb` plugin can be used to lookup configuration values for the `alias`, `config`, `facts`, `features`, `name`, `uri` and `vars` inventory options for each target. These values can be set in the `target_mapping` field. The fact lookup values can be either `certname` to reference the `[certname]` of the target, or a [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference fact value. Dot notation is required for both structured and unstructured facts.
+If target-specific configuration is required, the `puppetdb` plugin can be used to lookup configuration values for the `alias`, `config`, `facts`, `features`, `name`, `uri` and `vars` inventory options for each target. These values can be set in the `target_mapping` field. The fact lookup values can be either `certname` to reference the `[certname]` of the target, or a [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference a fact value. Dot notation is required for both structured and unstructured facts.
 
 #### Available fields
 
