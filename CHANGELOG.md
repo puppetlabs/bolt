@@ -1,21 +1,5 @@
 # Changelog
 
-## Development
-
-### New Features
-
-* **Added ability to populate all `target` properties in the `puppetdb` plugin's `target_mapping`**
-  Previously the `target_mapping` field only supported populating target's
-  `uri`, `name` and `config` values. Additional fields are now able to be
-  pupulated on a target, a complete list is below:
-   * `alias`
-   * `config`
-   * `facts`
-   * `features`
-   * `name`
-   * `uri`
-   * `vars`
-
 ## Bolt 2.3.0 (2020-03-23)
 
 ### New features
