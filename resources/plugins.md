@@ -1,6 +1,6 @@
 # 3rd Party Bolt Plugin list
 
-Below is a plugin list of all documented 3rd party bolt plugins.  If you have created a plugin please add your plugin
+Below is a list of documented third-party plugins for Bolt.  If you have created a plugin you can add it to the list and [open a pull request](https://github.com/puppetlabs/bolt/blob/master/CONTRIBUTING.md#pull-requests) with the changes.
 
 ## Bolt Plugin Table
 |Name|Url|Author|Category|Description|Tags|Requirements|
