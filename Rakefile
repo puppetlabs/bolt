@@ -117,6 +117,7 @@ namespace :docs do
       actions.each do |action|
         command = [subcommand, action].compact.join(' ')
         help_text = parser.get_help_text(subcommand, action)
+        matches = help_text[:banner].match(/USAGE(?<usage>.+?)DESCRIPTION(?<desc>.+?)(EXAMPLES|\z)/m)
 
         options = help_text[:flags].map do |option|
           switch = parser.top.long[option]
@@ -129,8 +130,12 @@ namespace :docs do
           }
         end
 
+        desc  = matches[:desc].split("\n").map(&:strip).join("\n")
+        usage = matches[:usage].strip
+
         @commands[command] = {
-          banner: help_text[:banner],
+          usage: usage,
+          desc: desc,
           options: options
         }
       end
