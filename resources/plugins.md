@@ -5,4 +5,4 @@ Below is a list of documented third-party plugins for Bolt.  If you have created
 ## Bolt Plugin Table
 |Name|Url|Author|Category|Description|Tags|Requirements|
 | --- | --- | --- | --- | --- | --- | --- |
-|AD Inventory |https://github.com/glennsarti/bolt_ad_inventory |glennsarti |inventory |Bolt Plugin for getting inventory from Active Directory |windows, Active Directory, Inventory |bolt 1.x|
+| `ad_inventory` | Generate targets from Windows Active Directory queries. | [bolt_ad_inventory](https://github.com/glennsarti/bolt_ad_inventory) | [glennsarti](https://github.com/glennsarti) |
