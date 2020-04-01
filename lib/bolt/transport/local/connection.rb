@@ -2,6 +2,7 @@
 
 require 'open3'
 require 'fileutils'
+require 'tempfile'
 require 'bolt/node/output'
 require 'bolt/util'
 
@@ -44,7 +45,16 @@ module Bolt
         end
 
         def execute(command)
-          Open3.popen3(command)
+          if Bolt::Util.windows?
+            command += "\r\nif (!$?) { if($LASTEXITCODE) { exit $LASTEXITCODE } else { exit 1 } }"
+            script_file = Tempfile.new(['wrapper', '.ps1'])
+            File.write(script_file, command)
+            script_file.close
+
+            command = ['powershell.exe', *Bolt::Shell::Powershell::PS_ARGS, script_file.path]
+          end
+
+          Open3.popen3(*command)
         end
 
         # This is used by the Bash shell to decide whether to `cd` before
