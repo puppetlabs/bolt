@@ -47,7 +47,7 @@ The `apply` action supports the following options:
 
 ### Return value of `apply` action
 
-The `apply` action returns an object type `ResultSet` that contains `ApplyResult` object for each target. For more information on the methods you can call on `$result`, see [Handling plan function results](writing_plans.md#).
+The `apply` action returns an object type `ResultSet` that contains `ApplyResult` object for each target. For more information on the methods you can call on `$result`, see [Bolt data types](bolt_types_reference.md). 
 
 ```
 $results = apply($targets) { ... }
