@@ -143,7 +143,8 @@ module Bolt
     end
 
     RUBY_PLUGINS = %w[task pkcs7 prompt env_var].freeze
-    BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory puppetdb azure_inventory yaml env_var].freeze
+    BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory puppetdb azure_inventory
+                         yaml env_var gcloud_inventory].freeze
     DEFAULT_PLUGIN_HOOKS = { 'puppet_library' => { 'plugin' => 'puppet_agent', 'stop_service' => true } }.freeze
 
     attr_reader :pal, :plugin_context

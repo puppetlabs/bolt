@@ -40,6 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "CFPropertyList", "~> 2.2"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
   spec.add_dependency "hiera-eyaml", "~> 3"
+  spec.add_dependency "jwt", "~> 2.2"
   spec.add_dependency "logging", "~> 2.2"
   spec.add_dependency "minitar", "~> 0.6"
   spec.add_dependency "net-scp", "~> 1.2"
