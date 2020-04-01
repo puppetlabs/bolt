@@ -263,24 +263,6 @@ namespace :integration do
   end
 end
 
-desc 'Generate Plugin List'
-task :plugin_list do
-  require 'yaml'
-  plugin_file = YAML.load_file(File.expand_path(File.join(__dir__, 'resources', 'plugins.yaml')))
-  table_header = plugin_file['plugin_table_header']
-  plugin_list = []
-  plugin_file['plugins'].each do |category, plugins|
-    plugin_list = plugins.map do |_name, plugin|
-      <<~LIST
-         |#{plugin['name']} |#{plugin['url']} |#{plugin['author']} |#{category} |#{plugin['desc']} |#{plugin['tags'].join(', ')} |#{plugin['requirements'].join(', ')}|
-
-         LIST
-    end
-  end
-  data = ["\n## Bolt Plugin Table"] + [table_header] + plugin_list.flatten
-  File.write(File.expand_path(File.join(__dir__, 'resources', 'plugins.md')), plugin_file['plugin_intro'] + data.join("\n"))
-end
-
 desc 'Generate changelog'
 task :changelog, [:version] do |_t, args|
   sh "./scripts/generate_changelog.rb #{args[:version]}"
