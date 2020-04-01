@@ -27,8 +27,8 @@ Puppet::DataTypes.create_type('Target') do
       password => Callable[[], Optional[String[1]]],
       port => Callable[[], Optional[Integer]],
       protocol => Callable[[], Optional[String[1]]],
-      transport => Callable[[], Optional[String[1]]],
-      transport_config => Callable[[], Optional[Hash[String[1], Data]]],
+      transport => Callable[[], String[1]],
+      transport_config => Callable[[], Hash[String[1], Data]],
       user => Callable[[], Optional[String[1]]]
     }
   PUPPET
