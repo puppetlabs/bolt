@@ -270,12 +270,12 @@ module Bolt
       # for task input data because the sudo password has already either been
       # provided on stdin or was not needed.
       def prepend_sudo_success(sudo_id, command_str)
-        command_str = "cd && #{command_str}" if conn.reset_cwd?
+        command_str = "cd; #{command_str}" if conn.reset_cwd?
         "sh -c #{Shellwords.shellescape("echo #{sudo_id} 1>&2; #{command_str}")}"
       end
 
       def prepend_chdir(command_str)
-        "sh -c #{Shellwords.shellescape("cd && #{command_str}")}"
+        "sh -c #{Shellwords.shellescape("cd; #{command_str}")}"
       end
 
       # A helper to build up a single string that contains all of the options for
