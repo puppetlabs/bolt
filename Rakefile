@@ -45,6 +45,12 @@ RSpec::Core::RakeTask.new(:slow) do |t|
   t.rspec_opts = '--tag puppetserver --tag puppetdb --tag expensive'
 end
 
+task :bolt_spec do
+  Dir.chdir("#{__dir__}/bolt_spec_spec/") do
+    sh "rake spec"
+  end
+end
+
 RuboCop::RakeTask.new(:rubocop) do |t|
   t.options = ['--display-cop-names', '--display-style-guide', '--parallel']
 end
@@ -63,6 +69,7 @@ end
 namespace :ci do
   task :fast do
     Rake::Task['fast'].invoke
+    Rake::Task['bolt_spec'].invoke
   end
 
   task :slow do
