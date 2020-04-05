@@ -184,7 +184,7 @@ module Bolt
 
             begin
               if writable && index < in_buffer.length
-                to_print = in_buffer[index..-1]
+                to_print = in_buffer.byteslice(index..-1)
                 written = inp.write_nonblock to_print
                 index += written
 
