@@ -31,7 +31,7 @@ mod 'puppetlabs-ruby_plugin_helper', '0.1.0'
 
 # Plugin modules
 mod 'puppetlabs-azure_inventory', '0.3.0'
-mod 'puppetlabs-terraform', '0.4.0'
+mod 'puppetlabs-terraform', '0.5.0'
 mod 'puppetlabs-vault', '0.3.0'
 mod 'puppetlabs-aws_inventory', '0.5.0'
 mod 'puppetlabs-yaml', '0.2.0'
