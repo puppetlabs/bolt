@@ -15,6 +15,12 @@ describe Bolt::Result do
       Bolt::Result.from_exception(target, ex)
     end
 
+    let(:result_with_action) do
+      ex = RuntimeError.new("oops")
+      ex.set_backtrace('/path/to/bolt/node.rb:42')
+      Bolt::Result.from_exception(target, ex, action: 'oops')
+    end
+
     it 'has an error' do
       expect(result.error_hash['msg']).to eq("oops")
     end
@@ -29,6 +35,10 @@ describe Bolt::Result do
 
     it 'has an _error in value' do
       expect(result.value['_error']['msg']).to eq("oops")
+    end
+
+    it 'sets action when requested' do
+      expect(result_with_action.action).to eq("oops")
     end
   end
 

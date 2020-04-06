@@ -277,6 +277,7 @@ describe "Bolt::Executor" do
       results = executor.wait_until_available(targets)
       results.each do |result|
         expect(result).to be_instance_of(Bolt::Result)
+        expect(result.action).to eq('wait_until_available')
       end
     end
 
@@ -285,6 +286,7 @@ describe "Bolt::Executor" do
 
       results = executor.wait_until_available(targets, wait_time: 0, retry_interval: 0)
       results.each do |result|
+        expect(result.action).to eq('wait_until_available')
         expect(result.error_hash['msg']).to eq('Timed out waiting for target')
         expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
       end

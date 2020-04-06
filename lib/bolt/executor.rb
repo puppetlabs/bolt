@@ -302,12 +302,12 @@ module Bolt
         batch_execute(targets) do |transport, batch|
           with_node_logging('Waiting until available', batch) do
             wait_until(wait_time, retry_interval) { transport.batch_connected?(batch) }
-            batch.map { |target| Result.new(target) }
+            batch.map { |target| Result.new(target, action: 'wait_until_available') }
           rescue TimeoutError => e
             available, unavailable = batch.partition { |target| transport.batch_connected?([target]) }
             (
-              available.map { |target| Result.new(target) } +
-              unavailable.map { |target| Result.from_exception(target, e) }
+              available.map { |target| Result.new(target, action: 'wait_until_available') } +
+              unavailable.map { |target| Result.from_exception(target, e, action: 'wait_until_available') }
             )
           end
         end

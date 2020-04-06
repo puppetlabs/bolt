@@ -7,7 +7,7 @@ module Bolt
   class Result
     attr_reader :target, :value, :action, :object
 
-    def self.from_exception(target, exception)
+    def self.from_exception(target, exception, action: nil)
       if exception.is_a?(Bolt::Error)
         error = exception.to_h
       else
@@ -19,7 +19,7 @@ module Bolt
         }
         error['details']['stack_trace'] = exception.backtrace.join('\n') if exception.backtrace
       end
-      Result.new(target, error: error)
+      action.nil? ? Result.new(target, error: error) : Result.new(target, error: error, action: action)
     end
 
     def self.for_command(target, stdout, stderr, exit_code, action, command)
