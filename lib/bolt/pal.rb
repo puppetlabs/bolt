@@ -146,14 +146,21 @@ module Bolt
           rescue Bolt::Error => e
             e
           rescue Puppet::DataBinding::LookupError => e
-            if /Undefined variable/.match(e.message)
+            if e.issue_code == :HIERA_UNDEFINED_VARIABLE
               message = "Interpolations are not supported in lookups outside of an apply block: #{e.message}"
               PALError.new(message)
             else
               PALError.from_preformatted_error(e)
             end
           rescue Puppet::PreformattedError => e
-            PALError.from_preformatted_error(e)
+            if e.issue_code == :UNKNOWN_VARIABLE &&
+               (match = /(?<var>facts|trusted|server_facts|settings)/.match(e.message))
+              message = "Evaluation Error: Variable '#{match[:var]}' is not available in the current scope "\
+                        "unless explicitly defined. (file: #{e.file}, line: #{e.line}, column: #{e.pos})"
+              PALError.new(message)
+            else
+              PALError.from_preformatted_error(e)
+            end
           rescue StandardError => e
             PALError.from_preformatted_error(e)
           end

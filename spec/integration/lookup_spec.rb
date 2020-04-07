@@ -101,8 +101,8 @@ describe "lookup() in plans" do
   context 'with a builtin backend' do
     # Load pkcs7 keys as environment variables
     before(:each) do
-      ENV['BOLT_PKCS7_PUBLIC_KEY']  = File.read(File.expand_path('keys/public_key.pkcs7.pem', boltdir))
-      ENV['BOLT_PKCS7_PRIVATE_KEY'] = File.read(File.expand_path('keys/private_key.pkcs7.pem', boltdir))
+      ENV['BOLT_PKCS7_PUBLIC_KEY']  = File.read(File.expand_path('../keys/public_key.pkcs7.pem', boltdir))
+      ENV['BOLT_PKCS7_PRIVATE_KEY'] = File.read(File.expand_path('../keys/private_key.pkcs7.pem', boltdir))
     end
 
     after(:each) do
