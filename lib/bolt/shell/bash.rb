@@ -333,7 +333,11 @@ module Bolt
 
         @logger.debug { "Executing: #{command_str}" }
 
-        in_buffer = !use_sudo && options[:stdin] ? options[:stdin] : ''
+        in_buffer = if !use_sudo && options[:stdin]
+                      String.new(options[:stdin], encoding: 'binary')
+                    else
+                      String.new(encoding: 'binary')
+                    end
         # Chunks of this size will be read in one iteration
         index = 0
         timeout = 0.1

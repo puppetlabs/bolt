@@ -142,8 +142,8 @@ describe Bolt::Shell::Bash do
       expect(result.exit_code).to eq(6)
     end
 
-    it "runs a command with extremely long output" do
-      stdout = "hello world" * 60000
+    it "runs a command with extremely long UTF-8 output" do
+      stdout = "hello ☃" * 60000
       execute_result = mock_result(stdout: stdout)
       expect(connection).to receive(:execute).and_return(execute_result)
 
@@ -158,8 +158,8 @@ describe Bolt::Shell::Bash do
       expect(result.stdout.string).to eq("hello world")
     end
 
-    it "runs a command with extremely long input" do
-      stdin = "hello world" * 60000
+    it "runs a command with extremely long UTF-8 input" do
+      stdin = "hello ☃" * 60000
       expect(connection).to receive(:execute).and_return(echo_result)
 
       result = shell.execute('something', stdin: stdin)
