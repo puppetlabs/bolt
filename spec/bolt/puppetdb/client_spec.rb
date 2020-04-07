@@ -28,7 +28,7 @@ describe Bolt::PuppetDB::Client do
   end
 
   describe "#query_certnames" do
-    let(:response) { double('response', code: 200, body: '[]') }
+    let(:response) { double('response', code: '200', body: '[]') }
     let(:http_client) { double('http_client', post: response) }
 
     before :each do
@@ -38,7 +38,6 @@ describe Bolt::PuppetDB::Client do
     it 'returns unique certnames' do
       body = [{ 'certname' => 'foo' }, { 'certname' => 'bar' }, { 'certname' => 'foo' }]
       allow(response).to receive(:body).and_return(body.to_json)
-
       expect(client.query_certnames('query')).to eq(%w[foo bar])
     end
 
@@ -54,7 +53,7 @@ describe Bolt::PuppetDB::Client do
     end
 
     it 'fails if the response from PuppetDB is an error' do
-      allow(response).to receive(:code).and_return(400)
+      allow(response).to receive(:code).and_return('400')
       allow(response).to receive(:body).and_return("something went wrong")
 
       expect { client.query_certnames('query') }.to raise_error(/Failed to query PuppetDB: something went wrong/)

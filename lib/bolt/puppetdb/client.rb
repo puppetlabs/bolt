@@ -16,6 +16,14 @@ module Bolt
         @logger = Logging.logger[self]
       end
 
+      def ssl_cert
+        @ssl_cert ||= File.read(@config.cert)
+      end
+
+      def ssl_key
+        @ssl_key ||= File.read(@config.key)
+      end
+
       def query_certnames(query)
         return [] unless query
 
@@ -64,14 +72,13 @@ module Bolt
         url += "/#{path}" if path
 
         begin
-          response = http_client.post(url, body: body, header: headers)
+          response = http_client.post(url, body, headers)
         rescue StandardError => e
           raise Bolt::PuppetDBFailoverError, "Failed to query PuppetDB: #{e}"
         end
-
-        if response.code != 200
+        if response.code != '200'
           msg = "Failed to query PuppetDB: #{response.body}"
-          if response.code == 400
+          if response.code == '400'
             raise Bolt::PuppetDBError, msg
           else
             raise Bolt::PuppetDBFailoverError, msg
@@ -90,19 +97,26 @@ module Bolt
       end
 
       def http_client
-        return @http if @http
-        # lazy-load expensive gem code
-        require 'httpclient'
-        @http = HTTPClient.new
-        @http.ssl_config.set_client_cert_file(@config.cert, @config.key) if @config.cert
-        @http.ssl_config.add_trust_ca(@config.cacert)
+        @http_client ||= reset_http_client(uri)
+      end
 
-        @http
+      def reset_http_client(uri)
+        https = Net::HTTP.new(uri.host, uri.port)
+        https.use_ssl = true
+        https.ssl_version = :TLSv1_2
+        https.ca_file = @config.cacert
+        if @config.cert
+          https.cert = OpenSSL::X509::Certificate.new(ssl_cert)
+          https.key = OpenSSL::PKey::RSA.new(ssl_key)
+          https.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        end
+        @http_client = https
       end
 
       def reject_url
         @bad_urls << @current_url if @current_url
         @current_url = nil
+        reset_http_client(uri)
       end
 
       def uri
