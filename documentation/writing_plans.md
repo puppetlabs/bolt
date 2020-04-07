@@ -192,8 +192,8 @@ fail_plan($errorobject)
 
 ### Catching errors in plans
 
-Bolt includes a `catch_errors` function that executes a block of code and returns the error if an error is raised, or returns the result of the block if no errors are raised. You might get an `Error` object returned if you: 
-- call `run_plan` with `_catch_errors`. 
+Bolt includes a `catch_errors` function that executes a block of code and returns the error if an error is raised, or returns the result of the block if no errors are raised. You might get an `Error` object returned if you:
+- call `run_plan` with `_catch_errors`.
 - use a `catch_errors` block.
 - call the `error` method on a result.
 
@@ -207,17 +207,23 @@ The `Error` data type includes:
 
 Use the `Error` data type in a case expression to match against different kinds of errors. To recover from certain errors, while failing on or ignoring others, set up your plan to include conditionals based on errors that occur while your plan runs. For example, you can set up a plan to retry a task when a timeout error occurs, but to fail when there is an authentication error.
 
-Below, the first plan continues whether it succeeds or fails with a `mymodule/not-serious` error. Other errors cause the plan to fail.
+In the following example the `mymodule::myplan` module runs a task and returns
+a `ResultSet` object. The `handle_errors` plan calls it with `_catch_errors`
+and extracts the ResultSet from the error if possible and runs another task on
+the successful targets.
 
 ```
 plan mymodule::handle_errors {
-  $result = run_plan('mymodule::myplan', '_catch_errors' => true)
-  case $result {
-    Error['mymodule/not-serious'] : {
-      notice("${result.message}")
-    }
-    Error : { fail_plan($result) } }
-  run_plan('mymodule::plan2')
+  $result_or_error = run_plan('mymodule::myplan', '_catch_errors' => true)
+  $result = case $result_or_error {
+    # When the plan returned a ResultSet use it.
+    ResultSet: { $result_or_error }
+    # If the run_task failed extract the result set from the error.
+    Error['bolt/run-failure'] : { $result_or_error.details['result_set'] }
+    # The sub-plan failed for an unexpected reason.
+    default : { fail_plan($result_or_error) } }
+  # Run a task on the successful targets
+  run_task('mymodule::task', $result.ok_set)
 }
 ```
 
