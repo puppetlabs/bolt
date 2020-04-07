@@ -207,7 +207,7 @@ The `Error` data type includes:
 
 Use the `Error` data type in a case expression to match against different kinds of errors. To recover from certain errors, while failing on or ignoring others, set up your plan to include conditionals based on errors that occur while your plan runs. For example, you can set up a plan to retry a task when a timeout error occurs, but to fail when there is an authentication error.
 
-In the following example the `mymodule::myplan` module runs a task and returns
+In the following example, the `mymodule::myplan` module runs a task and returns
 a `ResultSet` object. The `handle_errors` plan calls it with `_catch_errors`
 and extracts the ResultSet from the error if possible and runs another task on
 the successful targets.
