@@ -7,3 +7,4 @@ Below is a list of documented third-party plugins for Bolt.  If you have created
 | --- | --- | --- | --- |
 | `ad_inventory` | Generate targets from Windows Active Directory queries. | [bolt_ad_inventory](https://github.com/glennsarti/bolt_ad_inventory) | [glennsarti](https://github.com/glennsarti) |
 | `consul_inventory` | Generate targets from Hashicorp's [Consul](https://consul.io) Service. | [consul_inventory](https://github.com/magec/puppetlabs-consul_inventory) | [magec](https://github.com/magec) |
+| `hcloud_inventory` | Generate targets from [Hetzner Cloud](https://www.hetzner.com/cloud) Provider. | [hcloud_inventory](https://github.com/magec/puppetlabs-hcloud_inventory) | [magec](https://github.com/magec) |
