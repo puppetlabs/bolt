@@ -4,8 +4,6 @@ Within a plan, you can use Bolt to apply blocks of Puppet code (manifest blocks)
 
 Similar to the `puppet apply` command, which applies a standalone Puppet manifest to a local system, the Bolt `apply` command uses manifest blocks to pass code to remote targets from the command line. You can create manifest blocks that use existing content from the Forge, or mix declarative resource configuration via manifest blocks with procedural orchestration and action in a plan. Most features of the Puppet language are available in a manifest block: classes, custom resource types, and functions. For information about what language features aren't supported, see [Manifest block limitations](applying_manifest_blocks.md#).
 
-Manifest blocks require facts to compile. If your plan includes a manifest block, use the `apply_prep` function in your plan before your manifest block. The `apply_prep` function installs the packages necessary to run the Bolt `apply` command and gathers facts by running [facter](https://puppet.com/docs/facter/latest/), making the facts available to the manifest block. The `apply_prep` function also identifies the targets that do not have Puppet agents and runs the `puppet_agent::install` task (from the [puppet_agent module](https://forge.puppet.com/puppetlabs/puppet_agent)).
-
 **Tip:** If you installed Bolt as a Ruby Gem, make sure you have installed the core modules required to use the `puppet apply` command. These modules are listed in the [Bolt GitHub repository](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)and you can install them using a Puppetfile.
 
 **Related information**  
@@ -15,6 +13,10 @@ Manifest blocks require facts to compile. If your plan includes a manifest block
 [Puppetfile example](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)
 
 [Puppet Forge](https://forge.puppet.com/)
+
+## Using manifest blocks
+
+Manifest blocks require facts to compile. If your plan includes a manifest block, use the `apply_prep` function in your plan before your manifest block. The `apply_prep` function installs the packages necessary to run the Bolt `apply` command and gathers facts by running [facter](https://puppet.com/docs/facter/latest/), making the facts available to the manifest block. The `apply_prep` function also identifies the targets that do not have Puppet agents and runs the `puppet_agent::install` task (from the [puppet_agent module](https://forge.puppet.com/puppetlabs/puppet_agent)).
 
 ## How manifest blocks are applied
 
