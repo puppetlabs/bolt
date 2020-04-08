@@ -18,8 +18,7 @@ Manifest blocks require facts to compile. If your plan includes a manifest block
 
 ## How manifest blocks are applied
 
-Behind the scenes, Bolt compiles the code in your manifest block (the code wrapped in curly braces that follows the `apply` function) into a catalog. Code is compiled in the following order:
-
+Bolt compiles the code in your manifest block (the code wrapped in curly braces that follows the `apply` function) into a catalog. Bolt compiles code in the following order:
 -   Facts gathered from the targets or set in your inventory.
 -   Local variables in the plan, such as `$site_content`.
 -   [`Vars`](inventory_file_v2.md#title-1541705359297) set in your inventory.
