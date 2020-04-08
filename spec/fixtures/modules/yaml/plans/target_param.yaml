@@ -5,6 +5,6 @@ parameters:
 steps:
   - name: run_command
     command: echo hello world
-    targets: $targets
+    target: $targets
 
 return: $run_command

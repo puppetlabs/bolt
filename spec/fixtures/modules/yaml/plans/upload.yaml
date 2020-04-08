@@ -1,14 +1,14 @@
 parameters:
-  nodes:
+  targets:
     type: TargetSpec
 
 steps:
   - name: upload_file
     source: 'yaml/test.sh'
     destination: '/tmp/test_upload.sh'
-    target: $nodes
+    targets: $targets
   - name: cleanup
     command: rm '/tmp/test_upload.sh'
-    target: $nodes
+    targets: $targets
 
 return: $upload_file

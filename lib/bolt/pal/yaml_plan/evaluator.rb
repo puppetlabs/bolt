@@ -24,14 +24,14 @@ module Bolt
 
         def task_step(scope, step)
           task = step['task']
-          target = step['target']
+          targets = step['targets'] || step['target']
           description = step['description']
           params = step['parameters'] || {}
 
           args = if description
-                   [task, target, description, params]
+                   [task, targets, description, params]
                  else
-                   [task, target, params]
+                   [task, targets, params]
                  end
 
           scope.call_function('run_task', args)
@@ -48,15 +48,15 @@ module Bolt
 
         def script_step(scope, step)
           script = step['script']
-          target = step['target']
+          targets = step['targets'] || step['target']
           description = step['description']
           arguments = step['arguments'] || []
 
           options = { 'arguments' => arguments }
           args = if description
-                   [script, target, description, options]
+                   [script, targets, description, options]
                  else
-                   [script, target, options]
+                   [script, targets, options]
                  end
 
           scope.call_function('run_script', args)
@@ -64,10 +64,10 @@ module Bolt
 
         def command_step(scope, step)
           command = step['command']
-          target = step['target']
+          targets = step['targets'] || step['target']
           description = step['description']
 
-          args = [command, target]
+          args = [command, targets]
           args << description if description
           scope.call_function('run_command', args)
         end
@@ -75,10 +75,10 @@ module Bolt
         def upload_step(scope, step)
           source = step['source']
           destination = step['destination']
-          target = step['target']
+          targets = step['targets'] || step['target']
           description = step['description']
 
-          args = [source, destination, target]
+          args = [source, destination, targets]
           args << description if description
           scope.call_function('upload_file', args)
         end
@@ -88,11 +88,13 @@ module Bolt
         end
 
         def resources_step(scope, step)
+          targets = step['targets'] || step['target']
+
           # TODO: Only call apply_prep when needed
-          scope.call_function('apply_prep', step['target'])
+          scope.call_function('apply_prep', targets)
           manifest = generate_manifest(step['resources'])
 
-          apply_manifest(scope, step['target'], manifest)
+          apply_manifest(scope, targets, manifest)
         end
 
         def generate_manifest(resources)
@@ -127,16 +129,22 @@ module Bolt
           MANIFEST
         end
 
-        def apply_manifest(scope, target, manifest)
+        def apply_manifest(scope, targets, manifest)
           ast = @evaluator.parse_string(manifest)
           apply_block = ast.body.body
           applicator = Puppet.lookup(:apply_executor)
-          applicator.apply([target], apply_block, scope)
+          applicator.apply([targets], apply_block, scope)
         end
 
         # This is the method that Puppet calls to evaluate the plan. The name
         # makes more sense for .pp plans.
         def evaluate_block_with_bindings(closure_scope, args_hash, plan)
+          if plan.steps.any? { |step| step.body.key?('target') }
+            msg = "The 'target' parameter for YAML plan steps is deprecated and will be removed "\
+                  "in a future version of Bolt. Use the 'targets' parameter instead."
+            @logger.warn(msg)
+          end
+
           plan_result = closure_scope.with_local_scope(args_hash) do |scope|
             plan.steps.each do |step|
               step_result = dispatch_step(scope, step)

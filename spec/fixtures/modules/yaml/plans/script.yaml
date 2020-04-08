@@ -1,11 +1,11 @@
 parameters:
-  nodes:
+  targets:
     type: TargetSpec
 
 steps:
   - name: run_script
     script: 'yaml/test.sh'
-    target: $nodes
+    targets: $targets
     arguments: ["foo", "bar", "baz"]
 
 return: $run_script

@@ -10,7 +10,7 @@ module Bolt
           end
 
           def self.required_keys
-            Set['target']
+            Set['targets']
           end
 
           def initialize(step_body)
@@ -23,7 +23,7 @@ module Bolt
             code << "$#{@name} = " if @name
 
             fn = 'run_command'
-            args = [@command, @target]
+            args = [@command, @targets]
             args << @description if @description
 
             code << function_call(fn, args)

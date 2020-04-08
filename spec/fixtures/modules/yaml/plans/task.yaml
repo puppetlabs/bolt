@@ -1,11 +1,11 @@
 parameters:
-  nodes:
+  targets:
     type: TargetSpec
 
 steps:
   - name: run_task
     task: sample
-    target: $nodes
+    targets: $targets
     parameters:
       message: "hello world"
 

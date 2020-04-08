@@ -4,7 +4,8 @@ parameters:
 
 steps:
   - name: run_command
-    command: echo hello world
+    command: whoami
+    target: []
     targets: $targets
 
 return: $run_command

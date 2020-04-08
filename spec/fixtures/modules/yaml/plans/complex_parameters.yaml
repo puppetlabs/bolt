@@ -14,5 +14,5 @@ parameters:
 
 steps:
   - name: print
-    target: localhost
+    targets: localhost
     command: echo Initializing

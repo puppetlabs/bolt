@@ -1,7 +1,7 @@
 steps:
   - name: x_fail
     task: sample
-    target: 'foo'
+    targets: 'foo'
     parameters:
       message: |
         def not_puppet
