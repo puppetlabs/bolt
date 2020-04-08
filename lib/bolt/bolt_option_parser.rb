@@ -564,7 +564,7 @@ module Bolt
       DESCRIPTION
           Run a task on the specified targets.
 
-          Parameters take the form <parameter>=<value>.
+          Parameters take the form parameter=value.
 
       EXAMPLES
           bolt task run package --targets target1,target2 action=status name=bash
