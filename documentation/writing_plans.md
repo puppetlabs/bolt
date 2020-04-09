@@ -432,6 +432,39 @@ target objects, as well as add or remove objects from existing [inventory
 groups](https://puppet.com/docs/bolt/latest/inventory_file.html). Targets are modified in-memory
 for the life cycle of the plan and are not saved between plan runs.
 
+### Temporarily modifying target objects
+
+Target objects can be temporarily modified during a plan run. For example, you can store a target's
+configuration in a temporary variable, modify the target's configuration using the 
+[`set_config`](plan_functions.md#set-config) function, and then restore the target's original
+configuration.
+
+Temporarily modify a target's configuration:
+
+```
+plan test(String $host) {
+  $target = get_target($host)
+
+  # Store the target's original configuration
+  $original_config = $target.config['ssh']
+
+  # Modify the target's configuration
+  $config =  {
+    'user'     => 'bolt',
+    'password' => 'secret'
+  }
+
+  set_config($target, 'ssh', $config)
+
+  ...
+
+  # Restore the target's original configuration
+  set_config($target, 'ssh', $original_config)
+
+  ...
+}
+```
+
 ### Variables and facts on targets
 
 When Bolt runs, it loads transport configuration values, variables, and facts from the inventory. These can be accessed with the `$target.facts()` and `$target.vars()` functions. During the course of a plan, you can update the facts or variables for any target. Facts usually come from running `facter` or another fact collection application on the target, or from a fact store like PuppetDB. Variables are computed externally or assigned directly.

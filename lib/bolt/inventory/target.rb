@@ -32,7 +32,6 @@ module Bolt
         @vars = target_data['vars'] || {}
         @facts = target_data['facts'] || {}
         @features = target_data['features'] || Set.new
-        @options = target_data['options'] || {}
         @plugin_hooks = target_data['plugin_hooks'] || {}
         # When alias is specified in a plan, the key will be `target_alias`, when
         # alias is specified in inventory the key will be `alias`.
@@ -166,10 +165,6 @@ module Bolt
         Addressable::URI.unencode_component(@uri_obj.password) || transport_config['password']
       end
 
-      def options
-        transport_config
-      end
-
       # We only want to look up transport config keys for the configured
       # transport
       def transport_config
@@ -199,7 +194,6 @@ module Bolt
             'vars' => {},
             'facts' => {},
             'features' => Set.new,
-            'options' => {},
             'plugin_hooks' => {},
             'target_alias' => []
           }

@@ -129,6 +129,11 @@ module Bolt
       inventory_target.transport
     end
 
+    def transport_config
+      inventory_target.transport_config.to_h
+    end
+    alias options transport_config
+
     def protocol
       inventory_target.protocol || inventory_target.transport
     end
@@ -139,10 +144,6 @@ module Bolt
 
     def password
       inventory_target.password
-    end
-
-    def options
-      inventory_target.options
     end
 
     def plugin_hooks
