@@ -94,7 +94,7 @@ The following functions are available to `Target` objects:
 | `safe_name` | `String` | The target's safe name. Equivalent to `name` if a name was given, or the target's `uri` with any password omitted. ||
 | `target_alias` | `Variant[String, Array[String]]` | The target's aliases. ||
 | `transport` | `String` | The transport used to connect to the target. ||
-| `transport_config` | `Hash[String, Data]` | The merged configuration for the target's `transport`. | This function returns the merged configuration for a target's `transport`, including defaults, configuration set in a `bolt.yaml`, and configuration set in an `inventory.yaml` file or set in a plan using the `Target.new` or `set_config()` functions. |
+| `transport_config` | `Hash[String, Data]` | The merged configuration for the target's `transport`. | This function returns the merged configuration for a target's transport. This includes defaults, configuration set in a `bolt.yaml`, configuration set `inventory.yaml`, and configuration set in a plan using `set_config()`.|
 | `uri` | `String` | The target's URI. ||
 | `user` | `String` | The user to connect to the target. ||
 | `vars` | `Hash[String, Data]` | The target's variables. ||
