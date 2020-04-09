@@ -9,6 +9,9 @@ module Bolt
   end
 
   class Task
+    STDIN_METHODS       = %w[both stdin].freeze
+    ENVIRONMENT_METHODS = %w[both environment].freeze
+
     METADATA_KEYS = %w[description extensions files implementations
                        input_method parameters private puppet_task_version
                        remote supports_noop].freeze

@@ -1,17 +1,11 @@
 # frozen_string_literal: true
 
 require 'bolt/node/errors'
-require 'bolt/transport/sudoable'
-require 'json'
-require 'shellwords'
+require 'bolt/transport/simple'
 
 module Bolt
   module Transport
-    class SSH < Sudoable
-      def provided_features
-        ['shell']
-      end
-
+    class SSH < Simple
       def initialize
         super
 
@@ -37,12 +31,6 @@ module Bolt
         rescue StandardError => e
           logger.info("Failed to close connection to #{target.safe_name} : #{e.message}")
         end
-      end
-
-      def connected?(target)
-        with_connection(target) { true }
-      rescue Bolt::Node::ConnectError
-        false
       end
     end
   end

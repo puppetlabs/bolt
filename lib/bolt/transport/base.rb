@@ -37,9 +37,6 @@ module Bolt
     # before executing, and a :node_result event for each Target after
     # execution.
     class Base
-      STDIN_METHODS       = %w[both stdin].freeze
-      ENVIRONMENT_METHODS = %w[both environment].freeze
-
       attr_reader :logger
 
       def initialize

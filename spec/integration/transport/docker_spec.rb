@@ -37,19 +37,6 @@ describe Bolt::Transport::Docker, docker: true do
     end
 
     include_examples 'transport api'
-
-    context 'file errors' do
-      before(:each) do
-        allow_any_instance_of(Bolt::Transport::Docker::Connection).to receive(:write_remote_file).and_raise(
-          Bolt::Node::FileError.new("no write", "WRITE_ERROR")
-        )
-        allow_any_instance_of(Bolt::Transport::Docker::Connection).to receive(:make_tempdir).and_raise(
-          Bolt::Node::FileError.new("no tmpdir", "TEMDIR_ERROR")
-        )
-      end
-
-      include_examples 'transport failures'
-    end
   end
 
   context 'with_connection' do
