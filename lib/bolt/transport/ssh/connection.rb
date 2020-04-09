@@ -242,7 +242,11 @@ module Bolt
         end
 
         def shell
-          @shell ||= Bolt::Shell::Bash.new(target, self)
+          @shell ||= if target.options['login-shell'] == 'powershell'
+                       Bolt::Shell::Powershell.new(target, self)
+                     else
+                       Bolt::Shell::Bash.new(target, self)
+                     end
         end
 
         # This is used by the Bash shell to decide whether to `cd` before

@@ -161,14 +161,6 @@ describe Bolt::Inventory::Inventory do
       }
     }
 
-    let(:ssh_target_option_defaults) {
-      {
-        'connect-timeout' => 10,
-        'disconnect-timeout' => 5,
-        'tty' => false
-      }
-    }
-
     describe :validate do
       it 'accepts empty inventory' do
         expect(Bolt::Inventory::Inventory.new({}, transport, transports, plugins).validate).to be_nil
@@ -394,17 +386,16 @@ describe Bolt::Inventory::Inventory do
         end
 
         it 'should return {} for a string target' do
-          expect(get_target(inventory, 'target1').options.to_h).to include(ssh_target_option_defaults)
+          expect(get_target(inventory, 'target1').options.to_h).to eq(Bolt::Config::Transport::SSH::DEFAULTS)
         end
 
         it 'should return {} for a hash target with no config' do
-          expect(get_target(inventory, 'target2').options.to_h).to include(ssh_target_option_defaults)
+          expect(get_target(inventory, 'target2').options.to_h).to eq(Bolt::Config::Transport::SSH::DEFAULTS)
         end
 
         it 'should return config for the target' do
           target = get_target(inventory, 'target3')
-          expect(target.options.to_h).to eq(ssh_target_option_defaults.merge('port' => 2224,
-                                                                             'load-config' => true))
+          expect(target.options.to_h).to eq(Bolt::Config::Transport::SSH::DEFAULTS.merge('port' => 2224))
           expect(target.port).to eq(2224)
         end
 
@@ -817,20 +808,19 @@ describe Bolt::Inventory::Inventory do
 
         it 'should return {} for a string target' do
           target = inventory.get_target('target1')
-          expect(target.options.to_h).to include(ssh_target_option_defaults)
+          expect(target.options.to_h).to include(Bolt::Config::Transport::SSH::DEFAULTS)
           expect(target.config).to eq({})
         end
 
         it 'should return {} for a hash target with no config' do
           target = inventory.get_target('target2')
-          expect(target.options.to_h).to include(ssh_target_option_defaults)
+          expect(target.options.to_h).to include(Bolt::Config::Transport::SSH::DEFAULTS)
           expect(target.config).to eq({})
         end
 
         it 'should return config for the target' do
           target = inventory.get_target('target3')
-          expect(target.options.to_h).to eq(ssh_target_option_defaults.merge('port' => 2224,
-                                                                             "load-config" => true))
+          expect(target.options.to_h).to eq(Bolt::Config::Transport::SSH::DEFAULTS.merge('port' => 2224))
           expect(target.port).to eq(2224)
           expect(target.config).to eq("ssh" => { "data" => true, "port" => 2224 })
         end
@@ -1127,6 +1117,7 @@ describe Bolt::Inventory::Inventory do
           "tty" => false,
           "load-config" => true,
           "disconnect-timeout" => 11,
+          'login-shell' => 'bash',
           "password" => 'sshpass',
           "interpreters" => { ".rb" => "/foo/ruby" } }
       }
@@ -1338,7 +1329,8 @@ describe Bolt::Inventory::Inventory do
             'connect-timeout' => 10,
             'tty' => false,
             'load-config' => true,
-            'disconnect-timeout' => 100
+            'disconnect-timeout' => 100,
+            'login-shell' => 'bash'
           }
         },
         'vars' => {},

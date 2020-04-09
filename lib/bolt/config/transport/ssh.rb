@@ -7,6 +7,7 @@ module Bolt
   class Config
     module Transport
       class SSH < Base
+        LOGIN_SHELLS = %w[sh bash zsh dash ksh powershell].freeze
         OPTIONS = {
           "connect-timeout"    => { type: Integer,
                                     desc: "How long to wait when establishing connections." },
@@ -25,6 +26,10 @@ module Bolt
                                           "Bolt Ruby interpreter by default." },
           "load-config"        => { type: TrueClass,
                                     desc: "Whether to load system SSH configuration." },
+          "login-shell"        => { type: String,
+                                    desc: "Which login shell Bolt should expect on the target. "\
+                                          "Supported shells are #{LOGIN_SHELLS.join(', ')}. "\
+                                          "**This option is experimental.**" },
           "password"           => { type: String,
                                     desc: "Login password." },
           "port"               => { type: Integer,
@@ -70,7 +75,8 @@ module Bolt
           "connect-timeout"    => 10,
           "tty"                => false,
           "load-config"        => true,
-          "disconnect-timeout" => 5
+          "disconnect-timeout" => 5,
+          "login-shell"        => 'bash'
         }.freeze
 
         private def validate
@@ -90,6 +96,11 @@ module Bolt
 
           if @config['interpreters']
             @config['interpreters'] = normalize_interpreters(@config['interpreters'])
+          end
+
+          if @config['login-shell'] && !LOGIN_SHELLS.include?(@config['login-shell'])
+            raise Bolt::ValidationError,
+                  "Unsupported login-shell #{@config['login-shell']}. Supported shells are #{LOGIN_SHELLS.join(', ')}"
           end
 
           if (run_as_cmd = @config['run-as-command'])

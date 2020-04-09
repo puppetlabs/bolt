@@ -107,4 +107,22 @@ describe Bolt::Transport::SSH::Connection do
       end
     end
   end
+
+  context "when constructing a shell" do
+    it "uses Bash as the default" do
+      expect(subject.shell).to be_instance_of(Bolt::Shell::Bash)
+    end
+
+    %w[zsh ksh bash dash sh].each do |login_shell|
+      it "uses Bash when login-shell is #{login_shell}" do
+        inventory.set_config(target, 'ssh', 'login-shell' => login_shell)
+        expect(subject.shell).to be_instance_of(Bolt::Shell::Bash)
+      end
+    end
+
+    it "uses Powershell when login-shell is powershell" do
+      inventory.set_config(target, 'ssh', 'login-shell' => 'powershell')
+      expect(subject.shell).to be_instance_of(Bolt::Shell::Powershell)
+    end
+  end
 end
