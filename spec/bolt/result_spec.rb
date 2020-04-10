@@ -8,6 +8,33 @@ require 'bolt/result'
 describe Bolt::Result do
   let(:target) { "foo" }
 
+  describe :initialize do
+    it 'sets default values' do
+      result = Bolt::Result.new(target)
+      expect(result.target).to eq('foo')
+      expect(result.value).to eq({})
+      expect(result.action).to eq('action')
+      expect(result.object).to eq(nil)
+    end
+
+    it 'sets error' do
+      result = Bolt::Result.new(target, error: { 'This' => 'is an error' })
+      expect(result.error_hash).to eq('This' => 'is an error')
+      expect(result.value['_error']).to eq('This' => 'is an error')
+    end
+
+    it 'errors if error is not a hash' do
+      expect { Bolt::Result.new(target, error: 'This is an error') }
+        .to raise_error(RuntimeError, 'TODO: how did we get a string error')
+    end
+
+    it 'sets message' do
+      result = Bolt::Result.new(target, message: 'This is a message')
+      expect(result.message).to eq('This is a message')
+      expect(result.value['_output']).to eq('This is a message')
+    end
+  end
+
   describe :from_exception do
     let(:result) do
       ex = RuntimeError.new("oops")
@@ -29,6 +56,17 @@ describe Bolt::Result do
 
     it 'has an _error in value' do
       expect(result.value['_error']['msg']).to eq("oops")
+    end
+
+    it 'sets default action' do
+      expect(result.action).to eq('action')
+    end
+
+    it 'sets action when specified as an argument' do
+      ex = RuntimeError.new("oops")
+      ex.set_backtrace('/path/to/bolt/node.rb:42')
+      result = Bolt::Result.from_exception(target, ex, action: 'custom_action')
+      expect(result.action).to eq('custom_action')
     end
   end
 
