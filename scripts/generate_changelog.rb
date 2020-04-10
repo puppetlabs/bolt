@@ -44,7 +44,7 @@ latest = `git describe --abbrev=0`.chomp
 # to only include those that have a valid LABEL (e.g. !feature, !bug)
 stdout_str, stderr_str, status = Open3.capture3(
   "git log -z HEAD...#{latest} "\
-  "--pretty=format:'%b' "\
+  "--pretty=format:'%B' "\
   "--grep='!(#{entries.keys.join('|')})' -E"
 )
 
@@ -84,6 +84,7 @@ entries.each_value do |entry|
     ### #{entry[:name]}
 
     #{entry[:entries].join("\n\n")}
+
   CONTENT
 end
 
