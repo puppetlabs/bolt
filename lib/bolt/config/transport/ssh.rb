@@ -17,6 +17,12 @@ module Bolt
                                     desc: "Host name." },
           "host-key-check"     => { type: TrueClass,
                                     desc: "Whether to perform host key validation when connecting." },
+          "extensions"         => { type: Array,
+                                    desc: "List of file extensions that are accepted for scripts or tasks on Windows. "\
+                                         "Scripts with these file extensions rely on the target's file type "\
+                                         "association to run. For example, if Python is installed on the system, "\
+                                         "a `.py` script runs with `python.exe`. The extensions `.ps1`, `.rb`, and "\
+                                         "`.pp` are always allowed and run via hard-coded executables." },
           "interpreters"       => { type: Hash,
                                     desc: "A map of an extension name to the absolute path of an executable, "\
                                           "enabling you to override the shebang defined in a task executable. The "\
@@ -107,6 +113,15 @@ module Bolt
             unless run_as_cmd.all? { |n| n.is_a?(String) }
               raise Bolt::ValidationError,
                     "run-as-command must be an Array of Strings, received #{run_as_cmd.class} #{run_as_cmd.inspect}"
+            end
+          end
+
+          if @config['login-shell'] == 'powershell'
+            %w[tty run-as].each do |key|
+              if @config[key]
+                raise Bolt::ValidationError,
+                      "#{key} is not supported when using PowerShell"
+              end
             end
           end
         end
