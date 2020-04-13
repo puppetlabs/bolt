@@ -378,11 +378,22 @@ module Bolt
                      else
                        !ready_write.nil?
                      end
+          retries = 0
 
           begin
             if writable && index < in_buffer.length
               to_print = in_buffer[index..-1]
-              written = inp.write_nonblock to_print
+              begin
+                written = inp.write_nonblock to_print
+              rescue IO::WaitWritable, Errno::EINTR => e
+                IO.select(nil, [io])
+                retries += 1
+                if retries < 4
+                  retry
+                else
+                  raise e
+                end
+              end
               index += written
 
               if index >= in_buffer.length && !write_stream.empty?
