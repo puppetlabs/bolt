@@ -47,7 +47,7 @@ module Bolt
         def execute(command)
           if Bolt::Util.windows?
             command += "\r\nif (!$?) { if($LASTEXITCODE) { exit $LASTEXITCODE } else { exit 1 } }"
-            script_file = Tempfile.new(['wrapper', '.ps1'])
+            script_file = Tempfile.new(['wrapper', '.ps1'], target.options['tmpdir'])
             File.write(script_file, command)
             script_file.close
 
