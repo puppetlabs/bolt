@@ -382,16 +382,19 @@ module Bolt
           begin
             if writable && index < in_buffer.length
               to_print = in_buffer[index..-1]
-              written = inp.write_nonblock to_print
-              index += written
+              # On Windows, select marks the input stream as writable even if
+              # it's full. We need to check whether we received wait_writable
+              # and treat that as not having written anything.
+              written = inp.write_nonblock(to_print, exception: false)
+              index += written unless written == :wait_writable
 
               if index >= in_buffer.length && !write_stream.empty?
                 inp.close
                 write_stream = []
               end
             end
-            # If a task has stdin as an input_method but doesn't actually
-            # read from stdin, the task may return and close the input stream
+          # If a task has stdin as an input_method but doesn't actually
+          # read from stdin, the task may return and close the input stream
           rescue Errno::EPIPE
             write_stream = []
           end
