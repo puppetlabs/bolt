@@ -1,5 +1,61 @@
 # Changelog
 
+## Bolt 2.5.0 (2020-04-13)
+
+### New features
+
+* **Add Boltspec helper to load Bolt constructs**
+  ([#1688](https://github.com/puppetlabs/bolt/issues/1688))
+
+  A new helper function `in_bolt_context` can be used to wrap code that
+  references Bolt constructs, such as the Boltlib::TargetSpec datatype.
+
+* **Added `transport` and `transport_config` functions to `Target` data
+  type** ([#1686](https://github.com/puppetlabs/bolt/issues/1686))
+
+  The `Target` data type now supports a `transport` function, which
+  returns the transport used to connect to the target, and a
+  `transport_config` function, which returns a hash of merged
+  configuration for the target's transport.
+
+### Bug fixes
+
+* **`Bolt::Util.deep_clone` can now clone frozen objects**
+  ([#1696](https://github.com/puppetlabs/bolt/pulls/1696))
+
+  The `Bolt::Util.deep_clone` method can now clone frozen objects,
+  preserving the 'frozen' attribute
+
+* **Fix bug in Bolt::Result where nil actions threw an exception**
+  ([#1714](https://github.com/puppetlabs/bolt/issues/1714),
+  [#1724](https://github.com/puppetlabs/bolt/issues/1724))
+
+  Returning from a plan with results of `run_task()` on a remote transport
+  that returned `nil`, threw an exception. Returning from a plan with results 
+  of `wait_until_available()`, threw an exception.
+
+* **Fix a bug passing arguments to local shell transport**
+  ([#1713](https://github.com/puppetlabs/bolt/1713))
+
+  Local shell transport could miss some bytes when writing non-ASCII characters
+  to stdin.
+
+* **Don't fail when the `run-as` user's home directory doesn't exist**
+  ([#1702](https://github.com/puppetlabs/bolt/pull/1702))
+
+  When running commands with `run-as` set, Bolt will try to `cd` to the
+  new user's home directory before running the command. If that fails
+  because the directory doesn't exist, it will now run the command from
+  wherever it currently is rather than aborting.
+
+* **Don't rely on sudo to preserve environment variables**
+  ([#1702](https://github.com/puppetlabs/bolt/pull/1702))
+
+  Bolt previously set environment variables when invoking `sudo` and
+  relied on it to preserve them when running the task executable. That
+  behavior isn't reliable for all configurations, so now environment
+  variables are set directly when running the underlying executable.
+
 ## Bolt 2.4.0 (2020-04-06)
 
 ### New features
