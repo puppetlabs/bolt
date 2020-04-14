@@ -86,3 +86,4 @@ module Bolt
 end
 
 require 'bolt/shell/bash'
+require 'bolt/shell/powershell'

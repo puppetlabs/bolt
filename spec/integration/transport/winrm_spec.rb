@@ -560,29 +560,6 @@ describe Bolt::Transport::WinRM do
       end
     end
 
-    it 'errors if environment variables cannot be set', winrm: true do
-      contents = 'Write-Host "$env:PT_message"'
-      arguments = { message: "it's a hello world" }
-      expect_any_instance_of(
-        Bolt::Transport::WinRM::Connection
-      ).to receive(:execute).at_least(:once).and_wrap_original do |m, *args|
-        args.first =~ /SetEnvironmentVariable/ ? double('result', exit_code: 1) : m.call(*args)
-      end
-      with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
-        expect { winrm.run_task(target, task, arguments) }.to raise_error(Bolt::Node::EnvironmentVarError)
-      end
-    end
-
-    it "ignores run_as", winrm: true do
-      contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
-      arguments = { message_one: 'task is running',
-                    "message two": 'task has run' }
-      with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
-        expect(winrm.run_task(target, task, arguments, run_as: 'root').message)
-          .to eq("task is running task has run\r\n")
-      end
-    end
-
     it "supports the powershell input method", winrm: true do
       contents = <<~PS
         param ($Name, $Age, $Height)
@@ -967,90 +944,30 @@ describe Bolt::Transport::WinRM do
         contents = <<~PS
           Write-Output "42"
         PS
-        expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('powershell.exe',
-                ['-NoProfile', '-NonInteractive', '-NoLogo',
-                 '-ExecutionPolicy', 'Bypass', '-File', /^".*"$/],
-                anything)
-          .and_return(output)
         with_task_containing('task-ps1-winrm', contents, 'stdin', '.ps1') do |task|
           expect(
             winrm.run_task(target, task, {}).message
-          ).to eq("42")
+          ).to eq("42\r\n")
         end
       end
 
       it "can apply a ruby-based script", winrm: true do
-        expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('ruby.exe',
-                ['-S', /^".*"$/])
-          .and_return(output)
         with_tempfile_containing('script-rb-winrm', "puts 42", '.rb') do |file|
           expect(
             winrm.run_script(target, file.path, [])['stdout']
-          ).to eq("42")
+          ).to eq("42\r\n")
         end
       end
 
       it "can apply a ruby-based task", winrm: true do
-        expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('ruby.exe',
-                ['-S', /^".*"$/],
-                anything)
-          .and_return(output)
         with_task_containing('task-rb-winrm', "puts 42", 'stdin', '.rb') do |task|
           expect(
             winrm.run_task(target, task, {}).message
-          ).to eq("42")
-        end
-      end
-
-      it "can apply a puppet manifest for a '.pp' script", winrm: true do
-        stdout = <<~OUTPUT
-          Notice: Scope(Class[main]): hi
-          Notice: Compiled catalog for x.y.z in environment production in 0.04 seconds
-          Notice: Applied catalog in 0.04 seconds
-        OUTPUT
-        output = Bolt::Node::Output.new
-        output.stdout << stdout
-        output.exit_code = 0
-
-        expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('puppet.bat',
-                ['apply', /^".*"$/])
-          .and_return(output)
-        contents = "notice('hi')"
-        with_tempfile_containing('script-pp-winrm', contents, '.pp') do |file|
-          expect(
-            winrm.run_script(target, file.path, [])['stdout']
-          ).to eq(stdout)
-        end
-      end
-
-      it "can apply a puppet manifest for a '.pp' task", winrm: true do
-        expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('puppet.bat',
-                ['apply', /^".*"$/],
-                anything)
-          .and_return(output)
-        with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
-          expect(
-            winrm.run_task(target, task, {}).message
-          ).to eq("42")
+          ).to eq("42\r\n")
         end
       end
 
       it "does not apply an arbitrary script", winrm: true do
-        allow_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('cmd.exe',
-                ['/c', /^".*"$/])
-          .and_return(output)
         with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
           expect {
             winrm.run_script(target, file.path, []).value
@@ -1060,109 +977,11 @@ describe Bolt::Transport::WinRM do
       end
 
       it "does not apply an arbitrary script as a task", winrm: true do
-        allow_any_instance_of(Bolt::Transport::WinRM::Connection)
-          .to receive(:execute_process)
-          .with('cmd.exe',
-                ['/c', /^".*"$/],
-                anything)
-          .and_return(output)
         with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
           expect {
             winrm.run_task(target, task, {}).value
           }.to raise_error(Bolt::Node::FileError,
                            "File extension .py is not enabled, to run it please add to 'winrm: extensions'")
-        end
-      end
-
-      context "with extensions specified" do
-        let(:config) { mk_config(ssl: false, extensions: ['py'], user: user, password: password) }
-
-        it "can apply an arbitrary script", winrm: true do
-          expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-            .to receive(:execute_process)
-            .with('cmd.exe',
-                  ['/c', /^".*"$/])
-            .and_return(output)
-          with_tempfile_containing('script-py-winrm', 'print(42)', '.py') do |file|
-            expect(
-              winrm.run_script(target, file.path, [])['stdout']
-            ).to eq('42')
-          end
-        end
-
-        it "can apply an arbitrary script as a task", winrm: true do
-          expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-            .to receive(:execute_process)
-            .with('cmd.exe',
-                  ['/c', /^".*"$/],
-                  anything)
-            .and_return(output)
-          with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
-            expect(
-              winrm.run_task(target, task, {}).message
-            ).to eq('42')
-          end
-        end
-      end
-
-      context "with intperpreter path containing spaces" do
-        let(:config) { mk_config(ssl: false, interpreters: interpreter, user: user, password: password) }
-        context "with non-quoted interpreter" do
-          let(:interpreter) { { 'py' => 'C:/Program Files/Miniconda3/python.exe' } }
-          it "quotes interpreter and task executable", winrm: true do
-            expect(Bolt::Transport::Powershell)
-              .to receive(:make_tempdir)
-              .and_return('stubbed')
-            expect(Bolt::Transport::Powershell)
-              .to receive(:shell_init)
-              .and_return('stubbed')
-            expect(Bolt::Transport::Powershell)
-              .to receive(:rmdir)
-              .and_return('stubbed')
-            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-              .to receive(:execute)
-              .with("stubbed")
-              .exactly(3).times
-              .and_return(output)
-            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-              .to receive(:execute)
-              .with(/'#{interpreter['py']}'/)
-              .and_return(output)
-            with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
-              expect(
-                winrm.run_task(target, task, {}).message
-              ).to eq('42')
-            end
-          end
-        end
-
-        context "with quoted interpreter" do
-          let(:interpreter) { { 'py' => "'C:/Program Files/Miniconda3/python.exe'" } }
-          it "does not double quote interpreter when quoted and task executable", winrm: true do
-            expect(Bolt::Transport::Powershell)
-              .to receive(:make_tempdir)
-              .and_return('stubbed')
-            expect(Bolt::Transport::Powershell)
-              .to receive(:shell_init)
-              .and_return('stubbed')
-            expect(Bolt::Transport::Powershell)
-              .to receive(:rmdir)
-              .and_return('stubbed')
-            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-              .to receive(:execute)
-              .with("stubbed")
-              .exactly(3).times
-              .and_return(output)
-            expect_any_instance_of(Bolt::Transport::WinRM::Connection)
-              .to receive(:execute)
-              .with(/#{interpreter['py']}/)
-              .and_return(output)
-            with_task_containing('task-py-winrm', 'print(42)', 'stdin', '.py') do |task|
-              expect(
-                winrm.run_task(target, task, {}).message
-              ).to eq('42')
-            end
-          end
         end
       end
 

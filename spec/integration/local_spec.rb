@@ -129,7 +129,7 @@ describe "when running over the local transport" do
         results = run_cli_json(%W[script run #{script.path} param --targets localhost])
         results['items'].each do |result|
           expect(result['status']).to eq('success')
-          expect(result['value']).to eq("stdout" => "Ruby\nparam\n", "stderr" => "", "exit_code" => 0)
+          expect(result['value']).to eq("stdout" => "Ruby\r\nparam\r\n", "stderr" => "", "exit_code" => 0)
         end
       end
     end
@@ -153,15 +153,14 @@ describe "when running over the local transport" do
     end
 
     it 'runs a task reading from environment variables', :reset_puppet_settings do
-      result = run_one_node(%w[task run sample::winenv message=µsomemessage] + config_flags)
+      result = run_one_node(%w[task run sample::winenv message=somemessage] + config_flags)
       output = result['_output'].strip
-      expect(output).to match(/ENV: µsomemessage/)
+      expect(output).to match(/ENV: somemessage/)
     end
 
     it 'runs a task with complex parameters', :reset_puppet_settings do
       complex_input_file = File.join(__dir__, '../fixtures/complex_params/input.json')
       expected = File.open(File.join(__dir__, '../fixtures/complex_params/output'), 'rb', &:read)
-      expected = expected.gsub(/\r\n?/, "\n")
       result = run_one_node(%W[task run sample::complex_params --params @#{complex_input_file}] + config_flags)
       expect(result['_output']).to eq(expected)
     end
