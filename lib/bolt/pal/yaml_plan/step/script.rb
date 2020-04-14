@@ -10,7 +10,7 @@ module Bolt
           end
 
           def self.required_keys
-            Set['target']
+            Set['targets']
           end
 
           def initialize(step_body)
@@ -28,7 +28,7 @@ module Bolt
             options['arguments'] = @arguments unless @arguments.empty?
 
             fn = 'run_script'
-            args = [@script, @target]
+            args = [@script, @targets]
             args << @description if @description
             args << options unless options.empty?
 

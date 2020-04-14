@@ -10,7 +10,7 @@ module Bolt
           end
 
           def self.required_keys
-            Set['target']
+            Set['targets']
           end
 
           def initialize(step_body)
@@ -68,14 +68,14 @@ module Bolt
 
             code.print "  "
             fn = 'apply_prep'
-            args = [@target]
+            args = [@targets]
             code << function_call(fn, args)
             code.print "\n"
 
             code.print "  "
             code.print "$#{@name} = " if @name
 
-            code.puts "apply(#{Bolt::Util.to_code(@target)}) {"
+            code.puts "apply(#{Bolt::Util.to_code(@targets)}) {"
 
             declarations = @normalized_resources.map do |resource|
               type = resource['type'].is_a?(EvaluableString) ? resource['type'].value : resource['type']

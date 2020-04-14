@@ -6,13 +6,12 @@ module Bolt
   class PAL
     class YamlPlan
       class Step
-        attr_reader :name, :type, :body, :target
+        attr_reader :name, :type, :body, :targets
 
         def self.allowed_keys
-          Set['name', 'description', 'target']
+          Set['name', 'description', 'target', 'targets']
         end
 
-        COMMON_STEP_KEYS = %w[name description target].freeze
         STEP_KEYS = %w[command script task plan source destination eval resources].freeze
 
         def self.create(step_body, step_number)
@@ -38,7 +37,7 @@ module Bolt
         def initialize(step_body)
           @name = step_body['name']
           @description = step_body['description']
-          @target = step_body['target']
+          @targets = step_body['targets'] || step_body['target']
           @body = step_body
         end
 
@@ -82,6 +81,14 @@ module Bolt
 
           # Ensure all required keys are present
           missing_keys = required_keys - body.keys
+
+          # Handle cases where steps with a required 'targets' key are using the deprecated
+          # 'target' key instead.
+          # TODO: Remove this when 'target' is removed
+          if body.include?('target')
+            missing_keys -= ['targets']
+          end
+
           if missing_keys.any?
             error_message = "The #{step_type.inspect} step requires: #{missing_keys.to_a.inspect} key(s)"
             err = step_error(error_message, body['name'], step_number)

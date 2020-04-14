@@ -67,14 +67,14 @@ The step fails if the exit code of any command is non-zero.
 Command steps use these fields:
 
 -   `command`: The command to run
--   `target`: A target or list of targets to run the command on
+-   `targets`: A target or list of targets to run the command on
 
 For example:
 
 ```yaml
 steps:
   - command: hostname -f
-    target:
+    targets:
       - web1.example.com
       - web2.example.com
       - web3.example.com
@@ -88,7 +88,7 @@ Use a `task` step to run a Bolt task on a list of targets and save the results.
 Task steps use these fields:
 
 -   `task`: The task to run
--   `target`: A target or list of targets to run the task on
+-   `targets`: A target or list of targets to run the task on
 -   `parameters`: (Optional) A map of parameter values to pass to the task
 
 For example:
@@ -96,7 +96,7 @@ For example:
 ```yaml
 steps:
   - task: package
-    target:
+    targets:
       - web1.example.com
       - web2.example.com
       - web3.example.com
@@ -115,7 +115,7 @@ The script must be in the `files/` directory of a module. The name of the script
 Script steps use these fields:
 
 -   `script`: The script to run
--   `target`: A target or list of targets to run the script on
+-   `targets`: A target or list of targets to run the script on
 -   `arguments`: (Optional) An array of command-line arguments to pass to the script
 
 For example:
@@ -123,7 +123,7 @@ For example:
 ```yaml
 steps:
   - script: mymodule/check_server.sh
-    target:
+    targets:
       - web1.example.com
       - web2.example.com
       - web3.example.com
@@ -143,6 +143,7 @@ File upload steps use these fields:
 
 -   `source`: The location of the file to be uploaded
 -   `destination`: The location to upload the file to
+-   `targets`: A target or list of targets to upload the file to
 
 For example:
 
@@ -150,7 +151,7 @@ For example:
 steps:
   - source: mymodule/motd.txt
     destination: /etc/motd
-    target:
+    targets:
       - web1.example.com
       - web2.example.com
       - web3.example.com
@@ -188,7 +189,7 @@ For each `resources` step, Bolt executes the `apply_prep` plan function against 
 Resources steps use these fields:
 
 -   `resources`: An array of resources to apply
--   `target`: A target or list of targets to apply the resources on
+-   `targets`: A target or list of targets to apply the resources on
 
 Each resource is a YAML map with a type and title, and optionally a `parameters` key. The resource type and title can either be specified separately with the `type` and `title` keys, or can be specified in a single line by using the type name as a key with the title as its value.
 
@@ -206,7 +207,7 @@ steps:
       title: nginx
       parameters:
         ensure: running
-    target:
+    targets:
       - web1.example.com
       - web2.example.com
       - web3.example.com
@@ -290,7 +291,7 @@ parameters:
 
 steps:
   - command: hostname -f
-    target: $targets
+    targets: $targets
 ```
 
 Variables can also be interpolated into string values. The string must be double-quoted to allow interpolation. For example:
@@ -304,7 +305,7 @@ steps:
   - task: echo
     parameters:
       message: "hello ${username}"
-    target: $targets
+    targets: $targets
 ```
 
 Many operations can be performed on variables to compute new values for step parameters or other fields.
@@ -321,11 +322,11 @@ parameters:
 
 steps:
   - task: user::add
-    target: 'host.example.com'
+    targets: 'host.example.com'
     parameters:
       name: $users[0]
   - task: echo
-    target: 'host.example.com'
+    targets: 'host.example.com'
     parameters:
       message: "hello ${users[0]}"
 ```
@@ -383,7 +384,7 @@ parameters:
 steps:
   - name: hostnames
     command: hostname -f
-    target: $targets
+    targets: $targets
   - task: echo
     parameters:
       message: $hostnames.map |$hostname_result| { $hostname_result['stdout'] }.join(',')
@@ -402,7 +403,7 @@ steps:
   - name: double_count
     eval: $count * 2
   - task: echo
-    target: web1.example.com
+    targets: web1.example.com
     parameters:
       message: "The count is ${count}, and twice the count is ${double_count}"
 ```
@@ -415,7 +416,7 @@ You can return a result from a plan by setting the `return` key at the top level
 steps:
   - name: hostnames
     command: hostname -f
-    target: $targets
+    targets: $targets
 
 return: $hostnames.map |$hostname_result| { $hostname_result['stdout'] }
 ```
@@ -452,7 +453,7 @@ parameters:
 steps:
   - name: run_task
     task: sample
-    target: $targets
+    targets: $targets
     parameters:
       message: "hello world"
 return: $run_task
@@ -520,7 +521,7 @@ When applying Puppet resources in a `resource` step, variable interpolation beha
 
 ```yaml
 steps:
-  - target: localhost
+  - targets: localhost
     description: Apply a file resource
     resources:
     - type: file
@@ -566,7 +567,7 @@ parameters:
     type: TargetSpec
 steps:
   - name: pkg
-    target: $targets
+    targets: $targets
     resources:
       - title: openssh-server
         type: package
@@ -590,7 +591,7 @@ parameters:
     type: TargetSpec
 steps:
   - name: pkg
-    target: $targets
+    targets: $targets
     resources:
       - title: openssh-server
         type: package
