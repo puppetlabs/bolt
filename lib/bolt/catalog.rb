@@ -70,9 +70,38 @@ module Bolt
                           bolt_inventory: inv) do
             Puppet.lookup(:pal_current_node).trusted_data = target['trusted']
             pal.with_catalog_compiler do |compiler|
-              # This needs to happen inside the catalog compiler so loaders are initialized for loading
-              vars = Puppet::Pops::Serialization::FromDataConverter.convert(request['plan_vars'])
-              pal.send(:add_variables, compiler.send(:topscope), target['variables'].merge(vars))
+              # Deserializing needs to happen inside the catalog compiler so
+              # loaders are initialized for loading
+              plan_vars = Puppet::Pops::Serialization::FromDataConverter.convert(request['plan_vars'])
+
+              # Facts will be set by the catalog compiler, so we need to ensure
+              # that any plan or target variables with the same name are not
+              # passed into the apply block to avoid a redefinition error.
+              # Filter out plan and target vars separately and raise a Puppet
+              # warning if there are any collisions for either. Puppet warning
+              # is the only way to log a message that will make it back to Bolt
+              # to be printed.
+              pv_collisions, pv_filtered = plan_vars.partition do |k, _|
+                target['facts'].keys.include?(k)
+              end.map(&:to_h)
+              unless pv_collisions.empty?
+                print_pv = pv_collisions.keys.map { |k| "$#{k}" }.join(', ')
+                plural = pv_collisions.keys.length == 1 ? '' : 's'
+                Puppet.warning("Plan variable#{plural} #{print_pv} will be overridden by fact#{plural} " \
+                               "of the same name in the apply block")
+              end
+
+              tv_collisions, tv_filtered = target['variables'].partition do |k, _|
+                target['facts'].keys.include?(k)
+              end.map(&:to_h)
+              unless tv_collisions.empty?
+                print_tv = tv_collisions.keys.map { |k| "$#{k}" }.join(', ')
+                plural = tv_collisions.keys.length == 1 ? '' : 's'
+                Puppet.warning("Target variable#{plural} #{print_tv} " \
+                               "will be overridden by fact#{plural} of the same name in the apply block")
+              end
+
+              pal.send(:add_variables, compiler.send(:topscope), tv_filtered.merge(pv_filtered))
 
               # Configure language strictness in the CatalogCompiler. We want Bolt to be able
               # to compile most Puppet 4+ manifests, so we default to allowing deprecated functions.

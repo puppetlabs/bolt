@@ -101,6 +101,15 @@ describe "passes parsed AST to the apply_catalog task" do
       expect(logs).to include(/Plan vars set to undef:/)
     end
 
+    it 'facts override plan vars and target vars' do
+      result = run_cli_json(%w[plan run basic::fact_merge] + config_flags)
+      notify = get_notifies(result)
+      expect(notify[0]['title']).to eq('Fresh strawberries')
+      logs = @log_output.readlines
+      expect(logs).to include(/Plan variable \$fresh will be overridden by fact/)
+      expect(logs).to include(/Target variable \$fresh will be overridden by fact/)
+    end
+
     it 'applies a class from the modulepath' do
       result = run_cli_json(%w[plan run basic::class] + config_flags)
       notify = get_notifies(result)
