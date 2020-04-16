@@ -42,6 +42,12 @@ describe Bolt::Transport::SSH::Connection do
   end
 
   context "when connecting", ssh: true do
+    before :each do
+      # We can't allow(subject) here because we rely on subject being lazily
+      # instantiated so we can tweak the config per-test first.
+      allow_any_instance_of(described_class).to receive(:validate_ssh_version)
+    end
+
     it "passes proxyjump options" do
       inventory.set_config(target, 'ssh', 'proxyjump' => 'jump.example.com')
 
