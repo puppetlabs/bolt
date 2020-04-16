@@ -66,6 +66,13 @@ config:
       var: BOLT_PASSWORD
 ```
 
+### Google Cloud
+
+The `gcloud_inventory` plugin generates targets from Google Cloud compute engine instances.
+
+It is a module-based plugin available on the Puppet Forge and is installed with
+Bolt. [View the documentation on the forge](https://forge.puppet.com/puppetlabs/gcloud_inventory).
+
 ### Prompt
 
 The `prompt` plugin allows users to interactively enter sensitive configuration
