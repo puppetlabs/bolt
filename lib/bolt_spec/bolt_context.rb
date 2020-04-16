@@ -173,24 +173,6 @@ module BoltSpec
       end
     end
 
-    # Flag for the default behavior of executing sub-plans during testing
-    # By *default* we allow any sub-plan to be executed, no mocking required.
-    # Users can still mock out plans in this mode and the mocks will check for
-    # parameters and return values like normal. However, if a plan isn't explicitly
-    # mocked out, it will be executed.
-    def execute_any_plan
-      executor.execute_any_plan(true)
-    end
-
-    # If you want to explicitly mock out all of the sub-plan calls, then
-    # call this prior to calling `run_plan()` along with setting up any
-    # mocks that you require.
-    # In this mode, any plan that is not explicitly mocked out will not be executed
-    # and an error will be thrown.
-    def execute_no_plan
-      executor.execute_any_plan(false)
-    end
-
     # Does this belong here?
     def allow_out_message
       executor.stub_out_message.add_stub

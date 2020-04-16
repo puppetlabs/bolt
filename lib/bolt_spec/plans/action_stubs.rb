@@ -82,6 +82,14 @@ module BoltSpec
       # Used to create a valid Bolt::Result object from result data.
       def default_for(target)
         case @data[:default]
+        when Bolt::PlanFailure
+          # Bolt::PlanFailure needs to be declared before Bolt::Error because
+          # Bolt::PlanFailure is an instance of Bolt::Error, so it can match both
+          # in this case we need to treat Bolt::PlanFailure's in a different way
+          #
+          # raise Bolt::PlanFailure errors so that the PAL can catch them and wrap
+          # them into Bolt::PlanResult's for us.
+          raise @data[:default]
         when Bolt::Error
           Bolt::Result.from_exception(target, @data[:default])
         when Hash
@@ -164,10 +172,10 @@ module BoltSpec
       end
 
       # Set a default error result for all targets.
-      def error_with(data)
+      def error_with(data, clazz = Bolt::Error)
         data = Bolt::Util.walk_keys(data, &:to_s)
         if data['msg'] && data['kind'] && (data.keys - %w[msg kind details issue_code]).empty?
-          @data[:default] = Bolt::Error.new(data['msg'], data['kind'], data['details'], data['issue_code'])
+          @data[:default] = clazz.new(data['msg'], data['kind'], data['details'], data['issue_code'])
         else
           STDERR.puts "In the future 'error_with()' may require msg and kind, and " \
                       "optionally accept only details and issue_code."

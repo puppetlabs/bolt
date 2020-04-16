@@ -4,7 +4,7 @@ module BoltSpec
   module Plans
     class PlanStub < ActionStub
       def matches(_scope, _plan, params)
-        targets = params.fetch(:nodes, params.fetch(:targets, nil))
+        targets = params.fetch('nodes', params.fetch('targets', nil))
         if @invocation[:targets] && Set.new(@invocation[:targets]) != Set.new(targets)
           return false
         end
@@ -21,7 +21,7 @@ module BoltSpec
         if @return_block
           check_plan_result(@return_block.call(plan: plan, params: params), plan)
         else
-          Bolt::PlanResult.new(nil, 'success')
+          default_for(nil)
         end
       end
 
@@ -41,6 +41,14 @@ module BoltSpec
       def with_params(params)
         @invocation[:params] = params
         self
+      end
+
+      def return_for_targets(_data)
+        raise "return_for_targets is not implemented for plan spec tests (allow_plan, expect_plan, allow_any_plan, etc)"
+      end
+
+      def error_with(data, clazz = Bolt::PlanFailure)
+        super(data, clazz)
       end
     end
   end

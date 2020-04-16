@@ -18,8 +18,7 @@ module BoltSpec
     # Nothing on the executor is 'public'
     class MockExecutor
       attr_reader :noop, :error_message
-      attr_accessor :run_as, :transport_features
-      attr_writer :execute_any_plan
+      attr_accessor :run_as, :transport_features, :execute_any_plan
 
       def initialize(modulepath)
         @noop = false
@@ -116,10 +115,18 @@ module BoltSpec
         result = nil
         plan_name = plan_clj.closure_name
 
+        # get the mock object either by plan name, or the default in case allow_any_plan
+        # was called, if both are nil / don't exist, then dub will be nil and we'll fall
+        # through to another conditional statement
+        doub = @plan_doubles[plan_name] || @plan_doubles[:default]
+
         # High level:
-        #  - If we've explicitly "allowed" the plan, execute it
-        #  - If we've explicitly "expected" the plan (mocked), run it through the mock object
-        #  - If we're allowing "any" plan to be executed, execute it
+        #  - If we've explicitly allowed execution of the plan (normally the main plan
+        #    passed into BoltSpec::Plan::run_plan()), then execute it
+        #  - If we've explicitly "allowed/expected" the plan (mocked),
+        #    then run it through the mock object
+        #  - If we're allowing "any" plan to be executed,
+        #    then execute it
         #  - Otherwise we have an error
         if @allowed_exec_plans.key?(plan_name) && @allowed_exec_plans[plan_name] == params
           # This plan's name + parameters were explicitly allowed to be executed.
@@ -128,8 +135,7 @@ module BoltSpec
           # function can kick off the initial plan. In reality, no other plans should
           # be in this hash.
           result = @executor_real.run_plan(scope, plan_clj, params)
-        elsif @plan_doubles.key?(plan_name)
-          doub = @plan_doubles[plan_name]
+        elsif doub
           result = doub.process(scope, plan_clj, params)
           # the throw here is how Puppet exits out of a closure and returns a result
           # it throws this special symbol with a result object that is captured by
