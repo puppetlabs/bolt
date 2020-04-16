@@ -7,7 +7,7 @@ module Bolt
   class Result
     attr_reader :target, :value, :action, :object
 
-    def self.from_exception(target, exception)
+    def self.from_exception(target, exception, action: 'action')
       if exception.is_a?(Bolt::Error)
         error = exception.to_h
       else
@@ -19,7 +19,7 @@ module Bolt
         }
         error['details']['stack_trace'] = exception.backtrace.join('\n') if exception.backtrace
       end
-      Result.new(target, error: error)
+      Result.new(target, error: error, action: action)
     end
 
     def self.for_command(target, stdout, stderr, exit_code, action, command)
@@ -78,7 +78,7 @@ module Bolt
 
     def _pcore_init_from_hash(init_hash)
       opts = init_hash.reject { |k, _v| k == 'target' }
-      initialize(init_hash['target'], opts.map { |k, v| [k.to_sym, v] }.to_h)
+      initialize(init_hash['target'], opts.transform_keys(&:to_sym))
     end
 
     def _pcore_init_hash
@@ -90,7 +90,7 @@ module Bolt
         'object' => @object }
     end
 
-    def initialize(target, error: nil, message: nil, value: nil, action: nil, object: nil)
+    def initialize(target, error: nil, message: nil, value: nil, action: 'action', object: nil)
       @target = target
       @value = value || {}
       @action = action

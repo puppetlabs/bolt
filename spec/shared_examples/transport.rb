@@ -38,15 +38,15 @@ end
 
 def windows_context
   {
-    stdout_command: ['echo hello', /^hello$/],
+    stdout_command: ['echo hello', /^hello\r$/],
     stderr_command: ['echo oops 1>&2', /oops/],
     destination_dir: 'C:/mytmp',
     supported_req: 'powershell',
     extension: '.ps1',
     unsupported_req: 'shell',
     cat_cmd: 'cat',
-    rm_cmd: 'rm -rf',
-    ls_cmd: 'ls',
+    rm_cmd: 'rm -Recurse -Force',
+    ls_cmd: 'ls -Name',
     env_task: "Write-Output \"${env:PT_message_one}\n${env:PT_message_two}\"",
     stdin_task: "$line = [Console]::In.ReadLine()\nWrite-Output \"$line\"",
     find_task: 'Get-ChildItem -Path $env:PT__installdir -Recurse -File | % { Write-Host $_.Length $_.FullName  }',
@@ -55,22 +55,18 @@ def windows_context
   }
 end
 
-def mk_config(conf)
+def make_config(conf: transport_config)
   conf = Bolt::Util.walk_keys(conf, &:to_s)
-  conf_object = Bolt::Config.new(Bolt::Boltdir.new('.'), transport.to_s => conf)
-  conf_object.transport = transport.to_s
-  conf_object
+  Bolt::Config.new(boltdir, transport.to_s => conf)
 end
 
 def make_target
-  target = inventory.get_target(host_and_port)
-  update_target(target, config.transports[config.transport.to_sym])
-  target
+  inventory.get_target(host_and_port)
 end
 
-def update_target(targ, conf)
-  transport_config = targ.options.merge(conf)
-  targ.inventory_target.set_config(targ.transport, transport_config)
+def set_config(target, config)
+  merged = target.options.merge(config).to_h
+  target.inventory_target.set_config(transport.to_s, merged)
 end
 
 # Shared examples for Transports.
@@ -138,7 +134,7 @@ shared_examples 'transport api' do
         expect(result.object).to eq(file.path)
 
         expect(
-          runner.run_command(target, "#{os_context[:cat_cmd]} #{remote_path}").value['stdout']
+          runner.run_command(target, "#{os_context[:cat_cmd]} #{remote_path}").value['stdout'].chomp
         ).to eq(contents)
 
         runner.run_command(target, "#{os_context[:rm_cmd]} #{remote_path}")
@@ -156,11 +152,12 @@ shared_examples 'transport api' do
         runner.upload(target, dir, target_dir)
 
         expect(
-          runner.run_command(target, "#{os_context[:ls_cmd]} #{target_dir}")['stdout'].split("\n")
-        ).to eq(%w[content subdir])
+          runner.run_command(target, "#{os_context[:ls_cmd]} #{target_dir}")['stdout'].lines.map(&:chomp)
+        ).to contain_exactly('content', 'subdir')
 
         expect(
-          runner.run_command(target, "#{os_context[:ls_cmd]} #{File.join(target_dir, 'subdir')}")['stdout'].split("\n")
+          runner.run_command(target, "#{os_context[:ls_cmd]} #{File.join(target_dir, 'subdir')}")['stdout']
+            .lines.map(&:chomp)
         ).to eq(%w[more])
 
         runner.run_command(target, "#{os_context[:rm_cmd]} #{target_dir}")
@@ -170,7 +167,7 @@ shared_examples 'transport api' do
 
   context 'run_script' do
     it "can run a script remotely" do
-      with_tempfile_containing('script test', os_context[:echo_script]) do |file|
+      with_tempfile_containing('script test', os_context[:echo_script], os_context[:extension]) do |file|
         result = runner.run_script(target, file.path, [])
         expect(result['stdout'].strip).to eq('')
         expect(result.action).to eq('script')
@@ -180,6 +177,15 @@ shared_examples 'transport api' do
 
     it "can run a script remotely with quoted arguments" do
       with_tempfile_containing('script-test-docker-quotes', os_context[:echo_script], os_context[:extension]) do |file|
+        expected = <<~QUOTED
+                     nospaces
+                     with spaces
+                     "double double"
+                     'double single'
+                     double "double" double
+                     double 'single' double
+                   QUOTED
+
         expect(
           runner.run_script(target,
                             file.path,
@@ -189,14 +195,8 @@ shared_examples 'transport api' do
                              "'double single'",
                              "double \"double\" double",
                              "double 'single' double"])['stdout']
-        ).to eq(<<~QUOTED)
-                  nospaces
-                  with spaces
-                  "double double"
-                  'double single'
-                  double "double" double
-                  double 'single' double
-                QUOTED
+            .lines.map(&:chomp)
+        ).to eq(expected.lines.map(&:chomp))
       end
     end
 
@@ -205,8 +205,8 @@ shared_examples 'transport api' do
                    make_sensitive('$ecret!')]
       with_tempfile_containing('sensitive_test', os_context[:echo_script], os_context[:extension]) do |file|
         expect(
-          runner.run_script(target, file.path, arguments)['stdout']
-        ).to eq("non-sensitive-arg\n$ecret!\n")
+          runner.run_script(target, file.path, arguments)['stdout'].lines.map(&:chomp)
+        ).to eq(%w[non-sensitive-arg $ecret!])
       end
     end
 
@@ -215,10 +215,8 @@ shared_examples 'transport api' do
         expect(
           runner.run_script(target,
                             file.path,
-                            ['echo $HOME; cat /etc/passwd'])['stdout']
-        ).to eq(<<~SHELLWORDS)
-        echo $HOME; cat /etc/passwd
-        SHELLWORDS
+                            ['echo $HOME; cat /etc/passwd'])['stdout'].chomp
+        ).to eq("echo $HOME; cat /etc/passwd")
       end
     end
   end
@@ -228,7 +226,7 @@ shared_examples 'transport api' do
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_task_containing('tasks_test', os_context[:env_task], 'environment', os_context[:extension]) do |task|
         result = runner.run_task(target, task, arguments)
-        expect(result.message).to eq("Hello from task\nGoodbye\n")
+        expect(result.message.chomp).to eq("Hello from task\nGoodbye")
         expect(result.object).to eq('tasks_test')
       end
     end
@@ -253,7 +251,7 @@ shared_examples 'transport api' do
       content = "#{os_context[:env_task]}\n#{os_context[:stdin_task]}"
       arguments = { message_one: 'Hello from task', message_two: 'Goodbye' }
       with_task_containing('tasks-test-both', content, 'both', os_context[:extension]) do |task|
-        expect(runner.run_task(target, task, arguments).message.strip).to eq(<<~OUTPUT.strip)
+        expect(runner.run_task(target, task, arguments).message.lines.map(&:chomp)).to eq(<<~OUTPUT.lines.map(&:chomp))
         Hello from task
         Goodbye
         {"message_one":"Hello from task","message_two":"Goodbye"}
@@ -280,7 +278,7 @@ shared_examples 'transport api' do
       arguments = { 'message_one' => make_sensitive('$ecret!'),
                     'message_two' => make_sensitive(deep_hash) }
       with_task_containing('tasks_test_sensitive', os_context[:env_task], 'both', os_context[:extension]) do |task|
-        expect(runner.run_task(target, task, arguments).message).to eq(<<~SHELL)
+        expect(runner.run_task(target, task, arguments).message.lines.map(&:chomp)).to eq(<<~SHELL.lines.map(&:chomp))
         $ecret!
         {"k":"v","arr":[1,2,3]}
         SHELL
@@ -304,8 +302,8 @@ shared_examples 'transport api' do
       with_task_containing('tasks_test', contents, 'environment', os_context[:extension]) do |task|
         reqs = [os_context[:supported_req]]
         task.metadata['implementations'] = [{ 'name' => 'tasks_test', 'requirements' => reqs }]
-        expect(runner.run_task(target, task, arguments).message)
-          .to eq("Hello from task\nGoodbye\n")
+        expect(runner.run_task(target, task, arguments).message.chomp)
+          .to eq("Hello from task\nGoodbye")
       end
     end
 
@@ -471,8 +469,10 @@ shared_examples 'transport api' do
     let(:tmpdir) { File.join(os_context[:destination_dir], 'mytempdir') }
 
     it "errors when tmpdir doesn't exist" do
-      update_target(target, 'tmpdir' => tmpdir)
-      with_tempfile_containing('script dir', 'dummy script') do |file|
+      skip "Windows will create the directory anyway" if Bolt::Util.windows?
+      set_config(target, 'tmpdir' => tmpdir)
+
+      with_tempfile_containing('script dir', 'dummy script', os_context[:extension]) do |file|
         expect {
           runner.run_script(target, file.path, [])
         }.to raise_error(Bolt::Node::FileError, /Could not make tempdir.*#{Regexp.escape(tmpdir)}/)
@@ -499,10 +499,10 @@ shared_examples 'transport api' do
 
         runner.run_command(target, mkdir)
         # Once the tempdir is created the target can be configured to upload scripts to it
-        update_target(target, 'tmpdir' => tmpdir)
+        set_config(target, 'tmpdir' => tmpdir)
         example.run
         # Required because the Local transport changes to the tmpdir before running commands
-        update_target(target, 'tmpdir' => nil)
+        set_config(target, 'tmpdir' => nil)
         runner.run_command(target, rmdir)
       end
 
@@ -512,55 +512,6 @@ shared_examples 'transport api' do
           output = output.gsub(/\\\\?/, "/") if Bolt::Util.windows?
           expect(output).to match(/#{Regexp.escape(tmpdir)}/)
         end
-      end
-    end
-  end
-end
-
-# Shared failure tests for Transports
-#
-# Requires uploading files and making tempdir to be stubbed to throw Bolt::Node::FileError.
-shared_examples 'transport failures' do
-  context "when it can't upload a file" do
-    it 'returns an error result for upload' do
-      with_tempfile_containing('upload-test', 'dummy file') do |file|
-        expect {
-          runner.upload(target, file.path, "/upload-test")
-        }.to raise_error(Bolt::Node::FileError)
-      end
-    end
-
-    it 'returns an error result for run_script' do
-      with_tempfile_containing('script test', 'dummy script') do |file|
-        expect {
-          runner.run_script(target, file.path, [])
-        }.to raise_error(Bolt::Node::FileError)
-      end
-    end
-
-    it 'returns an error result for run_task' do
-      with_task_containing('tasks_test', 'dummy task', 'environment') do |task|
-        expect {
-          runner.run_task(target, task, {})
-        }.to raise_error(Bolt::Node::FileError)
-      end
-    end
-  end
-
-  context "when it can't create a tempfile" do
-    it 'errors when it tries to run a script' do
-      with_tempfile_containing('script test', 'dummy script') do |file|
-        expect {
-          runner.run_script(target, file.path, []).error_hash['msg']
-        }.to raise_error(Bolt::Node::FileError)
-      end
-    end
-
-    it "errors when it tries to run a task" do
-      with_task_containing('tasks_test', 'dummy task', 'environment') do |task|
-        expect {
-          runner.run_task(target, task, {})
-        }.to raise_error(Bolt::Node::FileError)
       end
     end
   end
@@ -577,11 +528,15 @@ end
 # - safe_name: expected target safe_name
 shared_examples 'with sudo', sudo: true do
   context "with sudo" do
-    let(:config) {
-      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                user: user, password: password)
-    }
-    let(:target) { make_target }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'sudo-password'  => password,
+        'run-as'         => 'root',
+        'user'           => user,
+        'password'       => password
+      }
+    end
 
     it "can execute a command" do
       expect(runner.run_command(target, 'whoami')['stdout']).to eq("root\n")
@@ -636,11 +591,15 @@ SHELL
     end
 
     context "with an incorrect password" do
-      let(:config) {
-        mk_config('host-key-check' => false, 'sudo-password' => 'nonsense', 'run-as' => 'root',
-                  user: user, password: password)
-      }
-      let(:target) { make_target }
+      let(:transport_config) do
+        {
+          'host-key-check' => false,
+          'sudo-password'  => 'nonsense',
+          'run-as'         => 'root',
+          'user'           => user,
+          'password'       => password
+        }
+      end
 
       it "returns a failed result" do
         expect {
@@ -652,12 +611,16 @@ SHELL
   end
 
   context "using a custom run-as-command" do
-    let(:config) {
-      mk_config('host-key-check' => false, 'sudo-password' => password, 'run-as' => 'root',
-                user: user, password: password,
-                'run-as-command' => ["sudo", "-nkSEu"])
-    }
-    let(:target) { make_target }
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'sudo-password'  => password,
+        'run-as'         => 'root',
+        'user'           => user,
+        'password'       => password,
+        'run-as-command' => ['sudo', '-nkSEu']
+      }
+    end
 
     it "can fail to execute with sudo -n" do
       expect(runner.run_command(target, 'whoami')['stderr']).to match("sudo: a password is required")

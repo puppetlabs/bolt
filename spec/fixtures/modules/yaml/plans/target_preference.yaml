@@ -1,0 +1,11 @@
+parameters:
+  targets:
+    type: TargetSpec
+
+steps:
+  - name: run_command
+    command: whoami
+    target: []
+    targets: $targets
+
+return: $run_command

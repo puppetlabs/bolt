@@ -76,7 +76,7 @@ module Bolt
       when 'project'
         case action
         when 'init'
-          { flags: OPTIONS[:global],
+          { flags: OPTIONS[:global] + %w[modules],
             banner: PROJECT_INIT_HELP }
         when 'migrate'
           { flags: OPTIONS[:global] + %w[inventoryfile boltdir configfile],
@@ -391,6 +391,8 @@ module Bolt
             bolt project init
           Create a new Bolt project at a specified path.
             bolt project init ~/path/to/project
+          Create a new Bolt project with existing modules.
+            bolt project init --modules puppetlabs-apt,puppetlabs-ntp
     HELP
 
     PROJECT_MIGRATE_HELP = <<~HELP
@@ -562,7 +564,7 @@ module Bolt
       DESCRIPTION
           Run a task on the specified targets.
 
-          Parameters take the form <parameter>=<value>.
+          Parameters take the form parameter=value.
 
       EXAMPLES
           bolt task run package --targets target1,target2 action=status name=bash
@@ -720,7 +722,7 @@ module Bolt
       define('--puppetfile FILEPATH',
              'Specify a Puppetfile to use when installing modules. (default: ~/.puppetlabs/bolt/Puppetfile)',
              'Modules are installed in the current Boltdir.') do |path|
-        @options[:puppetfile] = Pathname.new(File.expand_path(path))
+        @options[:puppetfile_path] = Pathname.new(File.expand_path(path))
       end
       define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|
         @options[:'save-rerun'] = save
@@ -761,6 +763,13 @@ module Bolt
       end
       define('--trace', 'Display error stack traces') do |_|
         @options[:trace] = true
+      end
+
+      separator "\nADDITIONAL OPTIONS"
+      define('--modules MODULES',
+             'A comma-separated list of modules to install from the Puppet Forge',
+             'when initializing a project. Resolves and installs all dependencies.') do |modules|
+        @options[:modules] = modules.split(',')
       end
 
       separator "\nGLOBAL OPTIONS"

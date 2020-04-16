@@ -1,11 +1,11 @@
 parameters:
-  nodes:
+  targets:
     type: TargetSpec
 
 steps:
-  - eval: $nodes.apply_prep
+  - eval: $targets.apply_prep
   - name: apply_resources
-    target: $nodes
+    targets: $targets
     resources: []
 
 return: $apply_resources

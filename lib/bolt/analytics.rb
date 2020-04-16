@@ -28,8 +28,12 @@ module Bolt
 
     def self.build_client
       logger = Logging.logger[self]
-      config_file = File.expand_path('~/.puppetlabs/bolt/analytics.yaml')
-      config = load_config(config_file, logger)
+      begin
+        config_file = File.expand_path('~/.puppetlabs/bolt/analytics.yaml')
+        config = load_config(config_file, logger)
+      rescue ArgumentError
+        config = { 'disabled' => true }
+      end
 
       if config['disabled'] || ENV['BOLT_DISABLE_ANALYTICS']
         logger.debug "Analytics opt-out is set, analytics will be disabled"

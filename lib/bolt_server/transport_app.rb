@@ -4,6 +4,7 @@ require 'sinatra'
 require 'addressable/uri'
 require 'bolt'
 require 'bolt/error'
+require 'bolt/inventory'
 require 'bolt/target'
 require 'bolt_server/file_cache'
 require 'bolt/task/puppet_server'
@@ -56,10 +57,17 @@ module BoltServer
     end
 
     def scrub_stack_trace(result)
-      if result.dig(:result, '_error', 'details', 'stack_trace')
-        result[:result]['_error']['details'].reject! { |k| k == 'stack_trace' }
+      if result.dig(:value, '_error', 'details', 'stack_trace')
+        result[:value]['_error']['details'].reject! { |k| k == 'stack_trace' }
       end
       result
+    end
+
+    def error_result(error)
+      {
+        'status' => 'failure',
+        'value' => { '_error' => error.to_h }
+      }
     end
 
     def validate_schema(schema, body)
@@ -279,7 +287,7 @@ module BoltServer
       body = JSON.parse(request.body.read)
 
       error = validate_schema(@schemas["transport-ssh"], body)
-      return [400, error.to_json] unless error.nil?
+      return [400, error_result(error).to_json] unless error.nil?
 
       targets = (body['targets'] || [body['target']]).map do |target|
         make_ssh_target(target)
@@ -319,7 +327,7 @@ module BoltServer
       body = JSON.parse(request.body.read)
 
       error = validate_schema(@schemas["transport-winrm"], body)
-      return [400, error.to_json] unless error.nil?
+      return [400, error_result(error).to_json] unless error.nil?
 
       targets = (body['targets'] || [body['target']]).map do |target|
         make_winrm_target(target)

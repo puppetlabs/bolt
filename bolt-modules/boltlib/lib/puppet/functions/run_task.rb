@@ -56,7 +56,7 @@ Puppet::Functions.create_function(:run_task) do
     end
 
     options, params = args.partition { |k, _v| k.start_with?('_') }.map(&:to_h)
-    options = options.map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+    options = options.transform_keys { |k| k.sub(/^_/, '').to_sym }
 
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)

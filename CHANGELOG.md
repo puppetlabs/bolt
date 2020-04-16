@@ -1,6 +1,127 @@
 # Changelog
 
-## Bolt 2.1.0
+## Bolt 2.5.0 (2020-04-13)
+
+### New features
+
+* **Add Boltspec helper to load Bolt constructs**
+  ([#1688](https://github.com/puppetlabs/bolt/issues/1688))
+
+  A new helper function `in_bolt_context` can be used to wrap code that
+  references Bolt constructs, such as the Boltlib::TargetSpec datatype.
+
+* **Added `transport` and `transport_config` functions to `Target` data
+  type** ([#1686](https://github.com/puppetlabs/bolt/issues/1686))
+
+  The `Target` data type now supports a `transport` function, which
+  returns the transport used to connect to the target, and a
+  `transport_config` function, which returns a hash of merged
+  configuration for the target's transport.
+
+### Bug fixes
+
+* **`Bolt::Util.deep_clone` can now clone frozen objects**
+  ([#1696](https://github.com/puppetlabs/bolt/pulls/1696))
+
+  The `Bolt::Util.deep_clone` method can now clone frozen objects,
+  preserving the 'frozen' attribute
+
+* **Fix bug in Bolt::Result where nil actions threw an exception**
+  ([#1714](https://github.com/puppetlabs/bolt/issues/1714),
+  [#1724](https://github.com/puppetlabs/bolt/issues/1724))
+
+  Returning from a plan with results of `run_task()` on a remote transport
+  that returned `nil`, threw an exception. Returning from a plan with results 
+  of `wait_until_available()`, threw an exception.
+
+* **Fix a bug passing arguments to local shell transport**
+  ([#1713](https://github.com/puppetlabs/bolt/1713))
+
+  Local shell transport could miss some bytes when writing non-ASCII characters
+  to stdin.
+
+* **Don't fail when the `run-as` user's home directory doesn't exist**
+  ([#1702](https://github.com/puppetlabs/bolt/pull/1702))
+
+  When running commands with `run-as` set, Bolt will try to `cd` to the
+  new user's home directory before running the command. If that fails
+  because the directory doesn't exist, it will now run the command from
+  wherever it currently is rather than aborting.
+
+* **Don't rely on sudo to preserve environment variables**
+  ([#1702](https://github.com/puppetlabs/bolt/pull/1702))
+
+  Bolt previously set environment variables when invoking `sudo` and
+  relied on it to preserve them when running the task executable. That
+  behavior isn't reliable for all configurations, so now environment
+  variables are set directly when running the underlying executable.
+
+## Bolt 2.4.0 (2020-04-06)
+
+### New features
+
+* **Populate all target attributes in the `puppetdb` plugin's `target_mapping`** 
+  ([#1689](https://github.com/puppetlabs/bolt/pull/1689))
+
+  Previously, the `target_mapping` field only supported populating a target's `uri`,
+  `name` and `config` values. All of a target's attributes can now be specified in
+  the `target_mapping` field, including `facts`, `vars`, `features`, and `alias`.
+
+## Bolt 2.3.1 (2020-03-30)
+
+### Bug fixes
+
+* **Validate that a specified Hiera config file exists**
+([#1692](https://github.com/puppetlabs/bolt/pull/1692))
+
+  Bolt was not properly validating that a Hiera config file specified
+  with the `hiera-config` option in a `bolt.yaml` existed.
+
+## Bolt 2.3.0 (2020-03-23)
+
+### New features
+
+* **Enable basic-auth-only option for WinRM when using SSL**
+([#1658](https://github.com/puppetlabs/bolt/pulls/1658))
+
+  Users can now use WinRM Basic authentication when SSL is configured.
+
+* **Add debugging statements to task errors**
+([#1647](https://github.com/puppetlabs/bolt/issues/1647))
+
+  The `ruby_task_helper` and `python_task_helper` modules include new
+  `debug` and `debug_statements` helper methods for adding debugging
+  statements to task errors.
+
+* **Initialize a Bolt project with modules and their dependencies**
+([#1574](https://github.com/puppetlabs/bolt/issues/1574))
+
+  The `bolt project init` command has a new `--modules` option that
+  accepts a comma-separated list of modules to install when initializing
+  a project. Modules and their dependencies are fully resolved, saved to
+  a `Puppetfile` in the project directory, and then automatically
+  installed with `bolt puppetfile install`.
+
+### Bug fixes
+
+* **Handle cases where loading hardcoded homedir paths fail**
+([#1671](https://github.com/puppetlabs/bolt/issues/1671))
+
+  Bolt's user level config and analytics config paths are hardcoded and
+  include `~`, which errors out when getlogin fails to return a user. We
+  now skip loading user level config if loading the file fails, and
+  disable analytics if loading the analytics config fails.
+
+## Bolt 2.2.0 (2020-03-10)
+
+### New features
+
+* **Support plugins in `bolt.yaml` transport configuration** ([#1591](https://github.com/puppetlabs/bolt/issues/1591))
+
+  Plugins can now be used to configure transports in a `bolt.yaml` file. Bolt will also provide more helpful
+  error messages when a plugin is used in an unsupported location.
+
+## Bolt 2.1.0 (2020-03-02)
 
 ### New features
 
@@ -35,7 +156,7 @@
   be caught but the modifications would still be made to the inventory. Modifications to the inventory are now
   validated prior to applying them to the inventory.
 
-## Bolt 2.0.1
+## Bolt 2.0.1 (2020-02-25)
 
 ### Deprecations and removals
 
@@ -53,7 +174,7 @@
   The `project migrate` command now correctly replaces all `nodes` keys in an inventory file with `targets`. 
   Previously, only the first group in an array of groups was having its `nodes` key replaced.
 
-## Bolt 2.0.0
+## Bolt 2.0.0 (2020-02-19)
 
 ### Deprecations and removals
 
@@ -150,7 +271,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   Use the `puppetdb` plugin in an inventory file to replicate this functionality in a more dynamic way.
 
-## Bolt 1.49.0
+## Bolt 1.49.0 (2020-02-10)
 
 ### New features
 
@@ -165,7 +286,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
   Apply result hashes will no longer be displayed when using human output. Instead, a metrics message
   will be shown.
 
-## Bolt 1.48.0
+## Bolt 1.48.0 (2020-02-03)
 
 ### New features
 
@@ -206,7 +327,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   The `prompt` plugin now correctly requires a `message` option.
 
-## Bolt 1.47.0
+## Bolt 1.47.0 (2020-01-27)
 
 ### Deprecations and removals
 
@@ -239,7 +360,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
   connected as the new user in the first place, using that user's home
   directory as the working directory.
 
-## Bolt 1.45.0
+## Bolt 1.45.0 (2020-01-13)
 
 ### Deprecations and removals
 
@@ -264,7 +385,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
   facts are available when running Bolt. This feature is experimental in both Puppet and Bolt, and
   this API may change or be removed.
 
-## Bolt 1.44.0
+## Bolt 1.44.0 (2020-01-09)
 
 ### New features
 
@@ -278,7 +399,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   Bolt no longer attempts to expand a `private-key` configuration `Hash` when `key-data` is being used in conjunction with the `future` setting.
 
-## Bolt 1.43.0
+## Bolt 1.43.0 (2019-12-18)
 
 ### New features
 
@@ -305,7 +426,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   When using `run-as`, the `sudo-executable` transport configuration option can be used to specify an executable to use to run as another user. This option can be set in a `local` or `ssh` config map or with the `--sudo-executable` flag on the CLI. This feature is experimental.
 
-## Bolt 1.42.0
+## Bolt 1.42.0 (2019-12-09)
 
 ### New features
 
@@ -331,7 +452,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   Bolt now searches for subdir paths, under the `plans` directory, for plan names when determining if the plan is a Puppet or YAML plan.
 
-## Bolt 1.41.0
+## Bolt 1.41.0 (2019-12-03)
 
 ### New features
 
@@ -347,7 +468,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
     Use this library to map lookup values to a target's configuration options in a `resolve_references` task.
     
-## Bolt 1.40.0
+## Bolt 1.40.0 (2019-12-02)
 
 ### New features
 
@@ -363,7 +484,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   The `puppetdb` inventory plugin has a new `target_mapping` field which accepts a hash of target configuration options and the facts to populate them with.
 
-## Bolt 1.39.0
+## Bolt 1.39.0 (2019-11-22)
 
 ### New features
 
@@ -385,7 +506,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
     Previously, plan parameters that were explicitly set to `undef` (optional parameters) and were referenced in an `apply` block resulted in a warning message when applying Puppet code. The warning is no longer issued when optional parameters are referenced.
 
-## Bolt 1.38.0
+## Bolt 1.38.0 (2019-11-15)
 
 ### New features
 
@@ -424,7 +545,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   The `file::exists` and `file::readable` functions no longer error when the file path is specified relative to a module and the file doesn't exist.
 
-## Bolt 1.37.0
+## Bolt 1.37.0 (2019-11-08)
 
 ### New features
 
@@ -438,7 +559,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   Optional parameters for `--password` and `--sudo-password` were prematurely removed. The previous behavior of prompting for a password when an argument is not specified for `--password` or `--sudo-password` has been added back. Arguments will be required in a future version.
 
-## Bolt 1.36.0
+## Bolt 1.36.0 (2019-11-07)
 
 ### Deprecation
 
@@ -474,7 +595,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   This fix standardizes all configured paths, including the modulepath, to be relative to the Boltdir. It only applies to file-based configs, not command line flags which expand relative to the current working directory. It is gated on the future config option, and will be available by default in Bolt 2.0.
 
-## 1.35.0
+## 1.35.0 (2019-10-25)
 
 ### Deprecation
 
@@ -492,7 +613,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   In the absence of a `config` section in `bolt_plugin.json`, Bolt will validate any configuration options in `bolt.yaml` against the schema for each task of the plugin’s hook. Bolt passes the values to the task at runtime and merges them with options set in `inventory.yaml`.
 
-## 1.34.0
+## 1.34.0 (2019-10-17)
 
 ### New features
 
@@ -527,7 +648,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   When calling the `run_task` function from a plan with the `_noop` metaparameter, `_noop` is now passed to the task.
 
-## 1.33.0
+## 1.33.0 (2019-10-10)
 
 ### Bug fixes
 
@@ -549,7 +670,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   When Bolt transfers a file, it logs hostname and filepath details at the debug level. Previously Bolt did not log this information.
 
-## 1.32.0
+## 1.32.0 (2019-10-04)
 
 ### Bug fixes
 
@@ -583,7 +704,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   The CLI now provides a new command `bolt group show` that will list all of the groups in the inventory file.
 
-## 1.31.1
+## 1.31.1 (2020-09-27)
 
 ### Bug fixes
 
@@ -591,7 +712,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
 
   Eliminated a race condition with the analytics client that could cause Bolt operations to fail or extraneous warnings to appear during startup.
 
-## 1.31.0
+## 1.31.0 (2019-09-26)
 
 ### Deprecations and removals
 
@@ -617,7 +738,7 @@ Bolt 2.0 contains backward-incompatible changes to the CLI, plan language, and c
   Modules can now include Bolt plugins by adding a `bolt_plugin.json` file at the top level. Users can configure these task-based plugins in `bolt.yaml`. \([\#1133](https://github.com/puppetlabs/bolt/issues/1133)\)
 
 
-## 1.30.1
+## 1.30.1 (2019-09-19)
 
 ### Deprecations and removals
 
@@ -634,7 +755,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   PowerShell tasks executed on targets with PowerShell version 2.x or earlier can now use task parameters with the string `type` in the name \(though a parameter simply named `type` is still incompatible\). PowerShell version 3.x or higher does not have this limitation.
 
-## 1.30.0
+## 1.30.0 (2019-09-05)
 
 ### Deprecations and removals
 
@@ -667,7 +788,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The Ruby task helper and Python task helper now wrap error results in `{ _error: < error >}` and correctly display errors.
 
-## 1.29.1
+## 1.29.1 (2019-08-22)
 
 ### Bug fixes
 
@@ -679,7 +800,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   When running on Windows, the Docker transport can now execute actions on Linux containers.
 
-## 1.29.0
+## 1.29.0 (2019-08-15)
 
 ### New features
 
@@ -697,7 +818,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   CLI commands that contain `--sudo-password` but not `--run-as` now run as expected without any warnings. ([BOLT-1514](https://tickets.puppet.com/browse/BOLT-1514))
 
-## 1.28.0
+## 1.28.0 (2019-08-08)
 
 ### New features
 
@@ -731,7 +852,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   A new `disconnect-timeout` configuration option for the SSH transport ensures that SSH connections are terminated. ([BOLT-1423](https://tickets.puppet.com/browse/BOLT-1423))
 
-## 1.27.1
+## 1.27.1 (2019-08-01)
 
 ### Bug fixes
 
@@ -743,7 +864,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Bolt now properly recognizes script arguments that contain "=". For example, `bolt script run myscript.sh foo a=b c=d -n mynode` recognizes and uses all three arguments. ([BOLT-1412](https://tickets.puppet.com/browse/BOLT-1412))
 
-## 1.27.0
+## 1.27.0 (2019-07-25)
 
 ### New features
 
@@ -773,7 +894,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The `out::message` standard plan function now prints messages as expected even when it is configured to use JSON. ([BOLT-1455](https://tickets.puppet.com/browse/BOLT-1455))
 
-## 1.26.0
+## 1.26.0 (2019-07-10)
 
 ### New features
 
@@ -799,7 +920,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Bolt now prints a warning stating that it is case sensitive when the specified path is not found but another path is found with different capitalization. For example, if the actual path is `C:\User\Administrator\modules` but the user specifies `C:\user\administrator\modules`, a warning states that the specified path was not used and that the correct path is `C:\User\Administrator\modules`. ([BOLT-1318](https://tickets.puppet.com/browse/BOLT-1318))
 
-## 1.25.0
+## 1.25.0 (2019-06-28)
 
 ### Bug fixes
 
@@ -817,7 +938,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   We have deprecated the target-lookups key in the experimental inventory file v2. To address this change, migrate any target-lookups entries to targets and move the plugin key in each entry to _plugin.
 
-## 1.24.0
+## 1.24.0 (2019-06-21)
 
 ### New features
 
@@ -837,7 +958,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   This change allows the `run_plan` function to be invoked with `$nodes` as the second positional argument, so that it can be used the same way `run_task` is used. ([BOLT-1197](https://tickets.puppet.com/browse/BOLT-1197))
 
-## 1.23.0
+## 1.23.0 (2019-06-14)
 
 ### New features
 
@@ -859,7 +980,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   PowerShell scripts and tasks run over the local transport on Windows hosts no longer load profiles and are run with the `Bypass` execution policy to maintain parity with the WinRM transport. ([BOLT-1358](https://tickets.puppet.com/browse/BOLT-1358))
 
-## 1.22.0
+## 1.22.0 (2019-06-07)
 
 ### New features
 
@@ -879,7 +1000,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   A new `prompt` plugin in inventory v2 allows setting configuration values via a prompt. ([BOLT-1269](https://tickets.puppet.com/browse/BOLT-1269))
 
-## 1.21.0
+## 1.21.0 (2019-05-29)
 
 ### New features
 
@@ -913,7 +1034,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   When the Boltdir was added as the local default configuration directory, the previous directory, `~/.puppetlab/bolt.yaml`, was deprecated in favor of `~/.puppetlabs/bolt/bolt.yaml`. For more information on the current default directory for configfile, inventoryfile and modules, see Configuring Bolt. ([BOLT-503](https://tickets.puppet.com/browse/BOLT-503))
 
-## 1.20.0
+## 1.20.0 (2019-05-16)
 
 ### New features
 
@@ -939,7 +1060,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The `bolt plan convert` command wrapped single-line evaluation steps in a `with` statement unnecessarily. ([BOLT-1299](https://tickets.puppet.com/browse/BOLT-1299))
 
-## 1.19.0
+## 1.19.0 (2019-05-03)
 
 ### New features
 
@@ -951,7 +1072,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   A clear error message is now shown when no object is specified on the command line, for example `bolt command run --nodes <NODE_NAME>`. ([BOLT-1243](https://tickets.puppet.com/browse/BOLT-1243))
 
-## 1.18.0
+## 1.18.0 (2019-04-25)
 
 ### New features
 
@@ -973,7 +1094,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   If no Bolt project directory existed, a `.rerun.json` file wasn't created, preventing you from rerunning failed commands. Bolt now creates a default project directory when one doesn't exist so it can generate `.rerun.json` files as expected. ([BOLT-1263](https://tickets.puppet.com/browse/BOLT-1263))
 
-## 1.17.0
+## 1.17.0 (2019-04-19)
 
 ### New features
 
@@ -991,7 +1112,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Bolt now ships with components similar to the Puppet agent to avoid discrepancies between using a puppet-agent to apply Puppet code locally versus using the Bolt puppet-agent. ([BOLT-1244](https://tickets.puppet.com/browse/BOLT-1244))
 
-## 1.16.0
+## 1.16.0 (2019-04-11)
 
 ### New features
 
@@ -1021,7 +1142,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The PowerShell and Bash implementations for the service and package tasks are more robust and provide output more consistent with the Ruby implementation. (BOLT-1103, BOLT-1104)
 
-## 1.15.0
+## 1.15.0 (2019-03-29)
 
 ### New features
 
@@ -1065,7 +1186,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Variables defined in scope in a plan were visible to sub-plans called with run_plan. ([BOLT-1190](https://tickets.puppet.com/browse/BOLT-1190))
 
-## 1.14.0
+## 1.14.0 (2019-03-15)
 
 ### New features
 
@@ -1077,7 +1198,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The PCP transport token-file configuration option now includes validation and a more helpful error message. ([BOLT-1076](https://tickets.puppet.com/browse/BOLT-1076))
 
-## 1.13.1
+## 1.13.1 (2019-03-07)
 
 ### Bug fixes
 
@@ -1089,7 +1210,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   When both interpreters and run-as were configured, tasks that required parameters to be passed over stdin failed. ([BOLT-1155](https://tickets.puppet.com/browse/BOLT-1155))
 
-## 1.13.0
+## 1.13.0 (2019-02-27)
 
 ### New features
 
@@ -1111,7 +1232,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Previously the ruby_task_helperTaskHelper.run method symbolized only-top level parameter keys. Now nested keys are also symbolized. ([BOLT-1053](https://tickets.puppet.com/browse/BOLT-1053))
 
-## 1.12.0
+## 1.12.0 (2019-02-21)
 
 ### New features
 
@@ -1133,7 +1254,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   When running Bolt in PowerShell with commands to be run on *nix nodes, string segments that could be interpreted by PowerShell needed to be triple-quoted. ([BOLT-159](https://tickets.puppet.com/browse/BOLT-159))
 
-## 1.11.0
+## 1.11.0 (2019-02-08)
 
 ### New features
 
@@ -1159,7 +1280,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The bash implementation of the puppet_agent::install task now downloads packages over HTTPS instead of HTTP. This fix ensures the download is authenticated and secures against a man-in-the-middle attack.
 
-## 1.10.0
+## 1.10.0 (2019-01-16)
 
 ### New features
 
@@ -1173,7 +1294,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The PowerShell implementation of the puppet_agent::install task now downloads Windows .msi files using HTTPS instead of HTTP. This fix ensures the download is authenticated and secures against a man-in-the-middle attack.
 
-## 1.9.0
+## 1.9.0 (2019-01-10)
 
 ### New features
 
@@ -1185,7 +1306,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Bolt now tries to connect to all configured PuppetDBserver_urls before failing. ([BOLT-938](https://tickets.puppet.com/browse/BOLT-938))
 
-#### Bug fixes
+### Bug fixes
 
 * **Bolt crashed if PuppetDB configuration was invalid**
 
@@ -1194,7 +1315,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Local transport now correctly returns an exit code instead of the stat of the process status as an integer. ([BOLT-1074](https://tickets.puppet.com/browse/BOLT-1074))
 
-## 1.8.1
+## 1.8.1 (2019-01-04)
 
 ### Bug fixes
 
@@ -1202,7 +1323,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Version 1.8.0 didn't include new standard library functions as intended. This release now includes standard library functions in the gem and packages. ([BOLT-1065](https://tickets.puppet.com/browse/BOLT-1065))
 
-## 1.8.0
+## 1.8.0 (2019-01-03)
 
 ### New features
 
@@ -1223,7 +1344,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The puppet_agent::install task now uses updates in the facts task to resolve Red Hat operating system facts and to download the correct puppet-agent package. ([BOLT-997](https://tickets.puppet.com/browse/BOLT-997))
 
-## 1.7.0
+## 1.7.0 (2018-12-19)
 
 ### New features
 
@@ -1249,7 +1370,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Previous releases of the puppet-bolt package omitted the python_task_helper and ruby_task_helper modules. These are now included. ([BOLT-1036](https://tickets.puppet.com/browse/BOLT-1036))
 
-## 1.6.0
+## 1.6.0 (2018-12-13)
 
 ### New features
 
@@ -1269,7 +1390,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The bolt_shim module that enables using Bolt with PE now marks file content as sensitive, preventing it from being logged or stored in a database. ([BOLT-815](https://tickets.puppet.com/browse/BOLT-815))
 
-#### Bug fixes
+### Bug fixes
 
 * **wait_until_available function didn't work with Docker transport**
 
@@ -1279,7 +1400,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The Python task helper included with Bolt didn't produce an error if an exception was thrown in a task implemented with the helper. ([BOLT-1021](https://tickets.puppet.com/browse/BOLT-1021))
 
-## 1.5.0
+## 1.5.0 (2018-12-06)
 
 ### New features
 
@@ -1291,7 +1412,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Bolt no longer requires installing the puppet_agent module in PE in order to run apply actions with the PE orchestrator. ([BOLT-940](https://tickets.puppet.com/browse/BOLT-940))
 
-## 1.4.0
+## 1.4.0 (2018-11-30)
 
 ### New features
 
@@ -1305,13 +1426,13 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 * **Additional plan test helpers**
 
-  The BoltSpec::Plans library now supports unit testing plans that use the _run_as parameter, apply, run_command, run_script, and upload_file. ([BOLT-984](https://tickets.puppet.com/browse/BOLT-984))
+  The BoltSpec::Plans library now supports unit testing plans that use the `_run_as` parameter, `apply`, `run_command`, `run_script`, and `upload_file`. ([BOLT-984](https://tickets.puppet.com/browse/BOLT-984))
 
 * **Data collection about applied catalogs**
 
   If analytics data collection is enabled, we now collect randomized info about the number of statements in a manifest block, and how many resources that produces for each target. ([BOLT-644](https://tickets.puppet.com/browse/BOLT-644))
 
-## 1.3.0
+## 1.3.0 (2018-11-14)
 
 ### New features
 
@@ -1332,7 +1453,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   The BoltSpec::Plans library now supports plans that use without_default_logging and wait_until_available, and includes a setup helper that ensures tasks are found and that notice works. ([BOLT-971](https://tickets.puppet.com/browse/BOLT-971))
 
-## 1.2.0
+## 1.2.0 (2018-10-30)
 
 ### New features
 
@@ -1356,15 +1477,15 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
 * **Task implementation not located relative to other files in installdir**
 
-  When you use tasks that include shared code, the task executable is located alongside shared code at _installdir/MODULE/tasks/TASK. ([BOLT-931](https://tickets.puppet.com/browse/BOLT-931))
+  When you use tasks that include shared code, the task executable is located alongside shared code at `_installdir/MODULE/tasks/TASK`. ([BOLT-931](https://tickets.puppet.com/browse/BOLT-931))
 
-## 1.1.0
+## 1.1.0 (2018-10-16)
 
 ### New features
 
 * **Share code between tasks**
 
-  Bolt includes the ability to share code between tasks. A task can include a list of files that it requires, from any module, that it copies over and makes available via a _installdir parameter. This feature is also supported in Puppet Enterprise 2019.0. For more information see, Sharing task code. ([BOLT-755](https://tickets.puppet.com/browse/BOLT-755))
+  Bolt includes the ability to share code between tasks. A task can include a list of files that it requires, from any module, that it copies over and makes available via a \_installdir parameter. This feature is also supported in Puppet Enterprise 2019.0. For more information see, Sharing task code. ([BOLT-755](https://tickets.puppet.com/browse/BOLT-755))
 
 * **Upgraded WinRM gem dependencies**
 
@@ -1396,7 +1517,7 @@ their containing plan** ([#1167](https://github.com/puppetlabs/bolt/issues/1167)
 
   Previously, Bolt suppressed some exception errors thrown by transports. For example, when the ed25519 gem was not present for an Net::SSH process, the NotImplementedError for ed25519 keys would not appear. These errors are now identified and displayed. ([BOLT-922](https://tickets.puppet.com/browse/BOLT-922))
 
-## 1.0.0
+## 1.0.0 (2018-10-08)
 
 ### Bug fixes
 

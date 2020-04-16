@@ -108,10 +108,10 @@ Transport configuration options can be set in both the configuration file and in
 <% @transports[:options].each do |transport, options| %>
 ### <%= transport %>
 
-| Option | Description | Default |
-| ------ | ----------- | ------- |
-<% options.each do |option, desc| -%>
-| `<%= option %>` | <%= desc %> | <%= @transports[:defaults][transport][option].to_s || "" %> |
+| Option | Description | Type | Default |
+| ------ | ----------- | ---- | ------- |
+<% options.each do |option, data| -%>
+| `<%= option %>` | <%= data[:desc] %> | <%= data[:type] == TrueClass ? 'Boolean' : data[:type] %> | <%= @transports[:defaults][transport][option].to_s || "" %> |
 <% end %>
 
 <% if transport == 'ssh' %>

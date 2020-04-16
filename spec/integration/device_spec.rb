@@ -30,7 +30,7 @@ describe "devices" do
           'targets' => [
             { 'uri' => "ssh://#{conn_info('ssh')[:host]}",
               'alias' => 'puppet_6',
-              'config' => { 'ssh' => { 'port' => '20024' } } }
+              'config' => { 'ssh' => { 'port' => 20024 } } }
           ] }
       ],
         'config' => {

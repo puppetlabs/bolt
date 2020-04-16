@@ -1,10 +1,10 @@
 parameters:
-  nodes:
+  targets:
     type: TargetSpec
 
 steps:
   - name: run_command
     command: echo hello world
-    target: $nodes
+    targets: $targets
 
 return: $run_command

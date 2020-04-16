@@ -72,7 +72,6 @@ For more details about specifying modules in a Puppetfile, see the [Puppetfile d
     mod 'puppetlabs-apache', '4.1.0'
     mod 'puppetlabs-postgresql', '5.12.0'
     mod 'puppetlabs-puppet_conf', '0.3.0'
-    mod 'puppetlabs-facts', '0.3.1'
     
     # Modules from a Git repository.
     mod 'puppetlabs-haproxy', git: 'https://github.com/puppetlabs/puppetlabs-haproxy.git', ref: 'master'

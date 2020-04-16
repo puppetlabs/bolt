@@ -5,25 +5,16 @@ require 'logging'
 require 'pathname'
 require 'bolt/boltdir'
 require 'bolt/logger'
-require 'bolt/transport/ssh'
-require 'bolt/transport/winrm'
-require 'bolt/transport/orch'
-require 'bolt/transport/local'
-require 'bolt/transport/local_windows'
-require 'bolt/transport/docker'
-require 'bolt/transport/remote'
 require 'bolt/util'
+# Transport config objects
+require 'bolt/config/transport/ssh'
+require 'bolt/config/transport/winrm'
+require 'bolt/config/transport/orch'
+require 'bolt/config/transport/local'
+require 'bolt/config/transport/docker'
+require 'bolt/config/transport/remote'
 
 module Bolt
-  TRANSPORTS = {
-    ssh: Bolt::Transport::SSH,
-    winrm: Bolt::Transport::WinRM,
-    pcp: Bolt::Transport::Orch,
-    local: Bolt::Util.windows? ? Bolt::Transport::LocalWindows : Bolt::Transport::Local,
-    docker: Bolt::Transport::Docker,
-    remote: Bolt::Transport::Remote
-  }.freeze
-
   class UnknownTransportError < Bolt::Error
     def initialize(transport, uri = nil)
       msg = uri.nil? ? "Unknown transport #{transport}" : "Unknown transport #{transport} found for #{uri}"
@@ -32,12 +23,16 @@ module Bolt
   end
 
   class Config
-    attr_accessor :concurrency, :format, :trace, :log, :puppetdb, :color, :save_rerun,
-                  :transport, :transports, :inventoryfile, :compile_concurrency, :boltdir,
-                  :puppetfile_config, :plugins, :plugin_hooks, :trusted_external,
-                  :apply_settings
-    attr_writer :modulepath
-    attr_reader :config_files, :warnings
+    attr_reader :config_files, :warnings, :data, :transports, :boltdir
+
+    TRANSPORT_CONFIG = {
+      'ssh'    => Bolt::Config::Transport::SSH,
+      'winrm'  => Bolt::Config::Transport::WinRM,
+      'pcp'    => Bolt::Config::Transport::Orch,
+      'local'  => Bolt::Config::Transport::Local,
+      'docker' => Bolt::Config::Transport::Docker,
+      'remote' => Bolt::Config::Transport::Remote
+    }.freeze
 
     OPTIONS = {
       "apply_settings"           => "A map of Puppet settings to use when applying Puppet code",
@@ -142,10 +137,15 @@ module Bolt
                     else
                       Pathname.new(File.join('/etc', 'puppetlabs', 'bolt', 'bolt.yaml'))
                     end
-      user_path = Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')))
+      user_path = begin
+                    Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')))
+                  rescue ArgumentError
+                    nil
+                  end
 
-      [{ filepath: system_path, data: Bolt::Util.read_optional_yaml_hash(system_path, 'config') },
-       { filepath: user_path, data: Bolt::Util.read_optional_yaml_hash(user_path, 'config') }]
+      confs = [{ filepath: system_path, data: Bolt::Util.read_optional_yaml_hash(system_path, 'config') }]
+      confs << { filepath: user_path, data: Bolt::Util.read_optional_yaml_hash(user_path, 'config') } if user_path
+      confs
     end
 
     def initialize(boltdir, config_data, overrides = {})
@@ -154,52 +154,83 @@ module Bolt
       end
 
       @logger = Logging.logger[self]
-
-      @boltdir = boltdir
-      @concurrency = 100
-      @compile_concurrency = Etc.nprocessors
-      @transport = 'ssh'
-      @format = 'human'
-      @puppetdb = {}
-      @color = true
-      @save_rerun = true
-      @puppetfile_config = {}
-      @plugins = {}
-      @plugin_hooks = {}
-      @apply_settings = {}
       @warnings = []
-
-      # add an entry for the default console logger
-      @log = { 'console' => {} }
-
+      @boltdir = boltdir
       @transports = {}
+      @config_files = []
 
-      TRANSPORTS.each do |key, transport|
-        @transports[key] = transport.default_options
+      default_data = {
+        'apply_settings'      => {},
+        'color'               => true,
+        'compile-concurrency' => Etc.nprocessors,
+        'concurrency'         => 100,
+        'format'              => 'human',
+        'log'                 => { 'console' => {} },
+        'plugin_hooks'        => {},
+        'plugins'             => {},
+        'puppetdb'            => {},
+        'puppetfile'          => {},
+        'save-rerun'          => true,
+        'transport'           => 'ssh'
+      }
+
+      loaded_data = config_data.map do |config|
+        @config_files.push(config[:filepath])
+        config[:data]
       end
 
-      @config_files = config_data.map { |config| config[:filepath] }
-      config_data = merge_config_data(config_data)
-      update_from_file(config_data)
+      override_data = normalize_overrides(overrides)
 
-      apply_overrides(overrides)
+      @data = merge_config_layers(default_data, *loaded_data, override_data)
 
+      TRANSPORT_CONFIG.each do |transport, config|
+        @transports[transport] = config.new(@data.delete(transport), @boltdir.path)
+      end
+
+      finalize_data
       validate
     end
 
-    # Merge configuration
-    # Precedence from highest to lowest is: project, user-level, system-wide
-    def merge_config_data(config_data)
+    # Transforms CLI options into a config hash that can be merged with
+    # default and loaded config.
+    def normalize_overrides(options)
+      opts = options.transform_keys(&:to_s)
+
+      # Pull out config options
+      overrides = opts.slice(*OPTIONS.keys)
+
+      # Pull out transport config options
+      TRANSPORT_CONFIG.each do |transport, config|
+        overrides[transport] = opts.slice(*config.options.keys)
+      end
+
+      # Set console log to debug if in debug mode
+      if options[:debug]
+        overrides['log'] = { 'console' => { 'level' => :debug } }
+      end
+
+      if options[:puppetfile_path]
+        @puppetfile = options[:puppetfile_path]
+      end
+
+      overrides['trace'] = opts['trace'] if opts.key?('trace')
+
+      overrides
+    end
+
+    # Merge configuration from all sources into a single hash. Precedence from lowest to highest:
+    # defaults, system-wide, user-level, project-level, CLI overrides
+    def merge_config_layers(*config_data)
       config_data.inject({}) do |acc, config|
-        acc.merge(config[:data]) do |key, val1, val2|
+        acc.merge(config) do |key, val1, val2|
           case key
           # Plugin config is shallow merged for each plugin
           when 'plugins'
             val1.merge(val2) { |_, v1, v2| v1.merge(v2) }
           # Transports are deep merged
-          when *TRANSPORTS.keys.map(&:to_s)
+          when *TRANSPORT_CONFIG.keys
             Bolt::Util.deep_merge(val1, val2)
-          # Hash values are shallow mergeed
+          # Hash values are shallow merged
           when 'puppetdb', 'plugin_hooks', 'apply_settings', 'log'
             val1.merge(val2)
           # All other values are overwritten
@@ -210,169 +241,110 @@ module Bolt
       end
     end
 
-    def overwrite_transport_data(transport, transports)
-      @transport = transport
-      @transports = transports
-    end
-
-    def transport_data_get
-      { transport: @transport, transports: @transports }
-    end
-
     def deep_clone
       Bolt::Util.deep_clone(self)
     end
 
-    def normalize_log(target)
-      return target if target == 'console'
-      target = target[5..-1] if target.start_with?('file:')
-      'file:' + File.expand_path(target, @boltdir.path)
-    end
-
-    def update_logs(logs)
-      logs.each_pair do |k, v|
-        log_name = normalize_log(k)
-        @log[log_name] ||= {}
-        log = @log[log_name]
-
-        next unless v.is_a?(Hash)
-
-        if v.key?('level')
-          log[:level] = v['level'].to_s
-        end
-
-        if v.key?('append')
-          log[:append] = v['append']
-        end
-      end
-    end
-
-    def update_from_file(data)
-      if data['future']
-        msg = "Configuration option 'future' no longer exposes future behavior."
-        @warnings << { option: 'future', msg: msg }
-      end
-
-      if data['log'].is_a?(Hash)
-        update_logs(data['log'])
+    private def finalize_data
+      if @data['log'].is_a?(Hash)
+        @data['log'] = update_logs(@data['log'])
       end
 
       # Expand paths relative to the Boltdir. Any settings that came from the
       # CLI will already be absolute, so the expand will be skipped.
-      if data.key?('modulepath')
+      if @data.key?('modulepath')
         moduledirs = if data['modulepath'].is_a?(String)
                        data['modulepath'].split(File::PATH_SEPARATOR)
                      else
                        data['modulepath']
                      end
-        @modulepath = moduledirs.map do |moduledir|
+        @data['modulepath'] = moduledirs.map do |moduledir|
           File.expand_path(moduledir, @boltdir.path)
         end
       end
 
-      @inventoryfile = File.expand_path(data['inventoryfile'], @boltdir.path) if data.key?('inventoryfile')
-
-      if data.key?('puppetfile')
-        @puppetfile_config = data['puppetfile'].select { |k, _| PUPPETFILE_OPTIONS.include?(k) }
+      %w[hiera-config inventoryfile trusted-external-command].each do |opt|
+        @data[opt] = File.expand_path(@data[opt], @boltdir.path) if @data.key?(opt)
       end
 
-      @hiera_config = File.expand_path(data['hiera-config'], @boltdir.path) if data.key?('hiera-config')
-      @trusted_external = if data.key?('trusted-external-command')
-                            File.expand_path(data['trusted-external-command'], @boltdir.path)
-                          end
-
-      if data.key?('apply_settings')
-        @apply_settings = data['apply_settings'].select { |k, _| APPLY_SETTINGS.keys.include?(k) }
-      end
-
-      @compile_concurrency = data['compile-concurrency'] if data.key?('compile-concurrency')
-
-      @save_rerun = data['save-rerun'] if data.key?('save-rerun')
-
-      %w[concurrency format puppetdb color plugins plugin_hooks].each do |key|
-        send("#{key}=", data[key]) if data.key?(key)
-      end
-
-      update_transports(data)
+      # Filter hashes to only include valid options
+      @data['apply_settings'] = @data['apply_settings'].slice(*APPLY_SETTINGS.keys)
+      @data['puppetfile'] = @data['puppetfile'].slice(*PUPPETFILE_OPTIONS.keys)
     end
-    private :update_from_file
 
-    def apply_overrides(options)
-      %i[concurrency transport format trace modulepath inventoryfile color].each do |key|
-        send("#{key}=", options[key]) if options.key?(key)
-      end
+    private def normalize_log(target)
+      return target if target == 'console'
+      target = target[5..-1] if target.start_with?('file:')
+      'file:' + File.expand_path(target, @boltdir.path)
+    end
 
-      @puppetfile = options[:puppetfile] if options.key?(:puppetfile)
+    private def update_logs(logs)
+      logs.each_with_object({}) do |(key, val), acc|
+        next unless val.is_a?(Hash)
 
-      @save_rerun = options[:'save-rerun'] if options.key?(:'save-rerun')
+        name = normalize_log(key)
+        acc[name] = val.slice(*LOG_OPTIONS.keys)
+                       .transform_keys(&:to_sym)
 
-      if options[:debug]
-        @log['console'][:level] = :debug
-      end
-
-      @compile_concurrency = options[:'compile-concurrency'] if options[:'compile-concurrency']
-
-      TRANSPORTS.each_key do |transport|
-        # Get the options first since transport is modified in the next line
-        transport_options = TRANSPORTS[transport]::OPTIONS.keys.map(&:to_sym)
-        transport = @transports[transport]
-        transport_options.each do |key|
-          if options[key]
-            transport[key.to_s] = Bolt::Util.walk_keys(options[key], &:to_s)
+        if (v = acc[name][:level])
+          unless v.is_a?(String) || v.is_a?(Symbol)
+            raise Bolt::ValidationError,
+                  "level of log #{name} must be a String or Symbol, received #{v.class} #{v.inspect}"
+          end
+          unless Bolt::Logger.valid_level?(v)
+            raise Bolt::ValidationError,
+                  "level of log #{name} must be one of #{Bolt::Logger.levels.join(', ')}; received #{v}"
           end
         end
-      end
 
-      if options.key?(:ssl) # this defaults to true so we need to check the presence of the key
-        @transports[:winrm]['ssl'] = options[:ssl]
-      end
-
-      if options.key?(:'ssl-verify') # this defaults to true so we need to check the presence of the key
-        @transports[:winrm]['ssl-verify'] = options[:'ssl-verify']
-      end
-
-      if options.key?(:'host-key-check') # this defaults to true so we need to check the presence of the key
-        @transports[:ssh]['host-key-check'] = options[:'host-key-check']
-      end
-    end
-
-    def update_from_inventory(data)
-      update_transports(data)
-    end
-
-    def update_transports(data)
-      self.class.update_transport_hash(@boltdir.path, @transports, data)
-      @transport = data['transport'] if data.key?('transport')
-    end
-
-    def self.update_transport_hash(boltdir, existing, data)
-      TRANSPORTS.each do |key, impl|
-        if data[key.to_s]
-          selected = impl.filter_options(data[key.to_s])
-
-          # Expand file paths relative to the Boltdir
-          to_expand = %w[private-key cacert token-file] & selected.keys
-          to_expand.each do |opt|
-            selected[opt] = File.expand_path(selected[opt], boltdir) if selected[opt].is_a?(String)
-          end
-
-          existing[key] = Bolt::Util.deep_merge(existing[key], selected)
-        end
-        if existing[key]['interpreters']
-          existing[key]['interpreters'] = normalize_interpreters(existing[key]['interpreters'])
+        if (v = acc[name][:append]) && v != true && v != false
+          raise Bolt::ValidationError,
+                "append flag of log #{name} must be a Boolean, received #{v.class} #{v.inspect}"
         end
       end
     end
 
-    def self.normalize_interpreters(interpreters)
-      Bolt::Util.walk_keys(interpreters) do |key|
-        key.chars[0] == '.' ? key : '.' + key
+    def validate
+      if @data['future']
+        msg = "Configuration option 'future' no longer exposes future behavior."
+        @warnings << { option: 'future', msg: msg }
       end
-    end
 
-    def transport_conf
-      { transport: @transport,
-        transports: @transports }
+      keys = OPTIONS.keys - %w[plugins plugin_hooks]
+      keys.each do |key|
+        next unless Bolt::Util.references?(@data[key])
+        valid_keys = TRANSPORT_CONFIG.keys + %w[plugins plugin_hooks]
+        raise Bolt::ValidationError,
+              "Found unsupported key _plugin in config setting #{key}. Plugins are only available in "\
+              "#{valid_keys.join(', ')}."
+      end
+
+      unless concurrency.is_a?(Integer) && concurrency > 0
+        raise Bolt::ValidationError,
+              "Concurrency must be a positive Integer, received #{concurrency.class} #{concurrency}"
+      end
+
+      unless compile_concurrency.is_a?(Integer) && compile_concurrency > 0
+        raise Bolt::ValidationError,
+              "Compile concurrency must be a positive Integer, received #{compile_concurrency.class} "\
+              "#{compile_concurrency}"
+      end
+
+      compile_limit = 2 * Etc.nprocessors
+      unless compile_concurrency < compile_limit
+        raise Bolt::ValidationError, "Compilation is CPU-intensive, set concurrency less than #{compile_limit}"
+      end
+
+      unless %w[human json].include? format
+        raise Bolt::ValidationError, "Unsupported format: '#{format}'"
+      end
+
+      Bolt::Util.validate_file('hiera-config', @data['hiera-config']) if @data['hiera-config']
+      Bolt::Util.validate_file('trusted-external-command', trusted_external) if trusted_external
+
+      unless TRANSPORT_CONFIG.include?(transport)
+        raise UnknownTransportError, transport
+      end
     end
 
     def default_inventoryfile
@@ -384,7 +356,7 @@ module Bolt
     end
 
     def hiera_config
-      @hiera_config || @boltdir.hiera_config
+      @data['hiera-config'] || @boltdir.hiera_config
     end
 
     def puppetfile
@@ -392,47 +364,75 @@ module Bolt
     end
 
     def modulepath
-      @modulepath || @boltdir.modulepath
+      @data['modulepath'] || @boltdir.modulepath
     end
 
-    def validate
-      @log.each_pair do |name, params|
-        if params.key?(:level) && !Bolt::Logger.valid_level?(params[:level])
-          raise Bolt::ValidationError,
-                "level of log #{name} must be one of: #{Bolt::Logger.levels.join(', ')}; received #{params[:level]}"
-        end
-        if params.key?(:append) && params[:append] != true && params[:append] != false
-          raise Bolt::ValidationError, "append flag of log #{name} must be a Boolean, received #{params[:append]}"
-        end
-      end
+    def modulepath=(value)
+      @data['modulepath'] = value
+    end
 
-      unless @concurrency.is_a?(Integer) && @concurrency > 0
-        raise Bolt::ValidationError, 'Concurrency must be a positive integer'
-      end
+    def concurrency
+      @data['concurrency']
+    end
 
-      unless @compile_concurrency.is_a?(Integer) && @compile_concurrency > 0
-        raise Bolt::ValidationError, 'Compile concurrency must be a positive integer'
-      end
+    def format
+      @data['format']
+    end
 
-      compile_limit = 2 * Etc.nprocessors
-      unless @compile_concurrency < compile_limit
-        raise Bolt::ValidationError, "Compilation is CPU-intensive, set concurrency less than #{compile_limit}"
-      end
+    def format=(value)
+      @data['format'] = value
+    end
 
-      unless %w[human json].include? @format
-        raise Bolt::ValidationError, "Unsupported format: '#{@format}'"
-      end
+    def trace
+      @data['trace']
+    end
 
-      Bolt::Util.validate_file('hiera-config', @hiera_config) if @hiera_config
-      Bolt::Util.validate_file('trusted-external-command', @trusted_external) if @trusted_external
+    def log
+      @data['log']
+    end
 
-      unless @transport.nil? || Bolt::TRANSPORTS.include?(@transport.to_sym)
-        raise UnknownTransportError, @transport
-      end
+    def puppetdb
+      @data['puppetdb']
+    end
 
-      TRANSPORTS.each do |transport, impl|
-        impl.validate(@transports[transport])
-      end
+    def color
+      @data['color']
+    end
+
+    def save_rerun
+      @data['save-rerun']
+    end
+
+    def inventoryfile
+      @data['inventoryfile']
+    end
+
+    def compile_concurrency
+      @data['compile-concurrency']
+    end
+
+    def puppetfile_config
+      @data['puppetfile']
+    end
+
+    def plugins
+      @data['plugins']
+    end
+
+    def plugin_hooks
+      @data['plugin_hooks']
+    end
+
+    def trusted_external
+      @data['trusted-external-command']
+    end
+
+    def apply_settings
+      @data['apply_settings']
+    end
+
+    def transport
+      @data['transport']
     end
 
     # Check if there is a case-insensitive match to the path
@@ -451,7 +451,7 @@ module Bolt
       [*paths].map { |p| Dir.glob([p, casefold(p)]) }.flatten.uniq.reject { |p| [*paths].include?(p) }
     end
 
-    def casefold(path)
+    private def casefold(path)
       path.chars.map do |l|
         l =~ /[A-Za-z]/ ? "[#{l.upcase}#{l.downcase}]" : l
       end.join

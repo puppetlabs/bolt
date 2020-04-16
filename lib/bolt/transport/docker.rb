@@ -7,34 +7,8 @@ require 'bolt/transport/base'
 module Bolt
   module Transport
     class Docker < Base
-      OPTIONS = {
-        "host"          => "Host name.",
-        "interpreters"  => "A map of an extension name to the absolute path of an executable, "\
-                            "enabling you to override the shebang defined in a task executable. The "\
-                            "extension can optionally be specified with the `.` character (`.py` and "\
-                            "`py` both map to a task executable `task.py`) and the extension is case "\
-                            "sensitive. When a target's name is `localhost`, Ruby tasks run with the "\
-                            "Bolt Ruby interpreter by default.",
-        "service-url"   => "URL of the Docker host used for API requests.",
-        "shell-command" => "A shell command to wrap any Docker exec commands in, such as `bash -lc`.",
-        "tmpdir"        => "The directory to upload and execute temporary files on the target.",
-        "tty"           => "Whether to enable tty on exec commands."
-      }.freeze
-
-      def self.options
-        OPTIONS.keys
-      end
-
       def provided_features
         ['shell']
-      end
-
-      def self.validate(options)
-        if (url = options['service-url'])
-          unless url.instance_of?(String)
-            raise Bolt::ValidationError, 'service-url must be a string'
-          end
-        end
       end
 
       def with_connection(target)
@@ -118,11 +92,11 @@ module Bolt
 
             remote_task_path = conn.write_remote_executable(task_dir, executable)
 
-            if STDIN_METHODS.include?(input_method)
+            if Bolt::Task::STDIN_METHODS.include?(input_method)
               execute_options[:stdin] = StringIO.new(JSON.dump(arguments))
             end
 
-            if ENVIRONMENT_METHODS.include?(input_method)
+            if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
               execute_options[:environment] = envify_params(arguments)
             end
 

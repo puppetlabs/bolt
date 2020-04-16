@@ -27,7 +27,7 @@ describe Bolt::Transport::Remote do
   }
 
   it 'errors when a poxy is remote' do
-    inventory = Bolt::Inventory.create_version(data, config, plugins)
+    inventory = Bolt::Inventory.create_version(data, config.transport, config.transports, plugins)
 
     executor = Bolt::Executor.new
     remote_transport = executor.transports['remote'].value

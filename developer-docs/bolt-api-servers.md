@@ -500,7 +500,7 @@ Where `<TARGET>` is either:
 
     * get the IP that the **bolt-server container** believes it is hosted on (for example the IP of the developer laptop hosting the bolt-server container):
       ```
-      bolt command run "/sbin/ip route" -n docker://bolt_boltserver_1 | awk '/default/ { print $3 }'
+      bolt command run "/sbin/ip route" -t docker://bolt_boltserver_1 | awk '/default/ { print $3 }'
       # Should return an IP such as 172.20.0.1
       ```
     * Append the port of one of the 3 containers to that IP: `20022` (for an ubuntu node with no agent), `20023` (for a puppet 5 agent), or `20024` (for a puppet 6 agent). It's also helpful to include the protocol (`ssh`), user (`bolt`), and password (`bolt`) in the URI.

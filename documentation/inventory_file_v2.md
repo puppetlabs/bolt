@@ -16,7 +16,7 @@ The following fields are available at the top level of a version 2 inventory fil
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
-| `config` | The configuration for the `all` group. Optional. | `Hash` |
+| `config` | The configuration for the `all` group. Optional. For more information see [Bolt configuration options](bolt_configuration_reference.md).  | `Hash` |
 | `facts` | The facts for the `all` group. Optional. | `Hash` |
 | `features` | The features for the `all` group. Optional. | `Array[String]`
 | `groups` | A list of targets and groups and their associated configuration. Optional. | `Array[Group]` |
@@ -29,7 +29,7 @@ A group lists a set of `targets` and `groups` and their associated configuration
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
-| `config` | The configuration for the group. Optional. | `Hash` |
+| `config` | The configuration for the group. Optional. For more information see [Bolt configuration options](bolt_configuration_reference.md). | `Hash` |
 | `facts` | The facts for the group. Optional. | `Hash` |
 | `features` | The features for the group. Optional. | `Array[String]`
 | `groups` | A list of groups and their associated configuration. Optional. | `Array[Group]` |
@@ -345,3 +345,7 @@ plugins:
 ```
 
 To verify that plugin references are resolved correctly and to view the targets and values loaded, use the command `bolt inventory show -t all --detail`.
+
+**Related information**
+
+- For more information on configuration options, see [Bolt configuration options](bolt_configuration_reference.md).

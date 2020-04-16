@@ -1,0 +1,24 @@
+rulesets:
+  commits:
+    message-matches:
+      range: once
+      params:
+        pattern: '!(feature|bug|deprecation|removal|no-release-note)'
+      error: |
+        At least one commit in a pull request must have a valid release note label.
+        Valid release note labels are:
+
+          !feature    !bug    !deprecation    !removal    !no-release-note
+
+        A commit with a release note label should also have a release note immediately 
+        following the label. If a release note is not needed, then the !no-release-note
+        label should be used and the release note should be omitted.
+
+        Release notes should follow the format set out in the CHANGELOG.md. A commit
+        with a valid release note label and release note would look like this:
+
+          !feature
+
+          * **Added a new feature** ([#1000](https://github.com/puppetlabs/bolt/issues/1000))
+
+            A brief summary of the new feature.

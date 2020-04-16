@@ -53,7 +53,7 @@ Dir.mktmpdir do |puppet_root|
     end
 
     # Transport.connect will modify this hash!
-    transport_conn_info = conn_info.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
+    transport_conn_info = conn_info.transform_keys(&:to_sym)
 
     transport = Puppet::ResourceApi::Transport.connect(type, transport_conn_info)
     Puppet::ResourceApi::Transport.inject_device(type, transport)

@@ -55,7 +55,7 @@ module BoltSpec
     end
 
     def clear_facts(facts_hash)
-      facts_hash.keys.each { |certname| deactivate_node(certname, wait: 30) }
+      facts_hash.each_key { |certname| deactivate_node(certname, wait: 30) }
     end
 
     def pdb_client

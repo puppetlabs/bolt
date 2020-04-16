@@ -11,6 +11,15 @@ AllCops:
 
 # Checks for if and unless statements that would fit on one line if written as a
 # modifier if/unless.
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
+
 Style/IfUnlessModifier:
   Enabled: false
 
@@ -90,7 +99,7 @@ Metrics/PerceivedComplexity:
 
 Lint/SuppressedException:
   Exclude:
-    - lib/bolt/transport/local/shell.rb
+    - lib/bolt/shell/bash.rb
 
 # Enforce LF line endings, even when on Windows
 Layout/EndOfLine:

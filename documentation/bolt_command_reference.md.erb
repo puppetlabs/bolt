@@ -6,8 +6,12 @@ These subcommands, actions, and options are available for Bolt.
 <% @commands.each do |key, val| %>
 ## <%= key %>
 
-```plain
-<%= val[:banner] -%>
+<%= val[:desc] %>
+
+**Usage**
+
+```bash
+<%= val[:usage] %>
 ```
 
 | Option | Description |

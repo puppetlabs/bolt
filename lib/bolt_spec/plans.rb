@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
+require 'bolt_spec/bolt_context'
 require 'bolt_spec/plans/mock_executor'
-require 'bolt/config'
-require 'bolt/inventory'
 require 'bolt/pal'
-require 'bolt/plugin'
 
 # These helpers are intended to be used for plan unit testing without calling
-# out to target nodes. It accomplishes this by replacing bolt's executor with a
-# mock executor. The mock executor allows calls to run_* functions to be
-# stubbed out for testing. By default this executor will fail on any run_*
-# call but stubs can be set up with allow_* and expect_* functions.
+# out to target nodes. It uses the BoltContext helper to set up a mock executor
+# which allows calls to run_* functions to be stubbed for testing. The context
+# helper also loads Bolt datatypes and plan functions to be used by the code
+# being tested.
 #
 # Stub matching
 #
@@ -41,7 +39,6 @@ require 'bolt/plugin'
 #  By default the plan helpers use the modulepath set up for rspec-puppet and
 #  an otherwise empty bolt config and inventory. To create your own values for
 #  these override the modulepath, config, or inventory methods.
-#
 #
 #  TODO:
 #  - Allow description based stub matching
@@ -142,6 +139,8 @@ require 'bolt/plugin'
 # See spec/bolt_spec/plan_spec.rb for more examples.
 module BoltSpec
   module Plans
+    include BoltSpec::BoltContext
+
     def self.init
       # Ensure tasks are enabled when rspec-puppet sets up an environment so we get task loaders.
       # Note that this is probably not safe to do in modules that also test Puppet manifest code.
@@ -150,38 +149,6 @@ module BoltSpec
 
       # Ensure logger is initialized with Puppet levels so 'notice' works when running plan specs.
       Logging.init :debug, :info, :notice, :warn, :error, :fatal, :any
-    end
-
-    # Override in your tests if needed
-    def modulepath
-      [RSpec.configuration.module_path]
-    rescue NoMethodError
-      raise "RSpec.configuration.module_path not defined set up rspec puppet or define modulepath for this test"
-    end
-
-    def plugins
-      @plugins ||= Bolt::Plugin.setup(config,
-                                      pal,
-                                      puppetdb_client,
-                                      Bolt::Analytics::NoopClient.new)
-    end
-
-    # Override in your tests
-    def config
-      @config ||= begin
-        conf = Bolt::Config.new(Bolt::Boltdir.new('.'), {})
-        conf.modulepath = [modulepath].flatten
-        conf
-      end
-    end
-
-    # Override in your tests
-    def inventory_data
-      {}
-    end
-
-    def inventory
-      @inventory ||= Bolt::Inventory.create_version(inventory_data, config, plugins)
     end
 
     # Provided as a class so expectations can be placed on it.
@@ -195,10 +162,6 @@ module BoltSpec
 
     def puppetdb_client
       @puppetdb_client ||= MockPuppetDBClient.new(Bolt::PuppetDB::Config.new({}))
-    end
-
-    def pal
-      @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.boltdir.resource_types)
     end
 
     def run_plan(name, params)
@@ -220,25 +183,6 @@ module BoltSpec
       result
     end
 
-    MOCKED_ACTIONS.each do |action|
-      # Allowed action stubs can be called up to be_called_times number of times
-      define_method :"allow_#{action}" do |object|
-        executor.send(:"stub_#{action}", object).add_stub(inventory)
-      end
-
-      # Expected action stubs must be called exactly the expected number of times
-      # or at least once without be_called_times
-      define_method :"expect_#{action}" do |object|
-        send(:"allow_#{action}", object).expect_call
-      end
-
-      # This stub will catch any action call if there are no stubs specifically for that task
-      # This is not OK for plans
-      define_method :"allow_any_#{action}" do
-        executor.send(:"stub_#{action}", :default).add_stub(inventory)
-      end
-    end
-
     def allow_apply_prep
       allow_task('apply_helpers::custom_facts')
       nil
@@ -254,42 +198,10 @@ module BoltSpec
       nil
     end
 
-    def allow_out_message
-      executor.stub_out_message.add_stub
-    end
-    alias allow_any_out_message allow_out_message
-
-    def expect_out_message
-      allow_out_message.expect_call
-    end
-
-    # Example helpers to mock other run functions
-    # The with_targets method makes sense for all stubs
-    # with_params could be reused for options
-    # They probably need special stub methods for other arguments through
-
-    # Scripts can be mocked like tasks by their name
-    # arguments is an array instead of a hash though
-    # so it probably should be set separately
-    # def allow_script(script_name)
-    #
-    # file uploads have a single destination and no arguments
-    # def allow_file_upload(source_name)
-    #
-    # Most of the information in commands is in the command string itself
-    # we may need more flexible allows than just the name/command string
-    # Only option params exist on a command.
-    # def allow_command(command)
-    # def allow_command_matching(command_regex)
-    # def allow_command(&block)
-    #
     # Plan execution does not flow through the executor mocking may make sense but
     # will be a separate effort.
     # def allow_plan(plan_name)
 
     # intended to be private below here
-    def executor
-      @executor ||= BoltSpec::Plans::MockExecutor.new(modulepath)
-    end
   end
 end

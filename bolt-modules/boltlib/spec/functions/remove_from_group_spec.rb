@@ -2,16 +2,16 @@
 
 describe 'remove_from_group' do
   include PuppetlabsSpec::Fixtures
-  let(:executor) { Bolt::Executor.new }
-  let(:config) { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
-  let(:pal) { nil }
-  let(:plugins) { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
-  let(:inventory) { Bolt::Inventory.create_version(data, config, plugins) }
+  let(:executor)      { Bolt::Executor.new }
+  let(:config)        { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
+  let(:pal)           { nil }
+  let(:plugins)       { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
+  let(:inventory)     { Bolt::Inventory.create_version(data, config.transport, config.transports, plugins) }
   let(:tasks_enabled) { true }
-  let(:target1) { 'target1' }
-  let(:target2) { 'target2' }
-  let(:parent) { 'group1' }
-  let(:child) { 'group2' }
+  let(:target1)       { 'target1' }
+  let(:target2)       { 'target2' }
+  let(:parent)        { 'group1' }
+  let(:child)         { 'group2' }
 
   let(:data) do
     { 'groups' => [

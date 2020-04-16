@@ -16,7 +16,7 @@ describe 'Facts functions' do
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:target) { 'example' }
+  let(:target)  { 'example' }
   let(:target2) { 'localhost' }
   let(:data) {
     {
@@ -24,16 +24,16 @@ describe 'Facts functions' do
       'facts' => { 'hot' => 'chocolate' }
     }
   }
-  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:pal)     { Bolt::PAL.new(modulepath, nil, nil) }
   let(:plugins) { Bolt::Plugin.setup(config, nil, nil, analytics) }
-  let(:inv) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
+  let(:inv)     { Bolt::Inventory::Inventory.new(data, config.transport, config.transports, plugins) }
 
   let(:analytics) { Bolt::Analytics::NoopClient.new }
-  let(:executor) { Bolt::Executor.new(1, analytics) }
+  let(:executor)  { Bolt::Executor.new(1, analytics) }
 
   let(:target_string) { "$t = get_targets(#{target})[0]\n" }
-  let(:facts) { "facts($t)\n" }
-  let(:add_facts) { "add_facts($t, {'hot' => 'tamales', 'dark' => 'chocolate'})\n" }
+  let(:facts)         { "facts($t)\n" }
+  let(:add_facts)     { "add_facts($t, {'hot' => 'tamales', 'dark' => 'chocolate'})\n" }
 
   it 'should get facts for a target' do
     output = peval(target_string + facts, pal, nil, inv)

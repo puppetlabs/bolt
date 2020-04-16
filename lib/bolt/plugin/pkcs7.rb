@@ -14,7 +14,7 @@ module Bolt
           end
         end
 
-        config.keys.each do |key|
+        config.each_key do |key|
           unless known_keys.include?(key)
             raise Bolt::ValidationError, "Unpexpected key in pkcs7 plugin config: #{key}"
           end

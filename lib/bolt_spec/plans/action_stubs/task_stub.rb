@@ -23,7 +23,7 @@ module BoltSpec
         @calls += 1
         if @return_block
           # Merge arguments and options into params to match puppet function signature.
-          params = options.map { |k, v| ["_#{k}", v] }.to_h
+          params = options.transform_keys { |k| "_#{k}" }
           params = params.merge(arguments)
 
           check_resultset(@return_block.call(targets: targets, task: task, params: params), task)
@@ -49,7 +49,7 @@ module BoltSpec
         @invocation[:params] = params
         @invocation[:arguments] = params.reject { |k, _v| k.start_with?('_') }
         @invocation[:options] = params.select { |k, _v| k.start_with?('_') }
-                                      .map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+                                      .transform_keys { |k| k.sub(/^_/, '').to_sym }
         self
       end
     end

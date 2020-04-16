@@ -170,7 +170,22 @@ module Bolt
         error_types << Java::JavaLang::CloneNotSupportedException if RUBY_PLATFORM == 'java'
 
         begin
-          cl = obj.clone
+          # We can't recurse on frozen objects to populate them with cloned
+          # data. Instead we store the freeze-state of the original object,
+          # deep_clone, then set the cloned object to frozen if the original
+          # object was frozen
+          frozen = obj.frozen?
+          cl = begin
+                 obj.clone(freeze: false)
+                 # Some datatypes, such as FalseClass, can't be unfrozen. These
+                 # aren't the types we recurse on, so we can leave them frozen
+               rescue ArgumentError => e
+                 if e.message =~ /can't unfreeze/
+                   obj.clone
+                 else
+                   raise e
+                 end
+               end
         rescue *error_types
           cloned[obj.object_id] = obj
           obj
@@ -192,6 +207,7 @@ module Bolt
             cl.instance_variable_set(var, v_cl)
           end
 
+          cl.freeze if frozen
           cl
         end
       end
@@ -237,6 +253,17 @@ module Bolt
       # Accept hash and return hash with top level keys of type "String" converted to symbols.
       def symbolize_top_level_keys(hsh)
         hsh.each_with_object({}) { |(k, v), h| k.is_a?(String) ? h[k.to_sym] = v : h[k] = v }
+      end
+
+      # Recursively searches a data structure for plugin references
+      def references?(input)
+        if input.is_a?(Hash)
+          input.key?('_plugin') || input.values.any? { |v| references?(v) }
+        elsif input.is_a?(Array)
+          input.any? { |v| references?(v) }
+        else
+          false
+        end
       end
     end
   end

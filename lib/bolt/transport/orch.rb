@@ -21,29 +21,9 @@ module Bolt
 
       attr_writer :plan_context
 
-      OPTIONS = {
-        "cacert"            => "The path to the CA certificate.",
-        "host"              => "Host name.",
-        "job-poll-interval" => "Set interval to poll orchestrator for job status.",
-        "job-poll-timeout"  => "Set time to wait for orchestrator job status.",
-        "service-url"       => "The URL of the orchestrator API.",
-        "task-environment"  => "The environment the orchestrator loads task code from.",
-        "token-file"        => "The path to the token file."
-      }.freeze
-
-      def self.options
-        OPTIONS.keys
-      end
-
-      def self.default_options
-        { 'task-environment' => 'production' }
-      end
-
       def provided_features
         ['puppet-agent']
       end
-
-      def self.validate(options); end
 
       def initialize(*args)
         # lazy-load expensive gem code
@@ -217,7 +197,7 @@ module Bolt
           end
         rescue StandardError => e
           targets.map do |target|
-            Bolt::Result.from_exception(target, e)
+            Bolt::Result.from_exception(target, e, 'task')
           end
         end
       end

@@ -10,7 +10,7 @@ module Bolt
           end
 
           def self.required_keys
-            Set['target', 'source', 'destination']
+            Set['destination', 'source', 'targets']
           end
 
           def initialize(step_body)
@@ -24,7 +24,7 @@ module Bolt
             code << "$#{@name} = " if @name
 
             fn = 'upload_file'
-            args = [@source, @destination, @target]
+            args = [@source, @destination, @targets]
             args << @description if @description
 
             code << function_call(fn, args)

@@ -11,7 +11,7 @@ module Bolt
         end
       end
 
-      TEMPLATE_OPTS = %w[uri name config].freeze
+      TEMPLATE_OPTS = %w[alias config facts features name uri vars].freeze
       PLUGIN_OPTS = %w[_plugin query target_mapping].freeze
 
       def initialize(pdb_client)
@@ -83,10 +83,14 @@ module Bolt
       def resolve_facts(config, certname, target_data)
         Bolt::Util.walk_vals(config) do |value|
           if value.is_a?(String)
-            data = target_data&.detect { |d| d['path'] == fact_path(value) }
-            warn_missing_fact(certname, value) if data.nil?
-            # If there's no fact data this will be nil
-            data&.fetch('value', nil)
+            if value == 'certname'
+              certname
+            else
+              data = target_data&.detect { |d| d['path'] == fact_path(value) }
+              warn_missing_fact(certname, value) if data.nil?
+              # If there's no fact data this will be nil
+              data&.fetch('value', nil)
+            end
           elsif value.is_a?(Array) || value.is_a?(Hash)
             value
           else

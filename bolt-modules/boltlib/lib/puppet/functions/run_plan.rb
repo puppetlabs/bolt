@@ -59,7 +59,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     executor = Puppet.lookup(:bolt_executor)
 
     options, params = args.partition { |k, _v| k.start_with?('_') }.map(&:to_h)
-    options = options.map { |k, v| [k.sub(/^_/, '').to_sym, v] }.to_h
+    options = options.transform_keys { |k| k.sub(/^_/, '').to_sym }
 
     # Bolt calls this function internally to trigger plans from the CLI. We
     # don't want to count those invocations.

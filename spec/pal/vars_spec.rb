@@ -22,17 +22,18 @@ describe 'Vars function' do
       'vars' => { 'pb' => 'jelly', 'mac' => 'cheese' }
     }
   }
-  let(:inventory) { Bolt::Inventory::Inventory.new(data, plugins: plugins) }
-  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
-  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, analytics) }
+
+  let(:inventory) { Bolt::Inventory::Inventory.new(data, config.transport, config.transports, plugins) }
+  let(:pal)       { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:plugins)   { Bolt::Plugin.setup(config, nil, nil, analytics) }
 
   let(:analytics) { Bolt::Analytics::NoopClient.new }
-  let(:executor) { Bolt::Executor.new(1, analytics) }
+  let(:executor)  { Bolt::Executor.new(1, analytics) }
 
-  let(:target) { "$t = get_targets('example')[0]\n" }
-  let(:vars) { "$t.vars\n" }
+  let(:target)     { "$t = get_targets('example')[0]\n" }
+  let(:vars)       { "$t.vars\n" }
   let(:set_donuts) { "$t.set_var('donuts', 'coffee')\n" }
-  let(:set_pb) { "$t.set_var('pb', 'banana')\n" }
+  let(:set_pb)     { "$t.set_var('pb', 'banana')\n" }
 
   it 'should get vars on a target' do
     output = peval(target + vars, pal, executor, inventory)

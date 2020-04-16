@@ -1,52 +1,19 @@
 # frozen_string_literal: true
 
+require 'bolt/transport/simple'
+
 module Bolt
   module Transport
-    class Local < Sudoable
-      OPTIONS = {
-        "interpreters"    => "A map of an extension name to the absolute path of an executable, "\
-                              "enabling you to override the shebang defined in a task executable. The "\
-                              "extension can optionally be specified with the `.` character (`.py` and "\
-                              "`py` both map to a task executable `task.py`) and the extension is case "\
-                              "sensitive. When a target's name is `localhost`, Ruby tasks run with the "\
-                              "Bolt Ruby interpreter by default.",
-        "run-as"          => "A different user to run commands as after login.",
-        "run-as-command"  => "The command to elevate permissions. Bolt appends the user and command "\
-                              "strings to the configured `run-as-command` before running it on the target. "\
-                              "This command must not require an interactive password prompt, and the "\
-                              "`sudo-password` option is ignored when `run-as-command` is specified. The "\
-                              "`run-as-command` must be specified as an array.",
-        "sudo-executable" => "The executable to use when escalating to the configured `run-as` user. This "\
-                              "is useful when you want to escalate using the configured `sudo-password`, since "\
-                              "`run-as-command` does not use `sudo-password` or support prompting. The command "\
-                              "executed on the target is `<sudo-executable> -S -u <user> -p custom_bolt_prompt "\
-                              "<command>`. **This option is experimental.**",
-        "sudo-password"   => "Password to use when changing users via `run-as`.",
-        "tmpdir"          => "The directory to copy and execute temporary files."
-      }.freeze
-
-      def self.options
-        OPTIONS.keys
-      end
-
-      def provided_features
-        ['shell']
-      end
-
-      def self.validate(options)
-        validate_sudo_options(options)
-      end
-
-      def with_connection(target, *_args)
-        conn = Shell.new(target)
-        yield conn
-      end
-
-      def connected?(_targets)
+    class Local < Simple
+      def connected?(_target)
         true
+      end
+
+      def with_connection(target)
+        yield Connection.new(target)
       end
     end
   end
 end
 
-require 'bolt/transport/local/shell'
+require 'bolt/transport/local/connection'

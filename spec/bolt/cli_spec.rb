@@ -390,11 +390,13 @@ describe "Bolt::CLI" do
 
     describe "key" do
       it "accepts a private key" do
-        cli = Bolt::CLI.new(%w[  command run uptime
-                                 --private-key ~/.ssh/google_compute_engine
+        allow(Bolt::Util).to receive(:validate_file).and_return(true)
+        path = '~/.ssh/google_compute_engine'
+        cli = Bolt::CLI.new(%W[  command run uptime
+                                 --private-key #{path}
                                  --targets foo])
-        expect(cli.parse).to include('private-key': '~/.ssh/google_compute_engine')
-        expect(cli.config.transports[:ssh]['private-key']).to eq('~/.ssh/google_compute_engine')
+        expect(cli.parse).to include('private-key': path)
+        expect(cli.config.transports['ssh']['private-key']).to eq(File.expand_path(path))
       end
 
       it "generates an error message if no key value is given" do
@@ -462,19 +464,19 @@ describe "Bolt::CLI" do
       it "accepts `--host-key-check`" do
         cli = Bolt::CLI.new(%w[command run uptime --host-key-check --targets foo])
         cli.parse
-        expect(cli.config.transports[:ssh]['host-key-check']).to eq(true)
+        expect(cli.config.transports['ssh']['host-key-check']).to eq(true)
       end
 
       it "accepts `--no-host-key-check`" do
         cli = Bolt::CLI.new(%w[command run uptime --no-host-key-check --targets foo])
         cli.parse
-        expect(cli.config.transports[:ssh]['host-key-check']).to eq(false)
+        expect(cli.config.transports['ssh']['host-key-check']).to eq(false)
       end
 
       it "defaults to nil" do
         cli = Bolt::CLI.new(%w[command run uptime --targets foo])
         cli.parse
-        expect(cli.config.transports[:ssh]['host-key-check']).to eq(nil)
+        expect(cli.config.transports['ssh']['host-key-check']).to eq(nil)
       end
     end
 
@@ -524,6 +526,15 @@ describe "Bolt::CLI" do
       it 'uses a specified Puppetfile' do
         cli.parse
         expect(cli.config.puppetfile.to_s).to eq(puppetfile)
+      end
+    end
+
+    describe "modules" do
+      let(:modules) { 'puppetlabs-apt,puppetlabs-stdlib' }
+      let(:cli)     { Bolt::CLI.new(%W[project init --modules #{modules}]) }
+
+      it 'accepts a comma-separated list of modules' do
+        expect(cli.parse).to include(modules: %w[puppetlabs-apt puppetlabs-stdlib])
       end
     end
 
@@ -2036,6 +2047,10 @@ describe "Bolt::CLI" do
         } }
     end
 
+    before(:each) do
+      allow(Bolt::Util).to receive(:validate_file).and_return(true)
+    end
+
     it 'reads modulepath' do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
@@ -2084,7 +2099,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
         cli.parse
-        expect(cli.config.transports[:ssh]['private-key']).to match(%r{/bar/foo\z})
+        expect(cli.config.transports['ssh']['private-key']).to match(%r{/bar/foo\z})
       end
     end
 
@@ -2092,7 +2107,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
         cli.parse
-        expect(cli.config.transports[:ssh]['host-key-check']).to eq(false)
+        expect(cli.config.transports['ssh']['host-key-check']).to eq(false)
       end
     end
 
@@ -2102,7 +2117,7 @@ describe "Bolt::CLI" do
           %W[command run r --configfile #{conf.path} --targets foo --password bar --no-host-key-check]
         )
         cli.parse
-        expect(cli.config.transports[:ssh]['run-as']).to eq('Fakey McFakerson')
+        expect(cli.config.transports['ssh']['run-as']).to eq('Fakey McFakerson')
       end
     end
 
@@ -2110,8 +2125,8 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check --no-ssl])
         cli.parse
-        expect(cli.config.transports[:ssh]['connect-timeout']).to eq(4)
-        expect(cli.config.transports[:winrm]['connect-timeout']).to eq(7)
+        expect(cli.config.transports['ssh']['connect-timeout']).to eq(4)
+        expect(cli.config.transports['winrm']['connect-timeout']).to eq(7)
       end
     end
 
@@ -2119,7 +2134,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
         cli.parse
-        expect(cli.config.transports[:winrm]['ssl']).to eq(false)
+        expect(cli.config.transports['winrm']['ssl']).to eq(false)
       end
     end
 
@@ -2127,7 +2142,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
         cli.parse
-        expect(cli.config.transports[:winrm]['ssl-verify']).to eq(false)
+        expect(cli.config.transports['winrm']['ssl-verify']).to eq(false)
       end
     end
 
@@ -2135,7 +2150,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-ssl])
         cli.parse
-        expect(cli.config.transports[:winrm]['extensions']).to eq(['.py', '.bat'])
+        expect(cli.config.transports['winrm']['extensions']).to eq(['.py', '.bat'])
       end
     end
 
@@ -2143,7 +2158,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
         cli.parse
-        expect(cli.config.transports[:pcp]['task-environment']).to eq('testenv')
+        expect(cli.config.transports['pcp']['task-environment']).to eq('testenv')
       end
     end
 
@@ -2151,7 +2166,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
         cli.parse
-        expect(cli.config.transports[:pcp]['service-url']).to eql('http://foo.org')
+        expect(cli.config.transports['pcp']['service-url']).to eql('http://foo.org')
       end
     end
 
@@ -2159,7 +2174,7 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
         cli.parse
-        expect(cli.config.transports[:pcp]['token-file']).to match(%r{/path/to/token\z})
+        expect(cli.config.transports['pcp']['token-file']).to match(%r{/path/to/token\z})
       end
     end
 
@@ -2167,8 +2182,8 @@ describe "Bolt::CLI" do
       with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check --no-ssl])
         cli.parse
-        expect(cli.config.transports[:pcp]['cacert']).to match(%r{/path/to/cacert\z})
-        expect(cli.config.transports[:winrm]['cacert']).to match(%r{/path/to/winrm-cacert\z})
+        expect(cli.config.transports['pcp']['cacert']).to match(%r{/path/to/cacert\z})
+        expect(cli.config.transports['winrm']['cacert']).to match(%r{/path/to/winrm-cacert\z})
       end
     end
 
@@ -2302,7 +2317,7 @@ describe "Bolt::CLI" do
     end
 
     context 'init' do
-      it 'init creates a new project at the specified path' do
+      it 'creates a new project at the specified path' do
         Dir.mktmpdir do |dir|
           file = File.join(dir, 'bolt.yaml')
           cli = Bolt::CLI.new(%W[project init #{dir}])
@@ -2311,12 +2326,70 @@ describe "Bolt::CLI" do
         end
       end
 
-      it 'init creates a new project in the current working directory' do
+      it 'creates a new project in the current working directory' do
         Dir.mktmpdir do |dir|
           file = File.join(dir, 'bolt.yaml')
           cli = Bolt::CLI.new(%w[project init])
           Dir.chdir(dir) { cli.execute(cli.parse) }
           expect(File.file?(file)).to be
+        end
+      end
+
+      it 'warns when a bolt.yaml already exists' do
+        Dir.mktmpdir do |dir|
+          config = File.join(dir, 'bolt.yaml')
+          cli    = Bolt::CLI.new(%W[project init #{dir}])
+
+          FileUtils.touch(config)
+          cli.execute(cli.parse)
+
+          expect(@log_output.readlines).to include(/Found existing project directory at #{dir}/)
+        end
+      end
+
+      context 'with modules' do
+        it 'creates a Puppetfile and installs modules with dependencies' do
+          # Create the tmpdir relative to the current dir to handle issues with tempfiles on Windows CI
+          Dir.mktmpdir(nil, Dir.pwd) do |dir|
+            puppetfile = File.join(dir, 'Puppetfile')
+            modulepath = File.join(dir, 'modules')
+
+            cli = Bolt::CLI.new(%W[project init #{dir} --modules puppetlabs-apt])
+            cli.execute(cli.parse)
+
+            expect(File.file?(puppetfile)).to be
+            expect(File.read(puppetfile).split("\n")).to match_array([/mod 'puppetlabs-apt'/,
+                                                                      /mod 'puppetlabs-stdlib'/,
+                                                                      /mod 'puppetlabs-translate'/])
+
+            expect(Dir.exist?(modulepath)).to be
+            expect(Dir.children(modulepath)).to match_array(%w[apt stdlib translate])
+          end
+        end
+
+        it 'errors when there is an existing Puppetfile' do
+          Dir.mktmpdir do |dir|
+            puppetfile = File.join(dir, 'Puppetfile')
+            config     = File.join(dir, 'bolt.yaml')
+
+            FileUtils.touch(puppetfile)
+
+            cli = Bolt::CLI.new(%W[project init #{dir} --modules puppetlabs-stdlib])
+            expect { cli.execute(cli.parse) }.to raise_error(Bolt::CLIError)
+            expect(File.file?(config)).not_to be
+          end
+        end
+
+        it 'errors with unknown module names' do
+          Dir.mktmpdir do |dir|
+            puppetfile = File.join(dir, 'Puppetfile')
+            config     = File.join(dir, 'bolt.yaml')
+
+            cli = Bolt::CLI.new(%W[project init #{dir} --modules puppetlabs-fakemodule])
+            expect { cli.execute(cli.parse) }.to raise_error(Bolt::ValidationError)
+            expect(File.file?(config)).not_to be
+            expect(File.file?(puppetfile)).not_to be
+          end
         end
       end
     end
