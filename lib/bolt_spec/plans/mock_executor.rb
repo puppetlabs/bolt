@@ -30,6 +30,10 @@ module BoltSpec
         @stub_out_message = nil
         @transport_features = ['puppet-agent']
         @executor_real = Bolt::Executor.new
+        # by default, we want to execute any plan that we come across without error
+        # or mocking. users can toggle this behavior so that plans will either need to
+        # be mocked out, or an error will be thrown.
+        @execute_any_plan = true
         # plans that are allowed to be executed by the @executor_real
         @allowed_exec_plans = {}
       end
@@ -100,6 +104,10 @@ module BoltSpec
         result
       end
 
+      def execute_any_plan(do_execution)
+        @execute_any_plan = do_execution
+      end
+
       def with_plan_allowed_exec(plan_name, params)
         @allowed_exec_plans[plan_name] = params
         result = yield
@@ -110,8 +118,14 @@ module BoltSpec
       def run_plan(scope, plan_clj, params)
         result = nil
         plan_name = plan_clj.closure_name
+        
+        # High level:
+        #  - If we've explicitly "allowed" the plan, execute it
+        #  - If we've explicitly "expected" the plan (mocked), run it through the mock object
+        #  - If we're allowing "any" plan to be executed, execute it
+        #  - Otherwise we have an error
         if @allowed_exec_plans.key?(plan_name) && @allowed_exec_plans[plan_name] == params
-          # This plan's name + params was explicitly allowed to be executed
+          # This plan's name + parameters were explicitly allowed to be executed.
           # run it with the real executor.
           # We require this functionality so that the BoltSpec::Plans.run_plan()
           # function can kick off the initial plan. In reality, no other plans should
@@ -124,6 +138,10 @@ module BoltSpec
           # it throws this special symbol with a result object that is captured by
           # the run_plan Puppet function
           throw :return, result
+        elsif @execute_any_plan
+          # if the plan wasn't allowed or mocked out, and we're allowing any plan to be
+          # executed, then execute the plan
+          result = @executor_real.run_plan(scope, plan_clj, params)
         else
           # convert to JSON and back so that we get the ruby representation with all keys and
           # values converted to a string .to_s instead of their ruby object notation

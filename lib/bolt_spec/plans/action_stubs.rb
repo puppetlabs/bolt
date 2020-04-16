@@ -58,6 +58,12 @@ module BoltSpec
           message = "Expected #{object} to be called #{times} times"
           message += " with targets #{@invocation[:targets]}" if @invocation[:targets]
           if parameters
+            # Print the parameters hash by converting it to JSON and then re-parsing.
+            # This prevents issues in Bolt data types, such as Targets, from generating
+            # gigantic, unreadable, data when converted to string by interpolation.
+            # Targets exhibit this behavior because they have a reference to @inventory.
+            # When the target is converted into a string, it converts the full Inventory
+            # into a string recursively.
             parameters_str = JSON.parse(parameters.to_json)
             message += " with parameters #{parameters_str}"
           end
