@@ -19,6 +19,7 @@ module BoltSpec
     class MockExecutor
       attr_reader :noop, :error_message
       attr_accessor :run_as, :transport_features
+      attr_writer :execute_any_plan
 
       def initialize(modulepath)
         @noop = false
@@ -104,10 +105,6 @@ module BoltSpec
         result
       end
 
-      def execute_any_plan(do_execution)
-        @execute_any_plan = do_execution
-      end
-
       def with_plan_allowed_exec(plan_name, params)
         @allowed_exec_plans[plan_name] = params
         result = yield
@@ -118,7 +115,7 @@ module BoltSpec
       def run_plan(scope, plan_clj, params)
         result = nil
         plan_name = plan_clj.closure_name
-        
+
         # High level:
         #  - If we've explicitly "allowed" the plan, execute it
         #  - If we've explicitly "expected" the plan (mocked), run it through the mock object

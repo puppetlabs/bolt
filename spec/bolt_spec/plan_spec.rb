@@ -279,6 +279,13 @@ describe "BoltSpec::Plans" do
     let(:plan_name) { 'plans::plan_calling_plan' }
     let(:sub_plan_name) { 'plans::command' }
 
+    it 'allows any sub-plan, by default, without mocking' do
+      expect_command('hostname').with_targets(targets)
+      expect_command('echo hello').with_targets(targets)
+      result = run_plan(plan_name, 'targets' => targets)
+      expect(result).to be_ok
+    end
+
     it 'allows with params' do
       allow_plan(sub_plan_name).with_params('targets' => targets)
       result = run_plan(plan_name, 'targets' => targets)
@@ -286,7 +293,7 @@ describe "BoltSpec::Plans" do
     end
 
     it 'expects with params' do
-      expect_plan(sub_plan_name).with_params('targets' => targets)
+      expect_plan(sub_plan_name).with_params('nodes' => targets)
       result = run_plan(plan_name, 'targets' => targets)
       expect(result).to be_ok
     end
@@ -304,11 +311,28 @@ describe "BoltSpec::Plans" do
         .to raise_error(RuntimeError, /Expected plans::command to be called 1 times with parameters #{params}/)
     end
 
-    it 'errors if unexpected plan is called' do
-      # TODO: need to add a flag to enable this behavior instead of it being the default
-      err = "Unexpected call to 'run_plan(plans::command, {\"targets\"=>[\"foo\", \"bar\"]})'"
-      expect { run_plan(plan_name, 'targets' => targets) }
-        .to raise_error(RuntimeError, err)
+    context 'with execute_no_plan' do
+      before(:each) do
+        execute_no_plan
+      end
+
+      it 'errors if unexpected plan is called' do
+        err = "Unexpected call to 'run_plan(plans::command, {\"nodes\"=>[\"foo\", \"bar\"]})'"
+        expect { run_plan(plan_name, 'targets' => targets) }
+          .to raise_error(RuntimeError, err)
+      end
+
+      it 'allows with params still mocks' do
+        allow_plan(sub_plan_name).with_params('targets' => targets)
+        result = run_plan(plan_name, 'targets' => targets)
+        expect(result).to be_ok
+      end
+
+      it 'expects with params still mocks' do
+        expect_plan(sub_plan_name).with_params('nodes' => targets)
+        result = run_plan(plan_name, 'targets' => targets)
+        expect(result).to be_ok
+      end
     end
   end
 end

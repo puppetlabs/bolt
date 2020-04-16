@@ -189,7 +189,7 @@ module BoltSpec
     # and an error will be thrown.
     def execute_no_plan
       executor.execute_any_plan(false)
-    end    
+    end
 
     # Does this belong here?
     def allow_out_message
