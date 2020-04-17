@@ -40,6 +40,23 @@ require 'bolt/pal'
 #  an otherwise empty bolt config and inventory. To create your own values for
 #  these override the modulepath, config, or inventory methods.
 #
+# Sub-plan Execution
+#
+#  When testing a plan, often times those plans call other plans in order to
+#  build complex workflows. To support this we offer running in two different
+#  modes:
+#    execute_any_plan (default) - This mode will execute any plan that is encountered
+#      without having to be stubbed/mocked. This default mode allows for plan control
+#      flow to behave as normal. If you choose to stub/mock out a sub-plan in this mode
+#      that will be honored and the sub-plan will not be executed. We will use the modifiers
+#      on the stub to check for the conditions specified (example: be_called_times(3))
+#
+#    execute_no_plan - This mode will not execute a plans that it encounters. Instead, when
+#      an plan is encountered it will throw an error unless the plan is mocked out. This
+#      mode is useful for ensuring that there are no plans called that you do not expect.
+#      This plan requires authors to mock out all sub-plans that may be invoked when running
+#      tests.
+#
 #  TODO:
 #  - Allow description based stub matching
 #  - Better testing of plan errors
@@ -47,15 +64,20 @@ require 'bolt/pal'
 #  - Allow stubbing with a block(at the double level? As a matched stub?)
 #  - package code so that it can be used for testing modules outside of this repo
 #  - set subject from describe and provide matchers similar to rspec puppets function tests
+#  - Allow specific plans to be executed when running in execute_no_plan mode.
 #
 #  MAYBE TODO?:
-#  - allow stubbing for subplans
 #  - validate call expectations at the end of the example instead of in run_plan
 #  - resultset matchers to help testing canary like plans?
 #  - inventory matchers to help testing plans that change inventory
 #
+# Flags:
+# - execute_any_plan: execute any plan that is encountered unless it is mocked (default)
+# - execute_no_plan: throw an error if a plan is encountered that is not stubbed
+#
 # Stubs:
 # - allow_command(cmd), expect_command(cmd): expect the exact command
+# - allow_plan(plan), expect_plan(plan): expect the named plan
 # - allow_script(script), expect_script(script): expect the script as <module>/path/to/file
 # - allow_task(task), expect_task(task): expect the named task
 # - allow_upload(file), expect_upload(file): expect the identified source file
@@ -69,22 +91,28 @@ require 'bolt/pal'
 #                       if expected, fail unless the action is called 'n' times
 # - not_be_called: fail if the action is called
 # - with_targets(targets): target or list of targets that you expect to be passed to the action
+#                          plan: does not support this modifier
 # - with_params(params): list of params and metaparams (or options) that you expect to be passed to the action.
 #                        Corresponds to the action's last argument.
 # - with_destination(dest): for upload_file, the expected destination path
 # - always_return(value): return a Bolt::ResultSet of Bolt::Result objects with the specified value Hash
+#                         plan: returns a Bolt::PlanResult with the specified value with a status of 'success'
 #                         command and script: only accept 'stdout' and 'stderr' keys
 #                         upload: does not support this modifier
 # - return_for_targets(targets_to_values): return a Bolt::ResultSet of Bolt::Result objects from the Hash mapping
 #                                          targets to their value Hashes
 #                                          command and script: only accept 'stdout' and 'stderr' keys
 #                                          upload: does not support this modifier
+#                                          plan: does not support this modifier
 # - return(&block): invoke the block to construct a Bolt::ResultSet. The blocks parameters differ based on action
 #                   command: `{ |targets:, command:, params:| ... }`
+#                   plan: `{ |plan:, params:| ... }`
 #                   script: `{ |targets:, script:, params:| ... }`
 #                   task: `{ |targets:, task:, params:| ... }`
 #                   upload: `{ |targets:, source:, destination:, params:| ... }`
 # - error_with(err): return a failing Bolt::ResultSet, with Bolt::Result objects with the identified err hash
+#                    plans will throw a Bolt::PlanFailure that will be returned as the value of
+#                    the Bolt::PlanResult object with a status of 'failure'.
 #
 # Example:
 #   describe "my_plan" do
@@ -128,11 +156,37 @@ require 'bolt/pal'
 #       end
 #       expect(run_plan('my_plan', { 'param1' => 10 })).to eq(10)
 #     end
-
+#
 #     it 'expects multiple messages to out::message' do
 #       expect_out_message.be_called_times(2).with_params(message)
 #       result = run_plan(plan_name, 'messages' => [message, message])
 #       expect(result).to be_ok
+#     end
+#
+#     it 'expects a sub-plan to be called' do
+#       expect_plan('module::sub_plan').with_params('targets' => ['foo']).be_called_times(1)
+#       result = run_plan('module::main_plan', 'targets' => ['foo'])
+#       expect(result).to be_ok
+#       expect(result.class).to eq(Bolt::PlanResult)
+#       expect(result.value).to eq('foo' => 'is_good')
+#       expect(result.status).to eq('success')
+#     end
+#
+#     it 'error when sub-plan is called' do
+#       execute_no_plan
+#       err = 'Unexpected call to 'run_plan(module::sub_plan, {\"targets\"=>[\"foo\"]})'
+#       expect { run_plan('module::main_plan', 'targets' => ['foo']) }
+#         .to raise_error(RuntimeError, err)
+#     end
+#
+#     it 'errors when plan calls fail_plan()' do
+#       result = run_plan('module::calls_fail_plan', {})
+#       expect(result).not_to be_ok
+#       expect(result.class).to eq(Bolt::PlanResult)
+#       expect(result.status).to eq('failure')
+#       expect(result.value.class).to eq(Bolt::PlanFailure)
+#       expect(result.value.msg).to eq('failure message passed to fail_plan()')
+#       expect(result.value.kind).to eq('bolt/plan-failure')
 #     end
 #   end
 #
