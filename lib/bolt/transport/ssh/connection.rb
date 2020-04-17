@@ -256,6 +256,12 @@ module Bolt
           true
         end
 
+        def max_command_length
+          if target.options['login-shell'] == 'powershell'
+            32000
+          end
+        end
+
         def validate_ssh_version
           remote_version = @session.transport.server_version.version
           return unless target.options['login-shell'] && remote_version

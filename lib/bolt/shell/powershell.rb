@@ -6,7 +6,7 @@ module Bolt
   class Shell
     class Powershell < Shell
       DEFAULT_EXTENSIONS = Set.new(%w[.ps1 .rb .pp])
-      PS_ARGS = %w[-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass -File].freeze
+      PS_ARGS = %w[-NoProfile -NonInteractive -NoLogo -ExecutionPolicy Bypass].freeze
 
       def initialize(target, conn)
         super
@@ -45,7 +45,7 @@ module Bolt
         when '.ps1'
           [
             'powershell.exe',
-            [*PS_ARGS, path]
+            [*PS_ARGS, '-File', path]
           ]
         when '.pp'
           [
@@ -133,10 +133,14 @@ module Bolt
       end
 
       def with_tempdir
-        dir = make_tempdir
-        yield dir
+        unless @tempdir
+          # Only cleanup the directory afterward if we made it to begin with
+          owner = true
+          @tempdir = make_tempdir
+        end
+        yield @tempdir
       ensure
-        rmdir(dir)
+        rmdir(@tempdir) if owner
       end
 
       def run_ps_task(task_path, arguments, input_method)
@@ -243,6 +247,15 @@ module Bolt
       end
 
       def execute(command)
+        if conn.max_command_length && command.length > conn.max_command_length
+          return with_tempdir do |dir|
+            command += "\r\nif (!$?) { if($LASTEXITCODE) { exit $LASTEXITCODE } else { exit 1 } }"
+            script_file = File.join(dir, "#{SecureRandom.uuid}_wrapper.ps1")
+            conn.copy_file(StringIO.new(command), script_file)
+            script_invocation = ['powershell.exe', *PS_ARGS, '-File', quote_string(script_file)].join(' ')
+            execute(script_invocation)
+          end
+        end
         inp, out, err, t = conn.execute(command)
 
         result = Bolt::Node::Output.new

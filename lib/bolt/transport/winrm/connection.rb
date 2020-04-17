@@ -175,6 +175,10 @@ module Bolt
           @shell ||= Bolt::Shell::Powershell.new(target, self)
         end
 
+        def max_command_length
+          nil
+        end
+
         private
 
         def smb_client_login
