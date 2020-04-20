@@ -252,7 +252,8 @@ module Bolt
             command += "\r\nif (!$?) { if($LASTEXITCODE) { exit $LASTEXITCODE } else { exit 1 } }"
             script_file = File.join(dir, "#{SecureRandom.uuid}_wrapper.ps1")
             conn.copy_file(StringIO.new(command), script_file)
-            script_invocation = ['powershell.exe', *PS_ARGS, '-File', quote_string(script_file)].join(' ')
+            args = escape_arguments([script_file])
+            script_invocation = ['powershell.exe', *PS_ARGS, '-File', *args].join(' ')
             execute(script_invocation)
           end
         end
