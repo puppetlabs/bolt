@@ -30,25 +30,25 @@ jobs:
         uses: actions/setup-ruby@v1
         with:
           ruby-version: 2.5.x
+      - name: Install bundler
+        run: |
+          gem install bundler
+          bundle config path vendor/bundle
       - name: Cache gems
-        id: gems
+        id: cache
         uses: actions/cache@v1
         with:
-          path: .bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('lib/bolt/version.rb') }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
+      - name: Install gems
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: bundle install --jobs 4 --retry 3
       - name: Cache modules
         id: modules
         uses: actions/cache@v1
         with:
           path: modules
           key: ${{ runner.os }}-modules-${{ hashFiles('**/Puppetfile') }}
-      - name: Install bundler
-        run: |
-          gem install bundler
-          bundle config --local path .bundle
-      - name: Install gems
-        if: steps.gems.outputs.cache-hit != 'true'
-        run: bundle install --jobs 4 --retry 3
       - name: Install modules
         if: steps.modules.outputs.cache-hit != 'true'
         run: bundle exec r10k puppetfile install
@@ -73,25 +73,25 @@ jobs:
         uses: actions/setup-ruby@v1
         with:
           ruby-version: 2.5.x
+      - name: Install bundler
+        run: |
+          gem install bundler
+          bundle config path vendor/bundle
       - name: Cache gems
-        id: gems
+        id: cache
         uses: actions/cache@v1
         with:
-          path: .bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('lib/bolt/version.rb') }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
+      - name: Install gems
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: bundle install --jobs 4 --retry 3
       - name: Cache modules
         id: modules
         uses: actions/cache@v1
         with:
           path: modules
           key: ${{ runner.os }}-modules-${{ hashFiles('**/Puppetfile') }}
-      - name: Install bundler
-        run: |
-          gem install bundler
-          bundle config --local path .bundle
-      - name: Install gems
-        if: steps.gems.outputs.cache-hit != 'true'
-        run: bundle install --jobs 4 --retry 3
       - name: Install modules
         if: steps.modules.outputs.cache-hit != 'true'
         run: bundle exec r10k puppetfile install
