@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
+          key: ${{ runner.os }}-gems-${{ hashFiles('lib/bolt/version.rb') }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
       - name: Install gems
         if: steps.cache.outputs.cache-hit != 'true'
         run: bundle install --jobs 4 --retry 3
@@ -68,7 +68,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
+          key: ${{ runner.os }}-gems-${{ hashFiles('lib/bolt/version.rb') }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
       - name: Install gems
         if: steps.cache.outputs.cache-hit != 'true'
         run: bundle install --jobs 4 --retry 3
