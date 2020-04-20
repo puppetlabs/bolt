@@ -32,7 +32,8 @@ module Bolt
           if source.is_a?(StringIO)
             Tempfile.create(File.basename(dest)) do |f|
               f.write(source.read)
-              FileUtils.mv(t, dest)
+              f.close
+              FileUtils.mv(f, dest)
             end
           else
             # Mimic the behavior of `cp --remove-destination`
