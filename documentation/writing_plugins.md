@@ -52,9 +52,7 @@ Bolt passes a single parameter `plaintext_value` to a `secret_encrypt` task.
 
 **`secret_createkeys` tasks**
 
-Bolt passes a single parameter `force` to a `secret_createkeys` task when the `--force` CLI option is set.
-Bolt passes no additional parameters other than the metaparameters to a `secret_createkeys` task. It is
-expected to create the keys based on its `_config` and the `_boltdir` metaparameter.
+Bolt passes a single parameter `force` to a `secret_createkeys` task when the `--force` CLI option is set. Bolt passes no additional parameters other than the metaparameters to a `secret_createkeys` task. It is expected to create the keys based on its `_config` and the `_boltdir` metaparameter.
 
 **`puppet_library` tasks**
 

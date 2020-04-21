@@ -155,7 +155,13 @@ module Bolt
         # handled previously. That may not always be the case so filter them
         # out now.
         meta, params = opts.partition { |key, _val| key.start_with?('_') }.map(&:to_h)
-        params = config.merge(params)
+
+        # Reject parameters from config that are not accepted by the task and
+        # merge in parameter defaults
+        params = config.slice(*task.parameters.keys)
+                       .merge(task.parameter_defaults)
+                       .merge(params)
+
         validate_params(task, params)
 
         meta['_boltdir'] = @context.boltdir.to_s
@@ -220,13 +226,11 @@ module Bolt
       end
 
       def validate_resolve_reference(opts)
-        # Merge config with params
-        merged = @config.merge(opts)
-        params = merged.reject { |k, _v| k.start_with?('_') }
+        task = @hook_map[:resolve_reference]['task']
+        params, _metaparams = process_params(task, opts)
 
-        sig = @hook_map[:resolve_reference]['task']
-        if sig
-          validate_params(sig, params)
+        if task
+          validate_params(task, params)
         end
 
         if @hook_map.include?(:validate_resolve_reference)
