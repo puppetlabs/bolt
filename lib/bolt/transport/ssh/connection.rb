@@ -108,6 +108,7 @@ module Bolt
           end
 
           @session = Net::SSH.start(target.host, @user, options)
+          validate_ssh_version
           @logger.debug { "Opened session" }
         rescue Net::SSH::AuthenticationFailed => e
           raise Bolt::Node::ConnectError.new(
@@ -242,13 +243,33 @@ module Bolt
         end
 
         def shell
-          @shell ||= Bolt::Shell::Bash.new(target, self)
+          @shell ||= if target.options['login-shell'] == 'powershell'
+                       Bolt::Shell::Powershell.new(target, self)
+                     else
+                       Bolt::Shell::Bash.new(target, self)
+                     end
         end
 
         # This is used by the Bash shell to decide whether to `cd` before
         # executing commands as a run-as user
         def reset_cwd?
           true
+        end
+
+        def max_command_length
+          if target.options['login-shell'] == 'powershell'
+            32000
+          end
+        end
+
+        def validate_ssh_version
+          remote_version = @session.transport.server_version.version
+          return unless target.options['login-shell'] && remote_version
+
+          match = remote_version.match(/OpenSSH_for_Windows_(\d+\.\d+)/)
+          if match && match[1].to_f < 7.9
+            raise "Powershell over SSH requires OpenSSH server >= 7.9, target is running #{match[1]}"
+          end
         end
       end
     end

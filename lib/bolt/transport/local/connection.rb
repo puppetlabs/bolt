@@ -32,7 +32,8 @@ module Bolt
           if source.is_a?(StringIO)
             Tempfile.create(File.basename(dest)) do |f|
               f.write(source.read)
-              FileUtils.mv(t, dest)
+              f.close
+              FileUtils.mv(f, dest)
             end
           else
             # Mimic the behavior of `cp --remove-destination`
@@ -46,12 +47,11 @@ module Bolt
 
         def execute(command)
           if Bolt::Util.windows?
-            command += "\r\nif (!$?) { if($LASTEXITCODE) { exit $LASTEXITCODE } else { exit 1 } }"
-            script_file = Tempfile.new(['wrapper', '.ps1'], target.options['tmpdir'])
-            File.write(script_file, command)
-            script_file.close
-
-            command = ['powershell.exe', *Bolt::Shell::Powershell::PS_ARGS, script_file.path]
+            # If it's already a powershell command then invoke it normally.
+            # Otherwise, wrap it in powershell.exe.
+            unless command.start_with?('powershell.exe')
+              command = ['powershell.exe', *Bolt::Shell::Powershell::PS_ARGS, '-Command', command]
+            end
           end
 
           Open3.popen3(*command)
@@ -61,6 +61,12 @@ module Bolt
         # executing commands as a run-as user
         def reset_cwd?
           false
+        end
+
+        def max_command_length
+          if Bolt::Util.windows?
+            32000
+          end
         end
       end
     end
