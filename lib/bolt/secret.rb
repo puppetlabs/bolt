@@ -22,6 +22,7 @@ module Bolt
 
       case options[:action]
       when 'createkeys'
+        opts['force'] = options[:force] if options.key?(:force)
         result = plugins.get_hook(name, :secret_createkeys).call(opts)
         outputter.print_message(result)
       when 'encrypt'

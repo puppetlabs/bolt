@@ -112,7 +112,7 @@ module Bolt
       when 'secret'
         case action
         when 'createkeys'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin],
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin force],
             banner: SECRET_CREATEKEYS_HELP }
         when 'decrypt'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin],
@@ -774,6 +774,9 @@ module Bolt
              'A comma-separated list of modules to install from the Puppet Forge',
              'when initializing a project. Resolves and installs all dependencies.') do |modules|
         @options[:modules] = modules.split(',')
+      end
+      define('--force', 'Overwrite existing key pairs') do |_force|
+        @options[:force] = true
       end
 
       separator "\nGLOBAL OPTIONS"
