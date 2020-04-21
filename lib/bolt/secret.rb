@@ -15,7 +15,7 @@ module Bolt
       plugin = plugins.by_name(name)
 
       unless plugin
-        raise Bolt::Plugin::PluginError::Unknown.new(name)
+        raise Bolt::Plugin::PluginError::Unknown, name
       end
 
       opts = plugin.config.slice(*KNOWN_KEYS[options[:action]])

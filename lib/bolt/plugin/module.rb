@@ -158,9 +158,13 @@ module Bolt
 
         # Reject parameters from config that are not accepted by the task and
         # merge in parameter defaults
-        params = config.slice(*task.parameters.keys)
-                       .merge(task.parameter_defaults)
-                       .merge(params)
+        params = if task.parameters
+                   config.slice(*task.parameters.keys)
+                         .merge(task.parameter_defaults)
+                         .merge(params)
+                 else
+                   config.merge(params)
+                 end
 
         validate_params(task, params)
 

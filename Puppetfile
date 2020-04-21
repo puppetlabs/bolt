@@ -34,8 +34,8 @@ mod 'puppetlabs-aws_inventory', '0.5.0'
 mod 'puppetlabs-azure_inventory', '0.3.0'
 mod 'puppetlabs-gcloud_inventory', '0.1.0'
 mod 'puppetlabs-pkcs7',
-  git: 'https://github.com/puppetlabs/puppetlabs-pkcs7',
-  branch: '1736/pkcs7-module'
+    git: 'https://github.com/puppetlabs/puppetlabs-pkcs7',
+    branch: '1736/pkcs7-module'
 mod 'puppetlabs-terraform', '0.5.0'
 mod 'puppetlabs-vault', '0.3.0'
 mod 'puppetlabs-yaml', '0.2.0'
