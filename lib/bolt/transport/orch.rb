@@ -197,7 +197,7 @@ module Bolt
           end
         rescue StandardError => e
           targets.map do |target|
-            Bolt::Result.from_exception(target, e, 'task')
+            Bolt::Result.from_exception(target, e, action: 'task')
           end
         end
       end
