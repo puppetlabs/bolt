@@ -6,11 +6,12 @@ Include your own plugins within a module by adding a `bolt_plugin.json` file to 
 
 ## Configuration
 
-Plugins can use configuration from the `bolt.yaml` file. To allow a plugin to be configured, add a `config` section to the `bolt_plugin.json` file. This section is similar to the `parameters` section in task metadata.
+Plugins can use configuration from the `bolt.yaml` file. To allow a plugin to be configured, add a `parameters`
+section to the [task metadata](writing_tasks.md#task-metadata).
 
 ```json
 { 
-  "config": {
+  "parameters": {
     "key1": {
       "type": "Optional[String]" 
     } 
@@ -34,27 +35,31 @@ A plugin can implement hooks as tasks. Bolt will search for tasks in a plugin mo
 
 In this case the plugin will implement two hooks: the `resolve_reference` hook that is explicitly defined and the `secret_decrypt` hook that is discovered from the task name. Bolt passes two metaparameters to all task hooks: `_config`, which contains the plugin configuration, and `_boltdir`, which contains the path to the current Boltdir.
 
-**`resolve_reference` tasks**
+### `resolve_reference` tasks
 
 Bolt passes the contents of the `_plugin` object minus `_plugin` as parameters to the `resolve_reference` task.
 
-**`validate_resolve_reference` tasks**
+### `validate_resolve_reference` tasks
 
 Use the `validate_resolve_reference` task to pre-validate the parameters that will be passed to the `resolve_reference` task. This lets Bolt raise any validation errors during inventory loading rather than in the middle of plan evaluation. Regardless of whether this hook is specified, Bolt tests the parameters to make sure they match the `parameters` of the `resolve_reference` task.
 
-**`secret_decrypt` tasks**
+### `secret_decrypt` tasks
 
-Bolt passes a single key `encrypted_value` to a `secret_decrypt` task.
+Bolt passes a single paramater `encrypted_value` to a `secret_decrypt` task.
 
-**`secret_encrypt` tasks**
+### `secret_encrypt` tasks
 
 Bolt passes a single parameter `plaintext_value` to a `secret_encrypt` task.
 
-**`secret_createkeys` tasks**
+### `secret_createkeys` tasks
 
-Bolt passes a single parameter `force` to a `secret_createkeys` task when the `--force` CLI option is set. Bolt passes no additional parameters other than the metaparameters to a `secret_createkeys` task. It is expected to create the keys based on its `_config` and the `_boltdir` metaparameter.
+Bolt passes a single parameter `force` to a `secret_createkeys` task. When running the `bolt secret createkeys`
+command, the `--force` option can be used to set the `force` parameter's value to `true`.
 
-**`puppet_library` tasks**
+Bolt passes no additional parameters other than the metaparameters to a `secret_createkeys` task. It is expected
+to create the keys based on its `_config` and the `_boltdir` metaparameter.
+
+### `puppet_library` tasks
 
 Bolt uses a `puppet_library` plugin to make sure the Puppet library is available on a target when `apply_prep` is called.
 

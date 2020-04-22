@@ -18,20 +18,16 @@ module Bolt
         raise Bolt::Plugin::PluginError::Unknown, name
       end
 
-      opts = plugin.config.slice(*KNOWN_KEYS[options[:action]])
-
       case options[:action]
       when 'createkeys'
-        opts['force'] = options[:force] if options.key?(:force)
+        opts = { 'force' => options[:force] }.compact
         result = plugins.get_hook(name, :secret_createkeys).call(opts)
         outputter.print_message(result)
       when 'encrypt'
-        opts['plaintext_value'] = options[:object]
-        encrypted = plugins.get_hook(name, :secret_encrypt).call(opts)
+        encrypted = plugins.get_hook(name, :secret_encrypt).call('plaintext_value' => options[:object])
         outputter.print_message(encrypted)
       when 'decrypt'
-        opts['encrypted_value'] = options[:object]
-        decrypted = plugins.get_hook(name, :secret_decrypt).call(opts)
+        decrypted = plugins.get_hook(name, :secret_decrypt).call('encrypted_value' => options[:object])
         outputter.print_message(decrypted)
       end
 
