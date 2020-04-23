@@ -52,7 +52,7 @@ require 'bolt/pal'
 #      on the stub to check for the conditions specified (example: be_called_times(3))
 #
 #    execute_no_plan - This mode will not execute a plans that it encounters. Instead, when
-#      an plan is encountered it will throw an error unless the plan is mocked out. This
+#      a plan is encountered it will throw an error unless the plan is mocked out. This
 #      mode is useful for ensuring that there are no plans called that you do not expect.
 #      This plan requires authors to mock out all sub-plans that may be invoked when running
 #      tests.
