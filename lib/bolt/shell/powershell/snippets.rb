@@ -20,7 +20,7 @@ module Bolt
             PS
           end
 
-          def make_tempdir(parent)
+          def make_tmpdir(parent)
             <<~PS
             $parent = #{parent}
             $name = [System.IO.Path]::GetRandomFileName()

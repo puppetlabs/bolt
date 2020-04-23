@@ -103,29 +103,29 @@ module Bolt
           end
         end
 
-        def make_tempdir
+        def make_tmpdir
           tmpdir = @target.options.fetch('tmpdir', container_tmpdir)
           tmppath = "#{tmpdir}/#{SecureRandom.uuid}"
 
           stdout, stderr, exitcode = execute('mkdir', '-m', '700', tmppath, {})
           if exitcode != 0
-            raise Bolt::Node::FileError.new("Could not make tempdir: #{stderr}", 'TEMPDIR_ERROR')
+            raise Bolt::Node::FileError.new("Could not make tmpdir: #{stderr}", 'TMPDIR_ERROR')
           end
           tmppath || stdout.first
         end
 
-        def with_remote_tempdir
-          dir = make_tempdir
+        def with_remote_tmpdir
+          dir = make_tmpdir
           yield dir
         ensure
           if dir
             if @target.options['cleanup']
               _, stderr, exitcode = execute('rm', '-rf', dir, {})
               if exitcode != 0
-                @logger.warn("Failed to clean up tempdir '#{dir}': #{stderr}")
+                @logger.warn("Failed to clean up tmpdir '#{dir}': #{stderr}")
               end
             else
-              @logger.warn("Skipping cleanup of tempdir '#{dir}'")
+              @logger.warn("Skipping cleanup of tmpdir '#{dir}'")
             end
           end
         end

@@ -119,11 +119,11 @@ module Bolt
         end
       end
 
-      def make_tempdir
+      def make_tmpdir
         find_parent = target.options['tmpdir'] ? "\"#{target.options['tmpdir']}\"" : '[System.IO.Path]::GetTempPath()'
-        result = execute(Snippets.make_tempdir(find_parent))
+        result = execute(Snippets.make_tmpdir(find_parent))
         if result.exit_code != 0
-          raise Bolt::Node::FileError.new("Could not make tempdir: #{result.stderr.string}", 'TEMPDIR_ERROR')
+          raise Bolt::Node::FileError.new("Could not make tmpdir: #{result.stderr.string}", 'TMPDIR_ERROR')
         end
         result.stdout.string.chomp
       end
@@ -132,19 +132,19 @@ module Bolt
         execute(Snippets.rmdir(dir))
       end
 
-      def with_tempdir
-        unless @tempdir
+      def with_tmpdir
+        unless @tmpdir
           # Only cleanup the directory afterward if we made it to begin with
           owner = true
-          @tempdir = make_tempdir
+          @tmpdir = make_tmpdir
         end
-        yield @tempdir
+        yield @tmpdir
       ensure
-        if owner && @tempdir
+        if owner && @tmpdir
           if target.options['cleanup']
-            rmdir(@tempdir)
+            rmdir(@tmpdir)
           else
-            @logger.warn("Skipping cleanup of tmpdir '#{@tempdir}'")
+            @logger.warn("Skipping cleanup of tmpdir '#{@tmpdir}'")
           end
         end
       end
@@ -177,7 +177,7 @@ module Bolt
       def run_script(script, arguments, _options = {})
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
-        with_tempdir do |dir|
+        with_tmpdir do |dir|
           script_path = write_executable(dir, script)
           command = if powershell_file?(script_path)
                       Snippets.run_script(arguments, script_path)
@@ -204,7 +204,7 @@ module Bolt
 
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
-        with_tempdir do |dir|
+        with_tmpdir do |dir|
           if extra_files.empty?
             task_dir = dir
           else
@@ -254,7 +254,7 @@ module Bolt
 
       def execute(command)
         if conn.max_command_length && command.length > conn.max_command_length
-          return with_tempdir do |dir|
+          return with_tmpdir do |dir|
             command += "\r\nif (!$?) { if($LASTEXITCODE) { exit $LASTEXITCODE } else { exit 1 } }"
             script_file = File.join(dir, "#{SecureRandom.uuid}_wrapper.ps1")
             conn.copy_file(StringIO.new(command), script_file)

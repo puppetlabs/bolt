@@ -466,7 +466,7 @@ shared_examples 'transport api' do
   end
 
   context 'when tmpdir is specified' do
-    let(:tmpdir) { File.join(os_context[:destination_dir], 'mytempdir') }
+    let(:tmpdir) { File.join(os_context[:destination_dir], 'mytmpdir') }
 
     it "errors when tmpdir doesn't exist" do
       skip "Windows will create the directory anyway" if Bolt::Util.windows?
@@ -475,7 +475,7 @@ shared_examples 'transport api' do
       with_tempfile_containing('script dir', 'dummy script', os_context[:extension]) do |file|
         expect {
           runner.run_script(target, file.path, [])
-        }.to raise_error(Bolt::Node::FileError, /Could not make tempdir.*#{Regexp.escape(tmpdir)}/)
+        }.to raise_error(Bolt::Node::FileError, /Could not make tmpdir.*#{Regexp.escape(tmpdir)}/)
       end
     end
 
@@ -498,7 +498,7 @@ shared_examples 'transport api' do
         end
 
         runner.run_command(target, mkdir)
-        # Once the tempdir is created the target can be configured to upload scripts to it
+        # Once the tmpdir is created the target can be configured to upload scripts to it
         set_config(target, 'tmpdir' => tmpdir)
         example.run
         # Required because the Local transport changes to the tmpdir before running commands

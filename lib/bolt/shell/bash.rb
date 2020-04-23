@@ -34,7 +34,7 @@ module Bolt
 
       def upload(source, destination, options = {})
         running_as(options[:run_as]) do
-          with_tempdir do |dir|
+          with_tmpdir do |dir|
             basename = File.basename(destination)
             tmpfile = File.join(dir.to_s, basename)
             conn.copy_file(source, tmpfile)
@@ -55,7 +55,7 @@ module Bolt
         arguments = unwrap_sensitive_args(arguments)
 
         running_as(options[:run_as]) do
-          with_tempdir do |dir|
+          with_tmpdir do |dir|
             path = write_executable(dir.to_s, script)
             dir.chown(run_as)
             output = execute([path, *arguments], sudoable: true)
@@ -86,7 +86,7 @@ module Bolt
           # unpack any Sensitive data
           arguments = unwrap_sensitive_args(arguments)
 
-          with_tempdir do |dir|
+          with_tmpdir do |dir|
             if extra_files.empty?
               task_dir = dir
             else
@@ -234,7 +234,7 @@ module Bolt
         end
       end
 
-      def make_tempdir
+      def make_tmpdir
         tmpdir = @target.options.fetch('tmpdir', '/tmp')
         script_dir = @target.options.fetch('script-dir', SecureRandom.uuid)
         tmppath = File.join(tmpdir, script_dir)
@@ -242,7 +242,7 @@ module Bolt
 
         result = execute(command)
         if result.exit_code != 0
-          raise Bolt::Node::FileError.new("Could not make tempdir: #{result.stderr.string}", 'TEMPDIR_ERROR')
+          raise Bolt::Node::FileError.new("Could not make tmpdir: #{result.stderr.string}", 'TMPDIR_ERROR')
         end
         path = tmppath || result.stdout.string.chomp
         Bolt::Shell::Bash::Tmpdir.new(self, path)
@@ -256,10 +256,10 @@ module Bolt
         remote_path
       end
 
-      # A helper to create and delete a tempdir on the remote system. Yields the
+      # A helper to create and delete a tmpdir on the remote system. Yields the
       # directory name.
-      def with_tempdir
-        dir = make_tempdir
+      def with_tmpdir
+        dir = make_tmpdir
         yield dir
       ensure
         if dir
