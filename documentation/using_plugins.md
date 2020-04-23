@@ -66,6 +66,13 @@ config:
       var: BOLT_PASSWORD
 ```
 
+### Google Cloud
+
+The `gcloud_inventory` plugin generates targets from Google Cloud compute engine instances.
+
+It is a module-based plugin available on the Puppet Forge and is installed with
+Bolt. [View the documentation on the forge](https://forge.puppet.com/puppetlabs/gcloud_inventory).
+
 ### Prompt
 
 The `prompt` plugin allows users to interactively enter sensitive configuration
@@ -273,8 +280,8 @@ The following fields are available to the pkcs7 plugin in a configuration file:
 | Key | Description | Type | Default |
 | --- | ----------- | ---- | ------- |
 | `keysize` | The size of the key to generate with `bolt secret createkeys`. | `Integer` | `2048` |
-| `private_key` | The path to the private key file. | `String` | `<boltdir>/keys/private_key.pkcs7.pem` |
-| `public_key` | The path to the public key file. | `String` | `<boltdir>/keys/public_key.pkcs7.pem` |
+| `private-key` | The path to the private key file. | `String` | `<boltdir>/keys/private_key.pkcs7.pem` |
+| `public-key` | The path to the public key file. | `String` | `<boltdir>/keys/public_key.pkcs7.pem` |
 
 #### Example usage
 

@@ -185,6 +185,7 @@ Bolt ships with several plugins.
 | `aws_inventory` | Generate targets from AWS EC2 instances. | [aws_inventory](https://forge.puppet.com/puppetlabs/aws_inventory) |
 | `azure_inventory` | Generate targets from Azure VMs and VM scale sets. | [azure_inventory](https://forge.puppet.com/puppetlabs/azure_inventory) |
 | `env_var` | Read a value from an environment variable. | [Using plugins](using_plugins.md#env_var) |
+| `gcloud_inventory` | Generate targets from Google Cloud compute engine instances. | [gcloud_inventory](https://forge.puppet.com/puppetlabs/gcloud_inventory) |
 | `pkcs7` | Use encrypted values for sensitive data. | [Using plugins](using_plugins.md#pkcs7) |
 | `prompt` | Prompt users to enter sensitive configuration information instead of storing it in a file. | [Using plugins](using_plugins.md#prompt) |
 | `puppetdb` | Query PuppetDB for a group of targets. | [Using plugins](using_plugins.md#puppetdb) |

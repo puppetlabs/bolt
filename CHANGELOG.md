@@ -1,5 +1,39 @@
 # Changelog
 
+## Bolt 2.6.0 (2020-04-20)
+
+### New features
+
+* **Google Cloud inventory plugin**
+  ([#1707](https://github.com/puppetlabs/bolt/issues/1707))
+
+  Bolt now includes a [`gcloud_inventory`
+  plugin](https://forge.puppet.com/puppetlabs/gcloud_inventory) to
+  generate inventory from Google Cloud compute engine instances.
+
+* **Commands run over local transport on Windows use powershell**
+  ([#1708](https://github.com/puppetlabs/bolt/pull/1708))
+
+  Previously, the local transport on Windows would exec commands
+  directly, meaning powershell constructs couldn't be used. These
+  commands are now always executed through powershell, so powershell
+  commands and script snippets can be run.
+
+* **Commands and tasks on Windows now consistently return \r\n**
+  ([#1708](https://github.com/puppetlabs/bolt/pull/1708))
+
+  The local transport on Windows was returning \n while WinRM returned
+  \r\n. They are now consistent and always use \r\n.
+
+### Deprecations
+
+* **YAML plan step parameter `target` deprecated in favor of `targets`**
+([#1722](https://github.com/puppetlabs/bolt/issues/1722))
+
+  The `target` parameter for YAML plan steps has been deprecated in
+  favor of `targets` and will be removed in a future release of Bolt.
+
+
 ## Bolt 2.5.0 (2020-04-13)
 
 ### New features

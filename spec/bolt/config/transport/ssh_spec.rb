@@ -62,5 +62,26 @@ describe Bolt::Config::Transport::SSH do
         expect(config['private-key']).to eq(File.expand_path('path/to/key', boltdir))
       end
     end
+
+    context "when using powershell" do
+      before :each do
+        data['login-shell'] = 'powershell'
+      end
+
+      it "fails if tty is true" do
+        data['tty'] = true
+        expect { transport.new(data) }.to raise_error(Bolt::ValidationError, /tty is not supported/)
+      end
+
+      it "fails if run-as is set" do
+        data['run-as'] = 'soandso'
+        expect { transport.new(data) }.to raise_error(Bolt::ValidationError, /run-as is not supported/)
+      end
+
+      it "doesn't fail if other run-as options are set" do
+        data['run-as-command'] = %w[foo bar baz]
+        expect { transport.new(data) }.not_to raise_error
+      end
+    end
   end
 end

@@ -14,7 +14,7 @@ require 'bolt/util'
 
 require 'shared_examples/transport'
 
-describe Bolt::Transport::SSH do
+describe Bolt::Transport::SSH, ssh: true do
   include BoltSpec::Conn
   include BoltSpec::Errors
   include BoltSpec::Files
@@ -59,7 +59,7 @@ describe Bolt::Transport::SSH do
     inventory.get_target("#{host_}:#{port_}")
   end
 
-  context 'with ssh', ssh: true do
+  context 'with ssh' do
     let(:transport_config) { no_host_key_check }
     let(:os_context)       { posix_context }
     let(:transport)        { :ssh }
@@ -70,89 +70,18 @@ describe Bolt::Transport::SSH do
     include_examples 'with sudo'
   end
 
-  context "when connecting", ssh: true do
-    it "passes proxyjump options" do
-      transport_config['proxyjump'] = 'jump.example.com'
+  context "when connecting" do
+    it "adheres to specified connection timeout when connecting to a non-SSH port" do
+      TCPServer.open(0) do |server|
+        port = server.addr[1]
 
-      allow(Net::SSH)
-        .to receive(:start)
-        .with(anything,
-              anything,
-              hash_including(
-                proxy: instance_of(Net::SSH::Proxy::Jump)
-              ))
-      ssh.with_connection(target) {}
-    end
+        transport_config.merge!('connect-timeout' => 2, 'user' => 'bad', 'password' => 'password')
 
-    it "performs secure host key verification by default" do
-      allow(Net::SSH)
-        .to receive(:start)
-        .with(anything,
-              anything,
-              hash_including(
-                verify_host_key: instance_of(Net::SSH::Verifiers::Always)
-              ))
-      ssh.with_connection(target) {}
-    end
-
-    it "downgrades to lenient if host-key-check is false" do
-      transport_config.merge!(no_host_key_check)
-
-      allow(Net::SSH)
-        .to receive(:start)
-        .with(anything,
-              anything,
-              hash_including(
-                verify_host_key: instance_of(Net::SSH::Verifiers::Never)
-              ))
-      ssh.with_connection(target) {}
-    end
-
-    it "defers to SSH config if host-key-check is unset" do
-      expect(Net::SSH::Config).to receive(:for).and_return(strict_host_key_checking: false)
-      expect(Net::SSH)
-        .to receive(:start)
-        .with(anything,
-              anything,
-              hash_including(
-                verify_host_key: instance_of(Net::SSH::Verifiers::AcceptNewOrLocalTunnel)
-              ))
-      ssh.with_connection(target) {}
-    end
-
-    it "ignores SSH config if host-key-check is set" do
-      transport_config.merge!(no_host_key_check)
-
-      expect(Net::SSH::Config).to receive(:for).and_return(strict_host_key_checking: true)
-      allow(Net::SSH)
-        .to receive(:start)
-        .with(anything,
-              anything,
-              hash_including(
-                verify_host_key: instance_of(Net::SSH::Verifiers::Never)
-              ))
-      ssh.with_connection(target) {}
-    end
-
-    it "rejects the connection if host key verification fails" do
-      expect_node_error(Bolt::Node::ConnectError,
-                        'HOST_KEY_ERROR',
-                        /Host key verification failed/) do
-        ssh.with_connection(target) {}
-      end
-    end
-
-    it "raises ConnectError if authentication fails" do
-      transport_config.merge!(no_host_key_check)
-
-      allow(Net::SSH)
-        .to receive(:start)
-        .and_raise(Net::SSH::AuthenticationFailed,
-                   "Authentication failed for foo@bar.com")
-      expect_node_error(Bolt::Node::ConnectError,
-                        'AUTH_ERROR',
-                        /Authentication failed for foo@bar.com/) do
-        ssh.with_connection(target) {}
+        exec_time = Time.now
+        expect {
+          ssh.with_connection(make_target(port_: port)) {}
+        }.to raise_error(Bolt::Node::ConnectError)
+        expect(Time.now - exec_time).to be > 2
       end
     end
 
@@ -190,42 +119,6 @@ describe Bolt::Transport::SSH do
         ssh.with_connection(target) {}
       end
     end
-
-    it "adheres to specified connection timeout when connecting to a non-SSH port", ssh: true do
-      TCPServer.open(0) do |server|
-        port = server.addr[1]
-
-        transport_config.merge!('connect-timeout' => 2, 'user' => 'bad', 'password' => 'password')
-
-        exec_time = Time.now
-        expect {
-          ssh.with_connection(make_target(port_: port)) {}
-        }.to raise_error(Bolt::Node::ConnectError)
-        expect(Time.now - exec_time).to be > 2
-      end
-    end
-
-    it "uses Net::SSH config when no user is specified" do
-      transport_config.merge!(no_user_config)
-
-      expect(Net::SSH::Config)
-        .to receive(:for)
-        .at_least(:once)
-        .with(hostname, any_args)
-        .and_return(user: user)
-
-      ssh.with_connection(target) {}
-    end
-
-    it "doesn't read system config if load_config is false" do
-      transport_config.merge!(no_load_config)
-
-      allow(Etc).to receive(:getlogin).and_return('bolt')
-      expect(Net::SSH::Config).not_to receive(:for)
-      transport_config['load-config'] = false
-      config_user = ssh.with_connection(target, &:user)
-      expect(config_user).to be('bolt')
-    end
   end
 
   context "when executing with private key" do
@@ -238,11 +131,11 @@ describe Bolt::Transport::SSH do
       }
     end
 
-    it "executes a command on a host", ssh: true do
+    it "executes a command on a host" do
       expect(ssh.run_command(target, command).value['stdout']).to eq("/home/#{user}\n")
     end
 
-    it "can upload a file to a host", ssh: true do
+    it "can upload a file to a host" do
       contents = "kljhdfg"
       remote_path = '/tmp/upload-test'
       with_tempfile_containing('upload-test', contents) do |file|
@@ -272,7 +165,7 @@ describe Bolt::Transport::SSH do
       }
     end
 
-    it "executes a command on a host", ssh: true do
+    it "executes a command on a host" do
       expect(ssh.run_command(target, command).value['stdout']).to eq("/home/#{user}\n")
     end
   end
@@ -280,11 +173,11 @@ describe Bolt::Transport::SSH do
   context "when executing" do
     let(:transport_config) { no_host_key_check }
 
-    it "can test whether the target is available", ssh: true do
+    it "can test whether the target is available" do
       expect(ssh.connected?(target)).to eq(true)
     end
 
-    it "returns false if the target is not available", ssh: true do
+    it "returns false if the target is not available" do
       expect(ssh.connected?(inventory.get_target('unknownfoo'))).to eq(false)
     end
   end
@@ -358,7 +251,7 @@ describe Bolt::Transport::SSH do
     end
   end
 
-  context "with sudo with task interpreter set", sudo: true, ssh: true do
+  context "with sudo with task interpreter set", sudo: true do
     let(:transport_config) do
       {
         'host-key-check' => false,
@@ -384,7 +277,7 @@ describe Bolt::Transport::SSH do
     end
   end
 
-  context "with no sudo-password", sudo: true, ssh: true do
+  context "with no sudo-password", sudo: true do
     let(:transport_config) do
       {
         'host-key-check' => false,
@@ -411,14 +304,14 @@ describe Bolt::Transport::SSH do
       }
     end
 
-    it "warns but succeeds when the private-key is missing", ssh: true do
+    it "warns but succeeds when the private-key is missing" do
       stub_logger
       expect(mock_logger).to receive(:warn)
       expect(ssh.run_command(target, 'whoami')['exit_code']).to eq(0)
     end
   end
 
-  context "requesting a pty", sudo: true, ssh: true do
+  context "requesting a pty", sudo: true do
     let(:transport_config) do
       {
         'host-key-check' => false,
@@ -448,7 +341,7 @@ describe Bolt::Transport::SSH do
     end
   end
 
-  context "when requesting a pty with task interpreter set", sudo: true, ssh: true do
+  context "when requesting a pty with task interpreter set", sudo: true do
     let(:transport_config) do
       {
         'host-key-check' => false,
@@ -496,7 +389,7 @@ describe Bolt::Transport::SSH do
       }
     end
 
-    it "uploads scripts to the specified directory", ssh: true do
+    it "uploads scripts to the specified directory" do
       cmd = 'cd $( dirname $0) && pwd'
       with_tempfile_containing('dir', cmd, '.sh') do |script|
         result = ssh.run_script(target, script.path, nil)
