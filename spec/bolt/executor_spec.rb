@@ -335,6 +335,33 @@ describe "Bolt::Executor" do
     end
   end
 
+  context 'prompting' do
+    let(:prompt)   { 'prompt' }
+    let(:response) { 'response' }
+
+    it 'prompts for data on STDERR when executed' do
+      allow(STDIN).to receive(:tty?).and_return(true)
+      allow(STDIN).to receive(:gets).and_return(response)
+      expect(STDERR).to receive(:print).with("#{prompt}: ")
+
+      executor.prompt(prompt, {})
+    end
+
+    it 'does not show input when sensitive' do
+      allow(STDIN).to receive(:tty?).and_return(true)
+      allow(STDERR).to receive(:puts)
+      allow(STDERR).to receive(:print).with("#{prompt}: ")
+      expect(STDIN).to receive(:noecho).and_return(prompt)
+
+      executor.prompt(prompt, sensitive: true)
+    end
+
+    it 'errors if STDIN is not a tty' do
+      allow(STDIN).to receive(:tty?).and_return(false)
+      expect { executor.prompt(prompt, {}) }.to raise_error(Bolt::Error, /STDIN is not a tty, unable to prompt/)
+    end
+  end
+
   it "returns and notifies an error result" do
     node_results.each_key do |_target|
       expect(ssh)

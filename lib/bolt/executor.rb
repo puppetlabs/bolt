@@ -326,6 +326,23 @@ module Bolt
       end
     end
 
+    def prompt(prompt, options)
+      unless STDIN.tty?
+        raise Bolt::Error.new('STDIN is not a tty, unable to prompt', 'bolt/no-tty-error')
+      end
+
+      STDERR.print("#{prompt}: ")
+      value = if options[:sensitive]
+                STDIN.noecho(&:gets).chomp
+              else
+                STDIN.gets.chomp
+              end
+
+      STDERR.puts if options[:sensitive]
+
+      value
+    end
+
     # Plan context doesn't make sense for most transports but it is tightly
     # coupled with the orchestrator transport since the transport behaves
     # differently when a plan is running. In order to limit how much this
