@@ -72,26 +72,23 @@ class ChangelogGenerator
     @changelog
   end
 
-  # Parses individual commits by searching for a !label, normalizing it to a
-  # valid entry key, and pulling out the changelog entry from the commit
+  # Parses individual commits by scanning the commit message for valid release notes
+  # and adding them to the list of entries. Entries include extra information about
+  # the author and whether it was an internal or external contribution so we can give
+  # kudos.
   def parse_commit(commit)
-    regex = /!(?<label>#{labels.join('|')})(?<entry>[\s\S]*)\z/
-    match = commit.commit.message.match(regex)
+    regex = /!(#{labels.join('|')})(.+?)(?=(?:!(?:#{labels.join('|')})|\z))/m
 
-    add_entry(match, commit) if match
-  end
+    commit.commit.message.scan(regex) do |match|
+      label, entry = match
 
-  # Adds valid entries to the list of entries, adding extra information about
-  # the author and whether it is an internal contribution
-  def add_entry(match, commit)
-    label = match[:label]
-
-    entries[label][:entries].push(
-      body:     match[:entry],
-      author:   commit.commit.author.name || commit.author.login,
-      profile:  commit.author.html_url,
-      internal: org_members.include?(commit.author.login)
-    )
+      entries[label][:entries].push(
+        body:     entry,
+        author:   commit.commit.author.name || commit.author.login,
+        profile:  commit.author.html_url,
+        internal: org_members.include?(commit.author.login)
+      )
+    end
   end
 
   def update_changelog
