@@ -99,7 +99,8 @@ module Bolt
         'vars' => vars,
         'features' => features,
         'facts' => facts,
-        'plugin_hooks' => plugin_hooks
+        'plugin_hooks' => plugin_hooks,
+        'groups' => @inventory.group_names_for(name)
       }
     end
 
