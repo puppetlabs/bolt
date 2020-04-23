@@ -1,9 +1,44 @@
 # Releasing Bolt 
 
-Hello, fearless reader! This document details the release process for Bolt. Our current release cadence is weekly for both the bolt gem and bolt system package, usually on Mondays. Here's how we do it: 
+Hello, fearless reader! This document details the release process for Bolt. We have a weekly release cadence and
+aim to release new versions of Bolt on Mondays. 
 
-1. Generate the changelog using the rake task `rake 'changelog[VERSION]'`, where `VERSION` is the new tag, and merge the changes into `master`.
-2. Build and stage bolt packages with the [init_bolt-release job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_bolt-vanagon_bolt-release-init_bolt-release/) using all defaults except the new tag for Bolt. The version specified will be the new tag in the github repo.
-3. Once step 2 is done and you are ready to push the packages to public repositories, run the [release job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_ship-bolt_stage-foss-artifacts-all-repos/) with all default parameters except the new tag. This will also kick off the [docs publishing job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_ship-bolt_publish_docs/) which will build and publish the docs based on the new tag. Note that this job can be run against any REF as a stand-alone pipeline in the case where a change is needed outside of a tagged version. 
-4. After packages are made public update the [Homebrew tap](https://github.com/puppetlabs/homebrew-puppet) with the new version of bolt. This can be accomplished by running the rake task `rake 'brew:cask[puppet-bolt]'` and opening a PR with the changes. Make sure the PR passes the Travis integration tests and merge the PR. 
-5. Once packages are public, send an email to the internal-puppet-products-update group.
+1. Generate the changelog using the changelog rake task, where `VERSION` is the next tagged version of Bolt.
+
+   ```bash
+   $ rake 'changelog[VERSION]'
+   ```
+   
+   Open a PR against `puppetlabs/bolt` and merge the changes into `master`.
+
+   > **Note:** To use the rake task you must be a member of the `puppetlabs` organization and set the environment
+     variable `GITHUB_TOKEN` with a [personal access token](https://github.com/settings/tokens) that has
+     `admin:read:org` permissions.
+
+1. Ensure that the [Bolt pipelines](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/) are green.
+
+1. Build and stage packages with the 
+   [init_bolt-release job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_bolt-vanagon_bolt-release-init_bolt-release/).
+   Click on _Build with Parameters_ and set `NEW_TAG` to the next tagged version of Bolt. Click _Build_.
+
+1. Once packages are staged and you are ready to push them to public repositories, run the
+   [release job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_ship-bolt_stage-foss-artifacts-all-repos/).
+   Click on _Build with Parameters_ and set `REFS` to the next tagged version of Bolt. Click _Build_. 
+   
+   Once the release pipeline is complete it will kick off additional jobs, including the
+   [puppet-bolt docker job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_ship-bolt_build_and_push_bolt_docker_image/)
+   and [docs publishing job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_ship-bolt_publish_docs/).
+   If these jobs are not kicked off automatically, they can be triggered manually without affecting the release.
+
+1. After packages are made public, update the [Homebrew tap](https://github.com/puppetlabs/homebrew-puppet) with the
+   new version of Bolt. Checkout a new release branch and run the following rake task:
+
+   ```bash
+   $ rake 'brew:cask[puppet-bolt]'
+   ```
+
+   Open a PR against `puppetlabs/homebrew-puppet`, wait for the Travis CI tests to pass, and then merge to
+   `master`
+
+1. Once packages are public, send an email to the `internal-puppet-products-update` group with the release
+   notes and announce the new version in the `#bolt` channel on the community Slack.
