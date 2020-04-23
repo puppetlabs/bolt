@@ -1336,6 +1336,7 @@ describe Bolt::Inventory::Inventory do
         'vars' => {},
         'facts' => { 'foo' => 'bar' },
         'features' => [],
+        'groups' => %w[group1 group2 all],
         'plugin_hooks' => {
           'puppet_library' => { 'plugin' => 'puppet_agent', 'stop_service' => true }
         } }
