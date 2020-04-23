@@ -63,7 +63,7 @@ module Bolt
               disabled: true
 
             Read more about what data Bolt collects and why here:
-              https://puppet.com/docs/bolt/latest/bolt_installing.html#concept-8242
+              https://puppet.com/docs/bolt/latest/bolt_installing.html#analytics-data-collection
             ANALYTICS
         end
 
