@@ -262,7 +262,13 @@ module Bolt
         dir = make_tempdir
         yield dir
       ensure
-        dir&.delete
+        if dir
+          if target.options['cleanup']
+            dir.delete
+          else
+            @logger.warn("Skipping cleanup of tmpdir #{dir}")
+          end
+        end
       end
 
       # In the case where a task is run with elevated privilege and needs stdin

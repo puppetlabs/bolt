@@ -8,6 +8,8 @@ module Bolt
     module Transport
       class Docker < Base
         OPTIONS = {
+          "cleanup"       => { type: TrueClass,
+                               desc: "Whether to clean up temporary files created on targets." },
           "host"          => { type: String,
                                desc: "Host name." },
           "interpreters"  => { type: Hash,
@@ -27,7 +29,9 @@ module Bolt
                                desc: "Whether to enable tty on exec commands." }
         }.freeze
 
-        DEFAULTS = {}.freeze
+        DEFAULTS = {
+          'cleanup' => true
+        }.freeze
 
         private def validate
           super

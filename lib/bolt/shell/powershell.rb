@@ -140,7 +140,13 @@ module Bolt
         end
         yield @tempdir
       ensure
-        rmdir(@tempdir) if owner
+        if owner && @tempdir
+          if target.options['cleanup']
+            rmdir(@tempdir)
+          else
+            @logger.warn("Skipping cleanup of tmpdir '#{@tempdir}'")
+          end
+        end
       end
 
       def run_ps_task(task_path, arguments, input_method)

@@ -119,9 +119,13 @@ module Bolt
           yield dir
         ensure
           if dir
-            _, stderr, exitcode = execute('rm', '-rf', dir, {})
-            if exitcode != 0
-              @logger.warn("Failed to clean up tempdir '#{dir}': #{stderr}")
+            if @target.options['cleanup']
+              _, stderr, exitcode = execute('rm', '-rf', dir, {})
+              if exitcode != 0
+                @logger.warn("Failed to clean up tempdir '#{dir}': #{stderr}")
+              end
+            else
+              @logger.warn("Skipping cleanup of tempdir '#{dir}'")
             end
           end
         end

@@ -9,7 +9,7 @@ module Bolt
     OPTIONS = { inventory: %w[targets query rerun description],
                 authentication: %w[user password password-prompt private-key host-key-check ssl ssl-verify],
                 escalation: %w[run-as sudo-password sudo-password-prompt sudo-executable],
-                run_context: %w[concurrency inventoryfile save-rerun],
+                run_context: %w[concurrency inventoryfile save-rerun cleanup],
                 global_config_setters: %w[modulepath boltdir configfile],
                 transports: %w[transport connect-timeout tty],
                 display: %w[format color verbose trace],
@@ -694,6 +694,10 @@ module Bolt
       define('--compile-concurrency CONCURRENCY', Integer,
              'Maximum number of simultaneous manifest block compiles (default: number of cores)') do |concurrency|
         @options[:'compile-concurrency'] = concurrency
+      end
+      define('--[no-]cleanup',
+             'Whether to clean up temporary files created on targets') do |cleanup|
+        @options[:cleanup] = cleanup
       end
       define('-m', '--modulepath MODULES',
              "List of directories containing modules, separated by '#{File::PATH_SEPARATOR}'",

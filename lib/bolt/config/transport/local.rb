@@ -8,6 +8,8 @@ module Bolt
     module Transport
       class Local < Base
         OPTIONS = {
+          "cleanup"         => { type: TrueClass,
+                                 desc: "Whether to clean up temporary files created on targets." },
           "interpreters"    => { type: Hash,
                                  desc: "A map of an extension name to the absolute path of an executable, "\
                                       "enabling you to override the shebang defined in a task executable. The "\
@@ -36,6 +38,8 @@ module Bolt
         }.freeze
 
         WINDOWS_OPTIONS = {
+          "cleanup"      => { type: TrueClass,
+                              desc: "Whether to clean up temporary files created on targets." },
           "interpreters" => { type: Hash,
                               desc: "A map of an extension name to the absolute path of an executable, "\
                                     "enabling you to override the shebang defined in a task executable. The "\
@@ -47,7 +51,9 @@ module Bolt
                               desc: "The directory to copy and execute temporary files." }
         }.freeze
 
-        DEFAULTS = {}.freeze
+        DEFAULTS = {
+          'cleanup' => true
+        }.freeze
 
         def self.options
           Bolt::Util.windows? ? WINDOWS_OPTIONS : OPTIONS

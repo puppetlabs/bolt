@@ -1118,6 +1118,7 @@ describe Bolt::Inventory::Inventory do
           "load-config" => true,
           "disconnect-timeout" => 11,
           'login-shell' => 'bash',
+          'cleanup' => true,
           "password" => 'sshpass',
           "interpreters" => { ".rb" => "/foo/ruby" } }
       }
@@ -1330,7 +1331,8 @@ describe Bolt::Inventory::Inventory do
             'tty' => false,
             'load-config' => true,
             'disconnect-timeout' => 100,
-            'login-shell' => 'bash'
+            'login-shell' => 'bash',
+            'cleanup' => true
           }
         },
         'vars' => {},
