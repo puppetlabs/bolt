@@ -37,22 +37,19 @@ module Bolt
     # before executing, and a :node_result event for each Target after
     # execution.
     class Base
-      STDIN_METHODS       = %w[both stdin].freeze
-      ENVIRONMENT_METHODS = %w[both environment].freeze
-
       attr_reader :logger
 
       def initialize
         @logger = Logging.logger[self]
       end
 
-      def with_events(target, callback)
+      def with_events(target, callback, action)
         callback&.call(type: :node_start, target: target)
 
         result = begin
                    yield
                  rescue StandardError, NotImplementedError => e
-                   Bolt::Result.from_exception(target, e)
+                   Bolt::Result.from_exception(target, e, action: action)
                  end
 
         callback&.call(type: :node_result, result: result)
@@ -106,7 +103,7 @@ module Bolt
       def batch_task(targets, task, arguments, options = {}, &callback)
         assert_batch_size_one("batch_task()", targets)
         target = targets.first
-        with_events(target, callback) do
+        with_events(target, callback, 'task') do
           @logger.debug { "Running task run '#{task}' on #{target.safe_name}" }
           run_task(target, task, arguments, options)
         end
@@ -120,7 +117,7 @@ module Bolt
       def batch_command(targets, command, options = {}, &callback)
         assert_batch_size_one("batch_command()", targets)
         target = targets.first
-        with_events(target, callback) do
+        with_events(target, callback, 'command') do
           @logger.debug("Running command '#{command}' on #{target.safe_name}")
           run_command(target, command, options)
         end
@@ -134,7 +131,7 @@ module Bolt
       def batch_script(targets, script, arguments, options = {}, &callback)
         assert_batch_size_one("batch_script()", targets)
         target = targets.first
-        with_events(target, callback) do
+        with_events(target, callback, 'script') do
           @logger.debug { "Running script '#{script}' on #{target.safe_name}" }
           run_script(target, script, arguments, options)
         end
@@ -148,7 +145,7 @@ module Bolt
       def batch_upload(targets, source, destination, options = {}, &callback)
         assert_batch_size_one("batch_upload()", targets)
         target = targets.first
-        with_events(target, callback) do
+        with_events(target, callback, 'upload') do
           @logger.debug { "Uploading: '#{source}' to #{destination} on #{target.safe_name}" }
           upload(target, source, destination, options)
         end

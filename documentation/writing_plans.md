@@ -270,43 +270,7 @@ Plan execution functions each return a result object that returns details about 
 
 Each [execution function](plan_functions.md#) returns an object type `ResultSet`. For each target that the execution takes place on, this object contains a `Result` object. The [apply action](applying_manifest_blocks.md#) returns a `ResultSet` containing `ApplyResult` objects.
 
-A `ResultSet` has the following methods:
-
--   `names()`: The `String` names (target URIs) of all targets in the set as an `Array`.
--   `empty()`: Returns `Boolean` if the execution result set is empty.
--   `count()`: Returns an `Integer` count of targets.
--   `first()`: The first `Result` object, useful to unwrap single results.
--   `find(String $target_name)`: Look up the `Result` for a specific target.
--   `error_set()`: A `ResultSet` containing only the results of failed targets.
--   `ok_set()`: A `ResultSet` containing only the successful results.
--   `filter_set(block)`: Filters a `ResultSet` with the given block and returns a `ResultSet` object (where the [filter function](https://puppet.com/docs/puppet/latest/function.html#filter) returns an array or hash).
--   `targets()`: An array of all the `Target` objects from every `Result` in the set.
--   `ok():` `Boolean` that is the same as `error_targets.empty`.
--   `to_data()`: An array of hashes representing either `Result` or `ApplyResults`.
--   `[]`: Array indexing allows accessing a single `Result` (for example `$result[0]`) or an array of results (for example `$result[0,2]`)
-
-
-A `Result` has the following methods:
-
--   `value()`: The hash containing the value of the `Result`.
--   `target()`: The `Target` object that the `Result` is from.
--   `error()`: An `Error` object constructed from the `_error` in the value.
--   `message()`: The `_output` key from the value.
--   `ok()`: Returns `true` if the `Result` was successful.
--   `[]`: Accesses the value hash directly.
--   `to_data()`: Hash representation of `Result`.
--   `action()`: String representation of result type (task, command, etc.).
-
-
-An `ApplyResult` has the following methods:
-
--   `report()`: The hash containing the Puppet report from the application.
--   `target()`: The `Target` object that the `Result` is from.
--   `error()`: An `Error` object constructed from the `_error` in the value.
--   `ok()`: Returns `true` if the `Result` was successful.
--   `to_data()`: Hash representation of `ApplyResult`.
--   `action()`: String representation of result type (apply).
-
+For information on the types returned from plan functions, see [Bolt data types](bolt_types_reference.md).
 
 An instance of `ResultSet` is `Iterable` as if it were an `Array[Variant[Result, ApplyResult]]` so that iterative functions such as `each`, `map`, `reduce`, or `filter` work directly on the `ResultSet` returning each result.
 
@@ -467,6 +431,39 @@ These can be used to add facts, transport specific configuration options, featur
 target objects, as well as add or remove objects from existing [inventory
 groups](https://puppet.com/docs/bolt/latest/inventory_file.html). Targets are modified in-memory
 for the life cycle of the plan and are not saved between plan runs.
+
+### Temporarily modifying target objects
+
+Target objects can be temporarily modified during a plan run. For example, you can store a target's
+configuration in a temporary variable, modify the target's configuration using the 
+[`set_config`](plan_functions.md#set-config) function, and then restore the target's original
+configuration.
+
+Temporarily modify a target's configuration:
+
+```
+plan test(String $host) {
+  $target = get_target($host)
+
+  # Store the target's original configuration
+  $original_config = $target.config['ssh']
+
+  # Modify the target's configuration
+  $config =  {
+    'user'     => 'bolt',
+    'password' => 'secret'
+  }
+
+  set_config($target, 'ssh', $config)
+
+  ...
+
+  # Restore the target's original configuration
+  set_config($target, 'ssh', $original_config)
+
+  ...
+}
+```
 
 ### Variables and facts on targets
 

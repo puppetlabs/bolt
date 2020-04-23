@@ -34,7 +34,7 @@ module Bolt
         remote_task = task.remote_instance
 
         result = transport.run_task(proxy_target, remote_task, arguments, options)
-        Bolt::Result.new(target, value: result.value)
+        Bolt::Result.new(target, value: result.value, action: 'task', object: task.name)
       end
     end
   end

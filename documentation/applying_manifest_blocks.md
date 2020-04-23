@@ -14,14 +14,13 @@ Similar to the `puppet apply` command, which applies a standalone Puppet manifes
 
 [Puppet Forge](https://forge.puppet.com/)
 
+## Using manifest blocks
+
+Manifest blocks require facts to compile. If your plan includes a manifest block, use the `apply_prep` function in your plan before your manifest block. The `apply_prep` function installs the packages necessary to run the Bolt `apply` command and gathers facts by running [facter](https://puppet.com/docs/facter/latest/), making the facts available to the manifest block. The `apply_prep` function also identifies the targets that do not have Puppet agents and runs the `puppet_agent::install` task (from the [puppet_agent module](https://forge.puppet.com/puppetlabs/puppet_agent)).
+
 ## How manifest blocks are applied
 
-When you run a plan that contains a manifest block, the `apply_prep` function installs the packages necessary to run the Bolt `apply` command.
-
-The `apply_prep` function identifies the targets that do not have Puppet agents and runs the `puppet_agent::install` task (from the [puppet_agent module](https://forge.puppet.com/puppetlabs/puppet_agent)). It also copies over custom facts from the Bolt modulepath and runs [facter](https://puppet.com/docs/facter/latest/) on the targets.
-
-Behind the scenes, Bolt compiles the code in your manifest block (the code wrapped in curly braces that follows the `apply` function) into a catalog. Code is compiled in the following order:
-
+Bolt compiles the code in your manifest block (the code wrapped in curly braces that follows the `apply` function) into a catalog. Bolt compiles code in the following order:
 -   Facts gathered from the targets or set in your inventory.
 -   Local variables in the plan, such as `$site_content`.
 -   [`Vars`](inventory_file_v2.md#title-1541705359297) set in your inventory.
@@ -47,7 +46,7 @@ The `apply` action supports the following options:
 
 ### Return value of `apply` action
 
-The `apply` action returns an object type `ResultSet` that contains `ApplyResult` object for each target. For more information on the methods you can call on `$result`, see [Handling plan function results](writing_plans.md#).
+The `apply` action returns an object type `ResultSet` that contains `ApplyResult` object for each target. For more information on the methods you can call on `$result`, see [Bolt data types](bolt_types_reference.md). 
 
 ```
 $results = apply($targets) { ... }

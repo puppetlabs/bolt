@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module Bolt
-  module Transport
-    class Sudoable < Base
+  class Shell
+    class Bash < Shell
       class Tmpdir
-        def initialize(node, path)
-          @conn = node
-          @owner = node.user
+        def initialize(shell, path)
+          @shell = shell
+          @owner = shell.conn.user
           @path = path
-          @logger = node.logger
+          @logger = shell.logger
         end
 
         def to_s
@@ -17,7 +17,7 @@ module Bolt
 
         def mkdirs(subdirs)
           abs_subdirs = subdirs.map { |subdir| File.join(@path, subdir) }
-          result = @conn.execute(['mkdir', '-p'] + abs_subdirs)
+          result = @shell.execute(['mkdir', '-p'] + abs_subdirs)
           if result.exit_code != 0
             message = "Could not create subdirectories in '#{@path}': #{result.stderr.string}"
             raise Bolt::Node::FileError.new(message, 'MKDIR_ERROR')
@@ -27,7 +27,7 @@ module Bolt
         def chown(owner)
           return if owner.nil? || owner == @owner
 
-          result = @conn.execute(['id', '-g', owner])
+          result = @shell.execute(['id', '-g', owner])
           if result.exit_code != 0
             message = "Could not identify group of user #{owner}: #{result.stderr.string}"
             raise Bolt::Node::FileError.new(message, 'ID_ERROR')
@@ -35,7 +35,7 @@ module Bolt
           group = result.stdout.string.chomp
 
           # Chown can only be run by root.
-          result = @conn.execute(['chown', '-R', "#{owner}:#{group}", @path], sudoable: true, run_as: 'root')
+          result = @shell.execute(['chown', '-R', "#{owner}:#{group}", @path], sudoable: true, run_as: 'root')
           if result.exit_code != 0
             message = "Could not change owner of '#{@path}' to #{owner}: #{result.stderr.string}"
             raise Bolt::Node::FileError.new(message, 'CHOWN_ERROR')
@@ -46,7 +46,7 @@ module Bolt
         end
 
         def delete
-          result = @conn.execute(['rm', '-rf', @path], sudoable: true, run_as: @owner)
+          result = @shell.execute(['rm', '-rf', @path], sudoable: true, run_as: @owner)
           if result.exit_code != 0
             @logger.warn("Failed to clean up tempdir '#{@path}': #{result.stderr.string}")
           end

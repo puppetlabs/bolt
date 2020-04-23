@@ -11,8 +11,11 @@ require "json"
 require "erb"
 
 # Needed for Vanagon component ship job
-require 'packaging'
-Pkg::Util::RakeUtils.load_packaging_tasks
+# Do not load in GitHub workflows
+unless ENV['GITHUB_WORKFLOW']
+  require 'packaging'
+  Pkg::Util::RakeUtils.load_packaging_tasks
+end
 
 desc "Run all RSpec tests"
 RSpec::Core::RakeTask.new(:spec)
@@ -42,6 +45,12 @@ RSpec::Core::RakeTask.new(:slow) do |t|
   t.rspec_opts = '--tag puppetserver --tag puppetdb --tag expensive'
 end
 
+task :bolt_spec do
+  Dir.chdir("#{__dir__}/bolt_spec_spec/") do
+    sh "rake spec"
+  end
+end
+
 RuboCop::RakeTask.new(:rubocop) do |t|
   t.options = ['--display-cop-names', '--display-style-guide', '--parallel']
 end
@@ -60,6 +69,7 @@ end
 namespace :ci do
   task :fast do
     Rake::Task['fast'].invoke
+    Rake::Task['bolt_spec'].invoke
   end
 
   task :slow do
@@ -117,6 +127,7 @@ namespace :docs do
       actions.each do |action|
         command = [subcommand, action].compact.join(' ')
         help_text = parser.get_help_text(subcommand, action)
+        matches = help_text[:banner].match(/USAGE(?<usage>.+?)DESCRIPTION(?<desc>.+?)(EXAMPLES|\z)/m)
 
         options = help_text[:flags].map do |option|
           switch = parser.top.long[option]
@@ -129,8 +140,12 @@ namespace :docs do
           }
         end
 
+        desc  = matches[:desc].split("\n").map(&:strip).join("\n")
+        usage = matches[:usage].strip
+
         @commands[command] = {
-          banner: help_text[:banner],
+          usage: usage,
+          desc: desc,
           options: options
         }
       end

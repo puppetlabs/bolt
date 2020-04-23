@@ -24,7 +24,7 @@ describe Bolt::PAL::YamlPlan do
     it 'parses parameter types' do
       @plan_body = {
         'parameters' => {
-          'nodes' => {
+          'targets' => {
             'type' => 'TargetSpec'
           },
           'package' => {
@@ -39,8 +39,8 @@ describe Bolt::PAL::YamlPlan do
 
       param_types = plan.parameters.inject({}) { |acc, param| acc.merge(param.name => param.type_expr) }
 
-      expect(param_types.keys).to contain_exactly('nodes', 'package', 'count')
-      expect(param_types['nodes'].name).to eq('TargetSpec')
+      expect(param_types.keys).to contain_exactly('targets', 'package', 'count')
+      expect(param_types['targets'].name).to eq('TargetSpec')
       expect(param_types['package']).to be_a(Puppet::Pops::Types::PStringType)
       expect(param_types['count']).to be_a(Puppet::Pops::Types::PIntegerType)
     end
@@ -187,7 +187,7 @@ describe Bolt::PAL::YamlPlan do
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
           expect(error.message).to match(/Parse error in step \"foo\"/)
-          expect(error.message).to match(/The \"task\" step requires: \[\"target\"\] key\(s\)/)
+          expect(error.message).to match(/The \"task\" step requires: \[\"targets\"\] key\(s\)/)
         end
       end
 

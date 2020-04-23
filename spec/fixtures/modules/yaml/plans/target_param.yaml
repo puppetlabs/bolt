@@ -1,0 +1,10 @@
+parameters:
+  targets:
+    type: TargetSpec
+
+steps:
+  - name: run_command
+    command: echo hello world
+    target: $targets
+
+return: $run_command

@@ -114,6 +114,17 @@ describe Bolt::Target do
       expect(target.to_s).to eq("ssh://#{user}@neptune:2222")
     end
 
+    it "returns the transport" do
+      target = inventory.get_target('ssh://jupiter')
+      expect(target.transport).to eq('ssh')
+    end
+
+    it "returns the transport config" do
+      transport_config = Bolt::Config::Transport::SSH.new
+      target = inventory.get_target('ssh://jupiter')
+      expect(target.transport_config).to eq(transport_config.to_h)
+    end
+
     describe "with winrm" do
       it "accepts 'winrm://host:port'" do
         target = inventory.get_target('winrm://neptune:55985')

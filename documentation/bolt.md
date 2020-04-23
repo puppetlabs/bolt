@@ -67,6 +67,7 @@ Bolt is an open source orchestration tool that automates the manual work it take
         <ul>
             <li><a class="xref" target="_blank" href="https://puppet.com/resources/webinar/product-spotlight-webinar-puppet-taskstm">Product Spotlight Webinar: Puppet Tasks</a></li>
             <li><a class="xref" target="_blank" href="https://puppet.com/blog/combining-powershell-bolt-and-puppet-tasks-part-1">Combining PowerShell, Bolt and Puppet Tasks</a></li>
+            <li><a class="xref" target="_blank" href="https://puppet.com/blog/automating-from-zero-to-something/">Automating from zero to something</a></li>
         </ul>
     </p>
     <p>Share and contribute

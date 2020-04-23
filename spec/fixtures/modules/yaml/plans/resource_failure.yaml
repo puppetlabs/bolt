@@ -1,10 +1,10 @@
 parameters:
-  nodes:
+  targets:
     type: TargetSpec
 
 steps:
   - name: apply_resources
-    target: $nodes
+    targets: $targets
     resources:
       - notify: "hello world"
       - file: "/tmp/foo/bar/baz"

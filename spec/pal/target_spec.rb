@@ -22,6 +22,8 @@ describe 'Target DataType' do
 
   let(:target_code) { "$target = Target('pcp://user1:pass1@example.com:33')\n" }
 
+  let(:default_config) { config.transports['pcp'].to_h }
+
   def target(attr)
     code = target_code + attr
     peval(code, pal, nil, Bolt::Inventory::Inventory.new({}, config.transport, config.transports, plugins))
@@ -53,5 +55,13 @@ describe 'Target DataType' do
 
   it 'should expose password' do
     expect(target('$target.password')).to eq('pass1')
+  end
+
+  it 'should expose transport' do
+    expect(target('$target.transport')).to eq('pcp')
+  end
+
+  it 'should expose transport_config' do
+    expect(target('$target.transport_config')).to eq(default_config)
   end
 end

@@ -19,12 +19,12 @@ describe Bolt::Result do
   end
   let(:expected) {
     [{ "target" => "target1",
-       "action" => nil,
+       "action" => 'action',
        "object" => nil,
        "status" => "success",
        "value" => { "key" => "val1" } },
      { "target" => "target1",
-       "action" => nil,
+       "action" => 'action',
        "object" => nil,
        "status" => "failure",
        "value" => { "key" => "val2", "_error" => { "kind" => "bolt/oops" } } }]

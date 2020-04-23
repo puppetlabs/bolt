@@ -110,4 +110,12 @@ describe Bolt::Util do
       expect(Bolt::Util.read_optional_yaml_hash('does-not-exist', 'config')).to eq({})
     end
   end
+
+  describe '#deep_clone' do
+    it 'works with frozen hashes' do
+      hash = { key: 'value', boolean: true }
+      hash.freeze
+      expect(Bolt::Util.deep_clone(hash)).to eq(hash)
+    end
+  end
 end

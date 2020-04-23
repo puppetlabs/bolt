@@ -92,11 +92,11 @@ module Bolt
 
             remote_task_path = conn.write_remote_executable(task_dir, executable)
 
-            if STDIN_METHODS.include?(input_method)
+            if Bolt::Task::STDIN_METHODS.include?(input_method)
               execute_options[:stdin] = StringIO.new(JSON.dump(arguments))
             end
 
-            if ENVIRONMENT_METHODS.include?(input_method)
+            if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
               execute_options[:environment] = envify_params(arguments)
             end
 

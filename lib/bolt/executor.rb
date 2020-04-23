@@ -15,7 +15,6 @@ require 'bolt/transport/ssh'
 require 'bolt/transport/winrm'
 require 'bolt/transport/orch'
 require 'bolt/transport/local'
-require 'bolt/transport/local_windows'
 require 'bolt/transport/docker'
 require 'bolt/transport/remote'
 
@@ -24,7 +23,7 @@ module Bolt
     ssh: Bolt::Transport::SSH,
     winrm: Bolt::Transport::WinRM,
     pcp: Bolt::Transport::Orch,
-    local: Bolt::Util.windows? ? Bolt::Transport::LocalWindows : Bolt::Transport::Local,
+    local: Bolt::Transport::Local,
     docker: Bolt::Transport::Docker,
     remote: Bolt::Transport::Remote
   }.freeze
@@ -302,12 +301,12 @@ module Bolt
         batch_execute(targets) do |transport, batch|
           with_node_logging('Waiting until available', batch) do
             wait_until(wait_time, retry_interval) { transport.batch_connected?(batch) }
-            batch.map { |target| Result.new(target) }
+            batch.map { |target| Result.new(target, action: 'wait_until_available', object: description) }
           rescue TimeoutError => e
             available, unavailable = batch.partition { |target| transport.batch_connected?([target]) }
             (
-              available.map { |target| Result.new(target) } +
-              unavailable.map { |target| Result.from_exception(target, e) }
+              available.map { |target| Result.new(target, action: 'wait_until_available', object: description) } +
+              unavailable.map { |target| Result.from_exception(target, e, action: 'wait_until_available') }
             )
           end
         end
