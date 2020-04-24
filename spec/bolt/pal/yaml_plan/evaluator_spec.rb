@@ -337,7 +337,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'returns the result of the eval key' do
-      expect(subject.eval_step(scope, step)). to eq(55)
+      expect(subject.eval_step(scope, step)).to eq(55)
     end
   end
 
