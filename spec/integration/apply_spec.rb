@@ -186,10 +186,10 @@ describe "apply", expensive: true do
         end
       end
 
-      it 'does not create Boltdir' do
+      it 'does not create project' do
         inventory_data = agent_version_inventory
-        is_boltdir = "if [ -d ~/.puppetlabs ]; then echo 'exists'; else echo 'not found'; fi"
-        results = run_command(is_boltdir, 'agent_targets', inventory: inventory_data)
+        is_project = "if [ -d ~/.puppetlabs ]; then echo 'exists'; else echo 'not found'; fi"
+        results = run_command(is_project, 'agent_targets', inventory: inventory_data)
         results.each do |result|
           expect(result['status']).to eq('success')
           expect(result['value']['stdout']).to match(/not found/)
@@ -474,9 +474,9 @@ describe "apply", expensive: true do
         end
       end
 
-      it 'does not create Boltdir' do
-        is_boltdir = "if (!(Test-Path ~/.puppetlabs)) {echo 'not found'}"
-        results = run_command(is_boltdir, conn_uri('winrm'), config: config)
+      it 'does not create project' do
+        is_project = "if (!(Test-Path ~/.puppetlabs)) {echo 'not found'}"
+        results = run_command(is_project, conn_uri('winrm'), config: config)
         results.each do |result|
           expect(result).to include('status' => 'success')
           expect(result['value']['stdout']).to match(/not found/)
@@ -520,9 +520,9 @@ describe "apply", expensive: true do
         end
       end
 
-      it 'does not create Boltdir' do
-        is_boltdir = "if (!(Test-Path ~/.puppetlabs)) {echo 'not found'}"
-        results = run_command(is_boltdir, conn_uri('winrm'), config: config)
+      it 'does not create project' do
+        is_project = "if (!(Test-Path ~/.puppetlabs)) {echo 'not found'}"
+        results = run_command(is_project, conn_uri('winrm'), config: config)
         results.each do |result|
           expect(result).to include('status' => 'success')
           expect(result['value']['stdout']).to match(/not found/)

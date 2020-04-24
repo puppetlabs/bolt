@@ -126,25 +126,25 @@ module BoltSpec
     end
 
     class BoltRunner
-      # Creates a temporary boltdir so no settings are picked up
-      # WARNING: puppetdb config and orch config which do not use the boltdir may
+      # Creates a temporary project so no settings are picked up
+      # WARNING: puppetdb config and orch config which do not use the project may
       # still be loaded
       def self.with_runner(config_data, inventory_data)
-        Dir.mktmpdir do |boltdir_path|
-          runner = new(Bolt::Util.deep_clone(config_data), Bolt::Util.deep_clone(inventory_data), boltdir_path)
+        Dir.mktmpdir do |project_path|
+          runner = new(Bolt::Util.deep_clone(config_data), Bolt::Util.deep_clone(inventory_data), project_path)
           yield runner
         end
       end
 
-      def initialize(config_data, inventory_data, boltdir_path)
+      def initialize(config_data, inventory_data, project_path)
         @config_data = config_data || {}
         @inventory_data = inventory_data || {}
-        @boltdir_path = boltdir_path
+        @project_path = project_path
         @analytics = Bolt::Analytics::NoopClient.new
       end
 
       def config
-        @config ||= Bolt::Config.new(Bolt::Boltdir.new(@boltdir_path), @config_data)
+        @config ||= Bolt::Config.new(Bolt::Project.new(@project_path), @config_data)
       end
 
       def inventory
@@ -165,7 +165,7 @@ module BoltSpec
       def pal
         @pal ||= Bolt::PAL.new(config.modulepath,
                                config.hiera_config,
-                               config.boltdir.resource_types,
+                               config.project.resource_types,
                                config.compile_concurrency)
       end
 

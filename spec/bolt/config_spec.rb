@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'bolt/config'
 
 describe Bolt::Config do
-  let(:boltdir) { Bolt::Boltdir.new(File.join(Dir.tmpdir, rand(1000).to_s)) }
+  let(:project) { Bolt::Project.new(File.join(Dir.tmpdir, rand(1000).to_s)) }
   let(:system_path) {
     if Bolt::Util.windows?
       Pathname.new(File.join(Dir::COMMON_APPDATA, 'PuppetLabs', 'bolt', 'etc', 'bolt.yaml'))
@@ -16,40 +16,40 @@ describe Bolt::Config do
 
   describe "when initializing" do
     it "accepts string values for config data" do
-      config = Bolt::Config.new(boltdir, 'concurrency' => 200)
+      config = Bolt::Config.new(project, 'concurrency' => 200)
       expect(config.concurrency).to eq(200)
     end
 
     it "accepts keyword values for overrides" do
-      config = Bolt::Config.new(boltdir, {}, concurrency: 200)
+      config = Bolt::Config.new(project, {}, concurrency: 200)
       expect(config.concurrency).to eq(200)
     end
 
     it "overrides config values with overrides" do
-      config = Bolt::Config.new(boltdir, { 'concurrency' => 200 }, concurrency: 100)
+      config = Bolt::Config.new(project, { 'concurrency' => 200 }, concurrency: 100)
       expect(config.concurrency).to eq(100)
     end
 
-    it "treats relative modulepath as relative to Boltdir" do
+    it "treats relative modulepath as relative to project" do
       module_dirs = %w[site modules]
-      config = Bolt::Config.new(boltdir, 'modulepath' => module_dirs.join(File::PATH_SEPARATOR))
-      expect(config.modulepath).to eq(module_dirs.map { |dir| (boltdir.path + dir).to_s })
+      config = Bolt::Config.new(project, 'modulepath' => module_dirs.join(File::PATH_SEPARATOR))
+      expect(config.modulepath).to eq(module_dirs.map { |dir| (project.path + dir).to_s })
     end
 
     it "accepts an array for modulepath" do
       module_dirs = %w[site modules]
-      config = Bolt::Config.new(boltdir, 'modulepath' => module_dirs)
-      expect(config.modulepath).to eq(module_dirs.map { |dir| (boltdir.path + dir).to_s })
+      config = Bolt::Config.new(project, 'modulepath' => module_dirs)
+      expect(config.modulepath).to eq(module_dirs.map { |dir| (project.path + dir).to_s })
     end
   end
 
-  describe "::from_boltdir" do
-    it "loads from the boltdir config file if present" do
-      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(boltdir.config_file, 'config')
+  describe "::from_project" do
+    it "loads from the project config file if present" do
+      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(project.config_file, 'config')
       expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(system_path, 'config')
       expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(user_path, 'config')
 
-      Bolt::Config.from_boltdir(boltdir)
+      Bolt::Config.from_project(project)
     end
 
     context "when loading user level config fails" do
@@ -64,11 +64,11 @@ describe Bolt::Config do
           .with('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')
           .and_raise(ArgumentError, "couldn't find login name -- expanding `~'")
 
-        expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(boltdir.config_file, 'config')
+        expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(project.config_file, 'config')
         expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(system_path, 'config')
         expect(Bolt::Util).not_to receive(:read_optional_yaml_hash).with(user_path, 'config')
 
-        Bolt::Config.from_boltdir(boltdir)
+        Bolt::Config.from_project(project)
       end
     end
   end
@@ -96,7 +96,7 @@ describe Bolt::Config do
   describe "validate" do
     it "returns suggested paths when path case is incorrect" do
       modules = File.expand_path('modules')
-      config = Bolt::Config.new(boltdir, 'modulepath' => modules.upcase)
+      config = Bolt::Config.new(project, 'modulepath' => modules.upcase)
       expect(config.matching_paths(config.modulepath)).to include(modules)
     end
 
@@ -107,7 +107,7 @@ describe Bolt::Config do
         }
       }
 
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(
+      expect { Bolt::Config.new(project, config) }.to raise_error(
         /level of log file:.* must be one of debug, info, notice, warn, error, fatal, any; received foo/
       )
     end
@@ -119,27 +119,27 @@ describe Bolt::Config do
         }
       }
 
-      expect { Bolt::Config.new(boltdir, config) }.to raise_error(
+      expect { Bolt::Config.new(project, config) }.to raise_error(
         /append flag of log file:.* must be a Boolean, received Symbol :foo/
       )
     end
   end
 
   describe 'expanding paths' do
-    it "expands inventoryfile relative to boltdir" do
+    it "expands inventoryfile relative to project" do
       data = {
         'inventoryfile' => 'targets.yml'
       }
 
-      config = Bolt::Config.new(boltdir, data)
+      config = Bolt::Config.new(project, data)
       expect(config.inventoryfile)
-        .to eq(File.expand_path('targets.yml', boltdir.path))
+        .to eq(File.expand_path('targets.yml', project.path))
     end
   end
 
   describe 'with future set' do
     let(:future_config) { { 'future' => true } }
-    let(:config) { Bolt::Config.new(boltdir, future_config) }
+    let(:config) { Bolt::Config.new(project, future_config) }
 
     it 'logs a warning' do
       expect(config.warnings).to include(
@@ -228,7 +228,7 @@ describe Bolt::Config do
     }
 
     let(:config) {
-      Bolt::Config.new(boltdir, [
+      Bolt::Config.new(project, [
                          { data: system_config },
                          { data: user_config },
                          { data: project_config }

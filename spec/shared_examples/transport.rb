@@ -57,7 +57,7 @@ end
 
 def make_config(conf: transport_config)
   conf = Bolt::Util.walk_keys(conf, &:to_s)
-  Bolt::Config.new(boltdir, transport.to_s => conf)
+  Bolt::Config.new(project, transport.to_s => conf)
 end
 
 def make_target

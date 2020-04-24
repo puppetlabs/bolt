@@ -11,7 +11,7 @@ module BoltSpec
       cli = Bolt::CLI.new(arguments)
 
       # prevent tests from reading users config
-      allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(Bolt::Boltdir.new(Dir.mktmpdir))
+      allow(Bolt::Project).to receive(:find_boltdir).and_return(Bolt::Project.new(Dir.mktmpdir))
       allow(cli).to receive(:puppetdb_client).and_return(pdb_client)
       allow(cli).to receive(:analytics).and_return(Bolt::Analytics::NoopClient.new)
 

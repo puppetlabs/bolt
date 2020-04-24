@@ -57,10 +57,10 @@ describe "Bolt::CLI" do
   end
 
   context "without a config file" do
-    let(:boltdir) { Bolt::Boltdir.new('.') }
+    let(:project) { Bolt::Project.new('.') }
     before(:each) do
-      allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(boltdir)
-      allow_any_instance_of(Bolt::Boltdir).to receive(:resource_types)
+      allow(Bolt::Project).to receive(:find_boltdir).and_return(project)
+      allow_any_instance_of(Bolt::Project).to receive(:resource_types)
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
       allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return({})
     end

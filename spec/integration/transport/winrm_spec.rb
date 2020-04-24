@@ -18,7 +18,7 @@ describe Bolt::Transport::WinRM do
   include BoltSpec::Sensitive
   include BoltSpec::Task
 
-  let(:boltdir)     { Bolt::Boltdir.new('.') }
+  let(:project)     { Bolt::Project.new('.') }
   let(:host)        { conn_info('winrm')[:host] }
   let(:port)        { conn_info('winrm')[:port] }
   let(:ssl_port)    { ENV['BOLT_WINRM_SSL_PORT'].to_i || 25986 }
@@ -337,7 +337,7 @@ describe Bolt::Transport::WinRM do
           'smb-port' => smb_port
         }
       }
-      expect { Bolt::Config.new(boltdir, conf) }.to raise_error(Bolt::ValidationError)
+      expect { Bolt::Config.new(project, conf) }.to raise_error(Bolt::ValidationError)
     end
 
     it "catches winrm-fs upload error", winrm: true do

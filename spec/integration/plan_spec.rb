@@ -72,13 +72,13 @@ describe "When a plan succeeds" do
     end
 
     after(:all) do
-      # Remove .resource_types generated in boltdir
+      # Remove .resource_types generated in project
       FileUtils.rm_rf(fixture_path('configs', '.resource_types'))
       uninstall(conn_uri('ssh', include_password: true))
     end
 
-    it 'runs registers types defined in $Boltdir/.resource_types', ssh: true do
-      # generate types based and save in boltdir (based on value of --configfile)
+    it 'runs registers types defined in $project/.resource_types', ssh: true do
+      # generate types based and save in project (based on value of --configfile)
       run_cli(%w[puppetfile generate-types] + config_flags)
       result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)
       expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
