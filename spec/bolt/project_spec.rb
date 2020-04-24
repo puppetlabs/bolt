@@ -4,6 +4,39 @@ require 'spec_helper'
 require 'bolt/project'
 
 describe Bolt::Project do
+  describe "configuration" do
+    let(:pwd) { @tmpdir }
+    let(:config) { { 'tasks' => ['facts'] } }
+
+    before(:each) do
+      allow(Bolt::Util).to receive(:read_optional_yaml_hash)
+        .with(File.expand_path(@tmpdir + 'project.yaml'), 'project')
+        .and_return(config)
+    end
+
+    around(:each) do |example|
+      Dir.mktmpdir do |tmpdir|
+        @tmpdir = Pathname.new(tmpdir)
+        FileUtils.touch(@tmpdir + 'bolt.yaml')
+        example.run
+      end
+    end
+
+    it "loads config with defaults" do
+      project = Bolt::Project.new(pwd)
+      expect(project.tasks).to eq(config['tasks'])
+      expect(project.plans).to eq(nil)
+    end
+
+    describe "validate" do
+      let(:config) { { 'tasks' => 'foo' } }
+
+      it "validates config" do
+        expect { Bolt::Project.new(pwd) }.to raise_error(/'tasks' in project.yaml must be an array/)
+      end
+    end
+  end
+
   describe "::find_boltdir" do
     let(:boltdir_path) { @tmpdir + 'foo' + 'Boltdir' }
     let(:project) { Bolt::Project.new(boltdir_path) }
@@ -16,7 +49,7 @@ describe Bolt::Project do
       end
     end
 
-    describe "when the project is named project" do
+    describe "when the project directory is named Boltdir" do
       it 'finds project from inside project' do
         pwd = boltdir_path
         expect(Bolt::Project.find_boltdir(pwd)).to eq(project)

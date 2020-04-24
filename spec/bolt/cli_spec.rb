@@ -981,6 +981,18 @@ describe "Bolt::CLI" do
           end
         end
 
+        it "only includes tasks set in project.yaml" do
+          proj = double('project', type: '', resource_types: '', tasks: ['facts'])
+          allow(cli.config).to receive(:project).and_return(proj)
+          options = {
+            subcommand: 'task',
+            action: 'show'
+          }
+          cli.execute(options)
+          tasks = JSON.parse(output.string)['tasks']
+          expect(tasks).to eq([['facts', "Gather system facts"]])
+        end
+
         it "lists modulepath" do
           options = {
             subcommand: 'task',

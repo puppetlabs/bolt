@@ -14,7 +14,7 @@ describe Bolt::Plugin::Pkcs7 do
 
   let(:context) do
     context = instance_double("Bolt::Plugin::PluginContext")
-    allow(context).to receive(:project).and_return(@project)
+    allow(context).to receive(:boltdir).and_return(@project)
     context
   end
 
