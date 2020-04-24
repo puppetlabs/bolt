@@ -68,6 +68,8 @@
   that returned `nil`, threw an exception. Returning from a plan with results 
   of `wait_until_available()`, threw an exception.
 
+  _Contributed by [Nick Maludy](https://github.com/nmaludy)_
+
 * **Fix a bug passing arguments to local shell transport**
   ([#1713](https://github.com/puppetlabs/bolt/1713))
 
@@ -100,6 +102,8 @@
   Previously, the `target_mapping` field only supported populating a target's `uri`,
   `name` and `config` values. All of a target's attributes can now be specified in
   the `target_mapping` field, including `facts`, `vars`, `features`, and `alias`.
+
+  _Contributed by [Nick Maludy](https://github.com/nmaludy)_
 
 ## Bolt 2.3.1 (2020-03-30)
 
