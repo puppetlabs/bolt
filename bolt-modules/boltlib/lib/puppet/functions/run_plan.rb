@@ -117,7 +117,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
         # undef/nil
         result = catch(:return) do
           scope.with_global_scope do |global_scope|
-            closure.call_by_name_with_scope(global_scope, params, true)
+            executor.run_plan(global_scope, closure, params)
           end
           nil
         end&.value

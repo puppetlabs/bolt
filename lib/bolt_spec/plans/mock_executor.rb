@@ -3,6 +3,7 @@
 require 'bolt_spec/plans/action_stubs'
 require 'bolt_spec/plans/publish_stub'
 require 'bolt/error'
+require 'bolt/executor'
 require 'bolt/result_set'
 require 'bolt/result'
 require 'pathname'
@@ -10,14 +11,14 @@ require 'set'
 
 module BoltSpec
   module Plans
-    MOCKED_ACTIONS = %i[command script task upload].freeze
+    MOCKED_ACTIONS = %i[command plan script task upload].freeze
 
     class UnexpectedInvocation < ArgumentError; end
 
     # Nothing on the executor is 'public'
     class MockExecutor
       attr_reader :noop, :error_message
-      attr_accessor :run_as, :transport_features
+      attr_accessor :run_as, :transport_features, :execute_any_plan
 
       def initialize(modulepath)
         @noop = false
@@ -28,6 +29,13 @@ module BoltSpec
         MOCKED_ACTIONS.each { |action| instance_variable_set(:"@#{action}_doubles", {}) }
         @stub_out_message = nil
         @transport_features = ['puppet-agent']
+        @executor_real = Bolt::Executor.new
+        # by default, we want to execute any plan that we come across without error
+        # or mocking. users can toggle this behavior so that plans will either need to
+        # be mocked out, or an error will be thrown.
+        @execute_any_plan = true
+        # plans that are allowed to be executed by the @executor_real
+        @allowed_exec_plans = {}
       end
 
       def module_file_id(file)
@@ -91,6 +99,57 @@ module BoltSpec
         unless result
           targets = targets.map(&:name)
           @error_message = "Unexpected call to 'upload_file(#{source}, #{destination}, #{targets}, #{options})'"
+          raise UnexpectedInvocation, @error_message
+        end
+        result
+      end
+
+      def with_plan_allowed_exec(plan_name, params)
+        @allowed_exec_plans[plan_name] = params
+        result = yield
+        @allowed_exec_plans.delete(plan_name)
+        result
+      end
+
+      def run_plan(scope, plan_clj, params)
+        result = nil
+        plan_name = plan_clj.closure_name
+
+        # get the mock object either by plan name, or the default in case allow_any_plan
+        # was called, if both are nil / don't exist, then dub will be nil and we'll fall
+        # through to another conditional statement
+        doub = @plan_doubles[plan_name] || @plan_doubles[:default]
+
+        # High level:
+        #  - If we've explicitly allowed execution of the plan (normally the main plan
+        #    passed into BoltSpec::Plan::run_plan()), then execute it
+        #  - If we've explicitly "allowed/expected" the plan (mocked),
+        #    then run it through the mock object
+        #  - If we're allowing "any" plan to be executed,
+        #    then execute it
+        #  - Otherwise we have an error
+        if @allowed_exec_plans.key?(plan_name) && @allowed_exec_plans[plan_name] == params
+          # This plan's name + parameters were explicitly allowed to be executed.
+          # run it with the real executor.
+          # We require this functionality so that the BoltSpec::Plans.run_plan()
+          # function can kick off the initial plan. In reality, no other plans should
+          # be in this hash.
+          result = @executor_real.run_plan(scope, plan_clj, params)
+        elsif doub
+          result = doub.process(scope, plan_clj, params)
+          # the throw here is how Puppet exits out of a closure and returns a result
+          # it throws this special symbol with a result object that is captured by
+          # the run_plan Puppet function
+          throw :return, result
+        elsif @execute_any_plan
+          # if the plan wasn't allowed or mocked out, and we're allowing any plan to be
+          # executed, then execute the plan
+          result = @executor_real.run_plan(scope, plan_clj, params)
+        else
+          # convert to JSON and back so that we get the ruby representation with all keys and
+          # values converted to a string .to_s instead of their ruby object notation
+          params_str = JSON.parse(params.to_json)
+          @error_message = "Unexpected call to 'run_plan(#{plan_name}, #{params_str})'"
           raise UnexpectedInvocation, @error_message
         end
         result

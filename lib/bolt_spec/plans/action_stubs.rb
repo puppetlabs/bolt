@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'bolt/plan_result'
 require 'bolt/result'
 require 'bolt/util'
 
@@ -23,8 +24,8 @@ module BoltSpec
         @stubs.each { |s| s.assert_called(object) }
       end
 
-      def add_stub
-        stub = Plans.const_get(@action_stub).new
+      def add_stub(inventory = nil)
+        stub = Plans.const_get(@action_stub).new(false, inventory)
         @stubs.unshift stub
         stub
       end
@@ -33,7 +34,7 @@ module BoltSpec
     class ActionStub
       attr_reader :invocation
 
-      def initialize(expect = false)
+      def initialize(expect = false, inventory = nil)
         @calls = 0
         @expect = expect
         @expected_calls = nil
@@ -41,6 +42,7 @@ module BoltSpec
         @invocation = {}
         # return value
         @data = { default: {} }
+        @inventory = inventory
       end
 
       def assert_called(object)
@@ -55,7 +57,16 @@ module BoltSpec
           end
           message = "Expected #{object} to be called #{times} times"
           message += " with targets #{@invocation[:targets]}" if @invocation[:targets]
-          message += " with parameters #{parameters}" if parameters
+          if parameters
+            # Print the parameters hash by converting it to JSON and then re-parsing.
+            # This prevents issues in Bolt data types, such as Targets, from generating
+            # gigantic, unreadable, data when converted to string by interpolation.
+            # Targets exhibit this behavior because they have a reference to @inventory.
+            # When the target is converted into a string, it converts the full Inventory
+            # into a string recursively.
+            parameters_str = JSON.parse(parameters.to_json)
+            message += " with parameters #{parameters_str}"
+          end
           raise message
         end
       end
@@ -71,6 +82,14 @@ module BoltSpec
       # Used to create a valid Bolt::Result object from result data.
       def default_for(target)
         case @data[:default]
+        when Bolt::PlanFailure
+          # Bolt::PlanFailure needs to be declared before Bolt::Error because
+          # Bolt::PlanFailure is an instance of Bolt::Error, so it can match both
+          # in this case we need to treat Bolt::PlanFailure's in a different way
+          #
+          # raise Bolt::PlanFailure errors so that the PAL can catch them and wrap
+          # them into Bolt::PlanResult's for us.
+          raise @data[:default]
         when Bolt::Error
           Bolt::Result.from_exception(target, @data[:default])
         when Hash
@@ -85,6 +104,13 @@ module BoltSpec
           raise "Return block for #{object} did not return a Bolt::ResultSet"
         end
         result_set
+      end
+
+      def check_plan_result(plan_result, plan_clj)
+        unless plan_result.is_a?(Bolt::PlanResult)
+          raise "Return block for #{plan_clj.closure_name} did not return a Bolt::PlanResult"
+        end
+        plan_result
       end
 
       # Below here are the intended 'public' methods of the stub
@@ -127,7 +153,10 @@ module BoltSpec
       def return_for_targets(data)
         data.each_with_object(@data) do |(target, result), hsh|
           raise "Mocked results must be hashes: #{target}: #{result}" unless result.is_a? Hash
-          hsh[target] = result_for(Bolt::Target.new(target), Bolt::Util.walk_keys(result, &:to_sym))
+          # set the inventory from the BoltSpec::Plans, otherwise if we try to convert
+          # this target to a string, it will fail to string conversion because the
+          # inventory is nil
+          hsh[target] = result_for(Bolt::Target.new(target, @inventory), Bolt::Util.walk_keys(result, &:to_sym))
         end
         raise "Cannot set return values and return block." if @return_block
         @data_set = true
@@ -143,10 +172,10 @@ module BoltSpec
       end
 
       # Set a default error result for all targets.
-      def error_with(data)
+      def error_with(data, clazz = Bolt::Error)
         data = Bolt::Util.walk_keys(data, &:to_s)
         if data['msg'] && data['kind'] && (data.keys - %w[msg kind details issue_code]).empty?
-          @data[:default] = Bolt::Error.new(data['msg'], data['kind'], data['details'], data['issue_code'])
+          @data[:default] = clazz.new(data['msg'], data['kind'], data['details'], data['issue_code'])
         else
           STDERR.puts "In the future 'error_with()' may require msg and kind, and " \
                       "optionally accept only details and issue_code."
@@ -160,6 +189,7 @@ module BoltSpec
 end
 
 require_relative 'action_stubs/command_stub'
+require_relative 'action_stubs/plan_stub'
 require_relative 'action_stubs/script_stub'
 require_relative 'action_stubs/task_stub'
 require_relative 'action_stubs/upload_stub'

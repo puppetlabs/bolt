@@ -291,6 +291,10 @@ module Bolt
       end
     end
 
+    def run_plan(scope, plan, params)
+      plan.call_by_name_with_scope(scope, params, true)
+    end
+
     class TimeoutError < RuntimeError; end
 
     def wait_until_available(targets,

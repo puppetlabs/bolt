@@ -858,6 +858,9 @@ describe "Bolt::CLI" do
       before :each do
         allow(Bolt::Executor).to receive(:new).and_return(executor)
         allow(executor).to receive(:log_plan) { |_plan_name, &block| block.call }
+        allow(executor).to receive(:run_plan) do |scope, plan, params|
+          plan.call_by_name_with_scope(scope, params, true)
+        end
 
         outputter = Bolt::Outputter::JSON.new(false, false, false, output)
 
@@ -1607,6 +1610,7 @@ describe "Bolt::CLI" do
 
             expect(executor).to receive(:start_plan)
             expect(executor).to receive(:log_plan)
+            expect(executor).to receive(:run_plan)
             expect(executor).to receive(:finish_plan)
 
             cli.execute(options)
@@ -1634,6 +1638,7 @@ describe "Bolt::CLI" do
 
             expect(executor).to receive(:start_plan)
             expect(executor).to receive(:log_plan)
+            expect(executor).to receive(:run_plan)
             expect(executor).to receive(:finish_plan)
 
             cli.execute(options)
@@ -1670,6 +1675,7 @@ describe "Bolt::CLI" do
 
             expect(executor).to receive(:start_plan)
             expect(executor).to receive(:log_plan)
+            expect(executor).to receive(:run_plan)
             expect(executor).to receive(:finish_plan)
 
             cli.execute(options)
@@ -1686,6 +1692,7 @@ describe "Bolt::CLI" do
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
+          expect(executor).to receive(:run_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
@@ -1706,6 +1713,7 @@ describe "Bolt::CLI" do
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
+          expect(executor).to receive(:run_plan)
           expect(executor).to receive(:finish_plan)
 
           expect(cli.execute(options)).to eq(1)
@@ -1720,6 +1728,7 @@ describe "Bolt::CLI" do
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
+          expect(executor).to receive(:run_plan)
           expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
