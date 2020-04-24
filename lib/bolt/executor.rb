@@ -332,10 +332,11 @@ module Bolt
       end
 
       STDERR.print("#{prompt}: ")
+
       value = if options[:sensitive]
-                STDIN.noecho(&:gets).chomp
+                STDIN.noecho(&:gets).to_s.chomp
               else
-                STDIN.gets.chomp
+                STDIN.gets.to_s.chomp
               end
 
       STDERR.puts if options[:sensitive]
