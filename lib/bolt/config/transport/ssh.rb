@@ -9,6 +9,8 @@ module Bolt
       class SSH < Base
         LOGIN_SHELLS = %w[sh bash zsh dash ksh powershell].freeze
         OPTIONS = {
+          "cleanup"            => { type: TrueClass,
+                                    desc: "Whether to clean up temporary files created on targets." },
           "connect-timeout"    => { type: Integer,
                                     desc: "How long to wait when establishing connections." },
           "disconnect-timeout" => { type: Integer,
@@ -78,6 +80,7 @@ module Bolt
         }.freeze
 
         DEFAULTS = {
+          "cleanup"            => true,
           "connect-timeout"    => 10,
           "tty"                => false,
           "load-config"        => true,

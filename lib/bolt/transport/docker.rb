@@ -19,7 +19,7 @@ module Bolt
 
       def upload(target, source, destination, _options = {})
         with_connection(target) do |conn|
-          conn.with_remote_tempdir do |dir|
+          conn.with_remote_tmpdir do |dir|
             basename = File.basename(destination)
             tmpfile = "#{dir}/#{basename}"
             if File.directory?(source)
@@ -57,7 +57,7 @@ module Bolt
         arguments = unwrap_sensitive_args(arguments)
 
         with_connection(target) do |conn|
-          conn.with_remote_tempdir do |dir|
+          conn.with_remote_tmpdir do |dir|
             remote_path = conn.write_remote_executable(dir, script)
             stdout, stderr, exitcode = conn.execute(remote_path, *arguments, {})
             Bolt::Result.for_command(target, stdout, stderr, exitcode, 'script', script)
@@ -77,7 +77,7 @@ module Bolt
         with_connection(target) do |conn|
           execute_options = {}
           execute_options[:interpreter] = select_interpreter(executable, target.options['interpreters'])
-          conn.with_remote_tempdir do |dir|
+          conn.with_remote_tmpdir do |dir|
             if extra_files.empty?
               task_dir = dir
             else

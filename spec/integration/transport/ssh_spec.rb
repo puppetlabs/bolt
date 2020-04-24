@@ -376,7 +376,7 @@ describe Bolt::Transport::SSH, ssh: true do
     end
   end
 
-  context "with specific tempdir using script-dir option" do
+  context "with specific tmpdir using script-dir option" do
     let(:script_dir) { "123456" }
     let(:transport_config) do
       {

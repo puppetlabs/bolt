@@ -12,6 +12,8 @@ module Bolt
                                  desc: "Force basic authentication. This option is only available when using SSL." },
           "cacert"          => { type: String,
                                  desc: "The path to the CA certificate." },
+          "cleanup"         => { type: TrueClass,
+                                 desc: "Whether to clean up temporary files created on targets." },
           "connect-timeout" => { type: Integer,
                                  desc: "How long Bolt should wait when establishing connections." },
           "extensions"      => { type: Array,
@@ -53,6 +55,7 @@ module Bolt
 
         DEFAULTS = {
           "basic-auth-only" => false,
+          "cleanup"         => true,
           "connect-timeout" => 10,
           "ssl"             => true,
           "ssl-verify"      => true,
