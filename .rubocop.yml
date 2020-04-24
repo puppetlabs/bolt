@@ -44,6 +44,9 @@ Style/NumericPredicate:
 Style/StderrPuts:
   Enabled: false
 
+Style/ExponentialNotation:
+  Enabled: true
+
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
@@ -101,6 +104,12 @@ Lint/SuppressedException:
   Exclude:
     - lib/bolt/shell/bash.rb
 
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
 # Enforce LF line endings, even when on Windows
 Layout/EndOfLine:
   EnforcedStyle: lf
@@ -108,3 +117,7 @@ Layout/EndOfLine:
 Layout/HashAlignment:
   EnforcedHashRocketStyle: [key, table]
   EnforcedColonStyle: [key, table]
+
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+

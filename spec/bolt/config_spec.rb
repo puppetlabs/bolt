@@ -119,7 +119,7 @@ describe Bolt::Config do
         }
       }
 
-      expect { Bolt::Config.new(boltdir, config) } .to raise_error(
+      expect { Bolt::Config.new(boltdir, config) }.to raise_error(
         /append flag of log file:.* must be a Boolean, received Symbol :foo/
       )
     end
