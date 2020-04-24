@@ -17,6 +17,7 @@ module Bolt
         unless opts['var']
           raise Bolt::ValidationError, "env_var plugin requires that the 'var' is specified"
         end
+        return if opts['optional']
         unless ENV[opts['var']]
           raise Bolt::ValidationError, "env_var plugin requires that the var '#{opts['var']}' be set"
         end
