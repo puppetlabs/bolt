@@ -24,7 +24,7 @@ module Bolt
       end
 
       def resolve_reference(opts)
-        ENV[opts['var']]
+        ENV[opts['var']] || opts['default_value']
       end
     end
   end
