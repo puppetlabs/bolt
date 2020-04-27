@@ -40,8 +40,8 @@ describe Bolt::Plugin::EnvVar do
     end
   end
 
-  describe 'when default_value is provided' do
-    let(:env_var_data) { super().merge({ 'default_value' => 'DEFAULT_STRING' }) }
+  describe 'when default is provided' do
+    let(:env_var_data) { super().merge({ 'default' => 'DEFAULT_STRING' }) }
     it 'raises a validation error when no var is provided' do
       env_var_data.delete('var')
       expect { subject.validate_resolve_reference(env_var_data) }
