@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'addressable'
+
 module Bolt
   class ApplyTarget
     ATTRIBUTES = %i[uri name target_alias config vars facts features
@@ -48,7 +50,7 @@ module Bolt
       # Merge the config hash with inventory config
       config = Bolt::Util.deep_merge(config, @config || {})
       transport = config['transport'] || 'ssh'
-      t_conf = config['transports'][transport] || {}
+      t_conf = config.dig('transports', transport) || {}
       uri_obj = parse_uri(uri)
       @host = uri_obj.hostname || t_conf['host']
       @password = Addressable::URI.unencode_component(uri_obj.password) || t_conf['password']

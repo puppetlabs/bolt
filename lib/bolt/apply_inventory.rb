@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/project'
-require 'bolt/config'
 require 'bolt/error'
+require 'bolt/apply_target'
 
 module Bolt
   class ApplyInventory
