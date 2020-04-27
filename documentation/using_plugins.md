@@ -50,7 +50,7 @@ The following fields are available to the `env_var` plugin.
 | Key | Description | Type | Default |
 | --- | ----------- | ---- | ------- |
 | **`var`** | The name of the environment variable to read from. **Required.** | `String` | None |
-| **`default_value`** | (Optional) A value to use if the environment variable `var` isn't set | `String` | None |
+| **`default`** | A value to use if the environment variable `var` isn't set | `String` | None |
 | **`optional`** | Unless `true`, env_var will raise an error when the environment variable `var` does not exist.  When `optional` is `true` and `var` does not exist, env_var returns `nil` | `Boolean` | `false` |
 
 #### Example usage
