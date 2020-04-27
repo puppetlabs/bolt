@@ -1,5 +1,76 @@
 # Changelog
 
+## Bolt 2.7.0 (2020-04-27)
+
+### New features
+
+* **Mock out sub-plans in BoltSpec testing**
+  ([#1630](https://github.com/puppetlabs/bolt/issues/1630))
+
+  New stubs `allow_plan` and `expect_plan` are available in BoltSpec::Plans for
+  mocking out `run_plan` functions during Bolt spec testing. New flags `execute_any_plan` 
+  (default) and `execute_no_plan` are avilable to control the behavior of sub-plan executions.
+  The new stubs `allow_plan` and `expect_plan` work with all of the existing action
+  modifiers except for `with_targets` and `return_for_targets`.
+
+  _Contributed by [Nick Maludy](https://github.com/nmaludy)_
+
+* **Experimental support for interacting with Windows hosts via PowerShell over SSH**
+  ([#813](https://github.com/puppetlabs/bolt/issues/813))
+
+  The `login-shell: powershell` config setting can be set on a target to
+  connect over SSH while running commands and tasks via PowerShell instead
+  of Bash. This feature requires OpenSSH >= 7.9 on the target.
+
+* **Print group membership for targets when running `bolt inventory show --detail`**
+  ([#1701](https://github.com/puppetlabs/bolt/pull/1701))
+
+  The `bolt inventory show --detail` command now lists a target's group membership.
+
+  _Contributed by [Nick Maludy](https://github.com/nmaludy)_
+
+* **`--no-cleanup` option to leave behind temporary files**
+  ([#1729](https://github.com/puppetlabs/bolt/issues/1729))
+
+  The `--no-cleanup` flag or `cleanup: false` transport option can now
+  be set to instruct Bolt not to clean up on a target after it's
+  finished. This is useful for debugging what Bolt is doing on a system.
+
+* **Add `prompt` plan function**
+  ([#1755](https://github.com/puppetlabs/bolt/issues/1755))
+
+  The new `prompt` plan function lets you pause plan execution and
+  prompt the user for input.
+
+* **OpenSSH config option StrictHostKeyChecking now honored**
+  ([#1758](https://github.com/puppetlabs/bolt/pull/1758))
+
+  Setting `StrictHostKeyChecking` in your ssh config will now be loaded
+  and merged with config along with other OpenSSH settings
+
+* **Support for ed25519 SSH keys**
+  ([#1758](https://github.com/puppetlabs/bolt/pull/1758))
+
+  Key exchange algorithm curve25519sha256 is now supported
+
+* **New `optional` and `default` keys for the `env_var` plugin**
+  ([#1768](https://github.com/puppetlabs/bolt/issues/1768))
+
+  The `env_var` plugin accepts two new optional keys. The `default` key
+  allows you to set a default value that the plugin should return when
+  the environment variable is not set, while the `option` key allows the
+  plugin to return `nil` when the environment variable is not set instead
+  of erroring.
+
+### Bug fixes
+
+* **Target facts with the same name as a plan or Target variable should
+  not raise an error** ([#1725](https://github.com/puppetlabs/bolt/issues/1725))
+
+  Previously, defining a fact with the same name as
+  another variable would cause a redefinition error in the apply block,
+  where now referencing the variable will refer to the fact value.
+
 ## Bolt 2.6.0 (2020-04-20)
 
 ### New features
