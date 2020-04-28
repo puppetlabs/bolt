@@ -278,6 +278,22 @@ module Bolt
       end
     end
 
+    def run_task_with(target_mapping, task, options = {})
+      targets = target_mapping.keys
+      description = options.fetch(:description, "task #{task.name}")
+
+      log_action(description, targets) do
+        options[:run_as] = run_as if run_as && !options.key?(:run_as)
+        target_mapping.each_value { |arguments| arguments['_task'] = task.name }
+
+        batch_execute(targets) do |transport, batch|
+          with_node_logging("Running task #{task.name}'", batch) do
+            transport.batch_task_with(batch, task, target_mapping, options, &method(:publish_event))
+          end
+        end
+      end
+    end
+
     def upload_file(targets, source, destination, options = {})
       description = options.fetch(:description, "file upload from #{source} to #{destination}")
       log_action(description, targets) do

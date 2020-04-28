@@ -210,6 +210,10 @@ module Bolt
         end
       end
 
+      def batch_task_with(_targets, _task, _target_mapping, _options = {})
+        raise NotImplementedError, "pcp transport does not support run_task_with()"
+      end
+
       def batch_connected?(targets)
         resp = get_connection(targets.first.options).query_inventory(targets)
         resp['items'].all? { |node| node['connected'] }
