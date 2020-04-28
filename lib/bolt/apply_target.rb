@@ -77,5 +77,9 @@ module Bolt
     rescue Addressable::URI::InvalidURIError => e
       raise Bolt::ParseError, "Could not parse target URI: #{e.message}"
     end
+
+    def hash
+      @name.hash
+    end
   end
 end
