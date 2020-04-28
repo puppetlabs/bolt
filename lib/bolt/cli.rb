@@ -238,6 +238,12 @@ module Bolt
       if options[:subcommand] == 'command' && (!options[:object] || options[:object].empty?)
         raise Bolt::CLIError, "Must specify a command to run"
       end
+
+      if options[:subcommand] == 'secret' &&
+         (options[:action] == 'decrypt' || options[:action] == 'encrypt') &&
+         !options[:object]
+        raise Bolt::CLIError, "Must specify a value to #{options[:action]}"
+      end
     end
 
     def handle_parser_errors
