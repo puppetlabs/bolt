@@ -57,6 +57,10 @@ module Bolt
       @user = Addressable::URI.unencode_component(uri_obj.user) || t_conf['user']
     end
 
+    def to_s
+      @safe_name
+    end
+
     def parse_uri(string)
       require 'addressable/uri'
       if string.nil?
