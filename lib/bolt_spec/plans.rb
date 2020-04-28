@@ -219,7 +219,7 @@ module BoltSpec
     end
 
     def run_plan(name, params)
-      pal = Bolt::PAL.new(config.modulepath, config.hiera_config, config.boltdir.resource_types)
+      pal = Bolt::PAL.new(config.modulepath, config.hiera_config, config.project.resource_types)
       result = executor.with_plan_allowed_exec(name, params) do
         pal.run_plan(name, params, executor, inventory, puppetdb_client)
       end

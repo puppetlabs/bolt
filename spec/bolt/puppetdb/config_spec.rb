@@ -5,10 +5,10 @@ require 'bolt/puppetdb/config'
 require 'bolt/util'
 
 describe Bolt::PuppetDB::Config do
-  context "with boltdir available" do
+  context "with project available" do
     let(:cacert) { File.expand_path('relative/to/cacert') }
     let(:token) { File.expand_path('relative/to/token') }
-    let(:boltdir) { '~/dirbolt' }
+    let(:project) { '~/dirbolt' }
     let(:options) do
       {
         'server_urls' => ['https://puppetdb:8081'],
@@ -17,12 +17,12 @@ describe Bolt::PuppetDB::Config do
       }
     end
 
-    let(:config) { Bolt::PuppetDB::Config.new(options, boltdir) }
+    let(:config) { Bolt::PuppetDB::Config.new(options, project) }
 
-    it 'expands the cacert relative to the boltdir if boltdir is available' do
+    it 'expands the cacert relative to the project if project is available' do
       allow(config).to receive(:validate_file_exists).with('cacert').and_return true
 
-      expect(config.cacert).to eq(File.expand_path(cacert, boltdir))
+      expect(config.cacert).to eq(File.expand_path(cacert, project))
     end
   end
 

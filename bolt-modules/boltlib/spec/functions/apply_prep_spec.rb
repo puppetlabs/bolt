@@ -148,7 +148,7 @@ describe 'apply_prep' do
         }
       }
 
-      let(:config)    { Bolt::Config.new(Bolt::Boltdir.new('.'), {}) }
+      let(:config)    { Bolt::Config.new(Bolt::Project.new('.'), {}) }
       let(:pal)       { nil }
       let(:plugins)   { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
       let(:inventory) { Bolt::Inventory.create_version(data, config.transport, config.transports, plugins) }

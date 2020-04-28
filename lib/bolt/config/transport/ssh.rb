@@ -99,7 +99,7 @@ module Bolt
             end
 
             if key_opt.instance_of?(String)
-              @config['private-key'] = File.expand_path(key_opt, @boltdir)
+              @config['private-key'] = File.expand_path(key_opt, @project)
             end
           end
 

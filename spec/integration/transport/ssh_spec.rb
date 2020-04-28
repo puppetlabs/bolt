@@ -42,7 +42,7 @@ describe Bolt::Transport::SSH, ssh: true do
   let(:env_task)          { "#!/bin/sh\necho $PT_data" }
 
   let(:config)            { make_config }
-  let(:boltdir)           { Bolt::Boltdir.new('.') }
+  let(:project)           { Bolt::Project.new('.') }
   let(:plugins)           { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new) }
   let(:inventory)         { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
   let(:target)            { make_target }
@@ -51,7 +51,7 @@ describe Bolt::Transport::SSH, ssh: true do
 
   def make_config(conf: transport_config)
     conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(boltdir, 'ssh' => conf)
+    Bolt::Config.new(project, 'ssh' => conf)
   end
   alias_method :mk_config, :make_config
 

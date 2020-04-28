@@ -57,10 +57,10 @@ describe "Bolt::CLI" do
   end
 
   context "without a config file" do
-    let(:boltdir) { Bolt::Boltdir.new('.') }
+    let(:project) { Bolt::Project.new('.') }
     before(:each) do
-      allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(boltdir)
-      allow_any_instance_of(Bolt::Boltdir).to receive(:resource_types)
+      allow(Bolt::Project).to receive(:find_boltdir).and_return(project)
+      allow_any_instance_of(Bolt::Project).to receive(:resource_types)
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
       allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return({})
     end
@@ -979,6 +979,18 @@ describe "Bolt::CLI" do
           ].each do |taskdoc|
             expect(tasks).to include(taskdoc)
           end
+        end
+
+        it "only includes tasks set in project.yaml" do
+          proj = double('project', type: '', resource_types: '', tasks: ['facts'])
+          allow(cli.config).to receive(:project).and_return(proj)
+          options = {
+            subcommand: 'task',
+            action: 'show'
+          }
+          cli.execute(options)
+          tasks = JSON.parse(output.string)['tasks']
+          expect(tasks).to eq([['facts', "Gather system facts"]])
         end
 
         it "lists modulepath" do

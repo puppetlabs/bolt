@@ -3,19 +3,23 @@
 require 'pathname'
 
 module Bolt
-  class Boltdir
+  class Project
     BOLTDIR_NAME = 'Boltdir'
+    PROJECT_SETTINGS = {
+      "plans" => "An array of plan names that can be included in `bolt plan show` output",
+      "tasks" => "An array of task names that can be included in `bolt task show` output"
+    }.freeze
 
     attr_reader :path, :config_file, :inventory_file, :modulepath, :hiera_config,
                 :puppetfile, :rerunfile, :type, :resource_types
 
-    def self.default_boltdir
-      Boltdir.new(File.join('~', '.puppetlabs', 'bolt'), 'user')
+    def self.default_project
+      Project.new(File.join('~', '.puppetlabs', 'bolt'), 'user')
     end
 
-    # Search recursively up the directory hierarchy for the Boltdir. Look for a
+    # Search recursively up the directory hierarchy for the Project. Look for a
     # directory called Boltdir or a file called bolt.yaml (for a control repo
-    # type Boltdir). Otherwise, repeat the check on each directory up the
+    # type Project). Otherwise, repeat the check on each directory up the
     # hierarchy, falling back to the default if we reach the root.
     def self.find_boltdir(dir)
       dir = Pathname.new(dir)
@@ -24,7 +28,7 @@ module Bolt
       elsif (dir + 'bolt.yaml').file?
         new(dir, 'local')
       elsif dir.root?
-        default_boltdir
+        default_project
       else
         find_boltdir(dir.parent)
       end
@@ -40,6 +44,10 @@ module Bolt
       @rerunfile = @path + '.rerun.json'
       @resource_types = @path + '.resource_types'
       @type = type
+
+      project_file = @path + 'project.yaml'
+      @data = Bolt::Util.read_optional_yaml_hash(File.expand_path(project_file), 'project') || {}
+      validate
     end
 
     def to_s
@@ -50,5 +58,21 @@ module Bolt
       path == other.path
     end
     alias == eql?
+
+    def tasks
+      @data['tasks']
+    end
+
+    def plans
+      @data['plans']
+    end
+
+    def validate
+      %w[tasks plans].each do |conf|
+        unless @data.fetch(conf, []).is_a?(Array)
+          raise Bolt::ValidationError, "'#{conf}' in project.yaml must be an array"
+        end
+      end
+    end
   end
 end

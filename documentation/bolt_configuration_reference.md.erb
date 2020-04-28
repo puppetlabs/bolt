@@ -80,6 +80,20 @@ plugin_hooks:
       message: "Which version of Puppet do you want to install?"
 ```
 
+## Project configuration options
+
+> **Note:** Project configuration is experimental
+
+Use `<PROJECT_NAME>/project.yaml` to whitelist the tasks or plans that are
+displayed by the `bolt [plan|task] show` command. You can define the following
+settings:
+
+| Option | Description | Default |
+| ------ | ----------- | ------- |
+<% @project[:options].each do |option, desc| -%>
+| `<%= option %>` | <%= desc %> | <%= @project[:defaults][option].to_s %> |
+<% end %>
+
 ## Apply options
 
 Apply options are a subset of [Puppet configuration settings](https://puppet.com/docs/puppet/latest/configuration.html) which are set when Bolt applies Puppet code on remote targets. Users can define values for the following Puppet settings:

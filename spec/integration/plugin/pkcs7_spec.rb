@@ -92,35 +92,35 @@ describe 'using the pkcs7 plugin' do
   }
 
   it 'uses the configured key files' do
-    with_boltdir(config: config) do |boltdir|
-      run_cli(['secret', 'createkeys', '--boltdir', boltdir])
-      expect(File.exist?(File.join(boltdir, 'private'))).to eq(true)
-      expect(File.exist?(File.join(boltdir, 'public'))).to eq(true)
+    with_boltdir(config: config) do |project|
+      run_cli(['secret', 'createkeys', '--boltdir', project])
+      expect(File.exist?(File.join(project, 'private'))).to eq(true)
+      expect(File.exist?(File.join(project, 'public'))).to eq(true)
     end
   end
 
   it 'errors with an unexpected key' do
-    with_boltdir(config: { 'plugins' => { 'pkcs7' => { 'public_key' => '/path' } } }) do |boltdir|
-      expect { run_cli(['secret', 'createkeys', '--boltdir', boltdir]) }.to raise_error(Bolt::ValidationError)
+    with_boltdir(config: { 'plugins' => { 'pkcs7' => { 'public_key' => '/path' } } }) do |project|
+      expect { run_cli(['secret', 'createkeys', '--boltdir', project]) }.to raise_error(Bolt::ValidationError)
     end
   end
 
   it 'encrypts a value' do
-    with_boltdir(config: config) do |boltdir|
-      File.write(File.join(boltdir, 'public'), public_key)
-      File.write(File.join(boltdir, 'private'), private_key)
-      output = run_cli(['secret', 'encrypt', 'ssshhh', '--boltdir', boltdir], outputter: Bolt::Outputter::Human)
+    with_boltdir(config: config) do |project|
+      File.write(File.join(project, 'public'), public_key)
+      File.write(File.join(project, 'private'), private_key)
+      output = run_cli(['secret', 'encrypt', 'ssshhh', '--boltdir', project], outputter: Bolt::Outputter::Human)
       expect(output).to start_with('ENC[PKCS7,')
-      decrypt = run_cli(['secret', 'decrypt', output, '--boltdir', boltdir], outputter: Bolt::Outputter::Human)
+      decrypt = run_cli(['secret', 'decrypt', output, '--boltdir', project], outputter: Bolt::Outputter::Human)
       expect(decrypt.strip).to eq('ssshhh')
     end
   end
 
   it 'decrypts a value' do
-    with_boltdir(config: config) do |boltdir|
-      File.write(File.join(boltdir, 'public'), public_key)
-      File.write(File.join(boltdir, 'private'), private_key)
-      output = run_cli(['secret', 'decrypt', encrypted_ssshhh, '--boltdir', boltdir],
+    with_boltdir(config: config) do |project|
+      File.write(File.join(project, 'public'), public_key)
+      File.write(File.join(project, 'private'), private_key)
+      output = run_cli(['secret', 'decrypt', encrypted_ssshhh, '--boltdir', project],
                        outputter: Bolt::Outputter::Human)
       expect(output.strip).to eq('ssshhh')
     end
@@ -144,13 +144,13 @@ describe 'using the pkcs7 plugin' do
         return(get_targets('node1')[0].password)
       }
     PLAN
-    with_boltdir(inventory: inventory, config: config) do |boltdir|
-      plan_dir = File.join(boltdir, 'modules', 'passw', 'plans')
+    with_boltdir(inventory: inventory, config: config) do |project|
+      plan_dir = File.join(project, 'modules', 'passw', 'plans')
       FileUtils.mkdir_p(plan_dir)
       File.write(File.join(plan_dir, 'init.pp'), plan)
-      File.write(File.join(boltdir, 'public'), public_key)
-      File.write(File.join(boltdir, 'private'), private_key)
-      output = run_cli(['plan', 'run', 'passw', '--boltdir', boltdir])
+      File.write(File.join(project, 'public'), public_key)
+      File.write(File.join(project, 'private'), private_key)
+      output = run_cli(['plan', 'run', 'passw', '--boltdir', project])
 
       expect(output.strip).to eq('"ssshhh"')
     end

@@ -115,7 +115,7 @@ module Bolt
       end
 
       def boltdir
-        @config.boltdir.path
+        @config.project.path
       end
     end
 

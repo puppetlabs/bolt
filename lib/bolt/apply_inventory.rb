@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/boltdir'
+require 'bolt/project'
 require 'bolt/config'
 require 'bolt/error'
 

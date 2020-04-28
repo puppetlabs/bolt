@@ -138,7 +138,7 @@ module BoltSpec
     # Override in your tests
     def config
       @config ||= begin
-                    conf = Bolt::Config.new(Bolt::Boltdir.new('.'), {})
+                    conf = Bolt::Config.new(Bolt::Project.new('.'), {})
                     conf.modulepath = [modulepath].flatten
                     conf
                   end
@@ -152,7 +152,7 @@ module BoltSpec
     end
 
     def pal
-      @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.boltdir.resource_types)
+      @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.project.resource_types)
     end
 
     BoltSpec::Plans::MOCKED_ACTIONS.each do |action|

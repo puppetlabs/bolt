@@ -22,7 +22,7 @@ module Bolt
         File.expand_path(File.join(Dir::COMMON_APPDATA, 'PuppetLabs/client-tools/puppetdb.conf'))
       end
 
-      def self.load_config(filename, options, boltdir_path = nil)
+      def self.load_config(filename, options, project_path = nil)
         config = {}
         global_path = Bolt::Util.windows? ? default_windows_config : DEFAULT_CONFIG[:global]
         if filename
@@ -46,12 +46,12 @@ module Bolt
         end
 
         config = config.fetch('puppetdb', {})
-        new(config.merge(options), boltdir_path)
+        new(config.merge(options), project_path)
       end
 
-      def initialize(settings, boltdir_path = nil)
+      def initialize(settings, project_path = nil)
         @settings = settings
-        @boltdir_path = boltdir_path
+        @project_path = project_path
         expand_paths
       end
 
@@ -71,8 +71,8 @@ module Bolt
       def expand_paths
         %w[cacert cert key token].each do |file|
           next unless @settings[file]
-          @settings[file] = if @boltdir_path
-                              File.expand_path(@settings[file], @boltdir_path)
+          @settings[file] = if @project_path
+                              File.expand_path(@settings[file], @project_path)
                             else
                               File.expand_path(@settings[file])
                             end

@@ -20,7 +20,7 @@ describe Bolt::Transport::Local do
   let(:password)      { 'runner' }
   let(:os_context)    { Bolt::Util.windows? ? windows_context : posix_context }
   let(:config)        { make_config }
-  let(:boltdir)       { Bolt::Boltdir.new('.') }
+  let(:project)       { Bolt::Project.new('.') }
   let(:plugins)       { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new) }
   let(:inventory)     { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
   let(:target)        { make_target }

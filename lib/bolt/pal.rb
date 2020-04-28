@@ -114,7 +114,7 @@ module Bolt
       compiler.evaluate_string('type PlanResult = Boltlib::PlanResult')
     end
 
-    # Register all resource types defined in $Boltdir/.resource_types as well as
+    # Register all resource types defined in $Project/.resource_types as well as
     # the built in types registered with the runtime_3_init method.
     def register_resource_types(loaders)
       static_loader = loaders.static_loader

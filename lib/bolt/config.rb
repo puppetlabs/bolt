@@ -3,7 +3,7 @@
 require 'etc'
 require 'logging'
 require 'pathname'
-require 'bolt/boltdir'
+require 'bolt/project'
 require 'bolt/logger'
 require 'bolt/util'
 # Transport config objects
@@ -23,7 +23,7 @@ module Bolt
   end
 
   class Config
-    attr_reader :config_files, :warnings, :data, :transports, :boltdir
+    attr_reader :config_files, :warnings, :data, :transports, :project
 
     TRANSPORT_CONFIG = {
       'ssh'    => Bolt::Config::Transport::SSH,
@@ -102,30 +102,30 @@ module Bolt
     }.freeze
 
     def self.default
-      new(Bolt::Boltdir.new('.'), {})
+      new(Bolt::Project.new('.'), {})
     end
 
-    def self.from_boltdir(boltdir, overrides = {})
+    def self.from_project(project, overrides = {})
       data = {
-        filepath: boltdir.config_file,
-        data: Bolt::Util.read_optional_yaml_hash(boltdir.config_file, 'config')
+        filepath: project.config_file,
+        data: Bolt::Util.read_optional_yaml_hash(project.config_file, 'config')
       }
 
       data = load_defaults.push(data).select { |config| config[:data]&.any? }
 
-      new(boltdir, data, overrides)
+      new(project, data, overrides)
     end
 
     def self.from_file(configfile, overrides = {})
-      boltdir = Bolt::Boltdir.new(Pathname.new(configfile).expand_path.dirname)
+      project = Bolt::Project.new(Pathname.new(configfile).expand_path.dirname)
 
       data = {
-        filepath: boltdir.config_file,
+        filepath: project.config_file,
         data: Bolt::Util.read_yaml_hash(configfile, 'config')
       }
       data = load_defaults.push(data).select { |config| config[:data]&.any? }
 
-      new(boltdir, data, overrides)
+      new(project, data, overrides)
     end
 
     def self.load_defaults
@@ -148,14 +148,14 @@ module Bolt
       confs
     end
 
-    def initialize(boltdir, config_data, overrides = {})
+    def initialize(project, config_data, overrides = {})
       unless config_data.is_a?(Array)
-        config_data = [{ filepath: boltdir.config_file, data: config_data }]
+        config_data = [{ filepath: project.config_file, data: config_data }]
       end
 
       @logger = Logging.logger[self]
       @warnings = []
-      @boltdir = boltdir
+      @project = project
       @transports = {}
       @config_files = []
 
@@ -184,7 +184,7 @@ module Bolt
       @data = merge_config_layers(default_data, *loaded_data, override_data)
 
       TRANSPORT_CONFIG.each do |transport, config|
-        @transports[transport] = config.new(@data.delete(transport), @boltdir.path)
+        @transports[transport] = config.new(@data.delete(transport), @project.path)
       end
 
       finalize_data
@@ -250,7 +250,7 @@ module Bolt
         @data['log'] = update_logs(@data['log'])
       end
 
-      # Expand paths relative to the Boltdir. Any settings that came from the
+      # Expand paths relative to the project. Any settings that came from the
       # CLI will already be absolute, so the expand will be skipped.
       if @data.key?('modulepath')
         moduledirs = if data['modulepath'].is_a?(String)
@@ -259,12 +259,12 @@ module Bolt
                        data['modulepath']
                      end
         @data['modulepath'] = moduledirs.map do |moduledir|
-          File.expand_path(moduledir, @boltdir.path)
+          File.expand_path(moduledir, @project.path)
         end
       end
 
       %w[hiera-config inventoryfile trusted-external-command].each do |opt|
-        @data[opt] = File.expand_path(@data[opt], @boltdir.path) if @data.key?(opt)
+        @data[opt] = File.expand_path(@data[opt], @project.path) if @data.key?(opt)
       end
 
       # Filter hashes to only include valid options
@@ -275,7 +275,7 @@ module Bolt
     private def normalize_log(target)
       return target if target == 'console'
       target = target[5..-1] if target.start_with?('file:')
-      'file:' + File.expand_path(target, @boltdir.path)
+      'file:' + File.expand_path(target, @project.path)
     end
 
     private def update_logs(logs)
@@ -348,23 +348,23 @@ module Bolt
     end
 
     def default_inventoryfile
-      @boltdir.inventory_file
+      @project.inventory_file
     end
 
     def rerunfile
-      @boltdir.rerunfile
+      @project.rerunfile
     end
 
     def hiera_config
-      @data['hiera-config'] || @boltdir.hiera_config
+      @data['hiera-config'] || @project.hiera_config
     end
 
     def puppetfile
-      @puppetfile || @boltdir.puppetfile
+      @puppetfile || @project.puppetfile
     end
 
     def modulepath
-      @data['modulepath'] || @boltdir.modulepath
+      @data['modulepath'] || @project.modulepath
     end
 
     def modulepath=(value)

@@ -55,11 +55,11 @@ describe Bolt::Config::Transport::SSH do
         expect { transport.new(data) }.to raise_error(Bolt::ValidationError)
       end
 
-      it 'expands path relative to Boltdir' do
+      it 'expands path relative to project' do
         allow(Bolt::Util).to receive(:validate_file).and_return(true)
         data['private-key'] = 'path/to/key'
-        config = transport.new(data, boltdir)
-        expect(config['private-key']).to eq(File.expand_path('path/to/key', boltdir))
+        config = transport.new(data, project)
+        expect(config['private-key']).to eq(File.expand_path('path/to/key', project))
       end
     end
 
