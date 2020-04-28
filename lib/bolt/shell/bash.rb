@@ -150,8 +150,14 @@ module Bolt
           end
         elsif err =~ /^#{@sudo_id}/
           if sudo_stdin
-            stdin.write("#{sudo_stdin}\n")
-            stdin.close
+            begin
+              stdin.write("#{sudo_stdin}\n")
+              stdin.close
+            # If a task has stdin as an input_method but doesn't actually read
+            # from stdin, the task may return and close the input stream before
+            # we finish writing
+            rescue Errno::EPIPE
+            end
           end
           ''
         else
@@ -399,8 +405,9 @@ module Bolt
                 write_stream = []
               end
             end
-          # If a task has stdin as an input_method but doesn't actually
-          # read from stdin, the task may return and close the input stream
+          # If a task has stdin as an input_method but doesn't actually read
+          # from stdin, the task may return and close the input stream before
+          # we finish writing
           rescue Errno::EPIPE
             write_stream = []
           end
