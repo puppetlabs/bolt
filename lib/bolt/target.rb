@@ -155,5 +155,9 @@ module Bolt
       self.class.equal?(other.class) && @name == other.name
     end
     alias == eql?
+
+    def hash
+      @name.hash
+    end
   end
 end

@@ -199,5 +199,23 @@ describe Bolt::Target do
       expect(target.eql?(target)).to eq(true)
       expect(target.eql?(other)).to eq(false)
     end
+
+    it 'treats two target with the same name as identical' do
+      target = inventory.get_target('target')
+      also_target = inventory.get_target('target')
+
+      expect(target).to be_eql(also_target)
+      expect([target, also_target].uniq).to eq([target])
+    end
+
+    it 'can use a target as a hash key' do
+      target = inventory.get_target('target')
+      also_target = inventory.get_target('target')
+
+      h = { target => "value" }
+      h[also_target] = "other value"
+
+      expect(h).to eq(target => "other value")
+    end
   end
 end
