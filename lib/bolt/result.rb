@@ -40,18 +40,23 @@ module Bolt
     end
 
     def self.for_task(target, stdout, stderr, exit_code, task)
-      begin
-        value = JSON.parse(stdout)
-        unless value.is_a? Hash
-          value = nil
-        end
-      rescue JSON::ParserError
-        value = nil
-      end
-      value ||= { '_output' => stdout }
+      stdout.force_encoding('utf-8') unless stdout.encoding == Encoding::UTF_8
+      value = if stdout.valid_encoding?
+                parse_hash(stdout) || { '_output' => stdout }
+              else
+                { '_error' => { 'kind' => 'puppetlabs.tasks/task-error',
+                                'issue_code' => 'TASK_ERROR',
+                                'msg' => 'The task result contained invalid UTF-8 on stdout',
+                                'details' => {} } }
+              end
+
       if exit_code != 0 && value['_error'].nil?
         msg = if stdout.empty?
-                "The task failed with exit code #{exit_code}:\n#{stderr}"
+                if stderr.empty?
+                  "The task failed with exit code #{exit_code} and no output"
+                else
+                  "The task failed with exit code #{exit_code} and no stdout, but stderr contained:\n#{stderr}"
+                end
               else
                 "The task failed with exit code #{exit_code}"
               end
@@ -61,6 +66,13 @@ module Bolt
                             'details' => { 'exit_code' => exit_code } }
       end
       new(target, value: value, action: 'task', object: task)
+    end
+
+    def self.parse_hash(string)
+      value = JSON.parse(string)
+      value if value.is_a? Hash
+    rescue JSON::ParserError
+      nil
     end
 
     def self.for_upload(target, source, destination)
