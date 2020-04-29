@@ -107,13 +107,14 @@ module Bolt
 
           # Use special handling if the result looks like a command or script result
           if result.generic_value.keys == %w[stdout stderr exit_code]
-            unless result['stdout'].strip.empty?
+            safe_value = result.safe_value
+            unless safe_value['stdout'].strip.empty?
               @stream.puts(indent(2, "STDOUT:"))
-              @stream.puts(indent(4, result['stdout']))
+              @stream.puts(indent(4, safe_value['stdout']))
             end
-            unless result['stderr'].strip.empty?
+            unless safe_value['stderr'].strip.empty?
               @stream.puts(indent(2, "STDERR:"))
-              @stream.puts(indent(4, result['stderr']))
+              @stream.puts(indent(4, safe_value['stderr']))
             end
           elsif result.generic_value.any?
             @stream.puts(indent(2, ::JSON.pretty_generate(result.generic_value)))

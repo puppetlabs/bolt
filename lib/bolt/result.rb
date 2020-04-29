@@ -122,18 +122,8 @@ module Bolt
       message && !message.strip.empty?
     end
 
-    def status_hash
-      {
-        target: @target.name,
-        action: action,
-        object: object,
-        status: status,
-        value: @value
-      }
-    end
-
     def generic_value
-      value.reject { |k, _| %w[_error _output].include? k }
+      safe_value.reject { |k, _| %w[_error _output].include? k }
     end
 
     def eql?(other)
@@ -151,15 +141,36 @@ module Bolt
     end
 
     def to_json(opts = nil)
-      status_hash.to_json(opts)
+      to_data.to_json(opts)
     end
 
     def to_s
       to_json
     end
 
+    # This is the value with all non-UTF-8 characters removed, suitable for
+    # printing or converting to JSON. It *should* only be possible to have
+    # non-UTF-8 characters in stdout/stderr keys as they are not allowed from
+    # tasks but we scrub the whole thing just in case.
+    def safe_value
+      Bolt::Util.walk_vals(value) do |val|
+        if val.is_a?(String)
+          # Replace invalid bytes with hex codes, ie. \xDE\xAD\xBE\xEF
+          val.scrub { |c| c.bytes.map { |b| "\\x" + b.to_s(16).upcase }.join }
+        else
+          val
+        end
+      end
+    end
+
     def to_data
-      Bolt::Util.walk_keys(status_hash, &:to_s)
+      {
+        "target" => @target.name,
+        "action" => action,
+        "object" => object,
+        "status" => status,
+        "value" => safe_value
+      }
     end
 
     def status
