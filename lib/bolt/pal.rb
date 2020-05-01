@@ -145,8 +145,22 @@ module Bolt
             end
           rescue Bolt::Error => e
             e
+          rescue Puppet::DataBinding::LookupError => e
+            if e.issue_code == :HIERA_UNDEFINED_VARIABLE
+              message = "Interpolations are not supported in lookups outside of an apply block: #{e.message}"
+              PALError.new(message)
+            else
+              PALError.from_preformatted_error(e)
+            end
           rescue Puppet::PreformattedError => e
-            PALError.from_preformatted_error(e)
+            if e.issue_code == :UNKNOWN_VARIABLE &&
+               %w[facts trusted server_facts settings].include?(e.arguments[:name])
+              message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope "\
+                        "unless explicitly defined. (file: #{e.file}, line: #{e.line}, column: #{e.pos})"
+              PALError.new(message)
+            else
+              PALError.from_preformatted_error(e)
+            end
           rescue StandardError => e
             PALError.from_preformatted_error(e)
           end
@@ -215,6 +229,7 @@ module Bolt
         Puppet.initialize_settings(cli)
         Puppet::GettextConfig.create_default_text_domain
         Puppet[:trusted_external_command] = @trusted_external
+        Puppet.settings[:hiera_config] = @hiera_config
         self.class.configure_logging
         yield
       end

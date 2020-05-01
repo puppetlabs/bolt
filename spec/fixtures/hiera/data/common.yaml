@@ -1,0 +1,10 @@
+---
+environment: environment data/common.yaml
+test::interpolations: test::interpolations data/common.yaml
+test::backends: test::backends data/common.yaml
+test::custom: test::custom data/common.yaml
+test::merge:
+  puppet:
+    key1: value1
+  bolt:
+    key2: value1

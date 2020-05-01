@@ -1,0 +1,8 @@
+---
+global: global modules/test/data/common.yaml
+test::module: test::module modules/test/data/common.yaml
+foo::namespace: foo::namespace modules/test/data/common.yaml
+test::merge:
+  bolt:
+    key1: value1
+    key2: value2

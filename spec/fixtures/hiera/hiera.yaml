@@ -1,0 +1,20 @@
+---
+version: 5 
+
+defaults:
+  data_hash: yaml_data
+
+hierarchy:
+  - name: custom backend
+    data_hash: custom_backend
+    path: custom.txt
+
+  - name: secret backend
+    lookup_key: eyaml_lookup_key
+    path: secret.eyaml
+    options:
+      pkcs7_private_key_env_var: BOLT_PKCS7_PRIVATE_KEY
+      pkcs7_public_key_env_var:  BOLT_PKCS7_PUBLIC_KEY
+
+  - name: common
+    path: common.yaml
