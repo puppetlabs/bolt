@@ -16,13 +16,16 @@ module Bolt
         rescue LoadError
           logger.debug("Authentication method 'gssapi-with-mic' (Kerberos) is not available.")
         end
-
         @transport_logger = Logging.logger[Net::SSH]
         @transport_logger.level = :warn
       end
 
       def with_connection(target)
-        conn = Connection.new(target, @transport_logger)
+        conn = if target.transport_config['ssh-command']
+                 ExecConnection.new(target)
+               else
+                 Connection.new(target, @transport_logger)
+               end
         conn.connect
         yield conn
       ensure
@@ -37,3 +40,4 @@ module Bolt
 end
 
 require 'bolt/transport/ssh/connection'
+require 'bolt/transport/ssh/exec_connection'

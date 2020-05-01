@@ -13,14 +13,20 @@ module Bolt
         #       in schemas/bolt-transport-definitions.json
         OPTIONS = {
           "cleanup"            => { type: TrueClass,
+                                    external: true,
                                     desc: "Whether to clean up temporary files created on targets." },
           "connect-timeout"    => { type: Integer,
                                     desc: "How long to wait when establishing connections." },
+          "copy-command"       => { external: true,
+                                    desc: "Command to use when copying files using ssh-command. "\
+                                          "Bolt runs `<copy-command> <src> <dest>`. **This option is experimental.**" },
           "disconnect-timeout" => { type: Integer,
                                     desc: "How long to wait before force-closing a connection." },
           "host"               => { type: String,
+                                    external: true,
                                     desc: "Host name." },
           "host-key-check"     => { type: TrueClass,
+                                    external: true,
                                     desc: "Whether to perform host key validation when connecting." },
           "extensions"         => { type: Array,
                                     desc: "List of file extensions that are accepted for scripts or tasks on Windows. "\
@@ -29,6 +35,7 @@ module Bolt
                                          "a `.py` script runs with `python.exe`. The extensions `.ps1`, `.rb`, and "\
                                          "`.pp` are always allowed and run via hard-coded executables." },
           "interpreters"       => { type: Hash,
+                                    external: true,
                                     desc: "A map of an extension name to the absolute path of an executable, "\
                                           "enabling you to override the shebang defined in a task executable. The "\
                                           "extension can optionally be specified with the `.` character (`.py` and "\
@@ -44,26 +51,36 @@ module Bolt
           "password"           => { type: String,
                                     desc: "Login password." },
           "port"               => { type: Integer,
+                                    external: true,
                                     desc: "Connection port." },
-          "private-key"        => { desc: "Either the path to the private key file to use for authentication, or a "\
+          "private-key"        => { external: true,
+                                    desc: "Either the path to the private key file to use for authentication, or a "\
                                           "hash with the key `key-data` and the contents of the private key." },
           "proxyjump"          => { type: String,
                                     desc: "A jump host to proxy connections through, and an optional user to "\
                                           "connect with." },
           "run-as"             => { type: String,
+                                    external: true,
                                     desc: "A different user to run commands as after login." },
           "run-as-command"     => { type: Array,
+                                    external: true,
                                     desc: "The command to elevate permissions. Bolt appends the user and command "\
                                           "strings to the configured `run-as-command` before running it on the "\
                                           "target. This command must not require an interactive password prompt, "\
                                           "and the `sudo-password` option is ignored when `run-as-command` is "\
                                           "specified. The `run-as-command` must be specified as an array." },
           "script-dir"         => { type: String,
+                                    external: true,
                                     desc: "The subdirectory of the tmpdir to use in place of a randomized "\
                                           "subdirectory for uploading and executing temporary files on the "\
                                           "target. It's expected that this directory already exists as a subdir "\
                                           "of tmpdir, which is either configured or defaults to `/tmp`." },
+          "ssh-command"        => { external: true,
+                                    desc: "Command and flags to use when SSHing. This enables the external "\
+                                          "SSH transport which shells out to the specified command. "\
+                                          "**This option is experimental.**" },
           "sudo-executable"    => { type: String,
+                                    external: true,
                                     desc: "The executable to use when escalating to the configured `run-as` "\
                                           "user. This is useful when you want to escalate using the configured "\
                                           "`sudo-password`, since `run-as-command` does not use `sudo-password` "\
@@ -71,14 +88,17 @@ module Bolt
                                           "`<sudo-executable> -S -u <user> -p custom_bolt_prompt <command>`. "\
                                           "**This option is experimental.**" },
           "sudo-password"      => { type: String,
+                                    external: true,
                                     desc: "Password to use when changing users via `run-as`." },
           "tmpdir"             => { type: String,
+                                    external: true,
                                     desc: "The directory to upload and execute temporary files on the target." },
           "tty"                => { type: TrueClass,
                                     desc: "Request a pseudo tty for the session. This option is generally "\
                                           "only used in conjunction with the `run-as` option when the sudoers "\
                                           "policy requires a `tty`." },
           "user"               => { type: String,
+                                    external: true,
                                     desc: "Login user." }
         }.freeze
 
@@ -103,6 +123,13 @@ module Bolt
 
             if key_opt.instance_of?(String)
               @config['private-key'] = File.expand_path(key_opt, @project)
+
+              # We have an explicit test for this to only warn if using net-ssh transport
+              Bolt::Util.validate_file('ssh key', @config['private-key']) if @config['ssh-command']
+            end
+
+            if key_opt.instance_of?(Hash) && @config['ssh-command']
+              raise Bolt::ValidationError, 'private-key must be a filepath when using ssh-command'
             end
           end
 
@@ -128,6 +155,25 @@ module Bolt
                 raise Bolt::ValidationError,
                       "#{key} is not supported when using PowerShell"
               end
+            end
+          end
+
+          if @config['ssh-command'] && !@config['load-config']
+            msg = 'Cannot use external SSH transport with load-config set to false'
+            raise Bolt::ValidationError, msg
+          end
+
+          if (ssh_cmd = @config['ssh-command'])
+            unless ssh_cmd.is_a?(String) || ssh_cmd.is_a?(Array)
+              raise Bolt::ValidationError,
+                    "ssh-command must be a String or Array, received #{ssh_cmd.class} #{ssh_cmd.inspect}"
+            end
+          end
+
+          if (copy_cmd = @config['copy-command'])
+            unless copy_cmd.is_a?(String) || copy_cmd.is_a?(Array)
+              raise Bolt::ValidationError,
+                    "copy-command must be a String or Array, received #{copy_cmd.class} #{copy_cmd.inspect}"
             end
           end
         end
