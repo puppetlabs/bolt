@@ -218,4 +218,73 @@ describe Bolt::Target do
       expect(h).to eq(target => "other value")
     end
   end
+
+  describe 'resources' do
+    let(:inventory) { Bolt::Inventory.empty }
+    let(:target)    { inventory.get_target('target') }
+
+    let(:resource) do
+      Bolt::ResourceInstance.new(
+        'target'        => target,
+        'type'          => 'file',
+        'title'         => '/etc/puppetlabs',
+        'state'         => { 'ensure' => 'present' },
+        'desired_state' => { 'mode'   => '0600' },
+        'events'        => ['event']
+      )
+    end
+
+    let(:resource2) do
+      Bolt::ResourceInstance.new(
+        'target'        => target,
+        'type'          => 'file',
+        'title'         => '/etc/puppetlabs',
+        'state'         => { 'ensure' => 'absent' },
+        'desired_state' => { 'mode' => '0644' },
+        'events'        => ['another event']
+      )
+    end
+
+    context '#resources' do
+      it 'returns an empty hash when there are no resources' do
+        expect(target.resources).to eq({})
+      end
+
+      it 'returns a map of resource instances' do
+        target.set_resource(resource)
+        expect(target.resources).to eq(resource.reference => resource)
+      end
+    end
+
+    context '#set_resource' do
+      it 'accepts a ResourceInstance' do
+        expect { target.set_resource(resource) }.not_to raise_error
+      end
+
+      it "overwrites an existing resource's state" do
+        target.set_resource(resource)
+        target.set_resource(resource2)
+        expect(target.resources.size).to eq(1)
+        expect(target.resources[resource.reference].state).to eq('ensure' => 'absent')
+      end
+
+      it "overwrites an existing resource's desired state" do
+        target.set_resource(resource)
+        target.set_resource(resource2)
+        expect(target.resources.size).to eq(1)
+        expect(target.resources[resource.reference].desired_state).to eq('mode' => '0644')
+      end
+
+      it "adds events to an existing resource's events" do
+        target.set_resource(resource)
+        target.set_resource(resource2)
+        expect(target.resources.size).to eq(1)
+        expect(target.resources[resource.reference].events).to match_array(['event', 'another event'])
+      end
+
+      it 'returns a ResourceInstance' do
+        expect(target.set_resource(resource)).to eq(resource)
+      end
+    end
+  end
 end

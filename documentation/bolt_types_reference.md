@@ -23,6 +23,31 @@ The following functions are available to `ApplyResult` objects.
 | `target` | `Target` | The target the result is from. |
 | `to_data` | `Hash` | A serialized representation of `ApplyResult`. |
 
+## `ResourceInstance`
+
+`ResourceInstance` objects are used to store the observed and desired state of a target's resource and to track events for the resource. These objects do not modify or interact with a target's resources.
+
+> **Note:** The `ResourceInstance` data type is under active development and is subject to change.
+
+You can access `ResourceInstance` functions with dot notation, using the syntax: `$resource.function`.
+
+The following functions are available to `ResourceInstance` objects.
+
+| Function | Type returned | Description |
+|---|---|---|
+| `add_event` | `Array[Hash]` | Add an event for the resource. |
+| `desired_state` | `Hash` | [Attributes](https://puppet.com/docs/puppet/latest/lang_resources.html#attributes) describing the desired state of the resource. |
+| `events` | `Array[Hash]` | Events for the resource. |
+| `overwrite_desired_state` | `Hash` | Overwrites the desired state of the resource. |
+| `overwrite_state` | `Hash` | Overwrites the observed state of the resource. |
+| `reference` | `String` | The resource's reference string, e.g. `File[/etc/puppetlabs]` |
+| `set_desired_state` | `Hash` | Sets attributes describing the desired state of the resource. Performs a shallow merge with existing desired state. |
+| `set_state` | `Hash` | Sets attributes describing the observed state of the resource. Performs a shallow merge with existing state. |
+| `state` | `Hash` | [Attributes](https://puppet.com/docs/puppet/latest/lang_resources.html#attributes) describing the observed state of the resource. |
+| `target` | `Target` | The resource's target. |
+| `title` | `String` | The [resource title](https://puppet.com/docs/puppet/latest/lang_resources.html#title).
+| `type` | `String` | The [resource type](https://puppet.com/docs/puppet/latest/lang_resources.html#resource-types). |
+
 ## `Result`
 
 For each target that you execute an action on, Bolt returns a `Result` object and adds the 
@@ -83,7 +108,7 @@ The following functions are available to `Target` objects:
 | Function | Type returned | Description | Note |
 |---|---|---|---|
 | `config` | `Hash[String, Data]` | The inventory configuration for the target. | This function returns the configuration set directly on the target in `inventory.yaml` or set in a plan using `Target.new` or `set_config()`. It does not return default configuration values or configuration set in `bolt.yaml`.  |
-| `facts` | `Hash[String, Data]` | The target's facts. | This function does not lookup facts for a target and only returns the facts specified in an `inventory.yaml` file or set on a target during a plan run. |
+| `facts` | `Hash[String, Data]` | The target's facts. | This function does not look up facts for a target and only returns the facts specified in an `inventory.yaml` file or set on a target during a plan run. |
 | `features` | `Array[String]` | The target's features. ||
 | `host` | `String` | The target's hostname. ||
 | `name` | `String` | The target's human-readable name, or its URI if a name was not given. ||
@@ -91,6 +116,7 @@ The following functions are available to `Target` objects:
 | `plugin_hooks` | `Hash[String, Data]` | The target's `plugin_hooks` [configuration options](bolt_configuration_reference.md#plugin-hooks-configuration-options). ||
 | `port` | `Integer` | The target's connection port. ||
 | `protocol` | `String` | The protocol used to connect to the target. | This is equivalent to the target's `transport`, except for targets using the `remote` transport. For example, a target with the URI `http://example.com` using the `remote` transport would return `http` for the `protocol`. |
+| `resources` | `Hash[String, ResourceInstance]` | The target's resources. | This function does not look up resources for a target and only returns resources set on a target during a plan run. |
 | `safe_name` | `String` | The target's safe name. Equivalent to `name` if a name was given, or the target's `uri` with any password omitted. ||
 | `target_alias` | `Variant[String, Array[String]]` | The target's aliases. ||
 | `transport` | `String` | The transport used to connect to the target. ||

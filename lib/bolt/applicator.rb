@@ -181,7 +181,7 @@ module Bolt
                                                                        rich_data: true,
                                                                        symbol_as_string: true,
                                                                        type_by_reference: true,
-                                                                       local_reference: false)
+                                                                       local_reference: true)
 
       scope = {
         code_ast: ast,

@@ -20,7 +20,8 @@ Puppet::DataTypes.create_type('Target') do
       vars => { type => Optional[Hash[String[1], Data]], kind => given_or_derived },
       facts => { type => Optional[Hash[String[1], Data]], kind => given_or_derived },
       features => { type => Optional[Array[String[1]]], kind => given_or_derived },
-      plugin_hooks => { type => Optional[Hash[String[1], Data]], kind => given_or_derived }
+      plugin_hooks => { type => Optional[Hash[String[1], Data]], kind => given_or_derived },
+      resources => { type => Optional[Hash[String[1], ResourceInstance]], kind => given_or_derived }
     },
     functions => {
       host => Callable[[], Optional[String]],

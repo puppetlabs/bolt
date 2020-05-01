@@ -11,5 +11,6 @@ type Boltlib::PlanResult = Variant[Boolean,
                                    ApplyResult,
                                    ResultSet,
                                    Target,
+                                   ResourceInstance,
                                    Array[Boltlib::PlanResult],
                                    Hash[String, Boltlib::PlanResult]]
