@@ -1,46 +1,64 @@
-# Writing plans in Puppet language
+# Writing plans in the Puppet language
 
-Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
+Bolt plans allow you to tie together complex workflows that include multiple
+tasks, scripts, commands, and even other plans.
 
-Write plans in the Puppet language, giving them a `.pp` extension, and place them in the module's `/plans` directory.
+Plans written in the Puppet language allow for more sophisticated control flow
+and better error handling than YAML plans. Puppet plans also allow you to apply
+blocks of Puppet code to remote targets.
 
-Plans can use any combination of [Bolt functions](plan_functions.md#) or [built-in Puppet functions](https://puppet.com/docs/puppet/6.1/function.html).
+When you're writing a plan, you can use any combination of [Bolt 
+functions](plan_functions.md) or [built-in Puppet functions](https://puppet.com/docs/puppet/latest/function.html).
 
-**Related information**  
+> **Note:** For information on how to convert an existing YAML plan to a Puppet
+> plan, see [Converting YAML plans to Puppet language plans](writing_yaml_plans.md).
 
-- [Converting YAML plans to Puppet language plans](writing_yaml_plans.md#)
+## Plans and modules
+
+Bolt plans are packaged into reusable and shareable Puppet modules and follow
+the same directory structure and naming conventions used by modules. This means
+you can install Bolt plans as you would any Puppet module and manage them in a
+Puppetfile. For more information on Puppet modules, see [Module
+fundamentals](https://puppet.com/docs/puppet/latest/modules_fundamentals.html).
 
 ## Naming plans
 
-Plan names are based on the filename of the plan, the name of the module containing the plan, and the path to the plan within the module.
+Puppet language plans are located in your module's `plans` directory and take
+the `.pp` extension.
 
-Place plan files in your module's `./plans` directory, using these file extensions:
-
--   Puppet plans — `.pp`
--   YAML plans — `.yaml`, not `.yml`
+The first line of your plan contains the plan name. You use the plan name to
+call the plan from the Bolt command line, or from other plans.
 
 Plan names are composed of two or more name segments, indicating:
-
 -   The name of the module the plan is located in.
 -   The name of the plan file, without the extension.
 -   The path within the module, if the plan is in a subdirectory of `./plans`.
 
+For example, given a module called `mymodule` with a plan defined in
+`./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. The first
+line in `myplan.pp` would be:
 
-For example, given a module called `mymodule` with a plan defined in `./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. A plan defined in `./mymodule/plans/service/myplan.pp` would be `mymodule::service::myplan`. This name is how you refer to the plan when you run commands.
+```puppet
+plan mymodule::myplan
+```
 
-The plan filename `init` is special. You reference an `init` plan using the module name only. For example, in a module called `mymodule`, the plan defined in `init.pp` is the `mymodule` plan.
+A plan defined in `./mymodule/plans/service/myplan.pp` would be defined as
+`mymodule::service::myplan`.
+
+The plan filename `init` is special. You reference an `init` plan using the
+module name only. For example, in a module called `mymodule`, the plan defined
+in `init.pp` is the `mymodule` plan. For an example of an `init` plan, see the
+[facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp).
 
 Avoid giving plans the same names as constructs in the Puppet language. Although plans do not share their namespace with other language constructs, giving plans these names makes your code difficult to read.
 
 Each plan name segment must begin with a lowercase letter and:
-
 -   Can include lowercase letters.
 -   Can include digits.
 -   Can include underscores.
--   Must not be a [reserved word](https://docs.puppet.com/puppet/5.3/lang_reserved.html).
+-   Must not be a [reserved word](https://puppet.com/docs/puppet/latest/lang_reserved.html).
 -   Must not have the same name as any Puppet data types.
 -   Namespace segments must match the regular expression: `\A[a-z][a-z0-9_]*\Z`.
-
 
 ## Defining plan parameters
 

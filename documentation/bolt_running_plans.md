@@ -15,7 +15,7 @@ bolt plan run mymodule::myplan load_balancer=lb.myorg.com
 
 > **Remember:** You can find the documentation and required parameters for a plan using `bolt plan show <PLAN NAME>`.
 
-You can pass a comma-separated list of target names, wildcard patterns, or group names to a plan parameter of type `TargetSpec`. For more information on the `TargetSpec` type, see [Writing PLans in the Puppet language](./writing_plans.md#targetspec).
+You can pass a comma-separated list of target names, wildcard patterns, or group names to a plan parameter of type `TargetSpec`. For more information on the `TargetSpec` type, see [Writing plans in the Puppet language](./writing_plans.md#targetspec).
 
 ## Passing structured data into a plan
 
