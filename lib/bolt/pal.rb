@@ -154,8 +154,8 @@ module Bolt
             end
           rescue Puppet::PreformattedError => e
             if e.issue_code == :UNKNOWN_VARIABLE &&
-               (match = /(?<var>facts|trusted|server_facts|settings)/.match(e.message))
-              message = "Evaluation Error: Variable '#{match[:var]}' is not available in the current scope "\
+               %w[facts trusted server_facts settings].include?(e.arguments[:name])
+              message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope "\
                         "unless explicitly defined. (file: #{e.file}, line: #{e.line}, column: #{e.pos})"
               PALError.new(message)
             else

@@ -98,6 +98,7 @@ describe Bolt::Applicator do
       allow(scope).to receive(:to_hash).and_return({})
       allow(Puppet).to receive(:lookup).with(:pal_script_compiler).and_return(double(:script_compiler, type: nil))
       allow(Puppet).to receive(:lookup).with(:loaders).and_return(loaders)
+      allow(Puppet).to receive(:lookup).with(:bolt_project).and_return(nil)
       allow(loaders).to receive(:private_environment_loader).and_return(env_loader)
       allow(env_loader).to receive(:load).with(:type, 'result').and_return(double('result'))
       allow(env_loader).to receive(:load).with(:type, 'resultset').and_return(double('resultset'))
