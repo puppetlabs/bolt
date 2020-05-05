@@ -108,8 +108,8 @@ module Bolt
           # it will fail if the shell attempts to provide stdin
           inp.close
 
-          out_rd, out_wr = IO.pipe
-          err_rd, err_wr = IO.pipe
+          out_rd, out_wr = IO.pipe('UTF-8')
+          err_rd, err_wr = IO.pipe('UTF-8')
           th = Thread.new do
             result = @session.run(command)
             out_wr << result.stdout

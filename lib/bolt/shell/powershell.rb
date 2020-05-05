@@ -267,10 +267,18 @@ module Bolt
 
         result = Bolt::Node::Output.new
         inp.close
-        out.binmode
-        err.binmode
-        stdout = Thread.new { result.stdout << out.read }
-        stderr = Thread.new { result.stderr << err.read }
+        stdout = Thread.new do
+          # Set to binmode to preserve \r\n line endings, but save and restore
+          # the proper encoding so the string isn't later misinterpreted
+          encoding = out.external_encoding
+          out.binmode
+          result.stdout << out.read.force_encoding(encoding)
+        end
+        stderr = Thread.new do
+          encoding = err.external_encoding
+          err.binmode
+          result.stderr << err.read.force_encoding(encoding)
+        end
 
         stdout.join
         stderr.join
