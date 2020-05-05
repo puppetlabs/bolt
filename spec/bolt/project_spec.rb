@@ -15,8 +15,9 @@ describe Bolt::Project do
     end
 
     around(:each) do |example|
-      Dir.mktmpdir do |tmpdir|
-        @tmpdir = Pathname.new(tmpdir)
+      Dir.mktmpdir("foo") do |tmpdir|
+        @tmpdir = Pathname.new(File.join(tmpdir, "validprojectname"))
+        FileUtils.mkdir_p(@tmpdir)
         FileUtils.touch(@tmpdir + 'bolt.yaml')
         example.run
       end
@@ -32,7 +33,7 @@ describe Bolt::Project do
       let(:config) { { 'tasks' => 'foo' } }
 
       it "raises an error" do
-        expect { Bolt::Project.new(pwd) }.to raise_error(/'tasks' in project.yaml must be an array/)
+        expect { Bolt::Project.new(pwd).validate }.to raise_error(/'tasks' in project.yaml must be an array/)
       end
     end
 
@@ -40,7 +41,8 @@ describe Bolt::Project do
       let(:config) { { 'name' => '_invalid' } }
 
       it "raises an error" do
-        expect { Bolt::Project.new(pwd) }.to raise_error(/Invalid module name '_invalid'/)
+        expect { Bolt::Project.new(pwd).validate }
+          .to raise_error(/Invalid project name '_invalid' in project.yaml/)
       end
     end
 
@@ -112,14 +114,14 @@ describe Bolt::Project do
         expect(Bolt::Project.find_boltdir(pwd)).to eq(Bolt::Project.default_project)
       end
 
-      it 'prefers a directory called project over the local directory' do
+      it 'prefers a directory called Boltdir over the local directory' do
         pwd = boltdir_path.parent
         FileUtils.touch(pwd + 'bolt.yaml')
 
         expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
       end
 
-      it 'prefers a directory called project over the parent directory' do
+      it 'prefers a directory called Boltdir over the parent directory' do
         pwd = boltdir_path.parent + 'bar'
         FileUtils.mkdir_p(pwd)
         FileUtils.touch(boltdir_path.parent + 'bolt.yaml')

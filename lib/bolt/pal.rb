@@ -59,15 +59,6 @@ module Bolt
         @logger.info("Loading modules from #{@modulepath.join(File::PATH_SEPARATOR)}")
       end
 
-      # If the project name is the same as one of the builtin modules raise a warning
-      bolt_mods = Dir.children(BOLTLIB_PATH)
-      if @project && bolt_mods.include?(@project.name)
-        msg = "The project #{@project.name} will not load as a module because the name conflicts "\
-          "with a builtin Bolt module of the same name"
-        @logger.warn(msg)
-        @project = nil
-      end
-
       @loaded = false
     end
 

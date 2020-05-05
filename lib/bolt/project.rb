@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 require 'pathname'
-require 'puppet'
+require 'bolt/pal'
 
 module Bolt
   class Project
     BOLTDIR_NAME = 'Boltdir'
     PROJECT_SETTINGS = {
       "name"  => "The name of the project",
-      "plans" => "An array of plan names that can be included in `bolt plan show` output",
-      "tasks" => "An array of task names that can be included in `bolt task show` output"
+      "plans" => "An array of plan names to whitelist. Whitelisted plans are included in `bolt plan show` output",
+      "tasks" => "An array of task names to whitelist. Whitelisted plans are included in `bolt task show` output"
     }.freeze
 
     attr_reader :path, :config_file, :inventory_file, :modulepath, :hiera_config,
@@ -49,7 +49,7 @@ module Bolt
 
       @project_file = @path + 'project.yaml'
       @data = Bolt::Util.read_optional_yaml_hash(File.expand_path(@project_file), 'project') || {}
-      validate
+      validate if load_as_module?
     end
 
     def to_s
@@ -72,8 +72,8 @@ module Bolt
     end
 
     def name
-      # If the project is in mymod/Boltdir/project.yaml, use mymod as the modulename
-      dirname = type == 'embedded' ? @path.parent.basename.to_s : @path.basename.to_s
+      # If the project is in mymod/Boltdir/project.yaml, use mymod as the project name
+      dirname = @path.basename.to_s == 'Boltdir' ? @path.parent.basename.to_s : @path.basename.to_s
       pname = @data['name'] || dirname
       pname.include?('-') ? pname.split('-', 2)[1] : pname
     end
@@ -86,14 +86,36 @@ module Bolt
       @data['plans']
     end
 
+    def project_directory_name?(name)
+      # it must match an installed project name according to forge validator
+      name =~ /^[a-z][a-z0-9_]*$/
+    end
+
+    def project_namespaced_name?(name)
+      # it must match the full project name according to forge validator
+      name =~ /^[a-zA-Z0-9]+[-][a-z][a-z0-9_]*$/
+    end
+
     def validate
       n = @data['name']
-      if n && !Puppet::Module.is_module_directory_name?(n) && !Puppet::Module.is_module_namespaced_name?(n)
+      if n && !project_directory_name?(n) && !project_namespaced_name?(n)
         raise Bolt::ValidationError, <<~ERROR_STRING
-        Invalid module name '#{n}'; module names must match either:
-        An installed module name (ex. modulename) matching the expression /^[a-z][a-z0-9_]*$/ -or-
-        A namespaced module name (ex. author-modulename) matching the expression /^[a-zA-Z0-9]+[-][a-z][a-z0-9_]*$/
+        Invalid project name '#{n}' in project.yaml; project names must match either:
+        An installed project name (ex. projectname) matching the expression /^[a-z][a-z0-9_]*$/ -or-
+        A namespaced project name (ex. author-projectname) matching the expression /^[a-zA-Z0-9]+[-][a-z][a-z0-9_]*$/
         ERROR_STRING
+      elsif !project_directory_name?(name) && !project_namespaced_name?(name)
+        raise Bolt::ValidationError, <<~ERROR_STRING
+        Invalid project name '#{name}'; project names must match either:
+        A project name (ex. projectname) matching the expression /^[a-z][a-z0-9_]*$/ -or-
+        A namespaced project name (ex. author-projectname) matching the expression /^[a-zA-Z0-9]+[-][a-z][a-z0-9_]*$/
+
+        Configure project name in <project_dir>/project.yaml
+        ERROR_STRING
+      # If the project name is the same as one of the built-in modules raise a warning
+      elsif Dir.children(Bolt::PAL::BOLTLIB_PATH).include?(name)
+        raise Bolt::ValidationError, "The project '#{name}' will not be loaded. The project name conflicts "\
+          "with a built-in Bolt module of the same name."
       end
 
       %w[tasks plans].each do |conf|
