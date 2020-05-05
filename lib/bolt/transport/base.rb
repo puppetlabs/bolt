@@ -104,7 +104,7 @@ module Bolt
         assert_batch_size_one("batch_task()", targets)
         target = targets.first
         with_events(target, callback, 'task') do
-          @logger.debug { "Running task run '#{task}' on #{target.safe_name}" }
+          @logger.debug { "Running task '#{task.name}' on #{target.safe_name}" }
           run_task(target, task, arguments, options)
         end
       end
@@ -120,7 +120,7 @@ module Bolt
         arguments = target_mapping[target]
 
         with_events(target, callback, 'task') do
-          @logger.debug { "Running task run '#{task}' on #{target.safe_name} with '#{arguments.to_json}'" }
+          @logger.debug { "Running task '#{task.name}' on #{target.safe_name} with '#{arguments.to_json}'" }
           run_task(target, task, arguments, options)
         end
       end
