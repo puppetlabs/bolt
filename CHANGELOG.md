@@ -4,6 +4,14 @@
 
 ### New features
 
+* **Support project-level Puppet content**
+  ([#1267](https://github.com/puppetlabs/bolt/issues/1267))
+
+  Users can now load Puppet content from the root of the Bolt project directory,
+  such as `<boltdir>/tasks`. Users must opt-in to this experimental feature by 
+  creating a `project.yaml` in their project directory. **This feature is
+  experimental.**
+
 * **Project authors can whitelist `bolt * show` output**
   ([#1756](https://github.com/puppetlabs/bolt/issues/1756))
 
@@ -51,14 +59,6 @@
   to look up data with Hiera. The `lookup` function will use the Hiera
   config file specified in the Bolt config. Interpolations are not
   available outside of apply blocks and will cause a plan to error.
-
-* **Support project-level Puppet content**
-  ([#1267](https://github.com/puppetlabs/bolt/issues/1267))
-
-  Users can now load Puppet content from the root of the Bolt project directory,
-  such as `<boltdir>/tasks`. Users must opt-in to this experimental feature by 
-  creating a `project.yaml` in their project directory. **This feature is
-  experimental.**
 
 ### Bug fixes
 
