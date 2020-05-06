@@ -57,8 +57,8 @@ module BoltServer
     end
 
     def scrub_stack_trace(result)
-      if result.dig(:value, '_error', 'details', 'stack_trace')
-        result[:value]['_error']['details'].reject! { |k| k == 'stack_trace' }
+      if result.dig('value', '_error', 'details', 'stack_trace')
+        result['value']['_error']['details'].reject! { |k| k == 'stack_trace' }
       end
       result
     end
@@ -87,14 +87,14 @@ module BoltServer
     # If the `result_set` contains only one item, it will be returned
     # as a single result object. Set `aggregate` to treat it as a set
     # of results with length 1 instead.
-    def result_set_to_status_hash(result_set, aggregate: false)
+    def result_set_to_data(result_set, aggregate: false)
       scrubbed_results = result_set.map do |result|
-        scrub_stack_trace(result.status_hash)
+        scrub_stack_trace(result.to_data)
       end
 
       if aggregate || scrubbed_results.length > 1
         # For actions that act on multiple targets, construct a status hash for the aggregate result
-        all_succeeded = scrubbed_results.all? { |r| r[:status] == 'success' }
+        all_succeeded = scrubbed_results.all? { |r| r['status'] == 'success' }
         {
           status: all_succeeded ? 'success' : 'failure',
           result: scrubbed_results
@@ -297,7 +297,7 @@ module BoltServer
       return [400, error.to_json] unless error.nil?
 
       aggregate = body['target'].nil?
-      [200, result_set_to_status_hash(result_set, aggregate: aggregate).to_json]
+      [200, result_set_to_data(result_set, aggregate: aggregate).to_json]
     end
 
     def make_winrm_target(target_hash)
@@ -337,7 +337,7 @@ module BoltServer
       return [400, error.to_json] if error
 
       aggregate = body['target'].nil?
-      [200, result_set_to_status_hash(result_set, aggregate: aggregate).to_json]
+      [200, result_set_to_data(result_set, aggregate: aggregate).to_json]
     end
 
     # Fetches the metadata for a single plan

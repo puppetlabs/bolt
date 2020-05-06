@@ -67,7 +67,7 @@ describe "when runnning over the winrm transport", winrm: true do
     it 'reports errors when task fails', :reset_puppet_settings do
       result = run_failed_node(%w[task run results::win] + config_flags)
       expect(result['_error']['kind']).to eq('puppetlabs.tasks/task-error')
-      expect(result['_error']['msg']).to eq("The task failed with exit code 1:\n")
+      expect(result['_error']['msg']).to eq("The task failed with exit code 1 and no output")
     end
 
     it 'passes noop to a task that supports noop', :reset_puppet_settings do

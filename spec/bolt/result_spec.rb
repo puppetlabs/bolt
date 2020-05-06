@@ -109,5 +109,25 @@ describe Bolt::Result do
       expect(result.value).to eq(obj)
       expect(result.error_hash).to eq(obj['_error'])
     end
+
+    it 'uses the unparsed value of stdout if it is not valid JSON' do
+      stdout = 'just some string'
+      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask')
+      expect(result.value).to eq('_output' => 'just some string')
+    end
+
+    it 'generates an error for binary data' do
+      stdout = "\xFC].\xF9\xA8\x85f\xDF{\x11d\xD5\x8E\xC6\xA6"
+      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask')
+      expect(result.value.keys).to eq(['_error'])
+      expect(result.error_hash['msg']).to match(/The task result contained invalid UTF-8/)
+    end
+
+    it 'generates an error for non-UTF-8 output' do
+      stdout = "☃".encode('utf-32')
+      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask')
+      expect(result.value.keys).to eq(['_error'])
+      expect(result.error_hash['msg']).to match(/The task result contained invalid UTF-8/)
+    end
   end
 end

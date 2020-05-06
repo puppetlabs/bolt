@@ -70,7 +70,7 @@ describe "BoltServer::TransportApp" do
       }
     end
     let(:action) { 'run_task' }
-    let(:result) { double(Bolt::Result, status_hash: { status: 'test_status' }) }
+    let(:result) { double(Bolt::Result, to_data: { 'status': 'test_status' }) }
 
     before(:each) do
       allow_any_instance_of(BoltServer::TransportApp)
@@ -235,7 +235,7 @@ describe "BoltServer::TransportApp" do
         } }
 
         expect_any_instance_of(BoltServer::TransportApp)
-          .to receive(:scrub_stack_trace).with(result.status_hash).and_return({})
+          .to receive(:scrub_stack_trace).with(result.to_data).and_return({})
 
         post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
 
@@ -255,7 +255,7 @@ describe "BoltServer::TransportApp" do
         } }
 
         expect_any_instance_of(BoltServer::TransportApp)
-          .to receive(:scrub_stack_trace).with(result.status_hash).and_return({})
+          .to receive(:scrub_stack_trace).with(result.to_data).and_return({})
 
         post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
 
@@ -349,7 +349,7 @@ describe "BoltServer::TransportApp" do
         } }
 
         expect_any_instance_of(BoltServer::TransportApp)
-          .to receive(:scrub_stack_trace).with(result.status_hash).and_return({})
+          .to receive(:scrub_stack_trace).with(result.to_data).and_return({})
 
         post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
 

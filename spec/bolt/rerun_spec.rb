@@ -32,8 +32,8 @@ describe 'rerun' do
 
   let(:failure_array) do
     result_set.map do |r|
-      r = r.status_hash
-      { 'target' => r[:target], 'status' => r[:status] }
+      r = r.to_data
+      { 'target' => r['target'], 'status' => r['status'] }
     end
   end
 

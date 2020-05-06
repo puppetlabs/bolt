@@ -28,7 +28,7 @@ module Bolt
 
       def print_result(result)
         @stream.puts ',' if @preceding_item
-        @stream.puts result.status_hash.to_json
+        @stream.puts result.to_json
         @preceding_item = true
       end
 

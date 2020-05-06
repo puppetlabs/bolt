@@ -40,18 +40,23 @@ module Bolt
     end
 
     def self.for_task(target, stdout, stderr, exit_code, task)
-      begin
-        value = JSON.parse(stdout)
-        unless value.is_a? Hash
-          value = nil
-        end
-      rescue JSON::ParserError
-        value = nil
-      end
-      value ||= { '_output' => stdout }
+      stdout.force_encoding('utf-8') unless stdout.encoding == Encoding::UTF_8
+      value = if stdout.valid_encoding?
+                parse_hash(stdout) || { '_output' => stdout }
+              else
+                { '_error' => { 'kind' => 'puppetlabs.tasks/task-error',
+                                'issue_code' => 'TASK_ERROR',
+                                'msg' => 'The task result contained invalid UTF-8 on stdout',
+                                'details' => {} } }
+              end
+
       if exit_code != 0 && value['_error'].nil?
         msg = if stdout.empty?
-                "The task failed with exit code #{exit_code}:\n#{stderr}"
+                if stderr.empty?
+                  "The task failed with exit code #{exit_code} and no output"
+                else
+                  "The task failed with exit code #{exit_code} and no stdout, but stderr contained:\n#{stderr}"
+                end
               else
                 "The task failed with exit code #{exit_code}"
               end
@@ -61,6 +66,13 @@ module Bolt
                             'details' => { 'exit_code' => exit_code } }
       end
       new(target, value: value, action: 'task', object: task)
+    end
+
+    def self.parse_hash(string)
+      value = JSON.parse(string)
+      value if value.is_a? Hash
+    rescue JSON::ParserError
+      nil
     end
 
     def self.for_upload(target, source, destination)
@@ -110,18 +122,8 @@ module Bolt
       message && !message.strip.empty?
     end
 
-    def status_hash
-      {
-        target: @target.name,
-        action: action,
-        object: object,
-        status: status,
-        value: @value
-      }
-    end
-
     def generic_value
-      value.reject { |k, _| %w[_error _output].include? k }
+      safe_value.reject { |k, _| %w[_error _output].include? k }
     end
 
     def eql?(other)
@@ -139,15 +141,36 @@ module Bolt
     end
 
     def to_json(opts = nil)
-      status_hash.to_json(opts)
+      to_data.to_json(opts)
     end
 
     def to_s
       to_json
     end
 
+    # This is the value with all non-UTF-8 characters removed, suitable for
+    # printing or converting to JSON. It *should* only be possible to have
+    # non-UTF-8 characters in stdout/stderr keys as they are not allowed from
+    # tasks but we scrub the whole thing just in case.
+    def safe_value
+      Bolt::Util.walk_vals(value) do |val|
+        if val.is_a?(String)
+          # Replace invalid bytes with hex codes, ie. \xDE\xAD\xBE\xEF
+          val.scrub { |c| c.bytes.map { |b| "\\x" + b.to_s(16).upcase }.join }
+        else
+          val
+        end
+      end
+    end
+
     def to_data
-      Bolt::Util.walk_keys(status_hash, &:to_s)
+      {
+        "target" => @target.name,
+        "action" => action,
+        "object" => object,
+        "status" => status,
+        "value" => safe_value
+      }
     end
 
     def status
