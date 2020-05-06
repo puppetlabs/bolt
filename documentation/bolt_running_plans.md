@@ -17,6 +17,30 @@ bolt plan run mymodule::myplan load_balancer=lb.myorg.com
 
 You can pass a comma-separated list of target names, wildcard patterns, or group names to a plan parameter of type `TargetSpec`. For more information on the `TargetSpec` type, see [Writing plans in the Puppet language](./writing_plans.md#targetspec).
 
+## Specifying the modulepath
+
+In order for Bolt to find a plan, the plan must be in a module
+on the modulepath. By default, Bolt looks for plans in the
+`<PROJECT_NAME>/modules/plans` and `<PROJECT_NAME>/site-modules/plans` directories.
+
+If you're developing a new project, and you want to use a simplified
+directory structure, create a file called `project.yaml` in the root of your
+project directory. 
+
+
+
+If `project.yaml` exists at the root of the project directory then the project itself is also loaded
+as a module, namespaced to either `name` in project.yaml if it's set or the name of the directory if
+not. 
+
+If you are developing a new task or plan you can create a `<PROJECT_NAME>/tasks/` or `<PROJECT_NAME>/plans/`
+directory alongside `<PROJECT_NAME/project.yaml` to develop your content in, then run Bolt from the
+root of your Bolt project directory to test the task or plan.
+
+**Related Information**
+
+[Bolt project directories](#bolt_project_directories.md)
+
 ## Passing structured data into a plan
 
 If one of your plan parameters accepts structured data like an `array` or `hash`, you can pass the data into the plan as JSON from the command line. The parsed value must match the parameter's type specification in the plan definition.

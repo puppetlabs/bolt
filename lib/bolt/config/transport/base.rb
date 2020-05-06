@@ -9,12 +9,12 @@ module Bolt
       class Base
         attr_reader :input
 
-        def initialize(data = {}, boltdir = nil)
+        def initialize(data = {}, project = nil)
           assert_hash_or_config(data)
           @input    = data
           @resolved = !Bolt::Util.references?(input)
           @config   = resolved? ? Bolt::Util.deep_merge(defaults, filter(input)) : defaults
-          @boltdir  = boltdir
+          @project  = project
 
           validate if resolved?
         end
@@ -62,7 +62,7 @@ module Bolt
             Bolt::Util.deep_merge(acc, layer_data)
           end
 
-          self.class.new(merged, @boltdir)
+          self.class.new(merged, @project)
         end
 
         # Resolve any references in the input data, then remerge it with the defaults

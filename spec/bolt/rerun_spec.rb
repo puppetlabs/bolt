@@ -10,8 +10,8 @@ require 'bolt/util'
 # keeping this separate.
 describe 'rerun' do
   around(:each) do |example|
-    Dir.mktmpdir do |boltdir|
-      @boltdir = Bolt::Boltdir.new(boltdir)
+    Dir.mktmpdir do |project|
+      @project = Bolt::Project.new(project)
       example.run
     end
   end
@@ -32,15 +32,15 @@ describe 'rerun' do
 
   let(:failure_array) do
     result_set.map do |r|
-      r = r.status_hash
-      { 'target' => r[:target], 'status' => r[:status] }
+      r = r.to_data
+      { 'target' => r['target'], 'status' => r['status'] }
     end
   end
 
   let(:output) { StringIO.new }
 
   before(:each) do
-    allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(@boltdir)
+    allow(Bolt::Project).to receive(:find_boltdir).and_return(@project)
     allow(Bolt::Executor).to receive(:new).and_return(executor)
     allow_any_instance_of(Bolt::CLI).to receive(:pal).and_return(pal)
 
@@ -52,11 +52,11 @@ describe 'rerun' do
   end
 
   def write_rerun(data)
-    File.write(File.join(@boltdir.path, '.rerun.json'), data.to_json)
+    File.write(File.join(@project.path, '.rerun.json'), data.to_json)
   end
 
   def read_rerun
-    JSON.parse(File.read(File.join(@boltdir.path, '.rerun.json')))
+    JSON.parse(File.read(File.join(@project.path, '.rerun.json')))
   end
 
   def run_cli(args)
@@ -71,7 +71,7 @@ describe 'rerun' do
   end
 
   it 'fails with an unparsable rerun file' do
-    File.write(File.join(@boltdir.path, '.rerun.json'), 'not"json:')
+    File.write(File.join(@project.path, '.rerun.json'), 'not"json:')
     expect do
       run_cli(['command', 'run', 'whoami', '--rerun', 'all'])
     end.to raise_error(Bolt::FileError, /Could not parse rerun/)
@@ -146,7 +146,7 @@ describe 'rerun' do
     end
 
     it 'does not update the file with save-rerun: false' do
-      File.write(@boltdir.config_file, { 'save-rerun' => false }.to_yaml)
+      File.write(@project.config_file, { 'save-rerun' => false }.to_yaml)
 
       allow(executor).to receive(:run_command)
         .with(targets, 'whoami', kind_of(Hash))
@@ -176,7 +176,7 @@ describe 'rerun' do
         .and_return(Bolt::PlanResult.new(nil, 'failure'))
       run_cli(%w[plan run whoami])
 
-      expect(File.exist?(File.join(@boltdir.path, '.rerun.json'))).to eq(false)
+      expect(File.exist?(File.join(@project.path, '.rerun.json'))).to eq(false)
     end
 
     it 'updates the file when apply fails' do

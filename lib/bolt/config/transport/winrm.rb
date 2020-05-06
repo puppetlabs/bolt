@@ -71,7 +71,7 @@ module Bolt
             end
 
             if @config['cacert']
-              @config['cacert'] = File.expand_path(@config['cacert'], @boltdir)
+              @config['cacert'] = File.expand_path(@config['cacert'], @project)
               Bolt::Util.validate_file('cacert', @config['cacert'])
             end
           end

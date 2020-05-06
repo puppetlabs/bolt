@@ -342,7 +342,7 @@ describe "passes parsed AST to the apply_catalog task" do
       it 'serializes Target objects as ApplyTargets in apply blocks' do
         result = run_cli_json(%w[plan run puppet_types::target] + config_flags)
         notify = get_notifies(result)
-        expect(notify[0]['title']).to eq("ApplyTarget protocol: ssh")
+        expect(notify[0]['title']).to eq("ApplyTarget ssh://bolt@localhost:20022 protocol: ssh")
       end
 
       it 'serializes Error objects in apply blocks' do

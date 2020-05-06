@@ -5,6 +5,6 @@ plan puppet_types::target (
   $first.apply_prep
 
   return apply($first) {
-    notify { "ApplyTarget protocol: ${$first.protocol}": }
+    notify { "ApplyTarget $first protocol: ${first.protocol}": }
   }
 }

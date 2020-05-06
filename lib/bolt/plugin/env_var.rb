@@ -17,13 +17,14 @@ module Bolt
         unless opts['var']
           raise Bolt::ValidationError, "env_var plugin requires that the 'var' is specified"
         end
+        return if opts['optional'] || opts['default']
         unless ENV[opts['var']]
           raise Bolt::ValidationError, "env_var plugin requires that the var '#{opts['var']}' be set"
         end
       end
 
       def resolve_reference(opts)
-        ENV[opts['var']]
+        ENV[opts['var']] || opts['default']
       end
     end
   end

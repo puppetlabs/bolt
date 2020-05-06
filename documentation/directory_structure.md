@@ -2,7 +2,7 @@
 
 Puppet tasks, plans, functions, classes and types must exist inside a Puppet module in order for Bolt to load them. Bolt loads modules by searching for module directories on the modulepath.
 
-By default, the `modulepath` includes the `modules/` and `site-modules` directories in the [Bolt project directory](bolt_project_directories.md#).
+By default, the modulepath includes the `modules` and `site-modules` directories in the [Bolt project directory](bolt_project_directories.md#). If `project.yaml` exists at the root of the project directory then the project itself is also loaded as a module, namespaced to either `name` in project.yaml if it's set or the name of the directory if not.
 
 ## Directory structure of a module
 
@@ -37,13 +37,14 @@ A typical module for use with Bolt may contain these directories:
 
 ### Where to put module code
 
-Modules can either be written directly in `site-modules/` or be installed from the Puppet Forge or a code repository into `modules/`.
+You can develop modules directly in the Bolt project directory or install them from the Puppet
+Forge into the `modules` directory.
 
 ## Modules for projects
 
-Modules developed to support a particular project can be developed directly in the `site-modules` directory of the Bolt project directory.
+Modules developed to support a particular project can be developed directly in the Bolt project directory. You can use `pdk new module` to create a skeleton structure, and `bolt project init` inside a directory to make it a Bolt project directory.
 
-Create a new directory for each module inside `site-modules` that matches the modules name or use `pdk new module` to create a skeleton structure.
+**Note**:  To use the `pdk` command, you must [install the Puppet Development Kit](https://puppet.com/docs/pdk/1.x/pdk_install.html) 
 
 ## Standalone modules
 
@@ -56,6 +57,5 @@ To create a standalone module, run `pdk new module` outside of the project direc
 Follow these tips for managing standalone modules:
 
 -   Add `modules/*` to `.gitignore` of your project to prevent accidentally committing standalone modules.
--   When you run tasks and plans within a project directory, the modulepath (`modules/` and `site-modules/`) is searched for modules containing Bolt content. If a module is found in `modules`, tasks and plans from the version of the module in `site-modules` are ignored. Remove a module from `site-modules` if you convert it to a standalone module.
+-   When you run tasks and plans within a project directory the modulepath is searched in order for modules containing Bolt content. The Bolt project directory itself is loaded as a module at the front of the modulepath, and the default modulepath is `<project directory>/modules:<project directory>/site-modules`. If you have a module in both the `modules` and `site-modules` directories, the version in `modules` will be used.
 -   As a best practice, write automated tests for the tasks and plans in your module, if possible. For information about automated testing patterns, check out these resources: [Example of unit testing plans and integration \(acceptance\) testing tasks](https://github.com/puppetlabs/puppetlabs-facts) (GitHub) and [Writing Robust Puppet Bolt Tasks: A Guide](https://puppet.com/blog/writing-robust-puppet-bolt-tasks-guide) (Puppet blog).
-

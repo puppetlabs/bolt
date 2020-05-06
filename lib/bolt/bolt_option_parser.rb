@@ -64,7 +64,7 @@ module Bolt
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: PLAN_CONVERT_HELP }
         when 'run'
-          { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir],
+          { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir hiera-config],
             banner: PLAN_RUN_HELP }
         when 'show'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[filter format],
@@ -112,7 +112,7 @@ module Bolt
       when 'secret'
         case action
         when 'createkeys'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin],
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin force],
             banner: SECRET_CREATEKEYS_HELP }
         when 'decrypt'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[plugin],
@@ -716,6 +716,10 @@ module Bolt
              'Directory containing bolt.yaml will be used as the Boltdir.') do |path|
         @options[:configfile] = path
       end
+      define('--hiera-config FILEPATH',
+             'Specify where to load Hiera config from (default: ~/.puppetlabs/bolt/hiera.yaml)') do |path|
+        @options[:'hiera-config'] = path
+      end
       define('-i', '--inventoryfile FILEPATH',
              'Specify where to load inventory from (default: ~/.puppetlabs/bolt/inventory.yaml)') do |path|
         if ENV.include?(Bolt::Inventory::ENVIRONMENT_VAR)
@@ -774,6 +778,9 @@ module Bolt
              'A comma-separated list of modules to install from the Puppet Forge',
              'when initializing a project. Resolves and installs all dependencies.') do |modules|
         @options[:modules] = modules.split(',')
+      end
+      define('--force', 'Overwrite existing key pairs') do |_force|
+        @options[:force] = true
       end
 
       separator "\nGLOBAL OPTIONS"

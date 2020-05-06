@@ -114,12 +114,12 @@ module Bolt
       @config = if options[:configfile]
                   Bolt::Config.from_file(options[:configfile], options)
                 else
-                  boltdir = if options[:boltdir]
-                              Bolt::Boltdir.new(options[:boltdir])
+                  project = if options[:boltdir]
+                              Bolt::Project.new(options[:boltdir])
                             else
-                              Bolt::Boltdir.find_boltdir(Dir.pwd)
+                              Bolt::Project.find_boltdir(Dir.pwd)
                             end
-                  Bolt::Config.from_boltdir(boltdir, options)
+                  Bolt::Config.from_project(project, options)
                 end
 
       Bolt::Logger.configure(config.log, config.color)
@@ -238,6 +238,12 @@ module Bolt
       if options[:subcommand] == 'command' && (!options[:object] || options[:object].empty?)
         raise Bolt::CLIError, "Must specify a command to run"
       end
+
+      if options[:subcommand] == 'secret' &&
+         (options[:action] == 'decrypt' || options[:action] == 'encrypt') &&
+         !options[:object]
+        raise Bolt::CLIError, "Must specify a value to #{options[:action]}"
+      end
     end
 
     def handle_parser_errors
@@ -252,7 +258,7 @@ module Bolt
 
     def puppetdb_client
       return @puppetdb_client if @puppetdb_client
-      puppetdb_config = Bolt::PuppetDB::Config.load_config(nil, config.puppetdb, config.boltdir.path)
+      puppetdb_config = Bolt::PuppetDB::Config.load_config(nil, config.puppetdb, config.project.path)
       @puppetdb_client = Bolt::PuppetDB::Client.new(puppetdb_config)
     end
 
@@ -314,7 +320,8 @@ module Bolt
 
       screen_view_fields = {
         output_format: config.format,
-        boltdir_type: config.boltdir.type
+        # For continuity
+        boltdir_type: config.project.type
       }
 
       # Only include target and inventory info for commands that take a targets
@@ -447,6 +454,7 @@ module Bolt
     def list_tasks
       tasks = pal.list_tasks
       tasks.select! { |task| task.first.include?(options[:filter]) } if options[:filter]
+      tasks.select! { |task| config.project.tasks.include?(task.first) } unless config.project.tasks.nil?
       outputter.print_tasks(tasks, pal.list_modulepath)
     end
 
@@ -457,6 +465,7 @@ module Bolt
     def list_plans
       plans = pal.list_plans
       plans.select! { |plan| plan.first.include?(options[:filter]) } if options[:filter]
+      plans.select! { |plan| config.project.plans.include?(plan.first) } unless config.project.plans.nil?
       outputter.print_plans(plans, pal.list_modulepath)
     end
 
@@ -567,10 +576,10 @@ module Bolt
     # Initializes a specified directory as a Bolt project and installs any modules
     # specified by the user, along with their dependencies
     def initialize_project
-      boltdir    = Pathname.new(File.expand_path(options[:object] || Dir.pwd))
-      config     = boltdir + 'bolt.yaml'
-      puppetfile = boltdir + 'Puppetfile'
-      modulepath = [boltdir + 'modules']
+      project    = Pathname.new(File.expand_path(options[:object] || Dir.pwd))
+      config     = project + 'bolt.yaml'
+      puppetfile = project + 'Puppetfile'
+      modulepath = [project + 'modules']
 
       # If modules were specified, first check if there is already a Puppetfile at the project
       # directory, erroring if there is. If there is no Puppetfile, generate the Puppetfile
@@ -590,20 +599,20 @@ module Bolt
       # Warn the user if the project directory already exists. We don't error here since users
       # might not have installed any modules yet.
       if config.exist?
-        @logger.warn "Found existing project directory at #{boltdir}"
+        @logger.warn "Found existing project directory at #{project}"
       end
 
       # Create the project directory
-      FileUtils.mkdir_p(boltdir)
+      FileUtils.mkdir_p(project)
 
-      # Bless the project directory as a boltdir
+      # Bless the project directory as a...wait for it...project
       if FileUtils.touch(config)
-        outputter.print_message "Successfully created Bolt project at #{boltdir}"
+        outputter.print_message "Successfully created Bolt project at #{project}"
       else
-        raise Bolt::FileError.new("Could not create Bolt project directory at #{boltdir}", nil)
+        raise Bolt::FileError.new("Could not create Bolt project directory at #{project}", nil)
       end
 
-      # Write the generated Puppetfile to the fancy new boltdir
+      # Write the generated Puppetfile to the fancy new project
       if puppetfile_specs
         File.write(puppetfile, puppetfile_specs.join("\n"))
         outputter.print_message "Successfully created Puppetfile at #{puppetfile}"
@@ -752,12 +761,14 @@ module Bolt
     end
 
     def pal
+      project = config.project.load_as_module? ? config.project : nil
       @pal ||= Bolt::PAL.new(config.modulepath,
                              config.hiera_config,
-                             config.boltdir.resource_types,
+                             config.project.resource_types,
                              config.compile_concurrency,
                              config.trusted_external,
-                             config.apply_settings)
+                             config.apply_settings,
+                             project)
     end
 
     def convert_plan(plan)

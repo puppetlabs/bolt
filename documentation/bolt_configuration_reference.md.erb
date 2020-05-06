@@ -80,6 +80,19 @@ plugin_hooks:
       message: "Which version of Puppet do you want to install?"
 ```
 
+## Project configuration options
+
+> **Note:** Project configuration is experimental
+
+Use `<PROJECT_NAME>/project.yaml` to configure your [Bolt
+project](bolt_project_directories.md). You can define the following settings:
+
+| Option | Description | Default |
+| ------ | ----------- | ------- |
+<% @project[:options].each do |option, desc| -%>
+| `<%= option %>` | <%= desc %> | <%= @project[:defaults][option].to_s %> |
+<% end %>
+
 ## Apply options
 
 Apply options are a subset of [Puppet configuration settings](https://puppet.com/docs/puppet/latest/configuration.html) which are set when Bolt applies Puppet code on remote targets. Users can define values for the following Puppet settings:
@@ -132,6 +145,7 @@ These are the options configurable in OpenSSH files:
 | `HostName` | Host name to log. |
 | `IdentityFile` | File in which user's identity key is stored. |
 | `Port` | SSH port. |
+| `StrictHostKeyChecking` | Prevents SSH from automatically adding host keys to the known hosts file, and refuses to connect to a host whose host key has changed. |
 | `User` | Login user. |
 | `UserKnownHostsFile` | Path to local user's host key database. |
 

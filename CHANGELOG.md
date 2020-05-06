@@ -1,5 +1,168 @@
 # Changelog
 
+## Bolt 2.8.0 (2020-05-05)
+
+### New features
+
+* **Support project-level Puppet content**
+  ([#1267](https://github.com/puppetlabs/bolt/issues/1267))
+
+  Users can now load Puppet content from the root of the Bolt project directory,
+  such as `<boltdir>/tasks`. Users must opt-in to this experimental feature by 
+  creating a `project.yaml` in their project directory. **This feature is
+  experimental.**
+
+* **Project authors can whitelist `bolt * show` output**
+  ([#1756](https://github.com/puppetlabs/bolt/issues/1756))
+
+  Project authors can now whitelist individual `bolt [plan|task] show`
+  content in `project.yaml` using the `tasks` and `plans` settings.
+
+* **Added `run_task_with` plan function**
+  ([#1673](https://github.com/puppetlabs/bolt/issues/1673))
+
+  The new plan function `run_task_with` lets you run tasks on a set of
+  targets with target-specific parameters. It accepts a lambda that
+  returns a `Hash` of parameters for a particular target.
+
+* **`pkcs7` plugin converted to module-based plugin**
+  ([#1736](https://github.com/puppetlabs/bolt/issues/1736))
+
+  The `pkcs7` plugin has been converted to a module-based plugin and
+  includes the `pkcs7::secret_encrypt`, `pkcs7::secret_decrypt`, and
+  `pkcs7::secret_createkeys` tasks.
+
+* **Require `--force` option to overwrite existing keys**
+  ([#1738](https://github.com/puppetlabs/bolt/issues/1738))
+
+  The `bolt secret createkeys` command now accepts an optional `--force`
+  option to force secret plugins to overwrite existing keys. The default
+  `pkcs7` secret plugin will now error when attempting to overwrite
+  existing keys without the `--force` option set.
+
+* **Support default task parameters in plugins**
+  ([#1754](https://github.com/puppetlabs/bolt/issues/1754))
+
+  Bolt now merges default task parameters for a plugin with parameters
+  set in a `bolt.yaml` and `inventory.yaml` file.
+
+* **Add `--hiera-config` option for `bolt plan run` command**
+  ([#1403](https://github.com/puppetlabs/bolt/issues/1403))
+
+  The `bolt plan run` command now supports a `--hiera-config` option
+  that accepts an absolute or relative path to a Hiera config file.
+
+* **Support `lookup` plan function outside of apply blocks**
+  ([#1403](https://github.com/puppetlabs/bolt/issues/1403))
+
+  Plans can now use the `lookup` plan function outside of apply blocks
+  to look up data with Hiera. The `lookup` function will use the Hiera
+  config file specified in the Bolt config. Interpolations are not
+  available outside of apply blocks and will cause a plan to error.
+
+### Bug fixes
+
+* **Target objects of the same name are now identical** 
+  ([#1773](https://github.com/puppetlabs/bolt/issues/1773))
+
+  Target objects will now be considered identical in all cases if they
+  have the same name. This allows uniq to operate on arrays of Targets
+  as well as Targets to be used as Hash keys.
+
+* **Fixed 'broken pipe' errors with SSH and local transports**
+  ([#1769](https://github.com/puppetlabs/bolt/issues/1769))
+
+  The SSH and local transports could experience broken pipes when
+  using run-as while running a task that accepted input on stdin but
+  didn't read it.
+
+* **Set `gcloud_inventory::resolve_reference` task to private**
+  ([#1783](https://github.com/puppetlabs/bolt/pull/1783))
+
+  The `gcloud_inventory::resolve_reference` task has been set to private
+  and will no longer appear when using `bolt task show`.
+
+### Deprecations
+
+* **`private-key` and `public-key` options for `pkcs7` plugin have been
+  deprecated**
+  ([#1736](https://github.com/puppetlabs/bolt/issues/1736))
+
+  The `pkcs7` plugin now accepts `private_key` and `public_key` options.
+  Support for the `private-key` and `public-key` options will be removed
+  in a future release of Bolt.
+
+## Bolt 2.7.0 (2020-04-27)
+
+### New features
+
+* **Mock out sub-plans in BoltSpec testing**
+  ([#1630](https://github.com/puppetlabs/bolt/issues/1630))
+
+  New stubs `allow_plan` and `expect_plan` are available in BoltSpec::Plans for
+  mocking out `run_plan` functions during Bolt spec testing. New flags `execute_any_plan` 
+  (default) and `execute_no_plan` are avilable to control the behavior of sub-plan executions.
+  The new stubs `allow_plan` and `expect_plan` work with all of the existing action
+  modifiers except for `with_targets` and `return_for_targets`.
+
+  _Contributed by [Nick Maludy](https://github.com/nmaludy)_
+
+* **Experimental support for interacting with Windows hosts via PowerShell over SSH**
+  ([#813](https://github.com/puppetlabs/bolt/issues/813))
+
+  The `login-shell: powershell` config setting can be set on a target to
+  connect over SSH while running commands and tasks via PowerShell instead
+  of Bash. This feature requires OpenSSH >= 7.9 on the target.
+
+* **Print group membership for targets when running `bolt inventory show --detail`**
+  ([#1701](https://github.com/puppetlabs/bolt/pull/1701))
+
+  The `bolt inventory show --detail` command now lists a target's group membership.
+
+  _Contributed by [Nick Maludy](https://github.com/nmaludy)_
+
+* **`--no-cleanup` option to leave behind temporary files**
+  ([#1729](https://github.com/puppetlabs/bolt/issues/1729))
+
+  The `--no-cleanup` flag or `cleanup: false` transport option can now
+  be set to instruct Bolt not to clean up on a target after it's
+  finished. This is useful for debugging what Bolt is doing on a system.
+
+* **Add `prompt` plan function**
+  ([#1755](https://github.com/puppetlabs/bolt/issues/1755))
+
+  The new `prompt` plan function lets you pause plan execution and
+  prompt the user for input.
+
+* **OpenSSH config option StrictHostKeyChecking now honored**
+  ([#1758](https://github.com/puppetlabs/bolt/pull/1758))
+
+  Setting `StrictHostKeyChecking` in your ssh config will now be loaded
+  and merged with config along with other OpenSSH settings
+
+* **Support for ed25519 SSH keys**
+  ([#1758](https://github.com/puppetlabs/bolt/pull/1758))
+
+  Key exchange algorithm curve25519sha256 is now supported
+
+* **New `optional` and `default` keys for the `env_var` plugin**
+  ([#1768](https://github.com/puppetlabs/bolt/issues/1768))
+
+  The `env_var` plugin accepts two new optional keys. The `default` key
+  allows you to set a default value that the plugin should return when
+  the environment variable is not set, while the `option` key allows the
+  plugin to return `nil` when the environment variable is not set instead
+  of erroring.
+
+### Bug fixes
+
+* **Target facts with the same name as a plan or Target variable should
+  not raise an error** ([#1725](https://github.com/puppetlabs/bolt/issues/1725))
+
+  Previously, defining a fact with the same name as
+  another variable would cause a redefinition error in the apply block,
+  where now referencing the variable will refer to the fact value.
+
 ## Bolt 2.6.0 (2020-04-20)
 
 ### New features

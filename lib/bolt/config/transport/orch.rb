@@ -32,12 +32,12 @@ module Bolt
           super
 
           if @config['cacert']
-            @config['cacert'] = File.expand_path(@config['cacert'], @boltdir)
+            @config['cacert'] = File.expand_path(@config['cacert'], @project)
             Bolt::Util.validate_file('cacert', @config['cacert'])
           end
 
           if @config['token-file']
-            @config['token-file'] = File.expand_path(@config['token-file'], @boltdir)
+            @config['token-file'] = File.expand_path(@config['token-file'], @project)
             Bolt::Util.validate_file('token-file', @config['token-file'])
           end
         end

@@ -278,6 +278,22 @@ module Bolt
       end
     end
 
+    def run_task_with(target_mapping, task, options = {})
+      targets = target_mapping.keys
+      description = options.fetch(:description, "task #{task.name}")
+
+      log_action(description, targets) do
+        options[:run_as] = run_as if run_as && !options.key?(:run_as)
+        target_mapping.each_value { |arguments| arguments['_task'] = task.name }
+
+        batch_execute(targets) do |transport, batch|
+          with_node_logging("Running task #{task.name}'", batch) do
+            transport.batch_task_with(batch, task, target_mapping, options, &method(:publish_event))
+          end
+        end
+      end
+    end
+
     def upload_file(targets, source, destination, options = {})
       description = options.fetch(:description, "file upload from #{source} to #{destination}")
       log_action(description, targets) do
@@ -328,6 +344,24 @@ module Bolt
         raise(TimeoutError, 'Timed out waiting for target') if (wait_now - start).to_i >= timeout
         sleep(retry_interval)
       end
+    end
+
+    def prompt(prompt, options)
+      unless STDIN.tty?
+        raise Bolt::Error.new('STDIN is not a tty, unable to prompt', 'bolt/no-tty-error')
+      end
+
+      STDERR.print("#{prompt}: ")
+
+      value = if options[:sensitive]
+                STDIN.noecho(&:gets).to_s.chomp
+              else
+                STDIN.gets.to_s.chomp
+              end
+
+      STDERR.puts if options[:sensitive]
+
+      value
     end
 
     # Plan context doesn't make sense for most transports but it is tightly

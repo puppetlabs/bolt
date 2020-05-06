@@ -40,7 +40,7 @@ module Bolt
     attr_reader :modulepath
 
     def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors,
-                   trusted_external = nil, apply_settings = {})
+                   trusted_external = nil, apply_settings = {}, project = nil)
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happens in tests
       self.class.load_puppet
@@ -52,6 +52,7 @@ module Bolt
       @apply_settings = apply_settings
       @max_compiles = max_compiles
       @resource_types = resource_types
+      @project = project
 
       @logger = Logging.logger[self]
       if modulepath && !modulepath.empty?
@@ -114,7 +115,7 @@ module Bolt
       compiler.evaluate_string('type PlanResult = Boltlib::PlanResult')
     end
 
-    # Register all resource types defined in $Boltdir/.resource_types as well as
+    # Register all resource types defined in $Project/.resource_types as well as
     # the built in types registered with the runtime_3_init method.
     def register_resource_types(loaders)
       static_loader = loaders.static_loader
@@ -136,19 +137,34 @@ module Bolt
       # TODO: If we always call this inside a bolt_executor we can remove this here
       setup
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: @modulepath, facts: {}) do |pal|
-        pal.with_script_compiler do |compiler|
-          alias_types(compiler)
-          register_resource_types(Puppet.lookup(:loaders)) if @resource_types
-          begin
-            Puppet.override(yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
+        Puppet.override(bolt_project: @project,
+                        yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
+          pal.with_script_compiler do |compiler|
+            alias_types(compiler)
+            register_resource_types(Puppet.lookup(:loaders)) if @resource_types
+            begin
               yield compiler
+            rescue Bolt::Error => e
+              e
+            rescue Puppet::DataBinding::LookupError => e
+              if e.issue_code == :HIERA_UNDEFINED_VARIABLE
+                message = "Interpolations are not supported in lookups outside of an apply block: #{e.message}"
+                PALError.new(message)
+              else
+                PALError.from_preformatted_error(e)
+              end
+            rescue Puppet::PreformattedError => e
+              if e.issue_code == :UNKNOWN_VARIABLE &&
+                 %w[facts trusted server_facts settings].include?(e.arguments[:name])
+                message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope "\
+                  "unless explicitly defined. (file: #{e.file}, line: #{e.line}, column: #{e.pos})"
+                PALError.new(message)
+              else
+                PALError.from_preformatted_error(e)
+              end
+            rescue StandardError => e
+              PALError.from_preformatted_error(e)
             end
-          rescue Bolt::Error => e
-            e
-          rescue Puppet::PreformattedError => e
-            PALError.from_preformatted_error(e)
-          rescue StandardError => e
-            PALError.from_preformatted_error(e)
           end
         end
       end
@@ -215,6 +231,7 @@ module Bolt
         Puppet.initialize_settings(cli)
         Puppet::GettextConfig.create_default_text_domain
         Puppet[:trusted_external_command] = @trusted_external
+        Puppet.settings[:hiera_config] = @hiera_config
         self.class.configure_logging
         yield
       end

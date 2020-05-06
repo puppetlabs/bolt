@@ -1,0 +1,13 @@
+---
+version: 5 
+
+defaults:
+  data_hash: yaml_data
+
+hierarchy:
+  - name: missing backend
+    data_hash: missing_backend
+    path: common.yaml
+
+  - name: common
+    path: common.yaml

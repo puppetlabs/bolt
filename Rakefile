@@ -79,7 +79,7 @@ namespace :ci do
   task :modules do
     success = true
     # Test core modules
-    %w[boltlib ctrl file out system].each do |mod|
+    %w[boltlib ctrl file out prompt system].each do |mod|
       Dir.chdir("#{__dir__}/bolt-modules/#{mod}") do
         sh 'rake spec' do |ok, _|
           success = false unless ok
@@ -106,6 +106,7 @@ namespace :docs do
     @log = { options: Bolt::Config::LOG_OPTIONS, defaults: Bolt::Config::DEFAULT_LOG_OPTIONS }
     @puppetfile = { options: Bolt::Config::PUPPETFILE_OPTIONS }
     @apply = { options: Bolt::Config::APPLY_SETTINGS, defaults: Bolt::Config::DEFAULT_APPLY_SETTINGS }
+    @project = { options: Bolt::Project::PROJECT_SETTINGS, defaults: {} }
 
     Bolt::Config::TRANSPORT_CONFIG.each do |name, transport|
       @transports[:options][name] = transport::OPTIONS
@@ -169,6 +170,7 @@ namespace :docs do
                                        'bolt-modules/ctrl',
                                        'bolt-modules/file',
                                        'bolt-modules/out',
+                                       'bolt-modules/prompt',
                                        'bolt-modules/system'])
     json = JSON.parse(File.read(tmpfile))
     funcs = json.delete('puppet_functions')

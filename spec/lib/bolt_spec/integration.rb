@@ -7,11 +7,12 @@ module BoltSpec
   module Integration
     include BoltSpec::PuppetDB
 
-    def run_cli(arguments, rescue_exec: false, outputter: Bolt::Outputter::JSON)
+    def run_cli(arguments, rescue_exec: false, outputter: Bolt::Outputter::JSON,
+                project: Bolt::Project.new(Dir.mktmpdir))
       cli = Bolt::CLI.new(arguments)
 
       # prevent tests from reading users config
-      allow(Bolt::Boltdir).to receive(:find_boltdir).and_return(Bolt::Boltdir.new(Dir.mktmpdir))
+      allow(Bolt::Project).to receive(:find_boltdir).and_return(project)
       allow(cli).to receive(:puppetdb_client).and_return(pdb_client)
       allow(cli).to receive(:analytics).and_return(Bolt::Analytics::NoopClient.new)
 

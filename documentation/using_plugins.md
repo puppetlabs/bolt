@@ -49,7 +49,9 @@ The following fields are available to the `env_var` plugin.
 
 | Key | Description | Type | Default |
 | --- | ----------- | ---- | ------- |
-| `var` | The name of the environment variable to read from. | `String` | None |
+| **`var`** | The name of the environment variable to read from. **Required.** | `String` | None |
+| **`default`** | A value to use if the environment variable `var` isn't set | `String` | None |
+| **`optional`** | Unless `true`, env_var will raise an error when the environment variable `var` does not exist.  When `optional` is `true` and `var` does not exist, env_var returns `nil` | `Boolean` | `false` |
 
 #### Example usage
 
@@ -255,59 +257,18 @@ Bolt. [View the documentation on the Forge](https://forge.puppet.com/puppetlabs/
 
 ## Secret plugins
 
-Secret plugins encrypt and decrypt sensitive values in data. The `bolt secret encrypt` and `bolt secret decrypt` commands encrypt or decrypt data that can be used as a reference in data files.
+Secret plugins encrypt and decrypt sensitive values in data. The `bolt secret encrypt` and `bolt secret decrypt`
+commands encrypt or decrypt data that can be used as a reference in data files, while the `bolt secret createkeys`
+command creates key pairs.
 
 
 ### pkcs7
 
-The `pkcs7` plugin allows configuration values to be stored as encrypted text in the inventory file and decrypted only as needed.
+The `pkcs7` plugin allows configuration values to be stored as encrypted text in the inventory file and decrypted
+only as needed.
 
-Using the pkcs7 plugin requires encryption keys. These keys can be created automatically with the command `bolt secret createkeys` or by reusing existing hiera-eyaml pkcs7 keys. By default, Bolt stores these keys in a `keys/` directory in the current Bolt project.
-
-Once keys are generated, values can be encrypted with the command `bolt secret encrypt <plaintext>` and the result can be copied into an inventory file. An encrypted value can be inspected by decrypting using the command `bolt secret decrypt <encrypted_value>`.
-
-#### Available fields
-
-The following fields are available to the `pkcs7` plugin in an inventory file:
-
-| Key | Description | Type | Default |
-| --- | ----------- | ---- | ------- |
-| **`_plugin`** | The name of the plugin.<br> **Required** and must be set to `pkcs7` | `String` | None |
-| **`encrypted_value`** | The encrypted value.<br> **Required.** | `String` | None |
-
-The following fields are available to the pkcs7 plugin in a configuration file:
-
-| Key | Description | Type | Default |
-| --- | ----------- | ---- | ------- |
-| `keysize` | The size of the key to generate with `bolt secret createkeys`. | `Integer` | `2048` |
-| `private-key` | The path to the private key file. | `String` | `<boltdir>/keys/private_key.pkcs7.pem` |
-| `public-key` | The path to the public key file. | `String` | `<boltdir>/keys/public_key.pkcs7.pem` |
-
-#### Example usage
-
-Encrypt a password in an inventory file:
-
-```yaml
-targets:
-  - uri: target1.example.com
-    config:
-      ssh:
-        password:
-          _plugin: pkcs7
-          encrypted_value: |
-            MY ENCRYPTED DATA
-```
-
-Configure the pkcs7 plugin in a configuration file:
-
-```yaml
-plugins:
-  pkcs7:
-    keysize: 4096
-    private_key: /path/to/key/private_key.pkcs7.pem
-    public_key: /path/to/key/public_key.pkcs7.pem
-```
-
+It is a module-based plugin available on the Puppet Forge and is installed with
+Bolt. [View the documentation on the Forge](https://forge.puppet.com/puppetlabs/pkcs7)
 
 ## Puppet library plugins
 

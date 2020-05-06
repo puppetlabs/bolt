@@ -5,7 +5,7 @@ require 'bolt/plugin'
 require 'bolt/config/transport/base'
 
 shared_examples 'transport config' do
-  let(:boltdir) { File.expand_path(__dir__) }
+  let(:project) { File.expand_path(__dir__) }
 
   it 'defines OPTIONS' do
     expect(defined? transport::OPTIONS).to be

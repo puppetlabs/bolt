@@ -214,6 +214,77 @@ describe "Bolt::Executor" do
     end
   end
 
+  context 'running a task with per-target params' do
+    let(:target_mapping) do
+      targets.each_with_object({}) { |target, map| map[target] = { 'name' => target.name } }
+    end
+
+    it "executes on all targets" do
+      node_results.each do |target, result|
+        expect(ssh)
+          .to receive(:run_task)
+          .with(target, task_type(task), target_mapping[target], task_options)
+          .and_return(result)
+      end
+
+      results = executor.run_task_with(target_mapping, mock_task(task), task_options)
+      results.each do |result|
+        expect(result).to be_instance_of(Bolt::Result)
+        expect(result).to be_success
+      end
+    end
+
+    it 'passes _run_as' do
+      executor.run_as = 'foo'
+      node_results.each do |target, result|
+        expect(ssh)
+          .to receive(:run_task)
+          .with(target, task_type(task), target_mapping[target], { run_as: 'foo' }.merge(task_options))
+          .and_return(result)
+      end
+
+      results = executor.run_task_with(target_mapping, mock_task(task), task_options)
+      results.each do |result|
+        expect(result).to be_instance_of(Bolt::Result)
+      end
+    end
+
+    it "yields each result" do
+      node_results.each do |target, result|
+        expect(ssh)
+          .to receive(:run_task)
+          .with(target, task_type(task), target_mapping[target], task_options)
+          .and_return(result)
+      end
+
+      executor.run_task_with(target_mapping, mock_task(task), task_options)
+      executor.shutdown
+
+      node_results.each do |target, result|
+        expect(collector.events).to include(success_event(result))
+        expect(collector.events).to include(start_event(target))
+      end
+    end
+
+    it 'catches errors' do
+      node_results.each_key do |target|
+        expect(ssh)
+          .to receive(:run_task)
+          .with(target, task_type(task), target_mapping[target], task_options)
+          .and_raise(Bolt::Error.new('failed', 'my-exception'))
+      end
+
+      executor.run_task_with(target_mapping, mock_task(task), task_options)
+      executor.shutdown
+
+      expect(collector.results.length).to eq(node_results.length)
+      collector.results.each do |result|
+        expect(result.error_hash['msg']).to eq('failed')
+        expect(result.error_hash['kind']).to eq('my-exception')
+      end
+    end
+  end
+
   context 'uploading a file' do
     it "executes on all nodes" do
       node_results.each do |target, result|
@@ -332,6 +403,33 @@ describe "Bolt::Executor" do
         expect(results.error_set.targets).to include(target_1)
         expect(results.ok_set.targets).to include(target_2)
       end
+    end
+  end
+
+  context 'prompting' do
+    let(:prompt)   { 'prompt' }
+    let(:response) { 'response' }
+
+    it 'prompts for data on STDERR when executed' do
+      allow(STDIN).to receive(:tty?).and_return(true)
+      allow(STDIN).to receive(:gets).and_return(response)
+      expect(STDERR).to receive(:print).with("#{prompt}: ")
+
+      executor.prompt(prompt, {})
+    end
+
+    it 'does not show input when sensitive' do
+      allow(STDIN).to receive(:tty?).and_return(true)
+      allow(STDERR).to receive(:puts)
+      allow(STDERR).to receive(:print).with("#{prompt}: ")
+      expect(STDIN).to receive(:noecho).and_return(prompt)
+
+      executor.prompt(prompt, sensitive: true)
+    end
+
+    it 'errors if STDIN is not a tty' do
+      allow(STDIN).to receive(:tty?).and_return(false)
+      expect { executor.prompt(prompt, {}) }.to raise_error(Bolt::Error, /STDIN is not a tty, unable to prompt/)
     end
   end
 
@@ -587,6 +685,24 @@ describe "Bolt::Executor" do
 
       executor.start_plan(plan_context)
       executor.run_task(targets, mock_task(task), task_arguments, task_options)
+      executor.shutdown
+
+      expect(collector.events).to include(include(type: :step_start, description: match(/task service::restart/)))
+      expect(collector.events).to include(include(type: :step_finish, description: match(/task service::restart/)))
+    end
+
+    it "sends event for tasks with per-target params" do
+      node_results.each do |target, result|
+        expect(ssh)
+          .to receive(:run_task)
+          .with(target, task_type(task), task_arguments, task_options)
+          .and_return(result)
+      end
+
+      target_mapping = targets.each_with_object({}) { |target, map| map[target] = task_arguments }
+
+      executor.start_plan(plan_context)
+      executor.run_task_with(target_mapping, mock_task(task), task_options)
       executor.shutdown
 
       expect(collector.events).to include(include(type: :step_start, description: match(/task service::restart/)))

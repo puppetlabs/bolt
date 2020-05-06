@@ -8,6 +8,7 @@ AllCops:
     - 'modules/**/*'
     - 'docs/**/*'
     - 'site-modules/**/*'
+    - 'tasks/**/*'
 
 # Checks for if and unless statements that would fit on one line if written as a
 # modifier if/unless.
@@ -43,6 +44,9 @@ Style/NumericPredicate:
 
 Style/StderrPuts:
   Enabled: false
+
+Style/ExponentialNotation:
+  Enabled: true
 
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
@@ -101,6 +105,12 @@ Lint/SuppressedException:
   Exclude:
     - lib/bolt/shell/bash.rb
 
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
 # Enforce LF line endings, even when on Windows
 Layout/EndOfLine:
   EnforcedStyle: lf
@@ -108,3 +118,7 @@ Layout/EndOfLine:
 Layout/HashAlignment:
   EnforcedHashRocketStyle: [key, table]
   EnforcedColonStyle: [key, table]
+
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+

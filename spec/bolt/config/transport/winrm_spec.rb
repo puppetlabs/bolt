@@ -63,11 +63,11 @@ describe Bolt::Config::Transport::WinRM do
     end
 
     context 'cacert' do
-      it 'expands path relative to Boltdir' do
+      it 'expands path relative to project' do
         allow(Bolt::Util).to receive(:validate_file).and_return(true)
         data['cacert'] = 'path/to/cacert'
-        config = transport.new(data, boltdir)
-        expect(config['cacert']).to eq(File.expand_path('path/to/cacert', boltdir))
+        config = transport.new(data, project)
+        expect(config['cacert']).to eq(File.expand_path('path/to/cacert', project))
       end
 
       it 'ignores cacert when ssl is false' do

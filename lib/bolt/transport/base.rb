@@ -32,7 +32,7 @@ module Bolt
     # Transports that need their own batching, like the Orch transport, can
     # instead override the batches() method to split Targets into sets that can
     # be executed together, and override the batch_task() and related methods
-    # to execute a batch of nodes. In that case, those Transports should accept
+    # to execute a batch of targets. In that case, those Transports should accept
     # a block argument and call it with a :node_start event for each Target
     # before executing, and a :node_result event for each Target after
     # execution.
@@ -90,12 +90,12 @@ module Bolt
       # case and raises an error if it's not.
       def assert_batch_size_one(method, targets)
         if targets.length > 1
-          message = "#{self.class.name} must implement #{method} to support batches (got #{targets.length} nodes)"
+          message = "#{self.class.name} must implement #{method} to support batches (got #{targets.length} targets)"
           raise NotImplementedError, message
         end
       end
 
-      # Runs the given task on a batch of nodes.
+      # Runs the given task on a batch of targets.
       #
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
@@ -104,12 +104,28 @@ module Bolt
         assert_batch_size_one("batch_task()", targets)
         target = targets.first
         with_events(target, callback, 'task') do
-          @logger.debug { "Running task run '#{task}' on #{target.safe_name}" }
+          @logger.debug { "Running task '#{task.name}' on #{target.safe_name}" }
           run_task(target, task, arguments, options)
         end
       end
 
-      # Runs the given command on a batch of nodes.
+      # Runs the given task on a batch of targets with variable parameters.
+      #
+      # The default implementation only supports batches of size 1 and will fail otherwise.
+      #
+      # Transports may override this method to implment their own batch processing.
+      def batch_task_with(targets, task, target_mapping, options = {}, &callback)
+        assert_batch_size_one("batch_task_with()", targets)
+        target = targets.first
+        arguments = target_mapping[target]
+
+        with_events(target, callback, 'task') do
+          @logger.debug { "Running task '#{task.name}' on #{target.safe_name} with '#{arguments.to_json}'" }
+          run_task(target, task, arguments, options)
+        end
+      end
+
+      # Runs the given command on a batch of targets.
       #
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
@@ -123,7 +139,7 @@ module Bolt
         end
       end
 
-      # Runs the given script on a batch of nodes.
+      # Runs the given script on a batch of targets.
       #
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
@@ -137,7 +153,7 @@ module Bolt
         end
       end
 
-      # Uploads the given source file to the destination location on a batch of nodes.
+      # Uploads the given source file to the destination location on a batch of targets.
       #
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
@@ -157,7 +173,7 @@ module Bolt
       end
 
       # Split the given list of targets into a list of batches. The default
-      # implementation returns single-node batches.
+      # implementation returns single-target batches.
       #
       # Transports may override this method, and the corresponding batch_*
       # methods, to implement their own batch processing.
