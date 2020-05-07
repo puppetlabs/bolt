@@ -57,9 +57,18 @@ describe "Bolt::CLI" do
   end
 
   context 'gem install' do
+    around(:each) do |example|
+      original_value = ENV['BOLT_GEM']
+      example.run
+    ensure
+      ENV['BOLT_GEM'] = original_value
+    end
+
     it 'displays a warning when Bolt is installed as a gem' do
+      ENV.delete('BOLT_GEM')
+
       cli = Bolt::CLI.new(%w[task show])
-      allow(cli).to receive(:gem_install?).and_return(true)
+      allow(cli).to receive(:incomplete_install?).and_return(true)
       cli.execute(cli.parse)
 
       output = @log_output.readlines.join
@@ -67,17 +76,14 @@ describe "Bolt::CLI" do
     end
 
     it 'does not display a warning when BOLT_GEM is set' do
-      original_env = ENV['BOLT_GEM']
-      ENV['BOLT_GEM'] = 'false'
+      ENV['BOLT_GEM'] = 'true'
 
       cli = Bolt::CLI.new(%w[task show])
-      allow(cli).to receive(:gem_install?).and_return(true)
+      allow(cli).to receive(:incomplete_install?).and_return(true)
       cli.execute(cli.parse)
 
       output = @log_output.readlines.join
       expect(output).not_to match(/Bolt may be installed as a gem/)
-    ensure
-      ENV['BOLT_GEM'] = original_env
     end
   end
 
