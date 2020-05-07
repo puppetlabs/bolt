@@ -7,6 +7,8 @@ module Bolt
   class Config
     module Transport
       class Local < Base
+        # NOTE: All transport configuration options should have a corresponding schema definition
+        #       in schemas/bolt-transport-definitions.json
         OPTIONS = {
           "cleanup"         => { type: TrueClass,
                                  desc: "Whether to clean up temporary files created on targets." },

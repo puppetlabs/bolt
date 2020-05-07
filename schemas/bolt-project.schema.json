@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bolt Project",
+  "description": "Bolt Project project.yaml Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "The Bolt project name.",
+      "type": "string",
+      "pattern": "^([a-zA-Z0-9]+[-])?[a-z][a-z0-9_]*$"
+    },
+    "plans": {
+      "description": "The list of whitelisted plans.",
+      "type": "array",
+      "items": {
+        "description": "Whitelisted plan.",
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*(::[a-z][a-z0-9_]*)*$"
+      },
+      "uniqueItems": true
+    },
+    "tasks": {
+      "description": "The list of whitelisted tasks.",
+      "type": "array",
+      "items": {
+        "description": "Whitelisted task.",
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*(::[a-z][a-z0-9_]*)*$"
+      },
+      "uniqueItems": true
+    }
+  }
+}

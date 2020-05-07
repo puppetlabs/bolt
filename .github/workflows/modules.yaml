@@ -3,10 +3,10 @@ name: Modules
 on:
   push:
     branches: [master]
-    paths-ignore: ['**.md', '**.erb']
+    paths-ignore: ['**.md', '**.erb', 'schemas/*']
   pull_request:
     type: [opened, reopened, edited]
-    paths-ignore: ['**.md', '**.erb']
+    paths-ignore: ['**.md', '**.erb', 'schemas/*']
 
 env:
   BOLT_SUDO_USER: true
