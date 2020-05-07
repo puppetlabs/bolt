@@ -75,9 +75,9 @@ To load your content from a Bolt project:
 2. Place your Bolt plans and tasks in `plans` and `tasks` directories
    respectively.
 
-If `project.yaml` exists at the root of a project directory, and your tasks and
-plans are located in their respective directories, Bolt loads the project as a 
-module namespaced to the name of the directory.
+If `project.yaml` exists at the root of a project directory, Bolt loads the project as a module.
+Tasks and plans are loaded from the `tasks/` and `plans/` directories and are namespaced
+to the project name.
 
 Here is an example of a project using a simplified directory structure:
 ```console
