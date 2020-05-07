@@ -804,6 +804,20 @@ module Bolt
     end
 
     def bundled_content
+      # If the bundled content directory is empty, Bolt is likely installed as a gem.
+      if ENV['BOLT_GEM'].nil? && incomplete_install?
+        msg = <<~MSG.chomp
+          Bolt may be installed as a gem. To use Bolt reliably and with all of its
+          dependencies, uninstall the 'bolt' gem and install Bolt as a package:
+          https://puppet.com/docs/bolt/latest/bolt_installing.html
+
+          If you meant to install Bolt as a gem and want to disable this warning,
+          set the BOLT_GEM environment variable.
+        MSG
+
+        @logger.warn(msg)
+      end
+
       # We only need to enumerate bundled content when running a task or plan
       content = { 'Plan' => [],
                   'Task' => [],
@@ -826,6 +840,12 @@ module Bolt
         Loaded configuration from: '#{config.config_files.join("', '")}'
       MSG
       @logger.debug(msg)
+    end
+
+    # Gem installs include the aggregate, canary, and puppetdb_fact modules, while
+    # package installs include modules listed in the Bolt repo Puppetfile
+    def incomplete_install?
+      (Dir.children(Bolt::PAL::MODULES_PATH) - %w[aggregate canary puppetdb_fact]).empty?
     end
   end
 end

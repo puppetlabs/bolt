@@ -56,6 +56,37 @@ describe "Bolt::CLI" do
     allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return(file_content)
   end
 
+  context 'gem install' do
+    around(:each) do |example|
+      original_value = ENV['BOLT_GEM']
+      example.run
+    ensure
+      ENV['BOLT_GEM'] = original_value
+    end
+
+    it 'displays a warning when Bolt is installed as a gem' do
+      ENV.delete('BOLT_GEM')
+
+      cli = Bolt::CLI.new(%w[task show])
+      allow(cli).to receive(:incomplete_install?).and_return(true)
+      cli.execute(cli.parse)
+
+      output = @log_output.readlines.join
+      expect(output).to match(/Bolt may be installed as a gem/)
+    end
+
+    it 'does not display a warning when BOLT_GEM is set' do
+      ENV['BOLT_GEM'] = 'true'
+
+      cli = Bolt::CLI.new(%w[task show])
+      allow(cli).to receive(:incomplete_install?).and_return(true)
+      cli.execute(cli.parse)
+
+      output = @log_output.readlines.join
+      expect(output).not_to match(/Bolt may be installed as a gem/)
+    end
+  end
+
   context "without a config file" do
     let(:project) { Bolt::Project.new('.') }
     before(:each) do
