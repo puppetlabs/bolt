@@ -87,7 +87,7 @@ Here is an example of a project using a simplified directory structure:
 │   └── myplan.yaml
 ├── project.yaml
 └── tasks
-    └── mytask.yaml
+    └── mytask.rb
 ```
 
 If you want to set a name for your project that is different from the name of
@@ -101,9 +101,7 @@ Project names must match the expression: `[a-z][a-z0-9_]*`. In other words, they
 can contain only lowercase letters, numbers, and underscores, and begin with a 
 lowercase letter.
 
-> **Note:** Avoid giving your project the same name as another module in your
-> modulepath. You cannot give your project the same name as a core Bolt module
-> such as `boltlib`.
+> **Note:** Projects take precedence over installed modules of the same name. 
 
 To see a list of other options available in `project.yaml`, see [Bolt
 configuration options](./bolt_configuration_reference.md#project-configuration-options).
