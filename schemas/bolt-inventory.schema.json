@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bolt Inventory",
+  "description": "Bolt Inventory inventory.yaml Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "config": {
+      "$ref": "#/definitions/config"
+    },
+    "facts": {
+      "$ref": "#/definitions/facts"
+    },
+    "features": {
+      "$ref": "#/definitions/features"
+    },
+    "groups": {
+      "$ref": "#/definitions/groups"
+    },
+    "targets": {
+      "$ref": "#/definitions/targets"
+    },
+    "vars": {
+      "$ref": "#/definitions/vars"
+    },
+    "version": {
+      "description": "The version of the inventory file.",
+      "type": "integer"
+    }
+  },
+  "definitions": {
+    "config": {
+      "description": "The configuration for a target.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "transport": {
+          "description": "The transport used to connect to a target.",
+          "type": "string",
+          "enum": ["docker", "local", "pcp", "remote", "ssh", "winrm"]
+        },
+        "docker": {
+          "$ref": "bolt-transport-definitions.json#/docker"
+        },
+        "local": {
+          "$ref": "bolt-transport-definitions.json#/local"
+        },
+        "pcp": {
+          "$ref": "bolt-transport-definitions.json#/pcp"
+        },
+        "remote": {
+          "$ref": "bolt-transport-definitions.json#/remote"
+        },
+        "ssh": {
+          "$ref": "bolt-transport-definitions.json#/ssh"
+        },
+        "winrm": {
+          "$ref": "bolt-transport-definitions.json#/winrm"
+        }
+      }
+    },
+    "facts": {
+      "description": "The facts for a target.",
+      "type": "object"
+    },
+    "features": {
+      "description": "The features for a target.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "groups": {
+      "description": "A list of target groups.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/group"
+      }
+    },
+    "group": {
+      "description": "A group of targets.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "config": {
+          "$ref": "#/definitions/config"
+        },
+        "facts": {
+          "$ref": "#/definitions/facts"
+        },
+        "features": {
+          "$ref": "#/definitions/features"
+        },
+        "groups": {
+          "$ref": "#/definitions/groups"
+        },
+        "name": {
+          "description": "The group's name.",
+          "type": "string",
+          "pattern": "^[a-z0-9_][a-z0-9_-]*$"
+        },
+        "targets": {
+          "$ref": "#/definitions/targets"
+        },
+        "vars": {
+          "$ref": "#/definitions/vars"
+        }
+      },
+      "required": ["name"]
+    },
+    "targets": {
+      "description": "A list of targets. Targets can be defined by either a string representation of its URI, or a map of its attributes and configuration.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/target"
+      }
+    },
+    "target": {
+      "description": "A target definition.",
+      "type": ["object", "string"],
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "description": "A unique alias to refer to the target.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9_][a-z0-9_-]*$"
+          }
+        },
+        "config": {
+          "$ref": "#/definitions/config"
+        },
+        "facts": {
+          "$ref": "#/definitions/facts"
+        },
+        "features": {
+          "$ref": "#/definitions/features"
+        },
+        "name": {
+          "description": "A human-readable name for a target.",
+          "type": "string"
+        },
+        "uri": {
+          "description": "The URI of the target.",
+          "type": "string",
+          "format": "uri"
+        },
+        "vars": {
+          "$ref": "#/definitions/vars"
+        }
+      },
+      "anyOf": [
+        { "required": ["uri"] },
+        { "required": ["name"] }
+      ]
+    },
+    "vars": {
+      "description": "The vars for a target.",
+      "type": "object"
+    }
+  }
+}

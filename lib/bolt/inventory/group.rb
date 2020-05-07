@@ -12,6 +12,7 @@ module Bolt
       # Regex used to validate group names and target aliases.
       NAME_REGEX = /\A[a-z0-9_][a-z0-9_-]*\Z/.freeze
 
+      # NOTE: All keys should have a corresponding schema property in schemas/bolt-inventory.schema.json
       DATA_KEYS = %w[config facts vars features plugin_hooks].freeze
       TARGET_KEYS = DATA_KEYS + %w[name alias uri]
       GROUP_KEYS = DATA_KEYS + %w[name groups targets]
