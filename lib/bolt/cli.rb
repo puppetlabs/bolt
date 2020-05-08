@@ -257,13 +257,11 @@ module Bolt
     end
 
     def puppetdb_client
-      return @puppetdb_client if @puppetdb_client
-      puppetdb_config = Bolt::PuppetDB::Config.load_config(config.puppetdb, config.project.path)
-      @puppetdb_client = Bolt::PuppetDB::Client.new(puppetdb_config)
+      plugins.by_name('puppetdb').puppetdb_client
     end
 
     def plugins
-      @plugins ||= Bolt::Plugin.setup(config, pal, puppetdb_client, analytics)
+      @plugins ||= Bolt::Plugin.setup(config, pal, analytics)
     end
 
     def query_puppetdb_nodes(query)

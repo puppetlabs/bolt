@@ -25,7 +25,7 @@ describe 'Facts functions' do
     }
   }
   let(:pal)     { Bolt::PAL.new(modulepath, nil, nil) }
-  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, analytics) }
+  let(:plugins) { Bolt::Plugin.setup(config, nil, analytics) }
   let(:inv)     { Bolt::Inventory::Inventory.new(data, config.transport, config.transports, plugins) }
 
   let(:analytics) { Bolt::Analytics::NoopClient.new }

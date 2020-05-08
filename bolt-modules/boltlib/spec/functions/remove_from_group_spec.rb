@@ -5,7 +5,7 @@ describe 'remove_from_group' do
   let(:executor)      { Bolt::Executor.new }
   let(:config)        { Bolt::Config.new(Bolt::Project.new('.'), {}) }
   let(:pal)           { nil }
-  let(:plugins)       { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins)       { Bolt::Plugin.setup(config, pal, Bolt::Analytics::NoopClient.new) }
   let(:inventory)     { Bolt::Inventory.create_version(data, config.transport, config.transports, plugins) }
   let(:tasks_enabled) { true }
   let(:target1)       { 'target1' }

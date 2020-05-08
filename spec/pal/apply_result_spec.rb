@@ -18,7 +18,7 @@ describe 'ApplyResult DataType' do
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
   let(:pal)     { Bolt::PAL.new(modulepath, nil, nil) }
-  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins) { Bolt::Plugin.setup(config, nil, Bolt::Analytics::NoopClient.new) }
 
   let(:result_code) do
     <<~PUPPET

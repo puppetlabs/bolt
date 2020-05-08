@@ -15,7 +15,7 @@ describe 'apply_prep' do
   let(:applicator)    { mock('Bolt::Applicator') }
   let(:config)        { Bolt::Config.default }
   let(:executor)      { Bolt::Executor.new(1, Bolt::Analytics::NoopClient.new) }
-  let(:plugins)       { Bolt::Plugin.setup(config, nil, nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins)       { Bolt::Plugin.setup(config, nil, Bolt::Analytics::NoopClient.new) }
   let(:plugin_result) { {} }
   let(:task_hook)     { proc { |_opts, target, _fun| proc { Bolt::Result.new(target, value: plugin_result) } } }
   let(:inventory)     { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
@@ -150,7 +150,7 @@ describe 'apply_prep' do
 
       let(:config)    { Bolt::Config.new(Bolt::Project.new('.'), {}) }
       let(:pal)       { nil }
-      let(:plugins)   { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
+      let(:plugins)   { Bolt::Plugin.setup(config, pal, Bolt::Analytics::NoopClient.new) }
       let(:inventory) { Bolt::Inventory.create_version(data, config.transport, config.transports, plugins) }
       let(:target)    { inventory.get_target(hostname) }
       let(:targets)   { inventory.get_targets(hostname) }

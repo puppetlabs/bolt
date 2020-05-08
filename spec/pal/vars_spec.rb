@@ -25,7 +25,7 @@ describe 'Vars function' do
 
   let(:inventory) { Bolt::Inventory::Inventory.new(data, config.transport, config.transports, plugins) }
   let(:pal)       { Bolt::PAL.new(modulepath, nil, nil) }
-  let(:plugins)   { Bolt::Plugin.setup(config, nil, nil, analytics) }
+  let(:plugins)   { Bolt::Plugin.setup(config, nil, analytics) }
 
   let(:analytics) { Bolt::Analytics::NoopClient.new }
   let(:executor)  { Bolt::Executor.new(1, analytics) }

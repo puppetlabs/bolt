@@ -5,14 +5,12 @@ require 'bolt/plugin/puppetdb'
 
 describe Bolt::Plugin::Puppetdb do
   let(:config) do
-    Bolt::PuppetDB::Config.new('server_urls' => 'https://localhost:8081',
-                               'cacert' => '/path/to/cacert',
-                               'token' => 'token')
+    { 'server_urls' => 'https://localhost:8081',
+      'cacert' => '/path/to/cacert',
+      'token' => 'token' }
   end
-  let(:pdb_client) { Bolt::PuppetDB::Client.new(config) }
-  let(:plugin) { Bolt::Plugin::Puppetdb.new(pdb_client) }
-  let(:opts) do
-  end
+  let(:context) { double('context', boltdir: nil) }
+  let(:plugin) { Bolt::Plugin::Puppetdb.new(config: config, context: context) }
 
   context "#fact_path" do
     it "converts a valid dot-notation fact to an array" do
@@ -40,8 +38,8 @@ describe Bolt::Plugin::Puppetdb do
       }] }
     end
     before(:each) do
-      allow(pdb_client).to receive(:query_certnames).and_return([certname])
-      allow(pdb_client).to receive(:fact_values).and_return(values_hash)
+      allow(plugin.puppetdb_client).to receive(:query_certnames).and_return([certname])
+      allow(plugin.puppetdb_client).to receive(:fact_values).and_return(values_hash)
     end
 
     it "sets uri to certname if uri and name are not configured" do

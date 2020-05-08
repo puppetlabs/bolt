@@ -14,8 +14,11 @@ module Bolt
       TEMPLATE_OPTS = %w[alias config facts features name uri vars].freeze
       PLUGIN_OPTS = %w[_plugin query target_mapping].freeze
 
-      def initialize(pdb_client)
-        @puppetdb_client = pdb_client
+      attr_reader :puppetdb_client
+
+      def initialize(config:, context:)
+        pdb_config = Bolt::PuppetDB::Config.load_config(config, context.boltdir)
+        @puppetdb_client = Bolt::PuppetDB::Client.new(pdb_config)
         @logger = Logging.logger[self]
       end
 

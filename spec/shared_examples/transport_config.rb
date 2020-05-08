@@ -44,7 +44,7 @@ shared_examples 'filters options' do
 end
 
 shared_examples 'plugins' do
-  let(:plugins) { Bolt::Plugin.setup(Bolt::Config.default, nil, nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins) { Bolt::Plugin.setup(Bolt::Config.default, nil, Bolt::Analytics::NoopClient.new) }
 
   it 'accepts plugin references' do
     expect { transport.new(plugin_data) }.not_to raise_error

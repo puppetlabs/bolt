@@ -180,25 +180,18 @@ describe Bolt::PuppetDB::Config do
   end
 
   context "::load_config" do
-    let(:user_supplied) { File.join('test', 'file') }
-
-    it "loads from specified filename when given" do
-      expect(File).to receive(:exist?).with(user_supplied)
-      expect { Bolt::PuppetDB::Config.load_config(user_supplied, {}) }.to raise_error(/does not exist/)
-    end
-
-    it "on non-windows OS loads from default location when filename is nil" do
+    it "on non-windows OS loads from default location" do
       allow(Bolt::Util).to receive(:windows?).and_return(false)
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user])
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:global])
-      Bolt::PuppetDB::Config.load_config(nil, {})
+      Bolt::PuppetDB::Config.load_config({})
     end
 
-    it "on windows OS loads from default location when filename is nil", :winrm do
+    it "on windows OS loads from default location", :winrm do
       allow(Bolt::Util).to receive(:windows?).and_return(true)
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user])
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config.default_windows_config)
-      Bolt::PuppetDB::Config.load_config(nil, {})
+      Bolt::PuppetDB::Config.load_config({})
     end
 
     it "Does not error if puppetdb.conf fails to load" do
@@ -206,7 +199,7 @@ describe Bolt::PuppetDB::Config do
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user]).and_return true
       expect(File).to receive(:read).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user]).and_return 'bad"json'
       expect(JSON).to receive(:parse).and_raise(JSON::ParserError.new("unexpected token"))
-      Bolt::PuppetDB::Config.load_config(nil, {})
+      Bolt::PuppetDB::Config.load_config({})
     end
   end
 end
