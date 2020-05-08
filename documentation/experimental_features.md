@@ -1,6 +1,6 @@
 # Experimental features
 
-This page describes experimental features that are currently available in Bolt.
+Most larger bolt features are released initially in an experimental or unstable state. This allows the bolt team to gather feedback from real users quickly while iterating on new functionality. Almost all experimental features are eventually stabilized in future bolt releases. While a feature is experimental it's API may change requiring the user to update their code or configuration. The bolt team attempts to make these changes painless and provide useful warnings around breaking behavior where possible. 
 Experimental features are subject to possible breaking changes between minor Bolt
 releases.
 
