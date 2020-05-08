@@ -2,11 +2,27 @@
 
 Bolt runs in the context of a project directory or a `Boltdir`. This directory contains all of the configuration, code, and data loaded by Bolt.
 
-The project directory structure makes it easy to share Bolt code by committing the project directory to Git. You can then check different repositories of Bolt code into different directories in order to manage various applications.
+The project directory structure makes it easy to share Bolt code by committing
+the project directory to Git. You can then check different repositories of Bolt
+code into different directories in order to manage various applications.
+
+> **Note:** Bolt projects received some experimental updates in Bolt 2.8.0. For
+> more information, see [Bolt projects](./experimental_features.md#bolt-projects).
+
+## Project directory names
+
+Project directory names must match the expression: `[a-z][a-z0-9_]*`. In other words, they
+can contain only lowercase letters, numbers, and underscores, and begin with a 
+lowercase letter.
+
+**Note:** Projects take precedence over installed modules of the same name. 
 
 ## Types of project directories
 
-There are three types of project directories that you can use depending on how you're using Bolt.
+There are three types of project directories that you can use depending on how
+you're using Bolt.
+
+Avoid giving your project the same name as another module in your modulepath.
 
 ### Local project directory
 
@@ -90,7 +106,7 @@ The default paths for all Bolt configuration, code, and data are relative to the
 |[`bolt.yaml`](bolt_configuration_reference.md)|Contains configuration options for Bolt.|
 |`hiera.yaml`|Contains the Hiera config to use for target-specific data when using `apply`.|
 |[`inventory.yaml`](inventory_file_v2.md)|Contains a list of known targets and target specific data.|
-|[`project.yaml`](bolt_configuration_reference.md#project_configuration_options)|Contains configuration for the Bolt project.  The project.yaml file contains a whitelist of tasks and plans that you can use to limit the output from the `bolt [plan|task] show` command.|
+|[`project.yaml`](bolt_configuration_reference.md#project_configuration_options)|Contains configuration for the Bolt project.  The `project.yaml` file contains a whitelist of tasks and plans that you can use to limit the output from the `bolt plan show` and `bolt task show` commands. This is an experimental feature. For more information, see [Bolt projects](./experimental_features.md#bolt-projects).|
 |[`Puppetfile`](bolt_installing_modules.md#)|Specifies which modules to install for the project.|
 |[`modules/`](bolt_installing_modules.md#)|The directory where modules from the `Puppetfile` are installed. In most cases, do not edit these modules locally.|
 |[`site-modules`](bolt_installing_modules.md)|Local modules that are edited and versioned with the project directory.|
