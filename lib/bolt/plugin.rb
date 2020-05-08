@@ -233,6 +233,10 @@ module Bolt
       end
     end
 
+    def puppetdb_client
+      by_name('puppetdb').puppetdb_client
+    end
+
     # Evaluate all _plugin references in a data structure. Leaves are
     # evaluated and then their parents are evaluated with references replaced
     # by their values. If the result of a reference contains more references,

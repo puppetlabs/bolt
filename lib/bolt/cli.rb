@@ -257,7 +257,7 @@ module Bolt
     end
 
     def puppetdb_client
-      plugins.by_name('puppetdb').puppetdb_client
+      plugins.puppetdb_client
     end
 
     def plugins

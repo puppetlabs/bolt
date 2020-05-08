@@ -156,7 +156,7 @@ module BoltSpec
       end
 
       def puppetdb_client
-        @puppetdb_client ||= plugins.by_name('puppetdb').puppetdb_client
+        plugins.puppetdb_client
       end
 
       def pal
