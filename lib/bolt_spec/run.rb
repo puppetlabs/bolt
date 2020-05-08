@@ -157,7 +157,7 @@ module BoltSpec
 
       def puppetdb_client
         @puppetdb_client ||= begin
-                               puppetdb_config = Bolt::PuppetDB::Config.load_config(nil, config.puppetdb)
+                               puppetdb_config = Bolt::PuppetDB::Config.load_config(config.puppetdb)
                                Bolt::PuppetDB::Client.new(puppetdb_config)
                              end
       end

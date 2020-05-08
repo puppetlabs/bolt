@@ -22,27 +22,20 @@ module Bolt
         File.expand_path(File.join(Dir::COMMON_APPDATA, 'PuppetLabs/client-tools/puppetdb.conf'))
       end
 
-      def self.load_config(filename, options, project_path = nil)
+      def self.load_config(options, project_path = nil)
         config = {}
         global_path = Bolt::Util.windows? ? default_windows_config : DEFAULT_CONFIG[:global]
-        if filename
-          if File.exist?(filename)
-            config = JSON.parse(File.read(filename))
-          else
-            raise Bolt::PuppetDBError, "config file #{filename} does not exist"
-          end
-        else
-          if File.exist?(DEFAULT_CONFIG[:user])
-            filepath = DEFAULT_CONFIG[:user]
-          elsif File.exist?(global_path)
-            filepath = global_path
-          end
 
-          begin
-            config = JSON.parse(File.read(filepath)) if filepath
-          rescue StandardError => e
-            Logging.logger[self].error("Could not load puppetdb.conf from #{filepath}: #{e.message}")
-          end
+        if File.exist?(DEFAULT_CONFIG[:user])
+          filepath = DEFAULT_CONFIG[:user]
+        elsif File.exist?(global_path)
+          filepath = global_path
+        end
+
+        begin
+          config = JSON.parse(File.read(filepath)) if filepath
+        rescue StandardError => e
+          Logging.logger[self].error("Could not load puppetdb.conf from #{filepath}: #{e.message}")
         end
 
         config = config.fetch('puppetdb', {})
@@ -51,8 +44,7 @@ module Bolt
 
       def initialize(settings, project_path = nil)
         @settings = settings
-        @project_path = project_path
-        expand_paths
+        expand_paths(project_path)
       end
 
       def token
@@ -68,14 +60,10 @@ module Bolt
         @token = @token.strip if @token
       end
 
-      def expand_paths
+      def expand_paths(project_path)
         %w[cacert cert key token].each do |file|
           next unless @settings[file]
-          @settings[file] = if @project_path
-                              File.expand_path(@settings[file], @project_path)
-                            else
-                              File.expand_path(@settings[file])
-                            end
+          @settings[file] = File.expand_path(@settings[file], project_path)
         end
       end
 
