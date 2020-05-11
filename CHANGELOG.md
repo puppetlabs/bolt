@@ -1,5 +1,63 @@
 # Changelog
 
+## Bolt 2.9.0 (2020-05-11)
+
+### New features
+
+* **Warn when Bolt is installed as a gem**
+  ([#1779](https://github.com/puppetlabs/bolt/issues/1779))
+
+  Bolt now issues a warning when it detects that it may have been
+  installed as a gem. This warning can be disabled by setting the
+  `BOLT_GEM` environment to `false`.
+
+  To install Bolt reliably and with all of its dependencies, it should
+  be [installed as a
+  package](https://puppet.com/docs/bolt/latest/bolt_installing.html).
+
+* **Added JSON schemas for validating Bolt configuration files**
+  ([#1795](https://github.com/puppetlabs/bolt/issues/1795))
+
+  JSON schemas are now available for validating `bolt.yaml`,
+  `inventory.yaml`, and `project.yaml` files.
+
+### Bug fixes
+
+* **Task output that contains invalid UTF-8 is now rejected**
+  ([#1759](https://github.com/puppetlabs/bolt/issues/1759))
+
+  Tasks are defined as returning UTF-8, but Bolt didn't handle the
+  non-UTF-8 case explicitly, leading to messy error messages and stack
+  traces. The error should now be clear and meaningful.
+
+* **Non-UTF-8 characters in command and script output are removed before printing**
+  ([#1759](https://github.com/puppetlabs/bolt/issues/1759))
+
+  Commands and scripts are allowed to return UTF-8, but Bolt would error
+  when trying to print those results or return them as JSON. Now,
+  accessing fields of the result from a Puppet plan will return the
+  values unmodified, but invalid characters will be replaced by their
+  hex-escaped equivalents when printing the result or converting it to
+  JSON.
+
+* **Improved support for non-UTF-8 character encodings**
+  ([#1759](https://github.com/puppetlabs/bolt/issues/1759))
+
+  Commands run from a target where the default character encoding is
+  non-UTF-8 will now return proper results when using the WinRM
+  transport.
+
+* **Fix `bolt plan show <plan>` for project-level plans**
+  ([#1799](https://github.com/puppetlabs/bolt/pull/1799))
+
+  This command was throwing errors due to a type mismatch that is now
+  resolved.
+
+* **Make an `ApplyResult` a valid `PlanResult`**
+  ([#1807](#1807))
+
+  Plans may now return `ApplyResult`s outside of a `ResultSet`.
+
 ## Bolt 2.8.0 (2020-05-05)
 
 ### New features
