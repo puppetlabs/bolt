@@ -4,7 +4,7 @@ Bolt lets you automate almost any task you can think of. These are some of the c
 
 If you'd like to share a real-world use case, reach out to us in the #bolt channel on [Slack](https://slack.puppet.com).
 
-For more usage examples, check out the [Puppet blog](https://puppet.com/blog-tags/puppet-bolt).
+For more usage examples, check out the [Puppet blog](https://puppet.com/search/?query=bolt&page=1&configure%5BhitsPerPage%5D=20&refinementList%5Btype%5D%5B0%5D=Post).
 
 ## Run a PowerShell script that restarts a service
 
