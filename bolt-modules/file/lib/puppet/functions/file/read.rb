@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Read a file and return its contents.
+# Read a file on localhost and return its contents using ruby's `File.read`. This will
+# only read files on the machine you run Bolt on.
 Puppet::Functions.create_function(:'file::read', Puppet::Functions::InternalFunction) do
   # @param filename Absolute path or Puppet file path.
   # @return The file's contents.
