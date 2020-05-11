@@ -422,11 +422,21 @@ describe "Bolt::CLI" do
     describe "key" do
       it "accepts a private key" do
         allow(Bolt::Util).to receive(:validate_file).and_return(true)
-        path = '~/.ssh/google_compute_engine'
+        path = File.expand_path('~/.ssh/google_compute_engine')
         cli = Bolt::CLI.new(%W[  command run uptime
                                  --private-key #{path}
                                  --targets foo])
         expect(cli.parse).to include('private-key': path)
+        expect(cli.config.transports['ssh']['private-key']).to eq(File.expand_path(path))
+      end
+
+      it "expands private key relative to cwd" do
+        allow(Bolt::Util).to receive(:validate_file).and_return(true)
+        path = './ssh/google_compute_engine'
+        cli = Bolt::CLI.new(%W[  command run uptime
+                                 --private-key #{path}
+                                 --targets foo])
+        expect(cli.parse).to include('private-key': File.expand_path(path))
         expect(cli.config.transports['ssh']['private-key']).to eq(File.expand_path(path))
       end
 

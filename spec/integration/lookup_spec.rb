@@ -11,7 +11,7 @@ describe "lookup() in plans" do
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
   let(:boltdir)      { fixture_path('hiera') }
-  let(:hiera_config) { 'hiera.yaml' }
+  let(:hiera_config) { File.join(boltdir, 'hiera.yaml') }
   let(:plan)         { 'test::lookup' }
 
   let(:cli_command) {
@@ -87,7 +87,7 @@ describe "lookup() in plans" do
   end
 
   context 'with interpolations' do
-    let(:hiera_config) { 'hiera_interpolations.yaml' }
+    let(:hiera_config) { File.join(boltdir, 'hiera_interpolations.yaml') }
 
     it 'returns an error' do
       result = run_cli_json(cli_command + %w[key=test::interpolations])
@@ -124,7 +124,7 @@ describe "lookup() in plans" do
   end
 
   context 'with a missing backend' do
-    let(:hiera_config) { 'hiera_missing_backend.yaml' }
+    let(:hiera_config) { File.join(boltdir, 'hiera_missing_backend.yaml') }
 
     it 'returns an error' do
       result = run_cli_json(cli_command + %w[key=test::backends])

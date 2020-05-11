@@ -655,8 +655,8 @@ module Bolt
         @options[:password] = STDIN.noecho(&:gets).chomp
         STDERR.puts
       end
-      define('--private-key KEY', 'Private ssh key to authenticate with') do |key|
-        @options[:'private-key'] = key
+      define('--private-key KEY', 'Path to private ssh key to authenticate with') do |key|
+        @options[:'private-key'] = File.expand_path(key)
       end
       define('--[no-]host-key-check', 'Check host keys with SSH') do |host_key_check|
         @options[:'host-key-check'] = host_key_check
@@ -718,7 +718,7 @@ module Bolt
       end
       define('--hiera-config FILEPATH',
              'Specify where to load Hiera config from (default: ~/.puppetlabs/bolt/hiera.yaml)') do |path|
-        @options[:'hiera-config'] = path
+        @options[:'hiera-config'] = File.expand_path(path)
       end
       define('-i', '--inventoryfile FILEPATH',
              'Specify where to load inventory from (default: ~/.puppetlabs/bolt/inventory.yaml)') do |path|
