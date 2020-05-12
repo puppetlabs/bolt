@@ -329,7 +329,8 @@ module Bolt
         raise Bolt::Error.unknown_plan(plan_name)
       end
 
-      mod = plan_sig.instance_variable_get(:@plan_func).loader.parent.path
+      # path may be a Pathname object, so make sure to stringify it
+      mod = plan_sig.instance_variable_get(:@plan_func).loader.parent.path.to_s
 
       # If it's a Puppet language plan, use strings to extract data. The only
       # way to tell is to check which filename exists in the module.

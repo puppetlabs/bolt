@@ -34,6 +34,8 @@ module Bolt
       'remote' => Bolt::Config::Transport::Remote
     }.freeze
 
+    # NOTE: All configuration options should have a corresponding schema property
+    #       in schemas/bolt-config.schema.json
     OPTIONS = {
       "apply_settings"           => "A map of Puppet settings to use when applying Puppet code",
       "color"                    => "Whether to use colored output when printing messages to the console.",

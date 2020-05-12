@@ -7,6 +7,8 @@ module Bolt
   class Config
     module Transport
       class WinRM < Base
+        # NOTE: All transport configuration options should have a corresponding schema definition
+        #       in schemas/bolt-transport-definitions.json
         OPTIONS = {
           "basic-auth-only" => { type: TrueClass,
                                  desc: "Force basic authentication. This option is only available when using SSL." },

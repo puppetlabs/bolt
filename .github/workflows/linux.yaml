@@ -3,10 +3,10 @@ name: Linux
 on:
   push:
     branches: [master]
-    paths-ignore: ['**.md', '**.erb']
+    paths-ignore: ['**.md', '**.erb', 'schemas/*']
   pull_request:
     type: [opened, reopened, edited]
-    paths-ignore: ['**.md', '**.erb']
+    paths-ignore: ['**.md', '**.erb', 'schemas/*']
 
 env:
   BOLT_SUDO_USER: true
@@ -38,8 +38,6 @@ jobs:
         run: bundle install --jobs 4 --retry 3
       - name: Pre-test setup
         run: |
-          sudo curl -L https://github.com/docker/compose/releases/download/1.23.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
           echo 'runner:runner' | sudo chpasswd
           sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
           sudo sh -c "echo 'runner  ALL=(ALL) PASSWD:ALL' >> /etc/sudoers"
@@ -74,8 +72,6 @@ jobs:
         run: bundle install --jobs 4 --retry 3
       - name: Pre-test setup
         run: |
-          sudo curl -L https://github.com/docker/compose/releases/download/1.23.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
           docker-compose -f spec/docker-compose.yml build --parallel
           docker-compose -f spec/docker-compose.yml up -d
           bundle exec r10k puppetfile install

@@ -7,6 +7,8 @@ module Bolt
   class Config
     module Transport
       class Orch < Base
+        # NOTE: All transport configuration options should have a corresponding schema definition
+        #       in schemas/bolt-transport-definitions.json
         OPTIONS = {
           "cacert"            => { type: String,
                                    desc: "The path to the CA certificate." },
