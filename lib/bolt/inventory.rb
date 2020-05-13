@@ -83,7 +83,7 @@ module Bolt
 
     def self.empty
       config  = Bolt::Config.default
-      plugins = Bolt::Plugin.setup(config, nil, Bolt::Analytics::NoopClient)
+      plugins = Bolt::Plugin.setup(config, nil)
 
       create_version({}, config.transport, config.transports, plugins)
     end

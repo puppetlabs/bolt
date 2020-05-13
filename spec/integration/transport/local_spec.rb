@@ -21,7 +21,7 @@ describe Bolt::Transport::Local do
   let(:os_context)    { Bolt::Util.windows? ? windows_context : posix_context }
   let(:config)        { make_config }
   let(:project)       { Bolt::Project.new('.') }
-  let(:plugins)       { Bolt::Plugin.setup(config, nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins)       { Bolt::Plugin.setup(config, nil) }
   let(:inventory)     { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
   let(:target)        { make_target }
 

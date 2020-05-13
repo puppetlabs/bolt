@@ -8,8 +8,7 @@ describe 'resolve_references' do
   let(:project)       { Bolt::Project.new('./spec/fixtures') }
   let(:config)        { Bolt::Config.new(project, {}) }
   let(:pal)           { Bolt::PAL.new(config.modulepath, config.hiera_config, config.project.resource_types) }
-  let(:analytics)     { Bolt::Analytics::NoopClient.new }
-  let(:plugins)       { Bolt::Plugin.setup(config, pal, analytics) }
+  let(:plugins)       { Bolt::Plugin.setup(config, pal) }
   let(:executor)      { Bolt::Executor.new }
   let(:inventory)     { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
   let(:tasks_enabled) { true }
