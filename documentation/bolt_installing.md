@@ -200,6 +200,14 @@ The Puppet Tools repository for the APT package management system is [https://ap
         sudo apt-get install puppet-bolt
         ```
 
+    -   Ubuntu 20.04
+        ```shell script
+        wget https://apt.puppet.com/puppet-tools-release-focal.deb
+        sudo dpkg -i puppet-tools-release-focal.deb
+        sudo apt-get update 
+        sudo apt-get install puppet-bolt
+        ```
+
 2.  Run a Bolt command and get started.
     ```
     bolt --help
