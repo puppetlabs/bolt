@@ -17,9 +17,10 @@ functions](plan_functions.md) or [built-in Puppet functions](https://puppet.com/
 
 Bolt plans are packaged into reusable and shareable Puppet modules and follow
 the same directory structure and naming conventions used by modules. This means
-you can install Bolt plans as you would any Puppet module and manage them in a
-Puppetfile. For more information on Puppet modules, see [Module
-fundamentals](https://puppet.com/docs/puppet/latest/modules_fundamentals.html).
+you can install modules with Bolt tasks and plans as you would any Puppet module
+and manage them in a Puppetfile. For more information on Puppet modules, see [Module
+fundamentals](https://puppet.com/docs/puppet/latest/modules_fundamentals.html)
+and [Installing modules with Bolt](./bolt_installing_modules.md).
 
 ## Naming plans
 
@@ -42,15 +43,17 @@ line in `myplan.pp` would be:
 plan mymodule::myplan
 ```
 
-A plan defined in `./mymodule/plans/service/myplan.pp` would be defined as
-`mymodule::service::myplan`.
+Similarly, to call a plan defined in `./mymodule/plans/service/myplan.pp`, you
+would use the name, `mymodule::service::myplan`.
 
 The plan filename `init` is special. You reference an `init` plan using the
 module name only. For example, in a module called `mymodule`, the plan defined
 in `init.pp` is the `mymodule` plan. For an example of an `init` plan, see the
 [facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp).
 
-Avoid giving plans the same names as constructs in the Puppet language. Although plans do not share their namespace with other language constructs, giving plans these names makes your code difficult to read.
+Avoid giving plans the same names as constructs in the Puppet language.
+Although plans do not share their namespace with other language constructs,
+giving plans these names makes your code difficult to read.
 
 Each plan name segment must begin with a lowercase letter and:
 -   Can include lowercase letters.
@@ -62,15 +65,37 @@ Each plan name segment must begin with a lowercase letter and:
 
 ## Defining plan parameters
 
-You can specify parameters in your plan.
+Below the plan name, define any parameters that you want to pass into your plan
+as arguments. To define a parameter, use the syntax `<TYPE> <PARAMETER_NAME>`.
+For example, the following plan defines two parameters, `src` and `dest`,
+which are both strings:
 
-Specify each parameter in your plan with its data type. For example, you might want parameters to specify which targets to run different parts of your plan on.
-
-The following example shows target parameters specified as data type `TargetSpec`. `TargetSpec` accepts a URI string, a target object, or an array of URI strings and Target objects. Using `TargetSpec` allows you to pass, for each parameter, either a target object by name or a URI string. URI strings must include a hostname, and can also set the protocol, the username, the password, and the port to use using the format `protocol://user:password@hostname:port`.
-
-The plan then calls the `run_task` function, specifying which targets to run the tasks on. The target names are collected and stored in `$webserver_names` by iterating over the list of target objects returned by `get_targets`. Task parameters are serialized to JSON format; therefore, extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
-
+```puppet
+plan mymodule::myplan
+  String $src
+  String $dest
+...  
 ```
+
+### Using the `TargetSpec` type
+
+The `TargetSpec` type allows you to pass a target, or multiple targets, into a
+plan parameter. `TargetSpec` accepts a URI string, a target object, or an array
+of URI strings and target objects. 
+
+URI strings must include a hostname. To set the protocol, the username, the
+password, and the port, use the format `protocol://user:password@hostname:port`.
+
+The following plan uses two parameters with the `TargetSpec` type. The plan
+calls the `run_task` function to call a series of Bolt tasks, specifying
+the targets to run the tasks on. The plan uses the `get_targets` function to
+collect the list of target objects from the `webservers` parameter and store 
+them in `$webserver_names` as an array of strings. This step is necessary
+because task parameters are serialized to JSON format. Extracting the names
+into an array of strings ensures that the `webservers` parameter is in a format
+that can be converted to JSON.
+
+```puppet
 plan mymodule::my_plan(
   TargetSpec $load_balancer,
   TargetSpec $webservers,
@@ -86,18 +111,23 @@ plan mymodule::my_plan(
  }
 ```
 
-To execute this plan from the command line, pass the parameters as `<PARAMETER>=<VALUE>`. The `Targetspec` accepts either an array as JSON, or a comma separated string of target names.
+To execute this plan from the command line, pass the parameters as
+`<PARAMETER>=<VALUE>`. The `Targetspec` accepts either an array as JSON, or a
+comma separated string of target names.
 
-```
+```console
 bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com webservers='["kermit.myorg.com","gonzo.myorg.com"]'
-        
 ```
 
-Parameters that are passed to the `run_*` plan functions are serialized to JSON.
+### JSON serialization
 
-To illustrate this concept, consider this plan:
+If you pass a parameter into a `run_*` plan function, Bolt serializes the
+parameter to JSON.
 
-```
+In the following plan, the default value of `$example_nul` is `undef`. The plan
+calls the task `test::demo_undef_bash` with the `example_nul` parameter. 
+
+```puppet
 plan test::parameter_passing (
   TargetSpec $targets,
   Optional[String[1]] $example_nul = undef,
@@ -106,7 +136,7 @@ plan test::parameter_passing (
 }
 ```
 
-The default value of `$example_nul` is `undef`. The plan calls the `test::demo_undef_bash` with the `example_nul` parameter. The implementation of the `demo_undef_bash.sh` task is:
+The implementation of the `demo_undef_bash.sh` task is:
 
 ```shell script
 #!/bin/bash
@@ -230,7 +260,7 @@ a `ResultSet` object. The `handle_errors` plan calls it with `_catch_errors`,
 extracts the `ResultSet` from the error if possible, and runs another task on
 the successful targets.
 
-```
+```puppet
 plan mymodule::handle_errors {
   $result_or_error = run_plan('mymodule::myplan', '_catch_errors' => true)
   $result = case $result_or_error {

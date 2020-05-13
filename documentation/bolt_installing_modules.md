@@ -1,4 +1,4 @@
-# Modules
+# Installing modules with Bolt
 
 Tasks and plans are packaged in Puppet modules, so you can install them as you would any module and manage them with a Puppetfile. 
 
