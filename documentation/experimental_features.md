@@ -13,7 +13,7 @@ Bolt project directories have been around for a while in Bolt, but this release
 signals a shift in the direction we're taking with them. We see Bolt projects as
 a way for you to quickly create orchestration that is specific to the
 infrastructure you're working with, and then commit the project directory to git
-and share it with other users in your org. 
+and share it with other users in your organization. 
 
 There are some barriers around quickly creating and sharing Bolt content that
 is specific to your infrastructure. Bolt's current project structure
@@ -37,9 +37,14 @@ higher](./bolt_installing.md).
 > changes between minor Bolt releases.
 
 To get started with a Bolt project:
-1. Create a `project.yaml` file in the root directory of your Bolt project. 
-2. Develop your Bolt plans and tasks in `plans` and `tasks` directories in the
-   respectively in the root project directory.
+1. Create a Bolt project:
+   - To create a fresh project directory, use the command `bolt project init
+   <PROJECT_NAME>`
+   - To turn an existing directory into a Bolt project directory, run `Bolt
+     project init` from the root of the directory.   
+2. Create a `project.yaml` file in the root of your Bolt project directory.
+3. Develop your Bolt plans and tasks in `plans` and `tasks` directories
+   in the root of the project directory.
 
 If `project.yaml` exists at the root of a project directory, Bolt loads the
 project as a module. Bolt loads tasks and plans from the `tasks` and `plans`
@@ -56,6 +61,7 @@ Here is an example of a project using a simplified directory structure:
 └── tasks
     └── mytask.yaml
 ```
+
 ### Naming your project
 
 If you want to set a name for your project that is different from the name of
@@ -71,9 +77,7 @@ Project names must match the expression: `[a-z][a-z0-9_]*`. In other words, they
 can contain only lowercase letters, numbers, and underscores, and begin with a 
 lowercase letter.
 
-> **Note:** Projects take precedence over installed modules of the same name. 
-To see a list of other options available in `project.yaml`, see [Bolt
-configuration options](./bolt_configuration_reference.md#project-configuration-options).
+> **Note:** Projects take precedence over installed modules of the same name.
 
 ### Whitelisting plans and tasks
 

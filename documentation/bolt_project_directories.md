@@ -1,28 +1,19 @@
 # Project directories
 
-Bolt runs in the context of a project directory or a `Boltdir`. This directory contains all of the configuration, code, and data loaded by Bolt.
+Bolt runs in the context of a project directory or a `Boltdir`. This directory
+contains all of the configuration, code, and data loaded by Bolt.
 
 The project directory structure makes it easy to share Bolt code by committing
 the project directory to Git. You can then check different repositories of Bolt
 code into different directories in order to manage various applications.
 
 > **Note:** Bolt projects received some experimental updates in Bolt 2.8.0. For
-> more information, see [Bolt projects](./experimental_features.md#bolt-projects).
-
-## Project directory names
-
-Project directory names must match the expression: `[a-z][a-z0-9_]*`. In other words, they
-can contain only lowercase letters, numbers, and underscores, and begin with a 
-lowercase letter.
-
-**Note:** Projects take precedence over installed modules of the same name. 
+> more information, see [Bolt projects](./experimental_features.md#bolt-projects). 
 
 ## Types of project directories
 
 There are three types of project directories that you can use depending on how
 you're using Bolt.
-
-Avoid giving your project the same name as another module in your modulepath.
 
 ### Local project directory
 

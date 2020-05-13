@@ -8,7 +8,8 @@ exists at the root of the project directory, the project itself is also
 loaded as a module and namespaced to either `name` in `project.yaml` if it's
 set, or the name of the directory if `name` is not set. 
 
-> **Note:** The `project.yaml` file is part of an experimental feature. For more information, see [Bolt projects](./experimental_features.md#bolt-projects).
+> **Note:** The `project.yaml` file is part of an experimental feature. For
+> more information, see [Bolt projects](./experimental_features.md#bolt-projects).
 
 ## Directory structure of a module
 
