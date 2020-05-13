@@ -159,6 +159,10 @@ module Bolt
       @unresolved_plugin_configs = config.plugins.dup
       # The puppetdb plugin config comes from the puppetdb section, not from
       # the plugins section
+      if @unresolved_plugin_configs.key?('puppetdb')
+        msg = "Configuration for the PuppetDB plugin must be in the 'puppetdb' config section, not 'plugins'"
+        raise Bolt::Error.new(msg, 'bolt/plugin-error')
+      end
       @unresolved_plugin_configs['puppetdb'] = config.puppetdb if config.puppetdb
       @plugin_hooks = DEFAULT_PLUGIN_HOOKS.dup
     end
