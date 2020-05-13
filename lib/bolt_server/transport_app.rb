@@ -50,8 +50,7 @@ module BoltServer
 
       @file_cache = BoltServer::FileCache.new(@config).setup
 
-      # This is needed until the PAL is threadsafe.
-      @pal_mutex = Mutex.new
+      BoltServer::PE::PAL.initialize_puppet({})
 
       super(nil)
     end
@@ -193,8 +192,8 @@ module BoltServer
       if environment.nil?
         [400, '`environment` is a required argument']
       else
-        @pal_mutex.synchronize do
-          pal = BoltServer::PE::PAL.new({}, environment)
+        begin
+          pal = BoltServer::PE::PAL.new(environment)
           yield pal
         rescue Puppet::Environments::EnvironmentNotFound
           [400, {
