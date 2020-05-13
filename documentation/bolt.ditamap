@@ -75,6 +75,7 @@
         <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
         <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
     </topichead>
+    <topicref href="experimental_features.md" format="markdown" />
     <topichead navtitle="Reference">
         <topicref href="bolt_command_reference.md" format="markdown"/>
         <topicref href="plan_functions.md" format="markdown"/>

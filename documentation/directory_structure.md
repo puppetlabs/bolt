@@ -2,7 +2,14 @@
 
 Puppet tasks, plans, functions, classes and types must exist inside a Puppet module in order for Bolt to load them. Bolt loads modules by searching for module directories on the modulepath.
 
-By default, the modulepath includes the `modules` and `site-modules` directories in the [Bolt project directory](bolt_project_directories.md#). If `project.yaml` exists at the root of the project directory then the project itself is also loaded as a module, namespaced to either `name` in project.yaml if it's set or the name of the directory if not.
+By default, the modulepath includes the `modules` and `site-modules` directories
+in the [Bolt project directory](bolt_project_directories.md#). If `project.yaml`
+exists at the root of the project directory, the project itself is also
+loaded as a module and namespaced to either `name` in `project.yaml` if it's
+set, or the name of the directory if `name` is not set. 
+
+> **Note:** The `project.yaml` file is part of an experimental feature. For
+> more information, see [Bolt projects](./experimental_features.md#bolt-projects).
 
 ## Directory structure of a module
 

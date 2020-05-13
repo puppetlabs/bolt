@@ -70,14 +70,14 @@ bolt plan run mymodule::myplan --targets app1.myorg.com --params $(@{load_balanc
 
 ## Specifying the modulepath
 
-In order for Bolt to find a task or plan, the task or plan must be in a module on the modulepath.
-If `project.yaml` exists at the root of the project directory then the project itself is also loaded
-as a module, namespaced to either `name` in project.yaml if it's set or the name of the directory if
-not. The default modulepath is `<PROJECT_NAME>/modules/:<PROJECT_NAME>/site-modules/`.
+In order for Bolt to find a plan, the plan must be in a module on the modulepath. By default, Bolt looks for plan content in `<PROJECT_NAME>/modules/plans/` and `<PROJECT_NAME>/site-modules/plans/`.
 
-If you are developing a new task or plan you can create a `<PROJECT_NAME>/tasks/` or `<PROJECT_NAME>/plans/`
-directory alongside `<PROJECT_NAME/project.yaml` to develop your content in, then run Bolt from the
-root of your Bolt project directory to test the task or plan.
+If you are developing a new plan, you can create an empty
+`<PROJECT_NAME/project.yaml` file, develop your plan in `<PROJECT_NAME>/plans/`,
+and run Bolt from the root of your Bolt project directory to test the plan. 
+
+> **Note:** The `project.yaml` file is part of an experimental feature. For
+> more information, see [Bolt projects](./experimental_features.md#bolt-projects).
 
 **Related Information**
 
