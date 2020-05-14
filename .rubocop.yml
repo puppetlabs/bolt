@@ -60,6 +60,9 @@ Layout/ClosingHeredocIndentation:
 Layout/LineLength:
   Max: 120
 
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
+
 Style/GuardClause:
   Enabled: false
 
@@ -70,6 +73,9 @@ Style/DoubleNegation:
   Enabled: false
 
 Style/SafeNavigation:
+  Enabled: false
+
+Style/SlicingWithRange:
   Enabled: false
 
 # Disable nearly all Metrics checks. These seem better off left to judgement.

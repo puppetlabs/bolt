@@ -594,6 +594,7 @@ module Bolt
     HELP
 
     attr_reader :warnings
+
     def initialize(options)
       super()
 

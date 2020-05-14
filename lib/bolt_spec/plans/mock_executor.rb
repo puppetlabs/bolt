@@ -230,6 +230,7 @@ module BoltSpec
       def transport(_protocol)
         Class.new do
           attr_reader :provided_features
+
           def initialize(features)
             @provided_features = features
           end

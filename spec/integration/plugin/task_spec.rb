@@ -40,6 +40,7 @@ describe 'using the task plugin' do
   end
 
   attr_reader :project
+
   around(:each) do |example|
     with_project(inventory: inventory, config: config, plan: plan) do |project|
       @project = project
