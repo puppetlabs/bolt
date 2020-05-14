@@ -27,7 +27,7 @@ module Bolt
       dir = Pathname.new(dir)
       if (dir + BOLTDIR_NAME).directory?
         new(dir + BOLTDIR_NAME, 'embedded')
-      elsif (dir + 'bolt.yaml').file?
+      elsif (dir + 'bolt.yaml').file? || (dir + 'bolt-project.yaml').file?
         new(dir, 'local')
       elsif dir.root?
         default_project
