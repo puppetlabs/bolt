@@ -53,6 +53,9 @@ RSpec.configure do |config|
   config.before :each do
     # Disable analytics while running tests
     ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
+    allow(Bolt::Project).to receive(:new).and_call_original
+    allow(Bolt::Project).to receive(:new).with('.')
+      .and_return(Bolt::Project.new(Dir.mktmpdir))
   end
 
   # This will be default in future rspec, leave it on
