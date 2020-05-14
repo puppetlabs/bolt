@@ -23,7 +23,7 @@ Bolt configuration files, including `bolt.yaml`, `inventory.yaml`, and
     ```json
     "yaml.schemas": {
       "<path to bolt-project.schema.json>": [
-        "project.yaml"
+        "bolt-project.yaml"
       ],
       "<path to bolt-config.schema.json>": [
         "bolt.yaml"
