@@ -359,6 +359,7 @@ module Bolt
           name = param.name
           if signature_params.include?(name)
             params[name] = { 'type' => param.types.first }
+            params[name]['sensitive'] = param.types.first =~ /\ASensitive(\[.*\])?\z/ ? true : false
             params[name]['default_value'] = defaults[name] if defaults.key?(name)
             params[name]['description'] = param.text unless param.text.empty?
           else
@@ -390,6 +391,7 @@ module Bolt
                        param.type_expr
                      end
           params[name] = { 'type' => type_str }
+          params[name]['sensitive'] = param.type_expr.instance_of?(Puppet::Pops::Types::PSensitiveType)
           params[name]['default_value'] = param.value
           params[name]['description'] = param.description if param.description
         end

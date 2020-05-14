@@ -1239,16 +1239,19 @@ describe "Bolt::CLI" do
             "parameters" => {
               "param_mandatory" => {
                 "type" => "String",
-                "description" => "A mandatory parameter"
+                "description" => "A mandatory parameter",
+                "sensitive" => false
               },
               "param_optional" => {
                 "type" => "Optional[String]",
-                "description" => "An optional parameter"
+                "description" => "An optional parameter",
+                "sensitive" => false
               },
               "param_with_default_value" => {
                 "type" => "String",
                 "description" => "A parameter with a default value",
-                "default_value" => "'foo'"
+                "default_value" => "'foo'",
+                "sensitive" => false
               }
             }
           )
@@ -1270,7 +1273,8 @@ describe "Bolt::CLI" do
             "parameters" => {
               "oops" => {
                 "type" => "String",
-                "default_value" => "typo"
+                "default_value" => "typo",
+                "sensitive" => false
               }
             }
           )
@@ -1294,15 +1298,18 @@ describe "Bolt::CLI" do
             "parameters" => {
               "nodes" => {
                 "type" => "TargetSpec",
-                "default_value" => nil
+                "default_value" => nil,
+                "sensitive" => false
               },
               "param_optional" => {
                 "type" => "Optional[String]",
-                "default_value" => 'undef'
+                "default_value" => 'undef',
+                "sensitive" => false
               },
               "param_with_default_value" => {
                 "type" => "String",
-                "default_value" => 'hello'
+                "default_value" => 'hello',
+                "sensitive" => false
               }
             }
           )

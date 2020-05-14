@@ -9,8 +9,6 @@ require 'bolt/target'
 require 'puppet/pops/types/p_sensitive_type'
 require 'rspec/expectations'
 
-Sensitive = Puppet::Pops::Types::PSensitiveType::Sensitive
-
 class TaskTypeMatcher < Mocha::ParameterMatchers::Equals
   def initialize(executable, input_method)
     super(nil)
@@ -287,6 +285,7 @@ describe 'run_task' do
     end
 
     context 'with sensitive data parameters' do
+      let(:sensitive) { Puppet::Pops::Types::PSensitiveType::Sensitive }
       let(:sensitive_string) { '$up3r$ecr3t!' }
       let(:sensitive_array) { [1, 2, 3] }
       let(:sensitive_hash) { { 'k' => 'v' } }
@@ -304,16 +303,16 @@ describe 'run_task' do
         }
 
         expected_params = {
-          'sensitive_string' => Sensitive.new(sensitive_string),
-          'sensitive_array' => Sensitive.new(sensitive_array),
-          'sensitive_hash' => Sensitive.new(sensitive_hash)
+          'sensitive_string' => sensitive.new(sensitive_string),
+          'sensitive_array' => sensitive.new(sensitive_array),
+          'sensitive_hash' => sensitive.new(sensitive_hash)
         }
 
-        Sensitive.expects(:new).with(input_params['sensitive_string'])
+        sensitive.expects(:new).with(input_params['sensitive_string'])
                  .returns(expected_params['sensitive_string'])
-        Sensitive.expects(:new).with(input_params['sensitive_array'])
+        sensitive.expects(:new).with(input_params['sensitive_array'])
                  .returns(expected_params['sensitive_array'])
-        Sensitive.expects(:new).with(input_params['sensitive_hash'])
+        sensitive.expects(:new).with(input_params['sensitive_hash'])
                  .returns(expected_params['sensitive_hash'])
 
         executor.expects(:run_task).with([target], mock_task(executable, nil), expected_params, {})

@@ -109,6 +109,15 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       end
     end
 
+    # Wrap Sensitive parameters for plans that are run from the CLI, as it's impossible to pass
+    # a Sensitive value that way. We don't do this for plans run from the run_plan function, as
+    # it can receive Sensitive values as arguments.
+    # This should only happen after expanding target params, otherwise things will blow up if
+    # the targets are wrapped as Sensitive. Hopefully nobody does that, though...
+    if options[:bolt_api_call]
+      params = wrap_sensitive_parameters(params, closure.parameters)
+    end
+
     # wrap plan execution in logging messages
     executor.log_plan(plan_name) do
       result = nil
@@ -167,6 +176,58 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     elsif defined?(type_expr.element_type)
       extract_parameter_types(type_expr.element_type)
     end
+  end
+
+  # Wrap any Sensitive parameters in the Sensitive wrapper type, unless they are already
+  # wrapped as Sensitive. This will also raise a helpful warning if the type expression
+  # is a complex data type using Sensitive, as we don't handle those cases.
+  def wrap_sensitive_parameters(params, param_models)
+    models = param_models.each_with_object({}) { |param, acc| acc[param.name] = param }
+
+    params.each_with_object({}) do |(name, value), acc|
+      model = models[name]
+
+      if sensitive_type?(model.type_expr)
+        acc[name] = Puppet::Pops::Types::PSensitiveType::Sensitive.new(value)
+      else
+        if model.type_expr.to_s.include?('Sensitive')
+          # Include the location for regular plans. YAML plans don't have this info, so
+          # the location will be suppressed.
+          file = defined?(model.file) ? model.file : :default
+          line = defined?(model.line) ? model.line : :default
+
+          Puppet.warn_once(
+            'unsupported_sensitive_type',
+            name,
+            "Parameter '#{name}' is a complex type using Sensitive, unable to automatically wrap as Sensitive",
+            file,
+            line
+          )
+        end
+
+        acc[name] = value
+      end
+    end
+  end
+
+  # Whether the type is a supported Sensitive type. We only support wrapping parameterized
+  # and non-parameterized Sensitive types (e.g. Sensitive, Sensitive[String])
+  def sensitive_type?(type_expr)
+    # Parameterized Sensitive type (e.g. Sensitive[String])
+    # left_expr is defined whenever the type is parameterized. If this is a parameterized
+    # Sensitive type, then we check the cased_value, which is the stringified version of
+    # the left expression's type.
+    (defined?(type_expr.left_expr) && type_expr.left_expr.cased_value == 'Sensitive') ||
+      # Non-parameterized Sensitive type (Sensitive)
+      # cased_value is defined whenever the type is non-parameterized. If the type expression
+      # defines cased_value, then this is a simple type and we just need to check that it's
+      # Sensitive.
+      (defined?(type_expr.cased_value) && type_expr.cased_value == 'Sensitive') ||
+      # Sensitive type from YAML plans
+      # Type expressions from YAML plans are a different class than those from regular plans.
+      # As long as the type expression is PSensitiveType we can be sure that the type is
+      # either a parameterized or non-parameterized Sensitive type.
+      type_expr.instance_of?(Puppet::Pops::Types::PSensitiveType)
   end
 
   def targets_to_param(targets, params, param_types)
