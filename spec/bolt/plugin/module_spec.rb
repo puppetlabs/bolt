@@ -15,7 +15,7 @@ describe Bolt::Plugin::Module do
   let(:config_data) { { 'modulepath' => modulepath, 'plugins' => plugin_config } }
 
   let(:pal) { Bolt::PAL.new(modulepath, {}, nil) }
-  let(:plugins) { Bolt::Plugin.setup(config(config_data), pal, nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins) { Bolt::Plugin.setup(config(config_data), pal) }
 
   let(:module_name) { 'empty_plug' }
   let(:mod) { Bolt::Module.new(module_name, fixtures_path('plugin_modules', module_name)) }

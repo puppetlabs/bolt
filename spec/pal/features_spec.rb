@@ -16,8 +16,7 @@ describe 'set_features function' do
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:analytics) { Bolt::Analytics::NoopClient.new }
-  let(:executor) { Bolt::Executor.new(1, analytics) }
+  let(:executor) { Bolt::Executor.new(1) }
 
   let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
   let(:inventory) { Bolt::Inventory.empty }

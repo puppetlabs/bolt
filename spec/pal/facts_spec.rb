@@ -25,11 +25,10 @@ describe 'Facts functions' do
     }
   }
   let(:pal)     { Bolt::PAL.new(modulepath, nil, nil) }
-  let(:plugins) { Bolt::Plugin.setup(config, nil, nil, analytics) }
+  let(:plugins) { Bolt::Plugin.setup(config, nil) }
   let(:inv)     { Bolt::Inventory::Inventory.new(data, config.transport, config.transports, plugins) }
 
-  let(:analytics) { Bolt::Analytics::NoopClient.new }
-  let(:executor)  { Bolt::Executor.new(1, analytics) }
+  let(:executor)  { Bolt::Executor.new }
 
   let(:target_string) { "$t = get_targets(#{target})[0]\n" }
   let(:facts)         { "facts($t)\n" }

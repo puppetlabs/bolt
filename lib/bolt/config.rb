@@ -312,10 +312,10 @@ module Bolt
         @warnings << { option: 'future', msg: msg }
       end
 
-      keys = OPTIONS.keys - %w[plugins plugin_hooks]
+      keys = OPTIONS.keys - %w[plugins plugin_hooks puppetdb]
       keys.each do |key|
         next unless Bolt::Util.references?(@data[key])
-        valid_keys = TRANSPORT_CONFIG.keys + %w[plugins plugin_hooks]
+        valid_keys = TRANSPORT_CONFIG.keys + %w[plugins plugin_hooks puppetdb]
         raise Bolt::ValidationError,
               "Found unsupported key _plugin in config setting #{key}. Plugins are only available in "\
               "#{valid_keys.join(', ')}."

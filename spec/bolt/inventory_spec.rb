@@ -10,7 +10,7 @@ describe Bolt::Inventory do
   include BoltSpec::Config
 
   let(:pal)     { nil } # Not used
-  let(:plugins) { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins) { Bolt::Plugin.setup(config, pal) }
 
   context 'with BOLT_INVENTORY set' do
     let(:inventory) { Bolt::Inventory.from_config(config, plugins) }

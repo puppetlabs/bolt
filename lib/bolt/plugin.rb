@@ -119,12 +119,8 @@ module Bolt
       end
     end
 
-    def self.setup(config, pal, pdb_client, analytics)
+    def self.setup(config, pal, analytics = Bolt::Analytics::NoopClient.new)
       plugins = new(config, pal, analytics)
-
-      # PDB is special because it needs the PDB client. Since it has no config,
-      # we can just add it first.
-      plugins.add_plugin(Bolt::Plugin::Puppetdb.new(pdb_client))
 
       # Initialize any plugins referenced in plugin config. This will also indirectly
       # initialize any plugins they depend on.
@@ -142,7 +138,7 @@ module Bolt
       plugins
     end
 
-    RUBY_PLUGINS = %w[task prompt env_var].freeze
+    RUBY_PLUGINS = %w[task prompt env_var puppetdb].freeze
     BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory puppetdb azure_inventory
                          yaml env_var gcloud_inventory].freeze
     DEFAULT_PLUGIN_HOOKS = { 'puppet_library' => { 'plugin' => 'puppet_agent', 'stop_service' => true } }.freeze
@@ -161,6 +157,13 @@ module Bolt
       @unknown = Set.new
       @resolution_stack = []
       @unresolved_plugin_configs = config.plugins.dup
+      # The puppetdb plugin config comes from the puppetdb section, not from
+      # the plugins section
+      if @unresolved_plugin_configs.key?('puppetdb')
+        msg = "Configuration for the PuppetDB plugin must be in the 'puppetdb' config section, not 'plugins'"
+        raise Bolt::Error.new(msg, 'bolt/plugin-error')
+      end
+      @unresolved_plugin_configs['puppetdb'] = config.puppetdb if config.puppetdb
       @plugin_hooks = DEFAULT_PLUGIN_HOOKS.dup
     end
 
@@ -168,7 +171,6 @@ module Bolt
       @modules ||= Bolt::Module.discover(@pal.modulepath)
     end
 
-    # Generally this is private. Puppetdb is special though
     def add_plugin(plugin)
       @plugins[plugin.name] = plugin
     end
@@ -233,6 +235,10 @@ module Bolt
         @unknown << plugin_name
         nil
       end
+    end
+
+    def puppetdb_client
+      by_name('puppetdb').puppetdb_client
     end
 
     # Evaluate all _plugin references in a data structure. Leaves are

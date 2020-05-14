@@ -145,10 +145,7 @@ module BoltSpec
     end
 
     def plugins
-      @plugins ||= Bolt::Plugin.setup(config,
-                                      pal,
-                                      nil,
-                                      Bolt::Analytics::NoopClient.new)
+      @plugins ||= Bolt::Plugin.setup(config, pal)
     end
 
     def pal

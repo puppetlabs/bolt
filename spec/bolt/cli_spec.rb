@@ -1919,7 +1919,7 @@ describe "Bolt::CLI" do
                                                      anything,
                                                      true).and_return(executor)
 
-        plugins = Bolt::Plugin.setup(Bolt::Config.default, nil, nil, nil)
+        plugins = Bolt::Plugin.setup(Bolt::Config.default, nil)
         allow(cli).to receive(:plugins).and_return(plugins)
 
         outputter = Bolt::Outputter::JSON.new(false, false, false, output)

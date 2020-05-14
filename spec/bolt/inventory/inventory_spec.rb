@@ -16,7 +16,7 @@ describe Bolt::Inventory::Inventory do
   end
 
   let(:pal)          { nil }
-  let(:plugins)      { Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new) }
+  let(:plugins)      { Bolt::Plugin.setup(config, pal) }
   let(:target_name)  { "example.com" }
   let(:target_entry) { target_name }
   let(:targets)      { [target_entry] }
@@ -1278,7 +1278,7 @@ describe Bolt::Inventory::Inventory do
     }
 
     let(:plugins) do
-      plugins = Bolt::Plugin.setup(config, pal, nil, Bolt::Analytics::NoopClient.new)
+      plugins = Bolt::Plugin.setup(config, pal)
       plugin = double('plugin')
       allow(plugin).to receive(:name).and_return('test_plugin')
       allow(plugin).to receive(:hooks).and_return([:resolve_reference])

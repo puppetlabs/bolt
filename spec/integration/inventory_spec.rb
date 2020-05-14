@@ -476,7 +476,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     let(:facts) { {} }
 
     before(:each) do
-      allow_any_instance_of(Bolt::CLI).to receive(:puppetdb_client).and_return(pdb_client)
+      allow_any_instance_of(Bolt::Config).to receive(:puppetdb).and_return(pdb_conf)
 
       push_facts(facts)
     end

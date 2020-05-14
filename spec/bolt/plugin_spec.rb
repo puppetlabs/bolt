@@ -15,9 +15,8 @@ describe Bolt::Plugin do
   let(:plugin_config) { {} }
   let(:config_data) { { 'modulepath' => modulepath, 'plugins' => plugin_config } }
   let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
-  let(:pdb_client) { double('pdb_client') }
 
-  let(:plugins) { Bolt::Plugin.setup(config(config_data), pal, pdb_client, Bolt::Analytics::NoopClient.new) }
+  let(:plugins) { Bolt::Plugin.setup(config(config_data), pal) }
 
   def identity(value)
     {
