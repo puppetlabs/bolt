@@ -47,7 +47,7 @@ PS
       result = on(bolt, 'ruby --version')
     when /osx/
       # System ruby for osx is 2.3. winrm-fs and its dependencies require > 2.3.
-      on(bolt, 'gem install winrm-fs -v 1.3.3 --no-rdoc --no-ri')
+      on(bolt, 'gem install winrm-fs -v 1.3.3 --no-document')
       result = on(bolt, 'ruby --version')
     else
       fail_test("#{bolt['platform']} not currently a supported bolt controller")
