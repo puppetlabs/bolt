@@ -5,6 +5,7 @@
 require 'bolt'
 require 'bolt/logger'
 require 'logging'
+require 'net/ssh'
 require 'rspec/logging_helper'
 # Make sure puppet is required for the 'reset puppet settings' context
 require 'puppet_pal'
@@ -53,6 +54,15 @@ RSpec.configure do |config|
   config.before :each do
     # Disable analytics while running tests
     ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
+
+    # Ignore local project.yaml files
+    allow(Bolt::Project).to receive(:new).and_call_original
+    allow(Bolt::Project).to receive(:new).with('.')
+                                         .and_return(Bolt::Project.new(Dir.mktmpdir))
+
+    # Ignore user's known hosts and ssh config files
+    conf = { user_known_hosts_file: '/dev/null/', global_known_hosts_file: '/dev/null' }
+    allow(Net::SSH::Config).to receive(:for).and_return(conf)
   end
 
   # This will be default in future rspec, leave it on
