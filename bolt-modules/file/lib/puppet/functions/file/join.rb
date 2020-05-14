@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Join file paths.
+# Join file paths using ruby's `File.join()` function.
 Puppet::Functions.create_function(:'file::join') do
   # @param paths The paths to join.
   # @return The joined file path.
