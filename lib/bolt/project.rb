@@ -126,7 +126,7 @@ module Bolt
     end
 
     def check_deprecated_file
-      if (@path + 'project.yaml').file? && !load_as_module?
+      if (@path + 'project.yaml').file?
         logger = Logging.logger[self]
         logger.warn "Project configuration file 'project.yaml' is deprecated; use 'bolt-project.yaml' instead."
       end
