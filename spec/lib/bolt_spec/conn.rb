@@ -11,7 +11,7 @@ module BoltSpec
       default_password = 'bolt'
       default_second_user = 'test'
       default_second_pw = 'test'
-      default_key = Dir["spec/fixtures/keys/id_rsa"][0]
+      default_key = File.expand_path(File.join(__dir__, '..', '..', 'fixtures/keys/id_rsa'))
       default_port = 0
 
       tu = transport.upcase
