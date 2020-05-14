@@ -75,10 +75,10 @@ modulepath. By default, Bolt looks for tasks in `<PROJECT_NAME>/modules/tasks/`
 and `<PROJECT_NAME>/site-modules/tasks/`.
 
 If you are developing a new task, you can create an empty
-`<PROJECT_NAME/project.yaml` file, develop your task in `<PROJECT_NAME>/tasks/`,
+`<PROJECT_NAME/bolt-project.yaml` file, develop your task in `<PROJECT_NAME>/tasks/`,
 and run Bolt from the root of your Bolt project directory to test the task.
 
-> **Note:** The `project.yaml` file is part of an experimental feature. For
+> **Note:** The `bolt-project.yaml` file is part of an experimental feature. For
 > more information, see [Bolt projects](./experimental_features.md#bolt-projects).
 
 **Related Information**

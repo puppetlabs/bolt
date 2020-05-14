@@ -75,7 +75,7 @@ describe Bolt::Config do
 
   describe "::from_file" do
     let(:path) { File.expand_path('/path/to/config') }
-    let(:proj_path) { Bolt::Util.windows? ? "D:/path/to/project.yaml" : "/path/to/project.yaml" }
+    let(:proj_path) { Bolt::Util.windows? ? "D:/path/to/bolt-project.yaml" : "/path/to/bolt-project.yaml" }
 
     it 'loads from the specified config file' do
       expect(Bolt::Util).to receive(:read_yaml_hash).with(path, 'config')

@@ -42,11 +42,11 @@ To get started with a Bolt project:
    <PROJECT_NAME>`
    - To turn an existing directory into a Bolt project directory, run `Bolt
      project init` from the root of the directory.   
-2. Create a `project.yaml` file in the root of your Bolt project directory.
+2. Create a `bolt-project.yaml` file in the root of your Bolt project directory.
 3. Develop your Bolt plans and tasks in `plans` and `tasks` directories
    in the root of the project directory.
 
-If `project.yaml` exists at the root of a project directory, Bolt loads the
+If `bolt-project.yaml` exists at the root of a project directory, Bolt loads the
 project as a module. Bolt loads tasks and plans from the `tasks` and `plans`
 directories and namespaces them to the project name.
 
@@ -54,10 +54,10 @@ Here is an example of a project using a simplified directory structure:
 ```console
 .
 ├── bolt.yaml
+├── bolt-project.yaml
 ├── inventory.yaml
 ├── plans
 │   └── myplan.yaml
-├── project.yaml
 └── tasks
     └── mytask.yaml
 ```
@@ -65,7 +65,7 @@ Here is an example of a project using a simplified directory structure:
 ### Naming your project
 
 If you want to set a name for your project that is different from the name of
-the Bolt project directory, add a `name` key to `project.yaml` with the project
+the Bolt project directory, add a `name` key to `bolt-project.yaml` with the project
 name. 
 
 For example:
@@ -83,10 +83,10 @@ lowercase letter.
 
 To control what tasks and plans appear when your users run `bolt plan
 show` or `bolt task show`, add `tasks` and `plans`
-keys to your `project.yaml` and include an array of task and plan names. 
+keys to your `bolt-project.yaml` and include an array of task and plan names. 
 
 For example, if you wanted to surface a plan named `myproject::myplan`, and a
-task named `myproject::mytask`, you would use the following `project.yaml` file:
+task named `myproject::mytask`, you would use the following `bolt-project.yaml` file:
 
 ```yaml
 name: myproject

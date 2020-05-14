@@ -10,7 +10,7 @@ describe Bolt::Project do
 
     before(:each) do
       allow(Bolt::Util).to receive(:read_optional_yaml_hash)
-        .with(File.expand_path(@tmpdir + 'project.yaml'), 'project')
+        .with(File.expand_path(@tmpdir + 'bolt-project.yaml'), 'project')
         .and_return(config)
     end
 
@@ -33,7 +33,7 @@ describe Bolt::Project do
       let(:config) { { 'tasks' => 'foo' } }
 
       it "raises an error" do
-        expect { Bolt::Project.new(pwd).validate }.to raise_error(/'tasks' in project.yaml must be an array/)
+        expect { Bolt::Project.new(pwd).validate }.to raise_error(/'tasks' in bolt-project.yaml must be an array/)
       end
     end
 
@@ -42,7 +42,7 @@ describe Bolt::Project do
 
       it "raises an error" do
         expect { Bolt::Project.new(pwd).validate }
-          .to raise_error(/Invalid project name '_invalid' in project.yaml/)
+          .to raise_error(/Invalid project name '_invalid' in bolt-project.yaml/)
       end
     end
 
