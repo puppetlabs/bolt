@@ -25,9 +25,13 @@ The following functions are available to `ApplyResult` objects.
 
 ## `ResourceInstance`
 
-`ResourceInstance` objects are used to store the observed and desired state of a target's resource and to track events for the resource. These objects do not modify or interact with a target's resources.
+`ResourceInstance` objects are used to store the observed and desired state of a target's resource
+and to track events for the resource. These objects do not modify or interact with a target's
+resources.
 
 > **Note:** The `ResourceInstance` data type is under active development and is subject to change.
+  You can learn more about this data type and how to use it in the [experimental features
+  documentation](experimental_features.md#resourceinstance-data-type).
 
 You can access `ResourceInstance` functions with dot notation, using the syntax: `$resource.function`.
 

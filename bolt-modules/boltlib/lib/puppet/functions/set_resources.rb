@@ -3,7 +3,13 @@
 require 'bolt/error'
 
 # Sets one or more resources on a target.
-# For more information about resources, see: https://puppet.com/docs/puppet/latest/lang_resources.html
+#
+# For more information about resources see [the
+# documentation](https://puppet.com/docs/puppet/latest/lang_resources.html).
+#
+# > **Note:** The `ResourceInstance` data type is under active development and is subject to
+#   change. You can read more about the data type in the [experimental features
+#   documentation](experimental_features.md#resourceinstance-data-type).
 #
 # > **Note:** Not available in apply block
 Puppet::Functions.create_function(:set_resources) do

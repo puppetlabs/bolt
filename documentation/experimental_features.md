@@ -1,8 +1,17 @@
 # Experimental features
 
-Most larger bolt features are released initially in an experimental or unstable state. This allows the bolt team to gather feedback from real users quickly while iterating on new functionality. Almost all experimental features are eventually stabilized in future bolt releases. While a feature is experimental it's API may change requiring the user to update their code or configuration. The bolt team attempts to make these changes painless and provide useful warnings around breaking behavior where possible. 
+Most larger Bolt features are released initially in an experimental or unstable state.
+This allows the Bolt team to gather feedback from real users quickly while iterating on
+new functionality. Almost all experimental features are eventually stabilized in future
+releases. While a feature is experimental, its API may change, requiring the user to
+update their code or configuration. The Bolt team attempts to make these changes painless
+by providing useful warnings around breaking behavior where possible. 
+
 Experimental features are subject to possible breaking changes between minor Bolt
 releases.
+
+- [Bolt projects](#bolt-projects)
+- [`ResourceInstance` data type](#resourceinstance-data-type)
 
 ## Bolt projects
 
@@ -105,4 +114,175 @@ MODULEPATH:
 /PATH/TO/BOLT_PROJECT/site
 
 Use `bolt plan show <plan-name>` to view details and parameters for a specific plan.
+```
+
+## `ResourceInstance` data type
+
+This feature was introduced in [Bolt
+2.10.0](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md#bolt-2100-2020-05-18).
+
+Bolt has had a limited ability to interact with Puppet's Resource Abstraction Layer. Users
+could use the `apply` function to generate catalogs and return events, and the `get_resources`
+plan function can be used to query resources on target. The `ResourceInstance` data type is
+the first step in enabling plan authors to build resource-based logic into their plans to
+enable a discover-inspect-execute workflow for interacting with resources on remote systems.
+
+The `ResourceInstance` data type is used to store information about a single resource on a
+target, including its observed state, desired state, and any related events.
+
+> **Note::** The `ResourceInstance` data type does not interact with or modify resources in
+  any way. It is only used to store information about a resource.
+
+### Creating `ResourceInstance` objects
+
+#### `Target.set_resources()`
+
+The recommended way to create `ResourceInstance` objects is by setting them directly on
+a `Target` object using the `Target.set_resources` function. This function can be used to 
+set one or more resources on a target at a time. You can read more about this function in
+the [Bolt plan functions reference documentation](plan_functions.md#set_resources).
+
+The `Target.set_resources` function can set existing `ResourceInstance` objects on a target,
+or take hashes of parameters to create new `ResourceInstance` objects and automatically set
+them on a target.
+
+When setting resources using a hash of parameters, you can pass either a single hash or an
+array of hashes:
+
+> **Note:** When passing a data hash to `Target.set_resources`, the `target` parameter
+  is **optional**. If the `target` parameter is not specified, the function automatically
+  sets the target to the target the function is called on.
+
+> **Note:** If the `target` parameter is any target other than the one you are setting the
+  resource on, Bolt will raise an error.
+
+```ruby
+$init_hash = {
+  'target'        => Optional[Target],
+  'type'          => Variant[String[1], Type[Resource]],
+  'title'         => String[1],
+  'state'         => Optional[Hash[String[1], Data]],
+  'desired_state' => Optional[Hash[String[1], Data]],
+  'events'        => Optional[Array[Hash[String[1], Data]]]
+}
+
+$target.set_resources(
+  Variant[Hash[String[1], Any], Array[Hash[String[1], Any]]] init_hash
+)
+```
+
+When setting resources using existing `ResourceInstance`s, you can pass either a single
+`ResourceInstance` or an array of `ResourceInstance`s.
+
+> **Note:** If the target for a `ResourceInstance` does not match the target it is being set
+  on, Bolt will raise an error.
+
+```ruby
+$resource = ResourceInstance.new(...)
+
+$target.set_resources(
+  Variant[ResourceInstance, Array[ResourceInstance]] resource
+)
+```
+
+A target can only have a single instance of a given resource. If a duplicate resource is set
+on a target, the `state` and `desired_state` of the duplicate resource will be shallow merged
+with that of the existing resource, while any `events` for the duplicate resource will be
+added to the events for the existing resource.
+
+#### `ResourceInstance.new()`
+
+You can also create standalone `ResourceInstance` objects without setting them directly
+on a target using the `new` function.
+
+The `new` function accepts either positional arguments:
+
+```ruby
+ResourceInstance.new(
+  Target                                 target,
+  Variant[String[1], Type[Resource]]     type,
+  String[1]                              title,
+  Optional[Hash[String[1], Data]]        state,
+  Optional[Hash[String[1], Data]]        desired_state,
+  Optional[Array[Hash[String[1], Data]]] events
+)
+```
+
+or a hash of arguments:
+
+```ruby
+$init_hash = {
+  'target'        => Target,
+  'type'          => Variant[String[1], Type[Resource]],
+  'title'         => String[1],
+  'state'         => Optional[Hash[String[1], Data]],
+  'desired_state' => Optional[Hash[String[1], Data]],
+  'events'        => Optional[Array[Hash[String[1], Data]]]
+}
+
+ResourceInstance.new(
+  Hash[String[1], Any] init_hash
+)
+```
+
+### Attributes
+
+Each `ResourceInstance` has the following attributes:
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `type` | The target that the resource is for. | `Target` |
+| `type` | The [type of the resource](https://puppet.com/docs/puppet/latest/type.html). This can be either the stringified name of the resource type or the actual type itself. For example, both `"file"` and `File` are acceptable. | `Variant[String[1], Type[Resource]]` |
+| `title` | The title, or [namevar](https://puppet.com/docs/puppet/latest/type.html#namevars-and-titles), of the resource. | `String[1]` |
+| `state` | The _observed state_ of the resource. This is the point-in-time state of the resource when it is queried. | `Hash[String[1], Data]` |
+| `desired_state` | The _desired state_ of the resource. This is the state that you want the resource to be in. | `Hash[String[1], Data]` |
+| `events` | Resource events that are generated from reports. | `Array[Hash[String[1], Data]]` | 
+
+A `ResourceInstance` is identified by its `target`, `type`, and `title`. As such, these
+three parameters _must_ be specified when creating a new `ResourceInstance` and are
+immutable. Since `Target.set_resources` will automatically set the `target` when passing
+a hash of parameters, the `target` parameter can be ommitted.
+
+The `state`, `desired_state`, and `events` parameters are optional when creating a
+`ResourceInstance`. If `state` and `desired_state` are not specified they will default to
+empty hashes, while `events` will default to an empty array. Each of these attributes can
+be modified during the lifetime of the `ResourceInstance` using [the data type's
+functions](bolt_types_reference.md#resourceinstance).
+
+### Functions
+
+The `ResourceInstance` data type has several built-in functions. These range from accessing
+the object's attributes to modifying and overwriting state. A full list of the available
+functions can be found in the [data type reference 
+documentation](bolt_types_reference.md#resourceinstance).
+
+### Example usage
+
+You can easily set a resource on a set of targets. For example, if you want to ensure that
+a file is present on each target:
+
+```ruby
+$resource = {
+  'type'  => File,
+  'title' => '/etc/puppetlabs/bolt.yaml',
+  'desired_state' => {
+    'ensure'  => 'present',
+    'content' => "..."
+  }
+}
+
+$targets.each |$target| {
+  $target.set_resources($resource)
+}
+```
+
+You can also combine the `get_resources` plan function with `Target.set_resources` to
+query resources on a target and set them on the corresponding `Target` objects:
+
+```ruby
+$results = $targets.get_resources([Package, User])
+
+$results.each |$result| {
+  $result.target.set_resources($result['resources'])
+}
 ```
