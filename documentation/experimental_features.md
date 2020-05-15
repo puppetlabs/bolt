@@ -7,9 +7,6 @@ releases. While a feature is experimental, its API may change, requiring the use
 update their code or configuration. The Bolt team attempts to make these changes painless
 by providing useful warnings around breaking behavior where possible. 
 
-Experimental features are subject to possible breaking changes between minor Bolt
-releases.
-
 - [Bolt projects](#bolt-projects)
 - [`ResourceInstance` data type](#resourceinstance-data-type)
 
@@ -121,13 +118,13 @@ Use `bolt plan show <plan-name>` to view details and parameters for a specific p
 This feature was introduced in [Bolt
 2.10.0](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md#bolt-2100-2020-05-18).
 
-Bolt has had a limited ability to interact with Puppet's Resource Abstraction Layer. Users
+Bolt has had a limited ability to interact with Puppet's Resource Abstraction Layer. You
 could use the `apply` function to generate catalogs and return events, and the `get_resources`
-plan function can be used to query resources on target. The `ResourceInstance` data type is
+plan function can be used to query resources on a target. The `ResourceInstance` data type is
 the first step in enabling plan authors to build resource-based logic into their plans to
 enable a discover-inspect-execute workflow for interacting with resources on remote systems.
 
-The `ResourceInstance` data type is used to store information about a single resource on a
+Use the `ResourceInstance` data type is used to store information about a single resource on a
 target, including its observed state, desired state, and any related events.
 
 > **Note::** The `ResourceInstance` data type does not interact with or modify resources in
@@ -138,9 +135,9 @@ target, including its observed state, desired state, and any related events.
 #### `Target.set_resources()`
 
 The recommended way to create `ResourceInstance` objects is by setting them directly on
-a `Target` object using the `Target.set_resources` function. This function can be used to 
-set one or more resources on a target at a time. You can read more about this function in
-the [Bolt plan functions reference documentation](plan_functions.md#set_resources).
+a `Target` object using the `Target.set_resources` function. Use the function to set one or
+more resources on a target at a time. You can read more about this function in
+[Bolt plan functions](plan_functions.md#set_resources).
 
 The `Target.set_resources` function can set existing `ResourceInstance` objects on a target,
 or take hashes of parameters to create new `ResourceInstance` objects and automatically set
@@ -148,13 +145,6 @@ them on a target.
 
 When setting resources using a hash of parameters, you can pass either a single hash or an
 array of hashes:
-
-> **Note:** When passing a data hash to `Target.set_resources`, the `target` parameter
-  is **optional**. If the `target` parameter is not specified, the function automatically
-  sets the target to the target the function is called on.
-
-> **Note:** If the `target` parameter is any target other than the one you are setting the
-  resource on, Bolt will raise an error.
 
 ```ruby
 $init_hash = {
@@ -171,11 +161,15 @@ $target.set_resources(
 )
 ```
 
-When setting resources using existing `ResourceInstance`s, you can pass either a single
-`ResourceInstance` or an array of `ResourceInstance`s.
+> **Note:** When passing a data hash to `Target.set_resources`, the `target` parameter
+  is **optional**. If the `target` parameter is not specified, the function automatically
+  sets the target to the target the function is called on.
 
-> **Note:** If the target for a `ResourceInstance` does not match the target it is being set
-  on, Bolt will raise an error.
+> **Note:** If the `target` parameter is any target other than the one you are setting the
+  resource on, Bolt will raise an error.
+
+When setting resources using existing `ResourceInstance` objects, you can pass either a single
+`ResourceInstance` or an array of `ResourceInstance` objects.
 
 ```ruby
 $resource = ResourceInstance.new(...)
@@ -185,10 +179,13 @@ $target.set_resources(
 )
 ```
 
-A target can only have a single instance of a given resource. If a duplicate resource is set
-on a target, the `state` and `desired_state` of the duplicate resource will be shallow merged
-with that of the existing resource, while any `events` for the duplicate resource will be
-added to the events for the existing resource.
+> **Note:** If the target for a `ResourceInstance` does not match the target it is being set
+  on, Bolt will raise an error.
+
+A target can only have a single instance of a given resource. If you set a duplicate resource 
+on a target, Bolt shallow merges the `state` and `desired_state` of the duplicate resource 
+with the `state` and `desired_state` of the existing resource and adds any `events` for the
+duplicate resource to the existing resource.
 
 #### `ResourceInstance.new()`
 
@@ -244,17 +241,16 @@ immutable. Since `Target.set_resources` will automatically set the `target` when
 a hash of parameters, the `target` parameter can be ommitted.
 
 The `state`, `desired_state`, and `events` parameters are optional when creating a
-`ResourceInstance`. If `state` and `desired_state` are not specified they will default to
-empty hashes, while `events` will default to an empty array. Each of these attributes can
-be modified during the lifetime of the `ResourceInstance` using [the data type's
+`ResourceInstance`. If you do not specify `state` and `desired_state`, they default to empty
+hashes, while `events` defaults to an empty array. You can modify each of these attributes
+during the lifetime of the `ResourceInstance` using [the data type's
 functions](bolt_types_reference.md#resourceinstance).
 
 ### Functions
 
 The `ResourceInstance` data type has several built-in functions. These range from accessing
-the object's attributes to modifying and overwriting state. A full list of the available
-functions can be found in the [data type reference 
-documentation](bolt_types_reference.md#resourceinstance).
+the object's attributes to modifying and overwriting state. For a full list of the available
+functions, see [Bolt data types](bolt_types_reference.md#resourceinstance).
 
 ### Example usage
 

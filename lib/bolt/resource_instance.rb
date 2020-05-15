@@ -42,7 +42,7 @@ module Bolt
       new(resource_hash)
     end
 
-    # Creates a ResourceINstance from positional arguments in a plan when
+    # Creates a ResourceInstance from positional arguments in a plan when
     # calling ResourceInstance.new(target, type, title, ...)
     def self.from_asserted_args(target,
                                 type,

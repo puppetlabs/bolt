@@ -2,7 +2,8 @@
 
 require 'bolt/error'
 
-# Sets one or more resources on a target.
+# Sets one or more ResourceInstances on a Target. This function does not apply or modify
+# resources on a target.
 #
 # For more information about resources see [the
 # documentation](https://puppet.com/docs/puppet/latest/lang_resources.html).
@@ -13,6 +14,7 @@ require 'bolt/error'
 #
 # > **Note:** Not available in apply block
 Puppet::Functions.create_function(:set_resources) do
+  # Set multiple resources
   # @param target The `Target` object to add resources to. See {get_targets}.
   # @param resources The resources to set on the target.
   # @return The added `ResourceInstance` objects.
@@ -40,6 +42,7 @@ Puppet::Functions.create_function(:set_resources) do
     return_type 'Array[ResourceInstance]'
   end
 
+  # Set a single resource
   # @param target The `Target` object to add resources to. See {get_targets}.
   # @param resource The resource to set on the target.
   # @return The added `ResourceInstance` object.
