@@ -281,4 +281,36 @@ $results = $targets.get_resources([Package, User])
 $results.each |$result| {
   $result.target.set_resources($result['resources'])
 }
+
+## External SSH transport
+
+Bolt's SSH transport uses the ruby library `net-ssh`, which is a pure ruby implementation of the
+SSH2 client protocol. While robust, the library lacks support for some features and algorithms that
+are available in native SSH. When you use the external SSH transport, Bolt uses the SSH executable
+you've specified instead of using `net-ssh`. Essentially, using the external SSH transport is the
+same as running SSH on your command line, but with Bolt managing the connections.
+
+To use the external SSH transport, set `ssh-command: <SSH>` in [bolt.yaml](configuring_bolt.md),
+where <SSH> is the SSH command to run. For example:
+
+```
+ssh:
+  ssh-command: 'ssh'
+```
+
+The value of `ssh-command` can be either a string or an array, and you can provide any flags to the
+command. Bolt will append Bolt-configuration settings to the command, as well as the specified
+target, when connecting. Not all Bolt configuration options are supported using the external SSH
+transport, but you can configure most options in your OpenSSH Config. See [bolt configuration
+reference](bolt_configuration_reference.md) for the list of supported Bolt SSH options.
+
+Bolt transports have two main functions: executing remotely, and copying files to the remote targets.
+`ssh-command` is what configures the remote execution, and `copy-command` configures the copy
+command. The default is `scp -r`, and `rsync` is not supported at this time.
+
+For example:
+```
+ssh:
+  ssh-command: 'ssh'
+  copy-command: 'scp -r -F ~/ssh-config/myconf'
 ```
