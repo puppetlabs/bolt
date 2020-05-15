@@ -15,6 +15,7 @@ module Bolt
 
     class ValidationError < Bolt::Error
       attr_accessor :path
+
       def initialize(message, offending_group)
         super(message, 'bolt.inventory/validation-error')
         @_message = message

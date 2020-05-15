@@ -7,6 +7,7 @@ module Bolt
   class Inventory
     class Inventory
       attr_reader :targets, :plugins, :config, :transport
+
       class WildcardError < Bolt::Error
         def initialize(target)
           super("Found 0 targets matching wildcard pattern #{target}", 'bolt.inventory/wildcard-error')
