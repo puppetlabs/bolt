@@ -73,10 +73,10 @@ bolt plan run mymodule::myplan --targets app1.myorg.com --params $(@{load_balanc
 In order for Bolt to find a plan, the plan must be in a module on the modulepath. By default, Bolt looks for plan content in `<PROJECT_NAME>/modules/plans/` and `<PROJECT_NAME>/site-modules/plans/`.
 
 If you are developing a new plan, you can create an empty
-`<PROJECT_NAME/project.yaml` file, develop your plan in `<PROJECT_NAME>/plans/`,
+`<PROJECT_NAME/bolt-project.yaml` file, develop your plan in `<PROJECT_NAME>/plans/`,
 and run Bolt from the root of your Bolt project directory to test the plan. 
 
-> **Note:** The `project.yaml` file is part of an experimental feature. For
+> **Note:** The `bolt-project.yaml` file is part of an experimental feature. For
 > more information, see [Bolt projects](./experimental_features.md#bolt-projects).
 
 **Related Information**

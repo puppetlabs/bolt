@@ -1022,7 +1022,7 @@ describe "Bolt::CLI" do
           end
         end
 
-        it "only includes tasks set in project.yaml" do
+        it "only includes tasks set in bolt-project.yaml" do
           mocks = {
             type: '',
             resource_types: '',

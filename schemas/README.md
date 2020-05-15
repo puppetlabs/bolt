@@ -2,7 +2,7 @@
 
 This directory includes several JSON schemas that can be used to validate
 Bolt configuration files, including `bolt.yaml`, `inventory.yaml`, and
-`project.yaml`.
+`bolt-project.yaml`.
 
 ## Using schemas with Visual Studio Code
 
@@ -23,7 +23,7 @@ Bolt configuration files, including `bolt.yaml`, `inventory.yaml`, and
     ```json
     "yaml.schemas": {
       "<path to bolt-project.schema.json>": [
-        "project.yaml"
+        "bolt-project.yaml"
       ],
       "<path to bolt-config.schema.json>": [
         "bolt.yaml"

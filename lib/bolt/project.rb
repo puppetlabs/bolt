@@ -27,7 +27,7 @@ module Bolt
       dir = Pathname.new(dir)
       if (dir + BOLTDIR_NAME).directory?
         new(dir + BOLTDIR_NAME, 'embedded')
-      elsif (dir + 'bolt.yaml').file?
+      elsif (dir + 'bolt.yaml').file? || (dir + 'bolt-project.yaml').file?
         new(dir, 'local')
       elsif dir.root?
         default_project
@@ -47,7 +47,7 @@ module Bolt
       @resource_types = @path + '.resource_types'
       @type = type
 
-      @project_file = @path + 'project.yaml'
+      @project_file = @path + 'bolt-project.yaml'
       @data = Bolt::Util.read_optional_yaml_hash(File.expand_path(@project_file), 'project') || {}
       validate if load_as_module?
     end
@@ -72,7 +72,7 @@ module Bolt
     end
 
     def name
-      # If the project is in mymod/Boltdir/project.yaml, use mymod as the project name
+      # If the project is in mymod/Boltdir/bolt-project.yaml, use mymod as the project name
       dirname = @path.basename.to_s == 'Boltdir' ? @path.parent.basename.to_s : @path.basename.to_s
       pname = @data['name'] || dirname
       pname.include?('-') ? pname.split('-', 2)[1] : pname
@@ -100,7 +100,7 @@ module Bolt
       n = @data['name']
       if n && !project_directory_name?(n) && !project_namespaced_name?(n)
         raise Bolt::ValidationError, <<~ERROR_STRING
-        Invalid project name '#{n}' in project.yaml; project names must match either:
+        Invalid project name '#{n}' in bolt-project.yaml; project names must match either:
         An installed project name (ex. projectname) matching the expression /^[a-z][a-z0-9_]*$/ -or-
         A namespaced project name (ex. author-projectname) matching the expression /^[a-zA-Z0-9]+[-][a-z][a-z0-9_]*$/
         ERROR_STRING
@@ -110,7 +110,7 @@ module Bolt
         A project name (ex. projectname) matching the expression /^[a-z][a-z0-9_]*$/ -or-
         A namespaced project name (ex. author-projectname) matching the expression /^[a-zA-Z0-9]+[-][a-z][a-z0-9_]*$/
 
-        Configure project name in <project_dir>/project.yaml
+        Configure project name in <project_dir>/bolt-project.yaml
         ERROR_STRING
       # If the project name is the same as one of the built-in modules raise a warning
       elsif Dir.children(Bolt::PAL::BOLTLIB_PATH).include?(name)
@@ -120,8 +120,15 @@ module Bolt
 
       %w[tasks plans].each do |conf|
         unless @data.fetch(conf, []).is_a?(Array)
-          raise Bolt::ValidationError, "'#{conf}' in project.yaml must be an array"
+          raise Bolt::ValidationError, "'#{conf}' in bolt-project.yaml must be an array"
         end
+      end
+    end
+
+    def check_deprecated_file
+      if (@path + 'project.yaml').file?
+        logger = Logging.logger[self]
+        logger.warn "Project configuration file 'project.yaml' is deprecated; use 'bolt-project.yaml' instead."
       end
     end
   end

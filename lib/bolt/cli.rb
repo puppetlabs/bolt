@@ -124,8 +124,9 @@ module Bolt
 
       Bolt::Logger.configure(config.log, config.color)
 
-      # Logger must be configured before checking path case, otherwise warnings will not display
+      # Logger must be configured before checking path case and project file, otherwise warnings will not display
       @config.check_path_case('modulepath', @config.modulepath)
+      @config.project.check_deprecated_file
 
       # Log the file paths for loaded config files
       config_loaded
