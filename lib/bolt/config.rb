@@ -66,7 +66,6 @@ module Bolt
 
     DEFAULT_OPTIONS = {
       "color" => true,
-      "concurrency" => 100,
       "compile-concurrency" => "Number of cores",
       "format" => "human",
       "hiera-config" => "Boltdir/hiera.yaml",
@@ -102,6 +101,8 @@ module Bolt
     DEFAULT_APPLY_SETTINGS = {
       "show_diff" => false
     }.freeze
+
+    DEFAULT_DEFAULT_CONCURRENCY = 100
 
     def self.default
       new(Bolt::Project.new('.'), {})
@@ -165,7 +166,7 @@ module Bolt
         'apply_settings'      => {},
         'color'               => true,
         'compile-concurrency' => Etc.nprocessors,
-        'concurrency'         => 100,
+        'concurrency'         => default_concurrency,
         'format'              => 'human',
         'log'                 => { 'console' => {} },
         'plugin_hooks'        => {},
@@ -182,6 +183,18 @@ module Bolt
       end
 
       override_data = normalize_overrides(overrides)
+
+      # If we need to lower concurrency and concurrency is not configured
+      ld_concurrency = loaded_data.map(&:keys).flatten.include?('concurrency')
+      if default_concurrency != DEFAULT_DEFAULT_CONCURRENCY &&
+         !ld_concurrency &&
+         !override_data.key?('concurrency')
+        concurrency_warning = { option: 'concurrency',
+                                msg: "Concurrency will default to #{default_concurrency} because ulimit "\
+                                "is low: #{Etc.sysconf(Etc::SC_OPEN_MAX)}. Set concurrency with "\
+                                "'--concurrency', or set your ulimit with 'ulimit -n <limit>'" }
+        @warnings << concurrency_warning
+      end
 
       @data = merge_config_layers(default_data, *loaded_data, override_data)
 
@@ -457,6 +470,14 @@ module Bolt
       path.chars.map do |l|
         l =~ /[A-Za-z]/ ? "[#{l.upcase}#{l.downcase}]" : l
       end.join
+    end
+
+    def default_concurrency
+      if Bolt::Util.windows? || Etc.sysconf(Etc::SC_OPEN_MAX) >= 300 || Etc.sysconf(Etc::SC_OPEN_MAX).nil?
+        DEFAULT_DEFAULT_CONCURRENCY
+      else
+        (Etc.sysconf(Etc::SC_OPEN_MAX) / 3).floor
+      end
     end
   end
 end

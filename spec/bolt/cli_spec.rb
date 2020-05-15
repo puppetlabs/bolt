@@ -455,10 +455,30 @@ describe "Bolt::CLI" do
         expect(cli.parse).to include(concurrency: 10)
       end
 
-      it "defaults to 100" do
+      it "defaults to 100 with sufficient ulimit" do
         cli = Bolt::CLI.new(%w[command run uptime --targets foo])
         cli.parse
         expect(cli.config.concurrency).to eq(100)
+      end
+
+      context "with low ulimit", :ssh do
+        before :each do
+          allow(Etc).to receive(:sysconf).with(Etc::SC_OPEN_MAX).and_return(256)
+        end
+
+        it "lowers default concurrency" do
+          cli = Bolt::CLI.new(%w[command run uptime --targets foo])
+          cli.parse
+          expect(cli.config.concurrency).to eq(85)
+          expect(@log_output.readlines).to include(/Concurrency will default to 85 because ulimit is low/)
+        end
+
+        it "does not warn if concurrency is configured with low ulimit" do
+          cli = Bolt::CLI.new(%w[command run uptime --concurrency 10 --targets foo])
+          cli.parse
+          expect(cli.config.concurrency).to eq(10)
+          expect(@log_output.readlines).not_to include(/Concurrency will default/)
+        end
       end
 
       it "generates an error message if no concurrency value is given" do
