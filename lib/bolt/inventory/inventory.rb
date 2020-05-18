@@ -319,6 +319,10 @@ module Bolt
       def target_config(target)
         @targets[target.name].config
       end
+
+      def resources(target)
+        @targets[target.name].resources
+      end
     end
   end
 end

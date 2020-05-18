@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
+require 'bolt/resource_instance'
+
 module Bolt
   class Inventory
     # This class represents the active state of a target within the inventory.
     class Target
-      attr_reader :name, :uri, :safe_name, :target_alias
+      attr_reader :name, :uri, :safe_name, :target_alias, :resources
 
       def initialize(target_data, inventory)
         unless target_data['name'] || target_data['uri']
@@ -36,11 +38,25 @@ module Bolt
         # When alias is specified in a plan, the key will be `target_alias`, when
         # alias is specified in inventory the key will be `alias`.
         @target_alias = target_data['target_alias'] || target_data['alias'] || []
+        @resources = {}
 
         @inventory = inventory
 
         validate
       end
+
+      # rubocop:disable Naming/AccessorMethodName
+      def set_resource(resource)
+        if (existing_resource = resources[resource.reference])
+          existing_resource.overwrite_state(resource.state)
+          existing_resource.overwrite_desired_state(resource.desired_state)
+          existing_resource.events = existing_resource.events + resource.events
+          existing_resource
+        else
+          @resources[resource.reference] = resource
+        end
+      end
+      # rubocop:enable Naming/AccessorMethodName
 
       def vars
         group_cache['vars'].merge(@vars)

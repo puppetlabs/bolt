@@ -3,7 +3,7 @@
 module Bolt
   class ApplyTarget
     ATTRIBUTES = %i[uri name target_alias config vars facts features
-                    plugin_hooks safe_name].freeze
+                    plugin_hooks resources safe_name].freeze
     COMPUTED = %i[host password port protocol user].freeze
 
     attr_reader(*ATTRIBUTES)
@@ -24,7 +24,8 @@ module Bolt
                                 facts = nil,
                                 vars = nil,
                                 features = nil,
-                                plugin_hooks = nil)
+                                plugin_hooks = nil,
+                                resources = nil)
       raise Bolt::Error.new("Target objects cannot be instantiated inside apply blocks", 'bolt/apply-error')
     end
     # rubocop:enable Lint/UnusedMethodArgument

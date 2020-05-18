@@ -31,7 +31,8 @@ module Bolt
                                 facts = nil,
                                 vars = nil,
                                 features = nil,
-                                plugin_hooks = nil)
+                                plugin_hooks = nil,
+                                resources = nil)
       from_asserted_hash('uri' => uri)
     end
     # rubocop:enable Lint/UnusedMethodArgument
@@ -74,6 +75,16 @@ module Bolt
     def target_alias
       inventory_target.target_alias
     end
+
+    def resources
+      inventory_target.resources
+    end
+
+    # rubocop:disable Naming/AccessorMethodName
+    def set_resource(resource)
+      inventory_target.set_resource(resource)
+    end
+    # rubocop:enable Naming/AccessorMethodName
 
     def to_h
       options.to_h.merge(
