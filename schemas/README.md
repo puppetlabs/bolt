@@ -14,22 +14,19 @@ Bolt configuration files, including `bolt.yaml`, `inventory.yaml`, and
 
 ### Enabling schemas
 
-1. Download and save each of the JSON files in this directory.
+Open the [user or workspace settings file](https://code.visualstudio.com/docs/getstarted/settings) and add
+the following:
 
-1. Open the [user or workspace settings file](https://code.visualstudio.com/docs/getstarted/settings).
-
-1. Add the following content as a top-level key in the settings file:
-
-    ```json
-    "yaml.schemas": {
-      "<path to bolt-project.schema.json>": [
-        "bolt-project.yaml"
-      ],
-      "<path to bolt-config.schema.json>": [
-        "bolt.yaml"
-      ],
-      "<path to bolt-inventory.schema.json>": [
-        "inventory.yaml"
-      ]
-    }
-    ```
+```json
+"yaml.schemas": {
+  "https://forgeapi.puppet.com/schemas/bolt-project.json": [
+    "bolt-project.yaml"
+  ],
+  "https://forgeapi.puppet.com/schemas/bolt-config.json": [
+    "bolt.yaml"
+  ],
+  "https://forgeapi.puppet.com/schemas/bolt-inventory.json": [
+    "inventory.yaml"
+  ]
+}
+```
