@@ -19,7 +19,11 @@ RUN chown -R bolt:sudo /home/bolt
 # Add test user without authorized key and different login shell
 RUN useradd test && echo "test:test" | chpasswd && adduser test sudo
 RUN echo test | chsh -s /bin/bash test
-RUN mkdir -p /home/test/
+RUN mkdir -p /home/test/.ssh
+COPY fixtures/keys/id_rsa.pub /home/test/.ssh/id_rsa.pub
+COPY fixtures/keys/id_rsa.pub /home/test/.ssh/authorized_keys
+RUN chmod 700 /home/test/.ssh/
+RUN chmod 600 /home/test/.ssh/authorized_keys
 RUN chown -R test:sudo /home/test
 
 CMD ["/usr/sbin/sshd", "-D"]

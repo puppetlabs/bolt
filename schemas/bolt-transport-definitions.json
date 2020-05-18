@@ -49,8 +49,9 @@
     "description": "Configuration for the ssh transport.",
     "type": "object",
     "properties": {
-      "cleanup": { "$ref": "#/definitions/cleanup" },
-      "connect-timeout": { "$ref": "#/definitions/connect-timeout" },
+      "cleanup":            { "$ref": "#/definitions/cleanup" },
+      "connect-timeout":    { "$ref": "#/definitions/connect-timeout" },
+      "copy-command":       { "$ref": "#/definitions/copy-command" },
       "disconnect-timeout": { "$ref": "#/definitions/disconnect-timeout" },
       "host":               { "$ref": "#/definitions/host" },
       "host-key-check":     { "$ref": "#/definitions/host-key-check" },
@@ -65,6 +66,7 @@
       "run-as":             { "$ref": "#/definitions/run-as" },
       "run-as-command":     { "$ref": "#/definitions/run-as-command" },
       "script-dir":         { "$ref": "#/definitions/script-dir" },
+      "ssh-command":        { "$ref": "#/definitions/ssh-command" },
       "sudo-executable":    { "$ref": "#/definitions/sudo-executable" },
       "sudo-password":      { "$ref": "#/definitions/sudo-password" },
       "tmpdir":             { "$ref": "#/definitions/tmpdir" },
@@ -109,6 +111,11 @@
       "type": "integer",
       "min": 1
     },
+    "copy-command": {
+      "description": "Array of command and flags to use when copying files using ssh-command. Bolt runs `<copy-command> <src> <dest>`.",
+      "type": ["array", "string"]
+    },
+
     "disconnect-timeout": {
       "description": "How long to wait in seconds before force-closing a connection.",
       "type": "integer",
@@ -230,6 +237,10 @@
       "description": "The port to establish a connection on when using the smb file protocol.",
       "type": "integer",
       "min": 0
+    },
+    "ssh-command": {
+      "description": "Array of command and flags to use when SSHing. This enables the external SSH transport which shells out to the specified command.",
+      "type": ["array", "string"]
     },
     "ssl": {
       "description": "Whether to use a secure https connection.",

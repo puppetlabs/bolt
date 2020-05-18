@@ -34,6 +34,12 @@ describe Bolt::Transport::SSH, ssh: true do
   let(:no_host_key_check) { { 'host-key-check' => false, user: user, password: password } }
   let(:no_user_config)    { { 'host-key-check' => false, password: password } }
   let(:no_load_config)    { { 'host-key-check' => false, password: password, 'load-config' => false } }
+  let(:ssh_exec)          {
+    { 'host-key-check' => false,
+      'user' => user,
+      'ssh-command' => 'ssh',
+      'private-key' => key }
+  }
 
   let(:ssh)               { Bolt::Transport::SSH.new }
   let(:task_input_size)   { 100000 }
@@ -61,6 +67,17 @@ describe Bolt::Transport::SSH, ssh: true do
 
   context 'with ssh' do
     let(:transport_config) { no_host_key_check }
+    let(:os_context)       { posix_context }
+    let(:transport)        { :ssh }
+
+    include BoltSpec::Transport
+
+    include_examples 'transport api'
+    include_examples 'with sudo'
+  end
+
+  context 'with external ssh' do
+    let(:transport_config) { ssh_exec }
     let(:os_context)       { posix_context }
     let(:transport)        { :ssh }
 
@@ -394,6 +411,204 @@ describe Bolt::Transport::SSH, ssh: true do
       with_tempfile_containing('dir', cmd, '.sh') do |script|
         result = ssh.run_script(target, script.path, nil)
         expect(result.value['stdout']).to eq("/tmp/123456\n")
+      end
+    end
+  end
+
+  context "with exec_connection" do
+    let(:exec_config) {
+      { 'ssh-command' => 'ssh',
+        'private-key' => key,
+        'sudo-password' => password,
+        'host-key-check' => false,
+        'user' => user,
+        'port' => port }
+    }
+    let(:transport_config) { exec_config }
+
+    it "executes a command on a host" do
+      expect(ssh.run_command(target, command).value['stdout']).to eq("/home/#{user}\n")
+    end
+
+    it "can upload a file to a host" do
+      contents = "kljhdfg"
+      remote_path = '/tmp/upload-test'
+      with_tempfile_containing('upload-test', contents) do |file|
+        expect(
+          ssh.upload(target, file.path, remote_path).value
+        ).to eq(
+          '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
+        )
+
+        expect(
+          ssh.run_command(target, "cat #{remote_path}").value['stdout']
+        ).to eq(contents)
+
+        ssh.run_command(target, "rm #{remote_path}")
+      end
+    end
+
+    it "can test whether the target is available" do
+      expect(ssh.connected?(target)).to eq(true)
+    end
+
+    it "returns false if the target is not available" do
+      expect(ssh.connected?(inventory.get_target('unknownfoo'))).to eq(false)
+    end
+
+    # Local transport doesn't have concept of 'user'
+    # so this test only applies to ssh
+    context "with sudo as non-root", sudo: true do
+      let(:transport_config) do
+        exec_config.merge('run-as' => user, 'sudo-password' => bash_password, 'user' => bash_user)
+      end
+
+      it 'runs as that user' do
+        expect(ssh.run_command(target, 'whoami')['stdout'].chomp).to eq(user)
+      end
+
+      it "can override run_as for command via an option" do
+        expect(ssh.run_command(target, 'whoami', run_as: 'root')['stdout']).to eq("root\n")
+      end
+
+      it "can override run_as for script via an option" do
+        contents = "#!/bin/sh\nwhoami"
+        with_tempfile_containing('script test', contents) do |file|
+          expect(ssh.run_script(target, file.path, [], run_as: 'root')['stdout']).to eq("root\n")
+        end
+      end
+
+      it "can override run_as for task via an option" do
+        contents = "#!/bin/sh\nwhoami"
+        with_task_containing('tasks_test', contents, 'environment') do |task|
+          expect(ssh.run_task(target, task, {}, run_as: 'root').message).to eq("root\n")
+        end
+      end
+
+      it "can override run_as for file upload via an option" do
+        contents = "upload file test as root content"
+        dest = '/tmp/root-file-upload-test'
+        with_tempfile_containing('tasks test upload as root', contents) do |file|
+          expect(ssh.upload(target, file.path, dest, run_as:  'root').message).to match(/Uploaded/)
+          expect(ssh.run_command(target, "cat #{dest}", run_as: 'root')['stdout']).to eq(contents)
+          expect(ssh.run_command(target, "stat -c %U #{dest}", run_as:  'root')['stdout'].chomp).to eq('root')
+          expect(ssh.run_command(target, "stat -c %G #{dest}", run_as:  'root')['stdout'].chomp).to eq('root')
+        end
+
+        ssh.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
+      end
+
+      it "runs from the run-as user's home directory" do
+        stdout = ssh.run_command(target, 'pwd; echo $HOME', run_as: 'root')['stdout']
+        pwd, homedir = stdout.lines.map(&:chomp)
+        expect(pwd).to match(/root/)
+        expect(homedir).to match(/root/)
+      end
+
+      it "runs a task that expects big data on stdin" do
+        with_task_containing('tasks_test', stdin_task, 'stdin') do |task|
+          result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
+          expect(result.value['data'].strip.size).to eq(task_input_size)
+        end
+      end
+
+      it "runs a task that expects big data in environment variable" do
+        with_task_containing('tasks_test', env_task, 'environment') do |task|
+          result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
+          expect(result.value['_output'].strip.size).to eq(task_input_size)
+        end
+      end
+    end
+
+    context "with sudo with task interpreter set", sudo: true do
+      let(:transport_config) { exec_config.merge('run-as' => 'root', 'interpreters' => { 'sh' => '/bin/sh' }) }
+
+      it "runs a task that expects big data on stdin" do
+        with_task_containing('tasks_test', stdin_task, 'stdin', '.sh') do |task|
+          result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
+          expect(result.value['data'].strip.size).to eq(task_input_size)
+        end
+      end
+
+      it "runs a task that expects big data in environment variable" do
+        with_task_containing('tasks_test', env_task, 'environment', '.sh') do |task|
+          result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
+          expect(result.value['_output'].strip.size).to eq(task_input_size)
+        end
+      end
+    end
+
+    context "requesting a pty", sudo: true do
+      let(:transport_config) { exec_config.merge('run-as' => 'root', 'tty' => true) }
+
+      it "can execute a command when a tty is requested" do
+        expect(ssh.run_command(target, 'whoami')['stdout'].strip).to eq('root')
+      end
+
+      it "runs a task that expects big data on stdin" do
+        with_task_containing('tasks_test', stdin_task, 'stdin') do |task|
+          result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
+          expect(result.value['data'].strip.size).to eq(task_input_size)
+        end
+      end
+
+      it "runs a task that expects big data in environment variable" do
+        with_task_containing('tasks_test', env_task, 'environment') do |task|
+          result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
+          expect(result.value['_output'].strip.size).to eq(task_input_size)
+        end
+      end
+    end
+
+    context "when requesting a pty with task interpreter set", sudo: true do
+      let(:transport_config) do
+        exec_config.merge({
+                            'run-as' => 'root',
+                            'tty' => true,
+                            'interpreters' => { 'sh' => '/bin/sh' }
+                          })
+      end
+
+      it "runs a task that expects big data on stdin" do
+        with_task_containing('tasks_test', stdin_task, 'stdin', '.sh') do |task|
+          result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
+          expect(result.value['data'].strip.size).to eq(task_input_size)
+        end
+      end
+
+      it "runs a task that expects big data in environment variable" do
+        with_task_containing('tasks_test', env_task, 'environment', '.sh') do |task|
+          result = ssh.run_task(target, task, { 'data' => big_task_input }, run_as: 'root')
+          expect(result.value['_output'].strip.size).to eq(task_input_size)
+        end
+      end
+    end
+
+    context 'when there is no host in the target' do
+      let(:target) { Bolt::Inventory::Target.new({ 'name' => 'hostless' }, inventory) }
+
+      it 'errors' do
+        expect { ssh.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
+      end
+    end
+
+    context "with specific tmpdir using script-dir option" do
+      let(:script_dir) { "123456" }
+      let(:transport_config) do
+        exec_config.merge({
+                            'run-as' => 'root',
+                            'sudo-password' => 'bolt',
+                            'script-dir' => script_dir,
+                            'interpreters' => { 'sh' => '/bin/sh' }
+                          })
+      end
+
+      it "uploads scripts to the specified directory" do
+        cmd = 'cd $( dirname $0) && pwd'
+        with_tempfile_containing('dir', cmd, '.sh') do |script|
+          result = ssh.run_script(target, script.path, nil)
+          expect(result.value['stdout']).to eq("/tmp/123456\n")
+        end
       end
     end
   end

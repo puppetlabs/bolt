@@ -11,7 +11,7 @@ module Bolt
                 escalation: %w[run-as sudo-password sudo-password-prompt sudo-executable],
                 run_context: %w[concurrency inventoryfile save-rerun cleanup],
                 global_config_setters: %w[modulepath boltdir configfile],
-                transports: %w[transport connect-timeout tty],
+                transports: %w[transport connect-timeout tty ssh-command copy-command],
                 display: %w[format color verbose trace],
                 global: %w[help version debug] }.freeze
 
@@ -741,6 +741,14 @@ module Bolt
       define('--transport TRANSPORT', TRANSPORTS.keys.map(&:to_s),
              "Specify a default transport: #{TRANSPORTS.keys.join(', ')}") do |t|
         @options[:transport] = t
+      end
+      define('--ssh-command EXEC', "Executable to use instead of the net-ssh ruby library. ",
+             "This option is experimental.") do |exec|
+        @options[:'ssh-command'] = exec
+      end
+      define('--copy-command EXEC', "Command to copy files to remote hosts if using external SSH. ",
+             "This option is experimental.") do |exec|
+        @options[:'copy-command'] = exec
       end
       define('--connect-timeout TIMEOUT', Integer, 'Connection timeout (defaults vary)') do |timeout|
         @options[:'connect-timeout'] = timeout

@@ -12,7 +12,7 @@ module Bolt
       def initialize
         @stdout = StringIO.new
         @stderr = StringIO.new
-        @exit_code = 'unkown'
+        @exit_code = 'unknown'
       end
     end
   end
