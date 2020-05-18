@@ -17,16 +17,6 @@
             <topicref href="using_plugins.md" format="markdown"/>
             <topicref href="writing_plugins.md" format="markdown"/>
         </topicref>
-        <topicref href="bolt_installing_modules.md" format="markdown">
-            <topicmeta>
-                <shortdesc>Tasks and plans are packaged in Puppet modules, so you can install them as you would any module and manage them with a Puppetfile.</shortdesc>
-            </topicmeta>
-        </topicref>
-        <topicref href="directory_structure.md" format="markdown">
-            <topicmeta>
-                <shortdesc>Puppet tasks, plans, functions, classes and types must exist inside a Puppet, module in order for Bolt to load them. Bolt loads modules by searching for module directories on the modulepath.</shortdesc>
-            </topicmeta>
-        </topicref>
     </topicref>
     <topicref href="running_bolt_commands.md" format="markdown" linking="targetonly"/>
     <topicref href="plans.md" format="markdown">
@@ -69,7 +59,11 @@
         </topicref>
     </topicref>
     
-    
+    <topichead navtitle="Modules">
+        <topicref href="bolt_installing_modules.md" format="markdown" />
+        <topicref href="module_structure.md" format="markdown" />
+    </topichead>
+
     <topicref href="bolt_examples.md" format="markdown"/>
     <topichead navtitle="Using Bolt with Puppet">
         <topicref href="bolt_configure_orchestrator.md" format="markdown"/>

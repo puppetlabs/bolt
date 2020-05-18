@@ -1,4 +1,4 @@
-# Directory structure
+# Module structure
 
 Puppet tasks, plans, functions, classes and types must exist inside a Puppet module in order for Bolt to load them. Bolt loads modules by searching for module directories on the modulepath.
 
