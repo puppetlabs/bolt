@@ -1,5 +1,72 @@
 # Changelog
 
+## Bolt 2.10.0 (2020-05-18)
+
+### New features
+
+* **Use plugins to set PuppetDB config**
+  ([#1771](https://github.com/puppetlabs/bolt/issues/1795))
+
+    Plugin references can now be used to set configuration options for
+    the PuppetDB client used by Bolt, in the `puppetdb` section of the
+    config.
+
+* **Packages for Ubuntu 20.04 now available**
+  ([#1782](https://github.com/puppetlabs/bolt/issues/1782))
+
+  Bolt packages are now available for Ubuntu 20.04.
+
+* **Added `ResourceInstance` data type**
+  ([#1781](https://github.com/puppetlabs/bolt/issues/1781))
+
+  The new `ResourceInstance` data type is available for use in plans and
+  can be used to store the observed state, desired state, and events for
+  a target's resource.
+
+* **Added `set_resources` plan function**
+  ([#1781](https://github.com/puppetlabs/bolt/issues/1781))
+
+  The `set_resources` plan function can be used to set
+  `ResourceInstance`s on a `Target`.
+
+* **Added `resources` function to `Target` data type**
+  ([#1781](https://github.com/puppetlabs/bolt/issues/1781))
+
+  `Target` objects have a new `resources` function that can be used to
+  return a map of `ResourceInstance`s for the target.
+
+* **Specify a local project directory with a `bolt-project.yaml` file**
+  ([#1816](https://github.com/puppetlabs/bolt/issues/1816))
+
+  Directories containing a `bolt-project.yaml` file are now considered
+  a [local project
+  directory](https://puppet.com/docs/bolt/latest/bolt_project_directories.html#local-project-directory).
+
+* **Allow users to shell out to SSH**
+  ([#1780](https://github.com/puppetlabs/bolt/issues/1780))
+
+  Users can now specify an SSH command, which Bolt will shell out to
+  when using the SSH transport. This allows users to run SSH as if it were
+  run locally without worrying about Ruby library feature support.
+
+### Bug fixes
+
+* **Expand filepaths passed on the CLI relative to the current working directory**
+  ([#1791](https://github.com/puppetlabs/bolt/pull/1791))
+
+  Config options `hiera-config` and `private-key` are now expanded relative
+  to the directory Bolt was run from when specified on the CLI, inline
+  with other CLI options.
+
+### Deprecations
+
+* **Project configuration file changed to `bolt-project.yaml`**
+  ([#1816](https://github.com/puppetlabs/bolt/issues/1816))
+
+  The project configuration file name `project.yaml` has been deprecated
+  in favor of a more-specific `bolt-project.yaml`. Bolt will no longer
+  load project configuration from a `project.yaml` file.
+
 ## Bolt 2.9.0 (2020-05-11)
 
 ### New features
