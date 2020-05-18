@@ -7,9 +7,6 @@ releases. While a feature is experimental, its API may change, requiring the use
 update their code or configuration. The Bolt team attempts to make these changes painless
 by providing useful warnings around breaking behavior where possible. 
 
-- [Bolt projects](#bolt-projects)
-- [`ResourceInstance` data type](#resourceinstance-data-type)
-
 ## Bolt projects
 
 This feature was introduced in [Bolt 
@@ -281,6 +278,7 @@ $results = $targets.get_resources([Package, User])
 $results.each |$result| {
   $result.target.set_resources($result['resources'])
 }
+```
 
 ## External SSH transport
 
