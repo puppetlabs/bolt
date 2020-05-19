@@ -10,11 +10,12 @@ For more usage examples, check out the [Puppet blog](https://puppet.com/search/?
 
 To show you how you can use Bolt to reuse your existing PowerShell scripts, this guide walks you through running a script with Bolt, and then converting the script to a Bolt task and running that.
 
-**Before you begin**
--   Ensure you’ve already [installed Bolt](bolt_installing.md#) on your Windows machine.
--   Identify a remote Windows target to work with.
--   Ensure you have Windows credentials for the target.
--   Ensure you have [configured Windows Remote Management](https://docs.microsoft.com/en-us/windows/desktop/winrm/installation-and-configuration-for-windows-remote-management) on the target.
+> **Before you begin**
+> 
+> -   Ensure you’ve already [installed Bolt](bolt_installing.md#) on your Windows machine.
+> -   Identify a remote Windows target to work with.
+> -   Ensure you have Windows credentials for the target.
+> -   Ensure you have [configured Windows Remote Management](https://docs.microsoft.com/en-us/windows/desktop/winrm/installation-and-configuration-for-windows-remote-management) on the target.
 
 The example script, called [restart_service.ps1](https://gist.github.com/RandomNoun7/03dfb910e5d93fefaae6e6c2da625c44#file-restart_service-ps1), performs common task of restarting a service on demand. The process involves these steps:
 
@@ -129,10 +130,12 @@ To convert the `restart_service.ps1` script to a task, giving you the ability to
 
 You can use Bolt with Chocolatey to deploy a package on a Windows node by writing a [Bolt plan](writing_plans.md) that installs Chocolatey and uses Puppet's Chocolatey package provider to install a package. This is all done using content from the [Puppet Forge](https://forge.puppet.com).
 
-**Before you begin** 
-
-- Install [Bolt](https://puppet.com/docs/bolt/latest/bolt_installing.html) and [Puppet Development Kit (PDK)](https://www.puppet.com/docs/pdk/1.x/pdk_install.html).
-- Ensure you have Powershell and Windows Remote Management (WinRM) access.
+> **Before you begin**
+>
+>- Install [Bolt](https://puppet.com/docs/bolt/latest/bolt_installing.html) and
+>  the [Puppet Development Kit
+>  (PDK)](https://www.puppet.com/docs/pdk/1.x/pdk_install.html).
+> - Ensure you have Powershell and Windows Remote Management (WinRM) access.
 
 In this example, you:
 

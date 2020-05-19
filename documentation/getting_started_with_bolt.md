@@ -17,14 +17,15 @@ After you've completed this guide, you'll know how to:
 - Write a Bolt plan that uses a script and a task, and uploads a file to your
   targets.
 
-Before you begin:
-- Make sure you've installed Bolt on your machine. For instructions on how to
-  install Bolt on your operating system, see
-  [Installing Bolt](./bolt_installing.md).
-- Make sure you've [installed Docker](https://docs.docker.com/get-docker/).
-  Bolt does not require Docker to run, but for the purposes of this guide,
-  Docker containers offer a safe and relatively simple way to set up some
-  targets to practice on.
+> **Before you begin**
+>
+> - Make sure you've installed Bolt on your machine. For instructions on how to
+>  install Bolt on your operating system, see
+>  [Installing Bolt](./bolt_installing.md).
+> - Make sure you've [installed Docker](https://docs.docker.com/get-docker/).
+>  Bolt does not require Docker to run, but for the purposes of this guide,
+>  Docker containers offer a safe and relatively simple way to set up some
+>  targets to practice on.
 
 ## Create a Bolt project and set up targets
 
