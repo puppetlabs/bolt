@@ -289,7 +289,7 @@ you've specified instead of using `net-ssh`. Essentially, using the external SSH
 same as running SSH on your command line, but with Bolt managing the connections.
 
 To use the external SSH transport, set `ssh-command: <SSH>` in [bolt.yaml](configuring_bolt.md),
-where <SSH> is the SSH command to run. For example:
+where `<SSH>` is the SSH command to run. For example:
 
 ```
 ssh:
