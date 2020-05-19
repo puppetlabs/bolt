@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'pathname'
+require 'etc'
 require 'bolt/pal'
 
 module Bolt
@@ -15,8 +16,16 @@ module Bolt
     attr_reader :path, :config_file, :inventory_file, :modulepath, :hiera_config,
                 :puppetfile, :rerunfile, :type, :resource_types
 
+    def self.home_dir
+      if Gem.win_platform?
+        Dir.home
+      else
+        Etc.getpwuid(Process.uid).dir
+      end
+    end
+
     def self.default_project
-      Project.new(File.join('~', '.puppetlabs', 'bolt'), 'user')
+      Project.new(File.join(home_dir, '.puppetlabs', 'bolt'), 'user')
     end
 
     # Search recursively up the directory hierarchy for the Project. Look for a
