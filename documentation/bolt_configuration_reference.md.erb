@@ -125,7 +125,7 @@ Transport configuration options can be set in both the configuration file and in
 | Option | Description | External SSH | Type | Default |
 | ------ | ----------- | :----------: | ---- | ------- |
 <% options.each do |option, data| -%>
-  | `<%= option %>` | <%= data[:desc] %> | <%= data[:external] == true ? '&#10004;' : '' %> | <%= data[:type] == TrueClass ? 'Boolean' : data[:type] %> | <%= @transports[:defaults][transport][option].to_s || "" %> |
+  | `<%= option %>` | <%= data[:desc] %> | <%= data[:external] == true ? 'Yes' : '' %> | <%= data[:type] == TrueClass ? 'Boolean' : data[:type] %> | <%= @transports[:defaults][transport][option].to_s || "" %> |
 <% end %>
 <% else %>
 | Option | Description | Type | Default |
