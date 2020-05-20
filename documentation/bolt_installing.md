@@ -311,7 +311,7 @@ To uninstall Bolt on Fedora use the following command:
 sudo dnf remove puppet-bolt
 ```
 
-## Install gems with Bolt packages
+## Install gems in Bolt's Ruby environment
 
 Bolt packages include their own copy of Ruby.
 

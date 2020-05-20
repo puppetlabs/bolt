@@ -1,14 +1,51 @@
-# Modules
+# Installing modules
 
-Tasks and plans are packaged in Puppet modules, so you can install them as you would any module and manage them with a Puppetfile. 
+To share the Bolt plans and tasks that you've created on the Forge, you can
+package them into Puppet modules. If you'd like to use a plan or task from a
+module that you found on the Forge, you can use Bolt to install the module.
+
+## Install a module
+
+> **Before you begin**
+> 
+> - In your Bolt project directory, create a file named `Puppetfile`. 
+> - Add any modules stored locally in `modules/` to the list. For
+>   example, 
+>   ```puppet
+>     mod 'my_awesome_module', local: true
+>   ```
+> 
+>   **Bolt deletes any content in `modules/` that is not listed in your
+>   Puppetfile.** If you
+>   want to keep the content, but you don't want to manage it with the Puppetfile,
+>   move the content to a `site-modules` directory in your project.
+
+To install a module:
+   1.  Open Puppetfile in a text editor and add the modules and versions that
+       you want to install. If the modules have dependencies, list those as
+       well. For example:
+       ```puppet
+       # Modules from the Puppet Forge.
+       mod 'puppetlabs-apache', '4.1.0'
+       mod 'puppetlabs-postgresql', '5.12.0'
+       mod 'puppetlabs-puppet_conf', '0.3.0'
+    
+       # Modules from a Git repository.
+       mod 'puppetlabs-haproxy', git: 'https://github.com/puppetlabs/puppetlabs-haproxy.git', ref: 'master'
+       ```   
+   2. Run the `bolt puppetfile install` command. Bolt installs modules to the first directory in the modulepath setting. By default, this is the `modules/` subdirectory inside the Bolt project directory. To override this location, update the modulepath setting in the [Bolt config file](bolt_configuration_reference.md).
 
 ## Packaged modules
 
 Bolt is packaged with a collection of useful modules to support common workflows.
 
-This list of packaged modules is available in a [Puppetfile](https://github.com/puppetlabs/bolt/blob/master/Puppetfile) in the Bolt repository. The modules and supporting documentation are publicly available on the [Puppet Forge](https://forge.puppet.com/).
+This list of packaged modules is available in a
+[Puppetfile](https://github.com/puppetlabs/bolt/blob/master/Puppetfile) in the
+Bolt repository. The modules and supporting documentation are publicly available
+on the [Puppet Forge](https://forge.puppet.com/).
 
-**Note:** If you installed Bolt as a Ruby Gem, make sure you have installed these core modules.
+**Note:** If you installed Bolt as a Ruby Gem, make sure you have installed
+these core modules.
 
 ### Modules with useful task and plan content
 
@@ -49,36 +86,10 @@ This list of packaged modules is available in a [Puppetfile](https://github.com/
 
 **Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
 
-**Related information**  
-
-[Puppetfile example](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)
-
-[Puppet Forge](https://forge.puppet.com/)
-
-[Bolt configuration options](bolt_configuration_reference.md)
-
-## Configure Bolt to download and install modules
-
-Before you can use Bolt to install modules, you must first create a Puppetfile. A Puppetfile is a formatted text file that contains a list of modules and their versions. It can include modules from the Forge or a Git repository.
-
-For modules that require Ruby Gems, see [Install Gems with Bolt packages](bolt_installing.md#)
-
-For more details about specifying modules in a Puppetfile, see the [Puppetfile documentation](https://puppet.com/docs/pe/latest/puppetfile.html).
-
-1.  Create a file named Puppetfile and store it in the [Bolt project directory](bolt_project_directories.md#).
-1.  Open the Puppetfile in a text editor and add the modules and versions that you want to install. If the modules have dependencies, list those as well.
-    ```
-    # Modules from the Puppet Forge.
-    mod 'puppetlabs-apache', '4.1.0'
-    mod 'puppetlabs-postgresql', '5.12.0'
-    mod 'puppetlabs-puppet_conf', '0.3.0'
-    
-    # Modules from a Git repository.
-    mod 'puppetlabs-haproxy', git: 'https://github.com/puppetlabs/puppetlabs-haproxy.git', ref: 'master'
-    ```
-1.  Add any task or plan modules stored locally in `modules/` to the list. If these modules are not listed in the Puppetfile, they are deleted.
-    ```
-    mod 'my_awesome_module', local: true
-    ```
-    Install any modules that you don't want to manage with the Puppetfile to a different subdirectory. Conventionally, `site-modules` is used for this purpose and is included on the default `modulepath`.
-1.  From a terminal, install the modules listed in the Puppetfile: `bolt puppetfile install`. Bolt installs modules to the first directory in the modulepath setting. By default, this is the `modules/` subdirectory inside the Bolt project directory. To override this location, update the modulepath setting in the Bolt config file.
+📖 **Related information**  
+- For modules that require Ruby Gems, see [Install Gems with Bolt packages](bolt_installing.md#install-gems-in-bolts-ruby-environment)
+- For more details about specifying modules in a Puppetfile, see the [Puppetfile documentation](https://puppet.com/docs/pe/latest/puppetfile.html).
+- For more information on structuring your Bolt project directory, see
+  [Bolt project directories](./bolt_project_directories.md).  
+- Search the [Puppet Forge](https://forge.puppet.com/) for plan and task content.
+- For an example of a Puppetfile, see the [Bolt Puppetfile](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)
