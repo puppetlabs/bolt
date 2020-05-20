@@ -9,7 +9,7 @@ module that you found on the Forge, you can use Bolt to install the module.
 > **Before you begin**
 > 
 > - In your Bolt project directory, create a file named `Puppetfile`. 
-> - Add any task or plan modules stored locally in `modules/` to the list. For
+> - Add any modules stored locally in `modules/` to the list. For
 >   example, 
 >   ```puppet
 >     mod 'my_awesome_module', local: true
@@ -87,7 +87,7 @@ these core modules.
 **Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
 
 📖 **Related information**  
-- For modules that require Ruby Gems, see [Install Gems with Bolt packages](bolt_installing.md#)
+- For modules that require Ruby Gems, see [Install Gems with Bolt packages](bolt_installing.md#install-gems-in-bolts-ruby-environment)
 - For more details about specifying modules in a Puppetfile, see the [Puppetfile documentation](https://puppet.com/docs/pe/latest/puppetfile.html).
 - For more information on structuring your Bolt project directory, see
   [Bolt project directories](./bolt_project_directories.md).  
