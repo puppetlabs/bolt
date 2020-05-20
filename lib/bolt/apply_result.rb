@@ -57,7 +57,7 @@ module Bolt
           msg = "Report result contains an '_output' key. Catalog application may have printed extraneous output to stdout: #{result['_output']}"
           # rubocop:enable Layout/LineLength
         else
-          msg = "Report did not contain all expected keys missing: #{missing_keys.join(' ,')}"
+          msg = "Report did not contain all expected keys missing: #{missing_keys.join(', ')}"
         end
 
         { 'msg' => msg,
