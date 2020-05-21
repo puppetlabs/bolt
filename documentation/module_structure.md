@@ -15,7 +15,7 @@ set, or the name of the directory if `name` is not set.
 
 A module is a sub-directory of one of the directories on the modulepath. In order for Bolt to load tasks and plans, they must exist in the `tasks/` or `plans/` directory of a module with the correct name.
 
-**Tip:** You can use the Puppet Development Kit (PDK) to create modules and add tasks to it.
+> 🔩 **Tip:** You can use the Puppet Development Kit (PDK) to create modules and add tasks to it.
 
 A typical module for use with Bolt may contain these directories:
 

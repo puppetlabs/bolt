@@ -4,9 +4,9 @@ Within a plan, you can use Bolt to apply blocks of Puppet code (manifest blocks)
 
 Similar to the `puppet apply` command, which applies a standalone Puppet manifest to a local system, the Bolt `apply` command uses manifest blocks to pass code to remote targets from the command line. You can create manifest blocks that use existing content from the Forge, or mix declarative resource configuration via manifest blocks with procedural orchestration and action in a plan. Most features of the Puppet language are available in a manifest block: classes, custom resource types, and functions. For information about what language features aren't supported, see [Manifest block limitations](applying_manifest_blocks.md#).
 
-**Tip:** If you installed Bolt as a Ruby Gem, make sure you have installed the core modules required to use the `puppet apply` command. These modules are listed in the [Bolt GitHub repository](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)and you can install them using a Puppetfile.
+> 🔩 **Tip:** If you installed Bolt as a Ruby Gem, make sure you have installed the core modules required to use the `puppet apply` command. These modules are listed in the [Bolt GitHub repository](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)and you can install them using a Puppetfile.
 
-**Related information**  
+📖 **Related information**  
 
 [Configure Bolt to download and install modules](bolt_installing_modules.md#)
 
@@ -81,7 +81,7 @@ Following the Hiera 5 convention, the default data dir is relative to `hiera.yam
 
 If a custom data provider is used (such as `hiera-eyaml`, which allows you to encrypt your data) the gem dependencies must be available to Bolt. See [Install gems with Bolt packages](bolt_installing.md#).
 
-**Related information**  
+📖 **Related information**  
 
 [Configuring Bolt](configuring_bolt.md)
 
@@ -106,7 +106,7 @@ In addition, the following top-level variables, which exist in normal catalog co
 
 You can optionally set these from a target's `vars`, but they don't have defaults in Bolt.
 
-**Related information**  
+📖 **Related information**  
 
 [puppetdb_query](plan_functions.md#)
 
@@ -166,9 +166,9 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
     ```
 1.  In a web browser, open `mytarget.mydomain`. The page displays the text `hello!`
 
-**Tip:** For complex web server deployments, consider adding the [puppet-nginx](https://forge.puppet.com/puppet/nginx) module.
+> 🔩 **Tip:** For complex web server deployments, consider adding the [puppet-nginx](https://forge.puppet.com/puppet/nginx) module.
 
-**Related information**  
+📖 **Related information**  
 
 [NGINX](https://www.nginx.com/resources/glossary/nginx/)
 
@@ -249,7 +249,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
     ```
 1.  In a web browser, open `mytarget.mydomain`. The page displays the text `hello!`
 
-**Related information**  
+📖 **Related information**
 
 [IIS](https://www.iis.net)
 

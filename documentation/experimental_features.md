@@ -36,9 +36,6 @@ and be presented with a list of only the content they need to see.
 Before your begin, make sure you've [updated Bolt to version 2.8.0 or
 higher](./bolt_installing.md).
 
-> **Remember:** This feature is experimental and is subject to possible breaking
-> changes between minor Bolt releases.
-
 To get started with a Bolt project:
 1. Create a Bolt project:
    - To create a fresh project directory, use the command `bolt project init
@@ -281,6 +278,9 @@ $results.each |$result| {
 ```
 
 ## External SSH transport
+
+This feature was introduced in [Bolt
+2.10.0](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md#bolt-2100-2020-05-18).
 
 Bolt's SSH transport uses the ruby library `net-ssh`, which is a pure ruby implementation of the
 SSH2 client protocol. While robust, the library lacks support for some features and algorithms that

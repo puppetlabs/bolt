@@ -77,16 +77,16 @@ these core modules.
 -   [canary](https://github.com/puppetlabs/bolt/tree/master/modules/canary): Run action against a small number of targets and only if it succeeds will it run on the rest.
 -   [puppetdb_fact](https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb_fact): Collect facts for the specified targets from the configured PuppetDB connection and stores the collected facts on the targets.
 
-**Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
+> 🔩 **Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
 
 ### Modules that contain helper code for writing your own tasks
 
 -   [ruby_task_helper](https://forge.puppet.com/puppetlabs/ruby_task_helper): A helper for writing tasks in Ruby.
 -   [python_task_helper](https://forge.puppet.com/puppetlabs/python_task_helper): A helper for writing tasks in Python.
 
-**Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
+> 🔩 **Tip:** To override a packaged module with another version, download the version you want and configure your modulepath to point to it.
 
-📖 **Related information**  
+📖 **Related information** 
 - For modules that require Ruby Gems, see [Install Gems with Bolt packages](bolt_installing.md#install-gems-in-bolts-ruby-environment)
 - For more details about specifying modules in a Puppetfile, see the [Puppetfile documentation](https://puppet.com/docs/pe/latest/puppetfile.html).
 - For more information on structuring your Bolt project directory, see
