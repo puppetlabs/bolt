@@ -67,6 +67,7 @@ module Bolt
     DEFAULT_OPTIONS = {
       "color" => true,
       "compile-concurrency" => "Number of cores",
+      "concurrency" => "100 or one-third of the ulimit, whichever is lower",
       "format" => "human",
       "hiera-config" => "Boltdir/hiera.yaml",
       "inventoryfile" => "Boltdir/inventory.yaml",
