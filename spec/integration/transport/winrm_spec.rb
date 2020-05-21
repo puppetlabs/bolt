@@ -157,6 +157,22 @@ describe Bolt::Transport::WinRM do
     end
   end
 
+  context "when execution fails", winrm: true do
+    let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
+
+    it "catches EMFILE error and raises helpful message" do
+      allow(Thread).to receive(:new)
+        .and_raise(Errno::EMFILE)
+
+      expect_node_error(
+        Bolt::Error, nil,
+        /Too many open files. This may be resolved by increasing your user limit with 'ulimit -n 1024'/
+      ) do
+        winrm.run_command(target, 'ls')
+      end
+    end
+  end
+
   context "connecting over SSL", winrm: true do
     # In order to run vagrant and docker targets simultaniously for local dev, use 4598{5,6} to avoid port conflict
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }

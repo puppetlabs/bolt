@@ -138,6 +138,27 @@ describe Bolt::Transport::SSH, ssh: true do
     end
   end
 
+  context "when execution fails" do
+    let(:transport_config) do
+      {
+        'host-key-check' => false,
+        'private-key'    => key,
+        'user'           => user,
+        'port'           => port
+      }
+    end
+
+    it "catches EMFILE error and raises helpful message" do
+      allow(Thread).to receive(:new)
+        .and_raise(Errno::EMFILE)
+
+      expect_node_error(
+        Bolt::Error, nil,
+        /Too many open files. This may be resolved by increasing your user limit with 'ulimit -n 1024'/
+      ) { ssh.run_command(target, 'ls') }
+    end
+  end
+
   context "when executing with private key" do
     let(:transport_config) do
       {

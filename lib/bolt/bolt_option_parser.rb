@@ -689,7 +689,7 @@ module Bolt
 
       separator "\nRUN CONTEXT OPTIONS"
       define('-c', '--concurrency CONCURRENCY', Integer,
-             'Maximum number of simultaneous connections (default: 100)') do |concurrency|
+             'Maximum number of simultaneous connections') do |concurrency|
         @options[:concurrency] = concurrency
       end
       define('--compile-concurrency CONCURRENCY', Integer,

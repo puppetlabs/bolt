@@ -120,6 +120,10 @@ module Bolt
           end
 
           [inp, out_rd, err_rd, th]
+        rescue Errno::EMFILE => e
+          msg = "#{e.message}. This may be resolved by increasing your user limit "\
+            "with 'ulimit -n 1024'. See https://puppet.com/docs/bolt/latest/bolt_known_issues.html for details."
+          raise Bolt::Error.new(msg, 'bolt/too-many-files')
         rescue StandardError
           @logger.debug { "Command aborted" }
           raise

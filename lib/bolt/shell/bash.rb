@@ -353,9 +353,9 @@ module Bolt
         # Chunks of this size will be read in one iteration
         index = 0
         timeout = 0.1
+        result_output = Bolt::Node::Output.new
 
         inp, out, err, t = conn.execute(command_str)
-        result_output = Bolt::Node::Output.new
         read_streams = { out => String.new,
                          err => String.new }
         write_stream = in_buffer.empty? ? [] : [inp]

@@ -28,7 +28,10 @@ As a workaround, you can generate new keys with the ssh-keygen `-m PEM` flag. Fo
 
 ## Commands fail in remote Windows sessions
 
-Interactive tools fail when run in a remote PowerShell session. For example, using `--password` to prompt for a password when running Bolt triggers an error. As a workaround, consider putting the password in `bolt.yaml` or an inventory file, or passing the password on the command line. ([BOLT-1075](https://tickets.puppetlabs.com/browse/BOLT-1075))
+Interactive tools fail when run in a remote PowerShell session. For example, using
+`--password-prompt` to prompt for a password when running Bolt triggers an error. As a workaround,
+consider putting the password in `bolt.yaml` or an inventory file, or passing the password on the
+command line. ([BOLT-1075](https://tickets.puppetlabs.com/browse/BOLT-1075))
 
 ## Unable to authenticate with ed25519 keys over SSH transport on Windows
 
@@ -44,3 +47,23 @@ unsupported key type `ssh-ed25519'
 ## Limited Kerberos support
 
 Support for Kerberos over WinRM from a Linux host is currently experimental and requires the [MIT Kerberos library](https://web.mit.edu/Kerberos/www/krb5-latest/doc/admin/install_clients.html) to be installed. In the future, Bolt will support Kerberos when running on Windows ([BOLT-1323](https://tickets.puppet.com/browse/BOLT-1323)) and macOS ([BOLT-1471](https://tickets.puppet.com/browse/BOLT-1471)).
+
+## Errno::EMFILE Too many open files
+
+This error is raised when there are too many files open in Bolt's Ruby process. To see what
+your current limit is, run:
+
+```
+ulimit -n
+```
+
+To raise the limit, set the following in your shell configuration file (For example,
+`~/.bash_profile`):
+
+```
+ulimit -n 1024
+```
+
+You can also set Bolt's concurrency lower to have fewer file descriptors opened at once. The default
+is 100, and you can use `--concurrency` on the CLI, or set `concurrency: <CONCURRENCY>` in [Bolt
+config](configuring_bolt.md)
