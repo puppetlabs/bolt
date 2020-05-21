@@ -21,7 +21,7 @@ To run the main module task defined in `init`, refer to the task by the module n
 bolt task run package action=status name=vim --targets neptune --modulepath ~/modules
 ```
 
-**Tip:** Bolt ships with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](bolt_installing_modules.md).
+> 🔩 **Tip:** Bolt ships with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](bolt_installing_modules.md).
 
 
 ## Passing structured data
@@ -81,6 +81,6 @@ and run Bolt from the root of your Bolt project directory to test the task.
 > **Note:** The `bolt-project.yaml` file is part of an experimental feature. For
 > more information, see [Bolt projects](./experimental_features.md#bolt-projects).
 
-**Related Information**
+📖 **Related information**
 
 [Bolt project directories](#bolt_project_directories.md)

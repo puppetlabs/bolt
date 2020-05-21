@@ -130,7 +130,7 @@ Task metadata can accept most Puppet data types.
 
 **Caution:** Some types supported by Puppet can not be represented as JSON, such as `Hash[Integer, String]`, `Object`, or `Resource`. Do not use these in tasks, because they can never be matched.
 
-**Related information**  
+📖 **Related information**  
 
 For more information on Puppet data types, see [Data type syntax](https://puppet.com/docs/puppet/latest/lang_data_type.html)
 

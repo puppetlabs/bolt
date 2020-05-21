@@ -347,6 +347,6 @@ plugins:
 
 To verify that plugin references are resolved correctly and to view the targets and values loaded, use the command `bolt inventory show -t all --detail`.
 
-**Related information**
+📖 **Related information**
 
 - For more information on configuration options, see [Bolt configuration options](bolt_configuration_reference.md).

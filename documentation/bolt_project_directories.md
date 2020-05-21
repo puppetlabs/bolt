@@ -21,7 +21,7 @@ Bolt treats a directory containing a `bolt.yaml` or `bolt-project.yaml` file as 
 project directory.  Use this type of directory to track and share management code in
 a dedicated repository.
 
-> **Tip:** You can use an existing control repo as a Bolt project directory by adding
+> 🔩 **Tip:** You can use an existing control repo as a Bolt project directory by adding
   a `bolt.yaml` file to it and configuring the `modulepath` to match the `modulepath`
   in `environment.conf`.
 

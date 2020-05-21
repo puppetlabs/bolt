@@ -83,7 +83,7 @@ groups:
       - web7.mydomain.edu
 ```
 
-**Related information**  
+📖 **Related information**  
 
 [Inventory file](inventory_file_v2.md)
 
@@ -133,11 +133,11 @@ If the target runs Linux, you can use a username and a public/private key pair i
 bolt command run 'hostname' --targets <LINUX_TARGETS> --user <USER> --private_key <PATH_TO_PRIVATE_KEY>
 ```
 
-**Tip:** For more information on creating these keys, see [GitHub's clear tutorial](https://help.github.com/en/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
+> 🔩 **Tip:** For more information on creating these keys, see [GitHub's clear tutorial](https://help.github.com/en/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
 If the target runs Linux, you can use an SSH configuration file (typically at `~/.ssh/config`) to specify a default username and private key for the remote target.
 
-**Tip:** A good guide to using SSH config files is the [Simplify Your Life With an SSH Config File](https://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/) blogpost on the Nerdarati blog.
+> 🔩 **Tip:** A good guide to using SSH config files is the [Simplify Your Life With an SSH Config File](https://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/) blogpost on the Nerdarati blog.
 
 If the host target runs Linux, the target runs Windows, and your network uses Kerberos for authentication, you can specify a Kerberos realm in your `bolt.yaml` file. This file is introduced in the [Configuring Bolt](configuring_bolt.md) section below. The best source of information and examples for this advanced topic is the [Kerberos section](https://github.com/puppetlabs/bolt/blob/master/developer-docs/kerberos.md) of the Bolt developer documentation.
 
@@ -159,6 +159,6 @@ bolt task run server action=restart name=httpd --rerun success
 
 **Note:** When a plan does not return a `ResultSet` object, Bolt can't save information for reruns and `.rerun.json` is deleted.
 
-**Related information**  
+📖 **Related information**  
 
 [Project directories](bolt_project_directories.md#)
