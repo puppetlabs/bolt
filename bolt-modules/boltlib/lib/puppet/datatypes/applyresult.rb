@@ -17,5 +17,7 @@ Puppet::DataTypes.create_type('ApplyResult') do
 
   load_file('bolt/apply_result')
 
+  # Needed for Puppet to recognize Bolt::ApplyResult as a Puppet object when deserializing
+  Bolt::ApplyResult.include(Puppet::Pops::Types::PuppetObject)
   implementation_class Bolt::ApplyResult
 end

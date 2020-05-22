@@ -8,8 +8,6 @@ Puppet::DataTypes.create_type('Target') do
     target_implementation_class = Bolt::Target
   end
 
-  require 'bolt/target'
-
   interface <<-PUPPET
     attributes => {
       uri => { type => Optional[String[1]], kind => given_or_derived },
@@ -34,5 +32,7 @@ Puppet::DataTypes.create_type('Target') do
     }
   PUPPET
 
+  # Needed for Puppet to recognize targets as Puppet objects when deserializing
+  target_implementation_class.include(Puppet::Pops::Types::PuppetObject)
   implementation_class target_implementation_class
 end

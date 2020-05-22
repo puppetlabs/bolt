@@ -13,6 +13,7 @@ describe Bolt::Catalog do
   let(:target) { inventory.get_target(uri) }
   let(:inventory) { Bolt::Inventory.empty }
   let(:executor) { Bolt::Executor.new }
+  let(:boltlib) { Bolt::PAL::BOLTLIB_PATH }
   let(:pdb_config) do
     Bolt::PuppetDB::Config.new('server_urls' => 'https://localhost:8081',
                                'cacert' => '/path/to/cacert',
@@ -53,25 +54,58 @@ describe Bolt::Catalog do
           'domain' => nil
         }
       },
-      'inventory' => {
-        'data' => {},
-        'target_hash' => {
-          'target_vars' => {},
-          'target_facts' => {},
-          'target_features' => {}
-        },
-        'config' => {
-          'transport' => "ssh",
-          'transports' => {
-            'ssh' => { 'connect-timeout' => 10, tty: false, "host-key-check" => true },
-            'winrm' => { 'connect-timeout' => 10, tty: false, ssl: true, "ssl-verify" => true },
-            'pcp' => { 'connect-timeout' => 10,
-                       'tty' => false,
-                       'task-environment' => 'production' },
-            'local' => { 'connect-timeout' => 10, tty: false }
-          }
+      'config' => {
+        'transport' => "ssh",
+        'transports' => {
+          'ssh' => { 'connect-timeout' => 10, tty: false, "host-key-check" => true },
+          'winrm' => { 'connect-timeout' => 10, tty: false, ssl: true, "ssl-verify" => true },
+          'pcp' => { 'connect-timeout' => 10,
+                     'tty' => false,
+                     'task-environment' => 'production' },
+          'local' => { 'connect-timeout' => 10, tty: false }
         }
       } }
+  end
+
+  let(:plan_vars) do
+    {
+      "t1" => [{
+        "__ptype" => "Target",
+        "uri" => "targeta.example.com",
+        "name" => "targetA",
+        "safe_name" => "targetA",
+        "target_alias" => [],
+        "config" => {
+          "ssh" => {
+            "host-key-check" => false,
+            "connect-timeout" => 100
+          }
+        },
+        "facts" => {},
+        "vars" => {},
+        "features" => [],
+        "plugin_hooks" => {},
+        "resources" => {}
+      }],
+      "t2" => [{
+        "__ptype" => "Target",
+        "uri" => "targetb.example.com",
+        "name" => "targetB",
+        "safe_name" => "targetB",
+        "target_alias" => [],
+        "config" => {
+          "ssh" => {
+            "__ptype" => "LocalRef",
+            "__pvalue" => "$['t1'][0]['config']['ssh']"
+          }
+        },
+        "facts" => {},
+        "vars" => {},
+        "features" => [],
+        "plugin_hooks" => {},
+        "resources" => {}
+      }]
+    }
   end
 
   it 'instantiates' do
@@ -95,6 +129,15 @@ describe Bolt::Catalog do
       expect(result['environment']).to eq('bolt_catalog')
       expect(result['resources'].map { |r| r['type'] }).to include('Notify')
       expect(result['resources'].count).to eq(4)
+    end
+
+    it 'resolves local references when deserializing Puppet types' do
+      request.merge!(
+        'code_ast'   => catalog.generate_ast(notify),
+        'modulepath' => [boltlib],
+        'plan_vars'  => plan_vars
+      )
+      expect { catalog.compile_catalog(request) }.not_to raise_error
     end
   end
 end

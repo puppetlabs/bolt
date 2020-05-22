@@ -16,6 +16,12 @@ require 'ruby_smb'
 ENV['RACK_ENV'] = 'test'
 $LOAD_PATH.unshift File.join(__dir__, 'lib')
 
+# Disables internationalized strings, which shouldn't be needed for tests.
+# This gets around an issue where Puppet::Environment and GettextSetup in
+# r10k are fighting over the same text domain within the FastGettext domain.
+# https://github.com/voxpupuli/ra10ke/issues/39
+Puppet[:disable_i18n] = true
+
 RSpec.shared_context 'reset puppet settings' do
   after :each do
     # reset puppet settings so that they can be initialized again
