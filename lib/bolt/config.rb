@@ -115,7 +115,7 @@ module Bolt
         data: Bolt::Util.read_optional_yaml_hash(project.config_file, 'config')
       }
 
-      data = load_defaults.push(data).select { |config| config[:data]&.any? }
+      data = load_defaults(project).push(data).select { |config| config[:data]&.any? }
 
       new(project, data, overrides)
     end
@@ -127,27 +127,29 @@ module Bolt
         filepath: project.config_file,
         data: Bolt::Util.read_yaml_hash(configfile, 'config')
       }
-      data = load_defaults.push(data).select { |config| config[:data]&.any? }
+      data = load_defaults(project).push(data).select { |config| config[:data]&.any? }
 
       new(project, data, overrides)
     end
 
-    def self.load_defaults
+    def self.load_defaults(project)
       # Lazy-load expensive gem code
       require 'win32/dir' if Bolt::Util.windows?
 
-      system_path = if Bolt::Util.windows?
-                      Pathname.new(File.join(Dir::COMMON_APPDATA, 'PuppetLabs', 'bolt', 'etc', 'bolt.yaml'))
-                    else
-                      Pathname.new(File.join('/etc', 'puppetlabs', 'bolt', 'bolt.yaml'))
-                    end
+      # Don't load /etc/puppetlabs/bolt/bolt.yaml twice
+      confs = if project.path == Bolt::Project.system_path
+                []
+              else
+                system_path = Pathname.new(File.join(Bolt::Project.system_path, 'bolt.yaml'))
+                [{ filepath: system_path, data: Bolt::Util.read_optional_yaml_hash(system_path, 'config') }]
+              end
+
       user_path = begin
                     Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')))
                   rescue ArgumentError
                     nil
                   end
 
-      confs = [{ filepath: system_path, data: Bolt::Util.read_optional_yaml_hash(system_path, 'config') }]
       confs << { filepath: user_path, data: Bolt::Util.read_optional_yaml_hash(user_path, 'config') } if user_path
       confs
     end
