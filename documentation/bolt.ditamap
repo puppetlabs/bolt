@@ -39,7 +39,6 @@
             <topicmeta>
                 <shortdesc>Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.</shortdesc>
             </topicmeta>
-            <topicref href="applying_manifest_blocks.md" format="markdown"/>
         </topicref>       
     </topicref>    
     <topicref href="tasks.md" format="markdown">
@@ -58,7 +57,8 @@
             </topicmeta>
         </topicref>
     </topicref>
-    
+    <topicref href="applying_manifest_blocks.md" format="markdown"/>
+
     <topichead navtitle="Modules">
         <topicref href="bolt_installing_modules.md" format="markdown" />
         <topicref href="module_structure.md" format="markdown" />
