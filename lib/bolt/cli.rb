@@ -537,6 +537,17 @@ module Bolt
       Puppet[:tasks] = false
       ast = pal.parse_manifest(code, filename)
 
+      if defined?(ast.body) &&
+         (ast.body.is_a?(Puppet::Pops::Model::HostClassDefinition) ||
+         ast.body.is_a?(Puppet::Pops::Model::ResourceTypeDefinition))
+        message = "Manifest only contains definitions and will result in no changes on the targets. "\
+                  "Definitions must be declared for their resources to be applied. You can read more "\
+                  "about defining and declaring classes and types in the Puppet documentation at "\
+                  "https://puppet.com/docs/puppet/latest/lang_classes.html and "\
+                  "https://puppet.com/docs/puppet/latest/lang_defined_types.html"
+        @logger.warn(message)
+      end
+
       executor = Bolt::Executor.new(config.concurrency, analytics, noop)
       executor.subscribe(outputter) if options.fetch(:format, 'human') == 'human'
       executor.subscribe(log_outputter)
