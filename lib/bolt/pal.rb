@@ -190,6 +190,7 @@ module Bolt
           # versions of "core" types, which are already present on the agent,
           # but may cause issues on Puppet 5 agents.
           @original_modulepath,
+          @project,
           pdb_client,
           @hiera_config,
           @max_compiles,
