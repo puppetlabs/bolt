@@ -29,7 +29,7 @@ module Bolt
     def self.build_client
       logger = Logging.logger[self]
       begin
-        config_file = File.expand_path('~/.puppetlabs/bolt/analytics.yaml')
+        config_file = config_path(logger)
         config = load_config(config_file, logger)
       rescue ArgumentError
         config = { 'disabled' => true }
@@ -51,6 +51,25 @@ module Bolt
       NoopClient.new
     end
 
+    def self.config_path(logger)
+      path     = File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'analytics.yaml'))
+      old_path = File.expand_path(File.join('~', '.puppetlabs', 'bolt', 'analytics.yaml'))
+
+      if File.exist?(path)
+        if File.exist?(old_path)
+          message = "Detected analytics configuration files at '#{old_path}' and '#{path}'. Loading "\
+                    "analytics configuration from '#{path}'."
+          logger.warn(message)
+        end
+
+        path
+      elsif File.exist?(old_path)
+        old_path
+      else
+        path
+      end
+    end
+
     def self.load_config(filename, logger)
       if File.exist?(filename)
         YAML.load_file(filename)
@@ -59,7 +78,7 @@ module Bolt
           logger.warn <<~ANALYTICS
             Bolt collects data about how you use it. You can opt out of providing this data.
 
-            To disable analytics data collection, add this line to ~/.puppetlabs/bolt/analytics.yaml :
+            To disable analytics data collection, add this line to ~/.puppetlabs/etc/bolt/analytics.yaml :
               disabled: true
 
             Read more about what data Bolt collects and why here:

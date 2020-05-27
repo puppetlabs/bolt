@@ -53,6 +53,49 @@ describe Bolt::Analytics do
 
     expect(subject.build_client.user_id).to eq(uuid)
   end
+
+  context 'config file' do
+    let(:path)     { File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'analytics.yaml')) }
+    let(:old_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt', 'analytics.yaml')) }
+
+    it 'loads config from user-level config directory' do
+      allow(File).to receive(:exist?).with(path).and_return(true)
+      allow(File).to receive(:exist?).with(old_path).and_return(false)
+
+      expect(subject).to receive(:write_config).with(path, anything)
+
+      subject.build_client
+    end
+
+    it 'falls back to the default project directory' do
+      allow(File).to receive(:exist?).with(path).and_return(false)
+      allow(File).to receive(:exist?).with(old_path).and_return(true)
+
+      expect(subject).to receive(:write_config).with(old_path, anything)
+
+      subject.build_client
+    end
+
+    it 'writes new config to the user-level config directory' do
+      allow(File).to receive(:exist?).with(path).and_return(false)
+      allow(File).to receive(:exist?).with(old_path).and_return(false)
+
+      expect(subject).to receive(:write_config).with(path, anything)
+
+      subject.build_client
+    end
+
+    it 'warns when user-level config and defaul project config both exist' do
+      allow(File).to receive(:exist?).with(path).and_return(true)
+      allow(File).to receive(:exist?).with(old_path).and_return(true)
+
+      expect(subject).to receive(:write_config).with(path, anything)
+
+      subject.build_client
+
+      expect(@log_output.readlines).to include(/Detected analytics configuration files/)
+    end
+  end
 end
 
 describe Bolt::Analytics::Client do
