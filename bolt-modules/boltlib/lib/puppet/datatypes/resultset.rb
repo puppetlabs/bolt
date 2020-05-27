@@ -25,5 +25,7 @@ Puppet::DataTypes.create_type('ResultSet') do
 
   load_file('bolt/result_set')
 
+  # Needed for Puppet to recognize Bolt::ResultSet as a Puppet object when deserializing
+  Bolt::ResultSet.include(Puppet::Pops::Types::PuppetObject)
   implementation_class Bolt::ResultSet
 end
