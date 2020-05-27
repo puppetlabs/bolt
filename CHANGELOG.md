@@ -1,5 +1,37 @@
 # Changelog
 
+## Bolt 2.11.0 (2020-05-27)
+
+### New features
+
+* **Lower default concurrency when ulimit is low**
+  ([1789](https://github.com/puppetlabs/bolt/issues/1789))
+
+  Concurrency defaults to 1/3 the ulimit if ulimit is below 300, and
+  warns if lowered concurrency is used.
+
+* **Type aliases are available in apply blocks**
+  ([GH-1828](https://github.com/puppetlabs/bolt/pull/1828))
+
+  Users can now use type aliases defined on their modulepath inside
+  apply blocks.
+
+### Bug fixes
+
+* **Add Puppet data types to plugin tarball**
+  ([BOLT-1549](https://tickets.puppetlabs.com/browse/BOLT-1549))
+
+  Puppet types are now added to the plugin tarball when running an apply block.
+
+  _Contributed by [Bert Hajee](https://github.com/hajee)_
+
+* **Add `PuppetObject` interface to Bolt data types**
+  ([#1836](https://github.com/puppetlabs/bolt/issues/1836))
+
+  Bolt data types would sometimes not be deserialized correctly when
+  using `apply` blocks in plans. All Bolt data types now implement the
+  `PuppetObject` interface so they can be deserialized correctly.
+
 ## Bolt 2.10.0 (2020-05-18)
 
 ### New features
