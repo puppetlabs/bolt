@@ -115,7 +115,7 @@ module Bolt
                   Bolt::Config.from_file(options[:configfile], options)
                 else
                   project = if options[:boltdir]
-                              Bolt::Project.new(options[:boltdir])
+                              Bolt::Project.create_project(options[:boltdir])
                             else
                               Bolt::Project.find_boltdir(Dir.pwd)
                             end
@@ -771,7 +771,7 @@ module Bolt
     end
 
     def pal
-      project = config.project.load_as_module? ? config.project : nil
+      project = config.project.project_file? ? config.project : nil
       @pal ||= Bolt::PAL.new(config.modulepath,
                              config.hiera_config,
                              config.project.resource_types,

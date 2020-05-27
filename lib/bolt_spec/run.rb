@@ -144,7 +144,7 @@ module BoltSpec
       end
 
       def config
-        @config ||= Bolt::Config.new(Bolt::Project.new(@project_path), @config_data)
+        @config ||= Bolt::Config.new(Bolt::Project.create_project(@project_path), @config_data)
       end
 
       def inventory

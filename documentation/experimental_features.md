@@ -37,14 +37,10 @@ Before your begin, make sure you've [updated Bolt to version 2.8.0 or
 higher](./bolt_installing.md).
 
 To get started with a Bolt project:
-1. Create a Bolt project:
-   - To create a fresh project directory, use the command `bolt project init
-   <PROJECT_NAME>`
-   - To turn an existing directory into a Bolt project directory, run `Bolt
-     project init` from the root of the directory.   
-2. Create a `bolt-project.yaml` file in the root of your Bolt project directory.
-3. Develop your Bolt plans and tasks in `plans` and `tasks` directories
-   in the root of the project directory.
+1. Create a `bolt-project.yaml` file in the root of your Bolt project directory. This can be an
+   existing directory, or a new one you make.
+1. Develop your Bolt plans and tasks in `plans` and `tasks` directories
+   in the root of the project directory, next to `bolt-project.yaml`.
 
 If `bolt-project.yaml` exists at the root of a project directory, Bolt loads the
 project as a module. Bolt loads tasks and plans from the `tasks` and `plans`
@@ -53,7 +49,6 @@ directories and namespaces them to the project name.
 Here is an example of a project using a simplified directory structure:
 ```console
 .
-├── bolt.yaml
 ├── bolt-project.yaml
 ├── inventory.yaml
 ├── plans
@@ -62,7 +57,29 @@ Here is an example of a project using a simplified directory structure:
     └── mytask.yaml
 ```
 
-### Naming your project
+### Project configuration
+
+As of Bolt 2.13.0 `bolt-project.yaml` contains both project configuration and [Bolt
+configuration](bolt_configuration_reference.md), excluding [transport configuration
+options](bolt_configuration_reference.md#transport-configuration-options). If your project contains
+both `bolt.yaml` and `bolt-project.yaml` files and `bolt-project.yaml` contains valid bolt config
+data, `bolt.yaml` will be ignored and `bolt-project.yaml` will be preferred for loading Bolt
+configuration. If using `bolt-project.yaml`, set transport configuration in your [inventory.yaml
+file](inventory_file_v2.md).
+
+For example, this `bolt-project.yaml` configures logging and modulepath for Bolt:
+```yaml
+# bolt-project.yaml
+modulepath: ['modules','site-modules','/home/user/mymodules']
+
+log:
+  console:
+    level: notice
+  ~/.puppetlabs/bolt/debug.log
+    level: debug
+```
+
+#### Naming your project
 
 If you want to set a name for your project that is different from the name of
 the Bolt project directory, add a `name` key to `bolt-project.yaml` with the project
@@ -79,7 +96,7 @@ lowercase letter.
 
 > **Note:** Projects take precedence over installed modules of the same name.
 
-### Whitelisting plans and tasks
+#### Whitelisting plans and tasks
 
 To control what tasks and plans appear when your users run `bolt plan
 show` or `bolt task show`, add `tasks` and `plans`

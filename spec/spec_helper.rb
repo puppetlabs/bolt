@@ -62,9 +62,11 @@ RSpec.configure do |config|
     ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 
     # Ignore local bolt-project.yaml files
-    allow(Bolt::Project).to receive(:new).and_call_original
-    allow(Bolt::Project).to receive(:new).with('.')
-                                         .and_return(Bolt::Project.new(Dir.mktmpdir))
+    allow(Bolt::Project).to receive(:create_project)
+      .and_call_original
+    allow(Bolt::Project).to receive(:create_project)
+      .with('.')
+      .and_return(Bolt::Project.create_project(Dir.mktmpdir))
 
     # Ignore user's known hosts and ssh config files
     conf = { user_known_hosts_file: '/dev/null/', global_known_hosts_file: '/dev/null' }

@@ -20,7 +20,7 @@ describe Bolt::Transport::WinRM do
   include BoltSpec::Sensitive
   include BoltSpec::Task
 
-  let(:project)     { Bolt::Project.new('.') }
+  let(:project)     { Bolt::Project.new({}, '.') }
   let(:host)        { conn_info('winrm')[:host] }
   let(:port)        { conn_info('winrm')[:port] }
   let(:ssl_port)    { ENV['BOLT_WINRM_SSL_PORT'].to_i || 25986 }

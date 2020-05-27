@@ -12,14 +12,14 @@ module Bolt
       "tasks" => "An array of task names to whitelist. Whitelisted plans are included in `bolt task show` output"
     }.freeze
 
-    attr_reader :path, :config_file, :inventory_file, :modulepath, :hiera_config,
-                :puppetfile, :rerunfile, :type, :resource_types
+    attr_reader :path, :data, :config_file, :inventory_file, :modulepath, :hiera_config,
+                :puppetfile, :rerunfile, :type, :resource_types, :warnings, :project_file
 
     def self.default_project
-      Project.new(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
+      create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
     # If homedir isn't defined use the system config path
     rescue ArgumentError
-      Project.new(system_path, 'system')
+      create_project(system_path, 'system')
     end
 
     def self.system_path
@@ -37,9 +37,9 @@ module Bolt
     def self.find_boltdir(dir)
       dir = Pathname.new(dir)
       if (dir + BOLTDIR_NAME).directory?
-        new(dir + BOLTDIR_NAME, 'embedded')
+        create_project(dir + BOLTDIR_NAME, 'embedded')
       elsif (dir + 'bolt.yaml').file? || (dir + 'bolt-project.yaml').file?
-        new(dir, 'local')
+        create_project(dir, 'local')
       elsif dir.root?
         default_project
       else
@@ -47,9 +47,25 @@ module Bolt
       end
     end
 
-    def initialize(path, type = 'option')
+    def self.create_project(path, type = 'option')
+      fullpath = Pathname.new(path).expand_path
+      project_file = File.join(fullpath, 'bolt-project.yaml')
+      data = Bolt::Util.read_optional_yaml_hash(File.expand_path(project_file), 'project')
+      new(data, path, type)
+    end
+
+    def initialize(raw_data, path, type = 'option')
       @path = Pathname.new(path).expand_path
-      @config_file = @path + 'bolt.yaml'
+      @project_file = @path + 'bolt-project.yaml'
+
+      @warnings = []
+      if (@path + 'bolt.yaml').file? && project_file?
+        msg = "Project-level configuration in bolt.yaml is deprecated if using bolt-project.yaml. "\
+          "Transport config should be set in inventory.yaml, all other config should be set in "\
+          "bolt-project.yaml."
+        @warnings << { msg: msg }
+      end
+
       @inventory_file = @path + 'inventory.yaml'
       @modulepath = [(@path + 'modules').to_s, (@path + 'site-modules').to_s, (@path + 'site').to_s]
       @hiera_config = @path + 'hiera.yaml'
@@ -58,9 +74,26 @@ module Bolt
       @resource_types = @path + '.resource_types'
       @type = type
 
-      @project_file = @path + 'bolt-project.yaml'
-      @data = Bolt::Util.read_optional_yaml_hash(File.expand_path(@project_file), 'project') || {}
-      validate if load_as_module?
+      tc = Bolt::Config::CONFIG_IN_INVENTORY.keys & raw_data.keys
+      if tc.any?
+        msg = "Transport configuration isn't supported in bolt-project.yaml. Ignoring keys #{tc}"
+        @warnings << { msg: msg }
+      end
+
+      @data = raw_data.reject { |k, _| Bolt::Config::CONFIG_IN_INVENTORY.keys.include?(k) }
+
+      # Once bolt.yaml deprecation is removed, this attribute should be removed
+      # and replaced with .project_file in lib/bolt/config.rb
+      @config_file = if (Bolt::Config::OPTIONS.keys & @data.keys).any?
+                       if (@path + 'bolt.yaml').file?
+                         msg = "bolt-project.yaml contains valid config keys, bolt.yaml will be ignored"
+                         @warnings << { msg: msg }
+                       end
+                       @project_file
+                     else
+                       @path + 'bolt.yaml'
+                     end
+      validate if project_file?
     end
 
     def to_s
@@ -78,7 +111,7 @@ module Bolt
     end
     alias == eql?
 
-    def load_as_module?
+    def project_file?
       @project_file.file?
     end
 

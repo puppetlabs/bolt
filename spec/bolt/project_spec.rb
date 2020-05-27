@@ -19,32 +19,50 @@ describe Bolt::Project do
     let(:pwd) { @tmpdir }
     let(:config) { { 'tasks' => ['facts'] } }
 
-    before(:each) do
-      allow(Bolt::Util).to receive(:read_optional_yaml_hash)
-        .with(File.expand_path(@tmpdir + 'bolt-project.yaml'), 'project')
-        .and_return(config)
-    end
-
     around(:each) do |example|
       Dir.mktmpdir("foo") do |tmpdir|
         @tmpdir = Pathname.new(File.join(tmpdir, "validprojectname"))
         FileUtils.mkdir_p(@tmpdir)
-        FileUtils.touch(@tmpdir + 'bolt.yaml')
+        FileUtils.touch(@tmpdir + 'bolt-project.yaml')
         example.run
       end
     end
 
     it "loads config with defaults" do
-      project = Bolt::Project.new(pwd)
+      project = Bolt::Project.new(config, pwd)
       expect(project.tasks).to eq(config['tasks'])
       expect(project.plans).to eq(nil)
+    end
+
+    context 'with bolt config values' do
+      let(:config) {
+        {
+          'concurrency' => 20,
+          'transport' => 'ssh',
+          'ssh' => {
+            'user' => 'blueberry'
+          }
+        }
+      }
+
+      it 'loads config' do
+        project = Bolt::Project.new(config, pwd)
+        expect(project.data['concurrency']).to eq(20)
+      end
+
+      it "ignores transport config" do
+        project = Bolt::Project.new(config, pwd)
+        expect(project.data.key?('ssh')).to be false
+        expect(project.data.key?('transport')).to be false
+      end
     end
 
     describe "with invalid tasks config" do
       let(:config) { { 'tasks' => 'foo' } }
 
       it "raises an error" do
-        expect { Bolt::Project.new(pwd).validate }.to raise_error(/'tasks' in bolt-project.yaml must be an array/)
+        expect { Bolt::Project.new(config, pwd).validate }
+          .to raise_error(/'tasks' in bolt-project.yaml must be an array/)
       end
     end
 
@@ -52,7 +70,7 @@ describe Bolt::Project do
       let(:config) { { 'name' => '_invalid' } }
 
       it "raises an error" do
-        expect { Bolt::Project.new(pwd).validate }
+        expect { Bolt::Project.new(config, pwd).validate }
           .to raise_error(/Invalid project name '_invalid' in bolt-project.yaml/)
       end
     end
@@ -61,7 +79,7 @@ describe Bolt::Project do
       let(:config) { { 'name' => 'puppetlabs-foo' } }
 
       it "strips namespace and hyphen" do
-        project = Bolt::Project.new(pwd)
+        project = Bolt::Project.new(config, pwd)
         expect(project.name).to eq('foo')
       end
     end
@@ -69,7 +87,7 @@ describe Bolt::Project do
 
   describe "::find_boltdir" do
     let(:boltdir_path) { @tmpdir + 'foo' + 'Boltdir' }
-    let(:project) { Bolt::Project.new(boltdir_path) }
+    let(:project) { Bolt::Project.new({}, boltdir_path) }
 
     around(:each) do |example|
       Dir.mktmpdir do |tmpdir|
@@ -114,7 +132,7 @@ describe Bolt::Project do
       it 'uses the current directory if it has a bolt.yaml' do
         pwd = @tmpdir
         FileUtils.touch(pwd + 'bolt.yaml')
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(Bolt::Project.new(pwd))
+        expect(Bolt::Project.find_boltdir(pwd)).to eq(Bolt::Project.new({}, pwd))
       end
 
       it 'ignores non-project children with bolt.yaml' do

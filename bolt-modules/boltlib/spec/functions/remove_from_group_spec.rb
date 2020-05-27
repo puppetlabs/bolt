@@ -3,7 +3,7 @@
 describe 'remove_from_group' do
   include PuppetlabsSpec::Fixtures
   let(:executor)      { Bolt::Executor.new }
-  let(:config)        { Bolt::Config.new(Bolt::Project.new('.'), {}) }
+  let(:config)        { Bolt::Config.default }
   let(:pal)           { nil }
   let(:plugins)       { Bolt::Plugin.setup(config, pal) }
   let(:inventory)     { Bolt::Inventory.create_version(data, config.transport, config.transports, plugins) }

@@ -4,9 +4,16 @@ require 'spec_helper'
 require 'bolt/config'
 
 describe Bolt::Config do
-  let(:project) { Bolt::Project.new(File.join(Dir.tmpdir, rand(1000).to_s)) }
+  let(:project) { Bolt::Project.new({}, @tmpdir) }
   let(:system_path) { Pathname.new(File.join(Bolt::Project.system_path, 'bolt.yaml')) }
   let(:user_path) { Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml'))) }
+
+  around(:each) do |example|
+    Dir.mktmpdir("foo") do |tmpdir|
+      @tmpdir = Pathname.new(File.join(tmpdir, "validprojectname")).to_s
+      example.run
+    end
+  end
 
   describe "when initializing" do
     it "accepts string values for config data" do
@@ -65,6 +72,27 @@ describe Bolt::Config do
         Bolt::Config.from_project(project)
       end
     end
+
+    it 'prefers bolt-project.yaml to bolt.yaml with config' do
+      FileUtils.mkdir_p(@tmpdir)
+      File.write(File.join(@tmpdir, 'bolt.yaml'), { 'format' => 'json' }.to_yaml)
+      File.write(File.join(@tmpdir, 'bolt-project.yaml'), { 'format' => 'human' }.to_yaml)
+
+      config = Bolt::Config.from_project(Bolt::Project.create_project(@tmpdir))
+      expect(config.data['format']).to eq('human')
+      expect(config.project.config_file.to_s).to eq(File.join(@tmpdir, 'bolt-project.yaml'))
+    end
+
+    # This should be removed when bolt.yaml deprecation is removed
+    it 'prefers bolt.yaml to bolt-project.yaml with no config' do
+      FileUtils.mkdir_p(@tmpdir)
+      File.write(File.join(@tmpdir, 'bolt.yaml'), { 'format' => 'json' }.to_yaml)
+      File.write(File.join(@tmpdir, 'bolt-project.yaml'), { 'name' => 'human' }.to_yaml)
+
+      config = Bolt::Config.from_project(Bolt::Project.create_project(@tmpdir))
+      expect(config.data['format']).to eq('json')
+      expect(config.project.config_file.to_s).to eq(File.join(@tmpdir, 'bolt.yaml'))
+    end
   end
 
   describe "::from_file" do
@@ -75,7 +103,9 @@ describe Bolt::Config do
       expect(Bolt::Util).to receive(:read_yaml_hash).with(path, 'config')
       expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(system_path, 'config')
       expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(user_path, 'config')
-      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(proj_path, "project")
+      expect(Bolt::Util).to receive(:read_optional_yaml_hash)
+        .with(proj_path, "project")
+        .and_return({})
 
       Bolt::Config.from_file(path)
     end

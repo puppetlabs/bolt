@@ -5,7 +5,7 @@ require 'bolt/plugin'
 
 describe 'resolve_references' do
   include PuppetlabsSpec::Fixtures
-  let(:project)       { Bolt::Project.new('./spec/fixtures') }
+  let(:project)       { Bolt::Project.create_project('./spec/fixtures') }
   let(:config)        { Bolt::Config.new(project, {}) }
   let(:pal)           { Bolt::PAL.new(config.modulepath, config.hiera_config, config.project.resource_types) }
   let(:plugins)       { Bolt::Plugin.setup(config, pal) }

@@ -14,7 +14,7 @@ module BoltSpec
       empty = {
         'inventoryfile' => fixture_path('inventory', 'empty.yml')
       }
-      Bolt::Config.new(Bolt::Project.new('.'), empty.merge(overrides))
+      Bolt::Config.new(Bolt::Project.new({}, '.'), empty.merge(overrides))
     end
 
     def conn_config(overrides = {})
