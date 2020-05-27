@@ -5,13 +5,13 @@
 ### New features
 
 * **Lower default concurrency when ulimit is low**
-  ([1789](https://github.com/puppetlabs/bolt/issues/1789))
+  ([#1789](https://github.com/puppetlabs/bolt/issues/1789))
 
   Concurrency defaults to 1/3 the ulimit if ulimit is below 300, and
   warns if lowered concurrency is used.
 
 * **Type aliases are available in apply blocks**
-  ([GH-1828](https://github.com/puppetlabs/bolt/pull/1828))
+  ([#1828](https://github.com/puppetlabs/bolt/pull/1828))
 
   Users can now use type aliases defined on their modulepath inside
   apply blocks.
