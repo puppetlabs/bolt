@@ -126,6 +126,28 @@ Similarly, parameters are made available to the task as environment variables wh
 
 - [Task metadata types](writing_tasks.md#)
 
+### Sensitive parameters
+
+Use the `Sensitive` data type to mask parameters that should not be displayed in logs can be masked using the 
+`Sensitive` data type.
+
+When you pass a value to a `Sensitive` parameter, Bolt automatically masks the value before the plan is run.
+
+To access the unmasked value, call the `unwrap` function on the parameter.
+
+```
+plan sensitive_task(
+  Sensitive $password
+) {
+  $result = run_task('task_with_password', ..., 'password' => $password.unwrap)
+  return($result)
+}
+```
+
+Sensitive parameters are only masked if they use the un-parameterized or parameterized `Sensitive` type, such as
+`Sensitive` or `Sensitive[Hash]`. Other types, such as `Optional[Sensitive]` or `Hash[String, Sensitive]`, will
+not be automatically masked.
+
 ## Returning results from plans
 
 Use plans to return results that you can use in other plans or save for use outside of Bolt.

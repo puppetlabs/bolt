@@ -39,11 +39,11 @@ describe "CLI parses input" do
       "description" => nil,
       "module_dir" => File.absolute_path(File.join(__dir__, '..', 'fixtures', 'modules', 'parsing')),
       "parameters" => {
-        "string" => { "type" => "String" },
-        "string_bool" => { "type" => "Variant[String, Boolean]" },
-        "nodes" => { "type" => "TargetSpec" },
-        "array" => { "type" => "Optional[Array]", "default_value" => 'undef' },
-        "hash" => { "type" => "Optional[Hash]", "default_value" => 'undef' }
+        "string" => { "type" => "String", "sensitive" => false },
+        "string_bool" => { "type" => "Variant[String, Boolean]", "sensitive" => false },
+        "nodes" => { "type" => "TargetSpec", "sensitive" => false },
+        "array" => { "type" => "Optional[Array]", "default_value" => 'undef', "sensitive" => false },
+        "hash" => { "type" => "Optional[Hash]", "default_value" => 'undef', "sensitive" => false }
       }
     )
   end

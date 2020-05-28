@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'puppet_pal'
 require 'bolt/executor'
 require 'bolt/plugin'
+require 'puppet/pops/types/p_sensitive_type'
 
 describe 'run_plan' do
   include PuppetlabsSpec::Fixtures
@@ -141,6 +142,57 @@ describe 'run_plan' do
     it 'fails when using the second positional argument' do
       is_expected.to run.with_params('test::run_me_nodes_and_targets', 'target1')
                         .and_raise_error(ArgumentError)
+    end
+  end
+
+  context 'with Sensitive parameters' do
+    let(:sensitive) { Puppet::Pops::Types::PSensitiveType::Sensitive }
+    let(:string)    { '$up3r$ecr3t!' }
+    let(:array)     { [1, 2, 3] }
+    let(:hash)      { { 'k' => 'v' } }
+
+    it 'parameters are wrapped as Sensitive' do
+      input_params = {
+        'array'  => array,
+        'hash'   => hash,
+        'string' => string
+      }
+
+      expected_params = {
+        'array'  => sensitive.new(array),
+        'hash'   => sensitive.new(hash),
+        'string' => sensitive.new(string)
+      }
+
+      sensitive.expects(:new).with(input_params['array'])
+               .returns(expected_params['array'])
+      sensitive.expects(:new).with(input_params['hash'])
+               .returns(expected_params['hash'])
+      sensitive.expects(:new).with(input_params['string'])
+               .returns(expected_params['string'])
+
+      is_expected.to run.with_params('sensitive', input_params.merge('_bolt_api_call' => true))
+                        .and_return(input_params)
+    end
+
+    it 'parameters are not wrapped from non-API calls' do
+      sensitive.expects(:new).never
+
+      is_expected.to run.with_params('sensitive::no_api', 'string' => string)
+                        .and_raise_error(
+                          Puppet::ParseError,
+                          /parameter 'string' expects a Sensitive\[String\]/
+                        )
+    end
+
+    it 'complex parameters using Sensitive are not wrapped' do
+      sensitive.expects(:new).never
+
+      is_expected.to run.with_params('sensitive::complex', 'complex' => string)
+                        .and_raise_error(
+                          Puppet::ParseError,
+                          /parameter 'complex' expects a value of type Sensitive\[String\] or Array/
+                        )
     end
   end
 end
