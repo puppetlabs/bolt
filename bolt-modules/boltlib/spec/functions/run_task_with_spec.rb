@@ -149,6 +149,30 @@ describe 'run_task_with' do
         .with_lambda { |_| args })
     end
 
+    it 'uses the default if a parameter is specified as undef' do
+      executable = File.join(tasks_root, 'undef.sh')
+      args = {
+        'undef_default'    => nil,
+        'undef_no_default' => nil
+      }
+      expected_args = {
+        'undef_default'    => 'foo',
+        'undef_no_default' => nil
+      }
+      target_mapping = {
+        target  => expected_args,
+        target2 => expected_args
+      }
+
+      executor.expects(:run_task_with).with(target_mapping, mock_task(executable, 'environment'), {})
+              .returns(result_set)
+      inventory.expects(:get_targets).with(hosts).returns(targets)
+
+      is_expected.to(run
+        .with_params('test::undef', hosts)
+        .with_lambda { |_| args })
+    end
+
     it 'does not invoke Bolt when target list is empty' do
       executor.expects(:run_task).never
       inventory.expects(:get_targets).with([]).returns([])

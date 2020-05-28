@@ -128,6 +128,24 @@ describe 'run_task' do
       is_expected.to run.with_params('Test::Params', hostname, args)
     end
 
+    it 'uses the default if a parameter is specified as undef' do
+      executable = File.join(tasks_root, 'undef.sh')
+      args = {
+        'undef_default'    => nil,
+        'undef_no_default' => nil
+      }
+      expected_args = {
+        'undef_default'    => 'foo',
+        'undef_no_default' => nil
+      }
+
+      executor.expects(:run_task).with([target], mock_task(executable, 'environment'), expected_args, {})
+              .returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
+
+      is_expected.to run.with_params('test::undef', hostname, args).and_return(result_set)
+    end
+
     it 'when called with no destinations - does not invoke bolt' do
       executor.expects(:run_task).never
       inventory.expects(:get_targets).with([]).returns([])
@@ -333,8 +351,8 @@ describe 'run_task' do
 
     it 'errors when unknown parameters are specified' do
       task_params.merge!(
-        'foo' => nil,
-        'bar' => nil
+        'foo' => 'foo',
+        'bar' => 'bar'
       )
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(

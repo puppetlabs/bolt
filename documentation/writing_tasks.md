@@ -228,7 +228,9 @@ To define a parameter as sensitive within the JSON metadata, add the `"sensitive
 
 ### Setting default values
 
-You can set a default value for a parameter which will be used if the parameter isn't specified. The default value must be valid according to the parameter's `type`.
+You can set a default value for a parameter which will be used if the parameter isn't specified or if the
+parameter is specified and has a value of `Undef`. The default will be used even if the parameter
+type is optional. Default values must be valid according to the parameter's `type`.
 
 ```json
 {
