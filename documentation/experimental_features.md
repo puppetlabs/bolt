@@ -222,7 +222,7 @@ Each `ResourceInstance` has the following attributes:
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `type` | The target that the resource is for. | `Target` |
+| `target` | The target that the resource is for. | `Target` |
 | `type` | The [type of the resource](https://puppet.com/docs/puppet/latest/type.html). This can be either the stringified name of the resource type or the actual type itself. For example, both `"file"` and `File` are acceptable. | `Variant[String[1], Type[Resource]]` |
 | `title` | The title, or [namevar](https://puppet.com/docs/puppet/latest/type.html#namevars-and-titles), of the resource. | `String[1]` |
 | `state` | The _observed state_ of the resource. This is the point-in-time state of the resource when it is queried. | `Hash[String[1], Data]` |
