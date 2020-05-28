@@ -366,7 +366,8 @@ Bolt collects data to help us understand how it's being used and make decisions 
 
 ### How can I opt out of Bolt data collection?
 
-To disable the collection of analytics data add the following line to `~/.puppetlabs/bolt/analytics.yaml`:
+To disable the collection of analytics data add the following line to `~/.puppetlabs/etc/bolt/analytics.yaml`:
+
 ```yaml
 disabled: true
 ```
