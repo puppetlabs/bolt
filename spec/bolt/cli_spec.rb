@@ -238,7 +238,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/USAGE.*bolt apply <manifest.pp>/m).to_stdout
+          }.to output(/USAGE.*bolt apply \[manifest.pp\]/m).to_stdout
         end
       end
     end

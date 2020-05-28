@@ -20,7 +20,7 @@ module Bolt
     def get_help_text(subcommand, action = nil)
       case subcommand
       when 'apply'
-        { flags: ACTION_OPTS + %w[noop execute compile-concurrency],
+        { flags: ACTION_OPTS + %w[noop execute compile-concurrency hiera-config],
           banner: APPLY_HELP }
       when 'command'
         case action
@@ -172,13 +172,14 @@ module Bolt
           apply
 
       USAGE
-          bolt apply <manifest.pp> [options]
+          bolt apply [manifest.pp] [options]
 
       DESCRIPTION
           Apply Puppet manifest code on the specified targets.
 
       EXAMPLES
-          bolt apply manifest.pp --targets target1,target2
+          bolt apply manifest.pp -t target
+          bolt apply -e "file { '/etc/puppetlabs': ensure => present }" -t target
     HELP
 
     COMMAND_HELP = <<~HELP
