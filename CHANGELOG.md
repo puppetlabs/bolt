@@ -1,5 +1,15 @@
 # Changelog
 
+## Bolt 2.11.1 (2020-05-28)
+
+### Bug fixes
+
+* **Do not attempt to use `Etc::SC_OPEN_MAX` when it is not defined**
+  ([1858](https://github.com/puppetlabs/bolt/pull/1858))
+
+  When the `SC_OPEN_MAX` constant is not defined (for example when running under
+  JRuby) do not attempt to use it to determine default concurrency.
+
 ## Bolt 2.11.0 (2020-05-27)
 
 ### New features
