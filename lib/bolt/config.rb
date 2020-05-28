@@ -473,12 +473,18 @@ module Bolt
       end.join
     end
 
+    # Etc::SC_OPEN_MAX is meaningless on windows, not defined in PE Jruby and not available
+    # on some platforms. This method holds the logic to decide whether or not to even consider it.
+    def sc_open_max_available?
+      !Bolt::Util.windows? && defined?(Etc::SC_OPEN_MAX) && Etc.sysconf(Etc::SC_OPEN_MAX)
+    end
+
     def default_concurrency
-      if Bolt::Util.windows? || Etc.sysconf(Etc::SC_OPEN_MAX) >= 300 || Etc.sysconf(Etc::SC_OPEN_MAX).nil?
-        DEFAULT_DEFAULT_CONCURRENCY
-      else
-        (Etc.sysconf(Etc::SC_OPEN_MAX) / 3).floor
-      end
+      @default_concurrency ||= if !sc_open_max_available? || Etc.sysconf(Etc::SC_OPEN_MAX) >= 300
+                                 DEFAULT_DEFAULT_CONCURRENCY
+                               else
+                                 Etc.sysconf(Etc::SC_OPEN_MAX) / 3
+                               end
     end
   end
 end
