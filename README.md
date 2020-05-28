@@ -21,7 +21,7 @@ Get going with your existing scripts and plans, including YAML, PowerShell, Bash
 
 ### Get up and running with Bolt even faster
 
-Speed up your Bolt knowledge with a step-by-step introduction to basic Bolt functionality with a [hands-on lab](http://bolt.guide) and [self-paced training](https://puppet.com/learning-training/kits/intro-to-bolt).
+Speed up your Bolt knowledge with a step-by-step introduction to basic Bolt functionality with our [getting started guide](http://bolt.guide) and [self-paced training](https://puppet.com/learning-training/kits/intro-to-bolt).
 
 More information and documentation is available on the [Bolt website](https://puppet.com/docs/bolt/latest/bolt.html).
 
