@@ -25,8 +25,10 @@ module Bolt
     # hierarchy, falling back to the default if we reach the root.
     def self.find_boltdir(dir)
       dir = Pathname.new(dir)
-      if (dir + BOLTDIR_NAME).directory?
-        new(dir + BOLTDIR_NAME, 'embedded')
+      # allows for any case of Boltdir, BoltDir, boltdir, etc
+      boltdirs = dir.children.select { |c| c.directory? && c.basename.to_s.casecmp?(BOLTDIR_NAME)  }
+      if !boltdirs.empty?
+        new(boltdirs.first, 'embedded')
       elsif (dir + 'bolt.yaml').file? || (dir + 'bolt-project.yaml').file?
         new(dir, 'local')
       elsif dir.root?
@@ -73,7 +75,7 @@ module Bolt
 
     def name
       # If the project is in mymod/Boltdir/bolt-project.yaml, use mymod as the project name
-      dirname = @path.basename.to_s == 'Boltdir' ? @path.parent.basename.to_s : @path.basename.to_s
+      dirname = @path.basename.to_s.casecmp?('boltdir') ? @path.parent.basename.to_s : @path.basename.to_s
       pname = @data['name'] || dirname
       pname.include?('-') ? pname.split('-', 2)[1] : pname
     end
