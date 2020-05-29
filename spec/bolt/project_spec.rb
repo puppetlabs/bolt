@@ -68,67 +68,38 @@ describe Bolt::Project do
       end
     end
 
-    describe "when the project directory is named Boltdir" do
-      it 'finds project from inside project' do
-        pwd = boltdir_path
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
-      end
+    %w[Boltdir boltdir BoltDir bOlTdIr].each do |boltdir|
+      describe "when the project directory is named #{boltdir}" do
+        let(:boltdir_path) { @tmpdir + 'foo' + boltdir }
 
-      it 'finds project from the parent directory' do
-        pwd = boltdir_path.parent
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
-      end
+        it 'finds project from inside project' do
+          pwd = boltdir_path
+          expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+        end
 
-      it 'does not find project from the grandparent directory' do
-        pwd = boltdir_path.parent.parent
-        expect(Bolt::Project.find_boltdir(pwd)).not_to eq(project)
-      end
+        it 'finds project from the parent directory' do
+          pwd = boltdir_path.parent
+          expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+        end
 
-      it 'finds the project from a sibling directory' do
-        pwd = boltdir_path.parent + 'bar'
-        FileUtils.mkdir_p(pwd)
+        it 'does not find project from the grandparent directory' do
+          pwd = boltdir_path.parent.parent
+          expect(Bolt::Project.find_boltdir(pwd)).not_to eq(project)
+        end
 
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
-      end
+        it 'finds the project from a sibling directory' do
+          pwd = boltdir_path.parent + 'bar'
+          FileUtils.mkdir_p(pwd)
 
-      it 'finds the project from a child directory' do
-        pwd = boltdir_path + 'baz'
-        FileUtils.mkdir_p(pwd)
+          expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+        end
 
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
-      end
-    end
+        it 'finds the project from a child directory' do
+          pwd = boltdir_path + 'baz'
+          FileUtils.mkdir_p(pwd)
 
-    describe "when the project directory is named boltdir" do
-      let(:boltdir_path) { @tmpdir + 'foo' + 'boltdir' }
-      
-      it 'finds project from inside project' do
-        pwd = boltdir_path
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
-      end
-
-      it 'finds project from the parent directory' do
-        pwd = boltdir_path.parent
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
-      end
-
-      it 'does not find project from the grandparent directory' do
-        pwd = boltdir_path.parent.parent
-        expect(Bolt::Project.find_boltdir(pwd)).not_to eq(project)
-      end
-
-      it 'finds the project from a sibling directory' do
-        pwd = boltdir_path.parent + 'bar'
-        FileUtils.mkdir_p(pwd)
-
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
-      end
-
-      it 'finds the project from a child directory' do
-        pwd = boltdir_path + 'baz'
-        FileUtils.mkdir_p(pwd)
-
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+          expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+        end
       end
     end
 
