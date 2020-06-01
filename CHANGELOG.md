@@ -1,5 +1,47 @@
 # Changelog
 
+## Bolt 2.12.0 (2020-06-01)
+
+### New features
+
+* **Support `--hiera-config` option when using `bolt apply`**
+  ([#1839](https://github.com/puppetlabs/bolt/pull/1839))
+
+  The `--hiera-config` option can now be used with the `bolt apply`
+  command to specify the path to a Hiera configuration file.
+
+* **Warn when applying manifests that only contain definitions**
+  ([#1785](https://github.com/puppetlabs/bolt/issues/1785))
+
+  Applying a manifest that only contains definitions with the `bolt
+  apply` command will now display a warning that no changes will be
+  applied to the targets.
+
+* **Analytics configuration loaded from user-level config directory**
+  ([#1843](https://github.com/puppetlabs/bolt/issues/1843))
+
+  Analytics configuration is now written to and loaded from
+  `~/.puppetlabs/etc/bolt/analytics.yaml` by default. Bolt will fall
+  back to loading analytics config from
+  `~/.puppetlabs/bolt/analytics.yaml` when the file does not exist in
+  the user-level config directory.
+
+* **Use `Sensitive` plan parameters with `bolt plan run`**
+  ([#1790](https://github.com/puppetlabs/bolt/issues/1790))
+
+  Plans now support parameters with the `Sensitive` wrapper type when
+  run with the `bolt plan run` command. Parameters marked as `Sensitive`
+  will be automatically wrapped with the `Sensitive` wrapper type upon
+  plan startup.
+
+### Bug fixes
+
+* **Fall back to system-wide config path if homedir expansion fails**
+  ([#1829](https://github.com/puppetlabs/bolt/pull/1829))
+
+  Bolt now falls back to `/etc/puppetlabs/bolt` as the default project
+  directory if expanding the homedir fails.
+
 ## Bolt 2.11.1 (2020-05-28)
 
 ### Bug fixes
