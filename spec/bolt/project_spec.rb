@@ -4,6 +4,17 @@ require 'spec_helper'
 require 'bolt/project'
 
 describe Bolt::Project do
+  it "loads from system-wide config path if homedir expansion fails" do
+    allow(File).to receive(:expand_path).and_call_original
+    allow(File)
+      .to receive(:expand_path)
+      .with(File.join('~', '.puppetlabs', 'bolt'))
+      .and_raise(ArgumentError, "couldn't find login name -- expanding `~'")
+    project = Bolt::Project.default_project
+    # we have to call expand_path to ensure C:/ instead of C:\ on Windows
+    expect(project.path.to_s).to eq(File.expand_path(Bolt::Project.system_path))
+  end
+
   describe "configuration" do
     let(:pwd) { @tmpdir }
     let(:config) { { 'tasks' => ['facts'] } }

@@ -5,13 +5,7 @@ require 'bolt/config'
 
 describe Bolt::Config do
   let(:project) { Bolt::Project.new(File.join(Dir.tmpdir, rand(1000).to_s)) }
-  let(:system_path) {
-    if Bolt::Util.windows?
-      Pathname.new(File.join(Dir::COMMON_APPDATA, 'PuppetLabs', 'bolt', 'etc', 'bolt.yaml'))
-    else
-      Pathname.new(File.join('/etc', 'puppetlabs', 'bolt', 'bolt.yaml'))
-    end
-  }
+  let(:system_path) { Pathname.new(File.join(Bolt::Project.system_path, 'bolt.yaml')) }
   let(:user_path) { Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml'))) }
 
   describe "when initializing" do

@@ -16,7 +16,18 @@ module Bolt
                 :puppetfile, :rerunfile, :type, :resource_types
 
     def self.default_project
-      Project.new(File.join('~', '.puppetlabs', 'bolt'), 'user')
+      Project.new(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
+    # If homedir isn't defined use the system config path
+    rescue ArgumentError
+      Project.new(system_path, 'system')
+    end
+
+    def self.system_path
+      if Bolt::Util.windows?
+        File.join(Dir::COMMON_APPDATA, 'PuppetLabs', 'bolt', 'etc')
+      else
+        File.join('/etc', 'puppetlabs', 'bolt')
+      end
     end
 
     # Search recursively up the directory hierarchy for the Project. Look for a

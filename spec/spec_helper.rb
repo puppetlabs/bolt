@@ -61,7 +61,7 @@ RSpec.configure do |config|
     # Disable analytics while running tests
     ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 
-    # Ignore local project.yaml files
+    # Ignore local bolt-project.yaml files
     allow(Bolt::Project).to receive(:new).and_call_original
     allow(Bolt::Project).to receive(:new).with('.')
                                          .and_return(Bolt::Project.new(Dir.mktmpdir))
