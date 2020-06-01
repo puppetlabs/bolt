@@ -58,6 +58,8 @@ module Bolt
       target = request['target']
       pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
       options = request['puppet_config'] || {}
+      project = request['project'] || {}
+      bolt_project = Struct.new(:name, :path).new(project['name'], project['path']) unless project.empty?
       with_puppet_settings(request['hiera_config']) do
         Puppet[:rich_data] = true
         Puppet[:node_name_value] = target['name']
@@ -67,7 +69,8 @@ module Bolt
         Puppet::Pal.in_tmp_environment('bolt_catalog', env_conf) do |pal|
           inv = Bolt::ApplyInventory.new(request['config'])
           Puppet.override(bolt_pdb_client: pdb_client,
-                          bolt_inventory: inv) do
+                          bolt_inventory: inv,
+                          bolt_project: bolt_project) do
             Puppet.lookup(:pal_current_node).trusted_data = target['trusted']
             pal.with_catalog_compiler do |compiler|
               # Deserializing needs to happen inside the catalog compiler so

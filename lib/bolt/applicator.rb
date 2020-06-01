@@ -14,7 +14,8 @@ require 'open3'
 
 module Bolt
   class Applicator
-    def initialize(inventory, executor, modulepath, plugin_dirs, pdb_client, hiera_config, max_compiles, apply_settings)
+    def initialize(inventory, executor, modulepath, plugin_dirs, project,
+                   pdb_client, hiera_config, max_compiles, apply_settings)
       # lazy-load expensive gem code
       require 'concurrent'
 
@@ -22,6 +23,7 @@ module Bolt
       @executor = executor
       @modulepath = modulepath
       @plugin_dirs = plugin_dirs
+      @project = project
       @pdb_client = pdb_client
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
       @apply_settings = apply_settings || {}
@@ -188,6 +190,7 @@ module Bolt
       scope = {
         code_ast: ast,
         modulepath: @modulepath,
+        project: @project.to_h,
         pdb_config: @pdb_client.config.to_hash,
         hiera_config: @hiera_config,
         plan_vars: plan_vars,

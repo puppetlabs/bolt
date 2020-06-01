@@ -292,6 +292,16 @@ describe "passes parsed AST to the apply_catalog task" do
       end
     end
 
+    context 'when using project-level content' do
+      let(:project) { File.join(__dir__, '../fixtures/projects/named') }
+
+      it 'applies a class contained in a project-level manifest' do
+        result = run_cli_json(%W[plan run test_project::apply --boltdir #{project}] + config_flags)
+        notify = get_notifies(result)
+        expect(notify[0]['title']).to eq('project notify')
+      end
+    end
+
     context 'with inventoryfile stubbed' do
       let(:inventory) {
         {
