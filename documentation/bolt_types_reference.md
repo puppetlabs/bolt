@@ -97,6 +97,7 @@ The following functions are available to `ResultSet` objects:
 | `first` || `Variant[Result, ApplyResult]` | The first result in the set. Useful for unwrapping single results. |
 | `names` || `Array[String]` | The names of all targets that have results in the set. |
 | `ok` || `Boolean` | Whether all results were successful. Equivalent to `$result_set.error_set.empty`. |
+| `ok_set` || `ResultSet` | The set of successful results. |
 | `results` || `Array[Variant[Result, ApplyResult]]` | All results in the set. |
 | `targets` || `Array[Target]` | The list of targets that have results in the set. |
 | `to_data` || `Array[Hash` | An array of serialized representations of each result in the set. |
