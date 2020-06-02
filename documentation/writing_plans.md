@@ -1,79 +1,86 @@
-# Writing plans in Puppet language
+# Writing plans in the Puppet language
 
-Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
+Bolt plans allow you to tie together complex workflows that include multiple
+tasks, scripts, commands, and even other plans.
 
-Write plans in the Puppet language, giving them a `.pp` extension, and place them in the module's `/plans` directory.
+Plans written in the Puppet language allow for more sophisticated control flow
+and better error handling than YAML plans. Puppet plans also allow you to apply
+blocks of Puppet code to remote targets.
 
-Plans can use any combination of [Bolt functions](plan_functions.md#) or [built-in Puppet functions](https://puppet.com/docs/puppet/6.1/function.html).
+When you're writing a plan, you can use any combination of [Bolt 
+functions](plan_functions.md) or [built-in Puppet functions](https://puppet.com/docs/puppet/latest/function.html).
 
-**Related information**  
+> **Note:** For information on how to convert an existing YAML plan to a Puppet
+> plan, see [Converting YAML plans to Puppet language plans](writing_yaml_plans.md).
 
-- [Converting YAML plans to Puppet language plans](writing_yaml_plans.md#)
+## Plan location
+
+Bolt content follows the same directory structure as Puppet modules. Bolt
+loads plans located in the `site-modules/<MODULE_NAME>/plans` and
+`modules/<MODULE_NAME>/plans` directories. Put your Bolt plan in your module's
+`plans` directory and give it the `.pp` extension. For example, given a plan
+named `my_plan.pp` in a module named `my_module`, the location of the plan
+would be `site-modules/my_module/site`. If you're developing a new plan and
+want to test it, or you don't need to create a module, you can create a Bolt
+project directory and put the plan in a `plans` directory. Bolt projects are an
+experimental feature. For more information, see [Bolt
+projects](experimental_features.md#bolt-projects)
 
 ## Naming plans
 
-Plan names are based on the filename of the plan, the name of the module containing the plan, and the path to the plan within the module.
-
-Place plan files in your module's `./plans` directory, using these file extensions:
-
--   Puppet plans — `.pp`
--   YAML plans — `.yaml`, not `.yml`
+The first line of your plan contains the plan name. You use the plan name to
+call the plan from the Bolt command line, or from other plans.
 
 Plan names are composed of two or more name segments, indicating:
-
 -   The name of the module the plan is located in.
 -   The name of the plan file, without the extension.
 -   The path within the module, if the plan is in a subdirectory of `./plans`.
 
+For example, given a module called `mymodule` with a plan defined in
+`./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. The first
+line in `myplan.pp` would be:
 
-For example, given a module called `mymodule` with a plan defined in `./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. A plan defined in `./mymodule/plans/service/myplan.pp` would be `mymodule::service::myplan`. This name is how you refer to the plan when you run commands.
+```puppet
+plan mymodule::myplan
+```
 
-The plan filename `init` is special. You reference an `init` plan using the module name only. For example, in a module called `mymodule`, the plan defined in `init.pp` is the `mymodule` plan.
+Similarly, to call a plan defined in `./mymodule/plans/service/myplan.pp`, you
+would use the name, `mymodule::service::myplan`.
 
-Avoid giving plans the same names as constructs in the Puppet language. Although plans do not share their namespace with other language constructs, giving plans these names makes your code difficult to read.
+The plan filename `init` is special. You reference an `init` plan using the
+module name only. For example, in a module called `mymodule`, the plan defined
+in `mymodule/plans/init.pp` is the `mymodule` plan. For an example of an `init` plan, see the
+[facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp).
+
+Avoid giving plans the same names as constructs in the Puppet language.
+Although plans do not share their namespace with other language constructs,
+giving plans these names makes your code difficult to read.
 
 Each plan name segment must begin with a lowercase letter and:
-
 -   Can include lowercase letters.
 -   Can include digits.
 -   Can include underscores.
--   Must not be a [reserved word](https://docs.puppet.com/puppet/5.3/lang_reserved.html).
+-   Must not be a [reserved word](https://puppet.com/docs/puppet/latest/lang_reserved.html).
 -   Must not have the same name as any Puppet data types.
 -   Namespace segments must match the regular expression: `\A[a-z][a-z0-9_]*\Z`.
 
-
 ## Defining plan parameters
 
-You can specify parameters in your plan.
+After the plan's name, in parentheses, define any parameters that you want to pass into your plan
+as arguments. To define a parameter, use the syntax `<TYPE> <PARAMETER_NAME>`.
+For example, the following plan defines two parameters, `src` and `dest`,
+which are both strings:
 
-Specify each parameter in your plan with its data type. For example, you might want parameters to specify which targets to run different parts of your plan on.
-
-The following example shows target parameters specified as data type `TargetSpec`. `TargetSpec` accepts a URI string, a target object, or an array of URI strings and Target objects. Using `TargetSpec` allows you to pass, for each parameter, either a target object by name or a URI string. URI strings must include a hostname, and can also set the protocol, the username, the password, and the port to use using the format `protocol://user:password@hostname:port`.
-
-The plan then calls the `run_task` function, specifying which targets to run the tasks on. The target names are collected and stored in `$webserver_names` by iterating over the list of target objects returned by `get_targets`. Task parameters are serialized to JSON format; therefore, extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
-
-```
-plan mymodule::my_plan(
-  TargetSpec $load_balancer,
-  TargetSpec $webservers,
-) {
-
-  # Extract the Target name from $webservers
-  $webserver_names = get_targets($webservers).map |$n| { $n.name }
-  
-  # process webservers
-  run_task('mymodule::lb_remove', $load_balancer, webservers => $webserver_names)
-  run_task('mymodule::update_frontend_app', $webservers, version => '1.2.3')
-  run_task('mymodule::lb_add', $load_balancer, webservers => $webserver_names)
- }
+```puppet
+plan mymodule::myplan(
+  String $src,
+  String $dest
+)
+...  
 ```
 
-To execute this plan from the command line, pass the parameters as `<PARAMETER>=<VALUE>`. The `Targetspec` accepts either an array as JSON, or a comma separated string of target names.
-
-```
-bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com webservers='["kermit.myorg.com","gonzo.myorg.com"]'
-        
-```
+You can use the `TargetSpec` type to pass a target, or multiple targets, into a
+plan parameter. For more information, see [`TargetSpec`](#targetspec)
 
 Parameters that are passed to the `run_*` plan functions are serialized to JSON.
 
