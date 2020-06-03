@@ -124,7 +124,10 @@ Puppet::Functions.create_function(:run_task_with) do
       # If parameters are mismatched, create a failing result for the target that will later
       # be added to the ResultSet.
       unless pcp_only
-        params = task.parameter_defaults.merge(params)
+        # Set the default value for any params that have one and were not provided or are undef
+        params = task.parameter_defaults.merge(params) do |_, default, passed|
+          passed.nil? ? default : passed
+        end
 
         type_match = task_signature.runnable_with?(params) do |mismatch_message|
           exception = with_stack(:TYPE_MISMATCH, mismatch_message)
@@ -157,7 +160,10 @@ Puppet::Functions.create_function(:run_task_with) do
         end
       end
 
-      mapping[target] = task.parameter_defaults.merge(params)
+      # Set the default value for any params that have one and were not provided or are undef
+      mapping[target] = task.parameter_defaults.merge(params) do |_, default, passed|
+        passed.nil? ? default : passed
+      end
     end
 
     # Add a noop parameter if the function was called with the noop metaparameter.

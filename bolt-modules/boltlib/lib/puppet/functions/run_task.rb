@@ -88,8 +88,10 @@ Puppet::Functions.create_function(:run_task) do
 
       task = Bolt::Task.from_task_signature(task_signature)
 
-      # Set the default value for any params that have one and were not provided
-      params = task.parameter_defaults.merge(params)
+      # Set the default value for any params that have one and were not provided or are undef
+      params = task.parameter_defaults.merge(params) do |_, default, passed|
+        passed.nil? ? default : passed
+      end
 
       task_signature.runnable_with?(params) do |mismatch_message|
         raise with_stack(:TYPE_MISMATCH, mismatch_message)
