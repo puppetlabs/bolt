@@ -14,26 +14,61 @@ require 'bolt/error'
 #
 # > **Note:** Not available in apply block
 Puppet::Functions.create_function(:set_resources) do
-  # Set multiple resources
-  # @param target The `Target` object to add resources to. See {get_targets}.
-  # @param resources The resources to set on the target.
-  # @return The added `ResourceInstance` objects.
-  # @example Add multiple resources to a target with an array of `ResourceInstance` objects.
-  #   $resource1 = ResourceInstance.new(
+  # Set a single resource from a data hash.
+  # @param target The `Target` object to add a resource to. See {get_targets}.
+  # @param resource The resource data hash used to set a resource on the target.
+  # @return An array with the added `ResourceInstance` object.
+  # @example Add a resource to a target from a data hash.
+  #   $resource_hash = {
+  #     'type'  => File,
+  #     'title' => '/etc/puppetlabs',
+  #     'state' => { 'ensure' => 'present' }
+  #   }
+  #
+  #   $target.set_resources($resource_hash)
+  dispatch :set_single_resource_from_hash do
+    param 'Target', :target
+    param 'Hash', :resource
+    return_type 'Array[ResourceInstance]'
+  end
+
+  # Set a single resource from a `ResourceInstance` object
+  # @param target The `Target` object to add a resource to. See {get_targets}.
+  # @param resource The `ResourceInstance` object to set on the target.
+  # @return An array with the added `ResourceInstance` object.
+  # @example Add a resource to a target from a `ResourceInstance` object.
+  #   $resource_instance = ResourceInstance.new(
   #     'target' => $target,
-  #     'type'   => 'file',
+  #     'type'   => File,
   #     'title'  => '/etc/puppetlabs',
   #     'state'  => { 'ensure' => 'present' }
   #   )
-  #   $resource2 = ResourceInstance.new(
-  #     'target' => $target,
-  #     'type'   => 'package',
-  #     'title'  => 'openssl',
-  #     'state'  => { 'ensure' => 'installed' }
-  #   )
-  #   $target.set_resources([$resource1, $resource2])
+  #
+  #   $target.set_resources($resource_instance)
+  dispatch :set_single_resource_from_object do
+    param 'Target', :target
+    param 'ResourceInstance', :resource
+    return_type 'Array[ResourceInstance]'
+  end
+
+  # Set multiple resources from an array of data hashes and `ResourceInstance` objects.
+  # @param target The `Target` object to add resources to. See {get_targets}.
+  # @param resources The resource data hashes and `ResourceInstance` objects to set on the target.
+  # @return An array of the added `ResourceInstance` objects.
+  # @example Add resources from resource data hashes returned from an apply block.
+  #   $apply_results = apply($targets) {
+  #     File { '/etc/puppetlabs':
+  #       ensure => present
+  #     }
+  #     Package { 'openssl':
+  #       ensure => installed
+  #     }
+  #   }
+  #
+  #   $apply_results.each |$result| {
+  #     $result.target.set_resources($result.report['resource_statuses'].values)
+  #   }
   # @example Add resources retrieved with [`get_resources`](#get_resources) to a target.
-  #   $target.apply_prep
   #   $resources = $target.get_resources(Package).first['resources']
   #   $target.set_resources($resources)
   dispatch :set_resources do
@@ -42,21 +77,12 @@ Puppet::Functions.create_function(:set_resources) do
     return_type 'Array[ResourceInstance]'
   end
 
-  # Set a single resource
-  # @param target The `Target` object to add resources to. See {get_targets}.
-  # @param resource The resource to set on the target.
-  # @return The added `ResourceInstance` object.
-  # @example Add a single resource to a target with a resource data hash.
-  #   $resource = {
-  #     'type'  => 'file',
-  #     'title' => '/etc/puppetlabs',
-  #     'state' => { 'ensure' => 'present' }
-  #   }
-  #   $target.set_resources($resource)
-  dispatch :set_resource do
-    param 'Target', :target
-    param 'Variant[Hash, ResourceInstance]', :resource
-    return_type 'Array[ResourceInstance]'
+  def set_single_resource_from_hash(target, resource)
+    set_resources(target, [resource])
+  end
+
+  def set_single_resource_from_object(target, resource)
+    set_resources(target, [resource])
   end
 
   def set_resources(target, resources)
@@ -68,11 +94,8 @@ Puppet::Functions.create_function(:set_resources) do
         )
     end
 
+    Puppet.lookup(:bolt_executor).report_function_call(self.class.name)
     inventory = Puppet.lookup(:bolt_inventory)
-    executor  = Puppet.lookup(:bolt_executor)
-    executor.report_function_call(self.class.name)
-
-    inventory_target = inventory.get_target(target)
 
     resources.uniq.map do |resource|
       if resource.is_a?(Hash)
@@ -81,7 +104,7 @@ Puppet::Functions.create_function(:set_resources) do
         resource_target = if resource.key?('target')
                             inventory.get_target(resource['target'])
                           else
-                            inventory_target
+                            target
                           end
 
         # Observed state from get_resources() is under the 'parameters' key
@@ -108,18 +131,14 @@ Puppet::Functions.create_function(:set_resources) do
         resource = call_function('new', type, init_hash)
       end
 
-      unless resource.target == inventory_target
+      unless resource.target == target
         file, line = Puppet::Pops::PuppetStack.top_of_stack
         raise Bolt::ValidationError, "Cannot set resource #{resource.reference} for target "\
-                                     "#{resource.target} on target #{inventory_target}. "\
+                                     "#{resource.target} on target #{target}. "\
                                      "#{Puppet::Util::Errors.error_location(file, line)}"
       end
 
-      inventory_target.set_resource(resource)
+      target.set_resource(resource)
     end
-  end
-
-  def set_resource(target, resource)
-    set_resources(target, [resource])
   end
 end

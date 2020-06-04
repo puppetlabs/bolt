@@ -277,6 +277,24 @@ $results.each |$result| {
 }
 ```
 
+Apply blocks will also return results with reports. These reports have resource data
+hashes that can be used to set resources on a target:
+
+```ruby
+$apply_results = apply($targets) {
+  File { '/etc/puppetlabs':
+    ensure => present
+  }
+  Package { 'openssl':
+    ensure => installed
+  }
+}
+
+$apply_results.each |$result| {
+  $result.target.set_resources($result.report['resource_statuses'].values)
+}
+```
+
 ## External SSH transport
 
 This feature was introduced in [Bolt

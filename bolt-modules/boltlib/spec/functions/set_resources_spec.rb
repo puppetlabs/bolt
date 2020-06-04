@@ -65,6 +65,18 @@ describe 'set_resources' do
                       .and_return([resource, resource2])
   end
 
+  it 'accepts a resource_type key instead of type' do
+    resource_object = resource
+    resource_data['resource_type'] = resource_data.delete('type')
+    is_expected.to run.with_params(target, resource_data).and_return([resource_object])
+  end
+
+  it 'accepts a parameters key instead of state' do
+    resource_object = resource
+    resource_data['parameters'] = resource_data.delete('state')
+    is_expected.to run.with_params(target, resource_data).and_return([resource_object])
+  end
+
   it 'errors on unknown types' do
     is_expected.to run.with_params(mock('anything')).and_raise_error(ArgumentError)
   end
