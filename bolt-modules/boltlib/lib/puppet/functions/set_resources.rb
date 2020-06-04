@@ -87,9 +87,12 @@ Puppet::Functions.create_function(:set_resources) do
         # Observed state from get_resources() is under the 'parameters' key
         resource_state = resource['state'] || resource['parameters']
 
+        # Type from apply results is under the 'resource_type' key
+        resource_type = resource['type'] || resource['resource_type']
+
         init_hash = {
           'target'        => resource_target,
-          'type'          => resource['type'],
+          'type'          => resource_type,
           'title'         => resource['title'],
           'state'         => resource_state,
           'desired_state' => resource['desired_state'],

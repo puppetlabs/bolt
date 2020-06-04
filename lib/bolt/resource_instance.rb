@@ -30,8 +30,7 @@ module Bolt
       @target        = resource_hash['target']
       @type          = resource_hash['type'].to_s.capitalize
       @title         = resource_hash['title']
-      # get_resources() returns observed state under the 'parameters' key
-      @state         = resource_hash['state'] || resource_hash['parameters'] || {}
+      @state         = resource_hash['state'] || {}
       @desired_state = resource_hash['desired_state'] || {}
       @events        = resource_hash['events'] || []
     end
