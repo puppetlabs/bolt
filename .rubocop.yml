@@ -117,6 +117,9 @@ Lint/RaiseException:
 Lint/StructNewOverride:
   Enabled: true
 
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+
 # Enforce LF line endings, even when on Windows
 Layout/EndOfLine:
   EnforcedStyle: lf
