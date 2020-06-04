@@ -216,6 +216,18 @@ ResourceInstance.new(
 )
 ```
 
+### Accessing `ResourceInstance` object on a Target
+
+You can retrieve a specific `ResourceInstance` object stored on a Target in a plan using the `resource()`
+function:
+
+```
+$packages = $target.get_resources(Package).first['resources']
+$target.set_resources($packages)
+$resource = $target.resource(Package, 'openssl')
+out::message($resource.reference)
+```
+
 ### Attributes
 
 Each `ResourceInstance` has the following attributes:

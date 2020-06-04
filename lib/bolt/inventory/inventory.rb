@@ -323,6 +323,10 @@ module Bolt
       def resources(target)
         @targets[target.name].resources
       end
+
+      def resource(target, type, title)
+        @targets[target.name].resource(type, title)
+      end
     end
   end
 end

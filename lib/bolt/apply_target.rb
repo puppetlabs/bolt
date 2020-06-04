@@ -62,6 +62,10 @@ module Bolt
       @safe_name
     end
 
+    def resource(type, title)
+      resources[Bolt::ResourceInstance.format_reference(type, title)]
+    end
+
     def parse_uri(string)
       require 'addressable/uri'
       if string.nil?

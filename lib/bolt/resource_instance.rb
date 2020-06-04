@@ -84,8 +84,12 @@ module Bolt
       to_hash.to_json(opts)
     end
 
+    def self.format_reference(type, title)
+      "#{type.capitalize}[#{title}]"
+    end
+
     def reference
-      "#{type}[#{title}]"
+      self.class.format_reference(@type, @title)
     end
     alias to_s reference
 

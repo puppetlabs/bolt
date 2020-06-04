@@ -90,6 +90,10 @@ module Bolt
         end
       end
 
+      def resource(type, title)
+        resources[Bolt::ResourceInstance.format_reference(type, title)]
+      end
+
       def plugin_hooks
         # Merge plugin_hooks from the config file with any defined by the group
         # or assigned dynamically to the target
