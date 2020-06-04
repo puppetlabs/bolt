@@ -58,7 +58,7 @@ To pass JSON values in PowerShell without worrying about escaping, use `ConvertT
 bolt plan run mymodule::myplan --targets app1.myorg.com --params $(@{load_balancers=@("lb1.myorg.com","lb2.myorg.com")} | ConvertTo-Json)
 ```
 
-📖 **Related information**	
+📖 **Related information**
 - For information on Bolt project directories, see [Bolt project directories](#bolt_project_directories.md)
 - For information on running Bolt tasks, see [Running tasks](./bolt_running_tasks.md)
 - To find out how to write your own plan, see [Writing plans in YAML](./writing_yaml_plans.md) or

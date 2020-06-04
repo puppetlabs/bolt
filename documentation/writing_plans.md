@@ -22,8 +22,9 @@ loads plans located in the `site-modules/<MODULE_NAME>/plans` and
 named `my_plan.pp` in a module named `my_module`, the location of the plan
 would be `site-modules/my_module/site`. If you're developing a new plan and
 want to test it, or you don't need to create a module, you can create a Bolt
-project directory and put the plan in a `plans` directory. Bolt projects are an
-experimental feature. For more information, see [Bolt
+project directory and put the plan in a `plans` directory. 
+
+> **Note:** Bolt projects are an experimental feature. For more information, see [Bolt
 projects](experimental_features.md#bolt-projects)
 
 ## Naming plans
@@ -80,11 +81,14 @@ plan mymodule::myplan(
 ```
 
 You can use the `TargetSpec` type to pass a target, or multiple targets, into a
-plan parameter. For more information, see [`TargetSpec`](#targetspec)
+plan parameter. For more information, see [`TargetSpec`](#targetspec).
+
+### JSON serialization
 
 Parameters that are passed to the `run_*` plan functions are serialized to JSON.
 
-To illustrate this concept, consider this plan:
+In the following plan, the default value of `$example_nul` is `undef`. The plan
+calls the task `test::demo_undef_bash` with the `example_nul` parameter.
 
 ```
 plan test::parameter_passing (
@@ -95,7 +99,7 @@ plan test::parameter_passing (
 }
 ```
 
-The default value of `$example_nul` is `undef`. The plan calls the `test::demo_undef_bash` with the `example_nul` parameter. The implementation of the `demo_undef_bash.sh` task is:
+The implementation of the `demo_undef_bash.sh` task is:
 
 ```shell script
 #!/bin/bash
@@ -129,14 +133,13 @@ The parameters `example_nul` and `_task` metadata are passed to the task as a JS
 
 Similarly, parameters are made available to the task as environment variables where the name of the parameter is converted to an environment variable prefixed with `PT_`. The prefixed environment variable points to the `String` representation in `JSON` format of the parameter value. So, the `PT_example_nul` environment variable has the value of `null` of type `String`.
 
-**Related information**  
+📖 **Related information**  
 
-- [Task metadata types](writing_tasks.md#)
+- [Task metadata types](writing_tasks.md#common-task-data-types)
 
 ### Sensitive parameters
 
-Use the `Sensitive` data type to mask parameters that should not be displayed in logs can be masked using the 
-`Sensitive` data type.
+Use the `Sensitive` data type to mask parameters that should not be displayed in logs.
 
 When you pass a value to a `Sensitive` parameter, Bolt automatically masks the value before the plan is run.
 
@@ -203,11 +206,19 @@ plan mymodule::myplan {
 }
 ```
 
-## Success and failure in plans
+## Indicating success and failure in plans
 
-Indicators that a plan has run successfully or failed.
+Any plan that completes execution without an error is considered successful. The
+`bolt` command exits `0` and any calling plans continue execution. If any calls
+to `run_` functions fail **without** `_catch_errors`, the plan halts execution
+and is considered a failure. Any calling plans also halt until a `run_plan` call
+with `_catch_errors` or a `catch_errors` block is reached. If one isn't reached,
+the `bolt` command exits `2`. 
 
-Any plan that completes execution without an error is considered successful. The `bolt` command exits `0` and any calling plans continue execution. If any calls to `run_` functions fail **without** `_catch_errors` then the plan halts execution and is considered a failure. Any calling plans also halt until a `run_plan` call with `_catch_errors` or a `catch_errors` block is reached. If one isn't reached, the `bolt` command will exit `2`. When writing a plan, if you have reason to believe it has failed, you can fail the plan with the `fail_plan` function. This causes the bolt command to exit `2` and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors` or in a `catch_errors` block.
+When writing a plan, if you have reason to believe it has failed, you can fail
+the plan with the `fail_plan` function. This causes the bolt command to exit `2`
+and prevents calling plans executing any further, unless `run_plan` was called
+with `_catch_errors` or in a `catch_errors` block.
 
 ### Failing plans
 
@@ -357,7 +368,7 @@ You define a task parameter as sensitive with the metadata property `"sensitive"
 run_task('task_with_secrets', ..., password => 'hunter2')
 ```
 
-### Working with the sensitive function
+### Working with the `Sensitive` function
 
 In Puppet you use the `Sensitive` function to mask data in output logs. Because plans are written in Puppet DSL, you can use this type freely. The `run_task()` function does not allow parameters of `Sensitive` function to be passed. When you need to pass a sensitive value to a task, you must unwrap it prior to calling `run_task()`.
 
@@ -366,7 +377,7 @@ $pass = Sensitive('hunter2')
 run_task('task_with_secrets', ..., password => $pass.unwrap)
 ```
 
-**Related information**  
+📖 **Related information**  
 
 - [Adding parameters to metadata](writing_tasks.md#)
 
@@ -374,7 +385,11 @@ run_task('task_with_secrets', ..., password => $pass.unwrap)
 
 The target object represents a target and its specific connection options.
 
-The state of a target is stored in the inventory for the duration of a plan, allowing you to collect facts or set variables for a target and retrieve them later. You can get a printable representation via the `name` function, as well as access components of the target: `protocol, host, port, user, password`.
+The state of a target is stored in the inventory for the duration of a plan,
+allowing you to collect facts or set variables for a target and retrieve them
+later. You can get a printable representation via the `name` function, as well
+as access components of the target: `protocol, host, port, user, password`. For
+a list of functions available to a target, see [Bolt data types](./bolt_types_reference.md#target) 
 
 ### `TargetSpec`
 
@@ -583,7 +598,7 @@ plan pdb_discover {
 }
 ```
 
-**Related information**  
+📖 **Related information**  
 
 - [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
 
@@ -635,16 +650,35 @@ without_default_logging { run_command('echo hi', $targets) }
 
 Check out some examples for inspiration on writing your own plans.
 
-|Resource|Description|Level|
-|--------|-----------|-----|
-|[facts module](https://forge.puppet.com/puppetlabs/facts)|Contains tasks and plans to discover facts about target systems.|Getting started|
-|[facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp)|Gathers facts using the facts task and sets the facts in inventory.|Getting started|
-|[facts::info plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/info.pp)|Uses the facts task to discover facts and map relevant fact values to targets.|Getting started|
-|[reboot module](https://forge.puppet.com/puppetlabs/reboot)|Contains tasks and plans for managing system reboots.|Intermediate|
-|[reboot plan](https://github.com/puppetlabs/puppetlabs-reboot/blob/master/plans/init.pp)|Restarts a target system and waits for it to become available again.|Intermediate|
-|[Introducing Masterless Puppet with Bolt](https://puppet.com/blog/introducing-masterless-puppet-bolt)|Blog post explaining how plans can be used to deploy a load-balanced web server.|Advanced|
-|[profiles::nginx_install plan](https://puppetlabs.github.io/bolt/lab/11-apply-manifest-code/)|Shows an example plan for deploying Nginx and HAProxy.|Advanced|
+### Beginner plans
 
--   **Getting started** resources show simple use cases such as running a task and manipulating the results.
--   **Intermediate** resources show more advanced features in the plan language.
--   **Advanced** resources show more complex use cases such as applying puppet code blocks and using external modules.
+These resources show simple use cases such as running a task and manipulating the results.
+
+- [facts module](https://forge.puppet.com/puppetlabs/facts): Contains tasks and plans to discover facts about target systems.
+- [facts
+  plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp):
+  Gathers facts using the facts task and sets the facts in inventory.
+- [facts::info
+  plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/info.pp):
+  Uses the facts task to discover facts and map relevant fact values to targets.
+
+### Intermediate
+
+These resources show more advanced features in the plan language.
+
+- [reboot module](https://forge.puppet.com/puppetlabs/reboot): Contains tasks and plans for managing system reboots.
+- [reboot
+  plan](https://github.com/puppetlabs/puppetlabs-reboot/blob/master/plans/init.pp):
+  Restarts a target system and waits for it to become available again.
+
+### Advanced
+
+These resources show more complex use cases such as applying puppet code blocks
+and using external modules.
+
+- [Introducing Masterless Puppet with
+  Bolt](https://puppet.com/blog/introducing-masterless-puppet-bolt): Blog post
+  explaining how plans can be used to deploy a load-balanced web server.
+- [profiles::nginx_install
+  plan](https://puppetlabs.github.io/bolt/lab/11-apply-manifest-code/): Shows an
+  example plan for deploying Nginx and HAProxy.
