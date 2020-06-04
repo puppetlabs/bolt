@@ -150,4 +150,14 @@ describe Bolt::ResourceInstance do
       expect { resource.overwrite_desired_state('present') }.to raise_error(Bolt::ValidationError)
     end
   end
+
+  context '#[]' do
+    it 'returns an attribute from state' do
+      expect(resource['ensure']).to eq('present')
+    end
+
+    it 'returns nil for a missing attribute' do
+      expect(resource['foo']).to eq(nil)
+    end
+  end
 end
