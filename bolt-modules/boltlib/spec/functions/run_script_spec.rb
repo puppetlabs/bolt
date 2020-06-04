@@ -165,7 +165,7 @@ describe 'run_script' do
     it 'errors when script appoints a directory' do
       executor.expects(:run_script).never
 
-      is_expected.to run.with_params('test/uploads', []).and_raise_error(%r{.*\/uploads is not a file})
+      is_expected.to run.with_params('test/uploads', []).and_raise_error(%r{.*/uploads is not a file})
     end
   end
 

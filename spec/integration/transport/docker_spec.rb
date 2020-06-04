@@ -44,7 +44,7 @@ describe Bolt::Transport::Docker, docker: true do
       # Test fails differently on Windows due to issues in the docker-api gem.
       expect {
         docker.with_connection(inventory.get_target('not_a_target')) {}
-      }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name or ID matching \'not_a_target\'/)
+      }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name or ID matching 'not_a_target'/)
     end
   end
 
