@@ -20,7 +20,7 @@ bolt plan run mymodule::myplan load_balancer=lb.myorg.com
 
 You can pass a comma-separated list of target names, wildcard patterns, or group names to a plan parameter of type `TargetSpec`. For more information on the `TargetSpec` type, see [Writing plans in the Puppet language](./writing_plans.md#targetspec).
 
-## Specifying the modulepath
+## How Bolt locates plans
 
 In order for Bolt to find a plan, the plan must be in a module
 on the modulepath. By default, Bolt looks for plans in the

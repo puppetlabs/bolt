@@ -6,11 +6,14 @@ Before you run a plan in your environment, inspect the plan to determine what ef
 
 ## Discover plans
 
-View a list of plans available on the current [modulepath](#specify-the-modulepath):
+View a list of available plans:
 
 ```
 bolt plan show
 ``` 
+
+If you don't see the plan you were expecting to find, make sure the plan is
+located in the correct directory. For more information, see [How Bolt locates plans](./bolt_running_plans.md#how-bolt-locates-plans)
 
 ## Inspect a plan
 

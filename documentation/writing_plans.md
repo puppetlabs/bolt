@@ -393,7 +393,19 @@ a list of functions available to a target, see [Bolt data types](./bolt_types_re
 
 ### `TargetSpec`
 
-The execution function takes a parameter with the type alias `TargetSpec`. `TargetSpec` accepts a URI string, a target object, or an array of URI strings and Target objects. Generally, use this type for plans that accept a set of targets as a parameter, to ensure clean interaction with the CLI and other plans. To operate on individual targets, resolve it to a list via `get_targets`. For example, to loop over each target in a plan, accept a `TargetSpec` argument, but call `get_targets` on it before looping.
+The `TargetSpec` type is a wrapper for defining targets that allows you to pass
+a target, or multiple targets, into a plan. To ensure clean interaction with the
+CLI and other plans, use this type for plans that accept a set of targets as a
+parameter.
+
+`TargetSpec` accepts a URI string, a target object, or an array of URI strings
+and Target objects. URI strings must include a hostname, and can also set the
+protocol, the username, the password, and the port to use using the format
+`protocol://user:password@hostname:port`. 
+
+To operate on individual targets, resolve `TargetSpec` to a list via
+`get_targets`. For example, to loop over each target in a plan, accept a
+`TargetSpec` argument, but call `get_targets` on it before looping.
 
 ```
 plan loop(TargetSpec $targets) {
@@ -403,7 +415,38 @@ plan loop(TargetSpec $targets) {
 }
 ```
 
-If your plan accepts a single `TargetSpec` parameter, you can call that parameter `targets` so that it can be specified with the `--targets` flag from the command line.
+If your plan accepts a single `TargetSpec` parameter, you can call that
+parameter `targets` so that it can be specified with the `--targets` flag from
+the command line.
+
+#### Example with `TargetSpec`
+
+The following example shows two target parameters, `load_balancer` and
+`webservers`, specified as data type `TargetSpec`.
+
+The plan calls the `run_task` function, specifying which targets to run the tasks on. The target names are collected and stored in `$webserver_names` by iterating over the list of target objects returned by `get_targets`. Task parameters are serialized to JSON format; therefore, extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
+
+```
+plan mymodule::my_plan(
+  TargetSpec $load_balancer,
+  TargetSpec $webservers,
+) {
+
+  # Extract the Target name from $webservers
+  $webserver_names = get_targets($webservers).map |$n| { $n.name }
+  
+  # process webservers
+  run_task('mymodule::lb_remove', $load_balancer, webservers => $webserver_names)
+  run_task('mymodule::update_frontend_app', $webservers, version => '1.2.3')
+  run_task('mymodule::lb_add', $load_balancer, webservers => $webserver_names)
+ }
+```
+
+To execute this plan from the command line, you would pass the parameters as `<PARAMETER>=<VALUE>`. The `Targetspec` accepts either an array as JSON, or a comma separated string of target names.
+
+```
+bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com webservers='["kermit.myorg.com","gonzo.myorg.com"]'        
+```
 
 ### Creating target objects
 
