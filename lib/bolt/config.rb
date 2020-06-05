@@ -23,7 +23,7 @@ module Bolt
   end
 
   class Config
-    attr_reader :config_files, :warnings, :data, :transports, :project
+    attr_reader :config_files, :warnings, :data, :transports, :project, :modified_concurrency
 
     TRANSPORT_CONFIG = {
       'ssh'    => Bolt::Config::Transport::SSH,
@@ -189,15 +189,9 @@ module Bolt
 
       # If we need to lower concurrency and concurrency is not configured
       ld_concurrency = loaded_data.map(&:keys).flatten.include?('concurrency')
-      if default_concurrency != DEFAULT_DEFAULT_CONCURRENCY &&
-         !ld_concurrency &&
-         !override_data.key?('concurrency')
-        concurrency_warning = { option: 'concurrency',
-                                msg: "Concurrency will default to #{default_concurrency} because ulimit "\
-                                "is low: #{Etc.sysconf(Etc::SC_OPEN_MAX)}. Set concurrency with "\
-                                "'--concurrency', or set your ulimit with 'ulimit -n <limit>'" }
-        @warnings << concurrency_warning
-      end
+      @modified_concurrency = default_concurrency != DEFAULT_DEFAULT_CONCURRENCY &&
+                              !ld_concurrency &&
+                              !override_data.key?('concurrency')
 
       @data = merge_config_layers(default_data, *loaded_data, override_data)
 
@@ -485,7 +479,7 @@ module Bolt
       @default_concurrency ||= if !sc_open_max_available? || Etc.sysconf(Etc::SC_OPEN_MAX) >= 300
                                  DEFAULT_DEFAULT_CONCURRENCY
                                else
-                                 Etc.sysconf(Etc::SC_OPEN_MAX) / 3
+                                 Etc.sysconf(Etc::SC_OPEN_MAX) / 7
                                end
     end
   end

@@ -589,6 +589,31 @@ describe "Bolt::Executor" do
     end
   end
 
+  context 'with modified default concurrency' do
+    let(:executor) { Bolt::Executor.new(2, analytics, false, true).subscribe(collector) }
+    let(:collector) { BoltSpec::EventCollector.new }
+
+    it "doesn't warn if concurrency limit isn't reached" do
+      executor.run_command(targets, command, {})
+      expect(@log_output.readlines).not_to include(/The ulimit is low, which may cause file limit issues/)
+    end
+
+    it 'warns if concurrency limit is reached' do
+      targets = inventory.get_targets(%w[target1 target2 target3])
+      executor.run_command(targets, command, {})
+      expect(@log_output.readlines).to include(/The ulimit is low, which may cause file limit issues/)
+    end
+
+    it 'only warns once' do
+      targets = inventory.get_targets(%w[target1 target2 target3])
+      executor.run_command(targets, command, {})
+      expect(@log_output.readlines).to include(/The ulimit is low, which may cause file limit issues/)
+
+      executor.run_command(targets, command, {})
+      expect(@log_output.readlines).not_to include(/The ulimit is low, which may cause file limit issues/)
+    end
+  end
+
   context 'reporting analytics data' do
     let(:targets) {
       inventory.get_targets(['ssh://node1', 'ssh://node2', 'winrm://node3', 'pcp://node4'])

@@ -34,7 +34,8 @@ module Bolt
 
     def initialize(concurrency = 1,
                    analytics = Bolt::Analytics::NoopClient.new,
-                   noop = false)
+                   noop = false,
+                   modified_concurrency = false)
       # lazy-load expensive gem code
       require 'concurrent'
 
@@ -64,6 +65,9 @@ module Bolt
                 Concurrent.global_immediate_executor
               end
       @logger.debug { "Started with #{concurrency} max thread(s)" }
+
+      @concurrency = concurrency
+      @warn_concurrency = modified_concurrency
     end
 
     def transport(transport)
@@ -102,6 +106,15 @@ module Bolt
     # defined by the transport. Yields each batch, along with the corresponding
     # transport, to the block in turn and returns an array of result promises.
     def queue_execute(targets)
+      if @warn_concurrency && targets.length > @concurrency
+        @warn_concurrency = false
+        @logger.warn("The ulimit is low, which may cause file limit issues. Default concurrency has been set to "\
+                     "'#{@concurrency}' to mitigate those issues, which may cause Bolt to run slow. "\
+                     "Disable this warning by configuring ulimit using 'ulimit -n <limit>' in your shell "\
+                     "configuration, or by configuring Bolt's concurrency. "\
+                     "See https://puppet.com/docs/bolt/latest/bolt_known_issues.html for details.")
+      end
+
       targets.group_by(&:transport).flat_map do |protocol, protocol_targets|
         transport = transport(protocol)
         report_transport(transport, protocol_targets.count)

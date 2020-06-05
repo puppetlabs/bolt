@@ -35,6 +35,13 @@ describe Bolt::Config do
       config = Bolt::Config.new(project, 'modulepath' => module_dirs)
       expect(config.modulepath).to eq(module_dirs.map { |dir| (project.path + dir).to_s })
     end
+
+    it 'modifies concurrency if ulimit is low', :ssh do
+      allow(Etc).to receive(:sysconf).with(Etc::SC_OPEN_MAX).and_return(256)
+      config = Bolt::Config.new(project, {})
+      expect(config.modified_concurrency).to eq(true)
+      expect(config.concurrency).to eq(36)
+    end
   end
 
   describe "::from_project" do
