@@ -106,7 +106,7 @@ Bolt uses these methods, in order, to choose a project directory.
 
 ## Project directory structure
 
-The default paths for all Bolt configuration, code, and data are relative to the modulepath.
+The default paths for all Bolt configuration, code, and data are relative to the module path.
 
 |Directory|Description|
 |---------|-----------|

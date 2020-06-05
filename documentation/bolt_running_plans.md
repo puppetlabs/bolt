@@ -68,13 +68,15 @@ bolt task run mymodule::mytask --targets app1.myorg.com --params $(@{load_balanc
 bolt plan run mymodule::myplan --targets app1.myorg.com --params $(@{load_balancers=@("lb1.myorg.com","lb2.myorg.com")} | ConvertTo-Json)
 ```
 
-## Specifying the modulepath
+## Specifying the module path
 
-In order for Bolt to find a plan, the plan must be in a module on the modulepath. By default, Bolt looks for plan content in `<PROJECT_NAME>/modules/plans/` and `<PROJECT_NAME>/site-modules/plans/`.
+In order for Bolt to find a plan, the plan must be in a module on the module path. The default
+modulepath is `[<project directory>/modules, <project directory>/site-modules]`.
 
-If you are developing a new plan, you can create an empty
-`<PROJECT_NAME/bolt-project.yaml` file, develop your plan in `<PROJECT_NAME>/plans/`,
-and run Bolt from the root of your Bolt project directory to test the plan. 
+The current [Bolt project](./experimental_features.md#bolt-projects) is loaded as a standalone
+module at the front of the module path.  If you are developing a new plan, you can create an empty
+`<PROJECT_NAME>/bolt-project.yaml` file, develop your plan in `<PROJECT_NAME>/plans/`, and run Bolt
+from the root of your Bolt project directory to test the plan. 
 
 > **Note:** The `bolt-project.yaml` file is part of an experimental feature. For
 > more information, see [Bolt projects](./experimental_features.md#bolt-projects).

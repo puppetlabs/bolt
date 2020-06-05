@@ -10,6 +10,17 @@ Global configuration options can be set in the configuration file.
 | `<%= option %>` | <%= desc %> | <%= @global[:defaults][option].to_s || "" %> |
 <% end %>
 
+### Example configuration
+
+Setting the module path and format:
+
+```yaml
+modulepath: ['./modules', '/home/user/path/to/modules', '/home/user/other/path']
+format: json
+```
+
+> **Note**: The `modulepath` can also be specified as a string containing a list of directories separated by the OS-specific PATH separator, but this format isn't platform agnostic.
+
 ## Log file configuration options
 
 You can configure how the results of plan runs are captured in a log file. Different log files can be configured by specifying the log file's location using either `console` or a path to the log file, such as `~/.puppetlabs/bolt/debug.log`.
