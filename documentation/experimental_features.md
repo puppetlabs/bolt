@@ -277,6 +277,42 @@ $results.each |$result| {
 }
 ```
 
+The `set_resources` function will return an array of `ResourceInstance` objects, which
+can be used to easily examine attributes for multiple resources and perform actions
+based on those attributes. For example, you can iterate over an array of resources to
+determine which users need to have their maxium password age modified:
+
+```ruby
+$results = $target.get_resources(User)
+
+$results.each |$result| {
+  $resources = $result.target.set_resources($result['resources'])
+
+  $users = $resources.filter |$resource| { $resource.state['password_max_age'] > 90 }
+                     .map |$resource| { $resource.title }
+
+  run_task('update_password_max_age', $result.target, 'users' => $users)
+}
+```
+
+Apply blocks will also return results with reports. These reports have resource data
+hashes that can be used to set resources on a target:
+
+```ruby
+$apply_results = apply($targets) {
+  File { '/etc/puppetlabs':
+    ensure => present
+  }
+  Package { 'openssl':
+    ensure => installed
+  }
+}
+
+$apply_results.each |$result| {
+  $result.target.set_resources($result.report['resource_statuses'].values)
+}
+```
+
 ## External SSH transport
 
 This feature was introduced in [Bolt
