@@ -88,6 +88,10 @@ module Bolt
     end
     alias to_s reference
 
+    def [](attribute)
+      @state[attribute]
+    end
+
     def add_event(event)
       @events << event
     end

@@ -16,7 +16,8 @@ Puppet::DataTypes.create_type('ResourceInstance') do
       overwrite_state         => Callable[[Hash[String[1], Data]], Hash[String[1], Data]],
       set_desired_state       => Callable[[Hash[String[1], Data]], Hash[String[1], Data]],
       overwrite_desired_state => Callable[[Hash[String[1], Data]], Hash[String[1], Data]],
-      reference               => Callable[[], String]
+      reference               => Callable[[], String],
+      '[]'                    => Callable[[String[1]], Data]
     }
   PUPPET
 
