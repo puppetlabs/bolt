@@ -44,6 +44,18 @@ describe Bolt::Config::Transport::SSH do
       end
     end
 
+    %w[encryption-algorithms host-key-algorithms kex-algorithms mac-algorithms].each do |opt|
+      it "#{opt} errors with wrong type" do
+        data[opt] = 'foo'
+        expect { transport.new(data) }.to raise_error(Bolt::ValidationError)
+      end
+
+      it "#{opt} errors with wrong array element type" do
+        data[opt] = ['foo', 3]
+        expect { transport.new(data) }.to raise_error(Bolt::ValidationError)
+      end
+    end
+
     context 'private-key' do
       it 'errors with wrong type' do
         data['private-key'] = ['/path/to/key']

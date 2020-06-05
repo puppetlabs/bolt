@@ -49,29 +49,33 @@
     "description": "Configuration for the ssh transport.",
     "type": "object",
     "properties": {
-      "cleanup":            { "$ref": "#/definitions/cleanup" },
-      "connect-timeout":    { "$ref": "#/definitions/connect-timeout" },
-      "copy-command":       { "$ref": "#/definitions/copy-command" },
-      "disconnect-timeout": { "$ref": "#/definitions/disconnect-timeout" },
-      "host":               { "$ref": "#/definitions/host" },
-      "host-key-check":     { "$ref": "#/definitions/host-key-check" },
-      "extensions":         { "$ref": "#/definitions/extensions" },
-      "interpreters":       { "$ref": "#/definitions/interpreters" },
-      "load-config":        { "$ref": "#/definitions/load-config" },
-      "login-shell":        { "$ref": "#/definitions/login-shell" },
-      "password":           { "$ref": "#/definitions/password" },
-      "port":               { "$ref": "#/definitions/port" },
-      "private-key":        { "$ref": "#/definitions/private-key" },
-      "proxyjump":          { "$ref": "#/definitions/proxyjump" },
-      "run-as":             { "$ref": "#/definitions/run-as" },
-      "run-as-command":     { "$ref": "#/definitions/run-as-command" },
-      "script-dir":         { "$ref": "#/definitions/script-dir" },
-      "ssh-command":        { "$ref": "#/definitions/ssh-command" },
-      "sudo-executable":    { "$ref": "#/definitions/sudo-executable" },
-      "sudo-password":      { "$ref": "#/definitions/sudo-password" },
-      "tmpdir":             { "$ref": "#/definitions/tmpdir" },
-      "tty":                { "$ref": "#/definitions/tty" },
-      "user":               { "$ref": "#/definitions/user" }
+      "cleanup":               { "$ref": "#/definitions/cleanup" },
+      "connect-timeout":       { "$ref": "#/definitions/connect-timeout" },
+      "copy-command":          { "$ref": "#/definitions/copy-command" },
+      "disconnect-timeout":    { "$ref": "#/definitions/disconnect-timeout" },
+      "encryption-algorithms": { "$ref": "#/definitions/encryption-algorithms" },
+      "host":                  { "$ref": "#/definitions/host" },
+      "host-key-algorithms":   { "$ref": "#/definitions/host-key-algorithms" },
+      "host-key-check":        { "$ref": "#/definitions/host-key-check" },
+      "extensions":            { "$ref": "#/definitions/extensions" },
+      "interpreters":          { "$ref": "#/definitions/interpreters" },
+      "kex-algorithms":        { "$ref": "#/definitions/kex-algorithms" },
+      "load-config":           { "$ref": "#/definitions/load-config" },
+      "login-shell":           { "$ref": "#/definitions/login-shell" },
+      "mac-algorithms":        { "$ref": "#/definitions/mac-algorithms" },
+      "password":              { "$ref": "#/definitions/password" },
+      "port":                  { "$ref": "#/definitions/port" },
+      "private-key":           { "$ref": "#/definitions/private-key" },
+      "proxyjump":             { "$ref": "#/definitions/proxyjump" },
+      "run-as":                { "$ref": "#/definitions/run-as" },
+      "run-as-command":        { "$ref": "#/definitions/run-as-command" },
+      "script-dir":            { "$ref": "#/definitions/script-dir" },
+      "ssh-command":           { "$ref": "#/definitions/ssh-command" },
+      "sudo-executable":       { "$ref": "#/definitions/sudo-executable" },
+      "sudo-password":         { "$ref": "#/definitions/sudo-password" },
+      "tmpdir":                { "$ref": "#/definitions/tmpdir" },
+      "tty":                   { "$ref": "#/definitions/tty" },
+      "user":                  { "$ref": "#/definitions/user" }
     }
   },
   "winrm": {
@@ -115,11 +119,17 @@
       "description": "Array of command and flags to use when copying files using ssh-command. Bolt runs `<copy-command> <src> <dest>`.",
       "type": ["array", "string"]
     },
-
     "disconnect-timeout": {
       "description": "How long to wait in seconds before force-closing a connection.",
       "type": "integer",
       "min": 1
+    },
+    "encryption-algorithms": {
+      "description": "List of encryption algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "cleanup": {
       "description": "Whether to clean up temporary files created on targets.",
@@ -141,6 +151,13 @@
     "host": {
       "description": "The host's name.",
       "type": "string"
+    },
+    "host-key-algorithms": {
+      "description": "List of host key algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "host-key-check": {
       "description": "Whether to perform host key validation when connecting.",
@@ -166,6 +183,13 @@
       "type": "integer",
       "min": 1
     },
+    "kex-algorithms": {
+      "description": "List of key exchange algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "load-config": {
       "description": "Whether to load system SSH configuration.",
       "type": "boolean"
@@ -174,6 +198,13 @@
       "description": "Which login shell Bolt should expect on the target.",
       "type": "string",
       "enum": ["sh", "bash", "zsh", "dash", "ksh", "powershell"]
+    },
+    "mac-algorithms": {
+      "description": "List of message authentication code algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "password": {
       "description": "Login password.",

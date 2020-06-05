@@ -48,6 +48,86 @@ describe Bolt::Transport::SSH::Connection do
       allow_any_instance_of(described_class).to receive(:validate_ssh_version)
     end
 
+    it "passes filtered encryption algorithms" do
+      inventory.set_config(target, 'ssh', 'encryption-algorithms' => %w[aes256-ctr fake])
+
+      allow(Net::SSH).to receive(:start) do |_, _, options|
+        expect(options[:encryption]).to match_array(['aes256-ctr'])
+      end
+
+      subject.connect
+    end
+
+    it "expands default encryption algorithms" do
+      inventory.set_config(target, 'ssh', 'encryption-algorithms' => ['defaults'])
+
+      allow(Net::SSH).to receive(:start) do |_, _, options|
+        expect(options[:encryption]).to match_array(Net::SSH::Transport::Algorithms::DEFAULT_ALGORITHMS[:encryption])
+      end
+
+      subject.connect
+    end
+
+    it "passes filtered host_key algorithms" do
+      inventory.set_config(target, 'ssh', 'host-key-algorithms' => %w[ssh-rsa fake])
+
+      allow(Net::SSH).to receive(:start) do |_, _, options|
+        expect(options[:host_key]).to match_array(['ssh-rsa'])
+      end
+
+      subject.connect
+    end
+
+    it "expands default host_key algorithms" do
+      inventory.set_config(target, 'ssh', 'host-key-algorithms' => ['defaults'])
+
+      allow(Net::SSH).to receive(:start) do |_, _, options|
+        expect(options[:host_key]).to match_array(Net::SSH::Transport::Algorithms::DEFAULT_ALGORITHMS[:host_key])
+      end
+
+      subject.connect
+    end
+
+    it "passes filtered kex algorithms" do
+      inventory.set_config(target, 'ssh', 'kex-algorithms' => %w[diffie-hellman-group14-sha1 fake])
+
+      allow(Net::SSH).to receive(:start) do |_, _, options|
+        expect(options[:kex]).to match_array(['diffie-hellman-group14-sha1'])
+      end
+
+      subject.connect
+    end
+
+    it "expands default kex algorithms" do
+      inventory.set_config(target, 'ssh', 'kex-algorithms' => ['defaults'])
+
+      allow(Net::SSH).to receive(:start) do |_, _, options|
+        expect(options[:kex]).to match_array(Net::SSH::Transport::Algorithms::DEFAULT_ALGORITHMS[:kex])
+      end
+
+      subject.connect
+    end
+
+    it "passes filtered mac algorithms" do
+      inventory.set_config(target, 'ssh', 'mac-algorithms' => %w[hmac-sha1 fake])
+
+      allow(Net::SSH).to receive(:start) do |_, _, options|
+        expect(options[:hmac]).to match_array(['hmac-sha1'])
+      end
+
+      subject.connect
+    end
+
+    it "expands default mac algorithms" do
+      inventory.set_config(target, 'ssh', 'mac-algorithms' => ['defaults'])
+
+      allow(Net::SSH).to receive(:start) do |_, _, options|
+        expect(options[:hmac]).to match_array(Net::SSH::Transport::Algorithms::DEFAULT_ALGORITHMS[:hmac])
+      end
+
+      subject.connect
+    end
+
     it "passes proxyjump options" do
       inventory.set_config(target, 'ssh', 'proxyjump' => 'jump.example.com')
 

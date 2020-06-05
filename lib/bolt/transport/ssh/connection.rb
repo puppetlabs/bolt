@@ -78,6 +78,28 @@ module Bolt
 
           options[:proxy] = Net::SSH::Proxy::Jump.new(target.options['proxyjump']) if target.options['proxyjump']
 
+          # Override the default supported algorithms for net-ssh. By default, a subset of supported algorithms
+          # are enabled in 6.x, while several are deprecated and not enabled by default. The *-algorithms
+          # options can be used to specify a list of algorithms to enable in net-ssh. Any algorithms not in the
+          # list are disabled, including ones that are normally enabled by default. Support for deprecated
+          # algorithms will be removed in 7.x.
+          # https://github.com/net-ssh/net-ssh#supported-algorithms
+          if target.options['encryption-algorithms']
+            options[:encryption] = net_ssh_algorithms(:encryption, target.options['encryption-algorithms'])
+          end
+
+          if target.options['host-key-algorithms']
+            options[:host_key] = net_ssh_algorithms(:host_key, target.options['host-key-algorithms'])
+          end
+
+          if target.options['kex-algorithms']
+            options[:kex] = net_ssh_algorithms(:kex, target.options['kex-algorithms'])
+          end
+
+          if target.options['mac-algorithms']
+            options[:hmac] = net_ssh_algorithms(:hmac, target.options['mac-algorithms'])
+          end
+
           # This option was to address discrepency betwen net-ssh host-key-check and ssh(1)
           # For the net-ssh 5.x series it defaults to true, in 6.x it will default to false, and will be removed in 7.x
           # https://github.com/net-ssh/net-ssh/pull/663#issuecomment-469979931
@@ -244,6 +266,19 @@ module Bolt
               Net::SSH::Verifiers::Lenient.new
             end
           end
+        end
+
+        # Add all default algorithms if the 'defaults' key is present and filter
+        # out any unsupported algorithms.
+        def net_ssh_algorithms(type, algorithms)
+          if algorithms.include?('defaults')
+            defaults = Net::SSH::Transport::Algorithms::DEFAULT_ALGORITHMS[type]
+            algorithms += defaults
+          end
+
+          known = Net::SSH::Transport::Algorithms::ALGORITHMS[type]
+
+          algorithms & known
         end
 
         def shell
