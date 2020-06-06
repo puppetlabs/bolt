@@ -53,11 +53,12 @@ To use Bolt plans or tasks, your Bolt project must use a specific directory
 structure. The directory structure of a Bolt project is closely tied to
 [Puppet modules](https://puppet.com/docs/puppet/latest/modules_fundamentals.html).
 Because your plan will install Apache, you need an `apache` module directory.
-Run the following command to set up the required directories in your project
+Run the following commands to set up the required directories in your project
 folder:
 
 ```bash
-mkdir -p site-modules/apache/plans site-modules/apache/files
+mkdir -p site-modules/apache/plans
+mkdir -p site-modules/apache/files
 ```
 
 After running the command, the file structure of `my_project` looks like this:
@@ -164,10 +165,10 @@ targets. The syntax to run a Bolt command is `bolt command run <COMMAND>
 Use the following command to run `whoami` on `target1`:
 
 ```bash
-bolt command run whoami -t 0.0.0.0:2000 -u root -p root --no-host-key-check
+bolt command run whoami -t 127.0.0.1:2000 -u root -p root --no-host-key-check
 ```
 
-This command targets `0.0.0.0:2000`, which is the IP address and SSH port for
+This command targets `127.0.0.1:2000`, which is the IP address and SSH port for
 the `target1` container. The command also specifies `root` as the username and
 password, and includes the `--no-host-key-check` option to turn off certificate
 authentication.
@@ -175,12 +176,12 @@ authentication.
 After you run the command, you get the following output from `whoami`:
 
 ```bash
-$ bolt command run whoami -t 0.0.0.0:2000 -u root -p root --no-host-key-check
-Started on 0.0.0.0:2000...
-Finished on 0.0.0.0:2000:
+$ bolt command run whoami -t 127.0.0.1:2000 -u root -p root --no-host-key-check
+Started on 127.0.0.1:2000...
+Finished on 127.0.0.1:2000:
   STDOUT:
     root
-Successful on 1 target: 0.0.0.0:2000
+Successful on 1 target: 127.0.0.1:2000
 Ran on 1 target in 0.46 sec
 ```
 
@@ -207,9 +208,9 @@ following:
 groups:
 - name: containers
   targets:
-    - uri: 0.0.0.0:2000
+    - uri: 127.0.0.1:2000
       name: target1
-    - uri: 0.0.0.0:2001
+    - uri: 127.0.0.1:2001
       name: target2
   config:
     transport: ssh
@@ -432,7 +433,7 @@ bolt plan run apache::install -t containers
 
 At this point, you can reach either of your targets in your web browser using
 their UID followed by port `3000` for `target1`, or port `3001` for `target2`.
-Go to [0.0.0.0:3000](http://0.0.0.0:3000) to see Apache's default Ubuntu
+Go to [127.0.0.1:3000](http://127.0.0.1:3000) to see Apache's default Ubuntu
 homepage on `target1`.
 
 You have two functioning Apache servers. Next, upload a file to your targets to
@@ -546,7 +547,7 @@ bolt plan run apache::install -t containers src=apache/index.html
   you can use the syntax `src=<MODULE_NAME>/<FILE_NAME>` instead of typing in
   the full path to the file.
 
-Go to [0.0.0.0:3000](http://0.0.0.0:3000) again to see your new index page.
+Go to [127.0.0.1:3000](http://127.0.0.1:3000) again to see your new index page.
 
 > **Note**: If the page hasn't changed from the default Ubuntu homepage, try a
   hard refresh to clear the page's cache. On most browsers, you can accomplish
