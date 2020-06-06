@@ -47,9 +47,7 @@ module Bolt
                                     "targets on the command line and from plans.",
       "log"                      => "The configuration of the logfile output. Configuration can be set for "\
                                     "`console` and the path to a log file, such as `~/.puppetlabs/bolt/debug.log`.",
-      "modulepath"               => "The module path for loading tasks and plan code. This is either an array "\
-                                    "of directories or a string containing a list of directories separated by the "\
-                                    "OS-specific PATH separator.",
+      "modulepath"               => "An array of directories that Bolt loads content (e.g. plans and tasks) from.",
       "plugin_hooks"             => "Which plugins a specific hook should use.",
       "plugins"                  => "A map of plugins and their configuration data.",
       "puppetdb"                 => "A map containing options for configuring the Bolt PuppetDB client.",

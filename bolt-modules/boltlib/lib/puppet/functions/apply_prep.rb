@@ -3,7 +3,7 @@
 require 'bolt/task'
 
 # Installs the `puppet-agent` package on targets if needed, then collects facts,
-# including any custom facts found in Bolt's modulepath. The package is
+# including any custom facts found in Bolt's module path. The package is
 # installed using either the configured plugin or the `task` plugin with the
 # `puppet_agent::install` task.
 #
