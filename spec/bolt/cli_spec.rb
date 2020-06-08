@@ -1610,8 +1610,8 @@ describe "Bolt::CLI" do
               # these are not legal parameters for the 'sample::params' task
               # according to the local task definition
               {
-                'foo' => nil,
-                'bar' => nil
+                'foo' => 'foo',
+                'bar' => 'bar'
               }
             }
 

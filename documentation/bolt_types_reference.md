@@ -39,6 +39,7 @@ The following functions are available to `ResourceInstance` objects.
 
 | Function | Type returned | Description |
 |---|---|---|
+| `[]` | `Data` | Accesses the `state` hash directly and returns the value for the specified attribute. This function does not use dot notation. Call the function directly on the `ResourceInstance`. For example, `$resource['ensure']`. |
 | `add_event` | `Array[Hash]` | Add an event for the resource. |
 | `desired_state` | `Hash` | [Attributes](https://puppet.com/docs/puppet/latest/lang_resources.html#attributes) describing the desired state of the resource. |
 | `events` | `Array[Hash]` | Events for the resource. |

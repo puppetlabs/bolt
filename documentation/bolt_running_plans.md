@@ -23,10 +23,12 @@ You can pass a comma-separated list of target names, wildcard patterns, or group
 ## How Bolt locates plans
 
 In order for Bolt to find a plan, the plan must be in a module
-on the modulepath. By default, Bolt looks for plans in the
+on the module path. By default, Bolt looks for plans in the
 `<PROJECT_NAME>/modules/plans` and `<PROJECT_NAME>/site-modules/plans` directories.
 
-If you are developing a new plan, you can create an empty `<PROJECT_NAME/bolt-project.yaml` file, develop your plan in `<PROJECT_NAME>/plans/`, and run Bolt from the root of your Bolt project directory to test the plan.
+Using a Bolt project, you can create an empty `<PROJECT_NAME>/bolt-project.yaml`
+file, develop your plan in `<PROJECT_NAME>/plans/`, and run Bolt from the root
+of your Bolt project directory to test the plan.
 
 > **Note**: The `bolt-project.yaml` file is part of an experimental feature. For more information, see [Bolt projects](./experimental_features.md#bolt-projects).
 

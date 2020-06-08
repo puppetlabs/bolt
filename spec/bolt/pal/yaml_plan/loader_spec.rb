@@ -36,7 +36,7 @@ describe Bolt::PAL::YamlPlan::Loader do
 
       expect { described_class.create(loader, plan_name, 'test.yaml', plan_body) }.to raise_error do |error|
         expect(error.to_s).to match(/Parse error in step number 1/)
-        expect(error.to_s).to match(/Error parsing \"command\": Illegal variable name/)
+        expect(error.to_s).to match(/Error parsing "command": Illegal variable name/)
       end
     end
 

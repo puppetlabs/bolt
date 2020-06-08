@@ -96,8 +96,8 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
-          expect(error.message).to match(/Parse error in step \"foo\"/)
-          expect(error.message).to match(/Duplicate step name or parameter detected: \"foo\"/)
+          expect(error.message).to match(/Parse error in step "foo"/)
+          expect(error.message).to match(/Duplicate step name or parameter detected: "foo"/)
         end
       end
 
@@ -108,7 +108,7 @@ describe Bolt::PAL::YamlPlan do
           'foo' => 'bar'
         }
 
-        expect { plan }.to raise_error(Bolt::Error, /Plan contains illegal key\(s\) \[\"foo\"\]/)
+        expect { plan }.to raise_error(Bolt::Error, /Plan contains illegal key\(s\) \["foo"\]/)
       end
 
       it 'fails if two steps have the same name' do
@@ -123,8 +123,8 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
-          expect(error.message).to match(/Parse error in step \"foo\"/)
-          expect(error.message).to match(/Duplicate step name or parameter detected: \"foo\"/)
+          expect(error.message).to match(/Parse error in step "foo"/)
+          expect(error.message).to match(/Duplicate step name or parameter detected: "foo"/)
         end
       end
 
@@ -138,8 +138,8 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
-          expect(error.message).to match(/Parse error in step \"foo-bar\"/)
-          expect(error.message).to match(/Invalid step name: \"foo-bar\"/)
+          expect(error.message).to match(/Parse error in step "foo-bar"/)
+          expect(error.message).to match(/Invalid step name: "foo-bar"/)
         end
       end
 
@@ -154,8 +154,8 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
-          expect(error.message).to match(/Parse error in step \"foo-bar\"/)
-          expect(error.message).to match(/Multiple action keys detected: \[\"task\", \"eval\"\]/)
+          expect(error.message).to match(/Parse error in step "foo-bar"/)
+          expect(error.message).to match(/Multiple action keys detected: \["task", "eval"\]/)
         end
       end
 
@@ -171,7 +171,7 @@ describe Bolt::PAL::YamlPlan do
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
           expect(error.message).to match(/Parse error in step number 1/)
-          expect(error.message).to match(/The \"eval\" step does not support: \[\"bar\"\] key\(s\)/)
+          expect(error.message).to match(/The "eval" step does not support: \["bar"\] key\(s\)/)
         end
       end
 
@@ -186,8 +186,8 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
-          expect(error.message).to match(/Parse error in step \"foo\"/)
-          expect(error.message).to match(/The \"task\" step requires: \[\"targets\"\] key\(s\)/)
+          expect(error.message).to match(/Parse error in step "foo"/)
+          expect(error.message).to match(/The "task" step requires: \["targets"\] key\(s\)/)
         end
       end
 

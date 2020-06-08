@@ -11,12 +11,13 @@ Puppet::DataTypes.create_type('ResourceInstance') do
       'events'        => Optional[Array[Hash[String[1], Data]]]
     },
     functions => {
-      add_event               => Callable[[Hash[String[1], Data]], [Hash[String[1], Data]]],
+      add_event               => Callable[[Hash[String[1], Data]], Array[Hash[String[1], Data]]],
       set_state               => Callable[[Hash[String[1], Data]], Hash[String[1], Data]],
       overwrite_state         => Callable[[Hash[String[1], Data]], Hash[String[1], Data]],
       set_desired_state       => Callable[[Hash[String[1], Data]], Hash[String[1], Data]],
       overwrite_desired_state => Callable[[Hash[String[1], Data]], Hash[String[1], Data]],
-      reference               => Callable[[], String]
+      reference               => Callable[[], String],
+      '[]'                    => Callable[[String[1]], Data]
     }
   PUPPET
 

@@ -130,7 +130,7 @@ describe "running YAML plans", ssh: true do
     result = run_plan('yaml::bad_puppet')
 
     expect(result['kind']).to eq("bolt/invalid-plan")
-    expect(result['msg']).to match(/Parse error in step \"x_fail\":/)
+    expect(result['msg']).to match(/Parse error in step "x_fail":/)
   end
 
   it 'passes information between steps' do

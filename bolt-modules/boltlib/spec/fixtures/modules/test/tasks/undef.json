@@ -1,0 +1,15 @@
+{
+  "description": "undef task",
+  "input_method": "environment",
+  "parameters": {
+    "undef_default": {
+      "description": "parameter with default",
+      "type": "String",
+      "default": "foo"
+    },
+    "undef_no_default": {
+      "description": "parameter with no default",
+      "type": "Any"
+    }
+  }
+}

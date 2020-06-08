@@ -1,8 +1,8 @@
 # Module structure
 
-Puppet tasks, plans, functions, classes and types must exist inside a Puppet module in order for Bolt to load them. Bolt loads modules by searching for module directories on the modulepath.
+Puppet tasks, plans, functions, classes and types must exist inside a Puppet module in order for Bolt to load them. Bolt loads modules by searching for module directories on the module path.
 
-By default, the modulepath includes the `modules` and `site-modules` directories
+By default, the module path includes the `modules` and `site-modules` directories
 in the [Bolt project directory](bolt_project_directories.md#). If `bolt-project.yaml`
 exists at the root of the project directory, the project itself is also
 loaded as a module and namespaced to either `name` in `bolt-project.yaml` if it's
@@ -13,7 +13,7 @@ set, or the name of the directory if `name` is not set.
 
 ## Directory structure of a module
 
-A module is a sub-directory of one of the directories on the modulepath. In order for Bolt to load tasks and plans, they must exist in the `tasks/` or `plans/` directory of a module with the correct name.
+A module is a sub-directory of one of the directories on the module path. In order for Bolt to load tasks and plans, they must exist in the `tasks/` or `plans/` directory of a module with the correct name.
 
 > 🔩 **Tip:** You can use the Puppet Development Kit (PDK) to create modules and add tasks to it.
 
@@ -64,5 +64,5 @@ To create a standalone module, run `pdk new module` outside of the project direc
 Follow these tips for managing standalone modules:
 
 -   Add `modules/*` to `.gitignore` of your project to prevent accidentally committing standalone modules.
--   When you run tasks and plans within a project directory the modulepath is searched in order for modules containing Bolt content. The Bolt project directory itself is loaded as a module at the front of the modulepath, and the default modulepath is `<project directory>/modules:<project directory>/site-modules`. If you have a module in both the `modules` and `site-modules` directories, the version in `modules` will be used.
+-   When you run tasks and plans within a project directory the module path is searched in order for modules containing Bolt content. The Bolt project directory itself is loaded as a module at the front of the module path, and the default module path is `[<project directory>/modules, <project directory>/site-modules]`. If you have a module in both the `modules` and `site-modules` directories, the version in `modules` will be used.
 -   As a best practice, write automated tests for the tasks and plans in your module, if possible. For information about automated testing patterns, check out these resources: [Example of unit testing plans and integration \(acceptance\) testing tasks](https://github.com/puppetlabs/puppetlabs-facts) (GitHub) and [Writing Robust Puppet Bolt Tasks: A Guide](https://puppet.com/blog/writing-robust-puppet-bolt-tasks-guide) (Puppet blog).

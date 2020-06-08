@@ -259,7 +259,7 @@ describe Bolt::Transport::WinRM do
     # verifies the local setup has already acquired the right Kerberos ticket
     it "has acquired a ticket granting ticket from the Samba AD / KDC" do
       esc_realm = Regexp.escape(@kerb_realm)
-      expect(`klist`).to match(%r{krbtgt\/#{esc_realm}@#{esc_realm}})
+      expect(`klist`).to match(%r{krbtgt/#{esc_realm}@#{esc_realm}})
     end
 
     it "executes a command on a host over HTTP" do
