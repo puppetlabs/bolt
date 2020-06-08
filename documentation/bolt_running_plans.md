@@ -7,7 +7,7 @@ details, see [Packaged modules](bolt_installing_modules.md#packaged-modules).
 
 To execute a plan, run `bolt plan run` and specify:
 -   The full name of the plan, formatted as `<MODULE>::<PLAN>`.
--   Any plan parameters, as `parameter=value`.
+-   Any plan parameters, as `<PARAMETER>=<VALUE>`.
 -   (If required) The username and password to access the target. Pass these in as `--user` and `--password` flags. 
 
 For example, imagine a plan that deploys a load balancer. The plan is located at `mymodule/plans/myplan.pp` and accepts a `load_balancer` parameter, which is the target that the plan runs its tasks or functions on. If your load balancer was `lb.myorg.com`, you would use the following command to run the plan:
@@ -34,7 +34,7 @@ If you are developing a new plan, you can create an empty `<PROJECT_NAME/bolt-pr
 
 If one of your plan parameters accepts structured data like an `array` or `hash`, you can pass the data into the plan as JSON from the command line. The parsed value must match the parameter's type specification in the plan definition.
 
-To pass a single parameter as JSON, use the syntax `<PARAM>=<VALUE>`. Make sure you wrap the JSON value in single quotes to prevent `"` characters from being swallowed by the shell. For example:
+To pass a single parameter as JSON, use the syntax `<PARAMETER>=<VALUE>`. Make sure you wrap the JSON value in single quotes to prevent `"` characters from being swallowed by the shell. For example:
 
 ```
 bolt plan run mymodule::myplan load_balancers='["lb1.myorg.com", "lb2.myorg.com"]'
@@ -59,7 +59,7 @@ bolt plan run mymodule::myplan --targets app1.myorg.com --params $(@{load_balanc
 ```
 
 📖 **Related information**
-- For information on Bolt project directories, see [Bolt project directories](#bolt_project_directories.md)
-- For information on running Bolt tasks, see [Running tasks](./bolt_running_tasks.md)
+- For information on Bolt project directories, see [Bolt project directories](#bolt_project_directories.md).
+- For information on running Bolt tasks, see [Running tasks](./bolt_running_tasks.md).
 - To find out how to write your own plan, see [Writing plans in YAML](./writing_yaml_plans.md) or
-  [Writing plans Puppet language](./writing_plans.md)
+  [Writing plans in the Puppet language](./writing_plans.md).

@@ -20,12 +20,7 @@ loads plans located in the `site-modules/<MODULE_NAME>/plans` and
 `modules/<MODULE_NAME>/plans` directories. Put your Bolt plan in your module's
 `plans` directory and give it the `.pp` extension. For example, given a plan
 named `my_plan.pp` in a module named `my_module`, the location of the plan
-would be `site-modules/my_module/site`. If you're developing a new plan and
-want to test it, or you don't need to create a module, you can create a Bolt
-project directory and put the plan in a `plans` directory. 
-
-> **Note:** Bolt projects are an experimental feature. For more information, see [Bolt
-projects](experimental_features.md#bolt-projects)
+would be `site-modules/my_module/plans/my_plan.pp`.
 
 ## Naming plans
 
@@ -37,26 +32,6 @@ Plan names are composed of two or more name segments, indicating:
 -   The name of the plan file, without the extension.
 -   The path within the module, if the plan is in a subdirectory of `./plans`.
 
-For example, given a module called `mymodule` with a plan defined in
-`./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. The first
-line in `myplan.pp` would be:
-
-```puppet
-plan mymodule::myplan
-```
-
-Similarly, to call a plan defined in `./mymodule/plans/service/myplan.pp`, you
-would use the name, `mymodule::service::myplan`.
-
-The plan filename `init` is special. You reference an `init` plan using the
-module name only. For example, in a module called `mymodule`, the plan defined
-in `mymodule/plans/init.pp` is the `mymodule` plan. For an example of an `init` plan, see the
-[facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp).
-
-Avoid giving plans the same names as constructs in the Puppet language.
-Although plans do not share their namespace with other language constructs,
-giving plans these names makes your code difficult to read.
-
 Each plan name segment must begin with a lowercase letter and:
 -   Can include lowercase letters.
 -   Can include digits.
@@ -64,6 +39,28 @@ Each plan name segment must begin with a lowercase letter and:
 -   Must not be a [reserved word](https://puppet.com/docs/puppet/latest/lang_reserved.html).
 -   Must not have the same name as any Puppet data types.
 -   Namespace segments must match the regular expression: `\A[a-z][a-z0-9_]*\Z`.
+
+> **Note**: Avoid giving plans the same names as constructs in the Puppet language.
+> Although plans do not share their namespace with other language constructs,
+> giving plans these names makes your code difficult to read.
+
+For example, given a module called `mymodule` with a plan defined in
+`./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. The first
+line in `myplan.pp` would be:
+
+```puppet
+plan mymodule::myplan()
+```
+
+Similarly, to call a plan defined in `./mymodule/plans/service/myplan.pp`, you
+would use the name, `mymodule::service::myplan`.
+
+### `init` plans
+
+The plan filename `init` is special. You reference an `init` plan using the
+module name only. For example, in a module called `mymodule`, the plan defined
+in `mymodule/plans/init.pp` is the `mymodule` plan. For an example of an `init` plan, see the
+[facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp).
 
 ## Defining plan parameters
 
@@ -287,9 +284,15 @@ plan test (String[1] $role) {
 
 ## Puppet and Ruby functions in plans
 
-You can define and call Puppet language functions and Ruby functions in plans.
+You can define and call [Puppet language functions](https://puppet.com/docs/puppet/latest/function.html) and Ruby functions in plans.
 
-This is useful for packaging common general logic in your plan. You can also call the plan functions, such as `run_task` or `run_plan`, from within a function.
+This is useful for packaging common general logic in your plan. You can also
+call the plan functions, such as `run_task` or `run_plan`, from within a
+function.
+
+> 🔩 **Tip**: You can use any combination of [Bolt 
+> functions](plan_functions.md) or [built-in Puppet
+> functions](https://puppet.com/docs/puppet/latest/function.html) in a plan.
 
 Not all Puppet language constructs are allowed in plans. The following constructs are not allowed:
 
@@ -705,7 +708,7 @@ These resources show simple use cases such as running a task and manipulating th
   plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/info.pp):
   Uses the facts task to discover facts and map relevant fact values to targets.
 
-### Intermediate
+### Intermediate plans
 
 These resources show more advanced features in the plan language.
 
@@ -714,7 +717,7 @@ These resources show more advanced features in the plan language.
   plan](https://github.com/puppetlabs/puppetlabs-reboot/blob/master/plans/init.pp):
   Restarts a target system and waits for it to become available again.
 
-### Advanced
+### Advanced plans
 
 These resources show more complex use cases such as applying puppet code blocks
 and using external modules.

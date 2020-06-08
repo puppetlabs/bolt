@@ -2,7 +2,7 @@
 
 Before you run a plan in your environment, inspect the plan to determine what effect it has on your targets.
 
-🔩 **Tip:** Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](bolt_installing_modules.md#packaged-modules).
+> 🔩 **Tip:** Bolt is packaged with a collection of modules that contain useful plans to support common workflows. For details, see [Packaged modules](bolt_installing_modules.md#packaged-modules).
 
 ## Discover plans
 
@@ -12,12 +12,12 @@ View a list of available plans:
 bolt plan show
 ``` 
 
-If you don't see the plan you were expecting to find, make sure the plan is
+If you don't see a plan you were expecting to find, make sure the plan is
 located in the correct directory. For more information, see [How Bolt locates plans](./bolt_running_plans.md#how-bolt-locates-plans)
 
-## Inspect a plan
+## Show documentation for a plan
 
-View parameters and other details for a plan, including whether a plan supports `--noop`:
+Use the following syntax to view parameters and other details for a plan, including whether a plan supports `--noop`:
 
 ```
 bolt plan show <PLAN NAME>
