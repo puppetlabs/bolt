@@ -1,5 +1,46 @@
 # Changelog
 
+## Bolt 2.13.0 (2020-06-08)
+
+### New features
+
+* **Use task parameter default when specified parameter is `Undef`**
+  ([#1847](https://github.com/puppetlabs/issues/1847))
+
+  Task parameters that are specified with a value of `Undef` will now
+  use the default parameter value if one is defined in the task's
+  metadata.
+
+* **Accept `resource_type` key in resource data hash for `set_resources`
+  plan function**
+  ([#1872](https://github.com/puppetlabs/bolt/issues/1872))
+
+  The `set_resources` function now accepts resource data hashes that
+  have a `resource_type` key instead of a `type` key. This allows users
+  to set resources directly from reports from an apply block, which set
+  a resource's type under the `resource_type` key.
+
+* **Added `[]` function to the `ResourceInstance` data type**
+  ([#1873](https://github.com/puppetlabs/bolt/issues/1873))
+
+  The `[]` function can be used to directly access the `state` hash for
+  a `ResourceInstance` object and return the specified attribute.
+
+### Bug fixes
+
+* **Project-level content can now be used in apply blocks**
+  ([#1836](https://github.com/puppetlabs/bolt/issues/1836))
+
+  Project-level classes and defines can now be used in `apply` blocks
+  and `bolt apply`.
+
+* **Correct `ResourceInstance.add_event` return type**
+  ([#1869](https://github.com/puppetlabs/bolt/pull/1869))
+
+  Previously, the `add_event` function had a typo that prevented it from
+  successfully returning. It now correctly expects an
+  `Array[Hash[String[1], Data]]]`.
+
 ## Bolt 2.12.0 (2020-06-01)
 
 ### New features
