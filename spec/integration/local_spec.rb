@@ -33,6 +33,13 @@ describe "when running over the local transport" do
       expect(result[0]['_error']).to be
     end
 
+    it 'returns correct exit code', :reset_puppet_settings do
+      cmd = 'puppet apply --trace --detailed-exitcodes -e "notify {foo:}"'
+      result = run_failed_nodes(%W[command run #{cmd} -t #{uri}]).first
+      expect(result['_error']['msg']).to eq('The command failed with exit code 2')
+      expect(result['_error']['details']['exit_code']).to eq(2)
+    end
+
     it 'runs a ruby task using bolt ruby', :reset_puppet_settings do
       result = run_one_node(%w[task run sample::bolt_ruby message=somemessage] + config_flags)
       expect(result['env']).to match(/somemessage/)

@@ -20,6 +20,14 @@ module Bolt
             PS
           end
 
+          def exit_with_code(command)
+            <<~PS
+            #{command}
+            if (-not $? -and ($LASTEXITCODE -eq $null)) { exit 1 }
+            exit $LASTEXITCODE
+            PS
+          end
+
           def make_tmpdir(parent)
             <<~PS
             $parent = #{parent}
