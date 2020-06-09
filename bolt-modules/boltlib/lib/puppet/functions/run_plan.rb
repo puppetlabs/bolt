@@ -187,7 +187,11 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     params.each_with_object({}) do |(name, value), acc|
       model = models[name]
 
-      if sensitive_type?(model.type_expr)
+      # Parameters passed to a plan that the plan is not expecting don't have a model,
+      # so keep the parameter as-is.
+      if model.nil?
+        acc[name] = value
+      elsif sensitive_type?(model.type_expr)
         acc[name] = Puppet::Pops::Types::PSensitiveType::Sensitive.new(value)
       else
         if model.type_expr.to_s.include?('Sensitive')
