@@ -15,9 +15,11 @@ functions](plan_functions.md) or [built-in Puppet functions](https://puppet.com/
 
 ## Plan location
 
-Bolt content follows the same directory structure as Puppet modules. Bolt
-loads plans located in the `site-modules/<MODULE_NAME>/plans` and
-`modules/<MODULE_NAME>/plans` directories. Put your Bolt plan in your module's
+Bolt content follows the same directory structure as Puppet modules. Bolt loads
+downloaded module plans from `modules/<MODULE_NAME>/plans/`, and local plans
+from `site-modules/<MODULE_NAME>/plans/`.
+
+Put your Bolt plan in your module's
 `plans` directory and give it the `.pp` extension. For example, given a plan
 named `my_plan.pp` in a module named `my_module`, the location of the plan
 would be `site-modules/my_module/plans/my_plan.pp`.
@@ -203,23 +205,13 @@ plan mymodule::myplan {
 }
 ```
 
-## Indicating success and failure in plans
+## Success and failure in plans
 
-Any plan that completes execution without an error is considered successful. The
-`bolt` command exits `0` and any calling plans continue execution. If any calls
-to `run_` functions fail **without** `_catch_errors`, the plan halts execution
-and is considered a failure. Any calling plans also halt until a `run_plan` call
-with `_catch_errors` or a `catch_errors` block is reached. If one isn't reached,
-the `bolt` command exits `2`. 
-
-When writing a plan, if you have reason to believe it has failed, you can fail
-the plan with the `fail_plan` function. This causes the bolt command to exit `2`
-and prevents calling plans executing any further, unless `run_plan` was called
-with `_catch_errors` or in a `catch_errors` block.
-
-### Failing plans
-
-If `upload_file`, `run_command`, `run_script`, or `run_task` are called without the `_catch_errors` option and they fail on any targets, the plan itself fails. To fail a plan directly, call the `fail_plan` function. Create an error with a message and include the kind, details, or issue code, or pass an existing error to it.
+If `upload_file`, `run_command`, `run_script`, or `run_task` are called without
+the `_catch_errors` option and they fail on any targets, the plan itself fails.
+To fail a plan directly, call the `fail_plan` function. Create an error with a
+message and include the kind, details, or issue code, or pass an existing error
+to it.
 
 ```
 fail_plan('The plan is failing', 'mymodules/pear-shaped', {'failedtargets' => $result.error_set.names})
@@ -284,7 +276,9 @@ plan test (String[1] $role) {
 
 ## Puppet and Ruby functions in plans
 
-You can define and call [Puppet language functions](https://puppet.com/docs/puppet/latest/function.html) and Ruby functions in plans.
+You can define and call [built-in Puppet
+functions](https://puppet.com/docs/puppet/latest/function.html) and custom Ruby
+functions in plans.
 
 This is useful for packaging common general logic in your plan. You can also
 call the plan functions, such as `run_task` or `run_plan`, from within a

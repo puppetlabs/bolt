@@ -17,10 +17,10 @@ located in the correct directory. For more information, see [How Bolt locates pl
 
 ## Show documentation for a plan
 
-Use the following syntax to view parameters and other details for a plan, including whether a plan supports `--noop`:
+Use the following command to view parameters and other details for a plan, including whether a plan supports `--noop`:
 
 ```
-bolt plan show <PLAN NAME>
+bolt plan show <PLAN_NAME>
 ```
 
 For example, to see the parameters and documentation for the `facts::info` plan, run:
