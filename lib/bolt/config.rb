@@ -34,6 +34,13 @@ module Bolt
       'remote' => Bolt::Config::Transport::Remote
     }.freeze
 
+    TRANSPORT_OPTION = { 'transport' => 'The default transport to use when the '\
+                         'transport for a target is not specified in the URL.' }.freeze
+
+    DEFAULT_TRANSPORT_OPTION = { 'transport' => 'ssh' }.freeze
+
+    CONFIG_IN_INVENTORY = TRANSPORT_CONFIG.merge(TRANSPORT_OPTION)
+
     # NOTE: All configuration options should have a corresponding schema property
     #       in schemas/bolt-config.schema.json
     OPTIONS = {
@@ -55,8 +62,8 @@ module Bolt
       "save-rerun"               => "Whether to update `.rerun.json` in the Bolt project directory. If "\
                                     "your target names include passwords, set this value to `false` to avoid "\
                                     "writing passwords to disk.",
-      "transport"                => "The default transport to use when the transport for a target is not "\
-                                    "specified in the URL or inventory.",
+      "transport"                => "The default transport to use when the transport for a target is not specified "\
+                                    "in the URL or inventory.",
       "trusted-external-command" => "The path to an executable on the Bolt controller that can produce "\
                                     "external trusted facts. **External trusted facts are experimental in both "\
                                     "Puppet and Bolt and this API may change or be removed.**"
@@ -104,14 +111,17 @@ module Bolt
     DEFAULT_DEFAULT_CONCURRENCY = 100
 
     def self.default
-      new(Bolt::Project.new('.'), {})
+      new(Bolt::Project.create_project('.'), {})
     end
 
     def self.from_project(project, overrides = {})
-      data = {
-        filepath: project.config_file,
-        data: Bolt::Util.read_optional_yaml_hash(project.config_file, 'config')
-      }
+      conf = if project.project_file == project.config_file
+               project.data
+             else
+               Bolt::Util.read_optional_yaml_hash(project.config_file, 'config')
+             end
+
+      data = { filepath: project.config_file, data: conf }
 
       data = load_defaults(project).push(data).select { |config| config[:data]&.any? }
 
@@ -119,12 +129,13 @@ module Bolt
     end
 
     def self.from_file(configfile, overrides = {})
-      project = Bolt::Project.new(Pathname.new(configfile).expand_path.dirname)
-
-      data = {
-        filepath: project.config_file,
-        data: Bolt::Util.read_yaml_hash(configfile, 'config')
-      }
+      project = Bolt::Project.create_project(Pathname.new(configfile).expand_path.dirname)
+      conf = if project.project_file == project.config_file
+               project.data
+             else
+               Bolt::Util.read_yaml_hash(configfile, 'config')
+             end
+      data = { filepath: project.config_file, data: conf }
       data = load_defaults(project).push(data).select { |config| config[:data]&.any? }
 
       new(project, data, overrides)
@@ -158,8 +169,8 @@ module Bolt
       end
 
       @logger = Logging.logger[self]
-      @warnings = []
       @project = project
+      @warnings = @project.warnings.dup
       @transports = {}
       @config_files = []
 

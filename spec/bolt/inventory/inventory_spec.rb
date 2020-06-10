@@ -240,7 +240,7 @@ describe Bolt::Inventory::Inventory do
           }
         }
       end
-      let(:config)    { Bolt::Config.new(Bolt::Project.new('.'), data) }
+      let(:config)    { Bolt::Config.new(Bolt::Project.new({}, '.'), data) }
       let(:inventory) { Bolt::Inventory::Inventory.new({}, config.transport, config.transports, plugins) }
       let(:target)    { inventory.get_targets('notarget')[0] }
 

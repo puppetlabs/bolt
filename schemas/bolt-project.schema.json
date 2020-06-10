@@ -4,6 +4,84 @@
   "description": "Bolt Project bolt-project.yaml Schema",
   "type": "object",
   "properties": {
+    "apply_settings": {
+      "description": "A map of Puppet settings to use when applying Puppet code.",
+      "type": "object",
+      "properties": {
+        "show_diff": {
+          "description": "Whether to log and report a contextual diff when files are being replaced.",
+          "type": "boolean"
+        }
+      }
+    },
+    "color": {
+      "description": "Whether to use colored output when printing messages to the console.",
+      "type": "boolean"
+    },
+    "compile-concurrency": {
+      "description": "The maximum number of simultaneous manifest block compiles.",
+      "type": "integer",
+      "min": 1
+    },
+    "concurrency": {
+      "description": "The number of threads to use when executing on remote targets.",
+      "type": "integer",
+      "min": 1
+    },
+    "format": {
+      "description": "The format to use when printing results.",
+      "type": "string",
+      "enum": ["human", "json"]
+    },
+    "hiera-config": {
+      "description": "The path to your Hiera config.",
+      "type": "string"
+    },
+    "inventoryfile": {
+      "description": "The path to your inventory file.",
+      "type": "string"
+    },
+    "log": {
+      "description": "The configuration of the logfile output. Configuration can be set for console and the path to a log file, such as ~/.puppetlabs/bolt/debug.log.",
+      "type": "object",
+      "properties": {
+        "console": {
+          "description": "Configuration for logs output to the console.",
+          "type": "object",
+          "properties": {
+            "level": {
+              "description": "The type of information in the log.",
+              "type": "string",
+              "enum": ["debug", "error", "info", "notice", "warn"]
+            }
+          }
+        }
+      },
+      "additionalProperties": {
+        "description": "Configuration for logs output to a file.",
+        "type": "object",
+        "properties": {
+          "append": {
+            "description": "Add output to an existing log file.",
+            "type": "boolean"
+          },
+          "level": {
+            "description": "The type of information in the log.",
+            "type": "string",
+            "enum": ["debug", "error", "info", "notice", "warn"]
+          }
+        }
+      }
+    },
+    "modulepath": {
+      "description": "The module path for loading tasks and plan code. This is either an array of directories or a string containing a list of directories separated by the OS-specific PATH separator.",
+      "type": ["array", "string"],
+      "items": {
+        "description": "Module path.",
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
     "name": {
       "description": "The Bolt project name.",
       "type": "string",
@@ -19,6 +97,84 @@
       },
       "uniqueItems": true
     },
+    "plugin_hooks": {
+      "description": "Which plugins a specific hook should use.",
+      "type": "object",
+      "properties": {
+        "puppet_library": {
+          "description": "Specify which plugin should be used to ensure the Puppet library is installed on a target.",
+          "type": "object"
+        }
+      }
+    },
+    "plugins": {
+      "description": "A map of plugins and their configuration data.",
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9_]*$": { 
+          "type": "object"
+        }
+      }
+    },
+    "puppetdb": {
+      "description": "A map containing options for configuring the Bolt PuppetDB client.",
+      "type": "object",
+      "properties": {
+        "cacert": {
+          "description": "The path to the ca certificate for PuppetDB.",
+          "type": "string"
+        },
+        "cert": {
+          "description": "The path to the client certificate file to use for authentication.",
+          "type": "string"
+        },
+        "key": {
+          "description": "The path to the private key for the certificate.",
+          "type": "string"
+        },
+        "server_urls": {
+          "description": "An array containing the PuppetDB host to connect to. Include the protocol https and the port, which is usually 8081. For example, https://my-master.example.com:8081.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "description": "A PuppetDB host.",
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "puppetfile": {
+      "description": "A map containing options for the 'bolt puppetfile install' command.",
+      "type": "object",
+      "properties": {
+        "forge": {
+          "description": "A subsection that can have its own proxy setting to set an HTTP proxy for Forge operations only, and a baseurl setting to specify a different Forge host.",
+          "type": "object",
+          "properties": {
+            "baseurl": {
+              "description": "The URI for the Forge host.",
+              "type": "string",
+              "format": "uri"
+            },
+            "proxy": {
+              "description": "The HTTP proxy to use for Forge operations.",
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "proxy": {
+          "description": "The HTTP proxy to use for Git and Forge operations.",
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "save-rerun": {
+      "description": "Whether to update .rerun.json in the Bolt project directory. If your target names include passwords, set this value to false to avoid writing passwords to disk.",
+      "type": "boolean"
+    },
     "tasks": {
       "description": "The list of whitelisted tasks.",
       "type": "array",
@@ -28,6 +184,10 @@
         "pattern": "^[a-z][a-z0-9_]*(::[a-z][a-z0-9_]*)*$"
       },
       "uniqueItems": true
+    },
+    "trusted-external-command": {
+      "description": "The path to an executable on the Bolt controller that can produce external trusted facts.",
+      "type": "string"
     }
   }
 }

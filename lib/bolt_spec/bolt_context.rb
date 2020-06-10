@@ -138,7 +138,7 @@ module BoltSpec
     # Override in your tests
     def config
       @config ||= begin
-                    conf = Bolt::Config.new(Bolt::Project.new('.'), {})
+                    conf = Bolt::Config.default
                     conf.modulepath = [modulepath].flatten
                     conf
                   end

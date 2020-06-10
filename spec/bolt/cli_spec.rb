@@ -88,7 +88,7 @@ describe "Bolt::CLI" do
   end
 
   context "without a config file" do
-    let(:project) { Bolt::Project.new('.') }
+    let(:project) { Bolt::Project.new({}, '.') }
     before(:each) do
       allow(Bolt::Project).to receive(:find_boltdir).and_return(project)
       allow_any_instance_of(Bolt::Project).to receive(:resource_types)
@@ -1047,7 +1047,7 @@ describe "Bolt::CLI" do
             type: '',
             resource_types: '',
             tasks: ['facts'],
-            load_as_module?: true,
+            project_file?: true,
             name: nil,
             to_h: {}
           }
@@ -2511,6 +2511,22 @@ describe "Bolt::CLI" do
         expect(@log_output.readlines.join)
           .to match(/CLI arguments \["password"\] may be overridden by Inventory:/)
       end
+    end
+  end
+
+  it 'with bolt-project with config, warns and ignores bolt.yaml' do
+    Dir.mktmpdir do |dir|
+      pwd = File.join(dir, 'validname')
+      FileUtils.mkdir_p(pwd)
+      FileUtils.touch(File.join(pwd, 'bolt.yaml'))
+      File.write(File.join(pwd, 'bolt-project.yaml'), { 'format' => 'json' }.to_yaml)
+
+      cli = Bolt::CLI.new(%W[command run whoami -t foo --boltdir #{pwd}])
+      cli.parse
+
+      output = @log_output.readlines
+      expect(output).to include(/Project-level configuration in bolt.yaml is deprecated/)
+      expect(output).to include(/bolt-project.yaml contains valid config keys/)
     end
   end
 end

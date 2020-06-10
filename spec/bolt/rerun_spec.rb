@@ -11,7 +11,7 @@ require 'bolt/util'
 describe 'rerun' do
   around(:each) do |example|
     Dir.mktmpdir do |project|
-      @project = Bolt::Project.new(project)
+      @project = Bolt::Project.new({}, project)
       example.run
     end
   end

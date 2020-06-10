@@ -8,7 +8,7 @@ describe "When loading content", ssh: true do
   include BoltSpec::Conn
   include BoltSpec::Integration
 
-  let(:local) { Bolt::Project.new(File.join(__dir__, '../fixtures/projects/local'), 'local') }
+  let(:local) { Bolt::Project.create_project(File.join(__dir__, '../fixtures/projects/local'), 'local') }
   let(:target) { conn_uri('ssh') }
   let(:config_flags) { %W[--no-host-key-check --password #{conn_info('ssh')[:password]}] }
 
@@ -28,13 +28,13 @@ describe "When loading content", ssh: true do
   end
 
   it "runs plans namespaced with embedded project type" do
-    embedded = Bolt::Project.new(File.join(__dir__, '../fixtures/projects/embedded/Boltdir'), 'embedded')
+    embedded = Bolt::Project.create_project(File.join(__dir__, '../fixtures/projects/embedded/Boltdir'), 'embedded')
     result = run_cli_json(%W[plan run embedded -t #{target}] + config_flags, project: embedded)
     expect(result[0]['value']['stdout'].strip).to eq('polo')
   end
 
   it "runs plans namespaced to configured project name" do
-    named = Bolt::Project.new(File.join(__dir__, '../fixtures/projects/named'), 'local')
+    named = Bolt::Project.create_project(File.join(__dir__, '../fixtures/projects/named'), 'local')
     result = run_cli_json(%W[plan run test_project -t #{target}] + config_flags, project: named)
     expect(result[0]['value']['stdout'].strip).to eq('polo')
   end

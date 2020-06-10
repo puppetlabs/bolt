@@ -8,7 +8,7 @@ module BoltSpec
     include BoltSpec::PuppetDB
 
     def run_cli(arguments, rescue_exec: false, outputter: Bolt::Outputter::JSON,
-                project: Bolt::Project.new(Dir.mktmpdir))
+                project: Bolt::Project.new({}, Dir.mktmpdir))
       cli = Bolt::CLI.new(arguments)
 
       # prevent tests from reading users config

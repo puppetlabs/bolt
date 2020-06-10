@@ -48,7 +48,7 @@ describe Bolt::Transport::SSH, ssh: true do
   let(:env_task)          { "#!/bin/sh\necho $PT_data" }
 
   let(:config)            { make_config }
-  let(:project)           { Bolt::Project.new('.') }
+  let(:project)           { Bolt::Project.new({}, '.') }
   let(:plugins)           { Bolt::Plugin.setup(config, nil) }
   let(:inventory)         { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
   let(:target)            { make_target }

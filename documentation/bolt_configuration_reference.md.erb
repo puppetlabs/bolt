@@ -127,7 +127,14 @@ The `puppetfile` section of the configuration file configures how to retrieve mo
 
 ## Transport configuration options
 
-Transport configuration options can be set in both the configuration file and inventory file.
+Transport configuration options can be set in the inventory file. Options at
+the inventory's top level will apply to all targets.
+
+### The transport option
+
+<% @transport_option[:options].each do |option, desc| -%>
+| `<%= option %>` | <%= desc %> | <%= @transport_option[:defaults][option].to_s %> |
+<% end %>
 
 <% @transports[:options].each do |transport, options| %>
 ### <%= transport %>
