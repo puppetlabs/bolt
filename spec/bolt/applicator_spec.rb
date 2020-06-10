@@ -62,6 +62,11 @@ describe Bolt::Applicator do
     expect(applicator).to be
   end
 
+  it 'errors with an empty catalog' do
+    expect { applicator.apply([target], nil, nil) }
+      .to raise_error(ArgumentError, /apply requires at least one statement/)
+  end
+
   it 'passes catalog input' do
     expect(Open3).to receive(:capture3)
       .with('ruby', /bolt_catalog/, 'compile', stdin_data: input.merge(target_hash).to_json)
