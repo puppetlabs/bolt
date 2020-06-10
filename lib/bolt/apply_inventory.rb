@@ -70,6 +70,10 @@ module Bolt
       @targets[target.name].features
     end
 
+    def resource(target, type, title)
+      @targets[target.name].resource(type, title)
+    end
+
     def add_to_group(*_params)
       raise InvalidFunctionCall, 'add_to_group'
     end
