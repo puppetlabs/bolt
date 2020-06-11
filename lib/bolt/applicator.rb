@@ -21,7 +21,7 @@ module Bolt
 
       @inventory = inventory
       @executor = executor
-      @modulepath = modulepath
+      @modulepath = modulepath || []
       @plugin_dirs = plugin_dirs
       @project = project
       @pdb_client = pdb_client
