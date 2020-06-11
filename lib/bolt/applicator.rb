@@ -146,6 +146,7 @@ module Bolt
 
     def apply(args, apply_body, scope)
       raise(ArgumentError, 'apply requires a TargetSpec') if args.empty?
+      raise(ArgumentError, 'apply requires at least one statement in the apply block') if apply_body.nil?
       type0 = Puppet.lookup(:pal_script_compiler).type('TargetSpec')
       Puppet::Pal.assert_type(type0, args[0], 'apply targets')
 

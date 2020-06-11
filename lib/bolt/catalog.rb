@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
+require 'bolt/apply_inventory'
 require 'bolt/apply_target'
 require 'bolt/config'
 require 'bolt/error'
 require 'bolt/inventory'
-require 'bolt/apply_inventory'
 require 'bolt/pal'
 require 'bolt/puppetdb'
 require 'bolt/util'
