@@ -1,83 +1,93 @@
-# Writing plans in Puppet language
+# Writing plans in the Puppet language
 
-Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.
+Bolt plans allow you to tie together complex workflows that include multiple
+tasks, scripts, commands, and even other plans.
 
-Write plans in the Puppet language, giving them a `.pp` extension, and place them in the module's `/plans` directory.
+Plans written in the Puppet language allow for more sophisticated control flow
+and better error handling than YAML plans. Puppet plans also allow you to apply
+blocks of Puppet code to remote targets.
 
-Plans can use any combination of [Bolt functions](plan_functions.md#) or [built-in Puppet functions](https://puppet.com/docs/puppet/6.1/function.html).
+When you're writing a plan, you can use any combination of [Bolt 
+functions](plan_functions.md) or [built-in Puppet functions](https://puppet.com/docs/puppet/latest/function.html).
 
-**Related information**  
+> **Note:** For information on how to convert an existing YAML plan to a Puppet
+> plan, see [Converting YAML plans to Puppet language plans](writing_yaml_plans.md).
 
-- [Converting YAML plans to Puppet language plans](writing_yaml_plans.md#)
+## Plan location
+
+Bolt content follows the same directory structure as Puppet modules. Bolt loads
+downloaded module plans from `modules/<MODULE_NAME>/plans/`, and local plans
+from `site-modules/<MODULE_NAME>/plans/`.
+
+Put your Bolt plan in your module's
+`plans` directory and give it the `.pp` extension. For example, given a plan
+named `my_plan.pp` in a module named `my_module`, the location of the plan
+would be `site-modules/my_module/plans/my_plan.pp`.
 
 ## Naming plans
 
-Plan names are based on the filename of the plan, the name of the module containing the plan, and the path to the plan within the module.
-
-Place plan files in your module's `./plans` directory, using these file extensions:
-
--   Puppet plans — `.pp`
--   YAML plans — `.yaml`, not `.yml`
+The first line of your plan contains the plan name. You use the plan name to
+call the plan from the Bolt command line, or from other plans.
 
 Plan names are composed of two or more name segments, indicating:
-
 -   The name of the module the plan is located in.
 -   The name of the plan file, without the extension.
 -   The path within the module, if the plan is in a subdirectory of `./plans`.
 
-
-For example, given a module called `mymodule` with a plan defined in `./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. A plan defined in `./mymodule/plans/service/myplan.pp` would be `mymodule::service::myplan`. This name is how you refer to the plan when you run commands.
-
-The plan filename `init` is special. You reference an `init` plan using the module name only. For example, in a module called `mymodule`, the plan defined in `init.pp` is the `mymodule` plan.
-
-Avoid giving plans the same names as constructs in the Puppet language. Although plans do not share their namespace with other language constructs, giving plans these names makes your code difficult to read.
-
 Each plan name segment must begin with a lowercase letter and:
-
 -   Can include lowercase letters.
 -   Can include digits.
 -   Can include underscores.
--   Must not be a [reserved word](https://docs.puppet.com/puppet/5.3/lang_reserved.html).
+-   Must not be a [reserved word](https://puppet.com/docs/puppet/latest/lang_reserved.html).
 -   Must not have the same name as any Puppet data types.
 -   Namespace segments must match the regular expression: `\A[a-z][a-z0-9_]*\Z`.
 
+> **Note**: Avoid giving plans the same names as constructs in the Puppet language.
+> Although plans do not share their namespace with other language constructs,
+> giving plans these names makes your code difficult to read.
+
+For example, given a module called `mymodule` with a plan defined in
+`./mymodule/plans/myplan.pp`, the plan name is `mymodule::myplan`. The first
+line in `myplan.pp` would be:
+
+```puppet
+plan mymodule::myplan()
+```
+
+Similarly, to call a plan defined in `./mymodule/plans/service/myplan.pp`, you
+would use the name, `mymodule::service::myplan`.
+
+### `init` plans
+
+The plan filename `init` is special. You reference an `init` plan using the
+module name only. For example, in a module called `mymodule`, the plan defined
+in `mymodule/plans/init.pp` is the `mymodule` plan. For an example of an `init` plan, see the
+[facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp).
 
 ## Defining plan parameters
 
-You can specify parameters in your plan.
+After the plan's name, in parentheses, define any parameters that you want to pass into your plan
+as arguments. To define a parameter, use the syntax `<TYPE> <PARAMETER_NAME>`.
+For example, the following plan defines two parameters, `src` and `dest`,
+which are both strings:
 
-Specify each parameter in your plan with its data type. For example, you might want parameters to specify which targets to run different parts of your plan on.
-
-The following example shows target parameters specified as data type `TargetSpec`. `TargetSpec` accepts a URI string, a target object, or an array of URI strings and Target objects. Using `TargetSpec` allows you to pass, for each parameter, either a target object by name or a URI string. URI strings must include a hostname, and can also set the protocol, the username, the password, and the port to use using the format `protocol://user:password@hostname:port`.
-
-The plan then calls the `run_task` function, specifying which targets to run the tasks on. The target names are collected and stored in `$webserver_names` by iterating over the list of target objects returned by `get_targets`. Task parameters are serialized to JSON format; therefore, extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
-
-```
-plan mymodule::my_plan(
-  TargetSpec $load_balancer,
-  TargetSpec $webservers,
-) {
-
-  # Extract the Target name from $webservers
-  $webserver_names = get_targets($webservers).map |$n| { $n.name }
-  
-  # process webservers
-  run_task('mymodule::lb_remove', $load_balancer, webservers => $webserver_names)
-  run_task('mymodule::update_frontend_app', $webservers, version => '1.2.3')
-  run_task('mymodule::lb_add', $load_balancer, webservers => $webserver_names)
- }
+```puppet
+plan mymodule::myplan(
+  String $src,
+  String $dest
+)
+...  
 ```
 
-To execute this plan from the command line, pass the parameters as `<PARAMETER>=<VALUE>`. The `Targetspec` accepts either an array as JSON, or a comma separated string of target names.
+You can use the `TargetSpec` type to pass a target, or multiple targets, into a
+plan parameter. For more information, see [`TargetSpec`](#targetspec).
 
-```
-bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com webservers='["kermit.myorg.com","gonzo.myorg.com"]'
-        
-```
+### JSON serialization
 
 Parameters that are passed to the `run_*` plan functions are serialized to JSON.
 
-To illustrate this concept, consider this plan:
+In the following plan, the default value of `$example_nul` is `undef`. The plan
+calls the task `test::demo_undef_bash` with the `example_nul` parameter.
 
 ```
 plan test::parameter_passing (
@@ -88,7 +98,7 @@ plan test::parameter_passing (
 }
 ```
 
-The default value of `$example_nul` is `undef`. The plan calls the `test::demo_undef_bash` with the `example_nul` parameter. The implementation of the `demo_undef_bash.sh` task is:
+The implementation of the `demo_undef_bash.sh` task is:
 
 ```shell script
 #!/bin/bash
@@ -122,14 +132,13 @@ The parameters `example_nul` and `_task` metadata are passed to the task as a JS
 
 Similarly, parameters are made available to the task as environment variables where the name of the parameter is converted to an environment variable prefixed with `PT_`. The prefixed environment variable points to the `String` representation in `JSON` format of the parameter value. So, the `PT_example_nul` environment variable has the value of `null` of type `String`.
 
-**Related information**  
+📖 **Related information**  
 
-- [Task metadata types](writing_tasks.md#)
+- [Task metadata types](writing_tasks.md#common-task-data-types)
 
 ### Sensitive parameters
 
-Use the `Sensitive` data type to mask parameters that should not be displayed in logs can be masked using the 
-`Sensitive` data type.
+Use the `Sensitive` data type to mask parameters that should not be displayed in logs.
 
 When you pass a value to a `Sensitive` parameter, Bolt automatically masks the value before the plan is run.
 
@@ -198,13 +207,11 @@ plan mymodule::myplan {
 
 ## Success and failure in plans
 
-Indicators that a plan has run successfully or failed.
-
-Any plan that completes execution without an error is considered successful. The `bolt` command exits `0` and any calling plans continue execution. If any calls to `run_` functions fail **without** `_catch_errors` then the plan halts execution and is considered a failure. Any calling plans also halt until a `run_plan` call with `_catch_errors` or a `catch_errors` block is reached. If one isn't reached, the `bolt` command will exit `2`. When writing a plan, if you have reason to believe it has failed, you can fail the plan with the `fail_plan` function. This causes the bolt command to exit `2` and prevents calling plans executing any further, unless `run_plan` was called with `_catch_errors` or in a `catch_errors` block.
-
-### Failing plans
-
-If `upload_file`, `run_command`, `run_script`, or `run_task` are called without the `_catch_errors` option and they fail on any targets, the plan itself fails. To fail a plan directly, call the `fail_plan` function. Create an error with a message and include the kind, details, or issue code, or pass an existing error to it.
+If `upload_file`, `run_command`, `run_script`, or `run_task` are called without
+the `_catch_errors` option and they fail on any targets, the plan itself fails.
+To fail a plan directly, call the `fail_plan` function. Create an error with a
+message and include the kind, details, or issue code, or pass an existing error
+to it.
 
 ```
 fail_plan('The plan is failing', 'mymodules/pear-shaped', {'failedtargets' => $result.error_set.names})
@@ -269,9 +276,17 @@ plan test (String[1] $role) {
 
 ## Puppet and Ruby functions in plans
 
-You can define and call Puppet language functions and Ruby functions in plans.
+You can define and call [built-in Puppet
+functions](https://puppet.com/docs/puppet/latest/function.html) and custom Ruby
+functions in plans.
 
-This is useful for packaging common general logic in your plan. You can also call the plan functions, such as `run_task` or `run_plan`, from within a function.
+This is useful for packaging common general logic in your plan. You can also
+call the plan functions, such as `run_task` or `run_plan`, from within a
+function.
+
+> 🔩 **Tip**: You can use any combination of [Bolt 
+> functions](plan_functions.md) or [built-in Puppet
+> functions](https://puppet.com/docs/puppet/latest/function.html) in a plan.
 
 Not all Puppet language constructs are allowed in plans. The following constructs are not allowed:
 
@@ -350,7 +365,7 @@ You define a task parameter as sensitive with the metadata property `"sensitive"
 run_task('task_with_secrets', ..., password => 'hunter2')
 ```
 
-### Working with the sensitive function
+### Working with the `Sensitive` function
 
 In Puppet you use the `Sensitive` function to mask data in output logs. Because plans are written in Puppet DSL, you can use this type freely. The `run_task()` function does not allow parameters of `Sensitive` function to be passed. When you need to pass a sensitive value to a task, you must unwrap it prior to calling `run_task()`.
 
@@ -359,7 +374,7 @@ $pass = Sensitive('hunter2')
 run_task('task_with_secrets', ..., password => $pass.unwrap)
 ```
 
-**Related information**  
+📖 **Related information**  
 
 - [Adding parameters to metadata](writing_tasks.md#)
 
@@ -367,11 +382,27 @@ run_task('task_with_secrets', ..., password => $pass.unwrap)
 
 The target object represents a target and its specific connection options.
 
-The state of a target is stored in the inventory for the duration of a plan, allowing you to collect facts or set variables for a target and retrieve them later. You can get a printable representation via the `name` function, as well as access components of the target: `protocol, host, port, user, password`.
+The state of a target is stored in the inventory for the duration of a plan,
+allowing you to collect facts or set variables for a target and retrieve them
+later. You can get a printable representation via the `name` function, as well
+as access components of the target: `protocol, host, port, user, password`. For
+a list of functions available to a target, see [Bolt data types](./bolt_types_reference.md#target) 
 
 ### `TargetSpec`
 
-The execution function takes a parameter with the type alias `TargetSpec`. `TargetSpec` accepts a URI string, a target object, or an array of URI strings and Target objects. Generally, use this type for plans that accept a set of targets as a parameter, to ensure clean interaction with the CLI and other plans. To operate on individual targets, resolve it to a list via `get_targets`. For example, to loop over each target in a plan, accept a `TargetSpec` argument, but call `get_targets` on it before looping.
+The `TargetSpec` type is a wrapper for defining targets that allows you to pass
+a target, or multiple targets, into a plan. To ensure clean interaction with the
+CLI and other plans, use this type for plans that accept a set of targets as a
+parameter.
+
+`TargetSpec` accepts a URI string, a target object, or an array of URI strings
+and Target objects. URI strings must include a hostname, and can also set the
+protocol, the username, the password, and the port to use using the format
+`protocol://user:password@hostname:port`. 
+
+To operate on individual targets, resolve `TargetSpec` to a list via
+`get_targets`. For example, to loop over each target in a plan, accept a
+`TargetSpec` argument, but call `get_targets` on it before looping.
 
 ```
 plan loop(TargetSpec $targets) {
@@ -381,7 +412,38 @@ plan loop(TargetSpec $targets) {
 }
 ```
 
-If your plan accepts a single `TargetSpec` parameter, you can call that parameter `targets` so that it can be specified with the `--targets` flag from the command line.
+If your plan accepts a single `TargetSpec` parameter, you can call that
+parameter `targets` so that it can be specified with the `--targets` flag from
+the command line.
+
+#### Example with `TargetSpec`
+
+The following example shows two target parameters, `load_balancer` and
+`webservers`, specified as data type `TargetSpec`.
+
+The plan calls the `run_task` function, specifying which targets to run the tasks on. The target names are collected and stored in `$webserver_names` by iterating over the list of target objects returned by `get_targets`. Task parameters are serialized to JSON format; therefore, extracting the names into an array of strings ensures that the `webservers` parameter is in a format that can be converted to JSON.
+
+```
+plan mymodule::my_plan(
+  TargetSpec $load_balancer,
+  TargetSpec $webservers,
+) {
+
+  # Extract the Target name from $webservers
+  $webserver_names = get_targets($webservers).map |$n| { $n.name }
+  
+  # process webservers
+  run_task('mymodule::lb_remove', $load_balancer, webservers => $webserver_names)
+  run_task('mymodule::update_frontend_app', $webservers, version => '1.2.3')
+  run_task('mymodule::lb_add', $load_balancer, webservers => $webserver_names)
+ }
+```
+
+To execute this plan from the command line, you would pass the parameters as `<PARAMETER>=<VALUE>`. The `Targetspec` accepts either an array as JSON, or a comma separated string of target names.
+
+```
+bolt plan run mymodule::myplan --modulepath ./PATH/TO/MODULES load_balancer=lb.myorg.com webservers='["kermit.myorg.com","gonzo.myorg.com"]'        
+```
 
 ### Creating target objects
 
@@ -576,7 +638,7 @@ plan pdb_discover {
 }
 ```
 
-**Related information**  
+📖 **Related information**  
 
 - [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
 
@@ -628,16 +690,35 @@ without_default_logging { run_command('echo hi', $targets) }
 
 Check out some examples for inspiration on writing your own plans.
 
-|Resource|Description|Level|
-|--------|-----------|-----|
-|[facts module](https://forge.puppet.com/puppetlabs/facts)|Contains tasks and plans to discover facts about target systems.|Getting started|
-|[facts plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp)|Gathers facts using the facts task and sets the facts in inventory.|Getting started|
-|[facts::info plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/info.pp)|Uses the facts task to discover facts and map relevant fact values to targets.|Getting started|
-|[reboot module](https://forge.puppet.com/puppetlabs/reboot)|Contains tasks and plans for managing system reboots.|Intermediate|
-|[reboot plan](https://github.com/puppetlabs/puppetlabs-reboot/blob/master/plans/init.pp)|Restarts a target system and waits for it to become available again.|Intermediate|
-|[Introducing Masterless Puppet with Bolt](https://puppet.com/blog/introducing-masterless-puppet-bolt)|Blog post explaining how plans can be used to deploy a load-balanced web server.|Advanced|
-|[profiles::nginx_install plan](https://puppetlabs.github.io/bolt/lab/11-apply-manifest-code/)|Shows an example plan for deploying Nginx and HAProxy.|Advanced|
+### Beginner plans
 
--   **Getting started** resources show simple use cases such as running a task and manipulating the results.
--   **Intermediate** resources show more advanced features in the plan language.
--   **Advanced** resources show more complex use cases such as applying puppet code blocks and using external modules.
+These resources show simple use cases such as running a task and manipulating the results.
+
+- [facts module](https://forge.puppet.com/puppetlabs/facts): Contains tasks and plans to discover facts about target systems.
+- [facts
+  plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp):
+  Gathers facts using the facts task and sets the facts in inventory.
+- [facts::info
+  plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/info.pp):
+  Uses the facts task to discover facts and map relevant fact values to targets.
+
+### Intermediate plans
+
+These resources show more advanced features in the plan language.
+
+- [reboot module](https://forge.puppet.com/puppetlabs/reboot): Contains tasks and plans for managing system reboots.
+- [reboot
+  plan](https://github.com/puppetlabs/puppetlabs-reboot/blob/master/plans/init.pp):
+  Restarts a target system and waits for it to become available again.
+
+### Advanced plans
+
+These resources show more complex use cases such as applying puppet code blocks
+and using external modules.
+
+- [Introducing Masterless Puppet with
+  Bolt](https://puppet.com/blog/introducing-masterless-puppet-bolt): Blog post
+  explaining how plans can be used to deploy a load-balanced web server.
+- [profiles::nginx_install
+  plan](https://puppetlabs.github.io/bolt/lab/11-apply-manifest-code/): Shows an
+  example plan for deploying Nginx and HAProxy.
