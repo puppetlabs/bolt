@@ -106,6 +106,16 @@ module Bolt
       out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
       ENV['PATH'] = old_path
 
+      # If bolt_catalog does not return valid JSON, we should print stderr to
+      # see what happened
+      print_logs = stat.success?
+      result = begin
+                 JSON.parse(out)
+               rescue JSON::ParserError
+                 print_logs = true
+                 { 'message' => "Something's gone terribly wrong! STDERR is logged." }
+               end
+
       # Any messages logged by Puppet will be on stderr as JSON hashes, so we
       # parse those and store them here. Any message on stderr that is not
       # properly JSON formatted is assumed to be an error message.  If
@@ -119,17 +129,15 @@ module Bolt
         { 'level' => 'err', 'message' => line }
       end
 
-      result = JSON.parse(out)
-      if stat.success?
+      if print_logs
         logs.each do |log|
           bolt_level = Bolt::Util::PuppetLogLevel::MAPPING[log['level'].to_sym]
           message = log['message'].chomp
           @logger.send(bolt_level, "#{target.name}: #{message}")
         end
-        result
-      else
-        raise ApplyError.new(target.name, result['message'])
       end
+      raise ApplyError.new(target.name, result['message']) unless stat.success?
+      result
     end
 
     def validate_hiera_config(hiera_config)
