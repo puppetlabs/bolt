@@ -83,9 +83,6 @@ module Bolt
 
       puppet_settings = {
         node_name_value: target['name'],
-        # CODEREVIEW: Isnt this already the default?
-        # https://github.com/puppetlabs/puppet/blob/master/lib/puppet/parser/catalog_compiler.rb#L18
-        rich_data: true,
         hiera_config: request['hiera_config']
       }
 
