@@ -1,6 +1,7 @@
 # Configuring Bolt
 
-You can configure Bolt's options and features at a project level, a user level, or a system-wide level. 
+You can configure Bolt's options and features at a project level, a user level,
+or a system-wide level. 
 
 Some options and features you can configure include:
 - global options
@@ -9,33 +10,46 @@ Some options and features you can configure include:
 - PuppetDB connections
 - log files 
 
-For a complete list of Bolt settings, see the [configuration reference](bolt_configuration_reference.md).
+For a complete list of Bolt settings, see the [configuration
+reference](bolt_configuration_reference.md).
 
 ## Configuration files
 
-To configure Bolt, create a Bolt configuration file named `bolt.yaml` in one of the locations listed below. If a configuration file is not located at the expected path, or the file is empty, Bolt does not load the file. 
+To configure Bolt, create a Bolt configuration file named `bolt.yaml` in one of
+the locations listed below. If a configuration file is not located at the
+expected path, or the file is empty, Bolt does not load the file. 
 
-You can place `bolt.yaml` configuration files at the following paths, from highest precedence to lowest:
+You can place `bolt.yaml` configuration files at the following paths, from
+highest precedence to lowest:
 
 - **Project**
-  
-  The `bolt.yaml` file in a project directory applies settings to that project specifically. Matching settings at the project level override those at the user and system-wide levels.
+
+  The `bolt.yaml` file in a project directory applies settings to that project
+  specifically. Matching settings at the project level override those at the
+  user and system-wide levels.
 
   `Boltdir/bolt.yaml` or `<MY_PROJECT_NAME>/bolt.yaml`
 
-  > **Note:** The project configuration file is loaded from the [Bolt project directory](bolt_project_directories.md). The default project directory is `~/.puppetlabs/bolt/`.
+  > **Note:** The project configuration file is loaded from the [Bolt project
+  > directory](bolt_project_directories.md). The default project directory is
+  > `~/.puppetlabs/bolt/`.
 
 - **User**
-  
-  The `bolt.yaml` file at the user level applies settings only to that user. Matching settings at the user level are overridden by project-level settings, but take precedence over system-wide settings.  
+
+  The `bolt.yaml` file at the user level applies settings only to that user.
+  Matching settings at the user level are overridden by project-level settings,
+  but take precedence over system-wide settings.  
 
   `~/.puppetlabs/etc/bolt/bolt.yaml`
 
 - **System-wide**
 
-  Settings in a system-wide config file apply to all users running Bolt, regardless of the Bolt project directory. However, matching settings at the project or user level override system-wide settings.
-  
-  The `bolt.yaml` file at the system-wide level applies settings only to that user.
+  Settings in a system-wide config file apply to all users running Bolt,
+  regardless of the Bolt project directory. However, matching settings at the
+  project or user level override system-wide settings.
+
+  The `bolt.yaml` file at the system-wide level applies settings only to that
+  user.
 
   \*nix: `/etc/puppetlabs/bolt/bolt.yaml`
 
@@ -43,7 +57,8 @@ You can place `bolt.yaml` configuration files at the following paths, from highe
 
 ## Configuration precedence
 
-Bolt uses the following precedence when interpolating configuration settings, from highest precedence to lowest:
+Bolt uses the following precedence when interpolating configuration settings,
+from highest precedence to lowest:
 
   - Target URI (i.e. ssh://user:password@hostname:port)
   - [Inventory file](inventory_file_v2.md) options
@@ -55,11 +70,16 @@ Bolt uses the following precedence when interpolating configuration settings, fr
 
 ## Merge strategy
 
-When merging configurations, Bolt's strategy is to shallow merge any options that accept hashes and to overwrite any options that do not accept hashes. There are two exceptions to this strategy:
+When merging configurations, Bolt's strategy is to shallow merge any options
+that accept hashes and to overwrite any options that do not accept hashes. There
+are two exceptions to this strategy:
 
-- [Transport configuration](bolt_configuration_reference.md#transport-configuration-options) (e.g. `ssh`, `winrm`) is deep-merged.
+- [Transport
+  configuration](bolt_configuration_reference.md#transport-configuration-options)
+  (e.g. `ssh`, `winrm`) is deep-merged.
 
-- [Plugin configuration](using_plugins.md#configuring-plugins) is shallow-merged for _each individual plugin_.
+- [Plugin configuration](using_plugins.md#configuring-plugins) is shallow-merged
+  for _each individual plugin_.
 
 ### Transport configuration merge strategy
 
@@ -95,9 +115,13 @@ ssh:
 
 ### Plugin configuration merge strategy
 
-The `plugins` option accepts a hash where each key is the name of a plugin and its value is a hash of configuration options for the plugin. When merging configurations, the configuration for individual plugins is shallow merged.
+The `plugins` option accepts a hash where each key is the name of a plugin and
+its value is a hash of configuration options for the plugin. When merging
+configurations, the configuration for individual plugins is shallow merged.
 
-> **Note:** If a plugin is configured in one file, but is not configured in a file with a higher precedence, the configuration for the plugin will still be present in the merged configuration.
+> **Note:** If a plugin is configured in one file, but is not configured in a
+> file with a higher precedence, the configuration for the plugin will still be
+> present in the merged configuration.
 
 For example, given this plugin configuration in a project configuration file:
 
@@ -140,16 +164,20 @@ plugins:
 ## Additional documentation
 
 - **[Project directories](bolt_project_directories.md#)**  
-  
-  Bolt runs in the context of a project directory or a `Boltdir`. This directory contains all of the configuration, code, and data loaded by Bolt.
+
+  Bolt runs in the context of a project directory or a `Boltdir`. This directory
+  contains all of the configuration, code, and data loaded by Bolt.
 
 - **[Bolt configuration options](bolt_configuration_reference.md)**  
 
   Your Bolt configuration file can contain global and transport options.
 
 - **[Using Bolt with Puppet Enterprise](bolt_configure_orchestrator.md)**  
-  
-  If you're a Puppet Enterprise (PE) customer, you can configure Bolt to use the PE orchestrator and perform actions on managed targets. Pairing PE with Bolt enables role-based access control, logging, and visual reports in the PE console.
+
+  If you're a Puppet Enterprise (PE) customer, you can configure Bolt to use the
+  PE orchestrator and perform actions on managed targets. Pairing PE with Bolt
+  enables role-based access control, logging, and visual reports in the PE
+  console.
 
 - **[Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)**  
 

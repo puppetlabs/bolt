@@ -8,7 +8,8 @@ the project directory to Git. You can then check different repositories of Bolt
 code into different directories in order to manage various applications.
 
 > **Note:** Bolt projects received some experimental updates in Bolt 2.8.0. For
-> more information, see [Bolt projects](./experimental_features.md#bolt-projects). 
+> more information, see [Bolt
+> projects](./experimental_features.md#bolt-projects). 
 
 ## Types of project directories
 
@@ -17,13 +18,13 @@ you're using Bolt.
 
 ### Local project directory
 
-Bolt treats a directory containing a `bolt.yaml` or `bolt-project.yaml` file as a 
-project directory.  Use this type of directory to track and share management code in
-a dedicated repository.
+Bolt treats a directory containing a `bolt.yaml` or `bolt-project.yaml` file as
+a project directory.  Use this type of directory to track and share management
+code in a dedicated repository.
 
-> 🔩 **Tip:** You can use an existing control repo as a Bolt project directory by adding
-  a `bolt.yaml` file to it and configuring the `modulepath` to match the `modulepath`
-  in `environment.conf`.
+> 🔩 **Tip:** You can use an existing control repo as a Bolt project directory
+  by adding a `bolt.yaml` file to it and configuring the `modulepath` to match
+  the `modulepath` in `environment.conf`.
 
 A project directory of this type has a structure like:
 
@@ -49,12 +50,14 @@ project/
 
 ### Embedded project directory
 
-Bolt treats a directory containing a subdirectory called `Boltdir` as a project directory.
-Use this type of directory to embed Bolt management code into another repo.
+Bolt treats a directory containing a subdirectory called `Boltdir` as a project
+directory. Use this type of directory to embed Bolt management code into another
+repo.
 
-For example, you can store management code in the same repo as the application it manages
-without cluttering up the top level with multiple files. This structure allows you to run Bolt
-from anywhere in the application's directory structure.
+For example, you can store management code in the same repo as the application
+it manages without cluttering up the top level with multiple files. This
+structure allows you to run Bolt from anywhere in the application's directory
+structure.
 
 A project with an embedded project directory has a structure like:
 
@@ -81,32 +84,35 @@ project/
 └── tests #non Bolt tests for the project
 ```
 
-> **Note:** If a directory contains both `Boltdir` and `bolt.yaml` or `bolt-project.yaml`, the
-  `Boltdir` directory is used as the project directory rather then the parent.
+> **Note:** If a directory contains both `Boltdir` and `bolt.yaml` or
+  `bolt-project.yaml`, the `Boltdir` directory is used as the project directory
+  rather then the parent.
 
 ### User project directory
 
-If Bolt can't find a project directory based on `Boltdir` or `bolt.yaml`, it uses
-`~/.puppetlabs/bolt` as the project directory. Use this type of directory if you have a single
-set of Bolt code and data that you use across all projects.
+If Bolt can't find a project directory based on `Boltdir` or `bolt.yaml`, it
+uses `~/.puppetlabs/bolt` as the project directory. Use this type of directory
+if you have a single set of Bolt code and data that you use across all projects.
 
 ## How the project directory is chosen
 
 Bolt uses these methods, in order, to choose a project directory.
 
-1. **Manually specified:** You can specify on the command line what directory Bolt to use with
-   `--boltdir <DIRECTORY_PATH>`. There is not an equivalent configuration setting because the
-   project directory must be known in order to load configuration.
-1. **Parent directory:** Bolt traverses parents of the current directory until it finds a directory
-   containing a `Boltdir`, `bolt.yaml`, or `bolt-project.yaml`, or it reaches the root of the file
-   system.
-1. **User project directory:** If no directory is specified manually or found in a parent directory,
-   the user project directory is used.
+1. **Manually specified:** You can specify on the command line what directory
+   Bolt to use with `--boltdir <DIRECTORY_PATH>`. There is not an equivalent
+   configuration setting because the project directory must be known in order to
+   load configuration.
+1. **Parent directory:** Bolt traverses parents of the current directory until
+   it finds a directory containing a `Boltdir`, `bolt.yaml`, or
+   `bolt-project.yaml`, or it reaches the root of the file system.
+1. **User project directory:** If no directory is specified manually or found in
+   a parent directory, the user project directory is used.
 
 
 ## Project directory structure
 
-The default paths for all Bolt configuration, code, and data are relative to the module path.
+The default paths for all Bolt configuration, code, and data are relative to the
+module path.
 
 |Directory|Description|
 |---------|-----------|

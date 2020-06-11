@@ -1,18 +1,26 @@
 # Inventory files
 
-Use an inventory file to store information about your targets and arrange them into groups. Grouping your targets lets you aim your Bolt commands at the group instead of having to reference each target individually.
+Use an inventory file to store information about your targets and arrange them
+into groups. Grouping your targets lets you aim your Bolt commands at the group
+instead of having to reference each target individually.
 
-The command `bolt inventory show -t <TARGET> --detail` provides a quick way to view the resolved values for a target or group of targets.
+The command `bolt inventory show -t <TARGET> --detail` provides a quick way to
+view the resolved values for a target or group of targets.
 
-> **Note**: Version 1 inventory files are deprecated. If you're using version 1 inventory files, make sure to migrate them to version 2. For more information on migrating to version 2, see [Migrating your inventory files to version 2](./migrating_inventory_files.md).
+> **Note**: Version 1 inventory files are deprecated. If you're using version 1
+> inventory files, make sure to migrate them to version 2. For more information
+> on migrating to version 2, see [Migrating your inventory files to version
+> 2](./migrating_inventory_files.md).
 
 ## Inventory file structure
 
 ### Top-level fields
 
-The top level of an inventory file acts as the implicit `all` group and has similar fields as a `groups` object.
+The top level of an inventory file acts as the implicit `all` group and has
+similar fields as a `groups` object.
 
-The following fields are available at the top level of a version 2 inventory file:
+The following fields are available at the top level of a version 2 inventory
+file:
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
@@ -25,7 +33,8 @@ The following fields are available at the top level of a version 2 inventory fil
 
 ### Group object
 
-A group lists a set of `targets` and `groups` and their associated configuration. Each group is a map that can contain any of the following fields:
+A group lists a set of `targets` and `groups` and their associated
+configuration. Each group is a map that can contain any of the following fields:
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
@@ -56,7 +65,8 @@ groups:
 
 ### Target object
 
-You can specify a target with the string representation of a URI, or as a hash with any of the following fields:
+You can specify a target with the string representation of a URI, or as a hash
+with any of the following fields:
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
@@ -93,9 +103,13 @@ targets:
 
 ## Precedence
 
-When searching for a target's configuration data, Bolt matches a target's URI with its name. Bolt uses depth-first search and uses the first value it finds.
+When searching for a target's configuration data, Bolt matches a target's URI
+with its name. Bolt uses depth-first search and uses the first value it finds.
 
-The `config` values for a target object, such as `host`, `transport`, and `port`, take precedent and override any `config` values at the group level. Bolt merges non-`config` data in the target object, such as `facts` and `vars`, with data in the group object.
+The `config` values for a target object, such as `host`, `transport`, and
+`port`, take precedent and override any `config` values at the group level. Bolt
+merges non-`config` data in the target object, such as `facts` and `vars`, with
+data in the group object.
 
 ```yaml
 groups:
@@ -129,9 +143,11 @@ groups:
 ```
 
 In the example above,  `mytarget` in `group1` contains the fact, `hardwaremodel:
-x86_64.` The fact `operatingsystem: CentOS` is set in `group2` which also contains `mytarget`.
+x86_64.` The fact `operatingsystem: CentOS` is set in `group2` which also
+contains `mytarget`.
 
-Running `bolt inventory show -t group1 --detail` returns both facts for `mytarget`:
+Running `bolt inventory show -t group1 --detail` returns both facts for
+`mytarget`:
 
 ```json
 …
@@ -142,7 +158,13 @@ Running `bolt inventory show -t group1 --detail` returns both facts for `mytarge
 },
 ```
 
-Inventory files are not context-aware. Any data set for a target, whether in a target definition or a group, apply to all definitions of the target. For example, the inventory file above contains two definitions of `mytarget`. The values for `user` and `host-key-check` are set in `group1`. The value for `password` is set in `group2`. If you ran a Bolt command on `group2`, all three values would be set on `mytarget`. Running `bolt inventory show -t group2 --detail` shows the three configuration values:
+Inventory files are not context-aware. Any data set for a target, whether in a
+target definition or a group, apply to all definitions of the target. For
+example, the inventory file above contains two definitions of `mytarget`. The
+values for `user` and `host-key-check` are set in `group1`. The value for
+`password` is set in `group2`. If you ran a Bolt command on `group2`, all three
+values would be set on `mytarget`. Running `bolt inventory show -t group2
+--detail` shows the three configuration values:
 
 
 ```json
@@ -163,7 +185,8 @@ Inventory files are not context-aware. Any data set for a target, whether in a t
   ]
 }
 ```
-> **Note**: The password for mytarget is defined at the target level in `group2`, and overrides the password set at the group level.
+> **Note**: The password for mytarget is defined at the target level in
+> `group2`, and overrides the password set at the group level.
 
 ## Plugins
 
@@ -198,11 +221,16 @@ Bolt ships with several plugins.
 
 ### Basic inventory file
 
-The following inventory file contains a basic hierarchy of groups and targets. As with all inventory files, it has a top-level group named `all`, which refers to all targets in the inventory. The `all` group has two subgroups named `linux` and `windows`.
+The following inventory file contains a basic hierarchy of groups and targets.
+As with all inventory files, it has a top-level group named `all`, which refers
+to all targets in the inventory. The `all` group has two subgroups named `linux`
+and `windows`.
 
-The `linux` group lists its targets and sets the default transport for the targets to the SSH protocol.
+The `linux` group lists its targets and sets the default transport for the
+targets to the SSH protocol.
 
-The `windows` group lists its targets and sets the default transport for the targets to the WinRM protocol.
+The `windows` group lists its targets and sets the default transport for the
+targets to the WinRM protocol.
 
 ```yaml
 groups:
@@ -224,11 +252,23 @@ groups:
 
 ### Detailed inventory file
 
-The following inventory file contains a more detailed hierarchy of groups and targets. As with all inventory files, it has a top-level group named `all`, which refers to all targets in the inventory. The `all` group has two subgroups named `ssh_nodes` and `win_nodes`.
+The following inventory file contains a more detailed hierarchy of groups and
+targets. As with all inventory files, it has a top-level group named `all`,
+which refers to all targets in the inventory. The `all` group has two subgroups
+named `ssh_nodes` and `win_nodes`.
 
-The `ssh_nodes` group has two subgroups - `webservers` and `memcached` - and sets the default transport for targets in the group to the SSH protocol. It also specifies a few configuration options for the SSH transport. Each of the subgroups lists the targets in the group and the `memcached` group has additional SSH transport configuration for its targets.
+The `ssh_nodes` group has two subgroups - `webservers` and `memcached` - and
+sets the default transport for targets in the group to the SSH protocol. It also
+specifies a few configuration options for the SSH transport. Each of the
+subgroups lists the targets in the group and the `memcached` group has
+additional SSH transport configuration for its targets.
 
-The `win_nodes` group also has two subgroups - `domaincontrollers` and `testservers` - and sets the default transport for targets in the group to the WinRM protocol. It also specifies a few configuration options for the WinRM transport. Each of the subgroups lists the targets in the group and the `testservers` group has additional WinRM transport configuration for its targets.
+The `win_nodes` group also has two subgroups - `domaincontrollers` and
+`testservers` - and sets the default transport for targets in the group to the
+WinRM protocol. It also specifies a few configuration options for the WinRM
+transport. Each of the subgroups lists the targets in the group and the
+`testservers` group has additional WinRM transport configuration for its
+targets.
 
 ```yaml
 groups:
@@ -278,11 +318,14 @@ groups:
 
 The following inventory file uses several bundled plugins.
 
-* The `yaml` plugin composes `aws_inventory.yaml` and `azure_inventory.yaml` into a single inventory file loaded by Bolt.
+* The `yaml` plugin composes `aws_inventory.yaml` and `azure_inventory.yaml`
+  into a single inventory file loaded by Bolt.
 * The `aws_inventory` plugin generates targets from AWS EC2 instances.
 * The `azure_inventory` plugin generates targets from Azure VMs.
-* The `vault` plugin loads a secret from a Hashicorp Vault server and uses it as a password.
-* The `prompt` plugin configures the `vault` plugin in a configuration file and prompts for the user's Vault password.
+* The `vault` plugin loads a secret from a Hashicorp Vault server and uses it as
+  a password.
+* The `prompt` plugin configures the `vault` plugin in a configuration file and
+  prompts for the user's Vault password.
 
 The `inventory.yaml` file:
 
@@ -345,8 +388,10 @@ plugins:
         message: Enter your Vault password
 ```
 
-To verify that plugin references are resolved correctly and to view the targets and values loaded, use the command `bolt inventory show -t all --detail`.
+To verify that plugin references are resolved correctly and to view the targets
+and values loaded, use the command `bolt inventory show -t all --detail`.
 
 📖 **Related information**
 
-- For more information on configuration options, see [Bolt configuration options](bolt_configuration_reference.md).
+- For more information on configuration options, see [Bolt configuration
+  options](bolt_configuration_reference.md).

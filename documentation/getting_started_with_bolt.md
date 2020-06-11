@@ -4,10 +4,10 @@ Welcome to _Getting started with Bolt!_ Bolt is an open source orchestration
 tool that helps you make on-demand changes to remote targets such as servers,
 network devices, and cloud services.
 
-In this guide, you'll learn to write a Bolt plan that installs Apache on a
-group of target machines and uploads a customized home page. Bolt plans are
-powerful workflows that allow you to string together and automate commands,
-scripts, tasks, and even other plans.
+In this guide, you'll learn to write a Bolt plan that installs Apache on a group
+of target machines and uploads a customized home page. Bolt plans are powerful
+workflows that allow you to string together and automate commands, scripts,
+tasks, and even other plans.
 
 After you've completed this guide, you'll know how to:
 - Set up a Bolt project directory.
@@ -19,10 +19,10 @@ After you've completed this guide, you'll know how to:
 
 > **Before you begin**
 >
-> - Make sure you've installed Bolt on your machine. For instructions on how to
->  install Bolt on your operating system, see
->  [Installing Bolt](./bolt_installing.md).
-> - Make sure you've [installed Docker](https://docs.docker.com/get-docker/).
+>- Make sure you've installed Bolt on your machine. For instructions on how to
+>  install Bolt on your operating system, see [Installing
+>  Bolt](./bolt_installing.md).
+>- Make sure you've [installed Docker](https://docs.docker.com/get-docker/).
 >  Bolt does not require Docker to run, but for the purposes of this guide,
 >  Docker containers offer a safe and relatively simple way to set up some
 >  targets to practice on.
@@ -50,8 +50,8 @@ bolt.yaml
 ```
 
 To use Bolt plans or tasks, your Bolt project must use a specific directory
-structure. The directory structure of a Bolt project is closely tied to
-[Puppet modules](https://puppet.com/docs/puppet/latest/modules_fundamentals.html).
+structure. The directory structure of a Bolt project is closely tied to [Puppet
+modules](https://puppet.com/docs/puppet/latest/modules_fundamentals.html).
 Because your plan will install Apache, you need an `apache` module directory.
 Run the following commands to set up the required directories in your project
 folder:
@@ -78,8 +78,8 @@ Bolt connects directly to computers, or _targets_, using Secure Shell (SSH) or
 Windows Remote Management (WinRM). To see how a Bolt plan works, you'll build
 and run some Docker containers to use as targets.
 
-In the root of your `my_project` directory, create a file named `Dockerfile`
-and paste in the following:
+In the root of your `my_project` directory, create a file named `Dockerfile` and
+paste in the following:
 
 ```bash
 FROM rastasheep/ubuntu-sshd
@@ -88,18 +88,17 @@ EXPOSE 80
 CMD ["/usr/sbin/sshd", "-D"]
 ```
 
-This Dockerfile defines an Ubuntu container with an SSH service running. The
-SSH service allows Bolt to communicate with the container using the SSH
-transport.
+This Dockerfile defines an Ubuntu container with an SSH service running. The SSH
+service allows Bolt to communicate with the container using the SSH transport.
 
 > 🔩 **Tip**: A transport defines the connection method that Bolt uses to
-  connect to a target. There is a Docker transport that simplifies connecting
-  to Docker containers, but the SSH transport is useful for gaining a broader
+  connect to a target. There is a Docker transport that simplifies connecting to
+  Docker containers, but the SSH transport is useful for gaining a broader
   understanding of how Bolt inventory files work.
 
 Next, build a `docker-compose.yaml` file to create two instances of the
-container. In your `my_project` directory, create the following file and name
-it `docker-compose.yaml`:
+container. In your `my_project` directory, create the following file and name it
+`docker-compose.yaml`:
 
 ```yaml
 version: '3'
@@ -197,8 +196,8 @@ imagine a situation where you need to use different passwords or certificates
 for different targets.
 
 An inventory file is useful for handling this complexity. With an inventory
-file, you can set up different connection settings for each of your targets,
-and group targets together so you can aim a command at the group instead of
+file, you can set up different connection settings for each of your targets, and
+group targets together so you can aim a command at the group instead of
 specifying targets in a list.
 
 Create a file named `inventory.yaml` in your project directory and paste in the
@@ -249,8 +248,8 @@ Notice how much shorter the command is now that the inventory file is handling
 connection details like the user, password, ports, and URIs.
 
 > 🔩 **Tip**: You can run a Bolt command on all of the targets in your inventory
- using the top-level `all` group. To target the `all` group, use the command: `bolt
- command run <COMMAND> -t all`.
+ using the top-level `all` group. To target the `all` group, use the command:
+ `bolt command run <COMMAND> -t all`.
 
 Next, write a Bolt plan to install Apache on your targets.
 
@@ -308,13 +307,12 @@ command line and use the `--targets` argument, Bolt interpolates the targets
 into the `targets` parameter.
 
 After the `parameters` section, you define the steps that make up the body of
-your plan. The first step in your plan is named `install_apache`. This step
-uses a Bolt task called `package` to install Apache on your targets. A Bolt
-task is a script that has been packaged into a Puppet module. The `package`
-task comes prepackaged with Bolt and allows you to perform various
-package-related actions. Bolt tasks are useful because you can reuse them or
-share them with others. Many of the modules on the Puppet forge include Bolt
-tasks.
+your plan. The first step in your plan is named `install_apache`. This step uses
+a Bolt task called `package` to install Apache on your targets. A Bolt task is a
+script that has been packaged into a Puppet module. The `package` task comes
+prepackaged with Bolt and allows you to perform various package-related actions.
+Bolt tasks are useful because you can reuse them or share them with others. Many
+of the modules on the Puppet forge include Bolt tasks.
 
 In addition to the name of the task and the targets that Bolt will execute the
 task on, the step also includes a `parameters` section to tell the task what
@@ -352,8 +350,8 @@ Because you're running Apache on containers, the Apache service does not start
 automatically. You must create a short bash script that starts the Apache
 service and add it to your plan as a script step.
 
-Create a file named `start_apache.sh` in
-`my-project/site-modules/apache/files/` and enter the following script:
+Create a file named `start_apache.sh` in `my-project/site-modules/apache/files/`
+and enter the following script:
 
 ```bash
 #!/usr/bin/env bash
@@ -441,11 +439,11 @@ change the homepage.
 
 ### Upload an HTML homepage to your targets
 
-Now that Apache is installed on both of your containers, upload an HTML
-homepage for the targets to display.
+Now that Apache is installed on both of your containers, upload an HTML homepage
+for the targets to display.
 
-In `my_project/site-modules/apache/files/`, create a file named `index.html`
-and enter the following:
+In `my_project/site-modules/apache/files/`, create a file named `index.html` and
+enter the following:
 
 ```html
 <html>
@@ -543,9 +541,9 @@ homepage file you want to upload:
 bolt plan run apache::install -t containers src=apache/index.html
 ```
 
-> **Remember**: Because the file is in your `<MODULE_NAME>/files` location,
-  you can use the syntax `src=<MODULE_NAME>/<FILE_NAME>` instead of typing in
-  the full path to the file.
+> **Remember**: Because the file is in your `<MODULE_NAME>/files` location, you
+  can use the syntax `src=<MODULE_NAME>/<FILE_NAME>` instead of typing in the
+  full path to the file.
 
 Go to [127.0.0.1:3000](http://127.0.0.1:3000) again to see your new index page.
 
@@ -554,24 +552,24 @@ Go to [127.0.0.1:3000](http://127.0.0.1:3000) again to see your new index page.
   this by holding **Shift** and clicking **Reload**.
 
 Congratulations! You've learned how to run commands and scripts with Bolt,
-you've created a Bolt project with an inventory file, and you've written and
-run a Bolt plan that installs Apache on your targets and uploads a customized
+you've created a Bolt project with an inventory file, and you've written and run
+a Bolt plan that installs Apache on your targets and uploads a customized
 homepage.
 
 **Continue learning about Bolt:**
-- For a deeper dive into Bolt, try the
-  [Introduction to Bolt](https://learn.puppet.com/course/puppet-orchestration-bolt-and-tasks)
-  training course or the
-  [Bolt learning kit](https://puppet.com/learning-training/kits/intro-to-bolt/).
-- For more information on working with Windows targets, see
-  [Automating Windows targets](./bolt_examples.md).
-- To find out more about Bolt plans, see
-  [Orchestrating workflows with plans](./plans.md).
-- For a list of available Bolt transports, see
-  [Running Bolt commands](./running_bolt_commands.md).
-- To learn about Bolt tasks, see
-  [Making on-demand changes with tasks](./tasks.md).
-- To find Puppet modules that use tasks, take a look at the
-  [Puppet Forge](https://forge.puppet.com/).
-- For information on the settings you can use in `bolt.yaml`, see
-  [Bolt configuration options](./bolt_configuration_reference.md).
+- For a deeper dive into Bolt, try the [Introduction to
+  Bolt](https://learn.puppet.com/course/puppet-orchestration-bolt-and-tasks)
+  training course or the [Bolt learning
+  kit](https://puppet.com/learning-training/kits/intro-to-bolt/).
+- For more information on working with Windows targets, see [Automating Windows
+  targets](./bolt_examples.md).
+- To find out more about Bolt plans, see [Orchestrating workflows with
+  plans](./plans.md).
+- For a list of available Bolt transports, see [Running Bolt
+  commands](./running_bolt_commands.md).
+- To learn about Bolt tasks, see [Making on-demand changes with
+  tasks](./tasks.md).
+- To find Puppet modules that use tasks, take a look at the [Puppet
+  Forge](https://forge.puppet.com/).
+- For information on the settings you can use in `bolt.yaml`, see [Bolt
+  configuration options](./bolt_configuration_reference.md).

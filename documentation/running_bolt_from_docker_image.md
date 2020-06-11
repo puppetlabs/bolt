@@ -1,6 +1,10 @@
 # Puppet-bolt container
 
-Puppet Bolt is available as a docker image. Container images are published to [Docker Hub](https://hub.docker.com/r/puppet/puppet-bolt/tags) with tags corresponding to Bolt system package and Rubygem versions in addition to a `latest` tag which points at the newest version. This document covers some possible ways to use the container.
+Puppet Bolt is available as a docker image. Container images are published to
+[Docker Hub](https://hub.docker.com/r/puppet/puppet-bolt/tags) with tags
+corresponding to Bolt system package and Rubygem versions in addition to a
+`latest` tag which points at the newest version. This document covers some
+possible ways to use the container.
 
 ## Downloading the image
 
@@ -11,7 +15,9 @@ docker pull puppet/puppet-bolt
 
 ## Completely stand-alone
 
-When running Bolt from the container, the `localhost` target is the container environment (not the Docker host environment). The following example shows running a command against the localhost target in the container.
+When running Bolt from the container, the `localhost` target is the container
+environment (not the Docker host environment). The following example shows
+running a command against the localhost target in the container.
 ```console
 $ docker run puppet/puppet-bolt command run 'cat /etc/os-release' -t localhost
 Started on localhost...
@@ -32,11 +38,17 @@ Successful on 1 target: localhost
 Ran on 1 target in 0.00 seconds
 ```
 
-In order to pass connection information and custom module content we need to share data from the host with the container. The following sections describe some ways to accomplish sharing data with the puppet-bolt container.
+In order to pass connection information and custom module content we need to
+share data from the host with the container. The following sections describe
+some ways to accomplish sharing data with the puppet-bolt container.
 
 ## Pass inventory as an environment variable
 
-In the case where no custom module content is required for the Bolt action you wish to execute with the container, and the only information you need is how to connect to targets you can pass inventory as an environment variable. The following inventory has all the information needed to connect to the example target. 
+In the case where no custom module content is required for the Bolt action you
+wish to execute with the container, and the only information you need is how to
+connect to targets you can pass inventory as an environment variable. The
+following inventory has all the information needed to connect to the example
+target. 
 
 ```yaml
 ---
@@ -51,7 +63,8 @@ targets:
         host-key-check: false
 ```
 
-Here is an example of running the built-in `facts` task against the target listed in inventory. 
+Here is an example of running the built-in `facts` task against the target
+listed in inventory. 
 
 ```console
 $ docker run --env "BOLT_INVENTORY=$(cat Boltdir/inventory.yaml)" puppet/puppet-bolt task run facts -t docker-example
@@ -74,7 +87,8 @@ Ran on 1 target in 0.55 seconds
 
 ## Mount Bolt project directory from host 
 
-This section describes making a Bolt project directory (Boltdir) available to the container. Here is the directory structure and relevant file content:
+This section describes making a Bolt project directory (Boltdir) available to
+the container. Here is the directory structure and relevant file content:
 ```console
 $ tree
 .
@@ -102,7 +116,8 @@ log:
 ```
 **`inventory.yaml`**
 
-Store information about targets. Note the absolute path to the private key is the path in the container, not on the host.
+Store information about targets. Note the absolute path to the private key is
+the path in the container, not on the host.
 
 ```yaml
 ---
@@ -126,7 +141,8 @@ Here is a sample shell task that echoes a `message` parameter:
 echo "Message: ${PT_message}"
 ```
 
-To execute the task with Docker and provide all the information from the Bolt project directory, mount the Boltdir on the host:
+To execute the task with Docker and provide all the information from the Bolt
+project directory, mount the Boltdir on the host:
 
 ```shell script
 $ docker run --mount type=bind,source=/home/cas/working_dir/docker_bolt/Boltdir,destination=/Boltdir puppet/puppet-bolt task run docker_task message=hi -t docker-example
@@ -139,7 +155,9 @@ Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
 Ran on 1 target in 0.56 seconds
 ```
 
-The `--mount` flag maps the Boltdir on the Docker host to `/Boltdir` in the container. The container is tagged as `puppet-bolt` and the rest of the invocation is all native to Bolt. 
+The `--mount` flag maps the Boltdir on the Docker host to `/Boltdir` in the
+container. The container is tagged as `puppet-bolt` and the rest of the
+invocation is all native to Bolt. 
 
 ## Building on top of the puppet-bolt image
 
@@ -160,7 +178,9 @@ cas@cas-ThinkPad-T460p:~/working_dir/docker_bolt$ tree
 5 directories, 5 files
 ```
 
-You can also extend the puppet-bolt image and copy in data that will always be available for that image. To illustrate this, you can add a Dockerfile with the following content (with the directory structure defined above):
+You can also extend the puppet-bolt image and copy in data that will always be
+available for that image. To illustrate this, you can add a Dockerfile with the
+following content (with the directory structure defined above):
 
 **`Dockerfile`**
 
@@ -170,7 +190,8 @@ FROM puppet/puppet-bolt
 COPY . /Boltdir
 ```
 
-This command builds a container image with our custom module content and tags it `my-extended-puppet-bolt`:
+This command builds a container image with our custom module content and tags it
+`my-extended-puppet-bolt`:
 
 ```shell script
 $ docker build . -t my-extended-puppet-bolt
@@ -183,7 +204,8 @@ Successfully built 03162d29a1ee
 Successfully tagged my-extended-puppet-bolt:latest
 ```
 
-You can now run that container with the custom module content and connection information available inside the container:
+You can now run that container with the custom module content and connection
+information available inside the container:
 
 ```shell script
 $ docker run my-extended-puppet-bolt task run docker_task message=hi -t docker-example

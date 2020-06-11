@@ -4,7 +4,8 @@ Bolt is available on Docker Hub, as an image called `puppet-bolt`.
 
 ## Downloading the image
 
-Docker Hub contains different versions of Bolt, with tags corresponding to Bolt system package and Rubygem versions. The newest version has a `latest` tag.
+Docker Hub contains different versions of Bolt, with tags corresponding to Bolt
+system package and Rubygem versions. The newest version has a `latest` tag.
 
 You can download the latest image with this command:
 ```
@@ -13,7 +14,8 @@ docker pull puppet/puppet-bolt
 
 ## Running Bolt from a Docker image
 
-When running Bolt from a Docker image, Docker creates a container and executes the Bolt command within that container. Running Bolt in this way is simple:
+When running Bolt from a Docker image, Docker creates a container and executes
+the Bolt command within that container. Running Bolt in this way is simple:
 ```console
 $ docker run puppet/puppet-bolt command run 'cat /etc/os-release' -t localhost
 Started on localhost...
@@ -34,13 +36,22 @@ Successful on 1 target: localhost
 Ran on 1 target in 0.00 seconds
 ```
 
-As you can see from the above example, the `localhost` target is the *container* environment, not the *host* environment.
+As you can see from the above example, the `localhost` target is the *container*
+environment, not the *host* environment.
 
-Typically you would want to run Bolt not against the container environment, but against a different computer. To do this, you must pass information to the Bolt container about how to connect to the target computer. You might also want to pass the container some custom module content for Bolt to use. The next sections describe three different techniques for sharing this kind of information between the host and the Docker container.
+Typically you would want to run Bolt not against the container environment, but
+against a different computer. To do this, you must pass information to the Bolt
+container about how to connect to the target computer. You might also want to
+pass the container some custom module content for Bolt to use. The next sections
+describe three different techniques for sharing this kind of information between
+the host and the Docker container.
 
 ## Pass inventory as an environment variable
 
-If you only need to pass information on how to connect to targets, and not any custom module content, you can pass the inventory information by assigning it to an environment variable. This `inventory.yaml` file contains all the information needed for connecting to an example target:
+If you only need to pass information on how to connect to targets, and not any
+custom module content, you can pass the inventory information by assigning it to
+an environment variable. This `inventory.yaml` file contains all the information
+needed for connecting to an example target:
 
 ```yaml
 targets:
@@ -54,7 +65,9 @@ targets:
         host-key-check: false
 ```
 
-Here is an example of running the built-in `facts` task against the target listed in inventory. Note that the command passes the contents of the inventory file via an environment variable:
+Here is an example of running the built-in `facts` task against the target
+listed in inventory. Note that the command passes the contents of the inventory
+file via an environment variable:
 
 ```console
 $ docker run --env "BOLT_INVENTORY=$(cat Boltdir/inventory.yaml)" \
@@ -78,7 +91,9 @@ Ran on 1 target in 0.55 seconds
 
 ## Mount the host's Bolt project directory
 
-Another way of passing information is to make your Bolt project directory (Boltdir) available to the container. Here is the directory structure of a typical Boltdir:
+Another way of passing information is to make your Bolt project directory
+(Boltdir) available to the container. Here is the directory structure of a
+typical Boltdir:
 
 ```console
 $ tree
@@ -133,7 +148,8 @@ This is a shell task that prints the contents of the `message` parameter.
 echo "Message: ${PT_message}"
 ```
 
-This command executes the Bolt task above within a Docker container, using a shared Boltdir to pass information to the container:
+This command executes the Bolt task above within a Docker container, using a
+shared Boltdir to pass information to the container:
 
 ```console
 $ docker run --mount type=bind,source=/path/to/Boltdir,destination=/Boltdir \
@@ -147,13 +163,17 @@ Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
 Ran on 1 target in 0.56 seconds
 ```
 
-The `--mount` flag maps the Bolt project directory on the Docker host to `/Boltdir` in the container. The container is tagged as `puppet-bolt` and the rest of the command is all native to Bolt.
+The `--mount` flag maps the Bolt project directory on the Docker host to
+`/Boltdir` in the container. The container is tagged as `puppet-bolt` and the
+rest of the command is all native to Bolt.
 
 ## Building on top of the `puppet-bolt` Docker image
 
-You can also extend the `puppet-bolt` image and copy in data that will always be available for that image.
+You can also extend the `puppet-bolt` image and copy in data that will always be
+available for that image.
 
-For example, create a file called `Dockerfile` in this location within your Boltdir:
+For example, create a file called `Dockerfile` in this location within your
+Boltdir:
 
 ```console
 $ tree
@@ -179,7 +199,8 @@ FROM puppet/puppet-bolt
 COPY . /Boltdir
 ```
 
-Now you can build a Docker image with your custom module content and tag it `my-extended-puppet-bolt` with this command:
+Now you can build a Docker image with your custom module content and tag it
+`my-extended-puppet-bolt` with this command:
 
 ```console
 $ docker build . -t my-extended-puppet-bolt
@@ -192,7 +213,8 @@ Successfully built 03162d29a1ee
 Successfully tagged my-extended-puppet-bolt:latest
 ```
 
-You can run that container with the custom module content and connection information available inside the container:
+You can run that container with the custom module content and connection
+information available inside the container:
 
 ```console
 $ docker run my-extended-puppet-bolt task run docker_task message=hi -t docker-example
