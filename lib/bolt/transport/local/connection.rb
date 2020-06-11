@@ -50,7 +50,8 @@ module Bolt
             # If it's already a powershell command then invoke it normally.
             # Otherwise, wrap it in powershell.exe.
             unless command.start_with?('powershell.exe')
-              command = ['powershell.exe', *Bolt::Shell::Powershell::PS_ARGS, '-Command', command]
+              cmd = Bolt::Shell::Powershell::Snippets.exit_with_code(command)
+              command = ['powershell.exe', *Bolt::Shell::Powershell::PS_ARGS, '-Command', cmd]
             end
           end
 
