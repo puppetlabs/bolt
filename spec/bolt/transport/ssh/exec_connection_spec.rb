@@ -21,7 +21,13 @@ describe Bolt::Transport::SSH::ExecConnection do
 
   context 'when copying files' do
     it 'uses configured copy-command' do
-      inventory.set_config(target, %w[ssh copy-command], ['scp', '-o', 'Port=21'])
+      inventory.set_config(target, '%w[ssh ssh-command]', ['ssh'])
+      inventory.set_config(
+        target,
+        'ssh',
+        'ssh-command'  => 'ssh',
+        'copy-command' => ['scp', '-o', 'Port=21']
+      )
 
       expect(Open3).to receive(:capture3)
         .with("scp", "-o", "Port=21", "-o", "BatchMode=yes", "good", "sshuser@foo.example.com:afternoon")
@@ -30,10 +36,15 @@ describe Bolt::Transport::SSH::ExecConnection do
     end
 
     it 'rejects invalid copy-command' do
-      inventory.set_config(target, %w[ssh copy-command], 3)
+      inventory.set_config(
+        target,
+        'ssh',
+        'ssh-command'  => 'ssh',
+        'copy-command' => 3
+      )
 
       expect { subject.copy_file('good', 'evening') }
-        .to raise_error(/copy-command must be a String or Array, received Integer 3/)
+        .to raise_error(/copy-command must be of type Array, String; received Integer 3/)
     end
 
     it 'builds scp command with port' do
@@ -86,7 +97,7 @@ describe Bolt::Transport::SSH::ExecConnection do
       inventory.set_config(target, %w[ssh ssh-command], 3)
 
       expect { subject.execute('ls') }
-        .to raise_error(/ssh-command must be a String or Array, received Integer 3/)
+        .to raise_error(/ssh-command must be of type Array, String; received Integer 3/)
     end
   end
 end

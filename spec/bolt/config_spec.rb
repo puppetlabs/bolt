@@ -199,15 +199,17 @@ describe Bolt::Config do
 
     it 'warns when inventory config keys are present' do
       allow(File).to receive(:exist?)
-      allow(Bolt::Util).to receive(:read_yaml_hash).and_return(Bolt::Config::INVENTORY_CONFIG.dup)
+      allow(Bolt::Util).to receive(:read_yaml_hash).and_return(Bolt::Config::INVENTORY_OPTIONS.dup)
 
       warnings = Bolt::Config.load_bolt_defaults_yaml(path)[:warnings]
       expect(warnings).to include(msg: /Unsupported inventory configuration/)
     end
 
     it 'warns when project config keys are present' do
+      project_config = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_PROJECT_OPTIONS)
+
       allow(File).to receive(:exist?)
-      allow(Bolt::Util).to receive(:read_yaml_hash).and_return(Bolt::Config::PROJECT_CONFIG.dup)
+      allow(Bolt::Util).to receive(:read_yaml_hash).and_return(project_config)
 
       warnings = Bolt::Config.load_bolt_defaults_yaml(path)[:warnings]
       expect(warnings).to include(msg: /Unsupported project configuration/)
@@ -216,11 +218,11 @@ describe Bolt::Config do
     it 'puts keys under inventory-config at the top level' do
       allow(File).to receive(:exist?)
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return(
-        'inventory-config' => Bolt::Config::INVENTORY_CONFIG.dup
+        'inventory-config' => Bolt::Config::INVENTORY_OPTIONS.dup
       )
 
       data = Bolt::Config.load_bolt_defaults_yaml(path)[:data]
-      expect(data).to eq(Bolt::Config::INVENTORY_CONFIG)
+      expect(data).to eq(Bolt::Config::INVENTORY_OPTIONS)
     end
   end
 

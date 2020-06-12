@@ -69,17 +69,17 @@ module Bolt
       @resource_types = @path + '.resource_types'
       @type = type
 
-      tc = Bolt::Config::INVENTORY_CONFIG.keys & raw_data.keys
+      tc = Bolt::Config::INVENTORY_OPTIONS.keys & raw_data.keys
       if tc.any?
         msg = "Transport configuration isn't supported in bolt-project.yaml. Ignoring keys #{tc}"
         @warnings << { msg: msg }
       end
 
-      @data = raw_data.reject { |k, _| Bolt::Config::INVENTORY_CONFIG.keys.include?(k) }
+      @data = raw_data.reject { |k, _| Bolt::Config::INVENTORY_OPTIONS.include?(k) }
 
       # Once bolt.yaml deprecation is removed, this attribute should be removed
       # and replaced with .project_file in lib/bolt/config.rb
-      @config_file = if (Bolt::Config::OPTIONS.keys & @data.keys).any?
+      @config_file = if (Bolt::Config::BOLT_OPTIONS & @data.keys).any?
                        if (@path + 'bolt.yaml').file?
                          msg = "bolt-project.yaml contains valid config keys, bolt.yaml will be ignored"
                          @warnings << { msg: msg }
