@@ -2,6 +2,7 @@
 
 require 'pathname'
 require 'bolt/pal'
+require 'bolt/config'
 
 module Bolt
   class Project
@@ -19,15 +20,7 @@ module Bolt
       create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
     # If homedir isn't defined use the system config path
     rescue ArgumentError
-      create_project(system_path, 'system')
-    end
-
-    def self.system_path
-      if Bolt::Util.windows?
-        File.join(Dir::COMMON_APPDATA, 'PuppetLabs', 'bolt', 'etc')
-      else
-        File.join('/etc', 'puppetlabs', 'bolt')
-      end
+      create_project(Bolt::Config.system_path, 'system')
     end
 
     # Search recursively up the directory hierarchy for the Project. Look for a
@@ -74,13 +67,13 @@ module Bolt
       @resource_types = @path + '.resource_types'
       @type = type
 
-      tc = Bolt::Config::CONFIG_IN_INVENTORY.keys & raw_data.keys
+      tc = Bolt::Config::INVENTORY_CONFIG.keys & raw_data.keys
       if tc.any?
         msg = "Transport configuration isn't supported in bolt-project.yaml. Ignoring keys #{tc}"
         @warnings << { msg: msg }
       end
 
-      @data = raw_data.reject { |k, _| Bolt::Config::CONFIG_IN_INVENTORY.keys.include?(k) }
+      @data = raw_data.reject { |k, _| Bolt::Config::INVENTORY_CONFIG.keys.include?(k) }
 
       # Once bolt.yaml deprecation is removed, this attribute should be removed
       # and replaced with .project_file in lib/bolt/config.rb

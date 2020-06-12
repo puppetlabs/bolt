@@ -1,0 +1,34 @@
+# Transport configuration options
+
+This page lists the configuration options that are available to each transport used by Bolt to connect
+to targets. These options can be set in multiple locations:
+
+- Under a `config` key in an [inventory file](inventory_file_v2.md).
+- As top-level keys in a `bolt.yaml` file.
+- Under the `inventory-config` key in a [`bolt-defaults.yaml` file](bolt_defaults_reference.md).
+
+<% @opts[:options].each do |option, desc| -%>
+## `<%= option %>`
+
+<%= desc %>
+
+<% if @transports[:options].key?(option) -%>
+<% @transports[:options][option].each do |t_option, data| -%>
+### `<%= t_option %>`
+
+<%= data[:desc] %>
+
+<% if data[:type] -%>
+- **Type:** <%= data[:type] == TrueClass ? 'Boolean' : data[:type] %>
+<% end -%>
+<% if @transports[:defaults][option][t_option] -%>
+- **Default:** <%= @transports[:defaults][option][t_option] %>
+<% end -%>
+<% if option == 'ssh' -%>
+- **External SSH Support:** <%= data[:external] ? 'Yes' : 'No' %>
+<% end %>
+<% end %>
+<% elsif @opts[:defaults].key?(option) -%>
+- **Default:** <%= @opts[:defaults][option] %>
+<% end %>
+<% end %>

@@ -4,9 +4,11 @@ require 'spec_helper'
 require 'bolt/config'
 
 describe Bolt::Config do
-  let(:project) { Bolt::Project.new({}, @tmpdir) }
-  let(:system_path) { Pathname.new(File.join(Bolt::Project.system_path, 'bolt.yaml')) }
-  let(:user_path) { Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml'))) }
+  let(:project)       { Bolt::Project.new({}, @tmpdir) }
+  let(:system_path)   { Bolt::Config.system_path }
+  let(:user_path)     { Bolt::Config.user_path }
+  let(:config_name)   { Bolt::Config::BOLT_CONFIG_NAME }
+  let(:defaults_name) { Bolt::Config::BOLT_DEFAULTS_NAME }
 
   around(:each) do |example|
     Dir.mktmpdir("foo") do |tmpdir|
@@ -53,9 +55,8 @@ describe Bolt::Config do
 
   describe "::from_project" do
     it "loads from the project config file if present" do
+      allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return({})
       expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(project.config_file, 'config')
-      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(system_path, 'config')
-      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(user_path, 'config')
 
       Bolt::Config.from_project(project)
     end
@@ -66,14 +67,8 @@ describe Bolt::Config do
       end
 
       it "doesn't load user level config and continues" do
-        allow(File).to receive(:join).and_call_original
-        allow(File)
-          .to receive(:join)
-          .with('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')
-          .and_raise(ArgumentError, "couldn't find login name -- expanding `~'")
-
-        expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(project.config_file, 'config')
-        expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(system_path, 'config')
+        allow(Bolt::Config).to receive(:user_path).and_return(nil)
+        allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return({})
         expect(Bolt::Util).not_to receive(:read_optional_yaml_hash).with(user_path, 'config')
 
         Bolt::Config.from_project(project)
@@ -107,9 +102,11 @@ describe Bolt::Config do
     let(:proj_path) { Bolt::Util.windows? ? "D:/path/to/bolt-project.yaml" : "/path/to/bolt-project.yaml" }
 
     it 'loads from the specified config file' do
-      expect(Bolt::Util).to receive(:read_yaml_hash).with(path, 'config')
-      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(system_path, 'config')
-      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(user_path, 'config')
+      allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return({})
+      allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
+      expect(Bolt::Util).to receive(:read_yaml_hash)
+        .with(path, 'config')
+        .and_return({})
       expect(Bolt::Util).to receive(:read_optional_yaml_hash)
         .with(proj_path, "project")
         .and_return({})
@@ -123,6 +120,107 @@ describe Bolt::Config do
       expect do
         Bolt::Config.from_file(path)
       end.to raise_error(Bolt::FileError)
+    end
+  end
+
+  describe '::load_defaults' do
+    shared_examples 'config defaults' do
+      it 'defaults to bolt.yaml' do
+        allow(File).to receive(:exist?)
+        allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
+        allow(File).to receive(:exist?).with(path + defaults_name).and_return(false)
+        allow(File).to receive(:exist?).with(path + config_name).and_return(true)
+        expect(Bolt::Util).to receive(:read_yaml_hash).with(path + config_name, 'config')
+
+        Bolt::Config.load_defaults(project)
+      end
+
+      it 'warns when using bolt.yaml' do
+        allow(File).to receive(:exist?)
+        allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
+        allow(File).to receive(:exist?).with(path + defaults_name).and_return(false)
+        allow(File).to receive(:exist?).with(path + config_name).and_return(true)
+
+        warnings = Bolt::Config.load_defaults(project).flat_map { |config| config[:warnings] }
+        expect(warnings).to include(msg: /bolt.yaml is deprecated/)
+      end
+
+      it 'loads bolt-defaults.yaml if present' do
+        allow(File).to receive(:exist?)
+        allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
+        allow(File).to receive(:exist?).with(path + defaults_name).and_return(true)
+        expect(Bolt::Util).to receive(:read_yaml_hash).with(path + defaults_name, 'config')
+
+        Bolt::Config.load_defaults(project)
+      end
+
+      it 'loads nothing when bolt.yaml and bolt-defaults.yaml are not present' do
+        allow(File).to receive(:exist?).and_return(false)
+        expect(Bolt::Util).not_to receive(:read_yaml_hash)
+
+        Bolt::Config.load_defaults(project)
+      end
+    end
+
+    context 'system-level config' do
+      let(:path) { system_path }
+
+      include_examples 'config defaults'
+
+      it 'does not load bolt.yaml if already loaded by project' do
+        allow(File).to receive(:exist?)
+        allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
+        allow(File).to receive(:exist?).with(path + defaults_name).and_return(false)
+        allow(project).to receive(:config_file).and_return(path + config_name)
+        expect(Bolt::Util).not_to receive(:read_yaml_hash).with(path + config_name, 'config')
+
+        Bolt::Config.load_defaults(project)
+      end
+    end
+
+    context 'user-level config' do
+      let(:path) { user_path }
+
+      include_examples 'config defaults'
+    end
+  end
+
+  describe '::load_bolt_defaults_yaml' do
+    let(:path) { user_path }
+
+    it 'warns when bolt.yaml is also present' do
+      allow(File).to receive(:exist?)
+      allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
+      allow(File).to receive(:exist?).with(path + config_name).and_return(true)
+
+      warnings = Bolt::Config.load_bolt_defaults_yaml(path)[:warnings]
+      expect(warnings).to include(msg: /Detected multiple configuration files/)
+    end
+
+    it 'warns when inventory config keys are present' do
+      allow(File).to receive(:exist?)
+      allow(Bolt::Util).to receive(:read_yaml_hash).and_return(Bolt::Config::INVENTORY_CONFIG.dup)
+
+      warnings = Bolt::Config.load_bolt_defaults_yaml(path)[:warnings]
+      expect(warnings).to include(msg: /Unsupported inventory configuration/)
+    end
+
+    it 'warns when project config keys are present' do
+      allow(File).to receive(:exist?)
+      allow(Bolt::Util).to receive(:read_yaml_hash).and_return(Bolt::Config::PROJECT_CONFIG.dup)
+
+      warnings = Bolt::Config.load_bolt_defaults_yaml(path)[:warnings]
+      expect(warnings).to include(msg: /Unsupported project configuration/)
+    end
+
+    it 'puts keys under inventory-config at the top level' do
+      allow(File).to receive(:exist?)
+      allow(Bolt::Util).to receive(:read_yaml_hash).and_return(
+        'inventory-config' => Bolt::Config::INVENTORY_CONFIG.dup
+      )
+
+      data = Bolt::Config.load_bolt_defaults_yaml(path)[:data]
+      expect(data).to eq(Bolt::Config::INVENTORY_CONFIG)
     end
   end
 
@@ -262,9 +360,9 @@ describe Bolt::Config do
 
     let(:config) {
       Bolt::Config.new(project, [
-                         { data: system_config },
-                         { data: user_config },
-                         { data: project_config }
+                         { data: system_config, warnings: [] },
+                         { data: user_config, warnings: [] },
+                         { data: project_config, warnings: [] }
                        ])
     }
 

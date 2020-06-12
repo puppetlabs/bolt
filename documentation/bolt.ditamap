@@ -75,5 +75,7 @@
         <topicref href="plan_functions.md" format="markdown"/>
         <topicref href="bolt_types_reference.md" format="markdown" />
         <topicref href="bolt_configuration_reference.md" format="markdown"/>
+        <topicref href="bolt_defaults_reference.md" format="markdown"/>
+        <topicref href="bolt_transports_reference.md" format="markdown"/>
     </topichead>
 </map>

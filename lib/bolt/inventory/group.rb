@@ -16,7 +16,7 @@ module Bolt
       DATA_KEYS = %w[config facts vars features plugin_hooks].freeze
       TARGET_KEYS = DATA_KEYS + %w[name alias uri]
       GROUP_KEYS = DATA_KEYS + %w[name groups targets]
-      CONFIG_KEYS = Bolt::Config::CONFIG_IN_INVENTORY.keys
+      CONFIG_KEYS = Bolt::Config::INVENTORY_CONFIG.keys
 
       def initialize(input, plugins)
         @logger = Logging.logger[self]

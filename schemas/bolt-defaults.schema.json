@@ -1,0 +1,134 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bolt Defaults",
+  "description": "Bolt Defaults bolt-defaults.yaml Schema",
+  "type": "object",
+  "properties": {
+    "color": {
+      "description": "Whether to use colored output when printing messages to the console.",
+      "type": "boolean"
+    },
+    "compile-concurrency": {
+      "description": "The maximum number of simultaneous manifest block compiles.",
+      "type": "integer",
+      "min": 1
+    },
+    "concurrency": {
+      "description": "The number of threads to use when executing on remote targets.",
+      "type": "integer",
+      "min": 1
+    },
+    "format": {
+      "description": "The format to use when printing results.",
+      "type": "string",
+      "enum": ["human", "json"]
+    },
+    "inventory-config": {
+      "description": "A map containing default configuration for each of Bolt's transports as well as the default transport to apply to targets that do not specify one in their URI or inventory configuration.",
+      "type": "object",
+      "parameters": {
+        "docker": {
+          "$ref": "bolt-transport-definitions.json#/docker"
+        },
+        "local": {
+          "$ref": "bolt-transport-definitions.json#/local"
+        },
+        "pcp": {
+          "$ref": "bolt-transport-definitions.json#/pcp"
+        },
+        "remote": {
+          "$ref": "bolt-transport-definitions.json#/remote"
+        },
+        "ssh": {
+          "$ref": "bolt-transport-definitions.json#/ssh"
+        },
+        "transport": {
+          "description": "The default transport to use when the transport for a target is not specified in the URI or inventory.",
+          "type": "string",
+          "enum": ["docker", "local", "pcp", "remote", "ssh", "winrm"]
+        },
+        "winrm": {
+          "$ref": "bolt-transport-definitions.json#/winrm"
+        }
+      }
+    },
+    "plugin_hooks": {
+      "description": "Which plugins a specific hook should use.",
+      "type": "object",
+      "properties": {
+        "puppet_library": {
+          "description": "Specify which plugin should be used to ensure the Puppet library is installed on a target.",
+          "type": "object"
+        }
+      }
+    },
+    "plugins": {
+      "description": "A map of plugins and their configuration data.",
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9_]*$": { 
+          "type": "object"
+        }
+      }
+    },
+    "puppetdb": {
+      "description": "A map containing options for configuring the Bolt PuppetDB client.",
+      "type": "object",
+      "properties": {
+        "cacert": {
+          "description": "The path to the ca certificate for PuppetDB.",
+          "type": "string"
+        },
+        "cert": {
+          "description": "The path to the client certificate file to use for authentication.",
+          "type": "string"
+        },
+        "key": {
+          "description": "The path to the private key for the certificate.",
+          "type": "string"
+        },
+        "server_urls": {
+          "description": "An array containing the PuppetDB host to connect to. Include the protocol https and the port, which is usually 8081. For example, https://my-master.example.com:8081.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "description": "A PuppetDB host.",
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "puppetfile": {
+      "description": "A map containing options for the 'bolt puppetfile install' command.",
+      "type": "object",
+      "properties": {
+        "forge": {
+          "description": "A subsection that can have its own proxy setting to set an HTTP proxy for Forge operations only, and a baseurl setting to specify a different Forge host.",
+          "type": "object",
+          "properties": {
+            "baseurl": {
+              "description": "The URI for the Forge host.",
+              "type": "string",
+              "format": "uri"
+            },
+            "proxy": {
+              "description": "The HTTP proxy to use for Forge operations.",
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "proxy": {
+          "description": "The HTTP proxy to use for Git and Forge operations.",
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "save-rerun": {
+      "description": "Whether to update .rerun.json in the Bolt project directory. If your target names include passwords, set this value to false to avoid writing passwords to disk.",
+      "type": "boolean"
+    }
+  }
+}

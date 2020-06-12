@@ -12,7 +12,7 @@ describe Bolt::Project do
       .and_raise(ArgumentError, "couldn't find login name -- expanding `~'")
     project = Bolt::Project.default_project
     # we have to call expand_path to ensure C:/ instead of C:\ on Windows
-    expect(project.path.to_s).to eq(File.expand_path(Bolt::Project.system_path))
+    expect(project.path.to_s).to eq(File.expand_path(Bolt::Config.system_path))
   end
 
   describe "configuration" do
