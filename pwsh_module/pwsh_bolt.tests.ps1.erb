@@ -1,0 +1,129 @@
+Import-Module -Name (Join-Path (Split-Path $PSCommandPath) 'pwsh_bolt.psm1') -Force
+BeforeAll {
+  Mock -ModuleName 'pwsh_bolt' -Verifiable -CommandName Invoke-BoltCommandLine -MockWith {
+    return $commandline
+  }
+  Mock Get-ItemProperty {
+    return [PSCustomObject]@{
+      RememberedInstallDir = 'C:/Program Files/Puppet Labs/Bolt'
+    }
+  }
+}
+
+function Get-HelpCases {
+  param($commandName, $parameter, $commandParameters, $helpParameters)
+  $helpCases = New-Object System.Collections.Generic.List[PSObject]
+
+  foreach ($parameter in $helpParameters) {
+    $currentCase = @{
+      commandName            = $commandName
+      parameterName          = $parameter.Name
+      parameterHelp          = $help.parameters.parameter | Where-Object Name -EQ $parameter.Name
+      paramTypeName          = $parameter.Type.Name
+      commandSaysisMandatory = $commandParameters | Where-Object name -eq $parameter.name | Select-Object -ExpandProperty IsMandatory
+    }
+    $helpCases.Add($currentCase) | Out-Null
+  }
+  return $helpCases
+}
+
+function Get-BoltCommandParameters {
+  param($command, $common)
+  $command.ParameterSets.Parameters |
+    Sort-Object -Property Name -Unique |
+    Where-Object { $_.Name -notin $common }
+}
+
+function Get-BoltCommandHelpParameters {
+  param($help, $common)
+  ## Without the filter, WhatIf and Confirm parameters are still flagged in "finds help parameter in code" test
+  $help.Parameters.Parameter |
+    Where-Object { $_.Name -notin $common } |
+    Sort-Object -Property Name -Unique
+}
+
+function Get-CommonParameters {
+  param()
+  @(
+    'Version', 'Debug', 'ErrorAction', 'ErrorVariable', 'InformationAction',
+    'InformationVariable', 'OutBuffer',  'OutVariable', 'PipelineVariable',
+    'Verbose', 'WarningAction', 'WarningVariable', 'Confirm', 'Whatif'
+  )
+}
+
+<% @commands.each do |pwsh_command| %>
+Describe "<%= pwsh_command[:cmdlet] -%>" {
+  $commandName       = '<%= pwsh_command[:cmdlet] -%>'
+  $command           = Get-Command $commandName
+  $help              = Get-Help -Name $commandName
+  $CommonParameters  = Get-CommonParameters
+  $commandParameters = Get-BoltCommandParameters -command $command -common $CommonParameters
+  $helpParameters    = Get-BoltCommandHelpParameters -help $help -common $CommonParameters
+  $helpCases         = Get-HelpCases -commandName $commandName -parameter $parameter -commandParameters $commandParameters -helpParameters $helpParameters
+
+  Context 'parameters' {
+    # Pester 5 doesn't allow outside variables to leak into the `It` block scope
+    # anymore. Until the Pester project has a supported workflow for this, the
+    # workaround is to inject the data the block needs via a single test case.
+    It 'has correct parameters' -TestCases @{command = $command} {
+<% pwsh_command[:options].each do |option| -%>
+<% if option[:parameter_set] -%>
+      $command.Parameters['<%= option[:name] -%>'].Attributes.Mandatory | Should -Be $true
+<% else -%>
+      $command.Parameters['<%= option[:name] -%>'] | Should -Be $true
+<% end -%>
+<% end -%>
+    }
+<% pwsh_command[:options].each do |option| -%>
+<% if option[:mandatory] -%>
+    It 'has a primary parameter' -TestCases @{command = $command} {
+      $command.Parameters['<%= option[:name] -%>'] | Should -Be $true
+      $command.Parameters['<%= option[:name] -%>'].ParameterSets.Values.IsMandatory | Should -Be $true
+    }
+<% end -%>
+<% end -%>
+  }
+
+  Context 'help' {
+    It 'should not be auto-generated' -TestCases @{help = $help} {
+      $help.Synopsis | Should -Not -BeNullOrEmpty
+      $help.Synopsis | Should -Not -BeLike '*`[`<CommonParameters`>`]*'
+    }
+
+    # Should be a description for every function
+    It 'gets description' -TestCases @{help = $help} {
+      $help.Description | Should -Not -BeNullOrEmpty
+    }
+
+    # Should be at least one link
+    It 'gets relatedLinks' -TestCases @{help = $help} {
+      ($help.relatedLinks | Select-Object -First 1).navigationLink | Should -Not -BeNullOrEmpty
+    }
+
+    # My guess is that someday soon, creating a hashtable array in a before block
+    # and passing it to the -TestCases parameter will generate the tests you want.
+    # For now, the array is out of scope when the file is parsed, so if you don't
+    # foreach() loop like this, you don't get any tests. But you still have to inject
+    # the data into each test. The Pester project is aware of this limitation
+    # and would like to fix it, so some day this loop will go away.
+    foreach($case in $helpCases) {
+      # Should be a description for every parameter
+      It 'gets help for parameter: <parameterName>' -TestCases $case {
+        $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty
+      }
+
+      # Required value in Help should match IsMandatory property of parameter
+      It 'help for <parametername> has correct Mandatory value' -TestCases $case {
+        $parameterHelp.Required | Should -Be $commandSaysisMandatory.toString()
+      }
+
+      # Parameter type in Help should match code
+      It 'help has correct parameter type for <parameterName>' -TestCases $case {
+        # To avoid calling Trim method on a null object.
+        $helpType = if ($parameterHelp.parameterValue) { $parameterHelp.parameterValue.Trim() }
+        $helpType | Should -Be $paramTypeName
+      }
+    }
+  }
+}
+<% end %>
