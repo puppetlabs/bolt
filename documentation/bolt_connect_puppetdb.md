@@ -4,11 +4,16 @@ Configure Bolt to connect to PuppetDB.
 
 ## PuppetDB authorization
 
-Bolt can authenticate with PuppetDB through an SSL client certificate or a PE RBAC token.
+Bolt can authenticate with PuppetDB through an SSL client certificate or a PE
+RBAC token.
 
 ## Client certificate
 
-Add the certname for the certificate you want to authenticate with to `/etc/puppetlabs/puppetdb/certificate-whitelist`. This certificate has full access to all PuppetDB API endpoints and can read all data, push new data, or run commands on PuppetDB. To test the certificate you run the following curl command.
+Add the certname for the certificate you want to authenticate with
+to `/etc/puppetlabs/puppetdb/certificate-whitelist`. This certificate has full
+access to all PuppetDB API endpoints and can read all data, push new data, or
+run commands on PuppetDB. To test the certificate you run the following curl
+command.
 
 ```
 curl -X GET $SERVER_URL/pdb/query/v4 --data-urlencode 'query=nodes[certname] {}' --cert $CERT_PATH --key $KEY_PATH --cacert $CACERT_PATH
@@ -16,13 +21,18 @@ curl -X GET $SERVER_URL/pdb/query/v4 --data-urlencode 'query=nodes[certname] {}'
 
 ## Token-based authentication with PE RBAC token
 
-If you use Puppet Enterprise you can grant more restricted access to PuppetDB with a PE role-based access control (RBAC) token.
+If you use Puppet Enterprise you can grant more restricted access to PuppetDB
+with a PE role-based access control (RBAC) token.
 
-1.  In PE, verify you are assigned to a role that has the appropriate RBAC permission. It needs the permission type **Nodes** and the action **View node data from PuppetDB**.
+1.  In PE, verify you are assigned to a role that has the appropriate RBAC
+    permission. It needs the permission type **Nodes** and the action **View
+    node data from PuppetDB**.
 
 2.  From the command line, run `puppet-access login --lifetime <TIME PERIOD>`.
 
-3.  When prompted, enter the same username and password that you use to log into the PE console. The token is generated and stored in a file for later use. The default location for storing the token is ~/.puppetlabs/token. 
+3.  When prompted, enter the same username and password that you use to log into
+    the PE console. The token is generated and stored in a file for later use.
+    The default location for storing the token is ~/.puppetlabs/token. 
 
 4.  Verify that authentication is working with the following curl command.
 
@@ -33,9 +43,12 @@ curl -X GET https://$SERVER_URL/pdb/query/v4 --data-urlencode 'query=nodes[certn
 
 ## Configuration
 
-To configure the Bolt PuppetDB client, add a `puppetdb` section to your [Bolt config](configuring_bolt.md) with the following values:
+To configure the Bolt PuppetDB client, add a `puppetdb` section to your [Bolt
+config](configuring_bolt.md) with the following values:
 
--   `server_urls`: An array containing the PuppetDB host to connect to. Include the protocol `https` and the port, which is usually `8081`. For example, `https://my-master.example.com:8081`.
+-   `server_urls`: An array containing the PuppetDB host to connect to. Include
+    the protocol `https` and the port, which is usually `8081`. For example,
+    `https://my-master.example.com:8081`.
 -   `cacert`: The path to the ca certificate for PuppetDB.
 
 If you are using certificate authentication also set:
@@ -57,9 +70,14 @@ puppetdb:
   key: /etc/puppetlabs/puppet/ssl/private_keys/my-host.example.com.pem
 ```
 
-If PE is installed and PuppetDB is not defined in a config file, Bolt uses the PuppetDB config defined in either: `$HOME/.puppetlabs/client-tools/puppetdb.conf`or `/etc/puppetlabs/client-tools/puppetdb.conf` (Windows: `%CSIDL_COMMON_APPDATA%\PuppetLabs\client-tools\puppetdb.conf`).
+If PE is installed and PuppetDB is not defined in a config file, Bolt uses the
+PuppetDB config defined in either:
+`$HOME/.puppetlabs/client-tools/puppetdb.conf`or
+`/etc/puppetlabs/client-tools/puppetdb.conf` (Windows:
+`%CSIDL_COMMON_APPDATA%\PuppetLabs\client-tools\puppetdb.conf`).
 
-**Important:** Bolt does not merge config files into a conf.d format the way that pe-client-tools does.
+**Important:** Bolt does not merge config files into a conf.d format the way
+that pe-client-tools does.
 
 To use PE RBAC authentication:
 
@@ -72,7 +90,8 @@ puppetdb:
 
 ## Testing
 
-You can test your configuration with the following plan, which returns a list of all nodes in PuppetDB.
+You can test your configuration with the following plan, which returns a list of
+all nodes in PuppetDB.
 
 ```
 plan pdb_test {
@@ -106,8 +125,9 @@ plan puppetdb_query_targets {
 }
 ```
 
-Alternatively, the [PuppetDB inventory plugin](using_plugins.md) can be used to execute
-a query and return Targets. This avoids the data munging from the previous example:
+Alternatively, the [PuppetDB inventory plugin](using_plugins.md) can be used to
+execute a query and return Targets. This avoids the data munging from the
+previous example:
 
 ```
 plan puppetdb_plugin_targets {

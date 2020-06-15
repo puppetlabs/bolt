@@ -8,7 +8,7 @@ An [apply action](applying_manifest_blocks.md#return-value-of-apply-action)
 returns an `ApplyResult`. An `ApplyResult` is part of a `ResultSet` object and
 contains information about the apply action. 
 
-You can access `ApplyResult` functions with dot notation, using the syntax: 
+You can access `ApplyResult` functions with dot notation, using the syntax:
 `$apply_result.function`.
 
 The following functions are available to `ApplyResult` objects. 
@@ -25,15 +25,17 @@ The following functions are available to `ApplyResult` objects.
 
 ## `ResourceInstance`
 
-`ResourceInstance` objects are used to store the observed and desired state of a target's resource
-and to track events for the resource. These objects do not modify or interact with a target's
-resources.
+`ResourceInstance` objects are used to store the observed and desired state of a
+target's resource and to track events for the resource. These objects do not
+modify or interact with a target's resources.
 
-> **Note:** The `ResourceInstance` data type is under active development and is subject to change.
-  You can learn more about this data type and how to use it in the [experimental features
+> **Note:** The `ResourceInstance` data type is under active development and is
+  subject to change. You can learn more about this data type and how to use it
+  in the [experimental features
   documentation](experimental_features.md#resourceinstance-data-type).
 
-You can access `ResourceInstance` functions with dot notation, using the syntax: `$resource.function`.
+You can access `ResourceInstance` functions with dot notation, using the syntax:
+`$resource.function`.
 
 The following functions are available to `ResourceInstance` objects.
 
@@ -55,11 +57,12 @@ The following functions are available to `ResourceInstance` objects.
 
 ## `Result`
 
-For each target that you execute an action on, Bolt returns a `Result` object and adds the 
-`Result` to a `ResultSet` object. A `Result` object contains information about the action 
-you executed on the target.
+For each target that you execute an action on, Bolt returns a `Result` object
+and adds the `Result` to a `ResultSet` object. A `Result` object contains
+information about the action you executed on the target.
 
-You can access `Result` functions with dot notation, using the syntax: `$result.function`.
+You can access `Result` functions with dot notation, using the syntax:
+`$result.function`.
 
 The following functions are available to `Result` objects.
 
@@ -78,9 +81,9 @@ The following functions are available to `Result` objects.
 ## `ResultSet`
 
 For each target that you execute an action on, Bolt returns a `Result` object
-and adds the `Result` to a `ResultSet` object. In the case of 
-[apply actions](applying_manifest_blocks.md), Bolt returns a `ResultSet` 
-with one or more `ApplyResult` objects.
+and adds the `Result` to a `ResultSet` object. In the case of [apply
+actions](applying_manifest_blocks.md), Bolt returns a `ResultSet` with one or
+more `ApplyResult` objects.
 
 You can access `ResultSet` functions with dot notation, using the syntax:
 `$result_set.function`.
@@ -107,7 +110,8 @@ The following functions are available to `ResultSet` objects:
 
 The `Target` object represents a target and its specific connection options.
 
-You can access `Target` functions using dot notation, using the syntax: `$target.function`.
+You can access `Target` functions using dot notation, using the syntax:
+`$target.function`.
 
 The following functions are available to `Target` objects:
 

@@ -1,6 +1,12 @@
 # Welcome to Bolt
 
-Bolt is an open source orchestration tool that automates the manual work it takes to maintain your infrastructure. Use Bolt to automate tasks that you perform on an as-needed basis or as part of a greater orchestration workflow. For example, you can use Bolt to patch and update systems, troubleshoot servers, deploy applications, or stop and restart services. Bolt can be installed on your local workstation and connects directly to remote targets with SSH or WinRM, so you are not required to install any agent software.
+Bolt is an open source orchestration tool that automates the manual work it
+takes to maintain your infrastructure. Use Bolt to automate tasks that you
+perform on an as-needed basis or as part of a greater orchestration workflow.
+For example, you can use Bolt to patch and update systems, troubleshoot servers,
+deploy applications, or stop and restart services. Bolt can be installed on your
+local workstation and connects directly to remote targets with SSH or WinRM, so
+you are not required to install any agent software.
 
 <img src="bolt-logo-dark.png" width="420" /><br/>
 
@@ -85,4 +91,6 @@ Bolt is an open source orchestration tool that automates the manual work it take
 </table>
 
 
-To send us feedback or let us know about a docs error, [open a ticket](https://tickets.puppetlabs.com/browse/DOCUMENT/?selectedTab=com.atlassian.jira.jira-projects-plugin:summary-panel) (you'll need a Jira account) or [email the docs team](mailto:docs@puppet.com).
+To send us feedback or let us know about a docs error, [open a
+ticket](https://tickets.puppetlabs.com/browse/DOCUMENT/?selectedTab=com.atlassian.jira.jira-projects-plugin:summary-panel)
+(you'll need a Jira account) or [email the docs team](mailto:docs@puppet.com).
