@@ -7,21 +7,13 @@ module Bolt
   class Config
     module Transport
       class Local < Base
-        OPTIONS = %w[
-          cleanup
-          interpreters
-          run-as
-          run-as-command
-          sudo-executable
-          sudo-password
-          tmpdir
-        ].freeze
-
         WINDOWS_OPTIONS = %w[
           cleanup
           interpreters
           tmpdir
         ].freeze
+
+        OPTIONS = WINDOWS_OPTIONS.dup.concat(RUN_AS_OPTIONS).sort.freeze
 
         DEFAULTS = {
           'cleanup' => true
