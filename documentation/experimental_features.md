@@ -402,10 +402,15 @@ ssh:
 
 ### Connecting with SSH configuration not supported by net-ssh
 
-You can use the external SSH transport to connect to targets using configuration that isn't
-supported by the Ruby net-ssh library, for example the encryption algorithm
-chacha20-poly1305@openssh.com. This example uses chacha20-poly1305@openssh.com to encrypt SSH
-connections:
+You can use the external SSH transport to connect to targets using configuration
+that isn't supported by the Ruby net-ssh library. Configure the settings for the
+transport in your inventory file, or use your local SSH config. 
+
+#### Using an inventory file to specify SSH configuration
+
+To encrypt SSH connections using the unsupported algorithm 
+`chacha20-poly1305@openssh.com`, add the SSH command and cypher
+option to your inventory file: 
 
 ```
 # inventory.yaml
@@ -416,20 +421,22 @@ config:
       - '-o Ciphers=chacha20-poly1305@openssh.com'
 ```
 
-You can also store this config in your SSH config at `~/.ssh/config` as:
+#### Using `~/.ssh/config` to specify SSH configuration
 
-```
-Ciphers+=chacha20-poly1305@openssh.com
-```
+To encrypt SSH connections using the unsupported algorithm 
+`chacha20-poly1305@openssh.com`:
+1. Store the following config in your SSH config at `~/.ssh/config` as:
+   ```
+   Ciphers+=chacha20-poly1305@openssh.com
+   ```
 
-then configure Bolt to use the SSH shell command
-```
-# inventory.yaml
-config:
-  ssh:
-    ssh-command: 'ssh'
-```
-and it will pick up that config.
+2. In your inventory file, configure Bolt to use the SSH shell command:
+   ```
+   # inventory.yaml
+   config:
+     ssh:
+       ssh-command: 'ssh'
+   ```
 
 > **Note**: While some OpenSSH config options are supported in net-ssh, such as Ciphers, the specific
 > algorithms you want to use may not be supported and you will still need to use the `ssh-command`
