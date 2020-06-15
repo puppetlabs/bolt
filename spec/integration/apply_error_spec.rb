@@ -7,10 +7,11 @@ require 'bolt_spec/integration'
 
 describe "errors gracefully attempting to apply a manifest block" do
   include BoltSpec::Conn
+  include BoltSpec::Files
   include BoltSpec::Integration
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
-  let(:config_flags) { %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
+  let(:config_flags) { %W[--targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
 
   describe 'over ssh', ssh: true do
     let(:uri) { conn_uri('ssh') }
@@ -25,6 +26,15 @@ describe "errors gracefully attempting to apply a manifest block" do
       error = result['details']['result_set'][0]['value']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg']).to eq("Puppet is not installed on the target, please install it to enable 'apply'")
+    end
+
+    it 'raises a helpful error when a non-Puppet error is raised' do
+      with_tempfile_containing('site', 'load_error()', '.pp') do |tempfile|
+        run_cli(%W[apply #{tempfile.path} --run-as root --sudo-password #{password}] + config_flags)
+        logs = @log_output.readlines
+        expect(logs).to include(/`require': cannot load such file -- fake \(LoadError\)/)
+        expect(logs).to include(/Something's gone terribly wrong! STDERR is logged/)
+      end
     end
 
     context 'when it cannot connect to the target' do
