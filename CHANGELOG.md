@@ -1,5 +1,61 @@
 # Changelog
 
+## Bolt 2.14.0 (2020-06-15)
+
+### New features
+
+* **Load config from bolt-project.yaml**
+  ([#1842](https://github.com/puppetlabs/bolt/issues/1842))
+
+  Bolt configuration options, excluding transport config, can now be
+  loaded from `bolt-project.yaml`. If both `bolt-project.yaml` and
+  `bolt.yaml` are present in the project and `bolt-project.yaml` has
+  bolt config keys (e.g. `format`), `bolt.yaml` will be ignored.
+
+* **Specify preferred algorithms for SSH transport connections**
+  ([#1862](https://github.com/puppetlabs/bolt/issues/1862))
+
+  Users can now specify a list of preferred algorithms to use when
+  establishing connections with targets using the SSH transport with the
+  `encryption-algorithms`, `host-key-algorithms`, `kex-algorithms`, and
+  `mac-algorithms` config options. Each option accepts an array of
+  algorithms and overrides the default list of preferred algorithms.
+  You can read more about these options in the [Bolt configuration
+  reference](https://puppet.com/docs/bolt/latest/bolt_configuration_reference.html#ssh).
+
+* **Add resource plan function to find a `ResourceInstance` on a target**
+  ([#1874](https://github.com/puppetlabs/bolt/issues/1874))
+
+  This adds a `resource` plan function that can be used to find a
+  `ResourceInstance` on a Target object by type and title.
+
+### Bug fixes
+
+* **Improve low ulimit warning**
+  ([#1870](https://github.com/puppetlabs/bolt/issues/1870))
+
+  Users running Bolt with a low ulimit should only be warned if the
+  number of targets they're running against may cause file limit issues.
+
+* **Raise correct error when passing unknown plan parameters**
+  ([#1886](https://github.com/puppetlabs/bolt/pull/1886))
+
+  Bolt was raising an obscure error when a plan received an unknown
+  parameter. It now raises the correct error indicating that the
+  parameter is unknown.
+
+* **Return correct exit code when running commands in powershell** 
+  ([#1846](https://github.com/puppetlabs/bolt/issues/1846))
+
+  Bolt will now display the correct exit code when running commands in
+  powershell that exit with code > 1.
+
+* **Empty apply blocks now error correctly**
+  ([#1880](https://github.com/puppetlabs/bolt/issues/1880))
+
+  This raises an appropriate error when an apply block is empty, instead
+  of an undefined method error.
+
 ## Bolt 2.13.0 (2020-06-08)
 
 ### New features
