@@ -180,7 +180,7 @@ targets:
         - facts.custom_feature
       config:
         ssh:
-          hostname: facts.networking.interfaces.en0.ipaddress
+          host: facts.networking.interfaces.en0.ipaddress
       vars:
         puppetversion: facts.puppetversion
 ```
