@@ -6,7 +6,7 @@ infrastructure. 
 To execute a task, run `bolt task run`, specifying:
 
 -   The full name of the task, formatted as `<MODULE::TASK>`, or as `<MODULE>`
-    for a module's main task \(the `init` task\).
+    for a module's main task (the `init` task).
 -   Any task parameters, as `parameter=value`.
 -   The targets on which to run the task and the connection protocol, with the
     `--targets` flag.
@@ -49,10 +49,6 @@ single quotes to prevent `"` characters from being swallowed by the shell.
 bolt task run mymodule::mytask --targets app1.myorg.com load_balancers='["lb1.myorg.com", "lb2.myorg.com"]'
 ```
 
-```
-bolt plan run mymodule::myplan load_balancers='["lb1.myorg.com", "lb2.myorg.com"]'
-```
-
 If you want to pass multiple structured values or are having trouble with the
 magic parsing of single parameters, you can pass a single JSON object for all
 parameters with the `--params` flag.
@@ -61,18 +57,10 @@ parameters with the `--params` flag.
 bolt task run mymodule::mytask --targets app1.myorg.com --params '{"load_balancers": ["lb1.myorg.com", "lb2.myorg.com"]}'
 ```
 
-```
-bolt plan run mymodule::myplan --params '{"load_balancers": ["lb1.myorg.com", "lb2.myorg.com"]}'
-```
-
 You can also load parameters from a file by putting `@` before the file name.
 
 ```
 bolt task run mymodule::mytask --targets app1.myorg.com --params @param_file.json
-```
-
-```
-bolt plan run mymodule::myplan --params @param_file.json
 ```
 
 To pass JSON values in PowerShell without worrying about escaping, use
@@ -80,10 +68,6 @@ To pass JSON values in PowerShell without worrying about escaping, use
 
 ```
 bolt task run mymodule::mytask --targets app1.myorg.com --params $(@{load_balancers=@("lb1.myorg.com","lb2.myorg.com")} | ConvertTo-Json)
-```
-
-```
-bolt plan run mymodule::myplan --targets app1.myorg.com --params $(@{load_balancers=@("lb1.myorg.com","lb2.myorg.com")} | ConvertTo-Json)
 ```
 
 ## Specifying the module path
