@@ -8,7 +8,7 @@ Puppet::Functions.create_function(:'file::read', Puppet::Functions::InternalFunc
   # @example Read a file from disk
   #   file::read('/tmp/i_dumped_this_here')
   # @example Read a file from the modulepath
-  #   file::read('example/files/VERSION')
+  #   file::read('example/VERSION')
   dispatch :read do
     scope_param
     required_param 'String', :filename
