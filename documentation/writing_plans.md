@@ -325,8 +325,8 @@ constructs are not allowed:
 -   Resource default expressions, such as `File { mode => '0666' }`
 -   Resource overrides, such as `File['/tmp/foo'] { mode => '0444' }`
 -   Relationship operators: `-> <- ~> <~`
--   Functions that operate on a catalog: `include`, `require`, `contain`,
-    `create_resources`
+-   Functions that operate on a catalog: `contain`, `create_resources`,
+    `include`, `realize`, `require`, `tag`, `tagged`
 -   Collector expressions, such as `SomeType <| |>`, `SomeType <<| |>>`
 -   ERB templates are not supported. Use EPP instead
 
