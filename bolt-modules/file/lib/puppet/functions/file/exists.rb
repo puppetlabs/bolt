@@ -9,7 +9,7 @@ Puppet::Functions.create_function(:'file::exists', Puppet::Functions::InternalFu
   # @example Check a file on disk
   #   file::exists('/tmp/i_dumped_this_here')
   # @example check a file from the modulepath
-  #   file::exists('example/files/VERSION')
+  #   file::exists('example/VERSION')
   dispatch :exists do
     scope_param
     required_param 'String', :filename

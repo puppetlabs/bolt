@@ -9,7 +9,7 @@ Puppet::Functions.create_function(:'file::readable', Puppet::Functions::Internal
   # @example Check a file on disk
   #   file::readable('/tmp/i_dumped_this_here')
   # @example check a file from the modulepath
-  #   file::readable('example/files/VERSION')
+  #   file::readable('example/VERSION')
   dispatch :readable do
     scope_param
     required_param 'String', :filename
