@@ -6,10 +6,9 @@ module directories on the module path.
 
 By default, the module path includes the `modules` and `site-modules`
 directories in the [Bolt project directory](bolt_project_directories.md#). If
-`bolt-project.yaml` exists at the root of the project directory, the project
-itself is also loaded as a module and namespaced to either `name` in
-`bolt-project.yaml` if it's set, or the name of the directory if `name` is not
-set. 
+`bolt-project.yaml` exists at the root of the project directory and contains a
+`name` key, the project itself is also loaded as a module and namespaced to the
+value of `name`.
 
 > **Note:** The `bolt-project.yaml` file is part of an experimental feature. For
 > more information, see [Bolt

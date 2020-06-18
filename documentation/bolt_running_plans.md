@@ -35,9 +35,9 @@ path. By default, Bolt looks for downloaded module plans in
 `<PROJECT_NAME>/modules/plans/` and local plans in
 `<PROJECT_NAME>/site-modules/plans/`.
 
-Using a Bolt project, you can create an empty `<PROJECT_NAME>/bolt-project.yaml`
-file, develop your plan in `<PROJECT_NAME>/plans/`, and run Bolt from the root
-of your Bolt project directory to test the plan.
+Using a Bolt project, you can create a `<PROJECT_NAME>/bolt-project.yaml` file,
+develop your plan in `<PROJECT_NAME>/plans/`, and run Bolt from the root of
+your Bolt project directory to test the plan.
 
 > **Note**: The `bolt-project.yaml` file is part of an experimental feature. For
 > more information, see [Bolt

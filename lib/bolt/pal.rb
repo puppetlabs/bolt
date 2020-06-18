@@ -137,7 +137,9 @@ module Bolt
       # TODO: If we always call this inside a bolt_executor we can remove this here
       setup
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: @modulepath, facts: {}) do |pal|
-        Puppet.override(bolt_project: @project,
+        # Only load the project if it a) exists, b) has a name it can be loaded with
+        bolt_project = @project if @project&.name
+        Puppet.override(bolt_project: bolt_project,
                         yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
           pal.with_script_compiler do |compiler|
             alias_types(compiler)
