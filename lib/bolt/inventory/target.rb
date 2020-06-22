@@ -30,6 +30,10 @@ module Bolt
           @safe_name = @uri_obj.omit(:password).to_str.sub(%r{^//}, '')
         end
 
+        if @name == 'localhost'
+          target_data = localhost_defaults(target_data)
+        end
+
         @config = target_data['config'] || {}
         @vars = target_data['vars'] || {}
         @facts = target_data['facts'] || {}
@@ -43,6 +47,20 @@ module Bolt
         @inventory = inventory
 
         validate
+      end
+
+      def localhost_defaults(data)
+        defaults = {
+          'config' => {
+            'transport' => 'local',
+            'local' => { 'interpreters' => { '.rb' => RbConfig.ruby } }
+          },
+          'features' => ['puppet-agent']
+        }
+        data = Bolt::Util.deep_merge(defaults, data)
+        # If features is an empty array deep_merge won't add the puppet-agent
+        data['features'] += ['puppet-agent'] if data['features'].empty?
+        data
       end
 
       # rubocop:disable Naming/AccessorMethodName
@@ -217,11 +235,6 @@ module Bolt
             'plugin_hooks' => {},
             'target_alias' => []
           }
-
-          # This should be handled by `get_targets`
-          if @name == 'localhost'
-            group_data = Bolt::Inventory::Inventory.localhost_defaults(group_data)
-          end
 
           @group_cache = group_data
         end

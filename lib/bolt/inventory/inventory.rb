@@ -78,20 +78,6 @@ module Bolt
         target_array.first
       end
 
-      def self.localhost_defaults(data)
-        defaults = {
-          'config' => {
-            'transport' => 'local',
-            'local' => { 'interpreters' => { '.rb' => RbConfig.ruby } }
-          },
-          'features' => ['puppet-agent']
-        }
-        data = Bolt::Util.deep_merge(defaults, data)
-        # If features is an empty array deep_merge won't add the puppet-agent
-        data['features'] += ['puppet-agent'] if data['features'].empty?
-        data
-      end
-
       #### PRIVATE ####
       def group_data_for(target_name)
         @groups.group_collect(target_name)
