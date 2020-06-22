@@ -13,6 +13,7 @@ module BoltSpec
 
       # prevent tests from reading users config
       allow(Bolt::Project).to receive(:find_boltdir).and_return(project)
+      allow(Bolt::Config).to receive(:load_defaults).and_return([])
       allow(cli).to receive(:puppetdb_client).and_return(pdb_client)
       allow(cli).to receive(:analytics).and_return(Bolt::Analytics::NoopClient.new)
 

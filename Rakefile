@@ -101,14 +101,14 @@ end
 namespace :docs do
   desc "Generate markdown docs for Bolt's transport configuration options"
   task :config_reference do
+    options = Bolt::Config::OPTIONS.sort.to_h
+
     @transports = { options: {}, defaults: {} }
-    @global = { options: Bolt::Config::OPTIONS, defaults: Bolt::Config::DEFAULT_OPTIONS }
+    @global = { options: options, defaults: Bolt::Config::DEFAULT_OPTIONS }
     @log = { options: Bolt::Config::LOG_OPTIONS, defaults: Bolt::Config::DEFAULT_LOG_OPTIONS }
     @puppetfile = { options: Bolt::Config::PUPPETFILE_OPTIONS }
     @apply = { options: Bolt::Config::APPLY_SETTINGS, defaults: Bolt::Config::DEFAULT_APPLY_SETTINGS }
     @project = { options: Bolt::Project::PROJECT_SETTINGS, defaults: {} }
-    @transport_option = { options: Bolt::Config::TRANSPORT_OPTION,
-                          defaults: Bolt::Config::DEFAULT_TRANSPORT_OPTION }
 
     Bolt::Config::TRANSPORT_CONFIG.each do |name, transport|
       @transports[:options][name] = transport::OPTIONS
@@ -117,6 +117,40 @@ namespace :docs do
 
     renderer = ERB.new(File.read('documentation/bolt_configuration_reference.md.erb'), nil, '-')
     File.write('documentation/bolt_configuration_reference.md', renderer.result)
+  end
+
+  desc 'Generate markdown docs for bolt-defaults.yaml'
+  task :defaults_reference do
+    @opts = {}
+
+    @opts[:options]    = Bolt::Config::BOLT_CONFIG.merge(Bolt::Config::DEFAULTS_CONFIG).sort.to_h
+    @opts[:defaults]   = Bolt::Config::DEFAULT_OPTIONS
+    @opts[:suboptions] = {}
+
+    @opts[:suboptions]['inventory-config'] = Bolt::Config::INVENTORY_CONFIG
+    @opts[:suboptions]['puppetfile']       = Bolt::Config::PUPPETFILE_OPTIONS
+    @opts[:suboptions]['puppetdb']         = Bolt::Config::PUPPETDB_OPTIONS
+
+    @transports = Bolt::Config::TRANSPORT_CONFIG.keys
+
+    renderer = ERB.new(File.read('documentation/bolt_defaults_reference.md.erb'), nil, '-')
+    File.write('documentation/bolt_defaults_reference.md', renderer.result)
+  end
+
+  task :transports_reference do
+    @opts       = {}
+    @transports = { options: {}, defaults: {} }
+
+    @opts[:options]  = Bolt::Config::INVENTORY_CONFIG
+    @opts[:defaults] = Bolt::Config::DEFAULT_OPTIONS
+
+    Bolt::Config::TRANSPORT_CONFIG.sort.each do |name, transport|
+      @transports[:options][name]  = transport::OPTIONS
+      @transports[:defaults][name] = transport::DEFAULTS
+    end
+
+    renderer = ERB.new(File.read('documentation/bolt_transports_reference.md.erb'), nil, '-')
+    File.write('documentation/bolt_transports_reference.md', renderer.result)
   end
 
   desc "Generate markdown docs for Bolt's command line options"
@@ -232,7 +266,7 @@ namespace :docs do
     File.write('documentation/plan_functions.md', renderer.result)
   end
 
-  task all: %i[cli_reference function_reference config_reference]
+  task all: %i[cli_reference function_reference config_reference defaults_reference transports_reference]
 end
 
 desc 'Generate all markdown docs'

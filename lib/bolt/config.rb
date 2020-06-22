@@ -25,6 +25,11 @@ module Bolt
   class Config
     attr_reader :config_files, :warnings, :data, :transports, :project, :modified_concurrency
 
+    BOLT_CONFIG_NAME = 'bolt.yaml'
+    BOLT_DEFAULTS_NAME = 'bolt-defaults.yaml'
+
+    # Transport config classes. Used to load default transport config which
+    # gets passed along to the inventory.
     TRANSPORT_CONFIG = {
       'ssh'    => Bolt::Config::Transport::SSH,
       'winrm'  => Bolt::Config::Transport::WinRM,
@@ -34,50 +39,84 @@ module Bolt
       'remote' => Bolt::Config::Transport::Remote
     }.freeze
 
-    TRANSPORT_OPTION = { 'transport' => 'The default transport to use when the '\
-                         'transport for a target is not specified in the URL.' }.freeze
+    # Options that configure Bolt. These options are used in bolt.yaml and
+    # bolt-defaults.yaml.
+    BOLT_CONFIG = {
+      "color"               => "Whether to use colored output when printing messages to the console.",
+      "compile-concurrency" => "The maximum number of simultaneous manifest block compiles.",
+      "concurrency"         => "The number of threads to use when executing on remote targets.",
+      "format"              => "The format to use when printing results. Options are `human` and `json`.",
+      "plugin_hooks"        => "Which plugins a specific hook should use.",
+      "plugins"             => "A map of plugins and their configuration data.",
+      "puppetdb"            => "A map containing options for configuring the Bolt PuppetDB client.",
+      "puppetfile"          => "A map containing options for the `bolt puppetfile install` command.",
+      "save-rerun"          => "Whether to update `.rerun.json` in the Bolt project directory. If "\
+                               "your target names include passwords, set this value to `false` to avoid "\
+                               "writing passwords to disk."
+    }.freeze
 
-    DEFAULT_TRANSPORT_OPTION = { 'transport' => 'ssh' }.freeze
+    # These options are only available to bolt-defaults.yaml.
+    DEFAULTS_CONFIG = {
+      "inventory-config" => "A map of default configuration options for the inventory. This includes options "\
+                            "for setting the default transport to use when connecting to targets, as well as "\
+                            "options for configuring the default behavior of each transport."
+    }.freeze
 
-    CONFIG_IN_INVENTORY = TRANSPORT_CONFIG.merge(TRANSPORT_OPTION)
+    # Options that configure the inventory, specifically the default transport
+    # used by targets and the transports themselves. These options are used in
+    # bolt.yaml, inventory.yaml, and under the inventory-config key in
+    # bolt-defaults.yaml.
+    INVENTORY_CONFIG = {
+      "transport" => "The default transport to use when the transport for a target is not specified in the URI.",
+      "docker"    => "A map of configuration options for the docker transport.",
+      "local"     => "A map of configuration options for the local transport.",
+      "pcp"       => "A map of configuration options for the pcp transport.",
+      "remote"    => "A map of configuration options for the remote transport.",
+      "ssh"       => "A map of configuration options for the ssh transport.",
+      "winrm"     => "A map of configuration options for the winrm transport."
+    }.freeze
 
-    # NOTE: All configuration options should have a corresponding schema property
-    #       in schemas/bolt-config.schema.json
-    OPTIONS = {
+    # Options that configure the project, such as paths to files used for a
+    # specific project. These settings are used in bolt.yaml and bolt-project.yaml.
+    PROJECT_CONFIG = {
       "apply_settings"           => "A map of Puppet settings to use when applying Puppet code",
-      "color"                    => "Whether to use colored output when printing messages to the console.",
-      "compile-concurrency"      => "The maximum number of simultaneous manifest block compiles.",
-      "concurrency"              => "The number of threads to use when executing on remote targets.",
-      "format"                   => "The format to use when printing results. Options are `human` and `json`.",
       "hiera-config"             => "The path to your Hiera config.",
       "inventoryfile"            => "The path to a structured data inventory file used to refer to groups of "\
                                     "targets on the command line and from plans.",
       "log"                      => "The configuration of the logfile output. Configuration can be set for "\
                                     "`console` and the path to a log file, such as `~/.puppetlabs/bolt/debug.log`.",
       "modulepath"               => "An array of directories that Bolt loads content (e.g. plans and tasks) from.",
-      "plugin_hooks"             => "Which plugins a specific hook should use.",
-      "plugins"                  => "A map of plugins and their configuration data.",
-      "puppetdb"                 => "A map containing options for configuring the Bolt PuppetDB client.",
-      "puppetfile"               => "A map containing options for the `bolt puppetfile install` command.",
-      "save-rerun"               => "Whether to update `.rerun.json` in the Bolt project directory. If "\
-                                    "your target names include passwords, set this value to `false` to avoid "\
-                                    "writing passwords to disk.",
-      "transport"                => "The default transport to use when the transport for a target is not specified "\
-                                    "in the URL or inventory.",
       "trusted-external-command" => "The path to an executable on the Bolt controller that can produce "\
                                     "external trusted facts. **External trusted facts are experimental in both "\
                                     "Puppet and Bolt and this API may change or be removed.**"
     }.freeze
 
+    # A combined map of all configuration options that can be set in this class.
+    # Includes all options except 'inventory-config', which is munged when loading
+    # a bolt-defaults.yaml file.
+    OPTIONS = BOLT_CONFIG.merge(INVENTORY_CONFIG).merge(PROJECT_CONFIG).freeze
+
+    # Default values for select options. These do not set the default values in Bolt
+    # and are only used for documentation.
     DEFAULT_OPTIONS = {
-      "color" => true,
+      "color"               => true,
       "compile-concurrency" => "Number of cores",
-      "concurrency" => "100 or one-third of the ulimit, whichever is lower",
-      "format" => "human",
-      "hiera-config" => "Boltdir/hiera.yaml",
-      "inventoryfile" => "Boltdir/inventory.yaml",
-      "modulepath" => ["Boltdir/modules", "Boltdir/site-modules", "Boltdir/site"],
-      "save-rerun" => true
+      "concurrency"         => "100 or one-seventh of the ulimit, whichever is lower",
+      "format"              => "human",
+      "hiera-config"        => "Boltdir/hiera.yaml",
+      "inventoryfile"       => "Boltdir/inventory.yaml",
+      "modulepath"          => ["Boltdir/modules", "Boltdir/site-modules", "Boltdir/site"],
+      "save-rerun"          => true,
+      "transport"           => "ssh"
+    }.freeze
+
+    PUPPETDB_OPTIONS = {
+      "cacert"      => "The path to the ca certificate for PuppetDB.",
+      "cert"        => "The path to the client certificate file to use for authentication.",
+      "key"         => "The private key for the certificate.",
+      "server_urls" => "An array containing the PuppetDB host to connect to. Include the protocol `https` and "\
+                       "the port, which is usually `8081`. For example, `https://my-master.example.com:8081`.",
+      "token"       => "The path to the PE RBAC Token."
     }.freeze
 
     PUPPETFILE_OPTIONS = {
@@ -121,57 +160,144 @@ module Bolt
                Bolt::Util.read_optional_yaml_hash(project.config_file, 'config')
              end
 
-      data = { filepath: project.config_file, data: conf }
-
-      data = load_defaults(project).push(data).select { |config| config[:data]&.any? }
+      data = load_defaults(project).push(
+        filepath: project.config_file,
+        data: conf,
+        warnings: []
+      )
 
       new(project, data, overrides)
     end
 
     def self.from_file(configfile, overrides = {})
       project = Bolt::Project.create_project(Pathname.new(configfile).expand_path.dirname)
+
       conf = if project.project_file == project.config_file
                project.data
              else
                Bolt::Util.read_yaml_hash(configfile, 'config')
              end
-      data = { filepath: project.config_file, data: conf }
-      data = load_defaults(project).push(data).select { |config| config[:data]&.any? }
+
+      data = load_defaults(project).push(
+        filepath: project.config_file,
+        data: conf,
+        warnings: []
+      )
 
       new(project, data, overrides)
     end
 
-    def self.load_defaults(project)
+    def self.system_path
       # Lazy-load expensive gem code
       require 'win32/dir' if Bolt::Util.windows?
 
-      # Don't load /etc/puppetlabs/bolt/bolt.yaml twice
-      confs = if project.path == Bolt::Project.system_path
-                []
-              else
-                system_path = Pathname.new(File.join(Bolt::Project.system_path, 'bolt.yaml'))
-                [{ filepath: system_path, data: Bolt::Util.read_optional_yaml_hash(system_path, 'config') }]
-              end
+      if Bolt::Util.windows?
+        Pathname.new(File.join(Dir::COMMON_APPDATA, 'PuppetLabs', 'bolt', 'etc'))
+      else
+        Pathname.new(File.join('/etc', 'puppetlabs', 'bolt'))
+      end
+    end
 
-      user_path = begin
-                    Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml')))
-                  rescue ArgumentError
-                    nil
-                  end
+    def self.user_path
+      Pathname.new(File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt')))
+    rescue StandardError
+      nil
+    end
 
-      confs << { filepath: user_path, data: Bolt::Util.read_optional_yaml_hash(user_path, 'config') } if user_path
+    # Loads a 'bolt-defaults.yaml' file, which contains default configuration that applies to all
+    # projects. This file does not allow project-specific configuration such as 'hiera-config' and
+    # 'inventoryfile', and nests all default inventory configuration under an 'inventory-config' key.
+    def self.load_bolt_defaults_yaml(dir)
+      filepath = dir + BOLT_DEFAULTS_NAME
+      data     = Bolt::Util.read_yaml_hash(filepath, 'config')
+      warnings = []
+
+      # Warn if 'bolt.yaml' detected in same directory.
+      if File.exist?(bolt_yaml = dir + BOLT_CONFIG_NAME)
+        warnings.push(
+          msg: "Detected multiple configuration files: ['#{bolt_yaml}', '#{filepath}']. '#{bolt_yaml}' "\
+               "will be ignored."
+        )
+      end
+
+      # Remove project-specific config such as hiera-config, etc.
+      project_config = data.slice(*PROJECT_CONFIG.keys)
+
+      if project_config.any?
+        data.reject! { |key, _| project_config.include?(key) }
+        warnings.push(
+          msg: "Unsupported project configuration detected in '#{filepath}': #{project_config.keys}. "\
+               "Project configuration should be set in 'bolt-project.yaml'."
+        )
+      end
+
+      # Remove top-level transport config such as transport, ssh, etc.
+      transport_config = data.slice(*INVENTORY_CONFIG.keys)
+
+      if transport_config.any?
+        data.reject! { |key, _| transport_config.include?(key) }
+        warnings.push(
+          msg: "Unsupported inventory configuration detected in '#{filepath}': #{transport_config.keys}. "\
+               "Transport configuration should be set under the 'inventory-config' option or "\
+               "in 'inventory.yaml'."
+        )
+      end
+
+      # Move data under transport-config to top-level so it can be easily merged with
+      # config from other sources.
+      if data.key?('inventory-config')
+        data = data.merge(data.delete('inventory-config'))
+      end
+
+      { filepath: filepath, data: data, warnings: warnings }
+    end
+
+    # Loads a 'bolt.yaml' file, the legacy configuration file. There's no special munging needed
+    # here since Bolt::Config will just ignore any invalid keys.
+    def self.load_bolt_yaml(dir)
+      filepath = dir + BOLT_CONFIG_NAME
+      data     = Bolt::Util.read_yaml_hash(filepath, 'config')
+      warnings = [msg: "Configuration file #{filepath} is deprecated and will be removed in a future version "\
+                        "of Bolt. Use '#{dir + BOLT_DEFAULTS_NAME}' instead."]
+
+      { filepath: filepath, data: data, warnings: warnings }
+    end
+
+    def self.load_defaults(project)
+      confs = []
+
+      # Load system-level config. Prefer a 'bolt-defaults.yaml' file, but fall back to the
+      # legacy 'bolt.yaml' file. If the project-level config file is also the system-level
+      # config file, don't load it a second time.
+      if File.exist?(system_path + BOLT_DEFAULTS_NAME)
+        confs << load_bolt_defaults_yaml(system_path)
+      elsif File.exist?(system_path + BOLT_CONFIG_NAME) &&
+            (system_path + BOLT_CONFIG_NAME) != project.config_file
+        confs << load_bolt_yaml(system_path)
+      end
+
+      # Load user-level config if there is a homedir. Prefer a 'bolt-defaults.yaml' file, but
+      # fall back to the legacy 'bolt.yaml' file.
+      if user_path
+        if File.exist?(user_path + BOLT_DEFAULTS_NAME)
+          confs << load_bolt_defaults_yaml(user_path)
+        elsif File.exist?(user_path + BOLT_CONFIG_NAME)
+          confs << load_bolt_yaml(user_path)
+        end
+      end
+
       confs
     end
 
     def initialize(project, config_data, overrides = {})
       unless config_data.is_a?(Array)
-        config_data = [{ filepath: project.config_file, data: config_data }]
+        config_data = [{ filepath: project.config_file, data: config_data, warnings: [] }]
       end
 
-      @logger = Logging.logger[self]
-      @project = project
-      @warnings = @project.warnings.dup
-      @transports = {}
+      @logger       = Logging.logger[self]
+      @project      = project
+      @warnings     = @project.warnings.dup
+      @transports   = {}
       @config_files = []
 
       default_data = {
@@ -189,9 +315,13 @@ module Bolt
         'transport'           => 'ssh'
       }
 
-      loaded_data = config_data.map do |config|
-        @config_files.push(config[:filepath])
-        config[:data]
+      loaded_data = config_data.each_with_object([]) do |data, acc|
+        @warnings.concat(data[:warnings]) if data[:warnings].any?
+
+        if data[:data].any?
+          @config_files.push(data[:filepath])
+          acc.push(data[:data])
+        end
       end
 
       override_data = normalize_overrides(overrides)
