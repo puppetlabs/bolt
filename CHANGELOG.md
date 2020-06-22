@@ -1,5 +1,48 @@
 # Changelog
 
+## Bolt 2.15.0 (2020-06-22)
+
+### New features
+
+* **Add rainbow output format**
+  ([#1911](https://github.com/puppetlabs/bolt/pull/1911))
+
+  The new format option `rainbow` prints success messages in rainbow colors.
+  This option is not available on Windows.
+
+* **Add `bolt-defaults.yaml` configuration file**
+  ([#1845](https://github.com/puppetlabs/bolt/issues/1845))
+
+  Bolt now supports a new `bolt-defaults.yaml` configuration file in the
+  [system-wide and user-level
+  directories](https://puppet.com/docs/bolt/latest/configuring_bolt.html).
+  This configuration file is intended to replace the `bolt.yaml`
+  configuration file in the system-wide and user-level directories in
+  a future version of Bolt. If a `bolt-defaults.yaml` file exists
+  alongside a `bolt.yaml` file, Bolt will ignore the `bolt.yaml` file.
+
+### Bug fixes
+
+* **Log error for unhandled catalog compilation errors** ([#1881](https://github.com/puppetlabs/bolt/issues/1881))
+
+  We now log whatever is on STDERR when catalog compilation fails in a
+  way that isn't already handled, and raise an ApplyError.
+
+* **Fix uninitialized constant error for `bolt secret createkeys`**
+
+  Running `bolt secret createkeys` should now succeed, where previously
+  it threw an uninitialized constant error.
+
+### Deprecations
+
+* **System-wide and user-level `bolt.yaml` is deprecated**
+  ([#1845](https://github.com/puppetlabs/bolt/issues/1845))
+
+  The [system-wide and
+  user-level](https://puppet.com/docs/bolt/latest/configuring_bolt.html)
+  `bolt.yaml` files have been deprecated in favor of
+  `bolt-defaults.yaml`.
+
 ## Bolt 2.14.0 (2020-06-15)
 
 ### New features
