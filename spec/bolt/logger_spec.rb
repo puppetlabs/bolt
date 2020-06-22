@@ -25,6 +25,77 @@ describe Bolt::Logger do
     Logging.logger[:root].appenders = @saved_appenders
   end
 
+  describe '::valid_level?' do
+    it 'identifies valid levels' do
+      expect(Bolt::Logger.valid_level?(:fatal)).to be true
+      expect(Bolt::Logger.valid_level?(:error)).to be true
+      expect(Bolt::Logger.valid_level?(:warn)).to be true
+      expect(Bolt::Logger.valid_level?(:notice)).to be true
+      expect(Bolt::Logger.valid_level?(:info)).to be true
+      expect(Bolt::Logger.valid_level?(:debug)).to be true
+    end
+
+    it 'rejects invalid levels' do
+      expect(Bolt::Logger.valid_level?(:warning)).to be false
+      expect(Bolt::Logger.valid_level?(:trace)).to be false
+      expect(Bolt::Logger.valid_level?(:loud)).to be false
+      expect(Bolt::Logger.valid_level?(:silent)).to be false
+    end
+  end
+
+  describe '::lower_level?' do
+    it 'confirms lower levels' do
+      expect(Bolt::Logger.lower_level?(:debug, :fatal)).to be true
+      expect(Bolt::Logger.lower_level?(:debug, :error)).to be true
+      expect(Bolt::Logger.lower_level?(:debug, :warn)).to be true
+      expect(Bolt::Logger.lower_level?(:debug, :notice)).to be true
+      expect(Bolt::Logger.lower_level?(:debug, :info)).to be true
+
+      expect(Bolt::Logger.lower_level?(:info, :fatal)).to be true
+      expect(Bolt::Logger.lower_level?(:info, :error)).to be true
+      expect(Bolt::Logger.lower_level?(:info, :warn)).to be true
+      expect(Bolt::Logger.lower_level?(:info, :notice)).to be true
+
+      expect(Bolt::Logger.lower_level?(:notice, :fatal)).to be true
+      expect(Bolt::Logger.lower_level?(:notice, :error)).to be true
+      expect(Bolt::Logger.lower_level?(:notice, :warn)).to be true
+
+      expect(Bolt::Logger.lower_level?(:warn, :fatal)).to be true
+      expect(Bolt::Logger.lower_level?(:warn, :error)).to be true
+
+      expect(Bolt::Logger.lower_level?(:error, :fatal)).to be true
+    end
+
+    it 'rejects higher or equal levels' do
+      expect(Bolt::Logger.lower_level?(:fatal, :fatal)).to be false
+      expect(Bolt::Logger.lower_level?(:fatal, :error)).to be false
+      expect(Bolt::Logger.lower_level?(:fatal, :warn)).to be false
+      expect(Bolt::Logger.lower_level?(:fatal, :notice)).to be false
+      expect(Bolt::Logger.lower_level?(:fatal, :info)).to be false
+      expect(Bolt::Logger.lower_level?(:fatal, :debug)).to be false
+
+      expect(Bolt::Logger.lower_level?(:error, :error)).to be false
+      expect(Bolt::Logger.lower_level?(:error, :warn)).to be false
+      expect(Bolt::Logger.lower_level?(:error, :notice)).to be false
+      expect(Bolt::Logger.lower_level?(:error, :info)).to be false
+      expect(Bolt::Logger.lower_level?(:error, :debug)).to be false
+
+      expect(Bolt::Logger.lower_level?(:warn, :warn)).to be false
+      expect(Bolt::Logger.lower_level?(:warn, :notice)).to be false
+      expect(Bolt::Logger.lower_level?(:warn, :info)).to be false
+      expect(Bolt::Logger.lower_level?(:warn, :debug)).to be false
+
+      expect(Bolt::Logger.lower_level?(:notice, :notice)).to be false
+      expect(Bolt::Logger.lower_level?(:notice, :info)).to be false
+      expect(Bolt::Logger.lower_level?(:notice, :debug)).to be false
+
+      expect(Bolt::Logger.lower_level?(:info, :info)).to be false
+      expect(Bolt::Logger.lower_level?(:info, :debug)).to be false
+
+      expect(Bolt::Logger.lower_level?(:debug, :debug)).to be false
+    end
+  end
+
   describe '::initialize_logging' do
     before :each do
       Logging.reset

@@ -228,6 +228,11 @@ module Bolt
       # Set console log to debug if in debug mode
       if options[:debug]
         overrides['log'] = { 'console' => { 'level' => :debug } }
+      elsif options[:verbose]
+        configured_level = overrides.dig('log', 'console', 'level')
+        if configured_level.nil? || Bolt::Logger.lower_level?(:notice, configured_level)
+          overrides['log'] = { 'console' => { 'level' => :notice } }
+        end
       end
 
       if options[:puppetfile_path]

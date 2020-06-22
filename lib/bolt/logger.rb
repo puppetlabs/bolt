@@ -93,6 +93,11 @@ module Bolt
       !Logging.level_num(level).nil?
     end
 
+    # Returns if level is lower severity than baseline
+    def self.lower_level?(level, baseline)
+      Logging.level_num(level) < Logging.level_num(baseline)
+    end
+
     def self.levels
       Logging::LNAMES.map(&:downcase)
     end
