@@ -1,8 +1,9 @@
-FROM puppet/puppetserver-standalone
+FROM puppet/puppetserver
 
 ARG hostname="boltserver"
 ENV PUPPETSERVER_HOSTNAME "$hostname"
-
+ENV PUPPET_STORECONFIGS false
+ENV PUPPET_REPORTS log
 
 # Use our own certs and disable the CA
 COPY fixtures/ssl/ca.pem /etc/puppetlabs/puppet/ssl/certs/ca.pem
