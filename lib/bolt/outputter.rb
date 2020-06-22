@@ -8,6 +8,8 @@ module Bolt
         Bolt::Outputter::Human.new(color, verbose, trace)
       when 'json'
         Bolt::Outputter::JSON.new(color, verbose, trace)
+      when 'rainbow'
+        Bolt::Outputter::Rainbow.new(color, verbose, trace)
       when nil
         raise "Cannot use outputter before parsing."
       end
@@ -24,4 +26,5 @@ end
 
 require 'bolt/outputter/human'
 require 'bolt/outputter/json'
+require 'bolt/outputter/rainbow'
 require 'bolt/outputter/logger'
