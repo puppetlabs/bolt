@@ -67,6 +67,10 @@ modules/zone_core/
 modules/terraform
 modules/azure_inventory
 modules/aws_inventory
+modules/gcloud_inventory/
+modules/pkcs7/
+modules/ruby_plugin_helper/
+modules/yaml/
 
 .sass-cache/
 locales/
