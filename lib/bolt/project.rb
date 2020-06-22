@@ -9,8 +9,10 @@ module Bolt
     BOLTDIR_NAME = 'Boltdir'
     PROJECT_SETTINGS = {
       "name"  => "The name of the project",
-      "plans" => "An array of plan names to whitelist. Whitelisted plans are included in `bolt plan show` output",
-      "tasks" => "An array of task names to whitelist. Whitelisted plans are included in `bolt task show` output"
+      "plans" => "An array of plan names to show, if they exist in the project."\
+                 "These plans are included in `bolt plan show` output",
+      "tasks" => "An array of task names to show, if they exist in the project."\
+                 "These tasks are included in `bolt task show` output"
     }.freeze
 
     attr_reader :path, :data, :config_file, :inventory_file, :modulepath, :hiera_config,

@@ -28,10 +28,10 @@ where you're looking to share orchestration that is specific to your
 infrastructure, it's not always necessary, and can be cumbersome to get going
 quickly. 
 
-We also needed a way for content authors to whitelist the plans and tasks that
-they've created, so that when they share the content with other users, those
-users can run `bolt plan show` or `bolt task show` from the project directory
-and be presented with a list of only the content they need to see. 
+We also needed a way for content authors to display a subset of plans and tasks
+that they've created, so that when they share the content with other users,
+those users can run `bolt plan show` or `bolt task show` from the project
+directory and be presented with a list of only the content they need to see.
 
 ### Using Bolt projects
 
@@ -100,11 +100,11 @@ lowercase letter.
 
 > **Note:** Projects take precedence over installed modules of the same name.
 
-#### Whitelisting plans and tasks
+#### Limiting displayed plans and tasks
 
-To control what tasks and plans appear when your users run `bolt plan show` or
-`bolt task show`, add `tasks` and `plans` keys to your `bolt-project.yaml` and
-include an array of task and plan names. 
+To control what plans and tasks appear when your users run `bolt plan show` or
+`bolt task show`, add `plans` and `tasks` keys to your `bolt-project.yaml` and
+include an array of plan and task names.
 
 For example, if you wanted to surface a plan named `myproject::myplan`, and a
 task named `myproject::mytask`, you would use the following `bolt-project.yaml`
