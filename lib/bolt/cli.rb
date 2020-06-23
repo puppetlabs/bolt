@@ -513,7 +513,7 @@ module Bolt
       plan_context[:description] = options[:description] if options[:description]
 
       executor = Bolt::Executor.new(config.concurrency, analytics, options[:noop], config.modified_concurrency)
-      if options.fetch(:format, 'human') == 'human'
+      if %w[human rainbow].include?(options.fetch(:format, 'human'))
         executor.subscribe(outputter)
       else
         # Only subscribe to out::message events for JSON outputter
