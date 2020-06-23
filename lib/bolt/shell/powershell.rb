@@ -111,7 +111,8 @@ module Bolt
       end
 
       def mkdirs(dirs)
-        mkdir_command = "mkdir -Force #{dirs.uniq.sort.join(',')}"
+        paths = dirs.uniq.sort.join('","')
+        mkdir_command = "mkdir -Force -Path (\"#{paths}\")"
         result = execute(mkdir_command)
         if result.exit_code != 0
           message = "Could not create directories: #{result.stderr.string}"
