@@ -39,7 +39,9 @@ module Bolt
       end
 
       def run_command(target, command, options = {})
-        options[:tty] = target.options['tty']
+        execute_options = {}
+        execute_options[:tty] = target.options['tty']
+        execute_options[:environment] = options[:env_vars]
 
         if target.options['shell-command'] && !target.options['shell-command'].empty?
           # escape any double quotes in command
@@ -47,19 +49,21 @@ module Bolt
           command = "#{target.options['shell-command']} \" #{command}\""
         end
         with_connection(target) do |conn|
-          stdout, stderr, exitcode = conn.execute(*Shellwords.split(command), options)
+          stdout, stderr, exitcode = conn.execute(*Shellwords.split(command), execute_options)
           Bolt::Result.for_command(target, stdout, stderr, exitcode, 'command', command)
         end
       end
 
-      def run_script(target, script, arguments, _options = {})
+      def run_script(target, script, arguments, options = {})
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
+        execute_options = {}
+        execute_options[:environment] = options[:env_vars]
 
         with_connection(target) do |conn|
           conn.with_remote_tmpdir do |dir|
             remote_path = conn.write_remote_executable(dir, script)
-            stdout, stderr, exitcode = conn.execute(remote_path, *arguments, {})
+            stdout, stderr, exitcode = conn.execute(remote_path, *arguments, execute_options)
             Bolt::Result.for_command(target, stdout, stderr, exitcode, 'script', script)
           end
         end

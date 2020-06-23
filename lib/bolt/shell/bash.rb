@@ -23,7 +23,7 @@ module Bolt
 
       def run_command(command, options = {})
         running_as(options[:run_as]) do
-          output = execute(command, sudoable: true)
+          output = execute(command, environment: options[:env_vars], sudoable: true)
           Bolt::Result.for_command(target,
                                    output.stdout.string,
                                    output.stderr.string,
@@ -58,7 +58,7 @@ module Bolt
           with_tmpdir do |dir|
             path = write_executable(dir.to_s, script)
             dir.chown(run_as)
-            output = execute([path, *arguments], sudoable: true)
+            output = execute([path, *arguments], environment: options[:env_vars], sudoable: true)
             Bolt::Result.for_command(target,
                                      output.stdout.string,
                                      output.stderr.string,
@@ -277,31 +277,8 @@ module Bolt
         end
       end
 
-      # In the case where a task is run with elevated privilege and needs stdin
-      # a random string is echoed to stderr indicating that the stdin is available
-      # for task input data because the sudo password has already either been
-      # provided on stdin or was not needed.
-      def prepend_sudo_success(sudo_id, command_str)
-        command_str = "cd; #{command_str}" if conn.reset_cwd?
-        "sh -c #{Shellwords.shellescape("echo #{sudo_id} 1>&2; #{command_str}")}"
-      end
-
-      def prepend_chdir(command_str)
-        "sh -c #{Shellwords.shellescape("cd; #{command_str}")}"
-      end
-
-      # A helper to build up a single string that contains all of the options for
-      # privilege escalation. A wrapper script is used to direct task input to stdin
-      # when a tty is allocated and thus we do not need to prepend_sudo_success when
-      # using the wrapper or when the task does not require stdin data.
-      def build_sudoable_command_str(command_str, sudo_str, sudo_id, options)
-        if options[:stdin] && !options[:wrapper]
-          "#{sudo_str} #{prepend_sudo_success(sudo_id, command_str)}"
-        elsif conn.reset_cwd?
-          "#{sudo_str} #{prepend_chdir(command_str)}"
-        else
-          "#{sudo_str} #{command_str}"
-        end
+      def sudo_success(sudo_id)
+        "echo #{sudo_id} 1>&2"
       end
 
       # Returns string with the interpreter conditionally prepended
@@ -322,13 +299,15 @@ module Bolt
         escalate = sudoable && run_as && conn.user != run_as
         use_sudo = escalate && @target.options['run-as-command'].nil?
 
-        command_str = inject_interpreter(options[:interpreter], command)
+        # Depending on the transport, whether we're using sudo and whether
+        # there are environment variables to set, we may need to stitch
+        # together multiple commands into a single sh invocation
+        commands = [inject_interpreter(options[:interpreter], command)]
 
         if options[:environment]
-          env_decls = options[:environment].map do |env, val|
+          env_decl = options[:environment].map do |env, val|
             "#{env}=#{Shellwords.shellescape(val)}"
-          end
-          command_str = "#{env_decls.join(' ')} #{command_str}"
+          end.join(' ')
         end
 
         if escalate
@@ -340,8 +319,17 @@ module Bolt
                      else
                        Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])
                      end
-          command_str = build_sudoable_command_str(command_str, sudo_str, @sudo_id, options)
+          commands.unshift('cd') if conn.reset_cwd?
+          commands.unshift(sudo_success(@sudo_id)) if options[:stdin] && !options[:wrapper]
         end
+
+        command_str = if sudo_str || env_decl
+                        "sh -c #{Shellwords.shellescape(commands.join('; '))}"
+                      else
+                        commands.last
+                      end
+
+        command_str = [sudo_str, env_decl, command_str].compact.join(' ')
 
         @logger.debug { "Executing: #{command_str}" }
 
