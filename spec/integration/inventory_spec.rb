@@ -407,7 +407,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           # Ensure that we try to connect to a *closed* port, to avoid spurious "success"
           port = TCPServer.open(0) { |socket| socket.addr[1] }
           config = { transport: 'ssh', ssh: { port: port } }
-          { targets: ['localhost'], config: config }
+          { targets: [{ uri: 'localhost', config: config }] }
         end
 
         it 'fails to connect' do
@@ -487,15 +487,22 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
     let(:inventory) do
       {
-        "targets" => [
+        targets: [
           {
             _plugin: 'puppetdb',
             query: 'inventory { facts.fact1 = true }',
             target_mapping: {
               config: {
+                transport: 'facts.transport',
                 ssh: ssh_config
               }
             }.merge(addtl_mapping)
+          },
+          {
+            name: conn[:host],
+            config: {
+              transport: conn[:protocol]
+            }
           }
         ],
         config: {
@@ -578,7 +585,8 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       context 'when a fact is not set' do
         let(:facts) do
           { conn[:host] => {
-            'fact1' => true
+            'fact1' => true,
+            'transport' => 'ssh'
           } }
         end
 
