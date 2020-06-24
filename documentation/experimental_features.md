@@ -86,9 +86,8 @@ log:
 
 #### Naming your project
 
-If you want to set a name for your project that is different from the name of
-the Bolt project directory, add a `name` key to `bolt-project.yaml` with the
-project name. 
+The project must have a name in order to load content. To set the project name,
+add a `name` key to `bolt-project.yaml` with the project name.
 
 For example:
   ```yaml

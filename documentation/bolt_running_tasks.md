@@ -78,9 +78,9 @@ directory>/site-modules]`.
 
 The current [Bolt project](./experimental_features.md#bolt-projects) is loaded
 as a standalone module at the front of the module path.  If you are developing a
-new task, you can create an empty `<PROJECT_NAME>/bolt-project.yaml` file,
-develop your task in `<PROJECT_NAME>/tasks/`, and run Bolt from the root of your
-Bolt project directory to test the task. 
+new task, you can create a `<PROJECT_NAME>/bolt-project.yaml` file, develop
+your task in `<PROJECT_NAME>/tasks/`, and run Bolt from the root of your Bolt
+project directory to test the task.
 
 > **Note:** The `bolt-project.yaml` file is part of an experimental feature. For
 > more information, see [Bolt

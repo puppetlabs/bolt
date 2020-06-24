@@ -771,14 +771,13 @@ module Bolt
     end
 
     def pal
-      project = config.project.project_file? ? config.project : nil
       @pal ||= Bolt::PAL.new(config.modulepath,
                              config.hiera_config,
                              config.project.resource_types,
                              config.compile_concurrency,
                              config.trusted_external,
                              config.apply_settings,
-                             project)
+                             config.project)
     end
 
     def convert_plan(plan)

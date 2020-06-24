@@ -78,9 +78,9 @@ describe Bolt::Project do
     describe "with namespaced project names" do
       let(:config) { { 'name' => 'puppetlabs-foo' } }
 
-      it "strips namespace and hyphen" do
-        project = Bolt::Project.new(config, pwd)
-        expect(project.name).to eq('foo')
+      it "raises an error" do
+        expect { Bolt::Project.new(config, pwd).validate }
+          .to raise_error(/Invalid project name 'puppetlabs-foo' in bolt-project.yaml/)
       end
     end
   end
