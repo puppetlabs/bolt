@@ -409,7 +409,7 @@ Bolt collects data about how you use it. You can opt out of providing this data.
 -   The number of targets targeted with a Bolt command
 -   The output format selected (human-readable, JSON)
 -   Whether the Bolt project directory was determined from the location of a
-    `bolt.yaml` file or with the `--boltdir` flag
+    `bolt.yaml` file or with the `--project` flag
 -   The number of times Bolt tasks and plans are run (not including user-defined
     tasks or plans.)
 -   The number of statements in a manifest block, and how many resources that

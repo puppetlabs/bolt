@@ -17,6 +17,11 @@ describe "When loading content", ssh: true do
     expect(result[0]['value']['stdout'].strip).to eq('polo')
   end
 
+  it "loads plans from project when specified with --project" do
+    result = run_cli_json(%W[plan run local -t #{target} --project #{local.path}] + config_flags)
+    expect(result[0]['value']['stdout'].strip).to eq('polo')
+  end
+
   it "project level content can reference other modules" do
     result = run_cli_json(%W[task run local -t #{target}] + config_flags, project: local)
     expect(result["items"][0]["value"]["_output"].strip).to eq('polo')

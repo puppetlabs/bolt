@@ -10,7 +10,7 @@ module Bolt
                 authentication: %w[user password password-prompt private-key host-key-check ssl ssl-verify],
                 escalation: %w[run-as sudo-password sudo-password-prompt sudo-executable],
                 run_context: %w[concurrency inventoryfile save-rerun cleanup],
-                global_config_setters: %w[modulepath boltdir configfile],
+                global_config_setters: %w[modulepath project configfile],
                 transports: %w[transport connect-timeout tty ssh-command copy-command],
                 display: %w[format color verbose trace],
                 global: %w[help version debug] }.freeze
@@ -422,7 +422,7 @@ module Bolt
 
       ACTIONS
           generate-types        Generate type references to register in plans
-          install               Install modules from a Puppetfile into a Boltdir
+          install               Install modules from a Puppetfile into a project
           show-modules          List modules available to the Bolt project
     HELP
 
@@ -445,7 +445,7 @@ module Bolt
           bolt puppetfile install [options]
 
       DESCRIPTION
-          Install modules from a Puppetfile into a Boltdir
+          Install modules from a Puppetfile into a project
     HELP
 
     PUPPETFILE_SHOWMODULES_HELP = <<~HELP
@@ -709,13 +709,13 @@ module Bolt
           File.expand_path(moduledir)
         end
       end
-      define('--boltdir FILEPATH',
-             'Specify what Boltdir to load config from (default: autodiscovered from current working dir)') do |path|
+      define('--project FILEPATH', '--boltdir FILEPATH',
+             'Specify what project to load config from (default: autodiscovered from current working dir)') do |path|
         @options[:boltdir] = path
       end
       define('--configfile FILEPATH',
              'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml).',
-             'Directory containing bolt.yaml will be used as the Boltdir.') do |path|
+             'Directory containing bolt.yaml will be used as the project directory.') do |path|
         @options[:configfile] = path
       end
       define('--hiera-config FILEPATH',
@@ -731,7 +731,7 @@ module Bolt
       end
       define('--puppetfile FILEPATH',
              'Specify a Puppetfile to use when installing modules. (default: ~/.puppetlabs/bolt/Puppetfile)',
-             'Modules are installed in the current Boltdir.') do |path|
+             'Modules are installed in the current project.') do |path|
         @options[:puppetfile_path] = Pathname.new(File.expand_path(path))
       end
       define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|
