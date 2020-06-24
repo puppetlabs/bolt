@@ -13,10 +13,13 @@ require 'bolt/task'
 # > **Note:** Not available in apply block
 Puppet::Functions.create_function(:apply_prep) do
   # @param targets A pattern or array of patterns identifying a set of targets.
+  # @param options Options hash.
+  # @option options [Array] _required_modules An array of modules to sync to the target.
   # @example Prepare targets by name.
   #   apply_prep('target1,target2')
   dispatch :apply_prep do
     param 'Boltlib::TargetSpec', :targets
+    optional_param 'Hash[String, Data]', :options
   end
 
   def script_compiler
@@ -60,17 +63,33 @@ Puppet::Functions.create_function(:apply_prep) do
     @executor ||= Puppet.lookup(:bolt_executor)
   end
 
-  def apply_prep(target_spec)
+  def apply_prep(target_spec, options = {})
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'apply_prep')
     end
+
+    options = options.transform_keys { |k| k.sub(/^_/, '').to_sym }
 
     applicator = Puppet.lookup(:apply_executor)
 
     executor.report_function_call(self.class.name)
 
     targets = inventory.get_targets(target_spec)
+
+    required_modules = options[:required_modules].nil? ? nil : Array(options[:required_modules])
+    if required_modules&.any?
+      Puppet.debug("Syncing only required modules: #{required_modules.join(',')}.")
+    end
+
+    # Gather facts, including custom facts
+    plugins = applicator.build_plugin_tarball do |mod|
+      next unless required_modules.nil? || required_modules.include?(mod.name)
+      search_dirs = []
+      search_dirs << mod.plugins if mod.plugins?
+      search_dirs << mod.pluginfacts if mod.pluginfacts?
+      search_dirs
+    end
 
     executor.log_action('install puppet and gather facts', targets) do
       executor.without_default_logging do
@@ -107,14 +126,6 @@ Puppet::Functions.create_function(:apply_prep) do
           raise Bolt::RunFailure.new(set.error_set, 'apply_prep') unless set.ok
 
           need_install_targets.each { |target| set_agent_feature(target) }
-        end
-
-        # Gather facts, including custom facts
-        plugins = applicator.build_plugin_tarball do |mod|
-          search_dirs = []
-          search_dirs << mod.plugins if mod.plugins?
-          search_dirs << mod.pluginfacts if mod.pluginfacts?
-          search_dirs
         end
 
         task = applicator.custom_facts_task

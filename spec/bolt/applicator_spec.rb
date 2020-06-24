@@ -10,6 +10,7 @@ require 'bolt/target'
 
 describe Bolt::Applicator do
   let(:uri) { 'foobar' }
+  let(:plugindirs) { [] }
   let(:target) { inventory.get_target(uri) }
   let(:inventory) { Bolt::Inventory.empty }
   let(:executor) { Bolt::Executor.new }
@@ -20,7 +21,7 @@ describe Bolt::Applicator do
   end
   let(:pdb_client) { Bolt::PuppetDB::Client.new(config) }
   let(:modulepath) { [Bolt::PAL::BOLTLIB_PATH, Bolt::PAL::MODULES_PATH] }
-  let(:applicator) { Bolt::Applicator.new(inventory, executor, modulepath, [], nil, pdb_client, nil, 2, {}) }
+  let(:applicator) { Bolt::Applicator.new(inventory, executor, modulepath, plugindirs, nil, pdb_client, nil, 2, {}) }
   let(:ast) { { 'resources' => [] } }
 
   let(:report) {
@@ -114,6 +115,61 @@ describe Bolt::Applicator do
     end
 
     let(:scope) { double('scope') }
+
+    context 'without required modules specified (default)' do
+      before do
+        allow(Logging).to receive(:logger).and_return(mock_logger)
+        allow(mock_logger).to receive(:[]).and_return(mock_logger)
+        allow(mock_logger).to receive(:'level=').with(any_args)
+        allow(mock_logger).to receive(:debug).with(any_args)
+      end
+
+      let(:mock_logger) { instance_double("Logging.logger") }
+      let(:plugindirs) { modulepath }
+
+      it 'syncs all modules' do
+        #
+        # Use a variable here instead of the Rspec let, so we can mock the logger
+        #
+        applicator = Bolt::Applicator.new(inventory, executor, modulepath, plugindirs, nil, pdb_client, nil, 2, {})
+        expect(applicator).to receive(:compile).and_return(ast)
+        result = Bolt::Result.new(target, value: report)
+        allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(result)
+        allow(Bolt::ApplyResult).to receive(:puppet_missing_error).with(result).and_return(nil)
+
+        expect(mock_logger).to receive(:debug).with(/Packing plugin/).at_least(:once)
+        expect(mock_logger).to_not receive(:debug).with(/Syncing only required modules/)
+        applicator.apply([target], :body, scope)
+      end
+    end
+
+    context 'required modules specified' do
+      before do
+        allow(Logging).to receive(:logger).and_return(mock_logger)
+        allow(mock_logger).to receive(:[]).and_return(mock_logger)
+        allow(mock_logger).to receive(:'level=').with(any_args)
+        allow(mock_logger).to receive(:debug).with(any_args)
+      end
+
+      let(:mock_logger) { instance_double("Logging.logger") }
+      let(:plugindirs) { modulepath }
+
+      it 'syncs only required modules' do
+        #
+        # Use a variable here instead of the Rspec let, so we can mock the logger
+        #
+        applicator = Bolt::Applicator.new(inventory, executor, modulepath, plugindirs, nil, pdb_client, nil, 2, {})
+        expect(applicator).to receive(:compile).and_return(ast)
+        result = Bolt::Result.new(target, value: report)
+        allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(result)
+        allow(Bolt::ApplyResult).to receive(:puppet_missing_error).with(result).and_return(nil)
+
+        expect(mock_logger).to_not receive(:debug).with(/Packing plugin/)
+        expect(mock_logger).to receive(:debug).with('Syncing only required modules: just_a_module_name.')
+
+        applicator.apply_ast(:body, [target], { required_modules: ['just_a_module_name'] })
+      end
+    end
 
     it 'replaces failures to find Puppet' do
       expect(applicator).to receive(:compile).and_return(ast)

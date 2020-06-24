@@ -18,7 +18,6 @@ module Bolt
                    pdb_client, hiera_config, max_compiles, apply_settings)
       # lazy-load expensive gem code
       require 'concurrent'
-
       @inventory = inventory
       @executor = executor
       @modulepath = modulepath || []
@@ -30,17 +29,6 @@ module Bolt
 
       @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
       @logger = Logging.logger[self]
-      @plugin_tarball = Concurrent::Delay.new do
-        build_plugin_tarball do |mod|
-          search_dirs = []
-          search_dirs << mod.plugins if mod.plugins?
-          search_dirs << mod.pluginfacts if mod.pluginfacts?
-          search_dirs << mod.files if mod.files?
-          type_files = "#{mod.path}/types"
-          search_dirs << type_files if File.exist?(type_files)
-          search_dirs
-        end
-      end
     end
 
     private def libexec
@@ -188,7 +176,6 @@ module Bolt
 
     def apply_ast(raw_ast, targets, options, plan_vars = {})
       ast = Puppet::Pops::Serialization::ToDataConverter.convert(raw_ast, rich_data: true, symbol_to_string: true)
-
       # Serialize as pcore for *Result* objects
       plan_vars = Puppet::Pops::Serialization::ToDataConverter.convert(plan_vars,
                                                                        rich_data: true,
@@ -206,8 +193,25 @@ module Bolt
         # This data isn't available on the target config hash
         config: @inventory.transport_data_get
       }
-
       description = options[:description] || 'apply catalog'
+
+      required_modules = options[:required_modules].nil? ? nil : Array(options[:required_modules])
+      if required_modules&.any?
+        @logger.debug("Syncing only required modules: #{required_modules.join(',')}.")
+      end
+
+      @plugin_tarball = Concurrent::Delay.new do
+        build_plugin_tarball do |mod|
+          next unless required_modules.nil? || required_modules.include?(mod.name)
+          search_dirs = []
+          search_dirs << mod.plugins if mod.plugins?
+          search_dirs << mod.pluginfacts if mod.pluginfacts?
+          search_dirs << mod.files if mod.files?
+          type_files = "#{mod.path}/types"
+          search_dirs << type_files if File.exist?(type_files)
+          search_dirs
+        end
+      end
 
       r = @executor.log_action(description, targets) do
         futures = targets.map do |target|
@@ -235,6 +239,7 @@ module Bolt
                   result
                 end
               else
+
                 arguments = {
                   'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
                   'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
