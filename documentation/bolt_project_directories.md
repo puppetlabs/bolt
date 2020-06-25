@@ -119,7 +119,7 @@ module path.
 |[`bolt.yaml`](bolt_configuration_reference.md)|Contains configuration options for Bolt.|
 |`hiera.yaml`|Contains the Hiera config to use for target-specific data when using `apply`.|
 |[`inventory.yaml`](inventory_file_v2.md)|Contains a list of known targets and target specific data.|
-|[`bolt-project.yaml`](bolt_configuration_reference.md#project_configuration_options)|Contains configuration for the Bolt project.  The `bolt-project.yaml` file contains a whitelist of tasks and plans that you can use to limit the output from the `bolt plan show` and `bolt task show` commands. This is an experimental feature. For more information, see [Bolt projects](./experimental_features.md#bolt-projects).|
+|[`bolt-project.yaml`](bolt_configuration_reference.md#project_configuration_options)|Contains configuration for the Bolt project.  The `bolt-project.yaml` file can contain a list of tasks and plans to limit the output from the `bolt plan show` and `bolt task show` commands. This is an experimental feature. For more information, see [Bolt projects](./experimental_features.md#bolt-projects).|
 |[`Puppetfile`](bolt_installing_modules.md#)|Specifies which modules to install for the project.|
 |[`modules/`](bolt_installing_modules.md#)|The directory where modules from the `Puppetfile` are installed. In most cases, do not edit these modules locally.|
 |[`site-modules`](bolt_installing_modules.md)|Local modules that are edited and versioned with the project directory.|
