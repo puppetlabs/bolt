@@ -13,7 +13,7 @@ module Bolt
                 global_config_setters: %w[modulepath project configfile],
                 transports: %w[transport connect-timeout tty ssh-command copy-command],
                 display: %w[format color verbose trace],
-                global: %w[help version debug] }.freeze
+                global: %w[help version debug log-level] }.freeze
 
     ACTION_OPTS = OPTIONS.values.flatten.freeze
 
@@ -709,27 +709,27 @@ module Bolt
           File.expand_path(moduledir)
         end
       end
-      define('--project FILEPATH', '--boltdir FILEPATH',
+      define('--project PATH', '--boltdir PATH',
              'Specify what project to load config from (default: autodiscovered from current working dir)') do |path|
         @options[:boltdir] = path
       end
-      define('--configfile FILEPATH',
+      define('--configfile PATH',
              'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml).',
              'Directory containing bolt.yaml will be used as the project directory.') do |path|
         @options[:configfile] = path
       end
-      define('--hiera-config FILEPATH',
+      define('--hiera-config PATH',
              'Specify where to load Hiera config from (default: ~/.puppetlabs/bolt/hiera.yaml)') do |path|
         @options[:'hiera-config'] = File.expand_path(path)
       end
-      define('-i', '--inventoryfile FILEPATH',
+      define('-i', '--inventoryfile PATH',
              'Specify where to load inventory from (default: ~/.puppetlabs/bolt/inventory.yaml)') do |path|
         if ENV.include?(Bolt::Inventory::ENVIRONMENT_VAR)
           raise Bolt::CLIError, "Cannot pass inventory file when #{Bolt::Inventory::ENVIRONMENT_VAR} is set"
         end
         @options[:inventoryfile] = Pathname.new(File.expand_path(path))
       end
-      define('--puppetfile FILEPATH',
+      define('--puppetfile PATH',
              'Specify a Puppetfile to use when installing modules. (default: ~/.puppetlabs/bolt/Puppetfile)',
              'Modules are installed in the current project.') do |path|
         @options[:puppetfile_path] = Pathname.new(File.expand_path(path))
@@ -803,8 +803,15 @@ module Bolt
       end
       define('--debug', 'Display debug logging') do |_|
         @options[:debug] = true
+        # We don't actually set '--log-level debug' here, but once the options are evaluated by
+        # the config class the end result is the same.
+        @warnings << { msg: "Command line option '--debug' is deprecated, set '--log-level debug' instead." }
       end
-
+      define('--log-level LEVEL',
+             "Set the log level for the console. Available options are",
+             "debug, info, notice, warn, error, fatal, any.") do |level|
+        @options[:log] = { 'console' => { 'level' => level } }
+      end
       define('--plugin PLUGIN', 'Select the plugin to use') do |plug|
         @options[:plugin] = plug
       end

@@ -499,6 +499,29 @@ describe "Bolt::CLI" do
         cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug --verbose])
         cli.parse
       end
+
+      it "errors when debug and log-level are both set" do
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug --log-level notice])
+        expect { cli.parse }.to raise_error(Bolt::CLIError, /Only one of '--debug' or '--log-level' may be specified/)
+      end
+
+      it "warns when using debug" do
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug])
+        cli.parse
+        expect(@log_output.readlines).to include(/Command line option '--debug' is deprecated/)
+      end
+
+      it "log-level sets the log option" do
+        expect(Bolt::Logger).to receive(:configure).with({ 'console' => { level: 'notice' } }, true)
+
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --log-level notice])
+        cli.parse
+      end
+
+      it "raises a Bolt error when the level is a stringified integer" do
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --log-level 42])
+        expect { cli.parse }.to raise_error(Bolt::ValidationError, /level of log console must be one of/)
+      end
     end
 
     describe "host-key-check" do

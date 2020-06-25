@@ -250,6 +250,10 @@ module Bolt
          !options[:object]
         raise Bolt::CLIError, "Must specify a value to #{options[:action]}"
       end
+
+      if options.key?(:debug) && options.key?(:log)
+        raise Bolt::CLIError, "Only one of '--debug' or '--log-level' may be specified"
+      end
     end
 
     def handle_parser_errors
