@@ -26,6 +26,10 @@ After you've completed this guide, you'll know how to:
 >  Bolt does not require Docker to run, but for the purposes of this guide,
 >  Docker containers offer a safe and relatively simple way to set up some
 >  targets to practice on.
+>- You can follow along and create the content you need as you go, or download
+>  everything you need from the [Getting started
+>  repo](https://github.com/puppetlabs/bolt-getting-started).
+
 
 ## Create a Bolt project and set up targets
 
@@ -57,11 +61,12 @@ Run the following commands to set up the required directories in your project
 folder:
 
 ```bash
+cd my_project
 mkdir -p site-modules/apache/plans
 mkdir -p site-modules/apache/files
 ```
 
-After running the command, the file structure of `my_project` looks like this:
+After creating the directories, the file structure of `my_project` looks like this:
 ```bash
 .
 ├── bolt.yaml
