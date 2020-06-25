@@ -787,6 +787,127 @@ not
 without_default_logging { run_command('echo hi', $targets) }
 ```
 
+## Documenting plans
+
+When writing plans, it's helpful to document what the plan does and the
+parameters that it accepts. This information can be used in `bolt plan show`
+output or in the Puppet Enterprise console to provide users with context
+on how to run the plan.
+
+Unlike tasks, plans do not have a corresponding
+[metadata.json](writing_tasks.md#task-metadata) file. Instead, Bolt pulls
+documentation directly from the plan using Puppet Types and [Puppet
+Strings](https://puppet.com/docs/puppet/latest/puppet_strings.html).
+
+### Plan description
+
+You can add a description for a plan by adding a comment to the top of the
+plan file. Each line of a comment begins with a `#` symbol.
+
+```ruby
+# This plan prints 'hello world' to the console.
+plan hello_world () {
+  out::message('hello world')
+}
+```
+
+Running `bolt plan show hello_world` will display the plan's documentation,
+which includes the plan's description:
+
+```shell
+$ bolt plan show hello_world
+
+hello_world - This plan prints 'hello world' to the console.
+
+USAGE:
+bolt plan run hello_world
+
+MODULE:
+/Users/bolt/.puppetlabs/bolt
+```
+
+### Parameter names, types, and defaults
+
+When a plan accepts parameters, the parameter's name and type are automatically
+included in the plan's documentation. If a parameter has a default value, that
+value will also be displayed in the documentation.
+
+For example, the following plan accepts two parameters, one of which has a
+default value:
+
+```ruby
+# This plan runs a single command on a group of targets.
+plan single_command (
+  TargetSpec $targets,
+  String     $command = 'uptime'
+) {
+  $results = run_command($command, $targets)
+  return $results
+}
+```
+
+Running `bolt plan show single_command` will display the plan's documentation,
+which includes the parameter names and types:
+
+```shell
+$ bolt plan show single_command
+
+single_command - This plan runs a single command on a group of targets.
+
+USAGE:
+bolt plan run single_command targets=<value> [command=<value>]
+
+PARAMETERS:
+- targets: TargetSpec
+- command: String
+    Default: 'uptime'
+
+MODULE:
+/Users/bolt/.puppetlabs/bolt
+```
+
+### Parameter descriptions
+
+You can add a description for a parameter using the `@param` Puppet Strings
+tag in a comment at the top of the plan file. To add a description, begin the
+comment with `@param`, followed by the name of the parameter and the
+parameter's description.
+
+```ruby
+# This plan runs a single command on a group of targets.
+# @param targets The list of targets to run the command on.
+# @param command The command to run on the targets.
+plan single_command (
+  TargetSpec $targets,
+  String     $command = 'uptime'
+) {
+  $results = run_command($command, $targets)
+  return $results
+}
+```
+
+Running `bolt plan show single_command` will display the plan's documentation,
+which includes the parameter descriptions:
+
+```shell
+$ bolt plan show single_command
+
+single_command - This plan runs a single command on a group of targets.
+
+USAGE:
+bolt plan run single_command targets=<value> [command=<value>]
+
+PARAMETERS:
+- targets: TargetSpec
+    The list of targets to run the command on.
+- command: String
+    Default: 'uptime'
+    The command to run on the targets.
+
+MODULE:
+/Users/bolt/.puppetlabs/bolt
+```
+
 ## Example plans
 
 Check out some examples for inspiration on writing your own plans.
