@@ -37,7 +37,7 @@ describe Bolt::Transport::SSH, ssh: true do
   let(:ssh_exec)          {
     { 'host-key-check' => false,
       'user' => user,
-      'ssh-command' => 'ssh',
+      'native-ssh' => true,
       'private-key' => key }
   }
 
@@ -438,7 +438,7 @@ describe Bolt::Transport::SSH, ssh: true do
 
   context "with exec_connection" do
     let(:exec_config) {
-      { 'ssh-command' => 'ssh',
+      { 'native-ssh' => true,
         'private-key' => key,
         'sudo-password' => password,
         'host-key-check' => false,
@@ -449,6 +449,15 @@ describe Bolt::Transport::SSH, ssh: true do
 
     it "executes a command on a host" do
       expect(ssh.run_command(target, command).value['stdout']).to eq("/home/#{user}\n")
+    end
+
+    context "with ssh-command set" do
+      let(:transport_config) { exec_config.merge('ssh-command' => %w[ssh -F /tmp/fake]) }
+
+      it "uses the configured ssh-command" do
+        expect { ssh.run_command(target, command) }
+          .to raise_error(/Can't open user config file \/tmp\/fake/)
+      end
     end
 
     it "can upload a file to a host" do

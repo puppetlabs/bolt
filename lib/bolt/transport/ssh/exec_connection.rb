@@ -58,7 +58,7 @@ module Bolt
         end
 
         def build_ssh_command(command)
-          ssh_conf = @target.transport_config['ssh-command']
+          ssh_conf = @target.transport_config['ssh-command'] || 'ssh'
           ssh_cmd = Array(ssh_conf)
           ssh_cmd += ssh_opts
           ssh_cmd << userhost

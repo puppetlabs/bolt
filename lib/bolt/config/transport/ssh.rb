@@ -39,6 +39,7 @@ module Bolt
           host
           host-key-check
           interpreters
+          native-ssh
           port
           private-key
           script-dir
@@ -61,12 +62,22 @@ module Bolt
         # may not be filtered correctly.
         def initialize(data = {}, project = nil)
           assert_hash_or_config(data)
-          @native = true if data['ssh-command']
+          @native = true if data['native-ssh']
           super(data, project)
         end
 
+        def self.options
+          %w[ssh-command native-ssh].concat(OPTIONS)
+        end
+
         private def filter(unfiltered)
-          @native ? unfiltered.slice(*NATIVE_OPTIONS) : unfiltered.slice(*OPTIONS)
+          # Because we filter before merging config together it's impossible to
+          # know whether both ssh-command *and* native-ssh will be specified
+          # unless they are both in the filter. However, we can't add
+          # ssh-command to OPTIONS since that's used for documenting available
+          # options. This makes it so that ssh-command is preserved so we can
+          # warn once all config is resolved if native-ssh isn't set.
+          @native ? unfiltered.slice(*NATIVE_OPTIONS) : unfiltered.slice(*self.class.options)
         end
 
         private def validate
@@ -83,11 +94,11 @@ module Bolt
               @config['private-key'] = File.expand_path(key_opt, @project)
 
               # We have an explicit test for this to only warn if using net-ssh transport
-              Bolt::Util.validate_file('ssh key', @config['private-key']) if @config['ssh-command']
+              Bolt::Util.validate_file('ssh key', @config['private-key']) if @config['native-ssh']
             end
 
-            if key_opt.instance_of?(Hash) && @config['ssh-command']
-              raise Bolt::ValidationError, 'private-key must be a filepath when using ssh-command'
+            if key_opt.instance_of?(Hash) && @config['native-ssh']
+              raise Bolt::ValidationError, 'private-key must be a filepath when using native-ssh'
             end
           end
 

@@ -213,7 +213,7 @@ namespace :docs do
 
   desc 'Generate markdown docs for transports configuration reference'
   task :transports_reference do
-    @opts     = Bolt::Config::INVENTORY_OPTIONS.dup
+    @opts = Bolt::Config::INVENTORY_OPTIONS.dup
     @nativessh = Bolt::Config::Transport::Options::TRANSPORT_OPTIONS.slice(
       *Bolt::Config::Transport::SSH::NATIVE_OPTIONS
     )

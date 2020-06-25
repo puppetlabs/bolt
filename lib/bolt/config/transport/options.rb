@@ -274,7 +274,7 @@ module Bolt
             description: "This enables the native SSH transport, which shells out to SSH instead of using the "\
                          "net-ssh Ruby library",
             _default: false,
-            _example: true,            
+            _example: true
           },
           "password" => {
             type: String,

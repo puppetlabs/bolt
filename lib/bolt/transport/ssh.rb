@@ -21,7 +21,7 @@ module Bolt
       end
 
       def with_connection(target)
-        conn = if target.transport_config['ssh-command']
+        conn = if target.transport_config['native-ssh']
                  ExecConnection.new(target)
                else
                  Connection.new(target, @transport_logger)
