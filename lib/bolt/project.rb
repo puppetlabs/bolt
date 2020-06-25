@@ -31,6 +31,7 @@ module Bolt
     # hierarchy, falling back to the default if we reach the root.
     def self.find_boltdir(dir)
       dir = Pathname.new(dir)
+
       if (dir + BOLTDIR_NAME).directory?
         create_project(dir + BOLTDIR_NAME, 'embedded')
       elsif (dir + 'bolt.yaml').file? || (dir + 'bolt-project.yaml').file?
@@ -44,6 +45,15 @@ module Bolt
 
     def self.create_project(path, type = 'option')
       fullpath = Pathname.new(path).expand_path
+
+      if !Bolt::Util.windows? && type != 'environment' && fullpath.world_writable?
+        raise Bolt::Error.new(
+          "Project directory '#{fullpath}' is world-writable which poses a security risk. Set "\
+          "BOLT_PROJECT='#{fullpath}' to force the use of this project directory.",
+          "bolt/world-writable-error"
+        )
+      end
+
       project_file = File.join(fullpath, 'bolt-project.yaml')
       data = Bolt::Util.read_optional_yaml_hash(File.expand_path(project_file), 'project')
       new(data, path, type)
@@ -51,6 +61,7 @@ module Bolt
 
     def initialize(raw_data, path, type = 'option')
       @path = Pathname.new(path).expand_path
+
       @project_file = @path + 'bolt-project.yaml'
 
       @warnings = []

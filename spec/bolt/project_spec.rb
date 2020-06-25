@@ -183,4 +183,24 @@ describe Bolt::Project do
       expect(Bolt::Project.find_boltdir(pwd)).to eq(Bolt::Project.default_project)
     end
   end
+
+  describe "::create_project" do
+    let(:path)     { 'world_writable' }
+    let(:pathname) { Pathname.new(path) }
+
+    before(:each) do
+      allow(Pathname).to receive(:new).and_call_original
+      allow(Pathname).to receive(:new).with(path).and_return(pathname)
+      allow(pathname).to receive(:expand_path).and_return(pathname)
+      allow(pathname).to receive(:world_writable?).and_return(true)
+    end
+
+    it 'errors when loading from a world-writable directory', :bash do
+      expect { Bolt::Project.create_project(path) }.to raise_error(/Project directory '#{pathname}' is world-writable/)
+    end
+
+    it 'loads from a world-writable directory when project is from environment variable' do
+      expect { Bolt::Project.create_project(path, 'environment') }.not_to raise_error
+    end
+  end
 end

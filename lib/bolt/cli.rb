@@ -111,7 +111,10 @@ module Bolt
 
       validate(options)
 
-      @config = if options[:configfile]
+      @config = if ENV['BOLT_PROJECT']
+                  project = Bolt::Project.create_project(ENV['BOLT_PROJECT'], 'environment')
+                  Bolt::Config.from_project(project, options)
+                elsif options[:configfile]
                   Bolt::Config.from_file(options[:configfile], options)
                 else
                   project = if options[:boltdir]
