@@ -214,8 +214,8 @@ namespace :docs do
   desc 'Generate markdown docs for transports configuration reference'
   task :transports_reference do
     @opts     = Bolt::Config::INVENTORY_OPTIONS.dup
-    @external = Bolt::Config::Transport::Options::TRANSPORT_OPTIONS.slice(
-      *Bolt::Config::Transport::SSH::EXTERNAL_OPTIONS
+    @nativessh = Bolt::Config::Transport::Options::TRANSPORT_OPTIONS.slice(
+      *Bolt::Config::Transport::SSH::NATIVE_OPTIONS
     )
 
     # Stringify data types
@@ -237,8 +237,8 @@ namespace :docs do
       win: Bolt::Config::Transport::Local::WINDOWS_OPTIONS
     }
 
-    # Stringify types for the external SSH transport
-    @external.transform_values! { |data| stringify_types(data) }
+    # Stringify types for the native SSH transport
+    @nativessh.transform_values! { |data| stringify_types(data) }
 
     # Generate YAML file examples
     @yaml = generate_yaml_file(@opts)

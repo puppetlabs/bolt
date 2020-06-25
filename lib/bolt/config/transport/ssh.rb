@@ -32,8 +32,8 @@ module Bolt
           user
         ].concat(RUN_AS_OPTIONS).sort.freeze
 
-        # Options available when using the external ssh transport
-        EXTERNAL_OPTIONS = %w[
+        # Options available when using the native ssh transport
+        NATIVE_OPTIONS = %w[
           cleanup
           copy-command
           host
@@ -56,17 +56,17 @@ module Bolt
           "tty"                => false
         }.freeze
 
-        # The set of options available for the ssh and external ssh transports overlap, so we
+        # The set of options available for the ssh and native ssh transports overlap, so we
         # need to check which transport is used before fully initializing, otherwise options
         # may not be filtered correctly.
         def initialize(data = {}, project = nil)
           assert_hash_or_config(data)
-          @external = true if data['ssh-command']
+          @native = true if data['ssh-command']
           super(data, project)
         end
 
         private def filter(unfiltered)
-          @external ? unfiltered.slice(*EXTERNAL_OPTIONS) : unfiltered.slice(*OPTIONS)
+          @native ? unfiltered.slice(*NATIVE_OPTIONS) : unfiltered.slice(*OPTIONS)
         end
 
         private def validate
@@ -117,8 +117,8 @@ module Bolt
             end
           end
 
-          if @config['ssh-command'] && !@config['load-config']
-            msg = 'Cannot use external SSH transport with load-config set to false'
+          if @config['native-ssh'] && !@config['load-config']
+            msg = 'Cannot use native SSH transport with load-config set to false'
             raise Bolt::ValidationError, msg
           end
         end

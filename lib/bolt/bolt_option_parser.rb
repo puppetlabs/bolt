@@ -747,7 +747,7 @@ module Bolt
              "This option is experimental.") do |exec|
         @options[:'ssh-command'] = exec
       end
-      define('--copy-command EXEC', "Command to copy files to remote hosts if using external SSH. ",
+      define('--copy-command EXEC', "Command to copy files to remote hosts if using native SSH. ",
              "This option is experimental.") do |exec|
         @options[:'copy-command'] = exec
       end

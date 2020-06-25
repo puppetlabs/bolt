@@ -357,7 +357,7 @@ $apply_results.each |$result| {
 }
 ```
 
-## External SSH transport
+## Native SSH transport
 
 This feature was introduced in [Bolt
 2.10.0](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md#bolt-2100-2020-05-18).
@@ -365,12 +365,12 @@ This feature was introduced in [Bolt
 Bolt's SSH transport uses the ruby library `net-ssh`, which is a pure ruby
 implementation of the SSH2 client protocol. While robust, the library lacks
 support for some features and algorithms that are available in native SSH. When
-you use the external SSH transport, Bolt uses the SSH executable you've
-specified instead of using `net-ssh`. Essentially, using the external SSH
+you use the native SSH transport, Bolt uses the SSH executable you've
+specified instead of using `net-ssh`. Essentially, using the native SSH
 transport is the same as running SSH on your command line, but with Bolt
 managing the connections.
 
-To use the external SSH transport, set `ssh-command: <SSH>` in
+To use the native SSH transport, set `ssh-command: <SSH>` in
 [bolt.yaml](configuring_bolt.md), where `<SSH>` is the SSH command to run. For
 example:
 
@@ -382,7 +382,7 @@ ssh:
 The value of `ssh-command` can be either a string or an array, and you can
 provide any flags to the command. Bolt will append Bolt-configuration settings
 to the command, as well as the specified target, when connecting. Not all Bolt
-configuration options are supported using the external SSH transport, but you
+configuration options are supported using the native SSH transport, but you
 can configure most options in your OpenSSH Config. See [bolt configuration
 reference](bolt_configuration_reference.md) for the list of supported Bolt SSH
 options.
@@ -401,7 +401,7 @@ ssh:
 
 ### Connecting with SSH configuration not supported by net-ssh
 
-You can use the external SSH transport to connect to targets using configuration
+You can use the native SSH transport to connect to targets using configuration
 that isn't supported by the Ruby net-ssh library. Configure the settings for the
 transport in your inventory file, or use your local SSH config. 
 

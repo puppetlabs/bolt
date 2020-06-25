@@ -76,7 +76,7 @@ describe Bolt::Transport::SSH, ssh: true do
     include_examples 'with sudo'
   end
 
-  context 'with external ssh' do
+  context 'with native ssh' do
     let(:transport_config) { ssh_exec }
     let(:os_context)       { posix_context }
     let(:transport)        { :ssh }

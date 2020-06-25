@@ -42,28 +42,28 @@ to targets. These options can be set in multiple locations:
 <% end %>
 <% end %>
 <% if option == 'ssh' -%>
-## External `ssh`
+## Native `ssh`
 
 Bolt's SSH transport uses the Ruby library `net-ssh`, which is a pure Ruby
 implementation of the SSH2 client protocol. While robust, the library lacks
 support for some features and algorithms that are available in native SSH.
-When you use the external SSH transport, Bolt uses the SSH executable you've
+When you use the native SSH transport, Bolt uses the SSH executable you've
 specified instead of using `net-ssh`.
 
-To enable the external SSH transport, you must set the `ssh-command` option
-under the `ssh` configuration option. When using the external SSH transport,
-a more limited set of configuration options is available.
+Set the `native-ssh` config option or pass `--native-ssh` on the command line
+to enable native SSH. When using the native SSH transport, a more limited set
+of configuration options is available.
 
 ```yaml
 ssh:
-  ssh-command: ssh
+  native-ssh: true
 ```
 
-> **Note:** The external SSH transport is experimental and is subject to
-> breaking changes. To read more about the external SSH transport, see
-> [External SSH transport](experimental_features.md#external-ssh-transport).
+> **Note:** The native SSH transport is experimental and is subject to
+> breaking changes. To read more about the native SSH transport, see
+> [Native SSH transport](experimental-features.md#native-ssh-transport).
 
-<% @external.each do |transport_option, data| -%>
+<% @nativessh.each do |transport_option, data| -%>
 ### `<%= transport_option %>`
 
 <%= data[:description] %>

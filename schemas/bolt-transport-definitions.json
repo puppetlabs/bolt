@@ -446,7 +446,7 @@
       "min": 0
     },
     "ssh-command": {
-      "description": "Array of command and flags to use when SSHing. This enables the external SSH transport which shells out to the specified command.",
+      "description": "Array of command and flags to use when SSHing using native SSH.",
       "type": ["array", "string"]
     },
     "ssl": {
