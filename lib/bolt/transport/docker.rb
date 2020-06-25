@@ -20,7 +20,7 @@ module Bolt
       def upload(target, source, destination, _options = {})
         with_connection(target) do |conn|
           conn.with_remote_tmpdir do |dir|
-            basename = File.basename(destination)
+            basename = File.basename(source)
             tmpfile = "#{dir}/#{basename}"
             if File.directory?(source)
               conn.write_remote_directory(source, tmpfile)

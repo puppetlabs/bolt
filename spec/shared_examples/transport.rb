@@ -141,6 +141,23 @@ shared_examples 'transport api' do
       end
     end
 
+    it "can upload a file to a directory on a host" do
+      contents = "kljhdfg"
+      with_tempfile_containing('upload-test', contents) do |file|
+        remote_path = File.join(os_context[:destination_dir], File.basename(file.path))
+        result = runner.upload(target, file.path, os_context[:destination_dir])
+        expect(result.message).to eq("Uploaded '#{file.path}' to '#{target.host}:#{os_context[:destination_dir]}'")
+        expect(result.action).to eq('upload')
+        expect(result.object).to eq(file.path)
+
+        expect(
+          runner.run_command(target, "#{os_context[:cat_cmd]} #{remote_path}").value['stdout'].chomp
+        ).to eq(contents)
+
+        runner.run_command(target, "#{os_context[:rm_cmd]} #{remote_path}")
+      end
+    end
+
     it "can upload a directory to a host" do
       Dir.mktmpdir do |dir|
         subdir = File.join(dir, 'subdir')
