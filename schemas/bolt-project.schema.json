@@ -88,7 +88,7 @@
       "pattern": "^([a-zA-Z0-9]+[-])?[a-z][a-z0-9_]*$"
     },
     "plans": {
-      "description": "The list of whitelisted plans.",
+      "description": "A list of plan names to show in 'bolt plan show' output, if they exist. This option is used to limit the visibility of plans for users of the project. For example, project authors might want to limit the visibility of plans that are bundled with Bolt or plans that should only be run as part of another plan. When this option is not configured, all plans are visible. This option does not prevent users from running plans that are not part of this list.",
       "type": "array",
       "items": {
         "description": "Whitelisted plan.",
@@ -176,7 +176,7 @@
       "type": "boolean"
     },
     "tasks": {
-      "description": "The list of whitelisted tasks.",
+      "description": "A list of task names to show in 'bolt task show' output, if they exist. This option is used to limit the visibility of tasks for users of the project. For example, project authors might want to limit the visibility of tasks that are bundled with Bolt or tasks that should only be run as part of another task. When this option is not configured, all tasks are visible. This option does not prevent users from running tasks that are not part of this list.",
       "type": "array",
       "items": {
         "description": "Whitelisted task.",
