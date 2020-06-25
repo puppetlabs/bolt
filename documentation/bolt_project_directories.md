@@ -99,7 +99,7 @@ if you have a single set of Bolt code and data that you use across all projects.
 Bolt uses these methods, in order, to choose a project directory.
 
 1. **Manually specified:** You can specify on the command line what directory
-   Bolt to use with `--boltdir <DIRECTORY_PATH>`. There is not an equivalent
+   Bolt to use with `--project <DIRECTORY_PATH>`. There is not an equivalent
    configuration setting because the project directory must be known in order to
    load configuration.
 1. **Parent directory:** Bolt traverses parents of the current directory until

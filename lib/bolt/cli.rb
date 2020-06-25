@@ -219,7 +219,7 @@ module Bolt
       end
 
       if options[:boltdir] && options[:configfile]
-        raise Bolt::CLIError, "Only one of '--boltdir' or '--configfile' may be specified"
+        raise Bolt::CLIError, "Only one of '--boltdir', '--project', or '--configfile' may be specified"
       end
 
       if options[:noop] &&

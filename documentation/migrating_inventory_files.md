@@ -25,7 +25,7 @@ of the keys in the inventory file, or automatically using a Bolt command.
 To automatically migrate a Version 1 inventory file to Version 2, use the `bolt
 project migrate` command. Bolt will locate the inventory file for the current
 Bolt project and migrate it in place. You can specify the projects and inventory
-files you want to migrate using the `--boltdir` and `--inventoryfile` options.
+files you want to migrate using the `--project` and `--inventoryfile` options.
 
 > **Note:** The `bolt project migrate` command modifies an inventory file in
 > place and does not preserve comments or formatting. Before using the command,
