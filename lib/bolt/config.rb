@@ -13,6 +13,7 @@ require 'bolt/config/transport/orch'
 require 'bolt/config/transport/local'
 require 'bolt/config/transport/docker'
 require 'bolt/config/transport/remote'
+require 'bolt/config/options'
 
 module Bolt
   class UnknownTransportError < Bolt::Error
@@ -23,6 +24,8 @@ module Bolt
   end
 
   class Config
+    include Bolt::Config::Options
+
     attr_reader :config_files, :warnings, :data, :transports, :project, :modified_concurrency
 
     BOLT_CONFIG_NAME = 'bolt.yaml'
@@ -39,114 +42,7 @@ module Bolt
       'remote' => Bolt::Config::Transport::Remote
     }.freeze
 
-    # Options that configure Bolt. These options are used in bolt.yaml and
-    # bolt-defaults.yaml.
-    BOLT_CONFIG = {
-      "color"               => "Whether to use colored output when printing messages to the console.",
-      "compile-concurrency" => "The maximum number of simultaneous manifest block compiles.",
-      "concurrency"         => "The number of threads to use when executing on remote targets.",
-      "format"              => "The format to use when printing results. Options are `human` and `json`.",
-      "plugin_hooks"        => "Which plugins a specific hook should use.",
-      "plugins"             => "A map of plugins and their configuration data.",
-      "puppetdb"            => "A map containing options for configuring the Bolt PuppetDB client.",
-      "puppetfile"          => "A map containing options for the `bolt puppetfile install` command.",
-      "save-rerun"          => "Whether to update `.rerun.json` in the Bolt project directory. If "\
-                               "your target names include passwords, set this value to `false` to avoid "\
-                               "writing passwords to disk."
-    }.freeze
-
-    # These options are only available to bolt-defaults.yaml.
-    DEFAULTS_CONFIG = {
-      "inventory-config" => "A map of default configuration options for the inventory. This includes options "\
-                            "for setting the default transport to use when connecting to targets, as well as "\
-                            "options for configuring the default behavior of each transport."
-    }.freeze
-
-    # Options that configure the inventory, specifically the default transport
-    # used by targets and the transports themselves. These options are used in
-    # bolt.yaml, inventory.yaml, and under the inventory-config key in
-    # bolt-defaults.yaml.
-    INVENTORY_CONFIG = {
-      "transport" => "The default transport to use when the transport for a target is not specified in the URI.",
-      "docker"    => "A map of configuration options for the docker transport.",
-      "local"     => "A map of configuration options for the local transport.",
-      "pcp"       => "A map of configuration options for the pcp transport.",
-      "remote"    => "A map of configuration options for the remote transport.",
-      "ssh"       => "A map of configuration options for the ssh transport.",
-      "winrm"     => "A map of configuration options for the winrm transport."
-    }.freeze
-
-    # Options that configure the project, such as paths to files used for a
-    # specific project. These settings are used in bolt.yaml and bolt-project.yaml.
-    PROJECT_CONFIG = {
-      "apply_settings"           => "A map of Puppet settings to use when applying Puppet code",
-      "hiera-config"             => "The path to your Hiera config.",
-      "inventoryfile"            => "The path to a structured data inventory file used to refer to groups of "\
-                                    "targets on the command line and from plans.",
-      "log"                      => "The configuration of the logfile output. Configuration can be set for "\
-                                    "`console` and the path to a log file, such as `~/.puppetlabs/bolt/debug.log`.",
-      "modulepath"               => "An array of directories that Bolt loads content (e.g. plans and tasks) from.",
-      "trusted-external-command" => "The path to an executable on the Bolt controller that can produce "\
-                                    "external trusted facts. **External trusted facts are experimental in both "\
-                                    "Puppet and Bolt and this API may change or be removed.**"
-    }.freeze
-
-    # A combined map of all configuration options that can be set in this class.
-    # Includes all options except 'inventory-config', which is munged when loading
-    # a bolt-defaults.yaml file.
-    OPTIONS = BOLT_CONFIG.merge(INVENTORY_CONFIG).merge(PROJECT_CONFIG).freeze
-
-    # Default values for select options. These do not set the default values in Bolt
-    # and are only used for documentation.
-    DEFAULT_OPTIONS = {
-      "color"               => true,
-      "compile-concurrency" => "Number of cores",
-      "concurrency"         => "100 or one-seventh of the ulimit, whichever is lower",
-      "format"              => "human",
-      "hiera-config"        => "Boltdir/hiera.yaml",
-      "inventoryfile"       => "Boltdir/inventory.yaml",
-      "modulepath"          => ["Boltdir/modules", "Boltdir/site-modules", "Boltdir/site"],
-      "save-rerun"          => true,
-      "transport"           => "ssh"
-    }.freeze
-
-    PUPPETDB_OPTIONS = {
-      "cacert"      => "The path to the ca certificate for PuppetDB.",
-      "cert"        => "The path to the client certificate file to use for authentication.",
-      "key"         => "The private key for the certificate.",
-      "server_urls" => "An array containing the PuppetDB host to connect to. Include the protocol `https` and "\
-                       "the port, which is usually `8081`. For example, `https://my-master.example.com:8081`.",
-      "token"       => "The path to the PE RBAC Token."
-    }.freeze
-
-    PUPPETFILE_OPTIONS = {
-      "forge" => "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations "\
-                 "only, and a `baseurl` setting to specify a different Forge host.",
-      "proxy" => "The HTTP proxy to use for Git and Forge operations."
-    }.freeze
-
-    LOG_OPTIONS = {
-      "append" => "Add output to an existing log file. Available only for logs output to a "\
-                  "filepath.",
-      "level"  => "The type of information in the log. Either `debug`, `info`, `notice`, "\
-                  "`warn`, or `error`."
-    }.freeze
-
-    DEFAULT_LOG_OPTIONS = {
-      "append" => true,
-      "level"  => "`warn` for console, `notice` for file"
-    }.freeze
-
-    APPLY_SETTINGS = {
-      "show_diff" => "Whether to log and report a contextual diff when files are being replaced. "\
-                     "See [Puppet documentation](https://puppet.com/docs/puppet/latest/configuration.html#showdiff) "\
-                     "for details"
-    }.freeze
-
-    DEFAULT_APPLY_SETTINGS = {
-      "show_diff" => false
-    }.freeze
-
+    # The default concurrency value that is used when the ulimit is not low (i.e. < 700)
     DEFAULT_DEFAULT_CONCURRENCY = 100
 
     def self.default
@@ -221,18 +117,18 @@ module Bolt
       end
 
       # Remove project-specific config such as hiera-config, etc.
-      project_config = data.slice(*PROJECT_CONFIG.keys)
+      project_config = data.slice(*(BOLT_PROJECT_OPTIONS - BOLT_DEFAULTS_OPTIONS))
 
       if project_config.any?
         data.reject! { |key, _| project_config.include?(key) }
         warnings.push(
           msg: "Unsupported project configuration detected in '#{filepath}': #{project_config.keys}. "\
-               "Project configuration should be set in 'bolt-project.yaml'."
+                "Project configuration should be set in 'bolt-project.yaml'."
         )
       end
 
       # Remove top-level transport config such as transport, ssh, etc.
-      transport_config = data.slice(*INVENTORY_CONFIG.keys)
+      transport_config = data.slice(*INVENTORY_OPTIONS.keys)
 
       if transport_config.any?
         data.reject! { |key, _| transport_config.include?(key) }
@@ -352,7 +248,7 @@ module Bolt
 
       # Pull out transport config options
       TRANSPORT_CONFIG.each do |transport, config|
-        overrides[transport] = opts.slice(*config.options.keys)
+        overrides[transport] = opts.slice(*config.options)
       end
 
       # Set console log to debug if in debug mode
@@ -419,8 +315,8 @@ module Bolt
       end
 
       # Filter hashes to only include valid options
-      @data['apply_settings'] = @data['apply_settings'].slice(*APPLY_SETTINGS.keys)
-      @data['puppetfile'] = @data['puppetfile'].slice(*PUPPETFILE_OPTIONS.keys)
+      @data['apply_settings'] = @data['apply_settings'].slice(*SUBOPTIONS['apply_settings'].keys)
+      @data['puppetfile'] = @data['puppetfile'].slice(*SUBOPTIONS['puppetfile'].keys)
     end
 
     private def normalize_log(target)
@@ -434,7 +330,7 @@ module Bolt
         next unless val.is_a?(Hash)
 
         name = normalize_log(key)
-        acc[name] = val.slice(*LOG_OPTIONS.keys)
+        acc[name] = val.slice(*SUBOPTIONS['log'].keys)
                        .transform_keys(&:to_sym)
 
         if (v = acc[name][:level])

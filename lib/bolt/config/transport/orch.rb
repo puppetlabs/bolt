@@ -7,24 +7,15 @@ module Bolt
   class Config
     module Transport
       class Orch < Base
-        # NOTE: All transport configuration options should have a corresponding schema definition
-        #       in schemas/bolt-transport-definitions.json
-        OPTIONS = {
-          "cacert"            => { type: String,
-                                   desc: "The path to the CA certificate." },
-          "host"              => { type: String,
-                                   desc: "Host name." },
-          "job-poll-interval" => { type: Integer,
-                                   desc: "Set interval to poll orchestrator for job status." },
-          "job-poll-timeout"  => { type: Integer,
-                                   desc: "Set time to wait for orchestrator job status." },
-          "service-url"       => { type: String,
-                                   desc: "The URL of the orchestrator API." },
-          "task-environment"  => { type: String,
-                                   desc: "The environment the orchestrator loads task code from." },
-          "token-file"        => { type: String,
-                                   desc: "The path to the token file." }
-        }.freeze
+        OPTIONS = %w[
+          cacert
+          host
+          job-poll-interval
+          job-poll-timeout
+          service-url
+          task-environment
+          token-file
+        ].freeze
 
         DEFAULTS = {
           "task-environment" => "production"

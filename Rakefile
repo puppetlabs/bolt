@@ -17,6 +17,30 @@ unless ENV['GITHUB_WORKFLOW']
   Pkg::Util::RakeUtils.load_packaging_tasks
 end
 
+def generate_yaml_file(data, subdata = {})
+  data.each_with_object({}) do |(option, option_data), acc|
+    if option_data.key?(:exmp)
+      acc[option] = option_data[:exmp]
+    elsif subdata.key?(option)
+      acc[option] = generate_yaml_file(subdata[option])
+    end
+  end
+end
+
+def stringify_types(opts)
+  opts.each_value do |data|
+    next unless data.key?(:type)
+
+    types = Array(data[:type])
+
+    if types.include?(TrueClass) || types.include?(FalseClass)
+      types = types - [TrueClass, FalseClass] + ['Boolean']
+    end
+
+    data[:type] = types.join(', ')
+  end
+end
+
 desc "Run all RSpec tests"
 RSpec::Core::RakeTask.new(:spec)
 
@@ -99,57 +123,69 @@ namespace :ci do
 end
 
 namespace :docs do
-  desc "Generate markdown docs for Bolt's transport configuration options"
+  desc 'Generate markdown docs for bolt.yaml'
   task :config_reference do
-    options = Bolt::Config::OPTIONS.sort.to_h
+    @opts      = stringify_types(Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_OPTIONS))
+    @subopts   = Bolt::Config::SUBOPTIONS.dup
+    @inventory = Bolt::Config::INVENTORY_OPTIONS
 
-    @transports = { options: {}, defaults: {} }
-    @global = { options: options, defaults: Bolt::Config::DEFAULT_OPTIONS }
-    @log = { options: Bolt::Config::LOG_OPTIONS, defaults: Bolt::Config::DEFAULT_LOG_OPTIONS }
-    @puppetfile = { options: Bolt::Config::PUPPETFILE_OPTIONS }
-    @apply = { options: Bolt::Config::APPLY_SETTINGS, defaults: Bolt::Config::DEFAULT_APPLY_SETTINGS }
-    @project = { options: Bolt::Project::PROJECT_SETTINGS, defaults: {} }
+    @yaml           = generate_yaml_file(@opts, @subopts)
+    @inventory_yaml = generate_yaml_file(@inventory)
 
-    Bolt::Config::TRANSPORT_CONFIG.each do |name, transport|
-      @transports[:options][name] = transport::OPTIONS
-      @transports[:defaults][name] = transport::DEFAULTS
-    end
+    @subopts.transform_values! { |data| stringify_types(data) }
 
-    renderer = ERB.new(File.read('documentation/bolt_configuration_reference.md.erb'), nil, '-')
+    renderer = ERB.new(File.read('documentation/templates/bolt_configuration_reference.md.erb'), nil, '-')
     File.write('documentation/bolt_configuration_reference.md', renderer.result)
+  end
+
+  desc 'Generate markdown docs for bolt-project.yaml'
+  task :project_reference do
+    @opts    = stringify_types(Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_PROJECT_OPTIONS))
+    @subopts = Bolt::Config::SUBOPTIONS.dup
+    @yaml    = generate_yaml_file(@opts, @subopts)
+
+    @subopts.transform_values! { |data| stringify_types(data) }
+
+    renderer = ERB.new(File.read('documentation/templates/bolt_project_reference.md.erb'), nil, '-')
+    File.write('documentation/bolt_project_reference.md', renderer.result)
   end
 
   desc 'Generate markdown docs for bolt-defaults.yaml'
   task :defaults_reference do
-    @opts = {}
-
-    @opts[:options]    = Bolt::Config::BOLT_CONFIG.merge(Bolt::Config::DEFAULTS_CONFIG).sort.to_h
-    @opts[:defaults]   = Bolt::Config::DEFAULT_OPTIONS
-    @opts[:suboptions] = {}
-
-    @opts[:suboptions]['inventory-config'] = Bolt::Config::INVENTORY_CONFIG
-    @opts[:suboptions]['puppetfile']       = Bolt::Config::PUPPETFILE_OPTIONS
-    @opts[:suboptions]['puppetdb']         = Bolt::Config::PUPPETDB_OPTIONS
-
+    @opts       = stringify_types(Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_DEFAULTS_OPTIONS))
+    @subopts    = Bolt::Config::SUBOPTIONS.dup
     @transports = Bolt::Config::TRANSPORT_CONFIG.keys
+    @yaml       = generate_yaml_file(@opts, @subopts)
 
-    renderer = ERB.new(File.read('documentation/bolt_defaults_reference.md.erb'), nil, '-')
+    @subopts.transform_values! { |data| stringify_types(data) }
+
+    renderer = ERB.new(File.read('documentation/templates/bolt_defaults_reference.md.erb'), nil, '-')
     File.write('documentation/bolt_defaults_reference.md', renderer.result)
   end
 
+  desc 'Generate markdown docs for transports configuration reference'
   task :transports_reference do
-    @opts       = {}
-    @transports = { options: {}, defaults: {} }
+    @opts = stringify_types(Bolt::Config::INVENTORY_OPTIONS)
 
-    @opts[:options]  = Bolt::Config::INVENTORY_CONFIG
-    @opts[:defaults] = Bolt::Config::DEFAULT_OPTIONS
+    @subopts = Bolt::Config::TRANSPORT_CONFIG.sort.each_with_object({}) do |(name, transport), acc|
+      # Only include suboption examples in the full example, not under individual suboption sections
+      @opts[name].delete(:exmp)
 
-    Bolt::Config::TRANSPORT_CONFIG.sort.each do |name, transport|
-      @transports[:options][name]  = transport::OPTIONS
-      @transports[:defaults][name] = transport::DEFAULTS
+      acc[name] = stringify_types(transport::TRANSPORT_OPTIONS.slice(*transport::OPTIONS))
     end
 
-    renderer = ERB.new(File.read('documentation/bolt_transports_reference.md.erb'), nil, '-')
+    @local_sets = {
+      nix: Bolt::Config::Transport::Local::OPTIONS,
+      win: Bolt::Config::Transport::Local::WINDOWS_OPTIONS
+    }
+
+    @subopts['external-ssh'] = stringify_types(
+      Bolt::Config::Transport::Options::TRANSPORT_OPTIONS.slice(*Bolt::Config::Transport::SSH::EXTERNAL_OPTIONS)
+    )
+
+    @yaml = generate_yaml_file(@opts, @subopts)
+
+    renderer = ERB.new(File.read('documentation/templates/bolt_transports_reference.md.erb'), nil, '-')
     File.write('documentation/bolt_transports_reference.md', renderer.result)
   end
 
@@ -192,7 +228,7 @@ namespace :docs do
     # We could get around this by sorting the COMMANDS hash in the CLI
     @commands = @commands.sort.to_h
 
-    renderer = ERB.new(File.read('documentation/bolt_command_reference.md.erb'), nil, '-')
+    renderer = ERB.new(File.read('documentation/templates/bolt_command_reference.md.erb'), nil, '-')
     File.write('documentation/bolt_command_reference.md', renderer.result)
   end
 
@@ -262,11 +298,18 @@ namespace :docs do
 
       func
     end
-    renderer = ERB.new(File.read('documentation/reference.md.erb'), nil, '-')
+    renderer = ERB.new(File.read('documentation/templates/reference.md.erb'), nil, '-')
     File.write('documentation/plan_functions.md', renderer.result)
   end
 
-  task all: %i[cli_reference function_reference config_reference defaults_reference transports_reference]
+  task all: %i[
+    cli_reference
+    function_reference
+    config_reference
+    project_reference
+    defaults_reference
+    transports_reference
+  ]
 end
 
 desc 'Generate all markdown docs'

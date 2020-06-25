@@ -1,0 +1,110 @@
+# Transport configuration options
+
+This page lists the configuration options that are available to each transport used by Bolt to connect
+to targets. These options can be set in multiple locations:
+
+- Under a `config` key in an [inventory file](inventory_file_v2.md).
+- As top-level keys in a `bolt.yaml` file.
+- Under the `inventory-config` key in a [`bolt-defaults.yaml` file](bolt_defaults_reference.md).
+
+<% @opts.each do |option, data| -%>
+## `<%= option %>`
+
+<%= data[:desc] %>
+
+<% if option == 'local' -%>
+- ***nix:** `<%= @local_sets[:nix].join('`, `') %>`
+- **Windows:** `<%= @local_sets[:win].join('`, `') %>`
+<% end -%>
+
+<% unless data[:def].nil? -%>
+- **Default:** <%= data[:def] %>
+<% end -%>
+
+<% if @subopts.key?(option) -%>
+<% @subopts[option].each do |transport_option, data| -%>
+### `<%= transport_option %>`
+
+<%= data[:desc] %>
+
+<% if data.key?(:type) -%>
+- **Type:** <%= data[:type] == TrueClass ? 'Boolean' : data[:type] %>
+<% end -%>
+<% if data.key?(:def) -%>
+- **Default:** <%= data[:def] %>
+<% end -%>
+
+<% if data.key?(:exmp) -%>
+```yaml
+<%= { transport_option => data[:exmp] }.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+```
+<% end %>
+<% end %>
+<% end %>
+<% if option == 'ssh' -%>
+## External `ssh`
+
+Bolt's SSH transport uses the Ruby library `net-ssh`, which is a pure Ruby
+implementation of the SSH2 client protocol. While robust, the library lacks
+support for some features and algorithms that are available in native SSH.
+When you use the external SSH transport, Bolt uses the SSH executable you've
+specified instead of using `net-ssh`.
+
+To enable the external SSH transport, you must set the `ssh-command` option
+under the `ssh` configuration option. When using the external SSH transport,
+a more limited set of configuration options is available.
+
+```yaml
+ssh:
+  ssh-command: ssh
+```
+
+> **Note:** The external SSH transport is experimental and is subject to
+> breaking changes. To read more about the external SSH transport, see
+> [External SSH transport](experimental-features.md#external-ssh-transport).
+
+<% @subopts['external-ssh'].each do |transport_option, data| -%>
+### `<%= transport_option %>`
+
+<%= data[:desc] %>
+
+<% if data.key?(:type) -%>
+- **Type:** <%= data[:type] == TrueClass ? 'Boolean' : data[:type] %>
+<% end -%>
+<% if data.key?(:def) -%>
+- **Default:** <%= data[:def] %>
+<% end -%>
+
+<% if data.key?(:exmp) -%>
+```yaml
+<%= { transport_option => data[:exmp] }.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+```
+<% end %>
+<% end %>
+<% end %>
+<% end %>
+
+## Example files
+
+### `bolt.yaml`
+
+```yaml
+# bolt.yaml
+<%= @yaml.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+```
+
+### `bolt-defaults.yaml`
+
+```yaml
+# bolt-defaults.yaml
+inventory-config:
+<%= @yaml.to_yaml(indentation: 2).split("\n").drop(1).map { |l| "  #{l}" }.join("\n") %>
+```
+
+### `inventory.yaml`
+
+```yaml
+# inventory.yaml
+config:
+<%= @yaml.to_yaml(indentation: 2).split("\n").drop(1).map { |l| "  #{l}" }.join("\n") %>
+```

@@ -1,0 +1,44 @@
+# `bolt-project.yaml` options
+
+This page lists the configuration options that are available in the `bolt-project.yaml` configuration file,
+which is supported in the [project directory](configuring_bolt.md).
+
+> **Note:** Bolt projects are experimental and may have breaking changes between minor releases. You
+> can read more about Bolt projects in [Experimental features](experimental_features.md#bolt-projects).
+
+## Options
+
+<% @opts.each do |option, data| -%>
+### `<%= option %>`
+
+<%= data[:desc] %>
+
+- **Type:** <%= data[:type] %>
+<% if data.key?(:def) -%>
+- **Default:** <%= data[:def] %>
+<% end -%>
+
+<% if @subopts.key?(option) -%>
+<% @subopts[option].each do |option, data| -%>
+#### `<%= option %>`
+
+<%= data[:desc] %>
+
+- **Type:** <%= data[:type] %>
+<% if data.key?(:def) -%>
+- **Default:** <%= data[:def] %>
+<% end -%>
+<% end %>
+<% end -%>
+
+```yaml
+<%= @yaml.slice(option).to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+```
+<% end -%>
+
+## Example file
+
+```yaml
+# bolt-project.yaml
+<%= @yaml.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+```

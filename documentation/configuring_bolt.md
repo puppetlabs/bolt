@@ -1,8 +1,33 @@
 # Configuring Bolt
 
-You can configure Bolt's options and features at a project level, a user level,
-or a system-wide level. Unless your use case requires setting user-specific or
-system-wide configurations, configure Bolt at the project level. 
+Bolt has many options and features that can be configured to suit your
+project's needs. In general, Bolt configuration falls into four categories:
+
+- **Bolt behavior:** Configure how Bolt itself runs, such as the format to use
+  when displaying output or how many threads to use when connecting to targets.
+
+- **Projects:** Configure the Bolt project that you are running Bolt in, such
+  as the path to an inventory file or the path to a Hiera configuration file.
+
+- **Transports:** Configure the transports that Bolt uses to connect to
+  targets, such as the path to a private key when using SSH or the port to
+  connect to when using WinRM.
+
+- **Inventory data:** Group and configure the targets that you connect to and
+  run commands on with Bolt.
+
+Each type of configuration can be set in a different file. You can configure
+Bolt's options and features at a project level, a user level, or a system-wide
+level. Unless your use case requires setting user-specific or system-wide
+configurations, configure Bolt at the project level.
+
+| Type of Configuration | [inventory.yaml](bolt_inventory_reference.md) | [bolt-project.yaml](bolt_project_reference.md) | [bolt-defaults.yaml](bolt_defaults_reference.md) |
+| --- | :-: | :-: | :-: |
+| Bolt behavior  |   | ✓ | ✓ |
+| Projects       |   | ✓ |   |
+| Transports     | ✓ |   | ✓ |
+| Inventory data | ✓ |   |   |
+| **Configuration level** | [project](#project-level-configuration) | [project](#project-level-configuration) | [user](#user-level-configuration), [system-wide](#system-wide-configuration) |
 
 ## Project-level configuration
 
@@ -45,8 +70,8 @@ Project configuration files take precedence over `bolt.yaml` files. If a
 project directory contains both files, Bolt will only load and read
 configuration from `bolt-project.yaml`.
 
-You can view a full list of the available options in [Bolt configuration
-options](bolt_configuration_reference.md).
+You can view a full list of the available options in [`bolt-project.yaml`
+options](bolt_project_reference.md).
 
 ### `inventory.yaml`
 
@@ -67,10 +92,10 @@ under a `config` option. You can set the following options under `config`:
 - `ssh`
 - `winrm`
 
-You can read more about inventory files and the available options in
-[Inventory files](inventory_file_v2.md).
+You can view a full list of the available options in [`inventory.yaml`
+fields](bolt_inventory_reference.md).
 
-### `bolt.yaml`
+### DEPRECATED: `bolt.yaml`
 
 > **Note:** The project-level `bolt.yaml` file is on the path towards
 > deprecation and will be removed in a future version of Bolt. Use
@@ -83,7 +108,7 @@ options, including default inventory configuration options. Any directory
 containing a `bolt.yaml` file is automatically considered a [Project
 directory](bolt_project_directories.md).
 
-You can view a full list of the available options in [Bolt configuration
+You can view a full list of the available options in [`bolt.yaml`
 options](bolt_configuration_reference.md).
 
 ## User-level configuration
@@ -98,9 +123,9 @@ You can set most configurable options in Bolt at the user level.
 You can set user-level configuration in two files:
 - Use `bolt-defaults.yaml` for configuration that is
 not project-specific.
-- You can set all configuration in a `bolt.yaml` file. **The user-level `bolt.yaml` file is on the path towards
-  deprecation and will be removed in a future version of Bolt. Use
-  `bolt-defaults.yaml` instead.**
+- You can set all configuration in a `bolt.yaml` file. **The user-level
+  `bolt.yaml` file is deprecated and will be removed in a future version of
+  Bolt. Use `bolt-defaults.yaml` instead.**
 
 The preferred method for setting user-level configuration is to use a
 `bolt-defaults.yaml` file. This file does not allow you to set project-specific
@@ -122,7 +147,7 @@ read configuration from `bolt-defaults.yaml`.
 You can view a full list of the available options in [`bolt-defaults.yaml`
 options](bolt_defaults_reference.md).
 
-### `bolt.yaml`
+### DEPRECATED: `bolt.yaml`
 
 > **Note:** The user-level `bolt.yaml` file is deprecated and will be removed
 > in a future version of Bolt. Use a `bolt-defaults.yaml` file instead.
@@ -132,7 +157,7 @@ options](bolt_defaults_reference.md).
 The Bolt configuration file can be used to set all available configuration
 options, including project-specific configuration options.
 
-You can view a full list of the available options in [Bolt configuration
+You can view a full list of the available options in [`bolt.yaml`
 options](bolt_configuration_reference.md).
 
 ## System-wide configuration
@@ -146,8 +171,8 @@ Bolt options at the system level.
 System-wide configuration can be set in two files.
 - Use `bolt-defaults.yaml` for configuration that is not project-specific.
 - You can set all configuration in a `bolt.yaml` file. **The system-level
-  `bolt.yaml` file is on the path towards deprecation and will be removed in a
-  future version of Bolt. Use `bolt-defaults.yaml` instead.** 
+  `bolt.yaml` file is deprecated and will be removed in a future version of
+  Bolt. Use `bolt-defaults.yaml` instead.** 
 
 The preferred method for setting user-level configuration is to use a
 `bolt-defaults.yaml` file. This file does not allow you to set project-specific
@@ -171,7 +196,7 @@ read configuration from `bolt-defaults.yaml`.
 You can view a full list of the available options in [`bolt-defaults.yaml`
 options](bolt_defaults_reference.md).
 
-### `bolt.yaml`
+### DEPRECATED: `bolt.yaml`
 
 > **Note:** The system-wide `bolt.yaml` file is deprecated and will be removed
 > in a future version of Bolt. Use a `bolt-defaults.yaml` file instead.
@@ -183,7 +208,7 @@ options](bolt_defaults_reference.md).
 You can set all available configuration
 options in `bolt.yaml`, including project-specific configuration options.
 
-You can view a full list of the available options in [Bolt configuration
+You can view a full list of the available options in [`bolt.yaml`
 options](bolt_configuration_reference.md).
 
 ## Configuration precedence
@@ -298,9 +323,10 @@ plugins:
 📖 **Related information**
 
 - [Project directories](bolt_project_directories.md#)
-- [Bolt configuration options](bolt_configuration_reference.md)
+- [bolt.yaml options](bolt_configuration_reference.md)
 - [bolt-defaults.yaml options](bolt_defaults_reference.md)
 - [bolt-project.yaml options](bolt_project_reference.md)
+- [inventory.yaml fields](bolt_inventory_reference.md)
 - [Transport configuration options](bolt_transports_reference.md)
 - For information on using configuring Bolt for Puppet Enterprise, see [Using Bolt with Puppet Enterprise](bolt_configure_orchestrator.md)
 - For information on connecting Bolt to PuppetDB, see [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)

@@ -2,11 +2,14 @@
 
 require 'bolt/error'
 require 'bolt/util'
+require 'bolt/config/transport/options'
 
 module Bolt
   class Config
     module Transport
       class Base
+        include Bolt::Config::Transport::Options
+
         attr_reader :input
 
         def initialize(data = {}, project = nil)
@@ -96,7 +99,7 @@ module Bolt
         end
 
         private def filter(unfiltered)
-          unfiltered.slice(*self.class.options.keys)
+          unfiltered.slice(*self.class.options)
         end
 
         private def assert_hash_or_config(data)
@@ -116,24 +119,21 @@ module Bolt
           assert_type
         end
 
-        # Validates that each option is the correct type. Types are loaded from the OPTIONS hash.
+        # Validates that each option is the correct type. Types are loaded from the TRANSPORT_OPTIONS hash.
         private def assert_type
           @config.each_pair do |opt, val|
-            next unless (type = self.class.options.dig(opt, :type))
+            types = Array(TRANSPORT_OPTIONS.dig(opt, :type)).compact
 
-            # Options that accept a Boolean value are indicated by the type TrueClass, so we
-            # need some special handling here to check if the value is either true or false.
-            if type == TrueClass
-              unless [true, false].include?(val)
-                raise Bolt::ValidationError,
-                      "#{opt} must be a Boolean true or false, received #{val.class} #{val.inspect}"
-              end
-            else
-              unless val.nil? || val.is_a?(type)
-                raise Bolt::ValidationError,
-                      "#{opt} must be a #{type}, received #{val.class} #{val.inspect}"
-              end
+            next if val.nil? || types.empty? || types.include?(val.class)
+
+            # Ruby doesn't have a Boolean class, so add it to the types list if TrueClass or FalseClass
+            # are present.
+            if types.include?(TrueClass) || types.include?(FalseClass)
+              types = types - [TrueClass, FalseClass] + ['Boolean']
             end
+
+            raise Bolt::ValidationError,
+                  "#{opt} must be of type #{types.join(', ')}; received #{val.class} #{val.inspect} "
           end
         end
       end

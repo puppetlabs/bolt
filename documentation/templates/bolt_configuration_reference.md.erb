@@ -1,0 +1,62 @@
+# DEPRECATED: `bolt.yaml` options
+
+This page lists the configuration options that are available in the legacy configuration file, `bolt.yaml`.
+The `bolt.yaml` configuration file is supported in all [project directories](configuring_bolt.md).
+
+> **Note:** `bolt.yaml` is deprecated and will be removed in a future version of Bolt. Configuration in
+> this file at the user- and system-level should be set in `bolt-defaults.yaml`, while configuration at
+> the project level should be set in `bolt-project.yaml` with transport configuration set in
+> `inventory.yaml`.
+
+## Options
+
+<% @opts.each do |option, data| -%>
+### `<%= option %>`
+
+<%= data[:desc] %>
+
+- **Type:** <%= data[:type] %>
+<% if data.key?(:def) -%>
+- **Default:** <%= data[:def] %>
+<% end -%>
+
+<% if @subopts.key?(option) -%>
+<% @subopts[option].each do |option, data| -%>
+#### `<%= option %>`
+
+<%= data[:desc] %>
+
+- **Type:** <%= data[:type] %>
+<% if data.key?(:def) -%>
+- **Default:** <%= data[:def] %>
+<% end -%>
+<% end %>
+<% end -%>
+
+```yaml
+<%= @yaml.slice(option).to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+```
+<% end -%>
+
+## Inventory configuration options
+
+The `bolt.yaml` file also supports several top-level options that configure each of the transports
+Bolt uses to connect to targets, as well as the default transport used to connect to targets.
+The following top-level options are available:
+
+<% @inventory.each do |option, _| -%>
+- `<%= option %>`
+<% end %>
+
+A detailed description of each option, their default values, and any available sub-options can be
+viewed in [Transport configuration options](bolt_transports_reference.md).
+
+## Example file
+
+```yaml
+# bolt.yaml
+<%= @yaml.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+
+# inventory configuration
+<%= @inventory_yaml.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+```
