@@ -57,6 +57,7 @@ Puppet::Functions.create_function(:run_command) do
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
+    # Send Analytics Report
     executor.report_function_call(self.class.name)
 
     # Ensure that given targets are all Target instances

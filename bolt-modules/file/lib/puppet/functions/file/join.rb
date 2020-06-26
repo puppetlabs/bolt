@@ -12,7 +12,9 @@ Puppet::Functions.create_function(:'file::join') do
   end
 
   def join(*paths)
+    # Send Analytics Report
     Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
+
     File.join(paths)
   end
 end

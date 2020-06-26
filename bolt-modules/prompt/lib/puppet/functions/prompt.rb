@@ -30,6 +30,7 @@ Puppet::Functions.create_function(:prompt) do
     options = options.transform_keys(&:to_sym)
 
     executor = Puppet.lookup(:bolt_executor)
+    # Send analytics report
     executor.report_function_call(self.class.name)
 
     response = executor.prompt(prompt, options)

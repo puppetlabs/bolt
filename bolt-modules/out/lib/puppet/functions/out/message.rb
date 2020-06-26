@@ -23,7 +23,9 @@ Puppet::Functions.create_function(:'out::message') do
     end
 
     executor = Puppet.lookup(:bolt_executor)
+    # Send Analytics Report
     executor.report_function_call(self.class.name)
+
     executor.publish_event(type: :message, message: message)
 
     nil

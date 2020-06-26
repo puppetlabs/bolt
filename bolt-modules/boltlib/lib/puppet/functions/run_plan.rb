@@ -64,10 +64,11 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     # Bolt calls this function internally to trigger plans from the CLI. We
     # don't want to count those invocations.
     unless options[:bolt_api_call]
+      # Send Analytics Report
       executor.report_function_call(self.class.name)
     end
 
-    # Report bundled content, this should capture plans run from both CLI and Plans
+    # Send Analytics Report for bundled content, this should capture plans run from both CLI and Plans
     executor.report_bundled_content('Plan', plan_name)
 
     loaders = closure_scope.compiler.loaders

@@ -16,7 +16,9 @@ Puppet::Functions.create_function(:'file::read', Puppet::Functions::InternalFunc
   end
 
   def read(scope, filename)
+    # Send Analytics Report
     Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
+
     found = Puppet::Parser::Files.find_file(filename, scope.compiler.environment)
     unless found && Puppet::FileSystem.exist?(found)
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(

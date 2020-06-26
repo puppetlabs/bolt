@@ -17,6 +17,7 @@ Puppet::Functions.create_function(:'file::exists', Puppet::Functions::InternalFu
   end
 
   def exists(scope, filename)
+    # Send Analytics Report
     Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
     found = Puppet::Parser::Files.find_file(filename, scope.compiler.environment)
     found ? Puppet::FileSystem.exist?(found) : false

@@ -94,6 +94,7 @@ Puppet::Functions.create_function(:set_resources) do
         )
     end
 
+    # Send Analytics Report
     Puppet.lookup(:bolt_executor).report_function_call(self.class.name)
     inventory = Puppet.lookup(:bolt_inventory)
 

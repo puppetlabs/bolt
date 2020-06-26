@@ -33,6 +33,7 @@ Puppet::Functions.create_function(:resolve_references) do
     end
 
     executor = Puppet.lookup(:bolt_executor)
+    # Send Analytics Report
     executor.report_function_call(self.class.name)
 
     plugins = Puppet.lookup(:bolt_inventory).plugins

@@ -20,7 +20,9 @@ Puppet::Functions.create_function(:'ctrl::do_until') do
   end
 
   def do_until(options = { 'limit' => 0 })
+    # Send Analytics Report
     Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
+
     limit = options['limit']
     i = 0
     until (x = yield)
