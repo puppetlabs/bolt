@@ -189,10 +189,10 @@ targets:
 ### Task
 
 The `task` plugin lets a Bolt plugin hook run a task. How this task is run
-depends on the hook called. In most cases the task will run on the localhost
-target without access to any configuration defined in an inventory file, but
-with access to any parameters that are configured. The plugin extracts the
-`value` key and uses that as the value.
+depends on the hook called. For all hooks except puppet_library the task will
+run on the localhost target without access to any configuration defined in an
+inventory file, but with access to any parameters that are configured. The
+plugin extracts the `value` key and uses that as the value.
 
 To use the `task` plugin to load targets, the task value must return an array of
 target objects in the format that the inventory file accepts. When referring to
@@ -272,7 +272,7 @@ Forge](https://forge.puppet.com/puppetlabs/terraform).
 ### Vault
 
 The `vault` plugin allows values to be set by accessing secrets from a Key/Value
-engine on a Hashicorp Vault server. 
+engine on a Hashicorp Vault server.
 
 It is a module-based plugin available on the Puppet Forge and is installed with
 Bolt. [View the documentation on the
