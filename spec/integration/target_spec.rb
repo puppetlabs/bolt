@@ -35,6 +35,11 @@ describe "when running a plan that creates targets", ssh: true do
       )
     end
 
+    it 'sets the default transport' do
+      output = run_cli(%w[plan run inventory::transport -t foo --transport winrm] + config_flags)
+      expect(JSON.parse(output)).to eq('winrm')
+    end
+
     it 'only prints necessary info' do
       params = { user: info[:user],
                  password: info[:password],
