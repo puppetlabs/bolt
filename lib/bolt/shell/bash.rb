@@ -35,7 +35,7 @@ module Bolt
       def upload(source, destination, options = {})
         running_as(options[:run_as]) do
           with_tmpdir do |dir|
-            basename = File.basename(destination)
+            basename = File.basename(source)
             tmpfile = File.join(dir.to_s, basename)
             conn.copy_file(source, tmpfile)
             # pass over file ownership if we're using run-as to be a different user
