@@ -40,6 +40,7 @@ Puppet::Functions.create_function(:fail_plan) do
     end
 
     executor = Puppet.lookup(:bolt_executor)
+    # Send Analytics Report
     executor.report_function_call(self.class.name)
 
     raise Bolt::PlanFailure.new(msg, kind || 'bolt/plan-failure', details, issue_code)

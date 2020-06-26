@@ -67,6 +67,7 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
+    # Send Analytics Report
     executor.report_function_call(self.class.name)
 
     found = Puppet::Parser::Files.find_file(source, scope.compiler.environment)

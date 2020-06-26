@@ -31,6 +31,7 @@ Puppet::Functions.create_function(:remove_from_group) do
 
     inventory = Puppet.lookup(:bolt_inventory)
     executor = Puppet.lookup(:bolt_executor)
+    # Send Analytics Report
     executor.report_function_call(self.class.name)
 
     inventory.remove_from_group(inventory.get_targets(target), group)

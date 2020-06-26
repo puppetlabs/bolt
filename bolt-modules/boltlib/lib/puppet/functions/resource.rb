@@ -41,6 +41,7 @@ Puppet::Functions.create_function(:resource) do
   def resource(target, type, title)
     inventory = Puppet.lookup(:bolt_inventory)
     executor  = Puppet.lookup(:bolt_executor) { nil }
+    # Send Analytics Report
     executor&.report_function_call(self.class.name)
 
     inventory.resource(target, type, title)

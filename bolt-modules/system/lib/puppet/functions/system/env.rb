@@ -12,7 +12,9 @@ Puppet::Functions.create_function(:'system::env') do
   end
 
   def env(name)
+    # Send analytics report
     Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
+
     ENV[name]
   end
 end
