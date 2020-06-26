@@ -243,8 +243,9 @@ module Bolt
     def normalize_overrides(options)
       opts = options.transform_keys(&:to_s)
 
-      # Pull out config options
-      overrides = opts.slice(*OPTIONS.keys)
+      # Pull out config options. We need to add 'transport' as it's not part of the
+      # OPTIONS hash but is a valid option that can be set with the --transport CLI option
+      overrides = opts.slice(*OPTIONS.keys, 'transport')
 
       # Pull out transport config options
       TRANSPORT_CONFIG.each do |transport, config|

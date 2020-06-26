@@ -51,6 +51,11 @@ describe Bolt::Config do
       expect(config.modified_concurrency).to eq(true)
       expect(config.concurrency).to eq(36)
     end
+
+    it 'sets the default transport from an override' do
+      config = Bolt::Config.new(project, {}, transport: 'winrm')
+      expect(config.transport).to eq('winrm')
+    end
   end
 
   describe "::from_project" do
