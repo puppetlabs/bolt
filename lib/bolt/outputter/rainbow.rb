@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
 require 'bolt/pal'
-require 'paint'
 
 module Bolt
   class Outputter
     class Rainbow < Bolt::Outputter::Human
       def initialize(color, verbose, trace, stream = $stdout)
+        begin
+          require 'paint'
+        rescue LoadError
+          raise "The 'paint' gem is required to use the rainbow outputter."
+        end
         super
         @line_color = 0
         @color = 0
