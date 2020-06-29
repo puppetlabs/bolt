@@ -7,7 +7,7 @@ doesn't allow incoming connections as the root user.  Bolt has several
 configuration options for setting which user to execute as, how to escalate to
 that user, and how to run commands as that user.
 
-### Limitations
+## Limitations
 
 Bolt will only use the `run-as` user if:
 
@@ -35,7 +35,7 @@ You can configure escalation privilege in your `inventory.yaml` or
 [Configuring Bolt](configuring_bolt.html).
 
 <% @run_as.each do |option, data| -%>
-### `<%= option %>`
+#### `<%= option %>`
 
 <%= data[:desc] %>
 
