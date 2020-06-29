@@ -1,14 +1,17 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/integration'
 
 describe "When loading content", ssh: true do
+  include BoltSpec::Config
   include BoltSpec::Conn
   include BoltSpec::Integration
 
   let(:local) { Bolt::Project.create_project(File.join(__dir__, '../fixtures/projects/local'), 'local') }
+  let(:embedded) { fixture_path('projects/embedded') }
   let(:target) { conn_uri('ssh') }
   let(:config_flags) { %W[--no-host-key-check --password #{conn_info('ssh')[:password]}] }
 
@@ -20,6 +23,11 @@ describe "When loading content", ssh: true do
   it "loads plans from project when specified with --project" do
     result = run_cli_json(%W[plan run local -t #{target} --project #{local.path}] + config_flags)
     expect(result[0]['value']['stdout'].strip).to eq('polo')
+  end
+
+  it "loads embedded plans from a project specified with --project" do
+    result = run_cli_json(%W[plan show --project #{embedded}])
+    expect(result['plans']).to include(['embedded'])
   end
 
   it "project level content can reference other modules" do
