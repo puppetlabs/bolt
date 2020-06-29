@@ -66,6 +66,9 @@ module Bolt
           super(data, project)
         end
 
+        # This method is used to filter CLI options in the Config class. This
+        # should include `ssh-command` so that we can later warn if the option
+        # is present without `native-ssh`
         def self.options
           %w[ssh-command native-ssh].concat(OPTIONS)
         end

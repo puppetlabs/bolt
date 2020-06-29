@@ -456,7 +456,7 @@ describe Bolt::Transport::SSH, ssh: true do
 
       it "uses the configured ssh-command" do
         expect { ssh.run_command(target, command) }
-          .to raise_error(/Can't open user config file \/tmp\/fake/)
+          .to raise_error(%r{Can't open user config file /tmp/fake})
       end
     end
 

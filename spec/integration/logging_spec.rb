@@ -14,7 +14,7 @@ describe "when logging executor activity", ssh: true do
   let(:stdin_task) { "sample::stdin" }
   let(:echo_plan) { "sample::single_task" }
   let(:without_default_plan) { "logging::without_default" }
-  let(:uri) { conn_uri('ssh') }
+  let(:uri) { conn_uri('ssh', include_password: true) }
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
   let(:log_level) { :notice }
@@ -49,6 +49,23 @@ describe "when logging executor activity", ssh: true do
     expect(lines).to include(match(/NOTICE.*Starting: plan #{echo_plan}/))
     expect(lines).to include(match(/NOTICE.*Finished: plan #{echo_plan}/))
     expect(result[0]['value']['_output'].strip).to match(/hi there/)
+  end
+
+  context 'with misconfigured ssh-command' do
+    let(:log_level) { :warn }
+    let(:conn) { conn_info('ssh') }
+    let(:second_uri) { [conn[:second_user], ':', conn[:second_pw], '@', conn[:host], ':', conn[:port]].join('') }
+    let(:config_flags) {
+      %W[--targets #{uri},#{second_uri} --no-host-key-check --modulepath #{modulepath} --ssh-command ssh]
+    }
+
+    it 'only warns once with warn_once' do
+      Dir.mktmpdir do |tmpdir|
+        allow(Bolt::Config).to receive(:user_path).and_return(Pathname.new(File.join(tmpdir, 'bolt')))
+        run_cli_json(%W[command run #{whoami}] + config_flags)
+        expect(lines).to eq(["  WARN  Bolt::Logger : native-ssh must be true to use ssh-command\n"])
+      end
+    end
   end
 
   context 'with verbose logging' do
