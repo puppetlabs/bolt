@@ -15,25 +15,36 @@ module Bolt
     # PALError is used to convert errors from executing puppet code into
     # Bolt::Errors
     class PALError < Bolt::Error
-      # Puppet sometimes rescues exceptions notes the location and reraises.
-      # Return the original error.
       def self.from_preformatted_error(err)
         if err.cause&.is_a? Bolt::Error
           err.cause
         else
-          from_error(err.cause || err)
+          from_error(err)
         end
       end
 
       # Generate a Bolt::Pal::PALError for non-bolt errors
       def self.from_error(err)
-        e = new(err.message)
+        # Use the original error message if available
+        message = err.cause ? err.cause.message : err.message
+
+        # Provide the location of an error if it came from a plan
+        details = if defined?(err.file) && err.file
+                    { file:   err.file,
+                      line:   err.line,
+                      column: err.pos }.compact
+                  else
+                    {}
+                  end
+
+        e = new(message, details)
+
         e.set_backtrace(err.backtrace)
         e
       end
 
-      def initialize(msg)
-        super(msg, 'bolt/pal-error')
+      def initialize(msg, details = {})
+        super(msg, 'bolt/pal-error', details)
       end
     end
 
@@ -159,8 +170,9 @@ module Bolt
               if e.issue_code == :UNKNOWN_VARIABLE &&
                  %w[facts trusted server_facts settings].include?(e.arguments[:name])
                 message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope "\
-                  "unless explicitly defined. (file: #{e.file}, line: #{e.line}, column: #{e.pos})"
-                PALError.new(message)
+                          "unless explicitly defined."
+                details = { file: e.file, line: e.line, column: e.pos }
+                PALError.new(message, details)
               else
                 PALError.from_preformatted_error(e)
               end
