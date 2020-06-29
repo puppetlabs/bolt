@@ -26,15 +26,11 @@ module Bolt
           port
           private-key
           proxyjump
-          run-as
-          run-as-command
           script-dir
-          sudo-executable
-          sudo-password
           tmpdir
           tty
           user
-        ].freeze
+        ].concat(RUN_AS_OPTIONS).sort.freeze
 
         # Options available when using the external ssh transport
         EXTERNAL_OPTIONS = %w[
@@ -45,15 +41,11 @@ module Bolt
           interpreters
           port
           private-key
-          run-as
-          run-as-command
           script-dir
           ssh-command
-          sudo-executable
-          sudo-password
           tmpdir
           user
-        ].freeze
+        ].concat(RUN_AS_OPTIONS).sort.freeze
 
         DEFAULTS = {
           "cleanup"            => true,

@@ -1,0 +1,86 @@
+# Escalating privilege with Bolt
+
+By default, Bolt connects to, and executes on, remote systems as the same user.
+Sometimes, connection and execution need to be done as separate users. For
+example, you might need to install a package as the root user on a system that
+doesn't allow incoming connections as the root user.  Bolt has several
+configuration options for setting which user to execute as, how to escalate to
+that user, and how to run commands as that user.
+
+### Limitations
+
+Bolt will only use the `run-as` user if:
+
+* The target shell is Bash
+* The transport is Local or SSH
+* The configured `run-as` user is different than the connecting `user`
+
+## Configuring `run-as`
+
+You can use privilege escalation from the command-line, or set it up using Bolt's configuration files.
+
+### Command-line options
+
+<% @run_as_options.each do |option| -%>
+
+#### `<%= option[:long] -%><%= option[:arg] %>`
+
+<%= option[:desc] %>
+<% end %>
+
+### Configuration file options
+
+You can configure escalation privilege in your `inventory.yaml` or
+`bolt-defaults.yaml` files. For more information on which file to use, see
+[Configuring Bolt](configuring_bolt.html).
+
+<% @run_as.each do |option, data| -%>
+### `<%= option %>`
+
+<%= data[:desc] %>
+
+<% if data.key?(:type) -%>
+- **Type:** <%= data[:type] %>
+<% end -%>
+<% if data.key?(:def) -%>
+- **Default:** <%= data[:def] %>
+<% end -%>
+
+<% if data.key?(:exmp) -%>
+```yaml
+<%= { option => data[:exmp] }.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+```
+<% end %>
+<% end %>
+
+## How `run-as` works
+
+Each time Bolt executes, it builds a command string to run on the remote
+system. The command is built from many configuration options, including
+interpreters, task input method, and the `run-as` configuration. When `run-as`
+is set, the following is prepended to the command:
+
+```
+<sudo-executable> -S -H -u <run-as> -p '[sudo] Bolt needs to run as another user, password:'
+```
+
+The default `sudo-executable` is `sudo`. If you're running a task that
+reads parameters from environment variables, `-E` will be appended.
+
+> **Note:** The command is shell escaped, so each value is interpreted
+> literally. This means you can't set sudo flags in the `run-as` configuration.
+> Use the `run-as-command` option to specify your own sudo command and flags.
+
+You can replace this command wholesale by specifying `run-as-command`, which
+will prepend the following to the command being run:
+
+```
+<run-as-command> <run-as>
+```
+
+This enables using any executable and flags to change users. Keep in mind that:
+- The `run-as-command` is non-interactive. If you set `run-as-command` and the
+  system prompts for a password, Bolt will error instead of supplying the password.
+- Bolt always appends the specified `run-as` user to the specified `run-as-command`,
+  which can be limiting for some escalating commands.
+- Bolt will not use the `run-as-command` option if `run-as` is not set.

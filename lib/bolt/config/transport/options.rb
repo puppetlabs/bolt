@@ -292,6 +292,13 @@ module Bolt
             exmp: "bolt"
           }
         }.freeze
+
+        RUN_AS_OPTIONS = %w[
+          run-as
+          run-as-command
+          sudo-executable
+          sudo-password
+        ].freeze
       end
     end
   end

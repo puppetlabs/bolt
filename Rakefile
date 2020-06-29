@@ -138,6 +138,25 @@ namespace :docs do
     File.write('documentation/bolt_configuration_reference.md', renderer.result)
   end
 
+  desc 'Generate privilege escalation document'
+  task :privilege_escalation do
+    @run_as = stringify_types(Bolt::Config::Transport::Options::TRANSPORT_OPTIONS
+      .slice(*Bolt::Config::Transport::Options::RUN_AS_OPTIONS))
+    parser = Bolt::BoltOptionParser.new({})
+    @run_as_options = Bolt::BoltOptionParser::OPTIONS[:escalation].map do |option|
+      switch = parser.top.long[option]
+
+      {
+        long: switch.long.first,
+        arg: switch.arg,
+        desc: switch.desc.map { |d| d.gsub("<", "&lt;") }.join("<br>")
+      }
+    end
+
+    renderer = ERB.new(File.read('documentation/templates/privilege_escalation.md.erb'), nil, '-')
+    File.write('documentation/privilege_escalation.md', renderer.result)
+  end
+
   desc 'Generate markdown docs for bolt-project.yaml'
   task :project_reference do
     @opts    = stringify_types(Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_PROJECT_OPTIONS))
@@ -306,6 +325,7 @@ namespace :docs do
     cli_reference
     function_reference
     config_reference
+    privilege_escalation
     project_reference
     defaults_reference
     transports_reference

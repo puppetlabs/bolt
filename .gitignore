@@ -77,5 +77,6 @@ locales/
 documentation/plan_functions.md
 documentation/bolt_command_reference.md
 documentation/bolt_configuration_reference.md
+documentation/privilege_escalation.md
 tasks/
 plans/
