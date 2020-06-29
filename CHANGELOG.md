@@ -1,5 +1,55 @@
 # Changelog
 
+## Bolt 2.16.0 (2020-06-29)
+
+### New features
+
+* **Add `--project` as an alias for the `--boltdir` CLI flag**
+  ([#1931](https://github.com/puppetlabs/bolt/issues/1931))
+
+  The new CLI flag `--project` can be used in place of `--boltdir`.
+
+### Bug fixes
+
+* **`localhost` default config is now target-level instead of group-level**
+  ([#1904](https://github.com/puppetlabs/bolt/issues/1904))
+
+  Previously, the 'localhost' special default config was merged at the
+  group-level, meaning that group-level config in the inventory would
+  override it. The config is now target-level and must be overridden at
+  the target-level in inventory.
+
+* **Output plan events when using `rainbow` format**
+  ([#1926](https://github.com/puppetlabs/bolt/pull/1926))
+
+  Plan events are now printed when using the `rainbow` output format
+
+* **Fix use of spaces in powershell `mkdir` method**
+  ([#1927](https://github.com/puppetlabs/bolt/issues/1927))
+
+  Fixes the powershell `mkdir` command to correctly handle paths with spaces
+  in them. When passed to the command line, paths have to be quoted, the
+  previous code did not handle this. This uses double quotes instead of single
+  quotes to allow string interpolation to happen when it is finally passed to
+  PowerShell.
+
+* **Upload files with the correct name when destination is a directory**
+  ([#1928](https://github.com/puppetlabs/bolt/issues/1928))
+
+  Files uploaded to directories will now retain the name of the original
+  source file rather than changing their name to the same name as the
+  destination directory. This also fixes the case where the destination
+  was `.`
+
+### Deprecations
+
+* **Project names must be explicitly specified**
+  ([#1871](https://github.com/puppetlabs/bolt/issues/1871))
+
+  Proejct names must now be specified in `bolt-project.yaml` in order
+  for project-level content to be loaded, rather than the name being
+  inferred by the name of the project directory.
+
 ## Bolt 2.15.0 (2020-06-22)
 
 ### New features
