@@ -11,8 +11,9 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param options A hash of additional options.
   # @option options [Array[String]] arguments An array of arguments to be passed to the script.
-  # @option args [Boolean] _catch_errors Whether to catch raised errors.
-  # @option args [String] _run_as User to run as using privilege escalation.
+  # @option options [Boolean] _catch_errors Whether to catch raised errors.
+  # @option options [String] _run_as User to run as using privilege escalation.
+  # @option options [Hash] _env_vars Map of environment variables to set
   # @return A list of results, one entry per target.
   # @example Run a local script on Linux targets as 'root'
   #   run_script('/var/tmp/myscript', $targets, '_run_as' => 'root')
@@ -33,8 +34,9 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
   # @param description A description to be output when calling this function.
   # @param options A hash of additional options.
   # @option options [Array[String]] arguments An array of arguments to be passed to the script.
-  # @option args [Boolean] _catch_errors Whether to catch raised errors.
-  # @option args [String] _run_as User to run as using privilege escalation.
+  # @option options [Boolean] _catch_errors Whether to catch raised errors.
+  # @option options [String] _run_as User to run as using privilege escalation.
+  # @option options [Hash] _env_vars Map of environment variables to set
   # @return A list of results, one entry per target.
   # @example Run a script
   #   run_script('/var/tmp/myscript', $targets, 'Downloading my application')

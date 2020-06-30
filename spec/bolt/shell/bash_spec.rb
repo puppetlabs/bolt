@@ -129,6 +129,12 @@ describe Bolt::Shell::Bash do
 
       shell.run_command('whoami', run_as: 'suchandsuch')
     end
+
+    it "sets environment variables if requested" do
+      expect(connection).to receive(:execute).with('FOO=bar sh -c echo\\ \\$FOO')
+
+      shell.run_command('echo $FOO', env_vars: { 'FOO' => 'bar' })
+    end
   end
 
   describe "#execute" do

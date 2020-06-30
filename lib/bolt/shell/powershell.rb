@@ -71,8 +71,10 @@ module Bolt
         end
       end
 
-      def set_env(arg, val)
-        "[Environment]::SetEnvironmentVariable('#{arg}', @'\n#{val}\n'@)"
+      def env_declarations(env_vars)
+        env_vars.map do |var, val|
+          "[Environment]::SetEnvironmentVariable('#{var}', @'\n#{val}\n'@)"
+        end
       end
 
       def quote_string(string)
@@ -166,7 +168,9 @@ module Bolt
         Bolt::Result.for_upload(target, source, destination)
       end
 
-      def run_command(command, _options = {})
+      def run_command(command, options = {})
+        command = [*env_declarations(options[:env_vars]), command].join("\r\n") if options[:env_vars]
+
         output = execute(command)
         Bolt::Result.for_command(target,
                                  output.stdout.string,
@@ -175,7 +179,7 @@ module Bolt
                                  'command', command)
       end
 
-      def run_script(script, arguments, _options = {})
+      def run_script(script, arguments, options = {})
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
         with_tmpdir do |dir|
@@ -187,6 +191,8 @@ module Bolt
                       args += escape_arguments(arguments)
                       execute_process(path, args)
                     end
+          command = [*env_declarations(options[:env_vars]), command].join("\r\n") if options[:env_vars]
+
           output = execute(command)
           Bolt::Result.for_command(target,
                                    output.stdout.string,
@@ -237,9 +243,7 @@ module Bolt
                     end
 
           env_assignments = if Bolt::Task::ENVIRONMENT_METHODS.include?(input_method)
-                              envify_params(arguments).map do |(arg, val)|
-                                set_env(arg, val)
-                              end
+                              env_declarations(envify_params(arguments))
                             else
                               []
                             end

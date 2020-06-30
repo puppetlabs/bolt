@@ -13,6 +13,7 @@ Puppet::Functions.create_function(:run_command) do
   # @param options A hash of additional options.
   # @option options [Boolean] _catch_errors Whether to catch raised errors.
   # @option options [String] _run_as User to run as using privilege escalation.
+  # @option options [Hash] _env_vars Map of environment variables to set
   # @return A list of results, one entry per target.
   # @example Run a command on targets
   #   run_command('hostname', $targets, '_catch_errors' => true)
@@ -30,6 +31,7 @@ Puppet::Functions.create_function(:run_command) do
   # @param options A hash of additional options.
   # @option options [Boolean] _catch_errors Whether to catch raised errors.
   # @option options [String] _run_as User to run as using privilege escalation.
+  # @option options [Hash] _env_vars Map of environment variables to set
   # @return A list of results, one entry per target.
   # @example Run a command on targets
   #   run_command('hostname', $targets, 'Get hostname')

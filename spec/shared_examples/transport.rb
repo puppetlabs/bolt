@@ -12,6 +12,15 @@ def result_value(stdout = nil, stderr = nil, exit_code = 0)
 end
 
 def posix_context
+  # The docker transport doesn't run commands in a shell by default so commands
+  # that interpolate variables won't work. For other transports, on the other
+  # hand, that's exactly the behavior we want to ensure.
+  env_command = if target.protocol == 'docker'
+                  "printenv BOLT_TEST_VAR"
+                else
+                  'echo $BOLT_TEST_VAR'
+                end
+
   {
     stdout_command: ['echo hello', /^hello$/],
     stderr_command: ['ssh -V', /OpenSSH/],
@@ -22,6 +31,7 @@ def posix_context
     cat_cmd: 'cat',
     rm_cmd: 'rm -rf',
     ls_cmd: 'ls',
+    env_command: env_command,
     env_task: "#!/bin/sh\nprintenv PT_message_one\nprintenv PT_message_two",
     stdin_task: "#!/bin/sh\ncat",
     find_task: "#!/bin/sh\nfind ${PT__installdir} -type f -exec wc -c {} \\;",
@@ -47,6 +57,7 @@ def windows_context
     cat_cmd: 'cat',
     rm_cmd: 'rm -Recurse -Force',
     ls_cmd: 'ls -Name',
+    env_command: 'Write-Output ${env:BOLT_TEST_VAR}',
     env_task: "Write-Output \"${env:PT_message_one}\n${env:PT_message_two}\"",
     stdin_task: "$line = [Console]::In.ReadLine()\nWrite-Output \"$line\"",
     find_task: 'Get-ChildItem -Path $env:PT__installdir -Recurse -File | % { Write-Host $_.Length $_.FullName  }',
@@ -120,6 +131,11 @@ shared_examples 'transport api' do
                 end
       result = runner.run_command(target, command, catch_errors: true).value
       expect(result['exit_code']).to eq(1)
+    end
+
+    it "sets environment variables if specified" do
+      result = runner.run_command(target, os_context[:env_command], env_vars: { 'BOLT_TEST_VAR' => 'hello world' })
+      expect(result['stdout']).to include('hello world')
     end
   end
 
