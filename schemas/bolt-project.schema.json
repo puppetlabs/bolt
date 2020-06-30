@@ -5,11 +5,67 @@
   "type": "object",
   "properties": {
     "apply_settings": {
-      "description": "A map of Puppet settings to use when applying Puppet code.",
+      "$ref": "#/definitions/apply_settings"
+    },
+    "color": {
+      "$ref": "#/definitions/color"
+    },
+    "compile-concurrency": {
+      "$ref": "#/definitions/compile-concurrency"
+    },
+    "concurrency": {
+      "$ref": "#/definitions/concurrency"
+    },
+    "format": {
+      "$ref": "#/definitions/format"
+    },
+    "hiera-config": {
+      "$ref": "#/definitions/hiera-config"
+    },
+    "inventoryfile": {
+      "$ref": "#/definitions/inventoryfile"
+    },
+    "log": {
+      "$ref": "#/definitions/log"
+    },
+    "modulepath": {
+      "$ref": "#/definitions/modulepath"
+    },
+    "name": {
+      "$ref": "#/definitions/name"
+    },
+    "plans": {
+      "$ref": "#/definitions/plans"
+    },
+    "plugin_hooks": {
+      "$ref": "#/definitions/plugin_hooks"
+    },
+    "plugins": {
+      "$ref": "#/definitions/plugins"
+    },
+    "puppetdb": {
+      "$ref": "#/definitions/puppetdb"
+    },
+    "puppetfile": {
+      "$ref": "#/definitions/puppetfile"
+    },
+    "save-rerun": {
+      "$ref": "#/definitions/save-rerun"
+    },
+    "tasks": {
+      "$ref": "#/definitions/tasks"
+    },
+    "trusted-external-command": {
+      "$ref": "#/definitions/trusted-external-command"
+    }
+  },
+  "definitions": {
+    "apply_settings": {
+      "description": "A map of Puppet settings to use when applying Puppet code using the `apply` plan function or the `bolt apply` command.",
       "type": "object",
       "properties": {
         "show_diff": {
-          "description": "Whether to log and report a contextual diff when files are being replaced.",
+          "description": "Whether to log and report a contextual diff.",
           "type": "boolean"
         }
       }
@@ -21,28 +77,32 @@
     "compile-concurrency": {
       "description": "The maximum number of simultaneous manifest block compiles.",
       "type": "integer",
-      "min": 1
+      "minimum": 1
     },
     "concurrency": {
       "description": "The number of threads to use when executing on remote targets.",
       "type": "integer",
-      "min": 1
+      "minimum": 1
     },
     "format": {
       "description": "The format to use when printing results.",
       "type": "string",
-      "enum": ["human", "json"]
+      "enum": [
+        "human",
+        "json",
+        "rainbow"
+      ]
     },
     "hiera-config": {
-      "description": "The path to your Hiera config.",
+      "description": "The path to the Hiera configuration file.",
       "type": "string"
     },
     "inventoryfile": {
-      "description": "The path to your inventory file.",
+      "description": "The path to a structured data inventory file used to refer to groups of targets on the command line and from plans. Read more about using inventory files in [Inventory files](inventory_file_v2.md).",
       "type": "string"
     },
     "log": {
-      "description": "The configuration of the logfile output. Configuration can be set for console and the path to a log file, such as ~/.puppetlabs/bolt/debug.log.",
+      "description": "A map of configuration for the logfile output. Configuration can be set for `console` and individual log files, such as `~/.puppetlabs/bolt/debug.log`. Each key in the map is the logfile output to configure, with the corresponding value configuring the logfile output.",
       "type": "object",
       "properties": {
         "console": {
@@ -50,115 +110,133 @@
           "type": "object",
           "properties": {
             "level": {
-              "description": "The type of information in the log.",
+              "description": "The type of information to log.",
               "type": "string",
-              "enum": ["debug", "error", "info", "notice", "warn"]
+              "enum": [
+                "debug",
+                "error",
+                "info",
+                "notice",
+                "warn",
+                "fatal",
+                "any"
+              ]
             }
           }
         }
       },
       "additionalProperties": {
-        "description": "Configuration for logs output to a file.",
+        "description": "Configuration for the logfile output.",
         "type": "object",
         "properties": {
           "append": {
-            "description": "Add output to an existing log file.",
+            "description": "Whether to append output to an existing log file.",
             "type": "boolean"
           },
           "level": {
-            "description": "The type of information in the log.",
+            "description": "The type of information to log.",
             "type": "string",
-            "enum": ["debug", "error", "info", "notice", "warn"]
+            "enum": [
+              "debug",
+              "error",
+              "info",
+              "notice",
+              "warn",
+              "fatal",
+              "any"
+            ]
           }
         }
       }
     },
     "modulepath": {
-      "description": "The module path for loading tasks and plan code. This is either an array of directories or a string containing a list of directories separated by the OS-specific PATH separator.",
-      "type": ["array", "string"],
+      "description": "An array of directories that Bolt loads content such as plans and tasks from. Read more about modules in [Module structure](module_structure.md).",
+      "type": [
+        "array",
+        "string"
+      ],
       "items": {
-        "description": "Module path.",
         "type": "string"
-      },
-      "uniqueItems": true
+      }
     },
     "name": {
-      "description": "The Bolt project name.",
-      "type": "string",
-      "pattern": "^([a-zA-Z0-9]+[-])?[a-z][a-z0-9_]*$"
+      "description": "The name of the Bolt project. When this option is configured, the project is considered a [Bolt project](experimental_features.md#bolt-projects), allowing Bolt to load content from the project directory as though it were a module.",
+      "type": "string"
     },
     "plans": {
-      "description": "A list of plan names to show in 'bolt plan show' output, if they exist. This option is used to limit the visibility of plans for users of the project. For example, project authors might want to limit the visibility of plans that are bundled with Bolt or plans that should only be run as part of another plan. When this option is not configured, all plans are visible. This option does not prevent users from running plans that are not part of this list.",
-      "type": "array",
-      "items": {
-        "description": "Whitelisted plan.",
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9_]*(::[a-z][a-z0-9_]*)*$"
-      },
-      "uniqueItems": true
+      "description": "A list of plan names to show in `bolt plan show` output, if they exist. This option is used to limit the visibility of plans for users of the project. For example, project authors might want to limit the visibility of plans that are bundled with Bolt or plans that should only be run as part of another plan. When this option is not configured, all plans are visible. This option does not prevent users from running plans that are not part of this list.",
+      "type": "array"
     },
     "plugin_hooks": {
-      "description": "Which plugins a specific hook should use.",
-      "type": "object",
-      "properties": {
-        "puppet_library": {
-          "description": "Specify which plugin should be used to ensure the Puppet library is installed on a target.",
+      "description": "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. The only configurable plugin hook is `puppet_library`, which can use two possible plugins: [`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) and [`task`](using_plugins.md#task).",
+      "oneOf": [
+        {
           "type": "object"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
         }
-      }
+      ]
     },
     "plugins": {
-      "description": "A map of plugins and their configuration data.",
-      "type": "object",
-      "patternProperties": {
-        "^[a-z][a-z0-9_]*$": { 
+      "description": "A map of plugins and their configuration data, where each key is the name of a plugin and its value is a map of configuration data. Configurable options are specified by the plugin. Read more about configuring plugins in [Using plugins](using_plugins.md#configuring-plugins).",
+      "oneOf": [
+        {
           "type": "object"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
         }
-      }
+      ]
     },
     "puppetdb": {
-      "description": "A map containing options for configuring the Bolt PuppetDB client.",
-      "type": "object",
-      "properties": {
-        "cacert": {
-          "description": "The path to the ca certificate for PuppetDB.",
-          "type": "string"
-        },
-        "cert": {
-          "description": "The path to the client certificate file to use for authentication.",
-          "type": "string"
-        },
-        "key": {
-          "description": "The path to the private key for the certificate.",
-          "type": "string"
-        },
-        "server_urls": {
-          "description": "An array containing the PuppetDB host to connect to. Include the protocol https and the port, which is usually 8081. For example, https://my-master.example.com:8081.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "description": "A PuppetDB host.",
-            "type": "string",
-            "format": "uri"
+      "description": "A map containing options for [configuring the Bolt PuppetDB client](bolt_connect_puppetdb.md).",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cacert": {
+              "description": "The path to the ca certificate for PuppetDB.",
+              "type": "string"
+            },
+            "cert": {
+              "description": "The path to the client certificate file to use for authentication.",
+              "type": "string"
+            },
+            "key": {
+              "description": "The private key for the certificate.",
+              "type": "string"
+            },
+            "server_urls": {
+              "description": "An array containing the PuppetDB host to connect to. Include the protocol `https` and the port, which is usually `8081`. For example, `https://my-master.example.com:8081`.",
+              "type": "array"
+            },
+            "token": {
+              "description": "The path to the PE RBAC Token.",
+              "type": "string"
+            }
           }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
         }
-      }
+      ]
     },
     "puppetfile": {
-      "description": "A map containing options for the 'bolt puppetfile install' command.",
+      "description": "A map containing options for the `bolt puppetfile install` command.",
       "type": "object",
       "properties": {
         "forge": {
-          "description": "A subsection that can have its own proxy setting to set an HTTP proxy for Forge operations only, and a baseurl setting to specify a different Forge host.",
+          "description": "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations only, and a `baseurl` setting to specify a different Forge host.",
           "type": "object",
           "properties": {
             "baseurl": {
-              "description": "The URI for the Forge host.",
+              "description": "The URL to the Forge host.",
               "type": "string",
               "format": "uri"
             },
             "proxy": {
-              "description": "The HTTP proxy to use for Forge operations.",
+              "description": "The HTTP proxy to use for Git and Forge operations.",
               "type": "string",
               "format": "uri"
             }
@@ -172,22 +250,32 @@
       }
     },
     "save-rerun": {
-      "description": "Whether to update .rerun.json in the Bolt project directory. If your target names include passwords, set this value to false to avoid writing passwords to disk.",
+      "description": "Whether to update `.rerun.json` in the Bolt project directory. If your target names include passwords, set this value to `false` to avoid writing passwords to disk.",
       "type": "boolean"
     },
     "tasks": {
-      "description": "A list of task names to show in 'bolt task show' output, if they exist. This option is used to limit the visibility of tasks for users of the project. For example, project authors might want to limit the visibility of tasks that are bundled with Bolt or tasks that should only be run as part of another task. When this option is not configured, all tasks are visible. This option does not prevent users from running tasks that are not part of this list.",
+      "description": "A list of task names to show in `bolt task show` output, if they exist. This option is used to limit the visibility of tasks for users of the project. For example, project authors might want to limit the visibility of tasks that are bundled with Bolt or plans that should only be run as part of a larger workflow. When this option is not configured, all tasks are visible. This option does not prevent users from running tasks that are not part of this list.",
       "type": "array",
       "items": {
-        "description": "Whitelisted task.",
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9_]*(::[a-z][a-z0-9_]*)*$"
-      },
-      "uniqueItems": true
+        "type": "string"
+      }
     },
     "trusted-external-command": {
-      "description": "The path to an executable on the Bolt controller that can produce external trusted facts.",
+      "description": "The path to an executable on the Bolt controller that can produce external trusted facts. **External trusted facts are experimental in both Puppet and Bolt and this API may change or be removed.**",
       "type": "string"
+    },
+    "_plugin": {
+      "description": "A plugin reference.",
+      "type": "object",
+      "required": [
+        "_plugin"
+      ],
+      "properties": {
+        "_plugin": {
+          "description": "The name of the plugin.",
+          "type": "string"
+        }
+      }
     }
   }
 }

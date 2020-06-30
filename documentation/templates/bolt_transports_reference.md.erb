@@ -10,33 +10,33 @@ to targets. These options can be set in multiple locations:
 <% @opts.each do |option, data| -%>
 ## `<%= option %>`
 
-<%= data[:desc] %>
+<%= data[:description] %>
 
 <% if option == 'local' -%>
 - ***nix:** `<%= @local_sets[:nix].join('`, `') %>`
 - **Windows:** `<%= @local_sets[:win].join('`, `') %>`
 <% end -%>
 
-<% unless data[:def].nil? -%>
-- **Default:** <%= data[:def] %>
+<% if data.key?(:_default) -%>
+- **Default:** <%= data[:_default] %>
 <% end -%>
 
-<% if @subopts.key?(option) -%>
-<% @subopts[option].each do |transport_option, data| -%>
+<% if data.key?(:properties) -%>
+<% data[:properties].each do |transport_option, data| -%>
 ### `<%= transport_option %>`
 
-<%= data[:desc] %>
+<%= data[:description] %>
 
 <% if data.key?(:type) -%>
-- **Type:** <%= data[:type] == TrueClass ? 'Boolean' : data[:type] %>
+- **Type:** <%= data[:type] %>
 <% end -%>
-<% if data.key?(:def) -%>
-- **Default:** <%= data[:def] %>
+<% if data.key?(:_default) -%>
+- **Default:** <%= data[:_default] %>
 <% end -%>
 
-<% if data.key?(:exmp) -%>
+<% if data.key?(:_example) -%>
 ```yaml
-<%= { transport_option => data[:exmp] }.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+<%= { transport_option => data[:_example] }.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
 ```
 <% end %>
 <% end %>
@@ -63,24 +63,29 @@ ssh:
 > breaking changes. To read more about the external SSH transport, see
 > [External SSH transport](experimental-features.md#external-ssh-transport).
 
-<% @subopts['external-ssh'].each do |transport_option, data| -%>
+<% @external.each do |transport_option, data| -%>
 ### `<%= transport_option %>`
 
-<%= data[:desc] %>
+<%= data[:description] %>
 
 <% if data.key?(:type) -%>
-- **Type:** <%= data[:type] == TrueClass ? 'Boolean' : data[:type] %>
+- **Type:** <%= data[:type] %>
 <% end -%>
-<% if data.key?(:def) -%>
-- **Default:** <%= data[:def] %>
+<% if data.key?(:_default) -%>
+- **Default:** <%= data[:_default] %>
 <% end -%>
 
-<% if data.key?(:exmp) -%>
+<% if data.key?(:_example) -%>
 ```yaml
-<%= { transport_option => data[:exmp] }.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+<%= { transport_option => data[:_example] }.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
 ```
 <% end %>
 <% end %>
+<% end %>
+<% if data.key?(:_example) -%>
+```yaml
+<%= { option => data[:_example] }.to_yaml(indentation: 2).split("\n").drop(1).join("\n") %>
+```
 <% end %>
 <% end %>
 

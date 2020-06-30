@@ -102,102 +102,278 @@
   },
 
   "definitions": {
-    "basic-auth-only": {
-      "description": "Force basic authentication. This option is only available when using SSL.",
-      "type": "boolean"
-    },
-    "cacert": {
-      "description": "The path to the CA certificate.",
-      "type": "string"
-    },
-    "connect-timeout": {
-      "description": "How long to wait in seconds when establishing connections.",
-      "type": "integer",
-      "min": 1
-    },
-    "copy-command": {
-      "description": "Array of command and flags to use when copying files using ssh-command. Bolt runs `<copy-command> <src> <dest>`.",
-      "type": ["array", "string"]
-    },
-    "disconnect-timeout": {
-      "description": "How long to wait in seconds before force-closing a connection.",
-      "type": "integer",
-      "min": 1
-    },
-    "encryption-algorithms": {
-      "description": "List of encryption algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "cleanup": {
-      "description": "Whether to clean up temporary files created on targets.",
-      "type": "boolean"
-    },
-    "extensions": {
-      "description": "A list of file extensions that are accepted for scripts or tasks.",
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "uniqueItems": true
-    },
-    "file-protocol": {
-      "description": "Which file transfer protocol to use. 'smb' is recommended for large file transfers.",
-      "type": "string",
-      "enum": ["smb", "winrm"]
-    },
-    "host": {
-      "description": "The host's name.",
-      "type": "string"
-    },
-    "host-key-algorithms": {
-      "description": "List of host key algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "host-key-check": {
-      "description": "Whether to perform host key validation when connecting.",
-      "type": "boolean"
-    },
-    "interpreters": {
-      "description": "A map of extension names to the absolute path of an executable, enabling you to override the shebang defined in a task executable.",
+    "_plugin": {
+      "description": "A plugin reference.",
       "type": "object",
-      "additionalProperties": false,
-      "patternProperties": {
-        "^.?[a-zA-Z0-9]+$": {
-          "type": "string"
+      "required": ["_plugin"],
+      "properties": {
+        "_plugin": {
+          "description": "The name of the plugin to use.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
         }
       }
     },
+    "basic-auth-only": {
+      "description": "Force basic authentication. This option is only available when using SSL.",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "cacert": {
+      "description": "The path to the CA certificate.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "connect-timeout": {
+      "description": "How long to wait in seconds when establishing connections.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "copy-command": {
+      "description": "Array of command and flags to use when copying files using ssh-command. Bolt runs `<copy-command> <src> <dest>`.",
+      "oneOf": [
+        {
+          "type": "array"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "disconnect-timeout": {
+      "description": "How long to wait in seconds before force-closing a connection.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "encryption-algorithms": {
+      "description": "List of encryption algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "cleanup": {
+      "description": "Whether to clean up temporary files created on targets.",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "extensions": {
+      "description": "A list of file extensions that are accepted for scripts or tasks.",
+      "oneOf": [
+        {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "file-protocol": {
+      "description": "Which file transfer protocol to use. 'smb' is recommended for large file transfers.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": ["smb", "winrm"]
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "host": {
+      "description": "The host's name.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "host-key-algorithms": {
+      "description": "List of host key algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "host-key-check": {
+      "description": "Whether to perform host key validation when connecting.",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "interpreters": {
+      "description": "A map of extension names to the absolute path of an executable, enabling you to override the shebang defined in a task executable.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^.?[a-zA-Z0-9]+$": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            }
+          }    
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
     "job-poll-interval": {
       "description": "The interval to poll orchestrator for job status.",
-      "type": "integer",
-      "min": 1
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
     },
     "job-poll-timeout": {
       "description": "The time to wait for orchestrator job status.",
-      "type": "integer",
-      "min": 1
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
     },
     "kex-algorithms": {
       "description": "List of key exchange algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
     },
     "load-config": {
       "description": "Whether to load system SSH configuration.",
-      "type": "boolean"
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
     },
     "login-shell": {
       "description": "Which login shell Bolt should expect on the target.",
-      "type": "string",
-      "enum": ["sh", "bash", "zsh", "dash", "ksh", "powershell"]
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": ["sh", "bash", "zsh", "dash", "ksh", "powershell"]
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
     },
     "mac-algorithms": {
       "description": "List of message authentication code algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",

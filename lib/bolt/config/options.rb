@@ -1,148 +1,363 @@
 # frozen_string_literal: true
 
+require 'bolt/config/transport/ssh'
+require 'bolt/config/transport/winrm'
+require 'bolt/config/transport/orch'
+require 'bolt/config/transport/local'
+require 'bolt/config/transport/docker'
+require 'bolt/config/transport/remote'
+
 module Bolt
   class Config
     module Options
+      # Transport config classes. Used to load default transport config which
+      # gets passed along to the inventory.
+      TRANSPORT_CONFIG = {
+        'ssh'    => Bolt::Config::Transport::SSH,
+        'winrm'  => Bolt::Config::Transport::WinRM,
+        'pcp'    => Bolt::Config::Transport::Orch,
+        'local'  => Bolt::Config::Transport::Local,
+        'docker' => Bolt::Config::Transport::Docker,
+        'remote' => Bolt::Config::Transport::Remote
+      }.freeze
+
+      # Plugin definition. This is used by the JSON schemas to indicate that an option
+      # accepts a plugin reference. Since this isn't used by Bolt to perform automatic
+      # type validation, the :type key is set to a JSON type instead of a Ruby type.
+      PLUGIN = {
+        "_plugin" => {
+          description: "A plugin reference.",
+          type: "object",
+          required: ["_plugin"],
+          properties: {
+            "_plugin" => {
+              description: "The name of the plugin.",
+              type: "string"
+            }
+          }
+        }
+      }.freeze
+
       # The following constants define the various configuration options available to Bolt.
       # Each constant is a hash where keys are the configuration option and values are the
-      # data describing the option. Data includes the following keys:
-      #   :def     The **documented** default value. This is the value that is displayed
-      #            in the reference docs and is not used by Bolt to actually set a default
-      #            value.
-      #   :desc    The text description of the option that is displayed in documentation.
-      #   :exmp    An example value for the option. This is used to generate an example
-      #            configuration file in the reference docs.
-      #   :type    The option's expected type. If an option accepts multiple types, this is
-      #            an array of the accepted types. Any options that accept a Boolean value
-      #            should use the [TrueClass, FalseClass] type.
+      # option's definition. These options are used in multiple locations:
+      #
+      #   - Automatic type validation when loading and setting configuration
+      #   - Generating reference documentation for configuration files
+      #   - Generating JSON schemas for configuration files
+      #
+      # Data includes keys defined by JSON Schema Draft 07 as well as some metadata used
+      # by Bolt to generate documentation. The following keys are used:
+      #
+      #   :description    String      A detailed description of the option and what it does. This
+      #                               field is used in both documentation and the JSON schemas,
+      #                               and should provide as much detail as possible, including
+      #                               links to relevant documentation.
+      #
+      #   :type           Class       The expected type of a value. These should be Ruby classes,
+      #                               as this field is used to perform automatic type validation.
+      #                               If an option can accept more than one type, this should be
+      #                               an array of types. Boolean values should set :type to
+      #                               [TrueClass, FalseClass], as Ruby does not have a single
+      #                               Boolean class.
+      #
+      #   :items          Hash        A definition hash for items in an array. Similar to values
+      #                               for top-level options, items can have a :description, :type,
+      #                               or any other key in this list.
+      #
+      #   :uniqueItems    Boolean     Whether or not an array should contain only unique items.
+      #
+      #   :properties     Hash        A hash where keys are sub-options and values are definitions
+      #                               for the sub-option. Similar to values for top-level options,
+      #                               properties can have a :description, :type, or any other key
+      #                               in this list.
+      #
+      #   :additionalProperties       A variation of the :properties key, where the hash is a
+      #                   Hash        definition for any properties not specified in :properties.
+      #                               This can be used to permit arbitrary sub-options, such as
+      #                               logs for the 'log' option.
+      #
+      #   :required       Array       An array of properties that are required for options that
+      #                               accept Hash values.
+      #
+      #   :minimum        Integer     The minimum integer value for an option.
+      #
+      #   :enum           Array       An array of values that the option recognizes.
+      #
+      #   :pattern        String      A JSON regex pattern that the option's vaue should match.
+      #
+      #   :format         String      Requires that a string value matches a format defined by the
+      #                               JSON Schema draft.
+      #
+      #   :_plugin        Boolean     Whether the option accepts a plugin reference. This is used
+      #                               when generating the JSON schemas to determine whether or not
+      #                               to include a reference to the _plugin definition. If :_plugin
+      #                               is set to true, the script that generates JSON schemas will
+      #                               automatically recurse through the :items and :properties keys
+      #                               and add plugin references if applicable.
+      #
+      #   :_example       Any         An example value for the option. This is used to generate
+      #                               reference documentation for configuration files.
+      #
+      #   :_default       Any         The documented default value for the option. This is only
+      #                               used to generate reference documentation for configuration
+      #                               files and is not used by Bolt to actually set default values.
       OPTIONS = {
         "apply_settings" => {
-          desc: "A map of Puppet settings to use when applying Puppet code using the `apply` "\
-                "plan function or the `bolt apply` command.",
-          type: Hash
+          description: "A map of Puppet settings to use when applying Puppet code using the `apply` "\
+                       "plan function or the `bolt apply` command.",
+          type: Hash,
+          properties: {
+            "show_diff" => {
+              description: "Whether to log and report a contextual diff.",
+              type: [TrueClass, FalseClass],
+              _example: true,
+              _default: false
+            }
+          },
+          _plugin: false
         },
         "color" => {
-          desc: "Whether to use colored output when printing messages to the console.",
+          description: "Whether to use colored output when printing messages to the console.",
           type: [TrueClass, FalseClass],
-          exmp: false,
-          def: true
+          _plugin: false,
+          _example: false,
+          _default: true
         },
         "compile-concurrency" => {
-          desc: "The maximum number of simultaneous manifest block compiles.",
+          description: "The maximum number of simultaneous manifest block compiles.",
           type: Integer,
-          exmp: 4,
-          def: "Number of cores."
+          minimum: 1,
+          _plugin: false,
+          _example: 5,
+          _default: "Number of cores."
         },
         "concurrency" => {
-          desc: "The number of threads to use when executing on remote targets.",
+          description: "The number of threads to use when executing on remote targets.",
           type: Integer,
-          exmp: 50,
-          def: "100 or 1/7 the ulimit, whichever is lower."
+          minimum: 1,
+          _plugin: false,
+          _example: 50,
+          _default: "100 or 1/7 the ulimit, whichever is lower."
         },
         "format" => {
-          desc: "The format to use when printing results. Options are `human`, `json`, and `rainbow`.",
+          description: "The format to use when printing results.",
           type: String,
-          exmp: "json",
-          def:  "human"
+          enum: %w[human json rainbow],
+          _plugin: false,
+          _example: "json",
+          _default: "human"
         },
         "hiera-config" => {
-          desc: "The path to your Hiera config.",
+          description: "The path to the Hiera configuration file.",
           type: String,
-          def:  "project/hiera.yaml",
-          exmp: "~/.puppetlabs/bolt/hiera.yaml"
+          _plugin: false,
+          _example: "~/.puppetlabs/bolt/hiera.yaml",
+          _default: "project/hiera.yaml"
         },
         "inventory-config" => {
-          desc: "A map of default configuration options for the inventory. This includes options "\
-                "for setting the default transport to use when connecting to targets, as well as "\
-                "options for configuring the default behavior of each transport.",
-          type: Hash
+          description: "A map of default configuration options for the inventory. This includes options "\
+                       "for setting the default transport to use when connecting to targets, as well as "\
+                       "options for configuring the default behavior of each transport.",
+          type: Hash,
+          _plugin: false,
+          _example: {}
         },
         "inventoryfile" => {
-          desc: "The path to a structured data inventory file used to refer to groups of targets on the command "\
-                "line and from plans. Read more about using inventory files in [Inventory "\
-                "files](inventory_file_v2.md).",
+          description: "The path to a structured data inventory file used to refer to groups of targets on the "\
+                       "command line and from plans. Read more about using inventory files in [Inventory "\
+                       "files](inventory_file_v2.md).",
           type: String,
-          def:  "project/inventory.yaml",
-          exmp: "~/.puppetlabs/bolt/inventory.yaml"
+          _plugin: false,
+          _example: "~/.puppetlabs/bolt/inventory.yaml",
+          _default: "project/inventory.yaml"
         },
         "log" => {
-          desc: "A map of configuration for the logfile output. Configuration can be set for "\
-                "`console` and individual log files, such as `~/.puppetlabs/bolt/debug.log`. "\
-                "Each key in the map is the logfile output to configure, with the corresponding "\
-                "value configuring the logfile output.",
+          description: "A map of configuration for the logfile output. Under `log`, you can configure log options "\
+                       "for `console` and add configuration for individual log files, such as "\
+                       "~/.puppetlabs/bolt/debug.log`. Individual log files must be valid filepaths. If the log "\
+                       "file does not exist, then Bolt will create it before logging information.",
           type: Hash,
-          exmp: { "console" => { "level" => "info" },
-                  "~/logs/debug.log" => { "append" => false, "level" => "debug" } }
+          properties: {
+            "console" => {
+              description: "Configuration for logs output to the console.",
+              type: Hash,
+              properties: {
+                "level" => {
+                  description: "The type of information to log.",
+                  type: String,
+                  enum: %w[debug error info notice warn fatal any],
+                  _default: "warn for console, notice for file"
+                }
+              }
+            }
+          },
+          additionalProperties: {
+            description: "Configuration for the logfile output.",
+            type: Hash,
+            properties: {
+              "append" => {
+                description: "Whether to append output to an existing log file.",
+                type: [TrueClass, FalseClass],
+                _default: true
+              },
+              "level" => {
+                description: "The type of information to log.",
+                type: String,
+                enum: %w[debug error info notice warn fatal any],
+                _default: "warn for console, notice for file"
+              }
+            }
+          },
+          _plugin: false,
+          _example: { "console" => { "level" => "info" },
+                      "~/logs/debug.log" => { "append" => false, "level" => "debug" } }
         },
         "modulepath" => {
-          desc: "An array of directories that Bolt loads content such as plans and tasks from. Read more "\
-                "about modules in [Module structure](module_structure.md).",
+          description: "An array of directories that Bolt loads content such as plans and tasks from. Read more "\
+                       "about modules in [Module structure](module_structure.md).",
           type: [Array, String],
-          def:  ["project/modules", "project/site-modules", "project/site"],
-          exmp: ["~/.puppetlabs/bolt/modules", "~/.puppetlabs/bolt/site-modules"]
+          items: {
+            type: String
+          },
+          _plugin: false,
+          _example: ["~/.puppetlabs/bolt/modules", "~/.puppetlabs/bolt/site-modules"],
+          _default: ["project/modules", "project/site-modules", "project/site"]
         },
         "name" => {
-          desc: "The name of the Bolt project. When this option is configured, the project is considered a "\
-                "[Bolt project](experimental_features.md#bolt-projects), allowing Bolt to load content from "\
-                "the project directory as though it were a module.",
+          description: "The name of the Bolt project. When this option is configured, the project is considered a "\
+                       "[Bolt project](experimental_features.md#bolt-projects), allowing Bolt to load content from "\
+                       "the project directory as though it were a module.",
           type: String,
-          exmp: "myproject"
+          _plugin: false,
+          _example: "myproject"
         },
         "plans" => {
-          desc: "A list of plan names to show in `bolt plan show` output, if they exist. This option is used to "\
-                "limit the visibility of plans for users of the project. For example, project authors might want to "\
-                "limit the visibility of plans that are bundled with Bolt or plans that should only be run as "\
-                "part of another plan. When this option is not configured, all plans are visible. This "\
-                "option does not prevent users from running plans that are not part of this list.",
+          description: "A list of plan names to show in `bolt plan show` output, if they exist. This option is used "\
+                       "to limit the visibility of plans for users of the project. For example, project authors "\
+                       "might want to limit the visibility of plans that are bundled with Bolt or plans that should "\
+                       "only be run as part of another plan. When this option is not configured, all plans are "\
+                       "visible. This option does not prevent users from running plans that are not part of this "\
+                       "list.",
           type: Array,
-          exmp: ["myproject", "myproject::foo", "myproject::bar"]
+          _plugin: false,
+          _example: ["myproject", "myproject::foo", "myproject::bar"]
         },
         "plugin_hooks" => {
-          desc: "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. "\
-                "The only configurable plugin hook is `puppet_library`, which can use two possible plugins: "\
-                "[`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) "\
-                "and [`task`](using_plugins.md#task).",
+          description: "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. "\
+                       "The only configurable plugin hook is `puppet_library`, which can use two possible plugins: "\
+                       "[`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) "\
+                       "and [`task`](using_plugins.md#task).",
           type: Hash,
-          exmp: { "puppet_library" => { "plugin" => "puppet_agent", "version" => "6.15.0", "_run_as" => "root" } }
+          _plugin: true,
+          _example: { "puppet_library" => { "plugin" => "puppet_agent", "version" => "6.15.0", "_run_as" => "root" } }
         },
         "plugins" => {
-          desc: "A map of plugins and their configuration data, where each key is the name of a plugin and its "\
-                "value is a map of configuration data. Configurable options are specified by the plugin. Read "\
-                "more about configuring plugins in [Using plugins](using_plugins.md#configuring-plugins).",
+          description: "A map of plugins and their configuration data, where each key is the name of a plugin and "\
+                       "its value is a map of configuration data. Configurable options are specified by the plugin. "\
+                       "Read more about configuring plugins in [Using plugins](using_plugins.md#configuring-plugins).",
           type: Hash,
-          exmp: { "pkcs7" => { "keysize" => 1024 } }
+          _plugin: true,
+          _example: { "pkcs7" => { "keysize" => 1024 } }
         },
         "puppetdb" => {
-          desc: "A map containing options for [configuring the Bolt PuppetDB client](bolt_connect_puppetdb.md).",
-          type: Hash
+          description: "A map containing options for [configuring the Bolt PuppetDB "\
+                       "client](bolt_connect_puppetdb.md).",
+          type: Hash,
+          properties: {
+            "cacert" => {
+              description: "The path to the ca certificate for PuppetDB.",
+              type: String,
+              _example: "/etc/puppetlabs/puppet/ssl/certs/ca.pem"
+            },
+            "cert" => {
+              description: "The path to the client certificate file to use for authentication.",
+              type: String,
+              _example: "/etc/puppetlabs/puppet/ssl/certs/my-host.example.com.pem"
+            },
+            "key" => {
+              description: "The private key for the certificate.",
+              type: String,
+              _example: "/etc/puppetlabs/puppet/ssl/private_keys/my-host.example.com.pem"
+            },
+            "server_urls" => {
+              description: "An array containing the PuppetDB host to connect to. Include the protocol `https` "\
+                           "and the port, which is usually `8081`. For example, "\
+                           "`https://my-master.example.com:8081`.",
+              type: Array,
+              _example: ["https://puppet.example.com:8081"]
+            },
+            "token" => {
+              description: "The path to the PE RBAC Token.",
+              type: String,
+              _example: "~/.puppetlabs/token"
+            }
+          },
+          _plugin: true
         },
         "puppetfile" => {
-          desc: "A map containing options for the `bolt puppetfile install` command.",
-          type: Hash
+          description: "A map containing options for the `bolt puppetfile install` command.",
+          type: Hash,
+          properties: {
+            "forge" => {
+              description: "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge "\
+                           "operations only, and a `baseurl` setting to specify a different Forge host.",
+              type: Hash,
+              properties: {
+                "baseurl" => {
+                  description: "The URL to the Forge host.",
+                  type: String,
+                  format: "uri",
+                  _example: "https://forge.example.com"
+                },
+                "proxy" => {
+                  description: "The HTTP proxy to use for Git and Forge operations.",
+                  type: String,
+                  format: "uri",
+                  _example: "https://forgeapi.example.com"
+                }
+              },
+              _example: { "baseurl" => "https://forge.example.com", "proxy" => "https://forgeapi.example.com" }
+            },
+            "proxy" => {
+              description: "The HTTP proxy to use for Git and Forge operations.",
+              type: String,
+              format: "uri",
+              _example: "https://forgeapi.example.com"
+            }
+          },
+          _plugin: false
         },
         "save-rerun" => {
-          desc: "Whether to update `.rerun.json` in the Bolt project directory. If "\
-                "your target names include passwords, set this value to `false` to avoid "\
-                "writing passwords to disk.",
+          description: "Whether to update `.rerun.json` in the Bolt project directory. If "\
+                       "your target names include passwords, set this value to `false` to avoid "\
+                       "writing passwords to disk.",
           type: [TrueClass, FalseClass],
-          exmp: false,
-          def:  true
+          _plugin: false,
+          _example: false,
+          _default: true
         },
         "tasks" => {
-          desc: "A list of task names to show in `bolt task show` output, if they exist. This option is used to "\
-                "limit the visibility of tasks for users of the project. For example, project authors might want to "\
-                "limit the visibility of tasks that are bundled with Bolt or plans that should only be run as "\
-                "part of a larger workflow. When this option is not configured, all tasks are visible. This "\
-                "option does not prevent users from running tasks that are not part of this list.",
+          description: "A list of task names to show in `bolt task show` output, if they exist. This option is used "\
+                       "to limit the visibility of tasks for users of the project. For example, project authors "\
+                       "might want to limit the visibility of tasks that are bundled with Bolt or plans that should "\
+                       "only be run as part of a larger workflow. When this option is not configured, all tasks "\
+                       "are visible. This option does not prevent users from running tasks that are not part of "\
+                       "this list.",
           type: Array,
-          exmp: ["myproject", "myproject::foo", "myproject::bar"]
+          items: {
+            type: String
+          },
+          _plugin: false,
+          _example: ["myproject", "myproject::foo", "myproject::bar"]
         },
         "trusted-external-command" => {
-          desc: "The path to an executable on the Bolt controller that can produce external trusted facts. "\
-                "**External trusted facts are experimental in both Puppet and Bolt and this API may change or "\
-                "be removed.**",
+          description: "The path to an executable on the Bolt controller that can produce external trusted facts. "\
+                       "**External trusted facts are experimental in both Puppet and Bolt and this API may change or "\
+                       "be removed.**",
           type: String,
-          exmp: "/etc/puppetlabs/facts/trusted_external.sh"
+          _plugin: false,
+          _example: "/etc/puppetlabs/facts/trusted_external.sh"
         }
       }.freeze
 
@@ -152,113 +367,50 @@ module Bolt
       # 'inventory-config' key in bolt-defaults.yaml.
       INVENTORY_OPTIONS = {
         "transport" => {
-          desc: "The default transport to use when the transport for a target is not "\
-                "specified in the URI.",
+          description: "The default transport to use when the transport for a target is not "\
+                       "specified in the URI.",
           type: String,
-          def:  "ssh",
-          exmp: "winrm"
+          enum: TRANSPORT_CONFIG.keys,
+          _plugin: false,
+          _example: "winrm",
+          _default: "ssh"
         },
         "docker" => {
-          desc: "A map of configuration options for the docker transport.",
+          description: "A map of configuration options for the docker transport.",
           type: Hash,
-          exmp: { "cleanup" => false, "service-url" => "https://docker.example.com" }
+          _plugin: true,
+          _example: { "cleanup" => false, "service-url" => "https://docker.example.com" }
         },
         "local" => {
-          desc: "A map of configuration options for the local transport. The set of available options is "\
-                "platform dependent.",
+          description: "A map of configuration options for the local transport. The set of available options is "\
+                       "platform dependent.",
           type: Hash,
-          exmp: { "cleanup" => false, "tmpdir" => "/tmp/bolt" }
+          _plugin: true,
+          _example: { "cleanup" => false, "tmpdir" => "/tmp/bolt" }
         },
         "pcp" => {
-          desc: "A map of configuration options for the pcp transport.",
+          description: "A map of configuration options for the pcp transport.",
           type: Hash,
-          exmp: { "job-poll-interval" => 15, "job-poll-timeout" => 30 }
+          _plugin: true,
+          _example: { "job-poll-interval" => 15, "job-poll-timeout" => 30 }
         },
         "remote" => {
-          desc: "A map of configuration options for the remote transport.",
+          description: "A map of configuration options for the remote transport.",
           type: Hash,
-          exmp: { "run-on" => "proxy_target" }
+          _plugin: true,
+          _example: { "run-on" => "proxy_target" }
         },
         "ssh" => {
-          desc: "A map of configuration options for the ssh transport.",
+          description: "A map of configuration options for the ssh transport.",
           type: Hash,
-          exmp: { "password" => "hunter2!", "user" => "bolt" }
+          _plugin: true,
+          _example: { "password" => "hunter2!", "user" => "bolt" }
         },
         "winrm" => {
-          desc: "A map of configuration options for the winrm transport.",
+          description: "A map of configuration options for the winrm transport.",
           type: Hash,
-          exmp: { "password" => "hunter2!", "user" => "bolt" }
-        }
-      }.freeze
-
-      # Suboptions for options that accept hashes.
-      SUBOPTIONS = {
-        "apply_settings" => {
-          "show_diff" => {
-            desc: "Whether to log and report a contextual diff when files are being replaced. See "\
-                  "[Puppet documentation](https://puppet.com/docs/puppet/latest/configuration.html#showdiff) "\
-                  "for details.",
-            type: [TrueClass, FalseClass],
-            exmp: true,
-            def:  false
-          }
-        },
-        "inventory-config" => INVENTORY_OPTIONS,
-        "log" => {
-          "append" => {
-            desc: "Add output to an existing log file. Available only for logs output to a "\
-                  "filepath.",
-            type: [TrueClass, FalseClass],
-            def:  true
-          },
-          "level" => {
-            desc: "The type of information in the log. Either `debug`, `info`, `notice`, "\
-                  "`warn`, or `error`.",
-            type: String,
-            def:  "`warn` for console, `notice` for file"
-          }
-        },
-        "puppetdb" => {
-          "cacert" => {
-            desc: "The path to the ca certificate for PuppetDB.",
-            type: String,
-            exmp: "/etc/puppetlabs/puppet/ssl/certs/ca.pem"
-          },
-          "cert" => {
-            desc: "The path to the client certificate file to use for authentication.",
-            type: String,
-            exmp: "/etc/puppetlabs/puppet/ssl/certs/my-host.example.com.pem"
-          },
-          "key" => {
-            desc: "The private key for the certificate.",
-            type: String,
-            exmp: "/etc/puppetlabs/puppet/ssl/private_keys/my-host.example.com.pem"
-          },
-          "server_urls" => {
-            desc: "An array containing the PuppetDB host to connect to. Include the protocol `https` "\
-                  "and the port, which is usually `8081`. For example, "\
-                  "`https://my-master.example.com:8081`.",
-            type: Array,
-            exmp: ["https://puppet.example.com:8081"]
-          },
-          "token" => {
-            desc: "The path to the PE RBAC Token.",
-            type: String,
-            exmp: "~/.puppetlabs/token"
-          }
-        },
-        "puppetfile" => {
-          "forge" => {
-            desc: "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge "\
-                  "operations only, and a `baseurl` setting to specify a different Forge host.",
-            type: Hash,
-            exmp: { "baseurl" => "https://forge.example.com", "proxy" => "https://forgeapi.example.com" }
-          },
-          "proxy" => {
-            desc: "The HTTP proxy to use for Git and Forge operations.",
-            type: String,
-            exmp: "https://forgeapi.example.com"
-          }
+          _plugin: true,
+          _example: { "password" => "hunter2!", "user" => "bolt" }
         }
       }.freeze
 

@@ -8,29 +8,27 @@ which is supported in both the [system-wide and user-level configuration directo
 <% @opts.each do |option, data| -%>
 ### `<%= option %>`
 
-<%= data[:desc] %>
+<%= data[:description] %>
 
 - **Type:** <%= data[:type] %>
-<% if data.key?(:def) -%>
-- **Default:** <%= data[:def] %>
+<% if data.key?(:_default) -%>
+- **Default:** <%= data[:_default] %>
 <% end -%>
 
-<% if @subopts.key?(option) -%>
 <% if option == 'inventory-config' %>
 For a detailed description of each option, their default values, and any available
 sub-options, see [Transport configuration reference](bolt_transports_reference.md).
-<% else %>
-<% @subopts[option].each do |option, data| -%>
+<% elsif data.key?(:properties) -%>
+<% data[:properties].each do |option, data| -%>
 #### `<%= option %>`
 
-<%= data[:desc] %>
+<%= data[:description] %>
 
 - **Type:** <%= data[:type] %>
-<% if data.key?(:def) -%>
-- **Default:** <%= data[:def] %>
+<% if data.key?(:_default) -%>
+- **Default:** <%= data[:_default] %>
 <% end %>
 <% end -%>
-<% end %>
 <% end -%>
 
 ```yaml
