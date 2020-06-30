@@ -15,6 +15,21 @@ Bolt will only use the `run-as` user if:
 * The transport is Local or SSH
 * The configured `run-as` user is different than the connecting `user`
 
+
+### Escalating privilege must be generalized
+
+Limiting privilege escalation permission to certain commands will not work well
+when running Bolt tasks, scripts, and some plans. Bolt often uses a temporary
+directory to copy content to remote systems and execute, which prevents Bolt's
+remote commands from being predictable. Furthermore, Bolt is an automation
+tool, and many organizations enforce specific security policies to prevent the
+kind of automated interaction that Bolt is performing. As a result, you will
+need to allow arbitrary script execution for any users who need to use Bolt to
+run tasks or scripts. We recommend either having a dedicated user to run Bolt
+on target systems and managing access to that user, or using [Puppet Enterprise
+to limit which tasks a user can run on which
+targets](https://puppet.com/docs/pe/latest/rbac_permissions_intro.html#user_permissions).
+
 ## Configuring `run-as`
 
 You can use privilege escalation from the command-line, or set it up using Bolt's configuration files.
