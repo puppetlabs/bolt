@@ -18,6 +18,9 @@ gem "rack", '>= 2.0.5'
 gem "rails-auth", '>= 2.1.4'
 gem "sinatra", '>= 2.0.4'
 
+# Optional paint gem for rainbow outputter
+gem "paint", "~> 2.2"
+
 group(:test) do
   gem "beaker-hostgenerator"
   gem "mocha", '~> 1.4.0'

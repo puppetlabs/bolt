@@ -26,5 +26,5 @@ end
 
 require 'bolt/outputter/human'
 require 'bolt/outputter/json'
-require 'bolt/outputter/rainbow'
 require 'bolt/outputter/logger'
+require 'bolt/outputter/rainbow'
