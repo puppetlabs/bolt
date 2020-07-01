@@ -115,7 +115,12 @@ module Bolt
                   Bolt::Config.from_file(options[:configfile], options)
                 else
                   project = if options[:boltdir]
-                              Bolt::Project.create_project(options[:boltdir])
+                              dir = Pathname.new(options[:boltdir])
+                              if (dir + Bolt::Project::BOLTDIR_NAME).directory?
+                                Bolt::Project.create_project(dir + Bolt::Project::BOLTDIR_NAME)
+                              else
+                                Bolt::Project.create_project(dir)
+                              end
                             else
                               Bolt::Project.find_boltdir(Dir.pwd)
                             end
