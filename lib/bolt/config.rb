@@ -139,9 +139,22 @@ module Bolt
         )
       end
 
-      # Move data under transport-config to top-level so it can be easily merged with
-      # config from other sources.
+      # Move data under inventory-config to top-level so it can be easily merged with
+      # config from other sources. Error early if inventory-config is not a hash or
+      # has a plugin reference.
       if data.key?('inventory-config')
+        unless data['inventory-config'].is_a?(Hash)
+          raise Bolt::ValidationError,
+                "Option 'inventory-config' must be of type Hash, received #{data['inventory-config']} "\
+                "#{data['inventory-config']} (file: #{filepath})"
+        end
+
+        if data['inventory-config'].key?('_plugin')
+          raise Bolt::ValidationError,
+                "Found unsupported key '_plugin' for option 'inventory-config'; supported keys are "\
+                "'#{INVENTORY_OPTIONS.keys.join("', '")}' (file: #{filepath})"
+        end
+
         data = data.merge(data.delete('inventory-config'))
       end
 
