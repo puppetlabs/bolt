@@ -78,6 +78,9 @@ Style/SafeNavigation:
 Style/SlicingWithRange:
   Enabled: false
 
+Style/RedundantFetchBlock:
+  Enabled: true
+
 Style/RedundantRegexpCharacterClass:
   Enabled: false
 
