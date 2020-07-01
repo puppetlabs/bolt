@@ -944,6 +944,5 @@ and using external modules.
 - [Introducing Masterless Puppet with
   Bolt](https://puppet.com/blog/introducing-masterless-puppet-bolt): Blog post
   explaining how plans can be used to deploy a load-balanced web server.
-- [profiles::nginx_install
-  plan](https://puppetlabs.github.io/bolt/lab/11-apply-manifest-code/): Shows an
-  example plan for deploying Nginx and HAProxy.
+- [patching::deploy_scripts
+  plan](https://github.com/EncoreTechnologies/puppet-patching/tree/master/plans/deploy_scripts.pp): Plan to deploy scripts from a Bolt controller to several targets using Puppet.
