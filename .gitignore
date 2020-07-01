@@ -78,5 +78,8 @@ documentation/plan_functions.md
 documentation/bolt_command_reference.md
 documentation/bolt_configuration_reference.md
 documentation/privilege_escalation.md
+documentation/bolt_defaults_reference.md
+documentation/bolt_project_reference.md
+documentation/bolt_transports_reference.md
 tasks/
 plans/
