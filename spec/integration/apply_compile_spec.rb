@@ -393,5 +393,95 @@ describe "passes parsed AST to the apply_catalog task" do
         end
       end
     end
+
+    context 'setting log level' do
+      let(:lines) { @log_output.readlines }
+
+      after(:each) { @log_output.level = :all }
+
+      it 'logs debug messages' do
+        @log_output.level = :debug
+        run_cli(%w[plan run basic::error --log-level debug] + config_flags)
+
+        expect(lines).to include(/DEBUG.*Debugging/)
+        expect(lines).to include(/INFO.*Meh/)
+        expect(lines).to include(/NOTICE.*Helpful/)
+        expect(lines).to include(/WARN.*Warned/)
+        expect(lines).to include(/ERROR.*Fire/)
+        expect(lines).to include(/ERROR.*Stop/)
+        expect(lines).to include(/FATAL.*Drop/)
+        expect(lines).to include(/FATAL.*Roll/)
+      end
+
+      it 'logs info messages' do
+        @log_output.level = :info
+        run_cli(%w[plan run basic::error --log-level info] + config_flags)
+
+        expect(lines).not_to include(/DEBUG.*Debugging/)
+        expect(lines).to include(/INFO.*Meh/)
+        expect(lines).to include(/NOTICE.*Helpful/)
+        expect(lines).to include(/WARN.*Warned/)
+        expect(lines).to include(/ERROR.*Fire/)
+        expect(lines).to include(/ERROR.*Stop/)
+        expect(lines).to include(/FATAL.*Drop/)
+        expect(lines).to include(/FATAL.*Roll/)
+      end
+
+      it 'logs notice messages' do
+        @log_output.level = :notice
+        run_cli(%w[plan run basic::error --log-level notice] + config_flags)
+
+        expect(lines).not_to include(/DEBUG.*Debugging/)
+        expect(lines).not_to include(/INFO.*Meh/)
+        expect(lines).to include(/NOTICE.*Helpful/)
+        expect(lines).to include(/WARN.*Warned/)
+        expect(lines).to include(/ERROR.*Fire/)
+        expect(lines).to include(/ERROR.*Stop/)
+        expect(lines).to include(/FATAL.*Drop/)
+        expect(lines).to include(/FATAL.*Roll/)
+      end
+
+      it 'logs warn messages' do
+        @log_output.level = :warn
+        run_cli(%w[plan run basic::error --log-level warn] + config_flags)
+
+        expect(lines).not_to include(/DEBUG.*Debugging/)
+        expect(lines).not_to include(/INFO.*Meh/)
+        expect(lines).not_to include(/NOTICE.*Helpful/)
+        expect(lines).to include(/WARN.*Warned/)
+        expect(lines).to include(/ERROR.*Fire/)
+        expect(lines).to include(/ERROR.*Stop/)
+        expect(lines).to include(/FATAL.*Drop/)
+        expect(lines).to include(/FATAL.*Roll/)
+      end
+
+      it 'logs error messages' do
+        @log_output.level = :error
+        run_cli(%w[plan run basic::error --log-level error] + config_flags)
+
+        expect(lines).not_to include(/DEBUG.*Debugging/)
+        expect(lines).not_to include(/INFO.*Meh/)
+        expect(lines).not_to include(/NOTICE.*Helpful/)
+        expect(lines).not_to include(/WARN.*Warned/)
+        expect(lines).to include(/ERROR.*Fire/)
+        expect(lines).to include(/ERROR.*Stop/)
+        expect(lines).to include(/FATAL.*Drop/)
+        expect(lines).to include(/FATAL.*Roll/)
+      end
+
+      it 'logs fatal messages' do
+        @log_output.level = :fatal
+        run_cli(%w[plan run basic::error --log-level fatal] + config_flags)
+
+        expect(lines).not_to include(/DEBUG.*Debugging/)
+        expect(lines).not_to include(/INFO.*Meh/)
+        expect(lines).not_to include(/NOTICE.*Helpful/)
+        expect(lines).not_to include(/WARN.*Warned/)
+        expect(lines).not_to include(/ERROR.*Fire/)
+        expect(lines).not_to include(/ERROR.*Stop/)
+        expect(lines).to include(/FATAL.*Drop/)
+        expect(lines).to include(/FATAL.*Roll/)
+      end
+    end
   end
 end

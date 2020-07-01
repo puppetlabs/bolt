@@ -89,8 +89,10 @@ module Bolt
       :notice
     end
 
+    # Explicitly check the log level names instead of the log level number, as levels
+    # that are stringified integers (e.g. "level" => "42") will return a truthy value
     def self.valid_level?(level)
-      !Logging.level_num(level).nil?
+      Logging::LEVELS.include?(Logging.levelify(level))
     end
 
     def self.levels
