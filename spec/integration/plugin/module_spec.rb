@@ -41,6 +41,11 @@ describe 'using module based plugins' do
 
   let(:inventory) { {} }
 
+  before :each do
+    # Don't print error messages to the console
+    allow($stdout).to receive(:puts)
+  end
+
   around(:each) do |example|
     with_boltdir(inventory: inventory, config: config, plan: plan) do |project|
       @project = project
@@ -194,10 +199,8 @@ describe 'using module based plugins' do
         let(:plugin_config) { { 'task_conf_plug' => { 'random_key' => 'bar' } } }
 
         it 'forbids config entries that do not match task metadata schema' do
-          result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
-
-          expect(result).to include('kind' => "bolt/validation-error")
-          expect(result['msg']).to match(/Config for task_conf_plug plugin contains unexpected key random_key/)
+          expect { run_cli(%W[plan run test_plan --boltdir #{project}]) }
+            .to raise_error(Bolt::ValidationError, /task_conf_plug plugin contains unexpected key random_key/)
         end
       end
     end

@@ -48,6 +48,11 @@ describe 'using the task plugin' do
     end
   end
 
+  before :each do
+    # Don't print error messages to the console
+    allow($stdout).to receive(:puts)
+  end
+
   context 'with a config lookup' do
     let(:plugin) {
       {
@@ -157,19 +162,16 @@ describe 'using the task plugin' do
       }
 
       it 'errors when the result is unexpected' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
-
-        expect(result).to include('kind' => "bolt/plugin-error")
-        expect(result['msg']).to match(/Task result did not return 'value'/)
+        expect { run_cli(%W[plan run test_plan --boltdir #{project}]) }
+          .to raise_error(Bolt::Plugin::PluginError, /Task result did not return 'value'/)
       end
 
       context 'execution fails' do
         let(:params) { { 'bad-key' => %w[foo bar] } }
-        it 'errors' do
-          result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
 
-          expect(result).to include('kind' => "bolt/validation-error")
-          expect(result['msg']).to match(/bad-key/)
+        it 'errors' do
+          expect { run_cli(%W[plan run test_plan --boltdir #{project}]) }
+            .to raise_error(Bolt::ValidationError, /bad-key/)
         end
       end
 
@@ -182,10 +184,8 @@ describe 'using the task plugin' do
           }
         }
         it 'errors when the task fails' do
-          result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
-
-          expect(result).to include('kind' => "bolt/plugin-error")
-          expect(result['msg']).to match(/The task failed/)
+          expect { run_cli(%W[plan run test_plan --boltdir #{project}]) }
+            .to raise_error(Bolt::Plugin::PluginError, /The task failed/)
         end
       end
     end

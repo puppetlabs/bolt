@@ -14,6 +14,8 @@ describe "running YAML plans", ssh: true do
   include BoltSpec::Logger
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
+  # Don't print error messages to the console
+  before(:each) { allow($stdout).to receive(:puts) }
 
   let(:modulepath) { fixture_path('modules') }
   let(:password) { conn_info('ssh')[:password] }
@@ -146,6 +148,8 @@ describe "running YAML plans", ssh: true do
     allow(Puppet::Util::Log).to receive(:newdestination).with(mock_logger)
     allow(mock_logger).to receive(:notice)
     allow(mock_logger).to receive(:info)
+    allow(mock_logger).to receive(:warn)
+      .with("No project name is specified in bolt-project.yaml. Project-level content will not be available.")
 
     expect(mock_logger).to receive(:warn).with(/Use the 'targets' parameter instead./)
 
