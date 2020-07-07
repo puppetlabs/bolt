@@ -82,9 +82,21 @@ Style/RedundantFetchBlock:
   Enabled: true
 
 Style/RedundantRegexpCharacterClass:
-  Enabled: false
+  Enabled: true
 
 Style/RedundantRegexpEscape:
+  Enabled: true
+
+Style/AccessorGrouping:
+  Enabled: true
+
+# Disabled due to a bug in Rubocop that raises an exception when accessors
+# are assigned using a splat operator
+# https://github.com/rubocop-hq/rubocop/issues/8257
+Style/BisectedAttrAccessor:
+  Enabled: false
+
+Style/RedundantAssignment:
   Enabled: true
 
 # Disable nearly all Metrics checks. These seem better off left to judgement.

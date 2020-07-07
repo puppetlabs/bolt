@@ -170,7 +170,7 @@ module Bolt
       def check_sudo(out, inp, stdin)
         buffer = out.readpartial(CHUNK_SIZE)
         # Split on newlines, including the newline
-        lines = buffer.split(/(?<=[\n])/)
+        lines = buffer.split(/(?<=\n)/)
         # handle_sudo will return the line if it is not a sudo prompt or error
         lines.map! { |line| handle_sudo(inp, line, stdin) }
         lines.join("")

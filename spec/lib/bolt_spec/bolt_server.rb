@@ -64,8 +64,7 @@ module BoltSpec
     def puppet_server_get(path, params)
       uri = URI("#{config_data['file-server-uri']}#{path}")
       uri.query = URI.encode_www_form(params)
-      resp = make_client.request(Net::HTTP::Get.new(uri))
-      resp
+      make_client.request(Net::HTTP::Get.new(uri))
     end
 
     def get_task_data(task)
