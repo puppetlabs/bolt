@@ -6,13 +6,6 @@ require 'pathname'
 require 'bolt/project'
 require 'bolt/logger'
 require 'bolt/util'
-# Transport config objects
-require 'bolt/config/transport/ssh'
-require 'bolt/config/transport/winrm'
-require 'bolt/config/transport/orch'
-require 'bolt/config/transport/local'
-require 'bolt/config/transport/docker'
-require 'bolt/config/transport/remote'
 require 'bolt/config/options'
 
 module Bolt
@@ -30,17 +23,6 @@ module Bolt
 
     BOLT_CONFIG_NAME = 'bolt.yaml'
     BOLT_DEFAULTS_NAME = 'bolt-defaults.yaml'
-
-    # Transport config classes. Used to load default transport config which
-    # gets passed along to the inventory.
-    TRANSPORT_CONFIG = {
-      'ssh'    => Bolt::Config::Transport::SSH,
-      'winrm'  => Bolt::Config::Transport::WinRM,
-      'pcp'    => Bolt::Config::Transport::Orch,
-      'local'  => Bolt::Config::Transport::Local,
-      'docker' => Bolt::Config::Transport::Docker,
-      'remote' => Bolt::Config::Transport::Remote
-    }.freeze
 
     # The default concurrency value that is used when the ulimit is not low (i.e. < 700)
     DEFAULT_DEFAULT_CONCURRENCY = 100
@@ -316,8 +298,8 @@ module Bolt
       end
 
       # Filter hashes to only include valid options
-      @data['apply_settings'] = @data['apply_settings'].slice(*SUBOPTIONS['apply_settings'].keys)
-      @data['puppetfile'] = @data['puppetfile'].slice(*SUBOPTIONS['puppetfile'].keys)
+      @data['apply_settings'] = @data['apply_settings'].slice(*OPTIONS['apply_settings'][:properties].keys)
+      @data['puppetfile'] = @data['puppetfile'].slice(*OPTIONS['puppetfile'][:properties].keys)
     end
 
     private def normalize_log(target)
@@ -331,7 +313,7 @@ module Bolt
         next unless val.is_a?(Hash)
 
         name = normalize_log(key)
-        acc[name] = val.slice(*SUBOPTIONS['log'].keys)
+        acc[name] = val.slice('append', 'level')
                        .transform_keys(&:to_sym)
 
         if (v = acc[name][:level])

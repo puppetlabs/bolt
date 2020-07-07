@@ -17,20 +17,18 @@ unless ENV['GITHUB_WORKFLOW']
   Pkg::Util::RakeUtils.load_packaging_tasks
 end
 
-def generate_yaml_file(data, subdata = {})
-  data.each_with_object({}) do |(option, option_data), acc|
-    if option_data.key?(:exmp)
-      acc[option] = option_data[:exmp]
-    elsif subdata.key?(option)
-      acc[option] = generate_yaml_file(subdata[option])
+def generate_yaml_file(data)
+  data.each_with_object({}) do |(option, definition), acc|
+    if definition.key?(:_example)
+      acc[option] = definition[:_example]
+    elsif definition.key?(:properties)
+      acc[option] = generate_yaml_file(definition[:properties])
     end
   end
 end
 
-def stringify_types(opts)
-  opts.each_value do |data|
-    next unless data.key?(:type)
-
+def stringify_types(data)
+  if data.key?(:type)
     types = Array(data[:type])
 
     if types.include?(TrueClass) || types.include?(FalseClass)
@@ -39,6 +37,14 @@ def stringify_types(opts)
 
     data[:type] = types.join(', ')
   end
+
+  if data.key?(:properties)
+    data[:properties] = data[:properties].transform_values do |d|
+      stringify_types(d)
+    end
+  end
+
+  data
 end
 
 desc "Run all RSpec tests"
@@ -125,14 +131,20 @@ end
 namespace :docs do
   desc 'Generate markdown docs for bolt.yaml'
   task :config_reference do
-    @opts      = stringify_types(Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_OPTIONS))
-    @subopts   = Bolt::Config::SUBOPTIONS.dup
-    @inventory = Bolt::Config::INVENTORY_OPTIONS
+    @opts      = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_OPTIONS)
+    @inventory = Bolt::Config::INVENTORY_OPTIONS.dup
 
-    @yaml           = generate_yaml_file(@opts, @subopts)
+    # Move sub-options for 'log' option up one level, as they're nested under
+    # 'console' and filepath
+    @opts['log'][:properties] = @opts['log'][:additionalProperties][:properties]
+
+    # Stringify data types
+    @opts.transform_values! { |data| stringify_types(data) }
+    @inventory.transform_values! { |data| stringify_types(data) }
+
+    # Generate YAML file examples
+    @yaml           = generate_yaml_file(@opts)
     @inventory_yaml = generate_yaml_file(@inventory)
-
-    @subopts.transform_values! { |data| stringify_types(data) }
 
     renderer = ERB.new(File.read('documentation/templates/bolt_configuration_reference.md.erb'), nil, '-')
     File.write('documentation/bolt_configuration_reference.md', renderer.result)
@@ -140,8 +152,12 @@ namespace :docs do
 
   desc 'Generate privilege escalation document'
   task :privilege_escalation do
-    @run_as = stringify_types(Bolt::Config::Transport::Options::TRANSPORT_OPTIONS
-      .slice(*Bolt::Config::Transport::Options::RUN_AS_OPTIONS))
+    @run_as = Bolt::Config::Transport::Options::TRANSPORT_OPTIONS.slice(
+      *Bolt::Config::Transport::Options::RUN_AS_OPTIONS
+    )
+
+    @run_as.transform_values! { |data| stringify_types(data) }
+
     parser = Bolt::BoltOptionParser.new({})
     @run_as_options = Bolt::BoltOptionParser::OPTIONS[:escalation].map do |option|
       switch = parser.top.long[option]
@@ -159,11 +175,17 @@ namespace :docs do
 
   desc 'Generate markdown docs for bolt-project.yaml'
   task :project_reference do
-    @opts    = stringify_types(Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_PROJECT_OPTIONS))
-    @subopts = Bolt::Config::SUBOPTIONS.dup
-    @yaml    = generate_yaml_file(@opts, @subopts)
+    @opts = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_PROJECT_OPTIONS)
 
-    @subopts.transform_values! { |data| stringify_types(data) }
+    # Move sub-options for 'log' option up one level, as they're nested under
+    # 'console' and filepath
+    @opts['log'][:properties] = @opts['log'][:additionalProperties][:properties]
+
+    # Stringify data types
+    @opts.transform_values! { |data| stringify_types(data) }
+
+    # Generate YAML file examples
+    @yaml = generate_yaml_file(@opts)
 
     renderer = ERB.new(File.read('documentation/templates/bolt_project_reference.md.erb'), nil, '-')
     File.write('documentation/bolt_project_reference.md', renderer.result)
@@ -171,12 +193,19 @@ namespace :docs do
 
   desc 'Generate markdown docs for bolt-defaults.yaml'
   task :defaults_reference do
-    @opts       = stringify_types(Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_DEFAULTS_OPTIONS))
-    @subopts    = Bolt::Config::SUBOPTIONS.dup
+    @opts       = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_DEFAULTS_OPTIONS)
+    inventory   = Bolt::Config::INVENTORY_OPTIONS.dup
     @transports = Bolt::Config::TRANSPORT_CONFIG.keys
-    @yaml       = generate_yaml_file(@opts, @subopts)
 
-    @subopts.transform_values! { |data| stringify_types(data) }
+    # Stringify data types
+    @opts.transform_values! { |data| stringify_types(data) }
+
+    # Generate YAML file examples
+    @yaml          = generate_yaml_file(@opts)
+    inventory_yaml = generate_yaml_file(inventory)
+
+    # Add inventory examples to 'inventory-config'
+    @yaml['inventory-config'] = inventory_yaml
 
     renderer = ERB.new(File.read('documentation/templates/bolt_defaults_reference.md.erb'), nil, '-')
     File.write('documentation/bolt_defaults_reference.md', renderer.result)
@@ -184,25 +213,35 @@ namespace :docs do
 
   desc 'Generate markdown docs for transports configuration reference'
   task :transports_reference do
-    @opts = stringify_types(Bolt::Config::INVENTORY_OPTIONS)
+    @opts     = Bolt::Config::INVENTORY_OPTIONS.dup
+    @external = Bolt::Config::Transport::Options::TRANSPORT_OPTIONS.slice(
+      *Bolt::Config::Transport::SSH::EXTERNAL_OPTIONS
+    )
 
-    @subopts = Bolt::Config::TRANSPORT_CONFIG.sort.each_with_object({}) do |(name, transport), acc|
+    # Stringify data types
+    @opts.transform_values! { |data| stringify_types(data) }
+
+    # Add sub-options for each of the transport options
+    Bolt::Config::TRANSPORT_CONFIG.each do |name, transport|
       # Only include suboption examples in the full example, not under individual suboption sections
-      @opts[name].delete(:exmp)
-
-      acc[name] = stringify_types(transport::TRANSPORT_OPTIONS.slice(*transport::OPTIONS))
+      @opts[name].delete(:_example)
+      # Pull out sub-options for each transport
+      suboptions = transport::TRANSPORT_OPTIONS.slice(*transport::OPTIONS)
+      # Add the sub-options as properties for the transport option
+      @opts[name][:properties] = suboptions.transform_values { |data| stringify_types(data) }
     end
 
+    # The 'local' transport's options are platform-dependent, so pull out the list for each
     @local_sets = {
       nix: Bolt::Config::Transport::Local::OPTIONS,
       win: Bolt::Config::Transport::Local::WINDOWS_OPTIONS
     }
 
-    @subopts['external-ssh'] = stringify_types(
-      Bolt::Config::Transport::Options::TRANSPORT_OPTIONS.slice(*Bolt::Config::Transport::SSH::EXTERNAL_OPTIONS)
-    )
+    # Stringify types for the external SSH transport
+    @external.transform_values! { |data| stringify_types(data) }
 
-    @yaml = generate_yaml_file(@opts, @subopts)
+    # Generate YAML file examples
+    @yaml = generate_yaml_file(@opts)
 
     renderer = ERB.new(File.read('documentation/templates/bolt_transports_reference.md.erb'), nil, '-')
     File.write('documentation/bolt_transports_reference.md', renderer.result)

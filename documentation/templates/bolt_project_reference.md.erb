@@ -11,22 +11,22 @@ which is supported in the [project directory](configuring_bolt.md).
 <% @opts.each do |option, data| -%>
 ### `<%= option %>`
 
-<%= data[:desc] %>
+<%= data[:description] %>
 
 - **Type:** <%= data[:type] %>
-<% if data.key?(:def) -%>
-- **Default:** <%= data[:def] %>
+<% if data.key?(:_default) -%>
+- **Default:** <%= data[:_default] %>
 <% end -%>
 
-<% if @subopts.key?(option) -%>
-<% @subopts[option].each do |option, data| -%>
+<% if data.key?(:properties) -%>
+<% data[:properties].each do |option, data| -%>
 #### `<%= option %>`
 
-<%= data[:desc] %>
+<%= data[:description] %>
 
 - **Type:** <%= data[:type] %>
-<% if data.key?(:def) -%>
-- **Default:** <%= data[:def] %>
+<% if data.key?(:_default) -%>
+- **Default:** <%= data[:_default] %>
 <% end -%>
 <% end %>
 <% end -%>

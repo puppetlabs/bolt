@@ -5,115 +5,157 @@
   "type": "object",
   "properties": {
     "color": {
+      "$ref": "#/definitions/color"
+    },
+    "compile-concurrency": {
+      "$ref": "#/definitions/compile-concurrency"
+    },
+    "concurrency": {
+      "$ref": "#/definitions/concurrency"
+    },
+    "format": {
+      "$ref": "#/definitions/format"
+    },
+    "inventory-config": {
+      "$ref": "#/definitions/inventory-config"
+    },
+    "plugin_hooks": {
+      "$ref": "#/definitions/plugin_hooks"
+    },
+    "plugins": {
+      "$ref": "#/definitions/plugins"
+    },
+    "puppetdb": {
+      "$ref": "#/definitions/puppetdb"
+    },
+    "puppetfile": {
+      "$ref": "#/definitions/puppetfile"
+    },
+    "save-rerun": {
+      "$ref": "#/definitions/save-rerun"
+    }
+  },
+  "definitions": {
+    "color": {
       "description": "Whether to use colored output when printing messages to the console.",
       "type": "boolean"
     },
     "compile-concurrency": {
       "description": "The maximum number of simultaneous manifest block compiles.",
       "type": "integer",
-      "min": 1
+      "minimum": 1
     },
     "concurrency": {
       "description": "The number of threads to use when executing on remote targets.",
       "type": "integer",
-      "min": 1
+      "minimum": 1
     },
     "format": {
       "description": "The format to use when printing results.",
       "type": "string",
-      "enum": ["human", "json"]
+      "enum": [
+        "human",
+        "json",
+        "rainbow"
+      ]
     },
     "inventory-config": {
-      "description": "A map containing default configuration for each of Bolt's transports as well as the default transport to apply to targets that do not specify one in their URI or inventory configuration.",
+      "description": "A map of default configuration options for the inventory. This includes options for setting the default transport to use when connecting to targets, as well as options for configuring the default behavior of each transport.",
       "type": "object",
-      "parameters": {
+      "properties": {
+        "transport": {
+          "$ref": "#/definitions/transport"
+        },
         "docker": {
-          "$ref": "bolt-transport-definitions.json#/docker"
+          "$ref": "#/definitions/docker"
         },
         "local": {
-          "$ref": "bolt-transport-definitions.json#/local"
+          "$ref": "#/definitions/local"
         },
         "pcp": {
-          "$ref": "bolt-transport-definitions.json#/pcp"
+          "$ref": "#/definitions/pcp"
         },
         "remote": {
-          "$ref": "bolt-transport-definitions.json#/remote"
+          "$ref": "#/definitions/remote"
         },
         "ssh": {
-          "$ref": "bolt-transport-definitions.json#/ssh"
-        },
-        "transport": {
-          "description": "The default transport to use when the transport for a target is not specified in the URI or inventory.",
-          "type": "string",
-          "enum": ["docker", "local", "pcp", "remote", "ssh", "winrm"]
+          "$ref": "#/definitions/ssh"
         },
         "winrm": {
-          "$ref": "bolt-transport-definitions.json#/winrm"
+          "$ref": "#/definitions/winrm"
         }
       }
     },
     "plugin_hooks": {
-      "description": "Which plugins a specific hook should use.",
-      "type": "object",
-      "properties": {
-        "puppet_library": {
-          "description": "Specify which plugin should be used to ensure the Puppet library is installed on a target.",
+      "description": "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. The only configurable plugin hook is `puppet_library`, which can use two possible plugins: [`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) and [`task`](using_plugins.md#task).",
+      "oneOf": [
+        {
           "type": "object"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
         }
-      }
+      ]
     },
     "plugins": {
-      "description": "A map of plugins and their configuration data.",
-      "type": "object",
-      "patternProperties": {
-        "^[a-z][a-z0-9_]*$": { 
+      "description": "A map of plugins and their configuration data, where each key is the name of a plugin and its value is a map of configuration data. Configurable options are specified by the plugin. Read more about configuring plugins in [Using plugins](using_plugins.md#configuring-plugins).",
+      "oneOf": [
+        {
           "type": "object"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
         }
-      }
+      ]
     },
     "puppetdb": {
-      "description": "A map containing options for configuring the Bolt PuppetDB client.",
-      "type": "object",
-      "properties": {
-        "cacert": {
-          "description": "The path to the ca certificate for PuppetDB.",
-          "type": "string"
-        },
-        "cert": {
-          "description": "The path to the client certificate file to use for authentication.",
-          "type": "string"
-        },
-        "key": {
-          "description": "The path to the private key for the certificate.",
-          "type": "string"
-        },
-        "server_urls": {
-          "description": "An array containing the PuppetDB host to connect to. Include the protocol https and the port, which is usually 8081. For example, https://my-master.example.com:8081.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "description": "A PuppetDB host.",
-            "type": "string",
-            "format": "uri"
+      "description": "A map containing options for [configuring the Bolt PuppetDB client](bolt_connect_puppetdb.md).",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cacert": {
+              "description": "The path to the ca certificate for PuppetDB.",
+              "type": "string"
+            },
+            "cert": {
+              "description": "The path to the client certificate file to use for authentication.",
+              "type": "string"
+            },
+            "key": {
+              "description": "The private key for the certificate.",
+              "type": "string"
+            },
+            "server_urls": {
+              "description": "An array containing the PuppetDB host to connect to. Include the protocol `https` and the port, which is usually `8081`. For example, `https://my-master.example.com:8081`.",
+              "type": "array"
+            },
+            "token": {
+              "description": "The path to the PE RBAC Token.",
+              "type": "string"
+            }
           }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
         }
-      }
+      ]
     },
     "puppetfile": {
-      "description": "A map containing options for the 'bolt puppetfile install' command.",
+      "description": "A map containing options for the `bolt puppetfile install` command.",
       "type": "object",
       "properties": {
         "forge": {
-          "description": "A subsection that can have its own proxy setting to set an HTTP proxy for Forge operations only, and a baseurl setting to specify a different Forge host.",
+          "description": "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations only, and a `baseurl` setting to specify a different Forge host.",
           "type": "object",
           "properties": {
             "baseurl": {
-              "description": "The URI for the Forge host.",
+              "description": "The URL to the Forge host.",
               "type": "string",
               "format": "uri"
             },
             "proxy": {
-              "description": "The HTTP proxy to use for Forge operations.",
+              "description": "The HTTP proxy to use for Git and Forge operations.",
               "type": "string",
               "format": "uri"
             }
@@ -127,8 +169,827 @@
       }
     },
     "save-rerun": {
-      "description": "Whether to update .rerun.json in the Bolt project directory. If your target names include passwords, set this value to false to avoid writing passwords to disk.",
+      "description": "Whether to update `.rerun.json` in the Bolt project directory. If your target names include passwords, set this value to `false` to avoid writing passwords to disk.",
       "type": "boolean"
+    },
+    "transport": {
+      "description": "The default transport to use when the transport for a target is not specified in the URI.",
+      "type": "string",
+      "enum": [
+        "ssh",
+        "winrm",
+        "pcp",
+        "local",
+        "docker",
+        "remote"
+      ]
+    },
+    "docker": {
+      "description": "A map of configuration options for the docker transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cleanup": {
+              "$ref": "#/transport_definitions/cleanup"
+            },
+            "host": {
+              "$ref": "#/transport_definitions/host"
+            },
+            "interpreters": {
+              "$ref": "#/transport_definitions/interpreters"
+            },
+            "service-url": {
+              "$ref": "#/transport_definitions/service-url"
+            },
+            "shell-command": {
+              "$ref": "#/transport_definitions/shell-command"
+            },
+            "tmpdir": {
+              "$ref": "#/transport_definitions/tmpdir"
+            },
+            "tty": {
+              "$ref": "#/transport_definitions/tty"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "local": {
+      "description": "A map of configuration options for the local transport. The set of available options is platform dependent.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cleanup": {
+              "$ref": "#/transport_definitions/cleanup"
+            },
+            "interpreters": {
+              "$ref": "#/transport_definitions/interpreters"
+            },
+            "run-as": {
+              "$ref": "#/transport_definitions/run-as"
+            },
+            "run-as-command": {
+              "$ref": "#/transport_definitions/run-as-command"
+            },
+            "sudo-executable": {
+              "$ref": "#/transport_definitions/sudo-executable"
+            },
+            "sudo-password": {
+              "$ref": "#/transport_definitions/sudo-password"
+            },
+            "tmpdir": {
+              "$ref": "#/transport_definitions/tmpdir"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "pcp": {
+      "description": "A map of configuration options for the pcp transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cacert": {
+              "$ref": "#/transport_definitions/cacert"
+            },
+            "host": {
+              "$ref": "#/transport_definitions/host"
+            },
+            "job-poll-interval": {
+              "$ref": "#/transport_definitions/job-poll-interval"
+            },
+            "job-poll-timeout": {
+              "$ref": "#/transport_definitions/job-poll-timeout"
+            },
+            "service-url": {
+              "$ref": "#/transport_definitions/service-url"
+            },
+            "task-environment": {
+              "$ref": "#/transport_definitions/task-environment"
+            },
+            "token-file": {
+              "$ref": "#/transport_definitions/token-file"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "remote": {
+      "description": "A map of configuration options for the remote transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "run-on": {
+              "$ref": "#/transport_definitions/run-on"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "ssh": {
+      "description": "A map of configuration options for the ssh transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cleanup": {
+              "$ref": "#/transport_definitions/cleanup"
+            },
+            "connect-timeout": {
+              "$ref": "#/transport_definitions/connect-timeout"
+            },
+            "disconnect-timeout": {
+              "$ref": "#/transport_definitions/disconnect-timeout"
+            },
+            "encryption-algorithms": {
+              "$ref": "#/transport_definitions/encryption-algorithms"
+            },
+            "extensions": {
+              "$ref": "#/transport_definitions/extensions"
+            },
+            "host": {
+              "$ref": "#/transport_definitions/host"
+            },
+            "host-key-algorithms": {
+              "$ref": "#/transport_definitions/host-key-algorithms"
+            },
+            "host-key-check": {
+              "$ref": "#/transport_definitions/host-key-check"
+            },
+            "interpreters": {
+              "$ref": "#/transport_definitions/interpreters"
+            },
+            "kex-algorithms": {
+              "$ref": "#/transport_definitions/kex-algorithms"
+            },
+            "load-config": {
+              "$ref": "#/transport_definitions/load-config"
+            },
+            "login-shell": {
+              "$ref": "#/transport_definitions/login-shell"
+            },
+            "mac-algorithms": {
+              "$ref": "#/transport_definitions/mac-algorithms"
+            },
+            "password": {
+              "$ref": "#/transport_definitions/password"
+            },
+            "port": {
+              "$ref": "#/transport_definitions/port"
+            },
+            "private-key": {
+              "$ref": "#/transport_definitions/private-key"
+            },
+            "proxyjump": {
+              "$ref": "#/transport_definitions/proxyjump"
+            },
+            "run-as": {
+              "$ref": "#/transport_definitions/run-as"
+            },
+            "run-as-command": {
+              "$ref": "#/transport_definitions/run-as-command"
+            },
+            "script-dir": {
+              "$ref": "#/transport_definitions/script-dir"
+            },
+            "sudo-executable": {
+              "$ref": "#/transport_definitions/sudo-executable"
+            },
+            "sudo-password": {
+              "$ref": "#/transport_definitions/sudo-password"
+            },
+            "tmpdir": {
+              "$ref": "#/transport_definitions/tmpdir"
+            },
+            "tty": {
+              "$ref": "#/transport_definitions/tty"
+            },
+            "user": {
+              "$ref": "#/transport_definitions/user"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "winrm": {
+      "description": "A map of configuration options for the winrm transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "basic-auth-only": {
+              "$ref": "#/transport_definitions/basic-auth-only"
+            },
+            "cacert": {
+              "$ref": "#/transport_definitions/cacert"
+            },
+            "cleanup": {
+              "$ref": "#/transport_definitions/cleanup"
+            },
+            "connect-timeout": {
+              "$ref": "#/transport_definitions/connect-timeout"
+            },
+            "extensions": {
+              "$ref": "#/transport_definitions/extensions"
+            },
+            "file-protocol": {
+              "$ref": "#/transport_definitions/file-protocol"
+            },
+            "host": {
+              "$ref": "#/transport_definitions/host"
+            },
+            "interpreters": {
+              "$ref": "#/transport_definitions/interpreters"
+            },
+            "password": {
+              "$ref": "#/transport_definitions/password"
+            },
+            "port": {
+              "$ref": "#/transport_definitions/port"
+            },
+            "realm": {
+              "$ref": "#/transport_definitions/realm"
+            },
+            "smb-port": {
+              "$ref": "#/transport_definitions/smb-port"
+            },
+            "ssl": {
+              "$ref": "#/transport_definitions/ssl"
+            },
+            "ssl-verify": {
+              "$ref": "#/transport_definitions/ssl-verify"
+            },
+            "tmpdir": {
+              "$ref": "#/transport_definitions/tmpdir"
+            },
+            "user": {
+              "$ref": "#/transport_definitions/user"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "_plugin": {
+      "description": "A plugin reference.",
+      "type": "object",
+      "required": [
+        "_plugin"
+      ],
+      "properties": {
+        "_plugin": {
+          "description": "The name of the plugin.",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "transport_definitions": {
+    "basic-auth-only": {
+      "description": "Whether to force basic authentication. This option is only available when using SSL.",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "cacert": {
+      "description": "The path to the CA certificate.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "cleanup": {
+      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt may create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "connect-timeout": {
+      "description": "How long to wait in seconds when establishing connections. Set this value higher if you frequently encounter connection timeout errors when running Bolt.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "copy-command": {
+      "description": "The command to use when copying files using ssh-command. Bolt runs `<copy-command> <src> <dest>`. This option is used when you need support for features or algorithms that are not supported by the net-ssh Ruby library. **This option is experimental.** You can read more about this option in [External SSH transport](experimental_features.md#external-ssh-transport).",
+      "oneOf": [
+        {
+          "type": [
+            "array",
+            "string"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "disconnect-timeout": {
+      "description": "How long to wait in seconds before force-closing a connection.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "encryption-algorithms": {
+      "description": "A list of encryption algorithms to use when establishing a connection to a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms using this option, add 'defaults' to the list of supported algorithms.",
+      "oneOf": [
+        {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "extensions": {
+      "description": "A list of file extensions that are accepted for scripts or tasks on Windows. Scripts with these file extensions rely on the target's file type association to run. For example, if Python is installed on the system, a `.py` script runs with `python.exe`. The extensions `.ps1`, `.rb`, and `.pp` are always allowed and run via hard-coded executables.",
+      "oneOf": [
+        {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "file-protocol": {
+      "description": "Which file transfer protocol to use. Either `winrm` or `smb`. Using `smb` is recommended for large file transfers.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "smb",
+            "winrm"
+          ]
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "host": {
+      "description": "The target's hostname.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "host-key-algorithms": {
+      "description": "A list of host key algorithms to use when establishing a connection to a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms using this option, add 'defaults' to the list of supported algorithms.",
+      "oneOf": [
+        {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "host-key-check": {
+      "description": "Whether to perform host key validation when connecting.",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "interpreters": {
+      "description": "A map of an extension name to the absolute path of an executable,  enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the `.` character (`.py` and `py` both map to a task executable `task.py`) and the extension is case sensitive. When a target's name is `localhost`, Ruby tasks run with the Bolt Ruby interpreter by default.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "pattern": "^.?[a-zA-Z0-9]+$"
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "job-poll-interval": {
+      "description": "The interval, in seconds, to poll orchestrator for job status.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "job-poll-timeout": {
+      "description": "The time, in seconds, to wait for orchestrator job status.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "kex-algorithms": {
+      "description": "A list of key exchange algorithms to use when establishing a connection to a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms using this option, add 'defaults' to the list of supported algorithms.",
+      "oneOf": [
+        {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "load-config": {
+      "description": "Whether to load system SSH configuration from '~/.ssh/config' and '/etc/ssh_config'.",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "login-shell": {
+      "description": "Which login shell Bolt should expect on the target. Supported shells are sh, bash, zsh, dash, ksh, powershell. **This option is experimental.**",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "sh",
+            "bash",
+            "zsh",
+            "dash",
+            "ksh",
+            "powershell"
+          ]
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "mac-algorithms": {
+      "description": "List of message authentication code algorithms to use when establishing a connection to a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms using this option, add 'defaults' to the list of supported algorithms.",
+      "oneOf": [
+        {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "password": {
+      "description": "The password to use to login.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "port": {
+      "description": "The port to use when connecting to the target.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "private-key": {
+      "description": "Either the path to the private key file to use for authentication, or a hash with the key `key-data` and the contents of the private key.",
+      "oneOf": [
+        {
+          "type": [
+            "object",
+            "string"
+          ],
+          "required": [
+            "key-data"
+          ],
+          "properties": {
+            "key-data": {
+              "description": "The contents of the private key.",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "proxyjump": {
+      "description": "A jump host to proxy connections through, and an optional user to connect with.",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "realm": {
+      "description": "The Kerberos realm (Active Directory domain) to authenticate against.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "run-as": {
+      "description": "The user to run commands as after login. The run-as user must be different than the login user.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "run-as-command": {
+      "description": "The command to elevate permissions. Bolt appends the user and command strings to the configured `run-as-command` before running it on the target. This command must not require  aninteractive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified. The `run-as-command` must be specified as an array.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "run-on": {
+      "description": "The proxy target that the task executes on.",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "script-dir": {
+      "description": "The subdirectory of the tmpdir to use in place of a randomized subdirectory for uploading and executing temporary files on the target. It's expected that this directory already exists as a subdir of tmpdir, which is either configured or defaults to `/tmp`.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "service-url": {
+      "description": "The URL of the host used for API requests.",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "shell-command": {
+      "description": "A shell command to wrap any Docker exec commands in, such as `bash -lc`.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "smb-port": {
+      "description": "The port to use when connecting to the target when file-protocol is set to 'smb'.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "ssh-command": {
+      "description": "The command and flags to use when SSHing. This enables the external SSH transport, which shells out to the specified command. This option is used when you need support for features or algorithms that are not supported by the net-ssh Ruby library. **This option is experimental.** You can read more about this  option in [External SSH transport](experimental_features.md#external-ssh-transport).",
+      "oneOf": [
+        {
+          "type": [
+            "array",
+            "string"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "ssl": {
+      "description": "Whether to use secure https connections for WinRM.",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "ssl-verify": {
+      "description": "Whether to verify that the target's certificate matches the cacert.",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "sudo-executable": {
+      "description": "The executable to use when escalating to the configured `run-as` user. This is useful when you want to escalate using the configured `sudo-password`, since `run-as-command` does not use `sudo-password` or support prompting. The command executed on the target is `<sudo-executable> -S -u <user> -p custom_bolt_prompt <command>`. **This option is experimental.**",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "sudo-password": {
+      "description": "The password to use when changing users via `run-as`.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "task-environment": {
+      "description": "The environment the orchestrator loads task code from.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "tmpdir": {
+      "description": "The directory to upload and execute temporary files on the target.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "token-file": {
+      "description": "The path to the token file.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "tty": {
+      "description": "Whether to enable tty on exec commands.",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "user": {
+      "description": "The user name to login as.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
     }
   }
 }
