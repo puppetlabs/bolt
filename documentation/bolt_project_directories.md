@@ -98,6 +98,8 @@ if you have a single set of Bolt code and data that you use across all projects.
 
 Bolt uses these methods, in order, to choose a project directory.
 
+1. **Environment variable:** You can specify a path to a project using the
+   `BOLT_PROJECT` environment variable.
 1. **Manually specified:** You can specify on the command line what directory
    Bolt to use with `--project <DIRECTORY_PATH>`. There is not an equivalent
    configuration setting because the project directory must be known in order to
@@ -108,6 +110,39 @@ Bolt uses these methods, in order, to choose a project directory.
 1. **User project directory:** If no directory is specified manually or found in
    a parent directory, the user project directory is used.
 
+## World-writable project directories
+
+On **Unix-like systems**, Bolt will not load a project from a world-writable
+directory by default, as loading from a world-writable directory presents a
+potential security risk. If you attempt to load a project from a
+world-writable directory, Bolt will not load any content and will raise an
+exception.
+
+If you wish to override this behavior and force Bolt to load a project from a
+world-writable directory, you can set the `BOLT_PROJECT` environment variable
+to the project directory path.
+
+For example, if you wanted to load a project named `my_project` from the
+world-writable directory at `~/project/`, you would set the `BOLT_PROJECT`
+environment variable as:
+
+```bash
+export BOLT_PROJECT='~/project/world_writable'
+```
+
+> **Note:** Exported environment variables expire at the end of the current
+> session. If you need a more permanent solution, add the `export` line to your
+> `~/.bashrc` or the relevant profile for the shell you're using.
+
+If you want to use a world-writable directory for a single Bolt execution, set the
+environment variable before the Bolt command:
+
+```bash
+BOLT_PROJECT='~/project/world_writable' bolt command run uptime -t target1
+```
+
+> **Note:** The `BOLT_PROJECT` environment variable takes precedence over the
+> `--configfile` CLI option. 
 
 ## Project directory structure
 

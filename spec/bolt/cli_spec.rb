@@ -2100,6 +2100,30 @@ describe "Bolt::CLI" do
     end
   end
 
+  describe 'BOLT_PROJECT' do
+    let(:bolt_project) { '/bolt/project' }
+    let(:pathname)     { Pathname.new(bolt_project).expand_path }
+
+    around(:each) do |example|
+      original = ENV['BOLT_PROJECT']
+      ENV['BOLT_PROJECT'] = bolt_project
+      example.run
+    ensure
+      ENV['BOLT_PROJECT'] = original
+    end
+
+    before(:each) do
+      allow(Bolt::Util).to receive(:validate_file).and_return(true)
+    end
+
+    it 'loads from BOLT_PROJECT environment variable over --configfile' do
+      cli = Bolt::CLI.new(%w[command run uptime --configfile /foo/bar --targets foo])
+      cli.parse
+
+      expect(cli.config.project.path).to eq(pathname)
+    end
+  end
+
   describe 'configfile' do
     let(:configdir) { File.join(__dir__, '..', 'fixtures', 'configs') }
     let(:modulepath) { [File.expand_path('/foo/bar'), File.expand_path('/baz/qux')] }

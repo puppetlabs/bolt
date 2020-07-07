@@ -28,7 +28,7 @@ module Bolt
     DEFAULT_DEFAULT_CONCURRENCY = 100
 
     def self.default
-      new(Bolt::Project.create_project('.'), {})
+      new(Bolt::Project.default_project, {})
     end
 
     def self.from_project(project, overrides = {})
