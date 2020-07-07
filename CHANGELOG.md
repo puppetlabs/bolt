@@ -1,5 +1,45 @@
 # Changelog
 
+## Bolt 2.17.0 (2020-07-07)
+
+### New features
+
+* **Set environment variables for commands and scripts**
+  ([#1899](https://github.com/puppetlabs/bolt/issues/1899))
+
+  The `run_command()` and `run_script()` plan functions now support an
+  `_env_vars` argument which accepts a Hash of environment variable
+  declarations to set when running the command/script.
+
+* **Add location of plan failures in error messages**
+  ([#1923](https://github.com/puppetlabs/bolt/issues/1923))
+
+  Errors raised by plan failures now include the location of the plan
+  failure, including the filepath, line, and column.
+
+* **Add `--log-level` CLI option**
+  ([#1920](https://github.com/puppetlabs/bolt/issues/1920))
+
+  The new `--log-level` CLI option can be used to override the console's
+  log level. It accepts the following log levels: `debug`, `info`,
+  `notice`, `warn`, `error`, `fatal`, `any`.
+
+### Bug fixes
+
+* **Load projects with an embedded Boltdir when specified on the CLI**
+  ([#1953](https://github.com/puppetlabs/bolt/pull/1953))
+
+  Bolt now looks for a `Boltdir` in the directory specified by `--project`
+  or `--boltdir` and uses it as the project directory if it is present.
+  Otherwise, the specified directory is used as the project directory.
+
+* **Support plugin references in JSON schemas**
+  ([#1900](https://github.com/puppetlabs/bolt/issues/1900))
+
+  The JSON schemas no longer mark plugin references as invalid values
+  when the option can accept a plugin reference. Previously, the schemas
+  would mark any plugin reference as an invalid value.
+
 ## Bolt 2.16.0 (2020-06-29)
 
 ### New features
