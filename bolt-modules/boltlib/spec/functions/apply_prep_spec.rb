@@ -217,6 +217,28 @@ describe 'apply_prep' do
     end
   end
 
+  context 'with required_modules specified' do
+    let(:hostnames)         { %w[foo bar] }
+    let(:targets)           { hostnames.map { |h| inventory.get_target(h) } }
+    let(:fact)              { { 'osfamily' => 'none' } }
+    let(:custom_facts_task) { Bolt::Task.new('custom_facts_task') }
+
+    before(:each) do
+      applicator.stubs(:build_plugin_tarball).returns(:tarball)
+      applicator.stubs(:custom_facts_task).returns(custom_facts_task)
+      targets.each { |target| inventory.set_feature(target, 'puppet-agent') }
+    end
+
+    it 'only uses required plugins' do
+      facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
+      executor.expects(:run_task).with(targets, custom_facts_task, includes('plugins')).returns(facts)
+
+      Puppet.expects(:debug).at_least(1)
+      Puppet.expects(:debug).with("Syncing only required modules: non-existing-module.")
+      is_expected.to run.with_params(hostnames.join(','), 'required_modules' => ['non-existing-module']).and_return(nil)
+    end
+  end
+
   context 'without tasks enabled' do
     let(:tasks_enabled) { false }
     it 'fails and reports that apply_prep is not available' do
