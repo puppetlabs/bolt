@@ -27,8 +27,7 @@ module BoltSpec
 
       headers = { "Content-Type" => "application/json" }
 
-      response = client.http_client.post(url, body: body, header: headers)
-      response
+      client.http_client.post(url, body: body, header: headers)
     end
 
     def replace_facts(certname, facts, wait: nil)
