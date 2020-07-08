@@ -15,6 +15,7 @@ module Bolt
       return if Logging.initialized?
 
       Logging.init :debug, :info, :notice, :warn, :error, :fatal, :any
+      @mutex = Mutex.new
 
       Logging.color_scheme(
         'bolt',
@@ -101,6 +102,17 @@ module Bolt
 
     def self.reset_logging
       Logging.reset
+    end
+
+    def self.warn_once(type, msg)
+      @mutex.synchronize {
+        @warnings ||= []
+        @logger ||= Logging.logger[self]
+        unless @warnings.include?(type)
+          @logger.warn(msg)
+          @warnings << type
+        end
+      }
     end
   end
 end

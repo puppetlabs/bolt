@@ -11,7 +11,7 @@ module Bolt
                 escalation: %w[run-as sudo-password sudo-password-prompt sudo-executable],
                 run_context: %w[concurrency inventoryfile save-rerun cleanup],
                 global_config_setters: %w[modulepath project configfile],
-                transports: %w[transport connect-timeout tty ssh-command copy-command],
+                transports: %w[transport connect-timeout tty native-ssh ssh-command copy-command],
                 display: %w[format color verbose trace],
                 global: %w[help version debug log-level] }.freeze
 
@@ -743,11 +743,15 @@ module Bolt
              "Specify a default transport: #{TRANSPORTS.keys.join(', ')}") do |t|
         @options[:transport] = t
       end
-      define('--ssh-command EXEC', "Executable to use instead of the net-ssh ruby library. ",
+      define('--[no-]native-ssh', 'Whether to shell out to native SSH or use the net-ssh Ruby library.',
+             'This option is experimental') do |bool|
+        @options[:'native-ssh'] = bool
+      end
+      define('--ssh-command EXEC', "Executable to use instead of the net-ssh Ruby library. ",
              "This option is experimental.") do |exec|
         @options[:'ssh-command'] = exec
       end
-      define('--copy-command EXEC', "Command to copy files to remote hosts if using external SSH. ",
+      define('--copy-command EXEC', "Command to copy files to remote hosts if using native SSH. ",
              "This option is experimental.") do |exec|
         @options[:'copy-command'] = exec
       end

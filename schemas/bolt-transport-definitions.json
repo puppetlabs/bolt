@@ -62,6 +62,7 @@
       "kex-algorithms":        { "$ref": "#/definitions/kex-algorithms" },
       "load-config":           { "$ref": "#/definitions/load-config" },
       "login-shell":           { "$ref": "#/definitions/login-shell" },
+      "native-ssh":            { "$ref": "#/definitions/native-ssh" },
       "mac-algorithms":        { "$ref": "#/definitions/mac-algorithms" },
       "password":              { "$ref": "#/definitions/password" },
       "port":                  { "$ref": "#/definitions/port" },
@@ -149,7 +150,7 @@
       ]
     },
     "copy-command": {
-      "description": "Array of command and flags to use when copying files using ssh-command. Bolt runs `<copy-command> <src> <dest>`.",
+      "description": "Array of command and flags to use when copying files using native SSH. Bolt runs `<copy-command> <src> <dest>`.",
       "oneOf": [
         {
           "type": "array"
@@ -375,6 +376,10 @@
         }
       ]
     },
+    "native-ssh": {
+      "description": "Whether to shell out directly to SSH or use the Ruby net-ssh library.",
+      "type": "boolean"
+    },
     "mac-algorithms": {
       "description": "List of message authentication code algorithms to use when establishing a connection with a target. Supported algorithms are defined by the Ruby net-ssh library and can be viewed at https://github.com/net-ssh/net-ssh#supported-algorithms . All supported, non-deprecated algorithms are available by default when this option is not used. To reference all default algorithms when using this option, add 'defaults' to the list of supported algorithms.",
       "type": "array",
@@ -446,7 +451,7 @@
       "min": 0
     },
     "ssh-command": {
-      "description": "Array of command and flags to use when SSHing. This enables the external SSH transport which shells out to the specified command.",
+      "description": "Array of command and flags to use when SSHing using native SSH.",
       "type": ["array", "string"]
     },
     "ssl": {

@@ -21,11 +21,10 @@ describe Bolt::Transport::SSH::ExecConnection do
 
   context 'when copying files' do
     it 'uses configured copy-command' do
-      inventory.set_config(target, '%w[ssh ssh-command]', ['ssh'])
       inventory.set_config(
         target,
         'ssh',
-        'ssh-command'  => 'ssh',
+        'native-ssh' => true,
         'copy-command' => ['scp', '-o', 'Port=21']
       )
 
@@ -39,7 +38,7 @@ describe Bolt::Transport::SSH::ExecConnection do
       inventory.set_config(
         target,
         'ssh',
-        'ssh-command'  => 'ssh',
+        'native-ssh' => true,
         'copy-command' => 3
       )
 
@@ -59,7 +58,10 @@ describe Bolt::Transport::SSH::ExecConnection do
 
   context 'when executing' do
     it 'builds ssh command' do
-      inventory.set_config(target, %w[ssh ssh-command], ['good', '-morning'])
+      inventory.set_config(target,
+                           'ssh',
+                           'ssh-command' => ['good', '-morning'],
+                           'native-ssh' => true)
 
       expect(Open3).to receive(:popen3)
         .with("good", "-morning", "-o", "BatchMode=yes", "sshuser@foo.example.com", "is it Friday?")
@@ -67,7 +69,7 @@ describe Bolt::Transport::SSH::ExecConnection do
     end
 
     it 'builds ssh command with port' do
-      inventory.set_config(target, %w[ssh ssh-command], ['ssh'])
+      inventory.set_config(target, %w[ssh native-ssh], true)
       inventory.set_config(target, %w[ssh port], 23)
 
       expect(Open3).to receive(:popen3)
@@ -77,7 +79,7 @@ describe Bolt::Transport::SSH::ExecConnection do
 
     it 'builds ssh command with key' do
       keypath = fixtures_path('keys', 'id_rsa')
-      inventory.set_config(target, %w[ssh ssh-command], ['ssh'])
+      inventory.set_config(target, %w[ssh native-ssh], true)
       inventory.set_config(target, %w[ssh private-key], keypath)
 
       expect(Open3).to receive(:popen3)
@@ -86,14 +88,15 @@ describe Bolt::Transport::SSH::ExecConnection do
     end
 
     it 'fails if key is not a string' do
-      inventory.set_config(target, %w[ssh ssh-command], ['ssh'])
+      inventory.set_config(target, %w[ssh native-ssh], true)
       inventory.set_config(target, %w[ssh private-key], 'key-data' => 'beepboop')
 
       expect { subject.execute('ls') }
-        .to raise_error(/private-key must be a filepath when using ssh-command/)
+        .to raise_error(/private-key must be a filepath when using native-ssh/)
     end
 
     it 'errors with invalid ssh-command' do
+      inventory.set_config(target, %w[ssh native-ssh], true)
       inventory.set_config(target, %w[ssh ssh-command], 3)
 
       expect { subject.execute('ls') }

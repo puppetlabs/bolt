@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'bolt/logger'
 require 'bolt/node/errors'
 require 'bolt/transport/simple'
 
@@ -21,7 +22,12 @@ module Bolt
       end
 
       def with_connection(target)
-        conn = if target.transport_config['ssh-command']
+        if target.transport_config['ssh-command'] && !target.transport_config['native-ssh']
+          Bolt::Logger.warn_once("ssh-command and native-ssh conflict",
+                                 "native-ssh must be true to use ssh-command")
+        end
+
+        conn = if target.transport_config['native-ssh']
                  ExecConnection.new(target)
                else
                  Connection.new(target, @transport_logger)

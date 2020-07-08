@@ -108,17 +108,16 @@ module Bolt
           },
           "copy-command" => {
             type: [Array, String],
-            description: "The command to use when copying files using ssh-command. Bolt runs `<copy-command> <src> "\
+            description: "The command to use when copying files using native SSH. Bolt runs `<copy-command> <src> "\
                          "<dest>`. This option is used when you need support for features or algorithms that are not "\
                          "supported by the net-ssh Ruby library. **This option is experimental.** You can read more "\
-                         "about this option in [External SSH "\
-                         "transport](experimental_features.md#external-ssh-transport).",
+                         "about this option in [Native SSH transport](experimental_features.md#native-ssh-transport).",
             items: {
               type: String
             },
             _plugin: true,
-            _default: "scp -r",
-            _example: "scp -r -F ~/ssh-config/myconf"
+            _default: %w[scp -r],
+            _example: %w[scp -r -F ~/ssh-config/myconf]
           },
           "disconnect-timeout" => {
             type: Integer,
@@ -270,6 +269,13 @@ module Bolt
             _plugin: true,
             _example: %w[defaults hmac-md5]
           },
+          "native-ssh" => {
+            type: [TrueClass, FalseClass],
+            description: "This enables the native SSH transport, which shells out to SSH instead of using the "\
+                         "net-ssh Ruby library",
+            _default: false,
+            _example: true
+          },
           "password" => {
             type: String,
             description: "The password to use to login.",
@@ -368,16 +374,16 @@ module Bolt
           },
           "ssh-command" => {
             type: [Array, String],
-            description: "The command and flags to use when SSHing. This enables the external SSH transport, which "\
-                         "shells out to the specified command. This option is used when you need support for "\
+            description: "The command and flags to use when SSHing. This option is used when you need support for "\
                          "features or algorithms that are not supported by the net-ssh Ruby library. **This option "\
-                         "is experimental.** You can read more about this  option in [External SSH "\
-                         "transport](experimental_features.md#external-ssh-transport).",
+                         "is experimental.** You can read more about this  option in [Native SSH "\
+                         "transport](experimental_features.md#native-ssh-transport).",
             items: {
               type: String
             },
             _plugin: true,
-            _example: "ssh"
+            _default: 'ssh',
+            _example: %w[ssh -o Ciphers=chacha20-poly1305@openssh.com]
           },
           "ssl" => {
             type: [TrueClass, FalseClass],
