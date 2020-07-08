@@ -20,6 +20,8 @@ describe "Bolt::CLI" do
 
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
+    # Don't print error messages to the console
+    allow($stdout).to receive(:puts)
 
     # Don't allow tests to override the captured log config
     allow(Bolt::Logger).to receive(:configure)
@@ -920,6 +922,7 @@ describe "Bolt::CLI" do
       end
 
       before :each do
+        allow(cli).to receive(:config).and_return(Bolt::Config.default)
         allow(Bolt::Executor).to receive(:new).and_return(executor)
         allow(executor).to receive(:log_plan) { |_plan_name, &block| block.call }
         allow(executor).to receive(:run_plan) do |scope, plan, params|
@@ -1956,6 +1959,7 @@ describe "Bolt::CLI" do
         outputter = Bolt::Outputter::JSON.new(false, false, false, output)
         allow(cli).to receive(:outputter).and_return(outputter)
         allow(executor).to receive(:report_bundled_content)
+        allow(cli).to receive(:config).and_return(Bolt::Config.default)
       end
 
       context "when running a task", :reset_puppet_settings do
@@ -2021,6 +2025,7 @@ describe "Bolt::CLI" do
 
       before :each do
         allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
+        allow(cli).to receive(:config).and_return(Bolt::Config.default)
         allow(puppetfile).to receive(:exist?).and_return(true)
         allow_any_instance_of(Bolt::PAL).to receive(:generate_types)
         allow(R10K::Action::Puppetfile::Install).to receive(:new).and_return(action_stub)
@@ -2087,6 +2092,7 @@ describe "Bolt::CLI" do
 
       before :each do
         allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
+        allow(cli).to receive(:config).and_return(Bolt::Config.default)
       end
 
       it 'fails if the code file does not exist' do

@@ -46,7 +46,6 @@ module Bolt
       Bolt::Logger.initialize_logging
       @logger = Logging.logger[self]
       @argv = argv
-      @config = Bolt::Config.default
       @options = {}
     end
 
@@ -77,64 +76,74 @@ module Bolt
     private :help?
 
     def parse
-      parser = BoltOptionParser.new(options)
-      # This part aims to handle both `bolt <mode> --help` and `bolt help <mode>`.
-      remaining = handle_parser_errors { parser.permute(@argv) } unless @argv.empty?
-      if @argv.empty? || help?(remaining)
-        # Update the parser for the subcommand (or lack thereof)
-        parser.update
-        puts parser.help
-        raise Bolt::CLIExit
-      end
-
-      options[:object] = remaining.shift
-
-      # Only parse task_options for task or plan
-      if %w[task plan].include?(options[:subcommand])
-        task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
-        if options[:task_options]
-          unless task_options.empty?
-            raise Bolt::CLIError,
-                  "Parameters must be specified through either the --params " \
-                  "option or param=value pairs, not both"
-          end
-          options[:params_parsed] = true
-        elsif task_options.any?
-          options[:params_parsed] = false
-          options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
-        else
-          options[:params_parsed] = true
-          options[:task_options] = {}
+      begin
+        parser = BoltOptionParser.new(options)
+        # This part aims to handle both `bolt <mode> --help` and `bolt help <mode>`.
+        remaining = handle_parser_errors { parser.permute(@argv) } unless @argv.empty?
+        if @argv.empty? || help?(remaining)
+          # Update the parser for the subcommand (or lack thereof)
+          parser.update
+          puts parser.help
+          raise Bolt::CLIExit
         end
-      end
-      options[:leftovers] = remaining
 
-      validate(options)
+        options[:object] = remaining.shift
 
-      @config = if ENV['BOLT_PROJECT']
-                  project = Bolt::Project.create_project(ENV['BOLT_PROJECT'], 'environment')
-                  Bolt::Config.from_project(project, options)
-                elsif options[:configfile]
-                  Bolt::Config.from_file(options[:configfile], options)
-                else
-                  project = if options[:boltdir]
-                              dir = Pathname.new(options[:boltdir])
-                              if (dir + Bolt::Project::BOLTDIR_NAME).directory?
-                                Bolt::Project.create_project(dir + Bolt::Project::BOLTDIR_NAME)
+        # Only parse task_options for task or plan
+        if %w[task plan].include?(options[:subcommand])
+          task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
+          if options[:task_options]
+            unless task_options.empty?
+              raise Bolt::CLIError,
+                    "Parameters must be specified through either the --params " \
+                    "option or param=value pairs, not both"
+            end
+            options[:params_parsed] = true
+          elsif task_options.any?
+            options[:params_parsed] = false
+            options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
+          else
+            options[:params_parsed] = true
+            options[:task_options] = {}
+          end
+        end
+        options[:leftovers] = remaining
+
+        validate(options)
+
+        @config = if ENV['BOLT_PROJECT']
+                    project = Bolt::Project.create_project(ENV['BOLT_PROJECT'], 'environment')
+                    Bolt::Config.from_project(project, options)
+                  elsif options[:configfile]
+                    Bolt::Config.from_file(options[:configfile], options)
+                  else
+                    project = if options[:boltdir]
+                                dir = Pathname.new(options[:boltdir])
+                                if (dir + Bolt::Project::BOLTDIR_NAME).directory?
+                                  Bolt::Project.create_project(dir + Bolt::Project::BOLTDIR_NAME)
+                                else
+                                  Bolt::Project.create_project(dir)
+                                end
                               else
-                                Bolt::Project.create_project(dir)
+                                Bolt::Project.find_boltdir(Dir.pwd)
                               end
-                            else
-                              Bolt::Project.find_boltdir(Dir.pwd)
-                            end
-                  Bolt::Config.from_project(project, options)
-                end
+                    Bolt::Config.from_project(project, options)
+                  end
 
-      Bolt::Logger.configure(config.log, config.color)
+        Bolt::Logger.configure(config.log, config.color)
+      rescue Bolt::Error => e
+        if $stdout.isatty
+          # Print the error message in red, mimicking outputter.fatal_error
+          $stdout.puts("\033[31m#{e.message}\033[0m")
+        else
+          $stdout.puts(e.message)
+        end
+        raise e
+      end
 
       # Logger must be configured before checking path case and project file, otherwise warnings will not display
-      @config.check_path_case('modulepath', @config.modulepath)
-      @config.project.check_deprecated_file
+      config.check_path_case('modulepath', config.modulepath)
+      config.project.check_deprecated_file
 
       # Log the file paths for loaded config files
       config_loaded
@@ -284,12 +293,12 @@ module Bolt
     def warn_inventory_overrides_cli(opts)
       inventory_source = if ENV[Bolt::Inventory::ENVIRONMENT_VAR]
                            Bolt::Inventory::ENVIRONMENT_VAR
-                         elsif @config.inventoryfile && Bolt::Util.file_stat(@config.inventoryfile)
-                           @config.inventoryfile
+                         elsif config.inventoryfile && Bolt::Util.file_stat(config.inventoryfile)
+                           config.inventoryfile
                          else
                            begin
-                             Bolt::Util.file_stat(@config.default_inventoryfile)
-                             @config.default_inventoryfile
+                             Bolt::Util.file_stat(config.default_inventoryfile)
+                             config.default_inventoryfile
                            rescue Errno::ENOENT
                              nil
                            end
@@ -393,7 +402,7 @@ module Bolt
         if options[:action] == 'generate-types'
           code = generate_types
         elsif options[:action] == 'install'
-          code = install_puppetfile(@config.puppetfile_config, @config.puppetfile, @config.modulepath)
+          code = install_puppetfile(config.puppetfile_config, config.puppetfile, config.modulepath)
         end
       when 'secret'
         code = Bolt::Secret.execute(plugins, outputter, options)
@@ -805,7 +814,7 @@ module Bolt
     end
 
     def rerun
-      @rerun ||= Bolt::Rerun.new(@config.rerunfile, @config.save_rerun)
+      @rerun ||= Bolt::Rerun.new(config.rerunfile, config.save_rerun)
     end
 
     def outputter
