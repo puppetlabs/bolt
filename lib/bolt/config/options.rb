@@ -175,7 +175,7 @@ module Bolt
         "log" => {
           description: "A map of configuration for the logfile output. Under `log`, you can configure log options "\
                        "for `console` and add configuration for individual log files, such as "\
-                       "~/.puppetlabs/bolt/debug.log`. Individual log files must be valid filepaths. If the log "\
+                       "`~/.puppetlabs/bolt/debug.log`. Individual log files must be valid filepaths. If the log "\
                        "file does not exist, then Bolt will create it before logging information.",
           type: Hash,
           properties: {
@@ -440,6 +440,7 @@ module Bolt
         concurrency
         format
         inventory-config
+        log
         plugin_hooks
         plugins
         puppetdb
