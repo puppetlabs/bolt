@@ -1,6 +1,6 @@
 # Contributing
 
-## Bolt Community Slack Channel 
+## Bolt Community Slack Channel
 
 Join the `#bolt` channel in the [Puppet community Slack](https://slack.puppet.com/) where Bolt developers and community members who use and contribute to Bolt discuss the tool. Another channel of interest is the `#office-hours` where once a week a Bolt developer leads a Q&A session about using Bolt.
 
@@ -39,8 +39,8 @@ License Agreement before we can accept your pull request: https://cla.puppet.com
 1. Commit your changes and add a useful commit message, including what specifically you changed and why - `git commit`
     * If your changes are user-facing, add a release note to the end of a commit message. Release notes should begin
       with a label indicating what kind of change you are making. Valid labels include `!feature`, `!bug`, `!deprecation`,
-      and `!removal`. 
-      
+      and `!removal`.
+
       Release notes should follow this format:
 
       ```
@@ -139,8 +139,8 @@ Windows includes additional tests that require a full Windows Server VM to run. 
 
 ### `rubocop` on Windows
 
-To use `rubocop` on Windows, you must install the `ruby.devkit` and the MSYS2 base package.
+To use `rubocop` on Windows, you must have a ruby install with a configured devkit and the MSYS2 base package in order to compile ruby C extensions. This can be downloaded from https://rubyinstaller.org/downloads/ or installed using [chocolatey](https://chocolatey.org/packages/ruby)
 
-    choco install ruby.devkit
+    choco install ruby
     refreshenv
     ridk install    # Choose the base install and complete the Wizard selections.
