@@ -21,6 +21,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   before :each do
     # Make sure we don't accidentally call any run functions
     allow(scope).to receive(:call_function)
+    allow_any_instance_of(Bolt::Analytics::NoopClient).to receive(:event)
   end
 
   def call_plan(plan, params = {})

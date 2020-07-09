@@ -184,12 +184,10 @@ module Bolt
       # Raises a deprecation warning if the pkcs7 plugin is using deprecated keys and
       # modifies the keys so they are the correct format
       def handle_deprecated_pkcs7_keys(params)
-        if (params.key?('private-key') || params.key?('public-key')) && !@deprecation_warning_issued
-          @deprecation_warning_issued = true
-
+        if params.key?('private-key') || params.key?('public-key')
           message = "pkcs7 keys 'private-key' and 'public-key' have been deprecated and will be "\
                     "removed in a future version of Bolt; use 'private_key' and 'public_key' instead."
-          Logging.logger[self].warn(message)
+          Bolt::Logger.deprecation_warning('PKCS7 keys using hyphens, not underscores', message)
         end
 
         params['private_key'] = params.delete('private-key') if params.key?('private-key')

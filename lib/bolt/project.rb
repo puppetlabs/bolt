@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require 'pathname'
-require 'bolt/pal'
 require 'bolt/config'
+require 'bolt/pal'
 
 module Bolt
   class Project
@@ -16,7 +16,8 @@ module Bolt
     }.freeze
 
     attr_reader :path, :data, :config_file, :inventory_file, :modulepath, :hiera_config,
-                :puppetfile, :rerunfile, :type, :resource_types, :warnings, :project_file
+                :puppetfile, :rerunfile, :type, :resource_types, :warnings, :project_file,
+                :deprecations
 
     def self.default_project
       create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
@@ -65,11 +66,12 @@ module Bolt
       @project_file = @path + 'bolt-project.yaml'
 
       @warnings = []
+      @deprecations = []
       if (@path + 'bolt.yaml').file? && project_file?
         msg = "Project-level configuration in bolt.yaml is deprecated if using bolt-project.yaml. "\
           "Transport config should be set in inventory.yaml, all other config should be set in "\
           "bolt-project.yaml."
-        @warnings << { msg: msg }
+        @deprecations << { type: 'Using bolt.yaml for project configuration', msg: msg }
       end
 
       @inventory_file = @path + 'inventory.yaml'
@@ -158,8 +160,8 @@ module Bolt
 
     def check_deprecated_file
       if (@path + 'project.yaml').file?
-        logger = Logging.logger[self]
-        logger.warn "Project configuration file 'project.yaml' is deprecated; use 'bolt-project.yaml' instead."
+        msg = "Project configuration file 'project.yaml' is deprecated; use 'bolt-project.yaml' instead."
+        Bolt::Logger.deprecation_warning('Using project.yaml instead of bolt-project.yaml', msg)
       end
     end
   end

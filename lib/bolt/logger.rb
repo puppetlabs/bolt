@@ -67,6 +67,10 @@ module Bolt
       end
     end
 
+    def self.analytics=(analytics)
+      @analytics = analytics
+    end
+
     def self.console_layout(color)
       color_scheme = :bolt if color
       Logging.layouts.pattern(
@@ -113,6 +117,11 @@ module Bolt
           @warnings << type
         end
       }
+    end
+
+    def self.deprecation_warning(type, msg)
+      @analytics&.event('Warn', 'deprecation', label: type)
+      warn_once(type, msg)
     end
   end
 end

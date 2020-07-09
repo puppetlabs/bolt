@@ -146,8 +146,9 @@ describe Bolt::Config do
         allow(File).to receive(:exist?).with(path + defaults_name).and_return(false)
         allow(File).to receive(:exist?).with(path + config_name).and_return(true)
 
-        warnings = Bolt::Config.load_defaults(project).flat_map { |config| config[:warnings] }
-        expect(warnings).to include(msg: /bolt.yaml is deprecated/)
+        deps = Bolt::Config.load_defaults(project).flat_map { |config| config[:deprecations] }
+        # All the deprecation messages + types
+        expect(deps.map(&:values).flatten).to include(/bolt.yaml is deprecated/)
       end
 
       it 'loads bolt-defaults.yaml if present' do
@@ -394,9 +395,9 @@ describe Bolt::Config do
 
     let(:config) {
       Bolt::Config.new(project, [
-                         { data: system_config, warnings: [] },
-                         { data: user_config, warnings: [] },
-                         { data: project_config, warnings: [] }
+                         { data: system_config, warnings: [], deprecations: [] },
+                         { data: user_config, warnings: [], deprecations: [] },
+                         { data: project_config, warnings: [], deprecations: [] }
                        ])
     }
 
