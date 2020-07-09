@@ -28,7 +28,7 @@ This acceptance suite allows you to test bolt using the following methods:
 * gem: Install bolt via gem from a gemsource defined as an environment
  variable (defaults to https://gems.rubygems.org).
 * git: Install bolt via the git repo from a branch or SHA defined as
- environment variables (defaults to #master/HEAD).
+ environment variables (defaults to #main/HEAD).
 * package: Install bolt via the puppet repos 
 
 The tests assume the following [Beaker
@@ -122,7 +122,7 @@ install, this value will be used by the test pre-suites in conjunction
 with `GIT_SERVER` to determine where the git repo should be obtained
 from.
 
-**GIT_BRANCH** (Default `master`): When testing via git install, this
+**GIT_BRANCH** (Default `main`): When testing via git install, this
 value will be used by the test pre-suites to determine what branch
 should be checked out for testing.
 
@@ -192,7 +192,7 @@ bundle exec rake test:gem
 
 #### Git
 
-Example to test latest git commit to master on https://github.com/puppetlabs/bolt
+Example to test latest git commit to main on https://github.com/puppetlabs/bolt
 ```
 SSH_PASSWORD='S3@ret3' \
 WINRM_PASSWORD='S3@ret3' \

@@ -11,7 +11,7 @@ around breaking behavior where possible.
 ## Bolt projects
 
 This feature was introduced in [Bolt
-2.8.0](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md#bolt-280-2020-05-05)
+2.8.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-280-2020-05-05)
 
 Bolt project directories have been around for a while in Bolt, but this release
 signals a shift in the direction we're taking with them. We see Bolt projects as
@@ -133,7 +133,7 @@ Use `bolt plan show <plan-name>` to view details and parameters for a specific p
 ## `ResourceInstance` data type
 
 This feature was introduced in [Bolt
-2.10.0](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md#bolt-2100-2020-05-18).
+2.10.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-2100-2020-05-18).
 
 Bolt has had a limited ability to interact with Puppet's Resource Abstraction
 Layer. You could use the `apply` function to generate catalogs and return
@@ -360,7 +360,7 @@ $apply_results.each |$result| {
 ## Native SSH transport
 
 This feature was introduced in [Bolt
-2.10.0](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md#bolt-2100-2020-05-18).
+2.10.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-2100-2020-05-18).
 
 Bolt's SSH transport uses the ruby library `net-ssh`, which is a pure ruby
 implementation of the SSH2 client protocol. While robust, the library lacks

@@ -1,6 +1,6 @@
-[![Modules Status](https://github.com/puppetlabs/bolt/workflows/Modules/badge.svg?branch=master)](https://github.com/puppetlabs/bolt/actions)
-[![Linux Status](https://github.com/puppetlabs/bolt/workflows/Linux/badge.svg?branch=master)](https://github.com/puppetlabs/bolt/actions)
-[![Windows Status](https://github.com/puppetlabs/bolt/workflows/Windows/badge.svg?branch=master)](https://github.com/puppetlabs/bolt/actions)
+[![Modules Status](https://github.com/puppetlabs/bolt/workflows/Modules/badge.svg?branch=main)](https://github.com/puppetlabs/bolt/actions)
+[![Linux Status](https://github.com/puppetlabs/bolt/workflows/Linux/badge.svg?branch=main)](https://github.com/puppetlabs/bolt/actions)
+[![Windows Status](https://github.com/puppetlabs/bolt/workflows/Windows/badge.svg?branch=main)](https://github.com/puppetlabs/bolt/actions)
 [![Version](https://img.shields.io/github/v/tag/puppetlabs/bolt?label=version)](./CHANGELOG.md)
 [![Platforms](https://img.shields.io/badge/platforms-linux%20%7C%20windows%20%7C%20macos-lightgrey)](./documentation/bolt_installing.md)
 [![License](https://img.shields.io/github/license/puppetlabs/bolt)](./LICENSE)
@@ -29,7 +29,7 @@ More information and documentation is available on the [Bolt website](https://pu
 
 Bolt can be installed on Linux, Windows, and macOS. For complete installation details, see the [installation docs](./documentation/bolt_installing.md).
 
-For alternate installation methods and running from source code, see our [contributing guidelines](https://github.com/puppetlabs/bolt/blob/master/CONTRIBUTING.md).
+For alternate installation methods and running from source code, see our [contributing guidelines](https://github.com/puppetlabs/bolt/blob/main/CONTRIBUTING.md).
 
 ## Getting help
 

@@ -35,7 +35,7 @@ License Agreement before we can accept your pull request: https://cla.puppet.com
 1. Fork the Bolt project (button in the top-right, next to 'star' and 'watch')
 1. Clone your fork of Bolt
 1. Add the puppetlabs repo as an upstream - `git remote add upstream git@github.com:puppetlabs/bolt`
-1. Make a new branch off of master - `git checkout -b mybranchname`
+1. Make a new branch off of main - `git checkout -b mybranchname`
 1. Commit your changes and add a useful commit message, including what specifically you changed and why - `git commit`
     * If your changes are user-facing, add a release note to the end of a commit message. Release notes should begin
       with a label indicating what kind of change you are making. Valid labels include `!feature`, `!bug`, `!deprecation`,
@@ -51,16 +51,16 @@ License Agreement before we can accept your pull request: https://cla.puppet.com
         Descriptive summary of changes.
       ```
 1. Push your changes to your branch on your fork - `git push origin mybranchname`
-1. Open a PR against master at https://github.com/puppetlabs/bolt
+1. Open a PR against main at https://github.com/puppetlabs/bolt
 
 **If it's not your first PR**
 1. Update from upstream:
    ```
-   git fetch upstream && git checkout upstream/master && git checkout -b mybranchname
+   git fetch upstream && git checkout upstream/main && git checkout -b mybranchname
    ```
 1. Commit your changes and add a useful commit message, including what specifically you changed and why - `git commit`
 1. Push your changes to your branch on your fork - `git push origin mybranchname`
-1. Open a PR against master at https://github.com/puppetlabs/bolt
+1. Open a PR against main at https://github.com/puppetlabs/bolt
 
 ## Installing Bolt
 

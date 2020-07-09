@@ -9,7 +9,7 @@ aim to release new versions of Bolt on Mondays.
    $ rake 'changelog[VERSION]'
    ```
    
-   Open a PR against `puppetlabs/bolt` and merge the changes into `master`.
+   Open a PR against `puppetlabs/bolt` and merge the changes into `main`.
 
    > **Note:** To use the rake task you must be a member of the `puppetlabs` organization and set the environment
      variable `GITHUB_TOKEN` with a [personal access token](https://github.com/settings/tokens) that has

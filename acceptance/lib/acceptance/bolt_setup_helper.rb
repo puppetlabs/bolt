@@ -35,7 +35,7 @@ module Acceptance
     end
 
     def git_branch
-      ENV['GIT_BRANCH'] || 'master'
+      ENV['GIT_BRANCH'] || 'main'
     end
 
     def git_sha

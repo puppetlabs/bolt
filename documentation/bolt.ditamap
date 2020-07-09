@@ -2,7 +2,7 @@
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
 <map id="boltmap" title="Bolt">
     <topicref href="bolt.md" format="markdown" linking="targetonly">
-        <topicref navtitle="Changelog" href="https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md" format="html" scope="external" />
+        <topicref navtitle="Changelog" href="https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md" format="html" scope="external" />
         <topicref href="bolt_versioning.md" format="markdown"/>
         <topicref href="migrating_inventory_files.md" format="markdown"/>   
         <topicref href="bolt_known_issues.md" format="markdown"/>

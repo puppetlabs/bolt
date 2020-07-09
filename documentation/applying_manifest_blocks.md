@@ -13,14 +13,14 @@ block limitations](#manifest-block-limitations).
 > 🔩 **Tip:** If you installed Bolt as a Ruby Gem, make sure you have installed
   the core modules required to use the `puppet apply` command. These modules are
   listed in the [Bolt GitHub
-  repository](https://github.com/puppetlabs/bolt/blob/master/Puppetfile) and you
+  repository](https://github.com/puppetlabs/bolt/blob/main/Puppetfile) and you
   can install them using a Puppetfile.
 
 📖 **Related information**  
 
 - [Configure Bolt to download and install modules](bolt_installing_modules.md#)
 - [Puppetfile
-  example](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)
+  example](https://github.com/puppetlabs/bolt/blob/main/Puppetfile)
 - [Puppet Forge](https://forge.puppet.com/)
 
 ## Applying manifest blocks from the command line
