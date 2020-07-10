@@ -132,5 +132,5 @@ module path.
 |[`bolt-project.yaml`](bolt_configuration_reference.md#project_configuration_options)|Contains configuration options for Bolt and Bolt projects. For more information on Bolt projects, see [Bolt projects](./experimental_features.md#bolt-projects).|
 |[`Puppetfile`](bolt_installing_modules.md#)|Specifies which modules to install for the project.|
 |[`modules/`](bolt_installing_modules.md#)|The directory where modules from the `Puppetfile` are installed. In most cases, do not edit these modules locally.|
-|[`site-modules`](bolt_installing_modules.md)|Local modules that are edited and versioned with the Bolt directory.|
+|[`site-modules/`](bolt_installing_modules.md)|Local modules that are edited and versioned with the Bolt directory.|
 |`data/`|The standard path to store static Hiera data files.|
