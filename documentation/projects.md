@@ -30,6 +30,12 @@ Here is an example of a typical project with a task, a plan, and an inventory fi
 Bolt projects are experimental. Make sure you've [updated to the latest version
 of Bolt](./bolt_installing.md) to get the most out of this feature.
 
+📖 **Related information**
+
+- [Tasks](tasks.md)
+- [Plans](plans.md)
+- [Inventory files](inventory_file_v2.md)
+
 ## Creating a Bolt project
 
 To get started with a Bolt project:
@@ -52,8 +58,7 @@ project name.
 ## Configuring a project
 
 The `bolt-project.yaml` file holds options to configure your Bolt project, as
-well as options to control how Bolt behaves when you run it from inside the
-project.
+well as options to control how Bolt behaves when you run a project.
 
 For example, if you wanted Bolt to load a custom module path, you could use the
 following in your `bolt-project.yaml`:
@@ -71,7 +76,7 @@ log:
 ```
 
 For a list of all the available configuration options in `bolt-project.yaml`,
-see [Configuring Bolt](bolt_configuration_reference.md).
+see [`bolt-project.yaml` options](bolt_project_reference.md).
 
 ### Limiting displayed plans and tasks
 

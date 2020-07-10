@@ -75,11 +75,13 @@ uses the default: `~/.puppetlabs/bolt-project.yaml`.
 
 Bolt uses the following methods, in order, to choose a Bolt directory.
 
-1. **Manually specified:** You can specify a directory path on the command line
+1. **Environment variable:** You can specify a path to a project using the
+   `BOLT_PROJECT` environment variable.
+2. **Manually specified:** You can specify a directory path on the command line
    with `--project <DIRECTORY_PATH>`. There is not an equivalent configuration
    setting because the Bolt directory must be known in order to load
    configuration.
-2. **Parent directory:** Bolt traverses parents of the current directory until
+3. **Parent directory:** Bolt traverses parents of the current directory until
    it finds a directory containing a `Boltdir`, or
    `bolt-project.yaml`, or it reaches the root of the file system.
 3. **Default project directory:** If no project directory is specified manually or found in
