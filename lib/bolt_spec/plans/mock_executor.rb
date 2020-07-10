@@ -11,7 +11,7 @@ require 'set'
 
 module BoltSpec
   module Plans
-    MOCKED_ACTIONS = %i[command plan script task upload].freeze
+    MOCKED_ACTIONS = %i[command download plan script task upload].freeze
 
     class UnexpectedInvocation < ArgumentError; end
 
@@ -85,6 +85,19 @@ module BoltSpec
           targets = targets.map(&:name)
           params = arguments.merge(options)
           @error_message = "Unexpected call to 'run_task(#{task.name}, #{targets}, #{params})'"
+          raise UnexpectedInvocation, @error_message
+        end
+        result
+      end
+
+      def download_file(targets, source, destination, options = {})
+        result = nil
+        if (doub = @download_doubles[source] || @download_doubles[:default])
+          result = doub.process(targets, source, destination, options)
+        end
+        unless result
+          targets = targets.map(&:name)
+          @error_message = "Unexpected call to 'download_file(#{source}, #{destination}, #{targets}, #{options})'"
           raise UnexpectedInvocation, @error_message
         end
         result

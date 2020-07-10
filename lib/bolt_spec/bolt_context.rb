@@ -41,6 +41,7 @@ require 'bolt/plugin'
 # - allow_command(cmd), expect_command(cmd): expect the exact command
 # - allow_script(script), expect_script(script): expect the script as <module>/path/to/file
 # - allow_task(task), expect_task(task): expect the named task
+# - allow_download(file), expect_download(file): expect the identified source file
 # - allow_upload(file), expect_upload(file): expect the identified source file
 # - allow_out_message, expect_out_message: expect a message to be passed to out::message (only modifiers are
 #   be_called_times(n), with_params(params), and not_be_called)
@@ -52,19 +53,22 @@ require 'bolt/plugin'
 # - with_targets(targets): target or list of targets that you expect to be passed to the action
 # - with_params(params): list of params and metaparams (or options) that you expect to be passed to the action.
 #                        Corresponds to the action's last argument.
-# - with_destination(dest): for upload_file, the expected destination path
+# - with_destination(dest): for upload_file and download_file, the expected destination path
 # - always_return(value): return a Bolt::ResultSet of Bolt::Result objects with the specified value Hash
 #                         command and script: only accept 'stdout' and 'stderr' keys
 #                         upload: does not support this modifier
+#                         download: does not support this modifier
 # - return_for_targets(targets_to_values): return a Bolt::ResultSet of Bolt::Result objects from the Hash mapping
 #                                          targets to their value Hashes
 #                                          command and script: only accept 'stdout' and 'stderr' keys
 #                                          upload: does not support this modifier
+#                                          download: does not support this modifier
 # - return(&block): invoke the block to construct a Bolt::ResultSet. The blocks parameters differ based on action
 #                   command: `{ |targets:, command:, params:| ... }`
 #                   script: `{ |targets:, script:, params:| ... }`
 #                   task: `{ |targets:, task:, params:| ... }`
 #                   upload: `{ |targets:, source:, destination:, params:| ... }`
+#                   download: `{ |targets:, source:, destination:, params:| ... }`
 # - error_with(err): return a failing Bolt::ResultSet, with Bolt::Result objects with the identified err hash
 #
 # Example:
@@ -190,8 +194,9 @@ module BoltSpec
     # so it probably should be set separately
     # def allow_script(script_name)
     #
-    # file uploads have a single destination and no arguments
+    # file uploads and downloads have a single destination and no arguments
     # def allow_file_upload(source_name)
+    # def allow_file_download(source_name)
     #
     # Most of the information in commands is in the command string itself
     # we may need more flexible allows than just the name/command string

@@ -80,6 +80,22 @@ module BoltSpec
       Bolt::Util.walk_keys(result, &:to_s)
     end
 
+    def download_file(source, dest, targets, options: {}, config: nil, inventory: nil)
+      if config.nil? && defined?(bolt_config)
+        config = bolt_config
+      end
+
+      if inventory.nil? && defined?(bolt_inventory)
+        inventory = bolt_inventory
+      end
+
+      result = BoltRunner.with_runner(config, inventory) do |runner|
+        runner.download_file(source, dest, targets, options)
+      end
+      result = result.to_a
+      Bolt::Util.walk_keys(result, &:to_s)
+    end
+
     def upload_file(source, dest, targets, options: {}, config: nil, inventory: nil)
       if config.nil? && defined?(bolt_config)
         config = bolt_config
@@ -192,6 +208,12 @@ module BoltSpec
         executor = Bolt::Executor.new(config.concurrency, @analytics)
         targets = inventory.get_targets(targets)
         executor.run_script(targets, script, arguments, options)
+      end
+
+      def download_file(source, dest, targets, options = {})
+        executor = Bolt::Executor.new(config.concurrency, @analytics)
+        targets = inventory.get_targets(targets)
+        executor.download_file(targets, source, dest, options)
       end
 
       def upload_file(source, dest, targets, options = {})
