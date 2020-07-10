@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# This was failing local test runs
-require 'bolt/target'
-
 Puppet::DataTypes.create_type('Target') do
   begin
     inventory = Puppet.lookup(:bolt_inventory)
