@@ -83,7 +83,7 @@ Bolt uses the following methods, in order, to choose a Bolt directory.
    it finds a directory containing a `Boltdir`, or
    `bolt-project.yaml`, or it reaches the root of the file system.
 3. **Default project directory:** If no project directory is specified manually or found in
-   a parent directory, Bolt uses `~/.puppetlabs/bolt-project.yaml`.
+   a parent directory, Bolt uses `~/.puppetlabs/bolt/` as the project directory.
 
 ## World-writable project directories
 
