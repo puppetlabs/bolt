@@ -81,6 +81,7 @@ module Bolt
       @rerunfile = @path + '.rerun.json'
       @resource_types = @path + '.resource_types'
       @type = type
+      @downloads = @path + 'downloads'
 
       tc = Bolt::Config::INVENTORY_OPTIONS.keys & raw_data.keys
       if tc.any?

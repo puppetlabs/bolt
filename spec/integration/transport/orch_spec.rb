@@ -416,6 +416,24 @@ describe Bolt::Transport::Orch, orchestrator: true do
     end
   end
 
+  describe :batch_download do
+    it 'returns failing results' do
+      error_hash = {
+        'kind'    => 'bolt/not-supported-error',
+        'msg'     => 'pcp transport does not support downloading files',
+        'details' => {}
+      }
+
+      results = orch.batch_download(targets, 'foo', 'bar')
+
+      expect(results[0]).not_to be_success
+      expect(results[0].error_hash).to eq(error_hash)
+
+      expect(results[1]).not_to be_success
+      expect(results[1].error_hash).to eq(error_hash)
+    end
+  end
+
   describe :batch_upload do
     let(:source_path) { File.join(base_path, 'spec', 'fixtures', 'scripts', 'success.sh') }
     let(:dest_path) { 'success.sh' }

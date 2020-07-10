@@ -38,6 +38,14 @@ module Bolt
         end
       end
 
+      def download(target, source, destination, _options = {})
+        with_connection(target) do |conn|
+          download = File.join(destination, Bolt::Util.unix_basename(source))
+          conn.download_remote_content(source, destination)
+          Bolt::Result.for_download(target, source, destination, download)
+        end
+      end
+
       def run_command(target, command, options = {})
         execute_options = {}
         execute_options[:tty] = target.options['tty']

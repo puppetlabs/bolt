@@ -121,6 +121,14 @@ Describe "test all bolt command examples" {
     }
   }
 
+  Context "bolt file download" {
+    It "bolt file download /etc/profile.d/login.sh login_script -t target1" {
+      $result = Receive-BoltFile '/etc/profile.d/login.sh' 'login_script' -target 'target1'
+      Write-Warning "this works but order is not same"
+      $result | Should -Be "bolt file download --targets 'target1' '/etc/profile.d/login.sh' 'login_script'"
+    }
+  }
+
   Context "bolt group" {
     It "bolt group show" {
       $result = Get-BoltGroup

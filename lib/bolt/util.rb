@@ -265,6 +265,16 @@ module Bolt
           false
         end
       end
+
+      def unix_basename(path)
+        raise Bolt::ValidationError, "path must be a String, received #{path.class} #{path}" unless path.is_a?(String)
+        path.split('/').last
+      end
+
+      def windows_basename(path)
+        raise Bolt::ValidationError, "path must be a String, received #{path.class} #{path}" unless path.is_a?(String)
+        path.split(%r{[/\\]}).last
+      end
     end
   end
 end

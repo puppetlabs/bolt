@@ -18,7 +18,8 @@ namespace :pwsh do
       'migrate'    => 'Update',
       'run'        => 'Invoke',
       'show'       => 'Get',
-      'upload'     => 'Send' # deploy? publish?
+      'upload'     => 'Send', # deploy? publish?
+      'download'   => 'Receive'
     }
 
     @hardcoded_cmdlets = {
@@ -151,10 +152,10 @@ namespace :pwsh do
             validate_not_null_or_empty: true
           }
         when 'file'
-          # bolt file upload <src> <dest> [options]
+          # bolt file download|upload <src> <dest> [options]
           @pwsh_command[:options] << {
             name:                       'source',
-            help_msg:                   'The source file or directory to upload',
+            help_msg:                   "The source file or directory to #{action}",
             type:                       'string',
             switch:                     false,
             mandatory:                  true,
@@ -168,7 +169,7 @@ namespace :pwsh do
             switch:                     false,
             mandatory:                  true,
             position:                   1,
-            help_msg:                   'The destination to upload to',
+            help_msg:                   "The destination to #{action} to",
             ruby_arg:                   'bare',
             validate_not_null_or_empty: true
           }

@@ -320,6 +320,21 @@ module Bolt
       end
     end
 
+    def download_file(targets, source, destination, options = {})
+      description = options.fetch(:description, "file download from #{source} to #{destination}")
+      FileUtils.mkdir_p(destination)
+
+      log_action(description, targets) do
+        options[:run_as] = run_as if run_as && !options.key?(:run_as)
+
+        batch_execute(targets) do |transport, batch|
+          with_node_logging("Downloading file #{source} to #{destination}", batch) do
+            transport.batch_download(batch, source, destination, options, &method(:publish_event))
+          end
+        end
+      end
+    end
+
     def run_plan(scope, plan, params)
       plan.call_by_name_with_scope(scope, params, true)
     end

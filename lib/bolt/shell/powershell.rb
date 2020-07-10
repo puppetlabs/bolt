@@ -85,7 +85,7 @@ module Bolt
         filename ||= File.basename(file)
         validate_extensions(File.extname(filename))
         destination = "#{dir}\\#{filename}"
-        conn.copy_file(file, destination)
+        conn.upload_file(file, destination)
         destination
       end
 
@@ -164,8 +164,14 @@ module Bolt
       end
 
       def upload(source, destination, _options = {})
-        conn.copy_file(source, destination)
+        conn.upload_file(source, destination)
         Bolt::Result.for_upload(target, source, destination)
+      end
+
+      def download(source, destination, _options = {})
+        download = File.join(destination, Bolt::Util.windows_basename(source))
+        conn.download_file(source, destination, download)
+        Bolt::Result.for_download(target, source, destination, download)
       end
 
       def run_command(command, options = {})
@@ -220,7 +226,7 @@ module Bolt
             task_dir = File.join(dir, task.tasks_dir)
             mkdirs([task_dir] + extra_files.map { |file| File.join(dir, File.dirname(file['name'])) })
             extra_files.each do |file|
-              conn.copy_file(file['path'], File.join(dir, file['name']))
+              conn.upload_file(file['path'], File.join(dir, file['name']))
             end
           end
 
@@ -262,7 +268,7 @@ module Bolt
           return with_tmpdir do |dir|
             command += "\r\nif (!$?) { if($LASTEXITCODE) { exit $LASTEXITCODE } else { exit 1 } }"
             script_file = File.join(dir, "#{SecureRandom.uuid}_wrapper.ps1")
-            conn.copy_file(StringIO.new(command), script_file)
+            conn.upload_file(StringIO.new(command), script_file)
             args = escape_arguments([script_file])
             script_invocation = ['powershell.exe', *PS_ARGS, '-File', *args].join(' ')
             execute(script_invocation)

@@ -37,7 +37,7 @@ module Bolt
           with_tmpdir do |dir|
             basename = File.basename(source)
             tmpfile = File.join(dir.to_s, basename)
-            conn.copy_file(source, tmpfile)
+            conn.upload_file(source, tmpfile)
             # pass over file ownership if we're using run-as to be a different user
             dir.chown(run_as)
             result = execute(['mv', '-f', tmpfile, destination], sudoable: true)
@@ -47,6 +47,27 @@ module Bolt
             end
           end
           Bolt::Result.for_upload(target, source, destination)
+        end
+      end
+
+      def download(source, destination, options = {})
+        running_as(options[:run_as]) do
+          # Target OS may be either Unix or Windows. Without knowing the target OS before-hand
+          # we can't assume whether the path separator is '/' or '\'. Assume we're connecting
+          # to a target with Unix and then check if the path exists after downloading.
+          download = File.join(destination, Bolt::Util.unix_basename(source))
+
+          conn.download_file(source, destination, download)
+
+          # If the download path doesn't exist, then the file was likely downloaded from Windows
+          # using a source path with backslashes (e.g. 'C:\Users\Administrator\foo'). The file
+          # should be saved to the expected location, so update the download path assuming a
+          # Windows basename so the result shows the correct local path.
+          unless File.exist?(download)
+            download = File.join(destination, Bolt::Util.windows_basename(source))
+          end
+
+          Bolt::Result.for_download(target, source, destination, download)
         end
       end
 
@@ -95,7 +116,7 @@ module Bolt
               task_dir = File.join(dir.to_s, task.tasks_dir)
               dir.mkdirs([task.tasks_dir] + extra_files.map { |file| File.dirname(file['name']) })
               extra_files.each do |file|
-                conn.copy_file(file['path'], File.join(dir.to_s, file['name']))
+                conn.upload_file(file['path'], File.join(dir.to_s, file['name']))
               end
             end
 
@@ -257,7 +278,7 @@ module Bolt
       def write_executable(dir, file, filename = nil)
         filename ||= File.basename(file)
         remote_path = File.join(dir.to_s, filename)
-        conn.copy_file(file, remote_path)
+        conn.upload_file(file, remote_path)
         make_executable(remote_path)
         remote_path
       end

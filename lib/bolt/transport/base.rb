@@ -167,6 +167,25 @@ module Bolt
         end
       end
 
+      # Downloads the given source file from a batch of targets to the destination location
+      # on the host.
+      #
+      # The default implementation only supports batches of size 1 and will fail otherwise.
+      #
+      # Transports may override this method to implement their own batch processing.
+      def batch_download(targets, source, destination, options = {}, &callback)
+        require 'erb'
+
+        assert_batch_size_one("batch_download()", targets)
+        target = targets.first
+        with_events(target, callback, 'download') do
+          escaped_name = ERB::Util.url_encode(target.safe_name)
+          target_destination = File.expand_path(escaped_name, destination)
+          @logger.debug { "Downloading: '#{source}' on #{target.safe_name} to #{target_destination}" }
+          download(target, source, target_destination, options)
+        end
+      end
+
       def batch_connected?(targets)
         assert_batch_size_one("connected?()", targets)
         connected?(targets.first)
@@ -199,6 +218,11 @@ module Bolt
       # Transports should override this method with their own implementation of file upload.
       def upload(*_args)
         raise NotImplementedError, "upload() must be implemented by the transport class"
+      end
+
+      # Transports should override this method with their own implementation of file download.
+      def download(*_args)
+        raise NotImplementedError, "download() must be implemented by the transport class"
       end
 
       # Transports should override this method with their own implementation of a connection test.

@@ -22,6 +22,7 @@ describe Bolt::Transport::SSH, ssh: true do
 
   let(:hostname)          { conn_info('ssh')[:host] }
   let(:safe_name)         { hostname.to_s }
+  let(:encoded_name)      { ERB::Util.url_encode(safe_name) }
   let(:port)              { conn_info('ssh')[:port] }
   let(:host_and_port)     { "#{hostname}:#{port}" }
   let(:user)              { conn_info('ssh')[:user] }
@@ -188,6 +189,21 @@ describe Bolt::Transport::SSH, ssh: true do
         ).to eq(contents)
 
         ssh.run_command(target, "rm #{remote_path}")
+      end
+    end
+
+    it "can download a file from a host" do
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        expect(
+          ssh.download(target, '/etc/ssh/ssh_config', destination).value
+        ).to eq(
+          '_output' => "Downloaded '#{target.host}:/etc/ssh/ssh_config' to '#{destination}'",
+          'path'    => File.expand_path('ssh_config', destination)
+        )
+
+        expect(
+          File.exist?(File.expand_path('ssh_config', destination))
+        ).to eq(true)
       end
     end
   end
@@ -475,6 +491,21 @@ describe Bolt::Transport::SSH, ssh: true do
         ).to eq(contents)
 
         ssh.run_command(target, "rm #{remote_path}")
+      end
+    end
+
+    it "can download a file from a host" do
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        expect(
+          ssh.download(target, '/etc/ssh/ssh_config', destination).value
+        ).to eq(
+          '_output' => "Downloaded '#{target.host}:/etc/ssh/ssh_config' to '#{destination}'",
+          'path'    => File.expand_path('ssh_config', destination)
+        )
+
+        expect(
+          File.exist?(File.expand_path('ssh_config', destination))
+        ).to eq(true)
       end
     end
 

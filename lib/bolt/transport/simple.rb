@@ -32,6 +32,12 @@ module Bolt
         end
       end
 
+      def download(target, source, destination, options = {})
+        with_connection(target) do |conn|
+          conn.shell.download(source, destination, options)
+        end
+      end
+
       def run_script(target, script, arguments, options = {})
         with_connection(target) do |conn|
           conn.shell.run_script(script, arguments, options)

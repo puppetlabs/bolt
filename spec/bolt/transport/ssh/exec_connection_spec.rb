@@ -31,7 +31,7 @@ describe Bolt::Transport::SSH::ExecConnection do
       expect(Open3).to receive(:capture3)
         .with("scp", "-o", "Port=21", "-o", "BatchMode=yes", "good", "sshuser@foo.example.com:afternoon")
         .and_return(['{}', '', double(:status, success?: true)])
-      subject.copy_file('good', 'afternoon')
+      subject.upload_file('good', 'afternoon')
     end
 
     it 'rejects invalid copy-command' do
@@ -42,7 +42,7 @@ describe Bolt::Transport::SSH::ExecConnection do
         'copy-command' => 3
       )
 
-      expect { subject.copy_file('good', 'evening') }
+      expect { subject.upload_file('good', 'evening') }
         .to raise_error(/copy-command must be of type Array, String; received Integer 3/)
     end
 
@@ -52,7 +52,7 @@ describe Bolt::Transport::SSH::ExecConnection do
       expect(Open3).to receive(:capture3)
         .with("scp", "-r", "-o", "BatchMode=yes", "-o", "Port=24", "good", "sshuser@foo.example.com:night")
         .and_return(['{}', '', double(:status, success?: true)])
-      subject.copy_file('good', 'night')
+      subject.upload_file('good', 'night')
     end
   end
 

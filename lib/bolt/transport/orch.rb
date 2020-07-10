@@ -184,6 +184,18 @@ module Bolt
         end
       end
 
+      def batch_download(targets, *_args)
+        error = {
+          'kind'    => 'bolt/not-supported-error',
+          'msg'     => 'pcp transport does not support downloading files',
+          'details' => {}
+        }
+
+        targets.map do |target|
+          Bolt::Result.new(target, error: error, action: 'download')
+        end
+      end
+
       def batches(targets)
         targets.group_by { |target| Connection.get_key(target.options) }.values
       end

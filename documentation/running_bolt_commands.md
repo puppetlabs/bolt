@@ -128,6 +128,55 @@ best limited to small files.
     ```
     bolt file upload my_file.txt /tmp/remote_file.txt --targets web5.mydomain.edu,web6.mydomain.edu
     ```
+
+## Download files or directories from remote targets
+
+Use Bolt to copy files or directories from remote targets to your local system.
+
+To download a file or directory from a remote target, run the
+`bolt file download` command. Specify the remote path to the file or
+directory, the destination directory on your local system, and the targets.
+
+```shell
+$ bolt file download <SOURCE> <DESTINATION> --targets <TARGETS>
+```
+
+The `destination` can be either an absolute or relative path to a directory
+on your local system. If you use a relative path, Bolt expands the path
+relative to the current working directory. If the destination directory does
+not exist, Bolt will automatically create it.
+
+Each file or directory is saved to the destination directory under a
+directory with a name matching the URL-encoded name of the target it
+was downloaded from. The target directory names are URL-encoded to ensure
+that they are valid directory names.
+
+For example, the following command downloads the SSH daemon configuration 
+file from two targets, `linux` and `ssh://example.com`:
+
+```shell
+$ bolt file download /etc/ssh/sshd_config sshd_config --targets linux,ssh://example.com
+```
+
+After running this command from the root of your project directory, your
+project directory structure would look like this:
+
+```shell
+$ tree
+.
+├── bolt-project.yaml
+├── inventory.yaml
+└── downloads/
+    └── sshd_config/
+        ├── linux/
+        │   └── sshd_config
+        └── ssh%3A%2F%2Fexample.com/
+            └── sshd_config
+```
+
+> 🔩 **Tip:** To avoid URL encoding the target's safe name, give the target a
+> simple, human-readable name in your inventory file.
+
 ## Adding options to Bolt commands
 
 Bolt commands can accept several command line options, some of which are

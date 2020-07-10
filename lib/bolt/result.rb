@@ -79,6 +79,13 @@ module Bolt
       new(target, message: "Uploaded '#{source}' to '#{target.host}:#{destination}'", action: 'upload', object: source)
     end
 
+    def self.for_download(target, source, destination, download)
+      msg   = "Downloaded '#{target.host}:#{source}' to '#{destination}'"
+      value = { 'path' => download }
+
+      new(target, value: value, message: msg, action: 'download', object: source)
+    end
+
     # Satisfies the Puppet datatypes API
     def self.from_asserted_args(target, value)
       new(target, value: value)

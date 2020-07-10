@@ -32,7 +32,7 @@ module Bolt
                  'script' => %w[run],
                  'task' => %w[show run],
                  'plan' => %w[show run convert],
-                 'file' => %w[upload],
+                 'file' => %w[download upload],
                  'puppetfile' => %w[install show-modules generate-types],
                  'secret' => %w[encrypt decrypt createkeys],
                  'inventory' => %w[show],
@@ -445,11 +445,22 @@ module Bolt
               src = options[:object]
               dest = options[:leftovers].first
 
+              if src.nil?
+                raise Bolt::CLIError, "A source path must be specified"
+              end
+
               if dest.nil?
                 raise Bolt::CLIError, "A destination path must be specified"
               end
-              validate_file('source file', src, true)
-              executor.upload_file(targets, src, dest, executor_opts)
+
+              case options[:action]
+              when 'download'
+                dest = File.expand_path(dest, Dir.pwd)
+                executor.download_file(targets, src, dest, executor_opts)
+              when 'upload'
+                validate_file('source file', src, true)
+                executor.upload_file(targets, src, dest, executor_opts)
+              end
             end
         end
 
