@@ -68,7 +68,7 @@ As long as your `bolt-project.yaml` file contains a `name` field, Bolt loads
 your local Bolt content from the top level of the `Boltdir`. Your `Boltdir` can
 also contain modules. For more information, see [Modules](modules.md).
 
-## How Bolt chooses a Bolt directory
+## How Bolt chooses a project directory
 
 If Bolt can't find a directory based on `Boltdir` or `bolt-project.yaml`, it
 uses the default: `~/.puppetlabs/bolt-project.yaml`.
