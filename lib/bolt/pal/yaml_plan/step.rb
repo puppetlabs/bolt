@@ -12,7 +12,7 @@ module Bolt
           Set['name', 'description', 'target', 'targets']
         end
 
-        STEP_KEYS = %w[command script task plan source destination eval resources].freeze
+        STEP_KEYS = %w[command script task plan source destination eval resources upload download].freeze
 
         def self.create(step_body, step_number)
           type_keys = (STEP_KEYS & step_body.keys)
@@ -22,8 +22,10 @@ module Bolt
           when 1
             type = type_keys.first
           else
-            if type_keys.to_set == Set['source', 'destination']
+            if [Set['source', 'destination'], Set['upload', 'destination']].include?(type_keys.to_set)
               type = 'upload'
+            elsif type_keys.to_set == Set['download', 'destination']
+              type = 'download'
             else
               raise step_error("Multiple action keys detected: #{type_keys.inspect}", step_body['name'], step_number)
             end
@@ -87,6 +89,12 @@ module Bolt
           # TODO: Remove this when 'target' is removed
           if body.include?('target')
             missing_keys -= ['targets']
+          end
+
+          # Handle cases where upload step uses deprecated 'source' key instead of 'upload'
+          # TODO: Remove when 'source' is removed
+          if body.include?('source')
+            missing_keys -= ['upload']
           end
 
           if missing_keys.any?
@@ -156,3 +164,4 @@ require 'bolt/pal/yaml_plan/step/resources'
 require 'bolt/pal/yaml_plan/step/script'
 require 'bolt/pal/yaml_plan/step/task'
 require 'bolt/pal/yaml_plan/step/upload'
+require 'bolt/pal/yaml_plan/step/download'

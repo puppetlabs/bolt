@@ -73,7 +73,7 @@ module Bolt
         end
 
         def upload_step(scope, step)
-          source = step['source']
+          source = step['upload'] || step['source']
           destination = step['destination']
           targets = step['targets'] || step['target']
           description = step['description']
@@ -81,6 +81,17 @@ module Bolt
           args = [source, destination, targets]
           args << description if description
           scope.call_function('upload_file', args)
+        end
+
+        def download_step(scope, step)
+          source = step['download']
+          destination = step['destination']
+          targets = step['targets'] || step['target']
+          description = step['description']
+
+          args = [source, destination, targets]
+          args << description if description
+          scope.call_function('download_file', args)
         end
 
         def eval_step(_scope, step)
@@ -143,6 +154,12 @@ module Bolt
             msg = "The 'target' parameter for YAML plan steps is deprecated and will be removed "\
                   "in a future version of Bolt. Use the 'targets' parameter instead."
             Bolt::Logger.deprecation_warning("Using 'target' parameter for YAML plan steps, not 'targets'", msg)
+          end
+
+          if plan.steps.any? { |step| step.body.key?('source') }
+            msg = "The 'source' parameter for YAML plan upload steps is deprecated and will be removed "\
+                  "in a future version of Bolt. Use the 'upload' parameter instead."
+            Bolt::Logger.deprecation_warning("Using 'source' parameter for YAML upload steps, not 'upload'", msg)
           end
 
           plan_result = closure_scope.with_local_scope(args_hash) do |scope|

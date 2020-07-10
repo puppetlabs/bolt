@@ -67,6 +67,21 @@ describe "running YAML plans", ssh: true do
     expect(result.first['value']['_output']).to match(/Uploaded .*test.sh/)
   end
 
+  it 'downloads a file' do
+    Dir.mktmpdir(nil, Dir.pwd) do |dir|
+      # download_file only accepts relative paths for the destination, so force the
+      # project to be the tmpdir so the test doesn't accidentally download a file to
+      # the user's default downloads directory
+      allow_any_instance_of(Bolt::Project).to receive(:downloads).and_return(Pathname.new(dir))
+
+      result = run_plan('yaml::download', targets: target, destination: 'foo')
+
+      expect(result.first['target']).to eq(target)
+      expect(result.first['status']).to eq('success')
+      expect(result.first['value']['_output']).to match(%r{Downloaded .*/etc/ssh/ssh_config})
+    end
+  end
+
   it 'runs another plan' do
     result = run_plan('yaml::delegate', targets: target)
 

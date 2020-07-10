@@ -79,6 +79,22 @@ describe Bolt::PAL::YamlPlan::Step do
       end
     end
 
+    context 'with download step' do
+      let(:step_body) do
+        {
+          "download"    => make_string("/etc/ssh/ssh_config"),
+          "destination" => make_string("downloads"),
+          "target"      => make_string("$foo")
+        }
+      end
+
+      let(:output) { "  download_file('/etc/ssh/ssh_config', 'downloads', $foo)\n" }
+
+      it 'stringifies a download step' do
+        expect(step.transpile).to eq(output)
+      end
+    end
+
     context 'with eval step' do
       context "with barestring eval" do
         let(:step_body) do

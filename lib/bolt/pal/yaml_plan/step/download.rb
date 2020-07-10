@@ -4,18 +4,18 @@ module Bolt
   class PAL
     class YamlPlan
       class Step
-        class Upload < Step
+        class Download < Step
           def self.allowed_keys
-            super + Set['source', 'destination', 'upload']
+            super + Set['download', 'destination']
           end
 
           def self.required_keys
-            Set['upload', 'destination', 'targets']
+            Set['download', 'destination', 'targets']
           end
 
           def initialize(step_body)
             super
-            @source = step_body['upload'] || step_body['source']
+            @source = step_body['download']
             @destination = step_body['destination']
           end
 
@@ -23,7 +23,7 @@ module Bolt
             code = String.new("  ")
             code << "$#{@name} = " if @name
 
-            fn = 'upload_file'
+            fn = 'download_file'
             args = [@source, @destination, @targets]
             args << @description if @description
 
