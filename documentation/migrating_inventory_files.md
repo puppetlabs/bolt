@@ -7,7 +7,7 @@ post](https://puppet.com/blog/introducing-bolt-2-0/).
 
 **Before you upgrade:**
 - Take a look at the
-  [Changelog](https://github.com/puppetlabs/bolt/blob/master/CHANGELOG.md).
+  [Changelog](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md).
 - Make sure you've [migrated your inventory files to version
   2](#migrating-inventory-files-from-version-1-to-version-2). 
 

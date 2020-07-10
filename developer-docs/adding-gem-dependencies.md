@@ -31,7 +31,7 @@ When new gem dependencies are added to Bolt, it's important to add them to both 
 
 1. Open a PR in the [Bolt repo](https://github.com/puppetlabs/bolt) with the following changes:
 
-    * Add each gem to [`bolt.gemspec`](https://github.com/puppetlabs/bolt/blob/master/bolt.gemspec).
+    * Add each gem to [`bolt.gemspec`](https://github.com/puppetlabs/bolt/blob/main/bolt.gemspec).
 
         ```ruby
         spec.add_dependency "<GEM_NAME>", "<GEM_VERSION>"

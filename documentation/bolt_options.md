@@ -180,7 +180,7 @@ Kerberos for authentication, you can specify a Kerberos realm in your
 `bolt.yaml` file. This file is introduced in the [Configuring
 Bolt](configuring_bolt.md) section below. The best source of information and
 examples for this advanced topic is the [Kerberos
-section](https://github.com/puppetlabs/bolt/blob/master/developer-docs/kerberos.md)
+section](https://github.com/puppetlabs/bolt/blob/main/developer-docs/kerberos.md)
 of the Bolt developer documentation.
 
 ## Rerunning commands based on the last result

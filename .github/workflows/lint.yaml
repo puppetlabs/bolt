@@ -2,7 +2,7 @@ name: Linting
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths-ignore: ['**.md', '**.erb', 'schemas/*']
   pull_request:
     type: [opened, reopened, edited]

@@ -44,7 +44,7 @@ Bolt is packaged with a collection of useful modules to support common
 workflows.
 
 This list of packaged modules is available in a
-[Puppetfile](https://github.com/puppetlabs/bolt/blob/master/Puppetfile) in the
+[Puppetfile](https://github.com/puppetlabs/bolt/blob/main/Puppetfile) in the
 Bolt repository. The modules and supporting documentation are publicly available
 on the [Puppet Forge](https://forge.puppet.com/).
 
@@ -92,12 +92,12 @@ these core modules.
 
 ### Bolt-specific modules that are not available on the Forge
 
--   [aggregate](https://github.com/puppetlabs/bolt/tree/master/modules/aggregate):
+-   [aggregate](https://github.com/puppetlabs/bolt/tree/main/modules/aggregate):
     Aggregate task, script or command results.
--   [canary](https://github.com/puppetlabs/bolt/tree/master/modules/canary): Run
+-   [canary](https://github.com/puppetlabs/bolt/tree/main/modules/canary): Run
     action against a small number of targets and only if it succeeds will it run
     on the rest.
--   [puppetdb_fact](https://github.com/puppetlabs/bolt/tree/master/modules/puppetdb_fact):
+-   [puppetdb_fact](https://github.com/puppetlabs/bolt/tree/main/modules/puppetdb_fact):
     Collect facts for the specified targets from the configured PuppetDB
     connection and stores the collected facts on the targets.
 
@@ -124,4 +124,4 @@ these core modules.
 - Search the [Puppet Forge](https://forge.puppet.com/) for plan and task
   content.
 - For an example of a Puppetfile, see the [Bolt
-  Puppetfile](https://github.com/puppetlabs/bolt/blob/master/Puppetfile)
+  Puppetfile](https://github.com/puppetlabs/bolt/blob/main/Puppetfile)

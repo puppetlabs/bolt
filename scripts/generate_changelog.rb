@@ -52,7 +52,7 @@ class ChangelogGenerator
   end
 
   def commits
-    @commits ||= client.compare('puppetlabs/bolt', latest, 'master').commits
+    @commits ||= client.compare('puppetlabs/bolt', latest, 'main').commits
   end
 
   def org_members
@@ -123,14 +123,14 @@ class ChangelogGenerator
   end
 
   def generate
-    puts "Loading and parsing commits for #{latest}..master"
+    puts "Loading and parsing commits for #{latest}..main"
 
     commits.each do |commit|
       parse_commit(commit)
     end
 
     if entries.each_value.all? { |type| type[:entries].empty? }
-      warn "No release notes for #{latest}..master"
+      warn "No release notes for #{latest}..main"
       exit 0
     end
 
