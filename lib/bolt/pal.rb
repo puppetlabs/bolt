@@ -150,7 +150,12 @@ module Bolt
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: @modulepath, facts: {}) do |pal|
         # Only load the project if it a) exists, b) has a name it can be loaded with
         bolt_project = @project if @project&.name
+        # Puppet currently won't receive the project unless it is a named project. Since
+        # the download_file plan function needs access to the project path, add it to the
+        # context.
+        bolt_project_data = @project
         Puppet.override(bolt_project: bolt_project,
+                        bolt_project_data: bolt_project_data,
                         yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
           pal.with_script_compiler do |compiler|
             alias_types(compiler)

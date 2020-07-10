@@ -17,7 +17,7 @@ module Bolt
 
     attr_reader :path, :data, :config_file, :inventory_file, :modulepath, :hiera_config,
                 :puppetfile, :rerunfile, :type, :resource_types, :warnings, :project_file,
-                :deprecations
+                :deprecations, :downloads
 
     def self.default_project
       create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
