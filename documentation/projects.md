@@ -12,7 +12,7 @@ your Bolt configuration files and your Bolt content, such as plans and tasks.
 In addition to working with your local Bolt content, Bolt projects give you a
 way to share that content with other users in your organization. You can create
 orchestration that is specific to the infrastructure you're working with, and
-then commit the project directory to git for others to consume.
+then commit the project directory to version control for others to consume.
 
 Here is an example of a typical project with a task, a plan, and an inventory file:
 
