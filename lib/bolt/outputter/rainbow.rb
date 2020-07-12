@@ -8,6 +8,12 @@ module Bolt
       def initialize(color, verbose, trace, stream = $stdout)
         begin
           require 'paint'
+          if Bolt::Util.windows?
+            # the Paint gem thinks that windows does not support ansi colors
+            # but windows 10 or later does
+            # we can display colors if we force mode to TRUE_COLOR
+            Paint.mode = 0xFFFFFF
+          end
         rescue LoadError
           raise "The 'paint' gem is required to use the rainbow outputter."
         end
