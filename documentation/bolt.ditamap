@@ -12,9 +12,10 @@
     </topicref>
     <topicref href="getting_started_with_bolt.md" format="markdown"/>
     <topicref href="configuring_bolt.md" format="markdown" linking="targetonly">
+        <topicref href="projects.md" format="markdown"/>
         <topicref href="bolt_project_directories.md" format="markdown"/>
-        <topicref href="inventory_file_v2.md" format="markdown" linking="targetonly"> 
-            <topicref href="using_plugins.md" format="markdown"/>
+        <topicref href="inventory_file_v2.md" format="markdown"/>
+        <topicref href="using_plugins.md" format="markdown">
             <topicref href="writing_plugins.md" format="markdown"/>
         </topicref>
         <topicref href="privilege_escalation.md" format="markdown"/>
@@ -60,10 +61,18 @@
     </topicref>
     <topicref href="applying_manifest_blocks.md" format="markdown"/>
 
-    <topichead navtitle="Modules">
-        <topicref href="bolt_installing_modules.md" format="markdown" />
-        <topicref href="module_structure.md" format="markdown" />
-    </topichead>
+    <topicref href="modules.md" format="md">
+        <topicref href="bolt_installing_modules.md" format="markdown">
+            <topicmeta>
+                <shortdesc>You can use Bolt to install a Forge module.</shortdesc>
+            </topicmeta>
+        </topicref>
+        <topicref href="module_structure.md" format="markdown">
+            <topicmeta>
+                <shortdesc>Use module structure if you use Forge modules with Bolt, or you want to develop your own modules to share tasks and plans.</shortdesc>
+            </topicmeta>
+        </topicref>
+    </topicref>
 
     <topicref href="bolt_examples.md" format="markdown"/>
     <topichead navtitle="Using Bolt with Puppet">
