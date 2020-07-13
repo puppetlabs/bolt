@@ -1,5 +1,60 @@
 # Changelog
 
+## Bolt 2.18.0 (2020-07-13)
+
+### New features
+
+* **Specify module plugins to sync during apply and apply prep**
+  ([#1934](https://github.com/puppetlabs/bolt/issues/1934))
+
+  The `apply_prep` and `apply` plan functions now accept a `_required_modules`
+  option that allows plan authors to specify a list of module plugins to
+  sync to targets. When the `_required_modules` option is not set, all module
+  plugins will be synced.
+
+  _Contributed by [Bert Hajee](https://github.com/hajee)_
+
+* **Use `native-ssh` config option to enable native SSH**
+  ([#1938](https://github.com/puppetlabs/issues/1938))
+
+  Use the new `native-ssh` SSH transport configuration option or
+  `--native-ssh` CLI option to opt-in to the experimental native SSH.
+  The SSH transport configuration option `ssh-command` no longer enables
+  native SSH.
+
+* **Support configuring log files in `bolt-defaults.yaml`**
+  ([#1968](https://github.com/puppetlabs/bolt/pull/1968))
+
+  The system-wide and user-level default configuration file,
+  `bolt-defaults.yaml`, now supports configuring log files using the
+  `log` option.
+
+* **Do not load projects from world-writable directories**
+  ([#1894](https://github.com/puppetlabs/bolt/issues/1894))
+
+  Bolt now raises an error when attempting to load a project from a
+  world-writable directory on Unix-like systems. Users who wish to
+  override this behavior and run a project from a world-writable
+  directory should can set the `BOLT_PROJECT` environment variable
+  to the project directory path.
+
+### Bug fixes
+
+* **Validate `inventory-config` option in `bolt-defaults.yaml`**
+  ([#1963](https://github.com/puppetlabs/bolt/pull/1963))
+
+  Bolt now checks that the `inventory-config` option in a
+  `bolt-defaults.yaml` file is a hash and is not a plugin reference
+  before merging configuration files. Previously, setting this value to
+  a hash or plugin reference would raise an unhelpful error.
+
+* **Don't load default project for every Bolt invocation**
+  ([1917](https://github.com/puppetlabs/bolt/issues/1917)
+
+  Bolt will no longer load the default project at `~/.puppetlabs/bolt`
+  for every Bolt invocation. Exceptions raised during project loading
+  are now handled correctly and will not show a backtrace.
+
 ## Bolt 2.17.0 (2020-07-07)
 
 ### New features
