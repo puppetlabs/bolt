@@ -393,6 +393,12 @@
         {
           "type": "object",
           "properties": {
+            "ssh-command": {
+              "$ref": "#/transport_definitions/ssh-command"
+            },
+            "native-ssh": {
+              "$ref": "#/transport_definitions/native-ssh"
+            },
             "cleanup": {
               "$ref": "#/transport_definitions/cleanup"
             },
@@ -597,7 +603,7 @@
       ]
     },
     "copy-command": {
-      "description": "The command to use when copying files using ssh-command. Bolt runs `<copy-command> <src> <dest>`. This option is used when you need support for features or algorithms that are not supported by the net-ssh Ruby library. **This option is experimental.** You can read more about this option in [External SSH transport](experimental_features.md#external-ssh-transport).",
+      "description": "The command to use when copying files using native SSH. Bolt runs `<copy-command> <src> <dest>`. This option is used when you need support for features or algorithms that are not supported by the net-ssh Ruby library. **This option is experimental.** You can read more about this option in [Native SSH transport](experimental_features.md#native-ssh-transport).",
       "oneOf": [
         {
           "type": [
@@ -808,6 +814,10 @@
         }
       ]
     },
+    "native-ssh": {
+      "type": "boolean",
+      "description": "This enables the native SSH transport, which shells out to SSH instead of using the net-ssh Ruby library"
+    },
     "password": {
       "description": "The password to use to login.",
       "oneOf": [
@@ -961,7 +971,7 @@
       ]
     },
     "ssh-command": {
-      "description": "The command and flags to use when SSHing. This enables the external SSH transport, which shells out to the specified command. This option is used when you need support for features or algorithms that are not supported by the net-ssh Ruby library. **This option is experimental.** You can read more about this  option in [External SSH transport](experimental_features.md#external-ssh-transport).",
+      "description": "The command and flags to use when SSHing. This option is used when you need support for features or algorithms that are not supported by the net-ssh Ruby library. **This option is experimental.** You can read more about this  option in [Native SSH transport](experimental_features.md#native-ssh-transport).",
       "oneOf": [
         {
           "type": [

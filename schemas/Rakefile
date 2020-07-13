@@ -224,7 +224,7 @@ namespace :schemas do
   desc 'Generate inventory.yaml JSON schema'
   task :inventory do
     filepath          = File.expand_path('bolt-inventory.schema.json', __dir__)
-    base              = JSON.parse(File.read(File.expand_path('bolt-base-inventory.json', __dir__)))
+    base              = JSON.parse(File.read(File.expand_path('bolt-inventory-base.json', __dir__)))
     inventory_options = Bolt::Config::INVENTORY_OPTIONS
     transport_options = Bolt::Config::Transport::Options::TRANSPORT_OPTIONS
     transports        = Bolt::Config::TRANSPORT_CONFIG
