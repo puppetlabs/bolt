@@ -54,13 +54,13 @@ level apply to all groups and targets in the inventory file.
 
 - **Type:** Array
 
-> 🔩 **Tip:** You can set the `puppet_agent` feature to indicate that Bolt
+> 🔩 **Tip:** You can set the `puppet-agent` feature to indicate that Bolt
 > should skip installing the Puppet agent on all targets when using
 > `bolt apply` or the `apply_prep` plan function.
 
 ```yaml
 features:
-  - puppet_agent
+  - puppet-agent
 ```
 
 ### `groups`
@@ -154,7 +154,7 @@ all groups and targets under the group.
 
 - **Type:** Array
 
-> 🔩 **Tip:** You can set the `puppet_agent` feature on the group to indicate
+> 🔩 **Tip:** You can set the `puppet-agent` feature on the group to indicate
 > that Bolt should skip installing the Puppet agent on all targets under the
 > group when using `bolt apply` or the `apply_prep` plan function.
 
@@ -162,7 +162,7 @@ all groups and targets under the group.
 groups:
   - name: agents
     features:
-      - puppet_agent
+      - puppet-agent
 ```
 
 ### `groups`
@@ -288,7 +288,7 @@ A list of available features for the target.
 
 - **Type:** Array
 
-> 🔩 **Tip:** You can set the `puppet_agent` feature on the target to indicate
+> 🔩 **Tip:** You can set the `puppet-agent` feature on the target to indicate
 > that Bolt should skip installing the Puppet agent on the target when using
 > `bolt apply` or the `apply_prep` plan function.
 
@@ -296,7 +296,7 @@ A list of available features for the target.
 targets:
   - uri: linux.example.com
     features:
-      - puppet_agent
+      - puppet-agent
 ```
 
 ### `name`
