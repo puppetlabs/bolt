@@ -57,7 +57,7 @@ describe "errors gracefully attempting to apply a manifest block" do
       error = result['details']['result_set'][0]['value']['_error']
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg'])
-        .to eq("Puppet is not installed on the target in $env:ProgramFiles, please install it to enable 'apply'")
+        .to eq("Puppet was not found on the target or in $env:ProgramFiles, please install it to enable 'apply'")
         .or eq("Found a Ruby without Puppet present, please install Puppet or " \
                "remove Ruby from $env:Path to enable 'apply'")
     end

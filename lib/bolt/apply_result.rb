@@ -20,7 +20,7 @@ module Bolt
              error_hash['msg'] =~ /The term 'ruby.exe' is not recognized as the name of a cmdlet/)
         # Windows does not have Ruby present
         {
-          'msg' => "Puppet is not installed on the target in $env:ProgramFiles, please install it to enable 'apply'",
+          'msg' => "Puppet was not found on the target or in $env:ProgramFiles, please install it to enable 'apply'",
           'kind' => 'bolt/apply-error'
         }
       elsif exit_code == 1 && error_hash['msg'] =~ /cannot load such file -- puppet \(LoadError\)/

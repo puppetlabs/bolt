@@ -85,12 +85,21 @@ module Bolt
 
           def shell_init
             <<~PS
-            $ENV:PATH += ";${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\bin\\;" +
-            "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\puppet\\bin;" +
-            "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\sys\\ruby\\bin\\"
-            $ENV:RUBYLIB = "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\puppet\\lib;" +
-            "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\facter\\lib;" +
-            "${ENV:ProgramFiles}\\Puppet Labs\\Puppet\\hiera\\lib;" +
+            $installRegKey = Get-ItemProperty -Path "HKLM:\\Software\\Puppet Labs\\Puppet" -ErrorAction 0
+            if(![string]::IsNullOrEmpty($installRegKey.RememberedInstallDir64)){
+              $boltBaseDir = $installRegKey.RememberedInstallDir64
+            }elseif(![string]::IsNullOrEmpty($installRegKey.RememberedInstallDir)){
+              $boltBaseDir = $installRegKey.RememberedInstallDir
+            }else{
+              $boltBaseDir = "${ENV:ProgramFiles}\\Puppet Labs\\Puppet"
+            }
+
+            $ENV:PATH += ";${boltBaseDir}\\bin\\;" +
+            "${boltBaseDir}\\puppet\\bin;" +
+            "${boltBaseDir}\\sys\\ruby\\bin\\"
+            $ENV:RUBYLIB = "${boltBaseDir}\\puppet\\lib;" +
+            "${boltBaseDir}\\facter\\lib;" +
+            "${boltBaseDir}\\hiera\\lib;" +
             $ENV:RUBYLIB
 
             Add-Type -AssemblyName System.ServiceModel.Web, System.Runtime.Serialization
