@@ -32,9 +32,10 @@ directory structure. For more information, see [Module
 structure](module_structure.md). 
 
 
-> 🔩 **Tip:** You can use an existing control repo as a Bolt directory by adding
-  a `bolt-project.yaml` file to it and configuring the `modulepath` to match the
-  `modulepath` in `environment.conf`.
+> 🔩 **Tip:** You can use an existing [Puppet control
+  repo](https://puppet.com/docs/pe/latest/control_repo.html) as a Bolt directory
+  by adding a `bolt-project.yaml` file to it and configuring the `modulepath` to
+  match the `modulepath` in `environment.conf`.
 
 ## Embedded project directories
 
@@ -71,7 +72,7 @@ also contain modules. For more information, see [Modules](modules.md).
 ## How Bolt chooses a project directory
 
 If Bolt can't find a directory based on `Boltdir` or `bolt-project.yaml`, it
-uses the default: `~/.puppetlabs/bolt-project.yaml`.
+uses the default: `~/.puppetlabs/bolt/`.
 
 Bolt uses the following methods, in order, to choose a Bolt directory.
 

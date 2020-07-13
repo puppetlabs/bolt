@@ -67,12 +67,6 @@ following in your `bolt-project.yaml`:
 # bolt-project.yaml
 name: myproject
 modulepath: ['modules','site-modules','/home/user/mymodules']
-
-log:
-  console:
-    level: notice
-  ~/.puppetlabs/bolt/debug.log
-    level: debug
 ```
 
 For a list of all the available configuration options in `bolt-project.yaml`,
@@ -80,13 +74,22 @@ see [`bolt-project.yaml` options](bolt_project_reference.md).
 
 ### Limiting displayed plans and tasks
 
+Projects allow you to limit which plans and
+tasks a user can see when running `bolt plan show` or `bolt task show`. 
+
+Limiting tasks and plans is useful for the following reasons:
+- Bolt is bundled with several plans and tasks that might not be useful in your
+  project. 
+- You might have written a task or plan that is only used by another task or
+  plan, and you don't want your users to run that task or plan directly.
+- Displaying only specific content in the `show` commands makes it easier for
+  your users to find what they're looking for.
+
 To control what plans and tasks appear when your users run `bolt plan show` or
 `bolt task show`, add `plans` and `tasks` keys to your `bolt-project.yaml` and
-include an array of plan and task names.
-
-For example, if you wanted to surface a plan named `myproject::myplan`, and a
-task named `myproject::mytask`, you would use the following `bolt-project.yaml`
-file:
+include an array of plan and task names. For example, if you wanted to surface a
+plan named `myproject::myplan`, and a task named `myproject::mytask`, you would
+use the following `bolt-project.yaml` file:
 
 ```yaml
 name: myproject
