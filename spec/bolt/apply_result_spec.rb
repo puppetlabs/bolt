@@ -47,7 +47,7 @@ describe Bolt::ApplyResult do
       error = Bolt::ApplyResult.puppet_missing_error(orig_result)
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg'])
-        .to eq("Puppet is not installed on the target in $env:ProgramFiles, please install it to enable 'apply'")
+        .to eq("Puppet was not found on the target or in $env:ProgramFiles, please install it to enable 'apply'")
     end
 
     it 'errors if Puppet cannot be found on Windows' do
