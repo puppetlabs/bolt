@@ -49,11 +49,17 @@
   a hash or plugin reference would raise an unhelpful error.
 
 * **Don't load default project for every Bolt invocation**
-  ([1917](https://github.com/puppetlabs/bolt/issues/1917)
+  ([#1917](https://github.com/puppetlabs/bolt/issues/1917))
 
   Bolt will no longer load the default project at `~/.puppetlabs/bolt`
   for every Bolt invocation. Exceptions raised during project loading
   are now handled correctly and will not show a backtrace.
+
+* **Correctly detect puppet agent install path on Windows**
+  ([#1967](https://github.com/puppetlabs/bolt/issues/1967))
+
+  Bolt now correctly detects the Puppet Agent install path on Windows during
+  the initialization steps in a WinRM connection.
 
 ## Bolt 2.17.0 (2020-07-07)
 
