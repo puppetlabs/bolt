@@ -39,7 +39,7 @@ jobs:
           Install-Module -Name Pester -Force
       - name: Generate PowerShell Cmdlets
         run: |
-          bundle exec rake pwsh:generate_module
+          bundle exec rake -f pwsh_module/Rakefile pwsh:generate_module
       - name: Run Pester
         shell: pwsh
         run: |
