@@ -131,6 +131,7 @@ module Bolt
                   end
 
         Bolt::Logger.configure(config.log, config.color)
+        Bolt::Logger.analytics = analytics
       rescue Bolt::Error => e
         if $stdout.isatty
           # Print the error message in red, mimicking outputter.fatal_error
@@ -149,8 +150,9 @@ module Bolt
       config_loaded
 
       # Display warnings created during parser and config initialization
-      parser.warnings.each { |warning| @logger.warn(warning[:msg]) }
       config.warnings.each { |warning| @logger.warn(warning[:msg]) }
+      parser.deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
+      config.deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
 
       # After validation, initialize inventory and targets. Errors here are better to catch early.
       # After this step

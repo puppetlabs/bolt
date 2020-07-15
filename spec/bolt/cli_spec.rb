@@ -508,9 +508,10 @@ describe "Bolt::CLI" do
       end
 
       it "warns when using debug" do
+        expect(Bolt::Logger).to receive(:deprecation_warning)
+          .with(anything, /Command line option '--debug' is deprecated/)
         cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug])
         cli.parse
-        expect(@log_output.readlines).to include(/Command line option '--debug' is deprecated/)
       end
 
       it "log-level sets the log option" do

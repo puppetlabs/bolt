@@ -20,6 +20,8 @@ describe "passes parsed AST to the apply_catalog task" do
 
   before(:each) do
     allow(Bolt::ApplyResult).to receive(:from_task_result) { |r| r }
+    # Don't print warnings
+    allow($stdout).to receive(:puts)
     allow_any_instance_of(Bolt::Applicator).to receive(:catalog_apply_task) {
       path = File.join(__dir__, "../fixtures/apply/#{apply_task}")
       impl = { 'name' => apply_task, 'path' => path }

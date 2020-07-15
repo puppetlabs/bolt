@@ -142,7 +142,7 @@ module Bolt
           if plan.steps.any? { |step| step.body.key?('target') }
             msg = "The 'target' parameter for YAML plan steps is deprecated and will be removed "\
                   "in a future version of Bolt. Use the 'targets' parameter instead."
-            @logger.warn(msg)
+            Bolt::Logger.deprecation_warning("Using 'target' parameter for YAML plan steps, not 'targets'", msg)
           end
 
           plan_result = closure_scope.with_local_scope(args_hash) do |scope|

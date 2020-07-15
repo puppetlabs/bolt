@@ -41,6 +41,16 @@ describe Bolt::Logger do
     end
   end
 
+  describe '::deprecation_warning' do
+    let(:analytics) { Bolt::Analytics::NoopClient.new }
+
+    it 'submits an analytics event' do
+      expect(analytics).to receive(:event).with('Warn', 'deprecation', { label: "We've got clearance Clarence" })
+      Bolt::Logger.analytics = analytics
+      Bolt::Logger.deprecation_warning("We've got clearance Clarence", 'Roger Roger')
+    end
+  end
+
   describe '::configure' do
     let(:appenders) {
       {

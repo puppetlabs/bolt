@@ -19,7 +19,7 @@ module Bolt
   class Config
     include Bolt::Config::Options
 
-    attr_reader :config_files, :warnings, :data, :transports, :project, :modified_concurrency
+    attr_reader :config_files, :warnings, :data, :transports, :project, :modified_concurrency, :deprecations
 
     BOLT_CONFIG_NAME = 'bolt.yaml'
     BOLT_DEFAULTS_NAME = 'bolt-defaults.yaml'
@@ -41,7 +41,8 @@ module Bolt
       data = load_defaults(project).push(
         filepath: project.config_file,
         data: conf,
-        warnings: []
+        warnings: [],
+        deprecations: []
       )
 
       new(project, data, overrides)
@@ -59,7 +60,8 @@ module Bolt
       data = load_defaults(project).push(
         filepath: project.config_file,
         data: conf,
-        warnings: []
+        warnings: [],
+        deprecations: []
       )
 
       new(project, data, overrides)
@@ -140,7 +142,7 @@ module Bolt
         data = data.merge(data.delete('inventory-config'))
       end
 
-      { filepath: filepath, data: data, warnings: warnings }
+      { filepath: filepath, data: data, warnings: warnings, deprecations: [] }
     end
 
     # Loads a 'bolt.yaml' file, the legacy configuration file. There's no special munging needed
@@ -148,10 +150,11 @@ module Bolt
     def self.load_bolt_yaml(dir)
       filepath = dir + BOLT_CONFIG_NAME
       data     = Bolt::Util.read_yaml_hash(filepath, 'config')
-      warnings = [msg: "Configuration file #{filepath} is deprecated and will be removed in a future version "\
-                        "of Bolt. Use '#{dir + BOLT_DEFAULTS_NAME}' instead."]
+      deprecations = [{ type: 'Using bolt.yaml for system configuration',
+                        msg: "Configuration file #{filepath} is deprecated and will be removed in a future version "\
+                        "of Bolt. Use '#{dir + BOLT_DEFAULTS_NAME}' instead." }]
 
-      { filepath: filepath, data: data, warnings: warnings }
+      { filepath: filepath, data: data, warnings: [], deprecations: deprecations }
     end
 
     def self.load_defaults(project)
@@ -182,12 +185,16 @@ module Bolt
 
     def initialize(project, config_data, overrides = {})
       unless config_data.is_a?(Array)
-        config_data = [{ filepath: project.config_file, data: config_data, warnings: [] }]
+        config_data = [{ filepath: project.config_file,
+                         data: config_data,
+                         warnings: [],
+                         deprecations: [] }]
       end
 
       @logger       = Logging.logger[self]
       @project      = project
       @warnings     = @project.warnings.dup
+      @deprecations = @project.deprecations.dup
       @transports   = {}
       @config_files = []
 
@@ -208,6 +215,7 @@ module Bolt
 
       loaded_data = config_data.each_with_object([]) do |data, acc|
         @warnings.concat(data[:warnings]) if data[:warnings].any?
+        @deprecations.concat(data[:deprecations]) if data[:deprecations].any?
 
         if data[:data].any?
           @config_files.push(data[:filepath])

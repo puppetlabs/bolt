@@ -594,13 +594,13 @@ module Bolt
             bolt task show canary
     HELP
 
-    attr_reader :warnings
+    attr_reader :deprecations
 
     def initialize(options)
       super()
 
       @options = options
-      @warnings = []
+      @deprecations = []
 
       separator "\nINVENTORY OPTIONS"
       define('-t', '--targets TARGETS',
@@ -809,7 +809,8 @@ module Bolt
         @options[:debug] = true
         # We don't actually set '--log-level debug' here, but once the options are evaluated by
         # the config class the end result is the same.
-        @warnings << { msg: "Command line option '--debug' is deprecated, set '--log-level debug' instead." }
+        msg = "Command line option '--debug' is deprecated, set '--log-level debug' instead."
+        @deprecations << { type: 'Using --debug instead of --log-level debug', msg: msg }
       end
       define('--log-level LEVEL',
              "Set the log level for the console. Available options are",

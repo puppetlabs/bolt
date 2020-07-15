@@ -323,7 +323,7 @@ the private key.
 ```yaml
 plugins:
   pkcs7:
-    private-key: ~/bolt_private_key.pem
+    private_key: ~/bolt_private_key.pem
 ```
 
 Plugin configuration can be derived from other plugins using `_plugin`
