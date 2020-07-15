@@ -386,7 +386,7 @@ module Bolt
         raise Bolt::ValidationError, "Compilation is CPU-intensive, set concurrency less than #{compile_limit}"
       end
 
-      if (format == 'rainbow' && Bolt::Util.windows?) || !(%w[human json rainbow].include? format)
+      unless %w[human json rainbow].include? format
         raise Bolt::ValidationError, "Unsupported format: '#{format}'"
       end
 
