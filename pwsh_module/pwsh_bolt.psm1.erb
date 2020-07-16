@@ -133,38 +133,6 @@ function Get-BoltCommandline {
   Write-Output $params
 }
 
-function Get-BoltTaskData{
-  param($data)
-  $final = $data.tasks | % {
-    [BoltTask]::new(@{name = $_[0]; description = $_[1] })
-  }
-  Write-Output $final
-}
-
-function Get-BoltPlanData{
-  param($data)
-  $final = $data.plans | % {
-    [BoltPlan]::new($_)
-  }
-  Write-Output $final
-}
-
-class BoltTask {
-  [string]$Name
-  [string]$Description
-  BoltTask([pscustomobject]$o){
-    $this.Name = $o.name
-    $this.Description = $o.description
-  }
-}
-
-class BoltPlan {
-  [string]$Name
-  BoltPlan([pscustomobject]$o){
-    $this.Name = $o.name
-  }
-}
-
 $boltFunctions = @(
 'bolt',
 '<%= @commands.sort_by { |cmd| cmd[:cmdlet] }.map{|cmd| cmd[:cmdlet] }.join("',\n'") %>'
