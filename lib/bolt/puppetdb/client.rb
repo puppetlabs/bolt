@@ -96,6 +96,8 @@ module Bolt
         @http = HTTPClient.new
         @http.ssl_config.set_client_cert_file(@config.cert, @config.key) if @config.cert
         @http.ssl_config.add_trust_ca(@config.cacert)
+        @http.connect_timeout = @config.connect_timeout if @config.connect_timeout
+        @http.receive_timeout = @config.read_timeout if @config.read_timeout
 
         @http
       end

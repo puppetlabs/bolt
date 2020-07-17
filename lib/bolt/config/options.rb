@@ -275,10 +275,24 @@ module Bolt
               type: String,
               _example: "/etc/puppetlabs/puppet/ssl/certs/my-host.example.com.pem"
             },
+            "connect_timeout" => {
+              description: "How long to wait in seconds when establishing connections with PuppetDB.",
+              type: Integer,
+              minimum: 1,
+              _default: 60,
+              _example: 120
+            },
             "key" => {
               description: "The private key for the certificate.",
               type: String,
               _example: "/etc/puppetlabs/puppet/ssl/private_keys/my-host.example.com.pem"
+            },
+            "read_timeout" => {
+              description: "How long to wait in seconds for a response from PuppetDB.",
+              type: Integer,
+              minimum: 1,
+              _default: 60,
+              _example: 120
             },
             "server_urls" => {
               description: "An array containing the PuppetDB host to connect to. Include the protocol `https` "\

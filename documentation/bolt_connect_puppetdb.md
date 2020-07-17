@@ -50,6 +50,9 @@ config](configuring_bolt.md) with the following values:
     the protocol `https` and the port, which is usually `8081`. For example,
     `https://my-master.example.com:8081`.
 -   `cacert`: The path to the ca certificate for PuppetDB.
+-   `connect_timeout`: How long to wait in seconds when establishing
+    connections with PuppetDB.
+-   `read_timeout`: How long to wait in seconds for a response from PuppetDB.
 
 If you are using certificate authentication also set:
 

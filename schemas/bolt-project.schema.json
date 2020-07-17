@@ -203,9 +203,19 @@
               "description": "The path to the client certificate file to use for authentication.",
               "type": "string"
             },
+            "connect_timeout": {
+              "description": "How long to wait in seconds when establishing connections with PuppetDB.",
+              "type": "integer",
+              "minimum": 1
+            },
             "key": {
               "description": "The private key for the certificate.",
               "type": "string"
+            },
+            "read_timeout": {
+              "description": "How long to wait in seconds for a response from PuppetDB.",
+              "type": "integer",
+              "minimum": 1
             },
             "server_urls": {
               "description": "An array containing the PuppetDB host to connect to. Include the protocol `https` and the port, which is usually `8081`. For example, `https://my-master.example.com:8081`.",
