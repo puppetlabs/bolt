@@ -195,7 +195,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/ACTIONS.*upload/m).to_stdout
+          }.to output(/ACTIONS.*download.*upload/m).to_stdout
         end
 
         it 'accepts puppetfile' do
@@ -700,6 +700,15 @@ describe "Bolt::CLI" do
           result = cli.parse
           expect(result[:object]).to eq('./src')
           expect(result[:leftovers].first).to eq('/path/dest')
+        end
+      end
+
+      describe "download" do
+        it "downloads a file" do
+          cli = Bolt::CLI.new(%w[file download /etc/ssh downloads --targets foo])
+          result = cli.parse
+          expect(result[:object]).to eq('/etc/ssh')
+          expect(result[:leftovers].first).to eq('downloads')
         end
       end
     end

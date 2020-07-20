@@ -1,0 +1,13 @@
+parameters:
+  targets:
+    type: TargetSpec
+  destination:
+    type: String
+
+steps:
+  - name: download_file
+    download: '/etc/ssh/ssh_config'
+    destination: $destination
+    targets: $targets
+
+return: $download_file

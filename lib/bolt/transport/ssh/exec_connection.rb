@@ -65,7 +65,7 @@ module Bolt
           ssh_cmd << command
         end
 
-        def copy_file(source, dest)
+        def upload_file(source, dest)
           @logger.debug { "Uploading #{source}, to #{userhost}:#{dest}" } unless source.is_a?(StringIO)
 
           cp_conf = @target.transport_config['copy-command'] || ["scp", "-r"]
@@ -88,6 +88,27 @@ module Bolt
 
           if stat.success?
             @logger.debug "Successfully uploaded #{source} to #{dest}"
+          else
+            message = "Could not copy file to #{dest}: #{err}"
+            raise Bolt::Node::FileError.new(message, 'COPY_ERROR')
+          end
+        end
+
+        def download_file(source, dest, _download)
+          @logger.debug { "Downloading #{userhost}:#{source} to #{dest}" }
+
+          FileUtils.mkdir_p(dest)
+
+          cp_conf = @target.transport_config['copy-command'] || ["scp", "-r"]
+          cp_cmd = Array(cp_conf)
+          cp_cmd += ssh_opts
+          cp_cmd << "#{userhost}:#{Shellwords.escape(source)}"
+          cp_cmd << dest
+
+          _, err, stat = Open3.capture3(*cp_cmd)
+
+          if stat.success?
+            @logger.debug "Successfully downloaded #{userhost}:#{source} to #{dest}"
           else
             message = "Could not copy file to #{dest}: #{err}"
             raise Bolt::Node::FileError.new(message, 'COPY_ERROR')

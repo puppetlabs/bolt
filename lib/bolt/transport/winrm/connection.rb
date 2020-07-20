@@ -129,23 +129,23 @@ module Bolt
           raise
         end
 
-        def copy_file(source, destination)
+        def upload_file(source, destination)
           @logger.debug { "Uploading #{source}, to #{destination}" }
           if target.options['file-protocol'] == 'smb'
-            copy_file_smb(source, destination)
+            upload_file_smb(source, destination)
           else
-            copy_file_winrm(source, destination)
+            upload_file_winrm(source, destination)
           end
         end
 
-        def copy_file_winrm(source, destination)
+        def upload_file_winrm(source, destination)
           fs = ::WinRM::FS::FileManager.new(@connection)
           fs.upload(source, destination)
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
 
-        def copy_file_smb(source, destination)
+        def upload_file_smb(source, destination)
           # lazy-load expensive gem code
           require 'ruby_smb'
 
@@ -165,7 +165,7 @@ module Bolt
           client = smb_client_login
           tree = client.tree_connect(path)
           begin
-            copy_file_smb_recursive(tree, source, dest)
+            upload_file_smb_recursive(tree, source, dest)
           ensure
             tree.disconnect!
           end
@@ -173,6 +173,61 @@ module Bolt
           raise Bolt::Node::FileError.new("SMB Error: #{e.message}", 'WRITE_ERROR')
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
+        end
+
+        def download_file(source, destination, download)
+          @logger.debug { "Downloading #{source} to #{destination}" }
+          if target.options['file-protocol'] == 'smb'
+            download_file_smb(source, destination)
+          else
+            download_file_winrm(source, destination, download)
+          end
+        end
+
+        def download_file_winrm(source, destination, download)
+          # The winrm gem doesn't create the destination directory if it's missing,
+          # so create it here
+          FileUtils.mkdir_p(destination)
+          fs = ::WinRM::FS::FileManager.new(@connection)
+          # params: source, destination, chunksize, first
+          # first needs to be set to false, otherwise if the source is a directory it
+          # will be nested inside a directory with the same name
+          fs.download(source, download, 1024 * 1024, false)
+        rescue StandardError => e
+          raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
+        end
+
+        def download_file_smb(source, destination)
+          # lazy-load expensive gem code
+          require 'ruby_smb'
+
+          win_source = source.tr('/', '\\')
+          if (md = win_source.match(/^([a-z]):\\(.*)/i))
+            # if drive, use admin share for that drive, so path is '\\host\C$'
+            path = "\\\\#{@target.host}\\#{md[1]}$"
+            src  = md[2]
+          elsif (md = win_source.match(/^(\\\\[^\\]+\\[^\\]+)\\(.*)/))
+            # if unc, path is '\\host\share'
+            path = md[1]
+            src  = md[2]
+          else
+            raise ArgumentError, "Unknown source '#{source}'"
+          end
+
+          client = smb_client_login
+          tree = client.tree_connect(path)
+
+          begin
+            # Make sure the root download directory for the target exists
+            FileUtils.mkdir_p(destination)
+            download_file_smb_recursive(tree, src, destination)
+          ensure
+            tree.disconnect!
+          end
+        rescue ::RubySMB::Error::UnexpectedStatusCode => e
+          raise Bolt::Node::FileError.new("SMB Error: #{e.message}", 'DOWNLOAD_ERROR')
+        rescue StandardError => e
+          raise Bolt::Node::FileError.new(e.message, 'DOWNLOAD_ERROR')
         end
 
         def shell
@@ -230,13 +285,13 @@ module Bolt
           )
         end
 
-        def copy_file_smb_recursive(tree, source, dest)
+        def upload_file_smb_recursive(tree, source, dest)
           if Dir.exist?(source)
             tree.open_directory(directory: dest, write: true, disposition: ::RubySMB::Dispositions::FILE_OPEN_IF)
 
             Dir.children(source).each do |child|
               child_dest = dest + '\\' + child
-              copy_file_smb_recursive(tree, File.join(source, child), child_dest)
+              upload_file_smb_recursive(tree, File.join(source, child), child_dest)
             end
             return
           end
@@ -253,6 +308,52 @@ module Bolt
             end
           ensure
             file.close
+          end
+        end
+
+        def download_file_smb_recursive(tree, source, destination)
+          dest = File.expand_path(Bolt::Util.windows_basename(source), destination)
+
+          # Check if the source is a directory by attempting to list its children.
+          # If the source is a directory, create the directory on the host and then
+          # recurse through the children.
+          if (children = list_directory_children_smb(tree, source))
+            FileUtils.mkdir_p(dest)
+
+            children.each do |child|
+              # File names are encoded UTF_16LE.
+              filename = child.file_name.encode(Encoding::UTF_8)
+
+              next if %w[. ..].include?(filename)
+
+              src = source + '\\' + filename
+              download_file_smb_recursive(tree, src, dest)
+            end
+          # If the source wasn't a directory and just returns 'STATUS_NOT_A_DIRECTORY, then
+          # it is a file. Write it to the host.
+          else
+            begin
+              file = tree.open_file(filename: source)
+              data = file.read
+
+              # Files may be encoded UTF_16LE
+              data = data.encode(Encoding::UTF_8) if data.encoding == Encoding::UTF_16LE
+
+              File.write(dest, data)
+            ensure
+              file.close
+            end
+          end
+        end
+
+        # Lists the children of a directory using rb_smb
+        # Returns an array of RubySMB::Fscc::FileInformation::FileIdFullDirectoryInformation objects
+        # if the source is a directory, or raises RubySMB::Error::UnexpectedStatusCode otherwise.
+        def list_directory_children_smb(tree, source)
+          tree.list(directory: source)
+        rescue RubySMB::Error::UnexpectedStatusCode => e
+          unless e.message == 'STATUS_NOT_A_DIRECTORY'
+            raise e
           end
         end
       end

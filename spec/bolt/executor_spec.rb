@@ -20,6 +20,7 @@ describe "Bolt::Executor" do
   let(:task_arguments) { { 'name' => 'apache' } }
   let(:task_options) { { '_load_config' => true } }
   let(:transport) { double('holodeck', initialize_transport: nil) }
+  let(:source) { '/etc/ssh/ssh_config' }
 
   def start_event(target)
     { type: :node_start, target: target }
@@ -332,6 +333,76 @@ describe "Bolt::Executor" do
       collector.results.each do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
+      end
+    end
+  end
+
+  context 'downloading a file' do
+    it 'creates the destination directory' do
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        allow(ssh).to receive(:download)
+        expect(FileUtils).to receive(:mkdir_p).with(destination)
+
+        executor.download_file(targets, source, destination)
+      end
+    end
+
+    it 'executes on all nodes' do
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        node_results.each do |target, result|
+          target_destination = File.expand_path(target.safe_name, destination)
+          expect(ssh)
+            .to receive(:download)
+            .with(target, source, target_destination, {})
+            .and_return(result)
+        end
+
+        results = executor.download_file(targets, source, destination)
+
+        results.each do |result|
+          expect(result).to be_instance_of(Bolt::Result)
+        end
+      end
+    end
+
+    it 'yields each result' do
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        node_results.each do |target, result|
+          target_destination = File.expand_path(target.safe_name, destination)
+          expect(ssh)
+            .to receive(:download)
+            .with(target, source, target_destination, {})
+            .and_return(result)
+        end
+
+        executor.download_file(targets, source, destination)
+        executor.shutdown
+
+        node_results.each do |target, result|
+          expect(collector.events).to include(success_event(result))
+          expect(collector.events).to include(start_event(target))
+        end
+      end
+    end
+
+    it 'catches errors' do
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        node_results.each_key do |target|
+          target_destination = File.expand_path(target.safe_name, destination)
+          expect(ssh)
+            .to receive(:download)
+            .with(target, source, target_destination, {})
+            .and_raise(Bolt::Error.new('failed', 'my-exception'))
+        end
+
+        executor.download_file(targets, source, destination)
+        executor.shutdown
+
+        expect(collector.results.length).to eq(node_results.length)
+        collector.results.each do |result|
+          expect(result.error_hash['msg']).to eq('failed')
+          expect(result.error_hash['kind']).to eq('my-exception')
+        end
       end
     end
   end
@@ -748,6 +819,25 @@ describe "Bolt::Executor" do
 
       expect(collector.events).to include(include(type: :step_start, description: match(/file upload/)))
       expect(collector.events).to include(include(type: :step_finish, description: match(/file upload/)))
+    end
+
+    it "logs downloads" do
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        node_results.each do |target, result|
+          target_destination = File.expand_path(target.safe_name, destination)
+          expect(ssh)
+            .to receive(:download)
+            .with(target, script, target_destination, {})
+            .and_return(result)
+        end
+
+        executor.start_plan(plan_context)
+        executor.download_file(targets, script, destination)
+        executor.shutdown
+
+        expect(collector.events).to include(include(type: :step_start, description: match(/file download/)))
+        expect(collector.events).to include(include(type: :step_finish, description: match(/file download/)))
+      end
     end
   end
 end

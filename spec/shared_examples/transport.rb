@@ -139,6 +139,64 @@ shared_examples 'transport api' do
     end
   end
 
+  context 'download_file' do
+    let(:contents)    { SecureRandom.uuid }
+    let(:remote_path) { File.join(os_context[:destination_dir], 'download-test') }
+    let(:remote_dir)  { File.join(remote_path, dir) }
+    let(:basename)    { 'download-test' }
+    let(:dir)         { 'dir' }
+    let(:subdir)      { 'subdir' }
+    let(:file)        { 'file.txt' }
+    let(:subfile)     { 'subfile.txt' }
+
+    it 'can download a file from a host' do
+      with_tempfile_containing(basename, contents) do |file|
+        runner.upload(target, file.path, remote_path)
+      end
+
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        result = runner.download(target, remote_path, destination)
+
+        expect(result.message).to eq("Downloaded '#{target.host}:#{remote_path}' to '#{destination}'")
+        expect(result.action).to eq('download')
+        expect(result.object).to eq(remote_path)
+        expect(result['path']).to eq(File.join(destination, basename))
+        expect(File.exist?(result['path'])).to eq(true)
+        expect(File.read(result['path'])).to match(/#{contents}/)
+      end
+    ensure
+      runner.run_command(target, "#{os_context[:rm_cmd]} #{remote_path}")
+    end
+
+    it 'can download a diretory from a host' do
+      Dir.mktmpdir(nil, Dir.pwd) do |tmp|
+        dir_path = File.join(tmp, dir)
+        subdir_path = File.join(dir_path, subdir)
+
+        Dir.mkdir(dir_path)
+        Dir.mkdir(subdir_path)
+        File.write(File.join(dir_path, file), 'foo')
+        File.write(File.join(subdir_path, subfile), 'bar')
+
+        runner.upload(target, tmp, remote_path)
+      end
+
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        result = runner.download(target, remote_dir, destination)
+
+        expect(result.message).to eq("Downloaded '#{target.host}:#{remote_dir}' to '#{destination}'")
+        expect(result.action).to eq('download')
+        expect(result.object).to eq(remote_dir)
+        expect(result['path']).to eq(File.join(destination, dir))
+        expect(Dir.exist?(result['path'])).to eq(true)
+        expect(Dir.children(result['path'])).to match_array([subdir, file])
+        expect(Dir.children(File.join(result['path'], subdir))).to match_array([subfile])
+      end
+    ensure
+      runner.run_command(target, "#{os_context[:rm_cmd]} #{remote_path}")
+    end
+  end
+
   context 'upload_file' do
     it "can upload a file to a host" do
       contents = "kljhdfg"

@@ -156,6 +156,48 @@ steps:
       - 60
 ```
 
+#### File download step
+
+Use a file download step to download a file or directory from a list of targets
+to a destination directory on the local host.
+
+Files and directories are downloaded to the destination directory within a
+subdirectory matching the target's URL-encoded safe name. If the destination
+directory is a relative path, it will expand relative to the project's
+downloads directory, `<project>/downloads`.
+
+File download steps use these fields:
+
+- `download`: The location of the remote file to download
+- `destination`: The destination directory to download the file to
+- `targets`: A target or list of targets to download the file from
+
+For example:
+
+```yaml
+steps:
+  - download: /etc/ssh/sshd_config
+    destination: sshd_config
+    targets:
+      - web1.example.com
+      - ssh://web2.example.com
+      - web3
+    description: "Download ssh daemon config from the webservers"
+```
+
+If the specified file exists on each of the targets, it would be saved to the
+following locations:
+
+- `~/.puppetlabs/bolt/downloads/sshd_config/web1.example.com/sshd_config`
+- `~/.puppetlabs/bolt/downloads/sshd_config/ssh%3A%2F%2Fweb2.example.com/sshd_config`
+- `~/.puppetlabs/bolt/downloads/sshd_config/web3/sshd_config`
+
+Since files are downloaded to a directory matching the target's safe name, the
+target's safe name is URL encoded to ensure it's a valid directory name.
+
+> 🔩 **Tip:** To avoid URL encoding the target's safe name, give the target a
+> simple, human-readable name in your inventory file.
+
 #### File upload step
 
 Use a file upload step to upload a file to a specific location on a list of
@@ -167,15 +209,15 @@ the `files` directory from the path.
 
 File upload steps use these fields:
 
--   `source`: The location of the file to be uploaded
--   `destination`: The location to upload the file to
+-   `upload`: The location of the local file to be uploaded
+-   `destination`: The remote location to upload the file to
 -   `targets`: A target or list of targets to upload the file to
 
 For example:
 
 ```yaml
 steps:
-  - source: mymodule/motd.txt
+  - upload: mymodule/motd.txt
     destination: /etc/motd
     targets:
       - web1.example.com

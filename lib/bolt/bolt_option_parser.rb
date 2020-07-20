@@ -36,6 +36,9 @@ module Bolt
         when 'upload'
           { flags: ACTION_OPTS + %w[tmpdir],
             banner: FILE_UPLOAD_HELP }
+        when 'download'
+          { flags: ACTION_OPTS,
+            banner: FILE_DOWNLOAD_HELP }
         else
           { flags: OPTIONS[:global],
             banner: FILE_HELP }
@@ -218,10 +221,30 @@ module Bolt
           bolt file <action> [options]
 
       DESCRIPTION
-          Upload a local file or directory
+          Copy files and directories between the controller and targets
 
       ACTIONS
-          upload        Upload a local file or directory
+          download      Download a file or directory to the controller
+          upload        Upload a local file or directory from the controller
+    HELP
+
+    FILE_DOWNLOAD_HELP = <<~HELP
+      NAME
+          download
+
+      USAGE
+          bolt file download <src> <dest> [options]
+
+      DESCRIPTION
+          Download a file or directory from one or more targets.
+
+          Downloaded files and directories are saved to the a subdirectory
+          matching the target's name under the destination directory. The
+          destination directory is expanded relative to the downloads
+          subdirectory of the project directory.
+
+      EXAMPLES
+          bolt file download /etc/ssh_config ssh_config -t all
     HELP
 
     FILE_UPLOAD_HELP = <<~HELP

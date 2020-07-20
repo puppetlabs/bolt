@@ -82,7 +82,9 @@ module Bolt
         def write_remote_file(source, destination)
           @logger.debug { "Uploading #{source}, to #{destination}" }
           _, stdout_str, status = execute_local_docker_command('cp', [source, "#{container_id}:#{destination}"])
-          raise "Error writing file to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
+          unless status.exitstatus.zero?
+            raise "Error writing file to container #{@container_id}: #{stdout_str}"
+          end
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
@@ -90,7 +92,23 @@ module Bolt
         def write_remote_directory(source, destination)
           @logger.debug { "Uploading #{source}, to #{destination}" }
           _, stdout_str, status = execute_local_docker_command('cp', [source, "#{container_id}:#{destination}"])
-          raise "Error writing directory to container #{@container_id}: #{stdout_str}" unless status.exitstatus.zero?
+          unless status.exitstatus.zero?
+            raise "Error writing directory to container #{@container_id}: #{stdout_str}"
+          end
+        rescue StandardError => e
+          raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
+        end
+
+        def download_remote_content(source, destination)
+          @logger.debug { "Downloading #{source} to #{destination}" }
+          # Create the destination directory, otherwise copying a source directory with Docker will
+          # copy the *contents* of the directory.
+          # https://docs.docker.com/engine/reference/commandline/cp/
+          FileUtils.mkdir_p(destination)
+          _, stdout_str, status = execute_local_docker_command('cp', ["#{container_id}:#{source}", destination])
+          unless status.exitstatus.zero?
+            raise "Error downloading content from container #{@container_id}: #{stdout_str}"
+          end
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end

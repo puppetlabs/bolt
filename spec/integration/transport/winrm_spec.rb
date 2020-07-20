@@ -205,6 +205,33 @@ describe Bolt::Transport::WinRM do
       end
     end
 
+    it "can download a file from a host", omi: false do
+      contents = SecureRandom.uuid
+      remote_path = File.join(%w[C: Windows Temp test-winrm-ssl])
+      basename = 'test.ps1'
+      remote_file = File.expand_path(basename, remote_path)
+
+      with_tempfile_containing(basename, contents) do |file|
+        winrm.upload(target, file.path, remote_file)
+      end
+
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        result = winrm.download(target, remote_file, destination)
+
+        expect(result.status).to eq('success')
+
+        expect(
+          File.exist?(result['path'])
+        ).to eq(true)
+
+        expect(
+          File.read(result['path'])
+        ).to match(/#{contents}/)
+      end
+    ensure
+      winrm.run_command(target, "Remove-Item -Recurse #{remote_path}")
+    end
+
     it "skips verification with ssl-verify: false" do
       set_config(target, 'ssl-verify' => false)
 
@@ -322,23 +349,51 @@ describe Bolt::Transport::WinRM do
     end
 
     %w[winrm smb].each do |protocol|
-      it "can upload a file to a host using #{protocol}", winrm: true do
-        conf = mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol, 'smb-port': smb_port)
-        target = make_target(conf: conf)
-        contents = SecureRandom.uuid
-        remote_path = "C:\\Windows\\Temp\\upload-test-#{protocol}"
-        with_tempfile_containing("upload-test-winrm-#{protocol}", contents, '.ps1') do |file|
-          expect(
-            winrm.upload(target, file.path, remote_path).value
-          ).to eq(
-            '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
-          )
+      context "using #{protocol}" do
+        let(:conf) do
+          mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol, 'smb-port': smb_port)
+        end
 
-          expect(
-            winrm.run_command(target, "type #{remote_path}")['stdout']
-          ).to eq("#{contents}\r\n")
+        let(:target)      { make_target(conf: conf) }
+        let(:contents)    { SecureRandom.uuid }
+        let(:remote_path) { File.join(%W[C: Windows Temp #{protocol}]) }
 
-          winrm.run_command(target, "del #{remote_path}")
+        it "can upload a file to a host", winrm: true do
+          with_tempfile_containing(protocol, contents, '.ps1') do |file|
+            expect(
+              winrm.upload(target, file.path, remote_path).value
+            ).to eq(
+              '_output' => "Uploaded '#{file.path}' to '#{target.host}:#{remote_path}'"
+            )
+
+            expect(
+              winrm.run_command(target, "type #{remote_path}")['stdout']
+            ).to eq("#{contents}\r\n")
+          end
+        ensure
+          winrm.run_command(target, "Remove-Item -Recurse #{remote_path}")
+        end
+
+        it "can download a file from a host", winrm: true do
+          with_tempfile_containing(protocol, contents, '.ps1') do |file|
+            winrm.upload(target, file.path, remote_path)
+          end
+
+          Dir.mktmpdir(nil, Dir.pwd) do |destination|
+            result = winrm.download(target, remote_path, destination)
+
+            expect(result.status).to eq('success')
+
+            expect(
+              File.exist?(result['path'])
+            ).to eq(true)
+
+            expect(
+              File.read(result['path'])
+            ).to match(/#{contents}/)
+          end
+        ensure
+          winrm.run_command(target, "Remove-Item -Recurse #{remote_path}")
         end
       end
     end
@@ -367,28 +422,73 @@ describe Bolt::Transport::WinRM do
     end
 
     %w[winrm smb].each do |protocol|
-      it "can upload a directory to a host using #{protocol}", winrm: true do
-        conf = mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol, 'smb-port': smb_port)
-        target = make_target(conf: conf)
+      context "using #{protocol}" do
+        let(:conf) do
+          mk_config(ssl: false, user: user, password: password, 'file-protocol': protocol, 'smb-port': smb_port)
+        end
 
-        Dir.mktmpdir do |dir|
-          subdir = File.join(dir, 'subdir')
-          File.write(File.join(dir, 'content'), 'hello world')
-          Dir.mkdir(subdir)
-          File.write(File.join(subdir, 'more'), 'lorem ipsum')
+        let(:target)      { make_target(conf: conf) }
+        let(:subdir)      { 'subdir' }
+        let(:file)        { 'file.txt' }
+        let(:subfile)     { 'subfile.txt' }
+        let(:remote_path) { File.join(%W[C: Windows Temp #{protocol}]) }
 
-          target_dir = "C:\\Windows\\Temp\\directory-test-#{protocol}"
-          winrm.upload(target, dir, target_dir)
+        it "can upload a directory to a host", winrm: true do
+          Dir.mktmpdir do |tmp|
+            subdir_path = File.join(tmp, subdir)
 
-          expect(
-            winrm.run_command(target, "Get-ChildItem -Name #{target_dir}")['stdout'].split("\r\n")
-          ).to eq(%w[subdir content])
+            Dir.mkdir(subdir_path)
+            File.write(File.join(tmp, file), 'foo')
+            File.write(File.join(subdir_path, subfile), 'bar')
 
-          expect(
-            winrm.run_command(target, "Get-ChildItem -Name #{File.join(target_dir, 'subdir')}")['stdout'].split("\r\n")
-          ).to eq(%w[more])
+            winrm.upload(target, tmp, remote_path)
 
-          winrm.run_command(target, "rm -r #{target_dir}")
+            expect(
+              winrm.run_command(target, "Get-ChildItem -Name #{remote_path}")['stdout'].split("\r\n")
+            ).to eq([subdir, file])
+
+            expect(
+              winrm.run_command(target, "Get-ChildItem -Name #{File.join(remote_path, subdir)}")['stdout'].split("\r\n")
+            ).to eq([subfile])
+          end
+        ensure
+          winrm.run_command(target, "Remove-Item -Recurse #{remote_path}")
+        end
+
+        it "can download a directory from a host", winrm: true do
+          Dir.mktmpdir do |tmp|
+            subdir_path = File.join(tmp, subdir)
+
+            Dir.mkdir(subdir_path)
+            File.write(File.join(tmp, file), 'foo')
+            File.write(File.join(subdir_path, subfile), 'bar')
+
+            winrm.upload(target, tmp, remote_path)
+          end
+
+          Dir.mktmpdir(nil, Dir.pwd) do |destination|
+            result = winrm.download(target, remote_path, destination)
+
+            expect(result.status).to eq('success')
+
+            expect(
+              Dir.exist?(result['path'])
+            ).to eq(true)
+
+            expect(
+              File.exist?(File.join(result['path'], file))
+            ).to eq(true)
+
+            expect(
+              Dir.exist?(File.join(result['path'], subdir))
+            ).to eq(true)
+
+            expect(
+              File.exist?(File.join(result['path'], subdir, subfile))
+            ).to eq(true)
+          end
+        ensure
+          winrm.run_command(target, "Remove-Item -Recurse #{remote_path}")
         end
       end
     end

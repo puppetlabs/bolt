@@ -235,10 +235,18 @@ module Bolt
           raise Bolt::Error.new(msg, 'bolt/too-many-files')
         end
 
-        def copy_file(source, destination)
+        def upload_file(source, destination)
           # Do not log wrapper script content
           @logger.debug { "Uploading #{source}, to #{destination}" } unless source.is_a?(StringIO)
           @session.scp.upload!(source, destination, recursive: true)
+        rescue StandardError => e
+          raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
+        end
+
+        def download_file(source, destination, _download)
+          # Do not log wrapper script content
+          @logger.debug { "Downloading #{source} to #{destination}" }
+          @session.scp.download!(source, destination, recursive: true)
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end

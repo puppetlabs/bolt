@@ -27,7 +27,7 @@ module Bolt
                      end
         end
 
-        def copy_file(source, dest)
+        def upload_file(source, dest)
           @logger.debug { "Uploading #{source}, to #{dest}" }
           if source.is_a?(StringIO)
             Tempfile.create(File.basename(dest)) do |f|
@@ -43,6 +43,19 @@ module Bolt
         rescue StandardError => e
           message = "Could not copy file to #{dest}: #{e}"
           raise Bolt::Node::FileError.new(message, 'COPY_ERROR')
+        end
+
+        def download_file(source, dest, _download)
+          @logger.debug { "Downloading #{source} to #{dest}" }
+          # Create the destination directory for the target, or the
+          # copied file will have the target's name
+          FileUtils.mkdir_p(dest)
+          # Mimic the behavior of `cp --remove-destination`
+          # since the flag isn't supported on MacOS
+          FileUtils.cp_r(source, dest, remove_destination: true)
+        rescue StandardError => e
+          message = "Could not download file to #{dest}: #{e}"
+          raise Bolt::Node::FileError.new(message, 'DOWNLOAD_ERROR')
         end
 
         def execute(command)

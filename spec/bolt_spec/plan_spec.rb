@@ -147,6 +147,39 @@ describe "BoltSpec::Plans" do
     end
   end
 
+  context 'with downloads' do
+    let(:project) { Bolt::Project.default_project }
+    let(:plan_name) { 'plans::download' }
+    let(:destination) { project.downloads + 'foo' }
+    let(:return_expects) { { source: 'plans/script', destination: destination, params: {} } }
+
+    before(:each) do
+      allow_download('plans/dir/prep').with_targets(targets)
+    end
+
+    def expect_action
+      expect_download('plans/script').with_destination(destination).with_params({})
+    end
+
+    include_examples 'action tests'
+
+    # always_return and return_for_Targets are not supported with download
+    it 'rejects always_return' do
+      expect {
+        expect_action.always_return('status' => 'done')
+      }.to raise_error('Download result cannot be changed')
+    end
+
+    it 'rejects return_for_targets' do
+      expect {
+        expect_action.return_for_targets(
+          targets[0] => { 'status' => 'done' },
+          targets[1] => { 'status' => 'running' }
+        )
+      }.to raise_error('Download result cannot be changed')
+    end
+  end
+
   context 'with uploads' do
     let(:plan_name) { 'plans::upload' }
     let(:return_expects) { { source: 'plans/script', destination: '/d', params: {} } }

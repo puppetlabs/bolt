@@ -309,26 +309,60 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   end
 
   describe "#upload_step" do
+    %w[source upload].each do |key|
+      context "with #{key} key" do
+        let(:step) do
+          { key => 'mymodule/file.txt',
+            'destination' => '/path/to/file.txt',
+            'target' => 'foo.example.com' }
+        end
+
+        it 'uploads the file' do
+          args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com']
+          expect(scope).to receive(:call_function).with('upload_file', args)
+
+          subject.upload_step(scope, step)
+        end
+
+        it 'supports a description' do
+          step['description'] = 'upload the file'
+
+          args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com', 'upload the file']
+          expect(scope).to receive(:call_function).with('upload_file', args)
+
+          subject.upload_step(scope, step)
+        end
+      end
+    end
+  end
+
+  describe "#download_step" do
+    let(:source)      { '/etc/ssh/ssh_config' }
+    let(:destination) { 'downloads' }
+    let(:target)      { 'foo.example.com' }
+
     let(:step) do
-      { 'source' => 'mymodule/file.txt',
-        'destination' => '/path/to/file.txt',
-        'target' => 'foo.example.com' }
+      {
+        'download'    => source,
+        'destination' => destination,
+        'target'      => target
+      }
     end
 
-    it 'uploads the file' do
-      args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com']
-      expect(scope).to receive(:call_function).with('upload_file', args)
+    it 'downloads the file' do
+      args = [source, destination, target]
+      expect(scope).to receive(:call_function).with('download_file', args)
 
-      subject.upload_step(scope, step)
+      subject.download_step(scope, step)
     end
 
     it 'supports a description' do
-      step['description'] = 'upload the file'
+      step['description'] = 'download the file'
 
-      args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com', 'upload the file']
-      expect(scope).to receive(:call_function).with('upload_file', args)
+      args = [source, destination, target, 'download the file']
+      expect(scope).to receive(:call_function).with('download_file', args)
 
-      subject.upload_step(scope, step)
+      subject.download_step(scope, step)
     end
   end
 
