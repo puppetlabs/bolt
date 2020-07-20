@@ -46,7 +46,7 @@ jobs:
           chmod 0600 spec/fixtures/keys/id_rsa
           bundle exec r10k puppetfile install
       - name: Run tests with minimal container infrastructure
-        run: bundle exec rake ci:fast
+        run: bundle exec rake ci:linux:fast
 
   slow:
     name: Slow
@@ -77,4 +77,4 @@ jobs:
           docker-compose -f spec/docker-compose.yml up -d
           bundle exec r10k puppetfile install
       - name: Run tests with expensive containers
-        run: bundle exec rake ci:slow
+        run: bundle exec rake ci:linux:slow
