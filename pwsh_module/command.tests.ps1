@@ -1,7 +1,7 @@
-Import-Module -Name (Join-Path (Split-Path $PSCommandPath) 'pwsh_bolt.psm1') -Force
+Import-Module -Name (Join-Path (Split-Path $PSCommandPath) 'PuppetBolt.psd1') -Force
 BeforeAll {
 
-  Mock -ModuleName 'pwsh_bolt' -Verifiable -CommandName Invoke-BoltCommandLine -MockWith {
+  Mock -ModuleName 'PuppetBolt' -Verifiable -CommandName Invoke-BoltCommandLine -MockWith {
     return "bolt " + $params -join " "
   }
   
@@ -16,6 +16,27 @@ BeforeAll {
     'InformationVariable', 'OutBuffer',  'OutVariable', 'PipelineVariable',
     'Verbose', 'WarningAction', 'WarningVariable', 'Confirm', 'Whatif'
   )
+}
+
+Describe "test bolt module" {
+  context "valid manifest" {
+    It "has a valid manifest" {
+      # these types of errors  might be caught by the import statement in line 1
+      # but check explicitly to be sure for all cases
+      Test-ModuleManifest -Path (Join-Path (Split-Path $PSCommandPath) 'PuppetBolt.psd1') -ErrorAction Stop
+    }
+  }
+
+  context "bolt module setup" {
+    BeforeEach {
+      $commands = Get-Command -Module 'PuppetBolt'
+    }
+
+    it "has the correct number of exported functions" {
+      # should count of pwsh functions plus legacy `bolt` function
+      @($commands).Count | Should -Be 21
+    }
+  }
 }
 
 Describe "test bolt command syntax" {

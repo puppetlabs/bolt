@@ -132,10 +132,3 @@ function Get-BoltCommandline {
 
   Write-Output $params
 }
-
-$boltFunctions = @(
-'bolt',
-'<%= @commands.sort_by { |cmd| cmd[:cmdlet] }.map{|cmd| cmd[:cmdlet] }.join("',\n'") %>'
-)
-
-Export-ModuleMember -Function $boltFunctions -Variable *

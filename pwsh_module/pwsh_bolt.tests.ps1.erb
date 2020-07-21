@@ -1,6 +1,6 @@
-Import-Module -Name (Join-Path (Split-Path $PSCommandPath) 'pwsh_bolt.psm1') -Force
+Import-Module -Name (Join-Path (Split-Path $PSCommandPath) 'PuppetBolt.psd1') -Force
 BeforeAll {
-  Mock -ModuleName 'pwsh_bolt' -Verifiable -CommandName Invoke-BoltCommandLine -MockWith {
+  Mock -ModuleName 'PuppetBolt' -Verifiable -CommandName Invoke-BoltCommandLine -MockWith {
     return $commandline
   }
   Mock Get-ItemProperty {
