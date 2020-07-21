@@ -84,8 +84,8 @@ choco uninstall puppet-bolt
 
 PowerShell versions 2.0 and 3.0 cannot automatically discover and load the Bolt
 module, so you'll need to add it manually. Unless your system dates from 2013 or
-earlier, this situation probably does not apply to you. To confirm your version,
-run `echo $PSTableVersion` in PowerShell.
+earlier, this situation probably does not apply to you. To confirm your version
+run `$PSVersionTable` in PowerShell.
 
 To allow PowerShell to load Bolt, add the correct module to your PowerShell
 profile.
