@@ -151,13 +151,14 @@ module BoltServer
         sha256 = file['sha256']
         kind = file['kind']
         path = File.join(cache_dir, relative_path)
-        if kind == 'file'
+        case kind
+        when 'file'
           # The parent should already be created by `directory` entries,
           # but this is to be on the safe side.
           parent = File.dirname(path)
           FileUtils.mkdir_p(parent)
           @file_cache.serial_execute { @file_cache.download_file(path, sha256, uri) }
-        elsif kind == 'directory'
+        when 'directory'
           # Create directory in cache so we can move files in.
           FileUtils.mkdir_p(path)
         else

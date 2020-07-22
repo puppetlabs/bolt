@@ -85,7 +85,8 @@ module Bolt
 
       def resolve_facts(config, certname, target_data)
         Bolt::Util.walk_vals(config) do |value|
-          if value.is_a?(String)
+          case value
+          when String
             if value == 'certname'
               certname
             else
@@ -94,7 +95,7 @@ module Bolt
               # If there's no fact data this will be nil
               data&.fetch('value', nil)
             end
-          elsif value.is_a?(Array) || value.is_a?(Hash)
+          when Array, Hash
             value
           else
             raise FactLookupError.new(value, "fact lookups must be a string")

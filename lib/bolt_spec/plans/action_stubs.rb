@@ -118,7 +118,7 @@ module BoltSpec
       # Restricts the stub to only match invocations with
       # the correct targets
       def with_targets(targets)
-        targets = [targets] unless targets.is_a? Array
+        targets = Array(targets)
         @invocation[:targets] = targets.map do |target|
           if target.is_a? String
             target

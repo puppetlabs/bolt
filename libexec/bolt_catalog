@@ -32,10 +32,11 @@ require 'json'
 # }
 
 command = ARGV[0]
-if command == "parse"
+case command
+when "parse"
   code = File.open(ARGV[1], &:read)
   puts JSON.pretty_generate(Bolt::Catalog.new.generate_ast(code, ARGV[1]))
-elsif command == "compile"
+when "compile"
   request = if ARGV[1]
               File.open(ARGV[1]) { |fh| JSON.parse(fh.read) }
             else

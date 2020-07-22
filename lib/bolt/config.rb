@@ -499,7 +499,7 @@ module Bolt
     end
 
     def matching_paths(paths)
-      [*paths].map { |p| Dir.glob([p, casefold(p)]) }.flatten.uniq.reject { |p| [*paths].include?(p) }
+      Array(paths).map { |p| Dir.glob([p, casefold(p)]) }.flatten.uniq.reject { |p| Array(paths).include?(p) }
     end
 
     private def casefold(path)

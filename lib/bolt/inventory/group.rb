@@ -50,10 +50,11 @@ module Bolt
           # or it could be a name/alias of a target defined in another group.
           # We can't tell the difference until all groups have been resolved,
           # so we store the string on its own here and process it later.
-          if target.is_a?(String)
+          case target
+          when String
             @string_targets << target
           # Handle plugins at this level so that lookups cannot trigger recursive lookups
-          elsif target.is_a?(Hash)
+          when Hash
             add_target_definition(target)
           else
             raise ValidationError.new("Target entry must be a String or Hash, not #{target.class}", @name)

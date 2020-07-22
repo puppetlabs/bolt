@@ -90,13 +90,25 @@ Style/RedundantRegexpEscape:
 Style/AccessorGrouping:
   Enabled: true
 
-# Disabled due to a bug in Rubocop that raises an exception when accessors
-# are assigned using a splat operator
-# https://github.com/rubocop-hq/rubocop/issues/8257
 Style/BisectedAttrAccessor:
-  Enabled: false
+  Enabled: true
 
 Style/RedundantAssignment:
+  Enabled: true
+
+Style/ArrayCoercion:
+  Enabled: true
+
+Style/CaseLikeIf:
+  Enabled: true
+
+Style/HashAsLastArrayItem:
+  Enabled: false
+
+Style/HashLikeCase:
+  Enabled: true
+
+Style/RedundantFileExtensionInRequire:
   Enabled: true
 
 # Disable nearly all Metrics checks. These seem better off left to judgement.
@@ -143,6 +155,9 @@ Lint/DeprecatedOpenSSLConstant:
 
 Lint/MixedRegexpCaptureTypes:
   Enabled: false
+
+Lint/DuplicateElsifCondition:
+  Enabled: true
 
 # Enforce LF line endings, even when on Windows
 Layout/EndOfLine:
