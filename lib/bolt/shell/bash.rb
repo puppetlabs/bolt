@@ -335,7 +335,6 @@ module Bolt
           sudo_str = if use_sudo
                        sudo_exec = target.options['sudo-executable'] || "sudo"
                        sudo_flags = [sudo_exec, "-S", "-H", "-u", run_as, "-p", sudo_prompt]
-                       sudo_flags += ["-E"] if options[:environment]
                        Shellwords.shelljoin(sudo_flags)
                      else
                        Shellwords.shelljoin(@target.options['run-as-command'] + [run_as])

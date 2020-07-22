@@ -27,6 +27,20 @@ describe "when running a plan using run_as", ssh: true do
     expect(JSON.parse(output)).to eq(%W[#{user}\n root\n #{user}\n root\n #{user}\n root\n])
   end
 
+  context 'when passing environment variables' do
+    let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
+
+    it 'correctly passes environment variables to a task' do
+      output = run_cli_json(%W[task run sample message=tacos -t #{uri}] + config_flags)
+      expect(output['items'].first['value']['_output'].strip).to eq('tacos')
+    end
+
+    it 'correctly passes environment variables specified in a plan' do
+      output = run_cli_json(%W[plan run env_var::command -t #{uri} user=root] + config_flags).first
+      expect(output['value']['stdout'].strip).to eq('and guacamole')
+    end
+  end
+
   it 'runs sudo within a plan when specified' do
     output = run_plan('test::incept', target: uri)
     expect(JSON.parse(output)).to eq(%W[#{user}\n root\n #{user}\n root\n #{user}\n root\n])
