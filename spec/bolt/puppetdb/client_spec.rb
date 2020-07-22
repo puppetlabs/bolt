@@ -3,12 +3,58 @@
 require 'spec_helper'
 require 'bolt/puppetdb/client'
 require 'bolt_spec/puppetdb'
+require 'httpclient'
 
 describe Bolt::PuppetDB::Client do
   let(:uri) { 'https://puppetdb:8081' }
   let(:cacert) { File.expand_path('/path/to/cacert') }
-  let(:config) { double('config', server_urls: [uri], cacert: cacert, token: nil, cert: nil, key: nil) }
   let(:client) { Bolt::PuppetDB::Client.new(config) }
+  let(:connect_timeout) { 45 }
+  let(:read_timeout) { 45 }
+
+  let(:config) do
+    double(
+      'config',
+      server_urls: [uri],
+      cacert: cacert,
+      token: nil,
+      cert: nil,
+      key: nil,
+      connect_timeout: nil,
+      read_timeout: nil
+    )
+  end
+
+  describe "#http_client" do
+    let(:http_client) { double('httpclient', ssl_config: ssl_config) }
+    let(:ssl_config)  { double('ssl_config', set_client_cert_file: nil, add_trust_ca: nil) }
+
+    before(:each) do
+      allow(HTTPClient).to receive(:new).and_return(http_client)
+    end
+
+    it 'sets connect_timeout when connect_timeout is set' do
+      allow(config).to receive(:connect_timeout).and_return(connect_timeout)
+      expect(http_client).to receive(:connect_timeout=).with(connect_timeout)
+      client.http_client
+    end
+
+    it 'does not connect_timeout when connect_timeout is not set' do
+      expect(http_client).not_to receive(:connect_timeout=)
+      client.http_client
+    end
+
+    it 'sets receive_timeout when read_timeout is set' do
+      allow(config).to receive(:read_timeout).and_return(read_timeout)
+      expect(http_client).to receive(:receive_timeout=).with(read_timeout)
+      client.http_client
+    end
+
+    it 'does not set receive_timeout when read_timeout is not set' do
+      expect(http_client).not_to receive(:receive_timeout=)
+      client.http_client
+    end
+  end
 
   describe "#headers" do
     it 'sets content-type' do

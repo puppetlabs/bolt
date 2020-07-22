@@ -132,6 +132,22 @@ module Bolt
         end
       end
 
+      def connect_timeout
+        validate_timeout('connect_timeout')
+        @settings['connect_timeout']
+      end
+
+      def read_timeout
+        validate_timeout('read_timeout')
+        @settings['read_timeout']
+      end
+
+      def validate_timeout(timeout)
+        unless @settings[timeout].nil? || (@settings[timeout].is_a?(Integer) && @settings[timeout] > 0)
+          raise Bolt::PuppetDBError, "#{timeout} must be a positive integer, received #{@settings[timeout]}"
+        end
+      end
+
       def to_hash
         @settings.dup
       end

@@ -31,13 +31,17 @@ describe Bolt::PuppetDB::Config do
     let(:token) { File.expand_path('/path/to/token') }
     let(:cert) { File.expand_path('/path/to/cert') }
     let(:key) { File.expand_path('/path/to/key') }
+    let(:connect_timeout) { 120 }
+    let(:read_timeout) { 120 }
     let(:options) do
       {
         'server_urls' => ['https://puppetdb:8081'],
         'cacert' => cacert,
         'token' => token,
         'cert' => cert,
-        'key' => key
+        'key' => key,
+        'connect_timeout' => connect_timeout,
+        'read_timeout' => read_timeout
       }
     end
 
@@ -175,6 +179,36 @@ describe Bolt::PuppetDB::Config do
         allow(File).to receive(:exist?).with(key).and_return false
 
         expect { config.key }.to raise_error(Bolt::PuppetDBError, /key file .* does not exist/)
+      end
+    end
+
+    %w[read_timeout connect_timeout].each do |timeout|
+      context timeout do
+        it 'fails if not an integer' do
+          options[timeout] = '120'
+
+          expect { config.send(timeout.to_sym) }.to raise_error(
+            Bolt::PuppetDBError, /#{timeout} must be a positive integer/
+          )
+        end
+
+        it 'fails if not a positive integer' do
+          options[timeout] = 0
+
+          expect { config.send(timeout.to_sym) }.to raise_error(
+            Bolt::PuppetDBError, /#{timeout} must be a positive integer/
+          )
+        end
+
+        it 'returns nil if not set' do
+          options.delete(timeout)
+
+          expect(config.send(timeout.to_sym)).to eq(nil)
+        end
+
+        it 'returns value if set' do
+          expect(config.send(timeout.to_sym)).to eq(options[timeout])
+        end
       end
     end
   end
