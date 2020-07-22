@@ -4,6 +4,9 @@ Use an inventory file to store information about your targets and arrange them
 into groups. Grouping your targets lets you aim your Bolt commands at the group
 instead of having to reference each target individually.
 
+An inventory file is part of a Bolt project and must exist alongside a
+`bolt-project.yaml` file. For more information, see [Bolt projects](projects.md).
+
 The command `bolt inventory show -t <TARGET> --detail` provides a quick way to
 view the resolved values for a target or group of targets.
 

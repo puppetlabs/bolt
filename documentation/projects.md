@@ -7,7 +7,8 @@ take full advantage of this feature.
 One of the first things you'll do when you start using Bolt is create a Bolt
 project. A Bolt project is a simple directory that serves as the launching point
 for Bolt. You run Bolt from your project directory, and the directory houses
-your Bolt configuration files and your Bolt content, such as plans and tasks.
+your Bolt configuration files, like an `inventory.yaml` and `bolt-project.yaml`
+file, and your Bolt content, such as plans and tasks.
 
 In addition to working with your local Bolt content, Bolt projects give you a
 way to share that content with other users in your organization. You can create
