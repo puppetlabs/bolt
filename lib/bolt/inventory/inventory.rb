@@ -109,11 +109,12 @@ module Bolt
       private :resolve_name
 
       def expand_targets(targets)
-        if targets.is_a? Bolt::Target
+        case targets
+        when Bolt::Target
           targets
-        elsif targets.is_a? Array
+        when Array
           targets.map { |tish| expand_targets(tish) }
-        elsif targets.is_a? String
+        when String
           # Expand a comma-separated list
           targets.split(/[[:space:],]+/).reject(&:empty?).map do |name|
             ts = resolve_name(name)

@@ -357,30 +357,32 @@ module Bolt
 
       analytics.screen_view(screen, screen_view_fields)
 
-      if options[:action] == 'show'
-        if options[:subcommand] == 'task'
+      case options[:action]
+      when 'show'
+        case options[:subcommand]
+        when 'task'
           if options[:object]
             show_task(options[:object])
           else
             list_tasks
           end
-        elsif options[:subcommand] == 'plan'
+        when 'plan'
           if options[:object]
             show_plan(options[:object])
           else
             list_plans
           end
-        elsif options[:subcommand] == 'inventory'
+        when 'inventory'
           if options[:detail]
             show_targets
           else
             list_targets
           end
-        elsif options[:subcommand] == 'group'
+        when 'group'
           list_groups
         end
         return 0
-      elsif options[:action] == 'show-modules'
+      when 'show-modules'
         list_modules
         return 0
       end
@@ -393,17 +395,19 @@ module Bolt
 
       case options[:subcommand]
       when 'project'
-        if options[:action] == 'init'
+        case options[:action]
+        when 'init'
           code = initialize_project
-        elsif options[:action] == 'migrate'
+        when 'migrate'
           code = migrate_project
         end
       when 'plan'
         code = run_plan(options[:object], options[:task_options], options[:target_args], options)
       when 'puppetfile'
-        if options[:action] == 'generate-types'
+        case options[:action]
+        when 'generate-types'
           code = generate_types
-        elsif options[:action] == 'install'
+        when 'install'
           code = install_puppetfile(config.puppetfile_config, config.puppetfile, config.modulepath)
         end
       when 'secret'

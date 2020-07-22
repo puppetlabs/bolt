@@ -107,12 +107,13 @@ module Bolt
       # Accepts a Data object and returns a copy with all hash keys
       # modified by block. use &:to_s to stringify keys or &:to_sym to symbolize them
       def walk_keys(data, &block)
-        if data.is_a? Hash
+        case data
+        when Hash
           data.each_with_object({}) do |(k, v), acc|
             v = walk_keys(v, &block)
             acc[yield(k)] = v
           end
-        elsif data.is_a? Array
+        when Array
           data.map { |v| walk_keys(v, &block) }
         else
           data
@@ -124,9 +125,10 @@ module Bolt
       # their descendants are.
       def walk_vals(data, skip_top = false, &block)
         data = yield(data) unless skip_top
-        if data.is_a? Hash
+        case data
+        when Hash
           data.transform_values { |v| walk_vals(v, &block) }
-        elsif data.is_a? Array
+        when Array
           data.map { |v| walk_vals(v, &block) }
         else
           data
@@ -137,9 +139,10 @@ module Bolt
       # modified by the given block. Descendants are modified before their
       # parents.
       def postwalk_vals(data, skip_top = false, &block)
-        new_data = if data.is_a? Hash
+        new_data = case data
+                   when Hash
                      data.transform_values { |v| postwalk_vals(v, &block) }
-                   elsif data.is_a? Array
+                   when Array
                      data.map { |v| postwalk_vals(v, &block) }
                    else
                      data
@@ -193,11 +196,12 @@ module Bolt
           cloned[obj.object_id] = cl
           cloned[cl.object_id] = cl
 
-          if cl.is_a? Hash
+          case cl
+          when Hash
             obj.each { |k, v| cl[k] = deep_clone(v, cloned) }
-          elsif cl.is_a? Array
+          when Array
             cl.collect! { |v| deep_clone(v, cloned) }
-          elsif cl.is_a? Struct
+          when Struct
             obj.each_pair { |k, v| cl[k] = deep_clone(v, cloned) }
           end
 
@@ -257,9 +261,10 @@ module Bolt
 
       # Recursively searches a data structure for plugin references
       def references?(input)
-        if input.is_a?(Hash)
+        case input
+        when Hash
           input.key?('_plugin') || input.values.any? { |v| references?(v) }
-        elsif input.is_a?(Array)
+        when Array
           input.any? { |v| references?(v) }
         else
           false

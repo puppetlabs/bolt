@@ -284,9 +284,10 @@ module Bolt
 
     def parse_params(type, object_name, params)
       in_bolt_compiler do |compiler|
-        if type == 'task'
+        case type
+        when 'task'
           param_spec = compiler.task_signature(object_name)&.task_hash&.dig('parameters')
-        elsif type == 'plan'
+        when 'plan'
           plan = compiler.plan_signature(object_name)
           param_spec = plan.params_type.elements&.each_with_object({}) { |t, h| h[t.name] = t.value_type } if plan
         end

@@ -39,9 +39,10 @@ module Bolt
             a = string.chars.map do |c|
               case @state
               when :normal
-                if c == "\e"
+                case c
+                when "\e"
                   @state = :ansi
-                elsif c == "\n"
+                when "\n"
                   @line_color += 1
                   @color = @line_color
                   c

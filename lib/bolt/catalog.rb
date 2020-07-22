@@ -138,9 +138,10 @@ module Bolt
         # That means the apply body either a) consists of just a
         # NodeDefinition, b) consists of a BlockExpression which may
         # contain NodeDefinitions, or c) doesn't contain NodeDefinitions.
-        definitions = if ast.is_a?(Puppet::Pops::Model::BlockExpression)
+        definitions = case ast
+                      when Puppet::Pops::Model::BlockExpression
                         ast.statements.select { |st| st.is_a?(Puppet::Pops::Model::NodeDefinition) }
-                      elsif ast.is_a?(Puppet::Pops::Model::NodeDefinition)
+                      when Puppet::Pops::Model::NodeDefinition
                         [ast]
                       else
                         []
