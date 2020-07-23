@@ -1,0 +1,9 @@
+version: 5
+
+hierarchy:
+  - name: Common
+    path: hierarchy.yaml
+
+plan_hierarchy:
+  - name: Common
+    path: plan_hierarchy.yaml

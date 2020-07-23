@@ -5,8 +5,8 @@ require 'bolt_spec/config'
 require 'bolt_spec/integration'
 
 describe "lookup() in plans" do
-  include BoltSpec::Integration
   include BoltSpec::Config
+  include BoltSpec::Integration
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
@@ -131,6 +131,34 @@ describe "lookup() in plans" do
       expect(result).to include(
         'kind' => 'bolt/pal-error',
         'msg'  => /Unable to find 'data_hash' function named 'missing_backend'/
+      )
+    end
+  end
+
+  context 'with plan_hiera' do
+    let(:hiera_config) { File.join(boltdir, 'plan_hiera.yaml') }
+    let(:plan)         { 'test::plan_lookup' }
+    let(:uri)          { 'localhost' }
+
+    it 'uses plan_hierarchy outside apply block, and hierarchy in apply block' do
+      pending('Until Puppet 6.18 is released')
+      result = run_cli_json(cli_command + %W[-t #{uri}])
+      expect(result['outside_apply']).to eq('goes the weasel')
+      expect(result['in_apply'].keys).to include('Notify[tarts]')
+    end
+  end
+
+  context 'with invalid plan_hierarchy' do
+    let(:hiera_config) { File.join(boltdir, 'plan_hiera_interpolations.yaml') }
+    let(:plan)         { 'test::plan_lookup' }
+    let(:uri)          { 'localhost' }
+
+    it 'raises a validation error' do
+      pending('Until Puppet 6.18 is released')
+      result = run_cli_json(cli_command + %W[-t #{uri}])
+      expect(result).to include(
+        'kind' => 'bolt/pal-error',
+        'msg'  => /Interpolations are not supported in lookups/
       )
     end
   end
