@@ -1,15 +1,41 @@
 # Changelog
 
-## Bolt 2.19.0 (2020-07-20)
+## Bolt 2.20.0 (2020-07-27)
 
 ### New features
 
-* **Support rainbow format on Windows 10**
-  ([#1983](https://github.com/puppetlabs/bolt/pull/1983))
+* **Added `bolt file download` CLI command**
+  ([#1868](https://github.com/puppetlabs/bolt/issues/1868))
 
-  The `rainbow` format is now supported on Windows 10.
+  Users can now download files and directories from targets to the local
+  system using the `bolt file download` CLI command. This command
+  accepts a path to the file or directory to download from the targets
+  and a path to a destination directory on the local system. The
+  destination directory is expanded relative to the project downloads
+  directory, `<project>/downloads/`.
 
-* **Autgenerate PowerShell cmdlets from Bolt commands**
+* **Add `download_file` plan function**
+  ([#1868](https://github.com/puppetlabs/bolt/issues/1868))
+
+  The `download_file` plan function can be used to download a file or
+  directory from a list of targets to a destination directory on the
+  local system. The result returned from this function includes the path
+  to the downloaded file on the local system.
+
+* **Add YAML plan download step**
+  ([#1868](https://github.com/puppetlabs/bolt/issues/1868))
+
+  YAML plans now support a download step which can be used to download a
+  file or directory from a list of targets to a destination directory on
+  the local system.
+
+* **Add `allow_download` and `expect_download` stubs to BoltSpec**
+  ([#1868](https://github.com/puppetlabs/bolt/issues/1868))
+
+  Users can use the `allow_download` and `expect_download` stubs to test
+  plans that contain calls to `download_file`.
+
+* **Ship Bolt with PowerShell cmdlets on Windows**
   ([#1895](https://github.com/puppetlabs/bolt/issues/1895))
 
   Bolt now ships with PowerShell cmdlets on Windows. All Bolt commands are
@@ -44,6 +70,47 @@
   | `bolt secret encrypt` | `Protect-BoltSecret` |
   | `bolt task run` | `Invoke-BoltTask` |
   | `bolt task show` | `Get-BoltTask` |
+
+* **Configure connection and read timeout length in PuppetDB client**
+  ([#1994](https://github.com/puppetlabs/bolt/issues/1994))
+
+  Users can now configure the connection and read timeout length for the
+  PuppetDB client with the `connect_timeout` and `read_timeout`
+  options under the `puppetdb` config option.
+
+* **Environment preservation permission no longer required when using run-as**
+  ([#1993](https://github.com/puppetlabs/bolt/issues/1993))
+
+  Bolt no longer passes the `-E` flag to sudo when building commands
+  using 'run-as', which allows users who do not have permission to use the
+  flag to use Bolt.
+
+### Bug fixes
+
+* **Do not re-rescue errors raised before config is loaded**
+  ([#2005](https://github.com/puppetlabs/bolt/pull/2005))
+
+  Errors raised before Bolt's configuration was loaded were raising a
+  second, ambiguous `NoMethodError`. Bolt now correctly handles errors
+  raised before configuration is loaded and will no longer trigger
+  additional errors.
+
+### Deprecations
+
+* **Deprecate `source` key for YAML plan upload step**
+  ([#1868](https://github.com/puppetlabs/bolt/issues/1868))
+
+  The `source` key used in YAML plan upload steps has been deprecated in
+  favor of a less ambiguous `upload` key.
+
+## Bolt 2.19.0 (2020-07-20)
+
+### New features
+
+* **Support rainbow format on Windows 10**
+  ([#1983](https://github.com/puppetlabs/bolt/pull/1983))
+
+  The `rainbow` format is now supported on Windows 10.
 
 ### Bug fixes
 
