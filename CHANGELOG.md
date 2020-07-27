@@ -53,6 +53,7 @@
   | --- | --- |
   | `bolt apply`  | `Invoke-BoltApply` |
   | `bolt command run` | `Invoke-BoltCommand` |
+  | `bolt file download` | `Receive-BoltFile` |
   | `bolt file upload` | `Send-BoltFile` |
   | `bolt group show` | `Get-BoltGroup` |
   | `bolt inventory show` | `Get-BoltInventory` |
