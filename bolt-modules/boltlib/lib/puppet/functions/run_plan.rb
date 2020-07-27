@@ -11,6 +11,9 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
   # @param args A hash of arguments to the plan. Can also include additional options.
   # @option args [Boolean] _catch_errors Whether to catch raised errors.
   # @option args [String] _run_as User to run as using privilege escalation.
+  #   This option sets the [run-as user](privilege_escalation.md) for all
+  #   targets whenever Bolt connects to a target. This is set for all functions
+  #   in the called plan, including `run_plan()`.
   # @return [PlanResult] The result of running the plan. Undef if plan does not explicitly return results.
   # @example Run a plan
   #   run_plan('canary', 'command' => 'false', 'targets' => $targets, '_catch_errors' => true)
@@ -31,6 +34,9 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
   # @param args A hash of arguments to the plan. Can also include additional options.
   # @option args [Boolean] _catch_errors Whether to catch raised errors.
   # @option args [String] _run_as User to run as using privilege escalation.
+  #   This option sets the [run-as user](privilege_escalation.md) for all
+  #   targets whenever Bolt connects to a target. This is set for all functions
+  #   in the called plan, including `run_plan()`.
   # @return [PlanResult] The result of running the plan. Undef if plan does not explicitly return results.
   # @example Run a plan
   #   run_plan('canary', $targets, 'command' => 'false')

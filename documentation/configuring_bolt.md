@@ -216,13 +216,14 @@ options](bolt_configuration_reference.md).
 Bolt uses the following precedence when interpolating configuration settings,
 from highest precedence to lowest:
 
-  - Target URI (i.e. ssh://user:password@hostname:port)
-  - [Inventory file](inventory_file_v2.md) options
-  - [Command line flags](bolt_command_reference.md)
-  - Project-level configuration file
-  - User-level configuration file
-  - System-wide configuration file
-  - SSH configuration file options (e.g. `~/.ssh/config`)
+  - Configuration specifications from the target's URI. For example, `ssh://user:password@hostname:port`.
+  - [Plan function](plan_functions.md) options that modify configuration, such as `_run_as`.
+  - [Inventory file](inventory_file_v2.md) configuration options.
+  - [Command line flags](bolt_command_reference.md) that modify configuration.
+  - Options from the project-level configuration file, `bolt-project.yaml`. 
+  - Options from the user-level configuration file, `~/.puppetlabs/etc/bolt/bolt-defaults.yaml`.
+  - Options from the system-wide configuration file, `/etc/puppetlabs/bolt/bolt-defaults.yaml`.
+  - SSH configuration file options. For example, `~/.ssh/config`.
 
 ## Merge strategy
 
