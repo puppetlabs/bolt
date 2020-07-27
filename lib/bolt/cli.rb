@@ -258,6 +258,13 @@ module Bolt
               "Option '--noop' may only be specified when running a task or applying manifest code"
       end
 
+      if options[:env_vars]
+        unless %w[command script].include?(options[:subcommand]) && options[:action] == 'run'
+          raise Bolt::CLIError,
+                "Option '--env-var' may only be specified when running a command or script"
+        end
+      end
+
       if options[:subcommand] == 'apply' && (options[:object] && options[:code])
         raise Bolt::CLIError, "--execute is unsupported when specifying a manifest file"
       end
@@ -450,6 +457,7 @@ module Bolt
         elapsed_time = Benchmark.realtime do
           executor_opts = {}
           executor_opts[:description] = options[:description] if options.key?(:description)
+          executor_opts[:env_vars] = options[:env_vars] if options.key?(:env_vars)
           executor.subscribe(outputter)
           executor.subscribe(log_outputter)
           results =

@@ -107,4 +107,10 @@ describe "CLI parses input" do
     result = run_one_node(['script', 'run', script_path, '--targets', target] + params + config_flags)
     expect(result['stdout']).to match(/dont=split/)
   end
+
+  it 'parses environment variables', ssh: true do
+    script = File.join(__dir__, '../fixtures/modules/env_var/tasks/get_var.sh')
+    output = run_cli_json(%W[script run #{script} -t #{target} --env-var test_var=123] + config_flags)
+    expect(output['items'][0]['value']['stdout'].strip).to eq('123')
+  end
 end

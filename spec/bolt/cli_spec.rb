@@ -700,6 +700,11 @@ describe "Bolt::CLI" do
           cli.parse
         }.to raise_error(Bolt::CLIError, /Must specify a command to run/)
       end
+
+      it "sets specified environment variables" do
+        cli = Bolt::CLI.new(%w[command run --targets foo whoami --env-var POP=TARTS])
+        expect(cli.parse[:env_vars]).to eq({ 'POP' => 'TARTS' })
+      end
     end
 
     it "distinguishes subcommands" do
@@ -714,6 +719,12 @@ describe "Bolt::CLI" do
           result = cli.parse
           expect(result[:object]).to eq('./src')
           expect(result[:leftovers].first).to eq('/path/dest')
+        end
+
+        it "fails with --env-var" do
+          cli = Bolt::CLI.new(%w[file upload -t foo --env-var POP=ROCKS])
+          expect { cli.parse }
+            .to raise_error(Bolt::CLIError, /Option '--env-var' may only be specified when running a command or script/)
         end
       end
 

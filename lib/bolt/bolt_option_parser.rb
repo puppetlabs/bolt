@@ -25,7 +25,7 @@ module Bolt
       when 'command'
         case action
         when 'run'
-          { flags: ACTION_OPTS,
+          { flags: ACTION_OPTS + %w[env-var],
             banner: COMMAND_RUN_HELP }
         else
           { flags: OPTIONS[:global],
@@ -106,7 +106,7 @@ module Bolt
       when 'script'
         case action
         when 'run'
-          { flags: ACTION_OPTS + %w[tmpdir],
+          { flags: ACTION_OPTS + %w[tmpdir env-var],
             banner: SCRIPT_RUN_HELP }
         else
           { flags: OPTIONS[:global],
@@ -759,6 +759,15 @@ module Bolt
       end
       define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|
         @options[:'save-rerun'] = save
+      end
+
+      separator "\nREMOTE ENVIRONMENT OPTIONS"
+      define('--env-var ENVIRONMENT_VARIABLES', 'Environment variables to set on the target') do |envvar|
+        unless envvar.include?('=')
+          raise Bolt::CLIError, "Environment variables must be specified using 'myenvvar=key' format"
+        end
+        @options[:env_vars] ||= {}
+        @options[:env_vars].store(*envvar.split('=', 2))
       end
 
       separator "\nTRANSPORT OPTIONS"
