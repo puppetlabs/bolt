@@ -59,7 +59,7 @@ jobs:
           Set-ActiveRubyFromPuppet
       - name: Run tests
         shell: powershell
-        run: bundle exec rake integration:windows_agents
+        run: bundle exec rake ci:windows:agentful
 
   agentless:
     name: Agentless
@@ -100,4 +100,4 @@ jobs:
         run: '& scripts\ci.ps1'
       - name: Run tests
         shell: powershell
-        run: bundle exec rake windows_ci
+        run: bundle exec rake ci:windows:agentless

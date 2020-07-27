@@ -34,4 +34,4 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: bundle install --jobs 4 --retry 3
       - name: Generate docs
-        run: bundle exec rake generate_docs
+        run: bundle exec rake docs:all
