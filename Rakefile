@@ -14,5 +14,5 @@ end
 
 desc "Update Bolt's changelog for release"
 task :changelog, [:version] do |_t, args|
-  sh "../scripts/generate_changelog.rb #{args[:version]}"
+  sh "scripts/generate_changelog.rb #{args[:version]}"
 end
