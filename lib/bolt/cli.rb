@@ -75,72 +75,100 @@ module Bolt
     end
     private :help?
 
+    # Wrapper method that is called by the Bolt executable. Parses the command and
+    # then loads the project and config. Once config is loaded, it completes the
+    # setup process by configuring Bolt and issuing warnings.
+    #
+    # This separation is needed since the Bolt::Outputter class that normally handles
+    # printing errors relies on config being loaded. All setup that happens before
+    # config is loaded will have errors printed directly to stdout, while all errors
+    # raised after config is loaded are handled by the outputter.
     def parse
-      begin
-        parser = BoltOptionParser.new(options)
-        # This part aims to handle both `bolt <mode> --help` and `bolt help <mode>`.
-        remaining = handle_parser_errors { parser.permute(@argv) } unless @argv.empty?
-        if @argv.empty? || help?(remaining)
-          # Update the parser for the subcommand (or lack thereof)
-          parser.update
-          puts parser.help
-          raise Bolt::CLIExit
-        end
+      parse_command
+      load_config
+      finalize_setup
+    end
 
-        options[:object] = remaining.shift
-
-        # Only parse task_options for task or plan
-        if %w[task plan].include?(options[:subcommand])
-          task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
-          if options[:task_options]
-            unless task_options.empty?
-              raise Bolt::CLIError,
-                    "Parameters must be specified through either the --params " \
-                    "option or param=value pairs, not both"
-            end
-            options[:params_parsed] = true
-          elsif task_options.any?
-            options[:params_parsed] = false
-            options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
-          else
-            options[:params_parsed] = true
-            options[:task_options] = {}
-          end
-        end
-        options[:leftovers] = remaining
-
-        validate(options)
-
-        @config = if ENV['BOLT_PROJECT']
-                    project = Bolt::Project.create_project(ENV['BOLT_PROJECT'], 'environment')
-                    Bolt::Config.from_project(project, options)
-                  elsif options[:configfile]
-                    Bolt::Config.from_file(options[:configfile], options)
-                  else
-                    project = if options[:boltdir]
-                                dir = Pathname.new(options[:boltdir])
-                                if (dir + Bolt::Project::BOLTDIR_NAME).directory?
-                                  Bolt::Project.create_project(dir + Bolt::Project::BOLTDIR_NAME)
-                                else
-                                  Bolt::Project.create_project(dir)
-                                end
-                              else
-                                Bolt::Project.find_boltdir(Dir.pwd)
-                              end
-                    Bolt::Config.from_project(project, options)
-                  end
-
-        Bolt::Logger.configure(config.log, config.color)
-        Bolt::Logger.analytics = analytics
-      rescue Bolt::Error => e
-        if $stdout.isatty
-          # Print the error message in red, mimicking outputter.fatal_error
-          $stdout.puts("\033[31m#{e.message}\033[0m")
-        else
-          $stdout.puts(e.message)
-        end
-        raise e
+    # Parses the command and validates options. All errors that are raised here
+    # are not handled by the outputter, as it relies on config being loaded.
+    def parse_command
+      parser = BoltOptionParser.new(options)
+      # This part aims to handle both `bolt <mode> --help` and `bolt help <mode>`.
+      remaining = handle_parser_errors { parser.permute(@argv) } unless @argv.empty?
+      if @argv.empty? || help?(remaining)
+        # Update the parser for the subcommand (or lack thereof)
+        parser.update
+        puts parser.help
+        raise Bolt::CLIExit
       end
+
+      options[:object] = remaining.shift
+
+      # Only parse task_options for task or plan
+      if %w[task plan].include?(options[:subcommand])
+        task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
+        if options[:task_options]
+          unless task_options.empty?
+            raise Bolt::CLIError,
+                  "Parameters must be specified through either the --params " \
+                  "option or param=value pairs, not both"
+          end
+          options[:params_parsed] = true
+        elsif task_options.any?
+          options[:params_parsed] = false
+          options[:task_options] = Hash[task_options.map { |a| a.split('=', 2) }]
+        else
+          options[:params_parsed] = true
+          options[:task_options] = {}
+        end
+      end
+      options[:leftovers] = remaining
+
+      # Default to verbose for everything except plans
+      unless options.key?(:verbose)
+        options[:verbose] = options[:subcommand] != 'plan'
+      end
+
+      validate(options)
+
+      # Deprecation warnings can't be issued until after config is loaded, so
+      # store them for later.
+      @parser_deprecations = parser.deprecations
+    rescue Bolt::Error => e
+      fatal_error(e)
+      raise e
+    end
+
+    # Loads the project and configuration. All errors that are raised here are not
+    # handled by the outputter, as it relies on config being loaded.
+    def load_config
+      @config = if ENV['BOLT_PROJECT']
+                  project = Bolt::Project.create_project(ENV['BOLT_PROJECT'], 'environment')
+                  Bolt::Config.from_project(project, options)
+                elsif options[:configfile]
+                  Bolt::Config.from_file(options[:configfile], options)
+                else
+                  project = if options[:boltdir]
+                              dir = Pathname.new(options[:boltdir])
+                              if (dir + Bolt::Project::BOLTDIR_NAME).directory?
+                                Bolt::Project.create_project(dir + Bolt::Project::BOLTDIR_NAME)
+                              else
+                                Bolt::Project.create_project(dir)
+                              end
+                            else
+                              Bolt::Project.find_boltdir(Dir.pwd)
+                            end
+                  Bolt::Config.from_project(project, options)
+                end
+    rescue Bolt::Error => e
+      fatal_error(e)
+      raise e
+    end
+
+    # Completes the setup process by configuring Bolt and issuing warnings
+    def finalize_setup
+      Bolt::Logger.configure(config.log, config.color)
+      Bolt::Logger.analytics = analytics
 
       # Logger must be configured before checking path case and project file, otherwise warnings will not display
       config.check_path_case('modulepath', config.modulepath)
@@ -151,28 +179,11 @@ module Bolt
 
       # Display warnings created during parser and config initialization
       config.warnings.each { |warning| @logger.warn(warning[:msg]) }
-      parser.deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
+      @parser_deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
       config.deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
 
-      # After validation, initialize inventory and targets. Errors here are better to catch early.
-      # After this step
-      # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
-      # options[:targets] will contain a resolved set of Target objects
-      unless options[:subcommand] == 'puppetfile' ||
-             options[:subcommand] == 'secret' ||
-             options[:subcommand] == 'project' ||
-             options[:action] == 'show' ||
-             options[:action] == 'convert'
-
-        update_targets(options)
-      end
-
-      unless options.key?(:verbose)
-        # Default to verbose for everything except plans
-        options[:verbose] = options[:subcommand] != 'plan'
-      end
-
       warn_inventory_overrides_cli(options)
+
       options
     rescue Bolt::Error => e
       outputter.fatal_error(e)
@@ -327,6 +338,17 @@ module Bolt
           "Exiting after receiving SIG#{Signal.signame(signo)} signal.#{message ? ' ' + message : ''}"
         )
         exit!
+      end
+
+      # Initialize inventory and targets. Errors here are better to catch early.
+      # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
+      # options[:targets] will contain a resolved set of Target objects
+      unless options[:subcommand] == 'puppetfile' ||
+             options[:subcommand] == 'secret' ||
+             options[:subcommand] == 'project' ||
+             options[:action] == 'show' ||
+             options[:action] == 'convert'
+        update_targets(options)
       end
 
       if options[:action] == 'convert'
@@ -893,6 +915,16 @@ module Bolt
     # package installs include modules listed in the Bolt repo Puppetfile
     def incomplete_install?
       (Dir.children(Bolt::PAL::MODULES_PATH) - %w[aggregate canary puppetdb_fact]).empty?
+    end
+
+    # Mimicks the output from Outputter::Human#fatal_error. This should be used to print
+    # errors prior to config being loaded, as the outputter relies on config being loaded.
+    def fatal_error(error)
+      if $stdout.isatty
+        $stdout.puts("\033[31m#{error.message}\033[0m")
+      else
+        $stdout.puts(error.message)
+      end
     end
   end
 end

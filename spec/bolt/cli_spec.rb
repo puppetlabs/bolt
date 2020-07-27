@@ -261,18 +261,24 @@ describe "Bolt::CLI" do
 
       it "accepts a single node" do
         cli = Bolt::CLI.new(%w[command run uptime --targets foo])
-        expect(cli.parse).to include(targets: [target])
+        options = cli.parse
+        cli.update_targets(options)
+        expect(options).to include(targets: [target])
       end
 
       it "accepts multiple nodes" do
         cli = Bolt::CLI.new(%w[command run uptime --targets foo,bar])
-        expect(cli.parse).to include(targets: targets)
+        options = cli.parse
+        cli.update_targets(options)
+        expect(options).to include(targets: targets)
       end
 
       it "accepts multiple nodes across multiple declarations" do
         cli = Bolt::CLI.new(%w[command run uptime --targets foo,bar --targets bar,more,bars])
+        options = cli.parse
+        cli.update_targets(options)
         extra_targets = [Bolt::Target.new('more'), Bolt::Target.new('bars')]
-        expect(cli.parse).to include(targets: targets + extra_targets)
+        expect(options).to include(targets: targets + extra_targets)
       end
 
       it "reads from stdin when --targets is '-'" do
@@ -282,8 +288,9 @@ describe "Bolt::CLI" do
         NODES
         cli = Bolt::CLI.new(%w[command run uptime --targets -])
         allow(STDIN).to receive(:read).and_return(nodes)
-        result = cli.parse
-        expect(result[:targets]).to eq(targets)
+        options = cli.parse
+        cli.update_targets(options)
+        expect(options[:targets]).to eq(targets)
       end
 
       it "reads from a file when --targets starts with @" do
@@ -293,8 +300,9 @@ describe "Bolt::CLI" do
         NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run uptime --targets @#{file.path}])
-          result = cli.parse
-          expect(result[:targets]).to eq(targets)
+          options = cli.parse
+          cli.update_targets(options)
+          expect(options[:targets]).to eq(targets)
         end
       end
 
@@ -302,9 +310,10 @@ describe "Bolt::CLI" do
         nodes = "  foo\nbar  \nbaz\nqux  "
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run uptime --targets @#{file.path}])
-          result = cli.parse
+          options = cli.parse
+          cli.update_targets(options)
           extra_targets = [Bolt::Target.new('baz'), Bolt::Target.new('qux')]
-          expect(result[:targets]).to eq(targets + extra_targets)
+          expect(options[:targets]).to eq(targets + extra_targets)
         end
       end
 
@@ -312,8 +321,9 @@ describe "Bolt::CLI" do
         expect(File).to receive(:read).with(File.join(Dir.home, 'nodes.txt')).and_return("foo\nbar\n")
         cli = Bolt::CLI.new(%w[command run uptime --targets @~/nodes.txt])
         allow(cli).to receive(:puppetdb_client)
-        result = cli.parse
-        expect(result[:targets]).to eq(targets)
+        options = cli.parse
+        cli.update_targets(options)
+        expect(options[:targets]).to eq(targets)
       end
 
       it "generates an error message if no nodes given" do
@@ -325,8 +335,9 @@ describe "Bolt::CLI" do
 
       it "generates an error message if nodes is omitted" do
         cli = Bolt::CLI.new(%w[command run uptime])
+        options = cli.parse
         expect {
-          cli.parse
+          cli.update_targets(options)
         }.to raise_error(Bolt::CLIError, /Command requires a targeting option/)
       end
     end
@@ -341,8 +352,9 @@ describe "Bolt::CLI" do
         NODES
         with_tempfile_containing('nodes-args', nodes) do |file|
           cli = Bolt::CLI.new(%W[command run uptime --targets @#{file.path}])
-          result = cli.parse
-          expect(result[:targets]).to eq(targets)
+          options = cli.parse
+          cli.update_targets(options)
+          expect(options[:targets]).to eq(targets)
         end
       end
 
@@ -369,8 +381,9 @@ describe "Bolt::CLI" do
 
         targets = [Bolt::Target.new('foo'), Bolt::Target.new('bar')]
 
-        result = cli.parse
-        expect(result[:targets]).to eq(targets)
+        options = cli.parse
+        cli.update_targets(options)
+        expect(options[:targets]).to eq(targets)
       end
 
       it "fails if it can't retrieve targets from PuppetDB" do
@@ -378,15 +391,16 @@ describe "Bolt::CLI" do
         puppetdb = double('puppetdb')
         allow(puppetdb).to receive(:query_certnames).and_raise(Bolt::PuppetDBError, "failed to puppetdb the nodes")
         allow(cli).to receive(:puppetdb_client).and_return(puppetdb)
+        options = cli.parse
 
-        expect { cli.parse }
+        expect { cli.update_targets(options) }
           .to raise_error(Bolt::PuppetDBError, /failed to puppetdb the nodes/)
       end
 
       it "fails if both --targets and --query are specified" do
         cli = Bolt::CLI.new(%w[command run id --query nodes{} --targets foo,bar])
-
-        expect { cli.parse }.to raise_error(Bolt::CLIError, /Only one/)
+        options = cli.parse
+        expect { cli.update_targets(options) }.to raise_error(Bolt::CLIError, /Only one/)
       end
     end
 
@@ -843,7 +857,7 @@ describe "Bolt::CLI" do
       it "fails when --targets AND --query provided" do
         expect {
           cli = Bolt::CLI.new(%w[plan run foo --query nodes{} --targets bar])
-          cli.parse
+          cli.update_targets(cli.parse)
         }.to raise_error(Bolt::CLIError, /Only one targeting option/)
       end
 
@@ -1687,7 +1701,7 @@ describe "Bolt::CLI" do
         let(:plan_params) { { 'nodes' => targets.map(&:host).join(',') } }
         let(:options) {
           {
-            target_args: [],
+            targets: [],
             subcommand: 'plan',
             action: 'run',
             object: plan_name,
@@ -1705,7 +1719,7 @@ describe "Bolt::CLI" do
         context 'with TargetSpec $nodes plan param' do
           it "uses the nodes passed using the --targets option(s) as the 'nodes' plan parameter" do
             plan_params.clear
-            options[:target_args] = targets.map(&:host)
+            options[:targets] = targets.map(&:host)
 
             expect(executor)
               .to receive(:run_task)
@@ -1733,7 +1747,7 @@ describe "Bolt::CLI" do
           let(:plan_name) { 'sample::single_task_targets' }
           it "uses the nodes passed using the --targets option(s) as the 'targets' plan parameter" do
             plan_params.clear
-            options[:target_args] = targets.map(&:host)
+            options[:targets] = targets.map(&:host)
 
             expect(executor)
               .to receive(:run_task)
@@ -1758,14 +1772,14 @@ describe "Bolt::CLI" do
         end
 
         it "errors when the --targets option(s) and the 'targets' plan parameter are both specified" do
-          options[:target_args] = targets.map(&:host)
+          options[:targets] = targets.map(&:host)
           options[:task_options] = { 'targets' => targets.map(&:host).join(',') }
           regex = /A plan's 'targets' parameter may be specified using the --targets option/
           expect { cli.execute(options) }.to raise_error(regex)
         end
 
         it "errors when the --targets option(s) and the 'targets' plan parameter are both specified" do
-          options[:target_args] = targets.map(&:host)
+          options[:targets] = targets.map(&:host)
           options[:task_options] = { 'targets' => targets.map(&:host).join(',') }
           regex = /A plan's 'targets' parameter may be specified using the --targets option/
           expect { cli.execute(options) }.to raise_error(regex)
@@ -1775,7 +1789,7 @@ describe "Bolt::CLI" do
           let(:plan_name) { 'sample::targets_nodes' }
           it "warns when --targets does not populate both $targets and $nodes" do
             plan_params.clear
-            options[:target_args] = targets.map(&:host)
+            options[:targets] = targets.map(&:host)
 
             expect(executor).to receive(:start_plan)
             expect(executor).to receive(:log_plan)
@@ -2094,7 +2108,8 @@ describe "Bolt::CLI" do
     describe "applying Puppet code" do
       let(:options) {
         {
-          subcommand: 'apply'
+          subcommand: 'apply',
+          targets: 'foo'
         }
       }
       let(:output) { StringIO.new }
@@ -2343,7 +2358,7 @@ describe "Bolt::CLI" do
         %W[command run uptime --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --targets foo]
       )
       expect {
-        cli.parse
+        cli.update_targets(cli.parse)
       }.to raise_error(Bolt::Error, /Could not parse/)
     end
 
