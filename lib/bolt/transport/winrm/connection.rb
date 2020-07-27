@@ -111,12 +111,21 @@ module Bolt
           out_rd, out_wr = IO.pipe('UTF-8')
           err_rd, err_wr = IO.pipe('UTF-8')
           th = Thread.new do
+            # By default, any exception raised in a thread will be reported to
+            # stderr as a stacktrace. Since we know these errors are going to
+            # propagate to the main thread via the shell, there's no chance
+            # they will be unhandled, so the default stack trace is unneeded.
+            Thread.current.report_on_exception = false
             result = @session.run(command)
             out_wr << result.stdout
             err_wr << result.stderr
             out_wr.close
             err_wr.close
             result.exitcode
+          ensure
+            # Close the streams to avoid the caller deadlocking
+            out_wr.close
+            err_wr.close
           end
 
           [inp, out_rd, err_rd, th]

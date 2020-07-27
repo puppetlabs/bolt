@@ -79,6 +79,11 @@ describe "when runnning over the winrm transport", winrm: true do
       result = run_one_node(%w[task run sample::ps_noop message=somemessage] + config_flags)
       expect(result['_output'].strip).to eq("somemessage with noop")
     end
+
+    it 'handles disconnects gracefully', :reset_puppet_settings do
+      result = run_cli_json(%w[plan run error::winrm_disconnect] + config_flags)
+      expect(result.first['status']).to eq("success")
+    end
   end
 
   context 'when using a configfile' do
