@@ -124,8 +124,8 @@ begin
 
     desc "Generate markdown docs for Bolt's core Puppet functions"
     task :function_reference do
-      filepath = File.expand_path('../documentation/reference.md', __dir__)
-      template = File.expand_path('../documentation/templates/reference.md.erb', __dir__)
+      filepath = File.expand_path('../documentation/plan_functions.md', __dir__)
+      template = File.expand_path('../documentation/templates/plan_functions.md.erb', __dir__)
 
       FileUtils.mkdir_p 'tmp'
       tmpfile = 'tmp/boltlib.json'
