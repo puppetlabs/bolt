@@ -66,7 +66,7 @@ Important client tools include:
 
 Manual verification of Bolt can be performed from a Linux node that is domain joined to Active Directory using the following steps:
 
-- Set the default winrm authentication to specify the domain in `~/puppetlabs/bolt/bolt.yaml` like:
+- Set the default winrm authentication to specify the domain in `~/puppetlabs/bolt/inventory.yaml` like:
 
 ```yaml
 winrm:

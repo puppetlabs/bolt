@@ -376,7 +376,7 @@ config:
       field: password
 ```
 
-The `bolt.yaml` configuration file:
+The `bolt-project.yaml` configuration file:
 
 ```yaml
 plugins:

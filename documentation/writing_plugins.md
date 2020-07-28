@@ -12,8 +12,8 @@ Puppet library.
 
 ## Configuration
 
-Plugins can use configuration from the `bolt.yaml` file. To allow a plugin to be
-configured, add a `parameters` section to the [task
+Plugins can use configuration from the `bolt-project.yaml` or `bolt-defaults.yaml` files. To allow a
+plugin to be configured, add a `parameters` section to the [task
 metadata](writing_tasks.md#task-metadata).
 
 ```json

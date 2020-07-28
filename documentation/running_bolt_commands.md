@@ -355,8 +355,7 @@ target.
 
 If the host target runs Linux, the target runs Windows, and your network uses
 Kerberos for authentication, you can specify a Kerberos realm in your
-`bolt.yaml` file. This file is introduced in the [Configuring
-Bolt](configuring_bolt.md) section below. The best source of information and
+[inventory file](inventory_file_v2.md). The best source of information and
 examples for this advanced topic is the [Kerberos
 section](https://github.com/puppetlabs/bolt/blob/main/developer-docs/kerberos.md)
 of the Bolt developer documentation.

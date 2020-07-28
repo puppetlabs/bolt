@@ -73,7 +73,9 @@ To generate this documentation, run:
 $ bundle exec rake docs:function_reference
 ```
 
-### `bolt.yaml` options
+### ⛔ `bolt.yaml` options
+
+`bolt.yaml` is deprecated and will be removed in a future version of Bolt.
 
 **Documentation page**
 - https://puppet.com/docs/bolt/latest/bolt_configuration_reference.html

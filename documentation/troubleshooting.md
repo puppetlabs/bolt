@@ -15,7 +15,7 @@ example, if your task is named `mytask.rb`, you must name your metadata file
 
 ## My task fails mysteriously
 
-Try running Bolt with `--debug` to see the exact output from your task.
+Try running Bolt with `--log-level debug` to see the exact output from your task.
 
 Make sure your task executable starts with a shebang (`#!`) line indicating the
 interpreter to use and verify that the executable is present on the target
@@ -42,8 +42,14 @@ If you can connect to the host over SSH outside Bolt, you can store the SSH host
 key fingerprint with `ssh-keyscan hostname.example.com >> ~/.ssh/known_hosts`.
 
 You can disable this check entirely with `--no-host-key-check` on the CLI or the
-`host-key-check: false` option under the `ssh` section of `bolt.yaml`. Note that
-doing so will reduce the security of your SSH connection.
+`host-key-check: false` option under the `config: ssh` section of [inventory.yaml](inventory_file_v2.md).
+Note that doing so will reduce the security of your SSH connection.
+
+```yaml
+config:
+  ssh:
+    host-key-check: false
+```
 
 ### Timeout or connection refused
 
@@ -81,8 +87,8 @@ If you need to send a message that is not a string value or is in an apply
 block, you can use the `warning` Puppet log function. 
 
 If you only wish to see the output in the console when executing your plan with
-the `--debug` flag, use the `notice` Puppet log function. The `notice` function
-sets the console log level to `debug` for that run.
+the `--log-level debug` flag, use the `notice` Puppet log function. The `notice` function sets the
+console log level to `debug` for that run.
 
 For more information, see the docs for configuring [Bolt's log
 level](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#log-file-configuration-options).
