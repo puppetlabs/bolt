@@ -38,6 +38,36 @@ To install a module:
       this location, update the `modulepath` setting in the [Bolt config
       file](bolt_configuration_reference.md).
 
+## Create a new Bolt project and install a list of modules with dependencies
+
+If you want to get started with a new Bolt project and you need specific modules
+from the Puppet Forge, you can install the modules and their dependencies with
+the `bolt project init` command. 
+
+When you use `bolt project init` along with the `--modules` flag and a
+comma-separated list of Forge modules, Bolt installs the latest versions of each
+module and resolves and installs all dependencies required by those modules. For
+example, to create a project named `example_project` with the `apache` and
+`mysql` modules installed, use the following command:
+
+```shell
+bolt project init example_project --modules puppetlabs-apache,puppetlabs-mysql
+```
+
+The project's Puppetfile lists the `apache` and `mysql` modules and all of their
+dependencies:
+
+```puppet
+# example_project/Puppetfile
+mod 'puppetlabs-apache', '5.5.0'
+mod 'puppetlabs-mysql', '10.6.0'
+mod 'puppetlabs-stdlib', '6.3.0'
+mod 'puppetlabs-concat', '6.2.0'
+mod 'puppetlabs-translate', '2.2.0'
+mod 'puppetlabs-resource_api', '1.1.0'
+mod 'puppetlabs-puppetserver_gem', '1.1.1'
+```
+
 ## Packaged modules
 
 Bolt is packaged with a collection of useful modules to support common
