@@ -108,6 +108,10 @@ module Bolt
           apply_manifest(scope, targets, manifest)
         end
 
+        def message_step(scope, step)
+          scope.call_function('out::message', step['message'])
+        end
+
         def generate_manifest(resources)
           # inspect returns the Ruby representation of the resource hashes,
           # which happens to be the same as the Puppet representation

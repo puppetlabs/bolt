@@ -182,6 +182,19 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
   end
 
+  describe "#message_step" do
+    let(:step) do
+      {
+        'message' => 'hello world'
+      }
+    end
+
+    it 'calls out::message' do
+      expect(scope).to receive(:call_function).with('out::message', 'hello world')
+      subject.message_step(scope, step)
+    end
+  end
+
   describe "#task_step" do
     let(:step) do
       { 'task' => 'package',
