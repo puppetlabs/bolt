@@ -40,6 +40,8 @@ namespace :pwsh do
     parser = Bolt::BoltOptionParser.new({})
 
     @commands = []
+    @mapped_options = {}
+
     Bolt::CLI::COMMANDS.each do |subcommand, actions|
       actions << nil if actions.empty?
       actions.each do |action|
@@ -276,6 +278,10 @@ namespace :pwsh do
 
           @pwsh_command[:options] << pwsh_param
         end
+
+        # maintain a global list of pwsh parameter => ruby parameter
+        # for the powershell erb file
+        @pwsh_command[:options].map { |option| @mapped_options[option[:name]] = option[:ruby_orig] }
 
         @commands << @pwsh_command
       end
