@@ -28,6 +28,7 @@ mod 'puppetlabs-python_task_helper', '0.4.3'
 mod 'puppetlabs-reboot', '3.0.0'
 mod 'puppetlabs-ruby_task_helper', '0.5.1'
 mod 'puppetlabs-ruby_plugin_helper', '0.1.0'
+mod 'puppetlabs-stdlib', '6.3.0'
 
 # Plugin modules
 mod 'puppetlabs-aws_inventory', '0.5.0'
@@ -42,3 +43,4 @@ mod 'puppetlabs-yaml', '0.2.0'
 mod 'canary', local: true
 mod 'aggregate', local: true
 mod 'puppetdb_fact', local: true
+mod 'secure_env_vars', local: true
