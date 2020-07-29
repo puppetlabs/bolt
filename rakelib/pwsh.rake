@@ -282,8 +282,10 @@ namespace :pwsh do
     end
 
     # pwsh_module.psm1 ==> PuppetBolt.psm1
-    renderer = ERB.new(File.read('pwsh_module/pwsh_bolt.psm1.erb'), nil, '-')
-    File.write('pwsh_module/PuppetBolt.psm1', renderer.result)
+    content = File.read('pwsh_module/pwsh_bolt_internal.ps1') +
+              File.read('pwsh_module/pwsh_bolt.psm1.erb')
+    pwsh_module = ERB.new(content, nil, '-')
+    File.write('pwsh_module/PuppetBolt.psm1', pwsh_module.result)
 
     # pwsh_module.psd1 ==> PuppetBolt.psd1
     manifest = ERB.new(File.read('pwsh_module/pwsh_bolt.psd1.erb'), nil, '-')
