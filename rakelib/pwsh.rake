@@ -214,7 +214,7 @@ namespace :pwsh do
             type:       'string',
             switch:     false,
             mandatory:  false,
-            help_msg:   ruby_param.desc.map { |d| d.gsub("<", "&lt;") }.join("\n"),
+            help_msg:   ruby_param.desc.join("\n"),
             ruby_short: ruby_param.short.first,
             ruby_long:  ruby_param.long.first,
             ruby_arg:   ruby_param.arg,
