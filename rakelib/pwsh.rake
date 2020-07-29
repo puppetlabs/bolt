@@ -205,11 +205,9 @@ namespace :pwsh do
         # verbose and debug are commonparameters and are already present in the
         # pwsh cmdlets, so they are omitted here to prevent them from being
         # added twice we add these back in when building the command to send to bolt
-        help_text[:flags].reject { |o| o =~ /verbose|debug|help/ }.map do |option|
+        help_text[:flags].reject { |o| o =~ /verbose|debug|help|version/ }.map do |option|
           ruby_param = parser.top.long[option]
           pwsh_name = option.gsub("-", "")
-
-          next if pwsh_name == 'version'
 
           pwsh_param = {
             name:       pwsh_name,
