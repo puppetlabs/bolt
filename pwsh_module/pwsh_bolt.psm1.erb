@@ -37,7 +37,7 @@ param (
 <% if option[:type] -%>[<%= option[:type] -%>]<% end -%>$<%= option[:name] -%>,
 <% end -%>
 [Parameter(Mandatory = $false)]
-[switch]$version
+[switch]$Version
 )
 
 if($version){

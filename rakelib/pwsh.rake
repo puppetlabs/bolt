@@ -82,7 +82,7 @@ namespace :pwsh do
           # bolt apply [manifest.pp] [options]
           # Cannot use bolt apply manifest.pp with --execute
           @pwsh_command[:options] << {
-            name:                       'manifest',
+            name:                       'Manifest',
             parameter_set:              'manifest',
             help_msg:                   'The manifest to apply',
             type:                       'string',
@@ -95,7 +95,7 @@ namespace :pwsh do
         when 'command'
           # bolt command run <command> [options]
           @pwsh_command[:options] << {
-            name:                       'command',
+            name:                       'Command',
             help_msg:                   'The command to execute',
             type:                       'string',
             switch:                     false,
@@ -107,7 +107,7 @@ namespace :pwsh do
         when 'script'
           # bolt command run <script> [options]
           @pwsh_command[:options] << {
-            name:                       'script',
+            name:                       'Script',
             help_msg:                   'The script to execute',
             type:                       'string',
             switch:                     false,
@@ -117,7 +117,7 @@ namespace :pwsh do
             validate_not_null_or_empty: true
           }
           @pwsh_command[:options] << {
-            name:      'arguments',
+            name:      'Arguments',
             help_msg:  'The arguments to the script',
             type:      'string',
             switch:    false,
@@ -129,7 +129,7 @@ namespace :pwsh do
           # bolt task show|run <task> [parameters] [options]
           task_param_mandatory = (@pwsh_command[:verb] != 'Get')
           @pwsh_command[:options] << {
-            name:                       'task',
+            name:                       'Task',
             help_msg:                   "The task to #{action}",
             type:                       'string',
             switch:                     false,
@@ -144,7 +144,7 @@ namespace :pwsh do
           # bolt plan run <plan> [parameters] [options]
           # bolt plan convert <path> [options]
           @pwsh_command[:options] << {
-            name:                       'plan',
+            name:                       'Plan',
             help_msg:                   "The plan to #{action}",
             type:                       'string',
             switch:                     false,
@@ -156,7 +156,7 @@ namespace :pwsh do
         when 'file'
           # bolt file download|upload <src> <dest> [options]
           @pwsh_command[:options] << {
-            name:                       'source',
+            name:                       'Source',
             help_msg:                   "The source file or directory to #{action}",
             type:                       'string',
             switch:                     false,
@@ -166,7 +166,7 @@ namespace :pwsh do
             validate_not_null_or_empty: true
           }
           @pwsh_command[:options] << {
-            name:                       'destination',
+            name:                       'Destination',
             type:                       'string',
             switch:                     false,
             mandatory:                  true,
@@ -179,7 +179,7 @@ namespace :pwsh do
           # bolt secret encrypt <plaintext> [options]
           # bolt secret decrypt <ciphertext> [options]
           @pwsh_command[:options] << {
-            name:                       'text',
+            name:                       'Text',
             help_msg:                   "The text to #{action}",
             type:                       'string',
             switch:                     false,
@@ -191,7 +191,7 @@ namespace :pwsh do
         when 'project'
           # bolt project init [directory] [options]
           @pwsh_command[:options] << {
-            name:                       'directory',
+            name:                       'Directory',
             help_msg:                   'The directory to turn into a Bolt project',
             mandatory:                  false,
             type:                       'string',
@@ -207,7 +207,7 @@ namespace :pwsh do
         # added twice we add these back in when building the command to send to bolt
         help_text[:flags].reject { |o| o =~ /verbose|debug|help|version/ }.map do |option|
           ruby_param = parser.top.long[option]
-          pwsh_name = option.gsub("-", "")
+          pwsh_name = option.split("-").map(&:capitalize).join('')
 
           pwsh_param = {
             name:       pwsh_name,
@@ -234,7 +234,7 @@ namespace :pwsh do
 
           # Only one of --targets , --rerun , or --query can be used
           # Only one of --configfile or --boltdir can be used
-          case pwsh_name
+          case pwsh_name.downcase
           when 'user'
             pwsh_param[:validate_not_null_or_empty] = true
           when 'password'
