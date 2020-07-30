@@ -84,7 +84,7 @@ begin
     task :modules do
       success = true
       # Test core modules
-      %w[boltlib ctrl file out prompt system].each do |mod|
+      %w[boltlib ctrl file dir out prompt system].each do |mod|
         Dir.chdir("#{__dir__}/../bolt-modules/#{mod}") do
           sh 'rake spec' do |ok, _|
             success = false unless ok
