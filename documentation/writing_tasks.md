@@ -1077,3 +1077,483 @@ path.
 For more information on securely passing user input, see the blog post [Stop
 using backtick to run shell command in
 Ruby](https://www.hilman.io/blog/2016/01/stop-using-backtick-to-run-shell-command-in-ruby/).
+
+## Debugging tasks
+
+There are several ways that you can debug tasks, including using remote
+debugging libraries, using methods available in the task helper libraries,
+running the task locally as a script, and redirecting `stderr` to `stdout`.
+
+### Debug logs
+
+Typically, Bolt only displays task output that is sent to `stdout`. However,
+Bolt does log additional information about a task run, including output sent to
+`stderr`, at the `debug` level. You can view these logs during a task run using
+the `--log-level debug` CLI option.
+
+```shell
+$ bolt task run mytask param1=foo param2=bar -t all --log-level debug
+```
+
+### Debuggers
+
+Many of the scripting languages you can use to write tasks have debugging
+libraries available that allow you to set breakpoints and examine your task
+as it executes.
+
+Both Python and Ruby have remote debugging libraries available that make it
+easy to pause execution of a task and debug the code. Using remote debugging
+libraries is necessary when running tasks with Bolt since the tasks are
+executed in separate threads.
+
+PowerShell tasks can take advantage of the `Set-PSBreakpoint` cmdlet, which
+sets a breakpoint in a PowerShell script and allows you to step through the
+code. Since Bolt passes parameters to PowerShell tasks as named arguments,
+you can easily run PowerShell tasks as scripts and use the `Set-PSBreakpoint`
+cmdlet.
+
+#### Python tasks
+
+The `rpdb` library is a wrapper for the `pdb` library, Python's standard
+debugging library. To use the `rpdb` library, you will need to install it
+on every target you want to debug the task on.
+
+> 🔩 **Tip:** In most cases, you can debug tasks by only running them on
+> `localhost` instead of a list of remote targets. This avoids the need to
+> establish a connection with a target, which may be difficult if your target
+> restricts incoming connections.
+
+You can install the `rpdb` library using `pip`:
+
+```shell
+$ pip install rpdb
+```
+
+Then, add the following line to your task wherever you want to begin debugging:
+
+```python
+import rpdb; rpdb.set_trace()
+```
+
+You can then open a connection to a target on port `4444` to begin debugging:
+
+```shell
+$ nc 127.0.0.1 4444
+
+> /tmp/96a96045-0eed-4dea-a497-400b9d5c8e30/python/tasks/init.py(13)task()
+-> result = num1 + num2
+(Pdb)
+```
+
+📖 **Related information**
+- [`rpdb` documentation](https://pypi.org/project/rpdb/)
+- [`pdb` documentation](https://docs.python.org/3/library/pdb.html)
+
+#### Ruby tasks
+
+The `pry-remote` gem allows you to start a remote debugging session using
+the `pry` gem, a standard debugging library for Ruby. To use the `pry-remote`
+gem, you will need to install it on every target you want to debug the task
+on.
+
+> 🔩 **Tip:** In most cases, you can debug tasks by only running them on
+> `localhost` instead of a list of remote targets. This avoids the need to
+> establish a connection with a target, which may be difficult if your target
+> restricts incoming connections.
+
+If you are running the task on remote targets, you can install the `pry-remote`
+gem using `gem install`:
+
+```shell
+$ gem install pry-remote
+```
+
+If you are running the task on `localhost`, you can install the `pry-remote`
+gem locally using Bolt's Ruby:
+
+```shell
+$ /opt/puppetlabs/bolt/bin/gem install --user-install pry-remote
+```
+
+If you are running the task on `localhost` on Windows, run the following
+command instead:
+
+```powershell
+> "C:/Program Files/Puppet Labs/Bolt/bin/gem.bat" install --user-install pry-remote
+```
+
+Then, add the following line to your task wherever you want to begin debugging:
+
+```ruby
+require 'pry-remote'; binding.remote_pry
+```
+
+You can then open a connection to a target using the `pry-remote` command:
+
+```shell
+$ pry-remote -s 127.0.0.1
+
+Frame number: 0/4
+
+From: /tmp/4f9dcfa3-ce0c-49e2-bcf5-8d761b202186/ruby/tasks/init.rb @ line 9 MyClass#task:
+
+     6: def task(opts)
+ =>  9:   require 'pry-remote'; binding.remote_pry
+    10:
+```
+
+📖 **Related information**
+- [`pry-remote` documentation](https://www.rubydoc.info/gems/pry-remote)
+- [`pry` documentation](http://pry.github.io/)
+
+#### PowerShell tasks
+
+PowerShell tasks can take advantage of the `Set-PSBreakpoint` cmdlet to debug
+tasks that are run as scripts. The `Set-PSBreakpoint` cmdlet can set a
+breakpoint at a specific line of your task, pausing execution of the task
+so you can examine the code and step through it line by line.
+
+To set a breakpoint at a specific line of your task, run the `Set-PSBreakpoint`
+cmdlet:
+
+```powershell
+> Set-PSBreakpoint -Script mytask.ps1 -Line <line number>
+```
+
+You can then run the task as a script. Execution of the task will pause at
+the breakpoint.
+
+```powershell
+> ./mytask.ps1
+```
+
+📖 **Related information**
+- [`Set-PSBreakpoint`
+  documentation](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/set-psbreakpoint?view=powershell-7)
+
+### Task helper methods
+
+Both the [Python task
+helper](https://github.com/puppetlabs/puppetlabs-python_task_helper) and [Ruby
+task helper](https://github.com/puppetlabs/puppetlabs-ruby_task_helper) include
+methods that can help you debug a task. The `debug` method logs arbitrary values
+as debugging messages, while the `debug_statements` method returns an array of
+the logged debugging messages.
+
+When a task using a task helper library raises a `TaskError`, the error will
+include any logged debugging messages under the `details` key. You can also add
+debugging statements when raising a `TaskError` yourself by calling
+`debug_statements` and adding the result under the `details` key.
+
+> 🔩 **Tip:** When running a task with `bolt task run`, use the `--format json`
+> option to see the full result from the task, including the value of the
+> `details` key.
+
+#### Python tasks
+
+The following Python task includes a few debugging statements which describe
+what the task is doing and the results from a couple arithmetic operations:
+
+**Metadata**
+
+```json
+{
+  "files": ["python_task_helper/files/task_helper.py"]
+}
+```
+
+**Task**
+
+```python
+#!/usr/bin/env python
+
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python_task_helper', 'files'))
+from task_helper import TaskHelper
+
+class MyTask(TaskHelper):
+    def task(self, args):
+        self.debug('Adding values')
+        sum = args['value_1'] + args['value_2']
+        self.debug("Sum of values: {}".format(sum))
+
+        self.debug('Dividing values')
+        quotient = args['value_1'] / args['value_2']
+        self.debug("Quotient of values: {}".format(quotient))
+
+        return { 'sum': sum, 'quotient': quotient }
+
+if __name__ == '__main__':
+    MyTask().run()
+
+```
+
+**Output**
+
+Running this task with the parameter `value_2=0` will raise a `TaskError`
+that will automatically include the logged debugging statements under the
+`details` key:
+
+```shell
+$ bolt task run mytask -t localhost value_1=10 value_2=0 --format json
+{
+  "items":[
+    {
+      "target":"localhost",
+      "action":"task",
+      "object":"mytask",
+      "status":"failure",
+      "value":{
+        "_error":{
+          "msg":"integer division or modulo by zero",
+          "issue_code":"EXCEPTION",
+          "kind":"python.task.helper/exception",
+          "details":{
+            "debug":[
+              "Adding values",
+              "Sum of values: 1",
+              "Dividing values"
+            ],
+            "class":"ZeroDivisionError"
+          }
+        }
+      }
+    }
+  ],
+  "target_count":1,
+  "elapsed_time":0
+}
+```
+
+📖 **Related information**
+- [Python task helper
+  debugging](https://github.com/puppetlabs/puppetlabs-python_task_helper#debugging)
+
+#### Ruby tasks
+
+The following Ruby task includes a few debugging statements which describe
+what the task is doing and the results from a couple arithmetic operations:
+
+**Metadata**
+
+```json
+{
+  "files": ["ruby_task_helper/lib/task_helper.rb"]
+}
+```
+
+**Task**
+
+```ruby
+#!/usr/bin/env ruby
+
+require_relative "../../ruby_task_helper/files/task_helper.rb"
+
+class MyTask < TaskHelper
+  def task(opts)
+    debug 'Adding values'
+    sum = opts[:value_1] + opts[:value_2]
+    debug "Sum of values: #{sum}"
+
+    debug 'Dividing values'
+    quotient = opts[:value_1] / opts[:value_2]
+    debug "Quotient of values: #{quotient}"
+
+    { sum: sum, quotient: quotient }
+  end
+end
+
+if __FILE__ == $0
+  MyTask.run
+end
+```
+
+**Output**
+
+Running this task with the parameter `value_2=0` will raise a `TaskError`
+that will automatically include the logged debugging statements under the
+`details` key:
+
+```shell
+$ bolt task run mytask -t localhost value_1=10 value_2=0 --format json
+
+{
+  "items":[
+    {
+      "target":"localhost",
+      "action":"task",
+      "object":"mytask",
+      "status":"failure",
+      "value":{
+        "_error":{
+          "kind":"ZeroDivisionError",
+          "msg":"divided by 0",
+          "details":{
+            "debug":[
+              "Adding values",
+              "Sum of values: 1",
+              "Dividing values"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "target_count":1,
+  "elapsed_time":0
+}
+```       
+
+📖 **Related information**
+- [Ruby task helper
+  debugging](https://github.com/puppetlabs/puppetlabs-ruby_task_helper#debugging)
+
+### Running a task as a script
+
+Running tasks without Bolt can make debugging easier, as the task will no
+longer be executed in a separate thread. Since tasks are similar to scripts,
+you can make temporary changes to the task so they can accept command-line
+arguments and be run from the command line.
+
+#### Python examples
+
+Tasks that are written to accept input from `stdin` can already by run as
+a script by piping the parameters as JSON to the task:
+
+```python
+#!/usr/bin/env python
+import sys, json
+
+params = json.load(sys.stdin)
+
+result = {
+    "sum": params['num1'] + params['num2']
+}
+
+print(json.dumps(result))
+```
+
+```shell
+$ echo '{"num1":10,"num2":5}' | ./mytask.py
+```
+
+Alternatively, you can write your task to parse command-line arguments
+as parameters if they are present:
+
+```python
+#!/usr/bin/env python
+import sys, json
+
+if len(sys.argv) > 0:
+    params = {
+        "num1": int(sys.argv[1]),
+        "num2": int(sys.argv[2])
+     }
+else:
+    params = json.load(sys.stdin)
+
+result = {
+    "sum": params['num1'] + params['num2']
+}
+
+print(json.dumps(result))
+```
+
+```shell
+$ ./mytask.py 10 5
+```
+
+#### Ruby examples
+
+Tasks that are written to accept input from `stdin` can already be run as
+a script by piping the parameters as JSON to the task:
+
+```ruby
+#!/usr/bin/env ruby
+require 'json'
+
+params = JSON.parse(STDIN.read)
+
+result = {
+  'sum' => params['num1'] + params['num2']
+}
+
+puts result.to_json
+```
+
+```shell
+$ echo '{"num1":10,"num2":5}' | ./mytask.rb
+```
+
+Alternatively, you can write your task to parse command-line arguments
+as parameters if they are present:
+
+```ruby
+#!/usr/bin/env ruby
+require 'json'
+
+if ARGV.any?
+  params = {
+    'num1' => ARGV[0].to_i,
+    'num2' => ARGV[1].to_i
+  }
+else
+  params = JSON.parse(STDIN.read)
+end
+
+result = {
+  'sum' => params['num1'] + params['num2']
+}
+
+puts result.to_json
+```
+
+```shell
+$ ./mytask.rb 10 5
+```
+
+#### PowerShell example
+
+Bolt sends parameters to PowerShell tasks by converting the parameters into
+named arguments. You can run a PowerShell task as a script by running it
+from the command line and providing the parameters as named arguments:
+
+```powershell
+[CmdletBinding()]
+Param(
+	[Int]$num1,
+  [Int]$num2
+)
+
+$result = @{Sum=($num1 + $num2)} | ConvertTo-Json
+
+Write-Output $result
+```
+
+```powershell
+> ./mytask.ps1 -num1 10 -num2 5
+```
+
+### Redirecting `stderr`
+
+By default, Bolt does not display output from `stderr` if any output is sent
+to `stdout`. If you want to stream output from both `stderr` and `stdout`, you
+can redirect `stderr`.
+
+#### Python example
+
+To redirect `stderr` to `stdout` in a Python task, use the `sys` library:
+
+```python
+import sys
+sys.stderr = sys.stdout
+```
+
+#### Ruby example
+
+To redirect `stderr` to `stdout` in a Ruby task, set the `$stderr` global
+variable:
+
+```ruby
+$stderr = $stdout
+```
