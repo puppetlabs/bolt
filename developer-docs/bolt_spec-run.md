@@ -4,8 +4,8 @@ The `BoltSpec::Run` module is intended to provide a method of executing bolt in 
 
 ## Configuration
 
-### Config (bolt.yaml)
-Bolt configuration data normally found in `bolt.yaml` can be passed with the `:config` key in the options hash for each method. This has the highest priority. 
+### Config
+Bolt configuration data can be passed with the `:config` key in the options hash for each method. This has the highest priority. 
 
 In order to avoid passing the same config option every time you want to use it each method will use `bolt_config` if it is available in scope and no config has been passed in the `options` hash. 
 

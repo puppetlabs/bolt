@@ -67,7 +67,9 @@ file](inventory_file_v2.md). The inventory file is a YAML file that contains a
 list of targets and target specific data.
 
 1.  Inside the `bolt-guide` directory, use a text editor to create an
-    `inventory.yaml` file.
+    `inventory.yaml` file and a `bolt-project.yaml` file. The `inventory.yaml` file is where
+    connection information is stored, while `bolt-project.yaml` tells Bolt that the directory is a project
+    and that it should load the inventory file from the directory.
 2.  Inside the new `inventory.yaml` file, add the following content, listing the
     fully qualified domain names of the targets you want to run the script on,
     and replacing the credentials in the `winrm` section with those appropriate
@@ -94,9 +96,9 @@ list of targets and target specific data.
     You now have an inventory file where you can store information about your
     targets.
 
-    You can also configure a variety of options for Bolt in `bolt.yaml`,
-    including global and transport options. For more information, see [Bolt
-    configuration options](bolt_configuration_reference.md).
+    You can also configure a variety of options for Bolt in `bolt-project.yaml`. For more
+    information about configuration see [Configuring Bolt](configuring_bolt.md). For more
+    information about Bolt projects see [Bolt project directories](bolt_project_directories.md)
 
 
 ### 3. Convert your script to a Bolt task
@@ -207,13 +209,13 @@ configuration, code, and data loaded by Bolt.
 mkdir bolt_choco_example
 ```
 
-1. Add a `bolt.yaml` file to the `puppet_choco_tap` directory:
+1. Add a `bolt-project.yaml` file to the `puppet_choco_tap` directory:
 
 ```
-New-Item -Type File -Path .\puppet_choco_tap\bolt.yaml
+New-Item -Type File -Path .\puppet_choco_tap\bolt-project.yaml
 ```
 
-Adding a `bolt.yaml` file (even if it's empty),  makes the containing directory
+Adding a `bolt-project.yaml` file (even if it's empty),  makes the containing directory
 a Bolt project directory when you run Bolt from it. This is where Bolt loads
 code and configuration from.
 

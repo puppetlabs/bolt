@@ -33,24 +33,22 @@ After you've completed this guide, you'll know how to:
 
 ## Create a Bolt project and set up targets
 
-A Bolt project is a directory containing a `bolt.yaml` file. The `bolt.yaml`
+A Bolt project is a directory containing a `bolt-project.yaml` file. The `bolt-project.yaml`
 file contains project-wide configuration settings. Your `my_project` directory
-must contain a `bolt.yaml` file so that Bolt recognizes it as a Bolt project.
+must contain a `bolt-project.yaml` file so that Bolt recognizes it as a Bolt project.
 
 ### Create a Bolt project directory
 
-Use the `bolt project init` command to create a project directory named
-`my_project`:
 
+Create a directory named my_project:
 ```bash
-bolt project init ./my_project
+mkdir my_project
 ```
 
-Listing the contents of `my_project` shows a `bolt.yaml` file:
-
+In your my_project directory, create a file named bolt-project.yaml with the following contents:
 ```bash
-$ ls my_project
-bolt.yaml
+# my_project/bolt-project.yaml
+name: my_project
 ```
 
 To use Bolt plans or tasks, your Bolt project must use a specific directory
@@ -69,7 +67,7 @@ mkdir -p site-modules/apache/files
 After creating the directories, the file structure of `my_project` looks like this:
 ```bash
 .
-├── bolt.yaml
+├── bolt-project.yaml
 └── site-modules
     └── apache
         ├── files
@@ -133,7 +131,7 @@ structure looks like this:
 ```bash
 .
 ├── Dockerfile
-├── bolt.yaml
+├── bolt-project.yaml
 ├── docker-compose.yaml
 └── site-modules
     └── apache
@@ -234,7 +232,7 @@ At this point, your file structure looks like this:
 ```bash
 .
 ├── Dockerfile
-├── bolt.yaml
+├── bolt-project.yaml
 ├── docker-compose.yaml
 ├── inventory.yaml
 └── site-modules
@@ -294,7 +292,7 @@ After creating `install.yaml`, your file structure looks like this:
 ```bash
 .
 ├── Dockerfile
-├── bolt.yaml
+├── bolt-project.yaml
 ├── docker-compose.yaml
 ├── inventory.yaml
 └── site-modules
@@ -377,7 +375,7 @@ At this point, your file structure looks like this:
 ```bash
 .
 ├── Dockerfile
-├── bolt.yaml
+├── bolt-project.yaml
 ├── docker-compose.yaml
 ├── inventory.yaml
 └── site-modules
@@ -467,7 +465,7 @@ Your final file structure looks like this:
 ```bash
 .
 ├── Dockerfile
-├── bolt.yaml
+├── bolt-project.yaml
 ├── docker-compose.yaml
 ├── inventory.yaml
 └── site-modules
@@ -576,5 +574,5 @@ homepage.
   tasks](./tasks.md).
 - To find Puppet modules that use tasks, take a look at the [Puppet
   Forge](https://forge.puppet.com/).
-- For information on the settings you can use in `bolt.yaml`, see [Bolt
-  configuration options](./bolt_configuration_reference.md).
+- For information on Bolt configuration see [Configuring Bolt](configuring_bolt.md).
+- For information on Bolt projects see [Bolt project directories](bolt_project_directories.md)

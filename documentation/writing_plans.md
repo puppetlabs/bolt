@@ -739,12 +739,11 @@ to the log file.
 
 ### Puppet log functions
 
-To generate log messages from a plan, use the Puppet log function that
-corresponds to the level you want to track: `error`, `warn`, `notice`, `info`,
-or `debug`. Configure the log level for both log files and console logging in
-`bolt.yaml`. The default log level for the console is `warn` and for log files
-is `notice`. Use the `--debug` flag to set the console log level to `debug` for
-a single run.
+To generate log messages from a plan, use the Puppet log function that corresponds to the level you
+want to track: `error`, `warn`, `notice`, `info`, or `debug`. Configure the log level for both log
+files and console logging in `bolt-project.yaml`.  The default log level for the console is `warn`.
+For log files, the default is `notice`.  Use the `--log-level debug` flag to set the console log
+level to `debug` for a single run.
 
 ### Default action logging
 

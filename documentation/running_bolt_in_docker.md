@@ -99,7 +99,7 @@ typical Boltdir:
 $ tree
 .
 └── Boltdir
-     ├── bolt.yaml
+     ├── bolt-project.yaml
      ├── inventory.yaml
      ├── keys
      │    └── id_rsa-acceptance
@@ -113,9 +113,9 @@ $ tree
 
 Here is sample content from relevant files in the Boltdir above.
 
-**`bolt.yaml`**
+**`bolt-project.yaml`**
 
-This is a basic Bolt configuration file.
+This is a basic [project configuration](configuring_bolt.md) file.
 
 ```yaml
 log:
@@ -179,7 +179,7 @@ Boltdir:
 $ tree
     .
     └── Boltdir
-          ├── bolt.yaml
+          ├── bolt-project.yaml
           ├── Dockerfile
           ├── inventory.yaml
           ├── keys

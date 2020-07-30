@@ -18,7 +18,7 @@ docker pull puppet/puppet-bolt
 When running Bolt from the container, the `localhost` target is the container
 environment (not the Docker host environment). The following example shows
 running a command against the localhost target in the container.
-```console
+```
 $ docker run puppet/puppet-bolt command run 'cat /etc/os-release' -t localhost
 Started on localhost...
 Finished on localhost:
@@ -66,7 +66,7 @@ targets:
 Here is an example of running the built-in `facts` task against the target
 listed in inventory. 
 
-```console
+```
 $ docker run --env "BOLT_INVENTORY=$(cat Boltdir/inventory.yaml)" puppet/puppet-bolt task run facts -t docker-example
 Started on pnz2rzpxfzp95hh.delivery.puppetlabs.net...
 Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
@@ -89,11 +89,11 @@ Ran on 1 target in 0.55 seconds
 
 This section describes making a Bolt project directory (Boltdir) available to
 the container. Here is the directory structure and relevant file content:
-```console
+```
 $ tree
 .
 └── Boltdir
-    ├── bolt.yaml
+    ├── bolt-project.yaml
     ├── inventory.yaml
     ├── keys
     │   └── id_rsa-acceptance
@@ -105,7 +105,7 @@ $ tree
 5 directories, 4 files
 ```
 
-**`bolt.yaml`**
+📄 `bolt-project.yaml`
 
 Bolt configuration file
 ```yaml
@@ -114,7 +114,8 @@ log:
   console:
     level: notice
 ```
-**`inventory.yaml`**
+
+📄 `inventory.yaml`
 
 Store information about targets. Note the absolute path to the private key is
 the path in the container, not on the host.
@@ -132,11 +133,11 @@ targets:
         host-key-check: false
 ```
 
-**`init.sh`**
+📄 `init.sh`
 
 Here is a sample shell task that echoes a `message` parameter:
 
-```shell script
+```bash
 #!/bin/bash
 echo "Message: ${PT_message}"
 ```
@@ -144,7 +145,7 @@ echo "Message: ${PT_message}"
 To execute the task with Docker and provide all the information from the Bolt
 project directory, mount the Boltdir on the host:
 
-```shell script
+```
 $ docker run --mount type=bind,source=/home/cas/working_dir/docker_bolt/Boltdir,destination=/Boltdir puppet/puppet-bolt task run docker_task message=hi -t docker-example
 Started on pnz2rzpxfzp95hh.delivery.puppetlabs.net...
 Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
@@ -161,11 +162,11 @@ invocation is all native to Bolt.
 
 ## Building on top of the puppet-bolt image
 
-```console
+```
 cas@cas-ThinkPad-T460p:~/working_dir/docker_bolt$ tree
 .
 └── Boltdir
-    ├── bolt.yaml
+    ├── bolt-project.yaml
     ├── Dockerfile
     ├── inventory.yaml
     ├── keys
@@ -182,9 +183,9 @@ You can also extend the puppet-bolt image and copy in data that will always be
 available for that image. To illustrate this, you can add a Dockerfile with the
 following content (with the directory structure defined above):
 
-**`Dockerfile`**
+📄 `Dockerfile`
 
-```Dockerfile
+```
 FROM puppet/puppet-bolt
 
 COPY . /Boltdir
@@ -193,7 +194,7 @@ COPY . /Boltdir
 This command builds a container image with our custom module content and tags it
 `my-extended-puppet-bolt`:
 
-```shell script
+```
 $ docker build . -t my-extended-puppet-bolt
 Sending build context to Docker daemon  10.75kB
 Step 1/2 : FROM puppet-bolt
@@ -207,7 +208,7 @@ Successfully tagged my-extended-puppet-bolt:latest
 You can now run that container with the custom module content and connection
 information available inside the container:
 
-```shell script
+```
 $ docker run my-extended-puppet-bolt task run docker_task message=hi -t docker-example
 Started on pnz2rzpxfzp95hh.delivery.puppetlabs.net...
 Finished on pnz2rzpxfzp95hh.delivery.puppetlabs.net:
