@@ -172,21 +172,21 @@ Describe "test all bolt command examples" {
       $result | Should -Be "bolt plan show"
     }
     It "bolt plan show aggregate::count" {
-      $result = Get-BoltPlan -plan 'aggregate::count'
+      $result = Get-BoltPlan -name 'aggregate::count'
       $result | Should -Be "bolt plan show 'aggregate::count'"
     }
     It "bolt plan convert path/to/plan/myplan.yaml" {
-      $result = Convert-BoltPlan -plan 'path/to/plan/myplan.yaml'
+      $result = Convert-BoltPlan -name 'path/to/plan/myplan.yaml'
       $result | Should -Be "bolt plan convert 'path/to/plan/myplan.yaml'"
     }
     It "bolt plan run canary --targets target1,target2 command=hostname" {
       Write-Warning 'requires params to not be positionl...is that a problem'
-      $result = Invoke-BoltPlan -plan 'canary' -targets 'target1,target2' -params 'command=hostname'
+      $result = Invoke-BoltPlan -name 'canary' -targets 'target1,target2' -params 'command=hostname'
       $result | Should -Be "bolt plan run 'canary' --targets 'target1,target2' --params 'command=hostname'"
     }
     It "bolt plan run canary --targets target1,target2 command=hostname" {
       Write-Warning 'requires params to not be positionl...is that a problem'
-      $result = Invoke-BoltPlan -plan 'canary' -targets 'target1,target2' -params @{ 'command' = 'hostname' }
+      $result = Invoke-BoltPlan -name 'canary' -targets 'target1,target2' -params @{ 'command' = 'hostname' }
       $result | Should -Be "bolt plan run 'canary' --targets 'target1,target2' --params '{`"command`":`"hostname`"}'"
     }
   }
@@ -257,11 +257,11 @@ Describe "test all bolt command examples" {
 
   Context "bolt task" {
     It "bolt task run package --targets target1,target2 action=status name=bash" {
-      $results = Invoke-BoltTask -task 'package' -targets 'target1,target2' -params 'action=status name=bash'
+      $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params 'action=status name=bash'
       Write-Warning "Come back to this"
       $results | Should -Be "bolt task run 'package' --targets 'target1,target2' --params 'action=status name=bash'"
 
-      # $results = Invoke-BoltTask -task 'package' -targets 'target1,target2' -params @{ 'action' = 'status'; 'name' = 'bash' }
+      # $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params @{ 'action' = 'status'; 'name' = 'bash' }
       # Write-Warning "Come back to this"
       # $results | Should -Be "bolt task run 'package' --targets 'target1,target2' --params 'action=status name=bash'"
     }
@@ -270,7 +270,7 @@ Describe "test all bolt command examples" {
       $results | Should -Be "bolt task show"
     }
     It "bolt task show canary" {
-      $results = Get-BoltTask -task 'canary'
+      $results = Get-BoltTask -name 'canary'
       $results | Should -Be "bolt task show 'canary'"
     }
   }

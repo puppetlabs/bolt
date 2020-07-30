@@ -8,49 +8,58 @@ $script:mapping = @{
 }
 
 <% @commands.each do |pwsh_command| %>
-# Automatic pwsh bolt cmdlets
-# <%= pwsh_command[:syntax] %>
-function <%= pwsh_command[:cmdlet] -%> {
 <#
 .SYNOPSIS
-<%= pwsh_command[:syntax] %>
+  <%= pwsh_command[:syntax] %>
 .DESCRIPTION
-<%= pwsh_command[:description] %>
+  <%= pwsh_command[:description] %>
 <% pwsh_command[:options].each do |option| -%>
 .PARAMETER <%= option[:name] %>
-<%= option[:help_msg] %>
+  <%= option[:help_msg] %>
 <% end -%>
 .PARAMETER version
-Get the version of the bolt installation
+  Get the version of the bolt installation
 .LINK
-https://puppet.com/products/bolt
+  https://puppet.com/products/bolt
 .LINK
-https://puppet.com/docs/bolt/latest/bolt_command_reference.html
+  https://puppet.com/docs/bolt/latest/bolt_command_reference.html
 #>
-[CmdletBinding()]
-param (
+function <%= pwsh_command[:cmdlet] %>
+{
+  [CmdletBinding()]
+  param (
 <% pwsh_command[:options].each do |option| -%>
-<% if option[:validate_not_null_or_empty] -%>[ValidateNotNullOrEmpty()]<% end -%>
-<% if option[:validate_set] -%>[ValidateSet(<%= option[:validate_set].map(&:inspect).join(', ') %>)]<% end -%>
-<% if option[:ruby_short] -%>[Alias('<%= option[:ruby_short].gsub("-","") %>')]<% end -%>
-[Parameter(Mandatory=$<%= option[:mandatory] -%><% if option[:position] -%>, Position=<%= option[:position] -%><% end -%><% if option[:parameter_set] -%>, ParameterSetName='<%= option[:parameter_set] -%>'<% end -%>)]
-<% if option[:type] -%>[<%= option[:type] -%>]<% end -%>$<%= option[:name] -%>,
+    [Parameter(<% if option[:mandatory] -%>Mandatory=$<%= option[:mandatory] -%><% end -%><% if option[:position] -%>, Position=<%= option[:position] -%><% end -%><% if option[:parameter_set] -%>, ParameterSetName='<%= option[:parameter_set] -%>'<% end -%>)]
+<% if option[:validate_not_null_or_empty] -%>
+    [ValidateNotNullOrEmpty()]
 <% end -%>
-[Parameter(Mandatory = $false)]
-[switch]$Version
-)
+<% if option[:validate_set] -%>
+    [ValidateSet(<%= option[:validate_set].map(&:inspect).join(', ') %>)]
+<% end -%>
+<% if option[:ruby_short] -%>
+    [Alias('<%= option[:ruby_short].gsub("-","") %>')]
+<% end -%>
+<% if option[:type] -%>
+    [<%= option[:type] -%>]
+<% end -%>
+    $<%= option[:name] -%>,
 
-if($version){
-  return (Get-Content -Path $script:BOLT_BASEDIR\misc\versions.txt)[0].split(" ")[1]
-}
+<% end -%>
+    [Parameter()]
+    [switch]$Version
+  )
 
-$params = @('<%= pwsh_command[:ruby_command] -%>'<% if pwsh_command[:ruby_action] -%>, '<%= pwsh_command[:ruby_action] -%>'<% end -%>)
+  if($version){
+    return (Get-Content -Path $script:BOLT_BASEDIR\misc\versions.txt)[0].split(" ")[1]
+  }
 
-$params = $params + (Get-BoltCommandline -parameterHash $PSBoundParameters -mapping $mapping)
+  $params = @('<%= pwsh_command[:ruby_command] -%>'<% if pwsh_command[:ruby_action] -%>, '<%= pwsh_command[:ruby_action] -%>'<% end -%>)
 
-$result = Invoke-BoltCommandline $params
+  $params = $params + (Get-BoltCommandline -parameterHash $PSBoundParameters -mapping $mapping)
 
-Write-Output $result
+  $result = Invoke-BoltCommandline $params
+
+  Write-Output $result
 
 }
 <% end %>
