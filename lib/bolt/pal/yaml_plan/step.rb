@@ -12,7 +12,19 @@ module Bolt
           Set['name', 'description', 'target', 'targets']
         end
 
-        STEP_KEYS = %w[command script task plan source destination eval resources upload download].freeze
+        STEP_KEYS = %w[
+          command
+          destination
+          download
+          eval
+          message
+          plan
+          resources
+          script
+          source
+          task
+          upload
+        ].freeze
 
         def self.create(step_body, step_number)
           type_keys = (STEP_KEYS & step_body.keys)
@@ -165,3 +177,4 @@ require 'bolt/pal/yaml_plan/step/script'
 require 'bolt/pal/yaml_plan/step/task'
 require 'bolt/pal/yaml_plan/step/upload'
 require 'bolt/pal/yaml_plan/step/download'
+require 'bolt/pal/yaml_plan/step/message'

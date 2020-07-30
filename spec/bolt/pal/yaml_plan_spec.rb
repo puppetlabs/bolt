@@ -155,7 +155,7 @@ describe Bolt::PAL::YamlPlan do
         expect { plan }.to raise_error do |error|
           expect(error.kind).to eq('bolt/invalid-plan')
           expect(error.message).to match(/Parse error in step "foo-bar"/)
-          expect(error.message).to match(/Multiple action keys detected: \["task", "eval"\]/)
+          expect(error.message).to match(/Multiple action keys detected: \["eval", "task"\]/)
         end
       end
 

@@ -12,6 +12,19 @@ describe Bolt::PAL::YamlPlan::Step do
       Bolt::PAL::YamlPlan::BareString.new(str)
     end
 
+    context 'with message step' do
+      let(:step_body) do
+        {
+          "message" => make_string("hello world")
+        }
+      end
+      let(:output) { "  out::message('hello world')\n" }
+
+      it 'stringifies a message step' do
+        expect(step.transpile).to eq(output)
+      end
+    end
+
     context 'with command step' do
       let(:step_body) do
         { "command" => make_string("echo peanut butter"),

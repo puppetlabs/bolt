@@ -71,11 +71,28 @@ failed.
 
 Steps use these fields:
 
--   `name`: A unique name that can be used to refer to the result of the step
-    later
+-   `name`: (Optional) A unique name that can be used to refer to the result of
+    the step later.
 -   `description`: (Optional) An explanation of what the step is doing.
 
 Other available keys depend on the type of step.
+
+#### Message step
+
+Use a `message` step to print a message. This will print a message to `stdout`
+when using the `human` output format, and print to `stderr` when using the
+`json` output format.
+
+Message steps use a single field:
+
+-   `message`: The message to print
+
+For example:
+
+```yaml
+steps:
+  - message: hello world
+```
 
 #### Command step
 
