@@ -19,6 +19,7 @@
             <topicref href="writing_plugins.md" format="markdown"/>
         </topicref>
         <topicref href="privilege_escalation.md" format="markdown"/>
+        <topicref href="vscode_and_bolt.md" format="markdown"/>
     </topicref>
     <topicref href="running_bolt_commands.md" format="markdown" linking="targetonly"/>
     <topicref href="plans.md" format="markdown">
