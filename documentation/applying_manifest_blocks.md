@@ -1,14 +1,14 @@
-# Applying Puppet manifests
+# Applying Puppet code
 
 You can use Bolt to apply blocks of Puppet code, called manifest blocks, to
 remote targets.
 
-You can create manifest blocks that use existing content from the Forge, or mix
-declarative resource configuration via manifest blocks with procedural
-orchestration and action in a plan. Most features of the Puppet language are
-available in a manifest block: classes, custom resource types, and functions.
-For information about what language features aren't supported, see [Manifest
-block limitations](#manifest-block-limitations).
+You can create manifest blocks that use existing content from the Forge, or use
+a plan to mix procedural orchestration and action with declarative resource
+configuration from a block. Most features of the Puppet language are available
+in a manifest block: classes, custom resource types, and functions. For
+information about what language features aren't supported, see [Manifest block
+limitations](#manifest-block-limitations).
 
 > 🔩 **Tip:** If you installed Bolt as a Ruby Gem, make sure you have installed
   the core modules required to use the `puppet apply` command. These modules are
@@ -19,8 +19,7 @@ block limitations](#manifest-block-limitations).
 📖 **Related information**  
 
 - [Configure Bolt to download and install modules](bolt_installing_modules.md#)
-- [Puppetfile
-  example](https://github.com/puppetlabs/bolt/blob/main/Puppetfile)
+- [Puppetfile example](https://github.com/puppetlabs/bolt/blob/main/Puppetfile)
 - [Puppet Forge](https://forge.puppet.com/)
 
 ## Applying manifest blocks from the command line
@@ -32,21 +31,19 @@ command](https://puppet.com/docs/bolt/latest/bolt_command_reference.html#apply)
 uses manifest blocks to pass code to remote targets from the command line.
 
 Manifest blocks require facts to compile. When using the `bolt apply` command,
-Bolt will automatically install the packages necessary to run the apply command,
-and gathers facts using [facter](https://puppet.com/docs/facter/latest/), making
-the facts available to the manifest block. Bolt will also identify targets that
-do not have Puppet agents and run the [`puppet_agent::install`
+Bolt automatically installs the packages necessary to run the apply command and
+gathers facts using [facter](https://puppet.com/docs/facter/latest/), making the
+facts available to the manifest block. Bolt also identifies targets that do not
+have Puppet agents and runs the [`puppet_agent::install`
 task](https://forge.puppet.com/puppetlabs/puppet_agent) to install the agent.
 
-> **Note:** The Puppet agent package is installed to enable the use of Puppet
+> **Note:** Bolt installs the Puppet agent package to enable the use of Puppet
   code. It does not require setting up an agent-master architecture between the
   remote systems and the local system running Bolt.
 
 ### Applying manifest files
 
-You can specify an existing manifest file to apply Puppet code from by passing
-an absolute path to the manifest file as an argument to the `bolt apply`
-command:
+To apply Puppet code from an existing manifest file, use the `bolt apply` command and specify the absolute path to the manifest file:
 
 ```shell
 $ bolt apply ~/bolt/site-modules/profiles/manifests/server.pp -t target1,target2
@@ -142,7 +139,7 @@ the manifest block. The `apply_prep` function also identifies the targets that
 do not have Puppet agents and runs the [`puppet_agent::install`
 task](https://forge.puppet.com/puppetlabs/puppet_agent) to install the agent.
 
-> **Note:** The Puppet agent package is installed to enable the use of Puppet
+> **Note:** Bolt installs the Puppet agent package to enable the use of Puppet
   code. It does not require setting up an agent-master architecture between the
   remote systems and the local system running Bolt.
 
