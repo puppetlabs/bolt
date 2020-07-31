@@ -43,7 +43,8 @@ task](https://forge.puppet.com/puppetlabs/puppet_agent) to install the agent.
 
 ### Applying manifest files
 
-To apply Puppet code from an existing manifest file, use the `bolt apply` command and specify the absolute path to the manifest file:
+To apply Puppet code from an existing manifest file, use the `bolt apply`
+command and specify the absolute path to the manifest file:
 
 ```shell
 $ bolt apply ~/bolt/site-modules/profiles/manifests/server.pp -t target1,target2
@@ -125,10 +126,19 @@ Successful on 2 targets: target1,target2
 Ran on 2 targets in 8.42 sec
 ```
 
-## Applying manifest blocks from a plan
+## Applying Puppet code from Puppet Forge modules in a YAML plan
 
-In addition to the `bolt apply` command, you can apply manifest blocks to remote
-systems during plan execution using the `apply` function.
+In addition to the `bolt apply` command, you can apply Puppet code from a
+module downloaded from the Puppet Forge in a YAML plan. To apply Puppet
+code in a YAML plan, use the YAML plan `resources` step.
+
+To learn more about applying Puppet code in YAML plans, see [Writing YAML
+plans](writing_yaml_plans.md#applying-puppet-code-from-puppet-forge-modules).
+
+## Applying manifest blocks from a Puppet plan
+
+You can apply manifest blocks to remote systems during execution of a Puppet
+plan using the `apply` function.
 
 Manifest blocks require facts to compile. If your plan includes a manifest
 block, use the `apply_prep` function in your plan _before_ your manifest block.
