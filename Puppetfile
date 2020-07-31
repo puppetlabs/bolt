@@ -5,7 +5,7 @@ forge "http://forge.puppetlabs.com"
 moduledir File.join(File.dirname(__FILE__), 'modules')
 
 # Core modules used by 'apply'
-mod 'puppetlabs-service', '1.2.0'
+mod 'puppetlabs-service', '1.3.0'
 mod 'puppetlabs-puppet_agent', '3.2.0'
 mod 'puppetlabs-facts', '1.0.0'
 
