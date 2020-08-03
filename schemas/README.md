@@ -1,32 +1,27 @@
 # Bolt schemas
 
-This directory includes several JSON schemas that can be used to validate
-Bolt configuration files, including `bolt.yaml`, `inventory.yaml`, and
-`bolt-project.yaml`.
+This directory includes several JSON schemas that can be used to validate Bolt
+configuration and inventory files. These schemas are distributed via the Puppet
+Forge.
 
-## Using schemas with Visual Studio Code
+More information about using the schemas can be found in [Setting up VS Code for
+Bolt](../documentation/vscode_and_bolt.md).
 
-### Prerequisites
+## Generating schemas
 
-- Install [Visual Studio Code](https://code.visualstudio.com/)
+Changes made to Bolt's source code may require regenerating the schemas. Bolt
+includes a Rake task for generating the schemas from Bolt's source code.
 
-- Install the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
+To regenerate the schemas, run the following command:
 
-### Enabling schemas
+```shell
+$ bundle exec rake schemas:all
+```
 
-Open the [user or workspace settings file](https://code.visualstudio.com/docs/getstarted/settings) and add
-the following:
+You can also regenerate individual schemas using the corresponding Rake task in
+the `schemas` namespace. To view a list of available Rake tasks in the `schemas`
+namespace, run the following command:
 
-```json
-"yaml.schemas": {
-  "https://forgeapi.puppet.com/schemas/bolt-project.json": [
-    "bolt-project.yaml"
-  ],
-  "https://forgeapi.puppet.com/schemas/bolt-config.json": [
-    "bolt.yaml"
-  ],
-  "https://forgeapi.puppet.com/schemas/bolt-inventory.json": [
-    "inventory.yaml"
-  ]
-}
+```shell
+$ bundle exec rake -T schemas
 ```
