@@ -575,4 +575,4 @@ homepage.
 - To find Puppet modules that use tasks, take a look at the [Puppet
   Forge](https://forge.puppet.com/).
 - For information on Bolt configuration see [Configuring Bolt](configuring_bolt.md).
-- For information on Bolt projects see [Bolt project directories](bolt_project_directories.md)
+- For information on Bolt projects see [Bolt projects](projects.md)

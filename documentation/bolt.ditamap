@@ -11,16 +11,16 @@
         <topicref href="running_bolt_in_docker.md" format="markdown"/>
     </topicref>
     <topicref href="getting_started_with_bolt.md" format="markdown"/>
-    <topicref href="configuring_bolt.md" format="markdown" linking="targetonly">
+    <topichead navtitle="Configuring Bolt">
         <topicref href="projects.md" format="markdown"/>
-        <topicref href="bolt_project_directories.md" format="markdown"/>
         <topicref href="inventory_file_v2.md" format="markdown"/>
+        <topicref href="configuring_bolt.md" format="markdown"/>
         <topicref href="using_plugins.md" format="markdown">
             <topicref href="writing_plugins.md" format="markdown"/>
         </topicref>
         <topicref href="privilege_escalation.md" format="markdown"/>
         <topicref href="vscode_and_bolt.md" format="markdown"/>
-    </topicref>
+    </topichead>
     <topicref href="running_bolt_commands.md" format="markdown" linking="targetonly"/>
     <topicref href="plans.md" format="markdown">
         <topicref href="inspecting_plans.md" format="markdown">
@@ -45,10 +45,11 @@
         </topicref>       
     </topicref>    
     <topicref href="tasks.md" format="markdown">
-        <topicmeta>
-            <shortdesc>Before you run a task in your environment, inspect the task to determine what effect it will have on your targets.</shortdesc>
-        </topicmeta>
-        <topicref href="inspecting_tasks.md" format="markdown"/>
+        <topicref href="inspecting_tasks.md" format="markdown">
+            <topicmeta>
+                <shortdesc>Before you run a task in your environment, inspect the task to determine what effect it will have on your targets.</shortdesc>
+            </topicmeta>
+        </topicref>
         <topicref href="bolt_running_tasks.md" format="markdown">
             <topicmeta>
                 <shortdesc>Bolt can run Puppet tasks on remote targets without requiring any Puppet infrastructure.</shortdesc>
@@ -60,7 +61,7 @@
             </topicmeta>
         </topicref>
     </topicref>
-    <topicref href="modules.md" format="md">
+    <topicref href="modules.md" format="markdown">
         <topicref href="bolt_installing_modules.md" format="markdown">
             <topicmeta>
                 <shortdesc>You can use Bolt to install a Forge module.</shortdesc>

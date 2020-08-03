@@ -62,20 +62,23 @@ unsupported key type `ssh-ed25519'
   * bcrypt_pbkdf (>= 1.0, < 2.0)
 ```
 
-A workaround is to use native SSH when you need to authenticate with
-ed25519 keys. When native SSH is enabled, Bolt will use a specified SSH
-client to connect to targets instead of the `net-ssh` Ruby library. To
-learn more about native SSH, see [native SSH
-transport](experimental_features.md#native-ssh-transport).
+A workaround is to use native SSH when you need to authenticate with ed25519
+keys. When native SSH is enabled, Bolt will use a specified SSH client to
+connect to targets instead of the `net-ssh` Ruby library. To learn more about
+native SSH, see [native SSH
+transport](experimental_features.md#native-ssh-transport). 
+
+🧪 Native SSH is
+experimental and might change in future minor (y) releases.
 
 📖 **Related issues**
 
 - [#1987 - Unable to authenticate with ed25519 keys over SSH transport
   on Windows](https://github.com/puppetlabs/bolt/issues/1987)
 
-## Limited Kerberos support over WinRM
+## 🧪 Limited Kerberos support over WinRM
 
-Authenticating with Kerberos over WinRM is considered experimental and is
+🧪 Authenticating with Kerberos over WinRM is considered experimental and is
 only supported when running Bolt from a Linux host. You must install the
 the [MIT Kerberos
 library](https://web.mit.edu/Kerberos/www/krb5-latest/doc/admin/install_clients.html)
