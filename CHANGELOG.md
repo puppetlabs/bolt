@@ -1,5 +1,55 @@
 # Changelog
 
+## Bolt 2.21.0 (2020-08-03)
+
+### New features
+
+* **Specify remote environment variables using `--env-var`**
+  ([#1980](https://github.com/puppetlabs/bolt/issue/1980))
+
+  Users can now set environment variables on targets when running
+  commands and scripts using the `--env-var` CLI option.
+
+* **Add `secure_env_vars` plan**
+  ([#1980](https://github.com/puppetlabs/bolt/issues/1980))
+
+  The new builtin Bolt plan `secure_env_vars` reads JSON from a  special
+  environment variable, `BOLT_ENV_VARS`, and passes that hash to either
+  `run_command` or `run_script`.
+
+* **YAML plan `message` step**
+  ([#2038](https://github.com/puppetlabs/bolt/issues/2038))
+
+  YAML plans now support a `message` step that prints a message.
+
+* **Service task now supports `enable` and `disable` when available**
+  ([puppetlabs-service#151](https://github.com/puppetlabs/puppetlabs-service/pull/151))
+
+  The builtin Bolt `service` task now supports `enable` and `disable`
+  actions for agentless targets if the actions are available on the target.
+
+* **New `dir::children` plan function**
+  ([#2047](https://github.com/puppetlabs/bolt/pull/2047))
+
+  The new plan function `dir::children` returns an array containing all of
+  the filenames in the given directory, similar to Ruby's `Dir.children()`.
+
+### Bug fixes
+
+* **Gracefully handle WinRM connection loss**
+  ([#1982](https://github.com/puppetlabs/bolt/issues/1982))
+
+  Bolt will now detect WinRM connection loss and return an error
+  rather than printing a stacktrace and deadlocking.
+
+* **Handle existing file errors when downloading files**
+  ([#2054](https://github.com/puppetlabs/bolt/pull/2054))
+
+  Bolt now handles existing file errors raised when creating the
+  destination directory for file downloads. Previously, if a file
+  already existed somewhere on the destination directory path, Bolt
+  would raise an error with a full backtrace.
+
 ## Bolt 2.20.0 (2020-07-27)
 
 ### New features
