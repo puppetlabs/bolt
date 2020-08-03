@@ -322,7 +322,13 @@ module Bolt
 
     def download_file(targets, source, destination, options = {})
       description = options.fetch(:description, "file download from #{source} to #{destination}")
-      FileUtils.mkdir_p(destination)
+
+      begin
+        FileUtils.mkdir_p(destination)
+      rescue Errno::EEXIST => e
+        message = "#{e.message}; unable to create destination directory #{destination}"
+        raise Bolt::Error.new(message, 'bolt/file-exist-error')
+      end
 
       log_action(description, targets) do
         options[:run_as] = run_as if run_as && !options.key?(:run_as)

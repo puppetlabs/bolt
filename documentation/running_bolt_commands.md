@@ -152,7 +152,8 @@ was downloaded from. The target directory names are URL-encoded to ensure
 that they are valid directory names.
 
 For example, the following command downloads the SSH daemon configuration 
-file from two targets, `linux` and `ssh://example.com`:
+file from two targets, `linux` and `ssh://example.com`, and saves it to the
+destination directory `sshd_config`:
 
 ```shell
 $ bolt file download /etc/ssh/sshd_config sshd_config --targets linux,ssh://example.com
@@ -166,12 +167,11 @@ $ tree
 .
 ├── bolt-project.yaml
 ├── inventory.yaml
-└── downloads/
-    └── sshd_config/
-        ├── linux/
-        │   └── sshd_config
-        └── ssh%3A%2F%2Fexample.com/
-            └── sshd_config
+└── sshd_config/
+    ├── linux/
+    │   └── sshd_config
+    └── ssh%3A%2F%2Fexample.com/
+        └── sshd_config
 ```
 
 > 🔩 **Tip:** To avoid URL encoding the target's safe name, give the target a
