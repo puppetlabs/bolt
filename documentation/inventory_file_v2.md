@@ -68,20 +68,22 @@ groups:
 
 ### Target object
 
-You can specify a target with the string representation of a URI, or as a hash
-with any of the following fields:
+Specify a target under the `targets` key. The `targets` key accepts an array
+where each element is either a string or a hash. 
+- For a string, use the string representation of the target's Universal Resource
+  Identifier (URI).
+- A hash must specify either the `uri` for a hash, or a `name`. If you don't
+  specify a `name`, Bolt uses the `uri` as the target's name. To make it easier to run Bolt commands
+  on the target, specify both a `uri` and a `name` and run your commands against
+  the `name`.
 
-| Key | Description | Type |
-| --- | ----------- | ---- |
-| `alias` | A unique alias to refer to the target. Optional. | `String` |
-| `config` | The configuration for the target. Optional. | `Hash` |
-| `facts` | The facts for the target. Optional. | `Hash` |
-| `features` | The features for the target. Optional. | `Array[String]`
-| `name` | A human-readable name for a target.<br> **Required** when specifying a target using a hash. Optional if using `uri`. | `String` |
-| `uri` | The URI of the target.<br> **Required** when specifying a target using a hash. Optional if using `name`. | `String` |
-| `vars` | The variables for the target. Optional. | `Hash` |
+Bolt uses the target's `uri` to establish a connection to the target. If you set
+a `name` and no `uri`, you must specify the hostname for the target using the
+`host` key in your transport configuration. If the transport you're using does
+not support hostname configuration, you must set a `uri`.
 
-An example of targets specified with the string representations of their URIs:
+An example of two targets specified with the string representations of
+their URIs:
 
 ```yaml
 targets:
@@ -89,20 +91,62 @@ targets:
   - target2.example.com
 ```
 
-An example of targets specified with hashes:
+An example of two targets specified with `uri` and `name` in hashes:
 
 ```yaml
 targets:
   - uri: target1.example.com
-    alias: target1
+    name: target1
     config:
       transport: ssh
   - uri: target2.example.com
-    alias: target2
+    name: target2
     config:
       transport: winrm
 ```
 
+An example of a target specified with `name` and no `uri`. In this case, Bolt
+uses the hostname of the target from the transport's `host` key to establish a
+connection with the target:
+
+```yaml
+targets:
+  - name: target1
+    config:
+      transport: ssh
+      ssh:
+        host: target1.example.com
+```
+
+Similar to `name`, you can specify an `alias` as another way to refer to a
+target. In the following example, you could run a command using the target's
+`uri`, `name`, or `alias`.
+
+```yaml
+targets:
+  - uri: target1.example.com
+    name: target1
+    alias: dashboard
+    config:
+      transport: ssh
+  - uri: target2.example.com
+    name: target2
+    alias: database
+    config:
+      transport: winrm
+```
+
+Targets specified with a hash accept the following fields:
+
+| Key | Description | Type |
+| --- | ----------- | ---- |
+| `alias` | A unique alias to refer to the target. Optional. | `String` |
+| `config` | The configuration for the target. Optional. | `Hash` |
+| `facts` | The facts for the target. Optional. | `Hash` |
+| `features` | The features for the target. Optional. | `Array[String]`
+| `name` | A human-readable name for a target.<br> **Required** when specifying a target using a hash. Optional if using `uri`. If you don't specify a `name`, Bolt uses the `uri` as the target name. | `String` |
+| `uri` | The URI of the target. Bolt uses the `uri` to establish a connection to the target. <br> **Required** when specifying a target using a hash, unless you specify a `name` **and** configure a hostname using `host` in the target's transport configuration.| `String` |
+| `vars` | The variables for the target. Optional. | `Hash` |
 
 ## Precedence
 
