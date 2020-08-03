@@ -27,11 +27,6 @@ module Bolt
         end
       end
 
-      def indent(indent, string)
-        indent = ' ' * indent
-        string.gsub(/^/, indent.to_s)
-      end
-
       def remove_trail(string)
         string.sub(/\s\z/, '')
       end
@@ -370,10 +365,6 @@ module Bolt
         else
           @stream.puts(colorize(:red, "Failed to sync modules from #{puppetfile} to #{moduledir}"))
         end
-      end
-
-      def print_message_event(event)
-        print_message(event[:message])
       end
 
       def fatal_error(err)

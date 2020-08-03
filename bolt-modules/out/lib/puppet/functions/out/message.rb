@@ -12,7 +12,7 @@ Puppet::Functions.create_function(:'out::message') do
   # @example Print a message
   #   out::message('Something went wrong')
   dispatch :output_message do
-    param 'String', :message
+    param 'Any', :message
     return_type 'Undef'
   end
 
