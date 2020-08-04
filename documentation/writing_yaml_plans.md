@@ -557,6 +557,54 @@ When your plans need more sophisticated control flow or error handling beyond
 running a list of steps in order, it's time to convert them to [Puppet language
 plans](writing_plans.md#).
 
+## Applying Puppet code from Puppet Forge modules
+
+Modules downloaded from the Puppet Forge often include Puppet code that you can
+use to simplify your workflow. The Puppet code in these modules can be applied
+to targets from a YAML plan using the [resources step](#resources-step).
+
+For example, if you wanted to install and configure Apache and MySQL on a group
+of targets, you could download the
+[apache](https://forge.puppet.com/puppetlabs/apache) and
+[mysql](https://forge.puppet.com/puppetlabs/mysql) modules and apply the
+`apache` and `mysql::server` classes to the targets with a resources step. You
+can invoke a class as part of a resources step by using the syntax `class:
+classname`.
+
+The following YAML plan accepts a list of targets and then installs and
+configures Apache and MySQL using classes from the `apache` and `mysql`
+modules:
+
+```yaml
+description: Install and configure Apache and MySQL
+
+parameters:
+  targets:
+    type: TargetSpec
+    description: The targets to configure
+
+steps:
+  - description: Install and configure Apache and MySQL
+    name: configure
+    targets: $targets
+    resources:
+      - class: apache
+      - class: mysql::server
+
+return: $configure
+```
+
+Puppet code included in modules often accepts parameters. To set parameters,
+add a map of parameter names and values under the `parameters` key for a
+specific resource.
+
+```yaml
+- class: apache
+  parameters:
+    user: apache
+    manage_user: false
+```
+
 ## Converting YAML plans to Puppet language plans
 
 You can convert a YAML plan to a Puppet language plan with the `bolt plan
