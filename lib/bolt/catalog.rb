@@ -76,7 +76,15 @@ module Bolt
       target = request['target']
       plan_vars = shadow_vars('plan', request['plan_vars'], target['facts'])
       target_vars = shadow_vars('target', target['variables'], target['facts'])
-      topscope_vars = target_vars.merge(plan_vars)
+
+      # Merge plan vars with target vars, while maintaining the order of the plan
+      # vars. It's critical that the order of plan vars is not changed, as Puppet
+      # will deserialize the variables in the order they appear. Variables may
+      # contain local references to variables that appear earlier in a plan. If
+      # these variables are moved before the variable they reference, Puppet will
+      # be unable to deserialize the data and raise an error.
+      topscope_vars = target_vars.reject { |k, _v| plan_vars.key?(k) }.merge(plan_vars)
+
       env_conf = { modulepath: request['modulepath'],
                    facts: target['facts'],
                    variables: topscope_vars }
