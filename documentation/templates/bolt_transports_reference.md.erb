@@ -30,6 +30,9 @@ to targets. These options can be set in multiple locations:
 <% if data.key?(:type) -%>
 - **Type:** <%= data[:type] %>
 <% end -%>
+<% if data.key?(:enum) -%>
+- **Available values:** `<%= data[:enum].join('`, `') %>`
+<% end -%>
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
 <% end -%>
@@ -70,6 +73,9 @@ ssh:
 
 <% if data.key?(:type) -%>
 - **Type:** <%= data[:type] %>
+<% end -%>
+<% if data.key?(:enum) -%>
+- **Available values:** `<%= data[:enum].join('`, `') %>`
 <% end -%>
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
