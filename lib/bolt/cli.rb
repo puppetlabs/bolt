@@ -358,11 +358,6 @@ module Bolt
         update_targets(options)
       end
 
-      if options[:action] == 'convert'
-        convert_plan(options[:object])
-        return 0
-      end
-
       screen = "#{options[:subcommand]}_#{options[:action]}"
       # submit a different screen for `bolt task show` and `bolt task show foo`
       if options[:action] == 'show' && options[:object]
@@ -413,6 +408,9 @@ module Bolt
         return 0
       when 'show-modules'
         list_modules
+        return 0
+      when 'convert'
+        convert_plan(options[:object])
         return 0
       end
 
