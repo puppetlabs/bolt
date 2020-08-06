@@ -2636,30 +2636,62 @@ describe "Bolt::CLI" do
     end
 
     context 'init' do
-      it 'creates a new project at the specified path' do
-        Dir.mktmpdir do |dir|
-          file = File.join(dir, 'bolt.yaml')
-          cli = Bolt::CLI.new(%W[project init #{dir}])
-          cli.execute(cli.parse)
-          expect(File.file?(file)).to be
-        end
-      end
+      it 'creates a new project in the current directory' do
+        Dir.mktmpdir do |tmpdir|
+          # The tmpdir doesn't have a valid modulename
+          dir = File.join(tmpdir, 'valid')
+          Dir.mkdir(dir)
+          allow(Dir).to receive(:pwd).and_return(dir)
+          file = File.join(dir, 'bolt-project.yaml')
 
-      it 'creates a new project in the current working directory' do
-        Dir.mktmpdir do |dir|
-          file = File.join(dir, 'bolt.yaml')
           cli = Bolt::CLI.new(%w[project init])
-          Dir.chdir(dir) { cli.execute(cli.parse) }
+          cli.execute(cli.parse)
+
           expect(File.file?(file)).to be
+          expect(File.read(file)).to eq("---\nname: valid\n")
         end
       end
 
-      it 'warns when a bolt.yaml already exists' do
-        Dir.mktmpdir do |dir|
-          config = File.join(dir, 'bolt.yaml')
-          cli    = Bolt::CLI.new(%W[project init #{dir}])
+      it 'creates a new project with a specified name' do
+        Dir.mktmpdir do |tmpdir|
+          dir = File.join(tmpdir, 'valid')
+          Dir.mkdir(dir)
+          allow(Dir).to receive(:pwd).and_return(dir)
+          file = File.join(dir, 'bolt-project.yaml')
 
+          cli = Bolt::CLI.new(%w[project init myproject])
+          cli.execute(cli.parse)
+
+          expect(File.file?(file)).to be
+          expect(File.read(file)).to eq("---\nname: myproject\n")
+        end
+      end
+
+      it 'errors if the directory name is invalid' do
+        Dir.mktmpdir do |dir|
+          allow(Dir).to receive(:pwd).and_return(dir)
+          cli = Bolt::CLI.new(%w[project init])
+          expect { cli.execute(cli.parse) }
+            .to raise_error(Bolt::ValidationError,
+                            /name '#{File.basename(dir)}' is an invalid project name/)
+        end
+      end
+
+      it 'errors if you pass in an invalid name' do
+        cli = Bolt::CLI.new(%w[project init 123])
+        expect { cli.execute(cli.parse) }
+          .to raise_error(Bolt::ValidationError, /The provided project name '123' is invalid;/)
+      end
+
+      it 'warns when a bolt-project.yaml already exists' do
+        Dir.mktmpdir do |tmpdir|
+          dir = File.join(tmpdir, 'valid')
+          Dir.mkdir(dir)
+          allow(Dir).to receive(:pwd).and_return(dir)
+
+          config = File.join(dir, 'bolt-project.yaml')
           FileUtils.touch(config)
+          cli = Bolt::CLI.new(%w[project init])
           cli.execute(cli.parse)
 
           expect(@log_output.readlines).to include(/Found existing project directory at #{dir}/)
@@ -2669,11 +2701,13 @@ describe "Bolt::CLI" do
       context 'with modules' do
         it 'creates a Puppetfile and installs modules with dependencies' do
           # Create the tmpdir relative to the current dir to handle issues with tempfiles on Windows CI
-          Dir.mktmpdir(nil, Dir.pwd) do |dir|
-            puppetfile = File.join(dir, 'Puppetfile')
-            modulepath = File.join(dir, 'modules')
+          Dir.mktmpdir(nil, Dir.pwd) do |tmpdir|
+            allow(Dir).to receive(:pwd).and_return(tmpdir)
 
-            cli = Bolt::CLI.new(%W[project init #{dir} --modules puppetlabs-apt])
+            puppetfile = File.join(tmpdir, 'Puppetfile')
+            modulepath = File.join(tmpdir, 'modules')
+
+            cli = Bolt::CLI.new(%w[project init valid --modules puppetlabs-apt])
             cli.execute(cli.parse)
 
             expect(File.file?(puppetfile)).to be
@@ -2687,13 +2721,13 @@ describe "Bolt::CLI" do
         end
 
         it 'errors when there is an existing Puppetfile' do
-          Dir.mktmpdir do |dir|
-            puppetfile = File.join(dir, 'Puppetfile')
-            config     = File.join(dir, 'bolt.yaml')
+          Dir.mktmpdir do |tmpdir|
+            puppetfile = File.join(tmpdir, 'Puppetfile')
+            config     = File.join(tmpdir, 'bolt.yaml')
 
             FileUtils.touch(puppetfile)
 
-            cli = Bolt::CLI.new(%W[project init #{dir} --modules puppetlabs-stdlib])
+            cli = Bolt::CLI.new(%w[project init valid --modules puppetlabs-stdlib])
             expect { cli.execute(cli.parse) }.to raise_error(Bolt::CLIError)
             expect(File.file?(config)).not_to be
           end

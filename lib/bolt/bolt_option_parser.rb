@@ -420,19 +420,18 @@ module Bolt
           init
 
       USAGE
-          bolt project init [directory] [options]
+          bolt project init [name] [options]
 
       DESCRIPTION
-          Create a new Bolt project.
+          Create a new Bolt project in the current working directory.
 
-          Specify a directory to create a Bolt project in. Defaults to the
-          curent working directory.
+          Specify a name for the Bolt project. Defaults to the basename of the current working directory.
 
       EXAMPLES
-          Create a new Bolt project in the current working directory.
+          Create a new Bolt project using the directory as the project name.
             bolt project init
-          Create a new Bolt project at a specified path.
-            bolt project init ~/path/to/project
+          Create a new Bolt project with a specified name.
+            bolt project init myproject
           Create a new Bolt project with existing modules.
             bolt project init --modules puppetlabs-apt,puppetlabs-ntp
     HELP

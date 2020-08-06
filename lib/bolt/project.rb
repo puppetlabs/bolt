@@ -141,8 +141,10 @@ module Bolt
     def validate
       if name
         if name !~ Bolt::Module::MODULE_NAME_REGEX
-          raise Bolt::ValidationError, "Invalid project name #{name.inspect.tr('"', "'")} in bolt-project.yaml; "\
-                                       "project name must match #{Bolt::Module::MODULE_NAME_REGEX.inspect}"
+          raise Bolt::ValidationError, <<~ERROR_STRING
+          Invalid project name '#{name}' in bolt-project.yaml; project name must begin with a lowercase letter
+          and can include lowercase letters, numbers, and underscores.
+          ERROR_STRING
         elsif Dir.children(Bolt::PAL::BOLTLIB_PATH).include?(name)
           raise Bolt::ValidationError, "The project '#{name}' will not be loaded. The project name conflicts "\
             "with a built-in Bolt module of the same name."

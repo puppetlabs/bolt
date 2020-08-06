@@ -200,18 +200,6 @@ Describe "test all bolt command examples" {
       $result = Get-BoltPlan
       $result | Should -Be "bolt plan show"
     }
-    It "bolt project init" {
-      $result = New-BoltProject
-      $result | Should -Be "bolt project init"
-    }
-    It "bolt project init ~/path/to/project" {
-      $result = New-BoltProject -Directory '~/path/to/project'
-      $result | Should -Be "bolt project init '~/path/to/project'"
-    }
-    It "bolt project init --modules puppetlabs-apt,puppetlabs-ntp" {
-      $result = New-BoltProject -modules 'puppetlabs-apt,puppetlabs-ntp'
-      $result | Should -Be "bolt project init --modules 'puppetlabs-apt,puppetlabs-ntp'"
-    }
   }
 
   Context "bolt project" {
@@ -219,9 +207,17 @@ Describe "test all bolt command examples" {
       $result = Update-BoltProject
       $result | Should -Be "bolt project migrate"
     }
-    It "bolt project migrate 'foo'" {
-      $result = Update-BoltProject -directory 'foo'
-      $result | Should -Be "bolt project migrate 'foo'"
+    It "bolt project init" {
+      $result = New-BoltProject
+      $result | Should -Be "bolt project init"
+    }
+    It "bolt project init myproject" {
+      $result = New-BoltProject -name 'myproject'
+      $result | Should -Be "bolt project init 'myproject'"
+    }
+    It "bolt project init --modules puppetlabs-apt,puppetlabs-ntp" {
+      $result = New-BoltProject -modules 'puppetlabs-apt,puppetlabs-ntp'
+      $result | Should -Be "bolt project init --modules 'puppetlabs-apt,puppetlabs-ntp'"
     }
   }
 

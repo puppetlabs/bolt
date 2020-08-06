@@ -770,8 +770,26 @@ module Bolt
     # Initializes a specified directory as a Bolt project and installs any modules
     # specified by the user, along with their dependencies
     def initialize_project
-      project    = Pathname.new(File.expand_path(options[:object] || Dir.pwd))
-      config     = project + 'bolt.yaml'
+      # Dir.pwd will return backslashes on Windows, but Pathname always uses
+      # forward slashes to concatenate paths. This results in paths like
+      # C:\User\Administrator/modules, which fail module install. This ensure
+      # forward slashes in the cwd path.
+      dir = File.expand_path(Dir.pwd)
+      name = options[:object] || File.basename(dir)
+      if name !~ Bolt::Module::MODULE_NAME_REGEX
+        if options[:object]
+          raise Bolt::ValidationError, "The provided project name '#{name}' is invalid; "\
+            "project name must begin with a lowercase letter and can include lowercase "\
+            "letters, numbers, and underscores."
+        else
+          raise Bolt::ValidationError, "The current directory name '#{name}' is an invalid "\
+            "project name. Please specify a name using 'bolt project init <name>'."
+        end
+      end
+
+      project    = Pathname.new(dir)
+      old_config = project + 'bolt.yaml'
+      config     = project + 'bolt-project.yaml'
       puppetfile = project + 'Puppetfile'
       modulepath = [project + 'modules']
 
@@ -792,18 +810,24 @@ module Bolt
 
       # Warn the user if the project directory already exists. We don't error here since users
       # might not have installed any modules yet.
+      # If both bolt.yaml and bolt-project.yaml exist, this will just warn
+      # about bolt-project.yaml and subsequent Bolt actions will warn about
+      # both files existing
       if config.exist?
-        @logger.warn "Found existing project directory at #{project}"
-      end
-
-      # Create the project directory
-      FileUtils.mkdir_p(project)
-
+        @logger.warn "Found existing project directory at #{project}. Skipping file creation."
+      # This won't get called if bolt-project.yaml exists
+      elsif old_config.exist?
+        @logger.warn "Found existing #{old_config.basename} at #{project}. "\
+          "#{old_config.basename} is deprecated, please rename to #{config.basename}."
       # Bless the project directory as a...wait for it...project
-      if FileUtils.touch(config)
-        outputter.print_message "Successfully created Bolt project at #{project}"
       else
-        raise Bolt::FileError.new("Could not create Bolt project directory at #{project}", nil)
+        begin
+          content = { 'name' => name }
+          File.write(config.to_path, content.to_yaml)
+          outputter.print_message "Successfully created Bolt project at #{project}"
+        rescue StandardError => e
+          raise Bolt::FileError.new("Could not create bolt-project.yaml at #{project}: #{e.message}", nil)
+        end
       end
 
       # Write the generated Puppetfile to the fancy new project
