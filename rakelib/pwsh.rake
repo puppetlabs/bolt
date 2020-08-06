@@ -19,7 +19,8 @@ namespace :pwsh do
       'run'        => 'Invoke',
       'show'       => 'Get',
       'upload'     => 'Send', # deploy? publish?
-      'download'   => 'Receive'
+      'download'   => 'Receive',
+      'new'        => 'New'
     }
 
     @hardcoded_cmdlets = {
@@ -148,10 +149,11 @@ namespace :pwsh do
           # bolt plan show [plan] [options]
           # bolt plan run <plan> [parameters] [options]
           # bolt plan convert <path> [options]
+          # bolt plan new <plan> [options]
           @pwsh_command[:options] << {
             name:                       'Name',
             ruby_short:                 'n',
-            help_msg:                   "The plan to #{action}",
+            help_msg:                   "The plan to #{action == 'new' ? 'create' : action}",
             type:                       'string',
             switch:                     false,
             mandatory:                  false,

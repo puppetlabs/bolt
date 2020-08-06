@@ -66,6 +66,9 @@ module Bolt
         when 'convert'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: PLAN_CONVERT_HELP }
+        when 'new'
+          { flags: OPTIONS[:global] + %w[configfile project],
+            banner: PLAN_NEW_HELP }
         when 'run'
           { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir hiera-config],
             banner: PLAN_RUN_HELP }
@@ -159,10 +162,10 @@ module Bolt
       SUBCOMMANDS
           apply             Apply Puppet manifest code
           command           Run a command remotely
-          file              Upload a local file or directory
+          file              Copy files between the controller and targets
           group             Show the list of groups in the inventory
           inventory         Show the list of targets an action would run on
-          plan              Convert, show, and run Bolt plans
+          plan              Convert, create, show, and run Bolt plans
           project           Create and migrate Bolt projects
           puppetfile        Install and list modules and generate type references
           script            Upload a local script and run it remotely
@@ -319,10 +322,11 @@ module Bolt
           bolt plan <action> [parameters] [options]
 
       DESCRIPTION
-          Convert, show, and run Bolt plans.
+          Convert, create, show, and run Bolt plans.
 
       ACTIONS
           convert       Convert a YAML plan to a Bolt plan
+          new           Create a new plan in the current project
           run           Run a plan on the specified targets
           show          Show available plans and plan documentation
     HELP
@@ -343,6 +347,20 @@ module Bolt
 
       EXAMPLES
           bolt plan convert path/to/plan/myplan.yaml
+    HELP
+
+    PLAN_NEW_HELP = <<~HELP
+      NAME
+          new
+      
+      USAGE
+          bolt plan new <plan> [options]
+      
+      DESCRIPTION
+          Create a new plan in the current project.
+
+      EXAMPLES
+          bolt plan new myproject::myplan
     HELP
 
     PLAN_RUN_HELP = <<~HELP

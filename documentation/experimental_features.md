@@ -327,3 +327,46 @@ To encrypt SSH connections using the unsupported algorithm
 > option to shell out to SSH. See [the net-ssh
 > README](https://github.com/net-ssh/net-ssh/#supported-algorithms) for a list of supported
 > algorithms.
+
+## `bolt plan new` command
+
+This feature was introduced in [Bolt
+2.22.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-2220-2020-08-10).
+
+Use the `bolt plan new` command to generate a new project-level YAML plan.
+The command accepts a single argument: the name of the plan. To use the `bolt
+plan new` command, you must have a named [Bolt project](projects.md).
+
+### Naming plans
+
+The plan name is used to identify and call the plan from the Bolt command line
+or from other plans. Plan names are composed of one or more name segments
+separated by a double colon `::`.
+
+Each plan name segment must begin with a lowercase letter, and may only include
+lowercase letters, digits, and underscores.
+
+Additionally, the first name segment of any plan created with `bolt plan new`
+must match the name of the project itself. For example, given a project named
+`myproject`, the following plan names are valid:
+
+- `myproject`
+- `myproject::myplan`
+- `myproject::my_plan`
+
+And the following plan names are invalid:
+
+- `myplan`
+- `myproject::MyPlan`
+- `myproject::1_myplan`
+- `myproject::my-plan`
+
+#### `init` plans
+
+Plan names that match the project name will create a special `init` plan.
+For example, if you have a project named `myproject` and run the command
+`bolt plan new myproject`, a plan will be created at
+`<project>/plans/init.yaml`.
+
+You can reference the `init` plan using the project's name. For example,
+you would run this plan using `bolt plan run myproject`.
