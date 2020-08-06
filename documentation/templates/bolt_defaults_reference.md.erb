@@ -11,6 +11,9 @@ which is supported in both the [system-wide and user-level configuration directo
 <%= data[:description] %>
 
 - **Type:** <%= data[:type] %>
+<% if data.key?(:enum) -%>
+- **Available values:** `<%= data[:enum].join('`, `') %>`
+<% end -%>
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
 <% end -%>
@@ -25,6 +28,9 @@ sub-options, see [Transport configuration reference](bolt_transports_reference.m
 <%= data[:description] %>
 
 - **Type:** <%= data[:type] %>
+<% if data.key?(:enum) -%>
+- **Available values:** `<%= data[:enum].join('`, `') %>`
+<% end -%>
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
 <% end %>

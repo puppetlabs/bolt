@@ -16,6 +16,9 @@ The `bolt.yaml` configuration file is supported in all [project directories](con
 <%= data[:description] %>
 
 - **Type:** <%= data[:type] %>
+<% if data.key?(:enum) -%>
+- **Available values:** `<%= data[:enum].join('`, `') %>`
+<% end -%>
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
 <% end -%>
@@ -27,6 +30,9 @@ The `bolt.yaml` configuration file is supported in all [project directories](con
 <%= data[:description] %>
 
 - **Type:** <%= data[:type] %>
+<% if data.key?(:enum) -%>
+- **Available values:** `<%= data[:enum].join('`, `') %>`
+<% end -%>
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
 <% end -%>
