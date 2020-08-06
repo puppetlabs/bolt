@@ -7,9 +7,6 @@ require 'bolt/pal'
 module Bolt
   class Project
     BOLTDIR_NAME = 'Boltdir'
-
-    NAME_SEGMENT_REGEX = /\A[a-z][a-z0-9_]*\Z/.freeze
-
     PROJECT_SETTINGS = {
       "name"  => "The name of the project",
       "plans" => "An array of plan names to show, if they exist in the project."\
@@ -141,9 +138,10 @@ module Bolt
 
     def validate
       if name
-        if name !~ NAME_SEGMENT_REGEX
+        name_regex = /^[a-z][a-z0-9_]*$/
+        if name !~ name_regex
           raise Bolt::ValidationError, <<~ERROR_STRING
-          Invalid project name '#{name}' in bolt-project.yaml; project name must match #{NAME_SEGMENT_REGEX.inspect}
+          Invalid project name '#{name}' in bolt-project.yaml; project name must match #{name_regex.inspect}
           ERROR_STRING
         elsif Dir.children(Bolt::PAL::BOLTLIB_PATH).include?(name)
           raise Bolt::ValidationError, "The project '#{name}' will not be loaded. The project name conflicts "\
