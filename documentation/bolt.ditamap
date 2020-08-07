@@ -60,8 +60,6 @@
             </topicmeta>
         </topicref>
     </topicref>
-    <topicref href="applying_manifest_blocks.md" format="markdown"/>
-
     <topicref href="modules.md" format="md">
         <topicref href="bolt_installing_modules.md" format="markdown">
             <topicmeta>
@@ -77,6 +75,7 @@
 
     <topicref href="bolt_examples.md" format="markdown"/>
     <topichead navtitle="Using Bolt with Puppet">
+        <topicref href="applying_manifest_blocks.md" format="markdown"/>
         <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
         <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
     </topichead>
