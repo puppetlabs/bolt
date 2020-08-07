@@ -73,14 +73,23 @@
             </topicmeta>
         </topicref>
     </topicref>
-
-    <topicref href="bolt_examples.md" format="markdown"/>
     <topichead navtitle="Using Bolt with Puppet">
         <topicref href="applying_manifest_blocks.md" format="markdown"/>
         <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
         <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
     </topichead>
-    <topicref href="tig_stack.md" format="markdown"/>
+    <topicref href="bolt_examples.md" format="markdown">
+      <topicref href="automating_windows_targets.md" format="markdown">
+        <topicmeta>
+          <shortdesc>Examples of how to run Powershell scripts, use Bolt inventory, convert a script to a task, and write a Bolt plan, all on Windows.</shortdesc>
+        </topicmeta>
+      </topicref>
+      <topicref href="tig_stack.md" format="markdown">
+        <topicmeta>
+          <shortdesc>An example of deploying a Telegraf, InfluxDB, and Grafana stack with Bolt, this demonstrates using existing Puppet content to quickly provide value.</shortdesc>
+        </topicmeta>
+      </topicref>
+    </topicref>
     <topicref href="experimental_features.md" format="markdown"/>
     <topichead navtitle="Reference">
         <topicref href="bolt_command_reference.md" format="markdown"/>
