@@ -1,198 +1,549 @@
-# Running basic Bolt commands
+# Run commands on remote targets
 
-Use Bolt commands to connect directly to the systems where you want to execute
-commands, run scripts, and upload files.
+You can use Bolt commands to connect to remote targets and perform actions on
+them. These actions range in complexity from invoking a simple command to
+running a series of commands and tasks as part of an orchestration workflow. 
 
-## Run a command on remote targets
+For a full list of available Bolt commands, see the [Bolt command
+reference](bolt_command_reference.md).
 
-Specify the command you want to run and which targets to run it on.
+## Run a command
 
-When you have credentials on remote systems, you can use Bolt to run commands
-across those systems.
+Bolt can run arbitrary commands on remote targets. To run a command, provide a
+command and a list of targets to run the command on.
 
--   To run a command on a list of targets:
-    ```shell script
-    bolt command run <COMMAND> --targets <TARGET NAME>,<TARGET NAME>,<TARGET NAME>
-    ```
-    
--   To run a command on WinRM targets, indicate the WinRM protocol in the
-    targets string:
-    ```shell script
-    bolt command run <COMMAND> --targets winrm://<WINDOWS.TARGET> --user <USERNAME> --password <PASSWORD>
-    ```
-
--   To run a command that contains spaces or shell special characters, wrap the
-    command in single quotation marks:
-    ```shell script
-    bolt command run 'echo $HOME' --targets web5.mydomain.edu,web6.mydomain.edu
-    ```
-    ```shell script
-    bolt command run "netstat -an | grep 'tcp.*LISTEN'" --targets web5.mydomain.edu,web6.mydomain.edu
-    ```
-
--   To run a cross-platform command:
-    ```shell script
-    bolt command run "echo 'hello world'"
-    ```
-
--   To read a command from a file, pass the command as an `@` symbol followed by
-    the path to the file:
-
-    ```
-    bolt command run @command.txt --targets servers
-    ```
-
-    For Windows PowerShell, add single quotation marks to define the file:
-
-    ```
-    bolt command run '@command.txt' --targets servers
-    ```
-
--   To read a command from `stdin`, pass the command as a single dash `-` and
-    pipe the command to Bolt:
-
-    ```
-    <COMMAND> | bolt command run - --targets servers
-    ```
-
-    For example, if you have a command in a text file:
-
-    ```
-    cat command.txt | bolt command run - --targets servers
-    ```
-
-> **Note:** When connecting to Bolt over WinRM, the target must be 
-> configured to use SSL over port 5986. If the target is not configured
-> to use SSL, use the `--no-ssl` option to connect to the default WinRM 
-> port 5985.
-
-## Running commands with redirection or pipes
-
-When you run one-line commands that include redirection or pipes, pass `bash` or
-another shell as the command.
-
-Using a shell ensures that the one-liner is run as a single command and that it
-works correctly with `run-as`. For example, instead of `bolt command run "echo
-foo > /root/foo" --run-as root`, use `bolt command run "bash -c 'echo foo >
-/root/foo'" --run-as root`.
-
-## Run a script on remote targets
-
-Specify the script you want to run and which targets to run it on.
-
-Use the `bolt script run` command to run existing scripts that you use or to
-combine the commands that you regularly run as part of sequence. When you run a
-script with Bolt, the script is transferred into a temporary directory on the
-remote system, run on that system, and then deleted.
-
-You can run scripts in any language as long as the appropriate interpreter is
-installed on the remote system. This includes Bash, PowerShell, or Python.
-
--   To run a script, specify the path to the script, and which targets to run it
-    on:
-    ```shell script
-    bolt script run <PATH/TO/SCRIPT> --targets <TARGET NAME>,<TARGET NAME>,<TARGET NAME>
-    ```
-    ```shell script
-    bolt script run ../myscript.sh --targets web5.mydomain.edu,web6.mydomain.edu
-    ```
--   When executing on WinRM targets, include the WinRM protocol in the targets
-    string:
-    ```shell script
-    bolt script run <PATH/TO/SCRIPT> --targets winrm://<TARGET NAME> --user <USERNAME> --password <PASSWORD>
-    ```
--   To pass arguments to a script, specify them after the command. If an
-    argument contain spaces or special characters, you must quote it:
-    ```shell script
-    bolt script run myscript.sh 'echo hello'
-    ```
-    Argument values are passed literally and are not interpolated by the shell
-    on the remote host. If you run `bolt script run myscript.sh 'echo $HOME'`,
-    then the script receives the argument `'echo $HOME'`, rather than any
-    interpolated value.
--   To pass arguments prefixed with `-` to a script, use the following syntax:
-    ```shell script
-    bolt script run <BOLT_ARGUMENTS> <SCRIPT_NAME> -- <SCRIPT_ARGUMENTS>
-    ```
-    For example, 
-    ```shell script
-    bolt script run -t targets -u user myscript.sh -- --script-param --foo bar
-    ```
-
-### Requirements for scripts run on remote \*nix systems
-
-A script must include a shebang (`#!`) line specifying the interpreter. For
-example, for a script written in Bash, provide the path to the Bash interpreter:
-
-```shell script
-#!/bin/bash
-echo hello
-```
-
-### Requirements for scripts run on remote Windows systems
-
-Bolt supports the extensions `.ps1`, `.rb`, and `.pp`. To enable other file
-extensions, add them to your Bolt configuration file, as follows:
-
-```yaml
-winrm:
-   extensions: [.py, .pl]
-```
-
-## Upload files or directories to remote targets
-
-Use Bolt to copy files or directories to remote targets.
-
-**Note:** Most transports are not optimized for file copying, so this command is
-best limited to small files.
-
--   To upload a file or directory to a remote target, run the `bolt file upload`
-    command. Specify the local path to the file or directory, the destination
-    location, and the targets.
-
-    ```
-    bolt file upload <SOURCE> <DESTINATION> --targets <TARGET NAME>,<TARGET NAME>
-    ```
-
-    ```
-    bolt file upload my_file.txt /tmp/remote_file.txt --targets web5.mydomain.edu,web6.mydomain.edu
-    ```
-
-## Download files or directories from remote targets
-
-Use Bolt to copy files or directories from remote targets to your local system.
-
-To download a file or directory from a remote target, run the
-`bolt file download` command. Specify the remote path to the file or
-directory, the destination directory on your local system, and the targets.
+_\*nix shell command_
 
 ```shell
-$ bolt file download <SOURCE> <DESTINATION> --targets <TARGETS>
+bolt command run 'pwd' --targets servers
 ```
 
-The `destination` can be either an absolute or relative path to a directory
-on your local system. If you use a relative path, Bolt expands the path
-relative to the current working directory. If the destination directory does
-not exist, Bolt will automatically create it.
+_PowerShell cmdlet_
 
-Each file or directory is saved to the destination directory under a
-directory with a name matching the URL-encoded name of the target it
-was downloaded from. The target directory names are URL-encoded to ensure
-that they are valid directory names.
-
-For example, the following command downloads the SSH daemon configuration 
-file from two targets, `linux` and `ssh://example.com`, and saves it to the
-destination directory `sshd_config`:
-
-```shell
-$ bolt file download /etc/ssh/sshd_config sshd_config --targets linux,ssh://example.com
+```powershell
+Invoke-BoltCommand -Command 'Get-Location' -Targets servers
 ```
 
-After running this command from the root of your project directory, your
-project directory structure would look like this:
+> 🔩 **Tip:** If a command contains spaces or special shell characters, wrap
+> the command in single quotation marks.
+
+### Read a command from a file
+
+Reading a command from a file is useful when you need to run a script on a target 
+that does not permit file uploads. To read a command from a file, pass an `@` symbol, 
+followed by the relative path to the file.
+
+_\*nix shell command_
 
 ```shell
-$ tree
+bolt command run @configure.sh --targets servers
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command '@configure.ps1' -Targets servers
+```
+
+> **Note:** In PowerShell, always wrap the file name in single quotes.
+
+### Read a command from stdin
+
+To read a command from standard input (stdin), pipe the results from another
+command to Bolt and pass a single dash (`-`) as the command.
+
+_\*nix shell command_
+
+```shell
+cat command.sh | bolt command run - --targets servers
+```
+
+Reading from stdin is not supported by the PowerShell module.
+
+## Specify targets
+
+The most common way to specify targets on the command line is with the
+`targets` option. This option accepts a comma-separated list of targets.
+
+_\*nix shell command_
+
+```shell
+bolt command run 'pwd' --targets bolt1.example.org,bolt2.example.org
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command 'pwd' -Targets bolt1.example.org,bolt2.example.org
+```
+
+### Specify targets from an inventory file
+
+If you have an inventory file, you can list targets and groups of targets by
+name instead of using the target's Universal Resource Identifier (URI).
+
+_\*nix shell command_
+
+```shell
+bolt command run 'pwd' --targets servers,databases
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command 'pwd' -Targets servers,databases
+```
+
+### Specify targets using glob matching
+
+Bolt supports glob matches for targets. This is helpful when you have several
+targets that you want to run a comand on that have similar names. For example,
+to run a command on all targets that start with the word `bolt`:
+
+_\*nix shell command_
+
+```shell
+bolt command run 'pwd' --targets 'bolt*'
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command 'pwd' -Targets 'bolt*'
+```
+
+### Read targets from a file
+
+To read a file of targets, pass an `@` symbol, followed by the relative path to
+the file, to the `targets` option.
+
+_\*nix shell command_
+
+```shell
+bolt command run 'pwd' --targets '@targets.txt'
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command 'pwd' -Targets '@targets.txt'
+```
+
+> **Note:** In PowerShell, always wrap the file name in single quotes.
+
+### Read targets from stdin
+
+To read a list of targets from stdin, pipe the results from another command to
+Bolt and pass a single dash (`-`) to the `targets` option.
+
+_\*nix shell command_
+
+```shell
+cat targets.txt | bolt command run 'pwd' --targets -
+```
+
+Reading from stdin is not supported by the PowerShell module.
+
+### Specify targets from the previous command
+
+After every execution, Bolt writes information about the result of that run to a
+`.rerun.json` file inside the Bolt project directory. You can use the
+`.rerun.json` file together with the `rerun` option to specify targets for
+future commands. The `rerun` option accepts one of three values:
+
+- `success`: The list of targets the command succeeded on.
+- `failure`: The list of targets the command failed on.
+- `all`: All of the targets the command ran on.
+
+For example, if you need to run a command that is dependent on the success of
+the previous command, you can target the successful targets with the `success`
+value.
+
+_\*nix shell command_
+
+```shell
+bolt task run restart_server --targets servers --rerun success
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltTask -Name restart_server -Targets servers -Rerun success
+``` 
+
+#### Disable `.rerun.json`
+
+If you want to preserve the results of a specific Bolt run and run multiple
+`rerun` commands against it, you can disable the `.rerun.json` file.
+
+_\*nix shell command_
+
+Use the `--no-save-rerun` option to disable saving the rerun file:
+
+```shell
+bolt task run restart_server --targets server --rerun success --no-save-rerun
+```
+_PowerShell cmdlet_
+
+Use the `-SaveRerun` argument with a value of `$false` to disable saving the
+rerun file:
+
+```powershell
+Invoke-BoltTask -Name restart_server -Targets servers -Rerun success -SaveRerun:$false
+```
+
+## Specify connection credentials
+
+To establish connections with remote targets, Bolt needs to provide credentials
+to the target. You can provide credentials at the command line or in an
+inventory file, and the credentials you provide might vary based on the
+operating system the target is running.
+
+Whether a target is running a Unix-like operating system or Windows, the
+simplest way to specify credentials is to pass the `user` and `password`
+to the Bolt command:
+
+_\*nix shell command_
+
+```shell
+bolt command run 'pwd' --targets servers --user bolt --password puppet
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command 'pwd' -Targets servers -User bolt -Password puppet
+```
+
+If you'd prefer to have Bolt securely prompt for a password, so that it does not
+appear in a process listing or on the console, use the `password-prompt` option
+instead:
+
+_\*nix shell command_
+
+```shell
+bolt command run 'pwd' --targets servers --user bolt --password-prompt
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command 'pwd' -Targets servers -User bolt -PasswordPrompt
+```
+
+## Specify a transport
+
+Bolt uses a specific transport to establish a connection with a target. By
+default, Bolt connects to targets using the `ssh` transport. You can use one of
+the methods below to set a different transport from the command line, or you can
+configure transports in your inventory file.
+
+You can specify the transport used to connect to a specific target by setting
+it as the protocol in the target's URI:
+
+_\*nix shell command_
+
+```shell
+bolt command run 'Get-Location' --targets winrm://windows.example.org
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command 'Get-Location' -Targets winrm://windows.example.org
+```
+
+You can also use the `transport` command-line option:
+
+_\*nix shell command_
+
+```shell
+bolt command run 'Get-Location' --targets windows.example.org --transport winrm
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command 'Get-Location' -Targets windows.example.org -Transport winrm
+```
+
+📖 **Related information**
+
+- [Bolt transports reference](bolt_transports_reference.md)
+
+## Run a script
+
+When you run a script on a remote target, Bolt copies the script from your
+workstation to a temporary directory on the target, runs the script, and then
+deletes the script from the target.
+
+You can run scripts in any language, as long as the appropriate interpreter is
+installed on the remote system. This includes scripting languages such as Bash,
+PowerShell, Python, and Ruby.
+
+To run a script, provide the path to the script on the workstation and a list of
+targets to run the script on.
+
+_\*nix shell command_
+
+```shell
+bolt script run ./scripts/configure.sh --targets servers
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltScript -Script ./scripts/configure.ps1 -Targets servers
+```
+
+### Pass arguments to a script
+
+Argument values are passed literally and are not interpolated by the shell on
+the remote host.
+
+_\*nix shell command_
+
+To pass arguments to a script, specify them after the command:
+
+```shell
+bolt script run ./scripts/configure.sh --targets servers arg1 arg2
+```
+
+_PowerShell cmdlet_
+
+To pass arguments to a script, use the `-Arguments` parameter:
+
+```powershell
+Invoke-BoltScript -Script ./scripts/configure.sh -Targets servers -Arguments arg1 arg2
+```
+
+> 🔩 **Tip:** If an argument contains spaces or special characters, wrap them
+> in single quotes.
+
+### Requirements for running a script
+
+Depending on a target's operating system, there are additional requirements for
+running scripts:
+
+- On Unix-like targets, your scripts must include a shebang line specifying the
+  interpreter. For example, a Bash script should provide the path to the Bash
+  interpreter:
+
+  ```bash
+  #!/bin/bash
+  echo hello
+  ```
+
+- For Windows targets, you might need to enable file extensions. By default,
+  Windows targets support the extensions `.ps1`, `.rb`, and `.pp`. To add
+  additional file extensions, add them to the `winrm` configuration section of
+  your inventory file:
+
+  ```yaml
+  # inventory.yaml
+  config:
+    winrm:
+      extensions:
+        - .py
+        - .pl
+  ```
+
+## Run a task
+
+Tasks are single actions that you can execute on a target. They are similar
+to scripts, but have metadata, accept structured input, and return structured
+output. You can write tasks that are specific to your project or download
+modules from the Puppet Forge that include tasks.
+
+To run a task, provide the name of the task and a list of targets to run the
+task on.
+
+_\*nix shell command_
+
+```shell
+bolt task run facts --targets servers
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltTask -Name facts -Targets servers
+```
+
+### Pass parameters to a task
+
+If a task accepts parameters, you can pass them to Bolt as part of the command.
+
+_\*nix shell command_
+
+To pass parameters to a task, add parameter declarations of the form
+`parameter=value` to the command:
+
+```shell
+bolt task run package action=status name=apache2 --targets servers
+```
+
+_PowerShell cmdlet_
+
+To pass parameters to a task, add an object with parameter declarations to
+the command:
+
+```powershell
+Invoke-BoltTask -Name package -Targets servers -Params @{action='status';name='apache2'}
+```
+
+📖 **Related information**
+
+- [Running tasks](bolt_running_tasks.md)
+- [Writing tasks](writing_tasks.md)
+- [Installing modules](bolt_installing_modules.md)
+
+## Run a plan
+
+Plans are sets of tasks and commands that can be combined with other logic. They
+allow you to do complex operations, such as running multiple tasks with one
+command, computing values for the input for a task, or running certain tasks
+based on the results of another task. Similar to tasks, you can write plans that
+are specific to your project or download modules from the Puppet Forge that
+include plans.
+
+To run a plan, provide the name of the plan.
+
+_\*nix shell command_
+
+```shell
+bolt plan run myplan
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltPlan -Name myplan
+```
+
+### Pass parameters to a plan
+
+If a plan accepts parameters, you can pass them to Bolt as part of the command.
+
+_\*nix shell command_
+
+To pass parameters to a plan, add parameter declarations of the form
+`parameter=value` to the command:
+
+```shell
+bolt plan run reboot targets=servers
+```
+
+_PowerShell cmdlet_
+
+To pass parameters to a task, add an object with parameter declarations to
+the command:
+
+```powershell
+Invoke-BoltTask -Name reboot -Params @{targets='servers'}
+```
+
+### Pass targets to a plan parameter 
+
+If a plan accepts a `targets` parameter with the type `TargetSpec`, you can
+use the `targets` command-line option to provide a value to the parameter.
+
+_\*nix shell command_
+
+```shell
+bolt task run reboot --targets servers
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltPlan -Name reboot -Targets servers
+```
+
+📖 **Related information**
+
+- [Running plans](bolt_running_plans.md)
+- [Writing YAML plans](writing_yaml_plans.md)
+- [Writing plans in the Puppet language](writing_plans.md)
+- [Installing modules](bolt_installing_modules.md)
+
+## Upload a file or directory
+
+Bolt can copy files and directories from your workstation to remote targets. To
+upload a file or directory, provide the `source` path on your workstation, the
+`destination` path on the remote target that it should be copied to, and a
+list of targets.
+
+Both the `source` and `destination` accept absolute and relative paths. If you
+provide a relative path as the `destination`, Bolt will copy the file relative
+to the current working directory on the target. Typically, the current working
+directory for the target is the log-in user's home directory.
+
+_\*nix shell command_
+
+```shell
+bolt file upload /path/to/source /path/to/destination --targets servers
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Send-BoltFile -Source /path/to/source -Destination /path/to/destination -Targets servers
+```
+
+## Download a file or directory
+
+Bolt can copy files and directories from remote targets to a destination
+directory on your workstation. To download a file or directory, provide the
+`source` path on the remote target, the path to the `destination` directory on
+the workstation, and a list of targets.
+
+Both the `source` and `destination` accept absolute and relative paths. If you
+provide a relative path as the `source`, Bolt will copy the file relative to the
+current working directory on the target. Typically, the current working
+directory for the target is the log-in user's home directory.
+
+_\*nix shell command_
+
+```shell
+bolt file download /path/to/source /path/to/destination --targets servers
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Receive-BoltFile -Source /path/to/source -Destination /path/to/destination -Targets servers
+```
+
+The `destination` on the workstation is a path to a directory that the downloaded
+file or directory is copied to. If the `destination` directory does not exist,
+Bolt will create it for you.
+
+Bolt saves each file or directory it downloads to a subdirectory of the
+`destination` directory that matches the URL-encoded name of the target it was
+downloaded from. The target directory names are URL-encoded to ensure that they
+are valid directory names.
+
+For example, the following command downloads the SSH daemon configuration file from
+two targets, `linux` and `ssh://example.com`, saving it to the destination
+directory `sshd_config`:
+
+_\*nix shell command_
+
+```shell
+bolt file download /etc/ssh/sshd_config sshd_config --targets linux,ssh://example.com
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Receive-BoltFile -Source /etc/ssh/sshd_config -Destination sshd_config -Targets linux,ssh://example.com
+```
+
+After running this command from the root of your project directory, your project
+directory structure would look similar to this:
+
+```shell
 .
 ├── bolt-project.yaml
 ├── inventory.yaml
@@ -203,216 +554,51 @@ $ tree
         └── sshd_config
 ```
 
-> 🔩 **Tip:** To avoid URL encoding the target's safe name, give the target a
-> simple, human-readable name in your inventory file.
+> 🔩 **Tip:** To avoid creating directories with special characters, give your
+> targets a simple, human-readable name.
 
-## Adding options to Bolt commands
+## Apply Puppet code
 
-Bolt commands can accept several command line options, some of which are
-required.
+### Apply Puppet code from a file
 
-### Specify targets
+You can directly apply Puppet code from a file containing Puppet code (known as
+a manifest) to your targets. To apply Puppet manifest code to a target, provide
+the path to the manifest file and a list of targets.
 
-Specify the targets that you want Bolt to target.
+The Puppet Agent package needs to be installed on the target for the manifest
+code to be run. When you apply Puppet manifest code, Bolt ensures that the
+Puppet Agent package is installed on the target.
 
-For most  Bolt commands, you specify targets with the `--targets` flag, for
-example, `--targets mercury`. For plans, you specify targets as a list within
-the task plan itself or specify them as regular parameters,
-like `targets=neptune`.
+_\*nix shell command_
 
-When targeting systems with the `--targets` flag, you can specify the transport
-either in the target URL for each host, such as `--targets
-winrm://mywindowstarget.mydomain`, or set a default transport for the operation
-with the`--transport` option. If you do not specify a transport it will default
-to `ssh`.
-
-#### Specify targets in the command line
-
--   To specify multiple targets with the `--targets` flag, use a comma-separated
-    list of targets:
-    ```
-    --targets neptune,saturn,mars
-    ```
-
--   To generate a target list with brace expansion, specify the target list with
-    an equals sign (`=`), such as `--targets=web{1,2}`.
-    ```
-     bolt command run --targets={web{5,6,7},elasticsearch{1,2,3}.subdomain}.mydomain.edu  
-    ```
-    This command runs Bolt on the following hosts:
-    -   elasticsearch1.subdomain.mydomain.edu
-    -   elasticsearch2.subdomain.mydomain.edu
-    -   elasticsearch3.subdomain.mydomain.edu
-    -   web5.mydomain.edu
-    -   web6.mydomain.edu
-    -   web7.mydomain.edu
-
--   To pass targets to Bolt in a file, pass the file name and relative location
-    with the `--targets` flag and an `@` symbol:
-    ```
-    bolt command run --targets @targets.txt
-    ```
-
-    For Windows PowerShell, add single quotation marks to define the file:
-    ```
-    bolt command run --targets '@targets.txt'
-    ```
-
--   To pass targets on `stdin`, on the command line, use a command to generate a
-    target list, and pipe the result to Bolt with `-` after `--targets`:
-    ```
-    <COMMAND> | bolt command run --targets -
-    ```
-
-    For example, if you have a target list in a text file:
-    ```
-    cat targets.txt | bolt command run --targets -
-    ```
-
--   To pass targets as IP addresses, use `protocol://user:password@host:port` or
-    inventory group name. You can use a domain name or IP address for `host`,
-    which is required. Other parameters are optional.
-    ```
-    bolt command run --targets ssh://user:password@[fe80::34eb:ff1:b584:d7c0]:22,
-    ssh://root:password@hostname, pcp://host01, winrm://Administrator:password@hostname
-    ```
-
-
-#### Specify targets from an inventory file
-
-To specify targets from an inventory file, reference targets by target name, a
-glob matching names in the file, or the name of a group of targets.
--   To match all targets in both groups listed in the inventory file example:
-    ```
-    --targets elastic_search,web_app
-    ```
--   To match all the targets that start with "elasticsearch" in the inventory
-    file example:
-    ```
-    --targets 'elasticsearch*' 
-    ```
-
-This inventory file defines two top-level groups: elastic_search and web_app.
-```yaml
-groups:
-  - name: elastic_search
-    targets:
-      - elasticsearch1.subdomain.mydomain.edu
-      - elasticsearch2.subdomain.mydomain.edu
-      - elasticsearch3.subdomain.mydomain.edu
-  - name: web_app
-    targets:
-      - web5.mydomain.edu
-      - web6.mydomain.edu
-      - web7.mydomain.edu
+```shell
+bolt apply manifests/servers.pp --targets servers
 ```
 
-📖 **Related information**  
+_PowerShell cmdlet_
 
-[Inventory file](inventory_file_v2.md)
-
-### Set a default transport
-
-To set a default transport protocol, pass it with the command with the
-`--transport` option.
-
-Available transports are:
--   `ssh`
--   `winrm`
--   `local`
--   `docker`
--   `pcp`
-
-Pass the `--transport` option after the targets list:
-```
-bolt command run <COMMAND> --targets win1 --transport winrm
+```powershell
+Invoke-BoltApply -Manifest manifests/servers.pp -Targets servers
 ```
 
-This sets the transport protocol as the default for this command. If you set
-this option when running a plan, it is treated as the default transport for the
-entire plan run. Any targets passed with transports in their URL or transports
-configured in inventory do not use this default.
+### Apply Puppet code from the command line
 
-This is useful on Windows, so that you do not have to include the `winrm`
-transport for each target. To override the default transport, specify the
-protocol on a per-host basis:
-```
-bolt command run facter --targets win1,ssh://linux --transport winrm
-```
+You can also apply Puppet code directly to your targets, without the need
+for writing it to a file first. To apply Puppet code directly to a target,
+use the `execute` command-line option.
 
-If `localhost` is passed to `--targets` when invoking Bolt,
-the `local` transport is used automatically. To avoid this behavior, prepend the
-target with the desired transport, for example `ssh://localhost`.
+_\*nix shell command_
 
-
-### Specify connection credentials
-
-To manage a target with Bolt, you must specify credentials for a user on the
-target. You have several options for doing this, depending on which operating
-system the target is running.
-
-Whether the target runs Linux or Windows, the simplest way to specify
-credentials is to pass the username and password right in the Bolt command:
-```
-bolt command run 'hostname' --targets <LINUX_TARGETS> --user <USER> --password <PASSWORD>
+```shell
+bolt apply --execute "file { '/etc/puppetlabs': ensure => present }" --targets servers
 ```
 
-If you'd prefer to have Bolt securely prompt for a password (so that it won't
-appear in a process listing or on the console), use the `--password-prompt`
-option without including a value:
-```
-bolt command run 'hostname' --targets <LINUX_TARGETS> --user <USER> --password-prompt
-```
+_PowerShell cmdlet_
 
-If the target runs Linux, you can use a username and a public/private key pair
-instead of a password:
-```
-bolt command run 'hostname' --targets <LINUX_TARGETS> --user <USER> --private_key <PATH_TO_PRIVATE_KEY>
+```powershell
+Invoke-BoltApply -Execute "file { '/etc/puppetlabs': ensure => present}" -Targets servers
 ```
 
-> 🔩 **Tip:** For more information on creating these keys, see [GitHub's clear
-> tutorial](https://help.github.com/en/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
+📖 **Related information**
 
-If the target runs Linux, you can use an SSH configuration file (typically at
-`~/.ssh/config`) to specify a default username and private key for the remote
-target.
-
-> 🔩 **Tip:** A good guide to using SSH config files is the [Simplify Your Life
-> With an SSH Config
-> File](https://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/)
-> blogpost on the Nerdarati blog.
-
-If the host target runs Linux, the target runs Windows, and your network uses
-Kerberos for authentication, you can specify a Kerberos realm in your
-[inventory file](inventory_file_v2.md). The best source of information and
-examples for this advanced topic is the [Kerberos
-section](https://github.com/puppetlabs/bolt/blob/main/developer-docs/kerberos.md)
-of the Bolt developer documentation.
-
-### Rerunning commands based on the last result
-
-After every execution, Bolt writes information about the result of that run to a
-`.rerun.json` file inside the Bolt project directory. That file can then be used
-to specify targets for future commands.
-
-To attempt to retry a failed action on targets, use `--rerun failure`. To
-continue targeting those targets, pass `--no-save-rerun` to prevent updating the
-file.
-```shell script
-bolt command run false --targets all
-bolt command run whoami --rerun failure --no-save-rerun
-```
-
-If one command is dependent on the success of a previous command, you can target
-the successful targets with `--rerun success`.
-```shell script
-bolt task run package action=install name=httpd --targets all
-bolt task run server action=restart name=httpd --rerun success
-```
-
-**Note:** When a plan does not return a `ResultSet` object, Bolt can't save
-information for reruns and `.rerun.json` is deleted.
-
-📖 **Related information**  
-
-[Bolt projects](projects.md)
+- [Applying Puppet code](applying_manifest_blocks.md)

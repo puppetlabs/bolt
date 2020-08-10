@@ -1,10 +1,21 @@
 # Bolt command reference
 
+## Command syntax
+
+Bolt shell commands follow a noun-verb convention.
+
+To view a full list of
+available commands, use the `bolt help` command:
+
+```shell
+bolt help
+```
+
+## Commands
 These subcommands, actions, and options are available for Bolt.
 
-
 <% @commands.each do |key, val| %>
-## <%= key %>
+### <%= key %>
 
 <%= val[:desc] %>
 
