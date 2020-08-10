@@ -1,5 +1,50 @@
 # Changelog
 
+## Bolt 2.22.0 (2020-08-10)
+
+### New features
+
+* **Use `-Name` parameters in PowerShell task and plan cmdlets**
+  ([#2049](https://github.com/puppetlabs/bolt/issues/2049))
+
+  The `Get|Invoke-BoltTask` and `Get|Invoke-BoltPlan` cmdlets now use
+  a `-Name` parameter instead of `-Task` and `-Plan` to specify the
+  name of a task or plan.
+
+* **Create new project-level YAML plans with `bolt plan new`**
+  ([#2004](https://github.com/puppetlabs/bolt/issues/2004))
+
+  Users can now quickly get started with writing a new project-level
+  YAML plan using the `bolt plan new` command. The command accepts a
+  single argument, the name of the plan to be generated, and creates the
+  necessary directories and file in the project's `plans` directory.
+
+  > **Note:** This feature is experimental and is subject to change.
+
+### Bug fixes
+
+* **Do not modify order of plan variables in catalog compilation**
+  ([#2025](https://github.com/puppetlabs/bolt/issues/2025))
+
+  Bolt will no longer error during catalog compilation when a plan
+  variable shares the same name as a target variable. Previously, Bolt
+  would modify the order plan variables were listed in a catalog if they
+  shared the name of a target variable, causing catalog compilation to
+  fail when deserializing variables.
+
+* **Fix parameter description parsing in PowerShell module**
+  ([#2049](https://github.com/puppetlabs/bolt/issues/2049))
+
+  Removes encoding HTML special characters from the parameter description
+  fields in the PowerShell module.
+
+* **Reject multi-line project names**
+  ([#2061](https://github.com/puppetlabs/bolt/pull/2061))
+
+  Previously, Bolt would accept a multi-line string as a project name,
+  causing multiple errors. Bolt will now reject multi-line strings as
+  project names.
+
 ## Bolt 2.21.0 (2020-08-03)
 
 ### New features
