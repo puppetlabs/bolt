@@ -3,6 +3,7 @@
 require 'pathname'
 require 'bolt/config'
 require 'bolt/pal'
+require 'bolt/module'
 
 module Bolt
   class Project
@@ -17,7 +18,7 @@ module Bolt
 
     attr_reader :path, :data, :config_file, :inventory_file, :modulepath, :hiera_config,
                 :puppetfile, :rerunfile, :type, :resource_types, :warnings, :project_file,
-                :deprecations, :downloads
+                :deprecations, :downloads, :plans_path
 
     def self.default_project
       create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
@@ -82,6 +83,7 @@ module Bolt
       @resource_types = @path + '.resource_types'
       @type = type
       @downloads = @path + 'downloads'
+      @plans_path = @path + 'plans'
 
       tc = Bolt::Config::INVENTORY_OPTIONS.keys & raw_data.keys
       if tc.any?
@@ -138,11 +140,9 @@ module Bolt
 
     def validate
       if name
-        name_regex = /^[a-z][a-z0-9_]*$/
-        if name !~ name_regex
-          raise Bolt::ValidationError, <<~ERROR_STRING
-          Invalid project name '#{name}' in bolt-project.yaml; project name must match #{name_regex.inspect}
-          ERROR_STRING
+        if name !~ Bolt::Module::MODULE_NAME_REGEX
+          raise Bolt::ValidationError, "Invalid project name #{name.inspect.tr('"', "'")} in bolt-project.yaml; "\
+                                       "project name must match #{Bolt::Module::MODULE_NAME_REGEX.inspect}"
         elsif Dir.children(Bolt::PAL::BOLTLIB_PATH).include?(name)
           raise Bolt::ValidationError, "The project '#{name}' will not be loaded. The project name conflicts "\
             "with a built-in Bolt module of the same name."

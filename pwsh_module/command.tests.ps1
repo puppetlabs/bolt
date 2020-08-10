@@ -34,7 +34,7 @@ Describe "test bolt module" {
 
     it "has the correct number of exported functions" {
       # should count of pwsh functions plus legacy `bolt` function
-      @($commands).Count | Should -Be 21
+      @($commands).Count | Should -Be 22
     }
   }
 }
@@ -188,6 +188,10 @@ Describe "test all bolt command examples" {
       Write-Warning 'requires params to not be positionl...is that a problem'
       $result = Invoke-BoltPlan -name 'canary' -targets 'target1,target2' -params @{ 'command' = 'hostname' }
       $result | Should -Be "bolt plan run 'canary' --targets 'target1,target2' --params '{`"command`":`"hostname`"}'"
+    }
+    It "bolt plan new myproject::myplan" {
+      $result = New-BoltPlan -name 'myproject::myplan'
+      $result | Should -Be "bolt plan new 'myproject::myplan'"
     }
   }
 

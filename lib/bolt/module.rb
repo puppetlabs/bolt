@@ -3,7 +3,8 @@
 # Is this Bolt::Pobs::Module?
 module Bolt
   class Module
-    MODULE_NAME_REGEX = /\A[a-z][a-z0-9_]*\z/.freeze
+    CONTENT_NAME_REGEX = /\A[a-z][a-z0-9_]*(::[a-z][a-z0-9_]*)*\z/.freeze
+    MODULE_NAME_REGEX  = /\A[a-z][a-z0-9_]*\z/.freeze
 
     def self.discover(modulepath)
       modulepath.each_with_object({}) do |path, mods|
