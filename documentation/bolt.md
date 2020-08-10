@@ -54,7 +54,8 @@ you are not required to install any agent software.
     <p>Learn the basics
         <ul>
             <li><a class="xref" href="getting_started_with_bolt.md">Getting started with Bolt</a></li>
-            <li><a class="xref" target="_blank" href="https://learn.puppet.com/course/puppet-orchestration-bolt-and-tasks?_ga=2.158319738.1526297716.1533055277-261802629.1531434605">Online training</a> - Learn how to use Bolt to run a command, a script, and a task.</li>
+            <li><a class="xref" href="bolt_examples.md">Bolt examples</a> - Guided examples of how Bolt can help you automate common tasks.</li>
+            <li><a href="https://github.com/puppetlabs/bolt-examples">Bolt example repo</a> - A curated repo of common Bolt patterns that you can use to reference syntax and structure.</li>
         </ul>
     </p>
     <p>Watch Bolt development

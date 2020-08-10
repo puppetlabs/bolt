@@ -356,3 +356,6 @@ dashboard. You can sign in with the following credentials (from
 - password: `boltIsAwesome`.
 
 Congratulations! You've deployed a TIG Stack with Bolt!
+
+> **Note:** Do you have a real-world use case for Bolt that you'd like to share? Reach out to us in the #bolt
+  channel on [Slack](https://slack.puppet.com).
