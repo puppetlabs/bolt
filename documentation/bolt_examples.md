@@ -98,7 +98,7 @@ list of targets and target specific data.
 
     You can also configure a variety of options for Bolt in `bolt-project.yaml`. For more
     information about configuration see [Configuring Bolt](configuring_bolt.md). For more
-    information about Bolt projects see [Bolt project directories](bolt_project_directories.md)
+    information about Bolt projects see [Bolt projects](projects.md)
 
 
 ### 3. Convert your script to a Bolt task
@@ -200,7 +200,7 @@ In this example, you:
 ### 1. Build a project-specific configuration
 
 Bolt runs in the context of a [Bolt project
-directory](bolt_project_directories.md). This directory contains all of the
+directory](projects.md). This directory contains all of the
 configuration, code, and data loaded by Bolt.
 
 1. Create a module called `bolt_choco_example`

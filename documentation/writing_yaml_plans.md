@@ -4,9 +4,6 @@ YAML plans run a list of steps in order, which allows you to define simple
 workflows. Steps can contain embedded Puppet code expressions to add logic where
 necessary.
 
-**Note:** YAML plans are an experimental feature and might experience breaking
-changes in future minor (y) releases.
-
 ## Naming plans
 
 Plan names are named based on the filename of the plan, the name of the module

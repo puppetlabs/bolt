@@ -36,26 +36,22 @@ You can set all configurable options in Bolt at the project level, and any optio
 you set within a project only apply to that project. 
 
 Bolt loads project-level configuration files from the root of your [Bolt project
-directory](bolt_project_directories.md). If it can't find a project directory,
+directory](projects.md). If it can't find a project directory,
 Bolt uses the default project directory: `~/.puppetlabs/bolt/`.
 
 You can set project-level configuration in three files: 
 - For Bolt configuration, use `bolt-project.yaml`.
 - For inventory configuration, use `inventory.yaml`.
 - You can set all configuration in a `bolt.yaml` file at the root of your
-  project directory. **The project-level `bolt.yaml` file is on the path towards
-  deprecation and will be removed in a future version of Bolt.** Use
-  `bolt-project.yaml` and `inventory.yaml` files instead.
+  project directory. ⛔ **The project-level `bolt.yaml` file is deprecated and
+  will be removed in a future version of Bolt.** Use `bolt-project.yaml` and
+  `inventory.yaml` files instead.
 
 The preferred method for setting project-level configuration is to use a
 combination of `bolt-project.yaml` and `inventory.yaml` files. This maintains
 a clear distinction between Bolt configuration and inventory configuration.
 
 ### `bolt-project.yaml`
-
-> **Note:** The `bolt-project.yaml` file is experimental and is subject to
-> change. You can read more about Bolt projects in [Experimental
-> features](experimental_features.md).
 
 **Filepath:** `<project-directory>/bolt-project.yaml`
 
@@ -64,7 +60,7 @@ such as how many threads it can use when running commands on targets. You can
 also use `bolt-project.yaml` to configure different components of the project,
 such as a list of plans and tasks that are visible to the user. Any directory
 containing a `bolt-project.yaml` file is automatically considered a [Project
-directory](bolt_project_directories.md).
+directory](projects.md).
 
 Project configuration files take precedence over `bolt.yaml` files. If a
 project directory contains both files, Bolt will only load and read
@@ -95,18 +91,18 @@ under a `config` option. You can set the following options under `config`:
 You can view a full list of the available options in [`inventory.yaml`
 fields](bolt_inventory_reference.md).
 
-### DEPRECATED: `bolt.yaml`
+### ⛔ `bolt.yaml`
 
-> **Note:** The project-level `bolt.yaml` file is on the path towards
-> deprecation and will be removed in a future version of Bolt. Use
-> `bolt-project.yaml` and `inventory.yaml` files instead.
+⛔ The project-level `bolt.yaml` file is deprecated and will be removed in a
+future version of Bolt. Use `bolt-project.yaml` and `inventory.yaml` files
+instead.
 
 **Filepath:** `<project-directory>/bolt.yaml`
 
 The Bolt configuration file can be used to set all available configuration
 options, including default inventory configuration options. Any directory
 containing a `bolt.yaml` file is automatically considered a [Project
-directory](bolt_project_directories.md).
+directory](projects.md).
 
 You can view a full list of the available options in [`bolt.yaml`
 options](bolt_configuration_reference.md).
@@ -147,10 +143,10 @@ read configuration from `bolt-defaults.yaml`.
 You can view a full list of the available options in [`bolt-defaults.yaml`
 options](bolt_defaults_reference.md).
 
-### DEPRECATED: `bolt.yaml`
+### ⛔ `bolt.yaml`
 
-> **Note:** The user-level `bolt.yaml` file is deprecated and will be removed
-> in a future version of Bolt. Use a `bolt-defaults.yaml` file instead.
+⛔ The user-level `bolt.yaml` file is deprecated and will be removed
+in a future version of Bolt. Use a `bolt-defaults.yaml` file instead.
 
 **Filepath:** `~/.puppetlabs/etc/bolt/bolt.yaml`
 
@@ -170,7 +166,7 @@ Bolt options at the system level.
 
 System-wide configuration can be set in two files.
 - Use `bolt-defaults.yaml` for configuration that is not project-specific.
-- You can set all configuration in a `bolt.yaml` file. **The system-level
+- You can set all configuration in a `bolt.yaml` file. ⛔ **The system-level
   `bolt.yaml` file is deprecated and will be removed in a future version of
   Bolt. Use `bolt-defaults.yaml` instead.** 
 
@@ -196,10 +192,10 @@ read configuration from `bolt-defaults.yaml`.
 You can view a full list of the available options in [`bolt-defaults.yaml`
 options](bolt_defaults_reference.md).
 
-### DEPRECATED: `bolt.yaml`
+### ⛔ `bolt.yaml`
 
-> **Note:** The system-wide `bolt.yaml` file is deprecated and will be removed
-> in a future version of Bolt. Use a `bolt-defaults.yaml` file instead.
+⛔ The system-wide `bolt.yaml` file is deprecated and will be removed
+in a future version of Bolt. Use a `bolt-defaults.yaml` file instead.
 
 **\*nix Filepath:** `/etc/puppetlabs/bolt/bolt.yaml`
 
@@ -323,7 +319,7 @@ plugins:
 
 📖 **Related information**
 
-- [Project directories](bolt_project_directories.md#)
+- [Bolt projects](projects.md)
 - [bolt.yaml options](bolt_configuration_reference.md)
 - [bolt-defaults.yaml options](bolt_defaults_reference.md)
 - [bolt-project.yaml options](bolt_project_reference.md)

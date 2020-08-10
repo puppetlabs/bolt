@@ -1,4 +1,4 @@
-# Experimental features
+# 🧪 Experimental features
 
 Most larger Bolt features are released initially in an experimental or unstable
 state. This allows the Bolt team to gather feedback from real users quickly

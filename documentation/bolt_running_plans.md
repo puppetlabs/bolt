@@ -36,12 +36,9 @@ path. By default, Bolt looks for downloaded module plans in
 `<PROJECT_NAME>/site-modules/plans/`.
 
 Using a Bolt project, you can create a `<PROJECT_NAME>/bolt-project.yaml` file,
-develop your plan in `<PROJECT_NAME>/plans/`, and run Bolt from the root of
-your Bolt project directory to test the plan.
-
-> **Note**: The `bolt-project.yaml` file is part of an experimental feature. For
-> more information, see [Bolt
-> projects](./experimental_features.md#bolt-projects).
+develop your plan in `<PROJECT_NAME>/plans/`, and run Bolt from the root of your
+Bolt project directory to test the plan. For more information, see [Bolt
+projects](projects.md)
 
 ## Passing structured data into a plan
 
@@ -82,7 +79,7 @@ bolt plan run mymodule::myplan --targets app1.myorg.com --params $(@{load_balanc
 
 📖 **Related information**
 - For information on Bolt project directories, see [Bolt project
-  directories](#bolt_project_directories.md).
+  directories](projects.md).
 - For information on running Bolt tasks, see [Running
   tasks](./bolt_running_tasks.md).
 - To find out how to write your own plan, see [Writing plans in

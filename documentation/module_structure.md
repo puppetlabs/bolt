@@ -5,14 +5,10 @@ module in order for Bolt to load them. Bolt loads modules by searching for
 module directories on the module path.
 
 By default, the module path includes the `modules` and `site-modules`
-directories in the [Bolt project directory](bolt_project_directories.md#). If
-`bolt-project.yaml` exists at the root of the project directory and contains a
-`name` key, the project itself is also loaded as a module and namespaced to the
-value of `name`.
-
-> **Note:** The `bolt-project.yaml` file is part of an experimental feature. For
-> more information, see [Bolt
-> projects](./experimental_features.md#bolt-projects).
+directories in the Bolt project directory. If `bolt-project.yaml` exists at the
+root of the project directory and contains a `name` key, the project itself is
+also loaded as a module and namespaced to the value of `name`. For more
+information on `bolt-project.yaml`, see [Bolt projects](projects.md)
 
 ## Directory structure of a module
 

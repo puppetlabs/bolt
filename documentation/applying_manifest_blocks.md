@@ -358,7 +358,7 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
 
 - [NGINX](https://www.nginx.com/resources/glossary/nginx/)
 - [Specify targets](running_bolt_commands.md#adding-options-to-bolt-commands)
-- [Project directories](bolt_project_directories.md#)
+- [Bolt Projects](projects.md)
 
 
 ### Create a sample manifest for IIS on Windows
@@ -449,21 +449,21 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 
 - [IIS](https://www.iis.net)
 - [Specify targets](running_bolt_commands.md#adding-options-to-bolt-commands)
-- [Project directories](bolt_project_directories.md#)
+- [Bolt projects](projects.md)
 
-## Using Puppet device modules from an apply statement
+## 🧪 Using Puppet device modules from an apply statement
+
+🧪 **Note:** Support for device modules is experimental and might change in
+future minor (y) releases.
 
 Puppet device modules based on remote transports allow network devices and other
 targets that can't run a Puppet agent to be managed from a proxy.
 
-> **Note:** Support for device modules is experimental and might change in
-> future minor (y) releases.
-
 To use device modules from an apply statement, the devices must be added to the
 Bolt inventory as remote targets. The `name` of the target will be used to
 auto-populate the `name`, `uri`, `user`, `password`, `host`, and `port` fields
-of the remote transport's connnection info. You must set the `remote-transport`
-option and any other connnection info under the `remote` section of config.
+of the remote transport's connection info. You must set the `remote-transport`
+option and any other connection info under the `remote` section of config.
 
 ```yaml
 targets:

@@ -150,7 +150,7 @@ these core modules.
 - For more details about specifying modules in a Puppetfile, see the [Puppetfile
   documentation](https://puppet.com/docs/pe/latest/puppetfile.html).
 - For more information on structuring your Bolt project directory, see [Bolt
-  project directories](./bolt_project_directories.md).  
+  project directories](./projects.md).  
 - Search the [Puppet Forge](https://forge.puppet.com/) for plan and task
   content.
 - For an example of a Puppetfile, see the [Bolt

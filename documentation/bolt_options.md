@@ -208,4 +208,4 @@ information for reruns and `.rerun.json` is deleted.
 
 📖 **Related information**  
 
-[Project directories](bolt_project_directories.md#)
+[Bolt projects](projects.md)
