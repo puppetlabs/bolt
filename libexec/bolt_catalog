@@ -40,7 +40,7 @@ when "compile"
   request = if ARGV[1]
               File.open(ARGV[1]) { |fh| JSON.parse(fh.read) }
             else
-              JSON.parse(STDIN.read)
+              JSON.parse($stdin.read)
             end
   begin
     catalog = Bolt::Catalog.new.compile_catalog(request)

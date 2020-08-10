@@ -6,7 +6,7 @@ require 'puppet'
 require 'puppet/module_tool/tar'
 require 'tempfile'
 
-args = JSON.parse(STDIN.read)
+args = JSON.parse($stdin.read)
 
 RESOURCE_INSTANCE = /^([^\[]+)\[([^\]]+)\]$/.freeze
 

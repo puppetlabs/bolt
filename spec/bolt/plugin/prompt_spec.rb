@@ -14,9 +14,9 @@ describe Bolt::Plugin::Prompt do
   end
 
   it 'prompts for data on STDERR when executed' do
-    allow(STDIN).to receive(:noecho).and_return(password)
-    allow(STDERR).to receive(:puts)
-    expect(STDERR).to receive(:print).with("#{prompt_data['message']}: ")
+    allow($stdin).to receive(:noecho).and_return(password)
+    allow($stderr).to receive(:puts)
+    expect($stderr).to receive(:print).with("#{prompt_data['message']}: ")
 
     val = subject.resolve_reference(prompt_data)
     expect(val).to eq(password)

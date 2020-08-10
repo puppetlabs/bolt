@@ -18,9 +18,9 @@ module Bolt
       end
 
       def resolve_reference(opts)
-        STDERR.print("#{opts['message']}: ")
-        value = STDIN.noecho(&:gets).to_s.chomp
-        STDERR.puts
+        $stderr.print("#{opts['message']}: ")
+        value = $stdin.noecho(&:gets).to_s.chomp
+        $stderr.puts
 
         value
       end
