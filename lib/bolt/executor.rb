@@ -381,19 +381,19 @@ module Bolt
     end
 
     def prompt(prompt, options)
-      unless STDIN.tty?
+      unless $stdin.tty?
         raise Bolt::Error.new('STDIN is not a tty, unable to prompt', 'bolt/no-tty-error')
       end
 
-      STDERR.print("#{prompt}: ")
+      $stderr.print("#{prompt}: ")
 
       value = if options[:sensitive]
-                STDIN.noecho(&:gets).to_s.chomp
+                $stdin.noecho(&:gets).to_s.chomp
               else
-                STDIN.gets.to_s.chomp
+                $stdin.gets.to_s.chomp
               end
 
-      STDERR.puts if options[:sensitive]
+      $stderr.puts if options[:sensitive]
 
       value
     end

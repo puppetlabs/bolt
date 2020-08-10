@@ -448,7 +448,7 @@ describe "Bolt::CLI" do
          bar
         NODES
         cli = Bolt::CLI.new(%w[command run uptime --targets -])
-        allow(STDIN).to receive(:read).and_return(nodes)
+        allow($stdin).to receive(:read).and_return(nodes)
         options = cli.parse
         cli.update_targets(options)
         expect(options[:targets]).to eq(targets)
@@ -588,9 +588,9 @@ describe "Bolt::CLI" do
 
     describe "password-prompt" do
       it "prompts the user for password" do
-        allow(STDIN).to receive(:noecho).and_return('opensesame')
-        allow(STDERR).to receive(:print).with('Please enter your password: ')
-        allow(STDERR).to receive(:puts)
+        allow($stdin).to receive(:noecho).and_return('opensesame')
+        allow($stderr).to receive(:print).with('Please enter your password: ')
+        allow($stderr).to receive(:puts)
         cli = Bolt::CLI.new(%w[command run uptime --targets foo --password-prompt])
         expect(cli.parse).to include(password: 'opensesame')
       end
@@ -796,9 +796,9 @@ describe "Bolt::CLI" do
 
     describe "sudo password-prompt" do
       it "prompts the user for escalation password" do
-        allow(STDIN).to receive(:noecho).and_return('opensesame')
-        allow(STDERR).to receive(:print).with('Please enter your privilege escalation password: ')
-        allow(STDERR).to receive(:puts)
+        allow($stdin).to receive(:noecho).and_return('opensesame')
+        allow($stderr).to receive(:print).with('Please enter your privilege escalation password: ')
+        allow($stderr).to receive(:puts)
         cli = Bolt::CLI.new(%w[command run uptime --targets foo --sudo-password-prompt])
         expect(cli.parse).to include('sudo-password': 'opensesame')
       end
@@ -968,7 +968,7 @@ describe "Bolt::CLI" do
       it "reads json from stdin when --params is just '-'" do
         json_args = '{"kj":"2hv","iuhg":"iube","2whf":"lcv"}'
         cli = Bolt::CLI.new(%w[plan run my::plan --params - --modulepath .])
-        allow(STDIN).to receive(:read).and_return(json_args)
+        allow($stdin).to receive(:read).and_return(json_args)
         result = cli.parse
         expect(result[:task_options]).to eq('kj' => '2hv',
                                             'iuhg' => 'iube',

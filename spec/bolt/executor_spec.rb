@@ -482,24 +482,24 @@ describe "Bolt::Executor" do
     let(:response) { 'response' }
 
     it 'prompts for data on STDERR when executed' do
-      allow(STDIN).to receive(:tty?).and_return(true)
-      allow(STDIN).to receive(:gets).and_return(response)
-      expect(STDERR).to receive(:print).with("#{prompt}: ")
+      allow($stdin).to receive(:tty?).and_return(true)
+      allow($stdin).to receive(:gets).and_return(response)
+      expect($stderr).to receive(:print).with("#{prompt}: ")
 
       executor.prompt(prompt, {})
     end
 
     it 'does not show input when sensitive' do
-      allow(STDIN).to receive(:tty?).and_return(true)
-      allow(STDERR).to receive(:puts)
-      allow(STDERR).to receive(:print).with("#{prompt}: ")
-      expect(STDIN).to receive(:noecho).and_return(prompt)
+      allow($stdin).to receive(:tty?).and_return(true)
+      allow($stderr).to receive(:puts)
+      allow($stderr).to receive(:print).with("#{prompt}: ")
+      expect($stdin).to receive(:noecho).and_return(prompt)
 
       executor.prompt(prompt, sensitive: true)
     end
 
     it 'errors if STDIN is not a tty' do
-      allow(STDIN).to receive(:tty?).and_return(false)
+      allow($stdin).to receive(:tty?).and_return(false)
       expect { executor.prompt(prompt, {}) }.to raise_error(Bolt::Error, /STDIN is not a tty, unable to prompt/)
     end
   end

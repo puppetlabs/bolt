@@ -651,10 +651,10 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     let(:shell_cmd) { 'whoami' }
 
     it 'sets a password from a prompt and only executes a single concurrent delay' do
-      allow(STDIN).to receive(:noecho).and_return('bolt').once
-      allow(STDERR).to receive(:puts)
+      allow($stdin).to receive(:noecho).and_return('bolt').once
+      allow($stderr).to receive(:puts)
 
-      expect(STDERR).to receive(:print).with("password please: ").once
+      expect($stderr).to receive(:print).with("password please: ").once
 
       result = run_one_node(['command', 'run', shell_cmd, '--targets', 'target-1'] + config_flags)
       expect(result).to include('stdout' => "bolt\n")

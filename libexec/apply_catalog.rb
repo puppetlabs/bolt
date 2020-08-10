@@ -9,7 +9,7 @@ require 'puppet/module_tool/tar'
 require 'securerandom'
 require 'tempfile'
 
-args = JSON.parse(ARGV[0] ? File.read(ARGV[0]) : STDIN.read)
+args = JSON.parse(ARGV[0] ? File.read(ARGV[0]) : $stdin.read)
 
 # Create temporary directories for all core Puppet settings so we don't clobber
 # existing state or read from puppet.conf. Also create a temporary modulepath.
@@ -110,7 +110,7 @@ ensure
   begin
     FileUtils.remove_dir(puppet_root)
   rescue Errno::ENOTEMPTY => e
-    STDERR.puts("Could not cleanup temporary directory: #{e}")
+    $stderr.puts("Could not cleanup temporary directory: #{e}")
   end
 end
 

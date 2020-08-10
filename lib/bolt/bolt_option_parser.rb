@@ -694,9 +694,9 @@ module Bolt
         @options[:password] = password
       end
       define('--password-prompt', 'Prompt for user to input password') do |_password|
-        STDERR.print "Please enter your password: "
-        @options[:password] = STDIN.noecho(&:gets).chomp
-        STDERR.puts
+        $stderr.print "Please enter your password: "
+        @options[:password] = $stdin.noecho(&:gets).chomp
+        $stderr.puts
       end
       define('--private-key KEY', 'Path to private ssh key to authenticate with') do |key|
         @options[:'private-key'] = File.expand_path(key)
@@ -720,9 +720,9 @@ module Bolt
         @options[:'sudo-password'] = password
       end
       define('--sudo-password-prompt', 'Prompt for user to input escalation password') do |_password|
-        STDERR.print "Please enter your privilege escalation password: "
-        @options[:'sudo-password'] = STDIN.noecho(&:gets).chomp
-        STDERR.puts
+        $stderr.print "Please enter your privilege escalation password: "
+        @options[:'sudo-password'] = $stdin.noecho(&:gets).chomp
+        $stderr.puts
       end
       define('--sudo-executable EXEC', "Specify an executable for running as another user.",
              "This option is experimental.") do |exec|
@@ -905,7 +905,7 @@ module Bolt
         file = value.sub(/^@/, '')
         read_arg_file(file)
       elsif value == '-'
-        STDIN.read
+        $stdin.read
       else
         value
       end

@@ -6,7 +6,7 @@ require 'puppet'
 require 'puppet/module_tool/tar'
 require 'tempfile'
 
-args = JSON.parse(STDIN.read)
+args = JSON.parse($stdin.read)
 
 Dir.mktmpdir do |puppet_root|
   # Create temporary directories for all core Puppet settings so we don't clobber
