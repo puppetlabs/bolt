@@ -35,8 +35,7 @@ To install a module:
    2. Run the `bolt puppetfile install` command. Bolt installs modules to the
       first directory in the `modulepath` setting. By default, this is the
       `modules/` subdirectory inside the Bolt project directory. To override
-      this location, update the `modulepath` setting in the [Bolt config
-      file](bolt_configuration_reference.md).
+      this location, update the `modulepath` setting in your [project configuration file](bolt_project_reference.md).
 
 ## Create a new Bolt project and install a list of modules with dependencies
 
@@ -76,7 +75,17 @@ workflows.
 This list of packaged modules is available in a
 [Puppetfile](https://github.com/puppetlabs/bolt/blob/main/Puppetfile) in the
 Bolt repository. The modules and supporting documentation are publicly available
-on the [Puppet Forge](https://forge.puppet.com/).
+on the [Puppet Forge](https://forge.puppet.com/). 
+
+> 🔩 **Tip:** To see a list of all modules on your current module path, use
+> `bolt puppetfile show-modules`.
+
+Modules installed on your module path take precedence over packaged modules with
+the same name. If you need to use a specific version of a packaged module, you
+can override the packaged version by installing the module into your `modules/`
+directory. If you’ve altered the module path in your Bolt configuration, and you
+want to override a packaged module, your altered module path must include the
+directory where you’ve installed the module.
 
 **Note:** If you installed Bolt as a Ruby Gem, make sure you have installed
 these core modules.
@@ -131,18 +140,12 @@ these core modules.
     Collect facts for the specified targets from the configured PuppetDB
     connection and stores the collected facts on the targets.
 
-> 🔩 **Tip:** To override a packaged module with another version, download the
-> version you want and configure your module path to point to it.
-
 ### Modules that contain helper code for writing your own tasks
 
 -   [ruby_task_helper](https://forge.puppet.com/puppetlabs/ruby_task_helper): A
     helper for writing tasks in Ruby.
 -   [python_task_helper](https://forge.puppet.com/puppetlabs/python_task_helper):
     A helper for writing tasks in Python.
-
-> 🔩 **Tip:** To override a packaged module with another version, download the
-> version you want and configure your module path to point to it.
 
 📖 **Related information** 
 - For modules that require Ruby Gems, see [Install Gems with Bolt
