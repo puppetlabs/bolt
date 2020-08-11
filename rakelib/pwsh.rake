@@ -200,11 +200,11 @@ namespace :pwsh do
             validate_not_null_or_empty: true
           }
         when 'project'
-          # bolt project init [directory] [options]
+          # bolt project init [name] [options]
           @pwsh_command[:options] << {
-            name:                       'Directory',
-            ruby_short:                 'd',
-            help_msg:                   'The directory to turn into a Bolt project',
+            name:                       'Name',
+            ruby_short:                 'n',
+            help_msg:                   'The name of the Bolt project to create',
             mandatory:                  false,
             type:                       'string',
             switch:                     false,
