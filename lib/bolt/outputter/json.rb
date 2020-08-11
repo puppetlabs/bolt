@@ -121,10 +121,6 @@ module Bolt
         @stream.puts '}' if @object_open
       end
 
-      def print_message_event(event)
-        print_message(event[:message])
-      end
-
       def print_message(message)
         $stderr.puts(message)
       end
