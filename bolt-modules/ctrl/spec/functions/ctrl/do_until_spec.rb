@@ -31,4 +31,25 @@ describe 'ctrl::do_until' do
     end.and_return("truthy"))
     expect(seq.length).to eq(1)
   end
+
+  it 'sleeps with an interval' do
+    Kernel.expects(:sleep).with(1).times(2)
+
+    is_expected.to(run.with_params('interval' => 1).with_lambda do
+      seq.pop
+    end.and_return('truthy'))
+
+    expect(seq.length).to eq(1)
+  end
+
+  it 'does not sleep if first value is truthy' do
+    seq << 'truthy'
+    Kernel.expects(:sleep).never
+
+    is_expected.to(run.with_params('interval' => 1).with_lambda do
+      seq.pop
+    end.and_return('truthy'))
+
+    expect(seq.length).to eq(4)
+  end
 end
