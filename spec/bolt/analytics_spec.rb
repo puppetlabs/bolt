@@ -6,13 +6,13 @@ require 'bolt/analytics'
 describe Bolt::Analytics do
   let(:default_config) { {} }
 
-  before :each do
+  before :each do |test|
     # We use a hard override to disable analytics for tests, but that obviously
     # interferes with these tests...
     ENV.delete('BOLT_DISABLE_ANALYTICS')
 
     # Ensure these tests will never read or write a local config
-    allow(subject).to receive(:load_config).and_return(default_config)
+    allow(subject).to receive(:load_config).and_return(default_config) unless test.metadata[:load_config]
     allow(subject).to receive(:write_config)
   end
 
@@ -94,6 +94,15 @@ describe Bolt::Analytics do
       subject.build_client
 
       expect(@log_output.readlines).to include(/Detected analytics configuration files/)
+    end
+
+    it 'returns an empty hash if config file is empty', :load_config do
+      logger = double('logger')
+      allow(logger).to receive(:warn)
+
+      Tempfile.create('analytics.yaml', Dir.pwd) do |file|
+        expect(subject.load_config(file, logger)).to eq({})
+      end
     end
   end
 end
