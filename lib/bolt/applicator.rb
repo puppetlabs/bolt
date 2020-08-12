@@ -183,11 +183,10 @@ module Bolt
                                                                        type_by_reference: true,
                                                                        local_reference: true)
 
-      bolt_project = @project if @project&.name
       scope = {
         code_ast: ast,
         modulepath: @modulepath,
-        project: bolt_project.to_h,
+        project: @project.to_h,
         pdb_config: @pdb_client.config.to_hash,
         hiera_config: @hiera_config,
         plan_vars: plan_vars,

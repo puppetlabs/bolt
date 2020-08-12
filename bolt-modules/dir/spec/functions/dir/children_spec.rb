@@ -9,9 +9,9 @@ describe 'dir::children' do
 
   around(:each) do |example|
     Puppet[:tasks] = true
-    project = Struct.new(:name, :path).new('default', File.expand_path(path))
+    project = Struct.new(:name, :path, :load_as_module?).new('default', File.expand_path(path), true)
 
-    Puppet.override(bolt_project_data: project) do
+    Puppet.override(bolt_project: project) do
       example.run
     end
   end

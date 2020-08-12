@@ -57,8 +57,10 @@ module Bolt
 
     def compile_catalog(request)
       pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
-      project = request['project'] || {}
-      bolt_project = Struct.new(:name, :path).new(project['name'], project['path']) unless project.empty?
+      project = request['project']
+      bolt_project = Struct.new(:name, :path, :load_as_module?).new(project['name'],
+                                                                    project['path'],
+                                                                    project['load_as_module?'])
       inv = Bolt::ApplyInventory.new(request['config'])
       puppet_overrides = {
         bolt_pdb_client: pdb_client,

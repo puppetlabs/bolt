@@ -144,19 +144,11 @@ describe Bolt::PAL do
   end
 
   describe :in_bolt_compiler do
-    it "sets the bolt_project in the context if it has a name" do
+    it "sets the bolt_project in the context" do
       project = Bolt::Project.new({ 'name' => 'mytestproject' }, Dir.getwd)
       pal = Bolt::PAL.new(nil, nil, nil, 1, nil, {}, project)
       pal.in_bolt_compiler do
         expect(Puppet.lookup(:bolt_project).name).to eq('mytestproject')
-      end
-    end
-
-    it "doesn't set bolt_project in the context if it doesn't have a name" do
-      project = Bolt::Project.new({}, Dir.getwd)
-      pal = Bolt::PAL.new(nil, nil, nil, 1, nil, {}, project)
-      pal.in_bolt_compiler do
-        expect(Puppet.lookup(:bolt_project)).to be_nil
       end
     end
   end
