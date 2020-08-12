@@ -8,13 +8,6 @@ API may change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
 around breaking behavior where possible. 
 
-## Bolt projects
-
-This feature was introduced in [Bolt
-2.8.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-280-2020-05-05)
-
-For more information, see [Bolt projects](projects.md)
-
 ## `ResourceInstance` data type
 
 This feature was introduced in [Bolt
