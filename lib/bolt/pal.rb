@@ -151,7 +151,7 @@ module Bolt
         # Only load the project if it a) exists, b) has a name it can be loaded with
         Puppet.override(bolt_project: @project,
                         yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
-          pal.with_script_compiler do |compiler|
+          pal.with_script_compiler(set_local_facts: false) do |compiler|
             alias_types(compiler)
             register_resource_types(Puppet.lookup(:loaders)) if @resource_types
             begin
