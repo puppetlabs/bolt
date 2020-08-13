@@ -48,7 +48,7 @@ module Bolt
       end
     end
 
-    attr_reader :modulepath
+    attr_reader :modulepath, :user_modulepath
 
     def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors,
                    trusted_external = nil, apply_settings = {}, project = nil)
@@ -56,7 +56,7 @@ module Bolt
       # is safe and in practice only happens in tests
       self.class.load_puppet
 
-      @original_modulepath = modulepath
+      @user_modulepath = modulepath
       @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
       @hiera_config = hiera_config
       @trusted_external = trusted_external
@@ -208,7 +208,7 @@ module Bolt
           # Skip syncing built-in plugins, since we vendor some Puppet 6
           # versions of "core" types, which are already present on the agent,
           # but may cause issues on Puppet 5 agents.
-          @original_modulepath,
+          @user_modulepath,
           @project,
           pdb_client,
           @hiera_config,
@@ -276,10 +276,6 @@ module Bolt
           end
         end
       end
-    end
-
-    def list_modulepath
-      @modulepath - [BOLTLIB_PATH, MODULES_PATH]
     end
 
     def parse_params(type, object_name, params)

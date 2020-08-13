@@ -58,7 +58,7 @@ module BoltServer
           # Bolt::PAL::MODULES_PATH which would be more complex if we tried to use @modulepath since
           # we need to append our modulepaths and exclude modules shiped in bolt gem code
           modulepath_dirs = environment.modulepath
-          @original_modulepath = modulepath_dirs
+          @user_modulepath = modulepath_dirs
           @modulepath = [PE_BOLTLIB_PATH, Bolt::PAL::BOLTLIB_PATH, *modulepath_dirs]
         end
       end

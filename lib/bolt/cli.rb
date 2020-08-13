@@ -526,7 +526,7 @@ module Bolt
       tasks = pal.list_tasks
       tasks.select! { |task| task.first.include?(options[:filter]) } if options[:filter]
       tasks.select! { |task| config.project.tasks.include?(task.first) } unless config.project.tasks.nil?
-      outputter.print_tasks(tasks, pal.list_modulepath)
+      outputter.print_tasks(tasks, pal.user_modulepath)
     end
 
     def show_plan(plan_name)
@@ -537,7 +537,7 @@ module Bolt
       plans = pal.list_plans
       plans.select! { |plan| plan.first.include?(options[:filter]) } if options[:filter]
       plans.select! { |plan| config.project.plans.include?(plan.first) } unless config.project.plans.nil?
-      outputter.print_plans(plans, pal.list_modulepath)
+      outputter.print_plans(plans, pal.user_modulepath)
     end
 
     def list_targets
