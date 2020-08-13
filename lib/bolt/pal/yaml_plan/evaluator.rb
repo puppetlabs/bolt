@@ -109,7 +109,7 @@ module Bolt
         end
 
         def message_step(scope, step)
-          scope.call_function('out::message', step['message'])
+          scope.call_function('out::message', [step['message']])
         end
 
         def generate_manifest(resources)
