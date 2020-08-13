@@ -61,6 +61,9 @@ module Bolt
           { flags: OPTIONS[:global],
             banner: GROUP_HELP }
         end
+      when 'guide'
+        { flags: OPTIONS[:global] + %w[format],
+          banner: GUIDE_HELP }
       when 'plan'
         case action
         when 'convert'
@@ -164,6 +167,7 @@ module Bolt
           command           Run a command remotely
           file              Copy files between the controller and targets
           group             Show the list of groups in the inventory
+          guide             View guides for Bolt concepts and features
           inventory         Show the list of targets an action would run on
           plan              Convert, create, show, and run Bolt plans
           project           Create and migrate Bolt projects
@@ -171,6 +175,9 @@ module Bolt
           script            Upload a local script and run it remotely
           secret            Create encryption keys and encrypt and decrypt values
           task              Show and run Bolt tasks
+
+      GUIDES
+          For a list of guides on Bolt's concepts and features, run 'bolt guide'.
     HELP
 
     APPLY_HELP = <<~HELP
@@ -287,6 +294,26 @@ module Bolt
 
       DESCRIPTION
           Show the list of groups in the inventory.
+    HELP
+
+    GUIDE_HELP = <<~HELP
+      NAME
+          guide
+
+      USAGE
+          bolt guide [topic] [options]
+
+      DESCRIPTION
+          View guides for Bolt's concepts and features.
+
+          Omitting a topic will display a list of available guides,
+          while providing a topic will display the relevant guide.
+
+      EXAMPLES
+          View a list of available guides
+            bolt guide
+          View the 'project' guide page
+            bolt guide project
     HELP
 
     INVENTORY_HELP = <<~HELP

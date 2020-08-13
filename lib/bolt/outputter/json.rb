@@ -83,6 +83,17 @@ module Bolt
         @stream.puts result.to_json
       end
 
+      def print_topics(topics)
+        print_table('topics' => topics)
+      end
+
+      def print_guide(guide, topic)
+        @stream.puts({
+          'topic' => topic,
+          'guide' => guide
+        }.to_json)
+      end
+
       def print_puppetfile_result(success, puppetfile, moduledir)
         @stream.puts({ "success": success,
                        "puppetfile": puppetfile,

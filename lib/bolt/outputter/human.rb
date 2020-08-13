@@ -286,6 +286,16 @@ module Bolt
                         "details and parameters for a specific plan.")
       end
 
+      def print_topics(topics)
+        print_message("Available topics are:")
+        print_message(topics.join("\n"))
+        print_message("\nUse `bolt guide <topic>` to view a specific guide.")
+      end
+
+      def print_guide(guide, _topic)
+        @stream.puts(guide)
+      end
+
       def print_module_list(module_list)
         module_list.each do |path, modules|
           if (mod = modules.find { |m| m[:internal_module_group] })

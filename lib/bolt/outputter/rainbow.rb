@@ -86,6 +86,21 @@ module Bolt
         total_msg << " in #{duration_to_string(elapsed_time)}" unless elapsed_time.nil?
         @stream.puts colorize(:rainbow, total_msg)
       end
+
+      def print_guide(guide, _topic)
+        @stream.puts colorize(:rainbow, guide)
+      end
+
+      def print_topics(topics)
+        content  = String.new("Available topics are:\n")
+        content += topics.join("\n")
+        content += "\n\nUse `bolt guide <topic>` to view a specific guide."
+        @stream.puts colorize(:rainbow, content)
+      end
+
+      def print_message(message)
+        @stream.puts colorize(:rainbow, message)
+      end
     end
   end
 end

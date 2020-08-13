@@ -145,4 +145,24 @@ describe "Bolt::Outputter::JSON" do
     expect(parsed['items'].size).to eq(2)
     expect(parsed['_error']['kind']).to eq("bolt/cli-error")
   end
+
+  it 'prints a list of guides' do
+    topics = %w[apple banana carrot]
+
+    outputter.print_topics(topics)
+    parsed = JSON.parse(output.string)
+
+    expect(parsed['topics']).to match_array(topics)
+  end
+
+  it 'prints a guide page' do
+    topic = 'boltymcboltface'
+    guide = "The trials and tribulations of Bolty McBoltface.\n"
+
+    outputter.print_guide(guide, 'boltymcboltface')
+    parsed = JSON.parse(output.string)
+
+    expect(parsed['topic']).to eq(topic)
+    expect(parsed['guide']).to eq(guide)
+  end
 end

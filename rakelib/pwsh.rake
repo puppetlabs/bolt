@@ -2,6 +2,7 @@
 
 require 'bolt/cli'
 require 'erb'
+require 'fileutils'
 
 namespace :pwsh do
   desc "Generate pwsh from Bolt's command line options"
@@ -44,6 +45,10 @@ namespace :pwsh do
     @mapped_options = {}
 
     Bolt::CLI::COMMANDS.each do |subcommand, actions|
+      # The 'bolt guide' command is handled by PowerShell's help system, so
+      # don't create a cmdlet for it.
+      next if subcommand == 'guide'
+
       actions << nil if actions.empty?
       actions.each do |action|
         help_text = parser.get_help_text(subcommand, action)
@@ -299,6 +304,19 @@ namespace :pwsh do
 
         @commands << @pwsh_command
       end
+    end
+
+    # Move 'guides' to 'en-US' directory in module, renaming the text files
+    # so they are recognized by the PowerShell help system
+    source = File.expand_path(File.join(__dir__, '..', 'guides'))
+    dest   = File.expand_path(File.join(__dir__, '..', 'pwsh_module', 'en-US'))
+
+    FileUtils.mkdir(dest)
+
+    Dir.children(source).each do |file|
+      next if file !~ /\.txt\z/
+      topic = File.basename(file, '.txt')
+      FileUtils.cp(File.join(source, file), File.join(dest, "about_bolt_#{topic}.help.txt"))
     end
 
     # pwsh_module.psm1 ==> PuppetBolt.psm1
