@@ -72,7 +72,7 @@ module Bolt
 
     def self.load_config(filename, logger)
       if File.exist?(filename)
-        YAML.load_file(filename)
+        Bolt::Util.read_optional_yaml_hash(filename, 'analytics')
       else
         unless ENV['BOLT_DISABLE_ANALYTICS']
           logger.warn <<~ANALYTICS
