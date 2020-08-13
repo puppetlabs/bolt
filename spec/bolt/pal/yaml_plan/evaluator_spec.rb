@@ -190,7 +190,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'calls out::message' do
-      expect(scope).to receive(:call_function).with('out::message', 'hello world')
+      expect(scope).to receive(:call_function).with('out::message', ['hello world'])
       subject.message_step(scope, step)
     end
   end
