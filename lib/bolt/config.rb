@@ -204,7 +204,7 @@ module Bolt
         'compile-concurrency' => Etc.nprocessors,
         'concurrency'         => default_concurrency,
         'format'              => 'human',
-        'log'                 => { 'console' => {} },
+        'log'                 => { 'console' => {}, 'bolt-debug.log' => { 'level' => 'debug', 'append' => false } },
         'plugin_hooks'        => {},
         'plugins'             => {},
         'puppetdb'            => {},
