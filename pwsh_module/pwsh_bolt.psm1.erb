@@ -17,7 +17,7 @@ $script:mapping = @{
 .PARAMETER <%= option[:name] %>
   <%= option[:help_msg] %>
 <% end -%>
-.PARAMETER version
+.PARAMETER Version
   Get the version of the bolt installation
 .LINK
   https://puppet.com/products/bolt
@@ -50,7 +50,8 @@ function <%= pwsh_command[:cmdlet] %>
   )
 
   if($version){
-    return (Get-Content -Path $script:BOLT_BASEDIR\misc\versions.txt)[0].split(" ")[1]
+    $boltBasedir = (Get-ItemProperty -Path "HKLM:\Software\Puppet Labs\Bolt").RememberedInstallDir
+    return (Get-Content -Path $boltBasedir\misc\versions.txt)[0].split(" ")[1]
   }
 
   $params = @('<%= pwsh_command[:ruby_command] -%>'<% if pwsh_command[:ruby_action] -%>, '<%= pwsh_command[:ruby_action] -%>'<% end -%>)
