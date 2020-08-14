@@ -267,12 +267,17 @@ namespace :pwsh do
             pwsh_param[:validate_not_null_or_empty] = true
           when 'transport'
             pwsh_param[:validate_set] = Bolt::Config::Options::TRANSPORT_CONFIG.keys
+          when 'loglevel'
+            pwsh_param[:validate_set] = %w[debug info notice warn error fatal any]
+          when 'filter'
+            pwsh_param[:validate_pattern] = '^[a-z0-9_:]+$'
           when 'targets'
             pwsh_param[:validate_not_null_or_empty] = true
           when 'query'
             pwsh_param[:validate_not_null_or_empty] = true
           when 'rerun'
             pwsh_param[:validate_not_null_or_empty] = true
+            pwsh_param[:validate_set] = %w[all failure success]
           when 'configfile'
             pwsh_param[:validate_not_null_or_empty] = true
           when 'boltdir'

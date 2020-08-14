@@ -51,6 +51,9 @@ pwsh_command[:options].each do |option|
   if option[:validate_set]
     output << "    [ValidateSet(#{option[:validate_set].map(&:inspect).join(', ')})]"
   end
+  if option[:validate_pattern]
+    output << "    [ValidatePattern('#{option[:validate_pattern]}')]"
+  end
   if option[:ruby_short]
     output << "    [Alias('#{option[:ruby_short].gsub("-","")}')]"
   end
