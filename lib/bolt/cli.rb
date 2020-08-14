@@ -20,6 +20,7 @@ require 'bolt/logger'
 require 'bolt/outputter'
 require 'bolt/puppetdb'
 require 'bolt/plugin'
+require 'bolt/project_migrate'
 require 'bolt/pal'
 require 'bolt/target'
 require 'bolt/version'
@@ -427,7 +428,9 @@ module Bolt
         when 'init'
           code = initialize_project
         when 'migrate'
-          code = migrate_project
+          inv = config.inventoryfile
+          path = config.project.path
+          code = Bolt::ProjectMigrate.new(path, outputter, inv).migrate_project
         end
       when 'plan'
         case options[:action]
@@ -901,49 +904,6 @@ module Bolt
       spec_graph.values.map do |spec|
         "mod '#{spec.owner}-#{spec.name}', '#{spec.version}'"
       end
-    end
-
-    def migrate_project
-      inventory_file = config.inventoryfile || config.default_inventoryfile
-      data = Bolt::Util.read_yaml_hash(inventory_file, 'inventory')
-
-      data.delete('version') if data['version'] != 2
-
-      migrated = migrate_group(data)
-
-      ok = File.write(inventory_file, data.to_yaml) if migrated
-
-      result = if migrated && ok
-                 "Successfully migrated Bolt project to latest version."
-               elsif !migrated
-                 "Bolt project already on latest version. Nothing to do."
-               else
-                 "Could not migrate Bolt project to latest version."
-               end
-      outputter.print_message result
-
-      ok ? 0 : 1
-    end
-
-    # Walks an inventory hash and replaces all 'nodes' keys with 'targets' keys
-    # and all 'name' keys nested in a 'targets' hash with 'uri' keys. Data is
-    # modified in place.
-    def migrate_group(group)
-      migrated = false
-      if group.key?('nodes')
-        migrated = true
-        targets = group['nodes'].map do |target|
-          target['uri'] = target.delete('name') if target.is_a?(Hash)
-          target
-        end
-        group.delete('nodes')
-        group['targets'] = targets
-      end
-      (group['groups'] || []).each do |subgroup|
-        migrated_group = migrate_group(subgroup)
-        migrated ||= migrated_group
-      end
-      migrated
     end
 
     def install_puppetfile(config, puppetfile, modulepath)
