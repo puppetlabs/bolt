@@ -149,6 +149,10 @@ module Bolt
       @data['plans']
     end
 
+    def modules
+      @data['modules']
+    end
+
     def validate
       if name
         if name !~ Bolt::Module::MODULE_NAME_REGEX
@@ -168,6 +172,23 @@ module Bolt
       %w[tasks plans].each do |conf|
         unless @data.fetch(conf, []).is_a?(Array)
           raise Bolt::ValidationError, "'#{conf}' in bolt-project.yaml must be an array"
+        end
+      end
+
+      if @data['modules']
+        unless @data['modules'].is_a?(Array)
+          raise Bolt::ValidationError, "'modules' in bolt-project.yaml must be an array"
+        end
+
+        @data['modules'].each do |mod|
+          next if mod.is_a?(Hash)
+          raise Bolt::ValidationError, "Module declaration #{mod.inspect} must be a hash"
+        end
+
+        unknown_keys = data['modules'].flat_map(&:keys).uniq - ['name']
+        if unknown_keys.any?
+          @logs << { warn: "Module declarations in bolt-project.yaml only support a name key. Ignoring "\
+                           "unsupported keys: #{unknown_keys.join(', ')}." }
         end
       end
     end

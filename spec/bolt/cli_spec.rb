@@ -164,6 +164,104 @@ describe "Bolt::CLI" do
     end
   end
 
+  context 'module install' do
+    let(:flags)   { %W[--project #{@project_dir}] }
+    let(:cli)     { Bolt::CLI.new(%w[module install] + flags) }
+    let(:project) { Pathname.new(@project_dir) }
+
+    let(:config) do
+      {
+        'modules' => [
+          { 'name' => 'puppetlabs-yaml' }
+        ]
+      }
+    end
+
+    around(:each) do |example|
+      original = ENV['BOLT_MODULE_FEATURE']
+      ENV['BOLT_MODULE_FEATURE'] = 'true'
+
+      Dir.mktmpdir(nil, Dir.pwd) do |dir|
+        @project_dir = dir
+        example.run
+      end
+    ensure
+      ENV['BOLT_MODULE_FEATURE'] = original
+    end
+
+    it 'errors without BOLT_MODULE_FEATURE being set' do
+      ENV.delete('BOLT_MODULE_FEATURE')
+
+      expect { cli.parse }.to raise_error(
+        Bolt::CLIError,
+        /Expected subcommand 'module' to be one of/
+      )
+    end
+
+    it 'does nothing if project config has no module declarations' do
+      result = cli.execute(cli.parse)
+      expect(result).to be
+      expect((project + 'Puppetfile').exist?).to eq(false)
+      expect((project + '.modules').exist?).to eq(false)
+    end
+
+    it 'installs declared modules and dependencies' do
+      File.write(File.join(@project_dir, 'bolt-project.yaml'), config.to_yaml)
+
+      result = cli.execute(cli.parse)
+      expect(result).to be
+      expect((project + 'Puppetfile').exist?).to eq(true)
+      expect(File.read(project + 'Puppetfile')).to match(/mod "puppetlabs-yaml"/)
+      expect((project + '.modules').exist?).to eq(true)
+      expect(Dir.children(project + '.modules')).to include('yaml')
+      expect(Dir.children(project + '.modules').size).to be > 1
+    end
+
+    context 'with existing Puppetfile' do
+      before(:each) do
+        File.write(File.join(@project_dir, 'Puppetfile'), "mod 'puppetlabs-yaml', '0.2.0'")
+      end
+
+      it 'errors if the Puppetfile is missing specifications' do
+        config['modules'] << { 'name' => 'puppetlabs-apt' }
+        File.write(File.join(@project_dir, 'bolt-project.yaml'), config.to_yaml)
+
+        expect { cli.execute(cli.parse) }.to raise_error(
+          Bolt::Error,
+          /Puppetfile .* is missing specifications for modules/
+        )
+      end
+
+      it 'installs the Puppetfile if it is not missing specifications' do
+        File.write(File.join(@project_dir, 'bolt-project.yaml'), config.to_yaml)
+
+        result = cli.execute(cli.parse)
+        expect(result).to be
+        expect((project + 'Puppetfile').exist?).to eq(true)
+        expect(File.read(project + 'Puppetfile')).to match(/mod 'puppetlabs-yaml'/)
+        expect((project + '.modules').exist?).to eq(true)
+        expect(Dir.children(project + '.modules')).to include('yaml')
+        expect(Dir.children(project + '.modules').size).to eq(1)
+      end
+
+      context 'with --force set' do
+        let(:flags) { %W[--project #{@project_dir} --force] }
+
+        it 'forcibly overwrites the Puppetfile' do
+          File.write(File.join(@project_dir, 'bolt-project.yaml'), config.to_yaml)
+
+          result = cli.execute(cli.parse)
+          expect(result).to be
+          expect((project + 'Puppetfile').exist?).to eq(true)
+          expect(File.read(project + 'Puppetfile')).to match(/mod "puppetlabs-yaml"/)
+          expect((project + '.modules').exist?).to eq(true)
+          expect(Dir.children(project + '.modules')).to include('yaml')
+          expect(Dir.children(project + '.modules').size).to be > 1
+        end
+      end
+    end
+  end
+
   context 'plan new' do
     let(:project_name) { 'project' }
     let(:config)       { { 'name' => project_name } }
@@ -851,7 +949,11 @@ describe "Bolt::CLI" do
       let(:cli)     { Bolt::CLI.new(%W[project init --modules #{modules}]) }
 
       it 'accepts a comma-separated list of modules' do
-        expect(cli.parse).to include(modules: %w[puppetlabs-apt puppetlabs-stdlib])
+        options = cli.parse
+        expect(options[:modules]).to match([
+                                             { 'name' => 'puppetlabs-apt' },
+                                             { 'name' => 'puppetlabs-stdlib' }
+                                           ])
       end
     end
 
@@ -2288,8 +2390,8 @@ describe "Bolt::CLI" do
         }
       }
       let(:output) { StringIO.new }
-      let(:puppetfile) { Pathname.new('path/to/puppetfile') }
-      let(:modulepath) { [Pathname.new('path/to/modules')] }
+      let(:puppetfile) { @puppetfile }
+      let(:modulepath) { Pathname.new('path/to/modules') }
       let(:action_stub) { double('r10k_action_puppetfile_install') }
 
       let(:cli) { Bolt::CLI.new({}) }
@@ -2297,13 +2399,20 @@ describe "Bolt::CLI" do
       before :each do
         allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
         allow(cli).to receive(:config).and_return(Bolt::Config.default)
-        allow(puppetfile).to receive(:exist?).and_return(true)
         allow_any_instance_of(Bolt::PAL).to receive(:generate_types)
         allow(R10K::Action::Puppetfile::Install).to receive(:new).and_return(action_stub)
       end
 
+      around :each do |example|
+        Dir.mktmpdir(nil, Dir.pwd) do |dir|
+          @puppetfile = File.expand_path('Puppetfile', dir)
+          File.write(@puppetfile, "mod 'puppetlabs-yaml'")
+          example.run
+        end
+      end
+
       it 'fails if the Puppetfile does not exist' do
-        allow(puppetfile).to receive(:exist?).and_return(false)
+        FileUtils.rm(puppetfile)
 
         expect do
           cli.install_puppetfile({}, puppetfile, modulepath)
@@ -2312,7 +2421,7 @@ describe "Bolt::CLI" do
 
       it 'installs to the first directory of the modulepath' do
         expect(R10K::Action::Puppetfile::Install).to receive(:new)
-          .with({ root: puppetfile.dirname.to_s, puppetfile: puppetfile.to_s, moduledir: modulepath.first.to_s }, nil)
+          .with({ root: File.dirname(puppetfile), puppetfile: puppetfile.to_s, moduledir: modulepath.to_s }, nil)
 
         allow(action_stub).to receive(:call).and_return(true)
 
@@ -2327,7 +2436,7 @@ describe "Bolt::CLI" do
         result = JSON.parse(output.string)
         expect(result['success']).to eq(true)
         expect(result['puppetfile']).to eq(puppetfile.to_s)
-        expect(result['moduledir']).to eq(modulepath.first.to_s)
+        expect(result['moduledir']).to eq(modulepath.to_s)
       end
 
       it 'returns 1 and prints a result if unsuccessful' do
@@ -2338,7 +2447,7 @@ describe "Bolt::CLI" do
         result = JSON.parse(output.string)
         expect(result['success']).to eq(false)
         expect(result['puppetfile']).to eq(puppetfile.to_s)
-        expect(result['moduledir']).to eq(modulepath.first.to_s)
+        expect(result['moduledir']).to eq(modulepath.to_s)
       end
 
       it 'propagates any r10k errors' do
@@ -2711,16 +2820,19 @@ describe "Bolt::CLI" do
             puppetfile = File.join(tmpdir, 'Puppetfile')
             modulepath = File.join(tmpdir, 'modules')
 
-            cli = Bolt::CLI.new(%w[project init valid --modules puppetlabs-apt])
+            cli = Bolt::CLI.new(%w[project init valid --modules puppetlabs-yaml])
             cli.execute(cli.parse)
 
             expect(File.file?(puppetfile)).to be
-            expect(File.read(puppetfile).split("\n")).to match_array([/mod 'puppetlabs-apt'/,
-                                                                      /mod 'puppetlabs-stdlib'/,
-                                                                      /mod 'puppetlabs-translate'/])
+
+            lines = File.read(puppetfile).split("\n")
+            lines.shift
+
+            expect(lines).to match_array([/mod "puppetlabs-yaml"/,
+                                          /mod "puppetlabs-ruby_task_helper"/])
 
             expect(Dir.exist?(modulepath)).to be
-            expect(Dir.children(modulepath)).to match_array(%w[apt stdlib translate])
+            expect(Dir.children(modulepath)).to match_array(%w[yaml ruby_task_helper])
           end
         end
 

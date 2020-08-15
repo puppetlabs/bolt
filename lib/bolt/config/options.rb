@@ -227,6 +227,24 @@ module Bolt
           _example: ["~/.puppetlabs/bolt/modules", "~/.puppetlabs/bolt/site-modules"],
           _default: ["project/modules", "project/site-modules", "project/site"]
         },
+        "modules" => {
+          description: "A list of module dependencies for the project. Each dependency is a map of data specifying "\
+                       "the module to install. To install the project's module dependencies, run the `bolt module "\
+                       "install` command.",
+          type: Array,
+          items: {
+            type: Hash,
+            required: ["name"],
+            properties: {
+              "name" => {
+                description: "The name of the module.",
+                type: String
+              }
+            }
+          },
+          _plugin: false,
+          _example: [{ "name" => "puppetlabs-mysql" }, { "name" => "puppetlabs-apache" }]
+        },
         "name" => {
           description: "The name of the Bolt project. When this option is configured, the project is considered a "\
                        "[Bolt project](experimental_features.md#bolt-projects), allowing Bolt to load content from "\
@@ -476,6 +494,7 @@ module Bolt
         inventoryfile
         log
         modulepath
+        modules
         name
         plans
         plugin_hooks

@@ -64,6 +64,15 @@ module Bolt
       when 'guide'
         { flags: OPTIONS[:global] + %w[format],
           banner: GUIDE_HELP }
+      when 'module'
+        case action
+        when 'install'
+          { flags: OPTIONS[:global] + %w[configfile force project],
+            banner: MODULE_INSTALL_HELP }
+        else
+          { flags: OPTIONS[:global],
+            banner: MODULE_HELP }
+        end
       when 'plan'
         case action
         when 'convert'
@@ -339,6 +348,35 @@ module Bolt
 
       DESCRIPTION
           Show the list of targets an action would run on.
+    HELP
+
+    MODULE_HELP = <<~HELP
+      NAME
+          module
+      
+      USAGE
+          bolt module <action> [options]
+
+      DESCRIPTION
+          Install the project's modules
+
+      ACTIONS
+          install       Install the project's modules
+    HELP
+
+    MODULE_INSTALL_HELP = <<~HELP
+      NAME
+          install
+      
+      USAGE
+          bolt module install [options]
+
+      DESCRIPTION
+          Install the project's modules.
+
+          Module declarations are loaded from the project's configuration
+          file. Bolt will automatically resolve all module dependencies,
+          generate a Puppetfile, and install the modules.
     HELP
 
     PLAN_HELP = <<~HELP
@@ -864,9 +902,9 @@ module Bolt
       define('--modules MODULES',
              'A comma-separated list of modules to install from the Puppet Forge',
              'when initializing a project. Resolves and installs all dependencies.') do |modules|
-        @options[:modules] = modules.split(',')
+        @options[:modules] = modules.split(',').map { |mod| { 'name' => mod } }
       end
-      define('--force', 'Overwrite existing key pairs') do |_force|
+      define('--force', 'Force a destructive action') do |_force|
         @options[:force] = true
       end
 
