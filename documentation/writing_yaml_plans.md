@@ -76,13 +76,13 @@ Other available keys depend on the type of step.
 
 #### Message step
 
-Use a `message` step to print a message. This will print a message to `stdout`
-when using the `human` output format, and print to `stderr` when using the
-`json` output format.
+Use a `message` step to print a message. This will print a message to standard
+out (stdout) when using the `human` output format, and print to standard error
+(stderr) when using the `json` output format. 
 
 Message steps use a single field:
 
--   `message`: The message to print
+- `message`: The message to print
 
 For example:
 
@@ -90,6 +90,14 @@ For example:
 steps:
   - message: hello world
 ```
+
+You can pass variables to the message step to print them to stdout. If the
+variable contains a valid plan result, Bolt formats the plan result using a JSON
+representation of the result object. If the object is not a plan result, Bolt
+prints the object as a string.
+
+For information on printing a step result with `message`, see [Debugging
+plans](#debugging-plans).
 
 #### Command step
 
@@ -487,7 +495,7 @@ parameters for another step.
 The `name` key makes its result available to later steps in a variable with that
 name.
 
-This example uses the `map` function to get the value of `stdout` from each
+This example uses the `map` function to get the value of stdout from each
 command result and then joins them into a single string separated by commas.
 
 ```yaml
@@ -536,6 +544,100 @@ steps:
     targets: $targets
 
 return: $hostnames.map |$hostname_result| { $hostname_result['stdout'] }
+```
+
+## Debugging plans
+
+By default, Bolt does not print the result for each step to stdout. However, you
+can use one of the following methods to investigate a plan execution:
+- Each time you run a Bolt command, Bolt prints a debug log to a
+  `bolt-debug.log` file in the root of your project directory.
+- Certain steps print to stdout when you use the `--verbose` CLI option.
+- You can print the result of any step to stdout using a `message` step. 
+- You can adjust your log level for detailed information on how Bolt is
+  executing your plan, including the results returned from each step.
+
+### Using the `--verbose` option for debugging 
+
+You can see the results for the following types of steps by running the plan
+with the `--verbose` CLI option:
+- commands
+- scripts
+- plans
+- tasks
+
+### Using a message step for debugging
+
+You can print the result of a step to stdout by passing the step name to a
+message step as a parameter.
+
+To print the result of a step to stdout using `message`, use the
+following structure:
+
+```yaml
+- message: $<STEP_NAME> 
+```
+
+For example, the following plan uses a task step named `check_mysql` to run the
+`package` task and check for MySQL. A message step prints the result of the
+`check_mysql` task:
+
+```yaml
+parameters:
+  targets:
+    type: TargetSpec   
+
+steps:
+  - name: check_mysql
+    targets: $targets
+    task: package
+    parameters:
+     action: status
+     name: mysql
+    description: "Check for MySQL"
+
+  - message: $check_mysql
+```
+
+The output from this plan looks something like this:
+
+```console
+Starting: plan wordpress::test
+Starting: Check for MySQL on target1
+Finished: Check for MySQL with 0 failures in 0.59 sec
+[
+  {
+    "target": "target1",
+    "action": "task",
+    "object": "package",
+    "status": "success",
+    "value": {
+      "status": "uninstalled",
+      "version": ""
+    }
+  }
+]
+Finished: plan wordpress::test in 0.6 sec
+Plan completed successfully with no result
+```
+
+### Debug logs
+
+Bolt logs additional information about a plan run, including output sent to
+standard error (stderr), at the `debug` level. Use the `--log-level debug` CLI
+option or the [`log` configuration setting](bolt_project_reference.html#log).
+
+```shell
+$ bolt task run mytask param1=foo param2=bar -t all --log-level debug
+```
+
+Each time you run a Bolt command, Bolt prints a debug level log to a
+`bolt-debug.log` file in the root of your project directory. You can disable the
+log file by specifying the following in your `bolt-project.yaml`:
+
+```yaml
+log:
+  bolt-debug.log: disable
 ```
 
 ## Computing complex values
