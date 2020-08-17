@@ -241,7 +241,7 @@ module Bolt
 
       @analytics&.event('Plan', 'yaml', plan_steps: steps, return_type: return_type)
     rescue StandardError => e
-      @logger.debug { "Failed to submit analytics event: #{e.message}" }
+      @logger.trace { "Failed to submit analytics event: #{e.message}" }
     end
 
     def with_node_logging(description, batch)

@@ -38,7 +38,7 @@ module Bolt
           @connections.each_value do |conn|
             conn.finish_plan(result)
           rescue StandardError => e
-            @logger.debug("Failed to finish plan on #{conn.key}: #{e.message}")
+            @logger.trace("Failed to finish plan on #{conn.key}: #{e.message}")
           end
         end
       end
@@ -133,7 +133,7 @@ module Bolt
           next unless File.file?(file)
 
           tar_path = Pathname.new(file).relative_path_from(Pathname.new(directory))
-          @logger.debug("Packing #{file} to #{tar_path}")
+          @logger.trace("Packing #{file} to #{tar_path}")
           stat = File.stat(file)
           content = File.binread(file)
           output.tar.add_file_simple(
@@ -146,7 +146,7 @@ module Bolt
         end
 
         duration = Time.now - start_time
-        @logger.debug("Packed upload in #{duration * 1000} ms")
+        @logger.trace("Packed upload in #{duration * 1000} ms")
 
         output.close
         io.string

@@ -161,9 +161,9 @@ module Bolt
         # Handle analytics submission in the background to avoid blocking the
         # app or polluting the log with errors
         Concurrent::Future.execute(executor: @executor) do
-          @logger.debug "Submitting analytics: #{JSON.pretty_generate(params)}"
+          @logger.trace "Submitting analytics: #{JSON.pretty_generate(params)}"
           @http.post(TRACKING_URL, params)
-          @logger.debug "Completed analytics submission"
+          @logger.trace "Completed analytics submission"
         end
       end
 
@@ -215,13 +215,13 @@ module Bolt
       end
 
       def screen_view(screen, **_kwargs)
-        @logger.debug "Skipping submission of '#{screen}' screenview because analytics is disabled"
+        @logger.trace "Skipping submission of '#{screen}' screenview because analytics is disabled"
       end
 
       def report_bundled_content(mode, name); end
 
       def event(category, action, **_kwargs)
-        @logger.debug "Skipping submission of '#{category} #{action}' event because analytics is disabled"
+        @logger.trace "Skipping submission of '#{category} #{action}' event because analytics is disabled"
       end
 
       def finish; end

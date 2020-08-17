@@ -67,7 +67,7 @@ module Bolt
 
       @logger = Logging.logger[self]
       if modulepath && !modulepath.empty?
-        @logger.info("Loading modules from #{@modulepath.join(File::PATH_SEPARATOR)}")
+        @logger.debug("Loading modules from #{@modulepath.join(File::PATH_SEPARATOR)}")
       end
 
       @loaded = false

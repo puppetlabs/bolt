@@ -300,7 +300,7 @@ module Bolt
 
         files.each do |file|
           tar_path = Pathname.new(file).relative_path_from(parent)
-          @logger.debug("Packing plugin #{file} to #{tar_path}")
+          @logger.trace("Packing plugin #{file} to #{tar_path}")
           stat = File.stat(file)
           content = File.binread(file)
           output.tar.add_file_simple(
@@ -314,7 +314,7 @@ module Bolt
       end
 
       duration = Time.now - start_time
-      @logger.debug("Packed plugins in #{duration * 1000} ms")
+      @logger.trace("Packed plugins in #{duration * 1000} ms")
 
       output.close
       Base64.encode64(sio.string)
