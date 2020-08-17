@@ -80,7 +80,7 @@ module Bolt
 
     def self.default_layout
       Logging.layouts.pattern(
-        pattern: '%d %-6l %c: %m\n',
+        pattern: '%d %-6l [%T] [%c] %m\n',
         date_pattern: '%Y-%m-%dT%H:%M:%S.%6N'
       )
     end

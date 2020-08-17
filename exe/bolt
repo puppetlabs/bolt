@@ -4,6 +4,7 @@
 require 'bolt'
 require 'bolt/cli'
 
+Thread.current[:name] ||= 'main'
 cli = Bolt::CLI.new(ARGV)
 begin
   opts = cli.parse

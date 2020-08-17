@@ -27,7 +27,7 @@ module Bolt
       @hiera_config = hiera_config ? validate_hiera_config(hiera_config) : nil
       @apply_settings = apply_settings || {}
 
-      @pool = Concurrent::ThreadPoolExecutor.new(max_threads: max_compiles)
+      @pool = Concurrent::ThreadPoolExecutor.new(name: 'apply', max_threads: max_compiles)
       @logger = Logging.logger[self]
     end
 
@@ -217,6 +217,7 @@ module Bolt
       r = @executor.log_action(description, targets) do
         futures = targets.map do |target|
           Concurrent::Future.execute(executor: @pool) do
+            Thread.current[:name] ||= Thread.current.name
             @executor.with_node_logging("Compiling manifest block", [target]) do
               compile(target, scope)
             end
