@@ -20,7 +20,6 @@ module Bolt
       Logging.color_scheme(
         'bolt',
         lines: {
-          notice: :green,
           warn: :yellow,
           error: :red,
           fatal: %i[white on_red]
@@ -91,7 +90,7 @@ module Bolt
     end
 
     def self.default_file_level
-      :notice
+      :warn
     end
 
     # Explicitly check the log level names instead of the log level number, as levels

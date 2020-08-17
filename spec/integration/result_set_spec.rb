@@ -40,13 +40,13 @@ describe "when running a plan that manipulates an execution result", ssh: true d
         params = { target: uri }.to_json
         run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
         expect(@log_output.readlines)
-          .to include("NOTICE  Puppet : Filtered set: [#{safe_uri}]\n")
+          .to include(/Puppet : Filtered set: \[#{safe_uri}\]/)
       end
 
       it 'excludes target when filter is false' do
         params = { target: uri, fail: true }.to_json
         run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
-        expect(@log_output.readlines).to include("NOTICE  Puppet : Filtered set: []\n")
+        expect(@log_output.readlines).to include(/Puppet : Filtered set: \[\]/)
       end
     end
 
@@ -55,13 +55,13 @@ describe "when running a plan that manipulates an execution result", ssh: true d
         params = { target: uri }.to_json
         run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
         expect(@log_output.readlines)
-          .to include("NOTICE  Puppet : Single index: #{uri}\n")
+          .to include(/Puppet : Single index: #{uri}/)
       end
 
       it 'with a slice index' do
         params = { target: uri, fail: true }.to_json
         run_cli(['plan', 'run', 'results::test_methods', "--params", params] + config_flags)
-        expect(@log_output.readlines).to include("NOTICE  Puppet : Slice index: [#{uri}]\n")
+        expect(@log_output.readlines).to include(/Puppet : Slice index: \[#{uri}\]/)
       end
     end
 
@@ -69,7 +69,7 @@ describe "when running a plan that manipulates an execution result", ssh: true d
       params = { nodes: uri }.to_json
       result = run_cli(['plan', 'run', 'results::test_result', "--params", params] + config_flags)
       expect(@log_output.readlines)
-        .to include("NOTICE  Puppet : Result status: success\n")
+        .to include(/Puppet : Result status: success/)
       expect(JSON.parse(result).first).to include('value')
     end
   end

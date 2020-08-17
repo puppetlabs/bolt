@@ -187,7 +187,7 @@ module Bolt
                   description: "The type of information to log.",
                   type: String,
                   enum: %w[debug error info notice warn fatal any],
-                  _default: "warn for console, notice for file"
+                  _default: "warn"
                 }
               }
             }
@@ -205,7 +205,7 @@ module Bolt
                 description: "The type of information to log.",
                 type: String,
                 enum: %w[debug error info notice warn fatal any],
-                _default: "warn for console, notice for file"
+                _default: "warn"
               }
             }
           },

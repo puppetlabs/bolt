@@ -30,7 +30,7 @@ describe "catch_errors", ssh: true do
   it 'catches an error and continues' do
     run_cli(%w[plan run catch_errors] + config_flags)
     output = @log_output.readlines
-    expect(output).to include("NOTICE  Puppet : Step 1\n")
+    expect(output).to include(/Puppet : Step 1/)
   end
 
   it 'returns a ResultSet' do
@@ -61,7 +61,7 @@ describe "catch_errors", ssh: true do
 
       # Verify that the plan continued
       output = @log_output.readlines
-      expect(output).to include("NOTICE  Puppet : Step 2\n")
+      expect(output).to include(/Puppet : Step 2/)
     end
 
     it 'returns the error if it matches the second type in the array' do
@@ -91,7 +91,7 @@ describe "catch_errors", ssh: true do
                             config_flags)
       expect(result).to eq("Break the chain")
       output = @log_output.readlines
-      expect(output).to include("NOTICE  Puppet : firstcomment\n")
+      expect(output).to include(/Puppet : firstcomment/)
       expect(output).not_to include(/Out of bounds/)
     end
   end
