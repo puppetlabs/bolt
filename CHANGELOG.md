@@ -1,5 +1,51 @@
 # Changelog
 
+## Bolt 2.23.0 (2020-08-17)
+
+### New features
+
+* **Print objects using `out::message()` plan function**
+  ([#2012](https://github.com/puppetlabs/bolt/issues/2012))
+
+  Users can now print any valid data type using the plan function
+  `out::message()`.
+
+* **`bolt project init` and `New-BoltProject` now create `bolt-project.yaml`**
+  ([#2003](https://github.com/puppetlabs/bolt/issues/2003))
+
+  `bolt project init` and `New-BoltProject` now create a `bolt-project.yaml`
+  file instead of `bolt.yaml`. The commands now accept a project name instead
+  of a path to the project directory.
+
+* **Set interval for repeating block in `ctrl::do_until` plan function**
+  ([#2072](https://github.com/puppetlabs/bolt/issues/2072))
+
+  The `ctrl::do_until` plan function now accepts an `interval` option.
+  This option accepts a numeric value that specifies the number of
+  seconds to wait before repeating the block.
+
+### Bug fixes
+
+* **Include `modules/` in displayed modulepath if it's in the user-configured
+  modulepath**
+
+  Bolt now includes `<bolt-installation-directory>/modules` in the displayed
+  modulepath if the user has the path as a component of their configured
+  modulepath. If installed as a package on *nix, bolt-installation-directory
+  would be `/opt/puppetlabs/bolt/lib/ruby/gems/2.5.0/gems/bolt-x.y.z/`.
+
+* **Do not error when analytics configuration file is empty**
+
+  Empty analytics configuration files would cause Bolt to raise a
+  `NoMethodError`. Now, if an analytics configuration file is empty,
+  Bolt will instead rewrite the file.
+
+* **Correctly pass objects to YAML plan message step**
+
+  Bolt was incorrectly passing objects used in the YAML plan `message`
+  step, resulting in an error. Any objects used in YAML plan `message`
+  steps are now correctly passed and printed to the console.
+
 ## Bolt 2.22.0 (2020-08-10)
 
 ### New features
