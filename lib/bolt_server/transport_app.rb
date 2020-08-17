@@ -375,6 +375,22 @@ module BoltServer
       end
     end
 
+    # Fetches the list of tasks for an environment
+    #
+    # @param environment [String] the environment to fetch the list of tasks from
+    get '/tasks' do
+      in_pe_pal_env(params['environment']) do |pal|
+        tasks = pal.list_tasks
+        tasks_response = tasks.map { |task_name, _description| { 'name' => task_name } }.to_json
+
+        # We structure this array of tasks to be an array of hashes so that it matches the structure
+        # returned by the puppetserver API that serves data like this. Structuring the output this way
+        # makes switching between puppetserver and bolt-server easier, which makes changes to switch
+        # to bolt-server smaller/simpler.
+        [200, tasks_response]
+      end
+    end
+
     error 404 do
       err = Bolt::Error.new("Could not find route #{request.path}",
                             'boltserver/not-found')
