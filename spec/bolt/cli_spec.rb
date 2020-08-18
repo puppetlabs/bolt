@@ -671,7 +671,7 @@ describe "Bolt::CLI" do
 
     describe "console log level" do
       it "is not sensitive to ordering of debug and verbose" do
-        expect(Bolt::Logger).to receive(:configure).with({ 'console' => { level: :debug } }, true)
+        expect(Bolt::Logger).to receive(:configure).with(include('console' => { level: :debug }), true)
 
         cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug --verbose])
         cli.parse
@@ -690,9 +690,9 @@ describe "Bolt::CLI" do
       end
 
       it "log-level sets the log option" do
-        expect(Bolt::Logger).to receive(:configure).with({ 'console' => { level: 'notice' } }, true)
+        expect(Bolt::Logger).to receive(:configure).with(include('console' => { level: 'debug' }), true)
 
-        cli = Bolt::CLI.new(%w[command run uptime --targets foo --log-level notice])
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --log-level debug])
         cli.parse
       end
 
@@ -2407,10 +2407,8 @@ describe "Bolt::CLI" do
         cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
         cli.parse
         normalized_path = File.expand_path(File.join(configdir, 'debug.log'))
-        expect(cli.config.log).to eq(
-          'console' => { level: 'warn' },
-          "file:#{normalized_path}" => { level: 'debug', append: false }
-        )
+        expect(cli.config.log).to include('console' => { level: 'warn' })
+        expect(cli.config.log).to include("file:#{normalized_path}" => { level: 'debug', append: false })
       end
     end
 

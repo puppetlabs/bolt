@@ -159,10 +159,10 @@ describe "passes parsed AST to the apply_catalog task" do
       result = run_cli_json(%w[plan run basic::error] + config_flags)
       expect(result[0]['status']).to eq('success')
       logs = @log_output.readlines
-      expect(logs).to include(/DEBUG.*Debugging/)
-      expect(logs).to include(/INFO.*Meh/)
+      expect(logs).to include(/TRACE.*Debugging/)
+      expect(logs).to include(/DEBUG.*Meh/)
       expect(logs).to include(/WARN.*Warned/)
-      expect(logs).to include(/NOTICE.*Helpful/)
+      expect(logs).to include(/INFO.*Helpful/)
       expect(logs).to include(/ERROR.*Fire/)
       expect(logs).to include(/ERROR.*Stop/)
       expect(logs).to include(/FATAL.*Drop/)
@@ -405,9 +405,9 @@ describe "passes parsed AST to the apply_catalog task" do
         @log_output.level = :debug
         run_cli(%w[plan run basic::error --log-level debug] + config_flags)
 
-        expect(lines).to include(/DEBUG.*Debugging/)
-        expect(lines).to include(/INFO.*Meh/)
-        expect(lines).to include(/NOTICE.*Helpful/)
+        expect(lines).not_to include(/TRACE.*Debugging/)
+        expect(lines).to include(/DEBUG.*Meh/)
+        expect(lines).to include(/INFO.*Helpful/)
         expect(lines).to include(/WARN.*Warned/)
         expect(lines).to include(/ERROR.*Fire/)
         expect(lines).to include(/ERROR.*Stop/)
@@ -419,23 +419,9 @@ describe "passes parsed AST to the apply_catalog task" do
         @log_output.level = :info
         run_cli(%w[plan run basic::error --log-level info] + config_flags)
 
-        expect(lines).not_to include(/DEBUG.*Debugging/)
-        expect(lines).to include(/INFO.*Meh/)
-        expect(lines).to include(/NOTICE.*Helpful/)
-        expect(lines).to include(/WARN.*Warned/)
-        expect(lines).to include(/ERROR.*Fire/)
-        expect(lines).to include(/ERROR.*Stop/)
-        expect(lines).to include(/FATAL.*Drop/)
-        expect(lines).to include(/FATAL.*Roll/)
-      end
-
-      it 'logs notice messages' do
-        @log_output.level = :notice
-        run_cli(%w[plan run basic::error --log-level notice] + config_flags)
-
-        expect(lines).not_to include(/DEBUG.*Debugging/)
-        expect(lines).not_to include(/INFO.*Meh/)
-        expect(lines).to include(/NOTICE.*Helpful/)
+        expect(lines).not_to include(/TRACE.*Debugging/)
+        expect(lines).not_to include(/DEBUG.*Meh/)
+        expect(lines).to include(/INFO.*Helpful/)
         expect(lines).to include(/WARN.*Warned/)
         expect(lines).to include(/ERROR.*Fire/)
         expect(lines).to include(/ERROR.*Stop/)
@@ -447,9 +433,9 @@ describe "passes parsed AST to the apply_catalog task" do
         @log_output.level = :warn
         run_cli(%w[plan run basic::error --log-level warn] + config_flags)
 
-        expect(lines).not_to include(/DEBUG.*Debugging/)
-        expect(lines).not_to include(/INFO.*Meh/)
-        expect(lines).not_to include(/NOTICE.*Helpful/)
+        expect(lines).not_to include(/TRACE.*Debugging/)
+        expect(lines).not_to include(/DEBUG.*Meh/)
+        expect(lines).not_to include(/INFO.*Helpful/)
         expect(lines).to include(/WARN.*Warned/)
         expect(lines).to include(/ERROR.*Fire/)
         expect(lines).to include(/ERROR.*Stop/)
@@ -461,9 +447,9 @@ describe "passes parsed AST to the apply_catalog task" do
         @log_output.level = :error
         run_cli(%w[plan run basic::error --log-level error] + config_flags)
 
-        expect(lines).not_to include(/DEBUG.*Debugging/)
-        expect(lines).not_to include(/INFO.*Meh/)
-        expect(lines).not_to include(/NOTICE.*Helpful/)
+        expect(lines).not_to include(/TRACE.*Debugging/)
+        expect(lines).not_to include(/DEBUG.*Meh/)
+        expect(lines).not_to include(/INFO.*Helpful/)
         expect(lines).not_to include(/WARN.*Warned/)
         expect(lines).to include(/ERROR.*Fire/)
         expect(lines).to include(/ERROR.*Stop/)
@@ -475,9 +461,9 @@ describe "passes parsed AST to the apply_catalog task" do
         @log_output.level = :fatal
         run_cli(%w[plan run basic::error --log-level fatal] + config_flags)
 
-        expect(lines).not_to include(/DEBUG.*Debugging/)
-        expect(lines).not_to include(/INFO.*Meh/)
-        expect(lines).not_to include(/NOTICE.*Helpful/)
+        expect(lines).not_to include(/TRACE.*Debugging/)
+        expect(lines).not_to include(/DEBUG.*Meh/)
+        expect(lines).not_to include(/INFO.*Helpful/)
         expect(lines).not_to include(/WARN.*Warned/)
         expect(lines).not_to include(/ERROR.*Fire/)
         expect(lines).not_to include(/ERROR.*Stop/)

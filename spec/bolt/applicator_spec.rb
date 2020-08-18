@@ -75,10 +75,10 @@ describe Bolt::Applicator do
     expect(applicator.compile(target, input)).to eq({})
   end
 
-  it 'logs messages returned on stderr' do
+  it 'logs messages returned on stderr at a lower level' do
     logs = [
       { level: 'debug', message: 'A message' },
-      { level: 'notice', message: 'Stuff happened' }
+      { level: 'info', message: 'Stuff happened' }
     ]
 
     expect(Open3).to receive(:capture3)
@@ -89,8 +89,8 @@ describe Bolt::Applicator do
       [
         " DEBUG  Bolt::Executor : Started with 1 max thread(s)\n",
         " DEBUG  Bolt::Inventory::Inventory : Did not find config for #{target.uri} in inventory\n",
-        " DEBUG  Bolt::Applicator : #{target.uri}: A message\n",
-        "NOTICE  Bolt::Applicator : #{target.uri}: Stuff happened\n"
+        " TRACE  Bolt::Applicator : #{target.uri}: A message\n",
+        " DEBUG  Bolt::Applicator : #{target.uri}: Stuff happened\n"
       ]
     )
   end
@@ -122,6 +122,7 @@ describe Bolt::Applicator do
         allow(mock_logger).to receive(:[]).and_return(mock_logger)
         allow(mock_logger).to receive(:'level=').with(any_args)
         allow(mock_logger).to receive(:debug).with(any_args)
+        allow(mock_logger).to receive(:trace).with(any_args)
       end
 
       let(:mock_logger) { instance_double("Logging.logger") }
@@ -137,7 +138,7 @@ describe Bolt::Applicator do
         allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(result)
         allow(Bolt::ApplyResult).to receive(:puppet_missing_error).with(result).and_return(nil)
 
-        expect(mock_logger).to receive(:debug).with(/Packing plugin/).at_least(:once)
+        expect(mock_logger).to receive(:trace).with(/Packing plugin/).at_least(:once)
         expect(mock_logger).to_not receive(:debug).with(/Syncing only required modules/)
         applicator.apply([target], :body, scope)
       end
@@ -164,7 +165,7 @@ describe Bolt::Applicator do
         allow_any_instance_of(Bolt::Transport::SSH).to receive(:batch_task).and_return(result)
         allow(Bolt::ApplyResult).to receive(:puppet_missing_error).with(result).and_return(nil)
 
-        expect(mock_logger).to_not receive(:debug).with(/Packing plugin/)
+        expect(mock_logger).to_not receive(:trace).with(/Packing plugin/)
         expect(mock_logger).to receive(:debug).with('Syncing only required modules: just_a_module_name.')
 
         applicator.apply_ast(:body, [target], { required_modules: ['just_a_module_name'] })

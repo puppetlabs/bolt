@@ -274,7 +274,7 @@ describe Bolt::Config do
       }
 
       expect { Bolt::Config.new(project, config) }.to raise_error(
-        /level of log file:.* must be one of debug, info, notice, warn, error, fatal, any; received foo/
+        /level of log file:.* must be one of .*; received foo/
       )
     end
 

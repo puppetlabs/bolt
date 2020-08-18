@@ -110,7 +110,7 @@ describe BoltServer::Config do
     config = build_config(requiredconfig)
     expect(config['host']).to eq('127.0.0.1')
     expect(config['port']).to be(62658)
-    expect(config['loglevel']).to eq('notice')
+    expect(config['loglevel']).to eq('warn')
     expect(config['logfile']).to eq(nil)
     expect(config['whitelist']).to eq(nil)
     expect(config['ssl-cipher-suites']).to include('ECDHE-ECDSA-AES256-GCM-SHA384')
