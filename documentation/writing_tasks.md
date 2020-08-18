@@ -649,6 +649,11 @@ To convert an existing script to a task, you can either write a task that wraps
 the script, or you can add logic in your script to check for parameters in
 environment variables.
 
+> 🔩 **Tip:** In most cases, you can wrap an existing script in a simple YAML
+> plan, giving you much of the same benefit of converting a script to a task
+> without much effort. To learn more about wrapping scripts in YAML plans, see
+> [Wrapping scripts](writing_yaml_plans.md#wrapping-scripts).
+
 If the script is already installed on the targets, you can write a task that
 wraps the script. In the task, read the script arguments as task parameters and
 call the script, passing the parameters as the arguments.

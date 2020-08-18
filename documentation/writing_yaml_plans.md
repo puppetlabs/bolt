@@ -538,6 +538,111 @@ steps:
 return: $hostnames.map |$hostname_result| { $hostname_result['stdout'] }
 ```
 
+## Wrapping scripts
+
+Oftentimes, you may have existing scripts that you use to perform tasks on your
+targets. While Bolt is able to run scripts on remote targets, scripts do not
+have many of the benefits of tasks and plans, such as parameterizing input or
+listing available scripts in the UI. Sometimes it might make sense to convert
+your scripts into tasks to get these benefits, but there are many instances
+where wrapping your script in a simple YAML plan is just as effective.
+
+The following script, `add_two.py`, is used to calculate the sum from two
+numbers passed as arguments to the script:
+
+```python
+#!/usr/bin/env python
+# myproject/files/add_two.py
+import sys
+
+if __name__ == "__main__":
+    if len(sys.argv) > 2:
+            num1 = long(sys.argv[1])
+            num2 = long(sys.argv[2])
+    else:
+            print "This command takes two arguments and adds them"
+            print "Less than two arguments given."
+            sys.exit(1)
+    print "%s" % str(num1 + num2)
+```
+
+We can easily wrap this script in a YAML plan that accepts two parameters and
+passes them to the script as arguments.
+
+First, you should place the script in the `files` directory of the module or
+Bolt project that you will create the plan in. By placing the script in a module
+or project `files` directory, you will be able to easily refer to it from a plan
+using the convention `<module_name>/<script_basename>`.
+
+Next, create a plan in the `plans` directory of the module or Bolt project. The
+following plan wraps the `add_two.py` script above:
+
+```yaml
+# myproject/plans/add_two.yaml
+description: Add two numbers together
+
+parameters:
+  num1:
+    type: Numeric
+    description: The first addend
+  num2:
+    type: Numeric
+    description: The second addend
+  targets:
+    type: TargetSpec
+    description: The targets to run the script on
+    default: localhost
+
+steps:
+  - name: add_two
+    script: myproject/add_two.py
+    targets: $targets
+    arguments:
+      - $num1
+      - $num2
+
+return: $add_two
+```
+
+The `myproject::add_two` plan accepts three parameters. `num1` and `num2` are
+the two numbers that will be passed to the script as arguments. `targets` is a
+list of targets that we want to run the script on.
+
+This plan executes a single `script` step that runs the script
+`myproject/add_two.py` on the list of targets and passes the parameters `num1`
+and `num2` as arguments to the script. Arguments listed under the `arguments`
+key are passed to the script in order. Once the script runs, its result is
+stored in the `add_two` variable. The value of the `add_two` variable is then
+returned by the plan, letting you view the output from the script.
+
+By wrapping your script in a plan, you get the benefit of plan metadata, which
+adds automatic parameter validation and helpful contextual information for users
+who run the script.
+
+Once you have created your plan, you can view its metadata using the
+`bolt plan show` command:
+
+```shell
+$ bolt plan show myproject::add_two
+
+myproject::add_two - Add two numbers together
+
+USAGE:
+bolt plan run myproject::add_two [num1=<value>] [num2=<value>] [targets=<value>]
+
+PARAMETERS:
+- num1: Numeric
+    The first addend
+- num2: Numeric
+    The second addend
+- targets: TargetSpec
+    Default: localhost
+    The targets to run the script on
+
+MODULE:
+/Users/bolt/.puppetlabs/bolt
+```
+
 ## Computing complex values
 
 To compute complex values, you can use a Puppet code expression as the value of
