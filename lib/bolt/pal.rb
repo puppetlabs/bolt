@@ -409,7 +409,7 @@ module Bolt
                      end
           params[name] = { 'type' => type_str }
           params[name]['sensitive'] = param.type_expr.instance_of?(Puppet::Pops::Types::PSensitiveType)
-          params[name]['default_value'] = param.value
+          params[name]['default_value'] = param.value unless param.value.nil?
           params[name]['description'] = param.description if param.description
         end
         {
