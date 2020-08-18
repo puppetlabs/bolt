@@ -216,7 +216,7 @@ namespace :pwsh do
 
         # verbose and debug are commonparameters and are already present in the
         # pwsh cmdlets, so they are omitted here to prevent them from being
-        # added twice we add these back in when building the command to send to bolt
+        # added twice
         help_text[:flags].reject { |o| o =~ /verbose|debug|help|version/ }.map do |option|
           ruby_param = parser.top.long[option]
           pwsh_name = option.split("-").map(&:capitalize).join('')
@@ -267,12 +267,17 @@ namespace :pwsh do
             pwsh_param[:validate_not_null_or_empty] = true
           when 'transport'
             pwsh_param[:validate_set] = Bolt::Config::Options::TRANSPORT_CONFIG.keys
+          when 'loglevel'
+            pwsh_param[:validate_set] = %w[debug info notice warn error fatal any]
+          when 'filter'
+            pwsh_param[:validate_pattern] = '^[a-z0-9_:]+$'
           when 'targets'
             pwsh_param[:validate_not_null_or_empty] = true
           when 'query'
             pwsh_param[:validate_not_null_or_empty] = true
           when 'rerun'
             pwsh_param[:validate_not_null_or_empty] = true
+            pwsh_param[:validate_set] = %w[all failure success]
           when 'configfile'
             pwsh_param[:validate_not_null_or_empty] = true
           when 'boltdir'
@@ -292,6 +297,12 @@ namespace :pwsh do
 
           @pwsh_command[:options] << pwsh_param
         end
+
+        # we add debug and verbose back in when building the command to send to
+        # bolt, so add them back to the global mapping here
+        # this allows us to not have any filtering logic inside the erb
+        @mapped_options['Debug'] = 'debug'
+        @mapped_options['Verbose'] = 'verbose'
 
         # maintain a global list of pwsh parameter => ruby parameter
         # for the powershell erb file

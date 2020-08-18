@@ -17,8 +17,10 @@ $script:mapping = @{
 .PARAMETER <%= option[:name] %>
   <%= option[:help_msg] %>
 <% end -%>
-.PARAMETER version
+<% if pwsh_command[:verb] == 'Get' -%>
+.PARAMETER Version
   Get the version of the bolt installation
+<% end -%>
 .LINK
   https://puppet.com/products/bolt
 .LINK
@@ -27,31 +29,54 @@ $script:mapping = @{
 function <%= pwsh_command[:cmdlet] %>
 {
   [CmdletBinding()]
-  param (
-<% pwsh_command[:options].each do |option| -%>
-    [Parameter(<% if option[:mandatory] -%>Mandatory=$<%= option[:mandatory] -%><% end -%><% if option[:position] -%>, Position=<%= option[:position] -%><% end -%><% if option[:parameter_set] -%>, ParameterSetName='<%= option[:parameter_set] -%>'<% end -%>)]
-<% if option[:validate_not_null_or_empty] -%>
-    [ValidateNotNullOrEmpty()]
-<% end -%>
-<% if option[:validate_set] -%>
-    [ValidateSet(<%= option[:validate_set].map(&:inspect).join(', ') %>)]
-<% end -%>
-<% if option[:ruby_short] -%>
-    [Alias('<%= option[:ruby_short].gsub("-","") %>')]
-<% end -%>
-<% if option[:type] -%>
-    [<%= option[:type] -%>]
-<% end -%>
-    $<%= option[:name] -%>,
+  param (<%
+function_params = []
+pwsh_command[:options].each do |option|
+  parameter_statement = []
+  if option[:mandatory]
+    parameter_statement << "Mandatory=$#{option[:mandatory]}"
+  end
+  if option[:position]
+    parameter_statement << "Position=#{option[:position]}"
+  end
+  if option[:parameter_set]
+    parameter_statement << "ParameterSetName='#{option[:parameter_set]}'"
+  end
 
-<% end -%>
-    [Parameter()]
-    [switch]$Version
+  output = []
+  output << "    [Parameter(" + parameter_statement.join(", ") + ")]"
+  if option[:validate_not_null_or_empty]
+    output << "    [ValidateNotNullOrEmpty()]"
+  end
+  if option[:validate_set]
+    output << "    [ValidateSet(#{option[:validate_set].map(&:inspect).join(', ')})]"
+  end
+  if option[:validate_pattern]
+    output << "    [ValidatePattern('#{option[:validate_pattern]}')]"
+  end
+  if option[:ruby_short]
+    output << "    [Alias('#{option[:ruby_short].gsub("-","")}')]"
+  end
+  if option[:type]
+    output << "    [#{option[:type]}]"
+  end
+  output << "    $#{option[:name]}"
+
+  function_params << output.join("\n")
+end
+
+if pwsh_command[:verb] == 'Get'
+  function_params << "    [Parameter()]\n    [switch]$Version"
+end
+%>
+<%= function_params.join(",\n\n") %>
   )
-
+<% if pwsh_command[:verb] == 'Get' %>
   if($version){
-    return (Get-Content -Path $script:BOLT_BASEDIR\misc\versions.txt)[0].split(" ")[1]
+    $boltBasedir = (Get-ItemProperty -Path "HKLM:\Software\Puppet Labs\Bolt").RememberedInstallDir
+    return (Get-Content -Path $boltBasedir\misc\versions.txt)[0].split(" ")[1]
   }
+<% end -%>
 
   $params = @('<%= pwsh_command[:ruby_command] -%>'<% if pwsh_command[:ruby_action] -%>, '<%= pwsh_command[:ruby_action] -%>'<% end -%>)
 
