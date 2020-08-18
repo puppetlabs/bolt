@@ -260,7 +260,7 @@ module Bolt
           pretty_params << "- #{name}: #{p['type']}\n"
           pretty_params << "    Default: #{p['default_value']}\n" unless p['default_value'].nil?
           pretty_params << "    #{p['description']}\n" if p['description']
-          usage << (p.include?('default_value') ? " [#{name}=<value>]" : " #{name}=<value>")
+          usage << (p['default_value'].nil? ? " #{name}=<value>" : " [#{name}=<value>]")
         end
 
         plan_info << "\n#{plan['name']}"
