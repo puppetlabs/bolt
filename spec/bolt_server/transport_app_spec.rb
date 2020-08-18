@@ -179,6 +179,26 @@ describe "BoltServer::TransportApp" do
       end
     end
 
+    describe '/tasks' do
+      let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
+      let(:path) { "/tasks?environment=production" }
+
+      it 'returns just the list of plan names when metadata=false' do
+        expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+        expect(fake_pal).to receive(:list_tasks).and_return([%w[abc abc_description], %w[def def_description]])
+        get(path)
+        metadata = JSON.parse(last_response.body)
+        expect(metadata).to eq([{ 'name' => 'abc' }, { 'name' => 'def' }])
+      end
+
+      it 'returns 400 if an environment not found error is thrown' do
+        stub_const("Puppet::Environments::EnvironmentNotFound", StandardError)
+        expect(BoltServer::PE::PAL).to receive(:new).and_raise(Puppet::Environments::EnvironmentNotFound)
+        get(path)
+        expect(last_response.status).to eq(400)
+      end
+    end
+
     describe '/ssh/*' do
       let(:path) { "/ssh/#{action}" }
       let(:target) { conn_info('ssh') }
