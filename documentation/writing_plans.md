@@ -98,7 +98,7 @@ plan test::parameter_passing (
   TargetSpec $targets,
   Optional[String[1]] $example_nul = undef,
 ) {
-  return run_task('test::demo_undef_bash', $targets, example_nul => $example_nul)
+  return run_task('test::demo_undef_bash', $targets, 'example_nul' => $example_nul)
 }
 ```
 
@@ -409,7 +409,7 @@ You define a task parameter as sensitive with the metadata property
 are masked.
 
 ```
-run_task('task_with_secrets', ..., password => 'hunter2')
+run_task('task_with_secrets', ..., 'password' => 'hunter2')
 ```
 
 ### Working with the `Sensitive` function
@@ -422,7 +422,7 @@ prior to calling `run_task()`.
 
 ```
 $pass = Sensitive('hunter2')
-run_task('task_with_secrets', ..., password => $pass.unwrap)
+run_task('task_with_secrets', ..., 'password' => $pass.unwrap)
 ```
 
 📖 **Related information**  
@@ -490,9 +490,9 @@ plan mymodule::my_plan(
   $webserver_names = get_targets($webservers).map |$n| { $n.name }
   
   # process webservers
-  run_task('mymodule::lb_remove', $load_balancer, webservers => $webserver_names)
-  run_task('mymodule::update_frontend_app', $webservers, version => '1.2.3')
-  run_task('mymodule::lb_add', $load_balancer, webservers => $webserver_names)
+  run_task('mymodule::lb_remove', $load_balancer, 'webservers' => $webserver_names)
+  run_task('mymodule::update_frontend_app', $webservers, 'version' => '1.2.3')
+  run_task('mymodule::lb_add', $load_balancer, 'webservers' => $webserver_names)
  }
 ```
 
@@ -673,12 +673,12 @@ which task to run on the targets.
 ```
 plan run_with_facts(TargetSpec $targets) {
   # This collects facts on targets and updates the inventory
-  run_plan(facts, targets => $targets)
+  run_plan('facts', 'targets' => $targets)
 
   $centos_targets = get_targets($targets).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
   $ubuntu_targets = get_targets($targets).filter |$n| { $n.facts['os']['name'] == 'Ubuntu' }
-  run_task(centos_task, $centos_targets)
-  run_task(ubuntu_task, $ubuntu_targets)
+  run_task('centos_task', $centos_targets)
+  run_task('ubuntu_task', $ubuntu_targets)
 }
 ```
 
@@ -692,12 +692,12 @@ to run on the targets. You must configure the PuppetDB client before you run it.
 ```
 plan run_with_facts(TargetSpec $targets) {
   # This collects facts on targets and update the inventory
-  run_plan(**puppetdb_fact**, targets => $targets)
+  run_plan('puppetdb_fact', 'targets' => $targets)
 
   $centos_targets = get_targets($targets).filter |$n| { $n.facts['os']['name'] == 'CentOS' }
   $ubuntu_targets = get_targets($targets).filter |$n| { $n.facts['os']['name'] == 'Ubuntu' }
-  run_task(centos_task, $centos_targets)
-  run_task(ubuntu_task, $ubuntu_targets)
+  run_task('centos_task', $centos_targets)
+  run_task('ubuntu_task', $ubuntu_targets)
 }
 ```
 
@@ -754,7 +754,7 @@ you pass a description to the function, that is used in place of the generic log
 message.
 
 ```
-run_task(my_task, $targets, "Better description", param1 => "val")
+run_task('my_task', $targets, 'Better description', 'param1' => 'val')
 ```
 
 If your plan contains many small actions, you might want to suppress these
@@ -767,7 +767,7 @@ example to loop over a series of targets without logging each action:
 plan deploy( TargetSpec $targets) {
   without_default_logging() || {
     get_targets($targets).each |$target| {
-      run_task(deploy, $target)
+      run_task('deploy', $target)
     }
   }
 }
