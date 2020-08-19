@@ -59,12 +59,6 @@ describe Bolt::Plugin do
                             'identity' => { 'foo' => { '_plugin' => 'pkcs7' } })
       expect { plugins }.to raise_error(/Configuration for plugin 'pkcs7' depends on the plugin itself/)
     end
-
-    it 'fails if the entire plugins key is set with a reference' do
-      plugin_config.replace(identity('pkcs7' => { 'keysize' => 1024 }))
-
-      expect { plugins }.to raise_error(/The 'plugins' setting cannot be set by a plugin reference/)
-    end
   end
 
   context 'loading plugin_hooks' do

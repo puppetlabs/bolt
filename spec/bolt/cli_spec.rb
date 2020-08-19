@@ -762,7 +762,7 @@ describe "Bolt::CLI" do
 
     describe "console log level" do
       it "is not sensitive to ordering of debug and verbose" do
-        expect(Bolt::Logger).to receive(:configure).with(include('console' => { level: :debug }), true)
+        expect(Bolt::Logger).to receive(:configure).with(include('console' => { level: 'debug' }), true)
 
         cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug --verbose])
         cli.parse
@@ -789,7 +789,7 @@ describe "Bolt::CLI" do
 
       it "raises a Bolt error when the level is a stringified integer" do
         cli = Bolt::CLI.new(%w[command run uptime --targets foo --log-level 42])
-        expect { cli.parse }.to raise_error(Bolt::ValidationError, /level of log console must be one of/)
+        expect { cli.parse }.to raise_error(Bolt::ValidationError, /Value at 'log.console.level' must be one of/)
       end
     end
 

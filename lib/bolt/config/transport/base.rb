@@ -2,6 +2,7 @@
 
 require 'bolt/error'
 require 'bolt/util'
+require 'bolt/config/validator'
 require 'bolt/config/transport/options'
 
 module Bolt
@@ -90,6 +91,14 @@ module Bolt
           self::OPTIONS
         end
 
+        def self.schema
+          {
+            type:       Hash,
+            properties: self::TRANSPORT_OPTIONS.slice(*self::OPTIONS),
+            _plugin:    true
+          }
+        end
+
         private def defaults
           unless defined? self.class::DEFAULTS
             raise NotImplementedError,
@@ -116,25 +125,7 @@ module Bolt
 
         # Validation defaults to just asserting the option types
         private def validate
-          assert_type
-        end
-
-        # Validates that each option is the correct type. Types are loaded from the TRANSPORT_OPTIONS hash.
-        private def assert_type
-          @config.each_pair do |opt, val|
-            types = Array(TRANSPORT_OPTIONS.dig(opt, :type)).compact
-
-            next if val.nil? || types.empty? || types.include?(val.class)
-
-            # Ruby doesn't have a Boolean class, so add it to the types list if TrueClass or FalseClass
-            # are present.
-            if types.include?(TrueClass) || types.include?(FalseClass)
-              types = types - [TrueClass, FalseClass] + ['Boolean']
-            end
-
-            raise Bolt::ValidationError,
-                  "#{opt} must be of type #{types.join(', ')}; received #{val.class} #{val.inspect} "
-          end
+          Bolt::Config::Validator.new.validate(@config.compact, self.class.schema.fetch(:properties))
         end
       end
     end

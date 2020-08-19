@@ -66,14 +66,6 @@ describe Bolt::Project do
       end
     end
 
-    describe "with invalid tasks config" do
-      let(:project_config) { { 'tasks' => 'foo' } }
-
-      it "raises an error" do
-        expect { project.validate }.to raise_error(/'tasks' in bolt-project.yaml must be an array/)
-      end
-    end
-
     describe "with invalid name config" do
       let(:project_config) { { 'name' => '_invalid' } }
 
@@ -87,28 +79,6 @@ describe Bolt::Project do
 
       it "raises an error" do
         expect { project.validate }.to raise_error(/Invalid project name 'puppetlabs-foo' in bolt-project.yaml/)
-      end
-    end
-
-    context 'with module delcarations' do
-      it 'errors if not an array' do
-        config = {
-          'modules' => {}
-        }
-
-        expect { Bolt::Project.new(config, project_path).validate }
-          .to raise_error(Bolt::ValidationError)
-      end
-
-      it 'errors if a module delcaration is not a hash or string' do
-        config = {
-          'modules' => [
-            23
-          ]
-        }
-
-        expect { Bolt::Project.new(config, project_path).validate }
-          .to raise_error(Bolt::ValidationError)
       end
     end
   end

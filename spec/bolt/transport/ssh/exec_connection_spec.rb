@@ -42,8 +42,7 @@ describe Bolt::Transport::SSH::ExecConnection do
         'copy-command' => 3
       )
 
-      expect { subject.upload_file('good', 'evening') }
-        .to raise_error(/copy-command must be of type Array, String; received Integer 3/)
+      expect { subject.upload_file('good', 'evening') }.to raise_error(Bolt::ValidationError)
     end
 
     it 'builds scp command with port' do
@@ -99,8 +98,7 @@ describe Bolt::Transport::SSH::ExecConnection do
       inventory.set_config(target, %w[ssh native-ssh], true)
       inventory.set_config(target, %w[ssh ssh-command], 3)
 
-      expect { subject.execute('ls') }
-        .to raise_error(/ssh-command must be of type Array, String; received Integer 3/)
+      expect { subject.execute('ls') }.to raise_error(Bolt::ValidationError)
     end
   end
 end

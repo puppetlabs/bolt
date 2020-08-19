@@ -2,6 +2,7 @@
 
 require 'pathname'
 require 'bolt/config'
+require 'bolt/config/validator'
 require 'bolt/pal'
 require 'bolt/module'
 
@@ -78,6 +79,12 @@ module Bolt
       default = type =~ /user|system/ ? 'default ' : ''
       exist = File.exist?(File.expand_path(project_file))
       logs << { info: "Loaded #{default}project from '#{fullpath}'" } if exist
+
+      # Validate the config against the schema. This will raise a single error
+      # with all validation errors.
+      schema = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_PROJECT_OPTIONS)
+      Bolt::Config::Validator.new.validate(data, schema, project_file)
+
       new(data, path, type, logs)
     end
 
@@ -197,23 +204,6 @@ module Bolt
       else
         message = "No project name is specified in bolt-project.yaml. Project-level content will not be available."
         @logs << { warn: message }
-      end
-
-      %w[tasks plans].each do |conf|
-        unless @data.fetch(conf, []).is_a?(Array)
-          raise Bolt::ValidationError, "'#{conf}' in bolt-project.yaml must be an array"
-        end
-      end
-
-      if @data['modules']
-        unless @data['modules'].is_a?(Array)
-          raise Bolt::ValidationError, "'modules' in bolt-project.yaml must be an array"
-        end
-
-        @data['modules'].each do |spec|
-          next if spec.is_a?(Hash) || spec.is_a?(String)
-          raise Bolt::ValidationError, "Module specification #{spec.inspect} must be a hash or string"
-        end
       end
     end
 
