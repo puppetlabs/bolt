@@ -125,10 +125,10 @@
               "description": "The type of information to log.",
               "type": "string",
               "enum": [
+                "trace",
                 "debug",
                 "error",
                 "info",
-                "notice",
                 "warn",
                 "fatal",
                 "any"
@@ -149,10 +149,10 @@
             "description": "The type of information to log.",
             "type": "string",
             "enum": [
+              "trace",
               "debug",
               "error",
               "info",
-              "notice",
               "warn",
               "fatal",
               "any"
