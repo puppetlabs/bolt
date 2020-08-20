@@ -9,11 +9,12 @@ Puppet::DataTypes.create_type('Result') do
     functions => {
       error => Callable[[], Optional[Error]],
       message => Callable[[], Optional[String]],
+      sensitive => Callable[[], Optional[Sensitive[Data]]],
       action => Callable[[], String],
       status => Callable[[], String],
       to_data => Callable[[], Hash],
       ok => Callable[[], Boolean],
-      '[]' => Callable[[String[1]], Data]
+      '[]' => Callable[[String[1]], Variant[Data, Sensitive[Data]]]
     }
   PUPPET
 

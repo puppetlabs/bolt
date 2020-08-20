@@ -363,6 +363,12 @@ describe "passes parsed AST to the apply_catalog task" do
         expect(notify[0]['title']).to eq("ApplyResult resource: The command failed with exit code 127")
       end
 
+      it 'preserves the sensitive data of Results' do
+        result = run_cli_json(%w[plan run puppet_types::sensitive_result] + config_flags)
+        notify = get_notifies(result)
+        expect(notify[0]['title']).to eq("Result sensitive value: secretpassword")
+      end
+
       context 'when calling invalid functions in apply' do
         it 'errors when get_targets is called' do
           result = run_cli_json(%w[plan run puppet_types::get_targets] + config_flags)

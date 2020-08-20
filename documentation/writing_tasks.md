@@ -421,6 +421,26 @@ end
 puts result.to_json
 ```
 
+### Returning sensitive data
+
+To return secrets from a task, use the `_sensitive` key in the output. Bolt
+will treat the result as sensitive and won't allow it to be printed to the
+console or log.
+
+```ruby
+#!/opt/puppetlabs/puppet/bin/ruby
+
+require 'json'
+
+user_name = 'someone'
+# Generate a 10 letter password
+user_password = [*'a'..'z'].sample(10).join
+
+result = { user: user_name, _sensitive: { password: user_password } }
+
+puts result.to_json
+```
+
 ## Supporting no-op in tasks
 
 Tasks support no-operation functionality, also known as no-op mode. This

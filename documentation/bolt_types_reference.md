@@ -72,6 +72,7 @@ The following functions are available to `Result` objects.
 | `action` | `String` | The type of result. For example, `task` or `command`. |
 | `error` | `Error` | An object constructed from the `_error` field of the result's value. |
 | `message` | `String` | The `_output` field of the result's value. |
+| `sensitive` | `Sensitive` | The `_sensitive` field of the result's value, wrapped in a `Sensitive` object. Call `unwrap()` to extract the value. |
 | `ok` | `Boolean` | Whether the result was successful. |
 | `status` | `String` | Either `success` if the result was successful or `failure`. |
 | `target` | `Target` | The target the result is from. |

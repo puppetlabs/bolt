@@ -89,11 +89,24 @@ describe Bolt::Result do
       expect(result.value).to eq(obj)
     end
 
-    it 'doesnt include _ keys in generic_value' do
+    it 'marks _sensitive values as sensitive' do
+      obj = { "user" => "someone", "_sensitive" => { "password" => "sosecretive" } }
+      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
+      expect(result.sensitive).to be_a(Puppet::Pops::Types::PSensitiveType::Sensitive)
+      expect(result.sensitive.unwrap).to eq('password' => 'sosecretive')
+    end
+
+    it 'excludes _output and _error from generic_value' do
       obj = { "key" => "val" }
       special = { "_error" => {}, "_output" => "output" }
       result = Bolt::Result.for_task(target, obj.merge(special).to_json, '', 0, 'atask')
       expect(result.generic_value).to eq(obj)
+    end
+
+    it 'includes _sensitive in generic_value' do
+      obj = { "user" => "someone", "_sensitive" => { "password" => "sosecretive" } }
+      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
+      expect(result.generic_value.keys).to include('user', '_sensitive')
     end
 
     it "doesn't parse arrays" do
