@@ -1520,7 +1520,6 @@ describe "Bolt::CLI" do
             "parameters" => {
               "nodes" => {
                 "type" => "TargetSpec",
-                "default_value" => nil,
                 "sensitive" => false
               },
               "param_optional" => {
