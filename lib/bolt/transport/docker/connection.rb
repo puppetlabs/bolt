@@ -12,7 +12,7 @@ module Bolt
           @target = target
           @logger = Logging.logger[target.safe_name]
           @docker_host = @target.options['service-url']
-          @logger.debug("Initializing docker connection to #{@target.safe_name}")
+          @logger.trace("Initializing docker connection to #{@target.safe_name}")
         end
 
         def connect
@@ -25,7 +25,7 @@ module Bolt
           output = execute_local_docker_json_command('inspect', [output[index]["ID"]])
           # Store the container information for later
           @container_info = output[0]
-          @logger.debug { "Opened session" }
+          @logger.trace { "Opened session" }
           true
         rescue StandardError => e
           raise Bolt::Node::ConnectError.new(
@@ -57,16 +57,16 @@ module Bolt
           command_options << container_id
           command_options.concat(command)
 
-          @logger.debug { "Executing: exec #{command_options}" }
+          @logger.trace { "Executing: exec #{command_options}" }
 
           stdout_str, stderr_str, status = execute_local_docker_command('exec', command_options, options[:stdin])
 
           # The actual result is the exitstatus not the process object
           status = status.nil? ? -32768 : status.exitstatus
           if status == 0
-            @logger.debug { "Command returned successfully" }
+            @logger.trace { "Command returned successfully" }
           else
-            @logger.info { "Command failed with exit code #{status}" }
+            @logger.trace { "Command failed with exit code #{status}" }
           end
           stdout_str.force_encoding(Encoding::UTF_8)
           stderr_str.force_encoding(Encoding::UTF_8)
@@ -75,12 +75,12 @@ module Bolt
           stderr_str.gsub!("\r\n", "\n")
           [stdout_str, stderr_str, status]
         rescue StandardError
-          @logger.debug { "Command aborted" }
+          @logger.trace { "Command aborted" }
           raise
         end
 
         def write_remote_file(source, destination)
-          @logger.debug { "Uploading #{source}, to #{destination}" }
+          @logger.trace { "Uploading #{source} to #{destination}" }
           _, stdout_str, status = execute_local_docker_command('cp', [source, "#{container_id}:#{destination}"])
           unless status.exitstatus.zero?
             raise "Error writing file to container #{@container_id}: #{stdout_str}"
@@ -90,7 +90,7 @@ module Bolt
         end
 
         def write_remote_directory(source, destination)
-          @logger.debug { "Uploading #{source}, to #{destination}" }
+          @logger.trace { "Uploading #{source} to #{destination}" }
           _, stdout_str, status = execute_local_docker_command('cp', [source, "#{container_id}:#{destination}"])
           unless status.exitstatus.zero?
             raise "Error writing directory to container #{@container_id}: #{stdout_str}"
@@ -100,7 +100,7 @@ module Bolt
         end
 
         def download_remote_content(source, destination)
-          @logger.debug { "Downloading #{source} to #{destination}" }
+          @logger.trace { "Downloading #{source} to #{destination}" }
           # Create the destination directory, otherwise copying a source directory with Docker will
           # copy the *contents* of the directory.
           # https://docs.docker.com/engine/reference/commandline/cp/

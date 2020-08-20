@@ -16,7 +16,7 @@ module BoltServer
 
     def defaults
       { 'host' => '127.0.0.1',
-        'loglevel' => 'notice',
+        'loglevel' => 'warn',
         'ssl-cipher-suites' => %w[ECDHE-ECDSA-AES256-GCM-SHA384
                                   ECDHE-RSA-AES256-GCM-SHA384
                                   ECDHE-ECDSA-CHACHA20-POLY1305

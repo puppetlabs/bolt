@@ -103,7 +103,7 @@ module Bolt
                                 " using '#{execute_options[:interpreter]}' interpreter"
                               end
           # log the arguments with sensitive data redacted, do NOT log unwrapped_arguments
-          logger.debug("Running '#{executable}' with #{arguments.to_json}#{interpreter_debug}")
+          logger.trace("Running '#{executable}' with #{arguments.to_json}#{interpreter_debug}")
           # unpack any Sensitive data
           arguments = unwrap_sensitive_args(arguments)
 
@@ -203,13 +203,13 @@ module Bolt
 
       def handle_sudo_errors(err)
         if err =~ /^#{conn.user} is not in the sudoers file\./
-          @logger.debug { err }
+          @logger.trace { err }
           raise Bolt::Node::EscalateError.new(
             "User #{conn.user} does not have sudo permission on #{target}",
             'SUDO_DENIED'
           )
         elsif err =~ /^Sorry, try again\./
-          @logger.debug { err }
+          @logger.trace { err }
           raise Bolt::Node::EscalateError.new(
             "Sudo password for user #{conn.user} not recognized on #{target}",
             'BAD_PASSWORD'
@@ -351,7 +351,7 @@ module Bolt
 
         command_str = [sudo_str, env_decl, command_str].compact.join(' ')
 
-        @logger.debug { "Executing: #{command_str}" }
+        @logger.trace { "Executing `#{command_str}`" }
 
         in_buffer = if !use_sudo && options[:stdin]
                       String.new(options[:stdin], encoding: 'binary')
@@ -431,16 +431,16 @@ module Bolt
         result_output.exit_code = t.value.respond_to?(:exitstatus) ? t.value.exitstatus : t.value
 
         if result_output.exit_code == 0
-          @logger.debug { "Command returned successfully" }
+          @logger.trace { "Command `#{command_str}` returned successfully" }
         else
-          @logger.info { "Command failed with exit code #{result_output.exit_code}" }
+          @logger.trace { "Command #{command_str} failed with exit code #{result_output.exit_code}" }
         end
         result_output
       rescue StandardError
         # Ensure we close stdin and kill the child process
         inp&.close
         t&.terminate if t&.alive?
-        @logger.debug { "Command aborted" }
+        @logger.trace { "Command aborted" }
         raise
       end
 

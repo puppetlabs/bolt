@@ -1056,7 +1056,7 @@ module Bolt
       msg = <<~MSG.chomp
         Loaded configuration from: '#{config.config_files.join("', '")}'
       MSG
-      @logger.debug(msg)
+      @logger.info(msg)
     end
 
     # Gem installs include the aggregate, canary, and puppetdb_fact modules, while

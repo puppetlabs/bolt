@@ -119,7 +119,7 @@ module Bolt
         end
 
         if contains_target?(t_name)
-          @logger.warn("Ignoring duplicate target in #{@name}: #{target}")
+          @logger.debug("Ignoring duplicate target in #{@name}: #{target}")
           return
         end
 
@@ -200,14 +200,14 @@ module Bolt
           # If this is an alias for an existing target, then add it to this group
           elsif (canonical_name = aliases[string_target])
             if contains_target?(canonical_name)
-              @logger.warn("Ignoring duplicate target in #{@name}: #{canonical_name}")
+              @logger.debug("Ignoring duplicate target in #{@name}: #{canonical_name}")
             else
               @unresolved_targets[canonical_name] = { 'name' => canonical_name }
             end
           # If it's not the name or alias of an existing target, then make a
           # new target using the string as the URI
           elsif contains_target?(string_target)
-            @logger.warn("Ignoring duplicate target in #{@name}: #{string_target}")
+            @logger.debug("Ignoring duplicate target in #{@name}: #{string_target}")
           else
             @unresolved_targets[string_target] = { 'uri' => string_target }
           end

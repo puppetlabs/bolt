@@ -28,7 +28,7 @@ module Bolt
         end
 
         def upload_file(source, dest)
-          @logger.debug { "Uploading #{source}, to #{dest}" }
+          @logger.trace { "Uploading #{source} to #{dest}" }
           if source.is_a?(StringIO)
             Tempfile.create(File.basename(dest)) do |f|
               f.write(source.read)
@@ -46,7 +46,7 @@ module Bolt
         end
 
         def download_file(source, dest, _download)
-          @logger.debug { "Downloading #{source} to #{dest}" }
+          @logger.trace { "Downloading #{source} to #{dest}" }
           # Create the destination directory for the target, or the
           # copied file will have the target's name
           FileUtils.mkdir_p(dest)

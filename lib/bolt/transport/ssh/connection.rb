@@ -28,7 +28,7 @@ module Bolt
 
           @logger = Logging.logger[@target.safe_name]
           @transport_logger = transport_logger
-          @logger.debug("Initializing ssh connection to #{@target.safe_name}")
+          @logger.trace("Initializing ssh connection to #{@target.safe_name}")
 
           if target.options['private-key']&.instance_of?(String)
             begin
@@ -131,7 +131,7 @@ module Bolt
 
           @session = Net::SSH.start(target.host, @user, options)
           validate_ssh_version
-          @logger.debug { "Opened session" }
+          @logger.trace { "Opened session" }
         rescue Net::SSH::AuthenticationFailed => e
           raise Bolt::Node::ConnectError.new(
             e.message,
@@ -161,7 +161,7 @@ module Bolt
             rescue Timeout::Error
               @session.shutdown!
             end
-            @logger.debug { "Closed session" }
+            @logger.trace { "Closed session" }
           end
         end
 
@@ -237,7 +237,7 @@ module Bolt
 
         def upload_file(source, destination)
           # Do not log wrapper script content
-          @logger.debug { "Uploading #{source}, to #{destination}" } unless source.is_a?(StringIO)
+          @logger.trace { "Uploading #{source} to #{destination}" } unless source.is_a?(StringIO)
           @session.scp.upload!(source, destination, recursive: true)
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
@@ -245,7 +245,7 @@ module Bolt
 
         def download_file(source, destination, _download)
           # Do not log wrapper script content
-          @logger.debug { "Downloading #{source} to #{destination}" }
+          @logger.trace { "Downloading #{source} to #{destination}" }
           @session.scp.download!(source, destination, recursive: true)
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')

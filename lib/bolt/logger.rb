@@ -14,13 +14,12 @@ module Bolt
       # redefs, so skip it if it's already been initialized
       return if Logging.initialized?
 
-      Logging.init :debug, :info, :notice, :warn, :error, :fatal, :any
+      Logging.init :trace, :debug, :info, :notice, :warn, :error, :fatal, :any
       @mutex = Mutex.new
 
       Logging.color_scheme(
         'bolt',
         lines: {
-          notice: :green,
           warn: :yellow,
           error: :red,
           fatal: %i[white on_red]
@@ -81,7 +80,7 @@ module Bolt
 
     def self.default_layout
       Logging.layouts.pattern(
-        pattern: '%d %-6l %c: %m\n',
+        pattern: '%d %-6l [%T] [%c] %m\n',
         date_pattern: '%Y-%m-%dT%H:%M:%S.%6N'
       )
     end
@@ -91,7 +90,7 @@ module Bolt
     end
 
     def self.default_file_level
-      :notice
+      :warn
     end
 
     # Explicitly check the log level names instead of the log level number, as levels

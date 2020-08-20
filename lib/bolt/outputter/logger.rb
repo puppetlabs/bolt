@@ -40,13 +40,13 @@ module Bolt
 
       def log_plan_start(event)
         plan = event[:plan]
-        @logger.notice("Starting: plan #{plan}")
+        @logger.info("Starting: plan #{plan}")
       end
 
       def log_plan_finish(event)
         plan = event[:plan]
         duration = event[:duration]
-        @logger.notice("Finished: plan #{plan} in #{duration.round(2)} sec")
+        @logger.info("Finished: plan #{plan} in #{duration.round(2)} sec")
       end
     end
   end

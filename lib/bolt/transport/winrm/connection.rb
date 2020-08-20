@@ -19,7 +19,7 @@ module Bolt
           # Build set of extensions from extensions config as well as interpreters
 
           @logger = Logging.logger[@target.safe_name]
-          logger.debug("Initializing winrm connection to #{@target.safe_name}")
+          logger.trace("Initializing winrm connection to #{@target.safe_name}")
           @transport_logger = transport_logger
         end
 
@@ -55,7 +55,7 @@ module Bolt
 
             @session = @connection.shell(:powershell)
             @session.run('$PSVersionTable.PSVersion')
-            @logger.debug { "Opened session" }
+            @logger.trace { "Opened session" }
           end
         rescue Timeout::Error
           # If we're using the default port with SSL, a timeout probably means the
@@ -97,11 +97,11 @@ module Bolt
         def disconnect
           @session&.close
           @client&.disconnect!
-          @logger.debug { "Closed session" }
+          @logger.trace { "Closed session" }
         end
 
         def execute(command)
-          @logger.debug { "Executing command: #{command}" }
+          @logger.trace { "Executing command: #{command}" }
 
           inp = StringIO.new
           # This transport doesn't accept stdin, so close the stream to ensure
@@ -134,12 +134,12 @@ module Bolt
             "with 'ulimit -n 1024'. See https://puppet.com/docs/bolt/latest/bolt_known_issues.html for details."
           raise Bolt::Error.new(msg, 'bolt/too-many-files')
         rescue StandardError
-          @logger.debug { "Command aborted" }
+          @logger.trace { "Command aborted" }
           raise
         end
 
         def upload_file(source, destination)
-          @logger.debug { "Uploading #{source}, to #{destination}" }
+          @logger.trace { "Uploading #{source} to #{destination}" }
           if target.options['file-protocol'] == 'smb'
             upload_file_smb(source, destination)
           else
@@ -185,7 +185,7 @@ module Bolt
         end
 
         def download_file(source, destination, download)
-          @logger.debug { "Downloading #{source} to #{destination}" }
+          @logger.trace { "Downloading #{source} to #{destination}" }
           if target.options['file-protocol'] == 'smb'
             download_file_smb(source, destination)
           else
@@ -257,7 +257,7 @@ module Bolt
           status = @client.login
           case status
           when WindowsError::NTStatus::STATUS_SUCCESS
-            @logger.debug { "Connected to #{@client.dns_host_name}" }
+            @logger.trace { "Connected to #{@client.dns_host_name}" }
           when WindowsError::NTStatus::STATUS_LOGON_FAILURE
             raise Bolt::Node::ConnectError.new(
               "SMB authentication failed for #{target.safe_name}",

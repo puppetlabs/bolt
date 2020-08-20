@@ -13,7 +13,7 @@ module Bolt
           msg = "Invalid content for #{file_name} file: #{path} should be a Hash or empty, not #{content.class}"
           raise Bolt::FileError.new(msg, path)
         end
-        logger.debug("Loaded #{file_name} from #{path}")
+        logger.trace("Loaded #{file_name} from #{path}")
         content
       rescue Errno::ENOENT
         raise Bolt::FileError.new("Could not read #{file_name} file: #{path}", path)

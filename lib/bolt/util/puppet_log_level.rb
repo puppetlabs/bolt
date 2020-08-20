@@ -4,9 +4,10 @@ module Bolt
   module Util
     module PuppetLogLevel
       MAPPING = {
-        debug: :debug,
-        info: :info,
-        notice: :notice,
+        # Demote Puppet's logs by one level, since Puppet is an implementation detail of Bolt
+        debug: :trace,
+        info: :debug,
+        notice: :info,
         warning: :warn,
         err: :error,
         # The following are used by Puppet functions of the same name, and are all treated as

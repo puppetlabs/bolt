@@ -186,8 +186,8 @@ module Bolt
                 "level" => {
                   description: "The type of information to log.",
                   type: String,
-                  enum: %w[debug error info notice warn fatal any],
-                  _default: "warn for console, notice for file"
+                  enum: %w[trace debug error info warn fatal any],
+                  _default: "warn"
                 }
               }
             }
@@ -204,8 +204,8 @@ module Bolt
               "level" => {
                 description: "The type of information to log.",
                 type: String,
-                enum: %w[debug error info notice warn fatal any],
-                _default: "warn for console, notice for file"
+                enum: %w[trace debug error info warn fatal any],
+                _default: "warn"
               }
             }
           },

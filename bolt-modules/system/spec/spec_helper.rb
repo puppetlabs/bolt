@@ -6,3 +6,8 @@ require 'puppet_pal'
 # so we get task loaders.
 Puppet[:tasks] = true
 require 'puppetlabs_spec_helper/module_spec_helper'
+
+RSpec.configure do
+  require 'bolt/logger'
+  Bolt::Logger.initialize_logging
+end

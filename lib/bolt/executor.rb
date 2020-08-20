@@ -56,11 +56,12 @@ module Bolt
       @reported_transports = Set.new
       @subscribers = {}
       @publisher = Concurrent::SingleThreadExecutor.new
+      @publisher.post { Thread.current[:name] = 'event-publisher' }
 
       @noop = noop
       @run_as = nil
       @pool = if concurrency > 0
-                Concurrent::ThreadPoolExecutor.new(max_threads: concurrency)
+                Concurrent::ThreadPoolExecutor.new(name: 'exec', max_threads: concurrency)
               else
                 Concurrent.global_immediate_executor
               end
@@ -125,6 +126,7 @@ module Bolt
           # Pass this argument through to avoid retaining a reference to a
           # local variable that will change on the next iteration of the loop.
           @pool.post(batch_promises) do |result_promises|
+            Thread.current[:name] ||= Thread.current.name
             results = yield transport, batch
             Array(results).each do |result|
               result_promises[result.target].set(result)
@@ -241,7 +243,7 @@ module Bolt
 
       @analytics&.event('Plan', 'yaml', plan_steps: steps, return_type: return_type)
     rescue StandardError => e
-      @logger.debug { "Failed to submit analytics event: #{e.message}" }
+      @logger.trace { "Failed to submit analytics event: #{e.message}" }
     end
 
     def with_node_logging(description, batch)
