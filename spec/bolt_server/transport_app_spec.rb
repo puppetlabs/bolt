@@ -9,6 +9,7 @@ require 'bolt_server/transport_app'
 require 'json'
 require 'rack/test'
 require 'puppet/environments'
+require 'digest'
 
 describe "BoltServer::TransportApp" do
   include BoltSpec::BoltServer
@@ -196,6 +197,85 @@ describe "BoltServer::TransportApp" do
         expect(BoltServer::PE::PAL).to receive(:new).and_raise(Puppet::Environments::EnvironmentNotFound)
         get(path)
         expect(last_response.status).to eq(400)
+      end
+    end
+
+    describe '/tasks/:module_name/:task_name' do
+      let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
+
+      context 'with module_name::task_name' do
+        let(:path) { '/tasks/foo/bar?environment=production' }
+        let(:mock_task) {
+          Bolt::Task.new(task_name, {}, [{ 'name' => 'bar.rb', 'path' => File.expand_path(__FILE__) }])
+        }
+        let(:task_name) { 'foo::bar' }
+        let(:expected_response) {
+          {
+            "metadata" => {},
+            "name" => "foo::bar",
+            "files" => [
+              {
+                "filename" => "bar.rb",
+                "sha256" => Digest::SHA256.hexdigest(File.read(__FILE__)),
+                "size_bytes" => File.size(__FILE__),
+                "uri" => {
+                  "path" => "/puppet/v3/file_content/tasks/foo/bar.rb",
+                  "params" => { "environment" => "production" }
+                }
+              }
+            ]
+          }
+        }
+        it '/tasks/:module_name/:task_name handles module::task_name' do
+          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:get_task).with(task_name).and_return(mock_task)
+          get(path)
+          resp = JSON.parse(last_response.body)
+          expect(resp).to eq(expected_response)
+        end
+      end
+
+      context 'with module_name' do
+        let(:path) { '/tasks/foo/init?environment=production' }
+        let(:mock_task) {
+          Bolt::Task.new(task_name, {}, [{ 'name' => 'init.rb', 'path' => File.expand_path(__FILE__) }])
+        }
+        let(:task_name) { 'foo' }
+        let(:expected_response) {
+          {
+            "metadata" => {},
+            "name" => "foo",
+            "files" => [
+              {
+                "filename" => "init.rb",
+                "sha256" => Digest::SHA256.hexdigest(File.read(__FILE__)),
+                "size_bytes" => File.size(__FILE__),
+                "uri" => {
+                  "path" => "/puppet/v3/file_content/tasks/foo/init.rb",
+                  "params" => { "environment" => "production" }
+                }
+              }
+            ]
+          }
+        }
+
+        it '/tasks/:module_name/:task_name handles task name = module name (init.rb) task' do
+          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:get_task).with(task_name).and_return(mock_task)
+          get(path)
+          resp = JSON.parse(last_response.body)
+          expect(resp).to eq(expected_response)
+        end
+      end
+
+      context 'with non-existant task' do
+        let(:path) { '/tasks/foo/bar?environment=production' }
+        it 'returns 400 if an unknown plan error is thrown' do
+          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:get_task).with('foo::bar').and_raise(Bolt::Error.unknown_task('foo::bar'))
+          get(path)
+          expect(last_response.status).to eq(400)
+        end
       end
     end
 
