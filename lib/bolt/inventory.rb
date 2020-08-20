@@ -46,10 +46,13 @@ module Bolt
     end
 
     def self.from_config(config, plugins)
+      logger = Logging.logger[self]
+
       if ENV.include?(ENVIRONMENT_VAR)
         begin
           data = YAML.safe_load(ENV[ENVIRONMENT_VAR])
           raise Bolt::ParseError, "Could not parse inventory from $#{ENVIRONMENT_VAR}" unless data.is_a?(Hash)
+          logger.debug("Loaded inventory from environment variable #{ENVIRONMENT_VAR}")
         rescue Psych::Exception
           raise Bolt::ParseError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
         end
@@ -57,8 +60,12 @@ module Bolt
         data = if config.inventoryfile
                  Bolt::Util.read_yaml_hash(config.inventoryfile, 'inventory')
                else
-                 Bolt::Util.read_optional_yaml_hash(config.default_inventoryfile, 'inventory')
+                 i = Bolt::Util.read_optional_yaml_hash(config.default_inventoryfile, 'inventory')
+                 logger.debug("Loaded inventory from #{config.default_inventoryfile}") if i
+                 i
                end
+        # This avoids rubocop complaining about identical conditionals
+        logger.debug("Loaded inventory from #{config.inventoryfile}") if config.inventoryfile
       end
 
       # Resolve plugin references from transport config

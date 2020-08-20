@@ -79,7 +79,7 @@ module Bolt
 
     # Wrapper method that is called by the Bolt executable. Parses the command and
     # then loads the project and config. Once config is loaded, it completes the
-    # setup process by configuring Bolt and issuing warnings.
+    # setup process by configuring Bolt and logging messages.
     #
     # This separation is needed since the Bolt::Outputter class that normally handles
     # printing errors relies on config being loaded. All setup that happens before
@@ -167,20 +167,17 @@ module Bolt
       raise e
     end
 
-    # Completes the setup process by configuring Bolt and issuing warnings
+    # Completes the setup process by configuring Bolt and log messages
     def finalize_setup
       Bolt::Logger.configure(config.log, config.color)
       Bolt::Logger.analytics = analytics
 
-      # Logger must be configured before checking path case and project file, otherwise warnings will not display
+      # Logger must be configured before checking path case and project file, otherwise logs will not display
       config.check_path_case('modulepath', config.modulepath)
       config.project.check_deprecated_file
 
-      # Log the file paths for loaded config files
-      config_loaded
-
-      # Display warnings created during parser and config initialization
-      config.warnings.each { |warning| @logger.warn(warning[:msg]) }
+      # Log messages created during parser and config initialization
+      config.logs.each { |log| @logger.send(log.keys[0], log.values[0]) }
       @parser_deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
       config.deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
 
@@ -1055,13 +1052,6 @@ module Bolt
       end
 
       content
-    end
-
-    def config_loaded
-      msg = <<~MSG.chomp
-        Loaded configuration from: '#{config.config_files.join("', '")}'
-      MSG
-      @logger.info(msg)
     end
 
     # Gem installs include the aggregate, canary, and puppetdb_fact modules, while

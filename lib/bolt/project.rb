@@ -17,35 +17,37 @@ module Bolt
     }.freeze
 
     attr_reader :path, :data, :config_file, :inventory_file, :modulepath, :hiera_config,
-                :puppetfile, :rerunfile, :type, :resource_types, :warnings, :project_file,
+                :puppetfile, :rerunfile, :type, :resource_types, :logs, :project_file,
                 :deprecations, :downloads, :plans_path
 
-    def self.default_project
-      create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
+    def self.default_project(logs = [])
+      create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user', logs)
     # If homedir isn't defined use the system config path
     rescue ArgumentError
-      create_project(Bolt::Config.system_path, 'system')
+      create_project(Bolt::Config.system_path, 'system', logs)
     end
 
     # Search recursively up the directory hierarchy for the Project. Look for a
     # directory called Boltdir or a file called bolt.yaml (for a control repo
     # type Project). Otherwise, repeat the check on each directory up the
     # hierarchy, falling back to the default if we reach the root.
-    def self.find_boltdir(dir)
+    def self.find_boltdir(dir, logs = [])
       dir = Pathname.new(dir)
 
       if (dir + BOLTDIR_NAME).directory?
-        create_project(dir + BOLTDIR_NAME, 'embedded')
+        create_project(dir + BOLTDIR_NAME, 'embedded', logs)
       elsif (dir + 'bolt.yaml').file? || (dir + 'bolt-project.yaml').file?
-        create_project(dir, 'local')
+        create_project(dir, 'local', logs)
       elsif dir.root?
-        default_project
+        default_project(logs)
       else
-        find_boltdir(dir.parent)
+        logs << { debug: "Did not detect Boltdir, bolt.yaml, or bolt-project.yaml at '#{dir}'. "\
+                  "This directory won't be loaded as a project." }
+        find_boltdir(dir.parent, logs)
       end
     end
 
-    def self.create_project(path, type = 'option')
+    def self.create_project(path, type = 'option', logs = [])
       fullpath = Pathname.new(path).expand_path
 
       if !Bolt::Util.windows? && type != 'environment' && fullpath.world_writable?
@@ -58,15 +60,18 @@ module Bolt
 
       project_file = File.join(fullpath, 'bolt-project.yaml')
       data = Bolt::Util.read_optional_yaml_hash(File.expand_path(project_file), 'project')
-      new(data, path, type)
+      default = type =~ /user|system/ ? 'default ' : ''
+      exist = File.exist?(File.expand_path(project_file))
+      logs << { info: "Loaded #{default}project from '#{fullpath}'" } if exist
+      new(data, path, type, logs)
     end
 
-    def initialize(raw_data, path, type = 'option')
+    def initialize(raw_data, path, type = 'option', logs = [])
       @path = Pathname.new(path).expand_path
 
       @project_file = @path + 'bolt-project.yaml'
 
-      @warnings = []
+      @logs = logs
       @deprecations = []
       if (@path + 'bolt.yaml').file? && project_file?
         msg = "Project-level configuration in bolt.yaml is deprecated if using bolt-project.yaml. "\
@@ -88,7 +93,7 @@ module Bolt
       tc = Bolt::Config::INVENTORY_OPTIONS.keys & raw_data.keys
       if tc.any?
         msg = "Transport configuration isn't supported in bolt-project.yaml. Ignoring keys #{tc}"
-        @warnings << { msg: msg }
+        @logs << { warn: msg }
       end
 
       @data = raw_data.reject { |k, _| Bolt::Config::INVENTORY_OPTIONS.include?(k) }
@@ -98,7 +103,7 @@ module Bolt
       @config_file = if (Bolt::Config::BOLT_OPTIONS & @data.keys).any?
                        if (@path + 'bolt.yaml').file?
                          msg = "bolt-project.yaml contains valid config keys, bolt.yaml will be ignored"
-                         @warnings << { msg: msg }
+                         @logs << { warn: msg }
                        end
                        @project_file
                      else
@@ -151,7 +156,7 @@ module Bolt
         end
       else
         message = "No project name is specified in bolt-project.yaml. Project-level content will not be available."
-        @warnings << { msg: message }
+        @logs << { warn: message }
       end
 
       %w[tasks plans].each do |conf|
