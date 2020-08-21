@@ -221,6 +221,56 @@ module BoltServer
       plan_info
     end
 
+    def build_puppetserver_uri(file_identifier, module_name, environment)
+      segments = file_identifier.split('/', 3)
+      if segments.size == 1
+        {
+          'path' => "/puppet/v3/file_content/tasks/#{module_name}/#{file_identifier}",
+          'params' => {
+            'environment' => environment
+          }
+        }
+      else
+        module_segment, mount_segment, name_segment = *segments
+        {
+          'path' => case mount_segment
+                    when 'files'
+                      "/puppet/v3/file_content/modules/#{module_segment}/#{name_segment}"
+                    when 'tasks'
+                      "/puppet/v3/file_content/tasks/#{module_segment}/#{name_segment}"
+                    when 'lib'
+                      "/puppet/v3/file_content/plugins/#{name_segment}"
+                    end,
+          'params' => {
+            'environment' => environment
+          }
+        }
+      end
+    end
+
+    def pe_task_info(pal, module_name, task_name, environment)
+      # Handle case where task name is simply module name with special `init` task
+      task_name = if task_name == 'init' || task_name.nil?
+                    module_name
+                  else
+                    "#{module_name}::#{task_name}"
+                  end
+      task = pal.get_task(task_name)
+      files = task.files.map do |file_hash|
+        {
+          'filename' => file_hash['name'],
+          'sha256' => Digest::SHA256.hexdigest(File.read(file_hash['path'])),
+          'size_bytes' => File.size(file_hash['path']),
+          'uri' => build_puppetserver_uri(file_hash['name'], module_name, environment)
+        }
+      end
+      {
+        'metadata' => task.metadata,
+        'name' => task.name,
+        'files' => files
+      }
+    end
+
     get '/' do
       200
     end
@@ -348,6 +398,16 @@ module BoltServer
       in_pe_pal_env(params['environment']) do |pal|
         plan_info = pe_plan_info(pal, params[:module_name], params[:plan_name])
         [200, plan_info.to_json]
+      end
+    end
+
+    # Fetches the metadata for a single task
+    #
+    # @param environment [String] the environment to fetch the task from
+    get '/tasks/:module_name/:task_name' do
+      in_pe_pal_env(params['environment']) do |pal|
+        task_info = pe_task_info(pal, params[:module_name], params[:task_name], params['environment'])
+        [200, task_info.to_json]
       end
     end
 
