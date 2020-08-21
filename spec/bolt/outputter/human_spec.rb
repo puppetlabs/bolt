@@ -339,4 +339,22 @@ describe "Bolt::Outputter::Human" do
       expect(str).to eq("1 hr, 2 min, 30 sec")
     end
   end
+
+  it 'prints a list of guide topics' do
+    outputter.print_topics(%w[apple banana carrot])
+    expect(output.string).to eq(<<~OUTPUT)
+      Available topics are:
+      apple
+      banana
+      carrot
+
+      Use `bolt guide <topic>` to view a specific guide.
+    OUTPUT
+  end
+
+  it 'prints a guide' do
+    guide = "The trials and tribulations of Bolty McBoltface\n"
+    outputter.print_guide(guide, 'boltymcboltface')
+    expect(output.string).to eq(guide)
+  end
 end

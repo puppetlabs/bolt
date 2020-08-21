@@ -38,7 +38,8 @@ module Bolt
                  'inventory' => %w[show],
                  'group' => %w[show],
                  'project' => %w[init migrate],
-                 'apply' => %w[] }.freeze
+                 'apply' => %w[],
+                 'guide' => %w[] }.freeze
 
     attr_reader :config, :options
 
@@ -354,7 +355,7 @@ module Bolt
       # Initialize inventory and targets. Errors here are better to catch early.
       # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
       # options[:targets] will contain a resolved set of Target objects
-      unless %w[project puppetfile secret].include?(options[:subcommand]) ||
+      unless %w[project puppetfile secret guide].include?(options[:subcommand]) ||
              %w[convert new show].include?(options[:action])
         update_targets(options)
       end
@@ -422,6 +423,12 @@ module Bolt
       end
 
       case options[:subcommand]
+      when 'guide'
+        code = if options[:object]
+                 show_guide(options[:object])
+               else
+                 list_topics
+               end
       when 'project'
         case options[:action]
         when 'init'
@@ -990,6 +997,48 @@ module Bolt
 
     def convert_plan(plan)
       pal.convert_plan(plan)
+    end
+
+    # Collects the list of Bolt guides and maps them to their topics.
+    def guides
+      @guides ||= begin
+                    root_path = File.expand_path(File.join(__dir__, '..', '..', 'guides'))
+                    files     = Dir.children(root_path).sort
+
+                    files.each_with_object({}) do |file, guides|
+                      next if file !~ /\.txt\z/
+                      topic = File.basename(file, '.txt')
+                      guides[topic] = File.join(root_path, file)
+                    end
+                  rescue SystemCallError => e
+                    raise Bolt::FileError.new("#{e.message}: unable to load guides directory", root_path)
+                  end
+    end
+
+    # Display the list of available Bolt guides.
+    def list_topics
+      outputter.print_topics(guides.keys)
+      0
+    end
+
+    # Display a specific Bolt guide.
+    def show_guide(topic)
+      if guides[topic]
+        analytics.event('Guide', 'known_topic', label: topic)
+
+        begin
+          guide = File.read(guides[topic])
+        rescue SystemCallError => e
+          raise Bolt::FileError("#{e.message}: unable to load guide page", filepath)
+        end
+
+        outputter.print_guide(guide, topic)
+      else
+        analytics.event('Guide', 'unknown_topic', label: topic)
+        outputter.print_message("Did not find guide for topic '#{topic}'.\n\n")
+        list_topics
+      end
+      0
     end
 
     def validate_file(type, path, allow_dir = false)

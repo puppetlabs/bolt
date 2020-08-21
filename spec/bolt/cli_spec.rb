@@ -89,6 +89,81 @@ describe "Bolt::CLI" do
     end
   end
 
+  context 'guide' do
+    let(:config) { double('config', format: nil) }
+    let(:topic)  { 'project' }
+
+    context '#guides' do
+      it 'returns a hash of topics and filepaths to guides' do
+        expect(Dir).to receive(:children).and_return(['milo.txt'])
+        cli = Bolt::CLI.new(['guide'])
+        expect(cli.guides).to match(
+          'milo' => %r{guides/milo.txt}
+        )
+      end
+    end
+
+    context '#list_topics' do
+      it 'lists topics' do
+        cli = Bolt::CLI.new(['guide'])
+        expect(cli.outputter).to receive(:print_topics).with(cli.guides.keys)
+        cli.list_topics
+      end
+
+      it 'returns 0' do
+        cli = Bolt::CLI.new(['guide'])
+        expect(cli.list_topics).to eq(0)
+      end
+    end
+
+    context '#show_guide' do
+      before(:each) do
+        allow_any_instance_of(Bolt::CLI).to receive(:analytics).and_return(Bolt::Analytics::NoopClient.new)
+      end
+
+      it 'prints a guide for a known topic' do
+        Tempfile.create do |file|
+          content = "The trials and tribulations of Bolty McBoltface\n"
+          File.write(file, content)
+
+          cli = Bolt::CLI.new(['guide', topic])
+          allow(cli).to receive(:guides).and_return(topic => file.path)
+
+          expect(cli.outputter).to receive(:print_guide).with(content, topic)
+          cli.show_guide(topic)
+        end
+      end
+
+      it 'submits a known_topic analytics event' do
+        cli = Bolt::CLI.new(['guide', topic])
+        expect(cli.analytics).to receive(:event).with('Guide', 'known_topic', label: topic)
+        cli.show_guide(topic)
+      end
+
+      it 'prints a list of topics when given an unknown topic' do
+        topic = 'boltymcboltface'
+        cli   = Bolt::CLI.new(['guide', topic])
+        allow(cli).to receive(:config).and_return(config)
+        expect(cli).to receive(:list_topics)
+        expect(cli.outputter).to receive(:print_message).with(/Did not find guide for topic '#{topic}'/)
+        cli.show_guide(topic)
+      end
+
+      it 'submits an uknown_topic analytics event' do
+        topic = 'boltymcboltface'
+        cli   = Bolt::CLI.new(['guide', topic])
+        allow(cli).to receive(:config).and_return(config)
+        expect(cli.analytics).to receive(:event).with('Guide', 'unknown_topic', label: topic)
+        cli.show_guide(topic)
+      end
+
+      it 'returns 0' do
+        cli = Bolt::CLI.new(['guide', topic])
+        expect(cli.show_guide(topic)).to eq(0)
+      end
+    end
+  end
+
   context 'plan new' do
     let(:project_name) { 'project' }
     let(:config)       { { 'name' => project_name } }

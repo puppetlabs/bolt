@@ -47,4 +47,30 @@ describe "Bolt::Outputter::Rainbow" do
     expect(summary[1]).to eq('Failed on 1 target: target2')
     expect(summary[2]).to eq('Ran on 2 targets in 10.0 sec')
   end
+
+  it "colorizes guide output" do
+    guide = "The trials and tribulations of Bolty McBoltface.\n"
+    expect(outputter).to receive(:colorize).with(:rainbow, guide).and_call_original
+    outputter.print_guide(guide, 'boltymcboltface')
+    expect(output.string).to eq(guide)
+  end
+
+  it "colorizes topics list" do
+    content = <<~CONTENT.chomp
+      Available topics are:
+      foo
+      bar
+
+      Use `bolt guide <topic>` to view a specific guide.
+    CONTENT
+
+    expect(outputter).to receive(:colorize).with(:rainbow, content)
+    outputter.print_topics(%w[foo bar])
+  end
+
+  it "colorizes a message" do
+    message = 'somewhere over the rainbow'
+    expect(outputter).to receive(:colorize).with(:rainbow, message)
+    outputter.print_message(message)
+  end
 end
