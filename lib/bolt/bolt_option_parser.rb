@@ -88,7 +88,7 @@ module Bolt
           { flags: OPTIONS[:global] + %w[modules],
             banner: PROJECT_INIT_HELP }
         when 'migrate'
-          { flags: OPTIONS[:global] + %w[inventoryfile boltdir configfile],
+          { flags: OPTIONS[:global] + %w[inventoryfile project configfile],
             banner: PROJECT_MIGRATE_HELP }
         else
           { flags: OPTIONS[:global],
@@ -471,10 +471,7 @@ module Bolt
           bolt project migrate [options]
 
       DESCRIPTION
-          Migrate a Bolt project to the latest version.
-
-          Loads a Bolt project's inventory file and migrates it to the latest version. The
-          inventory file is modified in place and will not preserve comments or formatting.
+          Migrate a Bolt project to use current best practices and the latest version of configuration files.
     HELP
 
     PUPPETFILE_HELP = <<~HELP

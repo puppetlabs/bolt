@@ -15,6 +15,27 @@ describe "When loading content", ssh: true do
   let(:target) { conn_uri('ssh') }
   let(:config_flags) { %W[--no-host-key-check --password #{conn_info('ssh')[:password]}] }
 
+  it "migrates project config files to the newest version" do
+    Dir.mktmpdir do |project|
+      # Don't actually print output
+      allow($stderr).to receive(:puts)
+
+      config = { 'color' => true, 'ssh' => { 'port' => 23 } }
+      conf_file = File.join(project, 'bolt.yaml')
+      project_file = File.join(project, 'bolt-project.yaml')
+      inv_file = File.join(project, 'inventory.yaml')
+
+      File.write(conf_file, config.to_yaml)
+      run_cli(%W[project migrate --project #{project}])
+
+      expect(File.exist?(conf_file)).not_to be
+      expect(File.exist?(project_file)).to be
+      expect(YAML.load_file(project_file)).to eq({ 'color' => true })
+      expect(File.exist?(inv_file)).to be
+      expect(YAML.load_file(inv_file)).to eq({ 'config' => { 'ssh' => { 'port' => 23 } } })
+    end
+  end
+
   it "loads plans from project level content" do
     result = run_cli_json(%W[plan run local -t #{target} --boltdir #{local.path}] + config_flags)
     expect(result[0]['value']['stdout'].strip).to eq('polo')
