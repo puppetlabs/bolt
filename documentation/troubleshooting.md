@@ -1,4 +1,4 @@
-# Troubleshooting common issues
+# Troubleshooting
 
 ## Bolt can't find my task
 
