@@ -4,7 +4,7 @@ BeforeAll {
   Mock -ModuleName 'PuppetBolt' -Verifiable -CommandName Invoke-BoltCommandLine -MockWith {
     return "bolt " + $params -join " "
   }
-  
+
   Mock Get-ItemProperty {
     return [PSCustomObject]@{
       RememberedInstallDir = 'C:/Program Files/Puppet Labs/Bolt'
@@ -257,13 +257,14 @@ Describe "test all bolt command examples" {
 
   Context "bolt task" {
     It "bolt task run package --targets target1,target2 action=status name=bash" {
-      $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params 'action=status name=bash'
-      Write-Warning "Come back to this"
-      $results | Should -Be "bolt task run 'package' --targets 'target1,target2' --params 'action=status name=bash'"
+      $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' action=status name=bash
+      $results | Should -Be "bolt task run 'package' --targets 'target1,target2' action=status name=bash"
 
-      # $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params @{ 'action' = 'status'; 'name' = 'bash' }
-      # Write-Warning "Come back to this"
-      # $results | Should -Be "bolt task run 'package' --targets 'target1,target2' --params 'action=status name=bash'"
+      $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params '{"name":"bash","action":"status"}'
+      $results | Should -Be "bolt task run 'package' --targets 'target1,target2' --params '{`"name`":`"bash`",`"action`":`"status`"}'"
+
+      $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params @{ 'name' = 'bash'; 'action' = 'status' }
+      $results | Should -Be "bolt task run 'package' --targets 'target1,target2' --params '{`"name`":`"bash`",`"action`":`"status`"}'"
     }
     It "bolt task show" {
       $results = Get-BoltTask

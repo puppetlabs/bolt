@@ -39,6 +39,9 @@ pwsh_command[:options].each do |option|
   if option[:position]
     parameter_statement << "Position=#{option[:position]}"
   end
+  if option[:value_from_remaining_arguments]
+    parameter_statement << "ValueFromRemainingArguments=$#{option[:value_from_remaining_arguments]}"
+  end
   if option[:parameter_set]
     parameter_statement << "ParameterSetName='#{option[:parameter_set]}'"
   end
@@ -78,11 +81,11 @@ end
   }
 <% end -%>
 
-  $params = @('<%= pwsh_command[:ruby_command] -%>'<% if pwsh_command[:ruby_action] -%>, '<%= pwsh_command[:ruby_action] -%>'<% end -%>)
+  $executionParams = @('<%= pwsh_command[:ruby_command] -%>'<% if pwsh_command[:ruby_action] -%>, '<%= pwsh_command[:ruby_action] -%>'<% end -%>)
 
-  $params = $params + (Get-BoltCommandline -parameterHash $PSBoundParameters -mapping $mapping)
+  $executionParams = $executionParams + (Get-BoltCommandline -parameterHash $PSBoundParameters -mapping $mapping)
 
-  $result = Invoke-BoltCommandline $params
+  $result = Invoke-BoltCommandline $executionParams
 
   Write-Output $result
 

@@ -292,8 +292,10 @@ namespace :pwsh do
             pwsh_param[:mandatory] = true
             pwsh_param[:position] = 0
           when 'params'
+            pwsh_param[:mandatory] = false
             pwsh_param[:position] = 1
             pwsh_param[:type] = nil
+            pwsh_param[:value_from_remaining_arguments] = true
           when 'modules'
             pwsh_param[:type] = nil
           when 'format'

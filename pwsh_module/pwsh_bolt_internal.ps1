@@ -1,6 +1,6 @@
 function bolt {
   $fso = New-Object -ComObject Scripting.FileSystemObject
-  
+
   $script:BOLT_BASEDIR = (Get-ItemProperty -Path "HKLM:\Software\Puppet Labs\Bolt").RememberedInstallDir
   # Windows API GetShortPathName requires inline C#, so use COM instead
   $script:BOLT_BASEDIR = $fso.GetFolder($script:BOLT_BASEDIR).ShortPath
@@ -15,7 +15,7 @@ function Invoke-BoltCommandline {
   [CmdletBinding()]
   param($params)
   $fso = New-Object -ComObject Scripting.FileSystemObject
-  
+
   $script:BOLT_BASEDIR = (Get-ItemProperty -Path "HKLM:\Software\Puppet Labs\Bolt").RememberedInstallDir
   # Windows API GetShortPathName requires inline C#, so use COM instead
   $script:BOLT_BASEDIR = $fso.GetFolder($script:BOLT_BASEDIR).ShortPath
@@ -42,34 +42,44 @@ function Get-BoltCommandline {
 
   $params = @()
   foreach ($kvp in $parameterHash.GetEnumerator()) {
-    if($kvp.Key -in $common){
+    if ($kvp.Key -in $common) {
       Write-Verbose "Skipping common parameter: $($kvp.Key)"
       continue
-    }else{
+    }
+    else {
       Write-Verbose "Examining $($kvp.Key)"
     }
     $pwshParameter = $kvp.Key
-    $pwshValue     = $kvp.Value
+    $pwshValue = $kvp.Value
     $rubyParameter = $mapping[$pwshParameter]
-    switch($pwshValue){
-      {$_ -is [System.Management.Automation.SwitchParameter]}{
-        if($pwshValue -eq $true){
-          $params += "--$($rubyParameter)"
-        }else{
-          $params += "--no-$($rubyParameter)"
-        }
-      }
-      {$_ -is [System.Collections.Hashtable]}{
-        $v = ConvertTo-Json -InputObject $pwshValue -Compress
+
+    if ($pwshValue -is [System.Management.Automation.SwitchParameter]) {
+      Write-Verbose "Parsing $($kvp.key) as switch parameter"
+      if ($pwshValue -eq $true) {
         $params += "--$($rubyParameter)"
-        $params += "'$($v)'"
       }
-      default {
-        if($rubyParameter){
-          $params += "--$($rubyParameter)"
-        }
-        $params += "'$($pwshValue)'"
+      else {
+        $params += "--no-$($rubyParameter)"
       }
+    }
+    elseif ($pwshValue -is [System.Collections.Hashtable]) {
+      Write-Verbose "Parsing $($kvp.key) as hashtable parameter"
+      $v = ConvertTo-Json -InputObject $pwshValue -Compress
+      $params += "--$($rubyParameter)"
+      $params += "'$($v)'"
+    }
+    elseif ($pwshValue.GetType().Name -eq 'List`1') {
+      Write-Verbose "Parsing $($kvp.key) as array parameter"
+      $pwshValue | Foreach-Object {
+        $params += "$($_)"
+      }
+    }
+    else {
+      Write-Verbose "Parsing $($kvp.key) as default"
+      if ($rubyParameter) {
+        $params += "--$($rubyParameter)"
+      }
+      $params += "'$($pwshValue)'"
     }
   }
 
