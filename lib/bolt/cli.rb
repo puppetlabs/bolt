@@ -413,7 +413,7 @@ module Bolt
         list_modules
         return 0
       when 'convert'
-        convert_plan(options[:object])
+        pal.convert_plan(options[:object])
         return 0
       end
 
@@ -953,10 +953,6 @@ module Bolt
                              config.trusted_external,
                              config.apply_settings,
                              config.project)
-    end
-
-    def convert_plan(plan)
-      pal.convert_plan(plan)
     end
 
     # Collects the list of Bolt guides and maps them to their topics.

@@ -1,3 +1,4 @@
+description: A plan with complex parameters
 parameters:
   empty:
   mandatory_string:

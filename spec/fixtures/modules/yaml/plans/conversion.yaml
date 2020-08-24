@@ -1,9 +1,12 @@
+description: A yaml plan for testing plan conversion
 parameters:
   targets:
+    description: The targets to run the plan on
     type: TargetSpec
   message:
+    description: A string to print
     type: String
-    default: "hello world"
+    default: hello world
 
 steps:
   - name: sample
