@@ -204,7 +204,7 @@ module Bolt
         'compile-concurrency' => Etc.nprocessors,
         'concurrency'         => default_concurrency,
         'format'              => 'human',
-        'log'                 => { 'console' => {}, 'bolt-debug.log' => { 'level' => 'debug', 'append' => false } },
+        'log'                 => { 'console' => {} },
         'plugin_hooks'        => {},
         'plugins'             => {},
         'puppetdb'            => {},
@@ -212,6 +212,13 @@ module Bolt
         'save-rerun'          => true,
         'transport'           => 'ssh'
       }
+
+      if project.path.directory?
+        default_data['log']['bolt-debug.log'] = {
+          'level' => 'debug',
+          'append' => false
+        }
+      end
 
       loaded_data = config_data.each_with_object([]) do |data, acc|
         @warnings.concat(data[:warnings]) if data[:warnings].any?
