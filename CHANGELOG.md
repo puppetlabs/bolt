@@ -1,5 +1,57 @@
 # Changelog
 
+## Bolt 2.24.0 (2020-08-24)
+
+### New features
+
+* **PowerShell validation for `-LogLevel`, `-Rerun`, and `-Filter`**
+  ([#2090](https://github.com/puppetlabs/bolt/pull/2090))
+
+  Add PowerShell parameter validation for `-LogLevel`, `-Rerun`, and `-Filter`.
+
+* **Write a default log file**
+  ([#2068](https://github.com/puppetlabs/bolt/issues/2068))
+
+  Bolt will now log activity at `debug` level to `bolt-debug.log` in the project
+  directory. This log will be truncated each time Bolt runs.
+
+* **View information about Bolt concepts and features from the CLI**
+  ([#2078](https://github.com/puppetlabs/bolt/issues/2078))
+
+  Bolt can now display information about various Bolt features and concepts with
+  the new CLI command `bolt guide` and PowerShell command `Get-Help
+  about_bolt_*`.
+
+* **`bolt project migrate` now updates project files**
+  ([#2081](https://github.com/puppetlabs/bolt/issues/2081))
+
+  The `bolt project migrate` command will now update `bolt.yaml` to
+  `bolt-project.yaml` and move transport configuration to `inventory.yaml`.
+  Modified files are backed up to a `.bolt-bak` directory in the project
+  directory.
+
+* **Plan conversion maintains plan and parameter descriptions**
+  ([#2039](https://github.com/puppetlabs/bolt/issues/2039))
+
+  Converting a YAML plan to a Puppet plan will now preserve plan and
+  parameter descriptions, so that `plan show` output is the same for the
+  YAML plan as the converted Puppet plan.
+
+### Bug fixes
+
+* **Fix PowerShell `-Version` parameter**
+  ([#2090](https://github.com/puppetlabs/bolt/pull/2090))
+
+  The PowerShell `-Version` parameter now looks at the `RememberedInstallDir`
+  property for Bolt's version file location.
+
+* **Show YAML plan parameters without default values as required**
+  ([#2095](https://github.com/puppetlabs/bolt/pull/2095))
+
+  Bolt was displaying YAML plan parameters without default values as
+  optional in `bolt plan show` output. Now, Bolt will show a parameter
+  without a default value as required.
+
 ## Bolt 2.23.0 (2020-08-17)
 
 ### New features
