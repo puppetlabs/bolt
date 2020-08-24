@@ -1,5 +1,16 @@
 # Changelog
 
+## Bolt 2.24.1 (2020-08-24)
+
+### Bug fixes
+
+* **Don't fail if bolt-debug.log can't be created**
+  ([#2115](https://github.com/puppetlabs/bolt/issues/2115))
+
+  This fixes a bug introduced in Bolt 2.24.0 where Bolt would fail
+  when trying to create the `bolt-debug.log` file if the Bolt project
+  didn't exist.
+
 ## Bolt 2.24.0 (2020-08-24)
 
 ### New features
