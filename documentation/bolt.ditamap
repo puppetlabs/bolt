@@ -22,7 +22,7 @@
         <topicref href="vscode_and_bolt.md" format="markdown"/>
     </topichead>
     <topicref href="running_bolt_commands.md" format="markdown" linking="targetonly"/>
-    <topicref href="plans.md" format="markdown">
+    <topicref href="plans.md" format="markdown" navtitle="Plans" locktitle="yes">
         <topicref href="inspecting_plans.md" format="markdown">
             <topicmeta>
                 <shortdesc>Before you run a plan in your environment, inspect the plan to determine what effect it will have on your targets.</shortdesc>
@@ -44,7 +44,7 @@
             </topicmeta>
         </topicref>       
     </topicref>    
-    <topicref href="tasks.md" format="markdown">
+    <topicref href="tasks.md" format="markdown" navtitle="Tasks" locktitle="yes">
         <topicref href="inspecting_tasks.md" format="markdown">
             <topicmeta>
                 <shortdesc>Before you run a task in your environment, inspect the task to determine what effect it will have on your targets.</shortdesc>
