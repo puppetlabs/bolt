@@ -322,7 +322,7 @@ namespace :pwsh do
     source = File.expand_path(File.join(__dir__, '..', 'guides'))
     dest   = File.expand_path(File.join(__dir__, '..', 'pwsh_module', 'en-US'))
 
-    FileUtils.mkdir(dest)
+    FileUtils.mkdir(dest) unless File.exist?(dest)
 
     Dir.children(source).each do |file|
       next if file !~ /\.txt\z/
