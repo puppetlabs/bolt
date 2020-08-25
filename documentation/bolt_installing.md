@@ -420,7 +420,7 @@ Bolt collects data about how you use it. You can opt out of providing this data.
 
 This data is associated with a random, non-identifiable user UUID.
 
-To see the data Bolt collects, add `--log-level debug` to a command.
+To see the data Bolt collects, add `--log-level trace` to a command.
 
 ### Why does Bolt collect data?
 
