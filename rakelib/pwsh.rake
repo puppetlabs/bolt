@@ -292,8 +292,10 @@ namespace :pwsh do
             pwsh_param[:mandatory] = true
             pwsh_param[:position] = 0
           when 'params'
+            pwsh_param[:mandatory] = false
             pwsh_param[:position] = 1
             pwsh_param[:type] = nil
+            pwsh_param[:value_from_remaining_arguments] = true
           when 'modules'
             pwsh_param[:type] = nil
           when 'format'
@@ -322,7 +324,7 @@ namespace :pwsh do
     source = File.expand_path(File.join(__dir__, '..', 'guides'))
     dest   = File.expand_path(File.join(__dir__, '..', 'pwsh_module', 'en-US'))
 
-    FileUtils.mkdir(dest)
+    FileUtils.mkdir(dest) unless File.exist?(dest)
 
     Dir.children(source).each do |file|
       next if file !~ /\.txt\z/
