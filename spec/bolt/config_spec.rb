@@ -402,7 +402,6 @@ describe Bolt::Config do
     }
 
     it 'performs a depth 2 shallow merge on plugins' do
-      allow(Bolt::Util).to receive(:validate_file).and_return(true)
       expect(config.plugins).to eq(
         'vault' => {
           'server_url' => 'http://example.com',
@@ -420,7 +419,6 @@ describe Bolt::Config do
     end
 
     it 'performs a deep merge on transport config' do
-      allow(Bolt::Util).to receive(:validate_file).and_return(true)
       expect(config.transports['ssh'].to_h).to include(
         'user' => 'bolt',
         'password' => 'bolt',
@@ -429,13 +427,11 @@ describe Bolt::Config do
     end
 
     it 'overwrites non-hash values' do
-      allow(Bolt::Util).to receive(:validate_file).and_return(true)
       expect(config.transport).to eq('remote')
       expect(config.concurrency).to eq(5)
     end
 
     it 'performs a shallow merge on hash values' do
-      allow(Bolt::Util).to receive(:validate_file).and_return(true)
       expect(config.plugin_hooks).to eq(
         'puppet_library' => {
           'plugin' => 'puppet_agent',
@@ -445,6 +441,11 @@ describe Bolt::Config do
           'plugin' => 'fake_plugin'
         }
       )
+    end
+
+    it 'removes log files that are disabled' do
+      project_config['log'] = { '~/.puppetlabs/debug.log' => 'disable' }
+      expect(config.log).not_to include('~/.puppetlabs/debug.log')
     end
   end
 end

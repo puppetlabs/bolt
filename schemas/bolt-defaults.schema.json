@@ -90,7 +90,7 @@
       }
     },
     "log": {
-      "description": "A map of configuration for the logfile output. Under `log`, you can configure log options for `console` and add configuration for individual log files, such as `~/.puppetlabs/bolt/debug.log`. Individual log files must be valid filepaths. If the log file does not exist, then Bolt will create it before logging information.",
+      "description": "A map of configuration for the logfile output. Under `log`, you can configure log options for `console` and add configuration for individual log files, such as `~/.puppetlabs/bolt/debug.log`. Individual log files must be valid filepaths. If the log file does not exist, then Bolt will create it before logging information. Set the value to `disable` to remove a log file defined at an earlier level of the config hierarchy.",
       "type": "object",
       "properties": {
         "console": {
@@ -115,7 +115,13 @@
       },
       "additionalProperties": {
         "description": "Configuration for the logfile output.",
-        "type": "object",
+        "type": [
+          "string",
+          "object"
+        ],
+        "enum": [
+          "disable"
+        ],
         "properties": {
           "append": {
             "description": "Whether to append output to an existing log file.",
