@@ -177,7 +177,8 @@ module Bolt
                        "for `console` and add configuration for individual log files, such as "\
                        "`~/.puppetlabs/bolt/debug.log`. Individual log files must be valid filepaths. If the log "\
                        "file does not exist, then Bolt will create it before logging information. Set the value to "\
-                       "`disable` to remove a log file defined at an earlier level of the config hierarchy.",
+                       "`disable` to remove a log file defined at an earlier level of the config hierarchy. By "\
+                       "default, Bolt logs to a bolt-debug.log file in the Bolt project directory.",
           type: Hash,
           properties: {
             "console" => {
