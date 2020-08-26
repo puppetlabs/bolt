@@ -1,5 +1,33 @@
 # Changelog
 
+## Bolt 2.25.0 (2020-08-26)
+
+### New features
+
+* **Add `puppet_agent::run` plan to run the agent**
+  ([#2022](https://github.com/puppetlabs/bolt/issues/2022))
+
+  The `puppet_agent::run` plan will run the agent if it's available and returns
+  a `ResultSet` including agents that failed and the results from runs that
+  succeeded.
+
+### Bug fixes
+
+* **Correctly handle array parameters in PowerShell**
+  ([#2118](https://github.com/puppetlabs/bolt/pull/2118))
+
+   Changes the switch statement in the `Get-BoltCommandline` function to an
+   `if/else` statement to properly handle parameters that are arrays that are
+   not supposed to be unwrapped.
+
+* **Initialize logger in `BoltSpec::Run`**
+  ([#2117](https://github.com/puppetlabs/bolt/issues/2117))
+
+  Bolt now initializes the logger when using `BoltSpec::Run` methods.
+  Previously, the logger was not initialized with Bolt's custom log
+  levels, causing `BoltSpec::Run` to raise an error when it encountered
+  a message being logged to one of these custom levels.
+
 ## Bolt 2.24.1 (2020-08-24)
 
 ### Bug fixes
