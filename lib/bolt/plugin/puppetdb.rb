@@ -19,7 +19,7 @@ module Bolt
       def initialize(config:, context:)
         pdb_config = Bolt::PuppetDB::Config.load_config(config, context.boltdir)
         @puppetdb_client = Bolt::PuppetDB::Client.new(pdb_config)
-        @logger = Logging.logger[self]
+        @logger = Bolt::Logger.logger(self)
       end
 
       def name

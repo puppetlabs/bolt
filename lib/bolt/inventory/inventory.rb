@@ -16,7 +16,7 @@ module Bolt
 
       # TODO: Pass transport config instead of config object
       def initialize(data, transport, transports, plugins)
-        @logger       = Logging.logger[self]
+        @logger       = Bolt::Logger.logger(self)
         @data         = data || {}
         @transport    = transport
         @config       = transports

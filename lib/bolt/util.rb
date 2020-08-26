@@ -6,7 +6,7 @@ module Bolt
       def read_yaml_hash(path, file_name)
         require 'yaml'
 
-        logger = Logging.logger[self]
+        logger = Bolt::Logger.logger(self)
         path = File.expand_path(path)
         content = File.open(path, "r:UTF-8") { |f| YAML.safe_load(f.read) } || {}
         unless content.is_a?(Hash)

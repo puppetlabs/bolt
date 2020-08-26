@@ -40,7 +40,7 @@ module Bolt
       attr_reader :logger
 
       def initialize
-        @logger = Logging.logger[self]
+        @logger = Bolt::Logger.logger(self)
       end
 
       def with_events(target, callback, action)

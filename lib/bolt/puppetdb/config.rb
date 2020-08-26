@@ -35,7 +35,7 @@ module Bolt
         begin
           config = JSON.parse(File.read(filepath)) if filepath
         rescue StandardError => e
-          Logging.logger[self].error("Could not load puppetdb.conf from #{filepath}: #{e.message}")
+          Bolt::Logger.logger(self).error("Could not load puppetdb.conf from #{filepath}: #{e.message}")
         end
 
         config = config.fetch('puppetdb', {})

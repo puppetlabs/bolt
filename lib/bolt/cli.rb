@@ -46,7 +46,7 @@ module Bolt
 
     def initialize(argv)
       Bolt::Logger.initialize_logging
-      @logger = Logging.logger[self]
+      @logger = Bolt::Logger.logger(self)
       @argv = argv
       @options = {}
     end

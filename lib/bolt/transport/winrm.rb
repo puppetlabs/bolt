@@ -11,7 +11,7 @@ module Bolt
         require 'winrm'
         require 'winrm-fs'
 
-        @transport_logger = Logging.logger[::WinRM]
+        @transport_logger = Bolt::Logger.logger(::WinRM)
         @transport_logger.level = :warn
       end
 

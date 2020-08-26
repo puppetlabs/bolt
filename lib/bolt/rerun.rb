@@ -8,7 +8,7 @@ module Bolt
     def initialize(path, save_failures)
       @path = path
       @save_failures = save_failures
-      @logger = Logging.logger[self]
+      @logger = Bolt::Logger.logger(self)
     end
 
     def data

@@ -12,7 +12,7 @@ describe Bolt::Transport::SSH::Connection do
   let(:uri) { 'ssh://foo.example.com' }
   let(:inventory) { Bolt::Inventory.empty }
   let(:target) { inventory.get_target(uri) }
-  let(:transport_logger) { Logging.logger[Net::SSH] }
+  let(:transport_logger) { Bolt::Logger.logger(Net::SSH) }
   let(:subject) { described_class.new(target, transport_logger) }
 
   context "when setting user" do

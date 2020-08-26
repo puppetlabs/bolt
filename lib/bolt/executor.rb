@@ -40,7 +40,7 @@ module Bolt
       require 'concurrent'
 
       @analytics = analytics
-      @logger = Logging.logger[self]
+      @logger = Bolt::Logger.logger(self)
 
       @transports = Bolt::TRANSPORTS.each_with_object({}) do |(key, val), coll|
         coll[key.to_s] = if key == :remote

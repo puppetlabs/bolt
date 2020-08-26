@@ -26,7 +26,7 @@ module Bolt
       @metadata = metadata
       @files = files
       @remote = remote
-      @logger = Logging.logger[self]
+      @logger = Bolt::Logger.logger(self)
 
       validate_metadata
     end

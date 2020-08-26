@@ -13,7 +13,7 @@ module Bolt
           raise Bolt::Inventory::ValidationError.new("Target must have either a name or uri", nil)
         end
 
-        @logger = Logging.logger[inventory]
+        @logger = Bolt::Logger.logger(inventory)
 
         # If the target isn't mentioned by any groups, it won't have a uri or
         # name and we will use the target_name as both
