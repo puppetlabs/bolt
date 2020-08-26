@@ -8,6 +8,7 @@ require 'bolt/pal'
 require 'bolt/plugin'
 require 'bolt/puppetdb'
 require 'bolt/util'
+require 'bolt/logger'
 
 # This is intended to provide a relatively stable method of executing bolt in process from tests.
 module BoltSpec
@@ -153,6 +154,8 @@ module BoltSpec
       end
 
       def initialize(config_data, inventory_data, project_path)
+        Bolt::Logger.initialize_logging
+
         @config_data = config_data || {}
         @inventory_data = inventory_data || {}
         @project_path = project_path
