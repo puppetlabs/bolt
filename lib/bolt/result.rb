@@ -65,6 +65,10 @@ module Bolt
                             'msg' => msg,
                             'details' => { 'exit_code' => exit_code } }
       end
+
+      if value.key?('_sensitive')
+        value['_sensitive'] = Puppet::Pops::Types::PSensitiveType::Sensitive.new(value['_sensitive'])
+      end
       new(target, value: value, action: 'task', object: task)
     end
 
@@ -204,6 +208,10 @@ module Bolt
         Puppet::DataTypes::Error.from_asserted_hash(error_hash)
 
       end
+    end
+
+    def sensitive
+      value['_sensitive']
     end
   end
 end
