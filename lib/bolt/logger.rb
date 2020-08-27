@@ -28,7 +28,7 @@ module Bolt
     end
 
     def self.configure(destinations, color)
-      root_logger = Logging.logger[:root]
+      root_logger = Bolt::Logger.logger(:root)
 
       root_logger.add_appenders Logging.appenders.stderr(
         'console',
@@ -64,6 +64,13 @@ module Bolt
 
         appender.level = params[:level] if params[:level]
       end
+    end
+
+    # A helper to ensure the Logging library is always initialized with our
+    # custom log levels before retrieving a Logger instance.
+    def self.logger(name)
+      initialize_logging
+      Logging.logger[name]
     end
 
     def self.analytics=(analytics)
@@ -110,7 +117,7 @@ module Bolt
     def self.warn_once(type, msg)
       @mutex.synchronize {
         @warnings ||= []
-        @logger ||= Logging.logger[self]
+        @logger ||= Bolt::Logger.logger(self)
         unless @warnings.include?(type)
           @logger.warn(msg)
           @warnings << type

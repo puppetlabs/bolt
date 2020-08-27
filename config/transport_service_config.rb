@@ -20,7 +20,7 @@ config.load_file_config(config_path)
 config.load_env_config
 config.validate
 
-Logging.logger[:root].add_appenders Logging.appenders.stderr(
+Bolt::Logger.logger(:root).add_appenders Logging.appenders.stderr(
   'console',
   layout: Bolt::Logger.default_layout,
   level: config['loglevel']

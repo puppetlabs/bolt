@@ -16,7 +16,7 @@ module Bolt
           @target = target
           # The familiar problem: Etc.getlogin is broken on osx
           @user = ENV['USER'] || Etc.getlogin
-          @logger = Logging.logger[self]
+          @logger = Bolt::Logger.logger(self)
         end
 
         def shell

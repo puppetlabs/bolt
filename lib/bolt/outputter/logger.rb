@@ -7,7 +7,7 @@ module Bolt
     class Logger < Bolt::Outputter
       def initialize(verbose, trace)
         super(false, verbose, trace)
-        @logger = Logging.logger[self]
+        @logger = Bolt::Logger.logger(self)
       end
 
       def handle_event(event)

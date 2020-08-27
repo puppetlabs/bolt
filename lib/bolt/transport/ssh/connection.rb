@@ -26,7 +26,7 @@ module Bolt
           @user = @target.user || ssh_config[:user] || Etc.getlogin
           @strict_host_key_checking = ssh_config[:strict_host_key_checking]
 
-          @logger = Logging.logger[@target.safe_name]
+          @logger = Bolt::Logger.logger(@target.safe_name)
           @transport_logger = transport_logger
           @logger.trace("Initializing ssh connection to #{@target.safe_name}")
 

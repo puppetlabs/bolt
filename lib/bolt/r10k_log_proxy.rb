@@ -7,7 +7,7 @@ module Bolt
     def initialize
       super('bolt')
 
-      @logger = Logging.logger[self]
+      @logger = Bolt::Logger.logger(self)
     end
 
     def canonical_log(event)

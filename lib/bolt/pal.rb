@@ -65,7 +65,7 @@ module Bolt
       @resource_types = resource_types
       @project = project
 
-      @logger = Logging.logger[self]
+      @logger = Bolt::Logger.logger(self)
       if modulepath && !modulepath.empty?
         @logger.debug("Loading modules from #{@modulepath.join(File::PATH_SEPARATOR)}")
       end
@@ -76,7 +76,7 @@ module Bolt
     # Puppet logging is global so this is class method to avoid confusion
     def self.configure_logging
       Puppet::Util::Log.destinations.clear
-      Puppet::Util::Log.newdestination(Logging.logger['Puppet'])
+      Puppet::Util::Log.newdestination(Bolt::Logger.logger('Puppet'))
       # Defer all log level decisions to the Logging library by telling Puppet
       # to log everything
       Puppet.settings[:log_level] = 'debug'

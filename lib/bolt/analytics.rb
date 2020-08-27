@@ -27,7 +27,7 @@ module Bolt
     }.freeze
 
     def self.build_client
-      logger = Logging.logger[self]
+      logger = Bolt::Logger.logger(self)
       begin
         config_file = config_path(logger)
         config = load_config(config_file, logger)
@@ -106,7 +106,7 @@ module Bolt
         require 'httpclient'
         require 'locale'
 
-        @logger = Logging.logger[self]
+        @logger = Bolt::Logger.logger(self)
         @http = HTTPClient.new
         @user_id = user_id
         @executor = Concurrent.global_io_executor
@@ -210,7 +210,7 @@ module Bolt
       attr_accessor :bundled_content
 
       def initialize
-        @logger = Logging.logger[self]
+        @logger = Bolt::Logger.logger(self)
         @bundled_content = []
       end
 

@@ -28,7 +28,7 @@ module Bolt
       @apply_settings = apply_settings || {}
 
       @pool = Concurrent::ThreadPoolExecutor.new(name: 'apply', max_threads: max_compiles)
-      @logger = Logging.logger[self]
+      @logger = Bolt::Logger.logger(self)
     end
 
     private def libexec

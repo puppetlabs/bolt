@@ -198,7 +198,7 @@ module Bolt
                          deprecations: [] }]
       end
 
-      @logger       = Logging.logger[self]
+      @logger       = Bolt::Logger.logger(self)
       @project      = project
       @logs         = @project.logs.dup
       @deprecations = @project.deprecations.dup

@@ -13,7 +13,7 @@ module Bolt
         @config = config
         @bad_urls = []
         @current_url = nil
-        @logger = Logging.logger[self]
+        @logger = Bolt::Logger.logger(self)
       end
 
       def query_certnames(query)

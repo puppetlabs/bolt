@@ -7,7 +7,7 @@ module Bolt
     def initialize(target, conn)
       @target = target
       @conn = conn
-      @logger = Logging.logger[@target.safe_name]
+      @logger = Bolt::Logger.logger(@target.safe_name)
     end
 
     def run_command(*_args)

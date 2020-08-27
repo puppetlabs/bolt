@@ -19,7 +19,7 @@ module Bolt
       CONFIG_KEYS = Bolt::Config::INVENTORY_OPTIONS.keys
 
       def initialize(input, plugins)
-        @logger = Logging.logger[self]
+        @logger = Bolt::Logger.logger(self)
         @plugins = plugins
 
         input = @plugins.resolve_top_level_references(input) if @plugins.reference?(input)

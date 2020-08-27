@@ -10,7 +10,7 @@ module Bolt
         def initialize(target)
           raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
           @target = target
-          @logger = Logging.logger[target.safe_name]
+          @logger = Bolt::Logger.logger(target.safe_name)
           @docker_host = @target.options['service-url']
           @logger.trace("Initializing docker connection to #{@target.safe_name}")
         end

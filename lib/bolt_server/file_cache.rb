@@ -33,7 +33,7 @@ module BoltServer
       @executor = executor
       @cache_dir = config['cache-dir']
       @config = config
-      @logger = Logging.logger[self]
+      @logger = Bolt::Logger.logger(self)
       @cache_dir_mutex = cache_dir_mutex
 
       if do_purge

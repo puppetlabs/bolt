@@ -18,7 +18,7 @@ module Bolt
           @user = @target.user
           # Build set of extensions from extensions config as well as interpreters
 
-          @logger = Logging.logger[@target.safe_name]
+          @logger = Bolt::Logger.logger(@target.safe_name)
           logger.trace("Initializing winrm connection to #{@target.safe_name}")
           @transport_logger = transport_logger
         end

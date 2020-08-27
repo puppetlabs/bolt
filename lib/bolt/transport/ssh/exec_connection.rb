@@ -14,7 +14,7 @@ module Bolt
           @target = target
           ssh_config = Net::SSH::Config.for(target.host)
           @user = @target.user || ssh_config[:user] || Etc.getlogin
-          @logger = Logging.logger[self]
+          @logger = Bolt::Logger.logger(self)
         end
 
         # This is used to verify we can connect to targets with `connected?`
