@@ -421,9 +421,9 @@ module Bolt
           the plan, including a list of available parameters.
 
       EXAMPLES
-          Display a list of available tasks
+          Display a list of available plans
             bolt plan show
-          Display documentation for the canary task
+          Display documentation for the aggregate::count plan
             bolt plan show aggregate::count
     HELP
 
