@@ -280,7 +280,7 @@ sudo apt remove puppet-bolt
 ### Install Bolt on RHEL, SLES, or Fedora
 
 Packaged versions of Bolt are available for Red Hat Enterprise Linux 6 and 7,
-SUSE Linux Enterprise Server 12, and Fedora 28-30.
+SUSE Linux Enterprise Server 12, and Fedora 28-32.
 
 The Puppet Tools repository for the YUM package management system is
 [http://yum.puppet.com/puppet-tools/](http://yum.puppet.com/puppet-tools/).
@@ -318,6 +318,11 @@ Puppet Tools on Linux 7 is `puppet-tools-release-el-7.noarch.rpm`.
     -   Fedora 31
         ```shell script
         sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-31.noarch.rpm
+        sudo dnf install puppet-bolt
+        ```
+    -   Fedora 32
+        ```shell script
+        sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-32.noarch.rpm
         sudo dnf install puppet-bolt
         ```
 1.  Run a Bolt command and get started.
