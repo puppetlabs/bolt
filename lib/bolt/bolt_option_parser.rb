@@ -366,7 +366,9 @@ module Bolt
           bolt plan convert <path> [options]
 
       DESCRIPTION
-          Convert a YAML plan to a Bolt plan.
+          Convert a YAML plan to a Puppet language plan.
+
+          Prints the converted plan to stdout.
 
           Converting a YAML plan may result in a plan that is syntactically
           correct but has different behavior. Always verify a converted plan's
