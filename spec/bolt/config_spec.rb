@@ -199,16 +199,16 @@ describe Bolt::Config do
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
       allow(File).to receive(:exist?).with(path + config_name).and_return(true)
 
-      warnings = Bolt::Config.load_bolt_defaults_yaml(path)[:warnings]
-      expect(warnings).to include(msg: /Detected multiple configuration files/)
+      logs = Bolt::Config.load_bolt_defaults_yaml(path)[:logs]
+      expect(logs).to include(warn: /Detected multiple configuration files/)
     end
 
     it 'warns when inventory config keys are present' do
       allow(File).to receive(:exist?)
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return(Bolt::Config::INVENTORY_OPTIONS.dup)
 
-      warnings = Bolt::Config.load_bolt_defaults_yaml(path)[:warnings]
-      expect(warnings).to include(msg: /Unsupported inventory configuration/)
+      logs = Bolt::Config.load_bolt_defaults_yaml(path)[:logs]
+      expect(logs).to include(warn: /Unsupported inventory configuration/)
     end
 
     it 'warns when project config keys are present' do
@@ -217,8 +217,8 @@ describe Bolt::Config do
       allow(File).to receive(:exist?)
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return(project_config)
 
-      warnings = Bolt::Config.load_bolt_defaults_yaml(path)[:warnings]
-      expect(warnings).to include(msg: /Unsupported project configuration/)
+      logs = Bolt::Config.load_bolt_defaults_yaml(path)[:logs]
+      expect(logs).to include(warn: /Unsupported project configuration/)
     end
 
     it 'puts keys under inventory-config at the top level' do
@@ -308,10 +308,7 @@ describe Bolt::Config do
     let(:config) { Bolt::Config.new(project, future_config) }
 
     it 'logs a warning' do
-      expect(config.warnings).to include(
-        msg: /Configuration option 'future'/,
-        option: 'future'
-      )
+      expect(config.logs).to include(warn: /Configuration option 'future'/)
     end
   end
 
@@ -395,9 +392,9 @@ describe Bolt::Config do
 
     let(:config) {
       Bolt::Config.new(project, [
-                         { data: system_config, warnings: [], deprecations: [] },
-                         { data: user_config, warnings: [], deprecations: [] },
-                         { data: project_config, warnings: [], deprecations: [] }
+                         { data: system_config, logs: [], deprecations: [] },
+                         { data: user_config, logs: [], deprecations: [] },
+                         { data: project_config, logs: [], deprecations: [] }
                        ])
     }
 

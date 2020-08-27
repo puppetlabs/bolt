@@ -165,6 +165,8 @@ describe "running YAML plans", ssh: true do
     allow(mock_logger).to receive(:info)
     allow(mock_logger).to receive(:warn)
       .with("No project name is specified in bolt-project.yaml. Project-level content will not be available.")
+    allow(mock_logger).to receive(:warn)
+      .with("bolt-project.yaml contains valid config keys, bolt.yaml will be ignored")
 
     expect(Bolt::Logger).to receive(:deprecation_warning).with(anything, /Use the 'targets' parameter instead./)
 

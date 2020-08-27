@@ -19,7 +19,7 @@ module Bolt
   class Config
     include Bolt::Config::Options
 
-    attr_reader :config_files, :warnings, :data, :transports, :project, :modified_concurrency, :deprecations
+    attr_reader :config_files, :logs, :data, :transports, :project, :modified_concurrency, :deprecations
 
     BOLT_CONFIG_NAME = 'bolt.yaml'
     BOLT_DEFAULTS_NAME = 'bolt-defaults.yaml'
@@ -32,16 +32,19 @@ module Bolt
     end
 
     def self.from_project(project, overrides = {})
+      logs = []
       conf = if project.project_file == project.config_file
                project.data
              else
-               Bolt::Util.read_optional_yaml_hash(project.config_file, 'config')
+               c = Bolt::Util.read_optional_yaml_hash(project.config_file, 'config')
+               logs << { debug: "Loaded configuration from #{project.config_file}" } if File.exist?(project.config_file)
+               c
              end
 
       data = load_defaults(project).push(
         filepath: project.config_file,
         data: conf,
-        warnings: [],
+        logs: logs,
         deprecations: []
       )
 
@@ -50,17 +53,20 @@ module Bolt
 
     def self.from_file(configfile, overrides = {})
       project = Bolt::Project.create_project(Pathname.new(configfile).expand_path.dirname)
+      logs = []
 
       conf = if project.project_file == project.config_file
                project.data
              else
-               Bolt::Util.read_yaml_hash(configfile, 'config')
+               c = Bolt::Util.read_yaml_hash(configfile, 'config')
+               logs << { debug: "Loaded configuration from #{configfile}" }
+               c
              end
 
       data = load_defaults(project).push(
         filepath: project.config_file,
         data: conf,
-        warnings: [],
+        logs: logs,
         deprecations: []
       )
 
@@ -90,13 +96,13 @@ module Bolt
     def self.load_bolt_defaults_yaml(dir)
       filepath = dir + BOLT_DEFAULTS_NAME
       data     = Bolt::Util.read_yaml_hash(filepath, 'config')
-      warnings = []
+      logs     = [{ debug: "Loaded configuration from #{filepath}" }]
 
       # Warn if 'bolt.yaml' detected in same directory.
       if File.exist?(bolt_yaml = dir + BOLT_CONFIG_NAME)
-        warnings.push(
-          msg: "Detected multiple configuration files: ['#{bolt_yaml}', '#{filepath}']. '#{bolt_yaml}' "\
-               "will be ignored."
+        logs.push(
+          warn: "Detected multiple configuration files: ['#{bolt_yaml}', '#{filepath}']. '#{bolt_yaml}' "\
+          "will be ignored."
         )
       end
 
@@ -105,9 +111,9 @@ module Bolt
 
       if project_config.any?
         data.reject! { |key, _| project_config.include?(key) }
-        warnings.push(
-          msg: "Unsupported project configuration detected in '#{filepath}': #{project_config.keys}. "\
-                "Project configuration should be set in 'bolt-project.yaml'."
+        logs.push(
+          warn: "Unsupported project configuration detected in '#{filepath}': #{project_config.keys}. "\
+          "Project configuration should be set in 'bolt-project.yaml'."
         )
       end
 
@@ -116,10 +122,10 @@ module Bolt
 
       if transport_config.any?
         data.reject! { |key, _| transport_config.include?(key) }
-        warnings.push(
-          msg: "Unsupported inventory configuration detected in '#{filepath}': #{transport_config.keys}. "\
-               "Transport configuration should be set under the 'inventory-config' option or "\
-               "in 'inventory.yaml'."
+        logs.push(
+          warn: "Unsupported inventory configuration detected in '#{filepath}': #{transport_config.keys}. "\
+          "Transport configuration should be set under the 'inventory-config' option or "\
+          "in 'inventory.yaml'."
         )
       end
 
@@ -142,7 +148,7 @@ module Bolt
         data = data.merge(data.delete('inventory-config'))
       end
 
-      { filepath: filepath, data: data, warnings: warnings, deprecations: [] }
+      { filepath: filepath, data: data, logs: logs, deprecations: [] }
     end
 
     # Loads a 'bolt.yaml' file, the legacy configuration file. There's no special munging needed
@@ -150,11 +156,12 @@ module Bolt
     def self.load_bolt_yaml(dir)
       filepath = dir + BOLT_CONFIG_NAME
       data     = Bolt::Util.read_yaml_hash(filepath, 'config')
+      logs     = [{ debug: "Loaded configuration from #{filepath}" }]
       deprecations = [{ type: 'Using bolt.yaml for system configuration',
                         msg: "Configuration file #{filepath} is deprecated and will be removed in a future version "\
                         "of Bolt. Use '#{dir + BOLT_DEFAULTS_NAME}' instead." }]
 
-      { filepath: filepath, data: data, warnings: [], deprecations: deprecations }
+      { filepath: filepath, data: data, logs: logs, deprecations: deprecations }
     end
 
     def self.load_defaults(project)
@@ -187,13 +194,13 @@ module Bolt
       unless config_data.is_a?(Array)
         config_data = [{ filepath: project.config_file,
                          data: config_data,
-                         warnings: [],
+                         logs: [],
                          deprecations: [] }]
       end
 
       @logger       = Logging.logger[self]
       @project      = project
-      @warnings     = @project.warnings.dup
+      @logs         = @project.logs.dup
       @deprecations = @project.deprecations.dup
       @transports   = {}
       @config_files = []
@@ -221,7 +228,7 @@ module Bolt
       end
 
       loaded_data = config_data.each_with_object([]) do |data, acc|
-        @warnings.concat(data[:warnings]) if data[:warnings].any?
+        @logs.concat(data[:logs]) if data[:logs].any?
         @deprecations.concat(data[:deprecations]) if data[:deprecations].any?
 
         if data[:data].any?
@@ -373,7 +380,7 @@ module Bolt
     def validate
       if @data['future']
         msg = "Configuration option 'future' no longer exposes future behavior."
-        @warnings << { option: 'future', msg: msg }
+        @logs << { warn: msg }
       end
 
       keys = OPTIONS.keys - %w[plugins plugin_hooks puppetdb]
