@@ -119,7 +119,9 @@ module Bolt
     # This API is used to prepend the project as a module to Puppet's internal
     # module_references list. CHANGE AT YOUR OWN RISK
     def to_h
-      { path: @path.to_s, name: name }
+      { path: @path.to_s,
+        name: name,
+        load_as_module?: load_as_module? }
     end
 
     def eql?(other)
@@ -129,6 +131,10 @@ module Bolt
 
     def project_file?
       @project_file.file?
+    end
+
+    def load_as_module?
+      !name.nil?
     end
 
     def name

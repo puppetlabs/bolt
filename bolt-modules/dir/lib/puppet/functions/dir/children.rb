@@ -25,7 +25,7 @@ Puppet::Functions.create_function(:'dir::children', Puppet::Functions::InternalF
     full_mod_path = File.join(mod_path, subpath || '') if mod_path
 
     # Expand relative to the project directory if path is relative
-    project = Puppet.lookup(:bolt_project_data)
+    project = Puppet.lookup(:bolt_project)
     pathname = Pathname.new(dirname)
     full_dir = pathname.absolute? ? dirname : File.expand_path(File.join(project.path, dirname))
 

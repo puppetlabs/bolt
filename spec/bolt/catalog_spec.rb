@@ -35,11 +35,13 @@ describe Bolt::Catalog do
   }
 
   let(:plan) { File.join(__FILE__, '../../fixtures/apply/basic/plans/trusted.pp') }
+  let(:project) { Struct.new(:name, :path, :load_as_module?).new('project', '', false) }
 
   let(:request) do
     { 'code_ast' => {},
       'modulepath' => [],
       'pdb_config' => pdb_config.to_hash,
+      'project' => project,
       'hiera_config' => nil,
       'plan_vars' => {},
       'target' => {

@@ -16,7 +16,7 @@ describe 'download_file' do
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.override(bolt_executor: executor, bolt_inventory: inventory, bolt_project_data: project) do
+    Puppet.override(bolt_executor: executor, bolt_inventory: inventory, bolt_project: project) do
       inventory.stubs(:version).returns(2)
       inventory.stubs(:target_implementation_class).returns(Bolt::Target)
       example.run

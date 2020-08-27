@@ -96,7 +96,7 @@ Puppet::Functions.create_function(:download_file, Puppet::Functions::InternalFun
 
     # Paths expand relative to the default downloads directory for the project
     # e.g. ~/.puppetlabs/bolt/downloads/
-    destination = Puppet.lookup(:bolt_project_data).downloads + destination
+    destination = Puppet.lookup(:bolt_project).downloads + destination
 
     # If the destination directory already exists, delete any existing contents
     if Dir.exist?(destination)

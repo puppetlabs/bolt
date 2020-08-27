@@ -1325,6 +1325,7 @@ describe "Bolt::CLI" do
             resource_types: '',
             tasks: ['facts'],
             project_file?: true,
+            load_as_module?: true,
             name: nil,
             to_h: {}
           }
