@@ -338,9 +338,17 @@ module Bolt
 
     private def update_logs(logs)
       logs.each_with_object({}) do |(key, val), acc|
-        next unless val.is_a?(Hash)
+        # Remove any disabled logs
+        next if val == 'disable'
 
         name = normalize_log(key)
+
+        # But otherwise it has to be a Hash
+        unless val.is_a?(Hash)
+          raise Bolt::ValidationError,
+                "config of log #{name} must be a Hash, received #{val.class} #{val.inspect}"
+        end
+
         acc[name] = val.slice('append', 'level')
                        .transform_keys(&:to_sym)
 

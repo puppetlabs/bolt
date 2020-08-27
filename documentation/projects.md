@@ -117,6 +117,7 @@ The following are common files and directories found in a Bolt project.
 |[`manifests`](applying_manifest_blocks.md)|A directory for storing your Puppet code files, known as _manifests_.|
 |`hiera.yaml`|Contains the Hiera config to use for target-specific data when using `apply`.|
 |`data/`|The standard path to store static Hiera data files.|
+|`bolt-debug.log`|Contains debug log output for the most recent Bolt command.|
 |[`bolt.yaml`](bolt_configuration_reference.md)|Contains configuration options for Bolt. ⛔ **`bolt.yaml` is deprecated; use `bolt-project.yaml` instead.** |
 
 > **Remember:** A directory must have a `bolt-project.yaml` file before Bolt
