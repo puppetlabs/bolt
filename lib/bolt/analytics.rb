@@ -93,6 +93,10 @@ module Bolt
     def self.write_config(filename, config)
       FileUtils.mkdir_p(File.dirname(filename))
       File.write(filename, config.to_yaml)
+    rescue StandardError => e
+      Bolt::Logger.warn_once('unwriteable_file', "Could not write analytics configuration to #{filename}.")
+      # This will get caught by build_client and create a NoopClient
+      raise e
     end
 
     class Client

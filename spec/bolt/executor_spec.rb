@@ -342,6 +342,7 @@ describe "Bolt::Executor" do
       Dir.mktmpdir(nil, Dir.pwd) do |destination|
         allow(ssh).to receive(:download)
         expect(FileUtils).to receive(:mkdir_p).with(destination)
+        expect(FileUtils).to receive(:mkdir_p).with(File.expand_path(File.join('~', '.puppetlabs', 'bolt')))
 
         executor.download_file(targets, source, destination)
       end

@@ -9,10 +9,13 @@ describe Bolt::Config do
   let(:user_path)     { Bolt::Config.user_path }
   let(:config_name)   { Bolt::Config::BOLT_CONFIG_NAME }
   let(:defaults_name) { Bolt::Config::BOLT_DEFAULTS_NAME }
+  let(:logfile)       { 'bolt.log' }
 
   around(:each) do |example|
     Dir.mktmpdir("foo") do |tmpdir|
-      @tmpdir = Pathname.new(File.join(tmpdir, "validprojectname")).to_s
+      @tmpdir = File.join(tmpdir, "validprojectname")
+      FileUtils.mkdir_p(@tmpdir)
+
       example.run
     end
   end
@@ -81,7 +84,6 @@ describe Bolt::Config do
     end
 
     it 'prefers bolt-project.yaml to bolt.yaml with config' do
-      FileUtils.mkdir_p(@tmpdir)
       File.write(File.join(@tmpdir, 'bolt.yaml'), { 'format' => 'json' }.to_yaml)
       File.write(File.join(@tmpdir, 'bolt-project.yaml'), { 'format' => 'human' }.to_yaml)
 
@@ -92,7 +94,6 @@ describe Bolt::Config do
 
     # This should be removed when bolt.yaml deprecation is removed
     it 'prefers bolt.yaml to bolt-project.yaml with no config' do
-      FileUtils.mkdir_p(@tmpdir)
       File.write(File.join(@tmpdir, 'bolt.yaml'), { 'format' => 'json' }.to_yaml)
       File.write(File.join(@tmpdir, 'bolt-project.yaml'), { 'name' => 'human' }.to_yaml)
 
@@ -103,10 +104,12 @@ describe Bolt::Config do
   end
 
   describe "::from_file" do
-    let(:path) { File.expand_path('/path/to/config') }
-    let(:proj_path) { Bolt::Util.windows? ? "D:/path/to/bolt-project.yaml" : "/path/to/bolt-project.yaml" }
+    let(:path) { File.expand_path('/path/to/config.yaml') }
+    let(:dir) { Bolt::Util.windows? ? "D:/path/to" : "/path/to" }
+    let(:proj_path) { File.join(dir, "bolt-project.yaml") }
 
     it 'loads from the specified config file' do
+      allow(File).to receive(:directory?).with(Pathname.new(dir)).and_return(true)
       allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return({})
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
       expect(Bolt::Util).to receive(:read_yaml_hash)
@@ -120,6 +123,7 @@ describe Bolt::Config do
     end
 
     it "fails if the config file doesn't exist" do
+      allow(File).to receive(:directory?).with(Pathname.new(dir)).and_return(true)
       expect(File).to receive(:open).with(path, anything).and_raise(Errno::ENOENT)
 
       expect do
@@ -269,7 +273,7 @@ describe Bolt::Config do
     it "does not accept invalid log levels" do
       config = {
         'log' => {
-          'file:/bolt.log' => { 'level' => :foo }
+          "file:#{logfile}" => { 'level' => :foo }
         }
       }
 
@@ -281,7 +285,7 @@ describe Bolt::Config do
     it "does not accept invalid append flag values" do
       config = {
         'log' => {
-          'file:/bolt.log' => { 'append' => :foo }
+          "file:#{logfile}" => { 'append' => :foo }
         }
       }
 
