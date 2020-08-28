@@ -141,7 +141,6 @@ describe "lookup() in plans" do
     let(:uri)          { 'localhost' }
 
     it 'uses plan_hierarchy outside apply block, and hierarchy in apply block' do
-      pending('Until Puppet 6.18 is released')
       result = run_cli_json(cli_command + %W[-t #{uri}])
       expect(result['outside_apply']).to eq('goes the weasel')
       expect(result['in_apply'].keys).to include('Notify[tarts]')
@@ -154,7 +153,6 @@ describe "lookup() in plans" do
     let(:uri)          { 'localhost' }
 
     it 'raises a validation error' do
-      pending('Until Puppet 6.18 is released')
       result = run_cli_json(cli_command + %W[-t #{uri}])
       expect(result).to include(
         'kind' => 'bolt/pal-error',
