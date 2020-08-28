@@ -141,6 +141,14 @@ module Bolt
       end
     end
 
+    def detect_project_conflict(project, modules)
+      return unless project
+      if modules.any? { |mod| mod.name == project.name }
+        Bolt::Logger.warn_once("project shadows module",
+                               "The project '#{project.name}' shadows an existing module of the same name")
+      end
+    end
+
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
     # exceptions thrown by the block and re-raises them ensuring they are
     # Bolt::Errors since the script compiler block will squash all exceptions.
@@ -151,6 +159,10 @@ module Bolt
         # Only load the project if it a) exists, b) has a name it can be loaded with
         Puppet.override(bolt_project: @project,
                         yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
+          # Because this has the side effect of loading and caching the list
+          # of modules, it must happen *after* we have overridden
+          # bolt_project or the project will be ignored
+          detect_project_conflict(@project, Puppet.lookup(:environments).get('bolt').modules)
           pal.with_script_compiler(set_local_facts: false) do |compiler|
             alias_types(compiler)
             register_resource_types(Puppet.lookup(:loaders)) if @resource_types
