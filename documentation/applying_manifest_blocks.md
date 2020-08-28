@@ -241,6 +241,13 @@ Following the Hiera 5 convention, the default data dir is relative to
 `hiera.yaml` at `$BOLTDIR/data`. For configfile examples, see [Configuring
 Hiera](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html).
 
+The target name is made available to hiera via the `certname` key of the `$trusted` top level Puppet variable, ie `$trusted['certname']`. This can be interpolated in hierarchy paths within `$BOLTDIR/hiera.yaml` using `%{trusted.certname}`.
+
+```yaml
+    paths:
+      - "targets/%{trusted.certname}.yaml"
+```
+
 If a custom data provider is used, such as `hiera-eyaml`, which allows you to
 encrypt your data, the gem dependencies must be available to Bolt. See [Install
 gems with Bolt packages](bolt_installing.md#).
