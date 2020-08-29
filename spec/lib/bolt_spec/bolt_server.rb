@@ -13,7 +13,8 @@ module BoltSpec
         'ssl-key' => File.join(ssl_dir, "key.pem"),
         'ssl-ca-cert' => File.join(ssl_dir, "ca.pem"),
         'cache-dir' => File.join(spec_dir, "tmp", "cache"),
-        'file-server-uri' => 'https://localhost:8140'
+        'file-server-uri' => 'https://localhost:8140',
+        'projects-dir' => '/tmp/foo'
       }
     end
 
