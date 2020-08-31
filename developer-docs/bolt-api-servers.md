@@ -106,6 +106,11 @@ For example, the following runs the 'echo' task on linux_target.net:
 }
 ```
 
+#### Response
+If the task runs, the response will have status 200.
+The response will be a standard bolt Result JSON object.
+
+
 ### POST /winrm/run_task
 - `target`: [WinRM Target Object](#winrm-target-object), *required* - Target information to run task on.
 - `task`: [Task Object](#task-object), *required* - Task to run on target.
@@ -139,6 +144,12 @@ For example, the following runs 'sample::complex_params' task on localhost:
     "message": "Hello world"
   }
 }
+
+#### Response
+If the task runs, the response will have status 200.
+The response will be a standard bolt Result JSON object.
+
+
 ```
 ### POST /ssh/run_command
 - `target`: [SSH Target Object](#ssh-target-object), *required* - Target information to run task on.
@@ -335,6 +346,7 @@ Example request for a single connectivity check on two nodes over SSH:
   ]
 }
 ```
+#### Response
 
 This returns a JSON object of the shape:
 ```
@@ -361,6 +373,9 @@ This returns a JSON object of the shape:
 - `targets`: An array of [WinRM Target Objects](#winrm-target-object), *required* - A set of targets to check once for connectivity over WinRM.
 
 This endpoint behaves identically to the /ssh/check_node_connections endpoint, but acts over WinRM instead.
+
+
+## Target Schemas
 
 ### SSH Target Object
 The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/partials/target-ssh.json)
@@ -400,9 +415,8 @@ The files array is required, and contains details about the files the task needs
 - `filename`: String, *required* - File name including extension
 - `size`: Number, *optional* - Size of file in Bytes
 
-### Response
-If the task runs, the response will have status 200.
-The response will be a standard bolt Result JSON object.
+
+
 
 ## Plan Executor API Endpoints
 Each API endpoint accepts a request as described below. The request body must be a JSON object.
