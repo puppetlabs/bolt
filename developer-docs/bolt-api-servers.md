@@ -144,13 +144,14 @@ For example, the following runs 'sample::complex_params' task on localhost:
     "message": "Hello world"
   }
 }
+```
 
 #### Response
 If the task runs, the response will have status 200.
 The response will be a standard bolt Result JSON object.
 
 
-```
+
 ### POST /ssh/run_command
 - `target`: [SSH Target Object](#ssh-target-object), *required* - Target information to run task on.
 - `command`: String, *required* - Command to run on target.
