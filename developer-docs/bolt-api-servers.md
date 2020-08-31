@@ -374,6 +374,137 @@ This returns a JSON object of the shape:
 
 This endpoint behaves identically to the /ssh/check_node_connections endpoint, but acts over WinRM instead.
 
+### GET /tasks
+- `environment`: String
+
+#### Response
+
+This returns a JSON array of this shape:
+
+```
+[
+  {
+    "name": "package"
+  },
+  {
+    "name": "service"
+  }
+]
+```
+
+### GET /tasks/:module/:taskname
+- `environment`: String
+
+#### Response
+
+This returns a JSON object of this shape:
+
+```
+{
+  "metadata": {
+    "description": "Manage and inspect the state of services",
+    "input_method": "stdin",
+    "parameters": {
+      "action": {
+        "description": "The operation (start, stop, restart, enable, disable, status) to perform on the service.",
+        "type": "Enum[start, stop, restart, enable, disable, status]"
+      },
+      "name": {
+        "description": "The name of the service to operate on.",
+        "type": "String[1]"
+      },
+      "force": {
+        "description": "Force a Windows service to restart even if it has dependent services. This parameter is passed for Windows services only.",
+        "type": "Optional[Boolean]"
+      },
+      "provider": {
+        "description": "The provider to use to manage or inspect the service, defaults to the system service manager. Only used when the 'puppet-agent' feature is available on the target so we can leverage Puppet.",
+        "type": "Optional[String[1]]"
+      }
+    },
+    "implementations": [
+      {
+        "name": "init.rb",
+        "requirements": [
+          "puppet-agent"
+        ]
+      },
+      {
+        "name": "windows.ps1",
+        "requirements": [
+          "powershell"
+        ],
+        "input_method": "powershell"
+      },
+      {
+        "name": "linux.sh",
+        "requirements": [
+          "shell"
+        ],
+        "input_method": "environment",
+        "files": [
+          "service/files/common.sh"
+        ]
+      }
+    ],
+    "extensions": {
+      "discovery": {
+        "friendlyName": "Manage service",
+        "type": [
+          "host"
+        ]
+      }
+    }
+  },
+  "name": "service",
+  "files": [
+    {
+      "filename": "init.rb",
+      "sha256": "da9441915636b2a231bca3da898788920490b8a061eb28b086f079da72dd3141",
+      "size_bytes": 1285,
+      "uri": {
+        "path": "/puppet/v3/file_content/tasks/service/init.rb",
+        "params": {
+          "environment": "production"
+        }
+      }
+    },
+    {
+      "filename": "windows.ps1",
+      "sha256": "a706b8c127b1aa72d7c75d6fbb0833d25abc97db89197f9b3faadf1caf688964",
+      "size_bytes": 2636,
+      "uri": {
+        "path": "/puppet/v3/file_content/tasks/service/windows.ps1",
+        "params": {
+          "environment": "production"
+        }
+      }
+    },
+    {
+      "filename": "linux.sh",
+      "sha256": "71d6bae0c580529d7c1a84e865bc08606aa5f8d6f627ef5083a2bc6918338cab",
+      "size_bytes": 4220,
+      "uri": {
+        "path": "/puppet/v3/file_content/tasks/service/linux.sh",
+        "params": {
+          "environment": "production"
+        }
+      }
+    },
+    {
+      "filename": "service/files/common.sh",
+      "sha256": "dbe3a6bdf0382a311b2cc885128b1069b3749c7bb3fef1143348179f0a659c30",
+      "size_bytes": 1120,
+      "uri": {
+        "path": "/puppet/v3/file_content/modules/service/common.sh",
+        "params": {
+          "environment": "production"
+        }
+      }
+    }
+  ]
+}
+```
 
 ## Target Schemas
 
