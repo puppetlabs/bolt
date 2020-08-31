@@ -1,5 +1,29 @@
 # Changelog
 
+## Bolt 2.26.0 (2020-08-31)
+
+### New features
+
+* **Allow task output to be treated as sensitive**
+  ([#2086](https://github.com/puppetlabs/bolt/issues/2086))
+
+  Tasks can now return a `_sensitive` key in their output which can
+  contain an arbitrary value which will be treated as sensitive by
+  Bolt. This means that it won't be printed to the console or logged at
+  any log level, and plans will need to use `unwrap()` to get the value.
+
+* **Disable log files by setting them to `disable`**
+  ([#2120](https://github.com/puppetlabs/bolt/issues/2120))
+
+  Log files can now be disabled if they were set at a previous level
+  of the hierarchy. This also allows the default `bolt-debug.log` file
+  to be disabled.
+
+* **Packages for Fedora 32**
+  ([#2042](https://github.com/puppetlabs/bolt/issues/2042))
+
+  Bolt packages are now available for Fedora 32.
+
 ## Bolt 2.25.0 (2020-08-26)
 
 ### New features
