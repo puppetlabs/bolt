@@ -725,7 +725,6 @@ module Bolt
     end
 
     def apply_manifest(code, targets, filename = nil, noop = false)
-      Puppet[:tasks] = false
       ast = pal.parse_manifest(code, filename)
 
       if defined?(ast.body) &&
@@ -748,12 +747,11 @@ module Bolt
 
       results = nil
       elapsed_time = Benchmark.realtime do
-        pal.in_plan_compiler(executor, inventory, puppetdb_client) do |compiler|
-          compiler.call_function('apply_prep', targets)
-        end
-
-        results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
-          Puppet.lookup(:apply_executor).apply_ast(ast, targets, catch_errors: true, noop: noop)
+        results = pal.in_bolt_compiler do |compiler|
+          pal.with_bolt_executor(executor, inventory, puppetdb_client) do
+            compiler.call_function('apply_prep', targets)
+            Puppet.lookup(:apply_executor).apply_ast(ast, targets, catch_errors: true, noop: noop)
+          end
         end
       end
 

@@ -230,11 +230,8 @@ module BoltSpec
         executor = Bolt::Executor.new(config.concurrency, @analytics, noop)
         targets = inventory.get_targets(targets)
 
-        pal.in_plan_compiler(executor, inventory, puppetdb_client) do |compiler|
+        pal.with_bolt_executor(executor, inventory, puppetdb_client) do |compiler|
           compiler.call_function('apply_prep', targets)
-        end
-
-        pal.with_bolt_executor(executor, inventory, puppetdb_client) do
           Puppet.lookup(:apply_executor).apply_ast(ast, targets, catch_errors: true, noop: noop)
         end
       end

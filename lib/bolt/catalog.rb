@@ -9,7 +9,7 @@ require 'bolt/pal'
 require 'bolt/puppetdb'
 require 'bolt/util'
 
-Bolt::PAL.load_puppet
+Bolt::PAL::CompilerService.load_puppet
 
 require 'bolt/catalog/logging'
 

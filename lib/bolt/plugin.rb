@@ -56,22 +56,8 @@ module Bolt
       private :empty_inventory
 
       def with_a_compiler
-        # If we're already inside a pal compiler block use that compiler
-        # This may blow up if you try to load a task in catalog pal. Should we
-        # guard against that?
-        compiler = nil
-        if defined?(Puppet)
-          begin
-            compiler = Puppet.lookup(:pal_compiler)
-          rescue Puppet::Context::UndefinedBindingError; end # rubocop:disable Lint/SuppressedException
-        end
-
-        if compiler
-          yield compiler
-        else
-          @pal.in_bolt_compiler do |temp_compiler|
-            yield temp_compiler
-          end
+        @pal.in_bolt_compiler do |temp_compiler|
+          yield temp_compiler
         end
       end
       private :with_a_compiler

@@ -3,6 +3,7 @@
 require 'bolt/applicator'
 require 'bolt/executor'
 require 'bolt/error'
+require 'bolt/pal/compiler_service'
 require 'bolt/plan_result'
 require 'bolt/util'
 require 'etc'
@@ -52,10 +53,6 @@ module Bolt
 
     def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors,
                    trusted_external = nil, apply_settings = {}, project = nil)
-      # Nothing works without initialized this global state. Reinitializing
-      # is safe and in practice only happens in tests
-      self.class.load_puppet
-
       @user_modulepath = modulepath
       @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
       @hiera_config = hiera_config
@@ -70,134 +67,38 @@ module Bolt
         @logger.debug("Loading modules from #{@modulepath.join(File::PATH_SEPARATOR)}")
       end
 
-      @loaded = false
-    end
-
-    # Puppet logging is global so this is class method to avoid confusion
-    def self.configure_logging
-      Puppet::Util::Log.destinations.clear
-      Puppet::Util::Log.newdestination(Bolt::Logger.logger('Puppet'))
-      # Defer all log level decisions to the Logging library by telling Puppet
-      # to log everything
-      Puppet.settings[:log_level] = 'debug'
-    end
-
-    def self.load_puppet
-      if Bolt::Util.windows?
-        # Windows 'fix' for openssl behaving strangely. Prevents very slow operation
-        # of random_bytes later when establishing winrm connections from a Windows host.
-        # See https://github.com/rails/rails/issues/25805 for background.
-        require 'openssl'
-        OpenSSL::Random.random_bytes(1)
-      end
-
-      begin
-        require 'puppet_pal'
-      rescue LoadError
-        raise Bolt::Error.new("Puppet must be installed to execute tasks", "bolt/puppet-missing")
-      end
-
-      require 'bolt/pal/logging'
-      require 'bolt/pal/issues'
-      require 'bolt/pal/yaml_plan/loader'
-      require 'bolt/pal/yaml_plan/transpiler'
-
-      # Now that puppet is loaded we can include puppet mixins in data types
-      Bolt::ResultSet.include_iterable
-    end
-
-    def setup
-      unless @loaded
-        # This is slow so don't do it until we have to
-        Bolt::PAL.load_puppet
-
-        # Make sure we don't create the puppet directories
-        with_puppet_settings { |_| nil }
-        @loaded = true
-      end
-    end
-
-    # Create a top-level alias for TargetSpec and PlanResult so that users don't have to
-    # namespace it with Boltlib, which is just an implementation detail. This
-    # allows them to feel like a built-in type in bolt, rather than
-    # something has been, no pun intended, "bolted on".
-    def alias_types(compiler)
-      compiler.evaluate_string('type TargetSpec = Boltlib::TargetSpec')
-      compiler.evaluate_string('type PlanResult = Boltlib::PlanResult')
-    end
-
-    # Register all resource types defined in $Project/.resource_types as well as
-    # the built in types registered with the runtime_3_init method.
-    def register_resource_types(loaders)
-      static_loader = loaders.static_loader
-      static_loader.runtime_3_init
-      if File.directory?(@resource_types)
-        Dir.children(@resource_types).each do |resource_pp|
-          type_name_from_file = File.basename(resource_pp, '.pp').capitalize
-          typed_name = Puppet::Pops::Loader::TypedName.new(:type, type_name_from_file)
-          resource_type = Puppet::Pops::Types::TypeFactory.resource(type_name_from_file)
-          loaders.static_loader.set_entry(typed_name, resource_type)
-        end
-      end
-    end
-
-    def detect_project_conflict(project, environment)
-      return unless project && project.load_as_module?
-      # The environment modulepath has stripped out non-existent directories,
-      # so we don't need to check for them
-      modules = environment.modulepath.flat_map do |path|
-        Dir.children(path).select { |name| Puppet::Module.is_module_directory?(name, path) }
-      end
-      if modules.include?(project.name)
-        Bolt::Logger.warn_once("project shadows module",
-                               "The project '#{project.name}' shadows an existing module of the same name")
-      end
+      @compiler_service = Bolt::PAL::CompilerService.new(project, @modulepath)
     end
 
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
     # exceptions thrown by the block and re-raises them ensuring they are
     # Bolt::Errors since the script compiler block will squash all exceptions.
-    def in_bolt_compiler
-      # TODO: If we always call this inside a bolt_executor we can remove this here
-      setup
-      r = Puppet::Pal.in_tmp_environment('bolt', modulepath: @modulepath, facts: {}) do |pal|
-        # Only load the project if it a) exists, b) has a name it can be loaded with
-        Puppet.override(bolt_project: @project,
-                        yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
-          # Because this has the side effect of loading and caching the list
-          # of modules, it must happen *after* we have overridden
-          # bolt_project or the project will be ignored
-          detect_project_conflict(@project, Puppet.lookup(:environments).get('bolt'))
-          pal.with_script_compiler(set_local_facts: false) do |compiler|
-            alias_types(compiler)
-            register_resource_types(Puppet.lookup(:loaders)) if @resource_types
-            begin
-              yield compiler
-            rescue Bolt::Error => e
-              e
-            rescue Puppet::DataBinding::LookupError => e
-              if e.issue_code == :HIERA_UNDEFINED_VARIABLE
-                message = "Interpolations are not supported in lookups outside of an apply block: #{e.message}"
-                PALError.new(message)
-              else
-                PALError.from_preformatted_error(e)
-              end
-            rescue Puppet::PreformattedError => e
-              if e.issue_code == :UNKNOWN_VARIABLE &&
-                 %w[facts trusted server_facts settings].include?(e.arguments[:name])
-                message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope "\
-                          "unless explicitly defined."
-                details = { file: e.file, line: e.line, column: e.pos }
-                PALError.new(message, details)
-              else
-                PALError.from_preformatted_error(e)
-              end
-            rescue StandardError => e
+    def in_bolt_compiler(&blk)
+      @compiler_service.start
+      r = begin
+            @compiler_service.perform(&blk)
+          rescue Bolt::Error => e
+            e
+          rescue Puppet::DataBinding::LookupError => e
+            if e.issue_code == :HIERA_UNDEFINED_VARIABLE
+              message = "Interpolations are not supported in lookups outside of an apply block: #{e.message}"
+              PALError.new(message)
+            else
               PALError.from_preformatted_error(e)
             end
+          rescue Puppet::PreformattedError => e
+            if e.issue_code == :UNKNOWN_VARIABLE &&
+                %w[facts trusted server_facts settings].include?(e.arguments[:name])
+              message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope "\
+                "unless explicitly defined."
+              details = { file: e.file, line: e.line, column: e.pos }
+              PALError.new(message, details)
+            else
+              PALError.from_preformatted_error(e)
+            end
+          rescue StandardError => e
+            PALError.from_preformatted_error(e)
           end
-        end
-      end
 
       # Plans may return PuppetError but nothing should be throwing them
       if r.is_a?(StandardError) && !r.is_a?(Bolt::PuppetError)
@@ -206,13 +107,12 @@ module Bolt
       r
     end
 
-    def with_bolt_executor(executor, inventory, pdb_client = nil, applicator = nil, &block)
-      setup
+    def with_bolt_executor(executor, inventory, pdb_client = nil, &block)
       opts = {
         bolt_executor: executor,
         bolt_inventory: inventory,
         bolt_pdb_client: pdb_client,
-        apply_executor: applicator || Applicator.new(
+        apply_executor: Applicator.new(
           inventory,
           executor,
           @modulepath,
@@ -230,49 +130,17 @@ module Bolt
       Puppet.override(opts, &block)
     end
 
-    def in_plan_compiler(executor, inventory, pdb_client, applicator = nil)
-      with_bolt_executor(executor, inventory, pdb_client, applicator) do
-        # TODO: remove this call and see if anything breaks when
-        # settings dirs don't actually exist. Plans shouldn't
-        # actually be using them.
-        with_puppet_settings do
-          in_bolt_compiler do |compiler|
-            yield compiler
-          end
-        end
-      end
-    end
-
-    def in_task_compiler(executor, inventory)
-      with_bolt_executor(executor, inventory) do
-        in_bolt_compiler do |compiler|
-          yield compiler
-        end
-      end
-    end
-
     # TODO: PUP-8553 should replace this
-    def with_puppet_settings
-      Dir.mktmpdir('bolt') do |dir|
-        cli = []
-        Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
-          cli << "--#{setting}" << dir
-        end
-        Puppet.settings.send(:clear_everything_for_tests)
-        Puppet.initialize_settings(cli)
-        Puppet::GettextConfig.create_default_text_domain
-        Puppet[:trusted_external_command] = @trusted_external
-        Puppet.settings[:hiera_config] = @hiera_config
-        self.class.configure_logging
-        yield
-      end
-    end
-
     # Parses a snippet of Puppet manifest code and returns the AST represented
     # in JSON.
-    def parse_manifest(code, filename)
-      setup
-      Puppet::Pops::Parser::EvaluatingParser.new.parse_string(code, filename)
+    def parse_manifest(code, filename, tasks_mode = false)
+      in_bolt_compiler do
+        previous_tasks = Puppet[:tasks]
+        Puppet[:tasks] = tasks_mode
+        Puppet::Pops::Parser::EvaluatingParser.new.parse_string(code, filename)
+      ensure
+        Puppet[:tasks] = previous_tasks
+      end
     rescue Puppet::Error => e
       raise Bolt::PAL::PALError, "Failed to parse manifest: #{e}"
     end
@@ -479,16 +347,20 @@ module Bolt
     end
 
     def run_task(task_name, targets, params, executor, inventory, description = nil)
-      in_task_compiler(executor, inventory) do |compiler|
-        params = params.merge('_bolt_api_call' => true, '_catch_errors' => true)
-        compiler.call_function('run_task', task_name, targets, description, params)
+      in_bolt_compiler do |compiler|
+        with_bolt_executor(executor, inventory) do
+          params = params.merge('_bolt_api_call' => true, '_catch_errors' => true)
+          compiler.call_function('run_task', task_name, targets, description, params)
+        end
       end
     end
 
-    def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil, applicator = nil)
-      in_plan_compiler(executor, inventory, pdb_client, applicator) do |compiler|
-        r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
-        Bolt::PlanResult.from_pcore(r, 'success')
+    def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil)
+      in_bolt_compiler do |compiler|
+        with_bolt_executor(executor, inventory, pdb_client) do |compiler|
+          r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
+          Bolt::PlanResult.from_pcore(r, 'success')
+        end
       end
     rescue Bolt::Error => e
       Bolt::PlanResult.new(e, 'failure')
