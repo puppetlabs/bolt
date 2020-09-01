@@ -66,9 +66,24 @@ module Bolt
                             'details' => { 'exit_code' => exit_code } }
       end
 
+      if value.key?('_error')
+        unless value['_error'].is_a?(Hash) && value['_error'].key?('msg')
+          value['_error'] = {
+            'msg'     => "Invalid error returned from task #{task}: #{value['_error'].inspect}. Error "\
+                         "must be an object with a msg key.",
+            'kind'    => 'bolt/invalid-task-error',
+            'details' => { 'original_error' => value['_error'] }
+          }
+        end
+
+        value['_error']['kind']    ||= 'bolt/error'
+        value['_error']['details'] ||= {}
+      end
+
       if value.key?('_sensitive')
         value['_sensitive'] = Puppet::Pops::Types::PSensitiveType::Sensitive.new(value['_sensitive'])
       end
+
       new(target, value: value, action: 'task', object: task)
     end
 

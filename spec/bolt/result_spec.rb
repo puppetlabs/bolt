@@ -89,6 +89,23 @@ describe Bolt::Result do
       expect(result.value).to eq(obj)
     end
 
+    it 'adds an error message if _error is missing a msg' do
+      obj = { '_error' => 'oops' }
+      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
+      expect(result.error_hash['msg']).to match(/Invalid error returned from task atask/)
+      expect(result.error_hash['details']['original_error']).to eq('oops')
+    end
+
+    it 'adds kind and details to _error hash if missing' do
+      obj = { '_error' => { 'msg' => 'oops' } }
+      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
+      expect(result.error_hash).to eq(
+        'msg'     => 'oops',
+        'kind'    => 'bolt/error',
+        'details' => {}
+      )
+    end
+
     it 'marks _sensitive values as sensitive' do
       obj = { "user" => "someone", "_sensitive" => { "password" => "sosecretive" } }
       result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
@@ -98,7 +115,7 @@ describe Bolt::Result do
 
     it 'excludes _output and _error from generic_value' do
       obj = { "key" => "val" }
-      special = { "_error" => {}, "_output" => "output" }
+      special = { "_error" => { 'msg' => 'oops' }, "_output" => "output" }
       result = Bolt::Result.for_task(target, obj.merge(special).to_json, '', 0, 'atask')
       expect(result.generic_value).to eq(obj)
     end
@@ -117,7 +134,7 @@ describe Bolt::Result do
 
     it 'handles errors' do
       obj = { "key" => "val",
-              "_error" => { "kind" => "error" } }
+              "_error" => { "msg" => "oops", "kind" => "error", "details" => {} } }
       result = Bolt::Result.for_task(target, obj.to_json, '', 1, 'atask')
       expect(result.value).to eq(obj)
       expect(result.error_hash).to eq(obj['_error'])
