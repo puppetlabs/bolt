@@ -141,9 +141,14 @@ module Bolt
       end
     end
 
-    def detect_project_conflict(project, modules)
-      return unless project
-      if modules.any? { |mod| mod.name == project.name }
+    def detect_project_conflict(project, environment)
+      return unless project && project.load_as_module?
+      # The environment modulepath has stripped out non-existent directories,
+      # so we don't need to check for them
+      modules = environment.modulepath.flat_map do |path|
+        Dir.children(path).select { |name| Puppet::Module.is_module_directory?(name, path) }
+      end
+      if modules.include?(project.name)
         Bolt::Logger.warn_once("project shadows module",
                                "The project '#{project.name}' shadows an existing module of the same name")
       end
@@ -162,7 +167,7 @@ module Bolt
           # Because this has the side effect of loading and caching the list
           # of modules, it must happen *after* we have overridden
           # bolt_project or the project will be ignored
-          detect_project_conflict(@project, Puppet.lookup(:environments).get('bolt').modules)
+          detect_project_conflict(@project, Puppet.lookup(:environments).get('bolt'))
           pal.with_script_compiler(set_local_facts: false) do |compiler|
             alias_types(compiler)
             register_resource_types(Puppet.lookup(:loaders)) if @resource_types
