@@ -51,13 +51,13 @@ module Bolt
     attr_reader :modulepath
 
     def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors,
-                   trusted_external = nil, apply_settings = {}, project = nil)
+                   trusted_external = nil, apply_settings = {}, project = nil, boltlib_path = [BOLTLIB_PATH])
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happens in tests
       self.class.load_puppet
 
       @original_modulepath = modulepath
-      @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
+      @modulepath = [*boltlib_path, *modulepath, MODULES_PATH]
       @hiera_config = hiera_config
       @trusted_external = trusted_external
       @apply_settings = apply_settings
