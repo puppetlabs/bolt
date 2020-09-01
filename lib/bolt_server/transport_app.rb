@@ -293,6 +293,12 @@ module BoltServer
       tasks.map { |task_name, _description| { 'name' => task_name } }
     end
 
+    def plan_list(pal, plan_show_list = nil)
+      plans = pal.list_plans.flatten
+      plans.select! { |plan_name| plan_show_list.include?(plan_name) } unless plan_show_list.nil?
+      plans.map { |plan_name| { 'name' => plan_name } }
+    end
+
     get '/' do
       200
     end
@@ -423,6 +429,16 @@ module BoltServer
       end
     end
 
+    # Fetches the metadata for a single plan
+    #
+    # @param project_ref [String] the project to fetch the plan from
+    get '/project_plans/:module_name/:plan_name' do
+      in_bolt_project(params['project_ref']) do |context|
+        plan_info = pe_plan_info(context[:pal], params[:module_name], params[:plan_name])
+        [200, plan_info.to_json]
+      end
+    end
+
     # Fetches the metadata for a single task
     #
     # @param environment [String] the environment to fetch the task from
@@ -473,6 +489,21 @@ module BoltServer
       end
     end
 
+    # Fetches the list of plans for a project
+    #
+    # @param project_ref [String] the project to fetch the list of plans from
+    get '/project_plans' do
+      in_bolt_project(params['project_ref']) do |context|
+        plans_response = plan_list(context[:pal], context[:config].project.plans).to_json
+
+        # We structure this array of plans to be an array of hashes so that it matches the structure
+        # returned by the puppetserver API that serves data like this. Structuring the output this way
+        # makes switching between puppetserver and bolt-server easier, which makes changes to switch
+        # to bolt-server smaller/simpler.
+        [200, plans_response]
+      end
+    end
+
     # Fetches the list of tasks for an environment
     #
     # @param environment [String] the environment to fetch the list of tasks from
@@ -490,7 +521,7 @@ module BoltServer
 
     # Fetches the list of tasks for a bolt-project
     #
-    # @param environment [String] the environment to fetch the list of tasks from
+    # @param project_ref [String] the project to fetch the list of tasks from
     get '/project_tasks' do
       in_bolt_project(params['project_ref']) do |context|
         tasks_response = task_list(context[:pal], context[:config].project.tasks).to_json

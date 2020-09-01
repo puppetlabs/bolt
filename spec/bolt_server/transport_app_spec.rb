@@ -180,6 +180,126 @@ describe "BoltServer::TransportApp" do
       end
     end
 
+    describe '/project_plans/:module_name/:plan_name' do
+      let(:fake_pal) { instance_double('Bolt::PAL') }
+      let(:fake_project) { instance_double('Bolt::Project') }
+      let(:fake_config) { instance_double('Bolt::Config') }
+
+      context 'with module_name::plan_name' do
+        let(:path) { '/project_plans/foo/bar?project_ref=some_project_somesha' }
+        let(:plan_name) { 'foo::bar' }
+        let(:metadata) { mock_plan_info(plan_name) }
+        let(:expected_response) {
+          {
+            'name' => metadata['name'],
+            'description' => metadata['description'],
+            'parameters' => metadata['parameters']
+          }
+        }
+        it '/project_plans/:module_name/:plan_name handles module::plan_name' do
+          allow(Dir).to receive(:exist?).with('/tmp/foo/some_project_somesha').and_return(true)
+          allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
+          allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
+
+          allow(fake_config).to receive(:modulepath)
+          allow(fake_config).to receive(:project)
+          expect(Bolt::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
+          get(path)
+          resp = JSON.parse(last_response.body)
+          expect(resp).to eq(expected_response)
+        end
+      end
+
+      context 'with module_name' do
+        let(:init_plan) { '/project_plans/foo/init?project_ref=some_project_somesha' }
+        let(:plan_name) { 'foo' }
+        let(:metadata) { mock_plan_info(plan_name) }
+        let(:expected_response) {
+          {
+            'name' => metadata['name'],
+            'description' => metadata['description'],
+            'parameters' => metadata['parameters']
+          }
+        }
+        it '/project_plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
+          allow(Dir).to receive(:exist?).with('/tmp/foo/some_project_somesha').and_return(true)
+          allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
+          allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
+
+          allow(fake_config).to receive(:modulepath)
+          allow(fake_config).to receive(:project)
+          expect(Bolt::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
+          get(init_plan)
+          resp = JSON.parse(last_response.body)
+          expect(resp).to eq(expected_response)
+        end
+      end
+
+      context 'with non-existant plan' do
+        let(:path) { '/project_plans/foo/bar?project_ref=some_project_somesha' }
+        it 'returns 400 if an unknown plan error is thrown' do
+          allow(Dir).to receive(:exist?).with('/tmp/foo/some_project_somesha').and_return(true)
+          allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
+          allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
+
+          allow(fake_config).to receive(:modulepath)
+          allow(fake_config).to receive(:project)
+          expect(Bolt::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:get_plan_info).with('foo::bar').and_raise(Bolt::Error.unknown_plan('foo::bar'))
+          get(path)
+          expect(last_response.status).to eq(400)
+        end
+      end
+    end
+
+    describe '/project_plans' do
+      let(:fake_pal) { instance_double('Bolt::PAL') }
+      let(:fake_project) { instance_double('Bolt::Project') }
+      let(:fake_config) { instance_double('Bolt::Config') }
+
+      describe 'when metadata=false' do
+        let(:path) { "/project_plans?project_ref=some_project_somesha" }
+        it 'returns just the list of plan names' do
+          allow(Dir).to receive(:exist?).with('/tmp/foo/some_project_somesha').and_return(true)
+          allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
+          allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
+
+          allow(fake_config).to receive(:modulepath)
+          allow(fake_config).to receive(:project).and_return(fake_project)
+          allow(fake_project).to receive(:plans)
+          expect(Bolt::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:list_plans).and_return([['abc'], ['def']])
+          get(path)
+          metadata = JSON.parse(last_response.body)
+          expect(metadata).to eq([{ 'name' => 'abc' }, { 'name' => 'def' }])
+        end
+
+        it 'filters plans based on allowlist in bolt-project.yaml' do
+          allow(Dir).to receive(:exist?).with('/tmp/foo/some_project_somesha').and_return(true)
+          allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
+          allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
+
+          allow(fake_config).to receive(:modulepath)
+          allow(fake_config).to receive(:project).and_return(fake_project)
+          allow(fake_project).to receive(:plans).and_return(['abc'])
+          expect(Bolt::PAL).to receive(:new).and_return(fake_pal)
+          expect(fake_pal).to receive(:list_plans).and_return([['abc'], ['def']])
+          get(path)
+          metadata = JSON.parse(last_response.body)
+          expect(metadata).to eq([{ 'name' => 'abc' }])
+        end
+
+        it 'returns 400 if an environment not found error is thrown' do
+          get(path)
+          error = last_response.body
+          expect(error).to eq('`project_ref`: /tmp/foo/some_project_somesha does not exist')
+          expect(last_response.status).to eq(400)
+        end
+      end
+    end
+
     describe '/tasks' do
       let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
       let(:path) { "/tasks?environment=production" }
@@ -228,7 +348,7 @@ describe "BoltServer::TransportApp" do
 
         allow(fake_config).to receive(:modulepath)
         allow(fake_config).to receive(:project).and_return(fake_project)
-        allow(fake_project).to receive(:tasks).and_return('abc')
+        allow(fake_project).to receive(:tasks).and_return(['abc'])
         expect(Bolt::PAL).to receive(:new).and_return(fake_pal)
         expect(fake_pal).to receive(:list_tasks).and_return([%w[abc abc_description], %w[def def_description]])
         get(path)
