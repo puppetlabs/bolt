@@ -828,7 +828,7 @@ module Bolt
              "This option is experimental.") do |exec|
         @options[:'copy-command'] = exec
       end
-      define('--connect-timeout TIMEOUT', Integer, 'Connection timeout (defaults vary)') do |timeout|
+      define('--connect-timeout TIMEOUT', Integer, 'Connection timeout in seconds (defaults vary)') do |timeout|
         @options[:'connect-timeout'] = timeout
       end
       define('--[no-]tty', 'Request a pseudo TTY on targets that support it') do |tty|
