@@ -507,49 +507,6 @@ This returns a JSON object of this shape:
 }
 ```
 
-## Target Schemas
-
-### SSH Target Object
-The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/partials/target-ssh.json)
-
-### WinRM Target Object
-The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/partials/target-winrm.json)
-
-### Task Object
-This is nearly identical to the [task detail JSON
-object](https://github.com/puppetlabs/puppetserver/blob/master/documentation/puppet-api/v3/task_detail.json)
-from [puppetserver](https://github.com/puppetlabs/puppetserver), with an
-additional `file_content` key.
-
-See the [schema](../lib/bolt_server/schemas/task.json). The task is a JSON object which includes the following keys:
-
-#### Name
-
-The name of the task
-
-#### Metadata
-The metadata object is optional, and contains metadata about the task being run. It includes the following keys:
-
-- `description`: String, *optional* - The task description from its metadata.
-- `parameters`: Object, *optional* - A JSON object whose keys are parameter names, and whose values are JSON objects with 2 keys:
-    - `description`: String, *optional* - The parameter description.
-    - `type`: String, *optional* - The type the parameter should accept.
-    - `sensitive`: Boolean, *optional* - Whether the task runner should treat the parameter value as sensitive
-    - `input_method`: String, *optional* - What input method should be used to pass params to task (stdin, environment, powershell)
-
-#### Files
-The files array is required, and contains details about the files the task needs as well as how to get them. Array items should be objects with the following keys:
-- `uri`: Object, *required* - Information on how to request task files
-    - `path`: String, *required* - Relative URI for requesting task content
-    - `params`: Object, *required* - Query parameters for locating task data
-        - `environment`: String, *required* - Environment task files are in
-- `sha256`: String, *required* - Shasum of the file contents
-- `filename`: String, *required* - File name including extension
-- `size`: Number, *optional* - Size of file in Bytes
-
-
-
-
 ### GET /project_tasks
 - `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[SHA])
 
@@ -677,6 +634,121 @@ The files array is required, and contains details about the files the task needs
   ]
 }
 ```
+
+### GET /plans
+- `environment`: String
+
+#### Response
+
+This returns a JSON array of this shape:
+
+```
+[
+  {
+    "name": "facts"
+  },
+  {
+    "name": "facts::info"
+  }
+]
+```
+
+### GET /plans/:module/:taskname
+- `environment`: String
+
+#### Response
+
+This returns a JSON object of this shape:
+
+```
+{
+  "name": "facts",
+  "description": "A plan that retrieves facts and stores in the inventory for the\nspecified targets.\n\nThe $targets parameter is a list of targets to retrieve the facts for.",
+  "parameters": {
+    "targets": {
+      "type": "TargetSpec",
+      "sensitive": false
+    }
+  }
+}
+
+```
+
+### GET /project_plans
+- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[SHA])
+
+#### Response
+
+```
+[
+  {
+    "name": "facts"
+  },
+  {
+    "name": "facts::info"
+  }
+]
+```
+
+### GET /project_plans/:module_name/:task_name
+- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[SHA])
+
+#### Response
+
+```
+{
+  "name": "facts",
+  "description": "A plan that retrieves facts and stores in the inventory for the\nspecified targets.\n\nThe $targets parameter is a list of targets to retrieve the facts for.",
+  "parameters": {
+    "targets": {
+      "type": "TargetSpec",
+      "sensitive": false
+    }
+  }
+}
+
+```
+
+## Target Schemas
+
+### SSH Target Object
+The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/partials/target-ssh.json)
+
+### WinRM Target Object
+The Target is a JSON object. See the [schema](../lib/bolt_server/schemas/partials/target-winrm.json)
+
+### Task Object
+This is nearly identical to the [task detail JSON
+object](https://github.com/puppetlabs/puppetserver/blob/master/documentation/puppet-api/v3/task_detail.json)
+from [puppetserver](https://github.com/puppetlabs/puppetserver), with an
+additional `file_content` key.
+
+See the [schema](../lib/bolt_server/schemas/task.json). The task is a JSON object which includes the following keys:
+
+#### Name
+
+The name of the task
+
+#### Metadata
+The metadata object is optional, and contains metadata about the task being run. It includes the following keys:
+
+- `description`: String, *optional* - The task description from its metadata.
+- `parameters`: Object, *optional* - A JSON object whose keys are parameter names, and whose values are JSON objects with 2 keys:
+    - `description`: String, *optional* - The parameter description.
+    - `type`: String, *optional* - The type the parameter should accept.
+    - `sensitive`: Boolean, *optional* - Whether the task runner should treat the parameter value as sensitive
+    - `input_method`: String, *optional* - What input method should be used to pass params to task (stdin, environment, powershell)
+
+#### Files
+The files array is required, and contains details about the files the task needs as well as how to get them. Array items should be objects with the following keys:
+- `uri`: Object, *required* - Information on how to request task files
+    - `path`: String, *required* - Relative URI for requesting task content
+    - `params`: Object, *required* - Query parameters for locating task data
+        - `environment`: String, *required* - Environment task files are in
+- `sha256`: String, *required* - Shasum of the file contents
+- `filename`: String, *required* - File name including extension
+- `size`: Number, *optional* - Size of file in Bytes
+
 
 ## Plan Executor API Endpoints
 Each API endpoint accepts a request as described below. The request body must be a JSON object.
