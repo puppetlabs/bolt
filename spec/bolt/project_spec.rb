@@ -83,6 +83,28 @@ describe Bolt::Project do
           .to raise_error(/Invalid project name 'puppetlabs-foo' in bolt-project.yaml/)
       end
     end
+
+    context 'with module delcarations' do
+      it 'errors if not an array' do
+        config = {
+          'modules' => {}
+        }
+
+        expect { Bolt::Project.new(config, pwd).validate }
+          .to raise_error(Bolt::ValidationError)
+      end
+
+      it 'errors if a module delcaration is not a hash' do
+        config = {
+          'modules' => [
+            'puppetlabs-yaml'
+          ]
+        }
+
+        expect { Bolt::Project.new(config, pwd).validate }
+          .to raise_error(Bolt::ValidationError)
+      end
+    end
   end
 
   describe "::find_boltdir" do

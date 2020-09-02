@@ -40,7 +40,8 @@ module Bolt
                  'group' => %w[show],
                  'project' => %w[init migrate],
                  'apply' => %w[],
-                 'guide' => %w[] }.freeze
+                 'guide' => %w[],
+                 'module' => %w[install] }.freeze
 
     attr_reader :config, :options
 
@@ -210,10 +211,14 @@ module Bolt
     end
 
     def validate(options)
-      unless COMMANDS.include?(options[:subcommand])
+      # Disables the 'module' subcommand unless the module feature flag is set.
+      commands = COMMANDS.dup
+      commands.delete('module') unless ENV['BOLT_MODULE_FEATURE']
+
+      unless commands.include?(options[:subcommand])
         raise Bolt::CLIError,
               "Expected subcommand '#{options[:subcommand]}' to be one of " \
-              "#{COMMANDS.keys.join(', ')}"
+              "#{commands.keys.join(', ')}"
       end
 
       actions = COMMANDS[options[:subcommand]]
@@ -353,7 +358,7 @@ module Bolt
       # Initialize inventory and targets. Errors here are better to catch early.
       # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
       # options[:targets] will contain a resolved set of Target objects
-      unless %w[project puppetfile secret guide].include?(options[:subcommand]) ||
+      unless %w[guide module project puppetfile secret].include?(options[:subcommand]) ||
              %w[convert new show].include?(options[:action])
         update_targets(options)
       end
@@ -443,12 +448,17 @@ module Bolt
         when 'run'
           code = run_plan(options[:object], options[:task_options], options[:target_args], options)
         end
+      when 'module'
+        case options[:action]
+        when 'install'
+          code = install_project_modules
+        end
       when 'puppetfile'
         case options[:action]
         when 'generate-types'
           code = generate_types
         when 'install'
-          code = install_puppetfile(config.puppetfile_config, config.puppetfile, config.modulepath)
+          code = install_puppetfile(config.puppetfile_config, config.puppetfile, config.modulepath.first)
         end
       when 'secret'
         code = Bolt::Secret.execute(plugins, outputter, options)
@@ -798,36 +808,38 @@ module Bolt
       old_config = project + 'bolt.yaml'
       config     = project + 'bolt-project.yaml'
       puppetfile = project + 'Puppetfile'
-      modulepath = [project + 'modules']
+      moduledir  = project + 'modules'
 
-      # If modules were specified, first check if there is already a Puppetfile at the project
-      # directory, erroring if there is. If there is no Puppetfile, generate the Puppetfile
-      # content by resolving the specified modules and all their dependencies.
-      # We generate the Puppetfile first so that any errors in resolving modules and their
-      # dependencies are caught early and do not create a project directory.
+      # Warn the user if the project directory already exists. We don't error
+      # here since users might not have installed any modules yet. If both
+      # bolt.yaml and bolt-project.yaml exist, this will just warn about
+      # bolt-project.yaml and subsequent Bolt actions will warn about both files
+      # existing.
+      if config.exist?
+        @logger.warn "Found existing project directory at #{project}. Skipping file creation."
+      elsif old_config.exist?
+        @logger.warn "Found existing #{old_config.basename} at #{project}. "\
+                    "#{old_config.basename} is deprecated, please rename to #{config.basename}."
+      end
+
+      # If modules were specified, first check if there is already a Puppetfile
+      # at the project directory, erroring if there is. If there is no
+      # Puppetfile, install the specified modules. The module installer will
+      # resolve dependencies, generate a Puppetfile, and install the modules.
       if options[:modules]
         if puppetfile.exist?
           raise Bolt::CLIError,
-                "Found existing Puppetfile at #{puppetfile}, unable to initialize project with "\
-                "#{options[:modules].join(', ')}"
-        else
-          puppetfile_specs = resolve_puppetfile_specs
+                "Found existing Puppetfile at #{puppetfile}, unable to initialize "\
+                "project with modules."
         end
+
+        install_modules(puppetfile, {}, moduledir, options[:modules])
       end
 
-      # Warn the user if the project directory already exists. We don't error here since users
-      # might not have installed any modules yet.
-      # If both bolt.yaml and bolt-project.yaml exist, this will just warn
-      # about bolt-project.yaml and subsequent Bolt actions will warn about
-      # both files existing
-      if config.exist?
-        @logger.warn "Found existing project directory at #{project}. Skipping file creation."
-      # This won't get called if bolt-project.yaml exists
-      elsif old_config.exist?
-        @logger.warn "Found existing #{old_config.basename} at #{project}. "\
-          "#{old_config.basename} is deprecated, please rename to #{config.basename}."
-      # Bless the project directory as a...wait for it...project
-      else
+      # If either bolt.yaml or bolt-project.yaml exist, the user has already
+      # been warned and we can just finish project creation. Otherwise, create a
+      # bolt-project.yaml with the project name in it.
+      unless config.exist? || old_config.exist?
         begin
           content = { 'name' => name }
           File.write(config.to_path, content.to_yaml)
@@ -837,109 +849,82 @@ module Bolt
         end
       end
 
-      # Write the generated Puppetfile to the fancy new project
-      if puppetfile_specs
-        File.write(puppetfile, puppetfile_specs.join("\n"))
-        outputter.print_message "Successfully created Puppetfile at #{puppetfile}"
-        # Install the modules from our shiny new Puppetfile
-        if install_puppetfile({}, puppetfile, modulepath)
-          outputter.print_message "Successfully installed #{options[:modules].join(', ')}"
-        else
-          raise Bolt::CLIError, "Could not install #{options[:modules].join(', ')}"
-        end
-      end
-
       0
     end
 
-    # Resolves Puppetfile specs from user-specified modules and dependencies resolved
-    # by the puppetfile-resolver gem.
-    def resolve_puppetfile_specs
-      require 'puppetfile-resolver'
-
-      # Build the document model from the module names, defaulting to the latest version of each module
-      model = PuppetfileResolver::Puppetfile::Document.new('')
-      options[:modules].each do |mod_name|
-        model.add_module(
-          PuppetfileResolver::Puppetfile::ForgeModule.new(mod_name).tap { |mod| mod.version = :latest }
-        )
+    # Installs modules declared in the project configuration file.
+    #
+    def install_project_modules
+      if config.project.modules.nil?
+        outputter.print_message "Project configuration file '#{config.project.project_file}' "\
+                                "does not specify any module dependencies. Nothing to do."
+        return 0
       end
 
-      # Make sure the Puppetfile model is valid
-      unless model.valid?
-        raise Bolt::ValidationError,
-              "Unable to resolve dependencies for #{options[:modules].join(', ')}"
-      end
-
-      # Create the resolver using the Puppetfile model. nil disables Puppet version restrictions.
-      resolver = PuppetfileResolver::Resolver.new(model, nil)
-
-      # Configure and resolve the dependency graph
-      result = resolver.resolve(
-        cache:                 nil,
-        ui:                    nil,
-        module_paths:          [],
-        allow_missing_modules: true
+      install_modules(
+        config.puppetfile,
+        config.puppetfile_config,
+        config.project.path + '.modules',
+        config.project.modules
       )
-
-      # Validate that the modules exist
-      missing_graph = result.specifications.select do |_name, spec|
-        spec.instance_of? PuppetfileResolver::Models::MissingModuleSpecification
-      end
-
-      if missing_graph.any?
-        titles = model.modules.each_with_object({}) do |mod, acc|
-          acc[mod.name] = mod.title
-        end
-
-        names = titles.values_at(*missing_graph.keys)
-        plural = names.count == 1 ? '' : 's'
-
-        raise Bolt::ValidationError,
-              "Unknown module name#{plural} #{names.join(', ')}"
-      end
-
-      # Filter the dependency graph to only include module specifications
-      spec_graph = result.specifications.select do |_name, spec|
-        spec.instance_of? PuppetfileResolver::Models::ModuleSpecification
-      end
-
-      # Map specification models to a Puppetfile specification
-      spec_graph.values.map do |spec|
-        "mod '#{spec.owner}-#{spec.name}', '#{spec.version}'"
-      end
     end
 
-    def install_puppetfile(config, puppetfile, modulepath)
-      require 'r10k/cli'
-      require 'bolt/r10k_log_proxy'
+    # Installs modules declared in the project configuration file.
+    #
+    def install_modules(puppetfile_path, config, moduledir, modules)
+      require 'bolt/puppetfile'
+      require 'bolt/puppetfile/installer'
 
-      if puppetfile.exist?
-        moduledir = modulepath.first.to_s
-        r10k_opts = {
-          root: puppetfile.dirname.to_s,
-          puppetfile: puppetfile.to_s,
-          moduledir: moduledir
-        }
+      puppetfile = Bolt::Puppetfile.new(modules)
 
-        settings = R10K::Settings.global_settings.evaluate(config)
-        R10K::Initializers::GlobalInitializer.new(settings).call
-        install_action = R10K::Action::Puppetfile::Install.new(r10k_opts, nil)
+      # If the Puppetfile exists, check if it includes specs for each declared
+      # module, erroring if there are any missing. Otherwise, resolve the
+      # module dependencies and write a new Puppetfile. Users can forcibly
+      # overwrite an existing Puppetfile with the '--force' option.
+      if puppetfile_path.exist? && !options[:force]
+        outputter.print_message "Parsing existing Puppetfile at #{puppetfile_path}"
+        existing = Bolt::Puppetfile.parse(puppetfile_path)
 
-        # Override the r10k logger with a proxy to our own logger
-        R10K::Logging.instance_variable_set(:@outputter, Bolt::R10KLogProxy.new)
+        unless existing.modules.superset? puppetfile.modules
+          missing_modules = puppetfile.modules - existing.modules
 
-        ok = install_action.call
-        outputter.print_puppetfile_result(ok, puppetfile, moduledir)
-        # Automatically generate types after installing modules
-        pal.generate_types
-
-        ok ? 0 : 1
+          raise Bolt::Error.new(
+            "Puppetfile #{puppetfile_path} is missing specifications for modules: "\
+            "#{missing_modules.map(&:title).join(', ')}. This may not be a Puppetfile "\
+            "managed by Bolt. To forcibly overwrite the Puppetfile, run with the "\
+            "'--force' option.",
+            'bolt/missing-module-specs'
+          )
+        end
       else
-        raise Bolt::FileError.new("Could not find a Puppetfile at #{puppetfile}", puppetfile)
+        outputter.print_message "Resolving module dependencies, this may take a moment"
+        puppetfile.resolve
+        outputter.print_message "Writing Puppetfile at #{puppetfile_path}"
+        puppetfile.write(puppetfile_path, force: true)
       end
-    rescue R10K::Error => e
-      raise PuppetfileError, e
+
+      outputter.print_message "Syncing modules from #{puppetfile_path} to #{moduledir}"
+      ok = Bolt::Puppetfile::Installer.new(config).install(puppetfile_path, moduledir)
+
+      # Automatically generate types after installing modules.
+      pal.generate_types
+
+      outputter.print_puppetfile_result(ok, puppetfile_path, moduledir)
+      ok ? 0 : 1
+    end
+
+    # Loads a Puppetfile and installs its modules.
+    #
+    def install_puppetfile(config, puppetfile, moduledir)
+      require 'bolt/puppetfile/installer'
+
+      ok = Bolt::Puppetfile::Installer.new(config).install(puppetfile, moduledir)
+
+      # Automatically generate types after installing modules.
+      pal.generate_types
+
+      outputter.print_puppetfile_result(ok, puppetfile, moduledir)
+      ok ? 0 : 1
     end
 
     def pal

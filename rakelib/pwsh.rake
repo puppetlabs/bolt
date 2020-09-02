@@ -47,7 +47,9 @@ namespace :pwsh do
     Bolt::CLI::COMMANDS.each do |subcommand, actions|
       # The 'bolt guide' command is handled by PowerShell's help system, so
       # don't create a cmdlet for it.
-      next if subcommand == 'guide'
+      # The 'bolt module' command is currently feature-flagged and should
+      # not be visible to users, so don't create a PowerShell cmdlet for now.
+      next if %w[guide module].include?(subcommand)
 
       actions << nil if actions.empty?
       actions.each do |action|
