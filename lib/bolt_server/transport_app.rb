@@ -214,7 +214,12 @@ module BoltServer
         project = Bolt::Project.create_project(project_dir)
         bolt_config = Bolt::Config.from_project(project, {})
         pal = Bolt::PAL.new(bolt_config.modulepath, nil, nil, nil, nil, nil, bolt_config.project)
-        module_path = [BoltServer::PE::PAL::PE_BOLTLIB_PATH, Bolt::PAL::BOLTLIB_PATH, *bolt_config.modulepath]
+        module_path = [
+          BoltServer::PE::PAL::PE_BOLTLIB_PATH,
+          Bolt::PAL::BOLTLIB_PATH,
+          *bolt_config.modulepath,
+          Bolt::PAL::MODULES_PATH
+        ]
         # CODEREVIEW: I *think* this is the only thing we need to make different between bolt's PAL. Is it acceptable
         # to hack this? Modulepath is currently a readable attribute, could we make it writeable?
         pal.instance_variable_set(:@modulepath, module_path)
