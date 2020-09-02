@@ -5,6 +5,7 @@ require 'addressable/uri'
 require 'bolt'
 require 'bolt/error'
 require 'bolt/inventory'
+require 'bolt/project'
 require 'bolt/target'
 require 'bolt_server/file_cache'
 require 'bolt/task/puppet_server'
@@ -191,20 +192,44 @@ module BoltServer
     end
 
     def in_pe_pal_env(environment)
-      if environment.nil?
-        [400, '`environment` is a required argument']
-      else
-        @pal_mutex.synchronize do
-          pal = BoltServer::PE::PAL.new({}, environment)
-          yield pal
-        rescue Puppet::Environments::EnvironmentNotFound
-          [400, {
-            "class" => 'bolt/unknown-environment',
-            "message" => "Environment #{environment} not found"
-          }.to_json]
-        rescue Bolt::Error => e
-          [400, e.to_json]
-        end
+      return [400, '`environment` is a required argument'] if environment.nil?
+      @pal_mutex.synchronize do
+        pal = BoltServer::PE::PAL.new({}, environment)
+        yield pal
+      rescue Puppet::Environments::EnvironmentNotFound
+        [400, {
+          "class" => 'bolt/unknown-environment',
+          "message" => "Environment #{environment} not found"
+        }.to_json]
+      rescue Bolt::Error => e
+        [400, e.to_json]
+      end
+    end
+
+    def in_bolt_project(bolt_project)
+      return [400, '`project_ref` is a required argument'] if bolt_project.nil?
+      project_dir = File.join(@config['projects-dir'], bolt_project)
+      return [400, "`project_ref`: #{project_dir} does not exist"] unless Dir.exist?(project_dir)
+      @pal_mutex.synchronize do
+        project = Bolt::Project.create_project(project_dir)
+        bolt_config = Bolt::Config.from_project(project, {})
+        pal = Bolt::PAL.new(bolt_config.modulepath, nil, nil, nil, nil, nil, bolt_config.project)
+        module_path = [
+          BoltServer::PE::PAL::PE_BOLTLIB_PATH,
+          Bolt::PAL::BOLTLIB_PATH,
+          *bolt_config.modulepath,
+          Bolt::PAL::MODULES_PATH
+        ]
+        # CODEREVIEW: I *think* this is the only thing we need to make different between bolt's PAL. Is it acceptable
+        # to hack this? Modulepath is currently a readable attribute, could we make it writeable?
+        pal.instance_variable_set(:@modulepath, module_path)
+        context = {
+          pal: pal,
+          config: bolt_config
+        }
+        yield context
+      rescue Bolt::Error => e
+        [400, e.to_json]
       end
     end
 
@@ -221,14 +246,12 @@ module BoltServer
       plan_info
     end
 
-    def build_puppetserver_uri(file_identifier, module_name, environment)
+    def build_puppetserver_uri(file_identifier, module_name, parameters)
       segments = file_identifier.split('/', 3)
       if segments.size == 1
         {
           'path' => "/puppet/v3/file_content/tasks/#{module_name}/#{file_identifier}",
-          'params' => {
-            'environment' => environment
-          }
+          'params' => parameters
         }
       else
         module_segment, mount_segment, name_segment = *segments
@@ -241,14 +264,12 @@ module BoltServer
                     when 'lib'
                       "/puppet/v3/file_content/plugins/#{name_segment}"
                     end,
-          'params' => {
-            'environment' => environment
-          }
+          'params' => parameters
         }
       end
     end
 
-    def pe_task_info(pal, module_name, task_name, environment)
+    def pe_task_info(pal, module_name, task_name, parameters)
       # Handle case where task name is simply module name with special `init` task
       task_name = if task_name == 'init' || task_name.nil?
                     module_name
@@ -261,7 +282,7 @@ module BoltServer
           'filename' => file_hash['name'],
           'sha256' => Digest::SHA256.hexdigest(File.read(file_hash['path'])),
           'size_bytes' => File.size(file_hash['path']),
-          'uri' => build_puppetserver_uri(file_hash['name'], module_name, environment)
+          'uri' => build_puppetserver_uri(file_hash['name'], module_name, parameters)
         }
       end
       {
@@ -269,6 +290,18 @@ module BoltServer
         'name' => task.name,
         'files' => files
       }
+    end
+
+    def task_list(pal, task_show_list = nil)
+      tasks = pal.list_tasks
+      tasks.select! { |task| task_show_list.include?(task.first) } unless task_show_list.nil?
+      tasks.map { |task_name, _description| { 'name' => task_name } }
+    end
+
+    def plan_list(pal, plan_show_list = nil)
+      plans = pal.list_plans.flatten
+      plans.select! { |plan_name| plan_show_list.include?(plan_name) } unless plan_show_list.nil?
+      plans.map { |plan_name| { 'name' => plan_name } }
     end
 
     get '/' do
@@ -401,12 +434,38 @@ module BoltServer
       end
     end
 
+    # Fetches the metadata for a single plan
+    #
+    # @param project_ref [String] the project to fetch the plan from
+    get '/project_plans/:module_name/:plan_name' do
+      in_bolt_project(params['project_ref']) do |context|
+        plan_info = pe_plan_info(context[:pal], params[:module_name], params[:plan_name])
+        [200, plan_info.to_json]
+      end
+    end
+
     # Fetches the metadata for a single task
     #
     # @param environment [String] the environment to fetch the task from
     get '/tasks/:module_name/:task_name' do
       in_pe_pal_env(params['environment']) do |pal|
-        task_info = pe_task_info(pal, params[:module_name], params[:task_name], params['environment'])
+        ps_parameters = {
+          'environment' => params['environment']
+        }
+        task_info = pe_task_info(pal, params[:module_name], params[:task_name], ps_parameters)
+        [200, task_info.to_json]
+      end
+    end
+
+    # Fetches the metadata for a single task
+    #
+    # @param bolt_project_ref [String] the reference to the bolt-project directory to load task metadata from
+    get '/project_tasks/:module_name/:task_name' do
+      in_bolt_project(params['project_ref']) do |context|
+        ps_parameters = {
+          'project' => params['project_ref']
+        }
+        task_info = pe_task_info(context[:pal], params[:module_name], params[:task_name], ps_parameters)
         [200, task_info.to_json]
       end
     end
@@ -435,13 +494,46 @@ module BoltServer
       end
     end
 
+    # Fetches the list of plans for a project
+    #
+    # @param project_ref [String] the project to fetch the list of plans from
+    get '/project_plans' do
+      in_bolt_project(params['project_ref']) do |context|
+        # Retrieve the allowlist of plans to show from the project attribute of the project object
+        # configured in bolt-project.yaml
+        plans_response = plan_list(context[:pal], context[:config].project.plans).to_json
+
+        # We structure this array of plans to be an array of hashes so that it matches the structure
+        # returned by the puppetserver API that serves data like this. Structuring the output this way
+        # makes switching between puppetserver and bolt-server easier, which makes changes to switch
+        # to bolt-server smaller/simpler.
+        [200, plans_response]
+      end
+    end
+
     # Fetches the list of tasks for an environment
     #
     # @param environment [String] the environment to fetch the list of tasks from
     get '/tasks' do
       in_pe_pal_env(params['environment']) do |pal|
-        tasks = pal.list_tasks
-        tasks_response = tasks.map { |task_name, _description| { 'name' => task_name } }.to_json
+        tasks_response = task_list(pal).to_json
+
+        # We structure this array of tasks to be an array of hashes so that it matches the structure
+        # returned by the puppetserver API that serves data like this. Structuring the output this way
+        # makes switching between puppetserver and bolt-server easier, which makes changes to switch
+        # to bolt-server smaller/simpler.
+        [200, tasks_response]
+      end
+    end
+
+    # Fetches the list of tasks for a bolt-project
+    #
+    # @param project_ref [String] the project to fetch the list of tasks from
+    get '/project_tasks' do
+      in_bolt_project(params['project_ref']) do |context|
+        # Retrieve the allowlist of tasks to show from the project attribute of the project object
+        # configured in bolt-project.yaml
+        tasks_response = task_list(context[:pal], context[:config].project.tasks).to_json
 
         # We structure this array of tasks to be an array of hashes so that it matches the structure
         # returned by the puppetserver API that serves data like this. Structuring the output this way

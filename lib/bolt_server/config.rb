@@ -7,7 +7,7 @@ require 'bolt/error'
 module BoltServer
   class Config < BoltServer::BaseConfig
     def config_keys
-      super + %w[concurrency cache-dir file-server-conn-timeout file-server-uri]
+      super + %w[concurrency cache-dir file-server-conn-timeout file-server-uri projects-dir]
     end
 
     def env_keys
