@@ -224,6 +224,86 @@ plan mymodule::myplan {
 }
 ```
 
+## Debugging plans
+
+By default, Bolt does not print verbose logs for each plan execution to stdout.
+However, you can use one of the following methods to investigate a plan
+execution:
+- Each time you run a Bolt command, Bolt prints a debug log to a
+  `bolt-debug.log` file in the root of your project directory.
+- You can use the `--verbose` CLI option for verbose logging to stdout.
+- You can print a message to stdout using the `out::message` function. 
+- You can adjust your log level for detailed information on how Bolt is
+  executing your plan.
+
+### Using `out::message` to debug a plan
+
+You can print a message, or a variable, to stdout using the `out::message`
+function. If the variable contains a valid plan result, Bolt formats the plan
+result using a JSON representation of the result object. If the object is not a
+plan result, Bolt prints the object as a string.
+
+To print a variable to stdout with `out::message`, use the following syntax:
+
+```puppet
+out::message($variable) 
+```
+
+For example, the following plan uses a `run_task` function to check targets for
+the MySQL package and assigns the result to a variable called `$check_mysql`.
+The plan uses `out::message($check_mysql)` to print the result set from
+`$check_mysql` to stdout.
+
+```puppet
+plan website::test(
+  TargetSpec $targets
+) {
+  $check_mysql = run_task('package', $targets, "Check for MySQL", {'action' => 'status', 'name' => 'mysql'})
+  out::message($check_mysql)
+}
+```
+
+The output from this plan looks something like this:
+
+```console
+Starting: plan website::test
+Starting: Check for MySQL on target0
+Finished: Check for MySQL with 0 failures in 0.76 sec
+[
+  {
+    "target": "target0",
+    "action": "task",
+    "object": "package",
+    "status": "success",
+    "value": {
+      "status": "uninstalled",
+      "version": ""
+    }
+  }
+]
+Finished: plan website::test in 0.77 sec
+Plan completed successfully with no result
+```
+
+### Debug logs
+
+Bolt logs additional information about a plan run, including output sent to
+standard error (stderr), at the `debug` level. Use the `--log-level debug` CLI
+option or the [`log` configuration setting](bolt_project_reference.html#log).
+
+```shell
+$ bolt task run mytask param1=foo param2=bar -t all --log-level debug
+```
+
+Each time you run a Bolt command, Bolt prints a debug level log to a
+`bolt-debug.log` file in the root of your project directory. You can disable the
+log file by specifying the following in your `bolt-project.yaml`:
+
+```yaml
+log:
+  bolt-debug.log: disable
+```
+
 ## Success and failure in plans
 
 If `upload_file`, `run_command`, `run_script`, or `run_task` are called without
