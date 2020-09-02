@@ -9,33 +9,33 @@ module Bolt
         @project = project
         @modulepath = modulepath
         @queue = Queue.new
+        @fiber = start_worker
       end
 
-      def start(&blk)
-        return if @thread
-        self.class.load_puppet
-        initialize_puppet
-        configure_logging
+      def start_worker
+        Fiber.new do |func|
+          # If we were never started then exit immediately without doing setup
+          return if func == :break
+          self.class.load_puppet
+          initialize_puppet
+          configure_logging
 
-        # XXX raise if already started
-        @thread = Thread.new do
           in_bolt_compiler(@project, @modulepath) do |compiler|
             initialize_compiler(compiler)
-            loop do
-              work = @queue.pop
-              func = work[:proc]
-              promise = work[:promise]
-              result = func.call(compiler)
-              promise.set(result)
+            while func != :break
+              result = begin
+                         func.call(compiler)
+                       rescue StandardError => e
+                         e
+                       end
+              func = Fiber.yield result
             end
           end
         end
       end
 
       def stop
-        return unless @thread
-        @thread.kill
-        @thread.join
+        @fiber.resume(:break)
       end
 
       def perform(&blk)
@@ -49,10 +49,12 @@ module Bolt
         if compiler
           yield compiler
         else
-          promise = Concurrent::Promise.new
-          @queue.push(proc: blk, promise: promise)
-          promise.wait!
-          promise.value
+          result = @fiber.resume(blk)
+          if result.is_a?(Exception)
+            raise result
+          else
+            result
+          end
         end
       end
 
