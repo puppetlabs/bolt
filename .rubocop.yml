@@ -1,117 +1,110 @@
 AllCops:
-  TargetRubyVersion: 2.5
   Exclude:
-    - 'Boltdir/**/*'
-    - 'vendor/**/*'
-    - 'vendored/**/*'
-    - 'acceptance/vendor/**/*'
-    - 'modules/**/*'
-    - 'docs/**/*'
-    - 'site-modules/**/*'
-    - 'tasks/**/*'
+    - Boltdir/**/*
+    - vendor/**/*
+    - vendored/**/*
+    - acceptance/vendor/**/*
+    - modules/**/*
+    - docs/**/*
+    - site-modules/**/*
+    - tasks/**/*
+  TargetRubyVersion: 2.5
 
-# Checks for if and unless statements that would fit on one line if written as a
-# modifier if/unless.
-Style/HashEachMethods:
-  Enabled: true
+# Layout cops
+# https://docs.rubocop.org/rubocop/cops_layout.html
 
-Style/HashTransformKeys:
-  Enabled: true
-
-Style/HashTransformValues:
-  Enabled: true
-
-Style/IfUnlessModifier:
+Layout/ClosingHeredocIndentation:
   Enabled: false
-
-Style/AccessModifierDeclarations:
-  Enabled: false
-
-Style/StringLiterals:
-  Enabled: false
-
-Style/Documentation:
-  Enabled: false
-
-Style/BlockDelimiters:
-  Enabled: false
-
-Style/NumericLiterals:
-  Enabled: false
-
-Style/NumericPredicate:
-  Enabled: false
-
-Style/StderrPuts:
-  Enabled: false
-
-Style/ExponentialNotation:
-  Enabled: true
 
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
-Layout/HeredocIndentation:
-  Enabled: false
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
 
-Layout/ClosingHeredocIndentation:
+Layout/EndOfLine:
+  EnforcedStyle: lf
+
+Layout/HashAlignment:
+  EnforcedColonStyle:
+    - key
+    - table
+  EnforcedHashRocketStyle:
+    - key
+    - table
+
+Layout/HeredocIndentation:
   Enabled: false
 
 Layout/LineLength:
   Max: 120
 
-Layout/EmptyLinesAroundAttributeAccessor:
+Layout/SpaceAroundMethodCallOperator:
   Enabled: true
 
-Style/GuardClause:
+# Lint cops
+# https://docs.rubocop.org/rubocop/cops_lint.html
+
+Lint/BinaryOperatorWithIdenticalOperands:
+  Enabled: true
+
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+
+Lint/DuplicateElsifCondition:
+  Enabled: true
+
+Lint/DuplicateRequire:
+  Enabled: true
+
+Lint/DuplicateRescueException:
+  Enabled: true
+
+Lint/EmptyConditionalBody:
+  Enabled: true
+
+Lint/EmptyFile:
+  Enabled: true
+
+Lint/FloatComparison:
+  Enabled: true
+
+Lint/MissingSuper:
   Enabled: false
 
-Style/MultilineBlockChain:
+Lint/MixedRegexpCaptureTypes:
   Enabled: false
 
-Style/DoubleNegation:
+Lint/OutOfRangeRegexpRef:
+  Enabled: true
+
+Lint/RaiseException:
+  Enabled: true
+
+Lint/SelfAssignment:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
+Lint/SuppressedException:
+  Exclude:
+    - lib/bolt/shell/bash.rb
+
+Lint/TopLevelReturnWithArgument:
+  Enabled: true
+
+Lint/TrailingCommaInAttributeDeclaration:
+  Enabled: true
+
+Lint/UnreachableLoop:
+  Enabled: true
+
+Lint/UselessMethodDefinition:
   Enabled: false
 
-Style/SafeNavigation:
-  Enabled: false
-
-Style/SlicingWithRange:
-  Enabled: false
-
-Style/RedundantFetchBlock:
-  Enabled: true
-
-Style/RedundantRegexpCharacterClass:
-  Enabled: true
-
-Style/RedundantRegexpEscape:
-  Enabled: true
-
-Style/AccessorGrouping:
-  Enabled: true
-
-Style/BisectedAttrAccessor:
-  Enabled: true
-
-Style/RedundantAssignment:
-  Enabled: true
-
-Style/ArrayCoercion:
-  Enabled: true
-
-Style/CaseLikeIf:
-  Enabled: true
-
-Style/HashAsLastArrayItem:
-  Enabled: false
-
-Style/HashLikeCase:
-  Enabled: true
-
-Style/RedundantFileExtensionInRequire:
-  Enabled: true
-
-# Disable nearly all Metrics checks. These seem better off left to judgement.
+# Metrics cops
+# https://docs.rubocop.org/rubocop/cops_metrics.html
 
 Metrics/AbcSize:
   Enabled: false
@@ -140,74 +133,116 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Enabled: false
 
-Lint/SuppressedException:
-  Exclude:
-    - lib/bolt/shell/bash.rb
+# Style cops
+# https://docs.rubocop.org/rubocop/cops_style.html
 
-Lint/RaiseException:
-  Enabled: true
-
-Lint/StructNewOverride:
-  Enabled: true
-
-Lint/DeprecatedOpenSSLConstant:
-  Enabled: true
-
-Lint/MixedRegexpCaptureTypes:
+Style/AccessModifierDeclarations:
   Enabled: false
 
-Lint/DuplicateElsifCondition:
+Style/AccessorGrouping:
   Enabled: true
 
-# Enforce LF line endings, even when on Windows
-Layout/EndOfLine:
-  EnforcedStyle: lf
-
-Layout/HashAlignment:
-  EnforcedHashRocketStyle: [key, table]
-  EnforcedColonStyle: [key, table]
-
-Layout/SpaceAroundMethodCallOperator:
+Style/ArrayCoercion:
   Enabled: true
 
-Lint/BinaryOperatorWithIdenticalOperands:
+Style/BisectedAttrAccessor:
   Enabled: true
 
-Lint/DuplicateRescueException:
-  Enabled: true
-
-Lint/EmptyConditionalBody:
-  Enabled: true
-
-Lint/FloatComparison:
-  Enabled: true
-
-Lint/MissingSuper:
+Style/BlockDelimiters:
   Enabled: false
 
-Lint/OutOfRangeRegexpRef:
+Style/CaseLikeIf:
   Enabled: true
 
-Lint/SelfAssignment:
+Style/CombinableLoops:
   Enabled: true
 
-Lint/TopLevelReturnWithArgument:
-  Enabled: true
+Style/Documentation:
+  Enabled: false
 
-Lint/UnreachableLoop:
-  Enabled: true
+Style/DoubleNegation:
+  Enabled: false
 
 Style/ExplicitBlockArgument:
   Enabled: false
 
+Style/ExponentialNotation:
+  Enabled: true
+
 Style/GlobalStdStream:
   Enabled: true
 
+Style/GuardClause:
+  Enabled: false
+
+Style/HashAsLastArrayItem:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashLikeCase:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/KeywordParametersOrder:
+  Enabled: true
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/NumericLiterals:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
 Style/OptionalBooleanParameter:
+  Enabled: false
+
+Style/RedundantAssignment:
+  Enabled: true
+
+Style/RedundantFetchBlock:
+  Enabled: true
+
+Style/RedundantFileExtensionInRequire:
+  Enabled: true
+
+Style/RedundantRegexpCharacterClass:
+  Enabled: true
+
+Style/RedundantRegexpEscape:
+  Enabled: true
+
+Style/RedundantSelfAssignment:
+  Enabled: true
+
+Style/SafeNavigation:
   Enabled: false
 
 Style/SingleArgumentDig:
   Enabled: false
 
+Style/SlicingWithRange:
+  Enabled: false
+
+Style/SoleNestedConditional:
+  Enabled: false
+
+Style/StderrPuts:
+  Enabled: false
+
 Style/StringConcatenation:
+  Enabled: false
+
+Style/StringLiterals:
   Enabled: false
