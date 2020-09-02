@@ -508,7 +508,7 @@ This returns a JSON object of this shape:
 ```
 
 ### GET /project_tasks
-- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[SHA])
+- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
 #### Response
 
@@ -524,7 +524,7 @@ This returns a JSON object of this shape:
 ```
 
 ### GET /project_tasks/:module_name/:task_name
-- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[SHA])
+- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
 #### Response
 
@@ -653,7 +653,7 @@ This returns a JSON array of this shape:
 ]
 ```
 
-### GET /plans/:module/:taskname
+### GET /plans/:module/:planname
 - `environment`: String
 
 #### Response
@@ -675,7 +675,7 @@ This returns a JSON object of this shape:
 ```
 
 ### GET /project_plans
-- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[SHA])
+- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
 #### Response
 
@@ -690,8 +690,8 @@ This returns a JSON object of this shape:
 ]
 ```
 
-### GET /project_plans/:module_name/:task_name
-- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[SHA])
+### GET /project_plans/:module_name/:plan_name
+- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
 #### Response
 

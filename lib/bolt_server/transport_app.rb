@@ -499,6 +499,8 @@ module BoltServer
     # @param project_ref [String] the project to fetch the list of plans from
     get '/project_plans' do
       in_bolt_project(params['project_ref']) do |context|
+        # Retrieve the allowlist of plans to show from the project attribute of the project object
+        # configured in bolt-project.yaml
         plans_response = plan_list(context[:pal], context[:config].project.plans).to_json
 
         # We structure this array of plans to be an array of hashes so that it matches the structure
@@ -529,6 +531,8 @@ module BoltServer
     # @param project_ref [String] the project to fetch the list of tasks from
     get '/project_tasks' do
       in_bolt_project(params['project_ref']) do |context|
+        # Retrieve the allowlist of tasks to show from the project attribute of the project object
+        # configured in bolt-project.yaml
         tasks_response = task_list(context[:pal], context[:config].project.tasks).to_json
 
         # We structure this array of tasks to be an array of hashes so that it matches the structure
