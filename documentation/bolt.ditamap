@@ -18,6 +18,7 @@
         <topicref href="using_plugins.md" format="markdown">
             <topicref href="writing_plugins.md" format="markdown"/>
         </topicref>
+        <topicref href="logs.md" format="markdown"/>
         <topicref href="privilege_escalation.md" format="markdown"/>
         <topicref href="vscode_and_bolt.md" format="markdown"/>
     </topichead>
