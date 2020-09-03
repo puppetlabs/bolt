@@ -25,6 +25,7 @@ require 'bolt/pal'
 require 'bolt/target'
 require 'bolt/version'
 require 'bolt/secret'
+require 'bolt/module_installer'
 
 module Bolt
   class CLIExit < StandardError; end
@@ -41,7 +42,7 @@ module Bolt
                  'project' => %w[init migrate],
                  'apply' => %w[],
                  'guide' => %w[],
-                 'module' => %w[install show generate-types] }.freeze
+                 'module' => %w[add generate-types install show] }.freeze
 
     attr_reader :config, :options
 
@@ -291,6 +292,10 @@ module Bolt
         raise Bolt::CLIError, "Must specify a plan name."
       end
 
+      if options[:subcommand] == 'module' && options[:action] == 'add' && !options[:object]
+        raise Bolt::CLIError, "Must specify a module name."
+      end
+
       if options.key?(:debug) && options.key?(:log)
         raise Bolt::CLIError, "Only one of '--debug' or '--log-level' may be specified"
       end
@@ -452,8 +457,10 @@ module Bolt
         end
       when 'module'
         case options[:action]
+        when 'add'
+          code = add_project_module(options[:object], config.project)
         when 'install'
-          code = install_project_modules
+          code = install_project_modules(config.project, options[:force])
         when 'generate-types'
           code = generate_types
         end
@@ -837,7 +844,8 @@ module Bolt
                 "project with modules."
         end
 
-        install_modules(puppetfile, {}, moduledir, options[:modules])
+        installer = Bolt::ModuleInstaller.new(outputter, pal)
+        installer.install(options[:modules], puppetfile, moduledir)
       end
 
       # If either bolt.yaml or bolt-project.yaml exist, the user has already
@@ -858,80 +866,54 @@ module Bolt
 
     # Installs modules declared in the project configuration file.
     #
-    def install_project_modules
-      if config.project.modules.nil?
-        outputter.print_message "Project configuration file '#{config.project.project_file}' "\
-                                "does not specify any module dependencies. Nothing to do."
+    def install_project_modules(project, force)
+      assert_project_file(project)
+
+      unless project.modules
+        outputter.print_message "Project configuration file #{project.project_file} does not "\
+                                "specify any module dependencies. Nothing to do."
         return 0
       end
 
-      install_modules(
-        config.puppetfile,
-        config.puppetfile_config,
-        config.project.path + '.modules',
-        config.project.modules
-      )
+      installer = Bolt::ModuleInstaller.new(outputter, pal)
+
+      ok = installer.install(project.modules, project.puppetfile, project.managed_moduledir, force: force)
+      ok ? 0 : 1
     end
 
-    # Installs modules declared in the project configuration file.
+    # Adds a single module to the project.
     #
-    def install_modules(puppetfile_path, config, moduledir, modules)
-      require 'bolt/puppetfile'
-      require 'bolt/puppetfile/installer'
+    def add_project_module(name, project)
+      assert_project_file(project)
 
-      puppetfile = Bolt::Puppetfile.new(modules)
+      modules   = project.modules || []
+      installer = Bolt::ModuleInstaller.new(outputter, pal)
 
-      # If the Puppetfile exists, check if it includes specs for each declared
-      # module, erroring if there are any missing. Otherwise, resolve the
-      # module dependencies and write a new Puppetfile. Users can forcibly
-      # overwrite an existing Puppetfile with the '--force' option.
-      if puppetfile_path.exist? && !options[:force]
-        outputter.print_message "Parsing existing Puppetfile at #{puppetfile_path}"
-        existing = Bolt::Puppetfile.parse(puppetfile_path)
-
-        unless existing.modules.superset? puppetfile.modules
-          missing_modules = puppetfile.modules - existing.modules
-
-          message = <<~MESSAGE.chomp
-            Puppetfile #{puppetfile_path} is missing specifications for the following
-            module declarations:
-            
-            #{missing_modules.map(&:to_hash).to_yaml.lines.drop(1).join.chomp}
-
-            This may not be a Puppetfile managed by Bolt. To forcibly overwrite the
-            Puppetfile, run 'bolt module install --force'.
-          MESSAGE
-
-          raise Bolt::Error.new(message, 'bolt/missing-module-specs')
-        end
-      else
-        outputter.print_message "Resolving module dependencies, this may take a moment"
-        puppetfile.resolve
-        outputter.print_message "Writing Puppetfile at #{puppetfile_path}"
-        puppetfile.write(puppetfile_path, force: true)
-      end
-
-      outputter.print_message "Syncing modules from #{puppetfile_path} to #{moduledir}"
-      ok = Bolt::Puppetfile::Installer.new(config).install(puppetfile_path, moduledir)
-
-      # Automatically generate types after installing modules.
-      pal.generate_types
-
-      outputter.print_puppetfile_result(ok, puppetfile_path, moduledir)
+      ok = installer.add(name, modules, project.puppetfile, project.managed_moduledir, project.project_file)
       ok ? 0 : 1
+    end
+
+    # Asserts that there is a project configuration file.
+    #
+    def assert_project_file(project)
+      unless project.project_file?
+        msg = if project.config_file.exist?
+                "Detected Bolt configuration file #{project.config_file}, unable to install "\
+                "modules. To update to a project configuration file, run 'bolt project migrate'."
+              else
+                "Could not find project configuration file #{project.project_file}, unable "\
+                "to install modules. To create a Bolt project, run 'bolt project init'."
+              end
+
+        raise Bolt::Error.new(msg, 'bolt/missing-project-config-error')
+      end
     end
 
     # Loads a Puppetfile and installs its modules.
     #
     def install_puppetfile(config, puppetfile, moduledir)
-      require 'bolt/puppetfile/installer'
-
-      ok = Bolt::Puppetfile::Installer.new(config).install(puppetfile, moduledir)
-
-      # Automatically generate types after installing modules.
-      pal.generate_types
-
-      outputter.print_puppetfile_result(ok, puppetfile, moduledir)
+      installer = Bolt::ModuleInstaller.new(outputter, pal)
+      ok = installer.install_puppetfile(puppetfile, moduledir, config)
       ok ? 0 : 1
     end
 

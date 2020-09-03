@@ -18,7 +18,7 @@ module Bolt
 
     attr_reader :path, :data, :config_file, :inventory_file, :modulepath, :hiera_config,
                 :puppetfile, :rerunfile, :type, :resource_types, :logs, :project_file,
-                :deprecations, :downloads, :plans_path
+                :deprecations, :downloads, :plans_path, :managed_moduledir
 
     def self.default_project(logs = [])
       create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user', logs)
@@ -94,15 +94,16 @@ module Bolt
         @deprecations << { type: 'Using bolt.yaml for project configuration', msg: msg }
       end
 
-      @inventory_file = @path + 'inventory.yaml'
-      @modulepath = [(@path + 'modules').to_s, (@path + 'site-modules').to_s, (@path + 'site').to_s]
-      @hiera_config = @path + 'hiera.yaml'
-      @puppetfile = @path + 'Puppetfile'
-      @rerunfile = @path + '.rerun.json'
-      @resource_types = @path + '.resource_types'
-      @type = type
-      @downloads = @path + 'downloads'
-      @plans_path = @path + 'plans'
+      @inventory_file    = @path + 'inventory.yaml'
+      @modulepath        = [(@path + 'modules').to_s, (@path + 'site-modules').to_s, (@path + 'site').to_s]
+      @hiera_config      = @path + 'hiera.yaml'
+      @puppetfile        = @path + 'Puppetfile'
+      @rerunfile         = @path + '.rerun.json'
+      @resource_types    = @path + '.resource_types'
+      @type              = type
+      @downloads         = @path + 'downloads'
+      @plans_path        = @path + 'plans'
+      @managed_moduledir = (@path + '.modules').to_s
 
       tc = Bolt::Config::INVENTORY_OPTIONS.keys & raw_data.keys
       if tc.any?
@@ -195,8 +196,8 @@ module Bolt
         end
 
         @data['modules'].each do |mod|
-          next if mod.is_a?(Hash)
-          raise Bolt::ValidationError, "Module declaration #{mod.inspect} must be a hash"
+          next if mod.is_a?(Hash) && mod.key?('name')
+          raise Bolt::ValidationError, "Module declaration #{mod.inspect} must be a hash with a name key"
         end
 
         unknown_keys = data['modules'].flat_map(&:keys).uniq - %w[name version_requirement]

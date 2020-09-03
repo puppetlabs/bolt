@@ -38,6 +38,7 @@ module Bolt
       def title
         "#{@owner}-#{@name}"
       end
+      alias to_s title
 
       # Checks two modules for equality.
       #

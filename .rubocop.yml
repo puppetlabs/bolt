@@ -99,6 +99,7 @@ Lint/StructNewOverride:
 Lint/SuppressedException:
   Exclude:
     - lib/bolt/shell/bash.rb
+    - lib/bolt/module_installer.rb
 
 Lint/TopLevelReturnWithArgument:
   Enabled: true
