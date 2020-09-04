@@ -3,7 +3,17 @@ name: Release Notes
 on:
   pull_request:
     type: [opened, reopened, edited]
-    paths-ignore: ['*.md', '**.md', '**.erb']
+    paths-ignore: 
+      - '*.md'
+      - '**.md'
+      - '**.erb'
+      - 'lib/bolt_server/**'
+      - 'spec/**'
+      - 'acceptance/**'
+      - 'bolt_spec_spec/**'
+      - 'config/**'
+      - '.github/**'
+      - 'rakelib/**'
 
 jobs:
 
