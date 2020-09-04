@@ -75,23 +75,24 @@ module Bolt
       end
     end
 
-    def compile(target, catalog_input)
+    def compile(target, scope)
       # This simplified Puppet node object is what .local uses to determine the
       # certname of the target
       node = Puppet::Node.from_data_hash('name' => target.name,
                                          'parameters' => { 'clientcert' => target.name })
       trusted = Puppet::Context::TrustedInformation.local(node)
-      catalog_input[:target] = {
+      target_data = {
         name: target.name,
         facts: @inventory.facts(target).merge('bolt' => true),
         variables: @inventory.vars(target),
         trusted: trusted.to_h
       }
+      catalog_request = scope.merge(target: target_data)
 
       bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
       old_path = ENV['PATH']
       ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}#{File::PATH_SEPARATOR}#{old_path}"
-      out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_input.to_json)
+      out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_request.to_json)
       ENV['PATH'] = old_path
 
       # If bolt_catalog does not return valid JSON, we should print stderr to
@@ -192,7 +193,7 @@ module Bolt
         plan_vars: plan_vars,
         # This data isn't available on the target config hash
         config: @inventory.transport_data_get
-      }
+      }.freeze
       description = options[:description] || 'apply catalog'
 
       required_modules = options[:required_modules].nil? ? nil : Array(options[:required_modules])
