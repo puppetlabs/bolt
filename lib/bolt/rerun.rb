@@ -53,7 +53,7 @@ module Bolt
         end
       end
     rescue StandardError => e
-      @logger.warn("Failed to save result to #{@path}: #{e.message}")
+      Bolt::Logger.warn_once('unwriteable_file', "Failed to save result to #{@path}: #{e.message}")
     end
   end
 end

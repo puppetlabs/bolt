@@ -215,6 +215,7 @@ describe Bolt::Project do
       allow(Pathname).to receive(:new).with(path).and_return(pathname)
       allow(pathname).to receive(:expand_path).and_return(pathname)
       allow(pathname).to receive(:world_writable?).and_return(true)
+      allow(File).to receive(:directory?).with(path).and_return(true)
     end
 
     it 'errors when loading from a world-writable directory', :bash do
@@ -223,6 +224,19 @@ describe Bolt::Project do
 
     it 'loads from a world-writable directory when project is from environment variable' do
       expect { Bolt::Project.create_project(path, 'environment') }.not_to raise_error
+    end
+
+    it 'creates user-level project if it does not exist' do
+      expect(FileUtils).to receive(:mkdir_p).with('myproject')
+      Bolt::Project.create_project('myproject', 'user')
+    end
+
+    it 'warns and continues if project creation fails' do
+      expect(FileUtils).to receive(:mkdir_p).with('myproject').and_raise(Errno::EACCES)
+      # Ensure execution continues
+      expect(Bolt::Project).to receive(:new).with(anything, 'myproject', 'user',
+                                                  [{ warn: /Could not create default project / }])
+      Bolt::Project.create_project('myproject', 'user')
     end
   end
 end

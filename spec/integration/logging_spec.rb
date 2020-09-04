@@ -2,11 +2,13 @@
 
 require 'spec_helper'
 require 'bolt_spec/conn'
+require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'logging'
 
 describe "when logging executor activity", ssh: true do
   include BoltSpec::Conn
+  include BoltSpec::Files
   include BoltSpec::Integration
 
   let(:whoami) { "whoami" }
@@ -37,6 +39,12 @@ describe "when logging executor activity", ssh: true do
     expect(lines).to include(match(/INFO.*Starting: plan #{echo_plan}/))
     expect(lines).to include(match(/INFO.*Finished: plan #{echo_plan}/))
     expect(result[0]['value']['_output'].strip).to match(/hi there/)
+  end
+
+  it 'does not error if the default log file cannot be written' do
+    expect(FileUtils).to receive(:touch).with(/bolt-debug\.log/).and_raise(Errno::EACCES)
+    expect { run_cli(%W[command run #{whoami}] + config_flags) }
+      .not_to raise_error
   end
 
   context 'with misconfigured ssh-command' do

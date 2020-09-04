@@ -85,7 +85,17 @@ describe Bolt::Analytics do
       subject.build_client
     end
 
-    it 'warns when user-level config and defaul project config both exist' do
+    it 'errors if new config cannot be written' do
+      allow(subject).to receive(:write_config).and_call_original
+      allow(File).to receive(:write)
+        .and_raise(Errno::EACCES, "Permission denied")
+
+      subject.build_client
+
+      expect(@log_output.readlines).to include(/Could not write analytics/)
+    end
+
+    it 'warns when user-level config and default project config both exist' do
       allow(File).to receive(:exist?).with(path).and_return(true)
       allow(File).to receive(:exist?).with(old_path).and_return(true)
 

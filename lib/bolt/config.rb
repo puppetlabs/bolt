@@ -64,7 +64,7 @@ module Bolt
              end
 
       data = load_defaults(project).push(
-        filepath: project.config_file,
+        filepath: configfile,
         data: conf,
         logs: logs,
         deprecations: []
@@ -344,6 +344,14 @@ module Bolt
     end
 
     private def update_logs(logs)
+      begin
+        if logs['bolt-debug.log'] && logs['bolt-debug.log'] != 'disable'
+          FileUtils.touch(File.expand_path('bolt-debug.log', @project.path))
+        end
+      rescue StandardError
+        logs.delete('bolt-debug.log')
+      end
+
       logs.each_with_object({}) do |(key, val), acc|
         # Remove any disabled logs
         next if val == 'disable'

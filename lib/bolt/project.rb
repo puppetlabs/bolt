@@ -50,6 +50,20 @@ module Bolt
     def self.create_project(path, type = 'option', logs = [])
       fullpath = Pathname.new(path).expand_path
 
+      if type == 'user'
+        begin
+          # This is already expanded if the type is user
+          FileUtils.mkdir_p(path)
+        rescue StandardError
+          logs << { warn: "Could not create default project at #{path}. Continuing without a writeable project. "\
+                    "Log and rerun files will not be written." }
+        end
+      end
+
+      if type == 'option' && !File.directory?(path)
+        raise Bolt::Error.new("Could not find project at #{path}", "bolt/project-error")
+      end
+
       if !Bolt::Util.windows? && type != 'environment' && fullpath.world_writable?
         raise Bolt::Error.new(
           "Project directory '#{fullpath}' is world-writable which poses a security risk. Set "\
