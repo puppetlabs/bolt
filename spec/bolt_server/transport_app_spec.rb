@@ -190,9 +190,8 @@ describe "BoltServer::TransportApp" do
         allow(Dir).to receive(:exist?).with("/tmp/foo/#{project_ref}").and_return(true)
         allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
         allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
-
         allow(fake_config).to receive(:modulepath)
-        allow(fake_config).to receive(:project)
+        allow(fake_config).to receive(:project).and_return(fake_project)
         allow(Bolt::PAL).to receive(:new).and_return(fake_pal)
       end
 
@@ -204,10 +203,12 @@ describe "BoltServer::TransportApp" do
           {
             'name' => metadata['name'],
             'description' => metadata['description'],
-            'parameters' => metadata['parameters']
+            'parameters' => metadata['parameters'],
+            'allowed' => true
           }
         }
         it '/project_plans/:module_name/:plan_name handles module::plan_name' do
+          allow(fake_project).to receive(:plans)
           expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
           get(path)
           resp = JSON.parse(last_response.body)
@@ -223,10 +224,12 @@ describe "BoltServer::TransportApp" do
           {
             'name' => metadata['name'],
             'description' => metadata['description'],
-            'parameters' => metadata['parameters']
+            'parameters' => metadata['parameters'],
+            'allowed' => true
           }
         }
         it '/project_plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
+          allow(fake_project).to receive(:plans)
           expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
           get(init_plan)
           resp = JSON.parse(last_response.body)
@@ -266,7 +269,7 @@ describe "BoltServer::TransportApp" do
           expect(fake_pal).to receive(:list_plans).and_return([['abc'], ['def']])
           get(path)
           metadata = JSON.parse(last_response.body)
-          expect(metadata).to eq([{ 'name' => 'abc' }, { 'name' => 'def' }])
+          expect(metadata).to eq([{ 'name' => 'abc', 'allowed' => true }, { 'name' => 'def', 'allowed' => true }])
         end
 
         it 'filters plans based on allowlist in bolt-project.yaml' do
@@ -275,7 +278,7 @@ describe "BoltServer::TransportApp" do
           expect(fake_pal).to receive(:list_plans).and_return([['abc'], ['def']])
           get(path)
           metadata = JSON.parse(last_response.body)
-          expect(metadata).to eq([{ 'name' => 'abc' }])
+          expect(metadata).to eq([{ 'name' => 'abc', 'allowed' => true }, { 'name' => 'def', 'allowed' => false }])
         end
 
         it 'returns 400 if an project_ref not found error is thrown' do
@@ -328,7 +331,7 @@ describe "BoltServer::TransportApp" do
         expect(fake_pal).to receive(:list_tasks).and_return([%w[abc abc_description], %w[def def_description]])
         get(path)
         metadata = JSON.parse(last_response.body)
-        expect(metadata).to eq([{ 'name' => 'abc' }, { 'name' => 'def' }])
+        expect(metadata).to eq([{ 'name' => 'abc', 'allowed' => true }, { 'name' => 'def', 'allowed' => true }])
       end
 
       it 'returns just the list of task names filtered on project allowlist' do
@@ -337,7 +340,7 @@ describe "BoltServer::TransportApp" do
         expect(fake_pal).to receive(:list_tasks).and_return([%w[abc abc_description], %w[def def_description]])
         get(path)
         metadata = JSON.parse(last_response.body)
-        expect(metadata).to eq([{ 'name' => 'abc' }])
+        expect(metadata).to eq([{ 'name' => 'abc', 'allowed' => true }, { 'name' => 'def', 'allowed' => false }])
       end
 
       it 'returns 400 if an environment not found error is thrown' do
@@ -438,7 +441,7 @@ describe "BoltServer::TransportApp" do
         allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
         allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
         allow(fake_config).to receive(:modulepath)
-        allow(fake_config).to receive(:project)
+        allow(fake_config).to receive(:project).and_return(fake_project)
         allow(Bolt::PAL).to receive(:new).and_return(fake_pal)
       end
 
@@ -462,10 +465,12 @@ describe "BoltServer::TransportApp" do
                   "params" => { "project" => project_ref }
                 }
               }
-            ]
+            ],
+            "allowed" => true
           }
         }
-        it '/tasks/:module_name/:task_name handles module::task_name' do
+        it '/project_tasks/:module_name/:task_name handles module::task_name' do
+          allow(fake_project).to receive(:tasks)
           expect(fake_pal).to receive(:get_task).with(task_name).and_return(mock_task)
           get(path)
           resp = JSON.parse(last_response.body)
@@ -493,11 +498,13 @@ describe "BoltServer::TransportApp" do
                   "params" => { "project" => project_ref }
                 }
               }
-            ]
+            ],
+            "allowed" => true
           }
         }
 
-        it '/tasks/:module_name/:task_name handles task name = module name (init.rb) task' do
+        it '/prject_tasks/:module_name/:task_name handles task name = module name (init.rb) task' do
+          allow(fake_project).to receive(:tasks)
           expect(fake_pal).to receive(:get_task).with(task_name).and_return(mock_task)
           get(path)
           resp = JSON.parse(last_response.body)

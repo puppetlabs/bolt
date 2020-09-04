@@ -516,10 +516,12 @@ This returns a JSON object of this shape:
 ```
 [
   {
-    "name": "facts"
+    "name": "facts",
+    "allowed": true
   },
   {
-    "name": "package"
+    "name": "package",
+    "allowed": true
   }
 ]
 ```
@@ -632,7 +634,8 @@ This returns a JSON object of this shape:
         }
       }
     }
-  ]
+  ],
+  "allowed": true
 }
 ```
 
@@ -683,10 +686,12 @@ This returns a JSON object of this shape:
 ```
 [
   {
-    "name": "facts"
+    "name": "facts",
+    "allowed": true
   },
   {
-    "name": "facts::info"
+    "name": "facts::info",
+    "allowed": true
   }
 ]
 ```
@@ -705,7 +710,8 @@ This returns a JSON object of this shape:
       "type": "TargetSpec",
       "sensitive": false
     }
-  }
+  },
+  "allowed": true
 }
 
 ```

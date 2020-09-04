@@ -292,15 +292,18 @@ module BoltServer
       }
     end
 
-    def task_list(pal, task_show_list = nil)
+    def allowed_helper(metadata, allowlist)
+      allowed = allowlist.nil? || allowlist.include?(metadata['name']) ? true : false
+      metadata.merge({ 'allowed' => allowed })
+    end
+
+    def task_list(pal)
       tasks = pal.list_tasks
-      tasks.select! { |task| task_show_list.include?(task.first) } unless task_show_list.nil?
       tasks.map { |task_name, _description| { 'name' => task_name } }
     end
 
-    def plan_list(pal, plan_show_list = nil)
+    def plan_list(pal)
       plans = pal.list_plans.flatten
-      plans.select! { |plan_name| plan_show_list.include?(plan_name) } unless plan_show_list.nil?
       plans.map { |plan_name| { 'name' => plan_name } }
     end
 
@@ -440,6 +443,7 @@ module BoltServer
     get '/project_plans/:module_name/:plan_name' do
       in_bolt_project(params['project_ref']) do |context|
         plan_info = pe_plan_info(context[:pal], params[:module_name], params[:plan_name])
+        plan_info = allowed_helper(plan_info, context[:config].project.plans)
         [200, plan_info.to_json]
       end
     end
@@ -466,6 +470,7 @@ module BoltServer
           'project' => params['project_ref']
         }
         task_info = pe_task_info(context[:pal], params[:module_name], params[:task_name], ps_parameters)
+        task_info = allowed_helper(task_info, context[:config].project.tasks)
         [200, task_info.to_json]
       end
     end
@@ -499,15 +504,16 @@ module BoltServer
     # @param project_ref [String] the project to fetch the list of plans from
     get '/project_plans' do
       in_bolt_project(params['project_ref']) do |context|
-        # Retrieve the allowlist of plans to show from the project attribute of the project object
-        # configured in bolt-project.yaml
-        plans_response = plan_list(context[:pal], context[:config].project.plans).to_json
+        plans_response = plan_list(context[:pal])
+
+        # Dig in context for the allowlist of plans from project object
+        plans_response.map! { |metadata| allowed_helper(metadata, context[:config].project.plans) }
 
         # We structure this array of plans to be an array of hashes so that it matches the structure
         # returned by the puppetserver API that serves data like this. Structuring the output this way
         # makes switching between puppetserver and bolt-server easier, which makes changes to switch
         # to bolt-server smaller/simpler.
-        [200, plans_response]
+        [200, plans_response.to_json]
       end
     end
 
@@ -531,15 +537,16 @@ module BoltServer
     # @param project_ref [String] the project to fetch the list of tasks from
     get '/project_tasks' do
       in_bolt_project(params['project_ref']) do |context|
-        # Retrieve the allowlist of tasks to show from the project attribute of the project object
-        # configured in bolt-project.yaml
-        tasks_response = task_list(context[:pal], context[:config].project.tasks).to_json
+        tasks_response = task_list(context[:pal])
+
+        # Dig in context for the allowlist of tasks from project object
+        tasks_response.map! { |metadata| allowed_helper(metadata, context[:config].project.tasks) }
 
         # We structure this array of tasks to be an array of hashes so that it matches the structure
         # returned by the puppetserver API that serves data like this. Structuring the output this way
         # makes switching between puppetserver and bolt-server easier, which makes changes to switch
         # to bolt-server smaller/simpler.
-        [200, tasks_response]
+        [200, tasks_response.to_json]
       end
     end
 
