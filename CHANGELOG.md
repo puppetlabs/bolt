@@ -1,5 +1,38 @@
 # Changelog
 
+## Bolt 2.27.0 (2020-09-08)
+
+### New features
+
+* **Bolt will now warn if a project has the same name as a module**
+     ([#2108](https://github.com/puppetlabs/bolt/issues/2108))
+
+    Any module with the same name as the Bolt project will be ignored,
+    and Bolt will now issue a warning to indicate that.
+
+### Bug fixes
+
+* **Ensure task error objects have correct format**
+  ([#2112](https://github.com/puppetlabs/bolt/issues/2112))
+
+  Bolt now ensures that error objects returned from a task have the
+  correct format and include a `msg` key. Bolt will also automatically
+  add `kind` and `details` keys if they are absent from the object, with
+  default values of `bolt/error` and `{}`.
+
+* **Handle project file writing errors more gracefully** ([#2116](https://github.com/puppetlabs/bolt/issues/2116))
+
+  Bolt will now warn and continue executing when it fails to write files
+  to the active project. Additionally, any user-specified file data that
+  fails to be written to will error.
+
+* **Prevent data for the wrong target being used when compiling `apply()` blocks**
+     ([#2156](https://github.com/puppetlabs/bolt/issues/2156))
+
+    Previously, a race condition allowed `apply()` blocks to use data
+    for the wrong target during compilation. This could cause targets to
+    apply incorrect or invalid catalogs.
+
 ## Bolt 2.26.0 (2020-08-31)
 
 ### New features
