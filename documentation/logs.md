@@ -2,7 +2,8 @@
 
 Bolt supports multiple log levels. You can configure the log level from the CLI,
 or in a project configuration file. Supported logging levels, in order from most
-to least information logged, are `trace`, `debug`, `info`, `warn`, and `error`.
+to least information logged, are `trace`, `debug`, `info`, `warn`, `error`, and
+`fatal`.
 
 By default, Bolt logs a debug-level log to a `bolt-debug.log` file in the root
 of your project directory. You can also configure custom logs from your project
@@ -29,8 +30,8 @@ configuration file.
 ### Setting log level on the CLI
 
 To set the log level from the CLI, use the `--log-level` option along with the
-desired level. Available log levels are `trace`, `debug`, `info`, `warn`, and
-`error`. For example:
+desired level. Available log levels are `trace`, `debug`, `info`, `warn`,
+`error`, and `fatal`. For example:
 
 ```console
 bolt command run whoami -t target1 --log-level trace
@@ -41,8 +42,7 @@ bolt command run whoami -t target1 --log-level trace
 To set the log level for the console, add a `log` map with a `console` mapping
 to your [project configuration file](configuring_bolt.md#project-level-configuration).
 
-Use `level` to set the log level. Available log levels are `trace`, `debug`,
-`info`, `warn`, and `error`. For example:
+Use the `level` key to set the log level. For example:
 
 ```yaml
 # bolt-project.yaml
@@ -82,7 +82,7 @@ or `true` if you want to append to the existing file.
 
 Trace logs contain the most detailed information for actions run on individual
 targets. For example, the logs include each command run on a target, each step
-of compiling a manifest for an apply block, and information about establishing
+of compiling a puppet code file (manifest) for an apply block, and information about establishing
 connections with targets.
 
 Trace logs are useful when you're trying to troubleshoot a problem with Bolt.
@@ -92,9 +92,10 @@ on each target.
 ### `debug`
 
 Debug logs contain information for target-specific steps and detailed
-information about where Bolt is loading data from. For example, you'll find
-information on how Bolt locates the project to load, where different content is
-loaded from, and information about actions run on each individual target.
+information about where Bolt is loading data from. For example, debug logs
+include information on how Bolt locates the project to load, where different
+content is loaded from, and information about actions run on each individual
+target.
 
 Debug logs are useful for troubleshooting a problem with a plan or the way
 you're using Bolt. You can use debug logs for a high-level understanding of what
@@ -131,14 +132,30 @@ feature.
 Error logs contain messages for errors that Bolt encountered during execution.
 For example, Bolt prints an error if a PuppetDB query fails.
 
-Bolt always prints errors to the console.
+Bolt prints errors to the console by default.
 
 Use an error log if you want to see errors that Bolt raised during a Bolt run.
 
+### `fatal`
+
+Fatal logs contain `emerg` and `critical` messages from a Puppet code file
+(manifest) or apply block.
+
+Use a fatal error log if you want to see fatal errors raised by issues in your
+Puppet code.
+
 ## Using `verbose` logging
 
-Bolt's `run`, `file upload`, and `file download` commands include the
-`--verbose` CLI option. Verbose logging is useful when you want to see the
+The following Bolt commands include the `--verbose` CLI option: 
+- `bolt command run`
+- `bolt task run`
+- `bolt plan run`
+- `bolt script run`
+- `bolt file upload`
+- `bolt file download`
+- `bolt apply`
+
+Verbose logging is useful when you want to see the
 results for Bolt actions on your targets that are usually not printed to
 standard out (stdout). Verbose logging is particularly useful for debugging your
 tasks and plans.
@@ -146,7 +163,8 @@ tasks and plans.
 📖 **Related information**  
 
 - [Debugging tasks](writing_tasks.md#debugging-tasks)
-- [Debugging Puppet language plans](writing_plans.md#debugging-plans)
 - [Debugging YAML plans](writing_tasks.md#debugging-tasks)
+- [Debugging Puppet language plans](writing_plans.md#debugging-plans)
 - [Project level configuration](configuring_bolt.md#project-level-configuration)
+- [Applying Puppet code](applying_manifest_blocks.md) 
 - [Bolt command reference](bolt_command_reference.md)
