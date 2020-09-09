@@ -120,7 +120,7 @@ executing. For example, Bolt warns you if your inventory file includes an
 unsupported transport configuration that might result in Bolt connecting to
 targets in a way that you don’t expect.
 
-Bolt always prints warnings to the console.
+Bolt prints warnings to the console by default.
 
 Use a warn log if you're trying to find out if you're using Bolt in a way that
 might result in unexpected behavior, or to see if you're using a deprecated
