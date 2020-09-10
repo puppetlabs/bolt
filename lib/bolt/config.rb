@@ -97,11 +97,8 @@ module Bolt
     end
 
     def self.system_path
-      # Lazy-load expensive gem code
-      require 'win32/dir' if Bolt::Util.windows?
-
       if Bolt::Util.windows?
-        Pathname.new(File.join(Dir::COMMON_APPDATA, 'PuppetLabs', 'bolt', 'etc'))
+        Pathname.new(File.join(ENV['ALLUSERSPROFILE'], 'PuppetLabs', 'bolt', 'etc'))
       else
         Pathname.new(File.join('/etc', 'puppetlabs', 'bolt'))
       end
