@@ -625,7 +625,7 @@ Plan completed successfully with no result
 
 Bolt logs additional information about a plan run, including output sent to
 standard error (stderr), at the `debug` level. Use the `--log-level debug` CLI
-option or the [`log` configuration setting](bolt_project_reference.html#log).
+option or the [`log` configuration setting](bolt_project_reference.md#log).
 
 ```shell
 $ bolt task run mytask param1=foo param2=bar -t all --log-level debug
