@@ -41,7 +41,7 @@ module Bolt
                  'project' => %w[init migrate],
                  'apply' => %w[],
                  'guide' => %w[],
-                 'module' => %w[install] }.freeze
+                 'module' => %w[install show generate-types] }.freeze
 
     attr_reader :config, :options
 
@@ -409,6 +409,8 @@ module Bolt
           end
         when 'group'
           list_groups
+        when 'module'
+          list_modules
         end
         return 0
       when 'show-modules'
@@ -452,6 +454,8 @@ module Bolt
         case options[:action]
         when 'install'
           code = install_project_modules
+        when 'generate-types'
+          code = generate_types
         end
       when 'puppetfile'
         case options[:action]

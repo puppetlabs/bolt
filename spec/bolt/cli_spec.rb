@@ -2459,6 +2459,15 @@ describe "Bolt::CLI" do
 
         expect(output.string).to be_empty
       end
+
+      it 'lists modules in the puppetfile' do
+        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::Human.new(false, false, false, output))
+        modules = cli.list_modules
+        expect(modules.keys.first).to match(/bolt-modules/)
+        expect(modules.values.first.map { |h| h[:name] }).to eq(%w[boltlib ctrl dir file out prompt system])
+        expect(modules.values[1].map { |h| h[:name] })
+          .to include("aggregate", "canary", "puppetdb_fact", "puppetlabs/yaml")
+      end
     end
 
     describe "applying Puppet code" do
