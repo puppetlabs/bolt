@@ -263,9 +263,12 @@ Describe "test all bolt command examples" {
       $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params '{"name":"bash","action":"status"}'
       $results | Should -Be "bolt task run 'package' --targets 'target1,target2' --params '{`"name`":`"bash`",`"action`":`"status`"}'"
 
-      # Addressing in https://github.com/puppetlabs/bolt/issues/2148
-      # $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params @{ 'name' = 'bash'; 'action' = 'status' }
-      # $results | Should -Be "bolt task run 'package' --targets 'target1,target2' --params '{`"name`":`"bash`",`"action`":`"status`"}'"
+      $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params @{ 'name' = 'bash'; 'action' = 'status' }
+      # We don't care about the order of JSON keys, and they might become out
+      # of order due to ConvertToJson
+      $results | Should -BeIn @("bolt task run 'package' --targets 'target1,target2' --params '{`"name`":`"bash`",`"action`":`"status`"}'",
+          "bolt task run 'package' --targets 'target1,target2' --params '{`"action`":`"status`",`"name`":`"bash`"}'")
+
     }
     It "bolt task show" {
       $results = Get-BoltTask
