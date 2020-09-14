@@ -180,6 +180,10 @@
           "name": {
             "description": "The name of the module.",
             "type": "string"
+          },
+          "version_requirement": {
+            "description": "The version requirement for the module. Accepts a specific version (1.2.3), version shorthand (1.2.x), or a version range (>= 1.2.0).",
+            "type": "string"
           }
         }
       }

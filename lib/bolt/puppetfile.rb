@@ -82,7 +82,7 @@ module Bolt
       @modules.each do |mod|
         model.add_module(
           PuppetfileResolver::Puppetfile::ForgeModule.new(mod.title).tap do |tap|
-            tap.version = :latest
+            tap.version = mod.version || :latest
           end
         )
       end

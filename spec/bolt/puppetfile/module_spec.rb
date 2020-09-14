@@ -48,6 +48,20 @@ describe Bolt::Puppetfile::Module do
 
       expect(mod1.eql?(mod2)).to eq(false)
     end
+
+    it 'returns true if versions intersect' do
+      mod1 = described_class.new('owner', 'title', '1.0.0')
+      mod2 = described_class.new('owner', 'title', '>= 1.0.0')
+
+      expect(mod1.eql?(mod2)).to eq(true)
+    end
+
+    it 'returns false if versions do not intersect' do
+      mod1 = described_class.new('owner', 'title', '1.0.0')
+      mod2 = described_class.new('owner', 'title', '>= 2.0.0')
+
+      expect(mod1.eql?(mod2)).to eq(false)
+    end
   end
 
   context '#hash' do
@@ -72,10 +86,11 @@ describe Bolt::Puppetfile::Module do
       expect(Set.new([mod1, mod2, mod3]).size).to eq(2)
     end
 
-    it 'does not hash from version' do
+    it 'hashes from version intersection' do
       mod1 = described_class.new('puppetlabs', 'apt', '1.0.0')
-      mod2 = described_class.new('puppetlabs', 'apt', '2.0.0')
-      expect(Set.new([mod1, mod2]).size).to eq(1)
+      mod2 = described_class.new('puppetlabs', 'apt', '1.x')
+      mod3 = described_class.new('puppetlabs', 'apt', '>= 2.0.0')
+      expect(Set.new([mod1, mod2, mod3]).size).to eq(2)
     end
   end
 
