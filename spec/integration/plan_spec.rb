@@ -79,8 +79,9 @@ describe 'plans' do
       end
 
       it 'runs registers types defined in $project/.resource_types', ssh: true do
+        ENV['BOLT_MODULE_FEATURE'] = 'true'
         # generate types based and save in project (based on value of --configfile)
-        run_cli(%w[puppetfile generate-types] + config_flags)
+        run_cli(%w[module generate-types] + config_flags)
         result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)
         expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
       end
