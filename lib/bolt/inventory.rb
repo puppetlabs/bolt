@@ -46,7 +46,7 @@ module Bolt
     end
 
     def self.from_config(config, plugins)
-      logger = Logging.logger[self]
+      logger = Bolt::Logger.logger(self)
 
       if ENV.include?(ENVIRONMENT_VAR)
         begin
