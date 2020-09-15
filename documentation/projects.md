@@ -106,7 +106,7 @@ The following are common files and directories found in a Bolt project.
 
 |Directory|Description|
 |---------|-----------|
-|[`bolt-project.yaml`](bolt_configuration_reference.md#project_configuration_options)|Contains configuration options for Bolt and  Bolt projects. This file must exist for Bolt to find any of the other files or directories in this list.|
+|[`bolt-project.yaml`](bolt_project_reference.md)|Contains configuration options for Bolt and  Bolt projects. This file must exist for Bolt to find any of the other files or directories in this list.|
 |[`inventory.yaml`](inventory_file_v2.md)|Contains a list of known targets and target specific data.|
 |[`plans/`](plans.md)|A directory for storing your plans.|
 |[`tasks/`](tasks.md)|A directory for storing your tasks.|
