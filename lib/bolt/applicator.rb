@@ -50,15 +50,15 @@ module Bolt
 
     def catalog_apply_task
       @catalog_apply_task ||= begin
-                                path = File.join(libexec, 'apply_catalog.rb')
-                                file = { 'name' => 'apply_catalog.rb', 'path' => path }
-                                metadata = { 'supports_noop' => true, 'input_method' => 'stdin',
-                                             'implementations' => [
-                                               { 'name' => 'apply_catalog.rb' },
-                                               { 'name' => 'apply_catalog.rb', 'remote' => true }
-                                             ] }
-                                Bolt::Task.new('apply_helpers::apply_catalog', metadata, [file])
-                              end
+        path = File.join(libexec, 'apply_catalog.rb')
+        file = { 'name' => 'apply_catalog.rb', 'path' => path }
+        metadata = { 'supports_noop' => true, 'input_method' => 'stdin',
+                     'implementations' => [
+                       { 'name' => 'apply_catalog.rb' },
+                       { 'name' => 'apply_catalog.rb', 'remote' => true }
+                     ] }
+        Bolt::Task.new('apply_helpers::apply_catalog', metadata, [file])
+      end
     end
 
     def query_resources_task
@@ -99,11 +99,11 @@ module Bolt
       # see what happened
       print_logs = stat.success?
       result = begin
-                 JSON.parse(out)
-               rescue JSON::ParserError
-                 print_logs = true
-                 { 'message' => "Something's gone terribly wrong! STDERR is logged." }
-               end
+        JSON.parse(out)
+      rescue JSON::ParserError
+        print_logs = true
+        { 'message' => "Something's gone terribly wrong! STDERR is logged." }
+      end
 
       # Any messages logged by Puppet will be on stderr as JSON hashes, so we
       # parse those and store them here. Any message on stderr that is not

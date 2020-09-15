@@ -142,10 +142,10 @@ module BoltSpec
     # Override in your tests
     def config
       @config ||= begin
-                    conf = Bolt::Config.default
-                    conf.modulepath = [modulepath].flatten
-                    conf
-                  end
+        conf = Bolt::Config.default
+        conf.modulepath = [modulepath].flatten
+        conf
+      end
     end
 
     def plugins

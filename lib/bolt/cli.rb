@@ -944,17 +944,17 @@ module Bolt
     # Collects the list of Bolt guides and maps them to their topics.
     def guides
       @guides ||= begin
-                    root_path = File.expand_path(File.join(__dir__, '..', '..', 'guides'))
-                    files     = Dir.children(root_path).sort
+        root_path = File.expand_path(File.join(__dir__, '..', '..', 'guides'))
+        files     = Dir.children(root_path).sort
 
-                    files.each_with_object({}) do |file, guides|
-                      next if file !~ /\.txt\z/
-                      topic = File.basename(file, '.txt')
-                      guides[topic] = File.join(root_path, file)
-                    end
-                  rescue SystemCallError => e
-                    raise Bolt::FileError.new("#{e.message}: unable to load guides directory", root_path)
-                  end
+        files.each_with_object({}) do |file, guides|
+          next if file !~ /\.txt\z/
+          topic = File.basename(file, '.txt')
+          guides[topic] = File.join(root_path, file)
+        end
+      rescue SystemCallError => e
+        raise Bolt::FileError.new("#{e.message}: unable to load guides directory", root_path)
+      end
     end
 
     # Display the list of available Bolt guides.
@@ -1005,10 +1005,10 @@ module Bolt
 
     def analytics
       @analytics ||= begin
-                       client = Bolt::Analytics.build_client
-                       client.bundled_content = bundled_content
-                       client
-                     end
+        client = Bolt::Analytics.build_client
+        client.bundled_content = bundled_content
+        client
+      end
     end
 
     def bundled_content
