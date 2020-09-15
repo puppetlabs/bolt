@@ -252,6 +252,44 @@ If a custom data provider is used, such as `hiera-eyaml`, which allows you to
 encrypt your data, the gem dependencies must be available to Bolt. See [Install
 gems with Bolt packages](bolt_installing.md#).
 
+[Hiera interpolations](https://puppet.com/docs/puppet/latest/hiera_merging.html#hiera_interpolation)
+are not supported in Bolt outside of apply blocks, because Hiera data is looked up per-target and
+plans do not run in a per-target context. If you want to use Hiera to look up data outside of an apply
+block and have an existing Hiera config that contains interpolations, you can add the data you want
+to use outside of the apply block to the top-level `plan_hierarchy` key. If present, Bolt uses the data 
+under the `plan_hierarchy` key outside of apply blocks, and uses the the typical hierarchy key inside 
+of apply blocks. This allows you to use your existing Hiera configs in Bolt plans without encountering 
+an error if interpolation exists and your plan tries to look up data outside of an apply block.
+
+For example, with this Hiera configuration at `<project>/hiera.yaml`:
+```yaml
+version: 5
+
+hierarchy:
+  - name: "Per-OS defaults"
+    path: "os/%{facts.os.family}.yaml"
+  - name: Common
+    path: hierarchy.yaml
+
+plan_hierarchy:
+  - name: Common
+    path: plan_hierarchy.yaml
+```
+
+Bolt uses the `plan_hierarchy` data for the first `lookup()` call, and the regular `hierarchy`
+data for the second `lookup()` call:
+```
+plan plan_lookup(
+  TargetSpec $targets
+) {
+  $outside_apply = lookup('pop')
+  $in_apply = apply($targets) {
+    notify { lookup('pop'): }
+  }
+  ...
+}
+```
+
 📖 **Related information**  
 
 - [Configuring Bolt](configuring_bolt.md)
