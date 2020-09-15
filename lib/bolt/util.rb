@@ -179,16 +179,16 @@ module Bolt
           # object was frozen
           frozen = obj.frozen?
           cl = begin
-                 obj.clone(freeze: false)
-                 # Some datatypes, such as FalseClass, can't be unfrozen. These
-                 # aren't the types we recurse on, so we can leave them frozen
-               rescue ArgumentError => e
-                 if e.message =~ /can't unfreeze/
-                   obj.clone
-                 else
-                   raise e
-                 end
-               end
+            obj.clone(freeze: false)
+          # Some datatypes, such as FalseClass, can't be unfrozen. These
+          # aren't the types we recurse on, so we can leave them frozen
+          rescue ArgumentError => e
+            if e.message =~ /can't unfreeze/
+              obj.clone
+            else
+              raise e
+            end
+          end
         rescue *error_types
           cloned[obj.object_id] = obj
           obj

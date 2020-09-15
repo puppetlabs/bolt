@@ -2,13 +2,13 @@
 
 require 'spec_helper'
 
-describe Bolt::Logger do
-  class MockAppender < Logging::Appender
-    def initialize(*args)
-      @name = args.first
-    end
+class MockAppender < Logging::Appender
+  def initialize(*args)
+    @name = args.first
   end
+end
 
+describe Bolt::Logger do
   before :all do
     # save the root logger appenders so as not to interfere with logging helpers
     @saved_appenders = Logging.logger[:root].appenders.map { |appender|

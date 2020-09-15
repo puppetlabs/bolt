@@ -64,17 +64,17 @@ module BoltServer
 
     def client
       @client ||= begin
-                    uri = URI(@config['file-server-uri'])
-                    https = Net::HTTP.new(uri.host, uri.port)
-                    https.use_ssl = true
-                    https.ssl_version = :TLSv1_2
-                    https.ca_file = @config['ssl-ca-cert']
-                    https.cert = OpenSSL::X509::Certificate.new(ssl_cert)
-                    https.key = OpenSSL::PKey::RSA.new(ssl_key)
-                    https.verify_mode = OpenSSL::SSL::VERIFY_PEER
-                    https.open_timeout = @config['file-server-conn-timeout']
-                    https
-                  end
+        uri = URI(@config['file-server-uri'])
+        https = Net::HTTP.new(uri.host, uri.port)
+        https.use_ssl = true
+        https.ssl_version = :TLSv1_2
+        https.ca_file = @config['ssl-ca-cert']
+        https.cert = OpenSSL::X509::Certificate.new(ssl_cert)
+        https.key = OpenSSL::PKey::RSA.new(ssl_key)
+        https.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        https.open_timeout = @config['file-server-conn-timeout']
+        https
+      end
     end
 
     def request_file(path, params, file)

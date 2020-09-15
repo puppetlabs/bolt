@@ -13,6 +13,9 @@ AllCops:
 # Layout cops
 # https://docs.rubocop.org/rubocop/cops_layout.html
 
+Layout/BeginEndAlignment:
+  Enabled: true
+
 Layout/ClosingHeredocIndentation:
   Enabled: false
 
@@ -48,6 +51,9 @@ Layout/SpaceAroundMethodCallOperator:
 Lint/BinaryOperatorWithIdenticalOperands:
   Enabled: true
 
+Lint/ConstantDefinitionInBlock:
+  Enabled: true
+
 Lint/DeprecatedOpenSSLConstant:
   Enabled: true
 
@@ -67,6 +73,9 @@ Lint/EmptyFile:
   Enabled: true
 
 Lint/FloatComparison:
+  Enabled: true
+
+Lint/IdentityComparison:
   Enabled: true
 
 Lint/MissingSuper:
@@ -102,6 +111,9 @@ Lint/UnreachableLoop:
 
 Lint/UselessMethodDefinition:
   Enabled: false
+
+Lint/UselessTimes:
+  Enabled: true
 
 # Metrics cops
 # https://docs.rubocop.org/rubocop/cops_metrics.html
