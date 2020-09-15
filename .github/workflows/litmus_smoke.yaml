@@ -36,14 +36,7 @@ jobs:
           gem install bundler
           bundle config path vendor/bundle
           bundle config with development
-      - name: Cache gems
-        id: cache
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('lib/bolt/version.rb') }}-${{ hashFiles('Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
       - name: Install gems
-        if: steps.cache.outputs.cache-hit != 'true'
         run: bundle install --jobs 4 --retry 3
       - name: Run smoke test on Ubuntu
         if: runner.os == 'Linux'
