@@ -746,7 +746,7 @@ module Bolt
              'For SSH, port defaults to `22`',
              'For WinRM, port defaults to `5985` or `5986` based on the --[no-]ssl setting') do |targets|
         @options[:targets] ||= []
-        @options[:targets] << get_arg_input(targets)
+        @options[:targets] << Bolt::Util.get_arg_input(targets)
       end
       define('-q', '--query QUERY', 'Query PuppetDB to determine the targets') do |query|
         @options[:query] = query
@@ -985,27 +985,10 @@ module Bolt
     end
 
     def parse_params(params)
-      json = get_arg_input(params)
+      json = Bolt::Util.get_arg_input(params)
       JSON.parse(json)
     rescue JSON::ParserError => e
       raise Bolt::CLIError, "Unable to parse --params value as JSON: #{e}"
-    end
-
-    def get_arg_input(value)
-      if value.start_with?('@')
-        file = value.sub(/^@/, '')
-        read_arg_file(file)
-      elsif value == '-'
-        $stdin.read
-      else
-        value
-      end
-    end
-
-    def read_arg_file(file)
-      File.read(File.expand_path(file))
-    rescue StandardError => e
-      raise Bolt::FileError.new("Error attempting to read #{file}: #{e}", file)
     end
   end
 end

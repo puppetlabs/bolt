@@ -107,6 +107,11 @@ module Bolt
 
       options[:object] = remaining.shift
 
+      # Handle reading a command from a file
+      if options[:subcommand] == 'command' && options[:object]
+        options[:object] = Bolt::Util.get_arg_input(options[:object])
+      end
+
       # Only parse task_options for task or plan
       if %w[task plan].include?(options[:subcommand])
         task_options, remaining = remaining.partition { |s| s =~ /.+=/ }
