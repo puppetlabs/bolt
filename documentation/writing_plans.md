@@ -64,8 +64,11 @@ would use the name, `mymodule::service::myplan`.
 
 The plan filename `init` is special. You reference an `init` plan using the
 module name only. For example, in a module called `mymodule`, the plan defined
-in `mymodule/plans/init.pp` is the `mymodule` plan. For an example of an `init`
-plan, see the [facts
+in `mymodule/plans/init.pp` is the `mymodule` plan. However, this does not apply
+to `init` plans nested in subdirectories. For example, an `init` plan at
+`mymodule/plans/service/init.pp` is the `mymodule::service::init` plan.
+
+For an example of an `init` plan, see the [facts
 plan](https://github.com/puppetlabs/puppetlabs-facts/blob/master/plans/init.pp).
 
 ## Defining plan parameters
