@@ -6,12 +6,7 @@ require 'octokit'
 class ChangelogGenerator
   attr_reader :version, :entries
 
-  def initialize(version)
-    unless version
-      warn "Usage: generate_changelog.rb VERSION"
-      exit 1
-    end
-
+  def initialize(version = nil)
     @version = version
     @entries = {
       'feature'     => { name: 'New features', entries: [] },
@@ -91,6 +86,16 @@ class ChangelogGenerator
     end
   end
 
+  def compute_version
+    x, y, z = latest.split('.').map(&:to_i)
+    if %w[feature deprecation removal].any? { |type| entries[type][:entries].any? }
+      y += 1
+    else
+      z += 1
+    end
+    [x, y, z].join('.')
+  end
+
   def update_changelog
     old_lines = File.read(changelog).split("\n")[2..-1]
 
@@ -133,6 +138,9 @@ class ChangelogGenerator
       warn "No release notes for #{latest}..main"
       exit 0
     end
+
+    @version ||= compute_version
+    puts "The next release will be version #{version}"
 
     update_changelog
   end
