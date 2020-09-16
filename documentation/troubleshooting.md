@@ -66,12 +66,29 @@ By default, Bolt tries to connect over SSH. Make sure you've specified the
 - Include the `winrm` in the name of the target. For example:
   `winrm://hostname.example.com` 
 - Pass `--transport winrm` on the CLI
-- Set the `winrm` transport in your Bolt config or inventory:
-  For example:
+- Set the `winrm` transport in your config or inventory file:
   ```yaml
+  # inventory.yaml
   ...
   config:
     transport: winrm
+  ```
+If you're still getting "connection refused" messages, try disabling SSL. By
+default, Bolt connects to targets over WinRM using the HTTPS port 5986. Your
+target may not be set up to connect over HTTPS. If you disable SSL, Bolt
+connects to the target using the HTTP port 5985. You can disable SSL in one of
+the following ways:
+
+- Pass `--no-ssl` on the CLI
+- Set the `ssl` key to `false` in your config or inventory file:
+
+  ```yaml
+  # inventory.yaml
+  ...
+  config:
+    transport: winrm
+    winrm:
+      ssl: false
   ```
 
 ## Puppet log functions are not logging to the console
@@ -110,4 +127,3 @@ Use the Bolt-provided gem command to reinstall/install these gems. For example:
 Visit the **#bolt** channel in the [Puppet Community
 Slack](https://slack.puppet.com) to find a whole community of people waiting
 to help!
-
