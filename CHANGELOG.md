@@ -1,5 +1,30 @@
 # Changelog
 
+## Bolt 2.28.0 (2020-09-16)
+
+### New features
+
+* **Define Hiera data to be looked up outside apply blocks under plan_hierarchy key** ([#1835](https://github.com/puppetlabs/bolt/issues/1835))
+
+  Previously, Bolt used the same Hiera hierarchy for lookups inside and
+  outside apply blocks. Interpolations are only supported in apply blocks,
+  so if a hierarchy included interpolations the user could not look up
+  data outside an apply block. Users can now define a separate, statically
+  configured hierarchy in their Hiera config to be used outside apply
+  blocks.
+
+### Bug fixes
+
+* **Fix warning when running from a gem install**
+
+    Bolt again properly detects when it's being run from a gem install
+    and emits a warning.
+
+* **Fix error 'no method found trace' error when running BoltSpec**
+
+    There was one place where we didn't properly initialize the Bolt logger, causing a stacktrace
+    in some BoltSpec uses. We now properly initialize the Bolt logger.
+
 ## Bolt 2.27.0 (2020-09-08)
 
 ### New features
