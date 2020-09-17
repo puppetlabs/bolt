@@ -400,6 +400,30 @@ describe 'run_task' do
     end
   end
 
+  context 'running in parallel' do
+    let(:default_args) { { 'message' => 'Krabby patty' } }
+    let(:future) { mock('future') }
+    let(:hostname) { 'a.b.com' }
+    let(:result) { Bolt::Result.new(target, value: { '_output' => 'Krabby patty' }) }
+    let(:result_set) { Bolt::ResultSet.new([result]) }
+    let(:target) { inventory.get_target(hostname) }
+    let(:task) { mock_task(File.join(tasks_root, 'echo.sh'), nil) }
+    let(:tasks_root) { File.expand_path(fixtures('modules', 'test', 'tasks')) }
+
+    it 'executes in a thread if the executor is in parallel mode' do
+      inventory.expects(:get_target).with(hostname).returns([target])
+
+      Concurrent::Future.expects(:execute).returns(future)
+      future.expects(:incomplete?).returns(false)
+      future.expects(:value).returns(result_set)
+      executor.expects(:in_parallel).returns(true)
+
+      is_expected.to run
+        .with_params('Test::Echo', hostname, default_args)
+        .and_return(result_set)
+    end
+  end
+
   context 'it validates the task parameters' do
     let(:task_name) { 'Test::Params' }
     let(:hostname) { 'a.b.com' }

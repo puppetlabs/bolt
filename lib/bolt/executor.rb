@@ -17,6 +17,7 @@ require 'bolt/transport/orch'
 require 'bolt/transport/local'
 require 'bolt/transport/docker'
 require 'bolt/transport/remote'
+require 'bolt/yarn'
 
 module Bolt
   TRANSPORTS = {
@@ -29,7 +30,7 @@ module Bolt
   }.freeze
 
   class Executor
-    attr_reader :noop, :transports
+    attr_reader :noop, :transports, :in_parallel
     attr_accessor :run_as
 
     def initialize(concurrency = 1,
@@ -60,6 +61,7 @@ module Bolt
 
       @noop = noop
       @run_as = nil
+      @in_parallel = false
       @pool = if concurrency > 0
                 Concurrent::ThreadPoolExecutor.new(name: 'exec', max_threads: concurrency)
               else
@@ -357,6 +359,24 @@ module Bolt
 
     def run_plan(scope, plan, params)
       plan.call_by_name_with_scope(scope, params, true)
+    end
+
+    def round_robin(skein)
+      results = Array.new(skein.length)
+      @in_parallel = true
+      until skein.empty?
+        skein.each do |yarn|
+          # Check if stored a value
+          if yarn.alive?
+            yarn.resume
+          else
+            results[yarn.index] = yarn.value
+            skein.delete(yarn)
+          end
+        end
+      end
+      @in_parallel = false
+      results
     end
 
     class TimeoutError < RuntimeError; end

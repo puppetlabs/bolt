@@ -90,6 +90,20 @@ module Bolt
     end
   end
 
+  class ParallelFailure < Bolt::Error
+    def initialize(results, failed_indices)
+      details = {
+        'action' => 'parallelize',
+        'failed_indices' => failed_indices,
+        'results' => results
+      }
+      message = "Plan aborted: parallel block failed on #{failed_indices.length} target"
+      message += "s" unless failed_indices.length == 1
+      super(message, 'bolt/parallel-failure', details)
+      @error_code = 2
+    end
+  end
+
   class PlanFailure < Error
     def initialize(*args)
       super(*args)
@@ -127,6 +141,16 @@ module Bolt
       super("Plan #{plan_name} returned an invalid result: #{result_str}",
             'bolt/invalid-plan-result',
             { 'plan_name' => plan_name,
+              'result_string' => result_str })
+    end
+  end
+
+  class InvalidParallelResult < Error
+    def initialize(result_str, file, line)
+      super("Parallel block returned an invalid result: #{result_str}",
+            'bolt/invalid-plan-result',
+            { 'file' => file,
+              'line' => line,
               'result_string' => result_str })
     end
   end

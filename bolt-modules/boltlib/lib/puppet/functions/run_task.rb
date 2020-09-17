@@ -133,7 +133,23 @@ Puppet::Functions.create_function(:run_task) do
     if targets.empty?
       Bolt::ResultSet.new([])
     else
-      result = executor.run_task(targets, task, params, options, Puppet::Pops::PuppetStack.top_of_stack)
+      result = if executor.in_parallel
+                 require 'concurrent'
+                 require 'fiber'
+                 future = Concurrent::Future.execute do
+                   executor.run_task(targets, task, params, options, Puppet::Pops::PuppetStack.top_of_stack)
+                 end
+
+                 while future.incomplete?
+                   Fiber.yield
+                   # Induce a context switch to give the task a chance to complete
+                   sleep(0)
+                 end
+                 future.value
+               else
+                 executor.run_task(targets, task, params, options, Puppet::Pops::PuppetStack.top_of_stack)
+               end
+
       if !result.ok && !options[:catch_errors]
         raise Bolt::RunFailure.new(result, 'run_task', task_name)
       end
