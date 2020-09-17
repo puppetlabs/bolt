@@ -212,7 +212,7 @@ module BoltServer
       return [400, "`project_ref`: #{project_dir} does not exist"] unless Dir.exist?(project_dir)
       @pal_mutex.synchronize do
         project = Bolt::Project.create_project(project_dir)
-        bolt_config = Bolt::Config.from_project(project, {})
+        bolt_config = Bolt::Config.from_project(project, { log: { 'bolt-debug.log' => 'disable' } })
         pal = Bolt::PAL.new(bolt_config.modulepath, nil, nil, nil, nil, nil, bolt_config.project)
         module_path = [
           BoltServer::PE::PAL::PE_BOLTLIB_PATH,
