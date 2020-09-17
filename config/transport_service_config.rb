@@ -42,8 +42,9 @@ bind bind_addr
 threads 0, config['concurrency']
 
 impl = BoltServer::TransportApp.new(config)
-unless config['whitelist'].nil?
-  impl = BoltServer::ACL.new(impl, config['whitelist'])
+
+if config['allowlist']
+  impl = BoltServer::ACL.new(impl, config['allowlist'])
 end
 
 app impl

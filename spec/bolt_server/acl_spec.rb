@@ -15,10 +15,10 @@ describe BoltServer::ACL do
   include Rack::Test::Methods
 
   let(:yes_app) { ->(_) { [200, { 'Content-Type' => 'text/plain' }, ['OK']] } }
-  let(:app) { described_class.new(yes_app, whitelist) }
+  let(:app) { described_class.new(yes_app, allowlist) }
 
-  context 'with empty whitelist' do
-    let(:whitelist) { [] }
+  context 'with empty allowlist' do
+    let(:allowlist) { [] }
 
     it 'rejects all requests' do
       get '/'
@@ -28,11 +28,11 @@ describe BoltServer::ACL do
     end
   end
 
-  context 'with whitelist' do
-    let(:whitelist) { %w[cert1 cert2] }
+  context 'with allowlist' do
+    let(:allowlist) { %w[cert1 cert2] }
 
-    it 'accepts requests from whitelisted certs' do
-      whitelist.each do |name|
+    it 'accepts requests from allowlisted certs' do
+      allowlist.each do |name|
         get '/', {}, 'HTTPS' => 'on', 'puma.peercert' => x509_certificate(name)
 
         expect(last_response).to be_ok

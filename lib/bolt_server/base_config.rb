@@ -7,7 +7,7 @@ module BoltServer
   class BaseConfig
     def config_keys
       %w[host port ssl-cert ssl-key ssl-ca-cert
-         ssl-cipher-suites loglevel logfile whitelist projects-dir]
+         ssl-cipher-suites loglevel logfile allowlist projects-dir]
     end
 
     def env_keys
@@ -98,8 +98,8 @@ module BoltServer
         raise Bolt::ValidationError, "Configured 'ssl-cipher-suites' must be an array of cipher suite names"
       end
 
-      unless @data['whitelist'].nil? || @data['whitelist'].is_a?(Array)
-        raise Bolt::ValidationError, "Configured 'whitelist' must be an array of names"
+      unless @data['allowlist'].nil? || @data['allowlist'].is_a?(Array)
+        raise Bolt::ValidationError, "Configured 'allowlist' must be an array of names"
       end
     end
 
