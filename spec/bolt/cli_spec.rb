@@ -166,18 +166,17 @@ describe "Bolt::CLI" do
   end
 
   context 'module' do
-    require 'bolt/module_installer'
+    include BoltSpec::Project
 
-    let(:project)   { @project_dir }
-    let(:config)    { File.expand_path('bolt-project.yaml', project) }
-    let(:installer) { double('installer', add: 0, install: 0) }
+    let(:cli)       { Bolt::CLI.new(command + %W[--project #{project_path}]) }
+    let(:command)   { %w[module show] }
+    let(:installer) { double('installer', add: true, install: true) }
 
     around(:each) do |example|
       original = ENV['BOLT_MODULE_FEATURE']
       ENV['BOLT_MODULE_FEATURE'] = 'true'
 
-      Dir.mktmpdir(nil, Dir.pwd) do |dir|
-        @project_dir = dir
+      with_project do
         example.run
       end
     ensure
@@ -186,11 +185,34 @@ describe "Bolt::CLI" do
 
     before(:each) do
       allow(Bolt::ModuleInstaller).to receive(:new).and_return(installer)
-      File.write(config, config_data.to_yaml)
+    end
+
+    it 'errors without BOLT_MODULE_FEATURE being set' do
+      ENV.delete('BOLT_MODULE_FEATURE')
+      expect { cli.parse }.to raise_error(
+        Bolt::CLIError,
+        /Expected subcommand/
+      )
+    end
+
+    it 'errors without modules configured' do
+      expect { cli.parse }.to raise_error(
+        Bolt::CLIError,
+        /Unable to use command/
+      )
+    end
+
+    context 'with modules configured' do
+      let(:project_config) { { 'modules' => [] } }
+
+      it 'does not error' do
+        result = cli.execute(cli.parse)
+        expect(result).to eq(0)
+      end
     end
 
     context 'add' do
-      let(:config_data) { { 'modules' => [] } }
+      let(:project_config) { { 'modules' => [] } }
 
       it 'errors without a module' do
         cli = Bolt::CLI.new(%W[module add --project #{project}])
@@ -208,15 +230,6 @@ describe "Bolt::CLI" do
         )
       end
 
-      it 'errors if missing a bolt-project.yaml' do
-        FileUtils.rm(config)
-        cli = Bolt::CLI.new(%W[module add puppetlabs-yaml --project #{project}])
-        expect { cli.execute(cli.parse) }.to raise_error(
-          Bolt::Error,
-          /Could not find project configuration file/
-        )
-      end
-
       it 'runs with a single module' do
         cli = Bolt::CLI.new(%W[module add puppetlabs-yaml --project #{project}])
         expect(installer).to receive(:add)
@@ -225,37 +238,19 @@ describe "Bolt::CLI" do
     end
 
     context 'install' do
-      let(:flags)       { %W[--project #{project}] }
-      let(:cli)         { Bolt::CLI.new(%w[module install] + flags) }
-      let(:config_data) { { 'modules' => [{ 'name' => 'puppetlabs-yaml' }] } }
+      let(:command)        { %W[module install --project #{project}] }
+      let(:project_config) { { 'modules' => [] } }
 
-      it 'errors if missing a bolt-project.yaml' do
-        FileUtils.rm(config)
-        expect { cli.execute(cli.parse) }.to raise_error(
-          Bolt::Error,
-          /Could not find project configuration file/
-        )
-      end
-
-      it 'exits successfully if there are no project modules' do
-        File.write(config, {}.to_yaml)
-        expect(installer).not_to receive(:install)
+      it 'does nothing if project config has no module declarations' do
+        allow(project).to receive(:modules).and_return([])
         result = cli.execute(cli.parse)
         expect(result).to eq(0)
+        expect((project_path + 'Puppetfile').exist?).to eq(false)
+        expect((project_path + '.modules').exist?).to eq(false)
       end
 
-      it 'installs project modules' do
+      it 'runs' do
         expect(installer).to receive(:install)
-        cli.execute(cli.parse)
-      end
-
-      it 'installs project modules forcibly' do
-        cli = Bolt::CLI.new(%W[module install --project #{project} --force])
-
-        allow(installer).to receive(:install) do |*args|
-          expect(args).to include({ force: true })
-        end
-
         cli.execute(cli.parse)
       end
     end

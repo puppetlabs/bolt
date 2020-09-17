@@ -225,9 +225,12 @@ describe Bolt::Project do
     end
 
     it 'returns the new default modulepath if modules is set' do
-      expect(project.modulepath).to match_array([
-                                                  (project_path + 'modules').to_s
-                                                ])
+      original = ENV['BOLT_MODULE_FEATURE']
+      ENV['BOLT_MODULE_FEATURE'] = 'true'
+
+      expect(project.modulepath).to match_array([(project_path + 'modules').to_s])
+    ensure
+      ENV['BOLT_MODULE_FEATURE'] = original
     end
 
     it 'returns the old default modulepath if modules is not set' do

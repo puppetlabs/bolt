@@ -369,6 +369,9 @@ module Bolt
       DESCRIPTION
           Manage Bolt project modules
 
+          The module command is only supported when a project is configured
+          with the 'modules' key.
+
       ACTIONS
           add                   Add a module to the project
           generate-types        Generate type references to register in plans
@@ -386,10 +389,12 @@ module Bolt
       DESCRIPTION
           Add a module to the project.
 
-          Adds a module declaration to the project's configuration file.
-          Bolt will automatically resolve the new module's dependencies,
-          update any existing project modules if necessary, generate a
-          new Puppetfile, and install the modules.
+          Module declarations are loaded from the project's configuration
+          file. Bolt will automatically resolve all module dependencies,
+          generate a Puppetfile, and install the modules.
+
+          The module command is only supported when a project is configured
+          with the 'modules' key.
     HELP
 
     MODULE_GENERATETYPES_HELP = <<~HELP
@@ -401,6 +406,9 @@ module Bolt
 
       DESCRIPTION
           Generate type references to register in plans.
+
+          The module command is only supported when a project is configured
+          with the 'modules' key.
     HELP
 
     MODULE_INSTALL_HELP = <<~HELP
@@ -427,6 +435,9 @@ module Bolt
 
       DESCRIPTION
           List modules available to the Bolt project.
+
+          The module command is only supported when a project is configured
+          with the 'modules' key.
     HELP
 
     PLAN_HELP = <<~HELP

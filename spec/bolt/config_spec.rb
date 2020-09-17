@@ -456,6 +456,14 @@ describe Bolt::Config do
     let(:overrides)         { { 'modulepath' => managed_moduledir } }
 
     context 'with modules configured' do
+      around(:each) do |example|
+        original = ENV['BOLT_MODULE_FEATURE']
+        ENV['BOLT_MODULE_FEATURE'] = 'true'
+        example.run
+      ensure
+        ENV['BOLT_MODULE_FEATURE'] = original
+      end
+
       it 'appends the managed moduledir to the modulepath' do
         expect(config.modulepath[-1]).to eq(managed_moduledir)
       end
