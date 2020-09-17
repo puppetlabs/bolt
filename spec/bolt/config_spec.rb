@@ -2,9 +2,11 @@
 
 require 'spec_helper'
 require 'bolt/config'
+require 'bolt_spec/project'
 
 describe Bolt::Config do
-  let(:project)       { Bolt::Project.new({}, @tmpdir) }
+  include BoltSpec::Project
+
   let(:system_path)   { Bolt::Config.system_path }
   let(:user_path)     { Bolt::Config.user_path }
   let(:config_name)   { Bolt::Config::BOLT_CONFIG_NAME }
@@ -12,10 +14,7 @@ describe Bolt::Config do
   let(:logfile)       { 'bolt.log' }
 
   around(:each) do |example|
-    Dir.mktmpdir("foo") do |tmpdir|
-      @tmpdir = File.join(tmpdir, "validprojectname")
-      FileUtils.mkdir_p(@tmpdir)
-
+    with_project do
       example.run
     end
   end
@@ -447,6 +446,37 @@ describe Bolt::Config do
     it 'removes log files that are disabled' do
       project_config['log'] = { '~/.puppetlabs/debug.log' => 'disable' }
       expect(config.log).not_to include('~/.puppetlabs/debug.log')
+    end
+  end
+
+  describe '#modulepath' do
+    let(:project_config)    { { 'modules' => [] } }
+    let(:config)            { Bolt::Config.from_project(project) }
+    let(:managed_moduledir) { (project_path + '.modules').to_s }
+    let(:overrides)         { { 'modulepath' => managed_moduledir } }
+
+    context 'with modules configured' do
+      it 'appends the managed moduledir to the modulepath' do
+        expect(config.modulepath[-1]).to eq(managed_moduledir)
+      end
+
+      it 'errors if the user configures the managed moduledir' do
+        expect { Bolt::Config.from_project(project, overrides) }.to raise_error(Bolt::ValidationError)
+      end
+    end
+
+    context 'with modules not configured' do
+      before(:each) do
+        delete_config
+      end
+
+      it 'does not append the managed moduledir to the modulepath' do
+        expect(config.modulepath).not_to include(managed_moduledir)
+      end
+
+      it 'does not error if the user configured the managed moduledir' do
+        expect { Bolt::Config.from_project(project, overrides) }.not_to raise_error
+      end
     end
   end
 end

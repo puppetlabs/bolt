@@ -391,6 +391,12 @@ module Bolt
         @logs << { warn: msg }
       end
 
+      if @project.modules && @data['modulepath']&.include?(@project.managed_moduledir)
+        raise Bolt::ValidationError,
+              "Found invalid path in modulepath: #{@project.managed_moduledir}. This path "\
+              "is automatically appended to the modulepath and cannot be configured."
+      end
+
       keys = OPTIONS.keys - %w[plugins plugin_hooks puppetdb]
       keys.each do |key|
         next unless Bolt::Util.references?(@data[key])
@@ -445,7 +451,13 @@ module Bolt
     end
 
     def modulepath
-      @data['modulepath'] || @project.modulepath
+      path = @data['modulepath'] || @project.modulepath
+
+      if @project.modules
+        path + [@project.managed_moduledir]
+      else
+        path
+      end
     end
 
     def modulepath=(value)
