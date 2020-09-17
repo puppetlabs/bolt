@@ -68,18 +68,25 @@ describe 'plans' do
     end
 
     context 'with puppet-agent installed for get_resources' do
-      before(:all) do
+      around(:each) do |example|
+        original = ENV['BOLT_MODULE_FEATURE']
+        ENV['BOLT_MODULE_FEATURE'] = 'true'
         install(conn_uri('ssh', include_password: true))
-      end
-
-      after(:all) do
-        # Remove .resource_types generated in project
+        example.run
+      ensure
+        ENV['BOLT_MODULE_FEATURE'] = original
         FileUtils.rm_rf(fixture_path('configs', '.resource_types'))
         uninstall(conn_uri('ssh', include_password: true))
       end
 
       it 'runs registers types defined in $project/.resource_types', ssh: true do
-        ENV['BOLT_MODULE_FEATURE'] = 'true'
+        # generate types based and save in project (based on value of --configfile)
+        run_cli(%w[puppetfile generate-types] + config_flags)
+        result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)
+        expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
+      end
+
+      it 'runs registers types defined in $project/.resource_types', ssh: true do
         # generate types based and save in project (based on value of --configfile)
         run_cli(%w[module generate-types] + config_flags)
         result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)

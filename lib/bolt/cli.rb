@@ -190,6 +190,9 @@ module Bolt
 
       warn_inventory_overrides_cli(options)
 
+      # Disable the puppetfile subcommand when 'modules' is configured.
+      assert_puppetfile_command(config.project.modules)
+
       options
     rescue Bolt::Error => e
       outputter.fatal_error(e)
@@ -474,7 +477,11 @@ module Bolt
         when 'generate-types'
           code = generate_types
         when 'install'
-          code = install_puppetfile(config.puppetfile_config, config.puppetfile, config.modulepath.first)
+          code = install_puppetfile(
+            config.puppetfile_config,
+            config.puppetfile,
+            config.modulepath.first
+          )
         end
       when 'secret'
         code = Bolt::Secret.execute(plugins, outputter, options)
@@ -920,6 +927,19 @@ module Bolt
       installer = Bolt::ModuleInstaller.new(outputter, pal)
       ok = installer.install_puppetfile(puppetfile, moduledir, config)
       ok ? 0 : 1
+    end
+
+    # Raises an error if the 'puppetfile install' command is deprecated due to
+    # modules being configured.
+    #
+    def assert_puppetfile_command(modules)
+      if modules
+        raise Bolt::CLIError,
+              "Unable to use command 'bolt puppetfile #{options[:action]}' when "\
+              "'modules' is configured in bolt-project.yaml. Use the 'module' command "\
+              "instead. For a list of available actions for the 'module' command, run "\
+              "'bolt module --help'."
+      end
     end
 
     def pal
