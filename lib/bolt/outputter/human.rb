@@ -6,10 +6,10 @@ module Bolt
   class Outputter
     class Human < Bolt::Outputter
       COLORS = {
-        red: "31",
-        green: "32",
+        red:    "31",
+        green:  "32",
         yellow: "33",
-        cyan: "36"
+        cyan:   "36"
       }.freeze
 
       def print_head; end

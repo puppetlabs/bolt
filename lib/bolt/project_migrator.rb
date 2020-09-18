@@ -2,6 +2,7 @@
 
 require 'bolt/project_migrator/config'
 require 'bolt/project_migrator/inventory'
+require 'bolt/project_migrator/modules'
 
 module Bolt
   class ProjectMigrator
@@ -28,12 +29,18 @@ module Bolt
 
       return 0 unless Bolt::Util.prompt_yes_no("Continue with project migration?", @outputter)
 
+      @outputter.print_message('')
+
       ok = migrate_inventory && migrate_config
+
+      if ok && ENV['BOLT_MODULE_FEATURE']
+        ok = migrate_modules
+      end
 
       if ok
         @outputter.print_message("Project successfully migrated")
       else
-        @outputter.print_message("Project could not be migrated")
+        @outputter.print_message("Project could not be migrated completely")
       end
 
       ok ? 0 : 1
@@ -60,6 +67,17 @@ module Bolt
       migrator.migrate(
         @config.inventoryfile || @config.project.inventory_file,
         @config.project.backup_dir
+      )
+    end
+
+    # Migrates the project's modules to use current best practices.
+    #
+    private def migrate_modules
+      migrator = Bolt::ProjectMigrator::Modules.new(@outputter)
+
+      migrator.migrate(
+        @config.project,
+        @config.modulepath
       )
     end
   end

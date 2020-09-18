@@ -31,7 +31,7 @@ describe "When loading content", ssh: true do
 
       expect(File.exist?(conf_file)).not_to be
       expect(File.exist?(project_file)).to be
-      expect(YAML.load_file(project_file)).to eq({ 'color' => true })
+      expect(YAML.load_file(project_file)).to include({ 'color' => true })
       expect(File.exist?(inv_file)).to be
       expect(YAML.load_file(inv_file)).to eq({ 'config' => { 'ssh' => { 'port' => 23 } } })
     end

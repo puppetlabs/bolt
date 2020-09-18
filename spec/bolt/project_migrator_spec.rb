@@ -14,6 +14,7 @@ describe Bolt::ProjectMigrator do
   let(:migrator)           { described_class.new(config, outputter) }
   let(:config_migrator)    { double('config_migrator', migrate: true) }
   let(:inventory_migrator) { double('inventory_migrator', migrate: true) }
+  let(:modules_migrator)   { double('modules_migrator', migrate: true) }
 
   around :each do |example|
     original = ENV['BOLT_MODULE_FEATURE']
@@ -42,6 +43,7 @@ describe Bolt::ProjectMigrator do
   it 'migrates config' do
     allow(Bolt::ProjectMigrator::Config).to receive(:new).and_return(config_migrator)
     allow(Bolt::ProjectMigrator::Inventory).to receive(:new).and_return(inventory_migrator)
+    allow(Bolt::ProjectMigrator::Modules).to receive(:new).and_return(modules_migrator)
     expect(config_migrator).to receive(:migrate)
     migrator.migrate
   end
@@ -49,19 +51,30 @@ describe Bolt::ProjectMigrator do
   it 'migrates inventory' do
     allow(Bolt::ProjectMigrator::Config).to receive(:new).and_return(config_migrator)
     allow(Bolt::ProjectMigrator::Inventory).to receive(:new).and_return(inventory_migrator)
+    allow(Bolt::ProjectMigrator::Modules).to receive(:new).and_return(modules_migrator)
     expect(inventory_migrator).to receive(:migrate)
+    migrator.migrate
+  end
+
+  it 'migrates modules' do
+    allow(Bolt::ProjectMigrator::Config).to receive(:new).and_return(config_migrator)
+    allow(Bolt::ProjectMigrator::Inventory).to receive(:new).and_return(inventory_migrator)
+    allow(Bolt::ProjectMigrator::Modules).to receive(:new).and_return(modules_migrator)
+    expect(modules_migrator).to receive(:migrate)
     migrator.migrate
   end
 
   it 'returns 0 if all migrations succeeded' do
     allow(Bolt::ProjectMigrator::Config).to receive(:new).and_return(config_migrator)
     allow(Bolt::ProjectMigrator::Inventory).to receive(:new).and_return(inventory_migrator)
+    allow(Bolt::ProjectMigrator::Modules).to receive(:new).and_return(modules_migrator)
     expect(migrator.migrate).to eq(0)
   end
 
   it 'returns 1 if any migrations failed' do
     allow(Bolt::ProjectMigrator::Config).to receive(:new).and_return(double('config_migrator', migrate: false))
     allow(Bolt::ProjectMigrator::Inventory).to receive(:new).and_return(inventory_migrator)
+    allow(Bolt::ProjectMigrator::Modules).to receive(:new).and_return(modules_migrator)
     expect(migrator.migrate).to eq(1)
   end
 end

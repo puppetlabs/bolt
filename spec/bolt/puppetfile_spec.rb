@@ -52,9 +52,18 @@ describe Bolt::Puppetfile do
       end
     end
 
-    it 'handles git modules' do
+    it 'errors with unsupported module types' do
       File.write(path, "mod 'puppetlabs-yaml', git: 'https://github.com/puppetlabs/puppetlabs-yaml', branch: 'master'")
-      expect { described_class.parse(path) }.not_to raise_error
+      expect { described_class.parse(path) }.to raise_error(
+        Bolt::ValidationError,
+        /not a Puppet Forge module/
+      )
+    end
+
+    it 'skips over unsupported module types' do
+      File.write(path, "mod 'puppetlabs-yaml', git: 'https://github.com/puppetlabs/puppetlabs-yaml', branch: 'master'")
+      puppetfile = described_class.parse(path, skip_unsupported_modules: true)
+      expect(puppetfile.modules.any?).to be(false)
     end
   end
 

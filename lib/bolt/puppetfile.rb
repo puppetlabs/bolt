@@ -19,7 +19,7 @@ module Bolt
     # Loads a Puppetfile and parses its module specifications, returning a
     # Bolt::Puppetfile object with the modules set.
     #
-    def self.parse(path)
+    def self.parse(path, skip_unsupported_modules: false)
       require 'puppetfile-resolver'
       require 'puppetfile-resolver/puppetfile/parser/r10k_eval'
 
@@ -38,8 +38,16 @@ module Bolt
               "managed by Bolt."
       end
 
-      modules = parsed.modules.map do |mod|
-        Bolt::Puppetfile::Module.new(mod.owner, mod.name, mod.version)
+      modules = parsed.modules.each_with_object([]) do |mod, acc|
+        unless mod.instance_of? PuppetfileResolver::Puppetfile::ForgeModule
+          next if skip_unsupported_modules
+
+          raise Bolt::ValidationError,
+                "Module '#{mod.title}' is not a Puppet Forge module. Unable to "\
+                "parse Puppetfile #{path}."
+        end
+
+        acc << Bolt::Puppetfile::Module.new(mod.owner, mod.name, mod.version)
       end
 
       new(modules)
