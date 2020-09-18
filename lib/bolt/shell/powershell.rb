@@ -278,6 +278,8 @@ module Bolt
             script_invocation = ['powershell.exe', *PS_ARGS, '-File', *args].join(' ')
             execute(script_invocation)
           end
+        else
+          command = Bolt::Shell::Powershell::Snippets.exit_with_code(command)
         end
         inp, out, err, t = conn.execute(command)
 
