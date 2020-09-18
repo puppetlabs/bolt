@@ -1032,7 +1032,7 @@ describe Bolt::Transport::WinRM do
 
           with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
             result = winrm.run_script(target, file.path, [])
-            expect(result).to be_success
+            expect(result).to_not be_success
           end
         end
       end
