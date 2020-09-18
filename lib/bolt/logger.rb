@@ -4,6 +4,10 @@ require 'logging'
 
 module Bolt
   module Logger
+    LEVELS = %w[trace debug info notice warn error fatal].freeze
+    @mutex = Mutex.new
+    @warnings = Set.new
+
     # This method provides a single point-of-entry to setup logging for both
     # the CLI and for tests. This is necessary because we define custom log
     # levels which create corresponding methods on the logger instances;
@@ -11,20 +15,25 @@ module Bolt
     # will fail.
     def self.initialize_logging
       # Initialization isn't idempotent and will result in warnings about const
-      # redefs, so skip it if it's already been initialized
-      return if Logging.initialized?
+      # redefs, so skip it if the log levels we expect are present. If it's
+      # already been initialized with an insufficient set of levels, go ahead
+      # and call init anyway or we'll have failures when calling log methods
+      # for missing levels.
+      unless levels & LEVELS == LEVELS
+        Logging.init(*LEVELS)
+      end
 
-      Logging.init :trace, :debug, :info, :notice, :warn, :error, :fatal, :any
-      @mutex = Mutex.new
-
-      Logging.color_scheme(
-        'bolt',
-        lines: {
-          warn: :yellow,
-          error: :red,
-          fatal: %i[white on_red]
-        }
-      )
+      # As above, only create the color scheme if we haven't already created it.
+      unless Logging.color_scheme('bolt')
+        Logging.color_scheme(
+          'bolt',
+          lines: {
+            warn: :yellow,
+            error: :red,
+            fatal: %i[white on_red]
+          }
+        )
+      end
     end
 
     def self.configure(destinations, color)
@@ -115,14 +124,12 @@ module Bolt
     end
 
     def self.warn_once(type, msg)
-      @mutex.synchronize {
-        @warnings ||= []
+      @mutex.synchronize do
         @logger ||= Bolt::Logger.logger(self)
-        unless @warnings.include?(type)
+        if @warnings.add?(type)
           @logger.warn(msg)
-          @warnings << type
         end
-      }
+      end
     end
 
     def self.deprecation_warning(type, msg)
