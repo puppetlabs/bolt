@@ -1022,8 +1022,29 @@ describe Bolt::Transport::WinRM do
           end
         end
 
+        it "Calling a working external binary", winrm: true do
+          contents = <<-PS
+          cmd.exe /c "exit 0"
+          # for desired behavior, a user must explicitly call
+          # exit $LASTEXITCODE
+          PS
+
+          with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
+            result = winrm.run_script(target, file.path, [])
+            expect(result).to be_success
+          end
+        end
+
         it "Calling a failing external binary", winrm: true do
-          # deriving meaning from $LASTEXITCODE requires a custom PS host
+          # In PR #2196 we added additional PowerShell logic to handle figuring
+          # out what the exit code is if the user did not specifically set it
+          # This results in this test correctly returning 42 to the spec test,
+          # which is a failure, so our test is 'succeeding' if the command
+          # 'fails'. Previously the test would pass because Bolt did not detect
+          # the 42, requiring the user to explicitly check themselves.
+          #
+          # In short, the correct behavior for this test is for it to return 42
+          # and fail.
           contents = <<-PS
           cmd.exe /c "exit 42"
           # for desired behavior, a user must explicitly call
@@ -1032,7 +1053,7 @@ describe Bolt::Transport::WinRM do
 
           with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
             result = winrm.run_script(target, file.path, [])
-            expect(result).to be_success
+            expect(result).to_not be_success
           end
         end
       end
