@@ -30,6 +30,8 @@ begin
       @commands = {}
 
       Bolt::CLI::COMMANDS.each do |subcommand, actions|
+        next if subcommand == 'module'
+
         actions << nil if actions.empty?
 
         actions.each do |action|
