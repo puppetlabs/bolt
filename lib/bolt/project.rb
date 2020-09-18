@@ -199,10 +199,9 @@ module Bolt
           raise Bolt::ValidationError, "Module declaration #{mod.inspect} must be a hash"
         end
 
-        unknown_keys = data['modules'].flat_map(&:keys).uniq - ['name']
+        unknown_keys = data['modules'].flat_map(&:keys).uniq - %w[name version_requirement]
         if unknown_keys.any?
-          @logs << { warn: "Module declarations in bolt-project.yaml only support a name key. Ignoring "\
-                           "unsupported keys: #{unknown_keys.join(', ')}." }
+          @logs << { warn: "Ignoring unknown keys in module declarations: #{unknown_keys.join(', ')}." }
         end
       end
     end

@@ -228,7 +228,7 @@ describe "Bolt::CLI" do
 
         expect { cli.execute(cli.parse) }.to raise_error(
           Bolt::Error,
-          /Puppetfile .* is missing specifications for modules/
+          /puppetlabs-apt/
         )
       end
 

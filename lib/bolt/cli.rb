@@ -892,13 +892,17 @@ module Bolt
         unless existing.modules.superset? puppetfile.modules
           missing_modules = puppetfile.modules - existing.modules
 
-          raise Bolt::Error.new(
-            "Puppetfile #{puppetfile_path} is missing specifications for modules: "\
-            "#{missing_modules.map(&:title).join(', ')}. This may not be a Puppetfile "\
-            "managed by Bolt. To forcibly overwrite the Puppetfile, run with the "\
-            "'--force' option.",
-            'bolt/missing-module-specs'
-          )
+          message = <<~MESSAGE.chomp
+            Puppetfile #{puppetfile_path} is missing specifications for the following
+            module declarations:
+            
+            #{missing_modules.map(&:to_hash).to_yaml.lines.drop(1).join.chomp}
+
+            This may not be a Puppetfile managed by Bolt. To forcibly overwrite the
+            Puppetfile, run 'bolt module install --force'.
+          MESSAGE
+
+          raise Bolt::Error.new(message, 'bolt/missing-module-specs')
         end
       else
         outputter.print_message "Resolving module dependencies, this may take a moment"

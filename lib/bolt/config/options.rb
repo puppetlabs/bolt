@@ -239,11 +239,21 @@ module Bolt
               "name" => {
                 description: "The name of the module.",
                 type: String
+              },
+              "version_requirement" => {
+                description: "The version requirement for the module. Accepts a specific version (1.2.3), version "\
+                             "shorthand (1.2.x), or a version range (>= 1.2.0).",
+                type: String
               }
             }
           },
           _plugin: false,
-          _example: [{ "name" => "puppetlabs-mysql" }, { "name" => "puppetlabs-apache" }]
+          _example: [
+            { "name" => "puppetlabs-mysql" },
+            { "name" => "puppetlabs-apache", "version_requirement" => "5.5.0" },
+            { "name" => "puppetlabs-puppetdb", "version_requirement" => "7.x" },
+            { "name" => "puppetlabs-firewall", "version_requirement" => ">= 1.0.0 < 3.0.0" }
+          ]
         },
         "name" => {
           description: "The name of the Bolt project. When this option is configured, the project is considered a "\

@@ -105,5 +105,32 @@ describe Bolt::Puppetfile do
         expect(mod).to be_kind_of(Bolt::Puppetfile::Module)
       end
     end
+
+    context 'with a specific version' do
+      let(:modules) { [{ 'name' => 'puppetlabs-facts', 'version_requirement' => '0.5.0' }] }
+
+      it 'resolves' do
+        modules = puppetfile.resolve.to_a
+        expect(modules.first.version).to eq('0.5.0')
+      end
+    end
+
+    context 'with version shorthand' do
+      let(:modules) { [{ 'name' => 'puppetlabs-facts', 'version_requirement' => '0.x' }] }
+
+      it 'resolves' do
+        modules = puppetfile.resolve.to_a
+        expect(modules.first.version).to eq('0.6.0')
+      end
+    end
+
+    context 'with a version range' do
+      let(:modules) { [{ 'name' => 'puppetlabs-facts', 'version_requirement' => '>= 0.2.0 < 0.4.0' }] }
+
+      it 'resolves' do
+        modules = puppetfile.resolve.to_a
+        expect(modules.first.version).to eq('0.3.1')
+      end
+    end
   end
 end
