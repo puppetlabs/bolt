@@ -16,10 +16,11 @@ describe "When loading content", ssh: true do
   let(:config_flags) { %W[--no-host-key-check --password #{conn_info('ssh')[:password]}] }
 
   it "migrates project config files to the newest version" do
-    Dir.mktmpdir do |project|
-      # Don't actually print output
-      allow($stderr).to receive(:puts)
+    allow($stdin).to receive(:tty?).and_return(true)
+    allow($stderr).to receive(:puts)
+    allow(Bolt::Util).to receive(:prompt_yes_no).and_return(true)
 
+    Dir.mktmpdir do |project|
       config = { 'color' => true, 'ssh' => { 'port' => 23 } }
       conf_file = File.join(project, 'bolt.yaml')
       project_file = File.join(project, 'bolt-project.yaml')

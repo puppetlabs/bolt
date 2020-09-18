@@ -118,4 +118,26 @@ describe Bolt::Util do
       expect(Bolt::Util.deep_clone(hash)).to eq(hash)
     end
   end
+
+  describe '#prompt_yes_no' do
+    let(:outputter) { double('outputter', print_prompt: nil) }
+
+    before(:each) do
+      allow($stdin).to receive(:tty?).and_return(true)
+    end
+
+    %w[y yes].each do |response|
+      it "returns true for #{response}" do
+        allow($stdin).to receive(:gets).and_return(response)
+        expect(Bolt::Util.prompt_yes_no('', outputter)).to be(true)
+      end
+    end
+
+    %w[n no].each do |response|
+      it "returns false for #{response}" do
+        allow($stdin).to receive(:gets).and_return(response)
+        expect(Bolt::Util.prompt_yes_no('', outputter)).to be(false)
+      end
+    end
+  end
 end

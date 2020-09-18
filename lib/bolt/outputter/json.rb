@@ -135,6 +135,10 @@ module Bolt
       def print_message(message)
         $stderr.puts(message)
       end
+
+      def print_migrate_step(step)
+        $stderr.puts(step)
+      end
     end
   end
 end

@@ -5,9 +5,12 @@ require 'bolt/pal'
 module Bolt
   class Outputter
     class Human < Bolt::Outputter
-      COLORS = { red: "31",
-                 green: "32",
-                 yellow: "33" }.freeze
+      COLORS = {
+        red: "31",
+        green: "32",
+        yellow: "33",
+        cyan: "36"
+      }.freeze
 
       def print_head; end
 
@@ -29,6 +32,10 @@ module Bolt
 
       def remove_trail(string)
         string.sub(/\s\z/, '')
+      end
+
+      def wrap(string, width = 80)
+        string.gsub(/(.{1,#{width}})(\s+|\Z)/, "\\1\n")
       end
 
       def handle_event(event)
@@ -392,6 +399,24 @@ module Bolt
 
       def print_message(message)
         @stream.puts(message)
+      end
+
+      def print_prompt(prompt)
+        @stream.print(colorize(:cyan, indent(4, prompt)))
+      end
+
+      def print_prompt_error(message)
+        @stream.puts(colorize(:red, indent(4, message)))
+      end
+
+      def print_migrate_step(step)
+        first, *remaining = wrap(step, 76).lines
+
+        first     = indent(2, "→ #{first}")
+        remaining = remaining.map { |line| indent(4, line) }
+        step      = [first, *remaining, "\n"].join
+
+        @stream.puts(step)
       end
 
       def duration_to_string(duration)
