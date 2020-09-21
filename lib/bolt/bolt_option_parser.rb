@@ -66,15 +66,18 @@ module Bolt
           banner: GUIDE_HELP }
       when 'module'
         case action
+        when 'add'
+          { flags: OPTIONS[:global] + %w[configfile force project],
+            banner: MODULE_ADD_HELP }
+        when 'generate-types'
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
+            banner: MODULE_GENERATETYPES_HELP }
         when 'install'
           { flags: OPTIONS[:global] + %w[configfile force project],
             banner: MODULE_INSTALL_HELP }
         when 'show'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: MODULE_SHOW_HELP }
-        when 'generate-types'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: MODULE_GENERATETYPES_HELP }
         else
           { flags: OPTIONS[:global],
             banner: MODULE_HELP }
@@ -364,12 +367,40 @@ module Bolt
           bolt module <action> [options]
 
       DESCRIPTION
-          Install and list modules and generate type references
+          Manage Bolt project modules
 
       ACTIONS
+          add                   Add a module to the project
           generate-types        Generate type references to register in plans
           install               Install the project's modules
           show                  List modules available to the Bolt project
+    HELP
+
+    MODULE_ADD_HELP = <<~HELP
+      NAME
+          add
+      
+      USAGE
+          bolt module add <module> [options]
+
+      DESCRIPTION
+          Add a module to the project.
+
+          Adds a module declaration to the project's configuration file.
+          Bolt will automatically resolve the new module's dependencies,
+          update any existing project modules if necessary, generate a
+          new Puppetfile, and install the modules.
+    HELP
+
+    MODULE_GENERATETYPES_HELP = <<~HELP
+      NAME
+          generate-types
+
+      USAGE
+          bolt module generate-types [options]
+
+      DESCRIPTION
+          Generate type references to register in plans.
     HELP
 
     MODULE_INSTALL_HELP = <<~HELP
@@ -385,17 +416,6 @@ module Bolt
           Module declarations are loaded from the project's configuration
           file. Bolt will automatically resolve all module dependencies,
           generate a Puppetfile, and install the modules.
-    HELP
-
-    MODULE_GENERATETYPES_HELP = <<~HELP
-      NAME
-          generate-types
-
-      USAGE
-          bolt module generate-types [options]
-
-      DESCRIPTION
-          Generate type references to register in plans.
     HELP
 
     MODULE_SHOW_HELP = <<~HELP

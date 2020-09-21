@@ -59,25 +59,8 @@ describe Bolt::Puppetfile do
   end
 
   context '#write' do
-    it 'errors if there is an existing Puppetfile' do
-      File.write(path, "mod 'puppetlabs-yaml', '0.2.0'")
-
-      expect { puppetfile.write(path) }.to raise_error(
-        Bolt::FileError,
-        /Cannot overwrite existing Puppetfile.*force/
-      )
-    end
-
     it 'writes modules to the Puppetfile' do
       puppetfile.write(path)
-      expect(path.exist?).to eq(true)
-      expect(File.read(path)).to match(/mod "puppetlabs-yaml"/)
-    end
-
-    it 'forcibly overwrites an existing Puppetfile' do
-      File.write(path, "mod 'puppetlabs-apt', '1.0.0'")
-
-      puppetfile.write(path, force: true)
       expect(path.exist?).to eq(true)
       expect(File.read(path)).to match(/mod "puppetlabs-yaml"/)
     end

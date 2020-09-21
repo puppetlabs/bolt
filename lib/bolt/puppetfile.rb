@@ -34,7 +34,8 @@ module Bolt
 
       unless parsed.valid?
         raise Bolt::ValidationError,
-              "Unable to parse Puppetfile #{path}"
+              "Unable to parse Puppetfile #{path}. This may not be a Puppetfile "\
+              "managed by Bolt."
       end
 
       modules = parsed.modules.map do |mod|
@@ -47,19 +48,10 @@ module Bolt
     # Writes a Puppetfile that includes specifications for each of the
     # modules.
     #
-    def write(path, force: false)
-      if File.exist?(path) && !force
-        raise Bolt::FileError.new(
-          "Cannot overwrite existing Puppetfile at #{path}. To forcibly overwrite, "\
-          "run with the '--force' option.",
-          path
-        )
-      end
-
+    def write(path)
       File.open(path, 'w') do |file|
         file.puts '# This Puppetfile is managed by Bolt. Do not edit.'
         modules.each { |mod| file.puts mod.to_spec }
-        file.puts
       end
     rescue SystemCallError => e
       raise Bolt::FileError.new(
@@ -143,7 +135,7 @@ module Bolt
     # Adds to the set of modules.
     #
     def add_modules(modules)
-      modules.each do |mod|
+      Array(modules).each do |mod|
         case mod
         when Bolt::Puppetfile::Module
           @modules << mod
