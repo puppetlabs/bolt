@@ -31,9 +31,6 @@
     "modulepath": {
       "$ref": "#/definitions/modulepath"
     },
-    "modules": {
-      "$ref": "#/definitions/modules"
-    },
     "name": {
       "$ref": "#/definitions/name"
     },
@@ -166,26 +163,6 @@
       ],
       "items": {
         "type": "string"
-      }
-    },
-    "modules": {
-      "description": "A list of module dependencies for the project. Each dependency is a map of data specifying the module to install. To install the project's module dependencies, run the `bolt module install` command.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "name"
-        ],
-        "properties": {
-          "name": {
-            "description": "The name of the module.",
-            "type": "string"
-          },
-          "version_requirement": {
-            "description": "The version requirement for the module. Accepts a specific version (1.2.3), version shorthand (1.2.x), or a version range (>= 1.2.0).",
-            "type": "string"
-          }
-        }
       }
     },
     "name": {
