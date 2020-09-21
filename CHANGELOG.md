@@ -1,5 +1,23 @@
 # Changelog
 
+## Bolt 2.29.0 (2020-09-21)
+
+### New features
+
+* **Read command from a file or `stdin` using `bolt command run`**
+  ([#2125](https://github.com/puppetlabs/bolt/issues/2125))
+
+  The `bolt command run` command can now read a command from a file or
+  `stdin`.
+
+### Bug fixes
+
+* **Reliably initialize logger with Bolt log levels**
+  ([#2188](https://github.com/puppetlabs/bolt/issues/2188))
+
+  Bolt now checks whether the logger includes all of Bolt's log levels
+  if the logger has already been initialized.
+
 ## Bolt 2.28.0 (2020-09-16)
 
 ### New features
