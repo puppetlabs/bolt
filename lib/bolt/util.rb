@@ -3,6 +3,25 @@
 module Bolt
   module Util
     class << self
+      # Gets input for an argument.
+      def get_arg_input(value)
+        if value.start_with?('@')
+          file = value.sub(/^@/, '')
+          read_arg_file(file)
+        elsif value == '-'
+          $stdin.read
+        else
+          value
+        end
+      end
+
+      # Reads a file passed as an argument to a command.
+      def read_arg_file(file)
+        File.read(File.expand_path(file))
+      rescue StandardError => e
+        raise Bolt::FileError.new("Error attempting to read #{file}: #{e}", file)
+      end
+
       def read_yaml_hash(path, file_name)
         require 'yaml'
 

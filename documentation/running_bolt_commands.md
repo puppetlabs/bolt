@@ -14,11 +14,13 @@ across those systems.
     ```shell script
     bolt command run <COMMAND> --targets <TARGET NAME>,<TARGET NAME>,<TARGET NAME>
     ```
+    
 -   To run a command on WinRM targets, indicate the WinRM protocol in the
     targets string:
     ```shell script
     bolt command run <COMMAND> --targets winrm://<WINDOWS.TARGET> --user <USERNAME> --password <PASSWORD>
     ```
+
 -   To run a command that contains spaces or shell special characters, wrap the
     command in single quotation marks:
     ```shell script
@@ -27,15 +29,42 @@ across those systems.
     ```shell script
     bolt command run "netstat -an | grep 'tcp.*LISTEN'" --targets web5.mydomain.edu,web6.mydomain.edu
     ```
+
 -   To run a cross-platform command:
     ```shell script
     bolt command run "echo 'hello world'"
     ```
 
-    **Note:** When connecting to Bolt hosts over WinRM that have not configured
-    SSL for port 5986, passing the `--no-ssl` switch is required to connect to
-    the default WinRM port 5985.
+-   To read a command from a file, pass the command as an `@` symbol followed by
+    the path to the file:
 
+    ```
+    bolt command run @command.txt --targets servers
+    ```
+
+    For Windows PowerShell, add single quotation marks to define the file:
+
+    ```
+    bolt command run '@command.txt' --targets servers
+    ```
+
+-   To read a command from `stdin`, pass the command as a single dash `-` and
+    pipe the command to Bolt:
+
+    ```
+    <COMMAND> | bolt command run - --targets servers
+    ```
+
+    For example, if you have a command in a text file:
+
+    ```
+    cat command.txt | bolt command run - --targets servers
+    ```
+
+> **Note:** When connecting to Bolt over WinRM, the target must be 
+> configured to use SSL over port 5986. If the target is not configured
+> to use SSL, use the `--no-ssl` option to connect to the default WinRM 
+> port 5985.
 
 ## Running commands with redirection or pipes
 

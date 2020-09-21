@@ -1043,6 +1043,25 @@ describe "Bolt::CLI" do
         cli = Bolt::CLI.new(%w[command run --targets foo whoami --env-var POP=TARTS])
         expect(cli.parse[:env_vars]).to eq({ 'POP' => 'TARTS' })
       end
+
+      it "reads from a file when command starts with @" do
+        command = 'whoami'
+
+        with_tempfile_containing('command', command) do |file|
+          cli = Bolt::CLI.new(%W[command run @#{file.path}])
+          options = cli.parse
+          expect(options[:object]).to eq(command)
+        end
+      end
+
+      it "reads from stdin when command is '-'" do
+        command = 'whoami'
+
+        cli = Bolt::CLI.new(%w[command run - --targets localhost])
+        allow($stdin).to receive(:read).and_return(command)
+        options = cli.parse
+        expect(options[:object]).to eq(command)
+      end
     end
 
     it "distinguishes subcommands" do
