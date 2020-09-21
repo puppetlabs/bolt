@@ -13,7 +13,7 @@ module Bolt
       NAME_REGEX = /\A[a-z0-9_][a-z0-9_-]*\Z/.freeze
 
       # NOTE: All keys should have a corresponding schema property in schemas/bolt-inventory.schema.json
-      DATA_KEYS = %w[config facts vars features plugin_hooks].freeze
+      DATA_KEYS = %w[config facts vars env_vars features plugin_hooks].freeze
       TARGET_KEYS = DATA_KEYS + %w[name alias uri]
       GROUP_KEYS = DATA_KEYS + %w[name groups targets]
       CONFIG_KEYS = Bolt::Config::INVENTORY_OPTIONS.keys
@@ -183,6 +183,7 @@ module Bolt
           # are assigned a new hash, rather than merging the existing value
           # with the value meant to replace it
           'vars' => data1['vars'].merge(data2['vars']),
+          'env_vars' => data1['env_vars'].merge(data2['env_vars']),
           'facts' => Bolt::Util.deep_merge(data1['facts'], data2['facts']),
           'features' => data1['features'] | data2['features'],
           'plugin_hooks' => data1['plugin_hooks'].merge(data2['plugin_hooks']),
@@ -318,6 +319,7 @@ module Bolt
         result = {
           'config' => @plugins.resolve_references(data.fetch('config', {})),
           'vars' => @plugins.resolve_references(data.fetch('vars', {})),
+          'env_vars' => @plugins.resolve_references(data.fetch('env_vars', {})),
           'facts' => @plugins.resolve_references(data.fetch('facts', {})),
           'features' => @plugins.resolve_references(data.fetch('features', [])),
           'plugin_hooks' => @plugins.resolve_references(data.fetch('plugin_hooks', {}))
@@ -331,6 +333,7 @@ module Bolt
         {
           'config' => Hash,
           'vars' => Hash,
+          'env_vars' => Hash,
           'facts' => Hash,
           'features' => Array,
           'plugin_hooks' => Hash

@@ -49,7 +49,7 @@ module Bolt
       def run_command(target, command, options = {})
         execute_options = {}
         execute_options[:tty] = target.options['tty']
-        execute_options[:environment] = options[:env_vars]
+        execute_options[:environment] = target.env_vars.merge(options[:env_vars] || {})
 
         if target.options['shell-command'] && !target.options['shell-command'].empty?
           # escape any double quotes in command
@@ -66,7 +66,7 @@ module Bolt
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
         execute_options = {}
-        execute_options[:environment] = options[:env_vars]
+        execute_options[:environment] = target.env_vars.merge(options[:env_vars] || {})
 
         with_connection(target) do |conn|
           conn.with_remote_tmpdir do |dir|

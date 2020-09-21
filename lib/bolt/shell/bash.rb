@@ -23,7 +23,7 @@ module Bolt
 
       def run_command(command, options = {})
         running_as(options[:run_as]) do
-          output = execute(command, environment: options[:env_vars], sudoable: true)
+          output = execute(command, environment: target.env_vars.merge(options[:env_vars] || {}), sudoable: true)
           Bolt::Result.for_command(target,
                                    output.stdout.string,
                                    output.stderr.string,
@@ -79,7 +79,11 @@ module Bolt
           with_tmpdir do |dir|
             path = write_executable(dir.to_s, script)
             dir.chown(run_as)
-            output = execute([path, *arguments], environment: options[:env_vars], sudoable: true)
+            output = execute(
+              [path, *arguments],
+              environment: target.env_vars.merge(options[:env_vars] || {}),
+              sudoable: true
+            )
             Bolt::Result.for_command(target,
                                      output.stdout.string,
                                      output.stderr.string,
@@ -325,7 +329,7 @@ module Bolt
         # together multiple commands into a single sh invocation
         commands = [inject_interpreter(options[:interpreter], command)]
 
-        if options[:environment]
+        if options[:environment] && !options[:environment].empty?
           env_decl = options[:environment].map do |env, val|
             "#{env}=#{Shellwords.shellescape(val)}"
           end.join(' ')

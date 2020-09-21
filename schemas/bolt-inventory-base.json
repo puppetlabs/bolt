@@ -23,6 +23,9 @@
     "vars": {
       "$ref": "#/definitions/vars"
     },
+    "env_vars": {
+      "$ref": "#/definitions/env_vars"
+    },
     "version": {
       "$ref": "#/definitions/version"
     }
@@ -122,6 +125,9 @@
             },
             "vars": {
               "$ref": "#/definitions/vars"
+            },
+            "env_vars": {
+              "$ref": "#/definitions/env_vars"
             }
           },
           "required": ["name"]    
@@ -197,6 +203,9 @@
             },
             "vars": {
               "$ref": "#/definitions/vars"
+            },
+            "env_vars": {
+              "$ref": "#/definitions/env_vars"
             }
           },
           "anyOf": [
@@ -211,6 +220,17 @@
     },
     "vars": {
       "description": "The vars for a target.",
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "env_vars": {
+      "description": "The environment variables for a target.",
       "oneOf": [
         {
           "type": "object"

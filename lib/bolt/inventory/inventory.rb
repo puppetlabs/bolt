@@ -278,6 +278,10 @@ module Bolt
         @targets[target.name].vars
       end
 
+      def env_vars(target)
+        @targets[target.name].env_vars
+      end
+
       def add_facts(target, new_facts = {})
         @targets[target.name].add_facts(new_facts)
         target

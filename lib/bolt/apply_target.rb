@@ -2,7 +2,7 @@
 
 module Bolt
   class ApplyTarget
-    ATTRIBUTES = %i[uri name target_alias config vars facts features
+    ATTRIBUTES = %i[uri name target_alias config vars env_vars facts features
                     plugin_hooks resources safe_name].freeze
     COMPUTED = %i[host password port protocol user].freeze
 
@@ -23,6 +23,7 @@ module Bolt
                                 config = nil,
                                 facts = nil,
                                 vars = nil,
+                                env_vars = nil,
                                 features = nil,
                                 plugin_hooks = nil,
                                 resources = nil)

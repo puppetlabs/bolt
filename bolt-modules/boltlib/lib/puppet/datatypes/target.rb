@@ -16,6 +16,7 @@ Puppet::DataTypes.create_type('Target') do
       target_alias => { type => Optional[Variant[String[1], Array[String[1]]]], kind => given_or_derived },
       config => { type => Optional[Hash[String[1], Data]], kind => given_or_derived },
       vars => { type => Optional[Hash[String[1], Data]], kind => given_or_derived },
+      env_vars => { type => Optional[Hash[String[1], String[1]]], kind => given_or_derived },
       facts => { type => Optional[Hash[String[1], Data]], kind => given_or_derived },
       features => { type => Optional[Array[String[1]]], kind => given_or_derived },
       plugin_hooks => { type => Optional[Hash[String[1], Data]], kind => given_or_derived },

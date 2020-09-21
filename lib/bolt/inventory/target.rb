@@ -36,6 +36,7 @@ module Bolt
 
         @config = target_data['config'] || {}
         @vars = target_data['vars'] || {}
+        @env_vars = target_data['env_vars'] || {}
         @facts = target_data['facts'] || {}
         @features = target_data['features'] || Set.new
         @plugin_hooks = target_data['plugin_hooks'] || {}
@@ -80,11 +81,23 @@ module Bolt
         group_cache['vars'].merge(@vars)
       end
 
+      def env_vars
+        group_cache['env_vars'].merge(@env_vars)
+      end
+
       # This method isn't actually an accessor and we want the name to
       # correspond to the Puppet function
       # rubocop:disable Naming/AccessorMethodName
       def set_var(var_hash)
         @vars.merge!(var_hash)
+      end
+      # rubocop:enable Naming/AccessorMethodName
+
+      # This method isn't actually an accessor and we want the name to
+      # correspond to the Puppet function
+      # rubocop:disable Naming/AccessorMethodName
+      def set_env_var(var_hash)
+        @env_vars.merge!(var_hash)
       end
       # rubocop:enable Naming/AccessorMethodName
 
@@ -230,6 +243,7 @@ module Bolt
           group_data ||= {
             'config' => {},
             'vars' => {},
+            'env_vars' => {},
             'facts' => {},
             'features' => Set.new,
             'plugin_hooks' => {},

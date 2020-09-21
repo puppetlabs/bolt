@@ -82,7 +82,7 @@ module Bolt
       end
 
       def batch_command(targets, command, options = {}, &callback)
-        if options[:env_vars] && !options[:env_vars].empty?
+        if options[:env_vars] && !options[:env_vars].empty? || targets.any? { |target| !target.env_vars.empty? }
           raise NotImplementedError, "pcp transport does not support setting environment variables"
         end
 
@@ -102,7 +102,7 @@ module Bolt
       end
 
       def batch_script(targets, script, arguments, options = {}, &callback)
-        if options[:env_vars] && !options[:env_vars].empty?
+        if options[:env_vars] && !options[:env_vars].empty? || targets.any? { |target| !target.env_vars.empty? }
           raise NotImplementedError, "pcp transport does not support setting environment variables"
         end
 

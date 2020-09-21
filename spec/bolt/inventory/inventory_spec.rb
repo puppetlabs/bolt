@@ -1337,6 +1337,7 @@ describe Bolt::Inventory::Inventory do
           }
         },
         'vars' => {},
+        'env_vars' => {},
         'facts' => { 'foo' => 'bar' },
         'features' => [],
         'groups' => %w[group1 group2 all],

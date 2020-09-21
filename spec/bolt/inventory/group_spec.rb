@@ -50,6 +50,7 @@ describe Bolt::Inventory::Group do
     it 'should return empty data' do
       expect(group.target_collect('target1')).to eq('config' => {},
                                                     'vars' => {},
+                                                    'env_vars' => {},
                                                     'name' => nil,
                                                     'plugin_hooks' => {},
                                                     'uri' => 'target1',

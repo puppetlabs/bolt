@@ -30,6 +30,7 @@ module Bolt
                                 config = nil,
                                 facts = nil,
                                 vars = nil,
+                                env_vars = nil,
                                 features = nil,
                                 plugin_hooks = nil,
                                 resources = nil)
@@ -54,6 +55,10 @@ module Bolt
 
     def vars
       @inventory.vars(self)
+    end
+
+    def env_vars
+      @inventory.env_vars(self)
     end
 
     def facts
@@ -108,6 +113,7 @@ module Bolt
           transport => options.to_h
         },
         'vars' => vars,
+        'env_vars' => env_vars,
         'features' => features,
         'facts' => facts,
         'plugin_hooks' => plugin_hooks,

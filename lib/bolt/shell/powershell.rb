@@ -175,7 +175,7 @@ module Bolt
       end
 
       def run_command(command, options = {})
-        command = [*env_declarations(options[:env_vars]), command].join("\r\n") if options[:env_vars]
+        command = [*env_declarations(target.env_vars.merge(options[:env_vars] || {})), command].join("\r\n")
 
         output = execute(command)
         Bolt::Result.for_command(target,
@@ -197,7 +197,7 @@ module Bolt
                       args += escape_arguments(arguments)
                       execute_process(path, args)
                     end
-          command = [*env_declarations(options[:env_vars]), command].join("\r\n") if options[:env_vars]
+          command = [*env_declarations(target.env_vars.merge(options[:env_vars] || {})), command].join("\r\n")
 
           output = execute(command)
           Bolt::Result.for_command(target,
