@@ -38,8 +38,8 @@ describe BoltServer::Config do
       expect(config['logfile']).to eq('/var/log/global')
     end
 
-    it 'reads whitelist' do
-      expect(config['whitelist']).to eq(['a'])
+    it 'reads allowlist' do
+      expect(config['allowlist']).to eq(['a'])
     end
 
     it 'reads ssl-cipher-suites' do
@@ -112,7 +112,7 @@ describe BoltServer::Config do
     expect(config['port']).to be(62658)
     expect(config['loglevel']).to eq('warn')
     expect(config['logfile']).to eq(nil)
-    expect(config['whitelist']).to eq(nil)
+    expect(config['allowlist']).to eq(nil)
     expect(config['ssl-cipher-suites']).to include('ECDHE-ECDSA-AES256-GCM-SHA384')
     expect(config['concurrency']).to eq(100)
   end
@@ -136,10 +136,10 @@ describe BoltServer::Config do
     }.to raise_error(Bolt::ValidationError, /You must configure/)
   end
 
-  it "errors when whitelist is not an array" do
+  it "errors when allowlist is not an array" do
     expect {
-      BoltServer::Config.new(base_config.merge('whitelist' => 'notanarray')).validate
-    }.to raise_error(Bolt::ValidationError, /Configured 'whitelist' must be an array of names/)
+      BoltServer::Config.new(base_config.merge('allowlist' => 'notanarray')).validate
+    }.to raise_error(Bolt::ValidationError, /Configured 'allowlist' must be an array of names/)
   end
 
   it "errors when ssl-cipher-suites is not an array" do

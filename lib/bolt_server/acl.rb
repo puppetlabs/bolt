@@ -16,9 +16,9 @@ module BoltServer
       end
     end
 
-    def initialize(app, whitelist)
+    def initialize(app, allowlist)
       acls = []
-      whitelist.each do |entry|
+      allowlist.each do |entry|
         acls << {
           'resources' => [
             {
