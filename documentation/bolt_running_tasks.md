@@ -73,13 +73,13 @@ bolt task run mymodule::mytask --targets app1.myorg.com --params $(@{load_balanc
 ## Specifying the module path
 
 In order for Bolt to find a task, the task must be in a module on the module
-path. The default modulepath is `[<project directory>/modules, <project
-directory>/site-modules]`.
+path. The default modulepath is `[<PROJECT DIRECTORY>/modules, <PROJECT
+DIRECTORY>/site-modules]`.
 
 The current [Bolt project](./experimental_features.md#bolt-projects) is loaded
 as a standalone module at the front of the module path.  If you are developing a
-new task, you can create a `<PROJECT_NAME>/bolt-project.yaml` file, develop your
-task in `<PROJECT_NAME>/tasks/`, and run Bolt from the root of your Bolt project
+new task, you can create a `<PROJECT DIRECTORY>/bolt-project.yaml` file, develop your
+task in `<PROJECT DIRECTORY>/tasks/`, and run Bolt from the root of your Bolt project
 directory to test the task. For more information, see [Bolt
 projects](projects.md).
 

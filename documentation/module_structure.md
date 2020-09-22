@@ -79,8 +79,8 @@ Follow these tips for managing standalone modules:
 -   When you run tasks and plans within a project directory the module path is
     searched in order for modules containing Bolt content. The Bolt project
     directory itself is loaded as a module at the front of the module path, and
-    the default module path is `[<project directory>/modules, <project
-    directory>/site-modules]`. If you have a module in both the `modules` and
+    the default module path is `[<PROJECT DIRECTORY>/modules, <PROJECT
+    DIRECTORY>/site-modules]`. If you have a module in both the `modules` and
     `site-modules` directories, the version in `modules` will be used.
 -   As a best practice, write automated tests for the tasks and plans in your
     module, if possible. For information about automated testing patterns, check

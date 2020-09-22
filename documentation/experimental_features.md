@@ -359,7 +359,7 @@ And the following plan names are invalid:
 Plan names that match the project name will create a special `init` plan.
 For example, if you have a project named `myproject` and run the command
 `bolt plan new myproject`, a plan will be created at
-`<project>/plans/init.yaml`.
+`<PROJECT DIRECTORY>/plans/init.yaml`.
 
 You can reference the `init` plan using the project's name. For example,
 you would run this plan using `bolt plan run myproject`.

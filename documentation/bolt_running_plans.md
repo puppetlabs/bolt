@@ -32,11 +32,11 @@ language](./writing_plans.md#targetspec).
 
 In order for Bolt to find a plan, the plan must be in a module on the module
 path. By default, Bolt looks for downloaded module plans in
-`<PROJECT_NAME>/modules/plans/` and local plans in
-`<PROJECT_NAME>/site-modules/plans/`.
+`<PROJECT DIRECTORY>/modules/plans/` and local plans in
+`<PROJECT DIRECTORY>/site-modules/plans/`.
 
-Using a Bolt project, you can create a `<PROJECT_NAME>/bolt-project.yaml` file,
-develop your plan in `<PROJECT_NAME>/plans/`, and run Bolt from the root of your
+Using a Bolt project, you can create a `<PROJECT DIRECTORY>/bolt-project.yaml` file,
+develop your plan in `<PROJECT DIRECTORY>/plans/`, and run Bolt from the root of your
 Bolt project directory to test the plan. For more information, see [Bolt
 projects](projects.md)
 
