@@ -30,19 +30,20 @@ require 'bolt/module_installer'
 module Bolt
   class CLIExit < StandardError; end
   class CLI
-    COMMANDS = { 'command' => %w[run],
-                 'script' => %w[run],
-                 'task' => %w[show run],
-                 'plan' => %w[show run convert new],
-                 'file' => %w[download upload],
-                 'puppetfile' => %w[install show-modules generate-types],
-                 'secret' => %w[encrypt decrypt createkeys],
-                 'inventory' => %w[show],
-                 'group' => %w[show],
-                 'project' => %w[init migrate],
-                 'apply' => %w[],
-                 'guide' => %w[],
-                 'module' => %w[add generate-types install show] }.freeze
+    COMMANDS = {
+      'command'    => %w[run],
+      'script'     => %w[run],
+      'task'       => %w[show run],
+      'plan'       => %w[show run convert new],
+      'file'       => %w[download upload],
+      'puppetfile' => %w[install show-modules generate-types],
+      'secret'     => %w[encrypt decrypt createkeys],
+      'inventory'  => %w[show],
+      'group'      => %w[show],
+      'project'    => %w[init migrate],
+      'apply'      => %w[],
+      'guide'      => %w[]
+    }.freeze
 
     attr_reader :config, :options
 
@@ -59,6 +60,14 @@ module Bolt
     end
     private :inventory
 
+    def commands
+      if ENV['BOLT_MODULE_FEATURE']
+        COMMANDS.merge('module' => %w[add generate-types install show])
+      else
+        COMMANDS
+      end
+    end
+
     def help?(remaining)
       # Set the subcommand
       options[:subcommand] = remaining.shift
@@ -70,7 +79,7 @@ module Bolt
 
       # This section handles parsing non-flag options which are
       # subcommand specific rather then part of the config
-      actions = COMMANDS[options[:subcommand]]
+      actions = commands[options[:subcommand]]
       if actions && !actions.empty?
         options[:action] = remaining.shift
       end
@@ -100,6 +109,10 @@ module Bolt
       # This part aims to handle both `bolt <mode> --help` and `bolt help <mode>`.
       remaining = handle_parser_errors { parser.permute(@argv) } unless @argv.empty?
       if @argv.empty? || help?(remaining)
+        # If the subcommand is not enabled, display the default
+        # help text
+        options[:subcommand] = nil unless commands.include?(options[:subcommand])
+
         # Update the parser for the subcommand (or lack thereof)
         parser.update
         puts parser.help
@@ -190,6 +203,10 @@ module Bolt
 
       warn_inventory_overrides_cli(options)
 
+      # Assert whether the puppetfile/module commands are available depending
+      # on whether 'modules' is configured.
+      assert_puppetfile_or_module_command(config.project.modules)
+
       options
     rescue Bolt::Error => e
       outputter.fatal_error(e)
@@ -217,17 +234,13 @@ module Bolt
     end
 
     def validate(options)
-      # Disables the 'module' subcommand unless the module feature flag is set.
-      commands = COMMANDS.dup
-      commands.delete('module') unless ENV['BOLT_MODULE_FEATURE']
-
       unless commands.include?(options[:subcommand])
         raise Bolt::CLIError,
               "Expected subcommand '#{options[:subcommand]}' to be one of " \
               "#{commands.keys.join(', ')}"
       end
 
-      actions = COMMANDS[options[:subcommand]]
+      actions = commands[options[:subcommand]]
       if actions.any?
         if options[:action].nil?
           raise Bolt::CLIError,
@@ -474,7 +487,11 @@ module Bolt
         when 'generate-types'
           code = generate_types
         when 'install'
-          code = install_puppetfile(config.puppetfile_config, config.puppetfile, config.modulepath.first)
+          code = install_puppetfile(
+            config.puppetfile_config,
+            config.puppetfile,
+            config.modulepath.first
+          )
         end
       when 'secret'
         code = Bolt::Secret.execute(plugins, outputter, options)
@@ -920,6 +937,24 @@ module Bolt
       installer = Bolt::ModuleInstaller.new(outputter, pal)
       ok = installer.install_puppetfile(puppetfile, moduledir, config)
       ok ? 0 : 1
+    end
+
+    # Raises an error if the 'puppetfile install' command is deprecated due to
+    # modules being configured.
+    #
+    def assert_puppetfile_or_module_command(modules)
+      if modules && options[:subcommand] == 'puppetfile'
+        raise Bolt::CLIError,
+              "Unable to use command 'bolt puppetfile #{options[:action]}' when "\
+              "'modules' is configured in bolt-project.yaml. Use the 'module' command "\
+              "instead. For a list of available actions for the 'module' command, run "\
+              "'bolt module --help'."
+      elsif modules.nil? && options[:subcommand] == 'module'
+        raise Bolt::CLIError,
+              "Unable to use command 'bolt module #{options[:action]}'. To use "\
+              "this command, update your project configuration to manage module "\
+              "dependencies."
+      end
     end
 
     def pal

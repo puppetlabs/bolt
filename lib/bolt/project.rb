@@ -16,9 +16,9 @@ module Bolt
                  "These tasks are included in `bolt task show` output"
     }.freeze
 
-    attr_reader :path, :data, :config_file, :inventory_file, :modulepath, :hiera_config,
+    attr_reader :path, :data, :config_file, :inventory_file, :hiera_config,
                 :puppetfile, :rerunfile, :type, :resource_types, :logs, :project_file,
-                :deprecations, :downloads, :plans_path, :managed_moduledir
+                :deprecations, :downloads, :plans_path, :modulepath, :managed_moduledir
 
     def self.default_project(logs = [])
       create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user', logs)
@@ -95,7 +95,6 @@ module Bolt
       end
 
       @inventory_file    = @path + 'inventory.yaml'
-      @modulepath        = [(@path + 'modules').to_s, (@path + 'site-modules').to_s, (@path + 'site').to_s]
       @hiera_config      = @path + 'hiera.yaml'
       @puppetfile        = @path + 'Puppetfile'
       @rerunfile         = @path + '.rerun.json'
@@ -112,6 +111,14 @@ module Bolt
       end
 
       @data = raw_data.reject { |k, _| Bolt::Config::INVENTORY_OPTIONS.include?(k) }
+
+      # If the 'modules' key is present in the project configuration file,
+      # use the new, shorter modulepath.
+      @modulepath = if @data.key?('modules') && ENV['BOLT_MODULE_FEATURE']
+                      [(@path + 'modules').to_s]
+                    else
+                      [(@path + 'modules').to_s, (@path + 'site-modules').to_s, (@path + 'site').to_s]
+                    end
 
       # Once bolt.yaml deprecation is removed, this attribute should be removed
       # and replaced with .project_file in lib/bolt/config.rb

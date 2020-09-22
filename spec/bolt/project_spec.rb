@@ -2,8 +2,11 @@
 
 require 'spec_helper'
 require 'bolt/project'
+require 'bolt_spec/project'
 
 describe Bolt::Project do
+  include BoltSpec::Project
+
   it "loads from system-wide config path if homedir expansion fails" do
     allow(File).to receive(:expand_path).and_call_original
     allow(File)
@@ -16,26 +19,21 @@ describe Bolt::Project do
   end
 
   describe "configuration" do
-    let(:pwd) { @tmpdir }
-    let(:config) { { 'tasks' => ['facts'] } }
+    let(:project_config) { { 'tasks' => ['facts'] } }
 
     around(:each) do |example|
-      Dir.mktmpdir("foo") do |tmpdir|
-        @tmpdir = Pathname.new(File.join(tmpdir, "validprojectname"))
-        FileUtils.mkdir_p(@tmpdir)
-        FileUtils.touch(@tmpdir + 'bolt-project.yaml')
+      with_project do
         example.run
       end
     end
 
     it "loads config with defaults" do
-      project = Bolt::Project.new(config, pwd)
-      expect(project.tasks).to eq(config['tasks'])
+      expect(project.tasks).to eq(project_config['tasks'])
       expect(project.plans).to eq(nil)
     end
 
     context 'with bolt config values' do
-      let(:config) {
+      let(:project_config) {
         {
           'concurrency' => 20,
           'transport' => 'ssh',
@@ -46,41 +44,36 @@ describe Bolt::Project do
       }
 
       it 'loads config' do
-        project = Bolt::Project.new(config, pwd)
         expect(project.data['concurrency']).to eq(20)
       end
 
       it "ignores transport config" do
-        project = Bolt::Project.new(config, pwd)
         expect(project.data.key?('ssh')).to be false
         expect(project.data.key?('transport')).to be false
       end
     end
 
     describe "with invalid tasks config" do
-      let(:config) { { 'tasks' => 'foo' } }
+      let(:project_config) { { 'tasks' => 'foo' } }
 
       it "raises an error" do
-        expect { Bolt::Project.new(config, pwd).validate }
-          .to raise_error(/'tasks' in bolt-project.yaml must be an array/)
+        expect { project.validate }.to raise_error(/'tasks' in bolt-project.yaml must be an array/)
       end
     end
 
     describe "with invalid name config" do
-      let(:config) { { 'name' => '_invalid' } }
+      let(:project_config) { { 'name' => '_invalid' } }
 
       it "raises an error" do
-        expect { Bolt::Project.new(config, pwd).validate }
-          .to raise_error(/Invalid project name '_invalid' in bolt-project.yaml/)
+        expect { project.validate }.to raise_error(/Invalid project name '_invalid' in bolt-project.yaml/)
       end
     end
 
     describe "with namespaced project names" do
-      let(:config) { { 'name' => 'puppetlabs-foo' } }
+      let(:project_config) { { 'name' => 'puppetlabs-foo' } }
 
       it "raises an error" do
-        expect { Bolt::Project.new(config, pwd).validate }
-          .to raise_error(/Invalid project name 'puppetlabs-foo' in bolt-project.yaml/)
+        expect { project.validate }.to raise_error(/Invalid project name 'puppetlabs-foo' in bolt-project.yaml/)
       end
     end
 
@@ -90,7 +83,7 @@ describe Bolt::Project do
           'modules' => {}
         }
 
-        expect { Bolt::Project.new(config, pwd).validate }
+        expect { Bolt::Project.new(config, project_path).validate }
           .to raise_error(Bolt::ValidationError)
       end
 
@@ -101,108 +94,90 @@ describe Bolt::Project do
           ]
         }
 
-        expect { Bolt::Project.new(config, pwd).validate }
+        expect { Bolt::Project.new(config, project_path).validate }
           .to raise_error(Bolt::ValidationError)
       end
     end
   end
 
   describe "::find_boltdir" do
-    let(:boltdir_path) { @tmpdir + 'foo' + 'Boltdir' }
-    let(:project) { Bolt::Project.new({}, boltdir_path) }
-
     around(:each) do |example|
-      Dir.mktmpdir do |tmpdir|
-        @tmpdir = Pathname.new(tmpdir)
-        FileUtils.mkdir_p(boltdir_path)
+      with_boltdir do
         example.run
       end
     end
 
     describe "when the project directory is named Boltdir" do
       it 'finds project from inside project' do
-        pwd = boltdir_path
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+        expect(Bolt::Project.find_boltdir(project_path)).to eq(project)
       end
 
       it 'finds project from the parent directory' do
-        pwd = boltdir_path.parent
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+        expect(Bolt::Project.find_boltdir(project_path.parent)).to eq(project)
       end
 
       it 'does not find project from the grandparent directory' do
-        pwd = boltdir_path.parent.parent
-        expect(Bolt::Project.find_boltdir(pwd)).not_to eq(project)
+        expect(Bolt::Project.find_boltdir(project_path.parent.parent)).not_to eq(project)
       end
 
       it 'finds the project from a sibling directory' do
-        pwd = boltdir_path.parent + 'bar'
-        FileUtils.mkdir_p(pwd)
+        sibling = project_path.parent + 'bar'
+        FileUtils.mkdir_p(sibling)
 
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+        expect(Bolt::Project.find_boltdir(sibling)).to eq(project)
       end
 
       it 'finds the project from a child directory' do
-        pwd = boltdir_path + 'baz'
-        FileUtils.mkdir_p(pwd)
+        child = project_path + 'baz'
+        FileUtils.mkdir_p(child)
 
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+        expect(Bolt::Project.find_boltdir(child)).to eq(project)
       end
     end
 
     describe "when using a control repo-style project" do
       it 'uses the current directory if it has a bolt.yaml' do
-        pwd = @tmpdir
-        FileUtils.touch(pwd + 'bolt.yaml')
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(Bolt::Project.new({}, pwd))
+        FileUtils.touch(tmpdir + 'bolt.yaml')
+        expect(Bolt::Project.find_boltdir(tmpdir)).to eq(Bolt::Project.new({}, tmpdir))
       end
 
       it 'ignores non-project children with bolt.yaml' do
-        pwd = @tmpdir
-        FileUtils.mkdir_p(pwd + 'bar')
-        FileUtils.touch(pwd + 'bar' + 'bolt.yaml')
+        FileUtils.mkdir_p(tmpdir + 'bar')
+        FileUtils.touch(tmpdir + 'bar' + 'bolt.yaml')
 
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(Bolt::Project.default_project)
+        expect(Bolt::Project.find_boltdir(tmpdir)).to eq(Bolt::Project.default_project)
       end
 
       it 'prefers a directory called Boltdir over the local directory' do
-        pwd = boltdir_path.parent
-        FileUtils.touch(pwd + 'bolt.yaml')
-
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+        FileUtils.touch(project_path.parent + 'bolt.yaml')
+        expect(Bolt::Project.find_boltdir(project_path.parent)).to eq(project)
       end
 
       it 'prefers a directory called Boltdir over the parent directory' do
-        pwd = boltdir_path.parent + 'bar'
-        FileUtils.mkdir_p(pwd)
-        FileUtils.touch(boltdir_path.parent + 'bolt.yaml')
-
-        expect(Bolt::Project.find_boltdir(pwd)).to eq(project)
+        sibling = project_path.parent + 'bar'
+        FileUtils.mkdir_p(sibling)
+        FileUtils.touch(project_path.parent + 'bolt.yaml')
+        expect(Bolt::Project.find_boltdir(sibling)).to eq(project)
       end
     end
 
     describe 'when setting a type' do
       it 'sets type to embedded when a project is used' do
-        pwd = boltdir_path.parent
-        expect(Bolt::Project.find_boltdir(pwd).type).to eq('embedded')
+        expect(Bolt::Project.find_boltdir(project_path.parent).type).to eq('embedded')
       end
 
       it 'sets type to local when a bolt.yaml is used' do
-        pwd = @tmpdir
-        FileUtils.touch(pwd + 'bolt.yaml')
-
-        expect(Bolt::Project.find_boltdir(pwd).type).to eq('local')
+        FileUtils.touch(tmpdir + 'bolt.yaml')
+        expect(Bolt::Project.find_boltdir(tmpdir).type).to eq('local')
       end
 
       it 'sets type to user when the default is used' do
-        pwd = @tmpdir
-        expect(Bolt::Project.find_boltdir(pwd).type).to eq('user')
+        expect(Bolt::Project.find_boltdir(tmpdir).type).to eq('user')
       end
     end
 
     it 'returns the default when no project is found' do
-      pwd = @tmpdir
-      expect(Bolt::Project.find_boltdir(pwd)).to eq(Bolt::Project.default_project)
+      expect(Bolt::Project.find_boltdir(tmpdir)).to eq(Bolt::Project.default_project)
     end
   end
 
@@ -237,6 +212,34 @@ describe Bolt::Project do
       expect(Bolt::Project).to receive(:new).with(anything, 'myproject', 'user',
                                                   [{ warn: /Could not create default project / }])
       Bolt::Project.create_project('myproject', 'user')
+    end
+  end
+
+  describe '#modulepath' do
+    let(:project_config) { { 'modules' => [] } }
+
+    around(:each) do |example|
+      with_project do
+        example.run
+      end
+    end
+
+    it 'returns the new default modulepath if modules is set' do
+      original = ENV['BOLT_MODULE_FEATURE']
+      ENV['BOLT_MODULE_FEATURE'] = 'true'
+
+      expect(project.modulepath).to match_array([(project_path + 'modules').to_s])
+    ensure
+      ENV['BOLT_MODULE_FEATURE'] = original
+    end
+
+    it 'returns the old default modulepath if modules is not set' do
+      delete_config
+      expect(project.modulepath).to match_array([
+                                                  (project_path + 'modules').to_s,
+                                                  (project_path + 'site-modules').to_s,
+                                                  (project_path + 'site').to_s
+                                                ])
     end
   end
 end

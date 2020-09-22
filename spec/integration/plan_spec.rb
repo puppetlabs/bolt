@@ -5,12 +5,14 @@ require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/project'
 require 'bolt_spec/puppet_agent'
 
 describe 'plans' do
   include BoltSpec::Integration
   include BoltSpec::Config
   include BoltSpec::Conn
+  include BoltSpec::Project
   include BoltSpec::PuppetAgent
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
@@ -23,6 +25,7 @@ describe 'plans' do
      '--no-host-key-check']
   }
   let(:target) { conn_uri('ssh', include_password: true) }
+  let(:project_config) { { 'modules' => [] } }
 
   context "When a plan succeeds" do
     it 'prints the result', ssh: true do
@@ -68,22 +71,33 @@ describe 'plans' do
     end
 
     context 'with puppet-agent installed for get_resources' do
-      before(:all) do
+      around(:each) do |example|
+        original = ENV['BOLT_MODULE_FEATURE']
+        ENV['BOLT_MODULE_FEATURE'] = 'true'
         install(conn_uri('ssh', include_password: true))
-      end
-
-      after(:all) do
-        # Remove .resource_types generated in project
+        example.run
+      ensure
+        ENV['BOLT_MODULE_FEATURE'] = original
         FileUtils.rm_rf(fixture_path('configs', '.resource_types'))
         uninstall(conn_uri('ssh', include_password: true))
       end
 
       it 'runs registers types defined in $project/.resource_types', ssh: true do
-        ENV['BOLT_MODULE_FEATURE'] = 'true'
         # generate types based and save in project (based on value of --configfile)
-        run_cli(%w[module generate-types] + config_flags)
+        run_cli(%w[puppetfile generate-types] + config_flags)
         result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)
         expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
+      end
+
+      it 'runs registers types defined in $project/.resource_types', ssh: true do
+        with_project do
+          config_flags = %W[--format json -m #{modulepath} --project #{project.path} --no-host-key-check]
+
+          # generate types based and save in project (based on value of --configfile)
+          run_cli(%w[module generate-types] + config_flags)
+          result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)
+          expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
+        end
       end
     end
   end
