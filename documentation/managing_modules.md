@@ -48,7 +48,7 @@ the `modules` key in your `bolt-project.yaml`, resolves the modules and their
 dependencies, generates a Puppetfile listing all of the modules to install, and
 then installs the modules.
 
-If your project needs another module, you can use the `bolt module add` command to add the module to your
+If your project needs another module, you can use Bolt to add the module to your
 project configuration, generate a new Puppetfile that includes the new module
 and its dependencies, and install the modules.
 
