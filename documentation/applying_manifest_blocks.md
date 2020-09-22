@@ -240,13 +240,15 @@ plan do_thing() {
 ```
 
 Manifest block compilation can access Hiera data that you add to your Bolt
-configuration. The default location for Hiera config is `$BOLTDIR/hiera.yaml`.
+configuration. The default location for Hiera config is `<project-directory>/hiera.yaml`.
 You can change this with the `hiera-config` key in a Bolt config file or the
 `--hiera-config` CLI option.
 
-Following the Hiera 5 convention, the default data dir is relative to
-`hiera.yaml` at `$BOLTDIR/data`. For configfile examples, see [Configuring
-Hiera](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html).
+Following the Hiera 5 convention, the default data directory is relative to
+`hiera.yaml` at `<project-directory>/data`. For configuration file examples, see [Configuring
+Hiera](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html). Bolt 
+will not automatically load any Hiera data from this directory. If you want to load data from a
+data file you must set the relevant paths in your Hiera config.
 
 If a custom data provider is used, such as `hiera-eyaml`, which allows you to
 encrypt your data, the gem dependencies must be available to Bolt. See [Install
