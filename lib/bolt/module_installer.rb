@@ -94,7 +94,7 @@ module Bolt
 
     # Installs a project's module dependencies.
     #
-    def install(modules, path, moduledir, force: false)
+    def install(modules, path, moduledir, force: false, resolve: true)
       require 'bolt/puppetfile'
 
       puppetfile = Bolt::Puppetfile.new(modules)
@@ -102,15 +102,20 @@ module Bolt
       # If the Puppetfile exists, check if it includes specs for each declared
       # module, erroring if there are any missing. Otherwise, resolve the
       # module dependencies and write a new Puppetfile. Users can forcibly
-      # overwrite an existing Puppetfile with the '--force' option.
-      if path.exist? && !force
-        assert_managed_puppetfile(puppetfile, path)
-      else
-        @outputter.print_message "Resolving module dependencies, this may take a moment"
-        puppetfile.resolve
+      # overwrite an existing Puppetfile with the '--force' option, or opt to
+      # install the Puppetfile as-is with --no-resolve.
+      #
+      # This is just if resolve is not false (nil should default to true)
+      if resolve != false
+        if path.exist? && !force
+          assert_managed_puppetfile(puppetfile, path)
+        else
+          @outputter.print_message "Resolving module dependencies, this may take a moment"
+          puppetfile.resolve
 
-        @outputter.print_message "Writing Puppetfile at #{path}"
-        puppetfile.write(path)
+          @outputter.print_message "Writing Puppetfile at #{path}"
+          puppetfile.write(path)
+        end
       end
 
       # Install the modules.
@@ -141,13 +146,17 @@ module Bolt
       unless existing_puppetfile.modules.superset? puppetfile.modules
         missing_modules = puppetfile.modules - existing_puppetfile.modules
 
-        raise Bolt::Error.new(
-          "Puppetfile #{path} is missing module specifications: "\
-          "#{missing_modules.to_a.join(', ')}. This may not be a Puppetfile "\
-          "managed by Bolt. To forcibly overwrite the Puppetfile and "\
-          "install modules, run 'bolt module install --force'.",
-          'bolt/missing-module-specs'
-        )
+        message = <<~MESSAGE.chomp
+          Puppetfile #{path} is missing specifications for the following
+          module declarations:
+
+          #{missing_modules.map(&:to_hash).to_yaml.lines.drop(1).join.chomp}
+          
+          This may not be a Puppetfile managed by Bolt. To forcibly overwrite the
+          Puppetfile, run 'bolt module install --force'.
+        MESSAGE
+
+        raise Bolt::Error.new(message, 'bolt/missing-module-specs')
       end
     end
   end
