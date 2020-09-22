@@ -1,5 +1,5 @@
 # Install gems
-FROM alpine:3.8 as build
+FROM alpine:3.12 as build
 
 RUN \
 apk --no-cache add build-base ruby-dev ruby-bundler ruby-json ruby-bigdecimal git openssl-dev linux-headers && \
@@ -13,7 +13,7 @@ WORKDIR /bolt-server
 RUN bundle install --no-cache --path vendor/bundle
 
 # Final image
-FROM alpine:3.8
+FROM alpine:3.12
 ARG bolt_version=no-version
 LABEL org.label-schema.maintainer="Puppet Bolt Team <team-direct-change-bolt@puppet.com>" \
       org.label-schema.vendor="Puppet" \
