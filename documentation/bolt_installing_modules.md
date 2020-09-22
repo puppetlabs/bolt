@@ -4,11 +4,17 @@ To share the Bolt plans and tasks that you've created on the Forge, you can
 package them into Puppet modules. If you'd like to use a plan or task from a
 module that you found on the Forge, you can use Bolt to install the module.
 
+## 🧪 New experimental module management
+
+**Experimental**: Bolt 2.30.0 introduced changes to how modules
+are managed in Bolt projects. To find out how to opt in to the changes, see
+[Managing modules](managing_modules.md).
+
 ## Create a new Bolt project and install a list of modules with dependencies
 
 If you want to get started with a new Bolt project and you need specific modules
 from the Puppet Forge, you can install the modules and their dependencies with
-the `bolt project init` command. 
+the `bolt project init` command.
 
 When you use `bolt project init` along with the `--modules` flag and a
 comma-separated list of Forge modules, Bolt installs the latest versions of each

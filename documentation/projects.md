@@ -9,25 +9,25 @@ way to share that content with other users in your organization. You can create
 orchestration that is specific to the infrastructure you're working with, and
 then commit the project directory to version control for others to consume.
 
-## Creating a Bolt project
-
 Bolt identifies a directory as a Bolt project as long as a `bolt-project.yaml`
 file exists at the root of the directory, and the `bolt-project.yaml` file
 contains a `name` key.
 
-To get started with a Bolt project:
-1. Create a `bolt-project.yaml` file in the root of your Bolt project directory.
-   This can be an existing directory, or a new one you make.
-2. Name your project by adding a `name` key to the top of `bolt-project.yaml`.
-   Project names can contain only lowercase letters, numbers, and underscores,
-   and begin with a lowercase letter. For example:
-   ```yaml
-   name: myproject
-   ```
-3. Develop your Bolt plans and tasks in `plans` and `tasks` directories in the
-   root of the project directory, next to `bolt-project.yaml`. Bolt loads tasks
-   and plans from the `tasks` and `plans` directories and namespaces them to the
-   project name.
+## Create a Bolt project
+
+To create a Bolt project:
+1. Create a directory for your Bolt project. To avoid having to specify a
+   project name in the next step, follow project naming conventions. Project
+   names can contain only lowercase letters, numbers, and underscores, and begin
+   with a lowercase letter. 
+2. Run `bolt project init`. Bolt creates a `bolt-project.yaml` file in your
+   project directory. At this point, the `bolt-project.yaml` only contains a
+   `name` key with the name of your project.
+
+Congratulations, you've created a Bolt project! 🎉 Develop your Bolt plans and
+tasks in `plans` and `tasks` directories in the root of the project directory,
+next to `bolt-project.yaml`. Bolt loads tasks and plans from the `tasks` and
+`plans` directories and namespaces them to the project name.
 
 Here is an example of a typical project with a task, a plan, and an inventory
 file:
@@ -111,7 +111,7 @@ The following are common files and directories found in a Bolt project.
 |[`plans/`](plans.md)|A directory for storing your plans.|
 |[`tasks/`](tasks.md)|A directory for storing your tasks.|
 |`files/`| A directory for storing content consumed by your tasks and plans, such as scripts.|
-|[`Puppetfile`](bolt_installing_modules.md#)|Specifies which modules to install for the project.|
+|[`Puppetfile`](bolt_installing_modules.md#)|Specifies which modules to install for the project. 🧪 **Experimental:** If you've opted in to the experimental module management workflows, Bolt manages this file. Avoid editing it. For more information, see [Managing modules](managing_modules.md).|
 |[`modules/`](bolt_installing_modules.md#)|The directory where modules from the `Puppetfile` are installed. In most cases, do not edit these modules locally.|
 |[`site-modules/`](bolt_installing_modules.md)|Local modules that are edited and versioned with the Bolt directory.|
 |[`manifests`](applying_manifest_blocks.md)|A directory for storing your Puppet code files, known as _manifests_.|
@@ -119,6 +119,7 @@ The following are common files and directories found in a Bolt project.
 |`data/`|The standard path to store static Hiera data files.|
 |`bolt-debug.log`|Contains debug log output for the most recent Bolt command.|
 |[`bolt.yaml`](bolt_configuration_reference.md)|Contains configuration options for Bolt. ⛔ **`bolt.yaml` is deprecated; use `bolt-project.yaml` instead.** |
+| `.modules/` | 🧪 **Experimental:** The directory where Bolt installs modules. Avoid committing this directory to source control. For more information, see [Managing modules](managing_modules.md).| 
 
 > **Remember:** A directory must have a `bolt-project.yaml` file before Bolt
 > recognizes it as a Bolt project.
@@ -203,6 +204,10 @@ information, see [Module structure](module_structure.md).
 
 > **Note:** When you're naming your modules or Bolt project, keep in mind that
 > projects take precedence over installed modules of the same name.
+
+🧪 **Experimental**: Bolt 2.30.0 introduced changes to how modules
+are managed in Bolt projects. To find out how to opt in to the changes, see
+[Managing modules](managing_modules.md).
 
 ## World-writable project directories
 

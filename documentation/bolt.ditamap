@@ -63,10 +63,15 @@
             </topicmeta>
         </topicref>
     </topicref>
-    <topicref href="modules.md" format="markdown">
+    <topicref href = "modules.md" format="markdown">
+        <topicref href="managing_modules.md" format="markdown">
+            <topicmeta>
+                <shortdesc>Install your modules and let Bolt manage your dependencies.</shortdesc>
+            </topicmeta>
+        </topicref> 
         <topicref href="bolt_installing_modules.md" format="markdown">
             <topicmeta>
-                <shortdesc>You can use Bolt to install a Forge module.</shortdesc>
+                <shortdesc>Install a Forge module with Bolt.</shortdesc>
             </topicmeta>
         </topicref>
         <topicref href="module_structure.md" format="markdown">
