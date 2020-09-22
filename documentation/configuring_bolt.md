@@ -53,7 +53,7 @@ a clear distinction between Bolt configuration and inventory configuration.
 
 ### `bolt-project.yaml`
 
-**Filepath:** `<project-directory>/bolt-project.yaml`
+**Filepath:** `<PROJECT DIRECTORY>/bolt-project.yaml`
 
 The project configuration file supports options that configure how Bolt behaves,
 such as how many threads it can use when running commands on targets. You can
@@ -71,7 +71,7 @@ options](bolt_project_reference.md).
 
 ### `inventory.yaml`
 
-**Filepath:** `<project-directory>/inventory.yaml`
+**Filepath:** `<PROJECT DIRECTORY>/inventory.yaml`
 
 The inventory file is a structured data file that contains groups of targets
 that you can run Bolt commands on, as well as configuration for the transports
@@ -97,7 +97,7 @@ fields](bolt_inventory_reference.md).
 future version of Bolt. Use `bolt-project.yaml` and `inventory.yaml` files
 instead.
 
-**Filepath:** `<project-directory>/bolt.yaml`
+**Filepath:** `<PROJECT DIRECTORY>/bolt.yaml`
 
 The Bolt configuration file can be used to set all available configuration
 options, including default inventory configuration options. Any directory

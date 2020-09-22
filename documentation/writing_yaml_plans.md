@@ -186,7 +186,7 @@ to a destination directory on the local host.
 Files and directories are downloaded to the destination directory within a
 subdirectory matching the target's URL-encoded safe name. If the destination
 directory is a relative path, it will expand relative to the project's
-downloads directory, `<project>/downloads`.
+downloads directory, `<PROJECT DIRECTORY>/downloads`.
 
 File download steps use these fields:
 
