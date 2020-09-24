@@ -811,33 +811,9 @@ plan pdb_discover {
 
 ## Plan logging
 
-Plan run information can be captured in log files or printed to a terminal
-session using the following methods.
-
-### Outputting message to the terminal
-
 Print message strings to `STDOUT` using the plan function `out::message`. This
 function always prints messages regardless of the log level and doesn't log them
 to the log file.
-
-### Puppet log functions
-
-To generate log messages from a plan, you can use Puppet's built-in log functions and configure
-your Bolt log level accordingly. Be aware that Bolt logs messages at slightly different levels than
-Puppet. Puppet log levels map to Bolt log levels in the following way:
-
-| Puppet log level | Bolt log level |
-| --- | --- |
-| `debug` | `trace` |
-| `info` | `debug` |
-| `notice` | `info` |
-| `warning` | `warn` |
-| `err` | `error` |
-
-Configure the log level for both log files and console logging in `bolt-project.yaml`. The default
-log level for both the console and log files is `warn`. Use the `--log-level debug` flag to set
-the console log level to `debug` for a single run.  For more information on configuring log
-levels, see [Logs](logs.md).
 
 ### Default action logging
 
@@ -879,6 +855,22 @@ not
 ```
 without_default_logging { run_command('echo hi', $targets) }
 ```
+
+For information on configuring log levels, see [Logs](logs.md).
+
+### Puppet log functions in Bolt
+
+You can use Puppet log functions in Bolt plans, but Bolt log levels do not map
+directly to Puppet log levels. For example, a `notice` function in a plan logs
+at the `info` level in Bolt. Log levels map as follows:
+
+| Puppet log level | Bolt log level |
+| --- | --- |
+| `debug` | `trace` |
+| `info` | `debug` |
+| `notice` | `info` |
+| `warning` | `warn` |
+| `err` | `error` |
 
 ## Documenting plans
 
