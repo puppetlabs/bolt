@@ -727,71 +727,80 @@ module Bolt
     end
 
     # Initializes a specified directory as a Bolt project and installs any modules
-    # specified by the user, along with their dependencies
+    # specified by the user, along with their dependencies.
+    #
     def initialize_project
       # Dir.pwd will return backslashes on Windows, but Pathname always uses
       # forward slashes to concatenate paths. This results in paths like
       # C:\User\Administrator/modules, which fail module install. This ensure
       # forward slashes in the cwd path.
-      dir = File.expand_path(Dir.pwd)
-      name = options[:object] || File.basename(dir)
-      if name !~ Bolt::Module::MODULE_NAME_REGEX
-        if options[:object]
-          raise Bolt::ValidationError, "The provided project name '#{name}' is invalid; "\
-            "project name must begin with a lowercase letter and can include lowercase "\
-            "letters, numbers, and underscores."
-        else
-          command = Bolt::Util.powershell? ? 'New-BoltProject -Name <NAME>' : 'bolt project init <NAME>'
-          raise Bolt::ValidationError, "The current directory name '#{name}' is an invalid "\
-            "project name. Please specify a name using '#{command}'."
-        end
-      end
-
+      dir        = File.expand_path(Dir.pwd)
       project    = Pathname.new(dir)
       old_config = project + 'bolt.yaml'
       config     = project + 'bolt-project.yaml'
       puppetfile = project + 'Puppetfile'
       moduledir  = project + 'modules'
+      name       = options[:object] || File.basename(dir)
 
-      # Warn the user if the project directory already exists. We don't error
-      # here since users might not have installed any modules yet. If both
-      # bolt.yaml and bolt-project.yaml exist, this will just warn about
-      # bolt-project.yaml and subsequent Bolt actions will warn about both files
-      # existing.
       if config.exist?
-        @logger.warn "Found existing project directory at #{project}. Skipping file creation."
+        if options[:modules]
+          raise Bolt::Error.new(
+            "Found existing project directory with #{config.basename} at #{project}, "\
+            "unable to initialize project with modules. To add modules to the project, "\
+            "run 'bolt module add <module>' instead.",
+            'bolt/existing-project-error'
+          )
+        else
+          raise Bolt::Error.new(
+            "Found existing project directory with #{config.basename} at #{project}, "\
+            "unable to initialize project.",
+            'bolt/existing-project-error'
+          )
+        end
       elsif old_config.exist?
-        @logger.warn "Found existing #{old_config.basename} at #{project}. "\
-                    "#{old_config.basename} is deprecated, please rename to #{config.basename}."
+        raise Bolt::Error.new(
+          "Found existing project directory with #{old_config.basename} at #{project}, "\
+          "unable to initialize project. #{old_config.basename} is deprecated. To "\
+          "update the project to current best practices, run 'bolt project migrate'.",
+          'bolt/existing-project-error'
+        )
+      elsif options[:modules] && puppetfile.exist?
+        raise Bolt::Error.new(
+          "Found existing Puppetfile at #{puppetfile}, unable to initialize project "\
+          "with modules.",
+          'bolt/existing-puppetfile-error'
+        )
+      elsif name !~ Bolt::Module::MODULE_NAME_REGEX
+        if options[:object]
+          raise Bolt::ValidationError,
+                "The provided project name '#{name}' is invalid; project name must "\
+                "begin with a lowercase letter and can include lowercase letters, "\
+                "numbers, and underscores."
+        else
+          raise Bolt::ValidationError,
+                "The current directory name '#{name}' is an invalid project name. "\
+                "Please specify a name using 'bolt project init <name>'."
+        end
       end
 
-      # If modules were specified, first check if there is already a Puppetfile
-      # at the project directory, erroring if there is. If there is no
-      # Puppetfile, install the specified modules. The module installer will
-      # resolve dependencies, generate a Puppetfile, and install the modules.
+      # If modules were specified, resolve and install first. We want to error
+      # early here and not initialize the project if the modules cannot be
+      # resolved and installed.
       if options[:modules]
-        if puppetfile.exist?
-          raise Bolt::CLIError,
-                "Found existing Puppetfile at #{puppetfile}, unable to initialize "\
-                "project with modules."
-        end
-
         installer = Bolt::ModuleInstaller.new(outputter, pal)
         installer.install(options[:modules], puppetfile, moduledir)
       end
 
-      # If either bolt.yaml or bolt-project.yaml exist, the user has already
-      # been warned and we can just finish project creation. Otherwise, create a
-      # bolt-project.yaml with the project name in it.
-      unless config.exist? || old_config.exist?
-        begin
-          content = { 'name' => name }
-          File.write(config.to_path, content.to_yaml)
-          outputter.print_message "Successfully created Bolt project at #{project}"
-        rescue StandardError => e
-          raise Bolt::FileError.new("Could not create bolt-project.yaml at #{project}: #{e.message}", nil)
-        end
+      data = { 'name' => name }
+      data['modules'] = options[:modules] || []
+
+      begin
+        File.write(config.to_path, data.to_yaml)
+      rescue StandardError => e
+        raise Bolt::FileError.new("Could not create bolt-project.yaml at #{project}: #{e.message}", nil)
       end
+
+      outputter.print_message "Successfully created Bolt project at #{project}"
 
       0
     end
