@@ -2,9 +2,9 @@
 
 require 'pathname'
 require 'spec_helper'
-require 'bolt/project_migrator/inventory'
+require 'bolt/project_manager/inventory_migrator'
 
-describe Bolt::ProjectMigrator::Inventory do
+describe Bolt::ProjectManager::InventoryMigrator do
   def migrate
     migrator.migrate(inventory_file, backup_dir)
   end
