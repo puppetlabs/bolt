@@ -195,7 +195,7 @@ module Bolt
         @stream.puts total_msg
       end
 
-      def print_table(results)
+      def print_table(results, padding_left = 0, padding_right = 3)
         # lazy-load expensive gem code
         require 'terminal-table'
 
@@ -205,8 +205,8 @@ module Bolt
             border_x: '',
             border_y: '',
             border_i: '',
-            padding_left: 0,
-            padding_right: 3,
+            padding_left: padding_left,
+            padding_right: padding_right,
             border_top: false,
             border_bottom: false
           }
@@ -306,9 +306,9 @@ module Bolt
       def print_module_list(module_list)
         module_list.each do |path, modules|
           if (mod = modules.find { |m| m[:internal_module_group] })
-            @stream.puts(mod[:internal_module_group])
+            @stream.puts(colorize(:cyan, mod[:internal_module_group]))
           else
-            @stream.puts(path)
+            @stream.puts(colorize(:cyan, path))
           end
 
           if modules.empty?
@@ -324,7 +324,7 @@ module Bolt
               [m[:name], version]
             end
 
-            print_table(module_info)
+            print_table(module_info, 2, 1)
           end
 
           @stream.write("\n")
