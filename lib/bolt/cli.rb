@@ -478,7 +478,7 @@ module Bolt
         when 'add'
           code = add_project_module(options[:object], config.project)
         when 'install'
-          code = install_project_modules(config.project, options[:force])
+          code = install_project_modules(config.project, options[:force], options[:resolve])
         when 'generate-types'
           code = generate_types
         end
@@ -888,7 +888,7 @@ module Bolt
 
     # Installs modules declared in the project configuration file.
     #
-    def install_project_modules(project, force)
+    def install_project_modules(project, force, resolve)
       assert_project_file(project)
 
       unless project.modules
@@ -899,7 +899,11 @@ module Bolt
 
       installer = Bolt::ModuleInstaller.new(outputter, pal)
 
-      ok = installer.install(project.modules, project.puppetfile, project.managed_moduledir, force: force)
+      ok = installer.install(project.modules,
+                             project.puppetfile,
+                             project.managed_moduledir,
+                             force: force,
+                             resolve: resolve)
       ok ? 0 : 1
     end
 
@@ -911,7 +915,11 @@ module Bolt
       modules   = project.modules || []
       installer = Bolt::ModuleInstaller.new(outputter, pal)
 
-      ok = installer.add(name, modules, project.puppetfile, project.managed_moduledir, project.project_file)
+      ok = installer.add(name,
+                         modules,
+                         project.puppetfile,
+                         project.managed_moduledir,
+                         project.project_file)
       ok ? 0 : 1
     end
 

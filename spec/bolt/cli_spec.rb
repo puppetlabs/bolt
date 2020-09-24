@@ -235,6 +235,16 @@ describe "Bolt::CLI" do
         expect(installer).to receive(:add)
         cli.execute(cli.parse)
       end
+
+      it 'passes force' do
+        cli = Bolt::CLI.new(%W[module add puppetlabs-yaml --project #{project} --force])
+
+        allow(installer).to receive(:install) do |*args|
+          expect(args).to include({ force: true })
+        end
+
+        cli.execute(cli.parse)
+      end
     end
 
     context 'install' do
@@ -251,6 +261,26 @@ describe "Bolt::CLI" do
 
       it 'runs' do
         expect(installer).to receive(:install)
+        cli.execute(cli.parse)
+      end
+
+      it 'installs project modules forcibly' do
+        cli = Bolt::CLI.new(%W[module install --project #{project} --force])
+
+        allow(installer).to receive(:install) do |*args|
+          expect(args).to include({ force: true, resolve: nil })
+        end
+
+        cli.execute(cli.parse)
+      end
+
+      it 'install modules from Puppetfile with resolving' do
+        cli = Bolt::CLI.new(%W[module install --project #{project} --no-resolve])
+
+        allow(installer).to receive(:install) do |*args|
+          expect(args).to include({ force: nil, resolve: false })
+        end
+
         cli.execute(cli.parse)
       end
     end

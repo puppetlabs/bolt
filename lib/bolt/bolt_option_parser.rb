@@ -67,13 +67,13 @@ module Bolt
       when 'module'
         case action
         when 'add'
-          { flags: OPTIONS[:global] + %w[configfile force project],
+          { flags: OPTIONS[:global] + %w[configfile project],
             banner: MODULE_ADD_HELP }
         when 'generate-types'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: MODULE_GENERATETYPES_HELP }
         when 'install'
-          { flags: OPTIONS[:global] + %w[configfile force project],
+          { flags: OPTIONS[:global] + %w[configfile force project resolve],
             banner: MODULE_INSTALL_HELP }
         when 'show'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
@@ -935,6 +935,13 @@ module Bolt
       end
       define('--tmpdir DIR', 'The directory to upload and execute temporary files on the target') do |tmpdir|
         @options[:tmpdir] = tmpdir
+      end
+
+      separator "\nMODULE OPTIONS"
+      define('--[no-]resolve',
+             'Use --no-resolve to install modules listed in the Puppetfile without resolving modules configured',
+             'in Bolt project configuration') do |resolve|
+        @options[:resolve] = resolve
       end
 
       separator "\nDISPLAY OPTIONS"
