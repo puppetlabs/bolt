@@ -251,6 +251,14 @@ describe "Bolt::CLI" do
       let(:command)        { %W[module install --project #{project}] }
       let(:project_config) { { 'modules' => [] } }
 
+      it 'errors with extra arguments' do
+        cli = Bolt::CLI.new(%W[module install puppetlabs-yaml --project #{project}])
+        expect { cli.parse }.to raise_error(
+          Bolt::CLIError,
+          /Invalid argument.*bolt module add/
+        )
+      end
+
       it 'does nothing if project config has no module declarations' do
         allow(project).to receive(:modules).and_return([])
         result = cli.execute(cli.parse)
