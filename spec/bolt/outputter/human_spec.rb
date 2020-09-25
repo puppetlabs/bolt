@@ -92,6 +92,21 @@ describe "Bolt::Outputter::Human" do
     TABLE
   end
 
+  it 'formats a modules with padding' do
+    modules = { "/modulepath" =>
+                [{ name: "boltlib", version: nil, internal_module_group: "Plan Language Modules" },
+                 { name: "ctrl", version: nil, internal_module_group: "Plan Language Modules" },
+                 { name: "dir", version: nil, internal_module_group: "Plan Language Modules" }] }
+    outputter.print_module_list(modules)
+    expect(output.string).to eq(<<~TABLE)
+    Plan Language Modules
+      boltlib   (built-in)
+      ctrl      (built-in)
+      dir       (built-in)
+
+    TABLE
+  end
+
   it "formats a task" do
     name = 'cinnamon_roll'
     files = [{ 'name' => 'cinnamon.rb',
