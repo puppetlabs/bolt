@@ -299,6 +299,28 @@ module Bolt
         raise Bolt::ValidationError, "path must be a String, received #{path.class} #{path}" unless path.is_a?(String)
         path.split(%r{[/\\]}).last
       end
+
+      # Prompts yes or no, returning true for yes and false for no.
+      #
+      def prompt_yes_no(prompt, outputter)
+        choices = {
+          'y'   => true,
+          'yes' => true,
+          'n'   => false,
+          'no'  => false
+        }
+
+        loop do
+          outputter.print_prompt("#{prompt} ([y]es/[n]o) ")
+          response = $stdin.gets.to_s.downcase.chomp
+
+          if choices.key?(response)
+            return choices[response]
+          else
+            outputter.print_prompt_error("Invalid response, must pick [y]es or [n]o")
+          end
+        end
+      end
     end
   end
 end

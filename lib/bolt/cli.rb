@@ -20,7 +20,7 @@ require 'bolt/logger'
 require 'bolt/outputter'
 require 'bolt/puppetdb'
 require 'bolt/plugin'
-require 'bolt/project_migrate'
+require 'bolt/project_migrator'
 require 'bolt/pal'
 require 'bolt/target'
 require 'bolt/version'
@@ -462,9 +462,7 @@ module Bolt
         when 'init'
           code = initialize_project
         when 'migrate'
-          inv = config.inventoryfile
-          path = config.project.path
-          code = Bolt::ProjectMigrate.new(path, outputter, inv).migrate_project
+          code = Bolt::ProjectMigrator.new(config, outputter).migrate
         end
       when 'plan'
         case options[:action]
