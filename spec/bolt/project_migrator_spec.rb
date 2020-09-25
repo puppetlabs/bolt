@@ -17,14 +17,9 @@ describe Bolt::ProjectMigrator do
   let(:modules_migrator)   { double('modules_migrator', migrate: true) }
 
   around :each do |example|
-    original = ENV['BOLT_MODULE_FEATURE']
-    ENV['BOLT_MODULE_FEATURE'] = 'true'
-
     with_project do
       example.run
     end
-  ensure
-    ENV['BOLT_MODULE_FEATURE'] = original
   end
 
   before(:each) do

@@ -177,7 +177,7 @@ namespace :schemas do
     require 'bolt/config'
 
     filepath    = File.expand_path('../schemas/bolt-project.schema.json', __dir__)
-    options     = Bolt::Config::BOLT_PROJECT_OPTIONS - ['modules']
+    options     = Bolt::Config::BOLT_PROJECT_OPTIONS
     definitions = Bolt::Config::Options::OPTIONS.slice(*options)
 
     properties = options.each_with_object({}) do |option, acc|

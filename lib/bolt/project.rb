@@ -116,7 +116,7 @@ module Bolt
 
       # If the 'modules' key is present in the project configuration file,
       # use the new, shorter modulepath.
-      @modulepath = if @data.key?('modules') && ENV['BOLT_MODULE_FEATURE']
+      @modulepath = if @data.key?('modules')
                       [(@path + 'modules').to_s]
                     else
                       [(@path + 'modules').to_s, (@path + 'site-modules').to_s, (@path + 'site').to_s]

@@ -72,12 +72,9 @@ describe 'plans' do
 
     context 'with puppet-agent installed for get_resources' do
       around(:each) do |example|
-        original = ENV['BOLT_MODULE_FEATURE']
-        ENV['BOLT_MODULE_FEATURE'] = 'true'
         install(conn_uri('ssh', include_password: true))
         example.run
       ensure
-        ENV['BOLT_MODULE_FEATURE'] = original
         FileUtils.rm_rf(fixture_path('configs', '.resource_types'))
         uninstall(conn_uri('ssh', include_password: true))
       end

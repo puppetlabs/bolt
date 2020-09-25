@@ -27,15 +27,10 @@ describe Bolt::ProjectMigrator::Modules do
   let(:migrator)       { described_class.new(outputter) }
 
   around(:each) do |example|
-    original = ENV['BOLT_MODULE_FEATURE']
-    ENV['BOLT_MODULE_FEATURE'] = 'true'
-
     Dir.mktmpdir(nil, Dir.pwd) do |tmpdir|
       @tmpdir = Pathname.new(tmpdir)
       example.run
     end
-  ensure
-    ENV['BOLT_MODULE_FEATURE'] = original
   end
 
   before(:each) do

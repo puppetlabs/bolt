@@ -41,6 +41,7 @@ module Bolt
       'inventory'  => %w[show],
       'group'      => %w[show],
       'project'    => %w[init migrate],
+      'module'     => %w[add generate-types install show],
       'apply'      => %w[],
       'guide'      => %w[]
     }.freeze
@@ -60,14 +61,6 @@ module Bolt
     end
     private :inventory
 
-    def commands
-      if ENV['BOLT_MODULE_FEATURE']
-        COMMANDS.merge('module' => %w[add generate-types install show])
-      else
-        COMMANDS
-      end
-    end
-
     def help?(remaining)
       # Set the subcommand
       options[:subcommand] = remaining.shift
@@ -79,7 +72,7 @@ module Bolt
 
       # This section handles parsing non-flag options which are
       # subcommand specific rather then part of the config
-      actions = commands[options[:subcommand]]
+      actions = COMMANDS[options[:subcommand]]
       if actions && !actions.empty?
         options[:action] = remaining.shift
       end
@@ -111,7 +104,7 @@ module Bolt
       if @argv.empty? || help?(remaining)
         # If the subcommand is not enabled, display the default
         # help text
-        options[:subcommand] = nil unless commands.include?(options[:subcommand])
+        options[:subcommand] = nil unless COMMANDS.include?(options[:subcommand])
 
         # Update the parser for the subcommand (or lack thereof)
         parser.update
@@ -234,13 +227,13 @@ module Bolt
     end
 
     def validate(options)
-      unless commands.include?(options[:subcommand])
+      unless COMMANDS.include?(options[:subcommand])
         raise Bolt::CLIError,
               "Expected subcommand '#{options[:subcommand]}' to be one of " \
-              "#{commands.keys.join(', ')}"
+              "#{COMMANDS.keys.join(', ')}"
       end
 
-      actions = commands[options[:subcommand]]
+      actions = COMMANDS[options[:subcommand]]
       if actions.any?
         if options[:action].nil?
           raise Bolt::CLIError,
