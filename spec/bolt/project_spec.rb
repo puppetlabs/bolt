@@ -53,6 +53,19 @@ describe Bolt::Project do
       end
     end
 
+    describe "with modules specified as strings and hashes" do
+      let(:project_config) {
+        { 'modules' => [
+          'puppetlabs-yaml',
+          { 'name' => 'puppetlabs-apache' }
+        ] }
+      }
+
+      it 'accepts string and hash input, and normalizes' do
+        expect(project.modules).to eq([{ "name" => "puppetlabs-yaml" }, { "name" => "puppetlabs-apache" }])
+      end
+    end
+
     describe "with invalid tasks config" do
       let(:project_config) { { 'tasks' => 'foo' } }
 
@@ -87,10 +100,10 @@ describe Bolt::Project do
           .to raise_error(Bolt::ValidationError)
       end
 
-      it 'errors if a module delcaration is not a hash' do
+      it 'errors if a module delcaration is not a hash or string' do
         config = {
           'modules' => [
-            'puppetlabs-yaml'
+            23
           ]
         }
 
