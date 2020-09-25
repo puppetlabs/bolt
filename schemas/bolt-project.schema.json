@@ -172,7 +172,10 @@
       "description": "A list of module dependencies for the project. Each dependency is a map of data specifying the module to install. To install the project's module dependencies, run the `bolt module install` command.",
       "type": "array",
       "items": {
-        "type": "object",
+        "type": [
+          "object",
+          "string"
+        ],
         "required": [
           "name"
         ],

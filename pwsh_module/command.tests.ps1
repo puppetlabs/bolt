@@ -34,7 +34,7 @@ Describe "test bolt module" {
 
     it "has the correct number of exported functions" {
       # should count of pwsh functions plus legacy `bolt` function
-      @($commands).Count | Should -Be 22
+      @($commands).Count | Should -Be 26
     }
   }
 }
@@ -235,6 +235,26 @@ Describe "test all bolt command examples" {
       $result | Should -Be 'bolt puppetfile show-modules'
     }
   }
+
+  Context "bolt module" {
+    It "bolt module add" {
+      $result = Add-BoltModule -M puppetlabs-yaml
+      $result | Should -Be "bolt module add 'puppetlabs-yaml'"
+    }
+    It "bolt module generate-types" {
+      $result = Register-BoltModuleTypes
+      $result | Should -Be 'bolt module generate-types'
+    }
+    It "bolt module install" {
+      $result = Install-BoltModule
+      $result | Should -Be 'bolt module install'
+    }
+    It "bolt module show" {
+      $result = Get-BoltModule
+      $result | Should -Be 'bolt module show'
+    }
+  }
+
 
   Context "bolt script" {
     It "bolt script run myscript.sh 'echo hello' --targets target1,target2" {
