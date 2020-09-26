@@ -254,12 +254,6 @@ module Bolt
         end
       end
 
-      if options[:subcommand] != 'file' && options[:subcommand] != 'script' &&
-         !options[:leftovers].empty?
-        raise Bolt::CLIError,
-              "Unknown argument(s) #{options[:leftovers].join(', ')}"
-      end
-
       if %w[task plan].include?(options[:subcommand]) && options[:action] == 'run'
         if options[:object].nil?
           raise Bolt::CLIError, "Must specify a #{options[:subcommand]} to run"
@@ -268,23 +262,6 @@ module Bolt
         unless options[:object] =~ /\A([a-z][a-z0-9_]*)?(::[a-z][a-z0-9_]*)*\Z/
           raise Bolt::CLIError,
                 "Invalid #{options[:subcommand]} '#{options[:object]}'"
-        end
-      end
-
-      if options[:boltdir] && options[:configfile]
-        raise Bolt::CLIError, "Only one of '--boltdir', '--project', or '--configfile' may be specified"
-      end
-
-      if options[:noop] &&
-         !(options[:subcommand] == 'task' && options[:action] == 'run') && options[:subcommand] != 'apply'
-        raise Bolt::CLIError,
-              "Option '--noop' may only be specified when running a task or applying manifest code"
-      end
-
-      if options[:env_vars]
-        unless %w[command script].include?(options[:subcommand]) && options[:action] == 'run'
-          raise Bolt::CLIError,
-                "Option '--env-var' may only be specified when running a command or script"
         end
       end
 
@@ -312,6 +289,34 @@ module Bolt
 
       if options[:subcommand] == 'module' && options[:action] == 'add' && !options[:object]
         raise Bolt::CLIError, "Must specify a module name."
+      end
+
+      if options[:subcommand] == 'module' && options[:action] == 'install' && options[:object]
+        raise Bolt::CLIError, "Invalid argument '#{options[:object]}'. To add a new module to "\
+                              "the project, run 'bolt module add #{options[:object]}'."
+      end
+
+      if options[:subcommand] != 'file' && options[:subcommand] != 'script' &&
+         !options[:leftovers].empty?
+        raise Bolt::CLIError,
+              "Unknown argument(s) #{options[:leftovers].join(', ')}"
+      end
+
+      if options[:boltdir] && options[:configfile]
+        raise Bolt::CLIError, "Only one of '--boltdir', '--project', or '--configfile' may be specified"
+      end
+
+      if options[:noop] &&
+         !(options[:subcommand] == 'task' && options[:action] == 'run') && options[:subcommand] != 'apply'
+        raise Bolt::CLIError,
+              "Option '--noop' may only be specified when running a task or applying manifest code"
+      end
+
+      if options[:env_vars]
+        unless %w[command script].include?(options[:subcommand]) && options[:action] == 'run'
+          raise Bolt::CLIError,
+                "Option '--env-var' may only be specified when running a command or script"
+        end
       end
 
       if options.key?(:debug) && options.key?(:log)
