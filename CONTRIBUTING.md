@@ -19,8 +19,13 @@ feature request, bug report, or docs change.
 ## Types of Improvements
 
 The Bolt ecosystem is extensible via Puppet modules such as those hosted on the
-[Forge](https://forge.puppet.com/). Many improvements to the Bolt plan ecosystem
-can be added there as new modules.
+[Forge](https://forge.puppet.com/). Many improvements to the Bolt ecosystem
+can be added there as new modules, including [Bolt
+tasks](https://puppet.com/docs/bolt/latest/writing_tasks.html), [Bolt
+plans](https://puppet.com/docs/bolt/latest/writing_yaml_plans.html), [inventory
+plugins](https://puppet.com/docs/bolt/latest/writing_plugins.html),
+and [Puppet functions](https://puppet.com/docs/puppet/latest/writing_custom_functions.html). Please
+consider if your use case can be solved with one of these tools before modifying Bolt itself.
 
 There are certain types of improvements that we believe make sense in Bolt
 itself:
@@ -30,20 +35,17 @@ itself:
   in the future they likely will be.
 * Core functionality we believe makes Bolt a better tool, such as the
   `aggregate` and `canary` plans included in `modules`.
-* New functions
-    * New core functions that use Bolt internals such as the Executor,
+* New core functions
+    * New functions that use Bolt internals such as the Executor,
       Applicator, or Inventory should live in bolt-modules/boltlib.
     * Other directories under bolt-modules are used to categorize Bolt's
       standard library functions.
 * New ways of interacting with plan progress and output, such as prompts to
   continue or output processors.
-* New inventory sources. This is experimental right now, but we're working
-  towards patterns for getting inventory into Bolt and how to refer to it from
-  within a plan.
 
 ## Pull Requests
 
-Pull requests are also welcome on GitHub: https://github.com/puppetlabs/bolt
+Pull requests are welcome on GitHub: https://github.com/puppetlabs/bolt
 
 As with other open-source projects managed by Puppet, you must digitally sign
 the Contributor License Agreement before we can accept your pull request:
@@ -74,6 +76,7 @@ https://cla.puppet.com
 1. Push your changes to your branch on your fork - `git push origin
    mybranchname`
 1. Open a PR against main at https://github.com/puppetlabs/bolt
+1. Ensure tests pass
 
 **If it's not your first PR:**
 1. Update from upstream:
@@ -85,6 +88,9 @@ https://cla.puppet.com
 1. Push your changes to your branch on your fork - `git push origin
    mybranchname`
 1. Open a PR against main at https://github.com/puppetlabs/bolt
+
+Once you've opened a PR the Bolt team will automatically be notified. We're a small team, but we do
+our best to review PRs in a timely manner.
 
 ## Installing Bolt
 
