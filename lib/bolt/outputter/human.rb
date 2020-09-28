@@ -55,9 +55,9 @@ module Bolt
           when :node_result
             print_result(event[:result]) if @verbose
           when :step_start
-            print_step_start(event) if plan_logging?
+            print_step_start(**event) if plan_logging?
           when :step_finish
-            print_step_finish(event) if plan_logging?
+            print_step_finish(**event) if plan_logging?
           when :plan_start
             print_plan_start(event)
           when :plan_finish

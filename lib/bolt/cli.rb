@@ -412,7 +412,7 @@ module Bolt
                                   inventory_version: inventory.version)
       end
 
-      analytics.screen_view(screen, screen_view_fields)
+      analytics.screen_view(screen, **screen_view_fields)
 
       case options[:action]
       when 'show'

@@ -13,9 +13,9 @@ module Bolt
       def handle_event(event)
         case event[:type]
         when :step_start
-          log_step_start(event)
+          log_step_start(**event)
         when :step_finish
-          log_step_finish(event)
+          log_step_finish(**event)
         when :plan_start
           log_plan_start(event)
         when :plan_finish

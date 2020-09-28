@@ -227,7 +227,7 @@ module Bolt
         data[:resource_mean] = sum / resource_counts.length
       end
 
-      @analytics&.event('Apply', 'ast', data)
+      @analytics&.event('Apply', 'ast', **data)
     end
 
     def report_yaml_plan(plan)
