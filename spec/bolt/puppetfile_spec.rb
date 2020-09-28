@@ -82,18 +82,7 @@ describe Bolt::Puppetfile do
       it 'errors' do
         expect { puppetfile.resolve }.to raise_error(
           Bolt::Error,
-          /Unknown modules.*puppetlabs-boltymcboltface/m
-        )
-      end
-    end
-
-    context 'with unknown module dependencies' do
-      let(:modules) { [{ 'name' => 'aursu-kubeinstall', 'version_requirement' => '0.2.1' }] }
-
-      it 'errors' do
-        expect { puppetfile.resolve }.to raise_error(
-          Bolt::Error,
-          %r{Unknown module dependencies.*aursu/dockerinstall}m
+          /Unknown module name/
         )
       end
     end
