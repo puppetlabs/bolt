@@ -174,7 +174,13 @@ module Bolt
     end
 
     def modules
-      @data['modules']
+      @modules ||= @data['modules']&.map do |mod|
+        if mod.is_a?(String)
+          { 'name' => mod }
+        else
+          mod
+        end
+      end
     end
 
     def validate
@@ -205,11 +211,11 @@ module Bolt
         end
 
         @data['modules'].each do |mod|
-          next if mod.is_a?(Hash) && mod.key?('name')
+          next if (mod.is_a?(Hash) && mod.key?('name')) || mod.is_a?(String)
           raise Bolt::ValidationError, "Module declaration #{mod.inspect} must be a hash with a name key"
         end
 
-        unknown_keys = data['modules'].flat_map(&:keys).uniq - %w[name version_requirement]
+        unknown_keys = modules.flat_map(&:keys).uniq - %w[name version_requirement]
         if unknown_keys.any?
           @logs << { warn: "Ignoring unknown keys in module declarations: #{unknown_keys.join(', ')}." }
         end

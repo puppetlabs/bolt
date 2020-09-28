@@ -233,7 +233,7 @@ module Bolt
                        "install` command.",
           type: Array,
           items: {
-            type: Hash,
+            type: [Hash, String],
             required: ["name"],
             properties: {
               "name" => {
@@ -250,6 +250,7 @@ module Bolt
           _plugin: false,
           _example: [
             { "name" => "puppetlabs-mysql" },
+            "puppetlabs-facts",
             { "name" => "puppetlabs-apache", "version_requirement" => "5.5.0" },
             { "name" => "puppetlabs-puppetdb", "version_requirement" => "7.x" },
             { "name" => "puppetlabs-firewall", "version_requirement" => ">= 1.0.0 < 3.0.0" }
