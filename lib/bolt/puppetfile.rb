@@ -111,23 +111,7 @@ module Bolt
       end
 
       # Validate that the modules exist.
-      missing_graph = result.specifications.select do |_name, spec|
-        spec.instance_of? PuppetfileResolver::Models::MissingModuleSpecification
-      end
-
-      if missing_graph.any?
-        titles = model.modules.each_with_object({}) do |mod, acc|
-          acc[mod.name] = mod.title
-        end
-
-        names = titles.values_at(*missing_graph.keys)
-        plural = names.count == 1 ? '' : 's'
-
-        raise Bolt::Error.new(
-          "Unknown module name#{plural} #{names.join(', ')}",
-          'bolt/unknown-modules'
-        )
-      end
+      assert_missing_modules(result.specifications)
 
       # Filter the dependency graph to only include module specifications. This
       # will only remove the Puppet version specification, which is not needed.
@@ -155,6 +139,68 @@ module Bolt
       end
 
       @modules
+    end
+
+    # Checks for any missing dependencies, raising an error if there
+    # are any.
+    #
+    private def assert_missing_modules(specifications)
+      missing_graph = specifications.select do |_name, spec|
+        spec.instance_of? PuppetfileResolver::Models::MissingModuleSpecification
+      end
+
+      return if missing_graph.empty?
+
+      # Maps the names of dependencies to their dependees. The graph only
+      # provides the name for a missing module (i.e. no owner), so use the name
+      # as the key. This will then map that to a hash containing the module's
+      # title (i.e. with owner) and the set of dependees for the module.
+      dependencies = specifications.each_with_object({}) do |(_name, spec), deps|
+        next unless spec.instance_of? PuppetfileResolver::Models::ModuleSpecification
+
+        spec.metadata(nil, nil).fetch(:dependencies, []).each do |dep|
+          _, name = dep[:name].tr('/', '-').split('-', 2)
+
+          deps[name] ||= {
+            title:     dep[:name],
+            dependees: Set.new
+          }
+
+          deps[name][:dependees] << "#{spec.owner}-#{spec.name}"
+        end
+      end
+
+      # Make a split between missing dependencies and missing modules. The
+      # former are modules that are listed in another module's dependencies,
+      # while the latter are those defined by the user.
+      missing_dependencies, missing_modules = missing_graph.partition do |name, _spec|
+        dependencies.key?(name)
+      end.map(&:to_h)
+
+      # Build the error message.
+      message = String.new("Unknown modules, unable to resolve\n\n")
+
+      if missing_modules.any?
+        message << "  Unknown modules:\n"
+
+        missing_modules.each_key do |name|
+          title = @modules.select { |mod| mod.name == name }.first.title
+          message << "    #{title}\n"
+        end
+
+        message << "\n"
+      end
+
+      if missing_dependencies.any?
+        message << "  Unknown module dependencies:\n"
+
+        missing_dependencies.each_key do |mod|
+          message << "    #{dependencies.dig(mod, :title)} which is a dependency of "\
+                     "#{dependencies.dig(mod, :dependees).to_a.join(', ')}\n"
+        end
+      end
+
+      raise Bolt::Error.new(message.chomp, 'bolt/missing-modules-error')
     end
   end
 end
