@@ -292,6 +292,20 @@ plan plan_lookup(
 }
 ```
 
+## Puppet log functions in Bolt
+
+You can use Puppet log functions in Bolt plans, but Bolt log levels do not map
+directly to Puppet log levels. For example, a `notice` function in a plan logs
+at the `info` level in Bolt. Log levels map as follows:
+
+| Puppet log level | Bolt log level |
+| --- | --- |
+| `debug` | `trace` |
+| `info` | `debug` |
+| `notice` | `info` |
+| `warning` | `warn` |
+| `err` | `error` |
+
 📖 **Related information**  
 
 - [Configuring Bolt](configuring_bolt.md)
