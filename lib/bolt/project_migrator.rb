@@ -36,7 +36,7 @@ module Bolt
       if ok
         @outputter.print_message("Project successfully migrated")
       else
-        @outputter.print_message("Project could not be migrated completely")
+        @outputter.print_error("Project could not be migrated completely")
       end
 
       ok ? 0 : 1

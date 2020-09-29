@@ -9,7 +9,13 @@ describe Bolt::ProjectMigrator do
   include BoltSpec::Project
 
   let(:config)    { Bolt::Config.from_project(project) }
-  let(:outputter) { double('outputter', print_message: nil, print_migrate_step: nil, print_prompt: nil) }
+  let(:outputter) {
+    double('outputter',
+           print_message: nil,
+           print_migrate_step: nil,
+           print_prompt: nil,
+           print_error: nil)
+  }
 
   let(:migrator)           { described_class.new(config, outputter) }
   let(:config_migrator)    { double('config_migrator', migrate: true) }
