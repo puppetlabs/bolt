@@ -99,7 +99,7 @@ in the following order:
 
 Like the code compiled with the `puppet apply` command, all of the variables are
 generated. As a result, you can reuse code between Bolt and Puppet. Bolt then
-copies custom module content from the module path to the targets and applies the
+copies custom module content from the modulepath to the targets and applies the
 catalog using Puppet.
 
 After the catalog compiles and is executed successfully on all targets, `bolt
@@ -188,7 +188,7 @@ in the following order:
 
 Like the code compiled with the `puppet apply` command, all the variables are
 generated. As a result, you can reuse code between Bolt and Puppet. Bolt then
-copies custom module content from the Bolt module path to the targets and
+copies custom module content from the Bolt modulepath to the targets and
 applies the catalog using Puppet.
 
 After the catalog compiles and is executed successfully on all targets, `apply`
@@ -362,7 +362,7 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
        ) {
 
          # Install the puppet-agent package if Puppet is not detected.
-         # Copy over custom facts from the Bolt module path.
+         # Copy over custom facts from the Bolt modulepath.
          # Run the `facter` command line tool to gather target information.
          $targets.apply_prep
 
@@ -449,7 +449,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
        ) {
 
          # Install the puppet-agent package if Puppet is not detected. 
-         # Copy over custom facts from the Bolt module path.
+         # Copy over custom facts from the Bolt modulepath.
          # Run the `facter` command line tool to gather target information.
          $targets.apply_prep
 

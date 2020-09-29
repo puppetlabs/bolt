@@ -441,7 +441,7 @@ module Bolt
     # Returns a mapping of all modules available to the Bolt compiler
     #
     # @return [Hash{String => Array<Hash{Symbol => String,nil}>}]
-    #   A hash that associates each directory on the module path with an array
+    #   A hash that associates each directory on the modulepath with an array
     #   containing a hash of information for each module in that directory.
     #   The information hash provides the name, version, and a string
     #   indicating whether the module belongs to an internal module group.

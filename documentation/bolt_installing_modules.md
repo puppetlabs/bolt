@@ -80,14 +80,14 @@ This list of packaged modules is available in a
 Bolt repository. The modules and supporting documentation are publicly available
 on the [Puppet Forge](https://forge.puppet.com/). 
 
-> 🔩 **Tip:** To see a list of all modules on your current module path, use
+> 🔩 **Tip:** To see a list of all modules on your current modulepath, use
 > `bolt puppetfile show-modules`.
 
-Modules installed on your module path take precedence over packaged modules with
+Modules installed on your modulepath take precedence over packaged modules with
 the same name. If you need to use a specific version of a packaged module, you
 can override the packaged version by installing the module into your `modules/`
-directory. If you’ve altered the module path in your Bolt configuration, and you
-want to override a packaged module, your altered module path must include the
+directory. If you’ve altered the modulepath in your Bolt configuration, and you
+want to override a packaged module, your altered modulepath must include the
 directory where you’ve installed the module.
 
 **Note:** If you installed Bolt as a Ruby Gem, make sure you have installed
