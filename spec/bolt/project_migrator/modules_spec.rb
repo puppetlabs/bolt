@@ -131,6 +131,30 @@ describe Bolt::ProjectMigrator::Modules do
       expect(data['modulepath']).to be(nil)
     end
 
+    context 'with a non-versioned module' do
+      let(:puppetfile_content) { "mod 'puppetlabs-yaml'" }
+
+      it 'does not set a version requirement' do
+        expect(migrate).to be(true)
+        data = Bolt::Util.read_yaml_hash(project.project_file, 'project')
+        expect(data['modules']).to match_array([
+                                                 { 'name' => 'puppetlabs-yaml' }
+                                               ])
+      end
+    end
+
+    context 'with a :latest version module' do
+      let(:puppetfile_content) { "mod 'puppetlabs-yaml', :latest" }
+
+      it 'does not set a version requirement' do
+        expect(migrate).to be(true)
+        data = Bolt::Util.read_yaml_hash(project.project_file, 'project')
+        expect(data['modules']).to match_array([
+                                                 { 'name' => 'puppetlabs-yaml' }
+                                               ])
+      end
+    end
+
     context 'without any managed modules' do
       before(:each) do
         allow(Bolt::Util).to receive(:prompt_yes_no).and_return(false)

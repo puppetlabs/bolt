@@ -13,6 +13,11 @@ describe Bolt::Puppetfile::Module do
     it 'does not require a version' do
       expect(described_class.new('owner', 'name')).to be
     end
+
+    it 'does not set version if version is :latest' do
+      mod = described_class.new('owner', 'name', :latest)
+      expect(mod.version).to be(nil)
+    end
   end
 
   context '#from_hash' do
@@ -98,12 +103,6 @@ describe Bolt::Puppetfile::Module do
     it 'returns a Puppetfile module spec' do
       expect(described_class.new('owner', 'name', '1.0.0').to_spec).to eq(
         'mod "owner-name", "1.0.0"'
-      )
-    end
-
-    it 'returns a Puppetfile module spec with :latest' do
-      expect(described_class.new('owner', 'name', :latest).to_spec).to eq(
-        'mod "owner-name", :latest'
       )
     end
 
