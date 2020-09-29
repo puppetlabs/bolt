@@ -104,40 +104,18 @@ module Bolt
           cache:                 nil,
           ui:                    nil,
           module_paths:          [],
-          allow_missing_modules: true
+          allow_missing_modules: false
         )
       rescue StandardError => e
         raise Bolt::Error.new(e.message, 'bolt/puppetfile-resolver-error')
       end
 
-      # Validate that the modules exist.
-      missing_graph = result.specifications.select do |_name, spec|
-        spec.instance_of? PuppetfileResolver::Models::MissingModuleSpecification
+      # Turn specifications into module objects. This will skip over anything that is not
+      # a module specification (i.e. a Puppet version specification).
+      @modules = result.specifications.each_with_object(Set.new) do |(_name, spec), acc|
+        next unless spec.instance_of? PuppetfileResolver::Models::ModuleSpecification
+        acc << Bolt::Puppetfile::Module.new(spec.owner, spec.name, spec.version.to_s)
       end
-
-      if missing_graph.any?
-        titles = model.modules.each_with_object({}) do |mod, acc|
-          acc[mod.name] = mod.title
-        end
-
-        names = titles.values_at(*missing_graph.keys)
-        plural = names.count == 1 ? '' : 's'
-
-        raise Bolt::Error.new(
-          "Unknown module name#{plural} #{names.join(', ')}",
-          'bolt/unknown-modules'
-        )
-      end
-
-      # Filter the dependency graph to only include module specifications. This
-      # will only remove the Puppet version specification, which is not needed.
-      specs = result.specifications.select do |_name, spec|
-        spec.instance_of? PuppetfileResolver::Models::ModuleSpecification
-      end
-
-      @modules = specs.map do |_name, spec|
-        Bolt::Puppetfile::Module.new(spec.owner, spec.name, spec.version.to_s)
-      end.to_set
     end
 
     # Adds to the set of modules.

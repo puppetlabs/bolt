@@ -82,7 +82,18 @@ describe Bolt::Puppetfile do
       it 'errors' do
         expect { puppetfile.resolve }.to raise_error(
           Bolt::Error,
-          /Unknown module name/
+          /could not find compatible versions for possibility named "boltymcboltface"/m
+        )
+      end
+    end
+
+    context 'with unknown module dependencies' do
+      let(:modules) { [{ 'name' => 'aursu-kubeinstall', 'version_requirement' => '0.2.1' }] }
+
+      it 'errors' do
+        expect { puppetfile.resolve }.to raise_error(
+          Bolt::Error,
+          /could not find compatible versions for possibility named "dockerinstall"/
         )
       end
     end
