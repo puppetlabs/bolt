@@ -13,7 +13,7 @@ module Bolt
       def initialize(owner, name, version = nil)
         @owner   = owner
         @name    = name
-        @version = version
+        @version = version unless version == :latest
       end
 
       # Creates a new module from a hash.
