@@ -301,7 +301,7 @@ namespace :pwsh do
           when 'transport'
             pwsh_param[:validate_set] = Bolt::Config::Options::TRANSPORT_CONFIG.keys
           when 'loglevel'
-            pwsh_param[:validate_set] = %w[debug info notice warn error fatal any]
+            pwsh_param[:validate_set] = %w[trace debug info notice warn error fatal any]
           when 'filter'
             pwsh_param[:validate_pattern] = '^[a-z0-9_:]+$'
           when 'targets'
