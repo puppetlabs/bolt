@@ -51,6 +51,7 @@ modules/python_task_helper
 modules/reboot
 modules/ruby_task_helper
 modules/service
+modules/stdlib
 
 modules/augeas_core/
 modules/cron_core/
