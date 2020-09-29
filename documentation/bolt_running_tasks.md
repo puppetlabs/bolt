@@ -70,14 +70,14 @@ To pass JSON values in PowerShell without worrying about escaping, use
 bolt task run mymodule::mytask --targets app1.myorg.com --params $(@{load_balancers=@("lb1.myorg.com","lb2.myorg.com")} | ConvertTo-Json)
 ```
 
-## Specifying the module path
+## Specifying the modulepath
 
 In order for Bolt to find a task, the task must be in a module on the module
 path. The default modulepath is `[<PROJECT DIRECTORY>/modules, <PROJECT
 DIRECTORY>/site-modules]`.
 
 The current [Bolt project](./experimental_features.md#bolt-projects) is loaded
-as a standalone module at the front of the module path.  If you are developing a
+as a standalone module at the front of the modulepath.  If you are developing a
 new task, you can create a `<PROJECT DIRECTORY>/bolt-project.yaml` file, develop your
 task in `<PROJECT DIRECTORY>/tasks/`, and run Bolt from the root of your Bolt project
 directory to test the task. For more information, see [Bolt

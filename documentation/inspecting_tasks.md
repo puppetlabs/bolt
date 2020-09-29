@@ -15,7 +15,7 @@ bolt task run package name=vim action=install --noop -n example.com
 
 ## Show a task list
 
-View a list of what tasks are installed in the current module path. Note that
+View a list of what tasks are installed in the current modulepath. Note that
 tasks marked with the `private` metadata key are not shown:
 
 ```

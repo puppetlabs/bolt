@@ -177,7 +177,7 @@ describe "Bolt::Outputter::Human" do
     TASK_OUTPUT
   end
 
-  it 'prints module path as builtin for builtin modules' do
+  it 'prints modulepath as builtin for builtin modules' do
     name = 'monkey_bread'
     files = [{ 'name' => 'monkey_bread.rb',
                'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }]

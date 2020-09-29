@@ -40,7 +40,7 @@ module BoltSpec
 
       def module_file_id(file)
         modpath = @modulepath.select { |path| file =~ /^#{path}/ }
-        raise "Could not identify module path containing #{file}: #{modpath}" unless modpath.size == 1
+        raise "Could not identify modulepath containing #{file}: #{modpath}" unless modpath.size == 1
 
         path = Pathname.new(file)
         relative = path.relative_path_from(Pathname.new(modpath.first))
