@@ -49,7 +49,7 @@ module Bolt
           @outputter.print_migrate_step("Parsing Puppetfile at #{puppetfile_path}")
           puppetfile = Bolt::Puppetfile.parse(puppetfile_path, skip_unsupported_modules: true)
         rescue Bolt::Error => e
-          @outputter.print_migrate_step("#{e.message} Skipping module migration.")
+          @outputter.print_migrate_error("#{e.message}\nSkipping module migration.")
           return false
         end
 
@@ -65,7 +65,7 @@ module Bolt
           @outputter.print_migrate_step("Resolving module dependencies, this may take a moment")
           puppetfile.resolve
         rescue Bolt::Error => e
-          @outputter.print_migrate_step("#{e.message} Skipping module migration.")
+          @outputter.print_migrate_error("#{e.message}\nSkipping module migration.")
           return false
         end
 

@@ -423,6 +423,19 @@ module Bolt
         @stream.puts(step)
       end
 
+      def print_migrate_error(error)
+        # Running everything through 'wrap' messes with newlines. Separating
+        # into lines and wrapping each individually ensures separate errors are
+        # distinguishable.
+        first, *remaining = error.lines
+        first = colorize(:red, indent(2, "→ #{wrap(first, 76)}"))
+        wrapped = remaining.map { |l| wrap(l) }
+        to_print = wrapped.map { |line| colorize(:red, indent(4, line)) }
+        step = [first, *to_print, "\n"].join
+
+        @stream.puts(step)
+      end
+
       def duration_to_string(duration)
         hrs = (duration / 3600).floor
         mins = ((duration % 3600) / 60).floor
