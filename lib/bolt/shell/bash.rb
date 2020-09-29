@@ -143,7 +143,7 @@ module Bolt
 
             execute_options[:stdin] = stdin
             execute_options[:sudoable] = true if run_as
-            output = execute(remote_task_path, execute_options)
+            output = execute(remote_task_path, **execute_options)
           end
           Bolt::Result.for_task(target, output.stdout.string,
                                 output.stderr.string,

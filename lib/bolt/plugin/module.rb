@@ -16,7 +16,7 @@ module Bolt
         mod = modules[name]
         if mod&.plugin?
           opts[:mod] = mod
-          plugin = Bolt::Plugin::Module.new(opts)
+          plugin = Bolt::Plugin::Module.new(**opts)
           plugin.setup
           plugin
         else

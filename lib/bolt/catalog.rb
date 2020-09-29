@@ -97,7 +97,7 @@ module Bolt
       }
 
       with_puppet_settings(puppet_settings) do
-        Puppet::Pal.in_tmp_environment('bolt_catalog', env_conf) do |pal|
+        Puppet::Pal.in_tmp_environment('bolt_catalog', **env_conf) do |pal|
           Puppet.override(puppet_overrides) do
             Puppet.lookup(:pal_current_node).trusted_data = target['trusted']
             pal.with_catalog_compiler do |compiler|
