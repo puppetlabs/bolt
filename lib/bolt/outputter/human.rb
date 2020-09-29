@@ -401,6 +401,10 @@ module Bolt
         @stream.puts(message)
       end
 
+      def print_error(message)
+        @stream.puts(colorize(:red, message))
+      end
+
       def print_prompt(prompt)
         @stream.print(colorize(:cyan, indent(4, prompt)))
       end

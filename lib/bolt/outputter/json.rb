@@ -135,6 +135,7 @@ module Bolt
       def print_message(message)
         $stderr.puts(message)
       end
+      alias print_error print_message
 
       def print_migrate_step(step)
         $stderr.puts(step)

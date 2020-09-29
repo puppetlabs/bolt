@@ -35,6 +35,10 @@ module Bolt
       raise NotImplementedError, "print_message() must be implemented by the outputter class"
     end
 
+    def print_error
+      raise NotImplementedError, "print_error() must be implemented by the outputter class"
+    end
+
     def stringify(message)
       formatted = format_message(message)
       if formatted.is_a?(Hash) || formatted.is_a?(Array)
