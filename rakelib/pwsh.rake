@@ -9,6 +9,7 @@ namespace :pwsh do
   task :generate_module do
     # https://docs.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7
     @pwsh_verbs = {
+      'add'        => 'Add',
       'apply'      => 'Invoke',
       'convert'    => 'Convert',
       'createkeys' => 'New',
@@ -25,17 +26,21 @@ namespace :pwsh do
     }
 
     @hardcoded_cmdlets = {
-      'createkeys' => {
+      'secret:createkeys' => {
         'verb' => 'New',
         'noun' => 'BoltSecretKey'
       },
-      'show-modules' => {
+      'puppetfile:show-modules' => {
         'verb' => 'Get',
         'noun' => 'BoltPuppetfileModules'
       },
-      'generate-types' => {
+      'puppetfile:generate-types' => {
         'verb' => 'Register',
         'noun' => 'BoltPuppetfileTypes'
+      },
+      'module:generate-types' => {
+        'verb' => 'Register',
+        'noun' => 'BoltModuleTypes'
       }
     }
 
@@ -47,9 +52,7 @@ namespace :pwsh do
     Bolt::CLI::COMMANDS.each do |subcommand, actions|
       # The 'bolt guide' command is handled by PowerShell's help system, so
       # don't create a cmdlet for it.
-      # The 'bolt module' command is currently feature-flagged and should
-      # not be visible to users, so don't create a PowerShell cmdlet for now.
-      next if %w[guide module].include?(subcommand)
+      next if %w[guide].include?(subcommand)
 
       actions << nil if actions.empty?
       actions.each do |action|
@@ -60,9 +63,9 @@ namespace :pwsh do
         if action.nil? && subcommand == 'apply'
           cmdlet_verb = 'Invoke'
           cmdlet_noun = "Bolt#{subcommand.capitalize}"
-        elsif @hardcoded_cmdlets[action]
-          cmdlet_verb = @hardcoded_cmdlets[action]['verb']
-          cmdlet_noun = @hardcoded_cmdlets[action]['noun']
+        elsif @hardcoded_cmdlets["#{subcommand}:#{action}"]
+          cmdlet_verb = @hardcoded_cmdlets["#{subcommand}:#{action}"]['verb']
+          cmdlet_noun = @hardcoded_cmdlets["#{subcommand}:#{action}"]['noun']
         else
           cmdlet_verb = @pwsh_verbs[action]
           cmdlet_noun = "Bolt#{subcommand.capitalize}"
@@ -157,13 +160,14 @@ namespace :pwsh do
           # bolt plan run <plan> [parameters] [options]
           # bolt plan convert <path> [options]
           # bolt plan new <plan> [options]
+          plan_param_mandatory = (@pwsh_command[:verb] != 'Get')
           @pwsh_command[:options] << {
             name:                       'Name',
             ruby_short:                 'n',
             help_msg:                   "The plan to #{action == 'new' ? 'create' : action}",
             type:                       'string',
             switch:                     false,
-            mandatory:                  false,
+            mandatory:                  plan_param_mandatory,
             position:                   0,
             ruby_arg:                   'bare',
             validate_not_null_or_empty: true
@@ -195,30 +199,52 @@ namespace :pwsh do
         when 'secret'
           # bolt secret encrypt <plaintext> [options]
           # bolt secret decrypt <ciphertext> [options]
-          @pwsh_command[:options] << {
-            name:                       'Text',
-            ruby_short:                 't',
-            help_msg:                   "The text to #{action}",
-            type:                       'string',
-            switch:                     false,
-            mandatory:                  true,
-            position:                   0,
-            ruby_arg:                   'bare',
-            validate_not_null_or_empty: true
-          }
+          # bolt secret createkeys
+          if @pwsh_command[:verb] != 'New'
+            @pwsh_command[:options] << {
+              name:                       'Text',
+              ruby_short:                 't',
+              help_msg:                   "The text to #{action}",
+              type:                       'string',
+              switch:                     false,
+              mandatory:                  true,
+              position:                   0,
+              ruby_arg:                   'bare',
+              validate_not_null_or_empty: true
+            }
+          end
         when 'project'
           # bolt project init [name] [options]
-          @pwsh_command[:options] << {
-            name:                       'Name',
-            ruby_short:                 'n',
-            help_msg:                   'The name of the Bolt project to create',
-            mandatory:                  false,
-            type:                       'string',
-            switch:                     false,
-            position:                   0,
-            ruby_arg:                   'bare',
-            validate_not_null_or_empty: true
-          }
+          # bolt project migrate
+          if @pwsh_command[:verb] == 'New'
+            @pwsh_command[:options] << {
+              name:                       'Name',
+              ruby_short:                 'n',
+              help_msg:                   'The name of the Bolt project to create',
+              mandatory:                  false,
+              type:                       'string',
+              switch:                     false,
+              position:                   0,
+              ruby_arg:                   'bare',
+              validate_not_null_or_empty: true
+            }
+          end
+        when 'module'
+          # bolt module install
+          # bolt module add [module]
+          if @pwsh_command[:verb] == 'Add'
+            @pwsh_command[:options] << {
+              name:                       'Module',
+              ruby_short:                 'md',
+              help_msg:                   'The name of the module to add to the Bolt project',
+              mandatory:                  true,
+              type:                       'string',
+              switch:                     false,
+              position:                   0,
+              ruby_arg:                   'bare',
+              validate_not_null_or_empty: true
+            }
+          end
         end
 
         # verbose and debug are commonparameters and are already present in the

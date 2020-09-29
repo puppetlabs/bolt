@@ -187,6 +187,7 @@ module Bolt
           group             Show the list of groups in the inventory
           guide             View guides for Bolt concepts and features
           inventory         Show the list of targets an action would run on
+          module            Manage Bolt project modules
           plan              Convert, create, show, and run Bolt plans
           project           Create and migrate Bolt projects
           puppetfile        Install and list modules and generate type references

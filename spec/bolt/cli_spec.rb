@@ -173,26 +173,13 @@ describe "Bolt::CLI" do
     let(:installer) { double('installer', add: true, install: true) }
 
     around(:each) do |example|
-      original = ENV['BOLT_MODULE_FEATURE']
-      ENV['BOLT_MODULE_FEATURE'] = 'true'
-
       with_project do
         example.run
       end
-    ensure
-      ENV['BOLT_MODULE_FEATURE'] = original
     end
 
     before(:each) do
       allow(Bolt::ModuleInstaller).to receive(:new).and_return(installer)
-    end
-
-    it 'errors without BOLT_MODULE_FEATURE being set' do
-      ENV.delete('BOLT_MODULE_FEATURE')
-      expect { cli.parse }.to raise_error(
-        Bolt::CLIError,
-        /Expected subcommand/
-      )
     end
 
     it 'errors without modules configured' do

@@ -31,11 +31,7 @@ module Bolt
 
       @outputter.print_message('')
 
-      ok = migrate_inventory && migrate_config
-
-      if ok && ENV['BOLT_MODULE_FEATURE']
-        ok = migrate_modules
-      end
+      ok = migrate_inventory && migrate_config && migrate_modules
 
       if ok
         @outputter.print_message("Project successfully migrated")

@@ -453,7 +453,7 @@ module Bolt
     def modulepath
       path = @data['modulepath'] || @project.modulepath
 
-      if @project.modules && ENV['BOLT_MODULE_FEATURE']
+      if @project.modules
         path + [@project.managed_moduledir]
       else
         path

@@ -6,7 +6,7 @@ module Bolt
   class ProjectMigrator
     class Modules < Base
       def migrate(project, configured_modulepath)
-        return true unless ENV['BOLT_MODULE_FEATURE'] && project.modules.nil?
+        return true unless project.modules.nil?
 
         @outputter.print_message "Migrating project modules\n\n"
 
