@@ -1,5 +1,50 @@
 # Changelog
 
+## Bolt 2.30.0 (2020-09-30)
+
+### New features
+
+* **Manage project dependencies with `bolt module` subcommand**
+  ([#2082](https://github.com/puppetlabs/bolt/issues/2082),
+  [#2083](https://github.com/puppetlabs/bolt/issues/2083),
+  [#2131](https://github.com/puppetlabs/bolt/issues/2131),
+  [#2134](https://github.com/puppetlabs/bolt/issues/2134),
+  [#2135](https://github.com/puppetlabs/bolt/issues/2135),
+  [#2182](https://github.com/puppetlabs/bolt/issues/2182),
+  [#2184](https://github.com/puppetlabs/bolt/issues/2184))
+
+  The new `bolt module` subcommand and `modules` key in project configuration
+  can be used to manage a project's module dependencies, including resolving
+  dependencies and version ranges. To learn more about managing a project's
+  module dependencies with Bolt, see [the
+  documentation](https://pup.pt/bolt-modules). To read about why we added this
+  feature, see the [developer
+  updates](https://puppet.com/docs/bolt/latest/developer_updates.html).
+
+  _This feature is experimental._
+
+* **HTTP request task**
+  ([#2103](https://github.com/puppetlabs/bolt/issues/2103))
+
+  Bolt now ships with the `http_request` module, which includes the
+  `http_request` task for making HTTP requests.
+
+### Bug fixes
+
+* **Show missing module dependencies when resolving modules**
+  ([#2224](https://github.com/puppetlabs/bolt/pull/2224))
+
+  Bolt now correctly displays the names of missing module dependencies when
+  resolving modules errors. Previously, if a module dependency was missing, Bolt
+  did not display the name of the missing module.
+
+* **Invalid YAML plans now fail gracefully**
+  ([#2197](https://github.com/puppetlabs/bolt/issues/2197))
+
+  Previously, if a YAML plan had a syntax error Bolt would stacktrace due to an
+  assumption about what methods the resulting error had. It now fails gracefully
+  with the line of the error.
+
 ## Bolt 2.29.0 (2020-09-21)
 
 ### New features
