@@ -65,6 +65,14 @@ describe Bolt::Puppetfile do
       puppetfile = described_class.parse(path, skip_unsupported_modules: true)
       expect(puppetfile.modules.any?).to be(false)
     end
+
+    it 'surfaces errors from the Puppetfile resolver' do
+      File.write(path, "mod 'puppetlabs-yaml', install_path: '/foo/bar'")
+      expect { described_class.parse(path) }.to raise_error(
+        Bolt::ValidationError,
+        /Module puppetlabs-yaml with args.*doesn't have an implementation./
+      )
+    end
   end
 
   context '#write' do

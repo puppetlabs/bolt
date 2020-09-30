@@ -33,9 +33,12 @@ module Bolt
       end
 
       unless parsed.valid?
-        raise Bolt::ValidationError,
-              "Unable to parse Puppetfile #{path}. This may not be a Puppetfile "\
-              "managed by Bolt."
+        # valid? Just checks if validation_errors is empty, so if we get here we know it's not.
+        raise Bolt::ValidationError, <<~MSG
+        Unable to parse Puppetfile #{path}:
+        #{parsed.validation_errors.join("\n\n")}.
+        This may not be a Puppetfile managed by Bolt.
+        MSG
       end
 
       modules = parsed.modules.each_with_object([]) do |mod, acc|

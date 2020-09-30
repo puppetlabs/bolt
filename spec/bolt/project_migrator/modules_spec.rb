@@ -20,7 +20,12 @@ describe Bolt::ProjectMigrator::Modules do
     FileUtils.touch(@tmpdir + 'site' + 'baz' + 'good')
   end
 
-  let(:outputter)      { double('outputter', print_message: nil, print_migrate_step: nil) }
+  let(:outputter) {
+    double('outputter',
+           print_message: nil,
+           print_migrate_step: nil,
+           print_migrate_error: nil)
+  }
   let(:project_config) { {} }
   let(:project)        { Bolt::Project.new(project_config, @tmpdir) }
   let(:modulepath)     { project.modulepath }

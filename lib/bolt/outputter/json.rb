@@ -140,6 +140,7 @@ module Bolt
       def print_migrate_step(step)
         $stderr.puts(step)
       end
+      alias print_migrate_error print_migrate_step
     end
   end
 end
