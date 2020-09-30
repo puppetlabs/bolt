@@ -87,6 +87,13 @@ describe Bolt::ProjectMigrator::Modules do
       )
     end
 
+    it 'writes a new Puppetfile with the new moduledir' do
+      expect(migrate).to be(true)
+      expect(File.read(project.puppetfile).lines).to include(
+        /moduledir '.*\.modules'/
+      )
+    end
+
     it 'installs modules to the managed moduledir' do
       expect(migrate).to be(true)
       expect(Dir.exist?(project.managed_moduledir)).to be(true)

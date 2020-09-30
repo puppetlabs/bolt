@@ -239,6 +239,19 @@ message if it cannot resolve a dependency due to a version requirement.
 > documentation on [Specifying
 > versions](https://puppet.com/docs/puppet/latest/modules_metadata.html#specifying-versions).
 
+## Compatibility with Bolt versions
+
+The new module management style is incompatible with older Bolt versions, since it sets the
+moduledir in the Puppetfile to `.modules/` which is not on the modulepath in versions < 2.30.0. If
+you're using the new module management system in an environment in Puppet Enterprise, you need to
+specify `.modules` on the modulepath in your [environment.conf](https://puppet.com/docs/puppet/latest/config_file_environment.html#example), like so:
+
+```
+# /etc/puppetlabs/code/environments/test/environment.conf
+
+modulepath = site:dist:modules:$basemodulepath:.modules
+```
+
 ## Examples
 
 ### Migrate an existing Bolt project

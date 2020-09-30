@@ -55,7 +55,7 @@ module Bolt
 
       # Write the Puppetfile.
       @outputter.print_message "Writing Puppetfile at #{puppetfile_path}"
-      puppetfile.write(puppetfile_path)
+      puppetfile.write(puppetfile_path, moduledir)
 
       # Install the modules.
       install_puppetfile(puppetfile_path, moduledir)
@@ -114,7 +114,16 @@ module Bolt
           puppetfile.resolve
 
           @outputter.print_message "Writing Puppetfile at #{path}"
-          puppetfile.write(path)
+          # We get here either through 'bolt module install' which uses the
+          # managed modulepath (which isn't configurable) or through bolt
+          # project init --modules, which uses the default modulepath. This
+          # should be safe to assume that if `.modules/` is the moduledir the
+          # user is using the new workflow
+          if moduledir.basename == '.modules'
+            puppetfile.write(path, moduledir)
+          else
+            puppetfile.write(path)
+          end
         end
       end
 
