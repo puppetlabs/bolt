@@ -103,7 +103,7 @@ module Bolt
       @type              = type
       @downloads         = @path + 'downloads'
       @plans_path        = @path + 'plans'
-      @managed_moduledir = (@path + '.modules').to_s
+      @managed_moduledir = @path + '.modules'
       @backup_dir        = @path + '.bolt-bak'
 
       tc = Bolt::Config::INVENTORY_OPTIONS.keys & raw_data.keys

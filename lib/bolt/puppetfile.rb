@@ -56,9 +56,10 @@ module Bolt
     # Writes a Puppetfile that includes specifications for each of the
     # modules.
     #
-    def write(path)
+    def write(path, moduledir = nil)
       File.open(path, 'w') do |file|
         file.puts '# This Puppetfile is managed by Bolt. Do not edit.'
+        file.puts "moduledir '#{moduledir.basename}'" if moduledir
         modules.each { |mod| file.puts mod.to_spec }
       end
     rescue SystemCallError => e

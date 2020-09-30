@@ -2882,6 +2882,7 @@ describe "Bolt::CLI" do
 
             expect(lines).to match_array([/mod "puppetlabs-yaml"/,
                                           /mod "puppetlabs-ruby_task_helper"/])
+            expect(lines).not_to include(/moduledir/)
 
             expect(Dir.exist?(modulepath)).to be
             expect(Dir.children(modulepath)).to match_array(%w[yaml ruby_task_helper])

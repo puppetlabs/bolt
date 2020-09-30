@@ -448,7 +448,7 @@ module Bolt
     def list_modules
       internal_module_groups = { BOLTLIB_PATH => 'Plan Language Modules',
                                  MODULES_PATH => 'Packaged Modules',
-                                 @project.managed_moduledir => 'Project Dependencies' }
+                                 @project.managed_moduledir.to_s => 'Project Dependencies' }
 
       in_bolt_compiler do
         # NOTE: Can replace map+to_h with transform_values when Ruby 2.4

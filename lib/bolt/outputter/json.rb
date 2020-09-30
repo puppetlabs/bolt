@@ -97,7 +97,7 @@ module Bolt
       def print_puppetfile_result(success, puppetfile, moduledir)
         @stream.puts({ "success": success,
                        "puppetfile": puppetfile,
-                       "moduledir": moduledir }.to_json)
+                       "moduledir": moduledir.to_s }.to_json)
       end
 
       def print_targets(targets)

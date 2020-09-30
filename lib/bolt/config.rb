@@ -391,7 +391,7 @@ module Bolt
         @logs << { warn: msg }
       end
 
-      if @project.modules && @data['modulepath']&.include?(@project.managed_moduledir)
+      if @project.modules && @data['modulepath']&.include?(@project.managed_moduledir.to_s)
         raise Bolt::ValidationError,
               "Found invalid path in modulepath: #{@project.managed_moduledir}. This path "\
               "is automatically appended to the modulepath and cannot be configured."
@@ -454,7 +454,7 @@ module Bolt
       path = @data['modulepath'] || @project.modulepath
 
       if @project.modules
-        path + [@project.managed_moduledir]
+        path + [@project.managed_moduledir.to_s]
       else
         path
       end

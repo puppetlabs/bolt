@@ -94,7 +94,7 @@ module Bolt
 
           # Write Puppetfile
           @outputter.print_migrate_step("Updating Puppetfile at #{puppetfile_path}")
-          puppetfile.write(puppetfile_path)
+          puppetfile.write(puppetfile_path, managed_moduledir)
 
           # Install Puppetfile
           @outputter.print_migrate_step("Syncing modules from #{puppetfile_path} to #{managed_moduledir}")

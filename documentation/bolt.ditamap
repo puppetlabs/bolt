@@ -79,7 +79,7 @@
                 <shortdesc>Use module structure if you use Forge modules with Bolt, or you want to develop your own modules to share tasks and plans.</shortdesc>
             </topicmeta>
         </topicref>
-    </topicref>    
+    </topicref>
     <topichead navtitle="Using Bolt with Puppet">
         <topicref href="applying_manifest_blocks.md" format="markdown"/>
         <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
