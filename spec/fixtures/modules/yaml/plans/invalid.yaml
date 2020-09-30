@@ -1,0 +1,12 @@
+parameters:
+  targets:
+    type: TargetSpec
+    description: A list of targets to run actions on
+    default: localhost
+
+# The steps key defines the actions the plan will take in order.
+steps:
+ - resources:
+    - class: prometheus
+    targets: $targets
+    description: 'Install prometheus'

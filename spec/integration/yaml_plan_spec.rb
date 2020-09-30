@@ -150,6 +150,13 @@ describe "running YAML plans", ssh: true do
     expect(result['msg']).to match(/Parse error in step "x_fail":/)
   end
 
+  it 'fails gracefully when the yaml plan contains errors' do
+    result = run_plan('yaml::invalid', targets: target)
+
+    expect(result['kind']).to eq("bolt/pal-error")
+    expect(result['msg']).to match(/did not find expected '-' indicator.*at line 10 column 5/)
+  end
+
   it 'passes information between steps' do
     result = run_plan('yaml::param_passing')
 

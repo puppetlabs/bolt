@@ -29,15 +29,12 @@ module Bolt
         message = err.cause ? err.cause.message : err.message
 
         # Provide the location of an error if it came from a plan
-        details = if defined?(err.file) && err.file
-                    { file:   err.file,
-                      line:   err.line,
-                      column: err.pos }.compact
-                  else
-                    {}
-                  end
+        details = {}
+        details[:file]   = err.file if defined?(err.file)
+        details[:line]   = err.line if defined?(err.line)
+        details[:column] = err.pos if defined?(err.pos)
 
-        e = new(message, details)
+        e = new(message, details.compact)
 
         e.set_backtrace(err.backtrace)
         e
