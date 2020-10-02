@@ -269,7 +269,7 @@ describe "Bolt::CLI" do
         cli.execute(cli.parse)
       end
 
-      it 'install modules from Puppetfile with resolving' do
+      it 'install modules from Puppetfile without resolving' do
         cli = Bolt::CLI.new(%W[module install --project #{project} --no-resolve])
 
         allow(installer).to receive(:install) do |*args|
@@ -1949,9 +1949,9 @@ describe "Bolt::CLI" do
 
             expect { cli.execute(options) }.to raise_error(
               Bolt::PAL::PALError,
-              /Task sample::params:\n(?x:
+              %r{Task sample::params:\n(?x:
                )\s*has no parameter named 'foo'\n(?x:
-               )\s*has no parameter named 'bar'/
+               )\s*has no parameter named 'bar'}
             )
             expect(JSON.parse(output.string)).to be
           end
@@ -1961,9 +1961,9 @@ describe "Bolt::CLI" do
 
             expect { cli.execute(options) }.to raise_error(
               Bolt::PAL::PALError,
-              /Task sample::params:\n(?x:
+              %r{Task sample::params:\n(?x:
                )\s*expects a value for parameter 'mandatory_integer'\n(?x:
-               )\s*expects a value for parameter 'mandatory_boolean'/
+               )\s*expects a value for parameter 'mandatory_boolean'}
             )
             expect(JSON.parse(output.string)).to be
           end
@@ -1979,10 +1979,10 @@ describe "Bolt::CLI" do
 
             expect { cli.execute(options) }.to raise_error(
               Bolt::PAL::PALError,
-              /Task sample::params:\n(?x:
+              %r{Task sample::params:\n(?x:
                )\s*parameter 'mandatory_boolean' expects a Boolean value, got String\n(?x:
                )\s*parameter 'optional_string' expects a value of type Undef or String,(?x:
-                                             ) got Integer/
+                                             ) got Integer}
             )
             expect(JSON.parse(output.string)).to be
           end
@@ -1998,10 +1998,10 @@ describe "Bolt::CLI" do
 
             expect { cli.execute(options) }.to raise_error(
               Bolt::PAL::PALError,
-              /Task sample::params:\n(?x:
+              %r{Task sample::params:\n(?x:
                )\s*parameter 'mandatory_string' expects a String\[1, 10\] value, got String\n(?x:
                )\s*parameter 'optional_integer' expects a value of type Undef or Integer\[-5, 5\],(?x:
-                                              ) got Integer\[10, 10\]/
+                                              ) got Integer\[10, 10\]}
             )
             expect(JSON.parse(output.string)).to be
           end
@@ -2045,9 +2045,9 @@ describe "Bolt::CLI" do
               it "errors as usual if invalid (according to the local task definition) parameters are specified" do
                 expect { cli.execute(options) }.to raise_error(
                   Bolt::PAL::PALError,
-                  /Task sample::params:\n(?x:
+                  %r{Task sample::params:\n(?x:
                    )\s*has no parameter named 'foo'\n(?x:
-                   )\s*has no parameter named 'bar'/
+                   )\s*has no parameter named 'bar'}
                 )
                 expect(JSON.parse(output.string)).to be
               end
@@ -2877,11 +2877,11 @@ describe "Bolt::CLI" do
 
             expect(File.file?(puppetfile)).to be
 
-            content = File.read(puppetfile)
+            lines = File.read(puppetfile).lines
 
-            expect(content).to match(/mod "puppetlabs-yaml"/)
-            expect(content).to match(/mod "puppetlabs-ruby_task_helper"/)
-            expect(content).not_to match(/moduledir/)
+            expect(lines).to match_array([%r{mod 'puppetlabs/yaml'},
+                                          %r{mod 'puppetlabs/ruby_task_helper'}])
+            expect(lines).not_to include(/moduledir/)
 
             expect(Dir.exist?(modulepath)).to be
             expect(Dir.children(modulepath)).to match_array(%w[yaml ruby_task_helper])

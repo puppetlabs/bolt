@@ -248,6 +248,10 @@ Style/RedundantRegexpEscape:
 Style/RedundantSelfAssignment:
   Enabled: true
 
+Style/RegexpLiteral:
+  Enabled: true
+  EnforcedStyle: mixed
+
 Style/SafeNavigation:
   Enabled: false
 

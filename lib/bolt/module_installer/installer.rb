@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
-require 'r10k/cli'
 require 'bolt/r10k_log_proxy'
 require 'bolt/error'
 
 # This class is used to install modules from a Puppetfile to a module directory.
 #
 module Bolt
-  class Puppetfile
+  class ModuleInstaller
     class Installer
       def initialize(config = {})
         @config = config
       end
 
       def install(path, moduledir)
+        require 'r10k/cli'
+
         unless File.exist?(path)
           raise Bolt::FileError.new(
             "Could not find a Puppetfile at #{path}",

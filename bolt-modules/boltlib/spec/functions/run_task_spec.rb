@@ -356,9 +356,9 @@ describe 'run_task' do
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
         Puppet::ParseError,
-        /Task\ test::params:\n
+        %r{Task\ test::params:\n
          \s*has\ no\ parameter\ named\ 'foo'\n
-         \s*has\ no\ parameter\ named\ 'bar'/x
+         \s*has\ no\ parameter\ named\ 'bar'}x
       )
     end
 
@@ -367,9 +367,9 @@ describe 'run_task' do
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
         Puppet::ParseError,
-        /Task\ test::params:\n
+        %r{Task\ test::params:\n
          \s*expects\ a\ value\ for\ parameter\ 'mandatory_integer'\n
-         \s*expects\ a\ value\ for\ parameter\ 'mandatory_boolean'/x
+         \s*expects\ a\ value\ for\ parameter\ 'mandatory_boolean'}x
       )
     end
 
@@ -383,10 +383,10 @@ describe 'run_task' do
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
         Puppet::ParseError,
-        /Task\ test::params:\n
+        %r{Task\ test::params:\n
          \s*parameter\ 'mandatory_boolean'\ expects\ a\ Boolean\ value,\ got\ String\n
          \s*parameter\ 'optional_string'\ expects\ a\ value\ of\ type\ Undef\ or\ String,
-                                        \ got\ Integer/x
+                                        \ got\ Integer}x
       )
     end
 
@@ -400,10 +400,10 @@ describe 'run_task' do
 
       is_expected.to run.with_params(task_name, hostname, task_params).and_raise_error(
         Puppet::ParseError,
-        /Task\ test::params:\n
+        %r{Task\ test::params:\n
          \s*parameter\ 'mandatory_string'\ expects\ a\ String\[1,\ 10\]\ value,\ got\ String\n
          \s*parameter\ 'optional_integer'\ expects\ a\ value\ of\ type\ Undef\ or\ Integer\[-5,\ 5\],
-                                         \ got\ Integer\[10,\ 10\]/x
+                                         \ got\ Integer\[10,\ 10\]}x
       )
     end
 

@@ -12,11 +12,11 @@ update](developer_updates.md#september-2020).
 - **Managed module installation directory:** Bolt now installs modules it
   manages into the `.modules/` directory instead of `modules/`. Avoid committing
   `.modules/` to source control. Your users can download your Bolt project and
-  use the `bolt module install` command to download the required modules from
-  the Forge.
+  use the `bolt module install` *nix shell command, or `Install-BoltModule`
+  cmdlet to download the required modules.
 - **Non-managed module directory:** Bolt no longer uses the `site-modules/`
   directory. Store any modules that you don't want Bolt to manage in the
-  `modules/` directory. This includes custom modules and non-Forge modules.
+  `modules/` directory.
 - **Module configuration:** Your `bolt-project.yaml` file contains a `modules`
   key that lists the direct module dependencies of your Bolt project. Unless you
   need to pin a module to a specific version, avoid editing the `modules` list
@@ -39,8 +39,8 @@ under the `modules` key. For example, a Bolt project that uses the `mysql` and
 
 ```yaml
 modules:
-- puppetlabs/apache
-- puppetlabs/mysql
+  - puppetlabs/apache
+  - puppetlabs/mysql
 ```
 
 When you use Bolt to install a project's modules, it loads the information from
@@ -98,16 +98,13 @@ Install-BoltModule -Force
 
 ## Install modules in a Bolt project
 
-After you've opted in, you can use the `bolt module add` and `bolt module
-install` commands to manage your Forge modules. 
-
-> **Note:** Bolt only supports managing modules from the public Puppet
-> Forge. Git modules and private Forge modules are not supported.
+After you've opted in, you can install your modules from the Bolt command line.
 
 ### Add a Forge module and its dependencies to an existing project
 
-To add a single module and its dependencies to your Bolt project, use the `bolt
-module add` command. For example, to add the puppetlabs/apt module:
+To add a single Forge module and its dependencies to your Bolt project, use the
+`bolt module add` *nix shell command or the `Add-BoltModule` Powershell cmdlet.
+For example, to add the puppetlabs/apt module:
 
 *\*nix shell command*
 ```shell
@@ -119,9 +116,13 @@ bolt module add puppetlabs/apt
 Add-BoltModule -Module puppetlabs/apt
 ```
 
-Bolt adds a declaration to your project configuration file, resolves
+Bolt adds a specification to your project configuration file, resolves
 dependencies, updates your project's Puppetfile, and installs the modules to the
 project's `.modules` directory.
+
+> **Note:** This command only works with Forge modules. To add a git module,
+> [manually specify the module in your project configuration
+> file](#git-modules).
 
 When Bolt adds a new module to the project and resolves its dependencies, it
 attempts to keep all installed modules on the same versions. If Bolt is unable
@@ -149,15 +150,16 @@ specifications for the resolved modules, and installs the modules to the
 project's `.modules` directory.
 
 #### Forcibly install modules
+
 When you add a module to a project, or install a project's modules, Bolt
-compares the module declarations in the project configuration file to the
+compares the module specifications in the project configuration file to the
 modules in the Puppetfile to check if an existing Puppetfile is managed by Bolt.
-If the Puppetfile is missing any module declarations, Bolt assumes the
+If the Puppetfile is missing any module specifications, Bolt assumes the
 Puppetfile is not managed by Bolt and raises an error like this:
 
 ```shell
-Puppetfile /myproject/Puppetfile is missing specifications for the following
-module declarations:
+Puppetfile at /myproject/Puppetfile does not include modules that
+satisfy the following specifications:
 
 - name: puppetlabs-ruby-task-helper
 
@@ -179,18 +181,82 @@ bolt module install --force
 Install-BoltModule -Force
 ```
 
+## Manually specify modules in a Bolt project
+
+In most cases, you can use the Bolt command line to install a new module.
+However, there are times when you might want to manually specify a module
+instead of using the Bolt command line. For example, you might want to add a git
+module, which is not supported through the command line, or you might want to
+add a large number of modules to your project at once and you don't want to
+string together multiple commands.
+
+To manually specify a module in a Bolt project, add a specification to the
+project configuration file `bolt-project.yaml`. Specifications are listed
+under the `modules` key, and include specific keys depending on the type
+of module specified.
+
+### Forge modules
+
+To specify a Forge module, use the following keys in the specification:
+
+| Key | Description | Required |
+| --- | --- | :-: |
+| `name` | The full name of the module. Can be either `<OWNER>-<NAME>` or `<OWNER>/<NAME>`. |	✓ |
+| `version_requirement` | The version requirement that the module must satisfy. Can be either a specific semantic version (`1.0.0`), a version range (`>= 1.0.0 < 3.0.0`), or version shorthand (`1.x`).  |
+
+The following example specifies the `puppetlabs/apache` Forge module with a
+shorthand version requirement:
+
+```yaml
+modules:
+  - name: puppetlabs/apache
+    version_requirement: '5.x'
+```
+
+If you do not need to add a version requirement to a specification, you
+can specify a Forge module using just the name of the module without using
+the `name` key. For example:
+
+```yaml
+modules:
+  - puppetlabs/apache
+```
+
+Bolt only supports installing Forge modules from the Puppet Forge. Private
+Forges are not supported.
+
+### Git modules
+
+To specify a git module, use the following keys in the specification:
+
+| Key | Description | Required |
+| --- | --- | :-: |
+| `git` | The URI to the GitHub repository. URI must begin with either `https://github.com`or `git@github.com`. |	✓ |
+| `ref` | The git reference to checkout. Can be either a branch, commit, or tag. | ✓ |
+
+The following example specifies the `puppetlabs/puppetlabs-puppetdb` git module
+with a specific tag:
+
+```yaml
+modules:
+  - git: https://github.com/puppetlabs/puppetlabs-puppetdb
+    ref: '7.0.0'
+```
+
+Bolt only supports installing git modules from GitHub.
+
 ## Update your project's modules
 
 To update the modules in your project, run:
 
 *\*nix shell command*
 ```shell
-bolt module install
+bolt module install --force
 ```
 
 *Powershell cmdlet*
 ```shell
-Install-BoltModule
+Install-BoltModule -Force
 ```
 
 Bolt updates your modules to the latest available versions and attempts to

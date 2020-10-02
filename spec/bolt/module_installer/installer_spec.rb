@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-require 'bolt/puppetfile/installer'
+require 'bolt/module_installer/installer'
 
-describe Bolt::Puppetfile::Installer do
+describe Bolt::ModuleInstaller::Installer do
   let(:path)      { (@project + 'Puppetfile').expand_path }
   let(:moduledir) { (@project + 'modules').expand_path }
   let(:installer) { described_class.new }
