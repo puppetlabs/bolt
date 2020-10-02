@@ -89,8 +89,3 @@ you are not required to install any agent software.
    </td>
  </tr>
 </table>
-
-
-To send us feedback or let us know about a docs error, [open a
-ticket](https://tickets.puppetlabs.com/browse/DOCUMENT/?selectedTab=com.atlassian.jira.jira-projects-plugin:summary-panel)
-(you'll need a Jira account) or [email the docs team](mailto:docs@puppet.com).
