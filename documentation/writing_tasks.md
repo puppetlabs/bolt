@@ -1222,6 +1222,9 @@ From: /tmp/4f9dcfa3-ce0c-49e2-bcf5-8d761b202186/ruby/tasks/init.rb @ line 9 MyCl
     10:
 ```
 
+> **Note:** pry-remote does not work with pry-byebug or pry-nav in Ruby 2.x. Use 'help' in the pry
+> debugger for a list of available commands.
+
 📖 **Related information**
 - [`pry-remote` documentation](https://www.rubydoc.info/gems/pry-remote)
 - [`pry` documentation](http://pry.github.io/)
