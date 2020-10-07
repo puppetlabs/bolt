@@ -962,13 +962,7 @@ module Bolt
     end
 
     def pal
-      @pal ||= Bolt::PAL.new(config.modulepath,
-                             config.hiera_config,
-                             config.project.resource_types,
-                             config.compile_concurrency,
-                             config.trusted_external,
-                             config.apply_settings,
-                             config.project)
+      @pal ||= Bolt::PAL.new(config)
     end
 
     # Collects the list of Bolt guides and maps them to their topics.
@@ -1061,7 +1055,7 @@ module Bolt
                   'Task' => [],
                   'Plugin' => Bolt::Plugin::BUILTIN_PLUGINS }
       if %w[plan task].include?(options[:subcommand]) && options[:action] == 'run'
-        default_content = Bolt::PAL.new([], nil, nil)
+        default_content = Bolt::PAL.new(Bolt::Config.new(Bolt::Project.default_project, {}, { :modulepath => [] }))
         content['Plan'] = default_content.list_plans.each_with_object([]) do |iter, col|
           col << iter&.first
         end
@@ -1076,7 +1070,7 @@ module Bolt
     # Gem installs include the aggregate, canary, and puppetdb_fact modules, while
     # package installs include modules listed in the Bolt repo Puppetfile
     def incomplete_install?
-      (Dir.children(Bolt::PAL::MODULES_PATH) - %w[aggregate canary puppetdb_fact secure_env_vars]).empty?
+      (Dir.children(Bolt::Config::MODULES_PATH) - %w[aggregate canary puppetdb_fact secure_env_vars]).empty?
     end
 
     # Mimicks the output from Outputter::Human#fatal_error. This should be used to print

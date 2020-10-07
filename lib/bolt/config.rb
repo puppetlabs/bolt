@@ -23,6 +23,8 @@ module Bolt
 
     BOLT_CONFIG_NAME = 'bolt.yaml'
     BOLT_DEFAULTS_NAME = 'bolt-defaults.yaml'
+    BOLTLIB_PATH = File.expand_path('../../bolt-modules', __dir__)
+    MODULES_PATH = File.expand_path('../../modules', __dir__)
 
     # The default concurrency value that is used when the ulimit is not low (i.e. < 700)
     DEFAULT_DEFAULT_CONCURRENCY = 100
@@ -462,6 +464,14 @@ module Bolt
 
     def modulepath=(value)
       @data['modulepath'] = value
+    end
+
+    # The modified_modulepath is used by bolt internally as the real
+    # modulepath used during plan execution. The modifications add
+    # BOLTLIB_PATH and MODULES_PATH to ensure that plan functions,
+    # bolt types, and built in content are available.
+    def modified_modulepath
+      [BOLTLIB_PATH, *modulepath, MODULES_PATH]
     end
 
     def concurrency

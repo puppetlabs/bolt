@@ -180,7 +180,7 @@ describe "Bolt::Outputter::Human" do
   it 'prints modulepath as builtin for builtin modules' do
     name = 'monkey_bread'
     files = [{ 'name' => 'monkey_bread.rb',
-               'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }]
+               'path' => "#{Bolt::Config::MODULES_PATH}/monkey/bread" }]
     metadata = {}
     outputter.print_task_info(Bolt::Task.new(name, metadata, files))
     expect(output.string).to eq(<<~TASK_OUTPUT)
@@ -199,7 +199,7 @@ describe "Bolt::Outputter::Human" do
     task = {
       'name' => 'monkey_bread',
       'files' => [{ 'name' => 'monkey_bread.rb',
-                    'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }],
+                    'path' => "#{Bolt::Config::MODULES_PATH}/monkey/bread" }],
       'metadata' => {}
     }
     outputter.print_tasks([task], %w[path1 path2])

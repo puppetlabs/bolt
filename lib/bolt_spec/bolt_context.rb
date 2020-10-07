@@ -105,7 +105,7 @@ module BoltSpec
 
       # Set the things
       Puppet[:tasks] = true
-      RSpec.configuration.module_path = [modulepath, Bolt::PAL::BOLTLIB_PATH].join(File::PATH_SEPARATOR)
+      RSpec.configuration.module_path = [modulepath, Bolt::Config::BOLTLIB_PATH].join(File::PATH_SEPARATOR)
       opts = {
         bolt_executor: executor,
         bolt_inventory: inventory,
@@ -153,7 +153,7 @@ module BoltSpec
     end
 
     def pal
-      @pal ||= Bolt::PAL.new(config.modulepath, config.hiera_config, config.project.resource_types)
+      @pal ||= Bolt::PAL.new(config)
     end
 
     BoltSpec::Plans::MOCKED_ACTIONS.each do |action|

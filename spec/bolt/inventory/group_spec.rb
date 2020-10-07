@@ -795,7 +795,7 @@ describe Bolt::Inventory::Group do
     let(:lookup_data) { {} }
 
     let(:modulepath) { [''] }
-    let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+    let(:pal) { Bolt::PAL.new(Bolt::Config.new(Bolt::Project.default_project, {}, { :modulepath => modulepath })) }
 
     let(:plugins) do
       plugins = Bolt::Plugin.setup(config, pal)

@@ -190,7 +190,7 @@ module Bolt
           Invalid project name '#{name}' in bolt-project.yaml; project name must begin with a lowercase letter
           and can include lowercase letters, numbers, and underscores.
           ERROR_STRING
-        elsif Dir.children(Bolt::PAL::BOLTLIB_PATH).include?(name)
+        elsif Dir.children(Bolt::Config::BOLTLIB_PATH).include?(name)
           raise Bolt::ValidationError, "The project '#{name}' will not be loaded. The project name conflicts "\
             "with a built-in Bolt module of the same name."
         end

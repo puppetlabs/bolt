@@ -48,7 +48,7 @@ module Bolt
 
       def print_task_info(task)
         path = task.files.first['path'].chomp("/tasks/#{task.files.first['name']}")
-        module_dir = if path.start_with?(Bolt::PAL::MODULES_PATH)
+        module_dir = if path.start_with?(Bolt::Config::MODULES_PATH)
                        "built-in module"
                      else
                        path
@@ -62,7 +62,7 @@ module Bolt
 
       def print_plan_info(plan)
         path = plan.delete('module')
-        plan['module_dir'] = if path.start_with?(Bolt::PAL::MODULES_PATH)
+        plan['module_dir'] = if path.start_with?(Bolt::Config::MODULES_PATH)
                                "built-in module"
                              else
                                path

@@ -18,7 +18,7 @@ describe 'set_features function' do
 
   let(:executor) { Bolt::Executor.new(1) }
 
-  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:pal) { Bolt::PAL.new(Bolt::Config.new(Bolt::Project.default_project, {}, { :modulepath => modulepath })) }
   let(:inventory) { Bolt::Inventory.empty }
   let(:target) { inventory.get_targets('example')[0] }
 

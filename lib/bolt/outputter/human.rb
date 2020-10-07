@@ -248,7 +248,7 @@ module Bolt
         task_info << "MODULE:\n"
 
         path = task.files.first['path'].chomp("/tasks/#{task.files.first['name']}")
-        task_info << if path.start_with?(Bolt::PAL::MODULES_PATH)
+        task_info << if path.start_with?(Bolt::Config::MODULES_PATH)
                        "built-in module"
                      else
                        path
@@ -278,7 +278,7 @@ module Bolt
         plan_info << "MODULE:\n"
 
         path = plan['module']
-        plan_info << if path.start_with?(Bolt::PAL::MODULES_PATH)
+        plan_info << if path.start_with?(Bolt::Config::MODULES_PATH)
                        "built-in module"
                      else
                        path

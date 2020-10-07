@@ -70,7 +70,7 @@ describe "Bolt::Outputter::JSON" do
   it "prints builtin for builtin modules" do
     name = 'monkey bread'
     files = [{ 'name' => 'monkey_bread.rb',
-               'path' => "#{Bolt::PAL::MODULES_PATH}/monkey/bread" }]
+               'path' => "#{Bolt::Config::MODULES_PATH}/monkey/bread" }]
     metadata = {}
 
     result = {

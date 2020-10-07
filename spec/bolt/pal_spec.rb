@@ -13,7 +13,7 @@ describe Bolt::PAL do
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
   describe :parse_manifest do
-    let(:pal) { Bolt::PAL.new(nil, nil, nil) }
+    let(:pal) { Bolt::PAL.new(Bolt::Config.default) }
 
     it "should parse a manifest string" do
       ast = pal.parse_manifest('notify { "hello world": }', 'test.pp')
@@ -146,7 +146,7 @@ describe Bolt::PAL do
   describe :in_bolt_compiler do
     it "sets the bolt_project in the context" do
       project = Bolt::Project.new({ 'name' => 'mytestproject' }, Dir.getwd)
-      pal = Bolt::PAL.new(nil, nil, nil, 1, nil, {}, project)
+      pal = Bolt::PAL.new(Bolt::Config.from_project(project, {}))
       pal.in_bolt_compiler do
         expect(Puppet.lookup(:bolt_project).name).to eq('mytestproject')
       end

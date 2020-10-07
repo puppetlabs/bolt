@@ -9,8 +9,6 @@ require 'etc'
 
 module Bolt
   class PAL
-    BOLTLIB_PATH = File.expand_path('../../bolt-modules', __dir__)
-    MODULES_PATH = File.expand_path('../../modules', __dir__)
 
     # PALError is used to convert errors from executing puppet code into
     # Bolt::Errors
@@ -47,20 +45,19 @@ module Bolt
 
     attr_reader :modulepath, :user_modulepath
 
-    def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors,
-                   trusted_external = nil, apply_settings = {}, project = nil)
+    def initialize(config)
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happens in tests
       self.class.load_puppet
 
-      @user_modulepath = modulepath
-      @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
-      @hiera_config = hiera_config
-      @trusted_external = trusted_external
-      @apply_settings = apply_settings
-      @max_compiles = max_compiles
-      @resource_types = resource_types
-      @project = project
+      @user_modulepath = config.modulepath
+      @modulepath = config.modified_modulepath
+      @hiera_config = config.hiera_config
+      @trusted_external = config.trusted_external
+      @apply_settings = config.apply_settings
+      @max_compiles = config.compile_concurrency
+      @resource_types = config.project.resource_types
+      @project = config.project
 
       @logger = Bolt::Logger.logger(self)
       if modulepath && !modulepath.empty?
@@ -443,8 +440,8 @@ module Bolt
     #   The information hash provides the name, version, and a string
     #   indicating whether the module belongs to an internal module group.
     def list_modules
-      internal_module_groups = { BOLTLIB_PATH => 'Plan Language Modules',
-                                 MODULES_PATH => 'Packaged Modules',
+      internal_module_groups = { Bolt::Config::BOLTLIB_PATH => 'Plan Language Modules',
+                                 Bolt::Config::MODULES_PATH => 'Packaged Modules',
                                  @project.managed_moduledir.to_s => 'Project Dependencies' }
 
       in_bolt_compiler do

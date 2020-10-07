@@ -14,7 +14,7 @@ describe Bolt::Plugin do
   let(:modulepath) { [fixtures_path('plugin_modules')] }
   let(:plugin_config) { {} }
   let(:config_data) { { 'modulepath' => modulepath, 'plugins' => plugin_config } }
-  let(:pal) { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:pal) { Bolt::PAL.new(Bolt::Config.new(Bolt::Project.default_project, {}, { :modulepath => modulepath })) }
 
   let(:plugins) { Bolt::Plugin.setup(config(config_data), pal) }
 

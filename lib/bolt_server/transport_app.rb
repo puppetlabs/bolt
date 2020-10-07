@@ -213,12 +213,12 @@ module BoltServer
       @pal_mutex.synchronize do
         project = Bolt::Project.create_project(project_dir)
         bolt_config = Bolt::Config.from_project(project, { log: { 'bolt-debug.log' => 'disable' } })
-        pal = Bolt::PAL.new(bolt_config.modulepath, nil, nil, nil, nil, nil, bolt_config.project)
+        pal = Bolt::PAL.new(bolt_config)
         module_path = [
           BoltServer::PE::PAL::PE_BOLTLIB_PATH,
-          Bolt::PAL::BOLTLIB_PATH,
+          Bolt::Config::BOLTLIB_PATH,
           *bolt_config.modulepath,
-          Bolt::PAL::MODULES_PATH
+          Bolt::Config::MODULES_PATH
         ]
         # CODEREVIEW: I *think* this is the only thing we need to make different between bolt's PAL. Is it acceptable
         # to hack this? Modulepath is currently a readable attribute, could we make it writeable?

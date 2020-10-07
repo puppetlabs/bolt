@@ -54,12 +54,12 @@ module BoltServer
           environment = Puppet.lookup(:environments).get!(environment_name)
           # A new modulepath is created from scratch (rather than using super's @modulepath)
           # so that we can have full control over all the entries in modulepath. In the future
-          # it's likely we will need to preceed _both_ Bolt::PAL::BOLTLIB_PATH _and_
-          # Bolt::PAL::MODULES_PATH which would be more complex if we tried to use @modulepath since
+          # it's likely we will need to preceed _both_ Bolt::Config::BOLTLIB_PATH _and_
+          # Bolt::Config::MODULES_PATH which would be more complex if we tried to use @modulepath since
           # we need to append our modulepaths and exclude modules shiped in bolt gem code
           modulepath_dirs = environment.modulepath
           @user_modulepath = modulepath_dirs
-          @modulepath = [PE_BOLTLIB_PATH, Bolt::PAL::BOLTLIB_PATH, *modulepath_dirs]
+          @modulepath = [PE_BOLTLIB_PATH, Bolt::Config::BOLTLIB_PATH, *modulepath_dirs]
         end
       end
     end
