@@ -56,16 +56,17 @@ module Bolt
         rescue Psych::Exception
           raise Bolt::ParseError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
         end
+      elsif config.inventoryfile
+        data = Bolt::Util.read_yaml_hash(config.inventoryfile, 'inventory')
+        logger.debug("Loaded inventory from #{config.inventoryfile}")
       else
-        data = if config.inventoryfile
-                 Bolt::Util.read_yaml_hash(config.inventoryfile, 'inventory')
-               else
-                 i = Bolt::Util.read_optional_yaml_hash(config.default_inventoryfile, 'inventory')
-                 logger.debug("Loaded inventory from #{config.default_inventoryfile}") if i
-                 i
-               end
-        # This avoids rubocop complaining about identical conditionals
-        logger.debug("Loaded inventory from #{config.inventoryfile}") if config.inventoryfile
+        data = Bolt::Util.read_optional_yaml_hash(config.default_inventoryfile, 'inventory')
+
+        if config.default_inventoryfile.exist?
+          logger.debug("Loaded inventory from #{config.default_inventoryfile}")
+        else
+          logger.debug("Tried to load inventory from #{config.default_inventoryfile}, but the file does not exist")
+        end
       end
 
       # Resolve plugin references from transport config
