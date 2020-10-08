@@ -16,7 +16,7 @@ module Bolt
     # Bolt::Errors
     class PALError < Bolt::Error
       def self.from_preformatted_error(err)
-        if err.cause&.is_a? Bolt::Error
+        if err.cause.is_a? Bolt::Error
           err.cause
         else
           from_error(err)

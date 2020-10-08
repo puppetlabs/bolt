@@ -30,7 +30,7 @@ module Bolt
           @transport_logger = transport_logger
           @logger.trace("Initializing ssh connection to #{@target.safe_name}")
 
-          if target.options['private-key']&.instance_of?(String)
+          if target.options['private-key'].instance_of?(String)
             begin
               Bolt::Util.validate_file('ssh key', target.options['private-key'])
             rescue Bolt::FileError => e
