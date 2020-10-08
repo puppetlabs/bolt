@@ -100,10 +100,19 @@ module Bolt
                        "moduledir": moduledir.to_s }.to_json)
       end
 
-      def print_targets(targets)
+      def print_targets(target_list, inventoryfile)
         @stream.puts ::JSON.pretty_generate(
-          "targets": targets.map(&:name),
-          "count": targets.count
+          "inventory": {
+            "targets": target_list[:inventory].map(&:name),
+            "count": target_list[:inventory].count,
+            "file": inventoryfile.to_s
+          },
+          "adhoc": {
+            "targets": target_list[:adhoc].map(&:name),
+            "count": target_list[:adhoc].count
+          },
+          "targets": target_list.values.flatten.map(&:name),
+          "count": target_list.values.flatten.count
         )
       end
 

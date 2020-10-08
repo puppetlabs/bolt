@@ -331,10 +331,28 @@ module Bolt
         end
       end
 
-      def print_targets(targets)
-        count = "#{targets.count} target#{'s' unless targets.count == 1}"
-        @stream.puts targets.map(&:name).join("\n")
-        @stream.puts colorize(:green, count)
+      def print_targets(target_list, inventoryfile)
+        adhoc = colorize(:yellow, "(Not found in inventory file)")
+
+        targets  = []
+        targets += target_list[:inventory].map { |target| [target.name, nil] }
+        targets += target_list[:adhoc].map { |target| [target.name, adhoc] }
+
+        if targets.any?
+          print_table(targets, 0, 2)
+          @stream.puts
+        end
+
+        @stream.puts "INVENTORY FILE:"
+        if inventoryfile.exist?
+          @stream.puts inventoryfile
+        else
+          @stream.puts wrap("Tried to load inventory from #{inventoryfile}, but the file does not exist")
+        end
+
+        @stream.puts "\nTARGET COUNT:"
+        @stream.puts "#{targets.count} total, #{target_list[:inventory].count} from inventory, "\
+                     "#{target_list[:adhoc].count} adhoc"
       end
 
       def print_target_info(targets)

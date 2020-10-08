@@ -165,4 +165,44 @@ describe "Bolt::Outputter::JSON" do
     expect(parsed['topic']).to eq(topic)
     expect(parsed['guide']).to eq(guide)
   end
+
+  context '#print_targets' do
+    let(:inventoryfile) { '/path/to/inventory' }
+
+    let(:target_list) do
+      {
+        inventory: [double('target', name: 'target')],
+        adhoc:     [double('target', name: 'target')]
+      }
+    end
+
+    it 'outputs inventory targets with count and file' do
+      outputter.print_targets(target_list, inventoryfile)
+      parsed = JSON.parse(output.string)
+
+      expect(parsed['inventory']).to eq(
+        'targets' => ['target'],
+        'count'   => 1,
+        'file'    => inventoryfile
+      )
+    end
+
+    it 'outputs adhoc targets with count' do
+      outputter.print_targets(target_list, inventoryfile)
+      parsed = JSON.parse(output.string)
+
+      expect(parsed['adhoc']).to eq(
+        'targets' => ['target'],
+        'count'   => 1
+      )
+    end
+
+    it 'outputs all targets with count' do
+      outputter.print_targets(target_list, inventoryfile)
+      parsed = JSON.parse(output.string)
+
+      expect(parsed['targets']).to match_array(%w[target target])
+      expect(parsed['count']).to eq(2)
+    end
+  end
 end

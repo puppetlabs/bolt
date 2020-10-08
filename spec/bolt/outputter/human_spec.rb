@@ -372,4 +372,36 @@ describe "Bolt::Outputter::Human" do
     outputter.print_guide(guide, 'boltymcboltface')
     expect(output.string).to eq(guide)
   end
+
+  context '#print_targets' do
+    let(:inventoryfile) { double('inventoryfile', to_s: '/path/to/inventory', exist?: true) }
+
+    let(:target_list) do
+      {
+        inventory: [double('target', name: 'target')],
+        adhoc:     [double('target', name: 'target')]
+      }
+    end
+
+    it 'prints adhoc targets' do
+      outputter.print_targets(target_list, inventoryfile)
+      expect(output.string).to match(/target\s*\(Not found in inventory file\)/)
+    end
+
+    it 'prints the inventory file path' do
+      outputter.print_targets(target_list, inventoryfile)
+      expect(output.string).to match(/INVENTORY FILE:\s*#{inventoryfile}/)
+    end
+
+    it 'prints a message that the inventory file does not exist' do
+      inventoryfile = double('inventoryfile', to_s: '/path/to/inventory', exist?: false)
+      outputter.print_targets(target_list, inventoryfile)
+      expect(output.string).to match(/INVENTORY FILE:.*does not exist/m)
+    end
+
+    it 'prints target counts' do
+      outputter.print_targets(target_list, inventoryfile)
+      expect(output.string).to match(/2 total, 1 from inventory, 1 adhoc/)
+    end
+  end
 end

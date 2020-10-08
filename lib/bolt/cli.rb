@@ -587,8 +587,24 @@ module Bolt
     end
 
     def list_targets
+      inventoryfile = config.inventoryfile || config.default_inventoryfile
+
+      # Retrieve the known group and target names. This needs to be done before
+      # updating targets, as that will add adhoc targets to the inventory.
+      known_names = inventory.target_names
+
       update_targets(options)
-      outputter.print_targets(options[:targets])
+
+      inventory_targets, adhoc_targets = options[:targets].partition do |target|
+        known_names.include?(target.name)
+      end
+
+      target_list = {
+        inventory: inventory_targets,
+        adhoc:     adhoc_targets
+      }
+
+      outputter.print_targets(target_list, inventoryfile)
     end
 
     def show_targets
