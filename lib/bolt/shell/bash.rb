@@ -202,13 +202,14 @@ module Bolt
       end
 
       def handle_sudo_errors(err)
-        if err =~ /^#{conn.user} is not in the sudoers file\./
+        case err
+        when /^#{conn.user} is not in the sudoers file\./
           @logger.trace { err }
           raise Bolt::Node::EscalateError.new(
             "User #{conn.user} does not have sudo permission on #{target}",
             'SUDO_DENIED'
           )
-        elsif err =~ /^Sorry, try again\./
+        when /^Sorry, try again\./
           @logger.trace { err }
           raise Bolt::Node::EscalateError.new(
             "Sudo password for user #{conn.user} not recognized on #{target}",

@@ -75,6 +75,9 @@ Lint/EmptyFile:
 Lint/FloatComparison:
   Enabled: true
 
+Lint/HashCompareByIdentity:
+  Enabled: false
+
 Lint/IdentityComparison:
   Enabled: true
 
@@ -88,6 +91,9 @@ Lint/OutOfRangeRegexpRef:
   Enabled: true
 
 Lint/RaiseException:
+  Enabled: true
+
+Lint/RedundantSafeNavigation:
   Enabled: true
 
 Lint/SelfAssignment:
@@ -165,6 +171,9 @@ Style/BlockDelimiters:
   Enabled: false
 
 Style/CaseLikeIf:
+  Enabled: true
+
+Style/ClassEqualityComparison:
   Enabled: true
 
 Style/CombinableLoops:
