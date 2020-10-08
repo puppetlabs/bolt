@@ -119,7 +119,7 @@ module Bolt
           # project init --modules, which uses the default modulepath. This
           # should be safe to assume that if `.modules/` is the moduledir the
           # user is using the new workflow
-          if moduledir.basename == '.modules'
+          if moduledir.basename.to_s == '.modules'
             puppetfile.write(path, moduledir)
           else
             puppetfile.write(path)
