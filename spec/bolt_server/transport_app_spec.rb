@@ -17,10 +17,16 @@ describe "BoltServer::TransportApp" do
   include BoltSpec::FileCache
   include Rack::Test::Methods
 
+  let(:basedir) { File.join(__dir__, '..', 'fixtures', 'bolt_server') }
+  let(:environment_dir) { File.join(basedir, 'environments', 'production') }
+  let(:project_dir) { File.join(basedir, 'projects') }
+
   def app
+    # The moduledir and mock file cache are used in the tests for task
+    # execution tests. Everything else uses the fixtures above.
     moduledir = File.join(__dir__, '..', 'fixtures', 'modules')
     mock_file_cache(moduledir)
-    config = BoltServer::Config.new(default_config)
+    config = BoltServer::Config.new({ 'projects-dir' => project_dir })
     BoltServer::TransportApp.new(config)
   end
 
@@ -32,6 +38,10 @@ describe "BoltServer::TransportApp" do
       'filename' => File.basename(file),
       'sha256' => Digest::SHA256.file(file),
       'size' => File.size(file) }
+  end
+
+  before(:each) do
+    stub_const('BoltServer::TransportApp::DEFAULT_BOLT_CODEDIR', basedir)
   end
 
   it 'responds ok' do
@@ -81,22 +91,16 @@ describe "BoltServer::TransportApp" do
     end
 
     describe '/plans/:module_name/:plan_name' do
-      let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
-
       context 'with module_name::plan_name' do
-        let(:path) { '/plans/foo/bar?environment=production' }
-        let(:plan_name) { 'foo::bar' }
-        let(:metadata) { mock_plan_info(plan_name) }
+        let(:path) { '/plans/bolt_server_test/simple_plan?environment=production' }
         let(:expected_response) {
           {
-            'name' => metadata['name'],
-            'description' => metadata['description'],
-            'parameters' => metadata['parameters']
+            'name' => 'bolt_server_test::simple_plan',
+            'description' => 'Simple plan testing',
+            'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } }
           }
         }
         it '/plans/:module_name/:plan_name handles module::plan_name' do
-          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-          expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
           get(path)
           resp = JSON.parse(last_response.body)
           expect(resp).to eq(expected_response)
@@ -104,19 +108,15 @@ describe "BoltServer::TransportApp" do
       end
 
       context 'with module_name' do
-        let(:init_plan) { '/plans/foo/init?environment=production' }
-        let(:plan_name) { 'foo' }
-        let(:metadata) { mock_plan_info(plan_name) }
+        let(:init_plan) { '/plans/bolt_server_test/init?environment=production' }
         let(:expected_response) {
           {
-            'name' => metadata['name'],
-            'description' => metadata['description'],
-            'parameters' => metadata['parameters']
+            'name' => 'bolt_server_test',
+            'description' => 'Init plan testing',
+            'parameters' => { 'bar' => { 'sensitive' => false, 'type' => 'String' } }
           }
         }
         it '/plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
-          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-          expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
           get(init_plan)
           resp = JSON.parse(last_response.body)
           expect(resp).to eq(expected_response)
@@ -125,8 +125,6 @@ describe "BoltServer::TransportApp" do
       context 'with non-existant plan' do
         let(:path) { '/plans/foo/bar?environment=production' }
         it 'returns 400 if an unknown plan error is thrown' do
-          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-          expect(fake_pal).to receive(:get_plan_info).with('foo::bar').and_raise(Bolt::Error.unknown_plan('foo::bar'))
           get(path)
           expect(last_response.status).to eq(400)
         end
@@ -134,82 +132,56 @@ describe "BoltServer::TransportApp" do
     end
 
     describe '/plans' do
-      let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
-
       describe 'when metadata=false' do
-        let(:path) { "/plans?environment=production" }
-        it 'returns just the list of plan names when metadata=false' do
-          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-          expect(fake_pal).to receive(:list_plans).and_return([['abc'], ['def']])
-          get(path)
-          metadata = JSON.parse(last_response.body)
-          expect(metadata).to eq([{ 'name' => 'abc' }, { 'name' => 'def' }])
+        context 'with a real environment' do
+          let(:path) { "/plans?environment=production" }
+          it 'returns just the list of plan names when metadata=false' do
+            get(path)
+            metadata = JSON.parse(last_response.body)
+            expect(metadata).to include({ 'name' => 'bolt_server_test' }, { 'name' => 'bolt_server_test::simple_plan' })
+          end
         end
 
-        it 'returns 400 if an environment not found error is thrown' do
-          # Actually creating the EnvironmentNotFound error with puppet is difficult to do without
-          # puppet actually loaded with settings, so just stub out the error type
-          stub_const("Puppet::Environments::EnvironmentNotFound", StandardError)
-          expect(BoltServer::PE::PAL).to receive(:new).and_raise(Puppet::Environments::EnvironmentNotFound)
-          get(path)
-          expect(last_response.status).to eq(400)
+        context 'with a non-existant environment' do
+          let(:path) { "/plans?environment=not_an_env" }
+          it 'returns 400 if an environment not found error is thrown' do
+            get(path)
+            expect(last_response.status).to eq(400)
+          end
         end
       end
 
       describe 'when metadata=true' do
         let(:path) { '/plans?environment=production&metadata=true' }
-        let(:plan_name) { 'abc' }
-        let(:metadata) { mock_plan_info(plan_name) }
         let(:expected_response) {
           {
-            metadata['name'] => {
-              'name' => metadata['name'],
-              'description' => metadata['description'],
-              'parameters' => metadata['parameters']
+            'bolt_server_test' => {
+              'name' => 'bolt_server_test',
+              'description' => 'Init plan testing',
+              'parameters' => { 'bar' => { 'sensitive' => false, 'type' => 'String' } }
             }
           }
         }
         it 'returns all metadata for each plan when metadata=true' do
-          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-          expect(fake_pal).to receive(:list_plans).and_return([plan_name])
-          expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
           get(path)
           resp = JSON.parse(last_response.body)
-          expect(resp).to eq(expected_response)
+          expect(resp).to include(expected_response)
         end
       end
     end
 
     describe '/project_plans/:module_name/:plan_name' do
-      let(:fake_pal) { instance_double('Bolt::PAL') }
-      let(:fake_project) { instance_double('Bolt::Project') }
-      let(:fake_config) { instance_double('Bolt::Config') }
-      let(:project_ref) { 'some_project_somesha' }
-
-      before(:each) do
-        allow(Dir).to receive(:exist?).with("/tmp/foo/#{project_ref}").and_return(true)
-        allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
-        allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
-        allow(fake_config).to receive(:modulepath)
-        allow(fake_config).to receive(:project).and_return(fake_project)
-        allow(Bolt::PAL).to receive(:new).and_return(fake_pal)
-      end
-
       context 'with module_name::plan_name' do
-        let(:path) { "/project_plans/foo/bar?project_ref=#{project_ref}" }
-        let(:plan_name) { 'foo::bar' }
-        let(:metadata) { mock_plan_info(plan_name) }
+        let(:path) { "/project_plans/bolt_server_test_project/simple_plan?project_ref=bolt_server_test_project" }
         let(:expected_response) {
           {
-            'name' => metadata['name'],
-            'description' => metadata['description'],
-            'parameters' => metadata['parameters'],
-            'allowed' => true
+            'name' => 'bolt_server_test_project::simple_plan',
+            'description' => 'Simple plan testing',
+            'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
+            'allowed' => false
           }
         }
         it '/project_plans/:module_name/:plan_name handles module::plan_name' do
-          allow(fake_project).to receive(:plans)
-          expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
           get(path)
           resp = JSON.parse(last_response.body)
           expect(resp).to eq(expected_response)
@@ -217,20 +189,16 @@ describe "BoltServer::TransportApp" do
       end
 
       context 'with module_name' do
-        let(:init_plan) { "/project_plans/foo/init?project_ref=#{project_ref}" }
-        let(:plan_name) { 'foo' }
-        let(:metadata) { mock_plan_info(plan_name) }
+        let(:init_plan) { "/project_plans/bolt_server_test_project/init?project_ref=bolt_server_test_project" }
         let(:expected_response) {
           {
-            'name' => metadata['name'],
-            'description' => metadata['description'],
-            'parameters' => metadata['parameters'],
+            'name' => 'bolt_server_test_project',
+            'description' => 'Project plan testing',
+            'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
             'allowed' => true
           }
         }
         it '/project_plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
-          allow(fake_project).to receive(:plans)
-          expect(fake_pal).to receive(:get_plan_info).with(plan_name).and_return(metadata)
           get(init_plan)
           resp = JSON.parse(last_response.body)
           expect(resp).to eq(expected_response)
@@ -238,9 +206,8 @@ describe "BoltServer::TransportApp" do
       end
 
       context 'with non-existant plan' do
-        let(:path) { "/project_plans/foo/bar?project_ref=#{project_ref}" }
+        let(:path) { "/project_plans/foo/bar?project_ref=not_a_real_project" }
         it 'returns 400 if an unknown plan error is thrown' do
-          expect(fake_pal).to receive(:get_plan_info).with('foo::bar').and_raise(Bolt::Error.unknown_plan('foo::bar'))
           get(path)
           expect(last_response.status).to eq(400)
         end
@@ -248,129 +215,84 @@ describe "BoltServer::TransportApp" do
     end
 
     describe '/project_plans' do
-      let(:fake_pal) { instance_double('Bolt::PAL') }
-      let(:fake_project) { instance_double('Bolt::Project') }
-      let(:fake_config) { instance_double('Bolt::Config') }
-      let(:project_ref) { 'some_project_somesha' }
-
-      before(:each) do
-        allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
-        allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
-        allow(fake_config).to receive(:modulepath)
-        allow(fake_config).to receive(:project).and_return(fake_project)
-        allow(Bolt::PAL).to receive(:new).and_return(fake_pal)
-      end
-
       describe 'when requesting plan list' do
-        let(:path) { "/project_plans?project_ref=#{project_ref}" }
-        it 'returns just the list of plan names' do
-          allow(Dir).to receive(:exist?).with("/tmp/foo/#{project_ref}").and_return(true)
-          allow(fake_project).to receive(:plans)
-          expect(fake_pal).to receive(:list_plans).and_return([['abc'], ['def']])
-          get(path)
-          metadata = JSON.parse(last_response.body)
-          expect(metadata).to eq([{ 'name' => 'abc', 'allowed' => true }, { 'name' => 'def', 'allowed' => true }])
+        context 'with an existing project' do
+          let(:path) { "/project_plans?project_ref=bolt_server_test_project" }
+          it 'returns the plans and filters based on allowlist in bolt-project.yaml' do
+            get(path)
+            metadata = JSON.parse(last_response.body)
+            expect(metadata).to include(
+              { 'name' => 'bolt_server_test_project', 'allowed' => true },
+              { 'name' => 'bolt_server_test_project::simple_plan', 'allowed' => false }
+            )
+          end
         end
 
-        it 'filters plans based on allowlist in bolt-project.yaml' do
-          allow(Dir).to receive(:exist?).with("/tmp/foo/#{project_ref}").and_return(true)
-          allow(fake_project).to receive(:plans).and_return(['abc'])
-          expect(fake_pal).to receive(:list_plans).and_return([['abc'], ['def']])
-          get(path)
-          metadata = JSON.parse(last_response.body)
-          expect(metadata).to eq([{ 'name' => 'abc', 'allowed' => true }, { 'name' => 'def', 'allowed' => false }])
-        end
-
-        it 'returns 400 if an project_ref not found error is thrown' do
-          get(path)
-          error = last_response.body
-          expect(error).to eq("`project_ref`: /tmp/foo/#{project_ref} does not exist")
-          expect(last_response.status).to eq(400)
+        context 'with a non existant project' do
+          let(:path) { "/project_plans/foo/bar?project_ref=not_a_real_project" }
+          it 'returns 400 if an project_ref not found error is thrown' do
+            get(path)
+            error = last_response.body
+            expect(error).to eq("`project_ref`: #{project_dir}/not_a_real_project does not exist")
+            expect(last_response.status).to eq(400)
+          end
         end
       end
     end
 
     describe '/tasks' do
-      let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
-      let(:path) { "/tasks?environment=production" }
-
-      it 'returns just the list of task names' do
-        expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-        expect(fake_pal).to receive(:list_tasks).and_return([%w[abc abc_description], %w[def def_description]])
-        get(path)
-        metadata = JSON.parse(last_response.body)
-        expect(metadata).to eq([{ 'name' => 'abc' }, { 'name' => 'def' }])
+      context 'with a non existant project' do
+        let(:path) { "/tasks?environment=production" }
+        it 'returns just the list of task names' do
+          get(path)
+          metadata = JSON.parse(last_response.body)
+          expect(metadata).to include({ 'name' => 'bolt_server_test' }, { 'name' => 'bolt_server_test::simple_task' })
+        end
       end
 
-      it 'returns 400 if an environment not found error is thrown' do
-        stub_const("Puppet::Environments::EnvironmentNotFound", StandardError)
-        expect(BoltServer::PE::PAL).to receive(:new).and_raise(Puppet::Environments::EnvironmentNotFound)
-        get(path)
-        expect(last_response.status).to eq(400)
+      context 'with a non existant project' do
+        let(:path) { "/tasks?environment=not_a_real_env" }
+        it 'returns 400 if an environment not found error is thrown' do
+          get(path)
+          expect(last_response.status).to eq(400)
+        end
       end
     end
 
     describe '/project_tasks' do
-      let(:fake_pal) { instance_double('Bolt::PAL') }
-      let(:fake_project) { instance_double('Bolt::Project') }
-      let(:fake_config) { instance_double('Bolt::Config') }
-      let(:project_ref) { 'my_project_somesha' }
-      let(:path) { "/project_tasks?project_ref=#{project_ref}" }
-
-      before(:each) do
-        allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
-        allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
-        allow(fake_config).to receive(:modulepath)
-        allow(fake_config).to receive(:project).and_return(fake_project)
-        allow(Bolt::PAL).to receive(:new).and_return(fake_pal)
-      end
-
-      it 'returns just the list of task names' do
-        allow(Dir).to receive(:exist?).with("/tmp/foo/#{project_ref}").and_return(true)
-        allow(fake_project).to receive(:tasks)
-        expect(fake_pal).to receive(:list_tasks).and_return([%w[abc abc_description], %w[def def_description]])
-        get(path)
-        metadata = JSON.parse(last_response.body)
-        expect(metadata).to eq([{ 'name' => 'abc', 'allowed' => true }, { 'name' => 'def', 'allowed' => true }])
-      end
-
-      it 'returns just the list of task names filtered on project allowlist' do
-        allow(Dir).to receive(:exist?).with("/tmp/foo/#{project_ref}").and_return(true)
-        allow(fake_project).to receive(:tasks).and_return(['abc'])
-        expect(fake_pal).to receive(:list_tasks).and_return([%w[abc abc_description], %w[def def_description]])
-        get(path)
-        metadata = JSON.parse(last_response.body)
-        expect(metadata).to eq([{ 'name' => 'abc', 'allowed' => true }, { 'name' => 'def', 'allowed' => false }])
-      end
-
-      it 'returns 400 if an environment not found error is thrown' do
-        get(path)
-        error = last_response.body
-        expect(error).to eq("`project_ref`: /tmp/foo/#{project_ref} does not exist")
-        expect(last_response.status).to eq(400)
+      context 'with an existing project' do
+        let(:path) { "/project_tasks?project_ref=bolt_server_test_project" }
+        it 'returns the tasks and filters based on allowlist in bolt-project.yaml' do
+          get(path)
+          metadata = JSON.parse(last_response.body)
+          expect(metadata).to include(
+            { 'name' => 'bolt_server_test_project', 'allowed' => true },
+            { 'name' => 'bolt_server_test_project::hidden', 'allowed' => false }
+          )
+        end
       end
     end
 
     describe '/tasks/:module_name/:task_name' do
-      let(:fake_pal) { instance_double('BoltServer::PE::PAL') }
-
       context 'with module_name::task_name' do
-        let(:path) { '/tasks/foo/bar?environment=production' }
-        let(:mock_task) {
-          Bolt::Task.new(task_name, {}, [{ 'name' => 'bar.rb', 'path' => File.expand_path(__FILE__) }])
-        }
-        let(:task_name) { 'foo::bar' }
+        let(:path) { '/tasks/bolt_server_test/simple_task?environment=production' }
         let(:expected_response) {
           {
-            "metadata" => {},
-            "name" => "foo::bar",
+            "metadata" => { "description" => "Environment task testing simple" },
+            "name" => "bolt_server_test::simple_task",
             "files" => [
               {
-                "filename" => "bar.rb",
-                "sha256" => Digest::SHA256.hexdigest(File.read(__FILE__)),
-                "size_bytes" => File.size(__FILE__),
+                "filename" => "simple_task.sh",
+                "sha256" => Digest::SHA256.hexdigest(
+                  File.read(
+                    File.join(environment_dir, 'modules', 'bolt_server_test', 'tasks', 'simple_task.sh')
+                  )
+                ),
+                "size_bytes" => File.size(
+                  File.join(environment_dir, 'modules', 'bolt_server_test', 'tasks', 'simple_task.sh')
+                ),
                 "uri" => {
-                  "path" => "/puppet/v3/file_content/tasks/foo/bar.rb",
+                  "path" => "/puppet/v3/file_content/tasks/bolt_server_test/simple_task.sh",
                   "params" => { "environment" => "production" }
                 }
               }
@@ -378,8 +300,6 @@ describe "BoltServer::TransportApp" do
           }
         }
         it '/tasks/:module_name/:task_name handles module::task_name' do
-          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-          expect(fake_pal).to receive(:get_task).with(task_name).and_return(mock_task)
           get(path)
           resp = JSON.parse(last_response.body)
           expect(resp).to eq(expected_response)
@@ -387,22 +307,24 @@ describe "BoltServer::TransportApp" do
       end
 
       context 'with module_name' do
-        let(:path) { '/tasks/foo/init?environment=production' }
-        let(:mock_task) {
-          Bolt::Task.new(task_name, {}, [{ 'name' => 'init.rb', 'path' => File.expand_path(__FILE__) }])
-        }
-        let(:task_name) { 'foo' }
+        let(:path) { '/tasks/bolt_server_test/init?environment=production' }
         let(:expected_response) {
           {
-            "metadata" => {},
-            "name" => "foo",
+            "metadata" => { "description" => "Environment task testing" },
+            "name" => "bolt_server_test",
             "files" => [
               {
-                "filename" => "init.rb",
-                "sha256" => Digest::SHA256.hexdigest(File.read(__FILE__)),
-                "size_bytes" => File.size(__FILE__),
+                "filename" => "init.sh",
+                "sha256" => Digest::SHA256.hexdigest(
+                  File.read(
+                    File.join(environment_dir, 'modules', 'bolt_server_test', 'tasks', 'init.sh')
+                  )
+                ),
+                "size_bytes" => File.size(
+                  File.join(environment_dir, 'modules', 'bolt_server_test', 'tasks', 'init.sh')
+                ),
                 "uri" => {
-                  "path" => "/puppet/v3/file_content/tasks/foo/init.rb",
+                  "path" => "/puppet/v3/file_content/tasks/bolt_server_test/init.sh",
                   "params" => { "environment" => "production" }
                 }
               }
@@ -411,67 +333,41 @@ describe "BoltServer::TransportApp" do
         }
 
         it '/tasks/:module_name/:task_name handles task name = module name (init.rb) task' do
-          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-          expect(fake_pal).to receive(:get_task).with(task_name).and_return(mock_task)
           get(path)
           resp = JSON.parse(last_response.body)
           expect(resp).to eq(expected_response)
         end
       end
-
-      context 'with non-existant task' do
-        let(:path) { '/tasks/foo/bar?environment=production' }
-        it 'returns 400 if an unknown plan error is thrown' do
-          expect(BoltServer::PE::PAL).to receive(:new).and_return(fake_pal)
-          expect(fake_pal).to receive(:get_task).with('foo::bar').and_raise(Bolt::Error.unknown_task('foo::bar'))
-          get(path)
-          expect(last_response.status).to eq(400)
-        end
-      end
     end
 
     describe '/project_tasks/:module_name/:task_name' do
-      let(:fake_pal) { instance_double('Bolt::PAL') }
-      let(:fake_project) { instance_double('Bolt::Project') }
-      let(:fake_config) { instance_double('Bolt::Config') }
-      let(:project_ref) { 'my_project_somesha' }
-
-      before(:each) do
-        allow(Dir).to receive(:exist?).with("/tmp/foo/#{project_ref}").and_return(true)
-        allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
-        allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
-        allow(fake_config).to receive(:modulepath)
-        allow(fake_config).to receive(:project).and_return(fake_project)
-        allow(Bolt::PAL).to receive(:new).and_return(fake_pal)
-      end
-
       context 'with module_name::task_name' do
-        let(:path) { "/project_tasks/foo/bar?project_ref=#{project_ref}" }
-        let(:mock_task) {
-          Bolt::Task.new(task_name, {}, [{ 'name' => 'bar.rb', 'path' => File.expand_path(__FILE__) }])
-        }
-        let(:task_name) { 'foo::bar' }
+        let(:path) { "/project_tasks/bolt_server_test_project/hidden?project_ref=bolt_server_test_project" }
         let(:expected_response) {
           {
-            "metadata" => {},
-            "name" => "foo::bar",
+            "metadata" => { "description" => "Project task testing" },
+            "name" => "bolt_server_test_project::hidden",
             "files" => [
               {
-                "filename" => "bar.rb",
-                "sha256" => Digest::SHA256.hexdigest(File.read(__FILE__)),
-                "size_bytes" => File.size(__FILE__),
+                "filename" => "hidden.sh",
+                "sha256" => Digest::SHA256.hexdigest(
+                  File.read(
+                    File.join(project_dir, 'bolt_server_test_project', 'tasks', 'hidden.sh')
+                  )
+                ),
+                "size_bytes" => File.size(
+                  File.join(project_dir, 'bolt_server_test_project', 'tasks', 'hidden.sh')
+                ),
                 "uri" => {
-                  "path" => "/puppet/v3/file_content/tasks/foo/bar.rb",
-                  "params" => { "project" => project_ref }
+                  "path" => "/puppet/v3/file_content/tasks/bolt_server_test_project/hidden.sh",
+                  "params" => { "project" => 'bolt_server_test_project' }
                 }
               }
             ],
-            "allowed" => true
+            "allowed" => false
           }
         }
         it '/project_tasks/:module_name/:task_name handles module::task_name' do
-          allow(fake_project).to receive(:tasks)
-          expect(fake_pal).to receive(:get_task).with(task_name).and_return(mock_task)
           get(path)
           resp = JSON.parse(last_response.body)
           expect(resp).to eq(expected_response)
@@ -479,23 +375,25 @@ describe "BoltServer::TransportApp" do
       end
 
       context 'with module_name' do
-        let(:path) { "/project_tasks/foo/init?project_ref=#{project_ref}" }
-        let(:mock_task) {
-          Bolt::Task.new(task_name, {}, [{ 'name' => 'init.rb', 'path' => File.expand_path(__FILE__) }])
-        }
-        let(:task_name) { 'foo' }
+        let(:path) { "/project_tasks/bolt_server_test_project/init?project_ref=bolt_server_test_project" }
         let(:expected_response) {
           {
-            "metadata" => {},
-            "name" => "foo",
+            "metadata" => { "description" => "Project task testing" },
+            "name" => "bolt_server_test_project",
             "files" => [
               {
-                "filename" => "init.rb",
-                "sha256" => Digest::SHA256.hexdigest(File.read(__FILE__)),
-                "size_bytes" => File.size(__FILE__),
+                "filename" => "init.sh",
+                "sha256" => Digest::SHA256.hexdigest(
+                  File.read(
+                    File.join(project_dir, 'bolt_server_test_project', 'tasks', 'init.sh')
+                  )
+                ),
+                "size_bytes" => File.size(
+                  File.join(project_dir, 'bolt_server_test_project', 'tasks', 'init.sh')
+                ),
                 "uri" => {
-                  "path" => "/puppet/v3/file_content/tasks/foo/init.rb",
-                  "params" => { "project" => project_ref }
+                  "path" => "/puppet/v3/file_content/tasks/bolt_server_test_project/init.sh",
+                  "params" => { "project" => 'bolt_server_test_project' }
                 }
               }
             ],
@@ -504,20 +402,9 @@ describe "BoltServer::TransportApp" do
         }
 
         it '/prject_tasks/:module_name/:task_name handles task name = module name (init.rb) task' do
-          allow(fake_project).to receive(:tasks)
-          expect(fake_pal).to receive(:get_task).with(task_name).and_return(mock_task)
           get(path)
           resp = JSON.parse(last_response.body)
           expect(resp).to eq(expected_response)
-        end
-      end
-
-      context 'with non-existant task' do
-        let(:path) { "/project_tasks/foo/bar?project_ref=#{project_ref}" }
-        it 'returns 400 if an unknown plan error is thrown' do
-          expect(fake_pal).to receive(:get_task).with('foo::bar').and_raise(Bolt::Error.unknown_task('foo::bar'))
-          get(path)
-          expect(last_response.status).to eq(400)
         end
       end
     end
