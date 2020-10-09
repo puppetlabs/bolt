@@ -1,339 +1,214 @@
 # Using plugins
 
-Use Plugins to dynamically load information into an inventory file or
-configuration file. Plugins either ship with Bolt or are installed as Puppet
-modules that have the same name as the plugin. The plugin framework is based on
-a set of plugin hooks that are implemented by plugin authors and called by Bolt.
+Bolt supports the use of plugins to dynamically load information during a Bolt
+run and change how Bolt executes certain actions. Bolt ships with some plugins,
+but you can also create your own plugins or install plugins created by other
+users. For information on how to write your own plugins, see [Writing
+plugins](writing_plugins.md). For information on how to install modules, which
+can include plugins, see [Installing modules](bolt_installing_modules.md).
 
-A plugin hook provides an API for a specific use case. A plugin can implement
-multiple hooks. The way in which a plugin is used varies depending on the type
-of hook used.
+There are three types of plugins that you can use with Bolt:
 
-> **Note:** Plugins are only available in configuration files and version 2
-> inventory files.
-
+- **Reference plugins:** Use to fetch data from an external source and store it
+  in a static data object.
+- **Secret plugins:**  Use to create keys for encryption and decryption, to
+  encrypt plaintext, or to decrypt ciphertext.
+- **Puppet library plugins:** Use to install Puppet libraries on a target when a
+  plan calls the `apply_prep` function.
 
 ## Reference plugins
 
 Reference plugins fetch data from an external source and store it in a static
-data object. For example, they can discover inventory targets from AWS or
-PuppetDB.
+data object. You can use reference plugins to dynamically load information into
+a configuration file or inventory file, or to load information for use in a
+plan. 
 
-To use a reference, add an object with a `_plugin` key where you want to use the
-resolved value. The `_plugin` value must be the name of the plugin you're using,
-and the object must contain any required plugin-specific options.
+For example, you might use a reference plugin to prompt a user to enter a
+password, or query AWS for a list of targets to populate the inventory with.
 
-Bolt currently supports references in an inventory file to define targets,
-groups, and any data like `facts` or `config`. It resolves references only as
-needed, which means that `targets` and `groups` references are resolved when the
-inventory is loaded, while data, such as `vars`, `facts`, `features`, and
-`config` references, are resolved when a target that uses that data is loaded in
-a plan.
+### Using reference plugins in configuration and inventory files
 
+You can use reference plugins in configuration and inventory files. For example,
+you can use plugins to dynamically load sensitive information or to generate
+lists of targets.
 
-### AWS
+To use a reference plugin in a configuration or inventory file, add an object
+with a `_plugin` key where you want to use the plugin. The `_plugin` key accepts
+the name of the plugin that you are using. You can also include additional keys
+that correspond to the parameters that the plugin accepts.
 
-The `aws_inventory` plugin generates targets from AWS EC2 instances. 
-
-It is a module-based plugin available on the Puppet Forge and is installed with
-Bolt. [View the documentation on the
-Forge](https://forge.puppet.com/puppetlabs/aws_inventory).
-
-
-### Azure
-
-The `azure_inventory` plugin generates targets from Azure VMs and VM scale sets.
-
-
-It is a module-based plugin available on the Puppet Forge and is installed with
-Bolt. [View the documentation on the
-forge](https://forge.puppet.com/puppetlabs/azure_inventory).
-
-
-### Environment variable
-
-The `env_var` plugin allows users to read values stored in environment variables
-and load them into an inventory or configuration file.
-
-#### Available fields
-
-The following fields are available to the `env_var` plugin.
-
-| Key | Description | Type | Default |
-| --- | ----------- | ---- | ------- |
-| **`var`** | The name of the environment variable to read from. **Required.** | `String` | None |
-| **`default`** | A value to use if the environment variable `var` isn't set | `String` | None |
-| **`optional`** | Unless `true`, env_var will raise an error when the environment variable `var` does not exist.  When `optional` is `true` and `var` does not exist, env_var returns `nil` | `Boolean` | `false` |
-
-#### Example usage
-
-Looking up a value from an environment variable in an inventory file:
+For example, if you wanted to prompt for a password that is used to authenticate
+with targets, you could use the supported `prompt` plugin in your configuration
+file:
 
 ```yaml
-targets:
-  - target1.example.com
-config:
-  ssh:
-    user: bolt
-    password:
-      _plugin: env_var
-      var: BOLT_PASSWORD
-```
-
-### Google Cloud
-
-The `gcloud_inventory` plugin generates targets from Google Cloud compute engine
-instances.
-
-It is a module-based plugin available on the Puppet Forge and is installed with
-Bolt. [View the documentation on the
-forge](https://forge.puppet.com/puppetlabs/gcloud_inventory).
-
-### Prompt
-
-The `prompt` plugin allows users to interactively enter sensitive configuration
-information on the CLI instead of storing that data in the inventory file. Data
-is looked up when the value is needed for the target. Once the value has been
-stored, it is re-used for the rest of the Bolt run. The `prompt` plugin must be
-nested under the `config` field.
-
-#### Available fields
-
-The following fields are available to the `prompt` plugin.
-
-| Key | Description | Type | Default |
-| --- | ----------- | ---- | ------- |
-| **`_plugin`** | The name of the plugin.<br> **Required.** Must be set to `prompt`. | `String` | None |
-| **`message`** | The text to show when prompting the user.<br> **Required.** | `String` | None |
-
-#### Example usage
-
-Prompting for a password in an inventory file:
-
-```yaml
-targets:
-  - target1.example.com
-config:
+# bolt-defaults.yaml
+inventory-config:
   ssh:
     password:
       _plugin: prompt
-      message: Enter your SSH password
+      message: Enter SSH password
 ```
 
-
-### PuppetDB
-
-The `puppetdb` plugin queries PuppetDB for a group of targets. 
-
-If target-specific configuration is required, the `puppetdb` plugin can be used
-to lookup configuration values for the `alias`, `config`, `facts`, `features`,
-`name`, `uri` and `vars` inventory options for each target. These values can be
-set in the `target_mapping` field. The fact lookup values can be either
-`certname` to reference the `[certname]` of the target, or a [PQL dot
-notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation)
-facts string such as `facts.os.family` to reference a fact value. Dot notation
-is required for both structured and unstructured facts.
-
-#### Available fields
-
-The following fields are available to the `puppetdb` plugin.
-
-> **Note:** If neither `name` nor `uri` is specified in `target_mapping`, then
-> `uri` will be set to `certname`.
-
-| Key | Description | Type | Default |
-| --- | ----------- | ---- | ------- |
-| **`_plugin`** | The name of the plugin.<br> **Required.** Must be set to `puppetdb`. | `String` | None |
-| **`query`** | A string containing a [PQL query](https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html) or an array containing a [PuppetDB AST format query](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html).<br> **Required.** | `String` | None |
-| `target_mapping` | A hash of target attributes (`name`, `uri`, `config`) to populate with fact lookup values. | `Hash` | None |
-
-#### Available fact paths
-
-The following values/patterns are available to use for looking up facts in the
-`target_mapping` field:
-
-| Key | Description |
-| --- | ----------- |
-| `certname` | The certname of the node returned from PuppetDB. This is short hand for doing: `facts.trusted.certname`. |
-| `facts.*` | [PQL dot notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation) facts string such as `facts.os.family` to reference fact value. Dot notation is required for both structured and unstructured facts. |
-
-#### Example usage
-
-Lookup targets with the fact `osfamily: RedHat` and setting:
- * The alias with the fact `hostname`
- * The name with the fact `certname`
- * A target fact called `custom_fact` with the `custom_fact` from PuppetDB
- * A feature from the fact `custom_feature`
- * The SSH hostname with the fact `networking.interfaces.en0.ipaddress`
- * The puppetversion var from the fact `puppetversion`
+You can also use reference plugins to generate lists of targets in an
+inventory file. For example, you can generate a list of targets from a
+Terraform state file using the supported `terraform` plugin:
 
 ```yaml
-targets:
-  - _plugin: puppetdb
-    query: "inventory[certname] { facts.osfamily = 'RedHat' }"
-    target_mapping:
-      alias: facts.hostname
-      name: certname
-      facts:
-        custom_fact: facts.custom_fact
-      features:
-        - facts.custom_feature
-      config:
-        ssh:
-          host: facts.networking.interfaces.en0.ipaddress
-      vars:
-        puppetversion: facts.puppetversion
+# inventory.yaml
+groups:
+  - name: terraform
+    targets:
+      _plugin: terraform
+      dir: /Users/bolt/terraform/project
+      resource_type: aws_instance.web
+      target_mapping:
+        uri: public_ip
 ```
 
+Whenever a plugin is used in a configuration or inventory file, it must return a
+valid value for the field it is being used with. For example, because the
+`targets` field of an inventory file expects an array, a plugin under the
+`targets` field of an inventory file must return an array.
 
-### Task
+Reference plugins are resolved only as needed. In configuration files, all
+reference plugins are resolved as as soon as Bolt loads the file. In inventory
+files, reference plugins under the `groups` and `targets` keys are resolved as
+soon as the inventory file is loaded, whereas reference plugins under data keys
+such as `config` or `facts` are resolved once Bolt starts running an action on
+that target.
 
-The `task` plugin lets a Bolt plugin hook run a task. How this task is run
-depends on the hook called. For all hooks except puppet_library the task will
-run on the localhost target without access to any configuration defined in an
-inventory file, but with access to any parameters that are configured. The
-plugin extracts the `value` key and uses that as the value.
+📖 **Related information**
 
-To use the `task` plugin to load targets, the task value must return an array of
-target objects in the format that the inventory file accepts. When referring to
-another value, the type of value should match whatever the reference expects.
-For example, `host-key-check` for SSH must be a boolean, `password` must be a
-string, and `run-as-command` must be an array of strings. The following result
-would be appropriate for the entire SSH section of a configuration.
+- [Configuring Bolt](configuring_bolt.md)
+- [Inventory files](inventory_file_v2.md)
 
-```json
-{
-  "config": {
-    "host-key-check": true,
-    "password": "bolt",
-    "run-as-command": [ "sudo", "-k", "-S", "-E", "-u", "user", "-p", "password"]
+### Using reference plugins in plans
+
+You can use reference plugins in plans. For example, if your plan launches new
+Azure VMs, you can use a reference plugin to fetch a list of the new instances
+for use in your plan.
+
+To use a reference plugin in a plan, call the `resolve_references` plan
+function. This function accepts a single argument: a hash of reference data to
+resolve. The hash is identical in structure to how you would use a reference
+plugin in a configuration or inventory file, and can include multiple reference
+plugins. When the `resolve_references` function is called, it resolves all of
+the plugin references in the hash, returning a hash of resolved data.
+
+For example, to use the `env_var` reference plugin in a plan to retrieve a
+value from an environment variable, you would call the `resolve_references`
+plan function like this:
+
+```ruby
+$references = {
+  "value" => {
+    "_plugin" => "env_var",
+    "var"     => "BOLT_PASSWORD"
   }
 }
+
+$resolved = resolve_references($references)
 ```
 
-#### Available fields
+If you wanted to use the `terraform` reference plugin in a plan to generate a
+list of targets from a Terraform state file, you would call the
+`resolve_references` function like this:
 
-The following fields are available to the `task` plugin:
+```ruby
+$references = {
+  "targets" => [
+    "_plugin"        => "terraform",
+    "dir"            => "/Users/bolt/terraform/project",
+    "resource_type"  => "aws_instance.web",
+    "target_mapping" => {
+      "uri" => "public_ip"
+    }
+  ]
+}
 
-| Key | Description | Type | Default |
-| --- | ----------- | ---- | ------- |
-| **`_plugin`** | The name of the plugin.<br> **Required** and must be set to `task` | `String` | None |
-| **`task`** | The name of the task to run.<br> **Required.** | `String` | None |
-| `parameters` | The parameters to pass to the task. | `Hash` | None |
-
-#### Example usage
-
-Loading targets with a `my_json_file::targets` task and a password with a
-`my_db::secret_lookup` task:
-
-```yaml
-targets:
-  - _plugin: task
-    task: my_json_file::targets
-    parameters:
-      file: /etc/targets/data.json
-      environment: production
-      app: my_app
-config:
-  ssh:
-    password:
-      _plugin: task
-      task: my_db::secret_lookup
-      parameters:
-        key: ssh_password
+$resolved = resolve_references($references)
 ```
 
-A python task to load a secret from a database:
+📖 **Related information**
 
-```python
-#!/usr/bin/env python
-import json, sys
-from my_secret import Client
-
-params = json.load(sys.stdin)
-
-client = Client
-secret = client.get_secret(data['key'])
-# secret can be any value that can be dumped to json.
-json.dump({'value': secret}, sys.stdout)
-```
-
-
-### Terraform
-
-The `terraform` plugin generates targets from local and remote Terraform state
-files. 
-
-It is a module-based plugin available on the Puppet Forge and is installed with
-Bolt. [View the documentation on the
-Forge](https://forge.puppet.com/puppetlabs/terraform).
-
-
-### Vault
-
-The `vault` plugin allows values to be set by accessing secrets from a Key/Value
-engine on a Hashicorp Vault server.
-
-It is a module-based plugin available on the Puppet Forge and is installed with
-Bolt. [View the documentation on the
-Forge](https://forge.puppet.com/puppetlabs/vault).
-
-
-### YAML
-
-The `yaml` plugin composes multiple YAML files into a single file. This can be
-used to combine multiple inventory files or to separate sensitive data from the
-Bolt project directory.
-
-It is a module-based plugin available on the Puppet Forge and is installed with
-Bolt. [View the documentation on the
-Forge](https://forge.puppet.com/puppetlabs/yaml)
-
+- [Bolt functions: resolve_references](plan_functions.md#resolve-references)
 
 ## Secret plugins
 
-Secret plugins encrypt and decrypt sensitive values in data. The `bolt secret
-encrypt` and `bolt secret decrypt` commands encrypt or decrypt data that can be
-used as a reference in data files, while the `bolt secret createkeys` command
-creates key pairs.
+Use secret plugins to create keys for encryption and decryption, to encrypt
+plaintext, or to decrypt ciphertext. Bolt uses secret plugins as part of the `bolt
+secret *` commands and `*-BoltSecret` cmdlets.
 
+By default, Bolt is configured to use the bundled `pkcs7` secret plugins.
+However, you can specify a different secret plugin for Bolt to use with the
+`plugin` command-line option. For example, to use an alternative secret plugin
+to encrypt a plaintext value, you would run the following command:
 
-### pkcs7
+- _\*nix shell command_
 
-The `pkcs7` plugin allows configuration values to be stored as encrypted text in
-the inventory file and decrypted only as needed.
+  ```shell
+  bolt secret encrypt '$ecretP@$$word!' --plugin <plugin name>
+  ```
 
-It is a module-based plugin available on the Puppet Forge and is installed with
-Bolt. [View the documentation on the
-Forge](https://forge.puppet.com/puppetlabs/pkcs7)
+- _PowerShell cmdlet_
+
+  ```powershell
+  Protect-BoltSecret -Text '$ecretP@$$word!' -Plugin <plugin name>
+  ```
 
 ## Puppet library plugins
 
-Puppet library plugins install Puppet libraries on target nodes when a plan
-calls `apply_prep`.
+Puppet library plugins install Puppet libraries on a target when a plan calls
+the `apply_prep` function. Bolt is configured to use the `puppet_agent::install`
+task as the default Puppet library plugin. However, you can configure Bolt to
+use another plugin instead.
+
+To configure Bolt to use a specific Puppet library plugin, configure the
+`puppet_library` plugin hook under the `plugin_hooks` key in a configuration
+file. The `puppet_library` plugin hook accepts one of two different plugins.
+The `puppet_agent` plugin is the default plugin that Bolt is configured to use,
+while `task` can be used to specify a task to run as a plugin.
+
+```yaml
+# bolt-defaults.yaml
+plugin_hooks:
+  puppet_library:
+    plugin: task
+    task: <plugin name>
+```
 
 
 ## Configuring plugins
 
-Some plugins use configuration data from the `plugins` section of a
-configuration file. Each plugin has its own configuration section. For example,
-the following configuration file will change where the `pkcs7` plugin looks for
-the private key.
+Plugins that accept parameters can be configured in Bolt's configuration files.
+Each time Bolt uses a plugin, it will use this configuration as default values
+for the plugin.
+
+Configure plugins when you need to use a consistent parameter value across
+multiple plugin uses. For example, if a reference plugin accepts a `password`
+parameter to authenticate with a service, you might want to configure the plugin
+to always use the same password so you don't need to specify it each time you
+use the plugin.
+
+To configure a plugin, specify the name of the plugin under the `plugins` key of
+a configuration file. Each plugin accepts a hash of parameters and values for
+the parameters. For example, the following configuration file changes where the
+`pkcs7` plugin looks for a private key:
 
 ```yaml
+# bolt-project.yaml
 plugins:
   pkcs7:
-    private_key: ~/bolt_private_key.pem
+    private_key: /Users/bolt/keys/private_key.pem
 ```
 
-Plugin configuration can be derived from other plugins using `_plugin`
-references. For example, you can configure the `vault` plugin to use the
-`prompt` plugin to prompt for a password.
-
-> **Note:** Plugins can only be used in a configuration file to configure other
-> plugins under the `plugins` and `plugin_hooks` fields.
+You can also use plugins to configure other plugins. For example, you can
+configure the `vault` plugin to use the `prompt` plugin to prompt for a
+password:
 
 ```yaml
+# bolt-project.yaml
 plugins:
   vault:
     auth:
@@ -343,3 +218,7 @@ plugins:
         _plugin: prompt
         message: Enter your Vault password
 ```
+
+📖 **Related information**
+
+- [Configuring Bolt](configuring_bolt.md)
