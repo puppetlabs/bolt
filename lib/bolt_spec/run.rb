@@ -179,7 +179,7 @@ module BoltSpec
       end
 
       def pal
-        @pal ||= Bolt::PAL.new(config.modulepath,
+        @pal ||= Bolt::PAL.new(Bolt::Config::Modulepath.new(config.modulepath),
                                config.hiera_config,
                                config.project.resource_types,
                                config.compile_concurrency)

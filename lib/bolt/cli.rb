@@ -617,10 +617,10 @@ module Bolt
         message = <<~MESSAGE.chomp
           Invalid plan name '#{plan_name}'. Plan names are composed of one or more name segments
           separated by double colons '::'.
-          
+
           Each name segment must begin with a lowercase letter, and may only include lowercase
           letters, digits, and underscores.
-          
+
           Examples of valid plan names:
               - #{config.project.name}
               - #{config.project.name}::my_plan
@@ -962,7 +962,7 @@ module Bolt
     end
 
     def pal
-      @pal ||= Bolt::PAL.new(config.modulepath,
+      @pal ||= Bolt::PAL.new(Bolt::Config::Modulepath.new(config.modulepath),
                              config.hiera_config,
                              config.project.resource_types,
                              config.compile_concurrency,
@@ -1061,7 +1061,7 @@ module Bolt
                   'Task' => [],
                   'Plugin' => Bolt::Plugin::BUILTIN_PLUGINS }
       if %w[plan task].include?(options[:subcommand]) && options[:action] == 'run'
-        default_content = Bolt::PAL.new([], nil, nil)
+        default_content = Bolt::PAL.new(Bolt::Config::Modulepath.new([]), nil, nil)
         content['Plan'] = default_content.list_plans.each_with_object([]) do |iter, col|
           col << iter&.first
         end
@@ -1076,7 +1076,7 @@ module Bolt
     # Gem installs include the aggregate, canary, and puppetdb_fact modules, while
     # package installs include modules listed in the Bolt repo Puppetfile
     def incomplete_install?
-      (Dir.children(Bolt::PAL::MODULES_PATH) - %w[aggregate canary puppetdb_fact secure_env_vars]).empty?
+      (Dir.children(Bolt::Config::Modulepath::MODULES_PATH) - %w[aggregate canary puppetdb_fact secure_env_vars]).empty?
     end
 
     # Mimicks the output from Outputter::Human#fatal_error. This should be used to print

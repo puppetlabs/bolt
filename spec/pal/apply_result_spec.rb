@@ -17,7 +17,7 @@ describe 'ApplyResult DataType' do
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:pal)     { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:pal)     { Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), nil, nil) }
   let(:plugins) { Bolt::Plugin.setup(config, nil) }
 
   let(:result_code) do
