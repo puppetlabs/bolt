@@ -28,7 +28,7 @@ module Bolt
 
         begin
           File.write(inventory_file, data.to_yaml)
-          @outputter.print_migrate_step(
+          @outputter.print_action_step(
             "Successfully migrated Bolt inventory to the latest version."
           )
           true
