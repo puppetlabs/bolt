@@ -16,6 +16,9 @@ require 'json-schema'
 require 'puppet'
 require 'bolt_server/pe/pal'
 
+# Needed by the `/project_file_metadatas` endpoint
+require 'puppet/file_serving/fileset'
+
 module BoltServer
   class TransportApp < Sinatra::Base
     # This disables Sinatra's error page generation
@@ -307,6 +310,23 @@ module BoltServer
       plans.map { |plan_name| { 'name' => plan_name } }
     end
 
+    def file_metadatas(pal, module_name, file)
+      pal.in_bolt_compiler do
+        mod = Puppet.lookup(:current_environment).module(module_name)
+        raise ArgumentError, "`module_name`: #{module_name} does not exist" unless mod
+        abs_file_path = mod.file(file)
+        raise ArgumentError, "`file`: #{file} does not exist inside the module's 'files' directory" unless abs_file_path
+        fileset = Puppet::FileServing::Fileset.new(abs_file_path, 'recurse' => 'yes')
+        Puppet::FileServing::Fileset.merge(fileset).collect do |relative_file_path, base_path|
+          metadata = Puppet::FileServing::Metadata.new(base_path, relative_path: relative_file_path)
+          metadata.checksum_type = 'sha256'
+          metadata.links = 'follow'
+          metadata.collect
+          metadata.to_data_hash
+        end
+      end
+    end
+
     get '/' do
       200
     end
@@ -548,6 +568,19 @@ module BoltServer
         # to bolt-server smaller/simpler.
         [200, tasks_response.to_json]
       end
+    end
+
+    # Implements puppetserver's file_metadatas endpoint for projects.
+    #
+    # @param project_ref [String] the project_ref to fetch the file metadatas from
+    get '/project_file_metadatas/:module_name/*' do
+      in_bolt_project(params['project_ref']) do |context|
+        file = params[:splat].first
+        metadatas = file_metadatas(context[:pal], params[:module_name], file)
+        [200, metadatas.to_json]
+      end
+    rescue ArgumentError => e
+      [400, e.message]
     end
 
     error 404 do
