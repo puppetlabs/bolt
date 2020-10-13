@@ -83,8 +83,8 @@ The default `sudo-executable` is `sudo`. If you're running a task that
 reads parameters from environment variables, `-E` will be appended.
 
 > **Note:** The command is shell escaped, so each value is interpreted
-> literally. This means you can't set sudo flags in the `run-as` configuration.
-> Use the `run-as-command` option to specify your own sudo command and flags.
+> literally. This means you can't set sudo command-line options in the `run-as` configuration.
+> Use the `run-as-command` option to specify your own sudo command and command-line options.
 
 You can replace this command wholesale by specifying `run-as-command`, which
 will prepend the following to the command being run:
@@ -93,7 +93,7 @@ will prepend the following to the command being run:
 <run-as-command> <run-as>
 ```
 
-This enables using any executable and flags to change users. Keep in mind that:
+This enables using any executable and command-line options to change users. Keep in mind that:
 - The `run-as-command` is non-interactive. If you set `run-as-command` and the
   system prompts for a password, Bolt will error instead of supplying the password.
 - Bolt always appends the specified `run-as` user to the specified `run-as-command`,

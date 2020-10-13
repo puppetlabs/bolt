@@ -29,13 +29,21 @@ configuration file.
 
 ### Setting log level on the CLI
 
-To set the log level from the CLI, use the `--log-level` option along with the
+To set the log level from the CLI, use the `log-level` option along with the
 desired level. Available log levels are `trace`, `debug`, `info`, `warn`,
 `error`, and `fatal`. For example:
 
-```console
-bolt command run whoami -t target1 --log-level trace
-```
+- _\*nix shell command_
+
+  ```shell
+  bolt command run whoami -t target1 --log-level trace
+  ```
+
+- _PowerShell cmdlet_
+
+  ```powershell
+  Invoke-BoltCommand -Command whoami -Targets target1 -LogLevel trace
+  ```
 
 ### Setting log level in a configuration file
 
@@ -154,6 +162,15 @@ The following Bolt commands include the `--verbose` CLI option:
 - `bolt file upload`
 - `bolt file download`
 - `bolt apply`
+
+The following PowerShell cmdlets include the `-Verbose` argument:
+- `Invoke-BoltCommand`
+- `Invoke-BoltTask`
+- `Invoke-BoltPlan`
+- `Invoke-BoltScript`
+- `Send-BoltFile`
+- `Receive-BoltFile`
+- `Invoke-BoltApply`
 
 Verbose logging is useful when you want to see the
 results for Bolt actions on your targets that are usually not printed to

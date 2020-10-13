@@ -26,12 +26,11 @@ limitations](#manifest-block-limitations).
 
 Similar to the [`puppet apply`
 command](https://puppet.com/docs/puppet/latest/man/apply.html), which applies a
-standalone Puppet manifest to a local system, the [`bolt apply`
-command](https://puppet.com/docs/bolt/latest/bolt_command_reference.html#apply)
-uses manifest blocks to pass code to remote targets from the command line.
+standalone Puppet manifest to a local system, you can use Bolt to apply
+Puppet manifests to remote targets.
 
-Manifest blocks require facts to compile. When using the `bolt apply` command,
-Bolt automatically installs the packages necessary to run the apply command and
+Manifest blocks require facts to compile. When Bolt applies Puppet manifests, it
+automatically installs the packages necessary to run the apply command and
 gathers facts using [facter](https://puppet.com/docs/facter/latest/), making the
 facts available to the manifest block. Bolt also identifies targets that do not
 have Puppet agents and runs the [`puppet_agent::install`
@@ -43,21 +42,37 @@ task](https://forge.puppet.com/puppetlabs/puppet_agent) to install the agent.
 
 ### Applying manifest files
 
-To apply Puppet code from an existing manifest file, use the `bolt apply`
-command and specify the absolute path to the manifest file:
+Bolt can apply a manifest from a file by passing an absolute path to the
+manifest:
 
-```shell
-$ bolt apply ~/bolt/site-modules/profiles/manifests/server.pp -t target1,target2
-```
+- _\*nix shell command_
+
+  ```shell
+  bolt apply manifests/server.pp --targets servers
+  ```
+
+- _PowerShell cmdlet_
+
+  ```powershell
+  Invoke-BoltApply -Manifest manifests/server.pp -Targets servers
+  ```
 
 ### Applying manifest code
 
-You can pass manifest code directly to the `bolt apply` command using the
-`[-e|--execute]` option. This option takes a string containing manifest code:
+Bolt can apply manifest code directly by passing the code to the `execute`
+command-line option:
 
-```shell
-$ bolt apply -e "file { '/etc/puppetlabs': ensure => present }" -t target1,target2
-```
+- _\*nix shell command_
+
+  ```shell
+  bolt apply --execute "file { '/etc/puppetlabs': ensure => present }" --targets servers
+  ```
+
+- _PowerShell cmdlet_
+
+  ```powershell
+  Invoke-BoltApply -Execute "file { '/etc/puppetlabs': ensure => present }" -Targets servers
+  ```
 
 ### Definitions and declarations
 
@@ -71,12 +86,11 @@ catalog. A class or defined type that is not called by name, or _declared_, is
 not added to the catalog, and thus none of the code in those definitions will be
 applied to the targets.
 
-When using the `bolt apply` command to apply a manifest containing only
-definitions, Bolt will issue a helpful warning to let you know that the apply
-will do nothing:
+When you apply a manifest containing only definitions, Bolt will issue a helpful
+warning to let you know that the apply will do nothing:
 
 ```shell
-$ bolt apply -e "define bolt { file { 'etc/puppetlabs': ensure => present } }" -t target1,target2
+$ bolt apply --execute "define bolt { file { 'etc/puppetlabs': ensure => present } }" --targets servers
 
 Manifest only contains definitions and will result in no changes on the targets.
 . . .
@@ -128,9 +142,9 @@ Ran on 2 targets in 8.42 sec
 
 ## Applying Puppet code from Puppet Forge modules in a YAML plan
 
-In addition to the `bolt apply` command, you can apply Puppet code from a
-module downloaded from the Puppet Forge in a YAML plan. To apply Puppet
-code in a YAML plan, use the YAML plan `resources` step.
+You can apply Puppet code from a module downloaded from the Puppet Forge in a
+YAML plan. To apply Puppet code in a YAML plan, use the YAML plan `resources`
+step.
 
 To learn more about applying Puppet code in YAML plans, see [Writing YAML
 plans](writing_yaml_plans.md#applying-puppet-code-from-puppet-forge-modules).

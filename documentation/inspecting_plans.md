@@ -11,9 +11,17 @@ effect it has on your targets.
 
 View a list of available plans:
 
-```
-bolt plan show
-``` 
+- _\*nix shell command_
+
+  ```shell
+  bolt plan show
+  ```
+
+- _PowerShell cmdlet_
+
+  ```powershell
+  Get-BoltPlan
+  ```
 
 If you don't see a plan you were expecting to find, make sure the plan is
 located in the correct directory. For more information, see [How Bolt locates
@@ -22,15 +30,16 @@ plans](./bolt_running_plans.md#how-bolt-locates-plans)
 ## Show documentation for a plan
 
 Use the following command to view parameters and other details for a plan,
-including whether a plan supports `--noop`:
+including whether a plan supports `noop`:
 
-```
-bolt plan show <PLAN_NAME>
-```
+- _\*nix shell command_
 
-For example, to see the parameters and documentation for the `facts::info` plan,
-run:
+  ```shell
+  bolt plan show <PLAN NAME>
+  ```
 
-```
-bolt plan show facts::info
-```
+- _PowerShell cmdlet_
+
+  ```powershell
+  Get-BoltPlan -Name <PLAN NAME>
+  ```

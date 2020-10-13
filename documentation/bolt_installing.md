@@ -373,10 +373,10 @@ sudo dnf remove puppet-bolt
 
 Bolt packages include their own copy of Ruby.
 
-When you install gems for use with Bolt, use the `--user-install` flag to avoid
-requiring privileged access for installation. This option also enables sharing
-gem content with Puppet installations — such as when running `apply` on
-`localhost` — that use the same Ruby version.
+When you install gems for use with Bolt, use the `--user-install` command-line
+option to avoid requiring privileged access for installation. This option also
+enables sharing gem content with Puppet installations — such as when running
+`apply` on `localhost` — that use the same Ruby version.
 
 To install a gem for use with Bolt, use the command appropriate to your
 operating system:
@@ -414,7 +414,7 @@ Bolt collects data about how you use it. You can opt out of providing this data.
 -   The number of targets targeted with a Bolt command
 -   The output format selected (human-readable, JSON)
 -   Whether the Bolt project directory was determined from the location of a
-    `bolt-project.yaml` file or with the `--project` flag
+    `bolt-project.yaml` file or with the `--project` command-line option
 -   The number of times Bolt tasks and plans are run (not including user-defined
     tasks or plans.)
 -   The number of statements in a manifest block, and how many resources that

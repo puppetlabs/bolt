@@ -7,9 +7,6 @@ instead of having to reference each target individually.
 An inventory file is part of a Bolt project and must exist alongside a
 `bolt-project.yaml` file. For more information, see [Bolt projects](projects.md).
 
-The command `bolt inventory show -t <TARGET> --detail` provides a quick way to
-view the resolved values for a target or group of targets.
-
 > **Note**: Version 1 inventory files are deprecated. If you're using version 1
 > inventory files, make sure to migrate them to version 2. For more information
 > on migrating to version 2, see [Migrating your inventory files to version
@@ -148,6 +145,23 @@ Targets specified with a hash accept the following fields:
 | `uri` | The URI of the target. Bolt uses the `uri` to establish a connection to the target. <br> **Required** when specifying a target using a hash, unless you specify a `name` **and** configure a hostname using `host` in the target's transport configuration.| `String` |
 | `vars` | The variables for the target. Optional. | `Hash` |
 
+## Showing inventory
+
+The following command provides a quick way to view the resolved values for a
+target or group of targets:
+
+- _\*nix shell command_
+
+  ```shell
+  bolt inventory show --targets <TARGET LIST> --detail
+  ```
+
+- _PowerShell cmdlet_
+
+  ```powershell
+  Get-BoltInventory -Targets <TARGET LIST> -Detail
+  ```
+
 ## Precedence
 
 When searching for a target's configuration data, Bolt matches a target's URI
@@ -193,8 +207,7 @@ In the example above,  `mytarget` in `group1` contains the fact, `hardwaremodel:
 x86_64.` The fact `operatingsystem: CentOS` is set in `group2` which also
 contains `mytarget`.
 
-Running `bolt inventory show -t group1 --detail` returns both facts for
-`mytarget`:
+Showing the detailed inventory for `mytarget` will return both facts:
 
 ```json
 …
@@ -210,8 +223,10 @@ target definition or a group, apply to all definitions of the target. For
 example, the inventory file above contains two definitions of `mytarget`. The
 values for `user` and `host-key-check` are set in `group1`. The value for
 `password` is set in `group2`. If you ran a Bolt command on `group2`, all three
-values would be set on `mytarget`. Running `bolt inventory show -t group2
---detail` shows the three configuration values:
+values would be set on `mytarget`.
+
+Showing the detailed inventory for `group` will return all three configuration
+values:
 
 
 ```json
@@ -434,9 +449,6 @@ plugins:
         _plugin: prompt
         message: Enter your Vault password
 ```
-
-To verify that plugin references are resolved correctly and to view the targets
-and values loaded, use the command `bolt inventory show -t all --detail`.
 
 📖 **Related information**
 
