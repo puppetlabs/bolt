@@ -6,15 +6,15 @@ require 'tempfile'
 #
 # > **Note:** Not available in apply block
 Puppet::Functions.create_function(:write_file) do
-  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param content File content to write.
   # @param destination An absolute path on the target(s).
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @option options [Boolean] _catch_errors Whether to catch raised errors.
   # @option options [String] _run_as User to run as using privilege escalation.
   # @return A list of results, one entry per target.
   # @example Write a file to a target
   #   $content = 'Hello, world!'
-  #   write_file($targets, $content, '/Users/me/hello.txt')
+  #   write_file($content, '/Users/me/hello.txt', $targets)
   dispatch :write_file do
     required_param 'String', :content
     required_param 'String[1]', :destination
