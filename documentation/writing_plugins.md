@@ -83,10 +83,10 @@ There are two plugin hooks associated with reference plugins:
 
 - `validate_resolve_reference`
 
-  This hook is used to pre-validate the parameters that will be passed to the
+  Use this hook to pre-validate the parameters that Bolt will pass to the
   `resolve_reference` plugin. These plugins let Bolt raise any validation
   errors during inventory loading, rather than in the middle of a plan run.
-  Regardless of whether this hook is specified, Bolt tests parameters to
+  Regardless of whether your specify this hook, Bolt tests parameters to
   make sure they match the parameters for the `resolve_reference` plugin.
 
 📖 **Related information**
