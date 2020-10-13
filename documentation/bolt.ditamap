@@ -16,9 +16,6 @@
         <topicref href="projects.md" format="markdown"/>
         <topicref href="inventory_file_v2.md" format="markdown"/>
         <topicref href="configuring_bolt.md" format="markdown"/>
-        <topicref href="using_plugins.md" format="markdown">
-            <topicref href="writing_plugins.md" format="markdown"/>
-        </topicref>
         <topicref href="logs.md" format="markdown"/>
         <topicref href="privilege_escalation.md" format="markdown"/>
         <topicref href="vscode_and_bolt.md" format="markdown"/>
@@ -80,6 +77,11 @@
             </topicmeta>
         </topicref>
     </topicref>
+    <topichead navtitle="Plugins">
+      <topicref href="using_plugins.md" format="markdown"/>
+      <topicref href="supported_plugins.md" format="markdown"/>
+      <topicref href="writing_plugins.md" format="markdown"/>
+    </topichead>
     <topichead navtitle="Using Bolt with Puppet">
         <topicref href="applying_manifest_blocks.md" format="markdown"/>
         <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
