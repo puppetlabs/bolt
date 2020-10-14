@@ -898,5 +898,87 @@ describe "BoltServer::TransportApp" do
         end
       end
     end
+
+    describe '/project_file_metadatas/:module_name/:file' do
+      let(:fake_pal) { instance_double('Bolt::PAL') }
+      let(:fake_project) { instance_double('Bolt::Project') }
+      let(:fake_config) { instance_double('Bolt::Config') }
+      let(:fake_environment) { instance_double('Puppet::Node::Environment') }
+      let(:fake_module) { instance_double('Puppet::Module') }
+      let(:fake_file) { 'foo_file_abs_path' }
+      let(:fake_fileset) { instance_double('Puppet::FileServing::Fileset') }
+      let(:project_ref) { 'some_project_somesha' }
+      let(:module_name) { 'foo_module' }
+      let(:file) { 'foo_file' }
+      let(:path) { "/project_file_metadatas/#{module_name}/#{file}?project_ref=#{project_ref}" }
+
+      before(:each) do
+        allow(Dir).to receive(:exist?).with("/tmp/foo/#{project_ref}").and_return(true)
+        allow(Bolt::Project).to receive(:create_project).and_return(fake_project)
+        allow(Bolt::Config).to receive(:from_project).and_return(fake_config)
+        allow(fake_config).to receive(:modulepath)
+        allow(fake_config).to receive(:project).and_return(fake_project)
+        allow(Bolt::PAL).to receive(:new).and_return(fake_pal)
+        allow(fake_pal).to receive(:in_bolt_compiler).and_yield
+        allow(Puppet).to receive(:lookup).with(:current_environment).and_return(fake_environment)
+        allow(fake_environment).to receive(:module).with(module_name).and_return(fake_module)
+        allow(fake_module).to receive(:file).with(file).and_return(fake_file)
+        # The Puppet::FileServing code will be tested more thoroughly in Orch's acceptance
+        # tests so it is enough for the unit tests to make sure that we're returning a 200
+        # status when the metadata's retrieved.
+        allow(Puppet::FileServing::Fileset).to receive(:new).with(fake_file, anything).and_return(fake_fileset)
+        allow(Puppet::FileServing::Fileset).to receive(:merge).with(fake_fileset).and_return([])
+      end
+
+      it 'returns 400 if project_ref is not specified' do
+        path = '/project_file_metadatas/foo_module/foo_file'
+        get(path)
+        error = last_response.body
+        expect(error).to eq("`project_ref` is a required argument")
+        expect(last_response.status).to eq(400)
+      end
+
+      it 'returns 400 if project_ref does not exist' do
+        allow(Dir).to receive(:exist?).with("/tmp/foo/#{project_ref}").and_return(false)
+        get(path)
+        error = last_response.body
+        expect(error).to eq("`project_ref`: /tmp/foo/#{project_ref} does not exist")
+        expect(last_response.status).to eq(400)
+      end
+
+      it 'returns 400 if module_name does not exist' do
+        allow(fake_environment).to receive(:module).with(module_name).and_return(nil)
+        get(path)
+        error = last_response.body
+        expect(error).to eq("`module_name`: #{module_name} does not exist")
+        expect(last_response.status).to eq(400)
+      end
+
+      it 'returns 400 if file does not exist in the module' do
+        allow(fake_module).to receive(:file).with(file).and_return(nil)
+        get(path)
+        error = last_response.body
+        expect(error).to eq("`file`: #{file} does not exist inside the module's 'files' directory")
+        expect(last_response.status).to eq(400)
+      end
+
+      it 'returns the file metadata of the file and all its children' do
+        get(path)
+        file_metadatas = last_response.body
+        expect(file_metadatas).to eq("[]")
+        expect(last_response.status).to eq(200)
+      end
+
+      context "when the file path contains '/'" do
+        let(:file) { "foo/bar" }
+
+        it 'returns the file metadata of the file and all its children' do
+          get(path)
+          file_metadatas = last_response.body
+          expect(file_metadatas).to eq("[]")
+          expect(last_response.status).to eq(200)
+        end
+      end
+    end
   end
 end

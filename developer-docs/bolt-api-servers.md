@@ -716,6 +716,86 @@ This returns a JSON object of this shape:
 
 ```
 
+### GET /project_file_metadatas/:module_name/path/to/file
+- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
+
+#### Response
+
+```
+[
+  {
+    "path": "/opt/puppetlabs/server/data/orchestration-services/projects/my_project_someref/modules/plan_functions/files/test_files",
+    "relative_path": ".",
+    "links": "follow",
+    "owner": 996,
+    "group": 994,
+    "mode": 420,
+    "checksum": {
+      "type": "ctime",
+      "value": "{ctime}2020-10-13 19:16:27 +0000"
+    },
+    "type": "directory",
+    "destination": null
+  },
+  {
+    "path": "/opt/puppetlabs/server/data/orchestration-services/projects/my_project_someref/modules/plan_functions/files/test_files",
+    "relative_path": "test1.txt",
+    "links": "follow",
+    "owner": 996,
+    "group": 994,
+    "mode": 420,
+    "checksum": {
+      "type": "sha256",
+      "value": "{sha256}8f2e3615923fecaa8db7fbaef12a38020bc9f6c93f68eb031bcd9776e61153f0"
+    },
+    "type": "file",
+    "destination": null
+  },
+  {
+    "path": "/opt/puppetlabs/server/data/orchestration-services/projects/my_project_someref/modules/plan_functions/files/test_files",
+    "relative_path": "subdir",
+    "links": "follow",
+    "owner": 996,
+    "group": 994,
+    "mode": 420,
+    "checksum": {
+      "type": "ctime",
+      "value": "{ctime}2020-10-13 19:16:27 +0000"
+    },
+    "type": "directory",
+    "destination": null
+  },
+  {
+    "path": "/opt/puppetlabs/server/data/orchestration-services/projects/my_project_someref/modules/plan_functions/files/test_files",
+    "relative_path": "test_link.txt",
+    "links": "follow",
+    "owner": 996,
+    "group": 994,
+    "mode": 420,
+    "checksum": {
+      "type": "sha256",
+      "value": "{sha256}8f2e3615923fecaa8db7fbaef12a38020bc9f6c93f68eb031bcd9776e61153f0"
+    },
+    "type": "file",
+    "destination": null
+  },
+  {
+    "path": "/opt/puppetlabs/server/data/orchestration-services/projects/my_project_someref/modules/plan_functions/files/test_files",
+    "relative_path": "subdir/test2.txt",
+    "links": "follow",
+    "owner": 996,
+    "group": 994,
+    "mode": 420,
+    "checksum": {
+      "type": "sha256",
+      "value": "{sha256}bd3b09cc9f62e80f0b1593a7ed07e68e80d7415f6df13c16f1a541fc074e0acc"
+    },
+    "type": "file",
+    "destination": null
+  }
+]
+```
+
 ## Target Schemas
 
 ### SSH Target Object
