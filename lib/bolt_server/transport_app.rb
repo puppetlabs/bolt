@@ -14,7 +14,6 @@ require 'json-schema'
 
 # These are only needed for the `/plans` endpoint.
 require 'puppet'
-require 'bolt_server/pe/pal'
 
 # Needed by the `/project_file_metadatas` endpoint
 require 'puppet/file_serving/fileset'
@@ -37,6 +36,17 @@ module BoltServer
       transport-ssh
       transport-winrm
     ].freeze
+
+    # PE_BOLTLIB_PATH is intended to function exactly like the BOLTLIB_PATH used
+    # in Bolt::PAL. Paths and variable names are similar to what exists in
+    # Bolt::PAL, but with a 'PE' prefix.
+    PE_BOLTLIB_PATH = '/opt/puppetlabs/server/apps/bolt-server/pe-bolt-modules'
+
+    # For now at least, we maintain an entirely separate codedir from
+    # puppetserver by default, so that filesync can work properly. If filesync
+    # is not used, this can instead match the usual puppetserver codedir.
+    # See the `orchestrator.bolt.codedir` tk config setting.
+    DEFAULT_BOLT_CODEDIR = '/opt/puppetlabs/server/data/orchestration-services/code'
 
     def initialize(config)
       @config = config
@@ -194,10 +204,52 @@ module BoltServer
       [@executor.run_script(target, file_location, body['arguments'])]
     end
 
+    # This function is nearly identical to Bolt::Pal's `with_puppet_settings` with the
+    # one difference that we set the codedir to point to actual code, rather than the
+    # tmpdir. We only use this funtion inside the Modulepath initializer so that Puppet
+    # is correctly configured to pull environment configuration correctly. If we don't
+    # set codedir in this way: when we try to load and interpolate the modulepath it
+    # won't correctly load.
+    #
+    # WARNING: THIS FUNCTION SHOULD ONLY BE CALLED INSIDE A SYNCHRONIZED PAL MUTEX
+    def with_pe_pal_init_settings(codedir, environmentpath, basemodulepath)
+      Dir.mktmpdir('pe-bolt') do |dir|
+        cli = []
+        Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
+          dir = setting == :codedir ? codedir : dir
+          cli << "--#{setting}" << dir
+        end
+        cli << "--environmentpath" << environmentpath
+        cli << "--basemodulepath" << basemodulepath
+        Puppet.settings.send(:clear_everything_for_tests)
+        Puppet.initialize_settings(cli)
+        yield
+      end
+    end
+
+    # Use puppet to identify the modulepath from an environment.
+    #
+    # WARNING: THIS FUNCTION SHOULD ONLY BE CALLED INSIDE A SYNCHRONIZED PAL MUTEX
+    def modulepath_from_environment(environment_name)
+      codedir = DEFAULT_BOLT_CODEDIR
+      environmentpath = "#{codedir}/environments"
+      basemodulepath = "#{codedir}/modules:/opt/puppetlabs/puppet/modules"
+      modulepath_dirs = nil
+      with_pe_pal_init_settings(codedir, environmentpath, basemodulepath) do
+        environment = Puppet.lookup(:environments).get!(environment_name)
+        modulepath_dirs = environment.modulepath
+      end
+      modulepath_dirs
+    end
+
     def in_pe_pal_env(environment)
       return [400, '`environment` is a required argument'] if environment.nil?
       @pal_mutex.synchronize do
-        pal = BoltServer::PE::PAL.new({}, environment)
+        modulepath_obj = Bolt::Config::Modulepath.new(
+          modulepath_from_environment(environment),
+          boltlib_path: [PE_BOLTLIB_PATH, Bolt::Config::Modulepath::BOLTLIB_PATH]
+        )
+        pal = Bolt::PAL.new(modulepath_obj, nil, nil)
         yield pal
       rescue Puppet::Environments::EnvironmentNotFound
         [400, {
@@ -216,16 +268,11 @@ module BoltServer
       @pal_mutex.synchronize do
         project = Bolt::Project.create_project(project_dir)
         bolt_config = Bolt::Config.from_project(project, { log: { 'bolt-debug.log' => 'disable' } })
-        pal = Bolt::PAL.new(bolt_config.modulepath, nil, nil, nil, nil, nil, bolt_config.project)
-        module_path = [
-          BoltServer::PE::PAL::PE_BOLTLIB_PATH,
-          Bolt::PAL::BOLTLIB_PATH,
-          *bolt_config.modulepath,
-          Bolt::PAL::MODULES_PATH
-        ]
-        # CODEREVIEW: I *think* this is the only thing we need to make different between bolt's PAL. Is it acceptable
-        # to hack this? Modulepath is currently a readable attribute, could we make it writeable?
-        pal.instance_variable_set(:@modulepath, module_path)
+        modulepath_object = Bolt::Config::Modulepath.new(
+          bolt_config.modulepath,
+          boltlib_path: [PE_BOLTLIB_PATH, Bolt::Config::Modulepath::BOLTLIB_PATH]
+        )
+        pal = Bolt::PAL.new(modulepath_object, nil, nil, nil, nil, nil, bolt_config.project)
         context = {
           pal: pal,
           config: bolt_config

@@ -24,7 +24,7 @@ describe 'Facts functions' do
       'facts' => { 'hot' => 'chocolate' }
     }
   }
-  let(:pal)     { Bolt::PAL.new(modulepath, nil, nil) }
+  let(:pal)     { Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), nil, nil) }
   let(:plugins) { Bolt::Plugin.setup(config, nil) }
   let(:inv)     { Bolt::Inventory::Inventory.new(data, config.transport, config.transports, plugins) }
 

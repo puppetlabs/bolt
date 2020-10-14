@@ -5,13 +5,11 @@ require 'bolt/executor'
 require 'bolt/error'
 require 'bolt/plan_result'
 require 'bolt/util'
+require 'bolt/config/modulepath'
 require 'etc'
 
 module Bolt
   class PAL
-    BOLTLIB_PATH = File.expand_path('../../bolt-modules', __dir__)
-    MODULES_PATH = File.expand_path('../../modules', __dir__)
-
     # PALError is used to convert errors from executing puppet code into
     # Bolt::Errors
     class PALError < Bolt::Error
@@ -45,16 +43,16 @@ module Bolt
       end
     end
 
-    attr_reader :modulepath, :user_modulepath
-
     def initialize(modulepath, hiera_config, resource_types, max_compiles = Etc.nprocessors,
                    trusted_external = nil, apply_settings = {}, project = nil)
+      unless modulepath.is_a?(Bolt::Config::Modulepath)
+        msg = "Type error in PAL: modulepath must be a Bolt::Config::Modulepath"
+        raise Bolt::Error.new(msg, "bolt/execution-error")
+      end
       # Nothing works without initialized this global state. Reinitializing
       # is safe and in practice only happens in tests
       self.class.load_puppet
-
-      @user_modulepath = modulepath
-      @modulepath = [BOLTLIB_PATH, *modulepath, MODULES_PATH]
+      @modulepath = modulepath
       @hiera_config = hiera_config
       @trusted_external = trusted_external
       @apply_settings = apply_settings
@@ -63,11 +61,19 @@ module Bolt
       @project = project
 
       @logger = Bolt::Logger.logger(self)
-      if modulepath && !modulepath.empty?
-        @logger.debug("Loading modules from #{@modulepath.join(File::PATH_SEPARATOR)}")
+      unless user_modulepath.empty?
+        @logger.debug("Loading modules from #{full_modulepath.join(File::PATH_SEPARATOR)}")
       end
 
       @loaded = false
+    end
+
+    def full_modulepath
+      @modulepath.full_modulepath
+    end
+
+    def user_modulepath
+      @modulepath.user_modulepath
     end
 
     # Puppet logging is global so this is class method to avoid confusion
@@ -157,7 +163,7 @@ module Bolt
     def in_bolt_compiler
       # TODO: If we always call this inside a bolt_executor we can remove this here
       setup
-      r = Puppet::Pal.in_tmp_environment('bolt', modulepath: @modulepath, facts: {}) do |pal|
+      r = Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath, facts: {}) do |pal|
         # Only load the project if it a) exists, b) has a name it can be loaded with
         Puppet.override(bolt_project: @project,
                         yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
@@ -212,11 +218,11 @@ module Bolt
         apply_executor: applicator || Applicator.new(
           inventory,
           executor,
-          @modulepath,
+          full_modulepath,
           # Skip syncing built-in plugins, since we vendor some Puppet 6
           # versions of "core" types, which are already present on the agent,
           # but may cause issues on Puppet 5 agents.
-          @user_modulepath,
+          user_modulepath,
           @project,
           pdb_client,
           @hiera_config,
@@ -443,8 +449,8 @@ module Bolt
     #   The information hash provides the name, version, and a string
     #   indicating whether the module belongs to an internal module group.
     def list_modules
-      internal_module_groups = { BOLTLIB_PATH => 'Plan Language Modules',
-                                 MODULES_PATH => 'Packaged Modules',
+      internal_module_groups = { Bolt::Config::Modulepath::BOLTLIB_PATH => 'Plan Language Modules',
+                                 Bolt::Config::Modulepath::MODULES_PATH => 'Packaged Modules',
                                  @project.managed_moduledir.to_s => 'Project Dependencies' }
 
       in_bolt_compiler do

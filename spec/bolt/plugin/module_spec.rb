@@ -14,7 +14,7 @@ describe Bolt::Plugin::Module do
   let(:plugin_config) { {} }
   let(:config_data) { { 'modulepath' => modulepath, 'plugins' => plugin_config } }
 
-  let(:pal) { Bolt::PAL.new(modulepath, {}, nil) }
+  let(:pal) { Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), {}, nil) }
   let(:plugins) { Bolt::Plugin.setup(config(config_data), pal) }
 
   let(:module_name) { 'empty_plug' }

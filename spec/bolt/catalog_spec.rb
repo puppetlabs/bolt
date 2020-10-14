@@ -13,7 +13,7 @@ describe Bolt::Catalog do
   let(:target) { inventory.get_target(uri) }
   let(:inventory) { Bolt::Inventory.empty }
   let(:executor) { Bolt::Executor.new }
-  let(:boltlib) { Bolt::PAL::BOLTLIB_PATH }
+  let(:boltlib) { Bolt::Config::Modulepath::BOLTLIB_PATH }
   let(:pdb_config) do
     Bolt::PuppetDB::Config.new('server_urls' => 'https://localhost:8081',
                                'cacert' => '/path/to/cacert',
