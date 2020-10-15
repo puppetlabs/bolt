@@ -548,8 +548,8 @@ plan loop(TargetSpec $targets) {
 ```
 
 If your plan accepts a single `TargetSpec` parameter, you can call that
-parameter `targets` so that it can be specified with the `--targets` flag from
-the command line.
+parameter `targets` so that it can be specified with the `--targets`
+command-line option.
 
 #### Example with `TargetSpec`
 

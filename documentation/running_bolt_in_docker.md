@@ -163,9 +163,9 @@ Successful on 1 target: pnz2rzpxfzp95hh.delivery.puppetlabs.net
 Ran on 1 target in 0.56 seconds
 ```
 
-The `--mount` flag maps the Bolt project directory on the Docker host to
-`/Boltdir` in the container. The container is tagged as `puppet-bolt` and the
-rest of the command is all native to Bolt.
+The `--mount` command-line option maps the Bolt project directory on the Docker
+host to `/Boltdir` in the container. The container is tagged as `puppet-bolt`
+and the rest of the command is all native to Bolt.
 
 ## Building on top of the `puppet-bolt` Docker image
 

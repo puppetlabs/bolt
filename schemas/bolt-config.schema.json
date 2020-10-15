@@ -991,7 +991,7 @@
       ]
     },
     "ssh-command": {
-      "description": "The command and flags to use when SSHing. This option is used when you need support for features or algorithms that are not supported by the net-ssh Ruby library. **This option is experimental.** You can read more about this  option in [Native SSH transport](experimental_features.md#native-ssh-transport).",
+      "description": "The command and options to use when SSHing. This option is used when you need support for features or algorithms that are not supported by the net-ssh Ruby library. **This option is experimental.** You can read more about this  option in [Native SSH transport](experimental_features.md#native-ssh-transport).",
       "oneOf": [
         {
           "type": [

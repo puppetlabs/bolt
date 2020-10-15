@@ -2,7 +2,8 @@
 
 ## Bolt can't find my task
 
-Run `bolt task show` and look for any warnings related to your task metadata.
+Run the `bolt task show` command or `Get-BoltTask` PowerShell cmdlet and look
+for any warnings related to your task metadata.
 
 Make sure your task name is valid: Task names must
 - Be lowercase
@@ -104,8 +105,9 @@ If you need to send a message that is not a string value or is in an apply
 block, you can use the `warning` Puppet log function. 
 
 If you only wish to see the output in the console when executing your plan with
-the `--log-level debug` flag, use the `notice` Puppet log function. The `notice` function sets the
-console log level to `debug` for that run.
+the `--log-level debug` command-line option, use the `notice` Puppet log
+function. The `notice` function sets the console log level to `debug` for that
+run.
 
 For more information, see the docs for configuring [Bolt's log
 level](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#log-file-configuration-options).

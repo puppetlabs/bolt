@@ -6,25 +6,33 @@ module that you found on the Forge, you can use Bolt to install the module.
 
 ## 🧪 New experimental module management
 
-**Experimental**: Bolt 2.30.0 introduced changes to how modules
-are managed in Bolt projects. To find out how to opt in to the changes, see
-[Managing modules](managing_modules.md).
+**Experimental**: Bolt 2.30.0 introduced changes to how modules are managed in
+Bolt projects. To find out how to opt in to the changes, see [Managing
+modules](managing_modules.md).
 
 ## Create a new Bolt project and install a list of modules with dependencies
 
 If you want to get started with a new Bolt project and you need specific modules
-from the Puppet Forge, you can install the modules and their dependencies with
-the `bolt project init` command.
+from the Puppet Forge, you can install the modules and their dependencies using
+the Bolt command line.
 
-When you use `bolt project init` along with the `--modules` flag and a
+When you create a new project with the `modules` command-line option and a
 comma-separated list of Forge modules, Bolt installs the latest versions of each
 module and resolves and installs all dependencies required by those modules. For
 example, to create a project named `example_project` with the `apache` and
 `mysql` modules installed, use the following command:
 
-```shell
-bolt project init example_project --modules puppetlabs-apache,puppetlabs-mysql
-```
+- _\*nix shell command_
+
+  ```shell
+  bolt project init example_project --modules puppetlabs-apache,puppetlabs-mysql
+  ```
+
+- _PowerShell cmdlet_
+
+  ```powershell
+  New-BoltProject -Name example_project -Modules puppetlabs-apache,puppetlabs-mysql
+  ```
 
 The project's Puppetfile lists the `apache` and `mysql` modules and all of their
 dependencies:
@@ -42,7 +50,10 @@ mod 'puppetlabs-puppetserver_gem', '1.1.1'
 
 ## Install a module to an existing project
 
-If you want to install a module to an existing project, use a Puppetfile. This method does not automatically resolve module dependencies. If the module you're installing requires other modules, make sure you add the required modules to your Puppetfile together with the module you're installing.
+If you want to install a module to an existing project, use a Puppetfile. This
+method does not automatically resolve module dependencies. If the module you're
+installing requires other modules, make sure you add the required modules to
+your Puppetfile together with the module you're installing.
 
 > **Before you begin**
 >
@@ -73,7 +84,8 @@ To install a module:
    2. Run the `bolt puppetfile install` command. Bolt installs modules to the
       first directory in the `modulepath` setting. By default, this is the
       `modules/` subdirectory inside the Bolt project directory. To override
-      this location, update the `modulepath` setting in your [project configuration file](bolt_project_reference.md).
+      this location, update the `modulepath` setting in your [project
+      configuration file](bolt_project_reference.md).
 
 
 ## Packaged modules
@@ -86,8 +98,8 @@ This list of packaged modules is available in a
 Bolt repository. The modules and supporting documentation are publicly available
 on the [Puppet Forge](https://forge.puppet.com/). 
 
-> 🔩 **Tip:** To see a list of all modules on your current modulepath, use
-> `bolt puppetfile show-modules`.
+> 🔩 **Tip:** To see a list of all modules on your current modulepath, use `bolt
+> puppetfile show-modules`.
 
 Modules installed on your modulepath take precedence over packaged modules with
 the same name. If you need to use a specific version of a packaged module, you

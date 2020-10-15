@@ -258,12 +258,12 @@ ssh:
 ```
 
 The value of `ssh-command` can be either a string or an array, and you can
-provide any flags to the command. Bolt will append Bolt-configuration settings
-to the command, as well as the specified target, when connecting. Not all Bolt
-configuration options are supported using the native SSH transport, but you
-can configure most options in your OpenSSH Config. See [bolt configuration
-reference](bolt_configuration_reference.md) for the list of supported Bolt SSH
-options.
+provide any command-line options to the command. Bolt will append
+Bolt-configuration settings to the command, as well as the specified target,
+when connecting. Not all Bolt configuration options are supported using the
+native SSH transport, but you can configure most options in your OpenSSH Config.
+See [bolt configuration reference](bolt_configuration_reference.md) for the list
+of supported Bolt SSH options.
 
 Bolt transports have two main functions: executing remotely, and copying files
 to the remote targets. `ssh-command` is what configures the remote execution,
@@ -326,9 +326,10 @@ To encrypt SSH connections using the unsupported algorithm
 This feature was introduced in [Bolt
 2.22.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-2220-2020-08-10).
 
-Use the `bolt plan new` command to generate a new project-level YAML plan.
-The command accepts a single argument: the name of the plan. To use the `bolt
-plan new` command, you must have a named [Bolt project](projects.md).
+Use the `bolt plan new` command or `New-BoltPlan` PowerShell cmdlet to generate
+a new project-level YAML plan. The command accepts a single argument: the name
+of the plan. To use the `bolt plan new` command or `New-BoltPlan` PowerShell
+cmdlet, you must have a named [Bolt project](projects.md).
 
 ### Naming plans
 
@@ -339,9 +340,9 @@ separated by a double colon `::`.
 Each plan name segment must begin with a lowercase letter, and may only include
 lowercase letters, digits, and underscores.
 
-Additionally, the first name segment of any plan created with `bolt plan new`
-must match the name of the project itself. For example, given a project named
-`myproject`, the following plan names are valid:
+Additionally, the first name segment of any new plan must match the name of the
+project itself. For example, given a project named `myproject`, the following
+plan names are valid:
 
 - `myproject`
 - `myproject::myplan`
