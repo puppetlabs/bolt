@@ -16,20 +16,26 @@ module Bolt
     def add(name, modules, puppetfile_path, moduledir, config_path)
       require 'bolt/puppetfile'
 
+      @outputter.print_message("Adding module #{name} to project\n\n")
+
       # If the project configuration file already includes this module,
       # exit early.
       puppetfile  = Bolt::Puppetfile.new(modules)
       new_module  = Bolt::Puppetfile::Module.from_hash('name' => name)
 
       if puppetfile.modules.include?(new_module)
-        @outputter.print_message "Project configuration file #{config_path} already "\
-                                 "includes module #{new_module}. Nothing to do."
+        @outputter.print_action_step(
+          "Project configuration file #{config_path} already includes module #{new_module}. Nothing to do."
+        )
         return true
       end
 
       # If the Puppetfile exists, make sure it's managed by Bolt.
       if puppetfile_path.exist?
         assert_managed_puppetfile(puppetfile, puppetfile_path)
+        existing = Bolt::Puppetfile.parse(puppetfile_path)
+      else
+        existing = Bolt::Puppetfile.new
       end
 
       # Create a Puppetfile object that includes the new module and its
@@ -37,8 +43,11 @@ module Bolt
       # project config or modify the Puppetfile.
       puppetfile = add_new_module_to_puppetfile(new_module, modules, puppetfile_path)
 
+      # Display the diff between the existing Puppetfile and the new Puppetfile.
+      print_puppetfile_diff(existing, puppetfile)
+
       # Add the module to the project configuration.
-      @outputter.print_message "Updating project configuration file at #{config_path}"
+      @outputter.print_action_step("Updating project configuration file at #{config_path}")
 
       data = Bolt::Util.read_yaml_hash(config_path, 'project')
       data['modules'] ||= []
@@ -54,7 +63,7 @@ module Bolt
       end
 
       # Write the Puppetfile.
-      @outputter.print_message "Writing Puppetfile at #{puppetfile_path}"
+      @outputter.print_action_step("Writing Puppetfile at #{puppetfile_path}")
       puppetfile.write(puppetfile_path, moduledir)
 
       # Install the modules.
@@ -64,7 +73,7 @@ module Bolt
     # Creates a new Puppetfile that includes the new module and its dependencies.
     #
     private def add_new_module_to_puppetfile(new_module, modules, path)
-      @outputter.print_message "Resolving module dependencies, this may take a moment"
+      @outputter.print_action_step("Resolving module dependencies, this may take a moment")
 
       # If there is an existing Puppetfile, add the new module and attempt
       # to resolve. This will not update the versions of any installed modules.
@@ -92,10 +101,71 @@ module Bolt
       puppetfile
     end
 
+    # Outputs a diff of an old Puppetfile and a new Puppetfile.
+    #
+    def print_puppetfile_diff(old, new)
+      # Build hashes mapping the module title to the module object. This makes it
+      # a little easier to determine which modules have been added, removed, or
+      # modified.
+      old = old.modules.each_with_object({}) do |mod, acc|
+        acc[mod.title] = mod
+      end
+
+      new = new.modules.each_with_object({}) do |mod, acc|
+        acc[mod.title] = mod
+      end
+
+      # New modules are those present in new but not in old.
+      added = new.reject { |title, _mod| old.include?(title) }.values
+
+      if added.any?
+        diff = "Adding the following modules:\n"
+        added.each { |mod| diff += "#{mod.title} #{mod.version}\n" }
+        @outputter.print_action_step(diff)
+      end
+
+      # Upgraded modules are those that have a newer version in new than old.
+      upgraded = new.select do |title, mod|
+        if old.include?(title)
+          SemanticPuppet::Version.parse(mod.version) > SemanticPuppet::Version.parse(old[title].version)
+        end
+      end.keys
+
+      if upgraded.any?
+        diff = "Upgrading the following modules:\n"
+        upgraded.each { |title| diff += "#{title} #{old[title].version} to #{new[title].version}\n" }
+        @outputter.print_action_step(diff)
+      end
+
+      # Downgraded modules are those that have an older version in new than old.
+      downgraded = new.select do |title, mod|
+        if old.include?(title)
+          SemanticPuppet::Version.parse(mod.version) < SemanticPuppet::Version.parse(old[title].version)
+        end
+      end.keys
+
+      if downgraded.any?
+        diff = "Downgrading the following modules: \n"
+        downgraded.each { |title| diff += "#{title} #{old[title].version} to #{new[title].version}\n" }
+        @outputter.print_action_step(diff)
+      end
+
+      # Removed modules are those present in old but not in new.
+      removed = old.reject { |title, _mod| new.include?(title) }.values
+
+      if removed.any?
+        diff = "Removing the following modules:\n"
+        removed.each { |mod| diff += "#{mod.title} #{mod.version}\n" }
+        @outputter.print_action_step(diff)
+      end
+    end
+
     # Installs a project's module dependencies.
     #
     def install(modules, path, moduledir, force: false, resolve: true)
       require 'bolt/puppetfile'
+
+      @outputter.print_message("Installing project modules\n\n")
 
       puppetfile = Bolt::Puppetfile.new(modules)
 
@@ -110,10 +180,10 @@ module Bolt
         if path.exist? && !force
           assert_managed_puppetfile(puppetfile, path)
         else
-          @outputter.print_message "Resolving module dependencies, this may take a moment"
+          @outputter.print_action_step("Resolving module dependencies, this may take a moment")
           puppetfile.resolve
 
-          @outputter.print_message "Writing Puppetfile at #{path}"
+          @outputter.print_action_step("Writing Puppetfile at #{path}")
           # We get here either through 'bolt module install' which uses the
           # managed modulepath (which isn't configurable) or through bolt
           # project init --modules, which uses the default modulepath. This
@@ -136,7 +206,7 @@ module Bolt
     def install_puppetfile(path, moduledir, config = {})
       require 'bolt/puppetfile/installer'
 
-      @outputter.print_message "Syncing modules from #{path} to #{moduledir}"
+      @outputter.print_action_step("Syncing modules from #{path} to #{moduledir}")
       ok = Bolt::Puppetfile::Installer.new(config).install(path, moduledir)
 
       # Automatically generate types after installing modules

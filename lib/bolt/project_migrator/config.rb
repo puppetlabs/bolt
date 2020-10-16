@@ -39,7 +39,7 @@ module Bolt
           backup_file(config_file, backup_dir)
 
           begin
-            @outputter.print_migrate_step(
+            @outputter.print_action_step(
               "Moving transportation configuration options '#{transport_data.keys.join(', ')}' "\
               "from bolt.yaml to inventory.yaml"
             )
@@ -51,10 +51,10 @@ module Bolt
           end
         end
 
-        @outputter.print_migrate_step("Renaming bolt.yaml to bolt-project.yaml")
+        @outputter.print_action_step("Renaming bolt.yaml to bolt-project.yaml")
         FileUtils.mv(config_file, project_file)
 
-        @outputter.print_migrate_step(
+        @outputter.print_action_step(
           "Successfully migrated config. Please add a 'name' key to bolt-project.yaml "\
           "to use project-level tasks and plans. Learn more about projects by running "\
           "'bolt guide project'."

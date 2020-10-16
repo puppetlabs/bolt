@@ -23,8 +23,8 @@ describe Bolt::ProjectMigrator::Modules do
   let(:outputter) {
     double('outputter',
            print_message: nil,
-           print_migrate_step: nil,
-           print_migrate_error: nil)
+           print_action_step: nil,
+           print_action_error: nil)
   }
   let(:project_config) { {} }
   let(:project)        { Bolt::Project.new(project_config, @tmpdir) }
@@ -133,7 +133,7 @@ describe Bolt::ProjectMigrator::Modules do
       expect(migrate).to be(true)
       data = Bolt::Util.read_yaml_hash(project.project_file, 'project')
       expect(data['modules']).to match_array([
-                                               { 'name' => 'puppetlabs-yaml', 'version_requirement' => '=0.1.0' }
+                                               { 'name' => 'puppetlabs-yaml', 'version_requirement' => '0.1.0' }
                                              ])
     end
 

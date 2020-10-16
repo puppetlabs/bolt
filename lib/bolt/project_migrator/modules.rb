@@ -19,7 +19,7 @@ module Bolt
 
         # Notify user to manually migrate modules if using non-default modulepath
         if configured_modulepath != modulepath
-          @outputter.print_migrate_step(
+          @outputter.print_action_step(
             "Project has a non-default configured modulepath, unable to automatically "\
             "migrate project modules. To migrate project modules manually, see "\
             "http://pup.pt/bolt-modules"
@@ -46,10 +46,10 @@ module Bolt
         require 'bolt/puppetfile/installer'
 
         begin
-          @outputter.print_migrate_step("Parsing Puppetfile at #{puppetfile_path}")
+          @outputter.print_action_step("Parsing Puppetfile at #{puppetfile_path}")
           puppetfile = Bolt::Puppetfile.parse(puppetfile_path, skip_unsupported_modules: true)
         rescue Bolt::Error => e
-          @outputter.print_migrate_error("#{e.message}\nSkipping module migration.")
+          @outputter.print_action_error("#{e.message}\nSkipping module migration.")
           return false
         end
 
@@ -62,10 +62,10 @@ module Bolt
         # Attempt to resolve dependencies
         begin
           @outputter.print_message('')
-          @outputter.print_migrate_step("Resolving module dependencies, this may take a moment")
+          @outputter.print_action_step("Resolving module dependencies, this may take a moment")
           puppetfile.resolve
         rescue Bolt::Error => e
-          @outputter.print_migrate_error("#{e.message}\nSkipping module migration.")
+          @outputter.print_action_error("#{e.message}\nSkipping module migration.")
           return false
         end
 
@@ -90,17 +90,17 @@ module Bolt
           # Show the new Puppetfile content
           message  = "Generated new Puppetfile content:\n\n"
           message += puppetfile.modules.map(&:to_spec).join("\n").to_s
-          @outputter.print_migrate_step(message)
+          @outputter.print_action_step(message)
 
           # Write Puppetfile
-          @outputter.print_migrate_step("Updating Puppetfile at #{puppetfile_path}")
+          @outputter.print_action_step("Updating Puppetfile at #{puppetfile_path}")
           puppetfile.write(puppetfile_path, managed_moduledir)
 
           # Install Puppetfile
-          @outputter.print_migrate_step("Syncing modules from #{puppetfile_path} to #{managed_moduledir}")
+          @outputter.print_action_step("Syncing modules from #{puppetfile_path} to #{managed_moduledir}")
           Bolt::Puppetfile::Installer.new({}).install(puppetfile_path, managed_moduledir)
         else
-          @outputter.print_migrate_step(
+          @outputter.print_action_step(
             "Project does not include any managed modules, deleting Puppetfile "\
             "at #{puppetfile_path}"
           )
@@ -112,7 +112,7 @@ module Bolt
       # the selected modules.
       #
       private def select_modules(modules)
-        @outputter.print_migrate_step(
+        @outputter.print_action_step(
           "Select modules that are direct dependencies of your project. Bolt will "\
           "automatically manage dependencies for each module selected, so do not "\
           "select a module's dependencies unless you use content from it directly "\
@@ -135,7 +135,7 @@ module Bolt
         sources.select! { |source| Dir.exist?(source) }
 
         if sources.any?
-          @outputter.print_migrate_step(
+          @outputter.print_action_step(
             "Moving modules from #{sources.join(', ')} to #{moduledir}"
           )
 
@@ -166,7 +166,7 @@ module Bolt
       # Deletes modules from a specified directory.
       #
       private def delete_modules(moduledir, modules)
-        @outputter.print_migrate_step("Cleaning up #{moduledir}")
+        @outputter.print_action_step("Cleaning up #{moduledir}")
         moduledir = Pathname.new(moduledir)
 
         modules.each do |mod|
@@ -178,7 +178,7 @@ module Bolt
       # Adds a list of modules to the project configuration file.
       #
       private def update_project_config(modules, config_file)
-        @outputter.print_migrate_step("Updating project configuration at #{config_file}")
+        @outputter.print_action_step("Updating project configuration at #{config_file}")
         data = Bolt::Util.read_optional_yaml_hash(config_file, 'project')
         data.merge!('modules' => modules)
         data.delete('modulepath')

@@ -938,6 +938,7 @@ module Bolt
     # Loads a Puppetfile and installs its modules.
     #
     def install_puppetfile(config, puppetfile, moduledir)
+      outputter.print_message("Installing modules from Puppetfile")
       installer = Bolt::ModuleInstaller.new(outputter, pal)
       ok = installer.install_puppetfile(puppetfile, moduledir, config)
       ok ? 0 : 1

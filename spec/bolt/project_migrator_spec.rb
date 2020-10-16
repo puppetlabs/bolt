@@ -12,7 +12,7 @@ describe Bolt::ProjectMigrator do
   let(:outputter) {
     double('outputter',
            print_message: nil,
-           print_migrate_step: nil,
+           print_action_step: nil,
            print_prompt: nil,
            print_error: nil)
   }

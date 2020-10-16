@@ -9,7 +9,7 @@ describe Bolt::ProjectMigrator::Inventory do
     migrator.migrate(inventory_file, backup_dir)
   end
 
-  let(:outputter)      { double('outputter', print_message: nil, print_migrate_step: nil) }
+  let(:outputter)      { double('outputter', print_message: nil, print_action_step: nil) }
   let(:migrator)       { described_class.new(outputter) }
   let(:inventory_file) { @tmpdir + 'inventory.yaml' }
   let(:backup_dir)     { @tmpdir + '.bolt-bak' }

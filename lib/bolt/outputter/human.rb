@@ -413,7 +413,7 @@ module Bolt
         @stream.puts(colorize(:red, indent(4, message)))
       end
 
-      def print_migrate_step(step)
+      def print_action_step(step)
         first, *remaining = wrap(step, 76).lines
 
         first     = indent(2, "→ #{first}")
@@ -423,7 +423,7 @@ module Bolt
         @stream.puts(step)
       end
 
-      def print_migrate_error(error)
+      def print_action_error(error)
         # Running everything through 'wrap' messes with newlines. Separating
         # into lines and wrapping each individually ensures separate errors are
         # distinguishable.

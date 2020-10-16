@@ -13,7 +13,10 @@ module Bolt
       def initialize(owner, name, version = nil)
         @owner   = owner
         @name    = name
-        @version = version unless version == :latest
+
+        if version.is_a?(String)
+          @version = version[0] == '=' ? version[1..-1] : version
+        end
       end
 
       # Creates a new module from a hash.
