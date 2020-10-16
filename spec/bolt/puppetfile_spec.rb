@@ -6,6 +6,7 @@ require 'bolt/puppetfile'
 
 describe Bolt::Puppetfile do
   let(:path)       { @project + 'Puppetfile' }
+  let(:moduledir)  { @project + '.modules' }
   let(:modules)    { [{ 'name' => 'puppetlabs-yaml' }] }
   let(:puppetfile) { described_class.new(modules) }
 
@@ -80,6 +81,12 @@ describe Bolt::Puppetfile do
       puppetfile.write(path)
       expect(path.exist?).to eq(true)
       expect(File.read(path)).to match(/mod "puppetlabs-yaml"/)
+    end
+
+    it 'writes the moduledir to the Puppetfile' do
+      puppetfile.write(path, moduledir)
+      expect(path.exist?).to eq(true)
+      expect(File.read(path)).to match(/moduledir '.modules'/)
     end
   end
 

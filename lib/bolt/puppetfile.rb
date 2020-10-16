@@ -61,8 +61,15 @@ module Bolt
     #
     def write(path, moduledir = nil)
       File.open(path, 'w') do |file|
-        file.puts '# This Puppetfile is managed by Bolt. Do not edit.'
-        file.puts "moduledir '#{moduledir.basename}'" if moduledir
+        if moduledir
+          file.puts "# This Puppetfile is managed by Bolt. Do not edit."
+          file.puts "# For more information, see https://pup.pt/bolt-modules"
+          file.puts
+          file.puts "# The following directive installs modules to the managed moduledir."
+          file.puts "moduledir '#{moduledir.basename}'"
+          file.puts
+        end
+
         modules.each { |mod| file.puts mod.to_spec }
       end
     rescue SystemCallError => e
