@@ -75,6 +75,7 @@ jobs:
         run: |
           docker-compose -f spec/docker-compose.yml build --parallel
           docker-compose -f spec/docker-compose.yml up -d
+          sleep 15
           bundle exec r10k puppetfile install
       - name: Run tests with expensive containers
         run: bundle exec rake ci:linux:slow
