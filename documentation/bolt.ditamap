@@ -102,6 +102,7 @@
     <topicref href="experimental_features.md" format="markdown"/>
     <topichead navtitle="Reference">
         <topicref href="bolt_command_reference.md" format="markdown"/>
+        <topicref href="bolt_cmdlet_reference.md" format="markdown"/>
         <topicref href="plan_functions.md" format="markdown"/>
         <topicref href="bolt_types_reference.md" format="markdown" />
         <topicref href="bolt_transports_reference.md" format="markdown"/>

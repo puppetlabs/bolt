@@ -12,6 +12,7 @@ begin
     desc 'Generate all markdown docs'
     task all: %i[
       function_reference
+      cmdlet_reference
       command_reference
       config_reference
       defaults_reference
@@ -20,7 +21,18 @@ begin
       transports_reference
     ]
 
-    desc "Generate markdown docs for Bolt's command line options"
+    desc "Generate markdown docs for Bolt PowerShell cmdlets"
+    task cmdlet_reference: 'pwsh:generate_powershell_cmdlets' do
+      filepath = File.expand_path('../documentation/bolt_cmdlet_reference.md', __dir__)
+      template = File.expand_path('../documentation/templates/bolt_cmdlet_reference.md.erb', __dir__)
+
+      renderer = ERB.new(File.read(template), nil, '-')
+      File.write(filepath, renderer.result)
+
+      $stdout.puts "Generate PowerShell cmdlet reference at:\n\t#{filepath}"
+    end
+
+    desc "Generate markdown docs for Bolt shell commands"
     task :command_reference do
       require 'bolt/bolt_option_parser'
 
@@ -66,7 +78,7 @@ begin
       renderer = ERB.new(File.read(template), nil, '-')
       File.write(filepath, renderer.result)
 
-      $stdout.puts "Generated command reference at:\n\t#{filepath}"
+      $stdout.puts "Generated shell command reference at:\n\t#{filepath}"
     end
 
     desc 'Generate markdown docs for bolt.yaml'

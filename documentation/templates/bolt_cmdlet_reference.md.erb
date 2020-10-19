@@ -1,0 +1,27 @@
+# PowerShell cmdlets
+
+## Cmdlet syntax
+
+Bolt PowerShell cmdlets follow a verb-noun convention.
+
+To view a full list of available cmdlets, use the `Get-Command` cmdlet:
+
+```shell
+Get-Command -Module PuppetBolt
+```
+
+## Cmdlets
+
+These PowerShell cmdlets are available in the Bolt PowerShell module.
+
+<% @commands.each do |command| %>
+### <%= command[:cmdlet] %>
+
+<%= command[:description] %>
+
+| Parameter | Description | Mandatory |
+| --- | --- | :-: |
+<% command[:options].each do |option| -%>
+| `-<%= option[:name] -%><%= option[:arg] %>` | <%= option[:help_msg].gsub("<", "&lt;").split("\n").join('<br>') %> | <%= option[:mandatory] ? '✓' : '' %>
+<% end %>
+<% end %>

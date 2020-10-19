@@ -28,7 +28,7 @@ Here are each of the documenation pages that are generated, the files
 that you may need to modify to make changes to the generated documentation,
 and the rake task used to generate the documentation.
 
-### Bolt command reference
+### *nix shell commands
 
 **Documentation page** 
 - https://puppet.com/docs/bolt/latest/bolt_command_reference.html
@@ -42,7 +42,25 @@ and the rake task used to generate the documentation.
 To generate this documentation, run:
 
 ```shell
-$ bundle exec rake docs:cli_reference
+$ bundle exec rake docs:command_reference
+```
+
+### PowerShell cmdlets
+
+**Documentation page** 
+- https://puppet.com/docs/bolt/latest/bolt_cmdlet_reference.html
+
+**Template file**
+- [`bolt_cmdlet_reference.md.erb`](./templates/bolt_cmdlet_reference.md.erb)
+
+**Relevant source code**
+- [`bolt_option_parser.rb`](../lib/bolt/bolt_option_parser.rb)
+- [`pwsh.rb`](../rakelib/lib/pwsh.rb)
+
+To generate this documentation, run:
+
+```shell
+$ bundle exec rake docs:cmdlet_reference
 ```
 
 ### Bolt functions
