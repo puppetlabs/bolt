@@ -19,9 +19,22 @@ These PowerShell cmdlets are available in the Bolt PowerShell module.
 
 <%= command[:description] %>
 
-| Parameter | Description | Mandatory |
-| --- | --- | :-: |
-<% command[:options].each do |option| -%>
-| `-<%= option[:name] -%><%= option[:arg] %>` | <%= option[:help_msg].gsub("<", "&lt;").split("\n").join('<br>') %> | <%= option[:mandatory] ? '✓' : '' %>
-<% end %>
+<table class="table">
+  <thead>
+   <tr>
+        <th>Option</th>
+        <th>Description</th>
+        <th align="center">Mandatory?</th>
+    </tr>
+  </thead>
+  <tbody>
+   <% command[:options].each do |option| -%>
+      <tr>
+        <td><code>-<%= option[:name] -%><%= option[:arg] %></code></td>
+        <td><%= option[:help_msg].gsub("<", "&lt;").split("\n").join('<p>')%></td>
+        <td align="center"><%= option[:mandatory] ? '✓' : '' %></td>
+     </tr>
+   <% end %>
+  </tbody>
+</table>
 <% end %>

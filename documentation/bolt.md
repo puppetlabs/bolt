@@ -11,10 +11,13 @@ you are not required to install any agent software.
 <img src="bolt-logo-dark.png" width="420" /><br/>
 
 <table>
+ <thead>
  <tr>
    <th>Helpful Bolt docs links</th>
    <th>Other useful places</th>
  </tr>
+ </thead>
+ <tbody>
  <tr>
    <td>
     <p>Install Bolt
@@ -88,4 +91,5 @@ you are not required to install any agent software.
     </p>        
    </td>
  </tr>
+ </tbody>
 </table>
