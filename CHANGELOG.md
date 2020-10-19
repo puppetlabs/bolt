@@ -1,5 +1,54 @@
 # Changelog
 
+## Bolt 2.31.0 (2020-10-19)
+
+### New features
+
+* **Improved output for `bolt inventory show` and `Get-BoltInventory`**
+  ([#2205](https://github.com/puppetlabs/bolt/issues/2205))
+
+  The `bolt inventory show` command and `Get-BoltInventory` cmdlet now show if a
+  target was not found in inventory. Output also includes the path to the loaded
+  inventory file and the number of inventory targets and adhoc targets.
+
+* **Print changes made to Puppetfile when adding modules**
+  ([#2230](https://github.com/puppetlabs/bolt/issues/2230))
+
+  The `bolt module add` command and `Add-BoltModule` cmdlet now display
+  a message describing changes made to the Puppetfile, including modules
+  that have been added, removed, upgraded, or downgraded.
+
+* **Update bundled modules to latest versions**
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [facts 1.1.0](https://forge.puppet.com/puppetlabs/facts)
+  - [augeas_core 1.1.1](https://forge.puppet.com/puppetlabs/augeas_core)
+  - [scheduled_task 2.2.1](https://forge.puppet.com/puppetlabs/scheduled_task)
+  - [sshkeys_core 2.1.0](https://forge.puppet.com/puppetlabs/sshkeys_core)
+  - [zfs_core 1.1.0](https://forge.puppet.com/puppetlabs/zfs_core)
+  - [cron_core 1.0.4](https://forge.puppet.com/puppetlabs/cron_core)
+  - [yumrepo_core 1.0.7](https://forge.puppet.com/puppetlabs/yumrepo_core)
+  - [package 1.3.0](https://forge.puppet.com/puppetlabs/package)
+  - [stdlib 6.5.0](https://forge.puppet.com/puppetlabs/stdlib)
+
+### Bug fixes
+
+* **Log when default inventory file cannot be loaded**
+  ([#2207](https://github.com/puppetlabs/bolt/issues/2207))
+
+  Bolt now logs that it tried but failed to load the default inventory
+  file when the default inventory file does not exist. Previously, Bolt
+  would log that it loaded the default inventory file, even when it was
+  unable to do so.
+
+* **Add moduledir directive to generated Puppetfile**
+  ([#2246](https://github.com/puppetlabs/bolt/pull/2246))
+
+  Puppetfiles generated using the `bolt module install` command and
+  `Install-BoltModule` cmdlet did not include the `moduledir` directive.
+
 ## Bolt 2.30.0 (2020-09-30)
 
 ### New features
