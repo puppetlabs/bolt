@@ -344,7 +344,7 @@ module Bolt
         end
 
         @stream.puts "INVENTORY FILE:"
-        if inventoryfile.exist?
+        if File.exist?(inventoryfile)
           @stream.puts inventoryfile
         else
           @stream.puts wrap("Tried to load inventory from #{inventoryfile}, but the file does not exist")
