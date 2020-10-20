@@ -6,7 +6,7 @@ on:
     paths: ['pwsh_module/*']
   pull_request:
     type: [opened, reopened, edited]
-    paths: ['pwsh_module/*', 'lib/bolt/bolt_option_parser.rb']
+    paths: ['pwsh_module/*', 'lib/bolt/bolt_option_parser.rb', 'rakelib/pwsh.rake']
 
 jobs:
 
