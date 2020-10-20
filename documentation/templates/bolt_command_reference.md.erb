@@ -26,9 +26,21 @@ These subcommands, actions, and options are available for Bolt.
 <%= val[:usage] %>
 ```
 
-| Option | Description |
-| ------ | ----------- |
-<% val[:options].each do |option| -%>
-| <% if option[:short] %>`<%= option[:short] %>`, <% end -%>`<%= option[:long] -%><%= option[:arg] %>` | <%= option[:desc] %> |
+<table class="table">
+  <thead>
+    <tr>
+     <th>Option</th>
+     <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% val[:options].each do |option| -%>
+    <tr>
+        <td><% if option[:short] %><code><%= option[:short] %></code>, <% end -%><code><%= option[:long] -%><%= option[:arg] %></code></td>
+        <td><%= option[:desc]%></td>
+    </tr>   
+  <% end %>
+  </tbody>
+</table>
 <% end %>
-<% end %>
+
