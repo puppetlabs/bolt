@@ -374,7 +374,7 @@ describe "Bolt::Outputter::Human" do
   end
 
   context '#print_targets' do
-    let(:inventoryfile) { double('inventoryfile', to_s: '/path/to/inventory', exist?: true) }
+    let(:inventoryfile) { '/path/to/inventory' }
 
     let(:target_list) do
       {
@@ -389,12 +389,13 @@ describe "Bolt::Outputter::Human" do
     end
 
     it 'prints the inventory file path' do
+      expect(File).to receive(:exist?).with(inventoryfile).and_return(true)
       outputter.print_targets(target_list, inventoryfile)
       expect(output.string).to match(/INVENTORY FILE:\s*#{inventoryfile}/)
     end
 
     it 'prints a message that the inventory file does not exist' do
-      inventoryfile = double('inventoryfile', to_s: '/path/to/inventory', exist?: false)
+      expect(File).to receive(:exist?).with(inventoryfile).and_return(false)
       outputter.print_targets(target_list, inventoryfile)
       expect(output.string).to match(/INVENTORY FILE:.*does not exist/m)
     end

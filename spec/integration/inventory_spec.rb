@@ -660,4 +660,11 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       expect(result).to include('stdout' => "bolt\n")
     end
   end
+
+  context 'when showing inventory targets' do
+    it 'shows targets from a configured inventory' do
+      expect { run_cli(%W[inventory show -t all -i #{@inventoryfile}], outputter: Bolt::Outputter::Human) }
+        .not_to raise_error
+    end
+  end
 end
