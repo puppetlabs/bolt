@@ -329,7 +329,7 @@ module Bolt
             "server_urls" => {
               description: "An array containing the PuppetDB host to connect to. Include the protocol `https` "\
                            "and the port, which is usually `8081`. For example, "\
-                           "`https://my-master.example.com:8081`.",
+                           "`https://my-puppetdb-server.com:8081`.",
               type: Array,
               _example: ["https://puppet.example.com:8081"]
             },

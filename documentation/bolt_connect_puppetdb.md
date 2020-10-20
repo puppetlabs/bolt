@@ -10,7 +10,7 @@ RBAC token.
 ## Client certificate
 
 Add the certname for the certificate you want to authenticate with
-to `/etc/puppetlabs/puppetdb/certificate-whitelist`. This certificate has full
+to `/etc/puppetlabs/puppetdb/certificate-allowlist`. This certificate has full
 access to all PuppetDB API endpoints and can read all data, push new data, or
 run commands on PuppetDB. To test the certificate you run the following curl
 command.
@@ -48,7 +48,7 @@ config](configuring_bolt.md) with the following values:
 
 -   `server_urls`: An array containing the PuppetDB host to connect to. Include
     the protocol `https` and the port, which is usually `8081`. For example,
-    `https://my-master.example.com:8081`.
+    `https://my-puppetdb-server.example.com:8081`.
 -   `cacert`: The path to the ca certificate for PuppetDB.
 -   `connect_timeout`: How long to wait in seconds when establishing
     connections with PuppetDB.

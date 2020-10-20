@@ -194,9 +194,10 @@ Use one of the supported *nix installation methods to install Bolt.
 
 > **CAUTION:** These instructions include enabling the Puppet Tools repository.
 > While Bolt can also be installed from the Puppet 6 or 5 platform repositories,
-> adding these repositories to a Puppet-managed target, especially a PE master,
-> might result in an unsupported version of a package like `puppet-agent` being
-> installed. This can cause downtime, especially on a PE master.
+> adding these repositories to a Puppet-managed target, especially a 
+> Puppet server, might result in an unsupported version of a package like 
+> `puppet-agent` being installed. This can cause downtime, especially on a 
+> Puppet server.
 
 ### Install Bolt on Debian or Ubuntu
 

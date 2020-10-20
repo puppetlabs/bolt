@@ -37,7 +37,7 @@ have Puppet agents and runs the [`puppet_agent::install`
 task](https://forge.puppet.com/puppetlabs/puppet_agent) to install the agent.
 
 > **Note:** Bolt installs the Puppet agent package to enable the use of Puppet
-  code. It does not require setting up an agent-master architecture between the
+  code. It does not require setting up a server-agent architecture between the
   remote systems and the local system running Bolt.
 
 ### Applying manifest files
@@ -164,7 +164,7 @@ do not have Puppet agents and runs the [`puppet_agent::install`
 task](https://forge.puppet.com/puppetlabs/puppet_agent) to install the agent.
 
 > **Note:** Bolt installs the Puppet agent package to enable the use of Puppet
-  code. It does not require setting up an agent-master architecture between the
+  code. It does not require setting up a server-agent architecture between the
   remote systems and the local system running Bolt.
 
 ### Options
