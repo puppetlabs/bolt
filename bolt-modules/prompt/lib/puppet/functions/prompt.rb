@@ -9,11 +9,14 @@ Puppet::Functions.create_function(:prompt) do
   # @param prompt The prompt to display.
   # @param options A hash of additional options.
   # @option options [Boolean] sensitive Disable echo back and mark the response as sensitive.
+  #   The returned value will be wrapped by the `Sensitive` data type. To access the raw
+  #   value, use the `unwrap` function (i.e. `$sensitive_value.unwrap`).
   # @return The response to the prompt.
   # @example Prompt the user if plan execution should continue
   #   $response = prompt('Continue executing plan? [Y\N]')
   # @example Prompt the user for sensitive information
   #   $password = prompt('Enter your password', 'sensitive' => true)
+  #   out::message("Password is: ${password.unwrap}")
   dispatch :prompt do
     param 'String', :prompt
     optional_param 'Hash[String[1], Any]', :options
