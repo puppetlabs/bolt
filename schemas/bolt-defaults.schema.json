@@ -194,7 +194,7 @@
               "minimum": 1
             },
             "server_urls": {
-              "description": "An array containing the PuppetDB host to connect to. Include the protocol `https` and the port, which is usually `8081`. For example, `https://my-master.example.com:8081`.",
+              "description": "An array containing the PuppetDB host to connect to. Include the protocol `https` and the port, which is usually `8081`. For example, `https://my-puppetdb-server.com:8081`.",
               "type": "array"
             },
             "token": {
