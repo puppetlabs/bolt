@@ -145,30 +145,5 @@ describe Bolt::Catalog do
       )
       expect { catalog.compile_catalog(request) }.not_to raise_error
     end
-
-    # This test checks that the order of plan_vars is not modified
-    # when merging with target_vars during catalog compilation.
-    # Plan vars may have local references to other plan vars. Because
-    # variables are deserialized in the order they appear in a hash,
-    # changing the order of plan variables may result in Puppet being
-    # unable to deserialize them, since a local reference may appear
-    # before the variable it references.
-    it 'does not change the order of plan_vars' do
-      plan_vars.merge!(
-        'roles' => {
-          '__ptype'  => 'LocalRef',
-          '__pvalue' => "$['t1'][0]['vars']['roles']"
-        }
-      )
-
-      request.merge!('plan_vars' => plan_vars)
-
-      allow(Puppet::Pal).to receive(:in_tmp_environment) do |_type, env_conf|
-        expect(env_conf[:variables].to_a).to eq(plan_vars.to_a)
-        expect(env_conf[:variables]['roles']).to eq(plan_vars['roles'])
-      end
-
-      catalog.compile_catalog(request)
-    end
   end
 end

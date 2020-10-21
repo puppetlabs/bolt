@@ -76,31 +76,27 @@ module Bolt
       # is the only way to log a message that will make it back to Bolt
       # to be printed.
       target = request['target']
-      plan_vars = shadow_vars('plan', request['plan_vars'], target['facts'])
-      target_vars = shadow_vars('target', target['variables'], target['facts'])
 
-      # Merge plan vars with target vars, while maintaining the order of the plan
-      # vars. It's critical that the order of plan vars is not changed, as Puppet
-      # will deserialize the variables in the order they appear. Variables may
-      # contain local references to variables that appear earlier in a plan. If
-      # these variables are moved before the variable they reference, Puppet will
-      # be unable to deserialize the data and raise an error.
-      topscope_vars = target_vars.reject { |k, _v| plan_vars.key?(k) }.merge(plan_vars)
+      variables = {
+        variables:        request['plan_vars'],
+        target_variables: target['variables']
+      }
 
-      env_conf = { modulepath: request['modulepath'],
-                   facts: target['facts'],
-                   variables: topscope_vars }
+      env_conf = {
+        modulepath: request['modulepath'],
+        facts:      target['facts']
+      }
 
       puppet_settings = {
         node_name_value: target['name'],
-        hiera_config: request['hiera_config']
+        hiera_config:    request['hiera_config']
       }
 
       with_puppet_settings(puppet_settings) do
         Puppet::Pal.in_tmp_environment('bolt_catalog', **env_conf) do |pal|
           Puppet.override(puppet_overrides) do
             Puppet.lookup(:pal_current_node).trusted_data = target['trusted']
-            pal.with_catalog_compiler do |compiler|
+            pal.with_catalog_compiler(**variables) do |compiler|
               options = request['puppet_config'] || {}
               # Configure language strictness in the CatalogCompiler. We want Bolt to be able
               # to compile most Puppet 4+ manifests, so we default to allowing deprecated functions.
@@ -117,21 +113,6 @@ module Bolt
           end
         end
       end
-    end
-
-    # Warn and remove variables that will be shadowed by facts of the same
-    # name, which are set in scope earlier.
-    def shadow_vars(type, vars, facts)
-      collisions, valid = vars.partition do |k, _|
-        facts.include?(k)
-      end
-      if collisions.any?
-        names = collisions.map { |k, _| "$#{k}" }.join(', ')
-        plural = collisions.length == 1 ? '' : 's'
-        Puppet.warning("#{type.capitalize} variable#{plural} #{names} will be overridden by fact#{plural} " \
-                       "of the same name in the apply block")
-      end
-      valid.to_h
     end
 
     def build_program(code)
