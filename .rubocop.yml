@@ -113,6 +113,9 @@ Lint/TopLevelReturnWithArgument:
 Lint/TrailingCommaInAttributeDeclaration:
   Enabled: true
 
+Layout/TrailingWhitespace:
+  AllowInHeredoc: true
+
 Lint/UnreachableLoop:
   Enabled: true
 
