@@ -63,9 +63,24 @@
                   "environment": {
                     "description": "Environment the task is in",
                     "type": "string"
+                  },
+                  "project": {
+                    "description": "Project the task is in",
+                    "type": "string"
                   }
                 },
-                "required": ["environment"],
+                "oneOf": [
+                  {
+                    "required": [
+                      "environment"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "project"
+                    ]
+                  }
+                ],              
                 "additionalProperties": true
               }
             },
@@ -90,5 +105,5 @@
     }
   },
   "required": ["name", "files"],
-  "additionalProperties": false
+  "additionalProperties": true
 }
