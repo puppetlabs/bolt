@@ -22,7 +22,7 @@ module Bolt
         when :node_result
           print_result(event[:result])
         when :message
-          print_message_event(event)
+          print_message(event[:message])
         end
       end
 
