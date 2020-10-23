@@ -1,6 +1,21 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+bootsnap_enabled = ENV['BOLT_BOOTSNAP'] || false
+if bootsnap_enabled
+  require 'bootsnap'
+  cache = File.join(ENV['USERPROFILE'], '.puppetlabs', 'etc', 'bolt')
+  Bootsnap.setup(
+    cache_dir:            cache, # Path to your cache
+    development_mode:     false, # Current working environment, e.g. RACK_ENV, RAILS_ENV, etc
+    load_path_cache:      true,  # Optimize the LOAD_PATH with a cache
+    autoload_paths_cache: false, # Optimize ActiveSupport autoloads with cache
+    disable_trace:        false, # Set `RubyVM::InstructionSequence.compile_option = { trace_instruction: false }`
+    compile_cache_iseq:   true,  # Compile Ruby code into ISeq cache, breaks coverage reporting.
+    compile_cache_yaml:   true   # Compile YAML into a cache
+  )
+end
+
 require 'bolt'
 require 'bolt/cli'
 
