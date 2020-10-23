@@ -214,9 +214,10 @@ module Bolt
       end
 
       def print_tasks(tasks, modulepath)
+        command = Bolt::Util.powershell? ? 'Get-BoltTask -Task <TASK NAME>' : 'bolt task show <TASK NAME>'
         print_table(tasks)
         print_message("\nMODULEPATH:\n#{modulepath.join(File::PATH_SEPARATOR)}\n"\
-                        "\nUse `bolt task show <task-name>` to view "\
+                        "\nUse '#{command}' to view "\
                         "details and parameters for a specific task.")
       end
 
@@ -225,20 +226,26 @@ module Bolt
         # Building lots of strings...
         pretty_params = +""
         task_info = +""
-        usage = +"bolt task run --targets <node-name> #{task.name}"
+        usage = if Bolt::Util.powershell?
+                  +"Invoke-BoltTask -Name #{task.name} -Targets <targets>"
+                else
+                  +"bolt task run #{task.name} --targets <targets>"
+                end
 
         task.parameters&.each do |k, v|
           pretty_params << "- #{k}: #{v['type'] || 'Any'}\n"
           pretty_params << "    Default: #{v['default'].inspect}\n" if v.key?('default')
           pretty_params << "    #{v['description']}\n" if v['description']
-          usage << if v['type'].is_a?(Puppet::Pops::Types::POptionalType)
+          usage << if v['type'].start_with?("Optional")
                      " [#{k}=<value>]"
                    else
                      " #{k}=<value>"
                    end
         end
 
-        usage << " [--noop]" if task.supports_noop
+        if task.supports_noop
+          usage << Bolt::Util.powershell? ? '[-Noop]' : '[--noop]'
+        end
 
         task_info << "\n#{task.name}"
         task_info << " - #{task.description}" if task.description
@@ -261,7 +268,11 @@ module Bolt
         # Building lots of strings...
         pretty_params = +""
         plan_info = +""
-        usage = +"bolt plan run #{plan['name']}"
+        usage = if Bolt::Util.powershell?
+                  +"Invoke-BoltPlan -Name #{plan['name']}"
+                else
+                  +"bolt plan run #{plan['name']}"
+                end
 
         plan['parameters'].each do |name, p|
           pretty_params << "- #{name}: #{p['type']}\n"
@@ -287,16 +298,17 @@ module Bolt
       end
 
       def print_plans(plans, modulepath)
+        command = Bolt::Util.powershell? ? 'Get-BoltPlan -Name <PLAN NAME>' : 'bolt plan show <PLAN NAME>'
         print_table(plans)
         print_message("\nMODULEPATH:\n#{modulepath.join(File::PATH_SEPARATOR)}\n"\
-                        "\nUse `bolt plan show <plan-name>` to view "\
+                        "\nUse '#{command}' to view "\
                         "details and parameters for a specific plan.")
       end
 
       def print_topics(topics)
         print_message("Available topics are:")
         print_message(topics.join("\n"))
-        print_message("\nUse `bolt guide <topic>` to view a specific guide.")
+        print_message("\nUse 'bolt guide <TOPIC>' to view a specific guide.")
       end
 
       def print_guide(guide, _topic)

@@ -54,10 +54,11 @@ module Bolt
         @outputter.print_action_step("Renaming bolt.yaml to bolt-project.yaml")
         FileUtils.mv(config_file, project_file)
 
+        command = Bolt::Util.powershell? ? 'Get-Help about_bolt_project' : 'bolt guide project'
         @outputter.print_action_step(
           "Successfully migrated config. Please add a 'name' key to bolt-project.yaml "\
           "to use project-level tasks and plans. Learn more about projects by running "\
-          "'bolt guide project'."
+          "'#{command}'."
         )
 
         true

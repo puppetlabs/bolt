@@ -197,10 +197,6 @@ module Bolt
 
       warn_inventory_overrides_cli(options)
 
-      # Assert whether the puppetfile/module commands are available depending
-      # on whether 'modules' is configured.
-      assert_puppetfile_or_module_command(config.project.modules)
-
       options
     rescue Bolt::Error => e
       outputter.fatal_error(e)
@@ -229,9 +225,9 @@ module Bolt
 
     def validate(options)
       unless COMMANDS.include?(options[:subcommand])
+        command = Bolt::Util.powershell? ? 'Get-Command -Module PuppetBolt' : 'bolt help'
         raise Bolt::CLIError,
-              "Expected subcommand '#{options[:subcommand]}' to be one of " \
-              "#{COMMANDS.keys.join(', ')}"
+              "'#{options[:subcommand]}' is not a Bolt command. See '#{command}'."
       end
 
       actions = COMMANDS[options[:subcommand]]
@@ -286,8 +282,9 @@ module Bolt
       end
 
       if options[:subcommand] == 'module' && options[:action] == 'install' && options[:object]
+        command = Bolt::Util.powershell? ? 'Add-BoltModule -Module' : 'bolt module add'
         raise Bolt::CLIError, "Invalid argument '#{options[:object]}'. To add a new module to "\
-                              "the project, run 'bolt module add #{options[:object]}'."
+                              "the project, run '#{command} #{options[:object]}'."
       end
 
       if options[:subcommand] != 'file' && options[:subcommand] != 'script' &&
@@ -466,7 +463,8 @@ module Bolt
       when 'plan'
         case options[:action]
         when 'new'
-          @logger.warn("Command 'bolt plan new' is experimental and subject to changes.")
+          command = Bolt::Util.powershell? ? 'New-BoltPlan' : 'bolt plan new'
+          @logger.warn("Command '#{command}' is experimental and subject to changes.")
           plan_name = options[:object]
 
           # If this passes validation, it will return the path to the plan to create
@@ -717,10 +715,12 @@ module Bolt
     end
 
     def list_modules
+      assert_puppetfile_or_module_command(config.project.modules)
       outputter.print_module_list(pal.list_modules)
     end
 
     def generate_types
+      assert_puppetfile_or_module_command(config.project.modules)
       # generate_types will surface a nice error with helpful message if it fails
       pal.generate_types
       0
@@ -741,8 +741,9 @@ module Bolt
             "project name must begin with a lowercase letter and can include lowercase "\
             "letters, numbers, and underscores."
         else
+          command = Bolt::Util.powershell? ? 'New-BoltProject -Name <NAME>' : 'bolt project init <NAME>'
           raise Bolt::ValidationError, "The current directory name '#{name}' is an invalid "\
-            "project name. Please specify a name using 'bolt project init <name>'."
+            "project name. Please specify a name using '#{command}'."
         end
       end
 
@@ -799,6 +800,7 @@ module Bolt
     #
     def install_project_modules(project, force, resolve)
       assert_project_file(project)
+      assert_puppetfile_or_module_command(project.modules)
 
       unless project.modules
         outputter.print_message "Project configuration file #{project.project_file} does not "\
@@ -820,6 +822,7 @@ module Bolt
     #
     def add_project_module(name, project)
       assert_project_file(project)
+      assert_puppetfile_or_module_command(project.modules)
 
       modules   = project.modules || []
       installer = Bolt::ModuleInstaller.new(outputter, pal)
@@ -837,11 +840,13 @@ module Bolt
     def assert_project_file(project)
       unless project.project_file?
         msg = if project.config_file.exist?
+                command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
                 "Detected Bolt configuration file #{project.config_file}, unable to install "\
-                "modules. To update to a project configuration file, run 'bolt project migrate'."
+                "modules. To update to a project configuration file, run '#{command}'."
               else
+                command = Bolt::Util.powershell? ? 'New-BoltProject' : 'bolt project init'
                 "Could not find project configuration file #{project.project_file}, unable "\
-                "to install modules. To create a Bolt project, run 'bolt project init'."
+                "to install modules. To create a Bolt project, run '#{command}'."
               end
 
         raise Bolt::Error.new(msg, 'bolt/missing-project-config-error')
@@ -850,10 +855,12 @@ module Bolt
 
     # Loads a Puppetfile and installs its modules.
     #
-    def install_puppetfile(config, puppetfile, moduledir)
+    def install_puppetfile(puppetfile_config, puppetfile, moduledir)
+      assert_puppetfile_or_module_command(config.project.modules)
+
       outputter.print_message("Installing modules from Puppetfile")
       installer = Bolt::ModuleInstaller.new(outputter, pal)
-      ok = installer.install_puppetfile(puppetfile, moduledir, config)
+      ok = installer.install_puppetfile(puppetfile, moduledir, puppetfile_config)
       ok ? 0 : 1
     end
 
@@ -861,17 +868,36 @@ module Bolt
     # modules being configured.
     #
     def assert_puppetfile_or_module_command(modules)
+      if Bolt::Util.powershell?
+        case options[:action]
+        when 'generate-types'
+          old_command = 'Register-BoltPuppetfileTypes'
+          new_command = 'Register-BoltModuleTypes'
+        when 'install'
+          old_command = 'Install-BoltPuppetfile'
+          new_command = 'Install-BoltModule'
+        when 'show', 'show-modules'
+          old_command = 'Get-BoltPuppetfileModules'
+          new_command = 'Get-BoltModule'
+        end
+      else
+        old_command = "bolt puppetfile #{options[:action]}"
+        new_command = if options[:action] == 'show-modules'
+                        'bolt module show'
+                      else
+                        "bolt module #{options[:action]}"
+                      end
+      end
+
       if modules && options[:subcommand] == 'puppetfile'
         raise Bolt::CLIError,
-              "Unable to use command 'bolt puppetfile #{options[:action]}' when "\
-              "'modules' is configured in bolt-project.yaml. Use the 'module' command "\
-              "instead. For a list of available actions for the 'module' command, run "\
-              "'bolt module --help'."
+              "Unable to use command '#{old_command}' when 'modules' is configured in "\
+              "bolt-project.yaml. Use '#{new_command}' instead."
       elsif modules.nil? && options[:subcommand] == 'module'
-        raise Bolt::CLIError,
-              "Unable to use command 'bolt module #{options[:action]}'. To use "\
-              "this command, update your project configuration to manage module "\
-              "dependencies."
+        msg  = "Unable to use command '#{new_command}' when 'modules' is not configured in "\
+               "bolt-project.yaml. "
+        msg += "Use '#{old_command}' instead." if options[:action] != 'add'
+        raise Bolt::CLIError, msg
       end
     end
 

@@ -183,7 +183,7 @@ describe "Bolt::CLI" do
     end
 
     it 'errors without modules configured' do
-      expect { cli.parse }.to raise_error(
+      expect { cli.execute(cli.parse) }.to raise_error(
         Bolt::CLIError,
         /Unable to use command/
       )
@@ -240,9 +240,10 @@ describe "Bolt::CLI" do
 
       it 'errors with extra arguments' do
         cli = Bolt::CLI.new(%W[module install puppetlabs-yaml --project #{project}])
+        command = Bolt::Util.powershell? ? 'Add-BoltModule' : 'bolt module add'
         expect { cli.parse }.to raise_error(
           Bolt::CLIError,
-          /Invalid argument.*bolt module add/
+          /Invalid argument.*#{command}/
         )
       end
 
@@ -360,7 +361,7 @@ describe "Bolt::CLI" do
       cli = Bolt::CLI.new(%w[--targets bolt1 bolt2 command run whoami])
       expect {
         cli.parse
-      }.to raise_error(Bolt::CLIError, /Expected subcommand 'bolt2' to be one of/)
+      }.to raise_error(Bolt::CLIError, /'bolt2' is not a Bolt command/)
     end
 
     it "generates an error message if an unknown action is given" do
@@ -1520,7 +1521,7 @@ describe "Bolt::CLI" do
             cli.execute(options)
           }.to raise_error(
             Bolt::Error,
-            'Could not find a task named "abcdefg". For a list of available tasks, run "bolt task show"'
+            /Could not find a task named 'abcdefg'/
           )
         end
       end
@@ -1717,7 +1718,7 @@ describe "Bolt::CLI" do
             cli.execute(options)
           }.to raise_error(
             Bolt::Error,
-            'Could not find a plan named "abcdefg". For a list of available plans, run "bolt plan show"'
+            /Could not find a plan named 'abcdefg'/
           )
         end
       end
@@ -1766,7 +1767,7 @@ describe "Bolt::CLI" do
           task_name.replace 'dne::task1'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::Error, /Could not find a task named "dne::task1"/
+            Bolt::Error, /Could not find a task named 'dne::task1'/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1775,7 +1776,7 @@ describe "Bolt::CLI" do
           task_name.replace 'sample::dne'
 
           expect { cli.execute(options) }.to raise_error(
-            Bolt::Error, /Could not find a task named "sample::dne"/
+            Bolt::Error, /Could not find a task named 'sample::dne'/
           )
           expect(JSON.parse(output.string)).to be
         end
@@ -1935,7 +1936,7 @@ describe "Bolt::CLI" do
                 task_name.replace 'unknown::task'
 
                 expect { cli.execute(options) }.to raise_error(
-                  Bolt::Error, /Could not find a task named "unknown::task"/
+                  Bolt::Error, /Could not find a task named 'unknown::task'/
                 )
                 expect(JSON.parse(output.string)).to be
               end
@@ -2165,7 +2166,7 @@ describe "Bolt::CLI" do
           expect(executor).to receive(:finish_plan)
 
           expect(cli.execute(options)).to eq(1)
-          expect(JSON.parse(output.string)['msg']).to match(/Could not find a plan named "sample::dne"/)
+          expect(JSON.parse(output.string)['msg']).to match(/Could not find a plan named 'sample::dne'/)
         end
       end
 
@@ -2816,8 +2817,11 @@ describe "Bolt::CLI" do
 
   context 'when warning about CLI flags being overridden by inventory' do
     it "does not warn when no inventory is detected" do
-      cli = Bolt::CLI.new(%w[command run whoami -t foo --password bar])
-      cli.parse
+      with_project do
+        cli = Bolt::CLI.new(%W[command run whoami -t foo --password bar --project #{project.path}])
+        cli.parse
+      end
+
       expect(@log_output.readlines.join)
         .not_to match(/CLI arguments \["password"\] may be overridden by Inventory/)
     end

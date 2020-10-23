@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/util'
+
 module Bolt
   class Error < RuntimeError
     attr_reader :kind, :details, :issue_code, :error_code
@@ -37,13 +39,17 @@ module Bolt
     end
 
     def self.unknown_task(task)
-      new("Could not find a task named \"#{task}\". For a list of available tasks, run \"bolt task show\"",
-          'bolt/unknown-task')
+      command = Bolt::Util.powershell? ? "Get-BoltTask" : "bolt task show"
+      new(
+        "Could not find a task named '#{task}'. For a list of available tasks, run '#{command}'.",
+        'bolt/unknown-task'
+      )
     end
 
     def self.unknown_plan(plan)
+      command = Bolt::Util.powershell? ? "Get-BoltPlan" : "bolt plan show"
       new(
-        "Could not find a plan named \"#{plan}\". For a list of available plans, run \"bolt plan show\"",
+        "Could not find a plan named '#{plan}'. For a list of available plans, run '#{command}'.",
         'bolt/unknown-plan'
       )
     end

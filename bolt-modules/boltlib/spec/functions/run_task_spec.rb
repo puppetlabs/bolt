@@ -353,7 +353,7 @@ describe 'run_task' do
       is_expected.to run
         .with_params('test::nonesuch', [])
         .and_raise_error(
-          /Could not find a task named "test::nonesuch"/
+          /Could not find a task named 'test::nonesuch'/
         )
     end
 

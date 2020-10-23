@@ -77,13 +77,21 @@ module Bolt
         )
       end
 
+      if Bolt::Util.powershell?
+        show_command = 'Get-BoltPlan -Name '
+        run_command  = 'Invoke-BoltPlan -Name '
+      else
+        show_command = 'bolt plan show'
+        run_command  = 'bolt plan run'
+      end
+
       output = <<~OUTPUT
         Created plan '#{plan_name}' at '#{plan_path}'
 
         Show this plan with:
-            bolt plan show #{plan_name}
+            #{show_command} #{plan_name}
         Run this plan with:
-            bolt plan run #{plan_name}
+            #{run_command} #{plan_name}
       OUTPUT
 
       outputter.print_message(output)
