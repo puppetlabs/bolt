@@ -154,55 +154,133 @@ begin
       json.delete('data_types')
       json.each { |k, v| raise "Expected #{k} to be empty, found #{v}" unless v.empty? }
 
+      apply = {
+        "name"       => "apply",
+        "desc"       => "Applies a block of manifest code to the targets.\n\nApplying manifest "\
+                        "code requires facts to compile a catalog. Targets must also have "\
+                        "the Puppet agent package installed to apply manifest code. To prep "\
+                        "targets for an apply, call the [apply_prep](#apply-prep) function before "\
+                        "the apply function.\n\nTo learn more about applying manifest code from a plan, "\
+                        "see [Applying manifest blocks from a Puppet "\
+                        "plan](applying_manifest_blocks.md#applying-manifest-blocks-from-a-puppet-plan).\n\n"\
+                        "> **Note:** The `apply` function returns a `ResultSet` object containing `ApplyResult`\n"\
+                        "> objects.",
+        "examples"   => [
+          {
+            "desc" => "Apply manifest code, logging the provided description.",
+            "exmp" => "apply($targets, '_description' => 'Install Docker') {\n  include 'docker'\n}"
+          },
+          {
+            "desc" => "Apply manifest code as another user, catching any errors.",
+            "exmp" => "$apply_results = apply($targets, '_catch_errors' => true, '_run_as' => 'bolt') {\n"\
+                      "  file { '/etc/puppetlabs':\n    ensure => present\n  }\n}"
+          }
+        ],
+        "signatures" => [
+          {
+            "signature" => "apply($targets, $options, &block) => ResultSet",
+            "return"    => "ResultSet",
+            "options"   => {
+              "_catch_errors" => {
+                "desc" => "When `true`, returns a `ResultSet` including failed results, rather "\
+                          "than failing the plan.",
+                "type" => "Boolean"
+              },
+              "_description" => {
+                "desc" => "Adds a description to the apply block, allowing you to distinguish "\
+                          "apply blocks.",
+                "type" => "String"
+              },
+              "_noop" => {
+                "desc" => "When `true`, applies the manifest block in Puppet no-operation mode, "\
+                          "returning a report of the changes it would make while taking no action.",
+                "type" => "Boolean"
+              },
+              "_run_as" => {
+                "desc" => "The user to apply the manifest block as. Only available for transports "\
+                          "that support the `run-as` option.",
+                "type" => "String"
+              }
+            },
+            "params"    => {
+              "targets" => {
+                "desc" => "The targets to apply the Puppet code to.",
+                "type" => "TargetSpec"
+              },
+              "options" => {
+                "desc" => "A hash of additional options.",
+                "type" => "Optional[Hash]"
+              },
+              "&block" => {
+                "desc" => "The manifest code to apply to the targets.",
+                "type" => "Callable"
+              }
+            }
+          }
+        ]
+      }
       # @functions will be a list of function descriptions, structured as
       #   name: function name
-      #   text: function description; first line should be usable as a summary
+      #   desc: function description
       #   signatures: a list of function overloads
-      #     text: overload description
+      #     desc: overload description
       #     signature: function signature
-      #     returns: list of return statements
-      #       text: return description
-      #       types: list of types (probably only one entry)
+      #     return: return type
       #     params: list of params
       #       name: parameter name
-      #       text: description
-      #       types: list of types (probably only one entry)
-      #     examples: list of examples
-      #       name: description
-      #       text: example body
+      #       desc: description
+      #       type: type
+      #   examples: list of examples
+      #     desc: description
+      #     exmp: example body
       @functions = funcs.map do |func|
-        func['text'] = func['docstring']['text']
+        data = {
+          'name'       => func['name'],
+          'desc'       => format_links(func['docstring']['text']),
+          'signatures' => [],
+          'examples'   => []
+        }
 
-        overloads = func['docstring']['tags'].select { |tag| tag['tag_name'] == 'overload' }
-        sig_tags = overloads.map { |overload| overload['docstring']['tags'] }
-        sig_tags = [func['docstring']['tags']] if sig_tags.empty?
-        func['signatures'] = func['signatures'].zip(sig_tags).map do |sig, tags|
-          sig['text'] = sig['docstring']['text']
-          sects = sig['docstring']['tags'].group_by { |t| t['tag_name'] }
-          sig['returns'] = sects['return'].map do |ret|
-            ret['text'] = format_links(ret['text'])
-            ret
-          end
-          sig['params'] = sects['param'].map do |param|
-            param['text'] = format_links(param['text'])
-            param
-          end
-          if sects['option']
-            sig['options'] = sects['option'].map do |option|
-              option['opt_text'] = format_links(option['opt_text'])
-              option
+        func['signatures'].each do |signature|
+          sig = {
+            'desc' => format_links(signature.dig('docstring', 'text')),
+            'params' => {},
+            'options' => {}
+          }
+
+          signature.dig('docstring', 'tags').each do |tag|
+            case tag['tag_name']
+            when 'example'
+              data['examples'].push(
+                'desc' => format_links(tag['name']),
+                'exmp' => tag['text']
+              )
+            when 'option'
+              sig['options'][tag['opt_name']] = {
+                'desc' => format_links(tag['opt_text']).gsub("\n", "\s"),
+                'type' => format_type(tag['opt_types'].first)
+              }
+            when 'param'
+              sig['params'][tag['name']] = {
+                'desc' => format_links(tag['text']).gsub("\n", "\s"),
+                'type' => format_type(tag['types'].first)
+              }
+            when 'return'
+              sig['return'] = format_type(tag['types'].first)
             end
           end
 
-          # get examples from overload docstring; puppet-strings should probably do this.
-          examples = tags.select { |t| t['tag_name'] == 'example' }
-          sig['examples'] = examples
-          sig.delete('docstring')
-          sig
+          sig['signature'] = make_signature(func['name'], sig['params'].keys, sig['return'])
+
+          data['signatures'].push(sig)
         end
 
-        func
+        data
       end
+
+      @functions << apply
+      @functions.sort! { |a, b| a['name'] <=> b['name'] }
+
       renderer = ERB.new(File.read(template), nil, '-')
       File.write(filepath, renderer.result)
 
@@ -341,4 +419,13 @@ end
 
 def format_links(text)
   text.gsub(/{([^}]+)}/, '[`\1`](#\1)')
+end
+
+def format_type(type)
+  type.gsub('Boltlib::', '')
+end
+
+def make_signature(function_name, params, return_type)
+  params.map! { |param| param == '&block' ? param : "$#{param}" }
+  "#{function_name}(#{params.join(', ')}) => #{return_type}"
 end
