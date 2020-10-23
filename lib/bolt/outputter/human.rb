@@ -45,7 +45,7 @@ module Bolt
         when :disable_default_output
           @disable_depth += 1
         when :message
-          print_message_event(event)
+          print_message(event[:message])
         end
 
         if enabled?

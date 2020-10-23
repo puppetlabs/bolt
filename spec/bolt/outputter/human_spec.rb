@@ -308,7 +308,7 @@ describe "Bolt::Outputter::Human" do
   end
 
   it "handles message events" do
-    outputter.print_message_event(message: "hello world")
+    outputter.handle_event(type: :message, message: "hello world")
     expect(output.string).to eq("hello world\n")
   end
 
