@@ -1,0 +1,25 @@
+TOPIC
+    modulepath
+
+DESCRIPTION
+    The modulepath is an ordered list of directories that Bolt loads modules
+    from. When Bolt runs a command, it automatically loads modules from the
+    modulepath.
+    
+    While Bolt has a default modulepath, you can also configure your own
+    modulepath, which can include directories within the project or directories
+    elsewhere on your system. Regardless of whether your project uses a default
+    or configured modulepath, Bolt automatically adds directories to the
+    modulepath. This includes modules containing core Bolt content, which is
+    added to the beginning of the modulepath, and bundled content, which is
+    added to the end of the modulepath.
+
+    Modules loaded from a directory listed earlier in the modulepath take
+    precedence over modules with the same name loaded from a directory later in
+    the modulepath. Bolt will not warn or error when two modules share a name
+    and instead will ignore modules with a lower precedence.
+
+    To learn more about modules, see the 'module' guide.
+
+DOCUMENTATION
+    https://pup.pt/bolt-project-reference#modulepath
