@@ -152,7 +152,7 @@ Fatal logs contain `emerg` and `critical` messages from a Puppet code file
 Use a fatal error log if you want to see fatal errors raised by issues in your
 Puppet code.
 
-## Using `verbose` logging
+## Using `verbose` output
 
 The following Bolt commands include the `--verbose` CLI option: 
 - `bolt command run`
@@ -172,10 +172,11 @@ The following PowerShell cmdlets include the `-Verbose` argument:
 - `Receive-BoltFile`
 - `Invoke-BoltApply`
 
-Verbose logging is useful when you want to see the
-results for Bolt actions on your targets that are usually not printed to
-standard out (stdout). Verbose logging is particularly useful for debugging your
-tasks and plans.
+Verbose output is useful when you want to see the results for Bolt actions on your targets that are
+usually not printed to standard out (stdout). Verbose isn't a log level, but is a way of telling
+Bolt to output additional information in a human-readable format. Verbose output is particularly
+useful for debugging your tasks and plans - if you're not sure why something is failing, try running
+it with `--verbose` to get more information.
 
 📖 **Related information**  
 
