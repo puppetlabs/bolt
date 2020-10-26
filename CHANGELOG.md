@@ -1,5 +1,38 @@
 # Changelog
 
+## Bolt 2.32.0 (2020-10-26)
+
+### New features
+
+* **Add `json_endpoint` parameter to `http_request` task**
+  ([#2](https://github.com/puppetlabs/puppetlabs-http_request/issues/2))
+
+  The `http_request` task now accepts a `json_endpoint` parameter. When set to
+  `true`, the task will convert the request body to JSON, set the `Content-Type`
+  header to `application/json`, and parse the response body as JSON.
+
+* **Git module support for module management feature**
+  ([#2187](https://github.com/puppetlabs/bolt/issues/2187))
+
+  Git modules can now be specified in `bolt-project.yaml` and used with
+  the module management feature. Only GitHub modules are supported.
+
+### Bug fixes
+
+* **Fix 'method not found' error when showing inventory**
+  ([#2269](https://github.com/puppetlabs/bolt/pull/2269))
+
+  Previously, when running `bolt inventory show` or `Get-BoltInventory` with a
+  configured inventory path and the human format a 'method not found' error was
+  raised. This now correctly prints the targets in the inventory.
+
+* **Handle printing preformatted Puppet errors with `out::message`**
+  ([#2241](https://github.com/puppetlabs/bolt/issues/2241))
+
+  The `out::message` plan function now correctly prints preformatted
+  Puppet errors. Previously, printing preformatted Puppet errors would
+  result in a 'stack level too deep' error.
+
 ## Bolt 2.31.0 (2020-10-19)
 
 ### New features
