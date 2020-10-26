@@ -119,7 +119,7 @@ The following functions are available to `Target` objects:
 | Function | Type returned | Description | Note |
 |---|---|---|---|
 | `config` | `Hash[String, Data]` | The inventory configuration for the target. | This function returns the configuration set directly on the target in `inventory.yaml` or set in a plan using `Target.new` or `set_config()`. It does not return default configuration values or configuration set in Bolt configuration files.  |
-| `facts` | `Hash[String, Data]` | The target's facts. | This function does not look up facts for a target and only returns the facts specified in an `inventory.yaml` file or set on a target during a plan run. |
+| `facts` | `Hash[String, Data]` | The target's facts. | This function does not look up facts for a target and only returns the facts specified in an `inventory.yaml` file or set on a target during a plan run. To retrieve facts for a target and set them in inventory, run the [facts](writing_plans.md#collect-facts-from-targets) plan or [puppetdb_fact](writing_plans.md#collect-facts-from-puppetdb) plan. |
 | `features` | `Array[String]` | The target's features. ||
 | `host` | `String` | The target's hostname. ||
 | `name` | `String` | The target's human-readable name, or its URI if a name was not given. ||

@@ -715,6 +715,12 @@ facts or variables for any target. Facts usually come from running `facter` or
 another fact collection application on the target, or from a fact store like
 PuppetDB. Variables are computed externally or assigned directly.
 
+Using the `facts` plan function does not automatically collect facts for a
+target, and will only return facts that are currently set in the inventory. To
+collect facts from a target and set them in the inventory, run the
+[facts](#collect-facts-from-targets) plan or
+[puppetdb_fact](#collect-facts-from-puppetdb) plan.
+
 Set variables in a plan using `$target.set_var`:
 
 ```
