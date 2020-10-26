@@ -42,12 +42,14 @@ module Bolt
       # to the new moduledir.
       #
       private def migrate_modules_from_puppetfile(config, puppetfile_path, managed_moduledir, modulepath)
-        require 'bolt/puppetfile'
-        require 'bolt/puppetfile/installer'
+        require 'bolt/module_installer/installer'
+        require 'bolt/module_installer/puppetfile'
+        require 'bolt/module_installer/resolver'
+        require 'bolt/module_installer/specs'
 
         begin
           @outputter.print_action_step("Parsing Puppetfile at #{puppetfile_path}")
-          puppetfile = Bolt::Puppetfile.parse(puppetfile_path, skip_unsupported_modules: true)
+          puppetfile = Bolt::ModuleInstaller::Puppetfile.parse(puppetfile_path, skip_unsupported_modules: true)
         rescue Bolt::Error => e
           @outputter.print_action_error("#{e.message}\nSkipping module migration.")
           return false
@@ -56,14 +58,14 @@ module Bolt
         # Prompt for direct dependencies
         modules = select_modules(puppetfile.modules)
 
-        # Create new Puppetfile object
-        puppetfile = Bolt::Puppetfile.new(modules)
+        # Create specs to resolve from
+        specs = Bolt::ModuleInstaller::Specs.new(modules.map(&:to_hash))
 
         # Attempt to resolve dependencies
         begin
           @outputter.print_message('')
           @outputter.print_action_step("Resolving module dependencies, this may take a moment")
-          puppetfile.resolve
+          puppetfile = Bolt::ModuleInstaller::Resolver.new.resolve(specs)
         rescue Bolt::Error => e
           @outputter.print_action_error("#{e.message}\nSkipping module migration.")
           return false
@@ -98,7 +100,7 @@ module Bolt
 
           # Install Puppetfile
           @outputter.print_action_step("Syncing modules from #{puppetfile_path} to #{managed_moduledir}")
-          Bolt::Puppetfile::Installer.new({}).install(puppetfile_path, managed_moduledir)
+          Bolt::ModuleInstaller::Installer.new.install(puppetfile_path, managed_moduledir)
         else
           @outputter.print_action_step(
             "Project does not include any managed modules, deleting Puppetfile "\
@@ -123,7 +125,7 @@ module Bolt
         return modules if all
 
         modules.select do |mod|
-          Bolt::Util.prompt_yes_no("Select #{mod.title}?", @outputter)
+          Bolt::Util.prompt_yes_no("Select #{mod.full_name}?", @outputter)
         end
       end
 

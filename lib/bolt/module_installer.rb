@@ -2,6 +2,10 @@
 
 require 'bolt/error'
 require 'bolt/logger'
+require 'bolt/module_installer/installer'
+require 'bolt/module_installer/puppetfile'
+require 'bolt/module_installer/resolver'
+require 'bolt/module_installer/specs'
 
 module Bolt
   class ModuleInstaller
@@ -13,45 +17,53 @@ module Bolt
 
     # Adds a single module to the project.
     #
-    def add(name, modules, puppetfile_path, moduledir, config_path)
-      require 'bolt/puppetfile'
+    def add(name, specs, puppetfile_path, moduledir, config_path)
+      project_specs = Specs.new(specs)
 
-      @outputter.print_message("Adding module #{name} to project\n\n")
-
-      # If the project configuration file already includes this module,
-      # exit early.
-      puppetfile  = Bolt::Puppetfile.new(modules)
-      new_module  = Bolt::Puppetfile::Module.from_hash('name' => name)
-
-      if puppetfile.modules.include?(new_module)
-        @outputter.print_action_step(
-          "Project configuration file #{config_path} already includes module #{new_module}. Nothing to do."
+      # Exit early if project config already includes a spec with this name.
+      if project_specs.include?(name)
+        @outputter.print_message(
+          "Project configuration file #{config_path} already includes specification with name "\
+          "#{name}. Nothing to do."
         )
         return true
       end
 
-      # If the Puppetfile exists, make sure it's managed by Bolt.
-      if puppetfile_path.exist?
-        assert_managed_puppetfile(puppetfile, puppetfile_path)
-        existing = Bolt::Puppetfile.parse(puppetfile_path)
-      else
-        existing = Bolt::Puppetfile.new
+      @outputter.print_message("Adding module #{name} to project\n\n")
+
+      # Generate the specs to resolve from. If a Puppetfile exists, parse it and
+      # convert the modules to specs. Otherwise, use the project specs.
+      resolve_specs = if puppetfile_path.exist?
+                        existing_puppetfile = Puppetfile.parse(puppetfile_path)
+                        existing_puppetfile.assert_satisfies(project_specs)
+                        Specs.from_puppetfile(existing_puppetfile)
+                      else
+                        project_specs
+                      end
+
+      # Resolve module dependencies. Attempt to first resolve with resolve
+      # specss. If that fails, fall back to resolving from project specs.
+      # This prevents Bolt from modifying installed modules unless there is
+      # a version conflict.
+      @outputter.print_action_step("Resolving module dependencies, this may take a moment")
+
+      begin
+        resolve_specs.add_specs('name' => name)
+        puppetfile = Resolver.new.resolve(resolve_specs)
+      rescue Bolt::Error
+        project_specs.add_specs('name' => name)
+        puppetfile = Resolver.new.resolve(project_specs)
       end
 
-      # Create a Puppetfile object that includes the new module and its
-      # dependencies. We error early here so we don't add the new module to the
-      # project config or modify the Puppetfile.
-      puppetfile = add_new_module_to_puppetfile(new_module, modules, puppetfile_path)
-
       # Display the diff between the existing Puppetfile and the new Puppetfile.
-      print_puppetfile_diff(existing, puppetfile)
+      print_puppetfile_diff(existing_puppetfile, puppetfile)
 
       # Add the module to the project configuration.
       @outputter.print_action_step("Updating project configuration file at #{config_path}")
 
       data = Bolt::Util.read_yaml_hash(config_path, 'project')
       data['modules'] ||= []
-      data['modules'] <<  { 'name' => new_module.title }
+      data['modules'] << name
 
       begin
         File.write(config_path, data.to_yaml)
@@ -70,130 +82,97 @@ module Bolt
       install_puppetfile(puppetfile_path, moduledir)
     end
 
-    # Creates a new Puppetfile that includes the new module and its dependencies.
-    #
-    private def add_new_module_to_puppetfile(new_module, modules, path)
-      @outputter.print_action_step("Resolving module dependencies, this may take a moment")
-
-      # If there is an existing Puppetfile, add the new module and attempt
-      # to resolve. This will not update the versions of any installed modules.
-      if path.exist?
-        puppetfile = Bolt::Puppetfile.parse(path)
-        puppetfile.add_modules(new_module)
-
-        begin
-          puppetfile.resolve
-          return puppetfile
-        rescue Bolt::Error
-          @logger.debug "Unable to find a version of #{new_module} compatible "\
-                        "with installed modules. Attempting to re-resolve modules "\
-                        "from project configuration; some versions of installed "\
-                        "modules may change."
-        end
-      end
-
-      # If there is not an existing Puppetfile, or resolving with pinned
-      # modules fails, resolve all of the module declarations with the new
-      # module.
-      puppetfile = Bolt::Puppetfile.new(modules)
-      puppetfile.add_modules(new_module)
-      puppetfile.resolve
-      puppetfile
-    end
-
     # Outputs a diff of an old Puppetfile and a new Puppetfile.
     #
     def print_puppetfile_diff(old, new)
-      # Build hashes mapping the module title to the module object. This makes it
+      # Build hashes mapping the module name to the module object. This makes it
       # a little easier to determine which modules have been added, removed, or
       # modified.
-      old = old.modules.each_with_object({}) do |mod, acc|
-        acc[mod.title] = mod
+      old = (old&.modules || []).each_with_object({}) do |mod, acc|
+        next unless mod.type == :forge
+        acc[mod.full_name] = mod
       end
 
       new = new.modules.each_with_object({}) do |mod, acc|
-        acc[mod.title] = mod
+        next unless mod.type == :forge
+        acc[mod.full_name] = mod
       end
 
       # New modules are those present in new but not in old.
-      added = new.reject { |title, _mod| old.include?(title) }.values
+      added = new.reject { |full_name, _mod| old.include?(full_name) }.values
 
       if added.any?
         diff = "Adding the following modules:\n"
-        added.each { |mod| diff += "#{mod.title} #{mod.version}\n" }
+        added.each { |mod| diff += "#{mod.full_name} #{mod.version}\n" }
         @outputter.print_action_step(diff)
       end
 
       # Upgraded modules are those that have a newer version in new than old.
-      upgraded = new.select do |title, mod|
-        if old.include?(title)
-          SemanticPuppet::Version.parse(mod.version) > SemanticPuppet::Version.parse(old[title].version)
+      upgraded = new.select do |full_name, mod|
+        if old.include?(full_name)
+          mod.version > old[full_name].version
         end
       end.keys
 
       if upgraded.any?
         diff = "Upgrading the following modules:\n"
-        upgraded.each { |title| diff += "#{title} #{old[title].version} to #{new[title].version}\n" }
+        upgraded.each { |full_name| diff += "#{full_name} #{old[full_name].version} to #{new[full_name].version}\n" }
         @outputter.print_action_step(diff)
       end
 
       # Downgraded modules are those that have an older version in new than old.
-      downgraded = new.select do |title, mod|
-        if old.include?(title)
-          SemanticPuppet::Version.parse(mod.version) < SemanticPuppet::Version.parse(old[title].version)
+      downgraded = new.select do |full_name, mod|
+        if old.include?(full_name)
+          mod.version < old[full_name].version
         end
       end.keys
 
       if downgraded.any?
         diff = "Downgrading the following modules: \n"
-        downgraded.each { |title| diff += "#{title} #{old[title].version} to #{new[title].version}\n" }
+        downgraded.each { |full_name| diff += "#{full_name} #{old[full_name].version} to #{new[full_name].version}\n" }
         @outputter.print_action_step(diff)
       end
 
       # Removed modules are those present in old but not in new.
-      removed = old.reject { |title, _mod| new.include?(title) }.values
+      removed = old.reject { |full_name, _mod| new.include?(full_name) }.values
 
       if removed.any?
         diff = "Removing the following modules:\n"
-        removed.each { |mod| diff += "#{mod.title} #{mod.version}\n" }
+        removed.each { |mod| diff += "#{mod.full_name} #{mod.version}\n" }
         @outputter.print_action_step(diff)
       end
     end
 
     # Installs a project's module dependencies.
     #
-    def install(modules, path, moduledir, force: false, resolve: true)
-      require 'bolt/puppetfile'
-
+    def install(specs, path, moduledir, force: false, resolve: true)
       @outputter.print_message("Installing project modules\n\n")
 
-      puppetfile = Bolt::Puppetfile.new(modules)
-
-      # If the Puppetfile exists, check if it includes specs for each declared
-      # module, erroring if there are any missing. Otherwise, resolve the
-      # module dependencies and write a new Puppetfile. Users can forcibly
-      # overwrite an existing Puppetfile with the '--force' option, or opt to
-      # install the Puppetfile as-is with --no-resolve.
-      #
-      # This is just if resolve is not false (nil should default to true)
       if resolve != false
-        if path.exist? && !force
-          assert_managed_puppetfile(puppetfile, path)
-        else
-          @outputter.print_action_step("Resolving module dependencies, this may take a moment")
-          puppetfile.resolve
+        specs = Specs.new(specs)
 
-          @outputter.print_action_step("Writing Puppetfile at #{path}")
+        # If forcibly installing or if there is no Puppetfile, resolve
+        # and write a Puppetfile.
+        if force || !path.exist?
+          @outputter.print_action_step("Resolving module dependencies, this may take a moment")
+          puppetfile = Resolver.new.resolve(specs)
+
           # We get here either through 'bolt module install' which uses the
           # managed modulepath (which isn't configurable) or through bolt
           # project init --modules, which uses the default modulepath. This
           # should be safe to assume that if `.modules/` is the moduledir the
           # user is using the new workflow
+          @outputter.print_action_step("Writing Puppetfile at #{path}")
           if moduledir.basename.to_s == '.modules'
             puppetfile.write(path, moduledir)
           else
             puppetfile.write(path)
           end
+        # If not forcibly installing and there is a Puppetfile, assert
+        # that it satisfies the specs.
+        else
+          puppetfile = Puppetfile.parse(path)
+          puppetfile.assert_satisfies(specs)
         end
       end
 
@@ -204,10 +183,8 @@ module Bolt
     # Installs the Puppetfile and generates types.
     #
     def install_puppetfile(path, moduledir, config = {})
-      require 'bolt/puppetfile/installer'
-
       @outputter.print_action_step("Syncing modules from #{path} to #{moduledir}")
-      ok = Bolt::Puppetfile::Installer.new(config).install(path, moduledir)
+      ok = Installer.new(config).install(path, moduledir)
 
       # Automatically generate types after installing modules
       @pal.generate_types
@@ -215,28 +192,6 @@ module Bolt
       @outputter.print_puppetfile_result(ok, path, moduledir)
 
       ok
-    end
-
-    # Asserts that an existing Puppetfile is managed by Bolt.
-    #
-    private def assert_managed_puppetfile(puppetfile, path)
-      existing_puppetfile = Bolt::Puppetfile.parse(path)
-
-      unless existing_puppetfile.modules.superset? puppetfile.modules
-        missing_modules = puppetfile.modules - existing_puppetfile.modules
-
-        message = <<~MESSAGE.chomp
-          Puppetfile #{path} is missing specifications for the following
-          module declarations:
-
-          #{missing_modules.map(&:to_hash).to_yaml.lines.drop(1).join.chomp}
-          
-          This may not be a Puppetfile managed by Bolt. To forcibly overwrite the
-          Puppetfile, run 'bolt module install --force'.
-        MESSAGE
-
-        raise Bolt::Error.new(message, 'bolt/missing-module-specs')
-      end
     end
   end
 end

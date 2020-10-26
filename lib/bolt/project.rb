@@ -210,14 +210,9 @@ module Bolt
           raise Bolt::ValidationError, "'modules' in bolt-project.yaml must be an array"
         end
 
-        @data['modules'].each do |mod|
-          next if (mod.is_a?(Hash) && mod.key?('name')) || mod.is_a?(String)
-          raise Bolt::ValidationError, "Module declaration #{mod.inspect} must be a hash with a name key"
-        end
-
-        unknown_keys = modules.flat_map(&:keys).uniq - %w[name version_requirement]
-        if unknown_keys.any?
-          @logs << { warn: "Ignoring unknown keys in module declarations: #{unknown_keys.join(', ')}." }
+        @data['modules'].each do |spec|
+          next if spec.is_a?(Hash) || spec.is_a?(String)
+          raise Bolt::ValidationError, "Module specification #{spec.inspect} must be a hash or string"
         end
       end
     end

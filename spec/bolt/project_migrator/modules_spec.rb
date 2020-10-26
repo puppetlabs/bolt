@@ -88,7 +88,7 @@ describe Bolt::ProjectMigrator::Modules do
     it 'writes a new Puppetfile with resolved dependencies' do
       expect(migrate).to be(true)
       expect(File.read(project.puppetfile).lines).to include(
-        /puppetlabs-yaml/, /puppetlabs-ruby_task_helper/
+        %r{puppetlabs/yaml}, %r{puppetlabs/ruby_task_helper}
       )
     end
 
@@ -133,7 +133,7 @@ describe Bolt::ProjectMigrator::Modules do
       expect(migrate).to be(true)
       data = Bolt::Util.read_yaml_hash(project.project_file, 'project')
       expect(data['modules']).to match_array([
-                                               { 'name' => 'puppetlabs-yaml', 'version_requirement' => '0.1.0' }
+                                               { 'name' => 'puppetlabs/yaml', 'version_requirement' => '0.1.0' }
                                              ])
     end
 
@@ -150,7 +150,7 @@ describe Bolt::ProjectMigrator::Modules do
         expect(migrate).to be(true)
         data = Bolt::Util.read_yaml_hash(project.project_file, 'project')
         expect(data['modules']).to match_array([
-                                                 { 'name' => 'puppetlabs-yaml' }
+                                                 { 'name' => 'puppetlabs/yaml' }
                                                ])
       end
     end
@@ -162,7 +162,7 @@ describe Bolt::ProjectMigrator::Modules do
         expect(migrate).to be(true)
         data = Bolt::Util.read_yaml_hash(project.project_file, 'project')
         expect(data['modules']).to match_array([
-                                                 { 'name' => 'puppetlabs-yaml' }
+                                                 { 'name' => 'puppetlabs/yaml' }
                                                ])
       end
     end
