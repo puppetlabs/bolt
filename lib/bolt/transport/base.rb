@@ -43,13 +43,13 @@ module Bolt
         @logger = Bolt::Logger.logger(self)
       end
 
-      def with_events(target, callback, action)
+      def with_events(target, callback, action, position)
         callback&.call(type: :node_start, target: target)
 
         result = begin
           yield
         rescue StandardError, NotImplementedError => e
-          Bolt::Result.from_exception(target, e, action: action)
+          Bolt::Result.from_exception(target, e, action: action, position: position)
         end
 
         callback&.call(type: :node_result, result: result)
@@ -100,12 +100,12 @@ module Bolt
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
       # Transports may override this method to implement their own batch processing.
-      def batch_task(targets, task, arguments, options = {}, &callback)
+      def batch_task(targets, task, arguments, options = {}, position = [], &callback)
         assert_batch_size_one("batch_task()", targets)
         target = targets.first
-        with_events(target, callback, 'task') do
+        with_events(target, callback, 'task', position) do
           @logger.debug { "Running task '#{task.name}' on #{target.safe_name}" }
-          run_task(target, task, arguments, options)
+          run_task(target, task, arguments, options, position)
         end
       end
 
@@ -114,14 +114,14 @@ module Bolt
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
       # Transports may override this method to implment their own batch processing.
-      def batch_task_with(targets, task, target_mapping, options = {}, &callback)
+      def batch_task_with(targets, task, target_mapping, options = {}, position = [], &callback)
         assert_batch_size_one("batch_task_with()", targets)
         target = targets.first
         arguments = target_mapping[target]
 
-        with_events(target, callback, 'task') do
+        with_events(target, callback, 'task', position) do
           @logger.debug { "Running task '#{task.name}' on #{target.safe_name} with '#{arguments.to_json}'" }
-          run_task(target, task, arguments, options)
+          run_task(target, task, arguments, options, position)
         end
       end
 
@@ -130,12 +130,12 @@ module Bolt
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
       # Transports may override this method to implement their own batch processing.
-      def batch_command(targets, command, options = {}, &callback)
+      def batch_command(targets, command, options = {}, position = [], &callback)
         assert_batch_size_one("batch_command()", targets)
         target = targets.first
-        with_events(target, callback, 'command') do
+        with_events(target, callback, 'command', position) do
           @logger.debug("Running command '#{command}' on #{target.safe_name}")
-          run_command(target, command, options)
+          run_command(target, command, options, position)
         end
       end
 
@@ -144,12 +144,12 @@ module Bolt
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
       # Transports may override this method to implement their own batch processing.
-      def batch_script(targets, script, arguments, options = {}, &callback)
+      def batch_script(targets, script, arguments, options = {}, position = [], &callback)
         assert_batch_size_one("batch_script()", targets)
         target = targets.first
-        with_events(target, callback, 'script') do
+        with_events(target, callback, 'script', position) do
           @logger.debug { "Running script '#{script}' on #{target.safe_name}" }
-          run_script(target, script, arguments, options)
+          run_script(target, script, arguments, options, position)
         end
       end
 
@@ -158,10 +158,10 @@ module Bolt
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
       # Transports may override this method to implement their own batch processing.
-      def batch_upload(targets, source, destination, options = {}, &callback)
+      def batch_upload(targets, source, destination, options = {}, position = [], &callback)
         assert_batch_size_one("batch_upload()", targets)
         target = targets.first
-        with_events(target, callback, 'upload') do
+        with_events(target, callback, 'upload', position) do
           @logger.debug { "Uploading: '#{source}' to #{destination} on #{target.safe_name}" }
           upload(target, source, destination, options)
         end
@@ -173,12 +173,12 @@ module Bolt
       # The default implementation only supports batches of size 1 and will fail otherwise.
       #
       # Transports may override this method to implement their own batch processing.
-      def batch_download(targets, source, destination, options = {}, &callback)
+      def batch_download(targets, source, destination, options = {}, position = [], &callback)
         require 'erb'
 
         assert_batch_size_one("batch_download()", targets)
         target = targets.first
-        with_events(target, callback, 'download') do
+        with_events(target, callback, 'download', position) do
           escaped_name = ERB::Util.url_encode(target.safe_name)
           target_destination = File.expand_path(escaped_name, destination)
           @logger.debug { "Downloading: '#{source}' on #{target.safe_name} to #{target_destination}" }

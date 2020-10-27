@@ -100,7 +100,7 @@ describe 'plans' do
   end
 
   context 'when a plan errors' do
-    it 'provides the location where the plan failed' do
+    it 'provides the location where a Puppet error was raised' do
       result = run_cli_json(%w[plan run error::inner] + config_flags)
 
       expect(result['details']).to match(
@@ -110,13 +110,41 @@ describe 'plans' do
       )
     end
 
-    it 'provides the location where a nested plan failed' do
+    it 'provides the location from a nested plan where a Puppet error was raised' do
       result = run_cli_json(%w[plan run error::outer] + config_flags)
 
       expect(result['details']).to match(
         'file'   => /inner.pp/,
         'line'   => 3,
         'column' => 3
+      )
+    end
+
+    it 'provides errors for Puppet preformatted errors with line numbers' do
+      result = run_cli_json(%W[plan run error::no_task -t #{target}] + config_flags)
+
+      expect(result['details']).to include(
+        'file' => /no_task.pp/,
+        'line' => 4,
+        'column' => 3
+      )
+    end
+
+    it 'provides the location where a Bolt error was raised', ssh: true do
+      result = run_cli_json(%W[plan run error::run_fail -t #{target}] + config_flags)
+
+      expect(result['details']['result_set'][0]['value']['_error']['details']).to include(
+        'file' => /run_fail.pp/,
+        'line' => 4
+      )
+    end
+
+    it 'provides the location from a nest plan where a Bolt error was raised', ssh: true do
+      result = run_cli_json(%W[plan run error::call_run_fail -t #{target}] + config_flags)
+
+      expect(result['details']).to include(
+        'file' => /run_fail.pp/,
+        'line' => 4
       )
     end
   end

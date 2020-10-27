@@ -20,9 +20,9 @@ module Bolt
         false
       end
 
-      def run_command(target, command, options = {})
+      def run_command(target, command, options = {}, position = [])
         with_connection(target) do |conn|
-          conn.shell.run_command(command, options)
+          conn.shell.run_command(command, options, position)
         end
       end
 
@@ -38,15 +38,15 @@ module Bolt
         end
       end
 
-      def run_script(target, script, arguments, options = {})
+      def run_script(target, script, arguments, options = {}, position = [])
         with_connection(target) do |conn|
-          conn.shell.run_script(script, arguments, options)
+          conn.shell.run_script(script, arguments, options, position)
         end
       end
 
-      def run_task(target, task, arguments, options = {})
+      def run_task(target, task, arguments, options = {}, position = [])
         with_connection(target) do |conn|
-          conn.shell.run_task(task, arguments, options)
+          conn.shell.run_task(task, arguments, options, position)
         end
       end
     end

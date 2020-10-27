@@ -421,6 +421,10 @@ end
 puts result.to_json
 ```
 
+Error results typically contain the file and line number under the `details` key of an
+error. Bolt merges the 'file' and 'line' keys with results unless 'file' is present in the
+`_error` hash returned from a task.
+
 ### Returning sensitive data
 
 To return secrets from a task, use the `_sensitive` key in the output. Bolt

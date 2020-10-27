@@ -2,6 +2,6 @@
 plan error::catch_plan_run(
   String $target
 ) {
- $r = run_plan('error::run_fail', 'target' => $target, '_catch_errors' => true)
+ $r = run_plan('error::run_fail', 'targets' => $target, '_catch_errors' => true)
  return $r.details['result_set'].first.error
 }

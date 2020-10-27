@@ -14,17 +14,11 @@ module Bolt
     # Bolt::Errors
     class PALError < Bolt::Error
       def self.from_preformatted_error(err)
-        if err.cause.is_a? Bolt::Error
-          err.cause
-        else
-          from_error(err)
-        end
-      end
-
-      # Generate a Bolt::Pal::PALError for non-bolt errors
-      def self.from_error(err)
-        # Use the original error message if available
-        message = err.cause ? err.cause.message : err.message
+        error = if err.cause.is_a? Bolt::Error
+                  err.cause
+                else
+                  from_error(err)
+                end
 
         # Provide the location of an error if it came from a plan
         details = {}
@@ -32,8 +26,15 @@ module Bolt
         details[:line]   = err.line if defined?(err.line)
         details[:column] = err.pos if defined?(err.pos)
 
-        e = new(message, details.compact)
+        error.add_filelineno(details)
+        error
+      end
 
+      # Generate a Bolt::Pal::PALError for non-bolt errors
+      def self.from_error(err)
+        # Use the original error message if available
+        message = err.cause ? err.cause.message : err.message
+        e = new(message)
         e.set_backtrace(err.backtrace)
         e
       end

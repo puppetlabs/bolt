@@ -24,16 +24,22 @@ describe "When a plan fails" do
 
   it 'returns the error object' do
     result = run_cli_json(['plan', 'run', 'error::args'] + config_flags, rescue_exec: true)
-    expect(result).to eq('msg' => 'oops',
-                         'kind' => 'test/oops',
-                         'details' => { 'some' => 'info' })
+    expect(result).to match('msg' => 'oops',
+                            'kind' => 'test/oops',
+                            'details' => { "column" => 3,
+                                           "file" => /args.pp/,
+                                           "line" => 2,
+                                           "some" => "info" })
   end
 
   it 'returns the error object' do
     result = run_cli_json(['plan', 'run', 'error::err'] + config_flags, rescue_exec: true)
-    expect(result).to eq('msg' => 'oops',
-                         'kind' => 'test/oops',
-                         'details' => { 'some' => 'info' })
+    expect(result).to match('msg' => 'oops',
+                            'kind' => 'test/oops',
+                            'details' => { "column" => 3,
+                                           "file" => /err.pp/,
+                                           "line" => 2,
+                                           "some" => "info" })
   end
 
   it 'catches plan failures' do
@@ -45,10 +51,12 @@ describe "When a plan fails" do
 
   it 'catches run failures', ssh: true do
     result = run_cli_json(['plan', 'run', 'error::catch_plan_run', "target=#{target}"] + config_flags)
-    expect(result).to eq("kind" => "puppetlabs.tasks/task-error",
-                         "issue_code" => "TASK_ERROR",
-                         "msg" => "The task failed with exit code 1",
-                         "details" => { "exit_code" => 1 })
+    expect(result).to match("kind" => "puppetlabs.tasks/task-error",
+                            "issue_code" => "TASK_ERROR",
+                            "msg" => "The task failed with exit code 1",
+                            "details" => { "exit_code" => 1,
+                                           "file" => /run_fail.pp/,
+                                           "line" => 4 })
   end
 
   it 'outputs nested errors' do

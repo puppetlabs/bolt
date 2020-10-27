@@ -21,6 +21,8 @@ describe "Bolt::Executor" do
   let(:task_options) { { '_load_config' => true } }
   let(:transport) { double('holodeck', initialize_transport: nil) }
   let(:source) { '/etc/ssh/ssh_config' }
+  let(:position) { ['/spooky/skeleton/', 10] }
+  let(:file_lineno) { { 'file' => '/spooky/skeleton', 'line' => 10 } }
 
   def start_event(target)
     { type: :node_start, target: target }
@@ -45,7 +47,7 @@ describe "Bolt::Executor" do
   context 'running a command' do
     it 'executes on all nodes' do
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_command).with(target, command, {}).and_return(result)
+        expect(ssh).to receive(:run_command).with(target, command, {}, []).and_return(result)
       end
 
       executor.run_command(targets, command, {})
@@ -54,7 +56,8 @@ describe "Bolt::Executor" do
     it 'passes run_as' do
       executor.run_as = 'foo'
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_command).with(target, command, run_as: 'foo').and_return(result)
+        expect(ssh).to receive(:run_command).with(target, command, { run_as: 'foo' }, [])
+                                            .and_return(result)
       end
 
       executor.run_command(targets, command)
@@ -62,7 +65,7 @@ describe "Bolt::Executor" do
 
     it "publishes an event for each result" do
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_command).with(target, command, {}).and_return(result)
+        expect(ssh).to receive(:run_command).with(target, command, {}, []).and_return(result)
       end
 
       executor.run_command(targets, command)
@@ -76,17 +79,19 @@ describe "Bolt::Executor" do
 
     it 'catches errors' do
       node_results.each_key do |target|
-        error = Bolt::Error.new('failed', 'my-exception')
-        expect(ssh).to receive(:run_command).with(target, command, {}).and_raise(error)
+        error = Bolt::Error.new('failed', 'my-exception', file_lineno)
+        expect(ssh).to receive(:run_command).with(target, command, {}, position)
+                                            .and_raise(error)
       end
 
-      executor.run_command(targets, command)
+      executor.run_command(targets, command, {}, position)
       executor.shutdown
 
       expect(collector.results.length).to eq(node_results.length)
       collector.results.each do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
+        expect(result.error_hash['details']).to include(file_lineno)
       end
     end
   end
@@ -94,7 +99,7 @@ describe "Bolt::Executor" do
   context 'executes running a script' do
     it "on all nodes" do
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_script).with(target, script, [], {}).and_return(result)
+        expect(ssh).to receive(:run_script).with(target, script, [], {}, []).and_return(result)
       end
 
       results = executor.run_script(targets, script, [], {})
@@ -106,7 +111,8 @@ describe "Bolt::Executor" do
     it 'passes run_as' do
       executor.run_as = 'foo'
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_script).with(target, script, [], run_as: 'foo').and_return(result)
+        expect(ssh).to receive(:run_script).with(target, script, [], { run_as: 'foo' }, [])
+                                           .and_return(result)
       end
 
       results = executor.run_script(targets, script, [])
@@ -117,7 +123,7 @@ describe "Bolt::Executor" do
 
     it "yields each result" do
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_script).with(target, script, [], {}).and_return(result)
+        expect(ssh).to receive(:run_script).with(target, script, [], {}, []).and_return(result)
       end
 
       executor.run_script(targets, script, [])
@@ -133,17 +139,18 @@ describe "Bolt::Executor" do
       node_results.each_key do |target|
         expect(ssh)
           .to receive(:run_script)
-          .with(target, script, [], {})
-          .and_raise(Bolt::Error.new('failed', 'my-exception'))
+          .with(target, script, [], {}, position)
+          .and_raise(Bolt::Error.new('failed', 'my-exception', file_lineno))
       end
 
-      executor.run_script(targets, script, [])
+      executor.run_script(targets, script, [], {}, position)
       executor.shutdown
 
       expect(collector.results.length).to eq(node_results.length)
       collector.results.each do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
+        expect(result.error_hash['details']).to include(file_lineno)
       end
     end
   end
@@ -153,7 +160,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, task_options)
+          .with(target, task_type(task), task_arguments, task_options, [])
           .and_return(result)
       end
 
@@ -169,7 +176,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, { run_as: 'foo' }.merge(task_options))
+          .with(target, task_type(task), task_arguments, { run_as: 'foo' }.merge(task_options), [])
           .and_return(result)
       end
 
@@ -183,7 +190,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, task_options)
+          .with(target, task_type(task), task_arguments, task_options, [])
           .and_return(result)
       end
 
@@ -200,17 +207,18 @@ describe "Bolt::Executor" do
       node_results.each_key do |target|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, task_options)
-          .and_raise(Bolt::Error.new('failed', 'my-exception'))
+          .with(target, task_type(task), task_arguments, task_options, position)
+          .and_raise(Bolt::Error.new('failed', 'my-exception', file_lineno))
       end
 
-      executor.run_task(targets, mock_task(task), task_arguments, task_options)
+      executor.run_task(targets, mock_task(task), task_arguments, task_options, position)
       executor.shutdown
 
       expect(collector.results.length).to eq(node_results.length)
       collector.results.each do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
+        expect(result.error_hash['details']).to include(file_lineno)
       end
     end
   end
@@ -224,7 +232,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), target_mapping[target], task_options)
+          .with(target, task_type(task), target_mapping[target], task_options, [])
           .and_return(result)
       end
 
@@ -240,7 +248,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), target_mapping[target], { run_as: 'foo' }.merge(task_options))
+          .with(target, task_type(task), target_mapping[target], { run_as: 'foo' }.merge(task_options), [])
           .and_return(result)
       end
 
@@ -254,7 +262,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), target_mapping[target], task_options)
+          .with(target, task_type(task), target_mapping[target], task_options, [])
           .and_return(result)
       end
 
@@ -271,17 +279,18 @@ describe "Bolt::Executor" do
       node_results.each_key do |target|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), target_mapping[target], task_options)
-          .and_raise(Bolt::Error.new('failed', 'my-exception'))
+          .with(target, task_type(task), target_mapping[target], task_options, position)
+          .and_raise(Bolt::Error.new('failed', 'my-exception', file_lineno))
       end
 
-      executor.run_task_with(target_mapping, mock_task(task), task_options)
+      executor.run_task_with(target_mapping, mock_task(task), task_options, position)
       executor.shutdown
 
       expect(collector.results.length).to eq(node_results.length)
       collector.results.each do |result|
         expect(result.error_hash['msg']).to eq('failed')
         expect(result.error_hash['kind']).to eq('my-exception')
+        expect(result.error_hash['details']).to include(file_lineno)
       end
     end
   end
@@ -744,7 +753,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_command)
-          .with(target, command, {})
+          .with(target, command, {}, [])
           .and_return(result)
       end
 
@@ -760,7 +769,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_script)
-          .with(target, script, [], {})
+          .with(target, script, [], {}, [])
           .and_return(result)
       end
 
@@ -776,7 +785,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, task_options)
+          .with(target, task_type(task), task_arguments, task_options, [])
           .and_return(result)
       end
 
@@ -792,7 +801,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_task)
-          .with(target, task_type(task), task_arguments, task_options)
+          .with(target, task_type(task), task_arguments, task_options, [])
           .and_return(result)
       end
 

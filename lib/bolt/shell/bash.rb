@@ -21,14 +21,16 @@ module Bolt
         ['shell']
       end
 
-      def run_command(command, options = {})
+      def run_command(command, options = {}, position = [])
         running_as(options[:run_as]) do
           output = execute(command, environment: options[:env_vars], sudoable: true)
           Bolt::Result.for_command(target,
                                    output.stdout.string,
                                    output.stderr.string,
                                    output.exit_code,
-                                   'command', command)
+                                   'command',
+                                   command,
+                                   position)
         end
       end
 
@@ -71,7 +73,7 @@ module Bolt
         end
       end
 
-      def run_script(script, arguments, options = {})
+      def run_script(script, arguments, options = {}, position = [])
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
 
@@ -84,12 +86,14 @@ module Bolt
                                      output.stdout.string,
                                      output.stderr.string,
                                      output.exit_code,
-                                     'script', script)
+                                     'script',
+                                     script,
+                                     position)
           end
         end
       end
 
-      def run_task(task, arguments, options = {})
+      def run_task(task, arguments, options = {}, position = [])
         implementation = select_implementation(target, task)
         executable = implementation['path']
         input_method = implementation['input_method']
@@ -148,7 +152,8 @@ module Bolt
           Bolt::Result.for_task(target, output.stdout.string,
                                 output.stderr.string,
                                 output.exit_code,
-                                task.name)
+                                task.name,
+                                position)
         end
       end
 

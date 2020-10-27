@@ -87,7 +87,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     r = if targets.empty?
           Bolt::ResultSet.new([])
         else
-          executor.run_script(targets, found, arguments, options)
+          executor.run_script(targets, found, arguments, options, Puppet::Pops::PuppetStack.top_of_stack)
         end
 
     if !r.ok && !options[:catch_errors]

@@ -253,33 +253,33 @@ module Bolt
       result
     end
 
-    def run_command(targets, command, options = {})
+    def run_command(targets, command, options = {}, position = [])
       description = options.fetch(:description, "command '#{command}'")
       log_action(description, targets) do
         options[:run_as] = run_as if run_as && !options.key?(:run_as)
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Running command '#{command}'", batch) do
-            transport.batch_command(batch, command, options, &method(:publish_event))
+            transport.batch_command(batch, command, options, position, &method(:publish_event))
           end
         end
       end
     end
 
-    def run_script(targets, script, arguments, options = {})
+    def run_script(targets, script, arguments, options = {}, position = [])
       description = options.fetch(:description, "script #{script}")
       log_action(description, targets) do
         options[:run_as] = run_as if run_as && !options.key?(:run_as)
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Running script #{script} with '#{arguments.to_json}'", batch) do
-            transport.batch_script(batch, script, arguments, options, &method(:publish_event))
+            transport.batch_script(batch, script, arguments, options, position, &method(:publish_event))
           end
         end
       end
     end
 
-    def run_task(targets, task, arguments, options = {})
+    def run_task(targets, task, arguments, options = {}, position = [])
       description = options.fetch(:description, "task #{task.name}")
       log_action(description, targets) do
         options[:run_as] = run_as if run_as && !options.key?(:run_as)
@@ -287,13 +287,13 @@ module Bolt
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Running task #{task.name} with '#{arguments.to_json}'", batch) do
-            transport.batch_task(batch, task, arguments, options, &method(:publish_event))
+            transport.batch_task(batch, task, arguments, options, position, &method(:publish_event))
           end
         end
       end
     end
 
-    def run_task_with(target_mapping, task, options = {})
+    def run_task_with(target_mapping, task, options = {}, position = [])
       targets = target_mapping.keys
       description = options.fetch(:description, "task #{task.name}")
 
@@ -303,26 +303,26 @@ module Bolt
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Running task #{task.name}'", batch) do
-            transport.batch_task_with(batch, task, target_mapping, options, &method(:publish_event))
+            transport.batch_task_with(batch, task, target_mapping, options, position, &method(:publish_event))
           end
         end
       end
     end
 
-    def upload_file(targets, source, destination, options = {})
+    def upload_file(targets, source, destination, options = {}, position = [])
       description = options.fetch(:description, "file upload from #{source} to #{destination}")
       log_action(description, targets) do
         options[:run_as] = run_as if run_as && !options.key?(:run_as)
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Uploading file #{source} to #{destination}", batch) do
-            transport.batch_upload(batch, source, destination, options, &method(:publish_event))
+            transport.batch_upload(batch, source, destination, options, position, &method(:publish_event))
           end
         end
       end
     end
 
-    def download_file(targets, source, destination, options = {})
+    def download_file(targets, source, destination, options = {}, position = [])
       description = options.fetch(:description, "file download from #{source} to #{destination}")
 
       begin
@@ -337,7 +337,7 @@ module Bolt
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Downloading file #{source} to #{destination}", batch) do
-            transport.batch_download(batch, source, destination, options, &method(:publish_event))
+            transport.batch_download(batch, source, destination, options, position, &method(:publish_event))
           end
         end
       end

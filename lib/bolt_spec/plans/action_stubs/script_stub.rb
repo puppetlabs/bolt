@@ -35,7 +35,7 @@ module BoltSpec
       end
 
       def result_for(target, stdout: '', stderr: '')
-        Bolt::Result.for_command(target, stdout, stderr, 0, 'script', '')
+        Bolt::Result.for_command(target, stdout, stderr, 0, 'script', '', [])
       end
 
       # Public methods
