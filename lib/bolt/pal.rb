@@ -256,19 +256,24 @@ module Bolt
 
     # TODO: PUP-8553 should replace this
     def with_puppet_settings
-      Dir.mktmpdir('bolt') do |dir|
-        cli = []
-        Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
-          cli << "--#{setting}" << dir
-        end
-        Puppet.settings.send(:clear_everything_for_tests)
-        Puppet.initialize_settings(cli)
-        Puppet::GettextConfig.create_default_text_domain
-        Puppet[:trusted_external_command] = @trusted_external
-        Puppet.settings[:hiera_config] = @hiera_config
-        self.class.configure_logging
-        yield
+      dir = Dir.mktmpdir('bolt')
+
+      cli = []
+      Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
+        cli << "--#{setting}" << dir
       end
+      Puppet.settings.send(:clear_everything_for_tests)
+      Puppet.initialize_settings(cli)
+      Puppet::GettextConfig.create_default_text_domain
+      Puppet[:trusted_external_command] = @trusted_external
+      Puppet.settings[:hiera_config] = @hiera_config
+      self.class.configure_logging
+      yield
+    ensure
+      # Delete the tmpdir if it still exists. This check is needed to
+      # prevent Bolt from erroring if the tmpdir is somehow deleted
+      # before reaching this point.
+      FileUtils.remove_entry_secure(dir) if File.exist?(dir)
     end
 
     # Parses a snippet of Puppet manifest code and returns the AST represented
