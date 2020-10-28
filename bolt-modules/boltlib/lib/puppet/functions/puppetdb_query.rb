@@ -2,12 +2,12 @@
 
 require 'bolt/error'
 
-# Makes a query to {https://puppet.com/docs/puppetdb/latest/index.html puppetdb}
+# Makes a query to [puppetdb](https://puppet.com/docs/puppetdb/latest/index.html)
 # using Bolt's PuppetDB client.
 Puppet::Functions.create_function(:puppetdb_query) do
   # rubocop:disable Layout/LineLength
   # @param query A PQL query.
-  #   {https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html Learn more about Puppet's query language, PQL}
+  #   Learn more about [Puppet's query language](https://puppet.com/docs/puppetdb/latest/api/query/tutorial-pql.html), PQL.
   # @return Results of the PuppetDB query.
   # @example Request certnames for all nodes
   #   puppetdb_query('nodes[certname] {}')

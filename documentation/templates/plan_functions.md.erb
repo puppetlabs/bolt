@@ -1,53 +1,58 @@
-# Bolt functions
+# Plan functions
+
+Plans can use functions that are built into Bolt and Puppet, or custom
+functions included in modules. This reference
+page includes a list of built-in Bolt functions. To see a list of built-in
+Puppet functions, see Puppet's [built-in function
+reference](https://puppet.com/docs/puppet/latest/function.html). To learn how
+to write custom Puppet functions, see [the Puppet documentation on writing
+functions](https://puppet.com/docs/puppet/latest/writing_custom_functions.html).
 
 <% for func in @functions %>
 ## `<%= func['name'] %>`
 
-<%= func['text'] %>
+<%= func['desc'] %>
 
-<% for sig in func['signatures'] %>
-<% if sig['text'] != func['text'] -%>
-### <%= sig['text'] %>
-
+<% for sig in func['signatures'] -%>
+<% unless func['signatures'].count == 1 -%>
+**<%= sig['desc'].lines.first.strip.chomp('.') %>**
+<%= sig['desc'].lines.drop(1).join %>
 <% end -%>
+
+
 ```
 <%= sig['signature'] %>
 ```
 
-<% if sig['returns'] -%>
+This function<%= func['signatures'].count == 1 ? '' : ' signature' %> returns
+an object with the type `<%= sig['return'] %>` and accepts the following
+parameter<%= sig['params'].count == 1 ? '' : 's' %>:
 
-**Returns**
+| Parameter | Type | Description |
+| --- | --- | --- |
+<% sig['params'].each do |name, data| -%>
+| `<%= name %>` | `<%= data['type'] %>` | <%= data['desc'] %> |
+<% end %>
 
-<% for ret in sig['returns'] -%>
-`<%= ret['types'].first %>` <%= ret['text'] %>
+<% if sig['options'].any? -%>
+This function<%= func['signatures'].count == 1 ? '' : ' signature' %> accepts the following option<%= sig['options'].count == 1 ? '' : 's' %>:
+
+| Option | Type | Description |
+| --- | --- | --- |
+<% sig['options'].each do |name, data| -%>
+| `<%= name %>` | `<%= data['type'] %>` | <%= data['desc'] %> |
 <% end -%>
-<% end -%>
-
-**Parameters**
-
-<% for param in sig['params'] -%>
-* **<%= param['name'] %>** `<%= param['types'].first %>` <%= param['text'] %>
-<% end -%>
-
-<% if sig['options'] -%>
-
-**Additional options**
-
-<% for option in sig['options'] -%>
-* **<%= option['opt_name'] %>** `<%= option['opt_types'].first %>` <%= option['opt_text'] %>
 <% end -%>
 <% end -%>
 
-<% if sig['examples'] -%>
+<% if func['examples'].any? -%>
+**Example usage**
 
-**Examples**
-
-<% for example in sig['examples'] -%>
-<%= example['name'] %>
+<% for example in func['examples'] -%>
+<%= example['desc'] %>
 ```
-<%= example['text'] %>
+<%= example['exmp'] %>
 ```
 <% end -%>
 <% end -%>
-<% end %>
-<% end %>
+<% end -%>
