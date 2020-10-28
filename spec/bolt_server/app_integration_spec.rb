@@ -18,6 +18,10 @@ describe "BoltServer::TransportApp", puppetserver: true do
     BoltServer::TransportApp.new(config)
   end
 
+  before(:all) do
+    wait_until_available(timeout: 30, interval: 1)
+  end
+
   context 'with ssh target', ssh: true do
     describe "run_task" do
       let(:path) { '/ssh/run_task' }
