@@ -124,6 +124,27 @@ Use the Bolt-provided gem command to reinstall/install these gems. For example:
     sudo /opt/puppetlabs/bolt/bin/gem pristine unf_ext --version 0.0.7.5
 ```
 
+
+## Certificate verify failed when installing modules
+
+When running on Windows, Bolt automatically sets the `SSL_CERT_DIR` and
+`SSL_CERT_FILE` environment variables if they are not already set. Assuming a
+default install location, the variables are set to the following directory and
+certificate, which are installed with the Bolt package:
+
+- `SSL_CERT_DIR = C:\Program Files\Puppet Labs\Bolt\ssl\certs`
+- `SSL_CERT_FILE = C:\Program Files\Puppet Labs\Bolt\ssl\cert.pem`
+
+If you see an SSL connection error similar to the following when running on
+Windows:
+
+```
+SSL_connect returned=1 errno=0 state=error: certificate verify failed (unable to get local issuer certificate)
+```
+
+Set the `SSL_CERT_DIR` and `SSL_CERT_FILE` environment variables to use a valid
+certificate and certificate directory.
+
 ## I still need help
 
 Visit the **#bolt** channel in the [Puppet Community
