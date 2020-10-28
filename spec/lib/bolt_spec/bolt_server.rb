@@ -22,7 +22,7 @@ module BoltSpec
     private def healthy?
       response = puppet_server_get("/status/v1/simple", {})
       response.is_a?(Net::HTTPOK) && response.read_body == 'running'
-    rescue OpenSSL::SSL::SSLError
+    rescue OpenSSL::SSL::SSLError, Errno::ECONNRESET
       false
     end
 
