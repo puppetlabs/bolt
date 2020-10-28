@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'bolt/puppetdb/client'
 require 'bolt_spec/puppetdb'
+require 'bolt_spec/bolt_server'
 require 'httpclient'
 
 describe Bolt::PuppetDB::Client do
@@ -117,6 +118,8 @@ describe Bolt::PuppetDB::Client do
 
   context 'when connected to puppetdb', puppetdb: true do
     include BoltSpec::PuppetDB
+    include BoltSpec::BoltServer
+
     def facts_hash
       { 'node1' => {
         'foo' => 'bar',
@@ -154,6 +157,7 @@ describe Bolt::PuppetDB::Client do
     end
 
     before(:all) do
+      wait_until_available(timeout: 30, interval: 1)
       push_facts(facts_hash)
     end
 

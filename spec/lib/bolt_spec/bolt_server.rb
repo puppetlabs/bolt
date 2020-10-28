@@ -5,6 +5,27 @@ require 'openssl'
 
 module BoltSpec
   module BoltServer
+    # Waits until puppetserver is accepting requests
+    def wait_until_available(timeout:, interval:)
+      start = Time.now
+
+      until healthy?
+        if (Time.now - start).to_i >= timeout
+          raise "Timed out waiting for puppetserver to start accepting requests"
+        end
+
+        sleep interval
+      end
+    end
+
+    # Returns true if puppetserver is running
+    private def healthy?
+      response = puppet_server_get("/status/v1/simple", {})
+      response.is_a?(Net::HTTPOK) && response.read_body == 'running'
+    rescue OpenSSL::SSL::SSLError
+      false
+    end
+
     def default_config
       spec_dir = File.join(__dir__, '..', '..')
       ssl_dir = File.join(spec_dir, 'fixtures', 'ssl')
