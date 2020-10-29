@@ -118,18 +118,22 @@ Describe "test all bolt command examples" {
   Context "bolt apply" {
     It "bolt apply manifest.pp -t target" {
       $result = Invoke-BoltApply -manifest 'manifest.pp' -target 'target'
-      $result | Should -Be "bolt apply 'manifest.pp' --targets 'target'"
+      $result | Should -Be "bolt apply manifest.pp --targets target"
     }
     It "bolt apply -e `"file { '/etc/puppetlabs': ensure => present }`" -t target" {
       $result = Invoke-BoltApply -execute "file { '/etc/puppetlabs': ensure => present }" -targets 'target'
-      $result | Should -Be "bolt apply --execute 'file { '/etc/puppetlabs': ensure => present }' --targets 'target'"
+      $result | Should -Be "bolt apply --execute 'file { '/etc/puppetlabs': ensure => present }' --targets target"
     }
   }
 
   Context "bolt command" {
     It "bolt command run 'uptime' -t target1,target2" {
       $result = Invoke-BoltCommand -command 'uptime' -target 'target1,target2'
-      $result | Should -Be "bolt command run 'uptime' --targets 'target1,target2'"
+      $result | Should -Be "bolt command run uptime --targets target1,target2"
+    }
+    It "bolt command run complicated quoting" {
+      $result = Invoke-BoltCommand -Command "Get-WMIObject Win32_Service -Filter \""Name like '%mon'\""" -Targets 'target1,target2'
+      $result | Should -Be 'bolt command run Get-WMIObject Win32_Service -Filter \"Name like ''%mon''\" --targets target1,target2'
     }
   }
 
@@ -138,7 +142,7 @@ Describe "test all bolt command examples" {
       $result = Send-BoltFile '/tmp/source' '/etc/profile.d/login.sh' -target 'target1'
       Write-Warning "this works but order is not same"
       # $result | Should -Be "bolt file upload /tmp/source /etc/profile.d/login.sh -t target1 warn on purpose"
-      $result | Should -Be "bolt file upload --targets 'target1' '/tmp/source' '/etc/profile.d/login.sh'"
+      $result | Should -Be "bolt file upload --targets target1 /tmp/source /etc/profile.d/login.sh"
     }
   }
 
@@ -146,7 +150,7 @@ Describe "test all bolt command examples" {
     It "bolt file download /etc/profile.d/login.sh login_script -t target1" {
       $result = Receive-BoltFile '/etc/profile.d/login.sh' 'login_script' -target 'target1'
       Write-Warning "this works but order is not same"
-      $result | Should -Be "bolt file download --targets 'target1' '/etc/profile.d/login.sh' 'login_script'"
+      $result | Should -Be "bolt file download --targets target1 /etc/profile.d/login.sh login_script"
     }
   }
 
@@ -173,25 +177,25 @@ Describe "test all bolt command examples" {
     }
     It "bolt plan show aggregate::count" {
       $result = Get-BoltPlan -name 'aggregate::count'
-      $result | Should -Be "bolt plan show 'aggregate::count'"
+      $result | Should -Be "bolt plan show aggregate::count"
     }
     It "bolt plan convert path/to/plan/myplan.yaml" {
       $result = Convert-BoltPlan -name 'path/to/plan/myplan.yaml'
-      $result | Should -Be "bolt plan convert 'path/to/plan/myplan.yaml'"
+      $result | Should -Be "bolt plan convert path/to/plan/myplan.yaml"
     }
     It "bolt plan run canary --targets target1,target2 command=hostname" {
       Write-Warning 'requires params to not be positionl...is that a problem'
       $result = Invoke-BoltPlan -name 'canary' -targets 'target1,target2' -params 'command=hostname'
-      $result | Should -Be "bolt plan run 'canary' --targets 'target1,target2' --params 'command=hostname'"
+      $result | Should -Be "bolt plan run canary --targets target1,target2 --params 'command=hostname'"
     }
     It "bolt plan run canary --targets target1,target2 command=hostname" {
       Write-Warning 'requires params to not be positionl...is that a problem'
       $result = Invoke-BoltPlan -name 'canary' -targets 'target1,target2' -params @{ 'command' = 'hostname' }
-      $result | Should -Be "bolt plan run 'canary' --targets 'target1,target2' --params '{`"command`":`"hostname`"}'"
+      $result | Should -Be "bolt plan run canary --targets target1,target2 --params '{`"command`":`"hostname`"}'"
     }
     It "bolt plan new myproject::myplan" {
       $result = New-BoltPlan -name 'myproject::myplan'
-      $result | Should -Be "bolt plan new 'myproject::myplan'"
+      $result | Should -Be "bolt plan new myproject::myplan"
     }
   }
 
@@ -213,11 +217,11 @@ Describe "test all bolt command examples" {
     }
     It "bolt project init myproject" {
       $result = New-BoltProject -name 'myproject'
-      $result | Should -Be "bolt project init 'myproject'"
+      $result | Should -Be "bolt project init myproject"
     }
     It "bolt project init --modules puppetlabs-apt,puppetlabs-ntp" {
       $result = New-BoltProject -modules 'puppetlabs-apt,puppetlabs-ntp'
-      $result | Should -Be "bolt project init --modules 'puppetlabs-apt,puppetlabs-ntp'"
+      $result | Should -Be "bolt project init --modules puppetlabs-apt,puppetlabs-ntp"
     }
   }
 
@@ -239,7 +243,7 @@ Describe "test all bolt command examples" {
   Context "bolt module" {
     It "bolt module add" {
       $result = Add-BoltModule -M puppetlabs-yaml
-      $result | Should -Be "bolt module add 'puppetlabs-yaml'"
+      $result | Should -Be "bolt module add puppetlabs-yaml"
     }
     It "bolt module generate-types" {
       $result = Register-BoltModuleTypes
@@ -260,34 +264,35 @@ Describe "test all bolt command examples" {
     It "bolt script run myscript.sh 'echo hello' --targets target1,target2" {
       $result = Invoke-BoltScript -script 'myscript.sh' -arguments 'echo hello' -targets 'target1,target2'
       Write-Warning "Verify this"
-      $result | Should -Be "bolt script run 'myscript.sh' 'echo hello' --targets 'target1,target2'"
+      # This does work without quotes being explicitly added here
+      $result | Should -Be "bolt script run myscript.sh echo hello --targets target1,target2"
     }
   }
 
   Context "bolt secret" {
     It "bolt secret decrypt ciphertext" {
-      $results = Unprotect-BoltSecret -text 'ciphertext'
-      $results | Should -Be "bolt secret decrypt 'ciphertext'"
+      $results = Unprotect-BoltSecret -Text 'ciphertext'
+      $results | Should -Be "bolt secret decrypt ciphertext"
     }
     It "bolt secret encrypt plaintext" {
-      $results = Protect-BoltSecret -text 'plaintext'
-      $results | Should -Be "bolt secret encrypt 'plaintext'"
+      $results = Protect-BoltSecret -Text 'plaintext'
+      $results | Should -Be "bolt secret encrypt plaintext"
     }
   }
 
   Context "bolt task" {
     It "bolt task run package --targets target1,target2 action=status name=bash" {
       $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' action=status name=bash
-      $results | Should -Be "bolt task run 'package' --targets 'target1,target2' action=status name=bash"
+      $results | Should -Be "bolt task run package --targets target1,target2 action=status name=bash"
 
       $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params '{"name":"bash","action":"status"}'
-      $results | Should -Be "bolt task run 'package' --targets 'target1,target2' --params '{`"name`":`"bash`",`"action`":`"status`"}'"
+      $results | Should -Be "bolt task run package --targets target1,target2 --params '{`"name`":`"bash`",`"action`":`"status`"}'"
 
       $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params @{ 'name' = 'bash'; 'action' = 'status' }
       # We don't care about the order of JSON keys, and they might become out
       # of order due to ConvertToJson
-      $results | Should -BeIn @("bolt task run 'package' --targets 'target1,target2' --params '{`"name`":`"bash`",`"action`":`"status`"}'",
-          "bolt task run 'package' --targets 'target1,target2' --params '{`"action`":`"status`",`"name`":`"bash`"}'")
+      $results | Should -BeIn @("bolt task run package --targets target1,target2 --params '{`"name`":`"bash`",`"action`":`"status`"}'",
+        "bolt task run package --targets target1,target2 --params '{`"action`":`"status`",`"name`":`"bash`"}'")
 
     }
     It "bolt task show" {
@@ -296,7 +301,7 @@ Describe "test all bolt command examples" {
     }
     It "bolt task show canary" {
       $results = Get-BoltTask -name 'canary'
-      $results | Should -Be "bolt task show 'canary'"
+      $results | Should -Be "bolt task show canary"
     }
   }
 }
