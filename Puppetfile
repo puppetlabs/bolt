@@ -36,6 +36,7 @@ mod 'puppetlabs-azure_inventory', '0.4.1'
 mod 'puppetlabs-gcloud_inventory', '0.1.3'
 mod 'puppetlabs-http_request', '0.2.0'
 mod 'puppetlabs-pkcs7', '0.1.1'
+mod 'puppetlabs-secure_env_vars', '0.1.0'
 mod 'puppetlabs-terraform', '0.5.0'
 mod 'puppetlabs-vault', '0.3.0'
 mod 'puppetlabs-yaml', '0.2.0'
@@ -44,4 +45,3 @@ mod 'puppetlabs-yaml', '0.2.0'
 mod 'canary', local: true
 mod 'aggregate', local: true
 mod 'puppetdb_fact', local: true
-mod 'secure_env_vars', local: true
