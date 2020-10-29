@@ -357,7 +357,7 @@ module Bolt
             description: "The URL of the host used for API requests.",
             format: "uri",
             _plugin: true,
-            _example: "https://api.example.com"
+            _example: "https://api.example.com:<port>"
           },
           "shell-command" => {
             type: String,
