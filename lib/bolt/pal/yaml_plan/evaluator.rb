@@ -191,7 +191,11 @@ module Bolt
               o[key] = evaluate_code_blocks(scope, v)
             end
           when EvaluableString
-            value.evaluate(scope, @evaluator)
+            begin
+              value.evaluate(scope, @evaluator)
+            rescue StandardError => e
+              raise format_evaluate_error(e, value)
+            end
           else
             value
           end
@@ -202,6 +206,24 @@ module Bolt
         # return the values as already evaluated.
         def evaluate(value, _scope)
           value
+        end
+
+        def format_evaluate_error(error, value)
+          # The Puppet::PreformattedError includes the line number of the
+          # evaluable string that caused the error, while the value includes the
+          # line number of the YAML plan that the string began on. To get the
+          # actual line number of the error, add these two numbers together.
+          line = error.line + value.line
+
+          # If the evaluable string is not a scalar literal, correct for it
+          # being on the same line as the step key.
+          line -= 1 if value.is_a?(BareString)
+
+          Bolt::PlanFailure.new(
+            error.basic_message,
+            'bolt/evaluation-error',
+            { file: value.file, line: line }
+          )
         end
       end
     end

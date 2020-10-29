@@ -9,10 +9,15 @@ module Bolt
     class YamlPlan
       class Loader
         class PuppetVisitor < Psych::Visitors::NoAliasRuby
-          def self.create_visitor
+          def initialize(scanner, class_loader, file)
+            super(scanner, class_loader)
+            @file = file
+          end
+
+          def self.create_visitor(source_ref)
             class_loader = Psych::ClassLoader::Restricted.new([], [])
             scanner = Psych::ScalarScanner.new(class_loader)
-            new(scanner, class_loader)
+            new(scanner, class_loader, source_ref)
           end
 
           def deserialize(node)
@@ -23,18 +28,18 @@ module Bolt
                 # @ss is a ScalarScanner, from the base ToRuby visitor class
                 node.value
               when Psych::Nodes::Scalar::DOUBLE_QUOTED
-                DoubleQuotedString.new(node.value)
-              # | style string or > style string
-              when Psych::Nodes::Scalar::LITERAL, Psych::Nodes::Scalar::FOLDED
-                CodeLiteral.new(node.value)
-              # This one shouldn't be possible
+                DoubleQuotedString.new(node.value, @file, node.start_line + 1)
+              # | style string
+              when Psych::Nodes::Scalar::LITERAL
+                CodeLiteral.new(node.value, @file, node.start_line + 1)
+              # > style string
               else
                 @ss.tokenize(node.value)
               end
             else
               value = @ss.tokenize(node.value)
               if value.is_a?(String)
-                BareString.new(value)
+                BareString.new(value, @file, node.start_line + 1)
               else
                 value
               end
@@ -50,7 +55,7 @@ module Bolt
                        else
                          Psych.parse(yaml_string, source_ref)
                        end
-          PuppetVisitor.create_visitor.accept(parse_tree)
+          PuppetVisitor.create_visitor(source_ref).accept(parse_tree)
         end
 
         def self.from_string(name, yaml_string, source_ref)
