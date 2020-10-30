@@ -264,6 +264,10 @@ Hiera](https://puppet.com/docs/puppet/latest/hiera_config_yaml_5.html). Bolt
 will not automatically load any Hiera data from this directory. If you want to load data from a
 data file you must set the relevant paths in your Hiera config.
 
+> **Note**: The target name is made available to Hiera as `trusted.certname`. You can learn more about
+  [interpolating variables into Hiera config
+  here](https://puppet.com/docs/puppet/latest/hiera_merging.html#interpolate_puppet_variable).
+
 If a custom data provider is used, such as `hiera-eyaml`, which allows you to
 encrypt your data, the gem dependencies must be available to Bolt. See [Install
 gems with Bolt packages](bolt_installing.md#).
@@ -282,6 +286,8 @@ For example, with this Hiera configuration at `<PROJECT DIRECTORY>/hiera.yaml`:
 version: 5
 
 hierarchy:
+  - name: "Target specific data"
+    path: "targets/%{trusted.certname}.yaml"
   - name: "Per-OS defaults"
     path: "os/%{facts.os.family}.yaml"
   - name: Common
