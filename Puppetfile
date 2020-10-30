@@ -6,16 +6,16 @@ moduledir File.join(File.dirname(__FILE__), 'modules')
 
 # Core modules used by 'apply'
 mod 'puppetlabs-service', '1.3.0'
-mod 'puppetlabs-puppet_agent', '4.1.1'
+mod 'puppetlabs-puppet_agent', '4.2.0'
 mod 'puppetlabs-facts', '1.1.0'
 
 # Core types and providers for Puppet 6
 mod 'puppetlabs-augeas_core', '1.1.1'
 mod 'puppetlabs-host_core', '1.0.3'
 mod 'puppetlabs-scheduled_task', '2.2.1'
-mod 'puppetlabs-sshkeys_core', '2.1.0'
-mod 'puppetlabs-zfs_core', '1.1.0'
-mod 'puppetlabs-cron_core', '1.0.4'
+mod 'puppetlabs-sshkeys_core', '2.2.0'
+mod 'puppetlabs-zfs_core', '1.2.0'
+mod 'puppetlabs-cron_core', '1.0.5'
 mod 'puppetlabs-mount_core', '1.0.4'
 mod 'puppetlabs-selinux_core', '1.0.4'
 mod 'puppetlabs-yumrepo_core', '1.0.7'
