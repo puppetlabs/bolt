@@ -140,12 +140,8 @@ Puppet::Functions.create_function(:run_task) do
                    executor.run_task(targets, task, params, options, Puppet::Pops::PuppetStack.top_of_stack)
                  end
 
-                 while future.incomplete?
-                   Fiber.yield
-                   # Induce a context switch to give the task a chance to complete
-                   sleep(0)
-                 end
-                 future.value
+                 Fiber.yield('unfinished') while future.incomplete?
+                 future.value || future.reason
                else
                  executor.run_task(targets, task, params, options, Puppet::Pops::PuppetStack.top_of_stack)
                end

@@ -853,7 +853,7 @@ describe "Bolt::Executor" do
 
   context "when round robining" do
     it "subscribes to node_result messages" do
-      expect(self).to receive(:subscribe).with(self, [:node_result])
+      expect(executor).to receive(:subscribe).with(executor, [:node_result])
       executor.round_robin([])
     end
 
@@ -874,5 +874,4 @@ describe "Bolt::Executor" do
       expect(executor.round_robin([])).to eq([])
     end
   end
-
 end

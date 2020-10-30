@@ -37,45 +37,7 @@ Puppet::Functions.create_function(:parallelize, Puppet::Functions::InternalFunct
     executor.report_function_call(self.class.name)
 
     skein = data.each_with_index.map do |object, index|
-      fiber = Fiber.new do
-        # Create the new scope
-        newscope = Puppet::Parser::Scope.new(scope.compiler)
-        local = Puppet::Parser::Scope::LocalScope.new
-
-        # Compress the current scopes into a single vars hash to add to the new scope
-        current_scope = scope.effective_symtable(true)
-        until current_scope.nil?
-          current_scope.instance_variable_get(:@symbols)&.each_pair { |k, v| local[k] = v }
-          current_scope = current_scope.parent
-        end
-        newscope.push_ephemerals([local])
-
-        begin
-          result = catch(:return) do
-            args = { block.parameters[0][1].to_s => object }
-            block.closure.call_by_name_with_scope(newscope, args, true)
-          end
-
-          # If we got a return from the block, get it's value
-          # Otherwise the result is the last line from the block
-          result = result.value if result.is_a?(Puppet::Pops::Evaluator::Return)
-
-          # Validate the result is a PlanResult
-          unless Puppet::Pops::Types::TypeParser.singleton.parse('Boltlib::PlanResult').instance?(result)
-            raise Bolt::InvalidParallelResult.new(result.to_s, *Puppet::Pops::PuppetStack.top_of_stack)
-          end
-
-          result
-        rescue Puppet::PreformattedError => e
-          if e.cause.is_a?(Bolt::Error)
-            e.cause
-          else
-            raise e
-          end
-        end
-      end
-
-      Bolt::Yarn.new(fiber, index)
+      executor.create_yarn(scope, block, object, index)
     end
 
     result = executor.round_robin(skein)

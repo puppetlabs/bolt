@@ -19,7 +19,7 @@ describe 'plans' do
   let(:modulepath) { fixture_path('modules') }
 
   shared_examples "parallelize plan function" do
-    let(:return_value) { 
+    let(:return_value) {
       { "action" => "task",
         "object" => "parallel",
         "status" => "success",
@@ -89,23 +89,23 @@ describe 'plans' do
                              "object" => "parallel",
                              "status" => "success",
                              "value" => { "_output" => "a\n" } }],
-      { "kind" => "bolt/run-failure",
-        "msg" => "Plan aborted: run_task 'error::fail' failed on 1 target",
-        "details" =>
-      { "action" => "run_task",
-        "object" => "error::fail",
-        "result_set" =>
-      [{ "target" => 'puppet_6_node',
-         "action" => "task",
-         "object" => "error::fail",
-         "status" => "failure",
-         "value" =>
-      { "_output" => "failing\n",
-        "_error" =>
-      { "kind" => "puppetlabs.tasks/task-error",
-        "issue_code" => "TASK_ERROR",
-        "msg" => "The task failed with exit code 1",
-        "details" => { "exit_code" => 1 } } } }] } }]
+                          { "kind" => "bolt/run-failure",
+                            "msg" => "Plan aborted: run_task 'error::fail' failed on 1 target",
+                            "details" =>
+                          { "action" => "run_task",
+                            "object" => "error::fail",
+                            "result_set" =>
+                          [{ "target" => 'puppet_6_node',
+                             "action" => "task",
+                             "object" => "error::fail",
+                             "status" => "failure",
+                             "value" =>
+                          { "_output" => "failing\n",
+                            "_error" =>
+                          { "kind" => "puppetlabs.tasks/task-error",
+                            "issue_code" => "TASK_ERROR",
+                            "msg" => "The task failed with exit code 1",
+                            "details" => { "exit_code" => 1 } } } }] } }]
 
       result = run_cli_json(%w[plan run parallel::error] + config_flags)
       expect(result).to include(expected_err)

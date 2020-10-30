@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'fiber'
+
 module Bolt
   class Yarn
     attr_reader :fiber, :value, :index
