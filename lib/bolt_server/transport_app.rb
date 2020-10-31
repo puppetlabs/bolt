@@ -357,23 +357,6 @@ module BoltServer
       plans.map { |plan_name| { 'name' => plan_name } }
     end
 
-    def file_metadatas(pal, module_name, file)
-      pal.in_bolt_compiler do
-        mod = Puppet.lookup(:current_environment).module(module_name)
-        raise ArgumentError, "`module_name`: #{module_name} does not exist" unless mod
-        abs_file_path = mod.file(file)
-        raise ArgumentError, "`file`: #{file} does not exist inside the module's 'files' directory" unless abs_file_path
-        fileset = Puppet::FileServing::Fileset.new(abs_file_path, 'recurse' => 'yes')
-        Puppet::FileServing::Fileset.merge(fileset).collect do |relative_file_path, base_path|
-          metadata = Puppet::FileServing::Metadata.new(base_path, relative_path: relative_file_path)
-          metadata.checksum_type = 'sha256'
-          metadata.links = 'follow'
-          metadata.collect
-          metadata.to_data_hash
-        end
-      end
-    end
-
     get '/' do
       200
     end
@@ -621,11 +604,40 @@ module BoltServer
     #
     # @param project_ref [String] the project_ref to fetch the file metadatas from
     get '/project_file_metadatas/:module_name/*' do
-      in_bolt_project(params['project_ref']) do |context|
-        file = params[:splat].first
-        metadatas = file_metadatas(context[:pal], params[:module_name], file)
-        [200, metadatas.to_json]
+      project_ref = params['project_ref']
+      file = params[:splat].first
+      module_name = params[:module_name]
+
+      abs_file_path = nil
+
+      # TODO: in_bolt_project and in_pe_pal_env should be re-structured to return
+      # _just_ what the block returns instead of a possible error response. That
+      # would clean-up some of this code.
+      error_response = in_bolt_project(project_ref) do |context|
+        abs_file_path = context[:pal].in_bolt_compiler do
+          mod = Puppet.lookup(:current_environment).module(module_name)
+          raise ArgumentError, "`module_name`: #{module_name} does not exist" unless mod
+          mod.file(file)
+        end
+        nil
       end
+      next error_response if error_response
+      # We don't need the pal_mutex for the remaining steps so unblock other pal-operations by
+      # exiting out of in_bolt_project. This is useful in case fetching the file metadata
+      # takes some time (possible for large directories).
+
+      raise ArgumentError, "`file`: #{file} does not exist inside the module's 'files' directory" unless abs_file_path
+
+      fileset = Puppet::FileServing::Fileset.new(abs_file_path, 'recurse' => 'yes')
+      metadatas = Puppet::FileServing::Fileset.merge(fileset).collect do |relative_file_path, base_path|
+        metadata = Puppet::FileServing::Metadata.new(base_path, relative_path: relative_file_path)
+        metadata.checksum_type = 'sha256'
+        metadata.links = 'follow'
+        metadata.collect
+        metadata.to_data_hash
+      end
+
+      [200, metadatas.to_json]
     rescue ArgumentError => e
       [400, e.message]
     end
