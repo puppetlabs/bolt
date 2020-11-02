@@ -41,7 +41,6 @@ module Bolt
                    modified_concurrency = false)
       # lazy-load expensive gem code
       require 'concurrent'
-
       @analytics = analytics
       @logger = Bolt::Logger.logger(self)
 

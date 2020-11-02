@@ -36,9 +36,11 @@ module Bolt
       end
 
       def run_command(target, command, options = {})
-        # TODO
-        # parse/escape command strings
         with_connection(target) do |conn|
+          # TODO: what about
+          # * environment variables
+          # * "run as" user (lxc supports this)
+          execute_options = {}
           stdout, stderr, exitcode = conn.execute(*Shellwords.split(command), execute_options)
           Bolt::Result.for_command(target, stdout, stderr, exitcode, 'command', command)
         end
@@ -48,7 +50,7 @@ module Bolt
         #TODO, upload and execute
       end
 
-      def run_task(target, task, arguments _options = {})
+      def run_task(target, task, arguments, _options = {})
         #TODO
       end
 

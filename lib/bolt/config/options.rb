@@ -4,6 +4,7 @@ require 'bolt/config/transport/ssh'
 require 'bolt/config/transport/winrm'
 require 'bolt/config/transport/orch'
 require 'bolt/config/transport/local'
+require 'bolt/config/transport/lxd'
 require 'bolt/config/transport/docker'
 require 'bolt/config/transport/remote'
 
@@ -506,7 +507,7 @@ module Bolt
           type: Hash,
           _plugin: true,
           _example: {}
-        }
+        },
         "pcp" => {
           description: "A map of configuration options for the pcp transport.",
           type: Hash,

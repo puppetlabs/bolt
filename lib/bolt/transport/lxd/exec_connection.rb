@@ -31,12 +31,13 @@ module Bolt
         end
 
         def execute(*command, options)
-            # TODO
+          container = @target.name
+          remote = @target.config["lxd"]["remote"]
+          capture_options = { binmode: true }
+          out, err, status = Open3.capture3('lxc', 'exec', "#{remote}:#{container}", "--", *command, capture_options)
+          [out, err, status]
         end
 
-        def execute(command)
-          # wrap "lxc exec remote:target --" here
-        end
 
         def execute_local_lxc_command(subcommand, command_options = [], redir_stdin = nil)
             # TODO
