@@ -5,9 +5,14 @@ function bolt {
   # Windows API GetShortPathName requires inline C#, so use COM instead
   $script:BOLT_BASEDIR = $fso.GetFolder($script:BOLT_BASEDIR).ShortPath
   $script:RUBY_DIR = $script:BOLT_BASEDIR
-  # Set SSL variables to ensure trusted locations are used
-  $env:SSL_CERT_FILE = "$($script:BOLT_BASEDIR)\ssl\cert.pem"
-  $env:SSL_CERT_DIR = "$($script:BOLT_BASEDIR)\ssl\certs"
+
+  if (!$env:SSL_CERT_FILE) {
+    $env:SSL_CERT_FILE = "$($script:BOLT_BASEDIR)\ssl\cert.pem"
+  }
+  if (!$env:SSL_CERT_DIR) {
+    $env:SSL_CERT_DIR = "$($script:BOLT_BASEDIR)\ssl\certs"
+  }
+
   &$script:RUBY_DIR\bin\ruby -S -- $script:RUBY_DIR\bin\bolt ($args -replace '"', '"""')
 }
 
@@ -20,9 +25,13 @@ function Invoke-BoltCommandline {
   # Windows API GetShortPathName requires inline C#, so use COM instead
   $script:BOLT_BASEDIR = $fso.GetFolder($script:BOLT_BASEDIR).ShortPath
   $script:RUBY_DIR = $script:BOLT_BASEDIR
-  # Set SSL variables to ensure trusted locations are used
-  $env:SSL_CERT_FILE = "$($script:BOLT_BASEDIR)\ssl\cert.pem"
-  $env:SSL_CERT_DIR = "$($script:BOLT_BASEDIR)\ssl\certs"
+
+  if (!$env:SSL_CERT_FILE) {
+    $env:SSL_CERT_FILE = "$($script:BOLT_BASEDIR)\ssl\cert.pem"
+  }
+  if (!$env:SSL_CERT_DIR) {
+    $env:SSL_CERT_DIR = "$($script:BOLT_BASEDIR)\ssl\certs"
+  }
 
   $processArgs = @('-S', '--', "$script:RUBY_DIR\bin\bolt") + $params
 
