@@ -19,7 +19,7 @@ SCRIPT
 
 linux_provision = <<SCRIPT
 # add the bolt & test user accounts
-useradd -m bolt && echo bolt | passwd --stdin bolt
+useradd -m bolt && echo bolt:bolt | chpasswd
 useradd -m test
 
 # let the bolt user use sudo
@@ -30,6 +30,40 @@ mkdir -p -m 0700 /home/bolt/.ssh
 cp id_rsa.pub /home/bolt/.ssh/authorized_keys
 chown -R bolt:bolt /home/bolt/.ssh
 chmod 600 /home/bolt/.ssh/authorized_keys
+SCRIPT
+
+lxd_provision = <<SCRIPT
+apt-get install snapcraft -y
+snap install lxd
+echo 'config: {}
+networks:
+- config:
+    ipv4.address: auto
+    ipv6.address: auto
+  description: ""
+  name: lxdbr0
+  type: ""
+  project: default
+storage_pools:
+- config:
+    size: 24GB
+  description: ""
+  name: default
+  driver: btrfs
+profiles:
+- config: {}
+  description: ""
+  devices:
+    eth0:
+      name: eth0
+      network: lxdbr0
+      type: nic
+    root:
+      path: /
+      pool: default
+      type: disk
+  name: default
+cluster: null' | lxd init --preseed
 SCRIPT
 
 Vagrant.configure('2') do |config|
@@ -64,10 +98,11 @@ Vagrant.configure('2') do |config|
 
   if ENV['BOLT_TEST_USE_VAGRANT']
     config.vm.define :linux do |linux|
-      linux.vm.box = 'bento/centos-6.7'
-      linux.vm.network :forwarded_port, guest: 22, host: 20022, host_ip: '127.0.0.1', id: 'ssh'
+      linux.vm.box = 'generic/ubuntu2004'
+      linux.vm.network :forwarded_port, guest: 22, host: 20026, host_ip: '127.0.0.1', id: 'ssh'
       linux.vm.provision 'file', source: 'spec/fixtures/keys/id_rsa.pub', destination: 'id_rsa.pub'
       linux.vm.provision 'shell', inline: linux_provision
+      linux.vm.provision 'shell', inline: lxd_provision
     end
   end
 end

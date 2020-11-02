@@ -1,9 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Bolt Defaults",
-  "description": "Bolt Defaults bolt-defaults.yaml Schema",
+  "title": "Bolt Configuration",
+  "description": "Bolt Configuration bolt.yaml Schema",
   "type": "object",
   "properties": {
+    "apply-settings": {
+      "$ref": "#/definitions/apply-settings"
+    },
+    "apply_settings": {
+      "$ref": "#/definitions/apply_settings"
+    },
     "color": {
       "$ref": "#/definitions/color"
     },
@@ -13,26 +19,26 @@
     "concurrency": {
       "$ref": "#/definitions/concurrency"
     },
-    "disable-warnings": {
-      "$ref": "#/definitions/disable-warnings"
-    },
     "format": {
       "$ref": "#/definitions/format"
     },
-    "inventory-config": {
-      "$ref": "#/definitions/inventory-config"
+    "hiera-config": {
+      "$ref": "#/definitions/hiera-config"
+    },
+    "inventoryfile": {
+      "$ref": "#/definitions/inventoryfile"
     },
     "log": {
       "$ref": "#/definitions/log"
     },
-    "module-install": {
-      "$ref": "#/definitions/module-install"
-    },
-    "plugin-cache": {
-      "$ref": "#/definitions/plugin-cache"
+    "modulepath": {
+      "$ref": "#/definitions/modulepath"
     },
     "plugin-hooks": {
       "$ref": "#/definitions/plugin-hooks"
+    },
+    "plugin_hooks": {
+      "$ref": "#/definitions/plugin_hooks"
     },
     "plugins": {
       "$ref": "#/definitions/plugins"
@@ -40,14 +46,64 @@
     "puppetdb": {
       "$ref": "#/definitions/puppetdb"
     },
+    "puppetfile": {
+      "$ref": "#/definitions/puppetfile"
+    },
     "save-rerun": {
       "$ref": "#/definitions/save-rerun"
     },
     "spinner": {
       "$ref": "#/definitions/spinner"
+    },
+    "trusted-external-command": {
+      "$ref": "#/definitions/trusted-external-command"
+    },
+    "transport": {
+      "$ref": "#/definitions/transport"
+    },
+    "docker": {
+      "$ref": "#/definitions/docker"
+    },
+    "local": {
+      "$ref": "#/definitions/local"
+    },
+    "lxd": {
+      "$ref": "#/definitions/lxd"
+    },
+    "pcp": {
+      "$ref": "#/definitions/pcp"
+    },
+    "remote": {
+      "$ref": "#/definitions/remote"
+    },
+    "ssh": {
+      "$ref": "#/definitions/ssh"
+    },
+    "winrm": {
+      "$ref": "#/definitions/winrm"
     }
   },
   "definitions": {
+    "apply-settings": {
+      "description": "A map of Puppet settings to use when applying Puppet code using the `apply` plan function or the `bolt apply` command.",
+      "type": "object",
+      "properties": {
+        "show_diff": {
+          "description": "Whether to log and report a contextual diff.",
+          "type": "boolean"
+        }
+      }
+    },
+    "apply_settings": {
+      "description": "A map of Puppet settings to use when applying Puppet code using the `apply` plan function or the `bolt apply` command.",
+      "type": "object",
+      "properties": {
+        "show_diff": {
+          "description": "Whether to log and report a contextual diff.",
+          "type": "boolean"
+        }
+      }
+    },
     "color": {
       "description": "Whether to use colored output when printing messages to the console.",
       "type": "boolean"
@@ -62,13 +118,6 @@
       "type": "integer",
       "minimum": 1
     },
-    "disable-warnings": {
-      "description": "An array of IDs of warnings to suppress. Warnings with a matching ID will not be logged by Bolt. If you are upgrading Bolt to a new major version, you should re-enable all warnings until you have finished upgrading.",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
     "format": {
       "description": "The format to use when printing results.",
       "type": "string",
@@ -78,35 +127,13 @@
         "rainbow"
       ]
     },
-    "inventory-config": {
-      "description": "A map of default configuration options for the inventory. This includes options for setting the default transport to use when connecting to targets, as well as options for configuring the default behavior of each transport.",
-      "type": "object",
-      "properties": {
-        "transport": {
-          "$ref": "#/definitions/transport"
-        },
-        "docker": {
-          "$ref": "#/definitions/docker"
-        },
-        "local": {
-          "$ref": "#/definitions/local"
-        },
-        "lxd": {
-          "$ref": "#/definitions/lxd"
-        },
-        "pcp": {
-          "$ref": "#/definitions/pcp"
-        },
-        "remote": {
-          "$ref": "#/definitions/remote"
-        },
-        "ssh": {
-          "$ref": "#/definitions/ssh"
-        },
-        "winrm": {
-          "$ref": "#/definitions/winrm"
-        }
-      }
+    "hiera-config": {
+      "description": "The path to the Hiera configuration file.",
+      "type": "string"
+    },
+    "inventoryfile": {
+      "description": "The path to a structured data inventory file used to refer to groups of targets on the command line and from plans. Read more about using inventory files in [Inventory files](inventory_file_v2.md).",
+      "type": "string"
     },
     "log": {
       "description": "A map of configuration for the logfile output. Under `log`, you can configure log options for `console` and add configuration for individual log files, such as `~/.puppetlabs/bolt/debug.log`. Individual log files must be valid filepaths. If the log file does not exist, then Bolt will create it before logging information. Set the value to `disable` to remove a log file defined at an earlier level of the config hierarchy. By default, Bolt logs to a bolt-debug.log file in the Bolt project directory.",
@@ -130,6 +157,7 @@
                 "debug",
                 "error",
                 "info",
+                "notice",
                 "warn",
                 "fatal",
                 "any"
@@ -160,6 +188,7 @@
               "debug",
               "error",
               "info",
+              "notice",
               "warn",
               "fatal",
               "any"
@@ -168,48 +197,28 @@
         }
       }
     },
-    "module-install": {
-      "description": "Options that configure where Bolt downloads modules from. This option is only used when installing modules using the `bolt module add|install` commands and `Add|Install-BoltModule` cmdlets.",
-      "type": "object",
-      "properties": {
-        "forge": {
-          "description": "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations only, and a `baseurl` setting to specify a different Forge host.",
-          "type": "object",
-          "properties": {
-            "baseurl": {
-              "description": "The URL to the Forge host.",
-              "type": "string",
-              "format": "uri"
-            },
-            "proxy": {
-              "description": "The HTTP proxy to use for Forge operations.",
-              "type": "string",
-              "format": "uri"
-            }
-          }
-        },
-        "proxy": {
-          "description": "The HTTP proxy to use for Git and Forge operations.",
-          "type": "string",
-          "format": "uri"
-        }
-      }
-    },
-    "plugin-cache": {
-      "description": "This feature is experimental. Enable plugin caching and set the time-to-live.",
-      "type": "object",
-      "required": [
-        "ttl"
+    "modulepath": {
+      "description": "An array of directories that Bolt loads content such as plans and tasks from. Read more about modules in [Module structure](module_structure.md).",
+      "type": [
+        "array",
+        "string"
       ],
-      "properties": {
-        "ttl": {
-          "description": "Time in seconds to keep the plugin cache.",
-          "type": "integer",
-          "minimum": 0
-        }
+      "items": {
+        "type": "string"
       }
     },
     "plugin-hooks": {
+      "description": "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. The only configurable plugin hook is `puppet_library`, which can use two possible plugins: [`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) and [`task`](using_plugins.md#task).",
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "plugin_hooks": {
       "description": "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. The only configurable plugin hook is `puppet_library`, which can use two possible plugins: [`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) and [`task`](using_plugins.md#task).",
       "oneOf": [
         {
@@ -326,6 +335,33 @@
         }
       ]
     },
+    "puppetfile": {
+      "description": "A map containing options for the `bolt puppetfile install` command and `Install-BoltPuppetfile` cmdlet.",
+      "type": "object",
+      "properties": {
+        "forge": {
+          "description": "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations only, and a `baseurl` setting to specify a different Forge host.",
+          "type": "object",
+          "properties": {
+            "baseurl": {
+              "description": "The URL to the Forge host.",
+              "type": "string",
+              "format": "uri"
+            },
+            "proxy": {
+              "description": "The HTTP proxy to use for Forge operations.",
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "proxy": {
+          "description": "The HTTP proxy to use for Git and Forge operations.",
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
     "save-rerun": {
       "description": "Whether to update `.rerun.json` in the Bolt project directory. If your target names include passwords, set this value to `false` to avoid writing passwords to disk.",
       "type": "boolean"
@@ -333,6 +369,10 @@
     "spinner": {
       "description": "Whether to print a spinner to the console for long-running Bolt operations.",
       "type": "boolean"
+    },
+    "trusted-external-command": {
+      "description": "The path to an executable on the Bolt controller that can produce external trusted facts. **External trusted facts are experimental in both Puppet and Bolt and this API may change or be removed.**",
+      "type": "string"
     },
     "transport": {
       "description": "The default transport to use when the transport for a target is not specified in the URI.",
@@ -593,16 +633,6 @@
               "oneOf": [
                 {
                   "$ref": "#/transport_definitions/job-poll-timeout"
-                },
-                {
-                  "$ref": "#/definitions/_plugin"
-                }
-              ]
-            },
-            "read-timeout": {
-              "oneOf": [
-                {
-                  "$ref": "#/transport_definitions/read-timeout"
                 },
                 {
                   "$ref": "#/definitions/_plugin"
@@ -1521,18 +1551,6 @@
         {
           "type": "string",
           "format": "uri"
-        },
-        {
-          "$ref": "#/definitions/_plugin"
-        }
-      ]
-    },
-    "read-timeout": {
-      "description": "How long to wait in seconds when making requests to the Orchestrator.",
-      "oneOf": [
-        {
-          "type": "integer",
-          "minimum": 1
         },
         {
           "$ref": "#/definitions/_plugin"

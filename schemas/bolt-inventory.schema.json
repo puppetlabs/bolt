@@ -45,6 +45,7 @@
                     "winrm",
                     "pcp",
                     "local",
+                    "lxd",
                     "docker",
                     "remote"
                   ]
@@ -254,6 +255,19 @@
                         }
                       ]
                     }
+                  }
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "lxd": {
+              "description": "A map of configuraiton options for the LXD transport",
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
                   }
                 },
                 {
@@ -1434,5 +1448,10 @@
     {
       "$ref": "#/definitions/_plugin"
     }
+<<<<<<< HEAD
   ]
 }
+=======
+  }
+}
+>>>>>>> regen schemas
