@@ -1,5 +1,58 @@
 # Changelog
 
+## Bolt 2.33.0 (2020-11-02)
+
+### New features
+
+* **Updated bundled modules to latest version**
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [cron_core 1.0.5](https://forge.puppet.com/puppetlabs/cron_core/changelog)
+  - [puppet_agent 4.2.0](https://forge.puppet.com/puppetlabs/puppet_agent/changelog)
+  - [sshkeys_core 2.2.0](https://forge.puppet.com/puppetlabs/sshkeys_core/changelog)
+  - [zfs_core 1.2.0](https://forge.puppet.com/puppetlabs/zfs_core/changelog)
+
+* **Include file and line number in YAML plan code evaluation errors**
+  ([#2278](https://github.com/puppetlabs/bolt/issues/2278))
+
+  Errors raised when evaluating code in a YAML plan now include the path
+  to the YAML plan and the line number that the error occurred on in the
+  plan.
+
+* **File and line number included in plan function errors**
+  ([#2057](https://github.com/puppetlabs/bolt/issues/2057))
+
+  If the plan functions `run_command`, `run_script`, or `run_task` fail
+  they will now include the file and line number in the `details` key of
+  the Result object. This information will also be printed when run with
+  info level logging or higher.
+
+### Bug fixes
+
+* **Safely delete tmpdir used to configure Puppet for PAL**
+  ([#2245](https://github.com/puppetlabs/bolt/issues/2245))
+
+  Bolt now safely deletes the tmpdir used to configure Puppet when using
+  PAL. Previously, if the tmpdir was deleted during a Bolt run before
+  Bolt deleted the directory itself, an error with a stacktrace would be
+  raised.
+
+* **Do not override SSL variables in PowerShell module**
+  ([#2171](https://github.com/puppetlabs/bolt/issues/2171))
+
+  The PowerShell module no longer overrides the `SSL_CERT_FILE` and
+  `SSL_CERT_DIR` environment variables if they are already set.
+
+### Removals
+
+* **Folded scalar values in YAML plans no longer evaluated**
+  ([#2306](https://github.com/puppetlabs/bolt/pull/2306))
+
+  Folded scalar values in YAML plans are no longer evaluated and are
+  instead treated as string literals.
+
 ## Bolt 2.32.0 (2020-10-26)
 
 ### New features
