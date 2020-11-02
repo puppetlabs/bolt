@@ -15,6 +15,7 @@ require 'bolt/transport/ssh'
 require 'bolt/transport/winrm'
 require 'bolt/transport/orch'
 require 'bolt/transport/local'
+require 'bolt/transport/lxd'
 require 'bolt/transport/docker'
 require 'bolt/transport/remote'
 require 'bolt/yarn'
@@ -25,6 +26,7 @@ module Bolt
     winrm: Bolt::Transport::WinRM,
     pcp: Bolt::Transport::Orch,
     local: Bolt::Transport::Local,
+    lxd: Bolt::Transport::LXD,
     docker: Bolt::Transport::Docker,
     remote: Bolt::Transport::Remote
   }.freeze

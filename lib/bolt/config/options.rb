@@ -17,6 +17,7 @@ module Bolt
         'winrm'  => Bolt::Config::Transport::WinRM,
         'pcp'    => Bolt::Config::Transport::Orch,
         'local'  => Bolt::Config::Transport::Local,
+        'lxd'    => Bolt::Config::Transport::LXD,
         'docker' => Bolt::Config::Transport::Docker,
         'remote' => Bolt::Config::Transport::Remote
       }.freeze
@@ -500,6 +501,12 @@ module Bolt
           _plugin: true,
           _example: { "cleanup" => false, "tmpdir" => "/tmp/bolt" }
         },
+        "lxd" => {
+          description: "A map of configuraiton options for the LXD transport",
+          type: Hash,
+          _plugin: true,
+          _example: {}
+        }
         "pcp" => {
           description: "A map of configuration options for the pcp transport.",
           type: Hash,
