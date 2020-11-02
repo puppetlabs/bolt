@@ -1,0 +1,5 @@
+steps:
+  - name: value
+    eval: $foo.map |$l| { $l *  2 }
+
+return: $value

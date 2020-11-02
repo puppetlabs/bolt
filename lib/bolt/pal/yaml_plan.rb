@@ -98,10 +98,12 @@ module Bolt
       # subclasses this parent class in order to implement its own evaluation
       # logic.
       class EvaluableString
-        attr_reader :value
+        attr_reader :file, :line, :value
 
-        def initialize(value)
+        def initialize(value, file = nil, line = nil)
           @value = value
+          @file  = file
+          @line  = line
         end
 
         def ==(other)

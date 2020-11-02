@@ -185,4 +185,30 @@ describe "running YAML plans", ssh: true do
     result = run_plan('yaml::target_preference', targets: target)
     expect(result.first['target']).to eq(target)
   end
+
+  context 'evaluating Puppet code' do
+    it 'includes file and line number for errors in bare strings' do
+      result = run_plan('yaml::eval_error_bare_string')
+
+      expect(result['kind']).to eq('bolt/evaluation-error')
+      expect(result['details']['file']).to match(/eval_error_bare_string\.yaml/)
+      expect(result['details']['line']).to eq(3)
+    end
+
+    it 'includes file and line number for errors in scalar literals' do
+      result = run_plan('yaml::eval_error_scalar_literal')
+
+      expect(result['kind']).to eq('bolt/evaluation-error')
+      expect(result['details']['file']).to match(/eval_error_scalar_literal\.yaml/)
+      expect(result['details']['line']).to eq(5)
+    end
+
+    it 'includes file and line number for errors in nested sub plans' do
+      result = run_plan('yaml::eval_error_sub_plan')
+
+      expect(result['kind']).to eq('bolt/evaluation-error')
+      expect(result['details']['file']).to match(/eval_error_bare_string\.yaml/)
+      expect(result['details']['line']).to eq(3)
+    end
+  end
 end

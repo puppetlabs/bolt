@@ -1,0 +1,5 @@
+steps:
+  - name: result
+    plan: yaml::eval_error_bare_string
+
+return: $result
