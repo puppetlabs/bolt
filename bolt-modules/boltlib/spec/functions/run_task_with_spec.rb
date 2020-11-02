@@ -74,7 +74,7 @@ describe 'run_task_with' do
       }
 
       executor.expects(:run_task_with)
-              .with(target_mapping, mock_task(executable, 'environment'), {})
+              .with(target_mapping, mock_task(executable, 'environment'), {}, [])
               .returns(result_set)
 
       inventory.expects(:get_targets).with(hosts).returns(targets)
@@ -88,7 +88,7 @@ describe 'run_task_with' do
       executable = File.join(tasks_root, 'meta.sh')
 
       executor.expects(:run_task_with)
-              .with(target_mapping, mock_task(executable, 'environment'), run_as: 'root')
+              .with(target_mapping, mock_task(executable, 'environment'), { run_as: 'root' }, [])
               .returns(result_set)
 
       inventory.expects(:get_targets).with(hosts).returns(targets)
@@ -118,7 +118,9 @@ describe 'run_task_with' do
         target2 => args.merge(defaults)
       }
 
-      executor.expects(:run_task_with).with(target_mapping, mock_task(executable, 'stdin'), {}).returns(result_set)
+      executor.expects(:run_task_with)
+              .with(target_mapping, mock_task(executable, 'stdin'), {}, [])
+              .returns(result_set)
       inventory.expects(:get_targets).with(hosts).returns(targets)
 
       is_expected.to(run
@@ -139,7 +141,9 @@ describe 'run_task_with' do
 
       target_mapping = { target => args, target2 => args }
 
-      executor.expects(:run_task_with).with(target_mapping, mock_task(executable, 'stdin'), {}).returns(result_set)
+      executor.expects(:run_task_with)
+              .with(target_mapping, mock_task(executable, 'stdin'), {}, [])
+              .returns(result_set)
       inventory.expects(:get_targets).with(hosts).returns(targets)
 
       is_expected.to(run
@@ -162,7 +166,8 @@ describe 'run_task_with' do
         target2 => expected_args
       }
 
-      executor.expects(:run_task_with).with(target_mapping, mock_task(executable, 'environment'), {})
+      executor.expects(:run_task_with)
+              .with(target_mapping, mock_task(executable, 'environment'), {}, [])
               .returns(result_set)
       inventory.expects(:get_targets).with(hosts).returns(targets)
 
@@ -186,7 +191,9 @@ describe 'run_task_with' do
       executor.expects(:report_bundled_content).with('Task', 'Test::Echo').once
       executable = File.join(tasks_root, 'echo.sh')
 
-      executor.expects(:run_task_with).with(target_mapping, mock_task(executable, nil), {}).returns(result_set)
+      executor.expects(:run_task_with)
+              .with(target_mapping, mock_task(executable, nil), {}, [])
+              .returns(result_set)
       inventory.expects(:get_targets).with(hosts).returns(targets)
 
       is_expected.to(run
@@ -199,7 +206,9 @@ describe 'run_task_with' do
       let(:message) { 'test message' }
 
       it 'passes the description through' do
-        executor.expects(:run_task_with).with(target_mapping, anything, description: message).returns(result_set)
+        executor.expects(:run_task_with)
+                .with(target_mapping, anything, { description: message }, [])
+                .returns(result_set)
         inventory.expects(:get_targets).with(hosts).returns(targets)
 
         is_expected.to(run
@@ -210,7 +219,9 @@ describe 'run_task_with' do
 
     context 'without description' do
       it 'ignores description if options are passed' do
-        executor.expects(:run_task_with).with(target_mapping, anything, {}).returns(result_set)
+        executor.expects(:run_task_with)
+                .with(target_mapping, anything, {}, [])
+                .returns(result_set)
         inventory.expects(:get_targets).with(hosts).returns(targets)
 
         is_expected.to(run
@@ -219,7 +230,9 @@ describe 'run_task_with' do
       end
 
       it 'ignores description if no parameters are passed' do
-        executor.expects(:run_task_with).with(target_mapping, anything, {}).returns(result_set)
+        executor.expects(:run_task_with)
+                .with(target_mapping, anything, {}, [])
+                .returns(result_set)
         inventory.expects(:get_targets).with(hosts).returns(targets)
 
         is_expected.to(run
@@ -235,7 +248,7 @@ describe 'run_task_with' do
         executable = File.join(tasks_root, 'meta.sh')
 
         executor.expects(:run_task_with)
-                .with(target_mapping, mock_task(executable, 'environment'), {})
+                .with(target_mapping, mock_task(executable, 'environment'), {}, [])
                 .returns(result_set)
 
         inventory.expects(:get_targets).with([hostname, [[hostname2]], []]).returns(targets)
@@ -250,7 +263,7 @@ describe 'run_task_with' do
         executable = File.join(tasks_root, 'meta.sh')
 
         executor.expects(:run_task_with)
-                .with(target_mapping, mock_task(executable, 'environment'), {})
+                .with(target_mapping, mock_task(executable, 'environment'), {}, [])
                 .returns(result_set)
 
         inventory.expects(:get_targets).with([target, [[target2]], []]).returns(targets)
@@ -269,7 +282,7 @@ describe 'run_task_with' do
           executable = File.join(tasks_root, 'meta.sh')
 
           executor.expects(:run_task_with)
-                  .with(target_mapping, mock_task(executable, 'environment'), {})
+                  .with(target_mapping, mock_task(executable, 'environment'), {}, [])
                   .returns(result_set)
 
           inventory.expects(:get_targets).with(hosts).returns(targets)
@@ -284,7 +297,7 @@ describe 'run_task_with' do
           executable = File.join(tasks_root, 'meta.sh')
 
           executor.expects(:run_task_with)
-                  .with(target_mapping, mock_task(executable, 'environment'), catch_errors: true)
+                  .with(target_mapping, mock_task(executable, 'environment'), { catch_errors: true }, [])
                   .returns(result_set)
 
           inventory.expects(:get_targets).with(hosts).returns(targets)
@@ -313,7 +326,9 @@ describe 'run_task_with' do
       it 'finds task named after the module' do
         executable = File.join(tasks_root, 'init.sh')
 
-        executor.expects(:run_task_with).with(target_mapping, mock_task(executable, nil), {}).returns(result_set)
+        executor.expects(:run_task_with)
+                .with(target_mapping, mock_task(executable, nil), {}, [])
+                .returns(result_set)
         inventory.expects(:get_targets).with(hostname).returns([target])
 
         is_expected.to run
@@ -368,7 +383,9 @@ describe 'run_task_with' do
         sensitive.expects(:new).with(input_params['sensitive_hash'])
                  .returns(expected_params['sensitive_hash'])
 
-        executor.expects(:run_task_with).with(target_mapping, mock_task(executable, nil), {}).returns(result_set)
+        executor.expects(:run_task_with)
+                .with(target_mapping, mock_task(executable, nil), {}, [])
+                .returns(result_set)
         inventory.expects(:get_targets).with(hostname).returns(target)
 
         is_expected.to run

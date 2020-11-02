@@ -53,7 +53,7 @@ module Bolt
         conn
       end
 
-      def process_run_results(targets, results, task_name)
+      def process_run_results(targets, results, task_name, position = [])
         targets_by_name = Hash[targets.map { |t| t.host || t.name }.zip(targets)]
         results.map do |node_result|
           target = targets_by_name[node_result['name']]
@@ -63,25 +63,31 @@ module Bolt
           # If it's finished or already has a proper error simply pass it to the
           # the result otherwise make sure an error is generated
           if state == 'finished' || (result && result['_error'])
+            if result['_error']
+              file_line = %w[file line].zip(position).to_h.compact
+              result['_error']['details'].merge!(file_line) unless result['_error']['details']['file']
+            end
+
             Bolt::Result.new(target, value: result, action: 'task', object: task_name)
           elsif state == 'skipped'
+            details = %w[file line].zip(position).to_h.compact
             Bolt::Result.new(
               target,
               value: { '_error' => {
                 'kind' => 'puppetlabs.tasks/skipped-node',
                 'msg' => "Target #{target.safe_name} was skipped",
-                'details' => {}
+                'details' => details
               } },
               action: 'task', object: task_name
             )
           else
             # Make a generic error with a unkown exit_code
-            Bolt::Result.for_task(target, result.to_json, '', 'unknown', task_name)
+            Bolt::Result.for_task(target, result.to_json, '', 'unknown', task_name, position)
           end
         end
       end
 
-      def batch_command(targets, command, options = {}, &callback)
+      def batch_command(targets, command, options = {}, position = [], &callback)
         if options[:env_vars] && !options[:env_vars].empty?
           raise NotImplementedError, "pcp transport does not support setting environment variables"
         end
@@ -93,6 +99,7 @@ module Bolt
                                BOLT_COMMAND_TASK,
                                params,
                                options,
+                               position,
                                &callback)
         callback ||= proc {}
         results.map! { |result| unwrap_bolt_result(result.target, result, 'command', command) }
@@ -101,7 +108,7 @@ module Bolt
         end
       end
 
-      def batch_script(targets, script, arguments, options = {}, &callback)
+      def batch_script(targets, script, arguments, options = {}, position = [], &callback)
         if options[:env_vars] && !options[:env_vars].empty?
           raise NotImplementedError, "pcp transport does not support setting environment variables"
         end
@@ -114,7 +121,7 @@ module Bolt
           'name' => Pathname(script).basename.to_s
         }
         callback ||= proc {}
-        results = run_task_job(targets, BOLT_SCRIPT_TASK, params, options, &callback)
+        results = run_task_job(targets, BOLT_SCRIPT_TASK, params, options, position, &callback)
         results.map! { |result| unwrap_bolt_result(result.target, result, 'script', script) }
         results.each do |result|
           callback.call(type: :node_result, result: result)
@@ -155,7 +162,7 @@ module Bolt
         output&.close
       end
 
-      def batch_upload(targets, source, destination, options = {}, &callback)
+      def batch_upload(targets, source, destination, options = {}, position = [], &callback)
         stat = File.stat(source)
         content = if stat.directory?
                     pack(source)
@@ -171,7 +178,7 @@ module Bolt
           'directory' => stat.directory?
         }
         callback ||= proc {}
-        results = run_task_job(targets, BOLT_UPLOAD_TASK, params, options, &callback)
+        results = run_task_job(targets, BOLT_UPLOAD_TASK, params, options, position, &callback)
         results.map! do |result|
           if result.error_hash
             result
@@ -200,7 +207,7 @@ module Bolt
         targets.group_by { |target| Connection.get_key(target.options) }.values
       end
 
-      def run_task_job(targets, task, arguments, options)
+      def run_task_job(targets, task, arguments, options, position)
         targets.each do |target|
           yield(type: :node_start, target: target) if block_given?
         end
@@ -210,7 +217,7 @@ module Bolt
           arguments = unwrap_sensitive_args(arguments)
           results = get_connection(targets.first.options).run_task(targets, task, arguments, options)
 
-          process_run_results(targets, results, task.name)
+          process_run_results(targets, results, task.name, position)
         rescue OrchestratorClient::ApiError => e
           targets.map do |target|
             Bolt::Result.new(target, error: e.data)
@@ -222,15 +229,15 @@ module Bolt
         end
       end
 
-      def batch_task(targets, task, arguments, options = {}, &callback)
+      def batch_task(targets, task, arguments, options = {}, position = [], &callback)
         callback ||= proc {}
-        results = run_task_job(targets, task, arguments, options, &callback)
+        results = run_task_job(targets, task, arguments, options, position, &callback)
         results.each do |result|
           callback.call(type: :node_result, result: result)
         end
       end
 
-      def batch_task_with(_targets, _task, _target_mapping, _options = {})
+      def batch_task_with(_targets, _task, _target_mapping, _options = {}, _position = [])
         raise NotImplementedError, "pcp transport does not support run_task_with()"
       end
 
@@ -248,11 +255,13 @@ module Bolt
           return result
         end
 
+        # If we get here, there's no error so we don't need the file or line
+        # number
         Bolt::Result.for_command(target,
                                  result.value['stdout'],
                                  result.value['stderr'],
                                  result.value['exit_code'],
-                                 action, obj)
+                                 action, obj, [])
       end
     end
   end

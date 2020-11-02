@@ -174,7 +174,7 @@ module Bolt
         Bolt::Result.for_download(target, source, destination, download)
       end
 
-      def run_command(command, options = {})
+      def run_command(command, options = {}, position = [])
         command = [*env_declarations(options[:env_vars]), command].join("\r\n") if options[:env_vars]
 
         output = execute(command)
@@ -182,10 +182,12 @@ module Bolt
                                  output.stdout.string,
                                  output.stderr.string,
                                  output.exit_code,
-                                 'command', command)
+                                 'command',
+                                 command,
+                                 position)
       end
 
-      def run_script(script, arguments, options = {})
+      def run_script(script, arguments, options = {}, position = [])
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
         with_tmpdir do |dir|
@@ -204,11 +206,13 @@ module Bolt
                                    output.stdout.string,
                                    output.stderr.string,
                                    output.exit_code,
-                                   'script', script)
+                                   'script',
+                                   script,
+                                   position)
         end
       end
 
-      def run_task(task, arguments, _options = {})
+      def run_task(task, arguments, _options = {}, position = [])
         implementation = select_implementation(target, task)
         executable = implementation['path']
         input_method = implementation['input_method']
@@ -259,7 +263,8 @@ module Bolt
           Bolt::Result.for_task(target, output.stdout.string,
                                 output.stderr.string,
                                 output.exit_code,
-                                task.name)
+                                task.name,
+                                position)
         end
       end
 

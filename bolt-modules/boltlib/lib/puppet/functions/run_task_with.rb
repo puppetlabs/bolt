@@ -180,7 +180,7 @@ Puppet::Functions.create_function(:run_task_with) do
     else
       # Combine the results from the task run with any failing results that were
       # generated earlier when creating the target mapping
-      task_result = executor.run_task_with(target_mapping, task, options)
+      task_result = executor.run_task_with(target_mapping, task, options, Puppet::Pops::PuppetStack.top_of_stack)
       result = Bolt::ResultSet.new(task_result.results + error_set)
 
       if !result.ok && !options[:catch_errors]

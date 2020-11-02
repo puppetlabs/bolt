@@ -1,5 +1,5 @@
 plan error::run_fail(
-  String $target
+  TargetSpec $targets
 ) {
- run_task('error::fail', $target)
+ run_task('error::fail', $targets)
 }

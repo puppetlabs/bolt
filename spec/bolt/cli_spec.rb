@@ -1849,7 +1849,7 @@ describe "Bolt::CLI" do
         it "runs a task given a name" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, kind_of(Hash))
+            .with(targets, task_t, task_params, kind_of(Hash), [])
             .and_return(Bolt::ResultSet.new([]))
           expect(cli.execute(options)).to eq(0)
           expect(JSON.parse(output.string)).to be
@@ -1858,7 +1858,7 @@ describe "Bolt::CLI" do
         it "returns 2 if any node fails" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, kind_of(Hash))
+            .with(targets, task_t, task_params, kind_of(Hash), [])
             .and_return(fail_set)
 
           expect(cli.execute(options)).to eq(2)
@@ -1887,7 +1887,7 @@ describe "Bolt::CLI" do
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, {}, kind_of(Hash))
+            .with(targets, task_t, {}, kind_of(Hash), [])
             .and_raise("Could not connect to target")
 
           expect { cli.execute(options) }.to raise_error(/Could not connect to target/)
@@ -1899,7 +1899,7 @@ describe "Bolt::CLI" do
 
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params, kind_of(Hash))
+            .with(targets, task_t, task_params, kind_of(Hash), [])
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)
@@ -1914,7 +1914,7 @@ describe "Bolt::CLI" do
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, kind_of(Hash))
+              .with(targets, task_t, task_params, kind_of(Hash), [])
               .and_return(Bolt::ResultSet.new([]))
 
             cli.execute(options)
@@ -1927,7 +1927,7 @@ describe "Bolt::CLI" do
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, kind_of(Hash))
+              .with(targets, task_t, task_params, kind_of(Hash), [])
               .and_return(Bolt::ResultSet.new([]))
 
             cli.execute(options)
@@ -2009,7 +2009,7 @@ describe "Bolt::CLI" do
           it "runs the task when the specified parameters are successfully validated" do
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, task_params, kind_of(Hash))
+              .with(targets, task_t, task_params, kind_of(Hash), [])
               .and_return(Bolt::ResultSet.new([]))
             task_params.merge!(
               'mandatory_string' => ' ',
@@ -2062,7 +2062,7 @@ describe "Bolt::CLI" do
 
                 expect(executor)
                   .to receive(:run_task)
-                  .with(targets, task_t, task_params, kind_of(Hash))
+                  .with(targets, task_t, task_params, kind_of(Hash), [])
                   .and_return(Bolt::ResultSet.new([]))
 
                 cli.execute(options)
@@ -2072,7 +2072,7 @@ describe "Bolt::CLI" do
               it "runs the task even when invalid (according to the local task definition) parameters are specified" do
                 expect(executor)
                   .to receive(:run_task)
-                  .with(targets, task_t, task_params, kind_of(Hash))
+                  .with(targets, task_t, task_params, kind_of(Hash), [])
                   .and_return(Bolt::ResultSet.new([]))
 
                 cli.execute(options)
@@ -2110,8 +2110,8 @@ describe "Bolt::CLI" do
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-              .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task')]))
+              .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash), kind_of(Array))
+              .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task', [])]))
 
             expect(executor).to receive(:start_plan)
             expect(executor).to receive(:log_plan)
@@ -2138,8 +2138,8 @@ describe "Bolt::CLI" do
 
             expect(executor)
               .to receive(:run_task)
-              .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-              .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task')]))
+              .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash), kind_of(Array))
+              .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task', [])]))
 
             expect(executor).to receive(:start_plan)
             expect(executor).to receive(:log_plan)
@@ -2192,8 +2192,8 @@ describe "Bolt::CLI" do
         it "formats results of a passing task" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task')]))
+            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash), [/single_task.pp/, 9])
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task', [])]))
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
@@ -2213,7 +2213,7 @@ describe "Bolt::CLI" do
         it "raises errors from the executor" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
+            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash), [/single_task.pp/, 9])
             .and_raise("Could not connect to target")
 
           expect(executor).to receive(:start_plan)
@@ -2228,8 +2228,8 @@ describe "Bolt::CLI" do
         it "formats results of a failing task" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash))
-            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1, 'some_task')]))
+            .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash), kind_of(Array))
+            .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1, 'some_task', ['/fail', 2])]))
 
           expect(executor).to receive(:start_plan)
           expect(executor).to receive(:log_plan)
@@ -2249,7 +2249,9 @@ describe "Bolt::CLI" do
                   "_error" => {
                     "msg" => "The task failed with exit code 1",
                     "kind" => "puppetlabs.tasks/task-error",
-                    "details" => { "exit_code" => 1 },
+                    "details" => { "exit_code" => 1,
+                                   "file" => "/fail",
+                                   "line" => 2 },
                     "issue_code" => "TASK_ERROR"
                   }
                 }
@@ -2395,7 +2397,7 @@ describe "Bolt::CLI" do
         it "runs a task that supports noop" do
           expect(executor)
             .to receive(:run_task)
-            .with(targets, task_t, task_params.merge('_noop' => true), kind_of(Hash))
+            .with(targets, task_t, task_params.merge('_noop' => true), kind_of(Hash), kind_of(Array))
             .and_return(Bolt::ResultSet.new([]))
 
           cli.execute(options)

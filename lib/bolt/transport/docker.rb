@@ -46,7 +46,7 @@ module Bolt
         end
       end
 
-      def run_command(target, command, options = {})
+      def run_command(target, command, options = {}, position = [])
         execute_options = {}
         execute_options[:tty] = target.options['tty']
         execute_options[:environment] = options[:env_vars]
@@ -58,11 +58,17 @@ module Bolt
         end
         with_connection(target) do |conn|
           stdout, stderr, exitcode = conn.execute(*Shellwords.split(command), execute_options)
-          Bolt::Result.for_command(target, stdout, stderr, exitcode, 'command', command)
+          Bolt::Result.for_command(target,
+                                   stdout,
+                                   stderr,
+                                   exitcode,
+                                   'command',
+                                   command,
+                                   position)
         end
       end
 
-      def run_script(target, script, arguments, options = {})
+      def run_script(target, script, arguments, options = {}, position = [])
         # unpack any Sensitive data
         arguments = unwrap_sensitive_args(arguments)
         execute_options = {}
@@ -72,12 +78,18 @@ module Bolt
           conn.with_remote_tmpdir do |dir|
             remote_path = conn.write_remote_executable(dir, script)
             stdout, stderr, exitcode = conn.execute(remote_path, *arguments, execute_options)
-            Bolt::Result.for_command(target, stdout, stderr, exitcode, 'script', script)
+            Bolt::Result.for_command(target,
+                                     stdout,
+                                     stderr,
+                                     exitcode,
+                                     'script',
+                                     script,
+                                     position)
           end
         end
       end
 
-      def run_task(target, task, arguments, _options = {})
+      def run_task(target, task, arguments, _options = {}, position = [])
         implementation = task.select_implementation(target, provided_features)
         executable = implementation['path']
         input_method = implementation['input_method']
@@ -113,7 +125,12 @@ module Bolt
             end
 
             stdout, stderr, exitcode = conn.execute(remote_task_path, execute_options)
-            Bolt::Result.for_task(target, stdout, stderr, exitcode, task.name)
+            Bolt::Result.for_task(target,
+                                  stdout,
+                                  stderr,
+                                  exitcode,
+                                  task.name,
+                                  position)
           end
         end
       end

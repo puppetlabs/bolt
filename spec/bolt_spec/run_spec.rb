@@ -92,7 +92,7 @@ describe "BoltSpec::Run", ssh: true do
     end
 
     it 'should return a failure' do
-      result = run_plan('error::run_fail', 'target' => 'ssh')
+      result = run_plan('error::run_fail', 'targets' => 'ssh')
       expect(result['status']).to eq('failure')
       expect(result['value']['kind']).to eq('bolt/run-failure')
     end

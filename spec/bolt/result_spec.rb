@@ -72,33 +72,37 @@ describe Bolt::Result do
 
   describe :for_command do
     it 'exposes value' do
-      result = Bolt::Result.for_command(target, "stout", "sterr", 0, 'command', 'command')
+      result = Bolt::Result.for_command(target, "stout", "sterr", 0, 'command', 'command', [])
       expect(result.value).to eq('stdout' => 'stout', 'stderr' => 'sterr', 'exit_code' => 0)
     end
 
     it 'creates errors' do
-      result = Bolt::Result.for_command(target, "stout", "sterr", 1, 'command', 'command')
+      result = Bolt::Result.for_command(target, "stout", "sterr", 1, 'command', 'command', ['/jacko/lantern', 6])
       expect(result.error_hash['kind']).to eq('puppetlabs.tasks/command-error')
+      expect(result.error_hash['details']).to include({ 'file' => '/jacko/lantern', 'line' => 6 })
     end
   end
 
   describe :for_task do
     it 'parses json objects' do
       obj = { "key" => "val" }
-      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
+      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask', ['/do/not/print', 8])
       expect(result.value).to eq(obj)
     end
 
     it 'adds an error message if _error is missing a msg' do
       obj = { '_error' => 'oops' }
-      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
+      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask', ['/pumpkin/patch', 10])
       expect(result.error_hash['msg']).to match(/Invalid error returned from task atask/)
-      expect(result.error_hash['details']['original_error']).to eq('oops')
+      expect(result.error_hash['details']).to include({ 'original_error' => 'oops',
+                                                        'file' => '/pumpkin/patch',
+                                                        'line' => 10 })
     end
 
     it 'adds kind and details to _error hash if missing' do
       obj = { '_error' => { 'msg' => 'oops' } }
-      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
+      # Ensure we don't add file and line if they aren't available
+      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask', [])
       expect(result.error_hash).to eq(
         'msg'     => 'oops',
         'kind'    => 'bolt/error',
@@ -108,7 +112,7 @@ describe Bolt::Result do
 
     it 'marks _sensitive values as sensitive' do
       obj = { "user" => "someone", "_sensitive" => { "password" => "sosecretive" } }
-      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
+      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask', [])
       expect(result.sensitive).to be_a(Puppet::Pops::Types::PSensitiveType::Sensitive)
       expect(result.sensitive.unwrap).to eq('password' => 'sosecretive')
     end
@@ -116,46 +120,46 @@ describe Bolt::Result do
     it 'excludes _output and _error from generic_value' do
       obj = { "key" => "val" }
       special = { "_error" => { 'msg' => 'oops' }, "_output" => "output" }
-      result = Bolt::Result.for_task(target, obj.merge(special).to_json, '', 0, 'atask')
+      result = Bolt::Result.for_task(target, obj.merge(special).to_json, '', 0, 'atask', [])
       expect(result.generic_value).to eq(obj)
     end
 
     it 'includes _sensitive in generic_value' do
       obj = { "user" => "someone", "_sensitive" => { "password" => "sosecretive" } }
-      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask')
+      result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask', [])
       expect(result.generic_value.keys).to include('user', '_sensitive')
     end
 
     it "doesn't parse arrays" do
       stdout = '[1, 2, 3]'
-      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask')
+      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask', [])
       expect(result.value).to eq('_output' => stdout)
     end
 
     it 'handles errors' do
       obj = { "key" => "val",
               "_error" => { "msg" => "oops", "kind" => "error", "details" => {} } }
-      result = Bolt::Result.for_task(target, obj.to_json, '', 1, 'atask')
+      result = Bolt::Result.for_task(target, obj.to_json, '', 1, 'atask', [])
       expect(result.value).to eq(obj)
       expect(result.error_hash).to eq(obj['_error'])
     end
 
     it 'uses the unparsed value of stdout if it is not valid JSON' do
       stdout = 'just some string'
-      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask')
+      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask', [])
       expect(result.value).to eq('_output' => 'just some string')
     end
 
     it 'generates an error for binary data' do
       stdout = "\xFC].\xF9\xA8\x85f\xDF{\x11d\xD5\x8E\xC6\xA6"
-      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask')
+      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask', [])
       expect(result.value.keys).to eq(['_error'])
       expect(result.error_hash['msg']).to match(/The task result contained invalid UTF-8/)
     end
 
     it 'generates an error for non-UTF-8 output' do
       stdout = "☃".encode('utf-32')
-      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask')
+      result = Bolt::Result.for_task(target, stdout, '', 0, 'atask', [])
       expect(result.value.keys).to eq(['_error'])
       expect(result.error_hash['msg']).to match(/The task result contained invalid UTF-8/)
     end

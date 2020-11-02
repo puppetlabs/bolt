@@ -24,6 +24,10 @@ module Bolt
       h
     end
 
+    def add_filelineno(details)
+      @details.merge!(details) unless @details['file']
+    end
+
     def to_json(opts = nil)
       to_h.to_json(opts)
     end

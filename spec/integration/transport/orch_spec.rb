@@ -147,7 +147,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
       it "returns failure for only the failed node" do
         results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
                    { 'name' => 'node2', 'state' => 'failed', 'result' => { '_output' => 'goodbye' } }]
-        node_results = orch.process_run_results(targets, results, 'thetask')
+        node_results = orch.process_run_results(targets, results, 'thetask', ['tomato/soup', 4])
 
         expect(node_results[0]).to be_success
         expect(node_results[1]).not_to be_success
@@ -155,6 +155,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
         error = node_results[1].error_hash
         expect(error['kind']).to eq('puppetlabs.tasks/task-error')
         expect(error['msg']).to match(/The task failed with exit code/)
+        expect(error['details']).to include({ 'file' => 'tomato/soup', 'line' => 4 })
       end
 
       it "returns the error specified by the node" do
@@ -398,16 +399,26 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
     context 'when it fails' do
       let(:results) {
-        [{ 'name' => 'node1', 'state' => 'finished', 'result' => { 'stderr' => 'bye', 'exit_code' => 23 } },
+        [{ 'name' => 'node1',
+           'state' => 'finished',
+           'result' => { 'stderr' => 'bye',
+                         '_error' => {
+                           'details' => {
+                             'exit_code' => 23
+                           }
+                         } } },
          { 'name' => 'node2', 'state' => 'finished', 'result' => { 'stdout' => 'hi', 'exit_code' => 1 } }]
       }
 
       it 'returns a failure with stdout, stderr and exit_code' do
-        results = orch.batch_command(targets, command)
+        results = orch.batch_command(targets, command, {}, ['/grilled/cheese', 5])
 
         expect(results[0]).not_to be_success
-        expect(results[0]['exit_code']).to eq(23)
         expect(results[0]['stderr']).to eq('bye')
+        expect(results[0].error_hash['details'])
+          .to include({ 'file' => '/grilled/cheese',
+                        'line' => 5,
+                        'exit_code' => 23 })
 
         expect(results[1]).not_to be_success
         expect(results[1]['exit_code']).to eq(1)
@@ -583,16 +594,26 @@ describe Bolt::Transport::Orch, orchestrator: true do
 
     context "when the script fails" do
       let(:results) {
-        [{ 'name' => 'node1', 'state' => 'finished', 'result' => { 'stdout' => 'hello', 'exit_code' => 34 } },
+        [{ 'name' => 'node1',
+           'state' => 'finished',
+           'result' => { 'stdout' => 'hello',
+                         '_error' => {
+                           'details' => {
+                             'exit_code' => 34
+                           }
+                         } } },
          { 'name' => 'node2', 'state' => 'finished', 'result' => { 'stderr' => 'there', 'exit_code' => 1 } }]
       }
 
       it 'returns a failure with stdout, stderr and exit_code' do
-        results = orch.batch_script(targets, script_path, args)
+        results = orch.batch_script(targets, script_path, args, {}, ['/hot/cocoa', 8])
 
         expect(results[0]).not_to be_success
-        expect(results[0]['exit_code']).to eq(34)
         expect(results[0]['stdout']).to eq('hello')
+        expect(results[0].error_hash['details'])
+          .to include({ 'file' => '/hot/cocoa',
+                        'line' => 8,
+                        'exit_code' => 34 })
 
         expect(results[1]).not_to be_success
         expect(results[1]['exit_code']).to eq(1)

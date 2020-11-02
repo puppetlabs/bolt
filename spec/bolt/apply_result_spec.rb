@@ -12,22 +12,22 @@ describe Bolt::ApplyResult do
       "status" => "" }
   }
 
-  let(:task_result) { Bolt::Result.for_task(example_target, result_value.to_json, '', 0, 'catalog') }
+  let(:task_result) { Bolt::Result.for_task(example_target, result_value.to_json, '', 0, 'catalog', []) }
   let(:apply_result) { Bolt::ApplyResult.from_task_result(task_result) }
 
   describe '#puppet_missing_error' do
     it 'returns the nil if no identifiable errors are found' do
-      result = Bolt::Result.for_task(:target, '', 'blah', 1, 'catalog')
+      result = Bolt::Result.for_task(:target, '', 'blah', 1, 'catalog', [])
       expect(Bolt::ApplyResult.puppet_missing_error(result)).to be_nil
     end
 
     it 'returns nil if no errors are present' do
-      result = Bolt::Result.for_task(:target, 'hello', '', 0, 'catalog')
+      result = Bolt::Result.for_task(:target, 'hello', '', 0, 'catalog', [])
       expect(Bolt::ApplyResult.puppet_missing_error(result)).to be_nil
     end
 
     it 'errors if /opt/puppetlabs/puppet/bin/ruby not found on Linux' do
-      orig_result = Bolt::Result.for_task(:target, '', 'blah', 127, 'catalog')
+      orig_result = Bolt::Result.for_task(:target, '', 'blah', 127, 'catalog', [])
       error = Bolt::ApplyResult.puppet_missing_error(orig_result)
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg'])
@@ -35,7 +35,7 @@ describe Bolt::ApplyResult do
     end
 
     it 'errors if /opt/puppetlabs/puppet/bin/ruby not found on macOS' do
-      orig_result = Bolt::Result.for_task(:target, '', 'blah', 126, 'catalog')
+      orig_result = Bolt::Result.for_task(:target, '', 'blah', 126, 'catalog', [])
       error = Bolt::ApplyResult.puppet_missing_error(orig_result)
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg'])
@@ -43,7 +43,7 @@ describe Bolt::ApplyResult do
     end
 
     it 'errors if Ruby cannot be found on Windows' do
-      orig_result = Bolt::Result.for_task(:target, '', "Could not find executable 'ruby.exe'", 1, 'catalog')
+      orig_result = Bolt::Result.for_task(:target, '', "Could not find executable 'ruby.exe'", 1, 'catalog', [])
       error = Bolt::ApplyResult.puppet_missing_error(orig_result)
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg'])
@@ -51,7 +51,7 @@ describe Bolt::ApplyResult do
     end
 
     it 'errors if Puppet cannot be found on Windows' do
-      orig_result = Bolt::Result.for_task(:target, '', 'cannot load such file -- puppet (LoadError)', 1, 'catalog')
+      orig_result = Bolt::Result.for_task(:target, '', 'cannot load such file -- puppet (LoadError)', 1, 'catalog', [])
       error = Bolt::ApplyResult.puppet_missing_error(orig_result)
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg'])

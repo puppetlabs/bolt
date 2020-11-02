@@ -112,7 +112,7 @@ Puppet::Functions.create_function(:download_file, Puppet::Functions::InternalFun
       call_function('debug', "Simulating file download of '#{source}' - no targets given - no action taken")
       r = Bolt::ResultSet.new([])
     else
-      r = executor.download_file(targets, source, destination, options)
+      r = executor.download_file(targets, source, destination, options, Puppet::Pops::PuppetStack.top_of_stack)
     end
 
     if !r.ok && !options[:catch_errors]

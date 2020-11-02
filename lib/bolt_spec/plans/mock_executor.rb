@@ -48,7 +48,7 @@ module BoltSpec
         ([segments[0]] + segments[2..-1]).join('/')
       end
 
-      def run_command(targets, command, options = {})
+      def run_command(targets, command, options = {}, _position = [])
         result = nil
         if (doub = @command_doubles[command] || @command_doubles[:default])
           result = doub.process(targets, command, options)
@@ -61,7 +61,7 @@ module BoltSpec
         result
       end
 
-      def run_script(targets, script_path, arguments, options = {})
+      def run_script(targets, script_path, arguments, options = {}, _position = [])
         script = module_file_id(script_path)
         result = nil
         if (doub = @script_doubles[script] || @script_doubles[:default])
@@ -76,7 +76,7 @@ module BoltSpec
         result
       end
 
-      def run_task(targets, task, arguments, options = {})
+      def run_task(targets, task, arguments, options = {}, _position = [])
         result = nil
         if (doub = @task_doubles[task.name] || @task_doubles[:default])
           result = doub.process(targets, task.name, arguments, options)
@@ -90,7 +90,7 @@ module BoltSpec
         result
       end
 
-      def download_file(targets, source, destination, options = {})
+      def download_file(targets, source, destination, options = {}, _position = [])
         result = nil
         if (doub = @download_doubles[source] || @download_doubles[:default])
           result = doub.process(targets, source, destination, options)
@@ -103,7 +103,7 @@ module BoltSpec
         result
       end
 
-      def upload_file(targets, source_path, destination, options = {})
+      def upload_file(targets, source_path, destination, options = {}, _position = [])
         source = module_file_id(source_path)
         result = nil
         if (doub = @upload_doubles[source] || @upload_doubles[:default])

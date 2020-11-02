@@ -7,47 +7,58 @@ module Bolt
   class Result
     attr_reader :target, :value, :action, :object
 
-    def self.from_exception(target, exception, action: 'action')
+    def self.from_exception(target, exception, action: 'action', position: [])
+      details = create_details(position)
       if exception.is_a?(Bolt::Error)
-        error = exception.to_h
+        error = Bolt::Util.deep_merge({ 'details' => details }, exception.to_h)
       else
+        details['class'] = exception.class.to_s
         error = {
           'kind' => 'puppetlabs.tasks/exception-error',
           'issue_code' => 'EXCEPTION',
           'msg' => exception.message,
-          'details' => { 'class' => exception.class.to_s }
+          'details' => details
         }
         error['details']['stack_trace'] = exception.backtrace.join('\n') if exception.backtrace
       end
       Result.new(target, error: error, action: action)
     end
 
-    def self.for_command(target, stdout, stderr, exit_code, action, command)
+    def self.create_details(position)
+      %w[file line].zip(position).to_h.compact
+    end
+
+    def self.for_command(target, stdout, stderr, exit_code, action, command, position)
       value = {
         'stdout' => stdout,
         'stderr' => stderr,
         'exit_code' => exit_code
       }
+
+      details = create_details(position)
       unless exit_code == 0
+        details['exit_code'] = exit_code
         value['_error'] = {
           'kind' => 'puppetlabs.tasks/command-error',
           'issue_code' => 'COMMAND_ERROR',
           'msg' => "The command failed with exit code #{exit_code}",
-          'details' => { 'exit_code' => exit_code }
+          'details' => details
         }
       end
       new(target, value: value, action: action, object: command)
     end
 
-    def self.for_task(target, stdout, stderr, exit_code, task)
+    def self.for_task(target, stdout, stderr, exit_code, task, position)
       stdout.force_encoding('utf-8') unless stdout.encoding == Encoding::UTF_8
+
+      details = create_details(position)
       value = if stdout.valid_encoding?
                 parse_hash(stdout) || { '_output' => stdout }
               else
                 { '_error' => { 'kind' => 'puppetlabs.tasks/task-error',
                                 'issue_code' => 'TASK_ERROR',
                                 'msg' => 'The task result contained invalid UTF-8 on stdout',
-                                'details' => {} } }
+                                'details' => details } }
               end
 
       if exit_code != 0 && value['_error'].nil?
@@ -60,24 +71,26 @@ module Bolt
               else
                 "The task failed with exit code #{exit_code}"
               end
+        details['exit_code'] = exit_code
         value['_error'] = { 'kind' => 'puppetlabs.tasks/task-error',
                             'issue_code' => 'TASK_ERROR',
                             'msg' => msg,
-                            'details' => { 'exit_code' => exit_code } }
+                            'details' => details }
       end
 
       if value.key?('_error')
         unless value['_error'].is_a?(Hash) && value['_error'].key?('msg')
+          details['original_error'] = value['_error']
           value['_error'] = {
             'msg'     => "Invalid error returned from task #{task}: #{value['_error'].inspect}. Error "\
                          "must be an object with a msg key.",
             'kind'    => 'bolt/invalid-task-error',
-            'details' => { 'original_error' => value['_error'] }
+            'details' => details
           }
         end
 
         value['_error']['kind']    ||= 'bolt/error'
-        value['_error']['details'] ||= {}
+        value['_error']['details'] ||= details
       end
 
       if value.key?('_sensitive')
@@ -221,7 +234,6 @@ module Bolt
     def error
       if error_hash
         Puppet::DataTypes::Error.from_asserted_hash(error_hash)
-
       end
     end
 
