@@ -21,9 +21,9 @@ module Bolt
         with_connection(target) do |conn|
           # TODO with_remote_tempdir stuff?
           if File.directory?(source)
-            conn.write_remote_directory(source, tmpfile)
+            conn.write_remote_directory(source, destination)
           else
-            conn.write_remote_file(source, tmpfile)
+            conn.write_remote_file(source, destination)
           end
         Bolt::Result.for_upload(target, source, destination)
         end

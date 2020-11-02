@@ -11,6 +11,7 @@ module Bolt
 
         def initialize(target)
           @target = target
+          @lxd_remote = @target.config["lxd"]["remote"]
           @logger = Bolt::Logger.logger(target.safe_name)
           @logger.trace("")
         end
@@ -27,30 +28,37 @@ module Bolt
             "Failed to connect to #{@target.safe_name}: #{e.message}",
             'CONNECT_ERROR'
           )
-        
         end
 
         def execute(*command, options)
           container = @target.name
-          remote = @target.config["lxd"]["remote"]
+          remote = @lxd_remote
           capture_options = { binmode: true }
-          out, err, status = Open3.capture3('lxc', 'exec', "#{remote}:#{container}", "--", *command, capture_options)
+          out, err, status = Open3.capture3('lxc', 'exec', "#{remote}:#{container}", 
+            "--", *command, capture_options)
           [out, err, status]
         end
 
-
-        def execute_local_lxc_command(subcommand, command_options = [], redir_stdin = nil)
-            # TODO
-            # set up streams
-            # delegate to Open3.capture
-        end
-
         def write_remote_directory(source, destination)
-            #TODO
+          container = @target.name
+          remote = @lxd_remote
+          # TODO: check dest is absolute path
+          capture_options = { binmode: true }
+          out, err, status = Open3.capture3('lxc', 'file', 'push', source,
+            "#{remote}:#{container}#{destination}", "--recursive", capture_options)
         end
 
         def write_remote_file(source, destination)
-            #TODO
+          container = @target.name
+          remote = @lxd_remote
+          # TODO: check dest is absolute path
+          capture_options = { binmode: true }
+          out, err, status = Open3.capture3('lxc', 'file', 'push', source,
+            "#{remote}:#{container}#{destination}",  capture_options)
+        end
+
+        def container_tmpdir
+          '/tmp'
         end
       end
     end
