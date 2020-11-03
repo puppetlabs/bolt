@@ -63,7 +63,7 @@ module Bolt
 
       data = Bolt::Util.read_yaml_hash(config_path, 'project')
       data['modules'] ||= []
-      data['modules'] << name
+      data['modules'] << name.tr('-', '/')
 
       begin
         File.write(config_path, data.to_yaml)

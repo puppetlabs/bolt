@@ -16,8 +16,21 @@ describe Bolt::ModuleInstaller::Specs::GitSpec do
       expect(spec.name).to eq(name)
     end
 
+    it 'allows uppercase letters for owner' do
+      init_hash['name'] = 'Puppetlabs/yaml'
+      expect { spec }.not_to raise_error
+    end
+
     it 'errors with an invalid name' do
       init_hash['name'] = 'Yaml'
+      expect { spec }.to raise_error(
+        Bolt::ValidationError,
+        /Invalid name for Git module specification/
+      )
+    end
+
+    it 'errors with an invalid owner' do
+      init_hash['name'] = 'puppet_labs/yaml'
       expect { spec }.to raise_error(
         Bolt::ValidationError,
         /Invalid name for Git module specification/

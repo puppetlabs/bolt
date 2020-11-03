@@ -11,7 +11,7 @@ module Bolt
   class ModuleInstaller
     class Specs
       class GitSpec
-        NAME_REGEX    = %r{\A(?:[a-z][a-z0-9_]*[-/])?(?<name>[a-z][a-z0-9_]*)\z}.freeze
+        NAME_REGEX    = %r{\A(?:[a-zA-Z0-9]+[-/])?(?<name>[a-z][a-z0-9_]*)\z}.freeze
         REQUIRED_KEYS = Set.new(%w[git ref]).freeze
 
         attr_reader :git, :ref, :type
@@ -36,8 +36,9 @@ module Bolt
           unless (match = name.match(NAME_REGEX))
             raise Bolt::ValidationError,
                   "Invalid name for Git module specification: #{name}. Name must match "\
-                  "'name' or 'owner/name', must start with a lowercase letter, and may "\
-                  "only include lowercase letters, digits, and underscores."
+                  "'name' or 'owner/name'. Owner segment may only include letters or digits. "\
+                  "Name segment must start with a lowercase letter and may only include "\
+                  "lowercase letters, digits, and underscores."
           end
 
           match[:name]
