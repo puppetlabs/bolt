@@ -1,5 +1,17 @@
 # Changelog
 
+## Bolt 2.33.2 (2020-11-04)
+
+### Bug fixes
+
+* **Fix module name validation for Forge and Git module specifications**
+  ([#2314](https://github.com/puppetlabs/bolt/issues/2314))
+
+  Forge and Git module specifications now correctly validate the
+  module's name and permit uppercase letters in the owner segment of the
+  module name. Previously, if the owner segment of a module name
+  included uppercase letters, Bolt would raise an error.
+
 ## Bolt 2.33.1 (2020-11-02)
 
 ### New features
