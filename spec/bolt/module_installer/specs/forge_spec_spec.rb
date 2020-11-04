@@ -19,8 +19,21 @@ describe Bolt::ModuleInstaller::Specs::ForgeSpec do
       expect(spec.name).to eq('yaml')
     end
 
+    it 'allows uppercase letters for owner' do
+      init_hash['name'] = 'Puppetlabs/yaml'
+      expect { spec }.not_to raise_error
+    end
+
     it 'errors with an invalid name' do
       init_hash['name'] = 'yaml'
+      expect { spec }.to raise_error(
+        Bolt::ValidationError,
+        /Invalid name for Forge module/
+      )
+    end
+
+    it 'errors with an invalid owner' do
+      init_hash['name'] = 'puppet_labs/yaml'
       expect { spec }.to raise_error(
         Bolt::ValidationError,
         /Invalid name for Forge module/
@@ -101,6 +114,13 @@ describe Bolt::ModuleInstaller::Specs::ForgeSpec do
       mod     = double('mod', type: :forge, full_name: name, version: version)
 
       expect(spec.satisfied_by?(mod)).to be(false)
+    end
+
+    it 'is case insensitive when comparing names' do
+      version = SemanticPuppet::Version.parse('0.1.0')
+      mod     = double('mod', type: :forge, full_name: name.upcase, version: version)
+
+      expect(spec.satisfied_by?(mod)).to be(true)
     end
   end
 end

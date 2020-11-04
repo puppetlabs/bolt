@@ -11,7 +11,7 @@ module Bolt
   class ModuleInstaller
     class Specs
       class ForgeSpec
-        NAME_REGEX    = %r{\A[a-z][a-z0-9_]*[-/](?<name>[a-z][a-z0-9_]*)\z}.freeze
+        NAME_REGEX    = %r{\A[a-zA-Z0-9]+[-/](?<name>[a-z][a-z0-9_]*)\z}.freeze
         REQUIRED_KEYS = Set.new(%w[name]).freeze
         KNOWN_KEYS    = Set.new(%w[name version_requirement]).freeze
 
@@ -33,8 +33,9 @@ module Bolt
           unless (match = name.match(NAME_REGEX))
             raise Bolt::ValidationError,
                   "Invalid name for Forge module specification: #{name}. Name must match "\
-                  "'owner/name', must start with a lowercase letter, and may only include "\
-                  "lowercase letters, digits, and underscores."
+                  "'owner/name'. Owner segment may only include letters or digits. Name "\
+                  "segment must start with a lowercase letter and may only include lowercase "\
+                  "letters, digits, and underscores."
           end
 
           [name.tr('-', '/'), match[:name]]
@@ -54,7 +55,7 @@ module Bolt
         #
         def satisfied_by?(mod)
           @type == mod.type &&
-            @full_name == mod.full_name &&
+            @full_name.downcase == mod.full_name.downcase &&
             !mod.version.nil? &&
             @semantic_version.cover?(mod.version)
         end
