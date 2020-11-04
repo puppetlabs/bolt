@@ -279,6 +279,7 @@ module Bolt
             execute(script_invocation)
           end
         else
+          # I am testing this on concat module
           command = Bolt::Shell::Powershell::Snippets.exit_with_code(command)
         end
         inp, out, err, t = conn.execute(command)
