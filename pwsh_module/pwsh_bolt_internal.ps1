@@ -88,7 +88,14 @@ function Get-BoltCommandline {
       if ($rubyParameter) {
         $params += "--$($rubyParameter)"
       }
-      $params += "'$($pwshValue)'"
+
+      $parsedValue = switch ($pwshParameter) {
+        'params' { "'$($pwshValue)'" }
+        'execute' { "'$($pwshValue)'" }
+        Default { $pwshValue }
+      }
+
+      $params += $parsedValue
     }
   }
 

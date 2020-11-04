@@ -27,6 +27,31 @@ Invoke-BoltCommand -Command 'Get-Location' -Targets servers
 > 🔩 **Tip:** If a command contains spaces or special shell characters, wrap
 > the command in single quotation marks.
 
+### Run a quoted command
+
+If you need to run a command that uses quotation marks, you must properly escape
+the quotations. The way you escape the quotations depends on whether you're
+using Bash or PowerShell.
+
+In a Bash shell, use backslashes `\` or double the the quotation marks:
+
+_\*nix shell command_
+
+```shell
+bolt command run "Get-WMIObject Win32_Service -Filter ""Name like '%mon'""" -t localhost
+```
+
+In a PowerShell shell, use a combination of backslashes `\` and doubling of
+quotation marks. The example below uses two double quotation marks to quote the
+value being passed to `Filter`, however the example also uses a backslash so
+that Bolt's underlying Ruby argument parser accepts the command.
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command "Get-WMIObject Win32_Service -Filter \""Name like '%mon'\""" -Targets localhost
+```
+
 ### Read a command from a file
 
 Reading a command from a file is useful when you need to run a script on a target 
