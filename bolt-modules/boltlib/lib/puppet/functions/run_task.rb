@@ -137,13 +137,21 @@ Puppet::Functions.create_function(:run_task) do
                  require 'concurrent'
                  require 'fiber'
                  future = Concurrent::Future.execute do
-                   executor.run_task(targets, task, params, options, Puppet::Pops::PuppetStack.top_of_stack)
+                   executor.run_task(targets,
+                                     task,
+                                     params,
+                                     options,
+                                     Puppet::Pops::PuppetStack.top_of_stack)
                  end
 
                  Fiber.yield('unfinished') while future.incomplete?
                  future.value || future.reason
                else
-                 executor.run_task(targets, task, params, options, Puppet::Pops::PuppetStack.top_of_stack)
+                 executor.run_task(targets,
+                                   task,
+                                   params,
+                                   options,
+                                   Puppet::Pops::PuppetStack.top_of_stack)
                end
 
       if !result.ok && !options[:catch_errors]

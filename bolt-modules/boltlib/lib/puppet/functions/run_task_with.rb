@@ -180,7 +180,24 @@ Puppet::Functions.create_function(:run_task_with) do
     else
       # Combine the results from the task run with any failing results that were
       # generated earlier when creating the target mapping
-      task_result = executor.run_task_with(target_mapping, task, options, Puppet::Pops::PuppetStack.top_of_stack)
+      task_result = if executor.in_parallel
+                      require 'concurrent'
+                      require 'fiber'
+                      future = Concurrent::Future.execute do
+                        executor.run_task_with(target_mapping,
+                                               task,
+                                               options,
+                                               Puppet::Pops::PuppetStack.top_of_stack)
+                      end
+
+                      Fiber.yield('unfinished') while future.incomplete?
+                      future.value || future.reason
+                    else
+                      executor.run_task_with(target_mapping,
+                                             task,
+                                             options,
+                                             Puppet::Pops::PuppetStack.top_of_stack)
+                    end
       result = Bolt::ResultSet.new(task_result.results + error_set)
 
       if !result.ok && !options[:catch_errors]

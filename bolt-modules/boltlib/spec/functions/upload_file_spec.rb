@@ -201,6 +201,28 @@ describe 'upload_file' do
     end
   end
 
+  context 'running in parallel' do
+    let(:future) { mock('future') }
+    let(:hostname) { 'test.example.com' }
+    let(:target) { Bolt::Target.new(hostname) }
+    let(:result) { Bolt::Result.new(target, value: { 'stdout' => hostname }) }
+    let(:result_set) { Bolt::ResultSet.new([result]) }
+    let(:destination) { '/var/www/html' }
+
+    it 'executes in a thread if the executor is in parallel mode' do
+      inventory.expects(:get_targets).with(hostname).returns([target])
+
+      Concurrent::Future.expects(:execute).returns(future)
+      future.expects(:incomplete?).returns(false)
+      future.expects(:value).returns(result_set)
+      executor.expects(:in_parallel).returns(true)
+
+      is_expected.to run
+        .with_params('test/uploads/index.html', destination, hostname)
+        .and_return(result_set)
+    end
+  end
+
   context 'without tasks enabled' do
     let(:tasks_enabled) { false }
 
