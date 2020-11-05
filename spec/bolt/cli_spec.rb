@@ -584,7 +584,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.not_to output(/[parameters].*nodes/m).to_stdout
+          }.not_to output(/\[parameters\].*nodes/m).to_stdout
         end
 
         it 'accepts apply' do
@@ -2923,7 +2923,7 @@ describe "Bolt::CLI" do
       cli = Bolt::CLI.new(%w[command run whoami -t foo --password bar])
       cli.parse
       expect(@log_output.readlines.join)
-        .not_to match(/CLI arguments ["password"] may be overridden by Inventory/)
+        .not_to match(/CLI arguments \["password"\] may be overridden by Inventory/)
     end
 
     context 'when BOLT_INVENTORY is set' do

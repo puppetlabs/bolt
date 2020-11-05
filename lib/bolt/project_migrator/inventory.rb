@@ -6,12 +6,12 @@ module Bolt
   class ProjectMigrator
     class Inventory < Base
       def migrate(inventory_file, backup_dir)
-        inventory_1_to_2(inventory_file, backup_dir)
+        inventory1to2(inventory_file, backup_dir)
       end
 
       # Migrates an inventory v1 file to inventory v2.
       #
-      private def inventory_1_to_2(inventory_file, backup_dir)
+      private def inventory1to2(inventory_file, backup_dir)
         unless File.exist?(inventory_file)
           return true
         end
