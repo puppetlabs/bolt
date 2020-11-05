@@ -2,7 +2,7 @@
 
 require 'bolt/yarn'
 
-# Map a code bock onto an array, where each array element executes in parallel.
+# Map a code block onto an array, where each array element executes in parallel.
 # This function is experimental.
 #
 # > **Note:** Not available in apply block.

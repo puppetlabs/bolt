@@ -414,12 +414,6 @@ module Bolt
     def handle_event(event)
       case event[:type]
       when :node_result
-        # Give the result a chance to return back to the function
-        # If we resume the fiber before the result makes it there, this will
-        # spin forever
-        #
-        # TODO: Is there a way to avoid this?
-        sleep(1)
         @thread_completed = true
       end
     end
@@ -443,7 +437,7 @@ module Bolt
         end
 
         next unless r == 'unfinished'
-        sleep(1) until @thread_completed || skein.empty?
+        sleep(0.1) until @thread_completed || skein.empty?
       end
 
       @in_parallel = false
