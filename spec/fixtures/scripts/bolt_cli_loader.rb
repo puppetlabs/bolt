@@ -7,11 +7,13 @@ require 'bolt'
 require 'bolt/cli'
 
 def suppress_outputs
+  # rubocop:disable Style/NegatedIfElseCondition
   null_io = !!File::ALT_SEPARATOR ? 'NUL' : '/dev/null'
   out = $stdout.clone
   err = $stderr.clone
   $stderr.reopen(null_io, 'w')
   $stdout.reopen(null_io, 'w')
+  # rubocop:enable Style/NegatedIfElseCondition
   yield
 ensure
   $stdout.reopen(out)

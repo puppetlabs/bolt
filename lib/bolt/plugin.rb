@@ -290,7 +290,7 @@ module Bolt
       begin
         validate_proc = get_hook(plugin_name, :validate_resolve_reference)
       rescue PluginError
-        validate_proc = proc { |*args| }
+        validate_proc = proc { |*args| } # Nothing to do
       end
 
       validate_proc.call(reference)

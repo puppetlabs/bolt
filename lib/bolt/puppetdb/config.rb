@@ -6,14 +6,14 @@ require 'bolt/util'
 module Bolt
   module PuppetDB
     class Config
-      if !ENV['HOME'].nil?
-        DEFAULT_TOKEN = File.expand_path('~/.puppetlabs/token')
-        DEFAULT_CONFIG = { user: File.expand_path('~/.puppetlabs/client-tools/puppetdb.conf'),
-                           global: '/etc/puppetlabs/client-tools/puppetdb.conf' }.freeze
-      else
+      if ENV['HOME'].nil?
         DEFAULT_TOKEN = Bolt::Util.windows? ? 'nul' : '/dev/null'
         DEFAULT_CONFIG = { user: '/etc/puppetlabs/puppet/puppetdb.conf',
                            global: '/etc/puppetlabs/puppet/puppetdb.conf' }.freeze
+      else
+        DEFAULT_TOKEN = File.expand_path('~/.puppetlabs/token')
+        DEFAULT_CONFIG = { user: File.expand_path('~/.puppetlabs/client-tools/puppetdb.conf'),
+                           global: '/etc/puppetlabs/client-tools/puppetdb.conf' }.freeze
 
       end
 
