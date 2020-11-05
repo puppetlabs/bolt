@@ -390,7 +390,7 @@ module Bolt
                         plan.docstring
                       end
 
-        defaults = plan.parameters.reject { |_, value| value.nil? }.to_h
+        defaults = plan.parameters.to_h.compact
         signature_params = Set.new(plan.parameters.map(&:first))
         parameters = plan.tags(:param).each_with_object({}) do |param, params|
           name = param.name

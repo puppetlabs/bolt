@@ -11,7 +11,7 @@ module Bolt
       def initialize(target, conn)
         super
 
-        extensions = [target.options['extensions'] || []].flatten.map { |ext| ext[0] != '.' ? '.' + ext : ext }
+        extensions = [target.options['extensions'] || []].flatten.map { |ext| ext[0] == '.' ? ext : '.' + ext }
         extensions += target.options['interpreters'].keys if target.options['interpreters']
         @extensions = DEFAULT_EXTENSIONS + extensions
       end

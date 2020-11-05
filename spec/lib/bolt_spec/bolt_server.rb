@@ -75,7 +75,9 @@ module BoltSpec
       uri = URI(uri || config_data['file-server-uri'])
       https = Net::HTTP.new(uri.host, uri.port)
       https.use_ssl = true
+      # rubocop:disable Naming/VariableNumber
       https.ssl_version = :TLSv1_2
+      # rubocop:enable Naming/VariableNumber
       https.ca_file = config_data['ssl-ca-cert']
       https.cert = OpenSSL::X509::Certificate.new(File.read(config_data['ssl-cert']))
       https.key = OpenSSL::PKey::RSA.new(File.read(config_data['ssl-key']))

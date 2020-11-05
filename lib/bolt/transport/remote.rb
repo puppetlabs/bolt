@@ -29,7 +29,7 @@ module Bolt
       def run_task(target, task, arguments, options = {}, position = [])
         proxy_target = get_proxy(target)
         transport = @executor.transport(proxy_target.transport)
-        arguments = arguments.merge('_target' => target.to_h.reject { |_, v| v.nil? })
+        arguments = arguments.merge('_target' => target.to_h.compact)
 
         remote_task = task.remote_instance
 

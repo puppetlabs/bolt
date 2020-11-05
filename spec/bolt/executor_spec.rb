@@ -471,18 +471,18 @@ describe "Bolt::Executor" do
 
     context 'with batched execution with more than one target' do
       let(:pcp) { executor.transport('pcp') }
-      let(:target_1) { inventory.get_target('pcp://node1') }
-      let(:target_2) { inventory.get_target('pcp://node2') }
-      let(:targets) { [target_1, target_2] }
+      let(:target1) { inventory.get_target('pcp://node1') }
+      let(:target2) { inventory.get_target('pcp://node2') }
+      let(:targets) { [target1, target2] }
 
       it 'partitions failures and successes by batch' do
         allow(pcp).to receive(:batch_connected?).with(targets).and_return(false)
-        allow(pcp).to receive(:batch_connected?).with([target_1]).and_return(false)
-        allow(pcp).to receive(:batch_connected?).with([target_2]).and_return(true)
+        allow(pcp).to receive(:batch_connected?).with([target1]).and_return(false)
+        allow(pcp).to receive(:batch_connected?).with([target2]).and_return(true)
 
         results = executor.wait_until_available(targets, wait_time: 1, retry_interval: 1)
-        expect(results.error_set.targets).to include(target_1)
-        expect(results.ok_set.targets).to include(target_2)
+        expect(results.error_set.targets).to include(target1)
+        expect(results.ok_set.targets).to include(target2)
       end
     end
   end

@@ -63,6 +63,7 @@ module BoltServer
     end
 
     def client
+      # rubocop:disable Naming/VariableNumber
       @client ||= begin
         uri = URI(@config['file-server-uri'])
         https = Net::HTTP.new(uri.host, uri.port)
@@ -75,6 +76,7 @@ module BoltServer
         https.open_timeout = @config['file-server-conn-timeout']
         https
       end
+      # rubocop:enable Naming/VariableNumber
     end
 
     def request_file(path, params, file)
