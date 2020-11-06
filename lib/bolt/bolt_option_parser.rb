@@ -88,7 +88,7 @@ module Bolt
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: PLAN_CONVERT_HELP }
         when 'new'
-          { flags: OPTIONS[:global] + %w[configfile project],
+          { flags: OPTIONS[:global] + %w[configfile project pp],
             banner: PLAN_NEW_HELP }
         when 'run'
           { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir hiera-config],
@@ -943,6 +943,11 @@ module Bolt
              'Use --no-resolve to install modules listed in the Puppetfile without resolving modules configured',
              'in Bolt project configuration') do |resolve|
         @options[:resolve] = resolve
+      end
+
+      separator "\nPLAN OPTIONS"
+      define('--pp', 'Create a new Puppet language plan.') do |pp|
+        @options[:puppet] = pp
       end
 
       separator "\nDISPLAY OPTIONS"

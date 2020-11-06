@@ -326,10 +326,11 @@ To encrypt SSH connections using the unsupported algorithm
 This feature was introduced in [Bolt
 2.22.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-2220-2020-08-10).
 
-Use the `bolt plan new` command or `New-BoltPlan` PowerShell cmdlet to generate
-a new project-level YAML plan. The command accepts a single argument: the name
-of the plan. To use the `bolt plan new` command or `New-BoltPlan` PowerShell
-cmdlet, you must have a named [Bolt project](projects.md).
+Use the `bolt plan new` command or `New-BoltPlan` PowerShell cmdlet to generate a new project-level
+plan. The command will generate a YAML plan by default, or you can pass `--pp` on nix or
+`-Pp` in PowerShell to generate a Puppet plan. The command accepts a single argument: the name
+of the plan. To use the `bolt plan new` command or `New-BoltPlan` PowerShell cmdlet, you must have a
+named [Bolt project](projects.md).
 
 ### Naming plans
 
