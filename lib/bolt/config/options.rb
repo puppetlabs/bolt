@@ -272,6 +272,41 @@ module Bolt
           _example: ["~/.puppetlabs/bolt/modules", "~/.puppetlabs/bolt/site-modules"],
           _default: ["project/modules", "project/site-modules", "project/site"]
         },
+        "module-install" => {
+          description: "Options that configure where Bolt downloads modules from. This option is only used when "\
+                       "installing modules using the `bolt module add|install` commands and "\
+                       "`Add|Install-BoltModule` cmdlets.",
+          type: Hash,
+          properties: {
+            "forge" => {
+              description: "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge "\
+                           "operations only, and a `baseurl` setting to specify a different Forge host.",
+              type: Hash,
+              properties: {
+                "baseurl" => {
+                  description: "The URL to the Forge host.",
+                  type: String,
+                  format: "uri",
+                  _example: "https://forge.example.com"
+                },
+                "proxy" => {
+                  description: "The HTTP proxy to use for Forge operations.",
+                  type: String,
+                  format: "uri",
+                  _example: "https://my-forge-proxy.com:8080"
+                }
+              },
+              _example: { "baseurl" => "https://forge.example.com", "proxy" => "https://my-forge-proxy.com:8080" }
+            },
+            "proxy" => {
+              description: "The HTTP proxy to use for Git and Forge operations.",
+              type: String,
+              format: "uri",
+              _example: "https://my-proxy.com:8080"
+            }
+          },
+          _plugin: false
+        },
         "modules" => {
           description: "A list of module dependencies for the project. Each dependency is a map of data specifying "\
                        "the module to install. To install the project's module dependencies, run the `bolt module "\
@@ -419,7 +454,8 @@ module Bolt
           _plugin: true
         },
         "puppetfile" => {
-          description: "A map containing options for the `bolt puppetfile install` command.",
+          description: "A map containing options for the `bolt puppetfile install` command and "\
+                       "`Install-BoltPuppetfile` cmdlet.",
           type: Hash,
           properties: {
             "forge" => {
@@ -434,19 +470,19 @@ module Bolt
                   _example: "https://forge.example.com"
                 },
                 "proxy" => {
-                  description: "The HTTP proxy to use for Git and Forge operations.",
+                  description: "The HTTP proxy to use for Forge operations.",
                   type: String,
                   format: "uri",
-                  _example: "https://forgeapi.example.com"
+                  _example: "https://my-forge-proxy.com:8080"
                 }
               },
-              _example: { "baseurl" => "https://forge.example.com", "proxy" => "https://forgeapi.example.com" }
+              _example: { "baseurl" => "https://forge.example.com", "proxy" => "https://my-forge-proxy.com:8080" }
             },
             "proxy" => {
               description: "The HTTP proxy to use for Git and Forge operations.",
               type: String,
               format: "uri",
-              _example: "https://forgeapi.example.com"
+              _example: "https://my-proxy.com:8080"
             }
           },
           _plugin: false
@@ -566,6 +602,7 @@ module Bolt
         format
         inventory-config
         log
+        module-install
         plugin-cache
         plugin-hooks
         plugin_hooks
@@ -587,6 +624,7 @@ module Bolt
         inventoryfile
         log
         modulepath
+        module-install
         modules
         name
         plans

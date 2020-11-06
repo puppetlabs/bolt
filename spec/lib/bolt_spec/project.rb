@@ -48,7 +48,7 @@ module BoltSpec
     end
 
     def project
-      Bolt::Project.create_project(project_path)
+      @project ||= Bolt::Project.create_project(project_path)
     end
 
     def delete_config

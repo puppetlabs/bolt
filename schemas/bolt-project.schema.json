@@ -34,6 +34,9 @@
     "modulepath": {
       "$ref": "#/definitions/modulepath"
     },
+    "module-install": {
+      "$ref": "#/definitions/module-install"
+    },
     "modules": {
       "$ref": "#/definitions/modules"
     },
@@ -195,6 +198,33 @@
         "type": "string"
       }
     },
+    "module-install": {
+      "description": "Options that configure where Bolt downloads modules from. This option is only used when installing modules using the `bolt module add|install` commands and `Add|Install-BoltModule` cmdlets.",
+      "type": "object",
+      "properties": {
+        "forge": {
+          "description": "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations only, and a `baseurl` setting to specify a different Forge host.",
+          "type": "object",
+          "properties": {
+            "baseurl": {
+              "description": "The URL to the Forge host.",
+              "type": "string",
+              "format": "uri"
+            },
+            "proxy": {
+              "description": "The HTTP proxy to use for Forge operations.",
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "proxy": {
+          "description": "The HTTP proxy to use for Git and Forge operations.",
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
     "modules": {
       "description": "A list of module dependencies for the project. Each dependency is a map of data specifying the module to install. To install the project's module dependencies, run the `bolt module install` command.",
       "type": "array",
@@ -340,7 +370,7 @@
       ]
     },
     "puppetfile": {
-      "description": "A map containing options for the `bolt puppetfile install` command.",
+      "description": "A map containing options for the `bolt puppetfile install` command and `Install-BoltPuppetfile` cmdlet.",
       "type": "object",
       "properties": {
         "forge": {
@@ -353,7 +383,7 @@
               "format": "uri"
             },
             "proxy": {
-              "description": "The HTTP proxy to use for Git and Forge operations.",
+              "description": "The HTTP proxy to use for Forge operations.",
               "type": "string",
               "format": "uri"
             }

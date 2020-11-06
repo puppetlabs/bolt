@@ -491,9 +491,9 @@ module Bolt
       when 'module'
         case options[:action]
         when 'add'
-          code = add_project_module(options[:object], config.project)
+          code = add_project_module(options[:object], config.project, config.module_install)
         when 'install'
-          code = install_project_modules(config.project, options[:force], options[:resolve])
+          code = install_project_modules(config.project, config.module_install, options[:force], options[:resolve])
         when 'generate-types'
           code = generate_types
         end
@@ -743,7 +743,7 @@ module Bolt
 
     # Installs modules declared in the project configuration file.
     #
-    def install_project_modules(project, force, resolve)
+    def install_project_modules(project, config, force, resolve)
       assert_project_file(project)
       assert_puppetfile_or_module_command(project.modules)
 
@@ -753,11 +753,21 @@ module Bolt
         return 0
       end
 
+      if resolve != false && config.any?
+        @logger.warn(
+          "Detected configuration for 'module-install'. This configuration is currently "\
+          "only supported when installing modules, not when resolving module dependencies. "\
+          "For more information, see https://pup.pt/bolt-module-install"
+        )
+      end
+
+      modules   = project.modules || []
       installer = Bolt::ModuleInstaller.new(outputter, pal)
 
-      ok = installer.install(project.modules,
+      ok = installer.install(modules,
                              project.puppetfile,
                              project.managed_moduledir,
+                             config,
                              force: force,
                              resolve: resolve)
       ok ? 0 : 1
@@ -765,9 +775,17 @@ module Bolt
 
     # Adds a single module to the project.
     #
-    def add_project_module(name, project)
+    def add_project_module(name, project, config)
       assert_project_file(project)
       assert_puppetfile_or_module_command(project.modules)
+
+      if config.any?
+        @logger.warn(
+          "Detected configuration for 'module-install'. This configuration is currently "\
+          "only supported when installing modules, not when resolving module dependencies. "\
+          "For more information, see https://pup.pt/bolt-module-install"
+        )
+      end
 
       modules   = project.modules || []
       installer = Bolt::ModuleInstaller.new(outputter, pal)
@@ -776,7 +794,8 @@ module Bolt
                          modules,
                          project.puppetfile,
                          project.managed_moduledir,
-                         project.project_file)
+                         project.project_file,
+                         config)
       ok ? 0 : 1
     end
 

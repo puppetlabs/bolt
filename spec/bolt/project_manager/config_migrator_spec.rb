@@ -31,6 +31,9 @@ describe Bolt::ProjectManager::ConfigMigrator do
           'puppet_library' => {
             'collection' => 'puppet6'
           }
+        },
+        'puppetfile' => {
+          'proxy' => 'http://myproxy.com:8080'
         }
       }
     end
@@ -44,6 +47,9 @@ describe Bolt::ProjectManager::ConfigMigrator do
           'puppet_library' => {
             'collection' => 'puppet6'
           }
+        },
+        'module-install' => {
+          'proxy' => 'http://myproxy.com:8080'
         }
       }
     end

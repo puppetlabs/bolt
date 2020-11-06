@@ -286,6 +286,55 @@ describe Bolt::Config do
         /The inventoryfile .* does not exist/
       )
     end
+
+    context 'puppetfile config' do
+      let(:data) do
+        {
+          'puppetfile' => {
+            'proxy' => 'https://proxy.example.com'
+          },
+          'module-install' => {
+            'proxy' => 'https://proxy.example.com'
+          }
+        }
+      end
+
+      let(:config) { Bolt::Config.new(project, data) }
+
+      context 'with modules configured' do
+        let(:project_config) { { 'modules' => [] } }
+
+        it 'warns when puppetfile is configured but not module-install' do
+          data.delete('module-install')
+
+          expect(config.logs).to include(
+            warn: /Detected configuration for 'puppetfile'.*'modules' is configured/
+          )
+        end
+
+        it 'warns when both puppetfile and module-install are configured' do
+          expect(config.logs).to include(
+            warn: /Detected configuration for 'puppetfile' and 'module-install'.*'modules' is also configured/
+          )
+        end
+      end
+
+      context 'without modules configured' do
+        it 'warns when module-install is configured but not puppetfile' do
+          data.delete('puppetfile')
+
+          expect(config.logs).to include(
+            warn: /Detected configuration for 'module-install'.*'modules' is not configured/
+          )
+        end
+
+        it 'warns when both puppetfile and module-install are configured' do
+          expect(config.logs).to include(
+            warn: /Detected configuration for 'puppetfile' and 'module-install'.*'modules' is not configured/
+          )
+        end
+      end
+    end
   end
 
   describe 'expanding paths' do

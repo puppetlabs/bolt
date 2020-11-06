@@ -1,5 +1,94 @@
 # Known issues
 
+## Resolving module dependencies does not support proxies or alternate Forge
+
+When running the `bolt module add|install` commands or `Add|Install-BoltModule`
+cmdlets, Bolt does not support a configured proxy or alternate Forge when it
+resolves module dependencies, even if the `module-install` configuration
+option is set. Support for resolving module dependencies with proxies or an
+alternate Forge requires changes to one of Bolt's gem dependencies, which is
+currently in progress.
+
+While Bolt will not resolve module dependencies with proxies or an alternate
+Forge, it will respect this configuration when installing modules.
+
+If your project configures the `module-install` option, you may experience
+one of the following issues:
+
+- On a restricted network where a proxy is required, resolving modules may
+  cause Bolt to fail.
+
+- When an alternate Forge is specified, Bolt may resolve and install a
+  different set of modules than expected.
+
+### Install modules without resolving dependencies
+
+To avoid this limitation and any potential errors, you can manually edit your
+Puppetfile to add and install modules without resolving dependencies. This is a
+similar workflow to using the `bolt puppetfile install` and
+`Install-BoltPuppetfileModules` commands.
+
+For example, if your project requires the `puppetlabs/apache` module, but
+you need to download modules hosted on an alternate Forge, you should write
+your Puppetfile manually. That Puppetfile might look similar to this:
+
+```ruby
+mod 'puppetlabs/apache', '5.7.0'
+mod 'puppetlabs/stdlib', '6.5.0'
+mod 'puppetlabs/concat', '6.3.0'
+mod 'puppetlabs/translate', '2.2.0'
+```
+
+Once you have a Puppetfile, you can install modules without resolving
+dependencies using the `no-resolve` command-line option:
+
+_\*nix command_
+
+```shell
+bolt module install --no-resolve
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Install-BoltModule -NoResolve
+```
+
+If you need to add a module to your project, manually add the module and
+its dependencies to your Puppetfile and then run the above command again.
+
+### Set the HTTP proxy environment variables
+
+If you only need to configure a proxy to work around network restrictions,
+you can set the HTTP proxy environment variables when you run Bolt. For
+example, if you only configure the `proxy` option under `module-install` like
+this:
+
+```yaml
+# bolt-project.yaml
+module-install:
+  proxy: http://myproxy.com
+```
+
+Then you can set the `HTTP_PROXY` and `HTTPS_PROXY` environment variables
+to this value when you run `bolt module add|install` or `Add|Install-BoltModule`.
+This will configure a proxy that Bolt will use when it makes requests to the
+Puppet Forge and GitHub when it resolves modules.
+
+_\*nix command_
+
+```shell
+HTTP_PROXY=http://myproxy.com HTTPS_PROXY=http://myproxy.com bolt module install
+```
+
+_PowerShell cmdlet_
+
+```powershell
+SET HTTP_PROXY=http://myproxy.com
+SET HTTPS_PROXY=http://myproxy.com
+Install-BoltModule
+```
+
 ## `facts` task fails on Windows targets with Facter 3 installed
 
 When running the `facts` task on a Windows target that has Facter 3 installed,

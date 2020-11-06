@@ -17,14 +17,14 @@ module Bolt
 
     # Adds a single module to the project.
     #
-    def add(name, specs, puppetfile_path, moduledir, config_path)
+    def add(name, specs, puppetfile_path, moduledir, project_file, config)
       project_specs = Specs.new(specs)
 
       # Exit early if project config already includes a spec with this name.
       if project_specs.include?(name)
         @outputter.print_message(
-          "Project configuration file #{config_path} already includes specification with name "\
-          "#{name}. Nothing to do."
+          "Project configuration file #{project_file} already includes specification "\
+          "with name #{name}. Nothing to do."
         )
         return true
       end
@@ -49,28 +49,28 @@ module Bolt
 
       begin
         resolve_specs.add_specs('name' => name)
-        puppetfile = Resolver.new.resolve(resolve_specs)
+        puppetfile = Resolver.new.resolve(resolve_specs, config)
       rescue Bolt::Error
         project_specs.add_specs('name' => name)
-        puppetfile = Resolver.new.resolve(project_specs)
+        puppetfile = Resolver.new.resolve(project_specs, config)
       end
 
       # Display the diff between the existing Puppetfile and the new Puppetfile.
       print_puppetfile_diff(existing_puppetfile, puppetfile)
 
       # Add the module to the project configuration.
-      @outputter.print_action_step("Updating project configuration file at #{config_path}")
+      @outputter.print_action_step("Updating project configuration file at #{project_file}")
 
-      data = Bolt::Util.read_yaml_hash(config_path, 'project')
+      data = Bolt::Util.read_yaml_hash(project_file, 'project')
       data['modules'] ||= []
       data['modules'] << name.tr('-', '/')
 
       begin
-        File.write(config_path, data.to_yaml)
+        File.write(project_file, data.to_yaml)
       rescue SystemCallError => e
         raise Bolt::FileError.new(
           "Unable to update project configuration file: #{e.message}",
-          config
+          project_file
         )
       end
 
@@ -79,7 +79,7 @@ module Bolt
       puppetfile.write(puppetfile_path, moduledir)
 
       # Install the modules.
-      install_puppetfile(puppetfile_path, moduledir)
+      install_puppetfile(puppetfile_path, moduledir, config)
     end
 
     # Outputs a diff of an old Puppetfile and a new Puppetfile.
@@ -145,7 +145,7 @@ module Bolt
 
     # Installs a project's module dependencies.
     #
-    def install(specs, path, moduledir, force: false, resolve: true)
+    def install(specs, path, moduledir, config = {}, force: false, resolve: true)
       @outputter.print_message("Installing project modules\n\n")
 
       if resolve != false
@@ -155,7 +155,7 @@ module Bolt
         # and write a Puppetfile.
         if force || !path.exist?
           @outputter.print_action_step("Resolving module dependencies, this may take a moment")
-          puppetfile = Resolver.new.resolve(specs)
+          puppetfile = Resolver.new.resolve(specs, config)
 
           # We get here either through 'bolt module install' which uses the
           # managed modulepath (which isn't configurable) or through bolt
@@ -177,7 +177,7 @@ module Bolt
       end
 
       # Install the modules.
-      install_puppetfile(path, moduledir)
+      install_puppetfile(path, moduledir, config)
     end
 
     # Installs the Puppetfile and generates types.
