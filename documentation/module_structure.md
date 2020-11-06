@@ -1,38 +1,22 @@
 # Module structure
 
-Puppet tasks, plans, functions, classes and types must exist inside a Puppet
-module in order for Bolt to load them. Bolt loads modules by searching for
-module directories on the modulepath.
+Before Bolt can load content like tasks, plans, functions, classes and types,
+that content must exist inside a Puppet module on the current Bolt project's
+modulepath.
 
-By default, the modulepath includes the `modules` and `site-modules`
-directories in the Bolt project directory. If `bolt-project.yaml` exists at the
-root of the project directory and contains a `name` key, the project itself is
-also loaded as a module and namespaced to the value of `name`. For more
-information on `bolt-project.yaml`, see [Bolt projects](projects.md).
+By default, the Bolt modulepath includes the `modules` and `.modules`
+directories, as well as any project-level content in the current Bolt project
+directory. You can create project-level content to use with Bolt, or create a
+standalone module that you can install with Bolt and use as you would any other
+module you downloaded from the Forge.
 
 ## Directory structure of a module
 
-A module is a sub-directory of one of the directories on the modulepath. In
-order for Bolt to load tasks and plans, they must exist in the `tasks/` or
-`plans/` directory of a module with the correct name.
+Modules have a specific directory structure outlined in the [Puppet
+documentation](https://puppet.com/docs/puppet/latest/modules_fundamentals.html#module_structure).
+However, a typical module for use with Bolt may contain these files and directories:
 
-> 🔩 **Tip:** You can use the Puppet Development Kit (PDK) to create modules and
-> add tasks to it.
-
-A typical module for use with Bolt may contain these directories:
-
-```console
-├── data/
-├── files/
-├── hiera.yaml
-├── lib/
-├── manifests/
-├── metadata.json
-├── plans/
-└── tasks/
-```
-
-|Directory|Contents|
+|Directory/File|Contents|
 |---------|--------|
 |`data`|Hiera data that can be used when applying a manifest block.|
 |`files`|Static files that can be loaded by a plan or required as a dependency of a task. Prefer putting non-Ruby libraries used by a task here.|
@@ -41,47 +25,50 @@ A typical module for use with Bolt may contain these directories:
 |`lib`|Typically Ruby code, such as custom Puppet functions, types, or providers.|
 |`manifests`|Classes and other Puppet code usable when applying a manifest block.|
 |`metadata.json`|Typical metadata for a module describing version, operating system compatibility, and other module dependencies.|
-|`plans`|Plans, which must end in the `.pp` extension.|
+|`plans`|Plans, which must end in the `.pp` or `.yaml` extensions.|
 |`tasks`|Tasks and their metadata.|
 
-### Where to put module code
+### Where to put module content
 
-You can develop modules directly in the Bolt project directory or install them
-from the Puppet Forge into the `modules` directory.
+You have two options when it comes to storing and developing module content: 
+- You can develop modules directly in the Bolt project directory inside the
+  `modules` directory. 
+- You can develop your module content outside of a project directory and then
+  add the module's directory to your project's modulepath for use with Bolt.
+  Alternatively, you can publish the module to the Forge and install it to your
+  Bolt project.
 
 ## Modules for projects
 
-Modules developed to support a particular project can be developed directly in
-the Bolt project directory. You can use `pdk new module` to create a skeleton
-structure, and `bolt project init` inside a directory to make it a Bolt project
-directory.
+If you're developing a module to support a particular project, you can develop
+the module directly in the Bolt project directory. To create a skeleton
+structure for your module, run `pdk new module` inside the `modules` directory
+in your project. For information on creating a new project, see [Bolt
+projects](./projects.md).
 
 **Note**:  To use the `pdk` command, you must [install the Puppet Development
 Kit](https://puppet.com/docs/pdk/1.x/pdk_install.html) 
 
 ## Standalone modules
 
-Standalone modules can be published to the Forge or saved in a shared code
-repository so that modules can be used from multiple projects or shared
-publicly.
+If you want to share a module publicly, you can develop the module outside of a
+Bolt project and publish it to the Puppet Forge. If you want to use the module
+in multiple Bolt projects, but don't want to publish it, you [can add the
+directory that contains the module to your modulepath](modules.md#modulepath).
 
-To use a standalone module, [install the module](bolt_installing_modules.md#)
-into the project directory.
+To create a standalone module and publish it on the Forge:
+1. Run `pdk new module` outside of a Bolt project directory.
+1. Develop the module.
+1. Push the module to a code repository or the Forge.
 
-To create a standalone module, run `pdk new module` outside of the project
-directory, develop the module, then push it to a code repository or the Forge
-before using it in your project.
+After you've published the module to the Forge, you can add it to a Bolt project
+using the Bolt command line. For more information, see [Installing
+modules](./bolt_installing_modules.md).
 
 Follow these tips for managing standalone modules:
-
--   Add `modules/*` to `.gitignore` of your project to prevent accidentally
-    committing standalone modules.
--   When you run tasks and plans within a project directory the modulepath is
-    searched in order for modules containing Bolt content. The Bolt project
-    directory itself is loaded as a module at the front of the modulepath, and
-    the default modulepath is `[<PROJECT DIRECTORY>/modules, <PROJECT
-    DIRECTORY>/site-modules]`. If you have a module in both the `modules` and
-    `site-modules` directories, the version in `modules` will be used.
+-   If you're testing a standalone module inside a project, add `modules/*` to
+    the project's `.gitignore` file to prevent accidentally committing the
+    module.
 -   As a best practice, write automated tests for the tasks and plans in your
     module, if possible. For information about automated testing patterns, check
     out these resources: [Example of unit testing plans and integration

@@ -516,3 +516,6 @@ targets:
 When you set the `run-on` option with a device module, the `puppet-resource_api`
 Gem must be installed with the Puppet agent on the proxy target and it must be
 version 1.8.1 or later.
+
+📖 **Related information**
+- For information on how Bolt loads the modulepath, see [Modules overview](modules.md#modulepath).

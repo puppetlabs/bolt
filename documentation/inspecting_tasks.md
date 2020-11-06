@@ -54,3 +54,7 @@ View parameters and other details for a task, including whether a task supports
   ```powershell
   Get-BoltTask -Name <TASK NAME>
   ```
+
+📖 **Related information**
+
+- For more information on the modulepath, see [Modules overview](modules.md#modulepath).

@@ -43,6 +43,10 @@ file:
     └── mytask.py
 ```
 
+> 🔩 **Tip:** To create a project with a list of pre-installed modules, use the
+> `--modules` option. For more information, see
+> [](./bolt_installing_modules.md#create-a-Bolt-project-with-pre-installed-modules).
+
 ## Configuring a project
 
 Besides the `name` key, the `bolt-project.yaml` file holds options to configure
@@ -134,25 +138,28 @@ The following metacharacters can be used in a glob pattern:
 
 The following are common files and directories found in a Bolt project.  
 
-|Directory|Description|
+|Directory/File|Description|
 |---------|-----------|
 |[`bolt-project.yaml`](bolt_project_reference.md)|Contains configuration options for Bolt and  Bolt projects. This file must exist for Bolt to find any of the other files or directories in this list.|
 |[`inventory.yaml`](inventory_file_v2.md)|Contains a list of known targets and target specific data.|
 |[`plans/`](plans.md)|A directory for storing your plans.|
 |[`tasks/`](tasks.md)|A directory for storing your tasks.|
-|`files/`| A directory for storing content consumed by your tasks and plans, such as scripts.|
-|[`Puppetfile`](bolt_installing_modules.md#)|Specifies which modules to install for the project. 🧪 **Experimental:** If you've opted in to the experimental module management workflows, Bolt manages this file. Avoid editing it. For more information, see [Managing modules](managing_modules.md).|
-|[`modules/`](bolt_installing_modules.md#)|The directory where modules from the `Puppetfile` are installed. In most cases, do not edit these modules locally.|
-|[`site-modules/`](bolt_installing_modules.md)|Local modules that are edited and versioned with the Bolt directory.|
+|`files/`|A directory for storing content consumed by your tasks and plans, such as scripts.|
+|[`Puppetfile`](bolt_installing_modules.md#)|Specifies the modules installed in your project. Bolt manages this file. Avoid editing it.|
+|[`modules/`](bolt_installing_modules.md#)|A directory for storing your custom modules.|
 |[`manifests`](applying_manifest_blocks.md)|A directory for storing your Puppet code files, known as _manifests_.|
 |`hiera.yaml`|Contains the Hiera config to use for target-specific data when using `apply`.|
 |`data/`|The standard path to store static Hiera data files.|
 |`bolt-debug.log`|Contains debug log output for the most recent Bolt command.|
-|[`bolt.yaml`](bolt_configuration_reference.md)|Contains configuration options for Bolt. ⛔ **`bolt.yaml` is deprecated; use `bolt-project.yaml` instead.** |
-| `.modules/` | 🧪 **Experimental:** The directory where Bolt installs modules. Avoid committing this directory to source control. For more information, see [Managing modules](managing_modules.md).| 
+|[`bolt.yaml`](bolt_configuration_reference.md)|Contains configuration options for Bolt. ⛔ **`bolt.yaml` is deprecated; use `bolt-project.yaml` instead.**|
+| `.modules/` |The directory where Bolt installs modules. Avoid committing this directory to source control.| 
 
 > **Remember:** A directory must have a `bolt-project.yaml` file before Bolt
 > recognizes it as a Bolt project.
+
+📖 **Related information**
+
+- [Modules overview](modules.md)
 
 ## How Bolt chooses a project directory
 
@@ -197,8 +204,7 @@ subdirectory named `Boltdir` as an embedded project directory.
 The contents the `Boltdir` directory follows the same pattern as a local project
 directory. As long as your `bolt-project.yaml` file contains a `name` field,
 Bolt loads your local Bolt content from the top level of the `Boltdir`. Your
-`Boltdir` can also contain modules. For more information, see
-[Modules](modules.md).
+`Boltdir` can also contain modules.
 
 An embedded Bolt directory looks like this:
 
@@ -235,10 +241,6 @@ information, see [Module structure](module_structure.md).
 > **Note:** When you're naming your modules or Bolt project, keep in mind that
 > projects take precedence over installed modules of the same name.
 
-🧪 **Experimental**: Bolt 2.30.0 introduced changes to how modules
-are managed in Bolt projects. To find out how to opt in to the changes, see
-[Managing modules](managing_modules.md).
-
 ## World-writable project directories
 
 On **Unix-like systems**, Bolt will not load a project from a world-writable
@@ -271,10 +273,186 @@ BOLT_PROJECT='~/project/my_project' bolt command run uptime -t target1
 ```
 
 > **Note:** The `BOLT_PROJECT` environment variable takes precedence over the
-> `--project` CLI option. 
+> `--project` CLI option.
+
+## Migrate a Bolt project
+
+After upgrading to a newer version of Bolt, you might find that a Bolt project
+you created in the past no longer works as expected. Or there might be new
+features that you want to use in an existing project. The `migrate` command
+allows you to update old Bolt projects so that you can use them with the latest
+Bolt release.
+
+Currently, the `migrate` command:
+- Updates inventory files from Bolt version 1.
+- Updates projects to use `bolt-project.yaml` and `inventory.yaml` instead of `bolt.yaml`.
+- Updates projects to implement module dependency management. Dependency
+  management was introduced in Bolt 2.30.0.
+
+To migrate a project:
+
+_\*nix shell command_
+
+```shell
+bolt project migrate
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Update-BoltProject
+```
+
+The migrate command modifies files in your project and does not preserve
+comments or formatting. Before using the command, **make sure to use source
+control or backup your projects**.
+
+### How Bolt updates inventory files
+
+Bolt locates the inventory file for the current Bolt project and migrates it
+in place.
+
+The updates change the following keys in your inventory file:
+- `nodes` becomes `targets`.
+- The `name` key in a `Target` object becomes a `uri` key.
+
+For example, the following inventory file from Bolt version 1:
+
+```yaml
+groups:
+  - name: linux
+    nodes:
+      - name: target1.example.com
+        alias: target1
+      - name: target2.example.com
+        alias: target2
+```
+
+Becomes:
+
+```yaml
+groups:
+  - name: linux
+    targets:
+      - uri: target1.example.com
+        alias: target1
+      - uri: target2.example.com
+        alias: target2
+```
+
+### How Bolt updates project configuration
+
+Bolt locates a `bolt.yaml` file and moves its configuration to a new `bolt-project.yaml` file
+and the `inventory.yaml` file. It then deletes the `bolt.yaml` file.
+
+Project-specific configuration is moved to the `bolt-project.yaml` file, while transport
+configuration is moved to the top-level `config` key in the `inventory.yaml` file. If the
+`inventory.yaml` file has an existing top-level `config` key, the transport configuration
+from `bolt.yaml` is deep merged, with the configuration in `inventory.yaml` having higher
+precedence.
+
+For example, a project with the following `bolt.yaml` and `inventory.yaml` files:
+
+```yaml
+# bolt.yaml
+format: json
+transport: winrm
+winrm:
+  user: Administrator
+  password: Bolt!
+```
+
+```yaml
+# inventory.yaml
+groups:
+  - name: windows
+    targets:
+      - target1.example.com
+      - target2.example.com
+config:
+  winrm:
+    ssl: false
+```
+
+Becomes:
+
+```yaml
+# bolt-project.yaml
+format: json
+```
+
+```yaml
+# inventory.yaml
+groups:
+  - name: windows
+    targets:
+      - target1.example.com
+      - target2.example.com
+config:
+  transport: winrm
+  winrm:
+    ssl: false
+    user: Administrator
+    password: Bolt!
+```
+
+### How Bolt updates projects to use module dependency management
+
+When you run the `migrate` command, Bolt reads your Puppetfile and prompts you
+for the direct dependencies of your project. Bolt adds the direct dependencies
+to a `modules` key in your `bolt-project.yaml` file and resolves the
+dependencies of those modules. Next, Bolt installs the modules and dependencies
+into a `.modules` directory and generates a Puppetfile with a list of the
+installed modules. Bolt moves any modules from your `site-modules` directory
+into `modules`.
+
+For example, given a project named `myproject` with a custom module named
+`mymodule` in your `site-modules` directory, and the following Puppetfile:
+
+```puppet
+mod "puppetlabs-apache", "5.5.0"
+mod "puppetlabs-apt", "7.6.0"
+mod "puppetlabs-mysql", "10.7.1"
+mod "puppetlabs-stdlib", "6.4.0"
+mod "puppetlabs-concat", "6.2.0"
+mod "puppetlabs-translate", "2.2.0"
+mod "puppetlabs-resource_api", "1.1.0"
+mod "puppetlabs-puppetserver_gem", "1.1.1"
+```
+
+If you ran the `migrate` command, and selected the `apache`, `apt`, and `mysql`
+modules as direct dependencies of your Bolt project, Bolt would do the
+following:
+- Update your `bolt-project.yaml` file to add the `modules` key, together with
+  the `apache`, `apt`, and `mysql` modules:
+  ```yaml
+  ---
+  name: myproject
+  modules:
+  - name: puppetlabs-apache
+  version_requirement: "=5.5.0"
+  - name: puppetlabs-apt
+  version_requirement: "=7.6.0"
+  - name: puppetlabs-mysql
+  version_requirement: "=10.7.1"
+  ```
+- Resolve your dependencies and generate a new Puppetfile:
+  ```puppet
+  # This Puppetfile is managed by Bolt. Do not edit.
+  mod "puppetlabs-apache", "5.5.0"
+  mod "puppetlabs-apt", "7.6.0"
+  mod "puppetlabs-mysql", "10.7.1"
+  mod "puppetlabs-stdlib", "6.4.0"
+  mod "puppetlabs-concat", "6.2.0"
+  mod "puppetlabs-translate", "2.2.0"
+  mod "puppetlabs-resource_api", "1.1.0"
+  mod "puppetlabs-puppetserver_gem", "1.1.1"
+  ```
+- Install the modules from the Puppetfile into the `.modules` directory.
+- Remove the old managed modules from the `modules/` directory.
+- Move `mymodule` from `site-modules/` to `modules/`.
 
 📖 **Related information**
 
-- [Tasks](tasks.md)
-- [Plans](plans.md)
+- [Modules overview](modules.md)
 - [Inventory files](inventory_file_v2.md)

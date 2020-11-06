@@ -56,6 +56,24 @@ management! With this improvement, you no longer need to manually manage your
 modules and their dependencies in a Puppetfile and can instead automate that
 process with Bolt.
 
+If you want to try it out, [create a
+project](bolt_installing_modules.md#create-a-bolt-project-with-pre-installed-modules)
+or migrate an existing project with the following command:
+
+_\*nix shell command_
+
+```shell
+bolt project migrate
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Update-BoltProject
+```
+
+#### Why are we making these changes?
+
 So why did we make this change to how Bolt manages modules? Because managing a
 project's modules could be a frustrating process that includes multiple steps:
 
@@ -80,6 +98,30 @@ install a Puppetfile, because Bolt installs modules to a special directory that
 is not part of the configured modulepath.
 
 The new module management feature is available starting with **Bolt 2.30.0**. To
-try it out, opt in by updating your project. You can learn more about this
-feature and opting in at [Managing modules in Bolt
-projects](managing_modules.md).
+try it out, [create a
+project](bolt_installing_modules.md#create-a-bolt-project-with-pre-installed-modules)
+or [migrate an existing project](./projects.md#migrate-a-bolt-project).
+
+Here's a summary of what's changed:
+
+- **Managed module installation directory:** Bolt now installs modules it
+  manages into the `.modules/` directory instead of `modules/`. Avoid committing
+  `.modules/` to source control. Your users can download your Bolt project and
+  use the `bolt module install` *nix shell command, or `Install-BoltModule`
+  cmdlet to download the required modules.
+- **Non-managed module directory:** Bolt no longer uses the `site-modules/`
+  directory. Store any modules that you don't want Bolt to manage in the
+  `modules/` directory.
+- **Module configuration:** Your `bolt-project.yaml` file contains a `modules`
+  key that lists the direct module dependencies of your Bolt project. Unless you
+  need to pin a module to a specific version, avoid editing the `modules` list
+  directly. Instead, use the `bolt module add` command.
+- **Puppetfile:** The Puppet file is now a lock file. Bolt generates a
+  Puppetfile each time you modify your modules with a Bolt command. Do not edit
+  the Puppetfile directly. Instead, use Bolt commands to manage your modules,
+  and rely on Bolt to manage the Puppetfile. You can compare a Puppetfile to a
+  [Gemfile.lock](https://bundler.io/rationale.html#checking-your-code-into-version-control)
+  file in Ruby, or a
+  [yarn.lock](https://classic.yarnpkg.com/en/docs/yarn-lock/) file in Yarn.
+- **modulepath:** The new modulepath is `['modules']` and Bolt always appends
+  `.modules` to the modulepath.

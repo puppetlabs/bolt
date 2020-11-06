@@ -37,17 +37,13 @@ names to a plan parameter of type `TargetSpec`. For more information on the
 `TargetSpec` type, see [Writing plans in the Puppet
 language](./writing_plans.md#targetspec).
 
-## How Bolt locates plans
+## Plan location
 
-In order for Bolt to find a plan, the plan must be in a module on the module
-path. By default, Bolt looks for downloaded module plans in
-`<PROJECT DIRECTORY>/modules/plans/` and local plans in
-`<PROJECT DIRECTORY>/site-modules/plans/`.
-
-Using a Bolt project, you can create a `<PROJECT DIRECTORY>/bolt-project.yaml` file,
-develop your plan in `<PROJECT DIRECTORY>/plans/`, and run Bolt from the root of your
-Bolt project directory to test the plan. For more information, see [Bolt
-projects](projects.md)
+In order for Bolt to find a plan, the plan must be in a module on the modulepath
+or in a `plans/` directory in your Bolt project. If you are developing a new
+plan, you can [create a Bolt project](projects.md#create-a-bolt-project),
+develop your task in `<PROJECT DIRECTORY>/plans/`, and run Bolt from the root of
+your Bolt project directory to test the task.
 
 ## Passing structured data into a plan
 
@@ -104,6 +100,7 @@ For example:
   ```
 
 📖 **Related information**
+
 - For information on Bolt project directories, see [Bolt project
   directories](projects.md).
 - For information on running Bolt tasks, see [Running
@@ -111,3 +108,5 @@ For example:
 - To find out how to write your own plan, see [Writing plans in
   YAML](./writing_yaml_plans.md) or [Writing plans in the Puppet
   language](./writing_plans.md).
+- For more information about the modulepath, see [Modules
+  overview](modules.md#modulepath).   
