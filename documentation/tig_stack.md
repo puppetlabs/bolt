@@ -93,10 +93,11 @@ To provision your targets:
     mkdir ~/.ssh
     vagrant ssh-config | sed /StrictHostKeyChecking/d | sed /UserKnownHostsFile/d >> ~/.ssh/config
     ```
-3. Make sure you can SSH into the targets. For example:
+1. Make sure you can SSH into the targets. For example:
    ```shell
    ssh vagrant@target0
    ```
+      
 Next, install the Puppet modules for the different components of the TIG stack. 
 
 ## Install the TIG modules from a Puppetfile
@@ -357,5 +358,5 @@ dashboard. You can sign in with the following credentials (from
 
 Congratulations! You've deployed a TIG Stack with Bolt!
 
-> **Note:** Do you have a real-world use case for Bolt that you'd like to share? Reach out to us in the #bolt
-  channel on [Slack](https://slack.puppet.com).
+Do you have a real-world use case for Bolt that you'd like to share? Reach out
+to us in the #bolt channel on [Slack](https://slack.puppet.com).
