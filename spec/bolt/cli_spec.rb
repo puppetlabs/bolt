@@ -12,7 +12,9 @@ require 'yaml'
 
 describe "Bolt::CLI" do
   include BoltSpec::Files
+  include BoltSpec::Project
   include BoltSpec::Task
+
   let(:inventory) { Bolt::Inventory.empty }
   let(:target) { inventory.get_target('foo') }
 
@@ -166,8 +168,6 @@ describe "Bolt::CLI" do
   end
 
   context 'module' do
-    include BoltSpec::Project
-
     let(:cli)       { Bolt::CLI.new(command + %W[--project #{project_path}]) }
     let(:command)   { %w[module show] }
     let(:installer) { double('installer', add: true, install: true) }
@@ -282,18 +282,15 @@ describe "Bolt::CLI" do
   end
 
   context 'plan new' do
-    let(:project_name) { 'project' }
-    let(:config)       { { 'name' => project_name } }
-    let(:project_path) { @project_dir }
-    let(:config_path)  { File.join(project_path, 'bolt-project.yaml') }
+    let(:plan_name)    { 'project' }
+    let(:config)       { { 'name' => plan_name } }
+    let(:config_path)  { File.join(@project_path, 'bolt-project.yaml') }
     let(:command)      { %W[plan new #{plan_name}] }
     let(:cli)          { Bolt::CLI.new(command) }
-    let(:plan_name)    { project_name }
-    let(:project)      { Bolt::Project.create_project(project_path) }
+    let(:project)      { Bolt::Project.create_project(@project_path) }
 
     around(:each) do |example|
-      Dir.mktmpdir(nil, Dir.pwd) do |dir|
-        @project_dir = dir
+      with_project do
         example.run
       end
     end
@@ -312,132 +309,33 @@ describe "Bolt::CLI" do
       )
     end
 
-    it 'calls #new_plan' do
-      allow(cli).to receive(:new_plan).and_return(0)
-      expect(cli).to receive(:new_plan).with(plan_name)
+    it 'calls PlanCreator functions' do
+      expect(Bolt::PlanCreator).to receive(:validate_input)
+        .with(project, plan_name)
+        .and_call_original
+      expect(Bolt::PlanCreator).to receive(:create_plan)
+        .with(project.plans_path, plan_name, cli.outputter, nil)
+        .and_call_original
       cli.execute(cli.parse)
+      expect(Dir.children(project.plans_path)).to eq(["init.yaml"])
+      expect(File.read(File.join(project.plans_path, "init.yaml")))
+        .to eq(Bolt::PlanCreator.yaml_plan('project'))
     end
 
-    describe '#new_plan' do
-      it 'errors without a named project' do
-        allow(project).to receive(:name).and_return(nil)
-        cli.parse
+    context "with puppet flag" do
+      let(:command) { %W[plan new #{plan_name} --pp] }
 
-        expect { cli.new_plan(plan_name) }.to raise_error(
-          Bolt::Error,
-          /Project directory '.*' is not a named project/
-        )
-      end
-
-      it 'errors when the plan name is invalid' do
-        cli.parse
-
-        %w[Foo foo-bar foo:: foo::Bar foo::1bar ::foo].each do |plan_name|
-          expect { cli.new_plan(plan_name) }.to raise_error(
-            Bolt::ValidationError,
-            /Invalid plan name '#{plan_name}'/
-          )
-        end
-      end
-
-      it 'errors if the first name segment is not the project name' do
-        plan_name = 'plan'
-        cli.parse
-
-        expect { cli.new_plan(plan_name) }.to raise_error(
-          Bolt::ValidationError,
-          /First segment of plan name '#{plan_name}' must match project name/
-        )
-      end
-
-      %w[pp yaml].each do |ext|
-        it "errors if there is an existing #{ext} plan with the same name" do
-          plan_path = File.join(project_path, 'plans', "init.#{ext}")
-          FileUtils.mkdir(File.dirname(plan_path))
-          FileUtils.touch(plan_path)
-
-          cli.parse
-
-          expect { cli.new_plan(plan_name) }.to raise_error(
-            Bolt::Error,
-            /A plan with the name '#{plan_name}' already exists/
-          )
-        end
-      end
-
-      it "creates a missing 'plans' directory" do
-        cli.parse
-        expect(Dir.exist?(project.plans_path)).to eq(false)
-        cli.new_plan(plan_name)
-        expect(Dir.exist?(project.plans_path)).to eq(true)
-      end
-
-      it 'creates a missing directory structure' do
-        plan_name = "#{project_name}::foo::bar"
-        cli.parse
-        expect(Dir.exist?(project.plans_path + 'foo')).to eq(false)
-        cli.new_plan(plan_name)
-        expect(Dir.exist?(project.plans_path + 'foo')).to eq(true)
-      end
-
-      it 'catches existing file errors when creating directories' do
-        plan_name = "#{project_name}::foo::bar"
-        FileUtils.mkdir(File.join(project_path, 'plans'))
-        FileUtils.touch(File.join(project_path, 'plans', 'foo'))
-
-        cli.parse
-
-        expect { cli.new_plan(plan_name) }.to raise_error(
-          Bolt::Error,
-          /unable to create plan directory/
-        )
-      end
-
-      it "creates an 'init' plan when the plan name matches the project name" do
-        cli.parse
-        cli.new_plan(plan_name)
-
-        plan_path = project.plans_path + 'init.yaml'
-
-        expect(File.exist?(plan_path)).to eq(true)
-      end
-
-      it 'creates a plan' do
-        plan_name = "#{project_name}::foo"
-
-        cli.parse
-        cli.new_plan(plan_name)
-
-        plan_path = project.plans_path + 'foo.yaml'
-
-        expect(File.size?(plan_path)).to be
-      end
-
-      it 'outputs the path to the plan and other helpful information' do
-        cli.parse
-
-        allow(cli.outputter).to receive(:print_message) do |output|
-          expect(output).to match(
-            /Created plan '#{plan_name}' at '#{project.plans_path + 'init.yaml'}'/
-          )
-          expect(output).to match(
-            /bolt plan show #{plan_name}/
-          )
-          expect(output).to match(
-            /bolt plan run #{plan_name}/
-          )
-        end
-
-        cli.new_plan(plan_name)
-      end
-
-      it "warns that 'plan new' is experimental" do
-        cli.parse
-        cli.new_plan(plan_name)
-
-        expect(@log_output.readlines).to include(
-          /Command 'bolt plan new' is experimental/
-        )
+      it 'sets is_puppet to true when flag is present' do
+        expect(Bolt::PlanCreator).to receive(:validate_input)
+          .with(project, plan_name)
+          .and_call_original
+        expect(Bolt::PlanCreator).to receive(:create_plan)
+          .with(project.plans_path, plan_name, cli.outputter, true)
+          .and_call_original
+        cli.execute(cli.parse)
+        expect(Dir.children(project.plans_path)).to eq(["init.pp"])
+        expect(File.read(File.join(project.plans_path, "init.pp")))
+          .to eq(Bolt::PlanCreator.puppet_plan('project'))
       end
     end
   end
@@ -2423,8 +2321,6 @@ describe "Bolt::CLI" do
     end
 
     describe "installing a Puppetfile" do
-      include BoltSpec::Project
-
       let(:output) { StringIO.new }
       let(:puppetfile) { @puppetfile }
       let(:modulepath) { (project_path + 'modules').to_s }
