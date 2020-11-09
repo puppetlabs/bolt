@@ -175,6 +175,7 @@ module Bolt
       end
 
       def run_command(command, options = {}, position = [])
+        command = Bolt::Shell::Powershell::Snippets.exit_with_code(command)
         command = [*env_declarations(options[:env_vars]), command].join("\r\n") if options[:env_vars]
 
         output = execute(command)
@@ -278,8 +279,6 @@ module Bolt
             script_invocation = ['powershell.exe', *PS_ARGS, '-File', *args].join(' ')
             execute(script_invocation)
           end
-        else
-          command = Bolt::Shell::Powershell::Snippets.exit_with_code(command)
         end
         inp, out, err, t = conn.execute(command)
 

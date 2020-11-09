@@ -22,7 +22,7 @@ module Bolt
 
           def exit_with_code(command)
             <<~PS
-            #{command}
+            #{command} | Out-String
             if (-not $? -and ($LASTEXITCODE -eq $null)) { exit 1 }
             exit $LASTEXITCODE
             PS
