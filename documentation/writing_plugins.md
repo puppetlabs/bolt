@@ -420,6 +420,31 @@ groups:
 - [Writing tasks: Using structured input and
   output](writing_tasks.md#using-structured-input-and-output)
 
+### Returning sensitive data
+
+If your plugin returns sensitive data, such as a password, you can encrypt the entire `value` hash
+you would normally return from a plugin under the `_sensitive` key. This is how [tasks return
+sensitive output], and Bolt will automatically unwrap the `_sensitive` value without logging the
+result. For example, the following task returns a password to be used in the inventory:
+
+```python
+#!/usr/bin/env python
+import json, os, sys
+
+value = os.environ[mypassword]
+
+json.dump({"_sensitive": {"value": value}}, sys.stdout)
+```
+
+This plugin can then be consumed in the inventory or config without logging it's return value:
+```yaml
+---
+ssh:
+  run-as: root
+  sudo-password:
+    _plugin: myplugin
+```
+
 ## Returning errors
 
 For all but the most simple plugins, it can be helpful to validate input, handle

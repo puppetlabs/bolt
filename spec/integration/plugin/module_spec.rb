@@ -76,9 +76,11 @@ describe 'using module based plugins' do
     }
 
     it 'supports a config lookup' do
-      output = run_cli(['plan', 'run', 'test_plan', '--boltdir', project])
+      result = run_cli(['plan', 'run', 'test_plan', '--boltdir', project])
 
-      expect(output.strip).to eq('"ssshhh"')
+      expect(result.strip).to eq('"ssshhh"')
+      output = @log_output.readlines
+      expect(output).to include(/"value":{"value":"ssshhh"/)
     end
 
     context 'with bad parameters' do
@@ -111,6 +113,30 @@ describe 'using module based plugins' do
 
         expect(result).to include('kind' => "bolt/plugin-error")
         expect(result['msg']).to match(/did not include a value/)
+      end
+    end
+
+    context 'with a sensitive result' do
+      let(:plugin) {
+        {
+          '_plugin' => 'sensitive',
+          'value' => "ssshhh"
+        }
+      }
+
+      it 'unwraps sensitive result' do
+        result = run_cli(['plan', 'run', 'test_plan', '--boltdir', project])
+
+        expect(result.strip).to eq('"ssshhh"')
+      end
+
+      it 'does not log sensitive results' do
+        result = run_cli(['plan', 'run', 'test_plan', '--boltdir', project])
+
+        expect(result.strip).to eq('"ssshhh"')
+        output = @log_output.readlines
+        expect(output).not_to include(/"value":{"value":"ssshhh"/)
+        expect(output).to include(/Sensitive \[value redacted\]/)
       end
     end
 
@@ -246,7 +272,7 @@ describe 'using module based plugins' do
     # TODO: how do we test this cheaply?
   end
 
-  context 'when manageing puppet_library', docker: true do
+  context 'when managing puppet_library', docker: true do
     let(:plan) do
       <<~PLAN
         plan test_plan() {

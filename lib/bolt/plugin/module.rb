@@ -243,6 +243,10 @@ module Bolt
         result = run_task(hook['task'], opts)
 
         if value
+          if result.include?('_sensitive')
+            result = result['_sensitive'].unwrap
+          end
+
           unless result.include?('value')
             msg = "Plugin #{name} result did not include a value, got #{result}"
             raise Bolt::Plugin::PluginError::ExecutionError.new(msg, name, hook_name)
