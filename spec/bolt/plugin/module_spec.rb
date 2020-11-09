@@ -140,4 +140,25 @@ describe Bolt::Plugin::Module do
       )
     end
   end
+
+  describe(:run_task) do
+    let(:files)       {
+      [{ 'name' => 'my_plug::resolve_reference',
+         'path' => fixtures_path('plugin_modules',
+                                 module_name,
+                                 'tasks',
+                                 'resolve_reference.sh') }]
+    }
+    let(:task)        { Bolt::Task.new('my_plug::resolve_reference', {}, files) }
+    let(:module_name) { 'my_plug' }
+    let(:target)      { Bolt::Target.new('localhost') }
+    let(:result)      { Bolt::Result.new(target, value: { "_output" => 'hi' }) }
+    let(:resultset)   { Bolt::ResultSet.new([result]) }
+
+    it 'does not log output' do
+      expect_any_instance_of(Bolt::Executor).to receive(:run_task_with_minimal_logging)
+        .and_return(resultset)
+      plugin.run_task(task, {})
+    end
+  end
 end

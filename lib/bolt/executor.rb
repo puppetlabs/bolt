@@ -293,6 +293,18 @@ module Bolt
       end
     end
 
+    def run_task_with_minimal_logging(targets, task, arguments, options = {})
+      description = options.fetch(:description, "task #{task.name}")
+      log_action(description, targets) do
+        options[:run_as] = run_as if run_as && !options.key?(:run_as)
+        arguments['_task'] = task.name
+
+        batch_execute(targets) do |transport, batch|
+          transport.batch_task(batch, task, arguments, options, [], &method(:publish_event))
+        end
+      end
+    end
+
     def run_task_with(target_mapping, task, options = {}, position = [])
       targets = target_mapping.keys
       description = options.fetch(:description, "task #{task.name}")
