@@ -17,9 +17,16 @@ module Bolt
         yield conn
       end
 
+      def self.validate(options)
+        if (url = options['service-url'])
+          unless url.instance_of?(String)
+            raise Bolt::ValidationError, 'service-url must be a string'
+          end
+        end
+      end
+
       def upload(target, source, destination, _options = {})
         with_connection(target) do |conn|
-          # TODO with_remote_tempdir stuff?
           if File.directory?(source)
             conn.write_remote_directory(source, destination)
           else
@@ -32,7 +39,9 @@ module Bolt
       def download(target, source, destination, _options = {})
         with_connection(target) do |conn|
           # TODO
+          stdout, stderr, exitcode = conn.download_file(source, destination)
         end
+        Bolt::Result.for_download(target, source, destination)
       end
 
       def run_command(target, command, options = {})

@@ -30,6 +30,13 @@ module Bolt
           )
         end
 
+        def download_file(source, destination)
+          contianer = @target.name
+          remote = @lxd_remote
+          out, err, status = Open3.capture3('lxc', 'file', 'pull',
+            "#{remote}:#{container}#{source}", destination)
+        end
+
         def execute(*command, options)
           container = @target.name
           remote = @lxd_remote
