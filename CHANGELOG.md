@@ -1,5 +1,37 @@
 # Changelog
 
+## Bolt 2.34.0 (2020-11-10)
+
+### New features
+
+* **Create new Puppet language plans with `--pp` flag**
+  ([#2327](https://github.com/puppetlabs/bolt/pull/2327))
+
+  Bolt can now create new Puppet language plans using the `bolt plan new` command
+  with the `--pp` flag or the `New-BoltPlan` PowerShell cmdlet with the `-Pp`
+  parameter.
+
+* **Show PowerShell cmdlets in output when running in PowerShell**
+  ([#2326](https://github.com/puppetlabs/bolt/pull/2326))
+
+  Bolt output that includes commands will now show PowerShell cmdlets instead of
+  \*nix shell commands when running in PowerShell.
+
+### Bug fixes
+
+* **Fix complicated quoting in PowerShell Cmdlets**
+  ([#2272](https://github.com/puppetlabs/bolt/issues/2272))
+
+  When using the Powershell cmdlets module, Bolt no longer wraps each command in
+  single quotes allowing users to successfully use more complicated quoting
+  patterns.
+
+* **Don't log task output from plugins**
+  ([#2329](https://github.com/puppetlabs/bolt/pull/2329))
+
+  Bolt no longer logs the output from plugin tasks, to avoid printing
+  sensitive information to logs.
+
 ## Bolt 2.33.2 (2020-11-04)
 
 ### Bug fixes
