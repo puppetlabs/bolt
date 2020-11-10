@@ -90,6 +90,7 @@ class ChangelogGenerator
     x, y, z = latest.split('.').map(&:to_i)
     if %w[feature deprecation removal].any? { |type| entries[type][:entries].any? }
       y += 1
+      z =  0
     else
       z += 1
     end
