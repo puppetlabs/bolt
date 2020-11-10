@@ -4,8 +4,8 @@ require 'fileutils'
 require 'bolt/error'
 
 module Bolt
-  class ProjectMigrator
-    class Base
+  class ProjectManager
+    class Migrator
       def initialize(outputter)
         @outputter = outputter
       end

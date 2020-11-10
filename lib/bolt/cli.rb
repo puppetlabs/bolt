@@ -21,7 +21,7 @@ require 'bolt/outputter'
 require 'bolt/pal'
 require 'bolt/plan_creator'
 require 'bolt/plugin'
-require 'bolt/project_migrator'
+require 'bolt/project_manager'
 require 'bolt/puppetdb'
 require 'bolt/rerun'
 require 'bolt/secret'
@@ -456,9 +456,10 @@ module Bolt
       when 'project'
         case options[:action]
         when 'init'
-          code = initialize_project
+          code = Bolt::ProjectManager.new(config, outputter, pal)
+                                     .create(Dir.pwd, options[:object], options[:modules])
         when 'migrate'
-          code = Bolt::ProjectMigrator.new(config, outputter).migrate
+          code = Bolt::ProjectManager.new(config, outputter, pal).migrate
         end
       when 'plan'
         case options[:action]
@@ -723,85 +724,6 @@ module Bolt
       assert_puppetfile_or_module_command(config.project.modules)
       # generate_types will surface a nice error with helpful message if it fails
       pal.generate_types
-      0
-    end
-
-    # Initializes a specified directory as a Bolt project and installs any modules
-    # specified by the user, along with their dependencies.
-    #
-    def initialize_project
-      # Dir.pwd will return backslashes on Windows, but Pathname always uses
-      # forward slashes to concatenate paths. This results in paths like
-      # C:\User\Administrator/modules, which fail module install. This ensure
-      # forward slashes in the cwd path.
-      dir        = File.expand_path(Dir.pwd)
-      project    = Pathname.new(dir)
-      old_config = project + 'bolt.yaml'
-      config     = project + 'bolt-project.yaml'
-      puppetfile = project + 'Puppetfile'
-      moduledir  = project + 'modules'
-      name       = options[:object] || File.basename(dir)
-
-      if config.exist?
-        if options[:modules]
-          raise Bolt::Error.new(
-            "Found existing project directory with #{config.basename} at #{project}, "\
-            "unable to initialize project with modules. To add modules to the project, "\
-            "run 'bolt module add <module>' instead.",
-            'bolt/existing-project-error'
-          )
-        else
-          raise Bolt::Error.new(
-            "Found existing project directory with #{config.basename} at #{project}, "\
-            "unable to initialize project.",
-            'bolt/existing-project-error'
-          )
-        end
-      elsif old_config.exist?
-        raise Bolt::Error.new(
-          "Found existing project directory with #{old_config.basename} at #{project}, "\
-          "unable to initialize project. #{old_config.basename} is deprecated. To "\
-          "update the project to current best practices, run 'bolt project migrate'.",
-          'bolt/existing-project-error'
-        )
-      elsif options[:modules] && puppetfile.exist?
-        raise Bolt::Error.new(
-          "Found existing Puppetfile at #{puppetfile}, unable to initialize project "\
-          "with modules.",
-          'bolt/existing-puppetfile-error'
-        )
-      elsif name !~ Bolt::Module::MODULE_NAME_REGEX
-        if options[:object]
-          raise Bolt::ValidationError,
-                "The provided project name '#{name}' is invalid; project name must "\
-                "begin with a lowercase letter and can include lowercase letters, "\
-                "numbers, and underscores."
-        else
-          raise Bolt::ValidationError,
-                "The current directory name '#{name}' is an invalid project name. "\
-                "Please specify a name using 'bolt project init <name>'."
-        end
-      end
-
-      # If modules were specified, resolve and install first. We want to error
-      # early here and not initialize the project if the modules cannot be
-      # resolved and installed.
-      if options[:modules]
-        installer = Bolt::ModuleInstaller.new(outputter, pal)
-        installer.install(options[:modules], puppetfile, moduledir)
-      end
-
-      data = { 'name' => name }
-      data['modules'] = options[:modules] || []
-
-      begin
-        File.write(config.to_path, data.to_yaml)
-      rescue StandardError => e
-        raise Bolt::FileError.new("Could not create bolt-project.yaml at #{project}: #{e.message}", nil)
-      end
-
-      outputter.print_message "Successfully created Bolt project at #{project}"
-
       0
     end
 
