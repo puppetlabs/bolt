@@ -175,7 +175,6 @@ module Bolt
       end
 
       def run_command(command, options = {}, position = [])
-        command = Bolt::Shell::Powershell::Snippets.exit_with_code(command)
         command = [*env_declarations(options[:env_vars]), command].join("\r\n") if options[:env_vars]
 
         output = execute(command)
