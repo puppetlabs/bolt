@@ -23,8 +23,7 @@ module Bolt
           def exit_with_code(command)
             <<~PS
             #{command}
-            if (-not $? -and ($LASTEXITCODE -eq $null)) { exit 1 }
-            exit $LASTEXITCODE
+            if (-not $? -and ($LASTEXITCODE -eq $null)) { exit 1 } else { exit $LASTEXITCODE }
             PS
           end
 
