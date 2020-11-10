@@ -81,6 +81,12 @@ describe 'using module based plugins' do
       expect(output.strip).to eq('"ssshhh"')
     end
 
+    it 'does not log task output' do
+      run_cli(['plan', 'run', 'test_plan', '--boltdir', project])
+      output = @log_output.readlines
+      expect(output).not_to include(/"value":{"value":"ssshhh"/)
+    end
+
     context 'with bad parameters' do
       let(:plugin) {
         {
