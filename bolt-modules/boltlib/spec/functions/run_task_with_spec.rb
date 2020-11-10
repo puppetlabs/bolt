@@ -345,7 +345,7 @@ describe 'run_task_with' do
         .with_params('test::nonesuch', [])
         .with_lambda { |_| {} }
         .and_raise_error(
-          /Could not find a task named "test::nonesuch"/
+          /Could not find a task named 'test::nonesuch'/
         )
     end
 

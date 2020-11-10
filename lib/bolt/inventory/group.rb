@@ -241,10 +241,11 @@ module Bolt
         end
 
         if input.key?('nodes')
+          command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
           msg = <<~MSG.chomp
                 Found 'nodes' key in group #{@name}. This looks like a v1 inventory file, which is
                 no longer supported by Bolt. Migrate to a v2 inventory file automatically using
-                'bolt project migrate'.
+                '#{command}'.
                 MSG
           raise ValidationError.new(msg, nil)
         end

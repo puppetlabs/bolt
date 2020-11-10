@@ -77,7 +77,7 @@ describe 'run_plan' do
     context 'handles exceptions by' do
       it 'failing with error for non-existent plan name' do
         is_expected.to run.with_params('not_a_plan_name').and_raise_error(
-          /Could not find a plan named "not_a_plan_name"/
+          /Could not find a plan named 'not_a_plan_name'/
         )
       end
 

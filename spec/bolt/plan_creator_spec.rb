@@ -108,15 +108,23 @@ describe Bolt::PlanCreator do
     end
 
     it 'outputs the path to the plan and other helpful information' do
+      if Bolt::Util.powershell?
+        show_command = 'Get-BoltPlan -Name '
+        run_command  = 'Invoke-BoltPlan -Name '
+      else
+        show_command = 'bolt plan show'
+        run_command  = 'bolt plan run'
+      end
+
       allow(outputter).to receive(:print_message) do |output|
         expect(output).to match(
           /Created plan '#{plan_name}' at '#{project.plans_path + 'init.yaml'}'/
         )
         expect(output).to match(
-          /bolt plan show #{plan_name}/
+          /#{show_command} #{plan_name}/
         )
         expect(output).to match(
-          /bolt plan run #{plan_name}/
+          /#{run_command} #{plan_name}/
         )
       end
       subject.create_plan(project.plans_path, plan_name, outputter, nil)

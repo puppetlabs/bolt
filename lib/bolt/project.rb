@@ -11,9 +11,9 @@ module Bolt
     PROJECT_SETTINGS = {
       "name"  => "The name of the project",
       "plans" => "An array of plan names to show, if they exist in the project."\
-                 "These plans are included in `bolt plan show` output",
+                 "These plans are included in `bolt plan show` and `Get-BoltPlan` output",
       "tasks" => "An array of task names to show, if they exist in the project."\
-                 "These tasks are included in `bolt task show` output"
+                 "These tasks are included in `bolt task show` and `Get-BoltTask` output"
     }.freeze
 
     attr_reader :path, :data, :config_file, :inventory_file, :hiera_config,

@@ -122,13 +122,20 @@ describe "Bolt::Outputter::Human" do
         }
       }
     }
+
+    command = if Bolt::Util.powershell?
+                'Invoke-BoltTask -Name cinnamon_roll -Targets <targets> icing=<value>'
+              else
+                'bolt task run cinnamon_roll --targets <targets> icing=<value>'
+              end
+
     outputter.print_task_info(Bolt::Task.new(name, metadata, files))
     expect(output.string).to eq(<<~TASK_OUTPUT)
 
       cinnamon_roll - A delicious sweet bun
 
       USAGE:
-      bolt task run --targets <node-name> cinnamon_roll icing=<value>
+      #{command}
 
       PARAMETERS:
       - icing: Cream cheese
@@ -158,13 +165,20 @@ describe "Bolt::Outputter::Human" do
         }
       }
     }
+
+    command = if Bolt::Util.powershell?
+                'Invoke-BoltTask -Name sticky_bun -Targets <targets> glaze=<value> pecans=<value>'
+              else
+                'bolt task run sticky_bun --targets <targets> glaze=<value> pecans=<value>'
+              end
+
     outputter.print_task_info(Bolt::Task.new(name, metadata, files))
     expect(output.string).to eq(<<~TASK_OUTPUT)
 
       sticky_bun - A delicious sweet bun with nuts
 
       USAGE:
-      bolt task run --targets <node-name> sticky_bun glaze=<value> pecans=<value>
+      #{command}
 
       PARAMETERS:
       - glaze: Sticky
@@ -182,13 +196,20 @@ describe "Bolt::Outputter::Human" do
     files = [{ 'name' => 'monkey_bread.rb',
                'path' => "#{Bolt::Config::Modulepath::MODULES_PATH}/monkey/bread" }]
     metadata = {}
+
+    command = if Bolt::Util.powershell?
+                'Invoke-BoltTask -Name monkey_bread -Targets <targets>'
+              else
+                'bolt task run monkey_bread --targets <targets>'
+              end
+
     outputter.print_task_info(Bolt::Task.new(name, metadata, files))
     expect(output.string).to eq(<<~TASK_OUTPUT)
 
       monkey_bread
 
       USAGE:
-      bolt task run --targets <node-name> monkey_bread
+      #{command}
 
       MODULE:
       built-in module
@@ -220,13 +241,20 @@ describe "Bolt::Outputter::Human" do
         }
       }
     }
+
+    command = if Bolt::Util.powershell?
+                'Invoke-BoltPlan -Name planity_plan foo=<value> [baz=<value>]'
+              else
+                'bolt plan run planity_plan foo=<value> [baz=<value>]'
+              end
+
     outputter.print_plan_info(plan)
     expect(output.string).to eq(<<~PLAN_OUTPUT)
 
       planity_plan
 
       USAGE:
-      bolt plan run planity_plan foo=<value> [baz=<value>]
+      #{command}
 
       PARAMETERS:
       - foo: Bar
@@ -363,7 +391,7 @@ describe "Bolt::Outputter::Human" do
       banana
       carrot
 
-      Use `bolt guide <topic>` to view a specific guide.
+      Use 'bolt guide <TOPIC>' to view a specific guide.
     OUTPUT
   end
 
