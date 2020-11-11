@@ -392,7 +392,7 @@ module Bolt
         output_format: config.format,
         # For continuity
         boltdir_type: config.project.type
-      }
+      }.merge!(analytics.plan_counts(config.project.plans_path))
 
       # Only include target and inventory info for commands that take a targets
       # list. This avoids loading inventory for commands that don't need it.

@@ -1366,6 +1366,7 @@ describe "Bolt::CLI" do
             project_file?: true,
             load_as_module?: true,
             name: nil,
+            plans_path: '',
             to_h: {}
           }
           proj = double('project', mocks)
