@@ -26,7 +26,7 @@ module Bolt
         details[:line]   = err.line if defined?(err.line)
         details[:column] = err.pos if defined?(err.pos)
 
-        error.add_filelineno(details)
+        error.add_filelineno(details.compact)
         error
       end
 
