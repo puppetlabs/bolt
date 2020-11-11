@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'bolt/project_migrator/modules'
+require 'bolt/project_manager/module_migrator'
 
-describe Bolt::ProjectMigrator::Modules do
+describe Bolt::ProjectManager::ModuleMigrator do
   def migrate
     migrator.migrate(project, modulepath)
   end
