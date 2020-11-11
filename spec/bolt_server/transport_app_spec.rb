@@ -41,6 +41,14 @@ describe "BoltServer::TransportApp" do
       'size' => File.size(file) }
   end
 
+  def with_project(bolt_project, inventory_content, inventory_name = 'inventory.yaml')
+    Dir.mktmpdir(nil, project_dir) do |tmpdir|
+      File.write(File.join(tmpdir, 'bolt-project.yaml'), bolt_project.to_yaml)
+      File.write(File.join(tmpdir, inventory_name), inventory_content.to_yaml) unless inventory_content.nil?
+      yield tmpdir
+    end
+  end
+
   before(:each) do
     stub_const('BoltServer::TransportApp::DEFAULT_BOLT_CODEDIR', basedir)
   end
@@ -784,6 +792,80 @@ describe "BoltServer::TransportApp" do
           expect(last_response.body)
             .to match(%r{The property '#/' contains additional properties \[\\"targets\\"\]})
         end
+      end
+    end
+
+    describe '/project_inventory_targets' do
+      let(:bolt_project) { { 'name' => 'my_project' } }
+      let(:targets) { %w[one two three] }
+      let(:bolt_inventory) { { 'targets' => targets } }
+
+      it 'parses inventory' do
+        with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
+          project_ref = path_to_tmp_project.split(File::SEPARATOR).last
+          get("/project_inventory_targets?project_ref=#{project_ref}")
+          expect(last_response.status).to eq(200)
+          target_list = JSON.parse(last_response.body)
+          target_names = target_list.map do |targ|
+            expect(targ).to include('name')
+            expect(targ).to include('transport')
+            targ['name']
+          end
+          expect(target_names.sort).to eq(targets.sort)
+        end
+      end
+
+      context 'when transport is different than protocol' do
+        let(:targets) {
+          [{
+            'uri' => 'ssh://foo.com',
+            'config' => {
+              'transport' => 'remote'
+            }
+          }]
+        }
+        it 'sets transport independent from protocol' do
+          with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
+            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
+            get("/project_inventory_targets?project_ref=#{project_ref}")
+            expect(last_response.status).to eq(200)
+            target_list = JSON.parse(last_response.body)
+            expect(target_list.first['transport']).to eq('remote')
+            expect(target_list.first['protocol']).to eq('ssh')
+          end
+        end
+      end
+
+      context 'when inventory cannot be processed' do
+        let(:targets) {
+          [{ 'oops' => 'bad target' }]
+        }
+        it 'responds with a 500 and error details' do
+          with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
+            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
+            get("/project_inventory_targets?project_ref=#{project_ref}")
+            expect(last_response.status).to eq(500)
+            error_hash = JSON.parse(last_response.body)
+            expect(error_hash['kind']).to eq('bolt.inventory/validation-error')
+          end
+        end
+      end
+
+      it 'disallows non-default inventoryfiles' do
+        non_default_inventoryfile = 'foo.yaml'
+        non_default_inventoryfile_conf = bolt_project.merge({ 'inventoryfile' => non_default_inventoryfile })
+        with_project(non_default_inventoryfile_conf, bolt_inventory, non_default_inventoryfile) do |path_to_tmp_project|
+          project_ref = path_to_tmp_project.split(File::SEPARATOR).last
+          get("/project_inventory_targets?project_ref=#{project_ref}")
+          expect(last_response.status).to eq(500)
+          expect(last_response.body).to match(/Project inventory must be defined in .*inventory.yaml.*/)
+        end
+      end
+
+      it 'errors when project_ref is invalid' do
+        get('/project_inventory_targets?project_ref=foo')
+        expect(last_response.status).to eq(500)
+        expect(last_response.body).to match(/foo does not exist/)
       end
     end
 

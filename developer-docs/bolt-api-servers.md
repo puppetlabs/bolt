@@ -376,6 +376,53 @@ This returns a JSON object of the shape:
 
 This endpoint behaves identically to the /ssh/check_node_connections endpoint, but acts over WinRM instead.
 
+### GET /project_inventory_targets
+
+This endpoint parses a project inventory and returns a list of target hashes. Note that the only accepetable inventoryfile location is the default `inventory.yaml` at the root of the project.
+
+- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
+
+#### Response
+
+Returns a list of targets parsed from project inventory
+```
+[
+  {
+    "name": "one",
+    "transport": "ssh",
+    "cleanup": true,
+    "connect-timeout": 10,
+    "disconnect-timeout": 5,
+    "load-config": true,
+    "login-shell": "bash",
+    "tty": false,
+    "uri": "one",
+    "protocol": "ssh",
+    "user": null,
+    "password": null,
+    "host": "one",
+    "port": null
+  },
+  {
+    "name": "two",
+    "transport": "ssh",
+    "cleanup": true,
+    "connect-timeout": 10,
+    "disconnect-timeout": 5,
+    "load-config": true,
+    "login-shell": "bash",
+    "tty": false,
+    "uri": "two",
+    "protocol": "ssh",
+    "user": null,
+    "password": null,
+    "host": "two",
+    "port": null
+  }
+]
+
+
+```
 ### GET /tasks
 - `environment`: String
 
