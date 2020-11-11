@@ -14,14 +14,6 @@ module BoltSpec
       end
     end
 
-    def in_project(name = 'project')
-      with_project(name) do
-        Dir.chdir(@project_path) do
-          yield
-        end
-      end
-    end
-
     def with_boltdir
       with_project do
         @project_path += 'Boltdir'

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'bolt/project_manager/migrator'
+require 'bolt/project_migrator/base'
 
 module Bolt
-  class ProjectManager
-    class ModuleMigrator < Migrator
+  class ProjectMigrator
+    class Modules < Base
       def migrate(project, configured_modulepath)
         return true unless project.modules.nil?
 

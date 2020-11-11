@@ -2,9 +2,9 @@
 
 require 'pathname'
 require 'spec_helper'
-require 'bolt/project_manager/config_migrator'
+require 'bolt/project_migrator/config'
 
-describe Bolt::ProjectManager::ConfigMigrator do
+describe Bolt::ProjectMigrator::Config do
   def migrate
     migrator.migrate(config_file, project_file, inventory_file, backup_dir)
   end
