@@ -32,6 +32,40 @@ chown -R bolt:bolt /home/bolt/.ssh
 chmod 600 /home/bolt/.ssh/authorized_keys
 SCRIPT
 
+lxd_provision = <<SCRIPT
+apt-get install snapcraft -y
+snap install lxd
+echo 'config: {}
+networks:
+- config:
+    ipv4.address: auto
+    ipv6.address: auto
+  description: ""
+  name: lxdbr0
+  type: ""
+  project: default
+storage_pools:
+- config:
+    size: 24GB
+  description: ""
+  name: default
+  driver: btrfs
+profiles:
+- config: {}
+  description: ""
+  devices:
+    eth0:
+      name: eth0
+      network: lxdbr0
+      type: nic
+    root:
+      path: /
+      pool: default
+      type: disk
+  name: default
+cluster: null' | lxd init --preseed
+SCRIPT
+
 Vagrant.configure('2') do |config|
   config.vm.define :windows do |windows|
     windows.vm.box = 'mwrock/WindowsNano'
@@ -68,6 +102,16 @@ Vagrant.configure('2') do |config|
       linux.vm.network :forwarded_port, guest: 22, host: 20022, host_ip: '127.0.0.1', id: 'ssh'
       linux.vm.provision 'file', source: 'spec/fixtures/keys/id_rsa.pub', destination: 'id_rsa.pub'
       linux.vm.provision 'shell', inline: linux_provision
+    end
+  end
+
+  if ENV['BOLT_TEST_USE_LXD']
+    config.vm.define :lxd do |lxd|
+      lxd.vm.box = 'generic/ubuntu2004'
+      lxd.vm.network :forwarded_port, guest: 22, host: 20023, host_ip: '127.0.0.1', id: 'ssh'
+      lxd.vm.provision 'file', source: 'spec/fixtures/keys/id_rsa.pub', destination: 'id_rsa.pub'
+      lxd.vm.provision 'shell', inline: linux_provision
+      lxd.vm.provision 'shell', inline: lxd_provision
     end
   end
 end
