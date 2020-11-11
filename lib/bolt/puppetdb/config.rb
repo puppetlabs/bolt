@@ -89,6 +89,8 @@ module Bolt
 
       def uri
         return @uri if @uri
+        require 'addressable/uri'
+
         uri = case @settings['server_urls']
               when String
                 @settings['server_urls']
@@ -100,7 +102,7 @@ module Bolt
                 raise Bolt::PuppetDBError, "server_urls must be a string or array"
               end
 
-        @uri = URI.parse(uri)
+        @uri = Addressable::URI.parse(uri)
         @uri.port ||= 8081
         @uri
       end
