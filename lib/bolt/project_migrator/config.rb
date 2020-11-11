@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'bolt/project_manager/migrator'
+require 'bolt/project_migrator/base'
 
 module Bolt
-  class ProjectManager
-    class ConfigMigrator < Migrator
+  class ProjectMigrator
+    class Config < Base
       def migrate(config_file, project_file, inventory_file, backup_dir)
         bolt_yaml_to_bolt_project(config_file, project_file, inventory_file, backup_dir)
       end
