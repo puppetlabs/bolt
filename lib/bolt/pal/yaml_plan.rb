@@ -45,6 +45,13 @@ module Bolt
         used_names = Set.new(@parameters.map(&:name))
 
         @steps = plan['steps'].each_with_index.map do |step, index|
+          unless step.is_a?(Hash)
+            raise Bolt::Error.new(
+              "Parse error in step number #{index + 1}: Plan step must be an object with valid step keys.",
+              'bolt/invalid-plan'
+            )
+          end
+
           # Step keys also aren't allowed to be code and neither is the value of "name"
           stringified_step = Bolt::Util.walk_keys(step) { |key| stringify(key) }
           stringified_step['name'] = stringify(stringified_step['name']) if stringified_step.key?('name')

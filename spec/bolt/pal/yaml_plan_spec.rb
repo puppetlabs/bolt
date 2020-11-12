@@ -204,6 +204,19 @@ describe Bolt::PAL::YamlPlan do
 
         expect { plan }.to raise_error(Bolt::Error, /Plan must specify an array of steps/)
       end
+
+      it 'fails if a step is not a hash' do
+        @plan_body = {
+          'steps' => [
+            'foo'
+          ]
+        }
+
+        expect { plan }.to raise_error do |error|
+          expect(error.kind).to eq('bolt/invalid-plan')
+          expect(error.message).to match(/Parse error in step number 1: Plan step must be an object/)
+        end
+      end
     end
   end
 
