@@ -312,19 +312,9 @@ namespace :pwsh do
           # Only one of --targets , --rerun , or --query can be used
           # Only one of --configfile or --boltdir can be used
           case pwsh_name.downcase
-          when 'user'
-            pwsh_param[:validate_not_null_or_empty] = true
-          when 'password'
-            pwsh_param[:validate_not_null_or_empty] = true
-          when 'privatekey'
-            pwsh_param[:validate_not_null_or_empty] = true
-          when 'concurrency'
-            pwsh_param[:validate_not_null_or_empty] = true
-          when 'compileconcurrency'
-            pwsh_param[:validate_not_null_or_empty] = true
-          when 'connecttimeout'
-            pwsh_param[:validate_not_null_or_empty] = true
-          when 'modulepath'
+          when 'user', 'password', 'privatekey', 'concurrency',
+            'compileconcurrency', 'connecttimeout', 'modulepath', 'targets',
+            'query', 'configfile', 'boltdir'
             pwsh_param[:validate_not_null_or_empty] = true
           when 'transport'
             pwsh_param[:validate_set] = Bolt::Config::Options::TRANSPORT_CONFIG.keys
@@ -332,17 +322,9 @@ namespace :pwsh do
             pwsh_param[:validate_set] = %w[trace debug info notice warn error fatal any]
           when 'filter'
             pwsh_param[:validate_pattern] = '^[a-z0-9_:]+$'
-          when 'targets'
-            pwsh_param[:validate_not_null_or_empty] = true
-          when 'query'
-            pwsh_param[:validate_not_null_or_empty] = true
           when 'rerun'
             pwsh_param[:validate_not_null_or_empty] = true
             pwsh_param[:validate_set] = %w[all failure success]
-          when 'configfile'
-            pwsh_param[:validate_not_null_or_empty] = true
-          when 'boltdir'
-            pwsh_param[:validate_not_null_or_empty] = true
           when 'execute'
             pwsh_param[:parameter_set] = 'execute'
             pwsh_param[:mandatory] = true

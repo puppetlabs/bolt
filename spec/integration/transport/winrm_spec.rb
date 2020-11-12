@@ -688,7 +688,7 @@ describe Bolt::Transport::WinRM do
         Height: $Height ($(if ($Height -ne $null) { $Height.GetType().Name } else { 'null' }))
         "@
       PS
-      # note that the order of the entries in this hash is not the same as
+      # NOTE: that the order of the entries in this hash is not the same as
       # the order of the task parameters
       arguments = { Age: 30,
                     Height: 5.75,
@@ -708,7 +708,7 @@ describe Bolt::Transport::WinRM do
 
         Write-Host "foo=$foo"
       PS
-      arguments = { foo: 30 } # note that the script doesn't recognize the 'bar' parameter
+      arguments = { foo: 30 } # NOTE: that the script doesn't recognize the 'bar' parameter
       with_task_containing('task-params-test-winrm', contents, 'powershell', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).message).to eq("foo=30\r\n")
       end
@@ -727,10 +727,10 @@ describe Bolt::Transport::WinRM do
         bar: $bar ($(if ($bar -ne $null) { $bar.GetType().Name } else { 'null' }))
         "@
       PS
-      arguments = { bar: 30 } # note that the script doesn't recognize the 'bar' parameter
+      arguments = { bar: 30 } # NOTE: that the script doesn't recognize the 'bar' parameter
       with_task_containing('task-params-test-winrm', contents, 'environment', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).message)
-          .to match(/\Afoo:  \(String\).*^bar: 30 \(String\).*\Z/m) # note that $foo is an empty string and not null
+          .to match(/\Afoo:  \(String\).*^bar: 30 \(String\).*\Z/m) # NOTE: that $foo is an empty string and not null
       end
     end
 

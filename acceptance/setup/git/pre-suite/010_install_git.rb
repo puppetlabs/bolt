@@ -8,11 +8,7 @@ test_name "Install Git" do
       # use chocolatey to install latest ruby
       on(bolt, powershell('choco install git -y'))
       result = on(bolt, powershell('git --version'))
-    when /debian|ubuntu/
-      # install system ruby packages
-      install_package(bolt, 'git')
-      result = on(bolt, 'git --version')
-    when /el-|centos|fedora/
+    when /debian|ubuntu|el-|centos|fedora/
       # install system ruby packages
       install_package(bolt, 'git')
       result = on(bolt, 'git --version')

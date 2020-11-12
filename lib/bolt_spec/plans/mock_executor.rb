@@ -133,6 +133,7 @@ module BoltSpec
         # through to another conditional statement
         doub = @plan_doubles[plan_name] || @plan_doubles[:default]
 
+        # rubocop:disable Lint/DuplicateBranch
         # High level:
         #  - If we've explicitly allowed execution of the plan (normally the main plan
         #    passed into BoltSpec::Plan::run_plan()), then execute it
@@ -165,6 +166,7 @@ module BoltSpec
           @error_message = "Unexpected call to 'run_plan(#{plan_name}, #{params_str})'"
           raise UnexpectedInvocation, @error_message
         end
+        # rubocop:enable Lint/DuplicateBranch
         result
       end
 
