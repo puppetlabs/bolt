@@ -102,70 +102,72 @@ This enables using any executable and command-line options to change users. Keep
 
 ## Escalating privilege over WinRM
 
-
-- **Sensitive task parameters** are best if need your secrets obfuscated in logs. You can either
-  pass these as static values to a task directly, or can compute them per target and use a plan to
-  pass them to the task.
-- **Remote tasks** are best if your secrets are unique to each target and you don't want to write a
-  plan.
-
 The WinRM transport does not support `run-as`. This is because WinRM operates
 with a session level token and has no functionality to change to another user
 after authentication. Once you connect with a user, you can only perform
-actions that you have permission to perform with that user.  Instead of
-switching users, you can connect with a user, and then provide credentials to a
-program that accepts them to perform another action. The behavior of providing
+actions that you have permission to perform with that user. Instead of
+switching users, you can connect with one user, and then provide a secondary
+user's credentials to a program to perform another action. The behavior of providing
 credentials to a program is not part of WinRM.
 
 For example, to get the processes running on a Windows target, you could
 connect to the target with WinRM using `Invoke-BoltScript -Script
 .\myscript.ps1 -Targets winrm://mytarget -User userA -Password passwordA` and
-then use the following Powershell script to pass credentials to the
-`Get-WmiObject` command:
-```
+then use a Powershell script to pass credentials to the `Get-WmiObject` command:
+
+```powershell
 $Cred = New-Object System.Management.Automation.PsCredential('userB',$passwordB)
 Get-WmiObject -Class Win32_BIOS -Computer SERVER1 -Credential $Cred
 ```
 
-If you want to securely pass your userB credentials into a powershell script
-you have a few options.  The best way to pass parameters securely into a script
-is by [converting it to a task](writing_tasks.md#converting-scripts-to-tasks)
-and [defining sensitive
-parameters](writing_tasks.md#defining-sensitive-parameters) for that task. This
-will obfuscate the secret in logs and API responses.
+If you want to securely pass credentials into a Powershell script, you have two options: 
+- **[Convert your script into a task](writing_tasks.md#converting-scripts-to-tasks) and
+  use [sensitive task parameters](writing_tasks.md#defining-sensitive-parameters):** 
+  This is the best option if you need your secret obfuscated in logs. You can either 
+  pass the parameters as static values to a task, or compute them per target and use a
+  plan to pass them to the task.
+- **Use a remote task:** If your secrets are unique to each target and you don't want
+  to write a Bolt plan, you can use a remote task. This option requires you to manage
+  the connection to the target yourself, rather than letting Bolt manage the connection.
 
-You can pass sensitive parameters to a task as static values if your secrets are the
-same for every target. If your secrets are unique to each target, or need to
-be computed or fetched you will want to set your secret as data on the target
-in the inventory. For the purposes of escalating as a secondary user you can
-set arbitrary variables on targets in the inventory, which you can then access
-from a Bolt plan.
+If you're not sure where to start, we recommend using a task with sensitive
+parameters. If your secrets are unique to targets, you must also use an
+inventory plugin and a Bolt plan. [This method is demonstrated in the example
+below](#example).
 
-There are a few ways of setting and retrieving variables on targets. You can set variables on a
-target using an [inventory plugin](using_plugins.md). You can then access those
-variables in a plan, or directly in the task using a [remote
+If your secrets are the same for every target, you can pass sensitive
+parameters to a task as static values. If your secrets are unique to each
+target, or the secrets need to be computed or fetched, set the secrets as data
+on the target in the inventory. For the purposes of escalating as a secondary
+user, you can set arbitrary variables on targets in the inventory which you
+can then access from a Bolt plan.
+
+You can set [variables on the target
+object](inventory_file_v2.md#target-object) in your
+[inventory](inventory_file_v2.md), either statically as plaintext in the
+inventoryfile or dynamically using [inventory plugins](using_plugins.md). You
+can then access variables on the target object in a plan, or using a [remote
 task](writing_tasks.md#writing-remote-tasks).
 
-Remote tasks run on localhost and pass the entire target object as json to the
-task as a metaparameter `_target`.  You would write a task to get the secret,
-then connect to the remote target and use the secret there. Put another way,
-you have to manage the connection to the remote target in your task rather than
-letting Bolt manage it for you. You should only do this if you are more
-comfortable managing connections in a script yourself and don't want to write a
-plan, or are unable to connect directly to the target using Bolt.
+Remote tasks run on localhost and pass the entire target object as JSON to the
+task as a metaparameter `_target`. You can write a task to get the secret, and
+then connect to the remote target and use the secret there. Put another way, if
+you're using a remote task, you have to manage the connection to the remote
+target in your task rather than letting Bolt manage it for you.  You should
+only use a remote task if you are comfortable managing connections in a script
+and don't want to write a plan, or are unable to connect directly to the target
+using Bolt.
 
-If you're not sure where to start we recommend using a task with sensitive
-parameters. If your secrets are unique to targets, we recommned using a task
-with sensitive parameters in addition to using inventory plugins along with a
-Bolt plan if your secrets are per-target.
+### Example
 
-In this example we will set the `secondary_user_password` variable on two
-groups of targets using the PKCS7 plugin. The `example::plan` plan can then get
-the variables from the targets and pass them to the `example::task` task as
-sensitive parameters.
+This example uses a task with sensitive parameters, together with a Bolt plan
+and the PKCS7 inventory plugin.
 
-inventory.yaml
+The inventory file below uses the PKCS7 plugin to set the 
+`secondary_user_password` variable on two groups of targets:
+
 ```yaml
+# inventory.yaml
 ---
 groups:
   - name: databases
@@ -188,8 +190,10 @@ groups:
           ENC[PKCS7, <OTHER_ENCRYPTED_DATA>]
 ```
 
-Bolt plan
-```
+The `example::plan` plan collects the variables from the targets and passes them 
+to the `example::task` task as sensitive parameters:
+
+```puppet
 # This is the example plan that we use to get variables from targets and pass them to the task
 plan example::plan(
   TargetSpec $targets
@@ -206,8 +210,9 @@ plan example::plan(
 }
 ```
 
-Task metadata
-```
+The task's `metadata.json` file defines `secondarypassword` as a sensitive parameter:
+
+```json
 {
   "input_method": "powershell",
   "parameters": {
@@ -224,8 +229,9 @@ Task metadata
 }
 ```
 
-Task
-```
+The task recieves the sensitive parameters from the plan:
+
+```powershell
 [CmdletBinding()]
 param(
   [Parameter(Mandatory = $True)]
@@ -243,10 +249,6 @@ Get-WmiObject -Class Win32_BIOS -Computer SERVER1 -Credential $Cred
 
 Write-Output $Message
 ```
-
-You can see examples of [defining sensitive
-parameters](writing_tasks.md#defining-sensitive-parameters) and [passing sensitive parameters to a
-task](https://puppet.com/docs/bolt/latest/writing_plans.html#passing-sensitive-data-to-tasks). 
 
 📖 **Related information**
 
