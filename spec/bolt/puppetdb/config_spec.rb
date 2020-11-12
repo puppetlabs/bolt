@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'addressable/uri'
 require 'bolt/puppetdb/config'
 require 'bolt/util'
 
@@ -49,12 +50,17 @@ describe Bolt::PuppetDB::Config do
 
     context "#uri" do
       it 'uses server_urls value if it is a string' do
-        expect(config.uri).to eq(URI.parse('https://puppetdb:8081'))
+        expect(config.uri).to eq(Addressable::URI.parse('https://puppetdb:8081'))
       end
 
       it 'uses the first item of server_urls when it is an array' do
         options['server_urls'] = ['https://puppetdb:8081', 'https://shmuppetdb:8082']
-        expect(config.uri).to eq(URI.parse('https://puppetdb:8081'))
+        expect(config.uri).to eq(Addressable::URI.parse('https://puppetdb:8081'))
+      end
+
+      it 'defaults to port 8081 if no port is specified' do
+        options['server_urls'] = ['https://puppetdb']
+        expect(config.uri).to eq(Addressable::URI.parse('https://puppetdb:8081'))
       end
 
       it 'fails if server_urls is not set' do

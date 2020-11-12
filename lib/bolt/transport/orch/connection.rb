@@ -17,13 +17,21 @@ module Bolt
         end
 
         def initialize(opts, plan_context, logger)
+          require 'addressable/uri'
+
           @logger = logger
           @key = self.class.get_key(opts)
-          client_keys = %w[service-url token-file cacert job-poll-interval job-poll-timeout]
-          client_opts = client_keys.each_with_object({}) do |k, acc|
-            acc[k] = opts[k] if opts.include?(k)
+          client_opts = opts.slice('token-file', 'cacert', 'job-poll-interval', 'job-poll-timeout')
+
+          unless opts['service-url'] && !opts['service-url'].empty?
+            raise Bolt::ValidationError, "must specify a value for service-url when using the PCP transport"
           end
+
+          uri = Addressable::URI.parse(opts['service-url'])
+          uri&.port ||= 8143
+          client_opts['service-url'] = uri.to_s
           client_opts['User-Agent'] = "Bolt/#{VERSION}"
+
           %w[token-file cacert].each do |f|
             client_opts[f] = File.expand_path(client_opts[f]) if client_opts[f]
           end

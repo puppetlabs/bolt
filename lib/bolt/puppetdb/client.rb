@@ -2,7 +2,6 @@
 
 require 'json'
 require 'logging'
-require 'uri'
 
 module Bolt
   module PuppetDB
@@ -108,13 +107,15 @@ module Bolt
       end
 
       def uri
+        require 'addressable/uri'
+
         @current_url ||= (@config.server_urls - @bad_urls).first
         unless @current_url
           msg = "Failed to connect to all PuppetDB server_urls: #{@config.server_urls.to_a.join(', ')}."
           raise Bolt::PuppetDBError, msg
         end
 
-        uri = URI.parse(@current_url)
+        uri = Addressable::URI.parse(@current_url)
         uri.port ||= 8081
         uri
       end

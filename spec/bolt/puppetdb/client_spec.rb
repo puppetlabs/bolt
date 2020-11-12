@@ -192,6 +192,15 @@ describe Bolt::PuppetDB::Client do
       expect(certnames).to eq(['node2'])
     end
 
+    context 'without a port set' do
+      it 'should set the port to 8081 if no port is specified' do
+        conf = pdb_conf
+        conf['server_urls'] = ['https://puppetdb']
+        client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(conf))
+        expect(client.uri.to_s).to eq('https://puppetdb:8081')
+      end
+    end
+
     it 'should error with an invalid query' do
       expect { client.query_certnames("inventory { 'name' = 'node2' }") }.to raise_error(Bolt::PuppetDBError, /parse/)
     end
