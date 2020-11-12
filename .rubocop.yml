@@ -60,6 +60,9 @@ Lint/ConstantDefinitionInBlock:
 Lint/DeprecatedOpenSSLConstant:
   Enabled: true
 
+Lint/DuplicateBranch:
+  Enabled: true
+
 Lint/DuplicateElsifCondition:
   Enabled: true
 
@@ -78,6 +81,9 @@ Lint/EmptyBlock:
     - bolt-modules/**/lib/puppet/functions/**/*
     - lib/bolt/transport/orch.rb
     - spec/**/*
+
+Lint/EmptyClass:
+  Enabled: true
 
 Lint/EmptyConditionalBody:
   Enabled: true
@@ -253,6 +259,9 @@ Style/MultilineBlockChain:
   Enabled: false
 
 Style/NegatedIfElseCondition:
+  Enabled: true
+
+Style/NilLambda:
   Enabled: true
 
 Style/NumericLiterals:

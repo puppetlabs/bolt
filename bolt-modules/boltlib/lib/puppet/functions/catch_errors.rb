@@ -44,9 +44,7 @@ Puppet::Functions.create_function(:catch_errors) do
       yield
     rescue Puppet::PreformattedError => e
       if e.cause.is_a?(Bolt::Error)
-        if error_types.nil?
-          e.cause.to_puppet_error
-        elsif error_types.include?(e.cause.to_h['kind'])
+        if error_types.nil? || error_types.include?(e.cause.to_h['kind'])
           e.cause.to_puppet_error
         else
           raise e
