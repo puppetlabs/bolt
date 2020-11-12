@@ -173,6 +173,73 @@ parameterized `Sensitive` type, such as `Sensitive` or `Sensitive[Hash]`. Other
 types, such as `Optional[Sensitive]` or `Hash[String, Sensitive]`, will not be
 automatically masked.
 
+## Using Hiera data in plans
+
+You can use the Puppet `lookup()` function in plans to look up Hiera data. It's useful to think
+of looking up Hiera data in Bolt plans in two different contexts: inside [apply
+blocks](applying_manifest_blocks.md) and outside apply blocks. Inside apply blocks, Bolt
+compiles Puppet catalogs in a per-target context, and has unfettered access to Hiera data. You can
+use the same Hiera config and data you would for Puppet, and look up data as you would expect
+inside apply blocks. Outside apply blocks, Bolt is essentially executing a script. It doesn't have a
+concept of a target or context, and thus cannot load per-target data. This breaks common Hiera
+features like interpolations.
+
+To look up static data outside of apply blocks, you can add a `plan_hierarchy` key to your Hiera
+configuration. The `plan_hierarchy` key is specified at the same level as the `hierarchy` key and is
+used whenever you look up data outside an apply block. By specifying both keys in the same Hiera
+configuration, you can look up data inside and outside apply blocks in the same plan. This allows
+you to use your existing Hiera configuration in Bolt plans without encountering an error if
+interpolations exist and your plan tries to look up data outside an apply block.
+
+Using static Hiera data is particularly useful for user-specific data that you want the plan to look
+up using Hiera (for example, to take advantage of Hiera eyaml). For example, with this Hiera
+configuration at `<PROJECT DIRECTORY>/hiera.yaml` plan users can set a user-specific API key in the
+`plan_hierarchy.yaml` data file as well as use Hiera to look up a per-target filepath inside an
+apply block.
+Using this `hiera.yaml`:
+```yaml
+version: 5
+
+hierarchy:
+  - name: "Target specific data"
+    path: "targets/%{trusted.certname}.yaml"
+  - name: "Per-OS defaults"
+    path: "os/%{facts.os.family}.yaml"
+  - name: Common
+    path: hierarchy.yaml
+
+plan_hierarchy:
+  - name: Common
+    path: plan_hierarchy.yaml
+```
+
+With this data at `<PROJECT DIRECTORY>/data/plan_hierarchy.yaml`:
+```
+api_key: 12345
+```
+
+And this data at `<PROJECT DIRECTORY/data/targets/myhost.com`:
+```
+confpath: "C:\Program Files\Common Files\mytool.conf"
+```
+
+Bolt looks up the API key in the first `lookup()` call, and the target-specific data inside the
+apply block:
+```
+plan plan_lookup(
+  TargetSpec $targets
+) {
+  $outside_apply = lookup('api_key')
+  run_task("make_request", $targets, 'api_key' => $outside_apply)
+  $in_apply = apply($targets) {
+    file { ${confpath}:
+      ensure  => file,
+      content => "setting: false"
+    }
+  }
+}
+```
+
 ## Returning results from plans
 
 Use plans to return results that you can use in other plans or save for use
