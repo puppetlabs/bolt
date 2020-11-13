@@ -23,13 +23,12 @@ module Bolt
           @key = self.class.get_key(opts)
           client_opts = opts.slice('token-file', 'cacert', 'job-poll-interval', 'job-poll-timeout')
 
-          unless opts['service-url'] && !opts['service-url'].empty?
-            raise Bolt::ValidationError, "must specify a value for service-url when using the PCP transport"
+          if opts['service-url']
+            uri = Addressable::URI.parse(opts['service-url'])
+            uri&.port ||= 8143
+            client_opts['service-url'] = uri.to_s
           end
 
-          uri = Addressable::URI.parse(opts['service-url'])
-          uri&.port ||= 8143
-          client_opts['service-url'] = uri.to_s
           client_opts['User-Agent'] = "Bolt/#{VERSION}"
 
           %w[token-file cacert].each do |f|

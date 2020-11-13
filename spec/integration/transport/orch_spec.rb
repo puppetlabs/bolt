@@ -66,21 +66,6 @@ describe Bolt::Transport::Orch, orchestrator: true do
       end
     end
 
-    it "errors when service-url is not set or empty" do
-      [nil, ''].each do |value|
-        with_tempfile_containing('token', 'faketoken') do |conf|
-          config = {
-            'service-url' => value,
-            'cacert' => conf.path,
-            'token-file' => conf.path
-          }
-          allow(OrchestratorClient).to receive(:new).and_call_original
-          expect { Bolt::Transport::Orch::Connection.new(config, nil, orch.logger) }
-            .to raise_error(/must specify a value for service-url/)
-        end
-      end
-    end
-
     it "sets the port to 8143 if one is not specified" do
       with_tempfile_containing('token', 'faketoken') do |conf|
         config = {
