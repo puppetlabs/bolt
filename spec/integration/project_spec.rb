@@ -77,11 +77,9 @@ describe "When loading content", ssh: true do
   end
 
   context 'filtering project content' do
-    let(:project) { @project }
-
     let(:project_config) do
       {
-        'modulepath' => fixtures_path('modules'),
+        'modulepath' => File.join(__dir__, '../fixtures/modules'),
         'plans' => [
           'sample',
           'error::catch*'
@@ -94,8 +92,7 @@ describe "When loading content", ssh: true do
     end
 
     around(:each) do |example|
-      with_project(config: project_config) do |project|
-        @project = project
+      with_project do
         example.run
       end
     end
