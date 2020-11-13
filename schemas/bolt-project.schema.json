@@ -216,7 +216,7 @@
       "type": "string"
     },
     "plans": {
-      "description": "A list of plan names to show in `bolt plan show` output, if they exist. This option is used to limit the visibility of plans for users of the project. For example, project authors might want to limit the visibility of plans that are bundled with Bolt or plans that should only be run as part of another plan. When this option is not configured, all plans are visible. This option does not prevent users from running plans that are not part of this list.",
+      "description": "A list of plan names and glob patterns to filter the project's plans by. This option is used to limit the visibility of plans for users of the project. For example, project authors might want to limit the visibility of plans that are bundled with Bolt or plans that should only be run as part of another plan. When this option is not configured, all plans are visible. This option does not prevent users from running plans that are not part of this list.",
       "type": "array"
     },
     "plugin_hooks": {
@@ -316,7 +316,7 @@
       "type": "boolean"
     },
     "tasks": {
-      "description": "A list of task names to show in `bolt task show` output, if they exist. This option is used to limit the visibility of tasks for users of the project. For example, project authors might want to limit the visibility of tasks that are bundled with Bolt or plans that should only be run as part of a larger workflow. When this option is not configured, all tasks are visible. This option does not prevent users from running tasks that are not part of this list.",
+      "description": "A list of task names and glob patterns to filter the project's tasks by. This option is used to limit the visibility of tasks for users of the project. For example, project authors might want to limit the visibility of tasks that are bundled with Bolt or plans that should only be run as part of a larger workflow. When this option is not configured, all tasks are visible. This option does not prevent users from running tasks that are not part of this list.",
       "type": "array",
       "items": {
         "type": "string"

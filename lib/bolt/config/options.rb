@@ -283,7 +283,7 @@ module Bolt
           _example: "myproject"
         },
         "plans" => {
-          description: "A list of plan names to show in `bolt plan show` output, if they exist. This option is used "\
+          description: "A list of plan names and glob patterns to filter the project's plans by. This option is used "\
                        "to limit the visibility of plans for users of the project. For example, project authors "\
                        "might want to limit the visibility of plans that are bundled with Bolt or plans that should "\
                        "only be run as part of another plan. When this option is not configured, all plans are "\
@@ -291,7 +291,7 @@ module Bolt
                        "list.",
           type: Array,
           _plugin: false,
-          _example: ["myproject", "myproject::foo", "myproject::bar"]
+          _example: ["myproject", "myproject::foo", "myproject::bar", "myproject::deploy::*"]
         },
         "plugin_hooks" => {
           description: "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. "\
@@ -402,7 +402,7 @@ module Bolt
           _default: true
         },
         "tasks" => {
-          description: "A list of task names to show in `bolt task show` output, if they exist. This option is used "\
+          description: "A list of task names and glob patterns to filter the project's tasks by. This option is used "\
                        "to limit the visibility of tasks for users of the project. For example, project authors "\
                        "might want to limit the visibility of tasks that are bundled with Bolt or plans that should "\
                        "only be run as part of a larger workflow. When this option is not configured, all tasks "\
@@ -413,7 +413,7 @@ module Bolt
             type: String
           },
           _plugin: false,
-          _example: ["myproject", "myproject::foo", "myproject::bar"]
+          _example: ["myproject", "myproject::foo", "myproject::bar", "myproject::deploy_*"]
         },
         "trusted-external-command" => {
           description: "The path to an executable on the Bolt controller that can produce external trusted facts. "\

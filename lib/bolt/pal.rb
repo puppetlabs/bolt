@@ -286,15 +286,26 @@ module Bolt
       raise Bolt::PAL::PALError, "Failed to parse manifest: #{e}"
     end
 
-    def list_tasks
+    # Filters content by a list of names and glob patterns specified in project
+    # configuration.
+    def filter_content(content, patterns)
+      return content unless content && patterns
+
+      content.select do |name,|
+        patterns.any? { |pattern| File.fnmatch?(pattern, name, File::FNM_EXTGLOB) }
+      end
+    end
+
+    def list_tasks(filter_content: false)
       in_bolt_compiler do |compiler|
-        tasks = compiler.list_tasks
-        tasks.map(&:name).sort.each_with_object([]) do |task_name, data|
+        tasks = compiler.list_tasks.map(&:name).sort.each_with_object([]) do |task_name, data|
           task_sig = compiler.task_signature(task_name)
           unless task_sig.task_hash['metadata']['private']
             data << [task_name, task_sig.task_hash['metadata']['description']]
           end
         end
+
+        filter_content ? filter_content(tasks, @project&.tasks) : tasks
       end
     end
 
@@ -346,14 +357,15 @@ module Bolt
       Bolt::Task.from_task_signature(task)
     end
 
-    def list_plans
+    def list_plans(filter_content: false)
       in_bolt_compiler do |compiler|
         errors = []
         plans = compiler.list_plans(nil, errors).map { |plan| [plan.name] }.sort
         errors.each do |error|
           @logger.warn(error.details['original_error'])
         end
-        plans
+
+        filter_content ? filter_content(plans, @project&.plans) : plans
       end
     end
 
