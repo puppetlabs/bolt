@@ -48,6 +48,10 @@ module BoltServer
     # See the `orchestrator.bolt.codedir` tk config setting.
     DEFAULT_BOLT_CODEDIR = '/opt/puppetlabs/server/data/orchestration-services/code'
 
+    MISSING_PROJECT_REF_RESPONSE = [
+      400, Bolt::ValidationError.new('`project_ref` is a required argument').to_json
+    ].freeze
+
     def initialize(config)
       @config = config
       @schemas = Hash[REQUEST_SCHEMAS.map do |basename|
@@ -261,13 +265,16 @@ module BoltServer
       end
     end
 
-    def in_bolt_project(bolt_project)
-      return [400, '`project_ref` is a required argument'] if bolt_project.nil?
-      project_dir = File.join(@config['projects-dir'], bolt_project)
-      return [400, "`project_ref`: #{project_dir} does not exist"] unless Dir.exist?(project_dir)
+    def config_from_project(project_ref)
+      project_dir = File.join(@config['projects-dir'], project_ref)
+      raise Bolt::ValidationError, "`project_ref`: #{project_dir} does not exist" unless Dir.exist?(project_dir)
+      project = Bolt::Project.create_project(project_dir)
+      Bolt::Config.from_project(project, { log: { 'bolt-debug.log' => 'disable' } })
+    end
+
+    def in_bolt_project(project_ref)
       @pal_mutex.synchronize do
-        project = Bolt::Project.create_project(project_dir)
-        bolt_config = Bolt::Config.from_project(project, { log: { 'bolt-debug.log' => 'disable' } })
+        bolt_config = config_from_project(project_ref)
         modulepath_object = Bolt::Config::Modulepath.new(
           bolt_config.modulepath,
           boltlib_path: [PE_BOLTLIB_PATH, Bolt::Config::Modulepath::BOLTLIB_PATH]
@@ -508,6 +515,7 @@ module BoltServer
     #
     # @param project_ref [String] the project to fetch the plan from
     get '/project_plans/:module_name/:plan_name' do
+      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
       in_bolt_project(params['project_ref']) do |context|
         plan_info = pe_plan_info(context[:pal], params[:module_name], params[:plan_name])
         plan_info = allowed_helper(plan_info, context[:config].project.plans)
@@ -532,6 +540,7 @@ module BoltServer
     #
     # @param bolt_project_ref [String] the reference to the bolt-project directory to load task metadata from
     get '/project_tasks/:module_name/:task_name' do
+      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
       in_bolt_project(params['project_ref']) do |context|
         ps_parameters = {
           'project' => params['project_ref']
@@ -570,6 +579,7 @@ module BoltServer
     #
     # @param project_ref [String] the project to fetch the list of plans from
     get '/project_plans' do
+      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
       in_bolt_project(params['project_ref']) do |context|
         plans_response = plan_list(context[:pal])
 
@@ -603,6 +613,7 @@ module BoltServer
     #
     # @param project_ref [String] the project to fetch the list of tasks from
     get '/project_tasks' do
+      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
       in_bolt_project(params['project_ref']) do |context|
         tasks_response = task_list(context[:pal])
 
@@ -621,6 +632,7 @@ module BoltServer
     #
     # @param project_ref [String] the project_ref to fetch the file metadatas from
     get '/project_file_metadatas/:module_name/*' do
+      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
       in_bolt_project(params['project_ref']) do |context|
         file = params[:splat].first
         metadatas = file_metadatas(context[:pal], params[:module_name], file)
@@ -630,13 +642,32 @@ module BoltServer
       [400, e.message]
     end
 
+    # Returns a list of targets parsed from a Project inventory
+    #
+    # @param project_ref [String] the project_ref to compute the inventory from
+    get '/project_inventory_targets' do
+      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
+      bolt_config = config_from_project(params['project_ref'])
+      if bolt_config.inventoryfile && bolt_config.project.inventory_file.to_s != bolt_config.inventoryfile
+        raise Bolt::ValidationError, "Project inventory must be defined in the " \
+          "inventory.yaml file at the root of the project directory"
+      end
+      plugins = Bolt::Plugin.setup(bolt_config, nil)
+      inventory = Bolt::Inventory.from_config(bolt_config, plugins)
+      target_list = inventory.get_targets('all').map { |targ| targ.to_h.merge({ 'transport' => targ.transport }) }
+
+      [200, target_list.to_json]
+    rescue Bolt::Error => e
+      [500, e.to_json]
+    end
+
     error 404 do
       err = Bolt::Error.new("Could not find route #{request.path}",
                             'boltserver/not-found')
       [404, err.to_json]
     end
 
-    error 500 do
+    error StandardError do
       e = env['sinatra.error']
       err = Bolt::Error.new("500: Unknown error: #{e.message}",
                             'boltserver/server-error')
