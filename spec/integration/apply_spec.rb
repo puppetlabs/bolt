@@ -317,6 +317,30 @@ describe "apply", expensive: true do
           expect(resources).to include('Notify[hello world]')
         end
 
+        context 'with a target with no uri' do
+          let(:uri) { 'mytarget' }
+          it "uses the target name as the certname", ssh: true do
+            inv = { 'targets' => [{
+              'name' => 'mytarget',
+              'config' => {
+                'transport' => 'ssh',
+                'ssh' => {
+                  'host' => conn_info('ssh')[:host],
+                  'user' => conn_info('ssh')[:user],
+                  'password' => conn_info('ssh')[:password],
+                  'port' => conn_info('ssh')[:port]
+                }
+              }
+            }] }
+            with_tempfile_containing('inventory', YAML.dump(inv), '.yaml') do |i|
+              result = run_cli_json(%W[plan run prep --inventoryfile #{i.path}] + config_flags).first
+              expect(result['status']).to eq('success')
+              report = result['value']['report']
+              expect(report['resource_statuses']).to include("Notify[Hello #{uri}]")
+            end
+          end
+        end
+
         it 'applies the deferred type' do
           result = run_cli_json(%w[plan run basic::defer] + config_flags)
           expect(result).not_to include('kind')
