@@ -575,10 +575,15 @@ module Bolt
       outputter.print_task_info(pal.get_task(task_name))
     end
 
+    # Filters a list of content by matching substring.
+    #
+    private def filter_content(content, filter)
+      return content unless content && filter
+      content.select { |name,| name.include?(filter) }
+    end
+
     def list_tasks
-      tasks = pal.list_tasks
-      tasks.select! { |task| task.first.include?(options[:filter]) } if options[:filter]
-      tasks.select! { |task| config.project.tasks.include?(task.first) } unless config.project.tasks.nil?
+      tasks = filter_content(pal.list_tasks(filter_content: true), options[:filter])
       outputter.print_tasks(tasks, pal.user_modulepath)
     end
 
@@ -587,9 +592,7 @@ module Bolt
     end
 
     def list_plans
-      plans = pal.list_plans
-      plans.select! { |plan| plan.first.include?(options[:filter]) } if options[:filter]
-      plans.select! { |plan| config.project.plans.include?(plan.first) } unless config.project.plans.nil?
+      plans = filter_content(pal.list_plans(filter_content: true), options[:filter])
       outputter.print_plans(plans, pal.user_modulepath)
     end
 

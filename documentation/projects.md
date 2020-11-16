@@ -63,22 +63,24 @@ For a list of all the available project configuration options, see
 
 ### Limiting displayed plans and tasks
 
-Projects allow you to limit which plans and
-tasks a user can see when running `bolt plan show` or `bolt task show`. 
+Projects allow you to limit which plans and tasks a user can see when running
+`bolt plan|task show` and `Get-Bolt(Plan|Task)`. 
 
 Limiting tasks and plans is useful for the following reasons:
+
 - Bolt is bundled with several plans and tasks that might not be useful in your
   project. 
 - You might have written a task or plan that is only used by another task or
   plan, and you don't want your users to run that task or plan directly.
-- Displaying only specific content in the `show` commands makes it easier for
-  your users to find what they're looking for.
+- Displaying only specific content in the UI makes it easier for your users to
+  find what they're looking for.
 
-To control what plans and tasks appear when your users run `bolt plan show` or
-`bolt task show`, add `plans` and `tasks` keys to your `bolt-project.yaml` and
-include an array of plan and task names. For example, to surface a
-plan named `myproject::myplan`, and a task named `myproject::mytask`, you would
-use the following `bolt-project.yaml` file:
+To control which plans and tasks appear when your users show project content,
+add `plans` and `tasks` keys to your `bolt-project.yaml`. Both keys accept a list
+of names and glob patterns to filter content by.
+
+For example, to surface a plan named `myproject::myplan`, and a task named
+`myproject::mytask`, you would use the following `bolt-project.yaml` file:
 
 ```yaml
 name: myproject
@@ -87,8 +89,9 @@ plans:
 tasks:
 - myproject::mytask
 ```
-If your user runs the `bolt plan show` command, they'll get similar output to
-this:
+
+If your user runs the `bolt plan show` command or `Get-BoltPlan` PowerShell
+cmdlet, they'll get similar output to this:
 
 ```console
 $ bolt plan show
@@ -99,6 +102,33 @@ MODULEPATH:
 
 Use `bolt plan show <plan-name>` to view details and parameters for a specific plan.
 ```
+
+You can also use glob patterns to match multiple plan or task names. For
+example, to surface all tasks and plans in a project named `myproject`, you
+would use the following `bolt-project.yaml` file:
+
+```yaml
+name: myproject
+plans:
+- myproject::*
+tasks:
+- myproject::*
+```
+
+Glob patterns that begin with a metacharacter might cause problems when the
+configuration file is loaded and parsed, because the pattern might not be
+recognized as a string. To avoid this parsing issue, wrap any glob pattern that
+begins with a metacharacter in quotes. For example, you would write
+`"[abc]_module::*"` instead of `[abc]_module::*`.
+
+The following metacharacters can be used in a glob pattern:
+
+| Metacharacter | Description |
+| --- | --- |
+| `*` | Matches any number of characters. |
+| `?` | Matches any one character. |
+| `[set]` | Matches any one character in the set. |
+| `{a,b}` | Matches pattern a and pattern b. |
 
 ## Common files and directories in a project
 

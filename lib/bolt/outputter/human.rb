@@ -215,7 +215,7 @@ module Bolt
 
       def print_tasks(tasks, modulepath)
         command = Bolt::Util.powershell? ? 'Get-BoltTask -Task <TASK NAME>' : 'bolt task show <TASK NAME>'
-        print_table(tasks)
+        tasks.any? ? print_table(tasks) : print_message('No available tasks')
         print_message("\nMODULEPATH:\n#{modulepath.join(File::PATH_SEPARATOR)}\n"\
                         "\nUse '#{command}' to view "\
                         "details and parameters for a specific task.")
@@ -299,7 +299,7 @@ module Bolt
 
       def print_plans(plans, modulepath)
         command = Bolt::Util.powershell? ? 'Get-BoltPlan -Name <PLAN NAME>' : 'bolt plan show <PLAN NAME>'
-        print_table(plans)
+        plans.any? ? print_table(plans) : print_message('No available plans')
         print_message("\nMODULEPATH:\n#{modulepath.join(File::PATH_SEPARATOR)}\n"\
                         "\nUse '#{command}' to view "\
                         "details and parameters for a specific plan.")

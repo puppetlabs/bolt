@@ -4,11 +4,13 @@ require 'spec_helper'
 require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/integration'
+require 'bolt_spec/project'
 
 describe "When loading content", ssh: true do
   include BoltSpec::Config
   include BoltSpec::Conn
   include BoltSpec::Integration
+  include BoltSpec::Project
 
   let(:local) { Bolt::Project.create_project(File.join(__dir__, '../fixtures/projects/local'), 'local') }
   let(:embedded) { fixture_path('projects/embedded') }
@@ -72,5 +74,47 @@ describe "When loading content", ssh: true do
     named = Bolt::Project.create_project(File.join(__dir__, '../fixtures/projects/named'), 'local')
     result = run_cli_json(%W[plan run test_project -t #{target}] + config_flags, project: named)
     expect(result[0]['value']['stdout'].strip).to eq('polo')
+  end
+
+  context 'filtering project content' do
+    let(:project_config) do
+      {
+        'modulepath' => File.join(__dir__, '../fixtures/modules'),
+        'plans' => [
+          'sample',
+          'error::catch*'
+        ],
+        'tasks' => [
+          'sample',
+          'error::*'
+        ]
+      }
+    end
+
+    around(:each) do |example|
+      with_project do
+        example.run
+      end
+    end
+
+    it 'filters plans by name and glob pattern' do
+      result = run_cli_json(%w[plan show], project: project)
+
+      expect(result['plans'].map(&:first)).to match_array([
+                                                            'sample',
+                                                            'error::catch_plan_run',
+                                                            'error::catch_plan'
+                                                          ])
+    end
+
+    it 'filters tasks by name and glob pattern' do
+      result = run_cli_json(%w[task show], project: project)
+
+      expect(result['tasks'].map(&:first)).to match_array([
+                                                            'sample',
+                                                            'error::fail',
+                                                            'error::typed'
+                                                          ])
+    end
   end
 end
