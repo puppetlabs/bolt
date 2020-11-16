@@ -42,7 +42,7 @@ module Bolt
         if targets.empty?
           Bolt::ResultSet.new([])
         else
-          result = executor.run_task_with_minimal_logging(targets, task, params, options)
+          result = executor.run_task(targets, task, params, options, [], :trace)
 
           if !result.ok && !options[:catch_errors]
             raise Bolt::RunFailure.new(result, 'run_task', task.name)

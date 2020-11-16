@@ -309,6 +309,12 @@ The above plugin returns the value of the environment variable under the `value`
 key. Bolt automatically parses this object and adds the value wherever the
 plugin is used.
 
+Because plugins might return sensitive information, such as passwords, Bolt sets
+the log level for plugin task output to `trace`. This prevents Bolt from
+accidentally printing sensitive information to the command line or default
+debugging log, `bolt-debug.log`. If you need to see a plugin task's output, you
+can [set Bolt's log level](logs.md#setting-log-level).
+
 ### Returning target data
 
 A common application for plugins is to query an external service for a list of
