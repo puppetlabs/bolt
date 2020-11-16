@@ -8,6 +8,104 @@ API may change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
 around breaking behavior where possible. 
 
+## `Parallelize()` function
+
+This feature was introduced in [Bolt
+2.35.0](https://github.com/puppetlabs/bolt/tree/main/CHANGELOG.md#bolt-2350-2020-11-16).
+
+Bolt plan functions have always run concurrently across targets - that is, if a function takes a
+list of targets and operates on them, the function runs that step on each target in parallel. For
+example, the following plan runs `hostname` on all targets at the same time, waits for all targets
+to finish, and then runs `whoami` on all targets at the same time. 
+
+```
+# $targets = target1,target2,target3
+plan myplan(TargetSpec $targets) {
+  run_command('hostname', $targets)
+  run_command('whoami', $targets)
+}
+```
+
+In the example above, `target3` has to wait for `hostname` to finish on `target1` and `target2`
+before it can run `whoami`. The experimental `parallelize()` function accepts an array and a block,
+and runs the entire block on each array element in parallel. Inside a parallelize block, targets can
+run subsequent plan functions before all targets have finished each step. For example, here is the
+same plan with a parallelize block:
+
+```
+# $targets = target1,target2,target3
+plan myplan(TargetSpec $targets) {
+  # Convert the input into an array of targets
+  $ts = get_targets($targets)
+
+  parallelize($ts) |$target| {
+    run_command('hostname', $target)
+    run_command('whoami', $target)
+  }
+}
+```
+
+Here, if `target3` completes running `hostname` before `target1` or `target2`, it can continue directly to
+running `whoami`.
+
+This functionality is particularly useful for plan functions that may take a long time on certain
+targets but not on others, or for plans where some long running process may fail on a target but the
+plan author wants the plan to be able to continue quickly on successful targets.
+
+Within the parallelize block, only the following functions can run in parallel: 
+- `run_command`
+- `run_task`
+- `run_task_with`
+- `run_script`
+- `upload_file`
+- `download_file`. 
+You can run other functions from a parallelize block, but those functions will block execution
+on other targets until they complete. For example, in the following plan, Bolt can start running
+`task2` and `task3` while `task1` is still executing. However, it cannot start `task4` while
+`out::message` is executing on any of the targets.
+
+```
+# $targets = target1,target2,target3
+plan myplan(TargetSpec $targets) {
+  # Convert the input into an array of targets
+  $ts = get_targets($targets)
+
+  parallelize($ts) |$target| {
+    run_task('task1', $target)
+    run_task('task2', $target)
+    $result = run_task('task3', $target)
+    out::message($result)
+    run_task('task4', $target)
+  }
+}
+```
+
+The `parallelize()` function returns an array that contains the results of executing the block in
+the same order as the input array. You can think of `parallelize()` as a `map` function that runs in
+parallel. The 'result' of the block for a particular input is either a value passed to a `return`
+statement, the result of the last function in the block, or an error. For example, consider the
+following plan:
+
+```
+# $ts = [target1, target2, target3]
+$result = parallelize($ts) |$target| {
+    if target.name == 'target1' {
+      return "Don't run the task on this target"
+    }
+    run_task('task1', $target)
+    run_command('hostname', $target)
+  }
+
+# This will print ["Don't run the task on this target", "target2", "target3"]
+out::message($result)
+```
+
+If any step of the block errors, Bolt stops executing the block for that target, but continues
+executing for all other targets from the input array. When the block finishes, if there is an error
+in the result array, the plan throws a `PlanFailure` and includes the entire result array in the
+`details` key of the failure. If the block is wrapped in a `catch_errors()` block, Bolt catches the
+`PlanFailure` and continues executing the plan.
+
 ## `ResourceInstance` data type
 
 This feature was introduced in [Bolt

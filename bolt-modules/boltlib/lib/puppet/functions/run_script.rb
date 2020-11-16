@@ -84,15 +84,34 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     # Ensure that given targets are all Target instances)
     targets = inventory.get_targets(targets)
 
-    r = if targets.empty?
-          Bolt::ResultSet.new([])
-        else
-          executor.run_script(targets, found, arguments, options, Puppet::Pops::PuppetStack.top_of_stack)
-        end
+    if targets.empty?
+      Bolt::ResultSet.new([])
+    else
+      r = if executor.in_parallel
+            require 'concurrent'
+            require 'fiber'
+            future = Concurrent::Future.execute do
+              executor.run_script(targets,
+                                  found,
+                                  arguments,
+                                  options,
+                                  Puppet::Pops::PuppetStack.top_of_stack)
+            end
 
-    if !r.ok && !options[:catch_errors]
-      raise Bolt::RunFailure.new(r, 'run_script', script)
+            Fiber.yield('unfinished') while future.incomplete?
+            future.value || future.reason
+          else
+            executor.run_script(targets,
+                                found,
+                                arguments,
+                                options,
+                                Puppet::Pops::PuppetStack.top_of_stack)
+          end
+
+      if !r.ok && !options[:catch_errors]
+        raise Bolt::RunFailure.new(r, 'run_script', script)
+      end
+      r
     end
-    r
   end
 end

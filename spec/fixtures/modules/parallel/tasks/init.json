@@ -1,0 +1,16 @@
+{
+  "description": "Sleep for a time and print a string",
+  "input_method": "environment",
+  "parameters": {
+    "val": {
+      "type": "String"
+    },
+    "time": {
+      "type": "Integer"
+    }
+  },
+  "implementations": [
+    {"name": "init.sh", "requirements": ["shell"]},
+    {"name": "init.ps1", "requirements": ["powershell"]}
+  ]
+}

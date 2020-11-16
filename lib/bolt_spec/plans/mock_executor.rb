@@ -17,12 +17,13 @@ module BoltSpec
 
     # Nothing on the executor is 'public'
     class MockExecutor
-      attr_reader :noop, :error_message
+      attr_reader :noop, :error_message, :in_parallel
       attr_accessor :run_as, :transport_features, :execute_any_plan
 
       def initialize(modulepath)
         @noop = false
         @run_as = nil
+        @in_parallel = false
         @error_message = nil
         @allow_apply = false
         @modulepath = [modulepath].flatten.map { |path| File.absolute_path(path) }

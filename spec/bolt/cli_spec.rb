@@ -1211,7 +1211,7 @@ describe "Bolt::CLI" do
     end
 
     describe "execute" do
-      let(:executor) { double('executor', noop: false, subscribe: nil, shutdown: nil) }
+      let(:executor) { double('executor', noop: false, subscribe: nil, shutdown: nil, in_parallel: false) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
@@ -2252,7 +2252,7 @@ describe "Bolt::CLI" do
     end
 
     describe "execute with noop" do
-      let(:executor) { double('executor', noop: true, subscribe: nil, shutdown: nil) }
+      let(:executor) { double('executor', noop: true, subscribe: nil, shutdown: nil, in_parallel: false) }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }
