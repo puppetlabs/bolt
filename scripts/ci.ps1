@@ -155,4 +155,4 @@ Enable-PSRemoting
 Set-WSManQuickConfig -Force
 Set-WinRMHostConfiguration
 Test-WinRMConfiguration @User | Out-Null
-Write-Output "::set-env name=BOLT_WINRM_PASSWORD::$pass"
+Add-Content -Path $ENV:GITHUB_ENV -Value "BOLT_WINRM_PASSWORD=$pass"
