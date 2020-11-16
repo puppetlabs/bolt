@@ -256,10 +256,10 @@ module Bolt
       @logger.trace { "Failed to submit analytics event: #{e.message}" }
     end
 
-    def with_node_logging(description, batch)
-      @logger.info("#{description} on #{batch.map(&:safe_name)}")
+    def with_node_logging(description, batch, log_level = :info)
+      @logger.send(log_level, "#{description} on #{batch.map(&:safe_name)}")
       result = yield
-      @logger.info(result.to_json)
+      @logger.send(log_level, result.to_json)
       result
     end
 
@@ -289,28 +289,16 @@ module Bolt
       end
     end
 
-    def run_task(targets, task, arguments, options = {}, position = [])
+    def run_task(targets, task, arguments, options = {}, position = [], log_level = :info)
       description = options.fetch(:description, "task #{task.name}")
       log_action(description, targets) do
         options[:run_as] = run_as if run_as && !options.key?(:run_as)
         arguments['_task'] = task.name
 
         batch_execute(targets) do |transport, batch|
-          with_node_logging("Running task #{task.name} with '#{arguments.to_json}'", batch) do
+          with_node_logging("Running task #{task.name} with '#{arguments.to_json}'", batch, log_level) do
             transport.batch_task(batch, task, arguments, options, position, &method(:publish_event))
           end
-        end
-      end
-    end
-
-    def run_task_with_minimal_logging(targets, task, arguments, options = {})
-      description = options.fetch(:description, "task #{task.name}")
-      log_action(description, targets) do
-        options[:run_as] = run_as if run_as && !options.key?(:run_as)
-        arguments['_task'] = task.name
-
-        batch_execute(targets) do |transport, batch|
-          transport.batch_task(batch, task, arguments, options, [], &method(:publish_event))
         end
       end
     end

@@ -155,8 +155,9 @@ describe Bolt::Plugin::Module do
     let(:result)      { Bolt::Result.new(target, value: { "_output" => 'hi' }) }
     let(:resultset)   { Bolt::ResultSet.new([result]) }
 
-    it 'does not log output' do
-      expect_any_instance_of(Bolt::Executor).to receive(:run_task_with_minimal_logging)
+    it 'logs output at trace level' do
+      expect_any_instance_of(Bolt::Executor).to receive(:run_task)
+        .with([target], task, anything, anything, [], :trace)
         .and_return(resultset)
       plugin.run_task(task, {})
     end
