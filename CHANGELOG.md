@@ -1,5 +1,41 @@
 # Changelog
 
+## Bolt 2.35.0 (2020-11-16)
+
+### New features
+
+* **Set default ports for PuppetDB and Orchestrator**
+  ([#2304](https://github.com/puppetlabs/bolt/issues/2304))
+
+  Bolt now sets the ports for PuppetDB `server_urls` and Orchestrator
+  `service-url` to 8081 and 8143 respectively if the port is not set in config.
+
+* **Filter project plans and tasks with glob patterns**
+  ([#2180](https://github.com/puppetlabs/bolt/issues/2180))
+
+  The `plans` and `tasks` options in `bolt-project.yaml` now support glob
+  patterns in addition to plan and task names. Plans and tasks that match a glob
+  pattern will appear in `bolt plan|task show` and `Get-Bolt(Plan|Task)` output.
+
+* **Execute plan functions in parallel with `parallelize` plan function**
+  ([#2190](https://github.com/puppetlabs/bolt/pull/2190))
+
+  The new `parallelize` plan function can be used to execute part of a plan in
+  parallel. It accepts an array of inputs and a block, executes the block on
+  each input, and returns a list of results. This function can be used to
+  continue executing part of a plan across multiple targets without waiting on
+  results to finish for each target.
+
+  _This feature is experimental._
+
+### Bug fixes
+
+* **Error with invalid YAML plan step type**
+  ([#2309](https://github.com/puppetlabs/bolt/issues/2309))
+
+  Bolt now errors if a YAML plan step is not a hash. Previously, YAML plans
+  would execute even if a plan step was not a hash.
+
 ## Bolt 2.34.0 (2020-11-10)
 
 ### New features
