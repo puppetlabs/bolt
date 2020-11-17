@@ -29,19 +29,26 @@ module Bolt
         path = File.expand_path(path)
         content = File.open(path, "r:UTF-8") { |f| YAML.safe_load(f.read) } || {}
         unless content.is_a?(Hash)
-          msg = "Invalid content for #{file_name} file: #{path} should be a Hash or empty, not #{content.class}"
-          raise Bolt::FileError.new(msg, path)
+          raise Bolt::FileError.new(
+            "Invalid content for #{file_name} file at #{path}\nContent should be a Hash or empty, "\
+            "not #{content.class}",
+            path
+          )
         end
         logger.trace("Loaded #{file_name} from #{path}")
         content
       rescue Errno::ENOENT
-        raise Bolt::FileError.new("Could not read #{file_name} file: #{path}", path)
+        raise Bolt::FileError.new("Could not read #{file_name} file at #{path}", path)
+      rescue Psych::SyntaxError => e
+        raise Bolt::FileError.new("Could not parse #{file_name} file at #{path}, line #{e.line}, "\
+                                  "column #{e.column}\n#{e.problem}",
+                                  path)
       rescue Psych::Exception => e
-        raise Bolt::FileError.new("Could not parse #{file_name} file: #{path}\n"\
-                                  "Error at line #{e.line} column #{e.column}", path)
+        raise Bolt::FileError.new("Could not parse #{file_name} file at #{path}\n#{e.message}",
+                                  path)
       rescue IOError, SystemCallError => e
-        raise Bolt::FileError.new("Could not read #{file_name} file: #{path}\n"\
-                                  "error: #{e}", path)
+        raise Bolt::FileError.new("Could not read #{file_name} file at #{path}\n#{e.message}",
+                                  path)
       end
 
       def read_optional_yaml_hash(path, file_name)
