@@ -75,13 +75,25 @@ module Bolt
     end
 
     def self.defaults_schema
-      base = OPTIONS.slice(*BOLT_DEFAULTS_OPTIONS)
-      base['inventory-config'][:properties] = TRANSPORT_CONFIG.transform_values(&:schema)
+      base      = OPTIONS.slice(*BOLT_DEFAULTS_OPTIONS)
+      inventory = INVENTORY_OPTIONS.each do |option, definition|
+        if TRANSPORT_CONFIG.key?(option)
+          definition[:properties] = TRANSPORT_CONFIG[option].schema
+        end
+      end
+
+      base['inventory-config'][:properties] = inventory
       base
     end
 
     def self.bolt_schema
-      OPTIONS.slice(*BOLT_OPTIONS).merge(TRANSPORT_CONFIG.transform_values(&:schema))
+      inventory = INVENTORY_OPTIONS.each do |option, definition|
+        if TRANSPORT_CONFIG.key?(option)
+          definition[:properties] = TRANSPORT_CONFIG[option].schema
+        end
+      end
+
+      OPTIONS.slice(*BOLT_OPTIONS).merge(inventory)
     end
 
     def self.system_path

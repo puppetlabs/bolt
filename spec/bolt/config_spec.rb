@@ -227,11 +227,21 @@ describe Bolt::Config do
     it 'puts keys under inventory-config at the top level' do
       allow(File).to receive(:exist?)
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return(
-        'inventory-config' => Bolt::Config::INVENTORY_OPTIONS.dup
+        'inventory-config' => {
+          'transport' => 'ssh',
+          'ssh' => {
+            'password' => 'bolt'
+          }
+        }
       )
 
       data = Bolt::Config.load_bolt_defaults_yaml(path)[:data]
-      expect(data).to eq(Bolt::Config::INVENTORY_OPTIONS)
+      expect(data).to include(
+        'transport' => 'ssh',
+        'ssh' => {
+          'password' => 'bolt'
+        }
+      )
     end
   end
 
