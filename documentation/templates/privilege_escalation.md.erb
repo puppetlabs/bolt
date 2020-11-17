@@ -99,3 +99,161 @@ This enables using any executable and command-line options to change users. Keep
 - Bolt always appends the specified `run-as` user to the specified `run-as-command`,
   which can be limiting for some escalating commands.
 - Bolt will not use the `run-as-command` option if `run-as` is not set.
+
+## Escalating privilege over WinRM
+
+The WinRM transport does not support `run-as`. This is because WinRM operates
+with a session level token and has no functionality to change to another user
+after authentication. Once you connect with a user, you can only perform
+actions that you have permission to perform with that user. Instead of
+switching users, you can connect with one user, and then provide a secondary
+user's credentials to a program to perform another action. The behavior of providing
+credentials to a program is not part of WinRM.
+
+For example, to get the processes running on a Windows target, you could
+connect to the target with WinRM using `Invoke-BoltScript -Script
+.\myscript.ps1 -Targets winrm://mytarget -User userA -Password passwordA` and
+then use a Powershell script to pass credentials to the `Get-WmiObject` command:
+
+```powershell
+$Cred = New-Object System.Management.Automation.PsCredential('userB',$passwordB)
+Get-WmiObject -Class Win32_BIOS -Computer SERVER1 -Credential $Cred
+```
+
+If you want to securely pass credentials into a Powershell script, you have two options: 
+- **[Convert your script into a task](writing_tasks.md#converting-scripts-to-tasks) and
+  use [sensitive task parameters](writing_tasks.md#defining-sensitive-parameters):** 
+  This is the best option if you need your secret obfuscated in logs. You can either 
+  pass the parameters as static values to a task, or compute them per target and use a
+  plan to pass them to the task.
+- **Use a remote task:** If your secrets are unique to each target and you don't want
+  to write a Bolt plan, you can use a remote task. This option requires you to manage
+  the connection to the target yourself, rather than letting Bolt manage the connection.
+
+If you're not sure where to start, we recommend using a task with sensitive
+parameters. If your secrets are unique to targets, you must also use an
+inventory plugin and a Bolt plan. [This method is demonstrated in the example
+below](#example).
+
+If your secrets are the same for every target, you can pass sensitive
+parameters to a task as static values. If your secrets are unique to each
+target, or the secrets need to be computed or fetched, set the secrets as data
+on the target in the inventory. For the purposes of escalating as a secondary
+user, you can set arbitrary variables on targets in the inventory which you
+can then access from a Bolt plan.
+
+You can set [variables on the target
+object](inventory_file_v2.md#target-object) in your
+[inventory](inventory_file_v2.md), either statically as plaintext in the
+inventoryfile or dynamically using [inventory plugins](using_plugins.md). You
+can then access variables on the target object in a plan, or using a [remote
+task](writing_tasks.md#writing-remote-tasks).
+
+Remote tasks run on localhost and pass the entire target object as JSON to the
+task as a metaparameter `_target`. You can write a task to get the secret, and
+then connect to the remote target and use the secret there. Put another way, if
+you're using a remote task, you have to manage the connection to the remote
+target in your task rather than letting Bolt manage it for you.  You should
+only use a remote task if you are comfortable managing connections in a script
+and don't want to write a plan, or are unable to connect directly to the target
+using Bolt.
+
+### Example
+
+This example uses a task with sensitive parameters, together with a Bolt plan
+and the PKCS7 inventory plugin.
+
+The inventory file below uses the PKCS7 plugin to set the 
+`secondary_user_password` variable on two groups of targets:
+
+```yaml
+# inventory.yaml
+---
+groups:
+  - name: databases
+    targets:
+      - mywindows.com
+      - mywindows2.com
+    vars:
+      secondary_user_pw:
+        _plugin: pkcs7
+        encrypted_value: |
+          ENC[PKCS7, <ENCRYPTED_DATA>]
+  - name: load_balancers
+    targets:
+      - mywindows3.com
+      - mywindows4.com
+    vars:
+      secondary_user_pw:
+        _plugin: pkcs7
+        encrypted_value: |
+          ENC[PKCS7, <OTHER_ENCRYPTED_DATA>]
+```
+
+The `example::plan` plan collects the variables from the targets and passes them 
+to the `example::task` task as sensitive parameters:
+
+```puppet
+# This is the example plan that we use to get variables from targets and pass them to the task
+plan example::plan(
+  TargetSpec $targets
+) {
+  # This gets all the data for the targets from the inventory and creates
+  # Target objects.
+  $target_objects = get_targets($targets)
+
+  run_task_with('example::task', $targets) |$target| {
+    # You can also pass static values here.
+    { 'secondarypassword' => $target.vars['secondary_user_pw'],
+      'message' => 'Good bye' }
+  }
+}
+```
+
+The task's `metadata.json` file defines `secondarypassword` as a sensitive parameter:
+
+```json
+{
+  "input_method": "powershell",
+  "parameters": {
+    "secondarypassword": {
+      "type": "String",
+      "description": "The password for the user to run 'GetWMI' as",
+      "sensitive": true
+    },
+    "message": {
+      "type": "String",
+      "description": "The message to print when finished"
+    }
+  }
+}
+```
+
+The task recieves the sensitive parameters from the plan:
+
+```powershell
+[CmdletBinding()]
+param(
+  [Parameter(Mandatory = $True)]
+  [string]
+  $Secondarypassword
+
+  [Parameter(Mandatory = $True)]
+  [string]
+  $Message
+)
+
+$Pw = $Secondarypassword | ConvertTo-SecureString -AsPlainText -Force
+$Cred = New-Object System.Management.Automation.PsCredential('bolt', $Pw)
+Get-WmiObject -Class Win32_BIOS -Computer SERVER1 -Credential $Cred
+
+Write-Output $Message
+```
+
+📖 **Related information**
+
+- [Defining sensitive parameters](writing_tasks.md#defining-sensitive-parameters)
+- [Passing sensitive data to tasks](writing_plans.md#passing-sensitive-data-to-tasks)
+- [Setting vars on a target in inventory](inventory_file_v2.md#top-level-fields)
+- [Using inventory plugins](https://puppet.com/docs/bolt/latest/using_plugins.html)
+- [Writing remote tasks](writing_tasks.md#writing-remote-tasks)
