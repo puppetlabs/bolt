@@ -37,6 +37,13 @@ describe Bolt::Transport::Local do
 
   include_examples 'transport api'
 
+  it "can run a command with pipes" do
+    command, expected = os_context[:pipe_command]
+    result = runner.run_command(target, command, catch_errors: true)
+    expect(result.value['exit_code']).to eq(0)
+    expect(result.value['stdout']).to match(expected)
+  end
+
   context 'running as another user', sudo: true do
     include_examples 'with sudo'
 

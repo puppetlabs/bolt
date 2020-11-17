@@ -25,6 +25,8 @@ def posix_context
     stdout_command: ['echo hello', /^hello$/],
     stderr_command: ['ssh -V', /OpenSSH/],
     destination_dir: '/tmp',
+    # Grep exits non-zero? This works locally, I'm not sure why it doesn't in CI
+    pipe_command: ["service --status-all | sed -n \"/rsy/ p\"", /rsync/],
     supported_req: 'shell',
     extension: '.sh',
     unsupported_req: 'powershell',
@@ -50,6 +52,7 @@ def windows_context
   {
     stdout_command: ['echo hello', /^hello\r$/],
     stderr_command: ['echo oops 1>&2', /oops/],
+    pipe_command: ["Get-Service | Where-Object {$_.Name -like \"*net*\"}", /Netman/],
     destination_dir: 'C:/mytmp',
     supported_req: 'powershell',
     extension: '.ps1',
@@ -125,12 +128,12 @@ shared_examples 'transport api' do
       command = if target.protocol == 'docker'
                   # explicitly launch bash for Docker transport because Docker doesn't have
                   # a default shell when you perform: docker exec
-                  "/bin/bash -c 'exit 1'"
+                  "/bin/bash -c 'exit 2'"
                 else
-                  "exit 1"
+                  "exit 2"
                 end
       result = runner.run_command(target, command, catch_errors: true).value
-      expect(result['exit_code']).to eq(1)
+      expect(result['exit_code']).to eq(2)
     end
 
     it "sets environment variables if specified" do
