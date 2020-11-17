@@ -7,6 +7,7 @@ require 'bolt/project'
 require 'bolt/logger'
 require 'bolt/util'
 require 'bolt/config/options'
+require 'bolt/config/validator'
 
 module Bolt
   class UnknownTransportError < Bolt::Error
@@ -73,6 +74,16 @@ module Bolt
       new(project, data, overrides)
     end
 
+    def self.defaults_schema
+      base = OPTIONS.slice(*BOLT_DEFAULTS_OPTIONS)
+      base['inventory-config'][:properties] = TRANSPORT_CONFIG.transform_values(&:schema)
+      base
+    end
+
+    def self.bolt_schema
+      OPTIONS.slice(*BOLT_OPTIONS).merge(TRANSPORT_CONFIG.transform_values(&:schema))
+    end
+
     def self.system_path
       # Lazy-load expensive gem code
       require 'win32/dir' if Bolt::Util.windows?
@@ -105,6 +116,10 @@ module Bolt
           "will be ignored."
         )
       end
+
+      # Validate the config against the schema. This will raise a single error
+      # with all validation errors.
+      Validator.new.validate(data, defaults_schema, filepath)
 
       # Remove project-specific config such as hiera-config, etc.
       project_config = data.slice(*(BOLT_PROJECT_OPTIONS - BOLT_DEFAULTS_OPTIONS))
@@ -160,6 +175,10 @@ module Bolt
       deprecations = [{ type: 'Using bolt.yaml for system configuration',
                         msg: "Configuration file #{filepath} is deprecated and will be removed in a future version "\
                         "of Bolt. Use '#{dir + BOLT_DEFAULTS_NAME}' instead." }]
+
+      # Validate the config against the schema. This will raise a single error
+      # with all validation errors.
+      Validator.new.validate(data, bolt_schema, filepath)
 
       { filepath: filepath, data: data, logs: logs, deprecations: deprecations }
     end
@@ -271,7 +290,7 @@ module Bolt
 
       # Set console log to debug if in debug mode
       if options[:debug]
-        overrides['log'] = { 'console' => { 'level' => :debug } }
+        overrides['log'] = { 'console' => { 'level' => 'debug' } }
       end
 
       if options[:puppetfile_path]
@@ -279,6 +298,9 @@ module Bolt
       end
 
       overrides['trace'] = opts['trace'] if opts.key?('trace')
+
+      # Validate the overrides
+      Validator.new.validate(overrides, OPTIONS, 'command line')
 
       overrides
     end
@@ -397,33 +419,9 @@ module Bolt
               "is automatically appended to the modulepath and cannot be configured."
       end
 
-      keys = OPTIONS.keys - %w[plugins plugin_hooks puppetdb]
-      keys.each do |key|
-        next unless Bolt::Util.references?(@data[key])
-        valid_keys = TRANSPORT_CONFIG.keys + %w[plugins plugin_hooks puppetdb]
-        raise Bolt::ValidationError,
-              "Found unsupported key _plugin in config setting #{key}. Plugins are only available in "\
-              "#{valid_keys.join(', ')}."
-      end
-
-      unless concurrency.is_a?(Integer) && concurrency > 0
-        raise Bolt::ValidationError,
-              "Concurrency must be a positive Integer, received #{concurrency.class} #{concurrency}"
-      end
-
-      unless compile_concurrency.is_a?(Integer) && compile_concurrency > 0
-        raise Bolt::ValidationError,
-              "Compile concurrency must be a positive Integer, received #{compile_concurrency.class} "\
-              "#{compile_concurrency}"
-      end
-
       compile_limit = 2 * Etc.nprocessors
       unless compile_concurrency < compile_limit
         raise Bolt::ValidationError, "Compilation is CPU-intensive, set concurrency less than #{compile_limit}"
-      end
-
-      unless %w[human json rainbow].include? format
-        raise Bolt::ValidationError, "Unsupported format: '#{format}'"
       end
 
       Bolt::Util.validate_file('hiera-config', @data['hiera-config']) if @data['hiera-config']

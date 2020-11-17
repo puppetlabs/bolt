@@ -190,14 +190,17 @@
     },
     "plugins": {
       "description": "A map of plugins and their configuration data, where each key is the name of a plugin and its value is a map of configuration data. Configurable options are specified by the plugin. Read more about configuring plugins in [Using plugins](using_plugins.md#configuring-plugins).",
-      "oneOf": [
-        {
-          "type": "object"
-        },
-        {
-          "$ref": "#/definitions/_plugin"
-        }
-      ]
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "object"
+          },
+          {
+            "$ref": "#/definitions/_plugin"
+          }
+        ]
+      }
     },
     "puppetdb": {
       "description": "A map containing options for [configuring the Bolt PuppetDB client](bolt_connect_puppetdb.md).",

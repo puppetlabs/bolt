@@ -215,7 +215,7 @@ describe Bolt::Config do
     end
 
     it 'warns when project config keys are present' do
-      project_config = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_PROJECT_OPTIONS)
+      project_config = { 'name' => 'myproject' }
 
       allow(File).to receive(:exist?)
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return(project_config)
@@ -232,33 +232,6 @@ describe Bolt::Config do
 
       data = Bolt::Config.load_bolt_defaults_yaml(path)[:data]
       expect(data).to eq(Bolt::Config::INVENTORY_OPTIONS)
-    end
-
-    it 'errors when inventory-config is not a Hash' do
-      allow(File).to receive(:exist?)
-      allow(Bolt::Util).to receive(:read_yaml_hash).and_return(
-        'inventory-config' => 'foo'
-      )
-
-      expect { Bolt::Config.load_bolt_defaults_yaml(path) }.to raise_error(
-        Bolt::ValidationError,
-        /must be of type Hash/
-      )
-    end
-
-    it 'errors when inventory-config is a plugin reference' do
-      allow(File).to receive(:exist?)
-      allow(Bolt::Util).to receive(:read_yaml_hash).and_return(
-        'inventory-config' => {
-          '_plugin'  => 'yaml',
-          'filepath' => '~/.puppetlabs/bolt/config.yaml'
-        }
-      )
-
-      expect { Bolt::Config.load_bolt_defaults_yaml(path) }.to raise_error(
-        Bolt::ValidationError,
-        /Found unsupported key '_plugin'/
-      )
     end
   end
 

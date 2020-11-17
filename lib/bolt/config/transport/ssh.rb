@@ -73,6 +73,14 @@ module Bolt
           %w[ssh-command native-ssh].concat(OPTIONS)
         end
 
+        def self.schema
+          {
+            type:       Hash,
+            properties: self::TRANSPORT_OPTIONS.slice(*(self::OPTIONS + self::NATIVE_OPTIONS)),
+            _plugin:    true
+          }
+        end
+
         private def filter(unfiltered)
           # Because we filter before merging config together it's impossible to
           # know whether both ssh-command *and* native-ssh will be specified
@@ -87,12 +95,6 @@ module Bolt
           super
 
           if (key_opt = @config['private-key'])
-            unless key_opt.instance_of?(String) || (key_opt.instance_of?(Hash) && key_opt.include?('key-data'))
-              raise Bolt::ValidationError,
-                    "private-key option must be a path to a private key file or a Hash containing the 'key-data', "\
-                    "received #{key_opt.class} #{key_opt}"
-            end
-
             if key_opt.instance_of?(String)
               @config['private-key'] = File.expand_path(key_opt, @project)
 
@@ -112,14 +114,6 @@ module Bolt
           if @config['login-shell'] && !LOGIN_SHELLS.include?(@config['login-shell'])
             raise Bolt::ValidationError,
                   "Unsupported login-shell #{@config['login-shell']}. Supported shells are #{LOGIN_SHELLS.join(', ')}"
-          end
-
-          %w[encryption-algorithms host-key-algorithms kex-algorithms mac-algorithms run-as-command].each do |opt|
-            next unless @config.key?(opt)
-            unless @config[opt].all? { |n| n.is_a?(String) }
-              raise Bolt::ValidationError,
-                    "#{opt} must be an Array of Strings, received #{@config[opt].inspect}"
-            end
           end
 
           if @config['login-shell'] == 'powershell'

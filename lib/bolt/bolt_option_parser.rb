@@ -891,12 +891,12 @@ module Bolt
         if ENV.include?(Bolt::Inventory::ENVIRONMENT_VAR)
           raise Bolt::CLIError, "Cannot pass inventory file when #{Bolt::Inventory::ENVIRONMENT_VAR} is set"
         end
-        @options[:inventoryfile] = Pathname.new(File.expand_path(path))
+        @options[:inventoryfile] = File.expand_path(path)
       end
       define('--puppetfile PATH',
              'Specify a Puppetfile to use when installing modules. (default: ~/.puppetlabs/bolt/Puppetfile)',
              'Modules are installed in the current project.') do |path|
-        @options[:puppetfile_path] = Pathname.new(File.expand_path(path))
+        @options[:puppetfile_path] = File.expand_path(path)
       end
       define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|
         @options[:'save-rerun'] = save

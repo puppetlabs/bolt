@@ -122,13 +122,6 @@ module Bolt
     def self.setup(config, pal, analytics = Bolt::Analytics::NoopClient.new)
       plugins = new(config, pal, analytics)
 
-      # Initialize any plugins referenced in plugin config. This will also indirectly
-      # initialize any plugins they depend on.
-      if plugins.reference?(config.plugins)
-        msg = "The 'plugins' setting cannot be set by a plugin reference"
-        raise PluginError.new(msg, 'bolt/plugin-error')
-      end
-
       config.plugins.each_key do |plugin|
         plugins.by_name(plugin)
       end

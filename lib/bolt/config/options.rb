@@ -307,7 +307,11 @@ module Bolt
                        "its value is a map of configuration data. Configurable options are specified by the plugin. "\
                        "Read more about configuring plugins in [Using plugins](using_plugins.md#configuring-plugins).",
           type: Hash,
-          _plugin: true,
+          additionalProperties: {
+            type: Hash,
+            _plugin: true
+          },
+          _plugin: false,
           _example: { "pkcs7" => { "keysize" => 1024 } }
         },
         "puppetdb" => {
