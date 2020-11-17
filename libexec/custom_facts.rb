@@ -51,7 +51,7 @@ Dir.mktmpdir do |puppet_root|
     Puppet::ResourceApi::Transport.inject_device(type, transport)
 
     Puppet[:facts_terminus] = :network_device
-    Puppet[:certname] = conn_info['uri']
+    Puppet[:certname] = conn_info['name']
   end
 
   facts = Puppet::Node::Facts.indirection.find(SecureRandom.uuid, environment: env)

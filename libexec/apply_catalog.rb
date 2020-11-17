@@ -74,7 +74,7 @@ begin
     Puppet::ResourceApi::Transport.inject_device(type, transport)
 
     Puppet[:facts_terminus] = :network_device
-    Puppet[:certname] = conn_info['uri']
+    Puppet[:certname] = conn_info['name']
   end
 
   # Ensure custom facts are available for provider suitability tests
