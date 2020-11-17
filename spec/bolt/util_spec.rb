@@ -63,7 +63,7 @@ describe Bolt::Util do
   end
 
   context "when parsing a yaml file with read_yaml_hash" do
-    it "raises an error with line and column number if the YAML has a syntax error" do
+    it "raises an error with line number if the YAML has a syntax error" do
       contents = <<-YAML
       ---
       version: 2
@@ -76,7 +76,21 @@ describe Bolt::Util do
       with_tempfile_containing('config_file_test', contents) do |file|
         expect {
           Bolt::Util.read_yaml_hash(file, 'inventory')
-        }.to raise_error(Bolt::FileError, /Error at line 2 column 14/)
+        }.to raise_error(Bolt::FileError, /line 2, column 14/)
+      end
+    end
+
+    it "does not error with line number if the YAML error does not include a line number" do
+      contents = <<~YAML
+        ---
+        color: :true
+      YAML
+
+      with_tempfile_containing('config_file_test', contents) do |file|
+        expect { Bolt::Util.read_yaml_hash(file, 'inventory') }.to raise_error do |error|
+          expect(error.class).to be(Bolt::FileError)
+          expect(error.message).not_to match(/line/)
+        end
       end
     end
 
