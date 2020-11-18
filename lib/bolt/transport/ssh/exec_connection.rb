@@ -12,8 +12,12 @@ module Bolt
           raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
 
           @target = target
-          ssh_config = Net::SSH::Config.for(target.host)
-          @user = @target.user || ssh_config[:user] || Etc.getlogin
+          begin
+            ssh_config = Net::SSH::Config.for(target.host)
+            @user = @target.user || ssh_config[:user] || Etc.getlogin
+          rescue StandardError
+            @user = @target.user || Etc.getlogin
+          end
           @logger = Bolt::Logger.logger(self)
         end
 
