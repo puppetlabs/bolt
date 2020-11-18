@@ -803,7 +803,7 @@ describe "BoltServer::TransportApp" do
       it 'parses inventory' do
         with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
           project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-          get("/project_inventory_targets?project_ref=#{project_ref}")
+          post("/project_inventory_targets?project_ref=#{project_ref}")
           expect(last_response.status).to eq(200)
           target_list = JSON.parse(last_response.body)
           target_names = target_list.map do |targ|
@@ -827,7 +827,7 @@ describe "BoltServer::TransportApp" do
         it 'sets transport independent from protocol' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
             project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            get("/project_inventory_targets?project_ref=#{project_ref}")
+            post("/project_inventory_targets?project_ref=#{project_ref}")
             expect(last_response.status).to eq(200)
             target_list = JSON.parse(last_response.body)
             expect(target_list.first['transport']).to eq('remote')
@@ -843,7 +843,7 @@ describe "BoltServer::TransportApp" do
         it 'responds with a 500 and error details' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
             project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            get("/project_inventory_targets?project_ref=#{project_ref}")
+            post("/project_inventory_targets?project_ref=#{project_ref}")
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt.inventory/validation-error')
@@ -856,14 +856,14 @@ describe "BoltServer::TransportApp" do
         non_default_inventoryfile_conf = bolt_project.merge({ 'inventoryfile' => non_default_inventoryfile })
         with_project(non_default_inventoryfile_conf, bolt_inventory, non_default_inventoryfile) do |path_to_tmp_project|
           project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-          get("/project_inventory_targets?project_ref=#{project_ref}")
+          post("/project_inventory_targets?project_ref=#{project_ref}")
           expect(last_response.status).to eq(500)
           expect(last_response.body).to match(/Project inventory must be defined in .*inventory.yaml.*/)
         end
       end
 
       it 'errors when project_ref is invalid' do
-        get('/project_inventory_targets?project_ref=foo')
+        post('/project_inventory_targets?project_ref=foo')
         expect(last_response.status).to eq(500)
         expect(last_response.body).to match(/foo does not exist/)
       end
