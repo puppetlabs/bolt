@@ -183,7 +183,8 @@ module Bolt
           properties: {
             "console" => {
               description: "Configuration for logs output to the console.",
-              type: Hash,
+              type: [String, Hash],
+              enum: ['disable'],
               properties: {
                 "level" => {
                   description: "The type of information to log.",

@@ -95,7 +95,13 @@
       "properties": {
         "console": {
           "description": "Configuration for logs output to the console.",
-          "type": "object",
+          "type": [
+            "string",
+            "object"
+          ],
+          "enum": [
+            "disable"
+          ],
           "properties": {
             "level": {
               "description": "The type of information to log.",
