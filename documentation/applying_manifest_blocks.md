@@ -240,9 +240,9 @@ name of a target.
 
 > **Note:** Only Hiera version 5 is supported in Bolt.
 
-Hiera is a key-value configuration data lookup system, used for separating data
+Hiera is a key-value configuration data look up system, used for separating data
 from Puppet code. You use Hiera data to implicitly override default class
-parameters. You can also explicitly lookup data from Hiera via the [`lookup`
+parameters. You can also explicitly look up data from Hiera via the [`lookup`
 function](https://puppet.com/docs/puppet/latest/function.html#lookup):
 
 ```puppet
@@ -275,42 +275,7 @@ gems with Bolt packages](bolt_installing.md#).
 [Hiera interpolations](https://puppet.com/docs/puppet/latest/hiera_merging.html#hiera_interpolation)
 are not supported in Bolt outside of apply blocks, because Hiera data is looked up per-target and
 plans do not run in a per-target context. If you want to use Hiera to look up data outside of an apply
-block and have an existing Hiera config that contains interpolations, you can add the data you want
-to use outside of the apply block to the top-level `plan_hierarchy` key. If present, Bolt uses the data 
-under the `plan_hierarchy` key outside of apply blocks, and uses the the typical hierarchy key inside 
-of apply blocks. This allows you to use your existing Hiera configs in Bolt plans without encountering 
-an error if interpolation exists and your plan tries to look up data outside of an apply block.
-
-For example, with this Hiera configuration at `<PROJECT DIRECTORY>/hiera.yaml`:
-```yaml
-version: 5
-
-hierarchy:
-  - name: "Target specific data"
-    path: "targets/%{trusted.certname}.yaml"
-  - name: "Per-OS defaults"
-    path: "os/%{facts.os.family}.yaml"
-  - name: Common
-    path: hierarchy.yaml
-
-plan_hierarchy:
-  - name: Common
-    path: plan_hierarchy.yaml
-```
-
-Bolt uses the `plan_hierarchy` data for the first `lookup()` call, and the regular `hierarchy`
-data for the second `lookup()` call:
-```
-plan plan_lookup(
-  TargetSpec $targets
-) {
-  $outside_apply = lookup('pop')
-  $in_apply = apply($targets) {
-    notify { lookup('pop'): }
-  }
-  ...
-}
-```
+block, you can use a [plan hierarchy](writing_plans.md#using-hiera-data-in-plans).
 
 ## Puppet log functions in Bolt
 
@@ -333,7 +298,7 @@ at the `info` level in Bolt. Log levels map as follows:
 ## Available plan functions
 
 In addition to the standard Puppet functions available to a catalog, such as
-`lookup`, you can use the following Bolt functions in a manifest block:
+`lookup()`, you can use the following Bolt functions in a manifest block:
 
 - [`puppetdb_query`](plan_functions.md#puppetdb_query)
 - [`puppetdb_facts`](plan_functions.md#puppetdb_facts)

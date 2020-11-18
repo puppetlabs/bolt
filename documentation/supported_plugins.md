@@ -112,7 +112,7 @@ The `puppetdb` plugin queries PuppetDB for a group of targets.
 If you require target-specific configuration, you can use the `puppetdb` plugin
 to look up configuration values for the `alias`, `config`, `facts`, `features`,
 `name`, `uri` and `vars` inventory options for each target. Set these values in
-the `target_mapping` field. The fact lookup values can be either `certname` to
+the `target_mapping` field. The fact look up values can be either `certname` to
 reference the `[certname]` of the target, or a [PQL dot
 notation](https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html#dot-notation)
 facts string such as `facts.os.family` to reference a fact value. Dot notation
