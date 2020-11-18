@@ -645,7 +645,7 @@ module BoltServer
     # Returns a list of targets parsed from a Project inventory
     #
     # @param project_ref [String] the project_ref to compute the inventory from
-    get '/project_inventory_targets' do
+    post '/project_inventory_targets' do
       return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
       bolt_config = config_from_project(params['project_ref'])
       if bolt_config.inventoryfile && bolt_config.project.inventory_file.to_s != bolt_config.inventoryfile
