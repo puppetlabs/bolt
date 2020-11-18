@@ -1,4 +1,4 @@
-plan sensitive (
+plan sensitive_test (
   Sensitive $array,
   Sensitive $hash,
   Sensitive $string

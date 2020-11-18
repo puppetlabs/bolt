@@ -1,4 +1,4 @@
-plan sensitive::no_api (
+plan sensitive_test::no_api (
   Sensitive[String] $string
 ) {
 }
