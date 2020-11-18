@@ -171,28 +171,31 @@ describe 'run_plan' do
       sensitive.expects(:new).with(input_params['string'])
                .returns(expected_params['string'])
 
-      is_expected.to run.with_params('sensitive', input_params.merge('_bolt_api_call' => true))
-                        .and_return(input_params)
+      is_expected.to run
+        .with_params('sensitive_test', input_params.merge('_bolt_api_call' => true))
+        .and_return(input_params)
     end
 
     it 'parameters are not wrapped from non-API calls' do
       sensitive.expects(:new).never
 
-      is_expected.to run.with_params('sensitive::no_api', 'string' => string)
-                        .and_raise_error(
-                          Puppet::ParseError,
-                          /parameter 'string' expects a Sensitive\[String\]/
-                        )
+      is_expected.to run
+        .with_params('sensitive_test::no_api', 'string' => string)
+        .and_raise_error(
+          Puppet::ParseError,
+          /parameter 'string' expects a Sensitive\[String\]/
+        )
     end
 
     it 'complex parameters using Sensitive are not wrapped' do
       sensitive.expects(:new).never
 
-      is_expected.to run.with_params('sensitive::complex', 'complex' => string)
-                        .and_raise_error(
-                          Puppet::ParseError,
-                          /parameter 'complex' expects a value of type Sensitive\[String\] or Array/
-                        )
+      is_expected.to run
+        .with_params('sensitive_test::complex', 'complex' => string)
+        .and_raise_error(
+          Puppet::ParseError,
+          /parameter 'complex' expects a value of type Sensitive\[String\] or Array/
+        )
     end
   end
 end
