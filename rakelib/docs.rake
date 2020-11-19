@@ -3,6 +3,49 @@
 require 'fileutils'
 require 'json'
 require 'erb'
+require 'net/http'
+
+class PuppetfileParser
+  attr_reader :local_modules, :modules
+
+  def initialize
+    @local_modules = []
+    @modules       = []
+  end
+
+  def forge(_forge); end
+
+  def moduledir(_moduledir); end
+
+  def mod(name, args)
+    case args
+    when String
+      @modules << [name, args]
+    else
+      @local_modules << [name, args]
+    end
+  end
+end
+
+def make_request(url)
+  uri = URI.parse(url)
+
+  # Build the client
+  client = Net::HTTP.new(uri.host, uri.port)
+  client.use_ssl = true
+
+  # Build the request
+  request = Net::HTTP::Get.new(uri.request_uri)
+
+  response = client.request(request)
+
+  case response
+  when Net::HTTPOK
+    response.body
+  else
+    raise "Error making request to #{uri}"
+  end
+end
 
 # rubocop:disable Lint/SuppressedException
 begin
@@ -19,6 +62,7 @@ begin
       privilege_escalation
       project_reference
       transports_reference
+      packaged_modules
     ]
 
     desc "Generate markdown docs for Bolt PowerShell cmdlets"
@@ -30,6 +74,44 @@ begin
       File.write(filepath, renderer.result)
 
       $stdout.puts "Generate PowerShell cmdlet reference at:\n\t#{filepath}"
+    end
+
+    desc "Generate markdown docs for packaged modules"
+    task :packaged_modules do
+      filepath   = File.expand_path('../documentation/packaged_modules.md', __dir__)
+      template   = File.expand_path('../documentation/templates/packaged_modules.md.erb', __dir__)
+      parser     = PuppetfileParser.new
+      puppetfile = File.read(File.expand_path('../Puppetfile', __dir__))
+
+      parser.instance_eval(puppetfile)
+
+      @forge_modules = parser.modules.sort.map do |mod|
+        slug = mod.join('-').tr('/', '-')
+        data = JSON.parse(make_request("https://forgeapi.puppet.com/v3/releases/#{slug}"))
+
+        {
+          name:        mod.first.tr('-', '/'),
+          version:     mod.last,
+          description: data['metadata']['summary'],
+          url:         "https://forge.puppet.com/#{mod.first.tr('-', '/')}/#{mod.last}"
+        }
+      end
+
+      @local_modules = parser.local_modules.sort.map do |mod|
+        readme = make_request("https://raw.githubusercontent.com/puppetlabs/bolt/main/modules/#{mod.first}/README.md")
+        match  = readme.match(/## Description(?<desc>.*)## Req/m)
+
+        {
+          name:        mod.first,
+          description: match[:desc].strip,
+          url:         "https://github.com/puppetlabs/bolt/main/modules/#{mod.first}"
+        }
+      end
+
+      renderer = ERB.new(File.read(template), nil, '-')
+      File.write(filepath, renderer.result)
+
+      $stdout.puts "Generated packaged modules at:\n\t#{filepath}"
     end
 
     desc "Generate markdown docs for Bolt shell commands"

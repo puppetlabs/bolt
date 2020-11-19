@@ -84,6 +84,7 @@ documentation/bolt_defaults_reference.md
 documentation/bolt_pwsh_reference.md
 documentation/bolt_project_reference.md
 documentation/bolt_transports_reference.md
+documentation/packaged_modules.md
 tasks/
 plans/
 

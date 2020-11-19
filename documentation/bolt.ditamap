@@ -76,6 +76,7 @@
                 <shortdesc>Use module structure if you use Forge modules with Bolt, or you want to develop your own modules to share tasks and plans.</shortdesc>
             </topicmeta>
         </topicref>
+        <topicref href="packaged_modules.md" format="markdown"/>
     </topicref>
     <topichead navtitle="Plugins">
       <topicref href="using_plugins.md" format="markdown"/>
