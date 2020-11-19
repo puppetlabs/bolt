@@ -1,5 +1,33 @@
 # Known issues
 
+## `facts` task fails on Windows targets with Facter 3 installed
+
+When running the `facts` task on a Windows target that has Facter 3 installed,
+the task will fail but still return facts for the target. Output may look
+similar to the following:
+
+```shell
+$ bolt task run facts --targets windows_target
+Started on windows_target...
+Failed on windows_target:
+{
+  ...
+}
+Failed on 1 target: windows_target
+Ran on 1 target in 4.97 sec
+```
+
+This failure is caused by a bug in Facter 3 on Windows that causes Facter to
+terminate with a segmentation violation signal when attempting to resolve Puppet
+facts.
+
+📖 **Related issues**
+
+- [#2344 - Bolt error caused by a Facter warning on
+  Windows](https://github.com/puppetlabs/bolt/issues/2344)
+- [FACT_1349 - testing custom fact via RUBYLIB causes
+  segfaults](https://tickets.puppetlabs.com/browse/FACT-1349)
+
 ## Tasks executed with PowerShell version 2.x or earlier cannot use parameters named `type`
 
 When executing PowerShell tasks on targets using PowerShell version 2.x or
