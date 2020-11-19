@@ -23,11 +23,17 @@ Gem::Specification.new do |spec|
                        Dir['bolt-modules/*/types/**/*.pp'] +
                        Dir['modules/*/metadata.json'] +
                        Dir['modules/*/bolt_plugin.json'] +
+                       Dir['modules/*/data/**/*'] +
+                       Dir['modules/*/facts.d/**/*'] +
                        Dir['modules/*/files/**/*'] +
+                       Dir['modules/*/functions/**/*'] +
                        Dir['modules/*/lib/**/*.rb'] +
                        Dir['modules/*/locales/**/*'] +
+                       Dir['modules/*/manifests/**/*'] +
                        Dir['modules/*/plans/**/*.pp'] +
                        Dir['modules/*/tasks/**/*'] +
+                       Dir['modules/*/templates/**/*'] +
+                       Dir['modules/*/types/**/*'] +
                        Dir['Puppetfile'] +
                        Dir['guides/*.txt']
   spec.bindir        = "exe"
