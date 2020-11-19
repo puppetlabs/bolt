@@ -6,11 +6,12 @@ require 'optparse'
 
 module Bolt
   class BoltOptionParser < OptionParser
+    PROJECT_PATHS = %w[project configfile boltdir].freeze
     OPTIONS = { inventory: %w[targets query rerun description],
                 authentication: %w[user password password-prompt private-key host-key-check ssl ssl-verify],
                 escalation: %w[run-as sudo-password sudo-password-prompt sudo-executable],
                 run_context: %w[concurrency inventoryfile save-rerun cleanup],
-                global_config_setters: %w[modulepath project configfile],
+                global_config_setters: PROJECT_PATHS + %w[modulepath],
                 transports: %w[transport connect-timeout tty native-ssh ssh-command copy-command],
                 display: %w[format color verbose trace],
                 global: %w[help version debug log-level] }.freeze
@@ -46,7 +47,8 @@ module Bolt
       when 'inventory'
         case action
         when 'show'
-          { flags: OPTIONS[:inventory] + OPTIONS[:global] + %w[format inventoryfile boltdir configfile detail],
+          { flags: OPTIONS[:inventory] + OPTIONS[:global] +
+            PROJECT_PATHS + %w[format inventoryfile detail],
             banner: INVENTORY_SHOW_HELP }
         else
           { flags: OPTIONS[:global],
@@ -55,7 +57,7 @@ module Bolt
       when 'group'
         case action
         when 'show'
-          { flags: OPTIONS[:global] + %w[format inventoryfile boltdir configfile],
+          { flags: OPTIONS[:global] + PROJECT_PATHS + %w[format inventoryfile],
             banner: GROUP_SHOW_HELP }
         else
           { flags: OPTIONS[:global],
@@ -67,13 +69,13 @@ module Bolt
       when 'module'
         case action
         when 'add'
-          { flags: OPTIONS[:global] + %w[configfile project],
+          { flags: OPTIONS[:global] + PROJECT_PATHS,
             banner: MODULE_ADD_HELP }
         when 'generate-types'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: MODULE_GENERATETYPES_HELP }
         when 'install'
-          { flags: OPTIONS[:global] + %w[configfile force project resolve],
+          { flags: OPTIONS[:global] + PROJECT_PATHS + %w[force resolve],
             banner: MODULE_INSTALL_HELP }
         when 'show'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
@@ -88,7 +90,7 @@ module Bolt
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: PLAN_CONVERT_HELP }
         when 'new'
-          { flags: OPTIONS[:global] + %w[configfile project pp],
+          { flags: OPTIONS[:global] + PROJECT_PATHS + %w[pp],
             banner: PLAN_NEW_HELP }
         when 'run'
           { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir hiera-config],
@@ -106,7 +108,7 @@ module Bolt
           { flags: OPTIONS[:global] + %w[modules],
             banner: PROJECT_INIT_HELP }
         when 'migrate'
-          { flags: OPTIONS[:global] + %w[inventoryfile project configfile],
+          { flags: OPTIONS[:global] + PROJECT_PATHS + %w[inventoryfile],
             banner: PROJECT_MIGRATE_HELP }
         else
           { flags: OPTIONS[:global],
@@ -793,7 +795,10 @@ module Bolt
         @options[:noop] = true
       end
       define('--description DESCRIPTION',
-             'Description to use for the job') do |description|
+             'Deprecated. Description to use for the job') do |description|
+        msg = "Command line option '--description' is deprecated, and will be "\
+          "removed in Bolt 3.0."
+        @deprecations << { type: 'Using --description', msg: msg }
         @options[:description] = description
       end
       define('--params PARAMETERS',
@@ -873,13 +878,25 @@ module Bolt
           File.expand_path(moduledir)
         end
       end
-      define('--project PATH', '--boltdir PATH',
-             'Specify what project to load config from (default: autodiscovered from current working dir)') do |path|
+      define('--boltdir PATH',
+             'Deprecated. Specify what project to load config from (default:',
+             'autodiscovered from current working dir)') do |path|
+        msg = "Command line option '--boltdir' is deprecated, use '--project' instead."
+        @deprecations << { type: 'Using --boltdir', msg: msg }
         @options[:boltdir] = path
       end
+      define('--project PATH',
+             'Path to load the Bolt project from (default: autodiscovered from current dir)') do |path|
+        @options[:project] = path
+      end
       define('--configfile PATH',
-             'Specify where to load config from (default: ~/.puppetlabs/bolt/bolt.yaml).',
-             'Directory containing bolt.yaml will be used as the project directory.') do |path|
+             'Deprecated. Specify where to load config from (default:',
+             '~/.puppetlabs/bolt/bolt.yaml). Directory containing bolt.yaml will be',
+             'used as the project directory.') do |path|
+        msg = "Command line option '--configfile' is deprecated, and " \
+          "will be removed in Bolt 3.0. Use '--project' and provide the "\
+          "directory path instead."
+        @deprecations << { type: 'Using --configfile', msg: msg }
         @options[:configfile] = path
       end
       define('--hiera-config PATH',
@@ -894,8 +911,14 @@ module Bolt
         @options[:inventoryfile] = File.expand_path(path)
       end
       define('--puppetfile PATH',
-             'Specify a Puppetfile to use when installing modules. (default: ~/.puppetlabs/bolt/Puppetfile)',
+             'Deprecated. Specify a Puppetfile to use when installing modules.',
+             ' (default: ~/.puppetlabs/bolt/Puppetfile)',
              'Modules are installed in the current project.') do |path|
+        command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
+        msg = "Command line option '--puppetfile' is deprecated, and will be removed "\
+          "in Bolt 3.0. You can migrate to using the new module management "\
+          "workflow using '#{command}'."
+        @deprecations << { type: 'Using --puppetfile', msg: msg }
         @options[:puppetfile_path] = File.expand_path(path)
       end
       define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|

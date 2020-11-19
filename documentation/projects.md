@@ -271,7 +271,7 @@ BOLT_PROJECT='~/project/my_project' bolt command run uptime -t target1
 ```
 
 > **Note:** The `BOLT_PROJECT` environment variable takes precedence over the
-> `--configfile` CLI option. 
+> `--project` CLI option. 
 
 📖 **Related information**
 

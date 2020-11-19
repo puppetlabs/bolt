@@ -859,6 +859,9 @@ describe "Bolt::CLI" do
       it 'uses a specified Puppetfile' do
         cli.parse
         expect(cli.config.puppetfile.to_s).to eq(puppetfile)
+        output = @log_output.readlines
+        # We'll have to remove this test soon anyway, may as well throw in a quick check
+        expect(output).to include(/Command line option '--puppetfile' is deprecated,/)
       end
     end
 
@@ -2454,8 +2457,8 @@ describe "Bolt::CLI" do
       allow(Bolt::Util).to receive(:validate_file).and_return(true)
     end
 
-    it 'loads from BOLT_PROJECT environment variable over --configfile' do
-      cli = Bolt::CLI.new(%w[command run uptime --configfile /foo/bar --targets foo])
+    it 'loads from BOLT_PROJECT environment variable over --project' do
+      cli = Bolt::CLI.new(%w[command run uptime --project /foo/bar --targets foo])
       cli.parse
 
       expect(cli.config.project.path).to eq(pathname)
