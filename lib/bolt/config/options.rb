@@ -33,6 +33,18 @@ module Bolt
             "_plugin" => {
               description: "The name of the plugin.",
               type: "string"
+            },
+            "_cache" => {
+              description: "This feature is experimental. Enable plugin caching and set a time-to-live.",
+              type: "object",
+              required: ["ttl"],
+              properties: {
+                "ttl" => {
+                  description: "Time in seconds to keep the plugin cache.",
+                  type: "integer",
+                  minimum: 0
+                }
+              }
             }
           }
         }
@@ -189,6 +201,20 @@ module Bolt
                         "project directory.",
           _example: "~/.puppetlabs/bolt/inventory.yaml",
           _default: "project/inventory.yaml"
+        },
+        "plugin-cache" => {
+          description: "This feature is experimental. Enable plugin caching and set the time-to-live.",
+          type: Hash,
+          required: ["ttl"],
+          properties: {
+            "ttl" => {
+              description: "Time in seconds to keep the plugin cache.",
+              type: Integer,
+              minimum: 0
+            }
+          },
+          _plugin: false,
+          _example: { "ttl" => 3600 }
         },
         "log" => {
           description: "A map of configuration for the logfile output. Under `log`, you can configure log options "\
@@ -540,6 +566,7 @@ module Bolt
         format
         inventory-config
         log
+        plugin-cache
         plugin-hooks
         plugin_hooks
         plugins
@@ -563,6 +590,7 @@ module Bolt
         modules
         name
         plans
+        plugin-cache
         plugin-hooks
         plugin_hooks
         plugins

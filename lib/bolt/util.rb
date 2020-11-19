@@ -22,6 +22,28 @@ module Bolt
         raise Bolt::FileError.new("Error attempting to read #{file}: #{e}", file)
       end
 
+      def read_json_file(path, filename)
+        require 'json'
+
+        logger = Bolt::Logger.logger(self)
+        path = File.expand_path(path)
+        content = JSON.parse(File.read(path))
+        logger.trace("Loaded #{filename} from #{path}")
+        content
+      rescue Errno::ENOENT
+        raise Bolt::FileError.new("Could not read #{filename} file at #{path}", path)
+      rescue JSON::ParserError => e
+        msg = "Unable to parse #{filename} file at #{path} as JSON: #{e.message}"
+        raise Bolt::FileError.new(msg, path)
+      rescue IOError, SystemCallError => e
+        raise Bolt::FileError.new("Could not read #{filename} file at #{path}\n#{e.message}",
+                                  path)
+      end
+
+      def read_optional_json_file(path, file_name)
+        File.exist?(path) && !File.zero?(path) ? read_yaml_hash(path, file_name) : {}
+      end
+
       def read_yaml_hash(path, file_name)
         require 'yaml'
 

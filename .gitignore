@@ -36,6 +36,7 @@ Gemfile.local
 
 # Running Bolt from source
 .rerun.json
+.plugin_cache.json
 Boltdir/
 bolt.yaml
 project.yaml

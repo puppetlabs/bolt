@@ -197,6 +197,10 @@ module Bolt
       @parser_deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
       config.deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
 
+      if options[:clear_cache] && File.exist?(config.project.cache_file)
+        FileUtils.rm(config.project.cache_file)
+      end
+
       warn_inventory_overrides_cli(options)
       validate_ps_version
 

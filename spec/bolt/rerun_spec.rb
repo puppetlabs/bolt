@@ -74,7 +74,7 @@ describe 'rerun' do
     File.write(File.join(@project.path, '.rerun.json'), 'not"json:')
     expect do
       run_cli(['command', 'run', 'whoami', '--rerun', 'all'])
-    end.to raise_error(Bolt::FileError, /Could not parse rerun/)
+    end.to raise_error(Bolt::FileError, /Unable to parse rerun file/)
   end
 
   it 'fails with invalid data in the rerun file' do

@@ -125,6 +125,45 @@ describe Bolt::Util do
     end
   end
 
+  describe "#read_json_file" do
+    it "reads a json file" do
+      contents = "{\"my\": \"cool data\"}"
+
+      with_tempfile_containing('json_test', contents) do |file|
+        expect(Bolt::Util.read_json_file(file, 'inventory'))
+          .to eq({ "my" => "cool data" })
+      end
+    end
+
+    it "raises an error if JSON is invalid" do
+      contents = "{\"invalid\": \"json\""
+
+      with_tempfile_containing('json_test', contents) do |file|
+        expect {
+          Bolt::Util.read_json_file(file, 'json')
+        }.to raise_error(Bolt::FileError, /Unable to parse json file at/)
+      end
+    end
+
+    it "errors when file does not exist and is required" do
+      expect {
+        Bolt::Util.read_json_file('does-not-exist', 'json')
+      }.to raise_error(Bolt::FileError, /Could not read json file at/)
+    end
+  end
+
+  describe "#read_optional_json_file" do
+    it "returns an empty hash when the json file does not exist" do
+      expect(Bolt::Util.read_optional_json_file('does-not-exist', 'config')).to eq({})
+    end
+
+    it "returns an empty hash when the json file is empty" do
+      Tempfile.create do |file|
+        expect(Bolt::Util.read_optional_json_file(file.path, 'config')).to eq({})
+      end
+    end
+  end
+
   describe '#deep_clone' do
     it 'works with frozen hashes' do
       hash = { key: 'value', boolean: true }

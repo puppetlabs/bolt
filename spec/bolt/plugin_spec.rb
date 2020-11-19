@@ -19,11 +19,15 @@ describe Bolt::Plugin do
 
   let(:plugins) { Bolt::Plugin.setup(config(config_data), pal) }
 
-  def identity(value)
-    {
+  def identity(value, cache = nil)
+    plugin = {
       '_plugin' => 'identity',
       'value' => value
     }
+    unless cache.nil?
+      plugin.merge!({ '_cache' => cache })
+    end
+    plugin
   end
 
   it 'loads an empty plugin module' do

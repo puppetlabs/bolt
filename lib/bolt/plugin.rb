@@ -4,6 +4,7 @@ require 'bolt/inventory'
 require 'bolt/executor'
 require 'bolt/module'
 require 'bolt/pal'
+require 'bolt/plugin/cache'
 require 'bolt/plugin/puppetdb'
 
 module Bolt
@@ -294,6 +295,16 @@ module Bolt
     # Evaluates a single reference. The value returned may be another
     # reference.
     def resolve_single_reference(reference)
+      plugin_cache = if cache?(reference)
+                       cache = Bolt::Plugin::Cache.new(reference,
+                                                       @config.project.cache_file,
+                                                       @config.plugin_cache)
+                       entry = cache.read_and_clean_cache
+                       return entry unless entry.nil?
+
+                       cache
+                     end
+
       plugin_name = reference['_plugin']
       hook = get_hook(plugin_name, :resolve_reference)
 
@@ -305,15 +316,23 @@ module Bolt
 
       validate_proc.call(reference)
 
-      begin
+      result = begin
         # Evaluate the plugin and then recursively evaluate any plugin returned by it.
         hook.call(reference)
       rescue StandardError => e
         loc = "resolve_reference in #{plugin_name}"
         raise PluginError::ExecutionError.new(e.message, plugin_name, loc)
       end
+
+      plugin_cache.write_cache(result) if cache?(reference)
+
+      result
     end
     private :resolve_single_reference
+
+    private def cache?(reference)
+      reference.key?('_cache') || @config.plugin_cache.key?('ttl')
+    end
 
     # Checks whether a given value is a _plugin reference
     def reference?(input)
