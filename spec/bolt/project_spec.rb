@@ -192,8 +192,8 @@ describe Bolt::Project do
     it 'warns and continues if project creation fails' do
       expect(FileUtils).to receive(:mkdir_p).with('myproject').and_raise(Errno::EACCES)
       # Ensure execution continues
-      expect(Bolt::Project).to receive(:new).with(anything, 'myproject', 'user',
-                                                  [{ warn: /Could not create default project / }])
+      expect(Bolt::Project).to receive(:new)
+        .with(anything, 'myproject', 'user', [{ warn: /Could not create default project / }], [])
       Bolt::Project.create_project('myproject', 'user')
     end
   end

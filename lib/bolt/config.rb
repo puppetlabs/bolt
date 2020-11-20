@@ -33,7 +33,9 @@ module Bolt
     end
 
     def self.from_project(project, overrides = {})
-      logs = []
+      logs         = []
+      deprecations = []
+
       conf = if project.project_file == project.config_file
                project.data
              else
@@ -43,7 +45,12 @@ module Bolt
                # with all validation errors.
                Validator.new.tap do |validator|
                  validator.validate(c, bolt_schema, project.config_file.to_s)
+
                  validator.warnings.each { |warning| logs << { warn: warning } }
+
+                 validator.deprecations.each do |dep|
+                   deprecations << { type: "#{BOLT_CONFIG_NAME} #{dep[:option]}", msg: dep[:message] }
+                 end
                end
 
                logs << { debug: "Loaded configuration from #{project.config_file}" } if File.exist?(project.config_file)
@@ -51,18 +58,19 @@ module Bolt
              end
 
       data = load_defaults(project).push(
-        filepath: project.config_file,
-        data: conf,
-        logs: logs,
-        deprecations: []
+        filepath:     project.config_file,
+        data:         conf,
+        logs:         logs,
+        deprecations: deprecations
       )
 
       new(project, data, overrides)
     end
 
     def self.from_file(configfile, overrides = {})
-      project = Bolt::Project.create_project(Pathname.new(configfile).expand_path.dirname)
-      logs = []
+      project      = Bolt::Project.create_project(Pathname.new(configfile).expand_path.dirname)
+      logs         = []
+      deprecations = []
 
       conf = if project.project_file == project.config_file
                project.data
@@ -72,8 +80,13 @@ module Bolt
                # Validate the config against the schema. This will raise a single error
                # with all validation errors.
                Validator.new.tap do |validator|
-                 validator.validate(c, bolt_schema, configfile)
+                 validator.validate(c, bolt_schema, project.config_file.to_s)
+
                  validator.warnings.each { |warning| logs << { warn: warning } }
+
+                 validator.deprecations.each do |dep|
+                   deprecations << { type: "#{BOLT_CONFIG_NAME} #{dep[:option]}", msg: dep[:message] }
+                 end
                end
 
                logs << { debug: "Loaded configuration from #{configfile}" }
@@ -81,10 +94,10 @@ module Bolt
              end
 
       data = load_defaults(project).push(
-        filepath: configfile,
-        data: conf,
-        logs: logs,
-        deprecations: []
+        filepath:     configfile,
+        data:         conf,
+        logs:         logs,
+        deprecations: deprecations
       )
 
       new(project, data, overrides)
@@ -126,9 +139,10 @@ module Bolt
     # projects. This file does not allow project-specific configuration such as 'hiera-config' and
     # 'inventoryfile', and nests all default inventory configuration under an 'inventory-config' key.
     def self.load_bolt_defaults_yaml(dir)
-      filepath = dir + BOLT_DEFAULTS_NAME
-      data     = Bolt::Util.read_yaml_hash(filepath, 'config')
-      logs     = [{ debug: "Loaded configuration from #{filepath}" }]
+      filepath     = dir + BOLT_DEFAULTS_NAME
+      data         = Bolt::Util.read_yaml_hash(filepath, 'config')
+      logs         = [{ debug: "Loaded configuration from #{filepath}" }]
+      deprecations = []
 
       # Warn if 'bolt.yaml' detected in same directory.
       if File.exist?(bolt_yaml = dir + BOLT_CONFIG_NAME)
@@ -142,7 +156,12 @@ module Bolt
       # with all validation errors.
       Validator.new.tap do |validator|
         validator.validate(data, defaults_schema, filepath)
+
         validator.warnings.each { |warning| logs << { warn: warning } }
+
+        validator.deprecations.each do |dep|
+          deprecations << { type: "#{BOLT_DEFAULTS_NAME} #{dep[:option]}", msg: dep[:message] }
+        end
       end
 
       # Remove project-specific config such as hiera-config, etc.
@@ -187,15 +206,15 @@ module Bolt
         data = data.merge(data.delete('inventory-config'))
       end
 
-      { filepath: filepath, data: data, logs: logs, deprecations: [] }
+      { filepath: filepath, data: data, logs: logs, deprecations: deprecations }
     end
 
     # Loads a 'bolt.yaml' file, the legacy configuration file. There's no special munging needed
     # here since Bolt::Config will just ignore any invalid keys.
     def self.load_bolt_yaml(dir)
-      filepath = dir + BOLT_CONFIG_NAME
-      data     = Bolt::Util.read_yaml_hash(filepath, 'config')
-      logs     = [{ debug: "Loaded configuration from #{filepath}" }]
+      filepath     = dir + BOLT_CONFIG_NAME
+      data         = Bolt::Util.read_yaml_hash(filepath, 'config')
+      logs         = [{ debug: "Loaded configuration from #{filepath}" }]
       deprecations = [{ type: 'Using bolt.yaml for system configuration',
                         msg: "Configuration file #{filepath} is deprecated and will be removed in a future version "\
                         "of Bolt. Use '#{dir + BOLT_DEFAULTS_NAME}' instead." }]
@@ -204,7 +223,12 @@ module Bolt
       # with all validation errors.
       Validator.new.tap do |validator|
         validator.validate(data, bolt_schema, filepath)
+
         validator.warnings.each { |warning| logs << { warn: warning } }
+
+        validator.deprecations.each do |dep|
+          deprecations << { type: "#{BOLT_CONFIG_NAME} #{dep[:option]}", msg: dep[:message] }
+        end
       end
 
       { filepath: filepath, data: data, logs: logs, deprecations: deprecations }

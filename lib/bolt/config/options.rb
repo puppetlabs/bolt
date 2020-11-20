@@ -169,6 +169,9 @@ module Bolt
                        "files](inventory_file_v2.md).",
           type: String,
           _plugin: false,
+          _deprecation: "This option will be removed in Bolt 3.0. Use the `--inventoryfile` command-line option "\
+                        "to use a non-default inventory file or move the file contents to `inventory.yaml` in the "\
+                        "project directory.",
           _example: "~/.puppetlabs/bolt/inventory.yaml",
           _default: "project/inventory.yaml"
         },

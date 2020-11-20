@@ -39,7 +39,7 @@ following command:
 
 Bolt will locate the inventory file for the current Bolt project and migrate it
 in place. You can specify the projects and inventory files you want to migrate
-using the `project` and `inventoryfile` options.
+using the `--project` and `--inventoryfile` command-line options.
 
 > **Note:** This command modifies an inventory file in place and does not
 > preserve comments or formatting. Before using the command, make sure to backup

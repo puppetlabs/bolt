@@ -389,4 +389,29 @@ describe Bolt::Config::Validator do
       expect(validator.warnings.empty?).to be
     end
   end
+
+  context 'adding deprecations' do
+    context ':_deprecation' do
+      let(:schema) do
+        {
+          'option' => {
+            type:         Integer,
+            _deprecation: "Donut use."
+          }
+        }
+      end
+
+      it 'adds a deprecation warning' do
+        data['option'] = 100
+
+        described_class.new.tap do |validator|
+          validator.validate(data, schema, location)
+          expect(validator.deprecations).to include(
+            option:  'option',
+            message: /Option 'option' at config is deprecated. Donut use./
+          )
+        end
+      end
+    end
+  end
 end

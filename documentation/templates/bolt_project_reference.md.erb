@@ -6,7 +6,11 @@ For more information, see [Configuring Bolt](configuring_bolt.md).
 ## Options
 
 <% @opts.each do |option, data| -%>
-### `<%= option %>`
+### <% if data.key?(:_deprecation) %>⛔<% end %> `<%= option %>`
+
+<% if data.key?(:_deprecation) -%>
+_This option is deprecated. <%= data[:_deprecation] %>_
+<% end -%>
 
 <%= data[:description] %>
 
