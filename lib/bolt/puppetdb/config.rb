@@ -18,8 +18,7 @@ module Bolt
       end
 
       def self.default_windows_config
-        require 'win32/dir'
-        File.expand_path(File.join(Dir::COMMON_APPDATA, 'PuppetLabs/client-tools/puppetdb.conf'))
+        File.expand_path(File.join(ENV['ALLUSERSPROFILE'], 'PuppetLabs/client-tools/puppetdb.conf'))
       end
 
       def self.load_config(options, project_path = nil)
