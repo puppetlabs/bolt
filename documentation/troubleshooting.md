@@ -14,6 +14,18 @@ Make sure your task executable is named the same as your task metadata. For
 example, if your task is named `mytask.rb`, you must name your metadata file
 `mytask.json`.
 
+## I can't add a module to my Bolt project
+
+If you receive the following error:
+
+```shell
+Unable to use command 'bolt module add'. To use this command, update your project configuration to manage module dependencies.
+```
+
+You need to upgrade your project so Bolt can manage your modules and
+dependencies. For more information, see [migrate a Bolt
+project](./projects.md#migrate-a-bolt-project).
+
 ## My task fails mysteriously
 
 Try running Bolt with `--log-level debug` to see the exact output from your task.

@@ -30,7 +30,6 @@ After you've completed this guide, you'll know how to:
 >  everything you need from the [Getting started
 >  repo](https://github.com/puppetlabs/bolt-getting-started).
 
-
 ## Create a Bolt project and set up targets
 
 A Bolt project is a directory containing a `bolt-project.yaml` file. The `bolt-project.yaml`
@@ -39,16 +38,22 @@ must contain a `bolt-project.yaml` file so that Bolt recognizes it as a Bolt pro
 
 ### Create a Bolt project directory
 
-
 Create a directory named my_project:
 ```bash
 mkdir my_project
 ```
 
-In your my_project directory, create a file named bolt-project.yaml with the following contents:
-```bash
-# my_project/bolt-project.yaml
-name: my_project
+Inside your `my_project` directory, run the following command to turn
+`my_project` into a Bolt project:
+
+*\*nix shell command*
+```shell
+bolt project init my_project 
+```
+
+*Powershell cmdlet*
+```shell
+New-BoltProject -Name my_project
 ```
 
 To use Bolt plans or tasks, your Bolt project must use a specific directory

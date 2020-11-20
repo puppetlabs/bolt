@@ -102,19 +102,15 @@ You can also load parameters from a file by putting `@` before the file name.
   Invoke-BoltTask -Name mymodule::mytask -Targets app1.myorg.com -Params '@param_file.json'
   ```
 
-## Specifying the modulepath
+## Task location
 
-In order for Bolt to find a task, the task must be in a module on the module
-path. The default modulepath is `[<PROJECT DIRECTORY>/modules, <PROJECT
-DIRECTORY>/site-modules]`.
-
-The current [Bolt project](./experimental_features.md#bolt-projects) is loaded
-as a standalone module at the front of the modulepath.  If you are developing a
-new task, you can create a `<PROJECT DIRECTORY>/bolt-project.yaml` file, develop
-your task in `<PROJECT DIRECTORY>/tasks/`, and run Bolt from the root of your
-Bolt project directory to test the task. For more information, see [Bolt
-projects](projects.md).
+In order for Bolt to find a task, the task must be in a module on the modulepath
+or in the `tasks/` directory in your Bolt project. If you are developing a new
+task, you can [create a Bolt project](projects.md#create-a-bolt-project),
+develop your task in `<PROJECT DIRECTORY>/tasks/`, and run Bolt from the root of
+your Bolt project directory to test the task.
 
 📖 **Related information**
 
-[Bolt project directories](projects.md)
+- For more information on projects, see [Bolt projects](projects.md).
+- For more information on the modulepath, see [Modules overview](modules.md#modulepath).

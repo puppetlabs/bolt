@@ -60,28 +60,16 @@
             </topicmeta>
         </topicref>
     </topicref>
-    <topicref href = "modules.md" format="markdown">
-        <topicref href="managing_modules.md" format="markdown">
-            <topicmeta>
-                <shortdesc>Install your modules and let Bolt manage your dependencies.</shortdesc>
-            </topicmeta>
-        </topicref> 
-        <topicref href="bolt_installing_modules.md" format="markdown">
-            <topicmeta>
-                <shortdesc>Install a Forge module with Bolt.</shortdesc>
-            </topicmeta>
-        </topicref>
-        <topicref href="module_structure.md" format="markdown">
-            <topicmeta>
-                <shortdesc>Use module structure if you use Forge modules with Bolt, or you want to develop your own modules to share tasks and plans.</shortdesc>
-            </topicmeta>
-        </topicref>
+    <topichead navtitle="Modules">
+        <topicref href="modules.md" format="markdown"/>
+        <topicref href="bolt_installing_modules.md" format="markdown"/>
+        <topicref href="module_structure.md" format="markdown"/>
         <topicref href="packaged_modules.md" format="markdown"/>
-    </topicref>
+    </topichead>
     <topichead navtitle="Plugins">
-      <topicref href="using_plugins.md" format="markdown"/>
-      <topicref href="supported_plugins.md" format="markdown"/>
-      <topicref href="writing_plugins.md" format="markdown"/>
+        <topicref href="using_plugins.md" format="markdown"/>
+        <topicref href="supported_plugins.md" format="markdown"/>
+        <topicref href="writing_plugins.md" format="markdown"/>
     </topichead>
     <topichead navtitle="Using Bolt with Puppet">
         <topicref href="applying_manifest_blocks.md" format="markdown"/>
