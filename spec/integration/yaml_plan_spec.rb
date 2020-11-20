@@ -21,7 +21,7 @@ describe "running YAML plans", ssh: true do
   let(:password) { conn_info('ssh')[:password] }
   let(:config_flags) {
     ['--format', 'json',
-     '--configfile', fixture_path('configs', 'empty.yml'),
+     '--project', fixture_path('configs', 'empty'),
      '--modulepath', modulepath,
      '--run-as', 'root',
      '--sudo-password', password,

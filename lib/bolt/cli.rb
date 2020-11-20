@@ -164,8 +164,9 @@ module Bolt
                 elsif options[:configfile]
                   Bolt::Config.from_file(options[:configfile], options)
                 else
-                  project = if options[:boltdir]
-                              dir = Pathname.new(options[:boltdir])
+                  cli_flag = options[:project] || options[:boltdir]
+                  project = if cli_flag
+                              dir = Pathname.new(cli_flag)
                               if (dir + Bolt::Project::BOLTDIR_NAME).directory?
                                 Bolt::Project.create_project(dir + Bolt::Project::BOLTDIR_NAME)
                               else
@@ -293,7 +294,7 @@ module Bolt
               "Unknown argument(s) #{options[:leftovers].join(', ')}"
       end
 
-      if options[:boltdir] && options[:configfile]
+      if options.slice(:boltdir, :configfile, :project).length > 1
         raise Bolt::CLIError, "Only one of '--boltdir', '--project', or '--configfile' may be specified"
       end
 
