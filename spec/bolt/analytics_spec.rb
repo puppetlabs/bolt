@@ -107,11 +107,8 @@ describe Bolt::Analytics do
     end
 
     it 'returns an empty hash if config file is empty', :load_config do
-      logger = double('logger')
-      allow(logger).to receive(:warn)
-
       Tempfile.create('analytics.yaml', Dir.pwd) do |file|
-        expect(subject.load_config(file, logger)).to eq({})
+        expect(subject.load_config(file)).to eq({})
       end
     end
   end

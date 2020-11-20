@@ -2,6 +2,7 @@
 
 require 'bolt/util'
 require 'bolt/version'
+require 'find'
 require 'json'
 require 'logging'
 require 'securerandom'
@@ -23,14 +24,16 @@ module Bolt
       plan_steps: :cd8,
       return_type: :cd9,
       inventory_version: :cd10,
-      boltdir_type: :cd11
+      boltdir_type: :cd11,
+      puppet_plan_count: :cd12,
+      yaml_plan_count: :cd13
     }.freeze
 
     def self.build_client
       logger = Bolt::Logger.logger(self)
       begin
-        config_file = config_path(logger)
-        config = load_config(config_file, logger)
+        config_file = config_path
+        config = load_config(config_file)
       rescue ArgumentError
         config = { 'disabled' => true }
       end
@@ -51,7 +54,7 @@ module Bolt
       NoopClient.new
     end
 
-    def self.config_path(logger)
+    def self.config_path
       path     = File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'analytics.yaml'))
       old_path = File.expand_path(File.join('~', '.puppetlabs', 'bolt', 'analytics.yaml'))
 
@@ -59,7 +62,7 @@ module Bolt
         if File.exist?(old_path)
           message = "Detected analytics configuration files at '#{old_path}' and '#{path}'. Loading "\
                     "analytics configuration from '#{path}'."
-          logger.warn(message)
+          Bolt::Logger.warn_once('duplicate_analytics', message)
         end
 
         path
@@ -70,12 +73,12 @@ module Bolt
       end
     end
 
-    def self.load_config(filename, logger)
+    def self.load_config(filename)
       if File.exist?(filename)
         Bolt::Util.read_optional_yaml_hash(filename, 'analytics')
       else
         unless ENV['BOLT_DISABLE_ANALYTICS']
-          logger.warn <<~ANALYTICS
+          Bolt::Logger.warn_once('analytics_opt_out', <<~ANALYTICS)
             Bolt collects data about how you use it. You can opt out of providing this data.
 
             To disable analytics data collection, add this line to ~/.puppetlabs/etc/bolt/analytics.yaml :
@@ -137,6 +140,18 @@ module Bolt
         if bundled_content[mode.split(' ').first]&.include?(name)
           event('Bundled Content', mode, label: name)
         end
+      end
+
+      def plan_counts(plans_path)
+        pp_count, yaml_count = if File.exist?(plans_path)
+                                 %w[pp yaml].map do |extension|
+                                   Find.find(plans_path.to_s).grep(/.*\.#{extension}/).length
+                                 end
+                               else
+                                 [0, 0]
+                               end
+
+        { puppet_plan_count: pp_count, yaml_plan_count: yaml_count }
       end
 
       def event(category, action, label: nil, value: nil, **kwargs)
@@ -223,6 +238,10 @@ module Bolt
       end
 
       def report_bundled_content(mode, name); end
+
+      def plan_counts(_)
+        {}
+      end
 
       def event(category, action, **_kwargs)
         @logger.trace "Skipping submission of '#{category} #{action}' event because analytics is disabled"
