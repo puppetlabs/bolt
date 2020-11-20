@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'bolt/project_migrator/base'
+require 'bolt/project_manager/migrator'
 
 module Bolt
-  class ProjectMigrator
-    class Inventory < Base
+  class ProjectManager
+    class InventoryMigrator < Migrator
       def migrate(inventory_file, backup_dir)
         inventory1to2(inventory_file, backup_dir)
       end
