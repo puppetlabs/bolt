@@ -369,7 +369,7 @@ describe "BoltServer::TransportApp" do
                 ),
                 "uri" => {
                   "path" => "/puppet/v3/file_content/tasks/bolt_server_test_project/hidden.sh",
-                  "params" => { "project" => 'bolt_server_test_project' }
+                  "params" => { "versioned_project" => 'bolt_server_test_project' }
                 }
               }
             ],
@@ -402,7 +402,7 @@ describe "BoltServer::TransportApp" do
                 ),
                 "uri" => {
                   "path" => "/puppet/v3/file_content/tasks/bolt_server_test_project/init.sh",
-                  "params" => { "project" => 'bolt_server_test_project' }
+                  "params" => { "versioned_project" => 'bolt_server_test_project' }
                 }
               }
             ],

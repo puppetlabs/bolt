@@ -543,7 +543,7 @@ module BoltServer
       return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
       in_bolt_project(params['project_ref']) do |context|
         ps_parameters = {
-          'project' => params['project_ref']
+          'versioned_project' => params['project_ref']
         }
         task_info = pe_task_info(context[:pal], params[:module_name], params[:task_name], ps_parameters)
         task_info = allowed_helper(task_info, context[:config].project.tasks)
