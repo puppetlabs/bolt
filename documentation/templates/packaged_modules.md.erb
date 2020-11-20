@@ -1,0 +1,24 @@
+# Packaged modules
+
+The following modules are shipped with Bolt packages.
+
+## Forge modules
+
+The following Forge modules are shipped with Bolt packages.
+
+| Module | Version | Description |
+| --- | --- | --- |
+<% for mod in @forge_modules -%>
+| [<%= mod[:name] %>](<%= mod[:url] %>) | <%= mod[:version] %> | <%= mod[:description] %> |
+<% end -%>
+
+## Local modules
+
+The following modules are shipped with Bolt packages and are not available
+on the Puppet Forge.
+
+| Module | Description |
+| --- | --- |
+<% for mod in @local_modules -%>
+| [<%= mod[:name] %>](<%= mod[:url] %>) | <%= mod[:description].gsub("\n", '') %> |
+<% end -%>
