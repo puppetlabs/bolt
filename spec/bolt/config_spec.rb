@@ -328,7 +328,7 @@ describe Bolt::Config do
             }
           }
         },
-        'plugin_hooks' => {
+        'plugin-hooks' => {
           'puppet_library' => {
             'plugin' => 'puppet_agent',
             '_run_as' => 'root'
@@ -350,7 +350,7 @@ describe Bolt::Config do
             'credentials' => '~/aws/credentials'
           }
         },
-        'plugin_hooks' => {
+        'plugin-hooks' => {
           'puppet_library' => {
             'plugin' => 'task',
             'task' => 'bootstrap'

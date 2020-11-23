@@ -282,6 +282,7 @@ module Bolt
         'concurrency'         => default_concurrency,
         'format'              => 'human',
         'log'                 => { 'console' => {} },
+        'plugin-hooks'        => {},
         'plugin_hooks'        => {},
         'plugins'             => {},
         'puppetdb'            => {},
@@ -369,7 +370,7 @@ module Bolt
           when *TRANSPORT_CONFIG.keys
             Bolt::Util.deep_merge(val1, val2)
           # Hash values are shallow merged
-          when 'puppetdb', 'plugin_hooks', 'apply_settings', 'log'
+          when 'puppetdb', 'plugin-hooks', 'plugin_hooks', 'apply_settings', 'log'
             val1.merge(val2)
           # All other values are overwritten
           else
@@ -567,7 +568,18 @@ module Bolt
     end
 
     def plugin_hooks
-      @data['plugin_hooks']
+      if @data['plugin-hooks'].any? && @data['plugin_hooks'].any?
+        Bolt::Logger.warn_once(
+          "plugin-hooks and plugin_hooks set",
+          "Detected configuration for 'plugin-hooks' and 'plugin_hooks'. Bolt will ignore 'plugin_hooks'."
+        )
+
+        @data['plugin-hooks']
+      elsif @data['plugin-hooks'].any?
+        @data['plugin-hooks']
+      else
+        @data['plugin_hooks']
+      end
     end
 
     def trusted_external

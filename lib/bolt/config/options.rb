@@ -304,6 +304,16 @@ module Bolt
                        "and [`task`](using_plugins.md#task).",
           type: Hash,
           _plugin: true,
+          _example: { "puppet_library" => { "plugin" => "puppet_agent", "version" => "6.15.0", "_run_as" => "root" } },
+          _deprecation: "This option will be removed in Bolt 3.0. Use `plugin-hooks` instead."
+        },
+        "plugin-hooks" => {
+          description: "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. "\
+                       "The only configurable plugin hook is `puppet_library`, which can use two possible plugins: "\
+                       "[`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) "\
+                       "and [`task`](using_plugins.md#task).",
+          type: Hash,
+          _plugin: true,
           _example: { "puppet_library" => { "plugin" => "puppet_agent", "version" => "6.15.0", "_run_as" => "root" } }
         },
         "plugins" => {
@@ -497,6 +507,7 @@ module Bolt
         inventoryfile
         log
         modulepath
+        plugin-hooks
         plugin_hooks
         plugins
         puppetdb
@@ -513,6 +524,7 @@ module Bolt
         format
         inventory-config
         log
+        plugin-hooks
         plugin_hooks
         plugins
         puppetdb
@@ -534,6 +546,7 @@ module Bolt
         modules
         name
         plans
+        plugin-hooks
         plugin_hooks
         plugins
         puppetdb

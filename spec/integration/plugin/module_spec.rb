@@ -28,7 +28,7 @@ describe 'using module based plugins' do
   let(:config) {
     { 'modulepath' => ['modules', File.join(__dir__, '../../fixtures/plugin_modules')],
       'plugins' => plugin_config,
-      'plugin_hooks' => plugin_hooks }
+      'plugin-hooks' => plugin_hooks }
   }
 
   let(:plan) do

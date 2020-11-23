@@ -165,14 +165,14 @@ task as the default Puppet library plugin. However, you can configure Bolt to
 use another plugin instead.
 
 To configure Bolt to use a specific Puppet library plugin, configure the
-`puppet_library` plugin hook under the `plugin_hooks` key in a configuration
+`puppet_library` plugin hook under the `plugin-hooks` key in a configuration
 file. The `puppet_library` plugin hook accepts one of two different plugins.
 The `puppet_agent` plugin is the default plugin that Bolt is configured to use,
 while `task` can be used to specify a task to run as a plugin.
 
 ```yaml
 # bolt-defaults.yaml
-plugin_hooks:
+plugin-hooks:
   puppet_library:
     plugin: task
     task: <plugin name>

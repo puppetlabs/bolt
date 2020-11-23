@@ -27,7 +27,7 @@ describe 'using the task plugin' do
   let(:config) {
     {
       'modulepath' => ['modules', File.join(__dir__, '../../fixtures/modules')],
-      'plugin_hooks' => plugin_hooks
+      'plugin-hooks' => plugin_hooks
     }
   }
 

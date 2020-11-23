@@ -40,6 +40,9 @@
     "plans": {
       "$ref": "#/definitions/plans"
     },
+    "plugin-hooks": {
+      "$ref": "#/definitions/plugin-hooks"
+    },
     "plugin_hooks": {
       "$ref": "#/definitions/plugin_hooks"
     },
@@ -224,6 +227,17 @@
     "plans": {
       "description": "A list of plan names and glob patterns to filter the project's plans by. This option is used to limit the visibility of plans for users of the project. For example, project authors might want to limit the visibility of plans that are bundled with Bolt or plans that should only be run as part of another plan. When this option is not configured, all plans are visible. This option does not prevent users from running plans that are not part of this list.",
       "type": "array"
+    },
+    "plugin-hooks": {
+      "description": "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. The only configurable plugin hook is `puppet_library`, which can use two possible plugins: [`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) and [`task`](using_plugins.md#task).",
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
     },
     "plugin_hooks": {
       "description": "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. The only configurable plugin hook is `puppet_library`, which can use two possible plugins: [`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) and [`task`](using_plugins.md#task).",
