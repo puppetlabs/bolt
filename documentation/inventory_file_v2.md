@@ -294,6 +294,9 @@ targets to the SSH protocol.
 The `windows` group lists its targets and sets the default transport for the
 targets to the WinRM protocol.
 
+The inventory file sets top-level configuration that applies to the `all` group.
+It sets default configuration for the `ssh` and `winrm` transports.
+
 ```yaml
 groups:
   - name: linux
@@ -302,14 +305,23 @@ groups:
       - target2.example.com
     config:
       transport: ssh
+      ssh:
+        private-key: /path/to/private_key.pem
   - name: windows
     targets:
-      - uri: target3.example.com
-        alias: windows1
-      - uri: target4.example.com
-        alias: windows2
+      - name: win1
+        uri: target3.example.com
+      - name: win2
+        uri: target4.example.com
     config:
       transport: winrm
+config:
+  ssh:
+    host-key-check: false
+  winrm:
+    user: Administrator
+    password: Bolt!
+    ssl: false
 ```
 
 ### Detailed inventory file
