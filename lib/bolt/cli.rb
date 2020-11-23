@@ -342,15 +342,10 @@ module Bolt
     def warn_inventory_overrides_cli(opts)
       inventory_source = if ENV[Bolt::Inventory::ENVIRONMENT_VAR]
                            Bolt::Inventory::ENVIRONMENT_VAR
-                         elsif config.inventoryfile && Bolt::Util.file_stat(config.inventoryfile)
+                         elsif config.inventoryfile
                            config.inventoryfile
-                         else
-                           begin
-                             Bolt::Util.file_stat(config.default_inventoryfile)
-                             config.default_inventoryfile
-                           rescue Errno::ENOENT
-                             nil
-                           end
+                         elsif File.exist?(config.default_inventoryfile)
+                           config.default_inventoryfile
                          end
 
       inventory_cli_opts = %i[authentication escalation transports].each_with_object([]) do |key, acc|

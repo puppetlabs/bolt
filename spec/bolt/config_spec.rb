@@ -275,6 +275,17 @@ describe Bolt::Config do
         /append flag of log file:.* must be a Boolean, received Symbol :foo/
       )
     end
+
+    it "does not accept inventory files that don't exist" do
+      config = {
+        'inventoryfile' => 'fake.yaml'
+      }
+
+      expect { Bolt::Config.new(project, config) }.to raise_error(
+        Bolt::FileError,
+        /The inventoryfile .* does not exist/
+      )
+    end
   end
 
   describe 'expanding paths' do
@@ -282,10 +293,12 @@ describe Bolt::Config do
       data = {
         'inventoryfile' => 'targets.yml'
       }
+      f = File.expand_path(File.join(project.path, 'targets.yml'))
+      FileUtils.touch(f)
 
       config = Bolt::Config.new(project, data)
       expect(config.inventoryfile)
-        .to eq(File.expand_path('targets.yml', project.path))
+        .to eq(f)
     end
   end
 
