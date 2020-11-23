@@ -273,6 +273,9 @@ Style/NumericPredicate:
 Style/OptionalBooleanParameter:
   Enabled: false
 
+Style/RedundantArgument:
+  Enabled: true
+
 Style/RedundantAssignment:
   Enabled: true
 

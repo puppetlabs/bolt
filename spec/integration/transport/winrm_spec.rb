@@ -763,7 +763,7 @@ describe Bolt::Transport::WinRM do
           "message 3\r\n",
           "message 4\r\n",
           "message 6\r\n"
-        ].join(''))
+        ].join)
       end
     end
 

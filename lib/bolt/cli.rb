@@ -30,6 +30,7 @@ require 'bolt/version'
 
 module Bolt
   class CLIExit < StandardError; end
+
   class CLI
     COMMANDS = {
       'command'    => %w[run],

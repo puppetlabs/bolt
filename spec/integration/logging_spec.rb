@@ -50,7 +50,7 @@ describe "when logging executor activity", ssh: true do
   context 'with misconfigured ssh-command' do
     let(:log_level) { :warn }
     let(:conn) { conn_info('ssh') }
-    let(:second_uri) { [conn[:second_user], ':', conn[:second_pw], '@', conn[:host], ':', conn[:port]].join('') }
+    let(:second_uri) { [conn[:second_user], ':', conn[:second_pw], '@', conn[:host], ':', conn[:port]].join }
     let(:config_flags) {
       %W[--targets #{uri},#{second_uri} --no-host-key-check --modulepath #{modulepath} --ssh-command ssh]
     }
