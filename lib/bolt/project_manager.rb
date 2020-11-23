@@ -6,6 +6,36 @@ require 'bolt/project_manager/module_migrator'
 
 module Bolt
   class ProjectManager
+    INVENTORY_TEMPLATE = <<~INVENTORY
+      # This is an example inventory.yaml
+      # To read more about inventory files, see https://pup.pt/bolt-inventory
+      #
+      # groups:
+      #   - name: linux
+      #     targets:
+      #       - target1.example.com
+      #       - target2.example.com
+      #     config:
+      #       transport: ssh
+      #       ssh:
+      #         private-key: /path/to/private_key.pem
+      #   - name: windows
+      #     targets:
+      #       - name: win1
+      #         uri: target3.example.com
+      #       - name: win2
+      #         uri: target4.example.com
+      #     config:
+      #       transport: winrm
+      # config:
+      #   ssh:
+      #     host-key-check: false
+      #   winrm:
+      #     user: Administrator
+      #     password: Bolt!
+      #     ssl: false
+    INVENTORY
+
     def initialize(config, outputter, pal)
       @config    = config
       @outputter = outputter
@@ -17,12 +47,13 @@ module Bolt
     def create(path, name, modules)
       require 'bolt/module_installer'
 
-      project      = Pathname.new(File.expand_path(path))
-      old_config   = project + 'bolt.yaml'
-      config       = project + 'bolt-project.yaml'
-      puppetfile   = project + 'Puppetfile'
-      moduledir    = project + '.modules'
-      project_name = name || File.basename(project)
+      project       = Pathname.new(File.expand_path(path))
+      old_config    = project + 'bolt.yaml'
+      config        = project + 'bolt-project.yaml'
+      puppetfile    = project + 'Puppetfile'
+      moduledir     = project + '.modules'
+      inventoryfile = project + 'inventory.yaml'
+      project_name  = name || File.basename(project)
 
       if config.exist?
         if modules
@@ -82,6 +113,14 @@ module Bolt
         File.write(config.to_path, data.to_yaml)
       rescue StandardError => e
         raise Bolt::FileError.new("Could not create bolt-project.yaml at #{project}: #{e.message}", nil)
+      end
+
+      unless inventoryfile.exist?
+        begin
+          File.write(inventoryfile.to_path, INVENTORY_TEMPLATE)
+        rescue StandardError => e
+          raise Bolt::FileError.new("Could not create inventory.yaml at #{project}: #{e.message}", nil)
+        end
       end
 
       @outputter.print_message("Successfully created Bolt project at #{project}")

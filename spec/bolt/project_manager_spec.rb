@@ -53,6 +53,17 @@ describe Bolt::ProjectManager do
       expect(YAML.load_file(config_path)).to include('modules' => [])
     end
 
+    it 'creates an inventory.yaml' do
+      manager.create(project_path, 'myproject', nil)
+      expect(project.inventory_file.exist?).to be
+    end
+
+    it 'does not create an inventory.yaml if one already exists' do
+      FileUtils.touch(project.inventory_file)
+      expect(File).not_to receive(:write).with(project.inventory_file.to_path, anything)
+      manager.create(project_path, 'myproject', nil)
+    end
+
     it 'errors if the directory name is invalid' do
       dir = tmpdir + 'MyProject'
       FileUtils.mkdir(dir)
