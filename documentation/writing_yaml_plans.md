@@ -4,6 +4,34 @@ YAML plans run a list of steps in order, which allows you to define simple
 workflows. Steps can contain embedded Puppet code expressions to add logic where
 necessary.
 
+## Creating a new project-level YAML plan
+
+You can create a new project-level YAML plan in your Bolt project using a Bolt
+command. The command accepts a single argument: the name of the plan.
+Project-level plans must be namespaced to the project.
+
+_\*nix shell command_
+
+```shell
+bolt plan new <PLAN NAME>
+```
+
+_PowerShell cmdlet_
+
+```powershell
+New-BoltPlan -Name <PLAN NAME>
+```
+
+For example, running `bolt plan new myproject::myplan` will result in
+a directory structure similar to this:
+
+```shell
+myproject/
+├── bolt-project.yaml
+└── plans/
+    └── myplan.yaml
+```
+
 ## Naming plans
 
 Plan names are named based on the filename of the plan, the name of the module

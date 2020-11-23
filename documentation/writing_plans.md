@@ -26,6 +26,34 @@ extension. For example, given a plan named `my_plan.pp` in a module named
 `my_module`, the location of the plan would be
 `site-modules/my_module/plans/my_plan.pp`.
 
+## Creating a new project-level Puppet language plan
+
+You can create a new project-level Puppet language plan in your Bolt project
+using a Bolt command. The command accepts a single argument: the name of the
+plan. Project-level plans must be namespaced to the project.
+
+_\*nix shell command_
+
+```shell
+bolt plan new <PLAN NAME> --pp
+```
+
+_PowerShell cmdlet_
+
+```powershell
+New-BoltPlan -Name <PLAN NAME> -Pp
+```
+
+For example, running `bolt plan new myproject::myplan --pp` will result in
+a directory structure similar to this:
+
+```shell
+myproject/
+├── bolt-project.yaml
+└── plans/
+    └── myplan.pp
+```
+
 ## Naming plans
 
 The first line of your plan contains the plan name. You use the plan name to
