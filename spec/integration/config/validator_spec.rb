@@ -104,13 +104,33 @@ describe 'validating config' do
           /Value at 'format' must be one of human, json, rainbow/,
           /Value at 'log.warn.log.level' must be one of trace, debug, error, info, warn, fatal, any/,
           /Value at 'log.warn.log.append' must be of type Boolean/,
-          /Value at 'log.bolt-debug.log' must be one of disable/,
+          /Value at 'log.bolt-debug.log' must be disable or must be of type Hash/,
           /Value at 'modulepath' is a plugin reference, which is unsupported at this location/,
           /Value at 'puppetdb.cacert' must be of type String/,
           /Value at 'puppetdb.server_urls' must be of type Array/,
           /Value at 'tasks' must be of type Array/
         )
       end
+    end
+  end
+
+  context 'with unknown config options' do
+    let(:project_config) do
+      {
+        'unknown' => 'unknown',
+        'puppetfile' => {
+          'unknown' => 'unknown'
+        }
+      }
+    end
+
+    it 'warns about unknown options' do
+      run_cli(command, project: project)
+
+      expect(@log_output.readlines).to include(
+        /WARN.*Unknown option 'unknown' at.*bolt-project.yaml/,
+        /WARN.*Unknown option 'unknown' at 'puppetfile' at.*bolt-project.yaml/
+      )
     end
   end
 end

@@ -4,7 +4,9 @@ require 'bolt/config/validator'
 
 describe Bolt::Config::Validator do
   def validate
-    described_class.new.validate(data, schema, location)
+    described_class.new.tap do |validator|
+      validator.validate(data, schema, location)
+    end
   end
 
   let(:location) { 'config' }
@@ -56,7 +58,7 @@ describe Bolt::Config::Validator do
 
         expect { validate }.to raise_error(
           Bolt::ValidationError,
-          /Value at 'option' must be of type String, Integer/
+          /Value at 'option' must be of type String or Integer/
         )
       end
     end
@@ -291,7 +293,17 @@ describe Bolt::Config::Validator do
 
         expect { validate }.to raise_error(
           Bolt::ValidationError,
-          /Value at 'option' must be one of foo/
+          /Value at 'option' must be foo/
+        )
+      end
+
+      it 'errors with invalid value and suggest alternate type' do
+        schema['option'][:type] = [String, Hash]
+        data['option']          = 'bar'
+
+        expect { validate }.to raise_error(
+          Bolt::ValidationError,
+          /Value at 'option' must be foo or must be of type Hash/
         )
       end
     end
@@ -322,6 +334,59 @@ describe Bolt::Config::Validator do
           /Value at 'option' must be a minimum of 1/
         )
       end
+    end
+  end
+
+  context 'validating keys' do
+    let(:schema) do
+      {
+        'nested' => {
+          type: Hash,
+          properties: {
+            'known' => { type: String }
+          }
+        },
+        'no_properties' => {
+          type: Hash
+        },
+        'additional_properties' => {
+          type: Hash,
+          properties: {
+            'known' => { type: String }
+          },
+          additionalProperties: {
+            type: String
+          }
+        }
+      }
+    end
+
+    it 'warns with unknown key' do
+      data['unknown'] = 'unknown key'
+      validator       = validate
+
+      expect(validator.warnings).to include(/Unknown option 'unknown' at config./)
+    end
+
+    it 'warns with nested uknown key' do
+      data['nested'] = { 'unknown' => 'unknown key' }
+      validator      = validate
+
+      expect(validator.warnings).to include(/Unknown option 'unknown' at 'nested' at config./)
+    end
+
+    it 'does not warn when :properties is not defined' do
+      data['no_properties'] = { 'unknown' => 'unknown key' }
+      validator             = validate
+
+      expect(validator.warnings.empty?).to be
+    end
+
+    it 'does not warn when :additionalProperties is defined' do
+      data['additional_properties'] = { 'unknown' => 'unknown key' }
+      validator                     = validate
+
+      expect(validator.warnings.empty?).to be
     end
   end
 end

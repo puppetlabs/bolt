@@ -38,6 +38,14 @@ module Bolt
                project.data
              else
                c = Bolt::Util.read_optional_yaml_hash(project.config_file, 'config')
+
+               # Validate the config against the schema. This will raise a single error
+               # with all validation errors.
+               Validator.new.tap do |validator|
+                 validator.validate(c, bolt_schema, project.config_file.to_s)
+                 validator.warnings.each { |warning| logs << { warn: warning } }
+               end
+
                logs << { debug: "Loaded configuration from #{project.config_file}" } if File.exist?(project.config_file)
                c
              end
@@ -60,6 +68,14 @@ module Bolt
                project.data
              else
                c = Bolt::Util.read_yaml_hash(configfile, 'config')
+
+               # Validate the config against the schema. This will raise a single error
+               # with all validation errors.
+               Validator.new.tap do |validator|
+                 validator.validate(c, bolt_schema, configfile)
+                 validator.warnings.each { |warning| logs << { warn: warning } }
+               end
+
                logs << { debug: "Loaded configuration from #{configfile}" }
                c
              end
@@ -128,7 +144,10 @@ module Bolt
 
       # Validate the config against the schema. This will raise a single error
       # with all validation errors.
-      Validator.new.validate(data, defaults_schema, filepath)
+      Validator.new.tap do |validator|
+        validator.validate(data, defaults_schema, filepath)
+        validator.warnings.each { |warning| logs << { warn: warning } }
+      end
 
       # Remove project-specific config such as hiera-config, etc.
       project_config = data.slice(*(BOLT_PROJECT_OPTIONS - BOLT_DEFAULTS_OPTIONS))
@@ -187,7 +206,10 @@ module Bolt
 
       # Validate the config against the schema. This will raise a single error
       # with all validation errors.
-      Validator.new.validate(data, bolt_schema, filepath)
+      Validator.new.tap do |validator|
+        validator.validate(data, bolt_schema, filepath)
+        validator.warnings.each { |warning| logs << { warn: warning } }
+      end
 
       { filepath: filepath, data: data, logs: logs, deprecations: deprecations }
     end
