@@ -53,7 +53,7 @@ module Bolt
                 @state = :normal if c == 'm'
               end
             end
-            a.join('')
+            a.join
           else
             "\033[#{COLORS[color]}m#{string}\033[0m"
           end

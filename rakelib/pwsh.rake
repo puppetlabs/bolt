@@ -280,7 +280,7 @@ namespace :pwsh do
         # added twice
         help_text[:flags].reject { |o| o =~ /verbose|debug|help|version/ }.map do |option|
           ruby_param = parser.top.long[option]
-          pwsh_name = option.split("-").map(&:capitalize).join('')
+          pwsh_name = option.split("-").map(&:capitalize).join
           case pwsh_name
           when 'Tty'
             pwsh_name.upcase!

@@ -199,7 +199,7 @@ module Bolt
         lines = buffer.split(/(?<=\n)/)
         # handle_sudo will return the line if it is not a sudo prompt or error
         lines.map! { |line| handle_sudo(inp, line, stdin) }
-        lines.join("")
+        lines.join
       # If stream has reached EOF, no password prompt is expected
       # return an empty string
       rescue EOFError
