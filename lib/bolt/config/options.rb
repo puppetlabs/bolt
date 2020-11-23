@@ -277,8 +277,8 @@ module Bolt
         },
         "name" => {
           description: "The name of the Bolt project. When this option is configured, the project is considered a "\
-                       "[Bolt project](experimental_features.md#bolt-projects), allowing Bolt to load content from "\
-                       "the project directory as though it were a module.",
+                       "[Bolt project](projects.md), allowing Bolt to load content from the project directory "\
+                       "as though it were a module.",
           type: String,
           _plugin: false,
           _example: "myproject"

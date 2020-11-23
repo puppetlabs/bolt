@@ -466,8 +466,6 @@ module Bolt
       when 'plan'
         case options[:action]
         when 'new'
-          command = Bolt::Util.powershell? ? 'New-BoltPlan' : 'bolt plan new'
-          @logger.warn("Command '#{command}' is experimental and subject to changes.")
           plan_name = options[:object]
 
           # If this passes validation, it will return the path to the plan to create
