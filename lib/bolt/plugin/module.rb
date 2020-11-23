@@ -12,15 +12,15 @@ module Bolt
         end
       end
 
-      def self.load(name, modules, opts)
-        mod = modules[name]
-        if mod&.plugin?
+      # mod should not be nil
+      def self.load(mod, opts)
+        if mod.plugin?
           opts[:mod] = mod
           plugin = Bolt::Plugin::Module.new(**opts)
           plugin.setup
           plugin
         else
-          raise PluginError::Unknown, name
+          raise PluginError::Unknown, mod.name
         end
       end
 

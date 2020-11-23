@@ -5,6 +5,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/config'
 require 'bolt/pal'
 require 'bolt/plugin'
+require 'bolt/plugin/env_var'
 require 'bolt/analytics'
 
 describe Bolt::Plugin do
@@ -92,6 +93,35 @@ describe Bolt::Plugin do
           'stop_service' => true
         }
       )
+    end
+  end
+
+  context 'plugin loading is disabled' do
+    let(:plugins) { Bolt::Plugin.setup(config(config_data), pal, load_plugins: false) }
+
+    it 'raises a plugin-loading-disabled error if it attempts to load a Ruby plugin' do
+      expect { plugins.by_name('env_var') }.to raise_error(
+        Bolt::Plugin::PluginError::LoadingDisabled,
+        /plugin.*env_var.*loading.*disabled/
+      ) do |error|
+        expect(error.details).to eql({ 'plugin_name' => 'env_var' })
+      end
+    end
+
+    it 'raises an unknown-plugin error if it attempts to load an unknown plugin' do
+      # by_name rescues unknown-plugin errors and returns nil for them so use get_hook instead. This should be OK
+      # since get_hook wraps by_name and is what Bolt actually calls when evaluating inventory plugins
+      expect { plugins.get_hook('unknown_plug', :resolve_reference) }.to raise_error(Bolt::Plugin::PluginError::Unknown)
+    end
+
+    it 'raises a plugin-loading-disabled error if it attempts to load a Module plugin' do
+      expect { plugins.by_name('identity') }.to raise_error(Bolt::Plugin::PluginError::LoadingDisabled)
+    end
+
+    it 'lets users add their statically loaded plugins via add_plugin' do
+      env_var_plugin = Bolt::Plugin::EnvVar.new
+      plugins.add_plugin(env_var_plugin)
+      expect(plugins.by_name('env_var')).to equal(env_var_plugin)
     end
   end
 end

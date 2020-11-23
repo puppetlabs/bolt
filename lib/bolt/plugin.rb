@@ -36,6 +36,13 @@ module Bolt
           super("Plugin #{plugin_name} does not support #{hook}", 'bolt/unsupported-hook')
         end
       end
+
+      class LoadingDisabled < PluginError
+        def initialize(plugin_name)
+          msg = "Cannot load plugin #{plugin_name}: plugin loading is disabled"
+          super(msg, 'bolt/plugin-loading-disabled', { 'plugin_name' => plugin_name })
+        end
+      end
     end
 
     class PluginContext
@@ -119,8 +126,8 @@ module Bolt
       end
     end
 
-    def self.setup(config, pal, analytics = Bolt::Analytics::NoopClient.new)
-      plugins = new(config, pal, analytics)
+    def self.setup(config, pal, analytics = Bolt::Analytics::NoopClient.new, **opts)
+      plugins = new(config, pal, analytics, **opts)
 
       config.plugins.each_key do |plugin|
         plugins.by_name(plugin)
@@ -141,12 +148,13 @@ module Bolt
 
     private_class_method :new
 
-    def initialize(config, pal, analytics)
+    def initialize(config, pal, analytics, load_plugins: true)
       @config = config
       @analytics = analytics
       @plugin_context = PluginContext.new(config, pal, self)
       @plugins = {}
       @pal = pal
+      @load_plugins = load_plugins
       @unknown = Set.new
       @resolution_stack = []
       @unresolved_plugin_configs = config.plugins.dup
@@ -169,6 +177,8 @@ module Bolt
     end
 
     def add_ruby_plugin(plugin_name)
+      raise PluginError::LoadingDisabled, plugin_name unless @load_plugins
+
       cls_name = Bolt::Util.snake_name_to_class_name(plugin_name)
       filename = "bolt/plugin/#{plugin_name}"
       require filename
@@ -185,10 +195,17 @@ module Bolt
     def add_module_plugin(plugin_name)
       opts = {
         context: @plugin_context,
+        # Make sure that the plugin's config is validated _before_ the unknown-plugin
+        # and loading-disabled checks. This way, we can fail early on invalid plugin
+        # config instead of _after_ loading the modulepath (which can be expensive).
         config: config_for_plugin(plugin_name)
       }
 
-      plugin = Bolt::Plugin::Module.load(plugin_name, modules, opts)
+      mod = modules[plugin_name]
+      raise PluginError::Unknown, plugin_name unless mod&.plugin?
+      raise PluginError::LoadingDisabled, plugin_name unless @load_plugins
+
+      plugin = Bolt::Plugin::Module.load(mod, opts)
       add_plugin(plugin)
     end
 
