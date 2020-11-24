@@ -83,7 +83,11 @@ module Bolt
       # Validate the config against the schema. This will raise a single error
       # with all validation errors.
       schema = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_PROJECT_OPTIONS)
-      Bolt::Config::Validator.new.validate(data, schema, project_file)
+
+      Bolt::Config::Validator.new.tap do |validator|
+        validator.validate(data, schema, project_file)
+        validator.warnings.each { |warning| logs << { warn: warning } }
+      end
 
       new(data, path, type, logs)
     end

@@ -6,7 +6,7 @@ module BoltSpec
     # has a :type and :description key, as they are required for
     # generating the JSON schemas and validating config.
     def assert_type_description(definitions)
-      definitions.each do |option, definition|
+      definitions.each_pair do |option, definition|
         expect(definition.key?(:description)).to be, "missing :description key for option '#{option}'"
         expect(definition.key?(:type)).to be, "missing :type key for option '#{option}'"
 

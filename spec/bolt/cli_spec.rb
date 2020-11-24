@@ -23,8 +23,10 @@ describe "Bolt::CLI" do
 
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
+
     # Don't print error messages to the console
     allow($stdout).to receive(:puts)
+    allow($stderr).to receive(:puts)
 
     # Don't allow tests to override the captured log config
     allow(Bolt::Logger).to receive(:configure)

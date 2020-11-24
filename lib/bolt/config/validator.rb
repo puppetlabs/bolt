@@ -8,9 +8,12 @@ require 'bolt/error'
 module Bolt
   class Config
     class Validator
+      attr_reader :warnings
+
       def initialize
-        @errors = []
-        @path   = []
+        @errors   = []
+        @warnings = []
+        @path     = []
       end
 
       # This is the entry method for validating data against the schema.
@@ -18,6 +21,10 @@ module Bolt
       # the value against the relevant schema definition.
       #
       def validate(data, schema, location = nil)
+        @location = location
+
+        validate_keys(data.keys, schema.keys)
+
         data.each_pair do |key, value|
           next unless schema.key?(key)
 
@@ -27,18 +34,18 @@ module Bolt
           @path.pop
         end
 
-        raise_error(location)
+        raise_error
       end
 
       # Raises a ValidationError if there are any errors. All error messages
       # created during validation are concatenated into a single error
       # message.
       #
-      private def raise_error(location)
+      private def raise_error
         return unless @errors.any?
 
         message = "Invalid configuration"
-        message += " at #{location}" if location
+        message += " at #{@location}" if @location
         message += ":\n"
         message += @errors.map { |error| "\s\s#{error}" }.join("\n")
 
@@ -72,6 +79,10 @@ module Bolt
       #
       private def validate_hash(value, definition)
         properties = definition[:properties] ? definition[:properties].keys : []
+
+        if definition[:properties] && definition[:additionalProperties].nil?
+          validate_keys(value.keys, properties)
+        end
 
         if definition[:required] && (definition[:required] - value.keys).any?
           missing = definition[:required] - value.keys
@@ -115,7 +126,10 @@ module Bolt
       #
       private def validate_string(value, definition)
         if definition.key?(:enum) && !definition[:enum].include?(value)
-          @errors << "Value at '#{path}' must be one of #{definition[:enum].join(', ')}"
+          message  = "Value at '#{path}' must be "
+          message += "one of " if definition[:enum].count > 1
+          message += definition[:enum].join(', ')
+          multitype_error(message, value, definition)
         end
       end
 
@@ -124,6 +138,18 @@ module Bolt
       private def validate_number(value, definition)
         if definition.key?(:minimum) && value < definition[:minimum]
           @errors << "Value at '#{path}' must be a minimum of #{definition[:minimum]}"
+        end
+      end
+
+      # Adds warnings for unknown config options.
+      #
+      private def validate_keys(keys, known_keys)
+        (keys - known_keys).each do |key|
+          message  = "Unknown option '#{key}'"
+          message += " at '#{path}'" if @path.any?
+          message += " at #{@location}" if @location
+          message += "."
+          @warnings << message
         end
       end
 
@@ -163,10 +189,22 @@ module Bolt
             types = types - [TrueClass, FalseClass] + ['Boolean']
           end
 
-          @errors << "Value at '#{path}' must be of type #{types.join(', ')}"
+          @errors << "Value at '#{path}' must be of type #{types.join(' or ')}"
 
           false
         end
+      end
+
+      # Adds an error that includes additional helpful information for values
+      # that accept multiple types.
+      #
+      private def multitype_error(message, value, definition)
+        if Array(definition[:type]).count > 1
+          types    = Array(definition[:type]) - [value.class]
+          message += " or must be of type #{types.join(' or ')}"
+        end
+
+        @errors << message
       end
 
       # Returns the formatted path for the key.
