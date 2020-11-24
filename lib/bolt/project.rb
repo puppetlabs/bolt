@@ -9,13 +9,7 @@ require 'bolt/module'
 module Bolt
   class Project
     BOLTDIR_NAME = 'Boltdir'
-    PROJECT_SETTINGS = {
-      "name"  => "The name of the project",
-      "plans" => "An array of plan names to show, if they exist in the project."\
-                 "These plans are included in `bolt plan show` and `Get-BoltPlan` output",
-      "tasks" => "An array of task names to show, if they exist in the project."\
-                 "These tasks are included in `bolt task show` and `Get-BoltTask` output"
-    }.freeze
+    CONFIG_NAME  = 'bolt-project.yaml'
 
     attr_reader :path, :data, :config_file, :inventory_file, :hiera_config,
                 :puppetfile, :rerunfile, :type, :resource_types, :logs, :project_file,
@@ -38,7 +32,7 @@ module Bolt
 
       if (dir + BOLTDIR_NAME).directory?
         create_project(dir + BOLTDIR_NAME, 'embedded', logs)
-      elsif (dir + 'bolt.yaml').file? || (dir + 'bolt-project.yaml').file?
+      elsif (dir + 'bolt.yaml').file? || (dir + CONFIG_NAME).file?
         create_project(dir, 'local', logs)
       elsif dir.root?
         default_project(logs)
@@ -74,10 +68,12 @@ module Bolt
         )
       end
 
-      project_file = File.join(fullpath, 'bolt-project.yaml')
-      data = Bolt::Util.read_optional_yaml_hash(File.expand_path(project_file), 'project')
-      default = type =~ /user|system/ ? 'default ' : ''
-      exist = File.exist?(File.expand_path(project_file))
+      project_file = File.join(fullpath, CONFIG_NAME)
+      data         = Bolt::Util.read_optional_yaml_hash(File.expand_path(project_file), 'project')
+      default      = type =~ /user|system/ ? 'default ' : ''
+      exist        = File.exist?(File.expand_path(project_file))
+      deprecations = []
+
       logs << { info: "Loaded #{default}project from '#{fullpath}'" } if exist
 
       # Validate the config against the schema. This will raise a single error
@@ -86,19 +82,23 @@ module Bolt
 
       Bolt::Config::Validator.new.tap do |validator|
         validator.validate(data, schema, project_file)
+
         validator.warnings.each { |warning| logs << { warn: warning } }
+
+        validator.deprecations.each do |dep|
+          deprecations << { type: "#{CONFIG_NAME} #{dep[:option]}", msg: dep[:message] }
+        end
       end
 
-      new(data, path, type, logs)
+      new(data, path, type, logs, deprecations)
     end
 
-    def initialize(raw_data, path, type = 'option', logs = [])
-      @path = Pathname.new(path).expand_path
+    def initialize(raw_data, path, type = 'option', logs = [], deprecations = [])
+      @path         = Pathname.new(path).expand_path
+      @project_file = @path + CONFIG_NAME
+      @logs         = logs
+      @deprecations = deprecations
 
-      @project_file = @path + 'bolt-project.yaml'
-
-      @logs = logs
-      @deprecations = []
       if (@path + 'bolt.yaml').file? && project_file?
         msg = "Project-level configuration in bolt.yaml is deprecated if using bolt-project.yaml. "\
           "Transport config should be set in inventory.yaml, all other config should be set in "\

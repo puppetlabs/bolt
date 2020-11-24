@@ -133,8 +133,8 @@ to lead to errors where Bolt loads content from another project.
 **Filepath:** `~/.puppetlabs/etc/bolt/bolt-defaults.yaml`
 
 The defaults configuration file supports most of Bolt's configuration options,
-with the exception of options that are project-specific such as `inventoryfile`
-and `modulepath`.
+with the exception of options that are project-specific such as `modules` and
+`modulepath`.
 
 The `bolt-defaults.yaml` file takes precedence over a `bolt.yaml` file in the
 same directory. If the directory contains both files, Bolt will only load and 

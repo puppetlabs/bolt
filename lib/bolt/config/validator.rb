@@ -8,12 +8,13 @@ require 'bolt/error'
 module Bolt
   class Config
     class Validator
-      attr_reader :warnings
+      attr_reader :deprecations, :warnings
 
       def initialize
-        @errors   = []
-        @warnings = []
-        @path     = []
+        @errors       = []
+        @deprecations = []
+        @warnings     = []
+        @path         = []
       end
 
       # This is the entry method for validating data against the schema.
@@ -29,12 +30,25 @@ module Bolt
           next unless schema.key?(key)
 
           @path.push(key)
+
+          check_deprecated(key, schema[key], location)
           validate_value(value, schema[key])
         ensure
           @path.pop
         end
 
         raise_error
+      end
+
+      # Adds a warning if the given option is deprecated.
+      #
+      def check_deprecated(key, definition, location)
+        if definition.key?(:_deprecation)
+          message  = "Option '#{path}' "
+          message += "at #{location} " if location
+          message += "is deprecated. #{definition[:_deprecation]}"
+          @deprecations << { option: key, message: message }
+        end
       end
 
       # Raises a ValidationError if there are any errors. All error messages
