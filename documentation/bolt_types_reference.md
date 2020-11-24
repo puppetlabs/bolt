@@ -19,9 +19,10 @@ The following functions are available to `ApplyResult` objects.
 | `error` | `Error` | An object constructed from the `_error` field of the result's value. |
 | `message` | `String` | The `_output` field of the result's value. |
 | `ok` | `Boolean` | Whether the result was successful. |
-| `report` | `Hash` | The Puppet report from the apply action. |
+| `report` | `Hash` | The Puppet report from the apply action. Equivalent to calling `$apply_result.value['report']`. |
 | `target` | `Target` | The target the result is from. |
 | `to_data` | `Hash` | A serialized representation of `ApplyResult`. |
+| `value` | `Hash` | A hash including the Puppet report from the apply action under a `report` key. |
 
 ## `ResourceInstance`
 

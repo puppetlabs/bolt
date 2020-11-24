@@ -96,9 +96,9 @@ module Bolt
       @target = target
       @value = {}
       @action = 'apply'
-      value['report'] = report if report
-      value['_error'] = error if error
-      value['_output'] = metrics_message if metrics_message
+      @value['report'] = report if report
+      @value['_error'] = error if error
+      @value['_output'] = metrics_message if metrics_message
     end
 
     def event_metrics
