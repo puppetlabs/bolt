@@ -63,7 +63,7 @@ describe Bolt::Plugin do
 
   context 'loading plugin_hooks' do
     it 'evaluates plugin references in the plugin_hooks configuration' do
-      config_data['plugin_hooks'] = {
+      config_data['plugin-hooks'] = {
         'puppet_library' => {
           'plugin' => 'my_hook',
           'param' => identity('foobar')
@@ -80,7 +80,7 @@ describe Bolt::Plugin do
         }
       }
 
-      config_data['plugin_hooks'] = identity(hooks)
+      config_data['plugin-hooks'] = identity(hooks)
 
       expect(plugins.plugin_hooks).to eq(
         'another_hook' => {

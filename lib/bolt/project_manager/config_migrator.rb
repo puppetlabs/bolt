@@ -6,7 +6,8 @@ module Bolt
   class ProjectManager
     class ConfigMigrator < Migrator
       def migrate(config_file, project_file, inventory_file, backup_dir)
-        bolt_yaml_to_bolt_project(config_file, project_file, inventory_file, backup_dir)
+        bolt_yaml_to_bolt_project(config_file, project_file, inventory_file, backup_dir) &&
+          update_options(project_file)
       end
 
       private def bolt_yaml_to_bolt_project(config_file, project_file, inventory_file, backup_dir)
@@ -60,6 +61,34 @@ module Bolt
           "to use project-level tasks and plans. Learn more about projects by running "\
           "'#{command}'."
         )
+
+        true
+      end
+
+      private def update_options(project_file)
+        return true unless File.exist?(project_file)
+
+        @outputter.print_message("Updating project configuration options\n\n")
+        data     = Bolt::Util.read_yaml_hash(project_file, 'config')
+        modified = false
+
+        if data.key?('plugin_hooks') && !data.key?('plugin-hooks')
+          @outputter.print_action_step("Updating 'plugin_hooks' option to 'plugin-hooks'")
+          data['plugin-hooks'] = data.delete('plugin_hooks')
+          modified = true
+        end
+
+        if modified
+          begin
+            File.write(project_file, data.to_yaml)
+          rescue StandardError => e
+            raise Bolt::FileError.new("#{e.message}; unable to write config.", project_file)
+          end
+
+          @outputter.print_action_step("Successfully updated project configuration #{project_file}")
+        else
+          @outputter.print_action_step("Project configuration is up to date, nothing to do.")
+        end
 
         true
       end
