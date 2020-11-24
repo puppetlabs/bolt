@@ -115,6 +115,21 @@ module Bolt
               _default: false
             }
           },
+          _plugin: false,
+          _deprecation: "This option will be removed in Bolt 3.0. Use `apply-settings` instead."
+        },
+        "apply-settings" => {
+          description: "A map of Puppet settings to use when applying Puppet code using the `apply` "\
+                       "plan function or the `bolt apply` command.",
+          type: Hash,
+          properties: {
+            "show_diff" => {
+              description: "Whether to log and report a contextual diff.",
+              type: [TrueClass, FalseClass],
+              _example: true,
+              _default: false
+            }
+          },
           _plugin: false
         },
         "color" => {
@@ -498,6 +513,7 @@ module Bolt
 
       # Options that are available in a bolt.yaml file
       BOLT_OPTIONS = %w[
+        apply-settings
         apply_settings
         color
         compile-concurrency
@@ -534,6 +550,7 @@ module Bolt
 
       # Options that are available in a bolt-project.yaml file
       BOLT_PROJECT_OPTIONS = %w[
+        apply-settings
         apply_settings
         color
         compile-concurrency

@@ -4,6 +4,9 @@
   "description": "Bolt Project bolt-project.yaml Schema",
   "type": "object",
   "properties": {
+    "apply-settings": {
+      "$ref": "#/definitions/apply-settings"
+    },
     "apply_settings": {
       "$ref": "#/definitions/apply_settings"
     },
@@ -66,6 +69,16 @@
     }
   },
   "definitions": {
+    "apply-settings": {
+      "description": "A map of Puppet settings to use when applying Puppet code using the `apply` plan function or the `bolt apply` command.",
+      "type": "object",
+      "properties": {
+        "show_diff": {
+          "description": "Whether to log and report a contextual diff.",
+          "type": "boolean"
+        }
+      }
+    },
     "apply_settings": {
       "description": "A map of Puppet settings to use when applying Puppet code using the `apply` plan function or the `bolt apply` command.",
       "type": "object",
