@@ -77,7 +77,7 @@
                   },
                   {
                     "required": [
-                      "project"
+                      "versioned_project"
                     ]
                   }
                 ],              
