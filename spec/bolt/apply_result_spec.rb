@@ -101,5 +101,9 @@ describe Bolt::ApplyResult do
     it 'with to_data' do
       expect(apply_result.to_data).to eq(expected)
     end
+
+    it 'with value' do
+      expect(apply_result.value).to eq(expected['value'])
+    end
   end
 end

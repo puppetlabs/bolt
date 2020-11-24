@@ -12,6 +12,7 @@ Puppet::DataTypes.create_type('ApplyResult') do
       message => Callable[[], Optional[String]],
       action => Callable[[], String],
       to_data => Callable[[], Hash],
+      value => Callable[[], Hash]
     }
   PUPPET
 
