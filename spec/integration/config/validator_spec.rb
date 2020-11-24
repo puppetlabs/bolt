@@ -18,7 +18,7 @@ describe 'validating config' do
   context 'with valid config' do
     let(:project_config) do
       {
-        'apply_settings' => {
+        'apply-settings' => {
           'show_diff' => true
         },
         'color' => false,
@@ -59,7 +59,7 @@ describe 'validating config' do
   context 'with invalid config' do
     let(:project_config) do
       {
-        'apply_settings' => {
+        'apply-settings' => {
           'show_diff' => 'yes'
         },
         'color' => 100,
@@ -98,7 +98,7 @@ describe 'validating config' do
         expect(error.kind).to eq('bolt/validation-error')
 
         expect(error.message.lines).to include(
-          /Value at 'apply_settings.show_diff' must be of type Boolean/,
+          /Value at 'apply-settings.show_diff' must be of type Boolean/,
           /Value at 'color' must be of type Boolean/,
           /Value at 'compile-concurrency' must be a minimum of 1/,
           /Value at 'format' must be one of human, json, rainbow/,

@@ -369,7 +369,7 @@ describe "apply", expensive: true do
             +Silly string (get it?)
             \\ No newline at end of file
             DIFF
-          with_tempfile_containing('bolt', YAML.dump("apply_settings" => show_diff), '.yaml') do |conf|
+          with_tempfile_containing('bolt', YAML.dump("apply-settings" => show_diff), '.yaml') do |conf|
             result = run_cli_json(%W[plan run settings::show_diff --configfile #{conf.path}] + config_flags).first
             expect(result['status']).to eq('success')
             expect(result['value']['report']['logs'][0]['message']).to include(diff_string)
@@ -436,7 +436,7 @@ describe "apply", expensive: true do
             +Silly string (get it?)
             \\ No newline at end of file
             DIFF
-          with_tempfile_containing('bolt', YAML.dump("apply_settings" => show_diff), '.yaml') do |conf|
+          with_tempfile_containing('bolt', YAML.dump("apply-settings" => show_diff), '.yaml') do |conf|
             result = run_cli_json(%W[plan run settings::show_diff --configfile #{conf.path}] + config_flags).first
             expect(result['status']).to eq('success')
             expect(result['value']['report']['logs'][0]['message']).to include(diff_string)

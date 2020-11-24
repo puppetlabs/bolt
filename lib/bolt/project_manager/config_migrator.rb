@@ -72,9 +72,17 @@ module Bolt
         data     = Bolt::Util.read_yaml_hash(project_file, 'config')
         modified = false
 
-        if data.key?('plugin_hooks') && !data.key?('plugin-hooks')
-          @outputter.print_action_step("Updating 'plugin_hooks' option to 'plugin-hooks'")
-          data['plugin-hooks'] = data.delete('plugin_hooks')
+        [%w[apply_settings apply-settings], %w[plugin_hooks plugin-hooks]].each do |old, new|
+          next unless data.key?(old)
+
+          if data.key?(new)
+            @outputter.print_action_step("Removing deprecated option '#{old}'")
+            data.delete(old)
+          else
+            @outputter.print_action_step("Updating deprecated option '#{old}' to '#{new}'")
+            data[new] = data.delete(old)
+          end
+
           modified = true
         end
 

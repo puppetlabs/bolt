@@ -276,6 +276,7 @@ module Bolt
       @config_files = []
 
       default_data = {
+        'apply-settings'      => {},
         'apply_settings'      => {},
         'color'               => true,
         'compile-concurrency' => Etc.nprocessors,
@@ -370,7 +371,7 @@ module Bolt
           when *TRANSPORT_CONFIG.keys
             Bolt::Util.deep_merge(val1, val2)
           # Hash values are shallow merged
-          when 'puppetdb', 'plugin-hooks', 'plugin_hooks', 'apply_settings', 'log'
+          when 'puppetdb', 'plugin-hooks', 'plugin_hooks', 'apply-settings', 'apply_settings', 'log'
             val1.merge(val2)
           # All other values are overwritten
           else
@@ -407,8 +408,9 @@ module Bolt
       end
 
       # Filter hashes to only include valid options
-      @data['apply_settings'] = @data['apply_settings'].slice(*OPTIONS['apply_settings'][:properties].keys)
-      @data['puppetfile'] = @data['puppetfile'].slice(*OPTIONS['puppetfile'][:properties].keys)
+      %w[apply-settings apply_settings puppetfile].each do |opt|
+        @data[opt] = @data[opt].slice(*OPTIONS.dig(opt, :properties).keys)
+      end
     end
 
     private def normalize_log(target)
@@ -587,7 +589,18 @@ module Bolt
     end
 
     def apply_settings
-      @data['apply_settings']
+      if @data['apply-settings'].any? && @data['apply_settings'].any?
+        Bolt::Logger.warn_once(
+          "apply-settings and apply_settings set",
+          "Detected configuration for 'apply-settings' and 'apply_settings'. Bolt will ignore 'apply_settings'."
+        )
+
+        @data['apply-settings']
+      elsif @data['apply-settings'].any?
+        @data['apply-settings']
+      else
+        @data['apply_settings']
+      end
     end
 
     def transport
