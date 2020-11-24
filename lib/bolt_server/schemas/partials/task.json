@@ -64,7 +64,7 @@
                     "description": "Environment the task is in",
                     "type": "string"
                   },
-                  "project": {
+                  "versioned_project": {
                     "description": "Project the task is in",
                     "type": "string"
                   }
