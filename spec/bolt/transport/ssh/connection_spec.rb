@@ -15,6 +15,20 @@ describe Bolt::Transport::SSH::Connection do
   let(:transport_logger) { Bolt::Logger.logger(Net::SSH) }
   let(:subject) { described_class.new(target, transport_logger) }
 
+  def mock_result(stdout: "", stderr: "", exitcode: 0)
+    _, in_w = IO.pipe
+    out_r, out_w = IO.pipe
+    err_r, err_w = IO.pipe
+    th = Thread.new do
+      out_w.write(stdout)
+      err_w.write(stderr)
+      out_w.close
+      err_w.close
+      exitcode
+    end
+    [in_w, out_r, err_r, th]
+  end
+
   context "when setting user" do
     before :each do
       allow(Net::SSH::Config).to receive(:for).and_return(user: 'sshuser')
@@ -208,6 +222,9 @@ describe Bolt::Transport::SSH::Connection do
 
     it "uses Powershell when login-shell is powershell" do
       inventory.set_config(target, 'ssh', 'login-shell' => 'powershell')
+      expect(subject).to receive(:execute)
+        .with("$PSVersionTable.PSVersion.Major")
+        .and_return(mock_result(stdout: "5\n"))
       expect(subject.shell).to be_instance_of(Bolt::Shell::Powershell)
     end
   end

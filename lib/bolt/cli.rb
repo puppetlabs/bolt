@@ -198,11 +198,23 @@ module Bolt
       config.deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
 
       warn_inventory_overrides_cli(options)
+      validate_ps_version
 
       options
     rescue Bolt::Error => e
       outputter.fatal_error(e)
       raise e
+    end
+
+    private def validate_ps_version
+      if Bolt::Util.powershell?
+        target = inventory.get_target('localhost')
+        Bolt::Transport::Local.new.with_connection(target) do |conn|
+          # This will automatically validate the powershell version on the Bolt
+          # controller
+          Bolt::Shell::Powershell.new(target, conn)
+        end
+      end
     end
 
     def update_targets(options)
