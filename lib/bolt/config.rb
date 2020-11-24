@@ -433,8 +433,13 @@ module Bolt
         raise Bolt::ValidationError, "Compilation is CPU-intensive, set concurrency less than #{compile_limit}"
       end
 
-      Bolt::Util.validate_file('hiera-config', @data['hiera-config']) if @data['hiera-config']
-      Bolt::Util.validate_file('trusted-external-command', trusted_external) if trusted_external
+      %w[hiera-config trusted-external-command inventoryfile].each do |opt|
+        Bolt::Util.validate_file(opt, @data[opt]) if @data[opt]
+      end
+
+      if File.exist?(default_inventoryfile)
+        Bolt::Util.validate_file('inventory file', default_inventoryfile)
+      end
 
       unless TRANSPORT_CONFIG.include?(transport)
         raise UnknownTransportError, transport
