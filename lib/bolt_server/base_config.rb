@@ -7,7 +7,9 @@ module BoltServer
   class BaseConfig
     def config_keys
       %w[host port ssl-cert ssl-key ssl-ca-cert
-         ssl-cipher-suites loglevel logfile allowlist projects-dir]
+         ssl-cipher-suites loglevel logfile allowlist
+         projects-dir environments-codedir
+         environmentpath basemodulepath]
     end
 
     def env_keys
