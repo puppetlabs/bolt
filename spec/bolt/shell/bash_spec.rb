@@ -176,6 +176,14 @@ describe Bolt::Shell::Bash do
       expect(connection).to receive(:execute).with('/path/to/my/ruby /path/to/my/script.rb')
       shell.execute('/path/to/my/script.rb', interpreter: "/path/to/my/ruby")
     end
+
+    it "appends noexec message when exit code is 126" do
+      execute_result = mock_result(stdout: "", stderr: "Permission denied", exitcode: 126)
+      expect(connection).to receive(:execute).and_return(execute_result)
+
+      result = shell.execute('my cool command')
+      expect(result.stderr.string).to include("This may be caused by the default tmpdir being mounted")
+    end
   end
 
   describe "when using run-as" do
