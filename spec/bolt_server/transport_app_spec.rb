@@ -27,7 +27,7 @@ describe "BoltServer::TransportApp" do
     # execution tests. Everything else uses the fixtures above.
     moduledir = File.join(__dir__, '..', 'fixtures', 'modules')
     mock_file_cache(moduledir)
-    config = BoltServer::Config.new({ 'projects-dir' => project_dir })
+    config = BoltServer::Config.new({ 'projects-dir' => project_dir, 'environments-codedir' => basedir })
     BoltServer::TransportApp.new(config)
   end
 
@@ -47,10 +47,6 @@ describe "BoltServer::TransportApp" do
       File.write(File.join(tmpdir, inventory_name), inventory_content.to_yaml) unless inventory_content.nil?
       yield tmpdir
     end
-  end
-
-  before(:each) do
-    stub_const('BoltServer::TransportApp::DEFAULT_BOLT_CODEDIR', basedir)
   end
 
   it 'responds ok' do

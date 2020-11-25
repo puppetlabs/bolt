@@ -235,9 +235,9 @@ module BoltServer
     #
     # WARNING: THIS FUNCTION SHOULD ONLY BE CALLED INSIDE A SYNCHRONIZED PAL MUTEX
     def modulepath_from_environment(environment_name)
-      codedir = DEFAULT_BOLT_CODEDIR
-      environmentpath = "#{codedir}/environments"
-      basemodulepath = "#{codedir}/modules:/opt/puppetlabs/puppet/modules"
+      codedir = @config['environments-codedir'] || DEFAULT_BOLT_CODEDIR
+      environmentpath = @config['environmentpath'] || "#{codedir}/environments"
+      basemodulepath = @config['basemodulepath'] || "#{codedir}/modules:/opt/puppetlabs/puppet/modules"
       modulepath_dirs = nil
       with_pe_pal_init_settings(codedir, environmentpath, basemodulepath) do
         environment = Puppet.lookup(:environments).get!(environment_name)
