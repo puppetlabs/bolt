@@ -95,6 +95,16 @@ module Bolt
       out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_request.to_json)
       ENV['PATH'] = old_path
 
+      # bolt_catalog sometimes return garbage before json output
+      out2 = out
+      out = ''
+      ok = false
+      out2.lines.each do |l|
+        if ok || l.strip.start_with?("{")
+          ok = true
+          out += l
+        end
+      end
       # If bolt_catalog does not return valid JSON, we should print stderr to
       # see what happened
       print_logs = stat.success?
