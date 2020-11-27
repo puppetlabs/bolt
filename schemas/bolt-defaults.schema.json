@@ -87,6 +87,9 @@
         "local": {
           "$ref": "#/definitions/local"
         },
+        "lxd": {
+          "$ref": "#/definitions/lxd"
+        },
         "pcp": {
           "$ref": "#/definitions/pcp"
         },
@@ -377,6 +380,7 @@
             "winrm",
             "pcp",
             "local",
+             "lxd",
             "docker",
             "remote"
           ]
@@ -554,6 +558,22 @@
                   "$ref": "#/definitions/_plugin"
                 }
               ]
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "lxd": {
+      "description": "A map of configuraiton options for the LXD transport",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "remote": {
+              "$ref": "#/transport_definitions/remote"
             }
           }
         },

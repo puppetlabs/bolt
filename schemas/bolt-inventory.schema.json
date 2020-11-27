@@ -261,6 +261,9 @@
                 }
               ]
             },
+            "lxd": {
+              "$ref": "#/definitions/lxd"
+            },
             "pcp": {
               "description": "A map of configuration options for the pcp transport.",
               "oneOf": [
@@ -1351,6 +1354,325 @@
           "$ref": "#/definitions/_plugin"
         }
       ]
+    },
+    "version": {
+      "description": "The version of the inventory file.",
+      "type": "integer"
+    },
+    "transport": {
+      "description": "The default transport to use when the transport for a target is not specified in the URI.",
+      "type": "string",
+      "enum": [
+        "ssh",
+        "winrm",
+        "pcp",
+        "local",
+        "lxd",
+        "docker",
+        "remote"
+      ]
+    },
+    "docker": {
+      "description": "A map of configuration options for the docker transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cleanup": {
+              "$ref": "#/transport_definitions/cleanup"
+            },
+            "host": {
+              "$ref": "#/transport_definitions/host"
+            },
+            "interpreters": {
+              "$ref": "#/transport_definitions/interpreters"
+            },
+            "service-url": {
+              "$ref": "#/transport_definitions/service-url"
+            },
+            "shell-command": {
+              "$ref": "#/transport_definitions/shell-command"
+            },
+            "tmpdir": {
+              "$ref": "#/transport_definitions/tmpdir"
+            },
+            "tty": {
+              "$ref": "#/transport_definitions/tty"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "local": {
+      "description": "A map of configuration options for the local transport. The set of available options is platform dependent.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cleanup": {
+              "$ref": "#/transport_definitions/cleanup"
+            },
+            "interpreters": {
+              "$ref": "#/transport_definitions/interpreters"
+            },
+            "run-as": {
+              "$ref": "#/transport_definitions/run-as"
+            },
+            "run-as-command": {
+              "$ref": "#/transport_definitions/run-as-command"
+            },
+            "sudo-executable": {
+              "$ref": "#/transport_definitions/sudo-executable"
+            },
+            "sudo-password": {
+              "$ref": "#/transport_definitions/sudo-password"
+            },
+            "tmpdir": {
+              "$ref": "#/transport_definitions/tmpdir"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "lxd": {
+      "description": "A map of configuraiton options for the LXD transport",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "remote": {
+              "$ref": "#/transport_definitions/remote"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "pcp": {
+      "description": "A map of configuration options for the pcp transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cacert": {
+              "$ref": "#/transport_definitions/cacert"
+            },
+            "host": {
+              "$ref": "#/transport_definitions/host"
+            },
+            "job-poll-interval": {
+              "$ref": "#/transport_definitions/job-poll-interval"
+            },
+            "job-poll-timeout": {
+              "$ref": "#/transport_definitions/job-poll-timeout"
+            },
+            "service-url": {
+              "$ref": "#/transport_definitions/service-url"
+            },
+            "task-environment": {
+              "$ref": "#/transport_definitions/task-environment"
+            },
+            "token-file": {
+              "$ref": "#/transport_definitions/token-file"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "remote": {
+      "description": "A map of configuration options for the remote transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "run-on": {
+              "$ref": "#/transport_definitions/run-on"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "ssh": {
+      "description": "A map of configuration options for the ssh transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ssh-command": {
+              "$ref": "#/transport_definitions/ssh-command"
+            },
+            "native-ssh": {
+              "$ref": "#/transport_definitions/native-ssh"
+            },
+            "cleanup": {
+              "$ref": "#/transport_definitions/cleanup"
+            },
+            "connect-timeout": {
+              "$ref": "#/transport_definitions/connect-timeout"
+            },
+            "disconnect-timeout": {
+              "$ref": "#/transport_definitions/disconnect-timeout"
+            },
+            "encryption-algorithms": {
+              "$ref": "#/transport_definitions/encryption-algorithms"
+            },
+            "extensions": {
+              "$ref": "#/transport_definitions/extensions"
+            },
+            "host": {
+              "$ref": "#/transport_definitions/host"
+            },
+            "host-key-algorithms": {
+              "$ref": "#/transport_definitions/host-key-algorithms"
+            },
+            "host-key-check": {
+              "$ref": "#/transport_definitions/host-key-check"
+            },
+            "interpreters": {
+              "$ref": "#/transport_definitions/interpreters"
+            },
+            "kex-algorithms": {
+              "$ref": "#/transport_definitions/kex-algorithms"
+            },
+            "load-config": {
+              "$ref": "#/transport_definitions/load-config"
+            },
+            "login-shell": {
+              "$ref": "#/transport_definitions/login-shell"
+            },
+            "mac-algorithms": {
+              "$ref": "#/transport_definitions/mac-algorithms"
+            },
+            "password": {
+              "$ref": "#/transport_definitions/password"
+            },
+            "port": {
+              "$ref": "#/transport_definitions/port"
+            },
+            "private-key": {
+              "$ref": "#/transport_definitions/private-key"
+            },
+            "proxyjump": {
+              "$ref": "#/transport_definitions/proxyjump"
+            },
+            "run-as": {
+              "$ref": "#/transport_definitions/run-as"
+            },
+            "run-as-command": {
+              "$ref": "#/transport_definitions/run-as-command"
+            },
+            "script-dir": {
+              "$ref": "#/transport_definitions/script-dir"
+            },
+            "sudo-executable": {
+              "$ref": "#/transport_definitions/sudo-executable"
+            },
+            "sudo-password": {
+              "$ref": "#/transport_definitions/sudo-password"
+            },
+            "tmpdir": {
+              "$ref": "#/transport_definitions/tmpdir"
+            },
+            "tty": {
+              "$ref": "#/transport_definitions/tty"
+            },
+            "user": {
+              "$ref": "#/transport_definitions/user"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "winrm": {
+      "description": "A map of configuration options for the winrm transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "basic-auth-only": {
+              "$ref": "#/transport_definitions/basic-auth-only"
+            },
+            "cacert": {
+              "$ref": "#/transport_definitions/cacert"
+            },
+            "cleanup": {
+              "$ref": "#/transport_definitions/cleanup"
+            },
+            "connect-timeout": {
+              "$ref": "#/transport_definitions/connect-timeout"
+            },
+            "extensions": {
+              "$ref": "#/transport_definitions/extensions"
+            },
+            "file-protocol": {
+              "$ref": "#/transport_definitions/file-protocol"
+            },
+            "host": {
+              "$ref": "#/transport_definitions/host"
+            },
+            "interpreters": {
+              "$ref": "#/transport_definitions/interpreters"
+            },
+            "password": {
+              "$ref": "#/transport_definitions/password"
+            },
+            "port": {
+              "$ref": "#/transport_definitions/port"
+            },
+            "realm": {
+              "$ref": "#/transport_definitions/realm"
+            },
+            "smb-port": {
+              "$ref": "#/transport_definitions/smb-port"
+            },
+            "ssl": {
+              "$ref": "#/transport_definitions/ssl"
+            },
+            "ssl-verify": {
+              "$ref": "#/transport_definitions/ssl-verify"
+            },
+            "tmpdir": {
+              "$ref": "#/transport_definitions/tmpdir"
+            },
+            "user": {
+              "$ref": "#/transport_definitions/user"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "_plugin": {
+      "description": "A plugin reference.",
+      "type": "object",
+      "required": [
+        "_plugin"
+      ],
+      "properties": {
+        "_plugin": {
+          "description": "The name of the plugin.",
+          "type": "string"
+        }
+      }
     }
   },
   "type": "object",
