@@ -11,6 +11,8 @@ module Bolt
 
         def initialize(target)
           @target = target
+          # TODO: if remote unset in config, default to globally-set remote
+          #  might need to shell out for this info
           @lxd_remote = @target.config["lxd"]["remote"]
           @logger = Bolt::Logger.logger(target.safe_name)
           @logger.trace("")
