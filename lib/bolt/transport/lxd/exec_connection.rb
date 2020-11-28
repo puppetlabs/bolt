@@ -19,12 +19,11 @@ module Bolt
         end
 
         def connect
-            # TODO: check container is running
+        # TODO: check container is running
 
-            # TODO: get info about container, store on self
-            #@container_info = get_info
-            
-            true
+        # TODO: get info about container, store on self
+        # @container_info = get_info
+          true
         rescue StandardError => e
           raise Bolt::Node::ConnectError.new(
             "Failed to connect to #{@target.safe_name}: #{e.message}",
@@ -43,8 +42,8 @@ module Bolt
           container = @target.name
           remote = @lxd_remote
           capture_options = { binmode: true }
-          out, err, status = Open3.capture3('lxc', 'exec', "#{remote}:#{container}", 
-            "--", *command, capture_options)
+          out, err, status = Open3.capture3('lxc', 'exec', "#{remote}:#{container}",
+                                            '--', *command, capture_options)
           [out, err, status]
         end
 

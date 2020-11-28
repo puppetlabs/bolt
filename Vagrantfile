@@ -19,7 +19,7 @@ SCRIPT
 
 linux_provision = <<SCRIPT
 # add the bolt & test user accounts
-useradd -m bolt && echo bolt | passwd --stdin bolt
+useradd -m bolt && echo bolt:bolt | chpasswd
 useradd -m test
 
 # let the bolt user use sudo

@@ -7,7 +7,6 @@ module Bolt
   class Config
     module Transport
       class LXD < Base
-
         # targets:
         # - name: container1
         #   uri: 159.89.184.173
@@ -15,7 +14,7 @@ module Bolt
         #     transport: lxd
         #     lxd:
         #       remote: remote1
-        # - name: container2 
+        # - name: container2
         #   uri: 10.108.0.7
         #   config:
         #     transport: lxd
@@ -30,15 +29,15 @@ module Bolt
         #
         #   lxc remote switch remote1
         #
-        # How do we just respect this default? Do we need anything in this object? 
+        # How do we just respect this default? Do we need anything in this object?
         DEFAULTS = {
 
         }.freeze
 
-        #private def validate
+        # private def validate
         #  super
         #  # TODO
-        #end
+        # end
       end
     end
   end
