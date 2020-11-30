@@ -285,8 +285,6 @@ module BoltServer
           config: bolt_config
         }
         yield context
-      rescue Bolt::Error => e
-        [400, e.to_json]
       end
     end
 
@@ -521,6 +519,8 @@ module BoltServer
         plan_info = allowed_helper(plan_info, context[:config].project.plans)
         [200, plan_info.to_json]
       end
+    rescue Bolt::Error => e
+      [400, e.to_json]
     end
 
     # Fetches the metadata for a single task
@@ -549,6 +549,8 @@ module BoltServer
         task_info = allowed_helper(task_info, context[:config].project.tasks)
         [200, task_info.to_json]
       end
+    rescue Bolt::Error => e
+      [400, e.to_json]
     end
 
     # Fetches the list of plans for an environment, optionally fetching all metadata for each plan
@@ -592,6 +594,8 @@ module BoltServer
         # to bolt-server smaller/simpler.
         [200, plans_response.to_json]
       end
+    rescue Bolt::Error => e
+      [400, e.to_json]
     end
 
     # Fetches the list of tasks for an environment
@@ -626,6 +630,8 @@ module BoltServer
         # to bolt-server smaller/simpler.
         [200, tasks_response.to_json]
       end
+    rescue Bolt::Error => e
+      [400, e.to_json]
     end
 
     # Implements puppetserver's file_metadatas endpoint for projects.
@@ -638,6 +644,8 @@ module BoltServer
         metadatas = file_metadatas(context[:pal], params[:module_name], file)
         [200, metadatas.to_json]
       end
+    rescue Bolt::Error => e
+      [400, e.to_json]
     rescue ArgumentError => e
       [400, e.message]
     end
