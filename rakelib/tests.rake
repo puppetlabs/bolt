@@ -44,6 +44,11 @@ begin
     RSpec::Core::RakeTask.new(:omi) do |t|
       t.rspec_opts = '--tag omi'
     end
+
+    desc 'Run tests that require an LXD virtual machine and the lxc cli'
+    RSpec::Core::RakeTask.new(:lxd) do |t|
+      t.rspec_opts = '--tag lxd'
+    end
   end
 
   # The following tasks are run during CI and require additional environment setup
