@@ -1,5 +1,115 @@
 # Changelog
 
+## Bolt 2.36.0 (2020-11-30)
+
+### New features
+
+* **`bolt plan new` and `New-BoltPlan` commands no longer experimental**
+
+  The `bolt plan new` and `New-BoltPlan` commands are no longer
+  considered experimental.
+
+* **Module management workflow no longer experimental**
+
+  The module management workflow is no longer considered experimental. For more
+  information, see the [modules
+  overview](https://puppet.com/docs/bolt/latest/modules.html) in the Bolt
+  documentation.
+
+* **Configure `modules` with `bolt project init`**
+  ([#2110](https://github.com/puppetlabs/bolt/issues/2210))
+
+  The `bolt project init` command will now configure the `modules` key
+  in the `bolt-project.yaml` file, enabling the `bolt module` command.
+
+* **Create `inventory.yaml` file when creating new projects**
+  ([#2364](https://github.com/puppetlabs/bolt/issues/2364))
+
+  The `bolt project init` and `New-BoltProject` commands now create an
+  `inventory.yaml` file in the new project.
+
+* **Log plugin task output at `trace` level**
+  ([#2336](https://github.com/puppetlabs/bolt/issues/2336))
+
+  Plugin task output is now logged at `trace` level.
+
+* **Improved config validation**
+  ([#2337](https://github.com/puppetlabs/bolt/issues/2337))
+
+  Bolt now validates config files against Bolt's schemas and indicates
+  which config file an error is found in.
+
+* **Warn about unknown configuration options**
+  ([#2376](https://github.com/puppetlabs/bolt/issues/2376))
+
+  Bolt now issues a warning when it detects an unknown configuration
+  option. The warning will indicate where the configuration option is
+  located.
+
+* **Added `value()` function to `ApplyResult` datatype**
+  ([#2370](https://github.com/puppetlabs/bolt/issues/2370))
+
+  The `ApplyResult` datatype has a new `value()` function that returns a
+  hash that includes the Puppet report from an apply under the `report`
+  key.
+
+### Bug fixes
+
+* **Targets without a uri can now use `apply()` and `get_resources()`**
+  ([#2346](https://github.com/puppetlabs/bolt/issues/2346))
+
+  Previously, if a target had a `host` set instead of a `uri` it would
+  error when trying to set the Puppet certname to the target's URI. We now
+  use the target's `name` instead of the `uri` as the Puppet certname when
+  compiling catalogs.
+
+* **Allow loading SSH Config through net-ssh when using native-ssh to fail**
+  ([#2289](https://github.com/puppetlabs/bolt/issues/2289)
+
+  As skipping loading SSH config through the net-ssh gem is not
+  feasible, we allow loading the ssh config to fail and fall back
+  to the inventory file settings or the logged in user.
+
+  _Contributed by [Robert Führicht](https://github.com/fuero)_
+
+* **Ship `puppet_agent` manifests directory**
+  ([#2368](https://github.com/puppetlabs/bolt/issues/2368))
+
+  Bolt now includes the `puppet_agent` module manifests directory and
+  it's classes in the Bolt gem and packages.
+
+### Deprecations
+
+* **Deprecate `--boltdir`, `--configfile`, `--puppetfile`, and `--description`
+  command-line options**
+  ([#2362](https://github.com/puppetlabs/bolt/issues/2362))
+
+  We are planning to remove the `--boltdir`, `--configfile`,
+  `--puppetfile`, and `--description` command line flags in the next major
+  version of Bolt. This adds deprecation warnings that are printed when
+  users specify any of these flags.
+
+* **Deprecate `inventoryfile` configuration option**
+  ([#2363](https://github.com/puppetlabs/bolt/issues/2363))
+
+  The `inventoryfile` configuration option has been deprecated and will
+  be removed in Bolt 3.0. Users should move contents from non-default
+  inventory files to the `inventory.yaml` file in a Bolt project, or can
+  use the `--inventoryfile` command-line option to load a non-default
+  inventory file.
+
+* **Deprecate `plugin_hooks` in favor of `plugin-hooks`**
+  ([#2358](https://github.com/puppetlabs/bolt/issues/2358))
+
+  The `plugin_hooks` configuration option has been deprecated in favor
+  of `plugin-hooks`.
+
+* **Deprecate `apply_settings` in favor of `apply-settings`**
+  ([#2357](https://github.com/puppetlabs/bolt/issues/2357))
+
+  The `apply_settings` configuration option has been deprecated in favor
+  of `apply-settings`.
+
 ## Bolt 2.35.0 (2020-11-16)
 
 ### New features
