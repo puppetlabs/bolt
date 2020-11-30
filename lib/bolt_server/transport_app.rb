@@ -8,6 +8,7 @@ require 'bolt/inventory'
 require 'bolt/project'
 require 'bolt/target'
 require 'bolt_server/file_cache'
+require 'bolt_server/plugin'
 require 'bolt/task/puppet_server'
 require 'json'
 require 'json-schema'
@@ -655,16 +656,24 @@ module BoltServer
     # @param project_ref [String] the project_ref to compute the inventory from
     post '/project_inventory_targets' do
       return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
-      bolt_config = config_from_project(params['project_ref'])
-      if bolt_config.inventoryfile && bolt_config.project.inventory_file.to_s != bolt_config.inventoryfile
-        raise Bolt::ValidationError, "Project inventory must be defined in the " \
-          "inventory.yaml file at the root of the project directory"
-      end
-      plugins = Bolt::Plugin.setup(bolt_config, nil)
-      inventory = Bolt::Inventory.from_config(bolt_config, plugins)
-      target_list = inventory.get_targets('all').map { |targ| targ.to_h.merge({ 'transport' => targ.transport }) }
+      in_bolt_project(params['project_ref']) do |context|
+        if context[:config].inventoryfile &&
+           context[:config].project.inventory_file.to_s !=
+           context[:config].inventoryfile
+          raise Bolt::ValidationError, "Project inventory must be defined in the " \
+            "inventory.yaml file at the root of the project directory"
+        end
+        begin
+          plugins = Bolt::Plugin.setup(context[:config], context[:pal], load_plugins: false)
+          inventory = Bolt::Inventory.from_config(context[:config], plugins)
+          target_list = inventory.get_targets('all').map { |targ| targ.to_h.merge({ 'transport' => targ.transport }) }
+        rescue Bolt::Plugin::PluginError::LoadingDisabled => e
+          msg = "Cannot load plugin #{e.details['plugin_name']}: plugin not supported"
+          raise BoltServer::Plugin::PluginNotSupported.new(msg, e.details['plugin_name'])
+        end
 
-      [200, target_list.to_json]
+        [200, target_list.to_json]
+      end
     rescue Bolt::Error => e
       [500, e.to_json]
     end
