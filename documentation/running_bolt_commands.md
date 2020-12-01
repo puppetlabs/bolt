@@ -1,6 +1,6 @@
-# Run commands on remote targets
+# Run Bolt
 
-You can use Bolt commands to connect to remote targets and perform actions on
+You can use Bolt commands to connect to targets and perform actions on
 them. These actions range in complexity from invoking a simple command to
 running a series of commands and tasks as part of an orchestration workflow. 
 
@@ -9,7 +9,7 @@ reference](bolt_command_reference.md).
 
 ## Run a command
 
-Bolt can run arbitrary commands on remote targets. To run a command, provide a
+Bolt can run arbitrary commands on targets. To run a command, provide a
 command and a list of targets to run the command on.
 
 _\*nix shell command_

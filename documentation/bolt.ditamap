@@ -20,7 +20,18 @@
         <topicref href="privilege_escalation.md" format="markdown"/>
         <topicref href="vscode_and_bolt.md" format="markdown"/>
     </topichead>
-    <topicref href="running_bolt_commands.md" format="markdown" linking="targetonly"/>
+    <topicref href="running_bolt.md" format="markdown" navtitle="Running Bolt" locktitle="yes">
+      <topicref href="running_bolt_commands.md" format="markdown">
+        <topicmeta>
+          <shortdesc>How Bolt commands are constructed, and what they can do</shortdesc>
+        </topicmeta>
+      </topicref>
+      <topicref href="running_bolt_network.md" format="markdown">
+        <topicmeta>
+          <shortdesc>Tips for running Bolt when targetting network devices</shortdesc>
+        </topicmeta>
+      </topicref>
+    </topicref>
     <topicref href="plans.md" format="markdown" navtitle="Plans" locktitle="yes">
         <topicref href="inspecting_plans.md" format="markdown">
             <topicmeta>
