@@ -36,6 +36,18 @@ system. For example, if you write a Python task and include the line:
 `#!/usr/bin/env python`, Bolt attempts to execute the script using the default
 `python` executable on the target system.
 
+If your task fails with the following error, the issue may be that your temporary directory (tmpdir)
+is [mounted with noexec](https://superuser.com/questions/728127/what-does-noexec-flag-mean-when-mounting-directories-on-rhel).
+
+```
+The task failed with exit code 126 and no stdout but stderr contained: 
+.... <temp path to task>>.rb: Permission denied
+```
+
+You can resolve this by [configuring an alternate tmpdir](bolt_transports_reference.md) for the
+transport you're using, or by talking to your administrator about updating permissions for the
+directory.
+
 ## Bolt can't connect to my hosts over SSH
 
 ### Host key verification failures
