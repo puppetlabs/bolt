@@ -14,6 +14,22 @@ module Bolt
         extensions = [target.options['extensions'] || []].flatten.map { |ext| ext[0] == '.' ? ext : '.' + ext }
         extensions += target.options['interpreters'].keys if target.options['interpreters']
         @extensions = DEFAULT_EXTENSIONS + extensions
+        validate_ps_version
+      end
+
+      def validate_ps_version
+        version = execute("$PSVersionTable.PSVersion.Major").stdout.string.chomp
+        if !version.empty? && version.to_i < 3
+          # This lets us know how many targets have Powershell 2, and lets the
+          # user know how many targets they have with PS2
+          msg = "Detected PowerShell 2 on one or more targets.\nPowerShell 2 "\
+            "is deprecated, and support will be removed in Bolt 3.0. See "\
+            "bolt-debug.log or run with '--log-level debug' to see the full "\
+            "list of targets with PowerShell 2."
+
+          Bolt::Logger.deprecation_warning("PowerShell 2", msg)
+          @logger.debug("Detected PowerShell 2 on #{target}.")
+        end
       end
 
       def provided_features

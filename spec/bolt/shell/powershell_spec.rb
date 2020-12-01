@@ -10,6 +10,7 @@ describe Bolt::Shell::Powershell do
   let(:connection) { double('connection', user: 'Administrator') }
   let(:shell) { Bolt::Shell::Powershell.new(target, connection) }
   let(:status) { double('status', alive: false?, value: 0) }
+  let(:ps_version) { double('node_output', stdout: StringIO.new("2\n")) }
 
   def mock_result(stdout: "", stderr: "", exitcode: 0)
     _, in_w = IO.pipe
@@ -27,6 +28,7 @@ describe Bolt::Shell::Powershell do
 
   before :each do
     allow(connection).to receive(:execute).and_return(mock_result)
+    allow(connection).to receive(:max_command_length).and_return(256)
   end
 
   it "provides the 'powershell' feature" do
@@ -42,6 +44,17 @@ describe Bolt::Shell::Powershell do
       expect(shell.default_input_method('foo')).to eq('both')
       expect(shell.default_input_method('foo.rb')).to eq('both')
       expect(shell.default_input_method('foo.py')).to eq('both')
+    end
+  end
+
+  describe "#validate_ps_version" do
+    it "warns when PSVersionTable reports less than 3" do
+      allow(shell).to receive(:execute)
+        .with("$PSVersionTable.PSVersion.Major")
+        .and_return(ps_version)
+
+      shell.validate_ps_version
+      expect(@log_output.readlines).to include(/Detected PowerShell 2 on/)
     end
   end
 
