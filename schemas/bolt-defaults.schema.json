@@ -114,6 +114,7 @@
                 "debug",
                 "error",
                 "info",
+                "notice",
                 "warn",
                 "fatal",
                 "any"
@@ -144,6 +145,7 @@
               "debug",
               "error",
               "info",
+              "notice",
               "warn",
               "fatal",
               "any"

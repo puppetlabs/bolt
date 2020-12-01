@@ -6,7 +6,7 @@ which is supported in both the [system-wide and user-level configuration directo
 ## Options
 
 <% @opts.each do |option, data| -%>
-### <% if data.key?(:_deprecation) %>⛔<% end %> `<%= option %>`
+### <% if data.key?(:_deprecation) %>⛔ <% end %>`<%= option %>`
 
 <% if data.key?(:_deprecation) -%>
 _This option is deprecated. <%= data[:_deprecation] %>_
