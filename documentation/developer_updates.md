@@ -158,6 +158,12 @@ compiled a list of expected changes and removals.
   non-default inventory file for a single run. However, there is little value in
   configuring a permanent non-default inventoryfile for a project.
 
+- **`notice` log level will be removed**
+
+  The `notice` log level has already been soft-deprecated. Bolt does not log
+  any messages at this level. Messages logged in apply blocks using the `notice()`
+  function are logged by Bolt at the `info` level.
+
 #### Updating your project
 
 While some of these changes will require you to manually update files, others

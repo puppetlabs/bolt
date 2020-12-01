@@ -102,7 +102,7 @@ describe 'validating config' do
           /Value at 'color' must be of type Boolean/,
           /Value at 'compile-concurrency' must be a minimum of 1/,
           /Value at 'format' must be one of human, json, rainbow/,
-          /Value at 'log.warn.log.level' must be one of trace, debug, error, info, warn, fatal, any/,
+          /Value at 'log.warn.log.level' must be one of/,
           /Value at 'log.warn.log.append' must be of type Boolean/,
           /Value at 'log.bolt-debug.log' must be disable or must be of type Hash/,
           /Value at 'modulepath' is a plugin reference, which is unsupported at this location/,

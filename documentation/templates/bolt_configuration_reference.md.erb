@@ -11,7 +11,7 @@ The `bolt.yaml` configuration file is supported in all [project directories](con
 ## Options
 
 <% @opts.each do |option, data| -%>
-### <% if data.key?(:_deprecation) %>⛔<% end %> `<%= option %>`
+### <% if data.key?(:_deprecation) %>⛔ <% end %>`<%= option %>`
 
 <% if data.key?(:_deprecation) -%>
 _This option is deprecated. <%= data[:_deprecation] %>_

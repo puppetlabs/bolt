@@ -448,9 +448,17 @@ module Bolt
             raise Bolt::ValidationError,
                   "level of log #{name} must be a String or Symbol, received #{v.class} #{v.inspect}"
           end
+
           unless Bolt::Logger.valid_level?(v)
             raise Bolt::ValidationError,
                   "level of log #{name} must be one of #{Bolt::Logger.levels.join(', ')}; received #{v}"
+          end
+
+          if v == 'notice'
+            @deprecations << {
+              type: 'notice log level',
+              msg:  "Log level 'notice' is deprecated and will be removed in Bolt 3.0. Use 'info' instead."
+            }
           end
         end
 
