@@ -1,5 +1,4 @@
-# Travis not using 18.04 yet
-FROM rastasheep/ubuntu-sshd:16.04
+FROM rastasheep/ubuntu-sshd:18.04
 RUN apt-get update && apt-get -y install sudo tree locales apt-transport-https
 RUN locale-gen en_US.UTF-8
 

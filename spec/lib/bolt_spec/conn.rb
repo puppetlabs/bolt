@@ -6,39 +6,42 @@ require 'bolt/inventory'
 module BoltSpec
   module Conn
     def conn_info(transport)
-      default_host = 'localhost'
-      default_user = 'bolt'
-      default_password = 'bolt'
+      default_host        = 'localhost'
+      default_user        = 'bolt'
+      default_password    = 'bolt'
       default_second_user = 'test'
-      default_second_pw = 'test'
-      default_key = File.expand_path(File.join(__dir__, '..', '..', 'fixtures/keys/id_rsa'))
-      default_port = 0
+      default_second_pw   = 'test'
+      default_key         = File.expand_path(File.join(__dir__, '..', '..', 'fixtures/keys/id_rsa'))
+      default_port        = 0
+      additional_config   = {}
 
       tu = transport.upcase
       case transport
       when 'ssh'
         default_port = 20022
       when 'winrm'
-        default_port = 25985
+        default_port      = 25985
+        additional_config = { ssl: false,
+                              'connect-timeout': 30 }
       when 'docker'
-        default_user = ''
+        default_user     = ''
         default_password = ''
-        default_host = 'ubuntu_node'
+        default_host     = 'ubuntu_node'
       else
         raise Error, "The transport must be either 'ssh' or 'winrm'"
       end
 
-      {
-        protocol: transport,
-        host: ENV["BOLT_#{tu}_HOST"] || default_host,
-        user: ENV["BOLT_#{tu}_USER"] || default_user,
-        password: ENV["BOLT_#{tu}_PASSWORD"] || default_password,
-        port: (ENV["BOLT_#{tu}_PORT"] || default_port).to_i,
-        key: ENV["BOLT_#{tu}_KEY"] || default_key,
+      additional_config.merge(
+        protocol:    transport,
+        host:        ENV["BOLT_#{tu}_HOST"] || default_host,
+        user:        ENV["BOLT_#{tu}_USER"] || default_user,
+        password:    ENV["BOLT_#{tu}_PASSWORD"] || default_password,
+        port:        (ENV["BOLT_#{tu}_PORT"] || default_port).to_i,
+        key:         ENV["BOLT_#{tu}_KEY"] || default_key,
         second_user: ENV["BOLT_#{tu}_SECOND_USER"] || default_second_user,
-        second_pw: ENV["BOLT_#{tu}_SECOND_PW"] || default_second_pw,
+        second_pw:   ENV["BOLT_#{tu}_SECOND_PW"] || default_second_pw,
         system_user: `whoami`.strip
-      }
+      )
     end
 
     def conn_uri(transport, include_password: false, override_port: nil)
@@ -68,17 +71,35 @@ module BoltSpec
 
     def docker_inventory(root: false)
       usernamepassword = root ? 'root' : 'bolt'
-      { 'version' => 2,
+      {
         'groups' => [
-          { 'name' => 'ssh',
+          {
+            'name' => 'ssh',
             'targets' => [
-              { 'name' => 'ubuntu_node',
+              {
+                'name' => 'ubuntu_node',
                 'alias' => 'agentless',
-                'config' => { 'ssh' => { 'port' => 20022 } } },
-              { 'name' => 'puppet_5_node',
-                'config' => { 'ssh' => { 'port' => 20023 } } },
-              { 'name' => 'puppet_6_node',
-                'config' => { 'ssh' => { 'port' => 20024 } } }
+                'config' => { 'ssh' => { 'port' => 20022 } }
+              }
+            ],
+            'groups' => [
+              {
+                'name' => 'nix_agents',
+                'targets' => [
+                  {
+                    'name' => 'puppet_5_node',
+                    'config' => { 'ssh' => { 'port' => 20023 } }
+                  },
+                  {
+                    'name' => 'puppet_6_node',
+                    'config' => { 'ssh' => { 'port' => 20024 } }
+                  },
+                  {
+                    'name' => 'puppet_7_node',
+                    'config' => { 'ssh' => { 'port' => 20025 } }
+                  }
+                ]
+              }
             ],
             'config' => {
               'ssh' => {
@@ -87,8 +108,10 @@ module BoltSpec
                 'user' => usernamepassword,
                 'password' => usernamepassword
               }
-            } }
-        ] }
+            }
+          }
+        ]
+      }
     end
 
     def root_password

@@ -18,6 +18,12 @@ services:
       - ubuntu_node
     ports:
       - "20024:22"
+  puppet_7_node:
+    image: bolt-spec
+    depends_on:
+      - ubuntu_node
+    ports:
+      - "20025:22"
 
   postgres:
     image: postgres:9.6

@@ -37,6 +37,9 @@ jobs:
       - name: Install gems
         if: steps.cache.outputs.cache-hit != 'true'
         run: bundle install --jobs 4 --retry 3
+      - name: Update gems
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: bundle update
       - name: Pre-test setup
         run: |
           echo 'runner:runner' | sudo chpasswd
@@ -72,6 +75,9 @@ jobs:
       - name: Install gems
         if: steps.cache.outputs.cache-hit != 'true'
         run: bundle install --jobs 4 --retry 3
+      - name: Update gems
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: bundle update
       - name: Pre-test setup
         run: |
           docker-compose -f spec/docker-compose.yml build --parallel
