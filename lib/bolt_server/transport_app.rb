@@ -9,6 +9,7 @@ require 'bolt/project'
 require 'bolt/target'
 require 'bolt_server/file_cache'
 require 'bolt_server/plugin'
+require 'bolt_server/plugin/puppet_connect_data'
 require 'bolt/task/puppet_server'
 require 'json'
 require 'json-schema'
@@ -36,6 +37,7 @@ module BoltServer
       action-upload_file
       transport-ssh
       transport-winrm
+      connect-data
     ].freeze
 
     # PE_BOLTLIB_PATH is intended to function exactly like the BOLTLIB_PATH used
@@ -656,6 +658,10 @@ module BoltServer
     # @param project_ref [String] the project_ref to compute the inventory from
     post '/project_inventory_targets' do
       return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
+      content_type :json
+      body = JSON.parse(request.body.read)
+      error = validate_schema(@schemas["connect-data"], body)
+      return [400, error_result(error).to_json] unless error.nil?
       in_bolt_project(params['project_ref']) do |context|
         if context[:config].inventoryfile &&
            context[:config].project.inventory_file.to_s !=
@@ -667,7 +673,9 @@ module BoltServer
         Bolt::Util.validate_file('inventory file', context[:config].project.inventory_file)
 
         begin
+          connect_plugin = BoltServer::Plugin::PuppetConnectData.new(body['puppet_connect_data'])
           plugins = Bolt::Plugin.setup(context[:config], context[:pal], load_plugins: false)
+          plugins.add_plugin(connect_plugin)
           inventory = Bolt::Inventory.from_config(context[:config], plugins)
           target_list = inventory.get_targets('all').map { |targ| targ.to_h.merge({ 'transport' => targ.transport }) }
         rescue Bolt::Plugin::PluginError::LoadingDisabled => e
