@@ -68,7 +68,7 @@ module Bolt
         # though, since that will resolve any nested references and we want to
         # leave it to the group to do that lazily.
         groups = @plugins.resolve_top_level_references(groups)
-
+        raise ValidationError.new("Groups must be an Array", nil) unless groups.is_a?(Array)
         @groups = Array(groups).map { |g| Group.new(g, plugins) }
       end
 

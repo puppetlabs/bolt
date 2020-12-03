@@ -469,6 +469,11 @@ describe Bolt::Inventory::Group do
       data['plugin_hooks'] = 'puppet_library'
       expect { group }.to raise_error(/Expected plugin_hooks to be of type Hash/)
     end
+
+    it 'fails if plugin_hooks is not a hash' do
+      data['groups'] = { 'forgot' => 'to make this a single element list' }
+      expect { group }.to raise_error(/Groups must be an Array/)
+    end
   end
 
   describe 'with aliases' do
