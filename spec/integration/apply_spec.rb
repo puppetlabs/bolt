@@ -104,7 +104,7 @@ describe "apply", expensive: true do
           'puppet_library' => {
             'plugin' => 'task',
             'task' => 'puppet_agent::install',
-            'parameters' => { 'version' => '6.2.0' }
+            'parameters' => { 'collection' => 'puppet6', 'version' => '6.2.0' }
           }
         }
       }],
