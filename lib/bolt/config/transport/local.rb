@@ -8,6 +8,7 @@ module Bolt
     module Transport
       class Local < Base
         WINDOWS_OPTIONS = %w[
+          bundled-ruby
           cleanup
           interpreters
           tmpdir

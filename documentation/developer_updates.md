@@ -53,6 +53,24 @@ compiled a list of expected changes and removals.
   should instead use the built-in [PowerShell
   cmdlets](bolt_cmdlet_reference.md).
 
+- **New default configuration for the local transport**
+
+  In Bolt 2.x, Bolt applied the following settings to targets named `localhost` by default:
+  ```
+  targets:
+    - name: localhost
+      config:
+        transport: local
+        local:
+          interpreters:
+            .rb: RbConfig.ruby # This uses the Ruby we ship with Bolt
+      features:
+        - puppet-agent
+  ```
+  These settings will now be applied to all targets using the local transport. Settings can be
+  overridden at the target level in inventory. They can also be enabled or disabled starting in Bolt
+  2.37 using the `bundled-ruby` local transport config option.
+
 - **`apply_settings` configuration option renamed to `apply-settings`**
 
   Most other configuration options in Bolt use hyphens instead of underscores.

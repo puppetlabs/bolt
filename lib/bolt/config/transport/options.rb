@@ -81,6 +81,13 @@ module Bolt
             _default: false,
             _example: true
           },
+          "bundled-ruby" => {
+            description: "Whether to use the Ruby bundled with Bolt packages for local targets.",
+            type: [TrueClass, FalseClass],
+            _plugin: false,
+            _example: true,
+            _default: false
+          },
           "cacert" => {
             type: String,
             description: "The path to the CA certificate.",

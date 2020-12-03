@@ -31,7 +31,8 @@ module Bolt
         end
 
         if @name == 'localhost'
-          target_data = localhost_defaults(target_data)
+          default = { 'config' => { 'transport' => 'local' } }
+          target_data = Bolt::Util.deep_merge(default, target_data)
         end
 
         @config = target_data['config'] || {}
@@ -49,18 +50,16 @@ module Bolt
         validate
       end
 
-      def localhost_defaults(data)
+      def set_local_defaults
+        return if @set_local_default
         defaults = {
-          'config' => {
-            'transport' => 'local',
-            'local' => { 'interpreters' => { '.rb' => RbConfig.ruby } }
-          },
-          'features' => ['puppet-agent']
+          'local' => { 'interpreters' => { '.rb' => RbConfig.ruby } }
         }
-        data = Bolt::Util.deep_merge(defaults, data)
-        # If features is an empty array deep_merge won't add the puppet-agent
-        data['features'] += ['puppet-agent'] if data['features'].empty?
-        data
+        old_config = @config
+        @config = Bolt::Util.deep_merge(defaults, @config)
+        invalidate_config_cache! if old_config != @config
+        set_feature('puppet-agent')
+        @set_local_default = true
       end
 
       # rubocop:disable Naming/AccessorMethodName
