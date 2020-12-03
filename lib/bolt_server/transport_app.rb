@@ -663,6 +663,9 @@ module BoltServer
           raise Bolt::ValidationError, "Project inventory must be defined in the " \
             "inventory.yaml file at the root of the project directory"
         end
+
+        Bolt::Util.validate_file('inventory file', context[:config].project.inventory_file)
+
         begin
           plugins = Bolt::Plugin.setup(context[:config], context[:pal], load_plugins: false)
           inventory = Bolt::Inventory.from_config(context[:config], plugins)

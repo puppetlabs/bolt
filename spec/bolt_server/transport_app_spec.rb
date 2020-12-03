@@ -847,6 +847,18 @@ describe "BoltServer::TransportApp" do
         end
       end
 
+      context 'when inventory file is absent' do
+        it 'responds with a 500 and error details' do
+          with_project(bolt_project, nil) do |path_to_tmp_project|
+            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
+            post("/project_inventory_targets?project_ref=#{project_ref}")
+            expect(last_response.status).to eq(500)
+            error_hash = JSON.parse(last_response.body)
+            expect(error_hash['kind']).to eq('bolt/file-error')
+          end
+        end
+      end
+
       context 'with unknown plugin' do
         let(:targets) {
           [{ 'name' => { '_plugin' => 'foo' } }]
