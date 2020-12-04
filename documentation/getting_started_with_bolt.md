@@ -65,15 +65,15 @@ folder:
 
 ```bash
 cd my_project
-mkdir -p site-modules/apache/plans
-mkdir -p site-modules/apache/files
+mkdir -p modules/apache/plans
+mkdir -p modules/apache/files
 ```
 
 After creating the directories, the file structure of `my_project` looks like this:
 ```bash
 .
 ├── bolt-project.yaml
-└── site-modules
+└── modules
     └── apache
         ├── files
         └── plans
@@ -138,7 +138,7 @@ structure looks like this:
 ├── Dockerfile
 ├── bolt-project.yaml
 ├── docker-compose.yaml
-└── site-modules
+└── modules
     └── apache
         └── files
         └── plans
@@ -240,7 +240,7 @@ At this point, your file structure looks like this:
 ├── bolt-project.yaml
 ├── docker-compose.yaml
 ├── inventory.yaml
-└── site-modules
+└── modules
     └── apache
         ├── files
         └── plans
@@ -274,7 +274,7 @@ homepage.
 The first step in your YAML plan uses a Puppet task to install Apache on your
 targets.
 
-In your `my_project/site-modules/apache/plans` directory, create the following
+In your `my_project/modules/apache/plans` directory, create the following
 file and name it `install.yaml`:
 
 ```yaml
@@ -300,7 +300,7 @@ After creating `install.yaml`, your file structure looks like this:
 ├── bolt-project.yaml
 ├── docker-compose.yaml
 ├── inventory.yaml
-└── site-modules
+└── modules
     └── apache
         ├── files
         └── plans
@@ -358,7 +358,7 @@ Because you're running Apache on containers, the Apache service does not start
 automatically. You must create a short bash script that starts the Apache
 service and add it to your plan as a script step.
 
-Create a file named `start_apache.sh` in `my-project/site-modules/apache/files/`
+Create a file named `start_apache.sh` in `my-project/modules/apache/files/`
 and enter the following script:
 
 ```bash
@@ -383,7 +383,7 @@ At this point, your file structure looks like this:
 ├── bolt-project.yaml
 ├── docker-compose.yaml
 ├── inventory.yaml
-└── site-modules
+└── modules
     └── apache
         ├── files
         │   └── start_apache.sh
@@ -450,7 +450,7 @@ change the homepage.
 Now that Apache is installed on both of your containers, upload an HTML homepage
 for the targets to display.
 
-In `my_project/site-modules/apache/files/`, create a file named `index.html` and
+In `my_project/modules/apache/files/`, create a file named `index.html` and
 enter the following:
 
 ```html
@@ -473,7 +473,7 @@ Your final file structure looks like this:
 ├── bolt-project.yaml
 ├── docker-compose.yaml
 ├── inventory.yaml
-└── site-modules
+└── modules
     └── apache
         ├── files
         │   ├── index.html
