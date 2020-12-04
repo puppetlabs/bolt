@@ -1,3 +1,6 @@
+require:
+  - rubocop-rake
+
 AllCops:
   Exclude:
     - Boltdir/**/*
@@ -8,6 +11,7 @@ AllCops:
     - docs/**/*
     - site-modules/**/*
     - tasks/**/*
+  SuggestExtensions: false
   TargetRubyVersion: 2.5
 
 # Layout cops
@@ -136,6 +140,9 @@ Lint/TopLevelReturnWithArgument:
   Enabled: true
 
 Lint/TrailingCommaInAttributeDeclaration:
+  Enabled: true
+
+Lint/UnexpectedBlockArity:
   Enabled: true
 
 Lint/UnmodifiedReduceAccumulator:

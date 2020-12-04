@@ -28,6 +28,7 @@ group(:test) do
   gem "mocha", '~> 1.4.0'
   gem "rack-test", '~> 1.0'
   gem "rubocop", require: false
+  gem "rubocop-rake", require: false
 end
 
 group(:packaging) do
