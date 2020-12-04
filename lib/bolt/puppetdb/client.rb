@@ -18,6 +18,7 @@ module Bolt
       def query_certnames(query)
         return [] unless query
 
+        @logger.debug("Querying certnames")
         results = make_query(query)
 
         if results&.first && !results.first&.key?('certname')
@@ -34,6 +35,8 @@ module Bolt
         certnames.uniq!
         name_query = certnames.map { |c| ["=", "certname", c] }
         name_query.insert(0, "or")
+
+        @logger.debug("Querying certnames")
         result = make_query(name_query, 'inventory')
 
         result&.each_with_object({}) do |node, coll|
@@ -52,6 +55,8 @@ module Bolt
         facts_query.insert(0, "or")
 
         query = ['and', name_query, facts_query]
+
+        @logger.debug("Querying certnames")
         result = make_query(query, 'fact-contents')
         result.map! { |h| h.delete_if { |k, _v| %w[environment name].include?(k) } }
         result.group_by { |c| c['certname'] }
@@ -63,11 +68,13 @@ module Bolt
         url += "/#{path}" if path
 
         begin
+          @logger.debug("Sending PuppetDB query to #{url}")
           response = http_client.post(url, body: body, header: headers)
         rescue StandardError => e
           raise Bolt::PuppetDBFailoverError, "Failed to query PuppetDB: #{e}"
         end
 
+        @logger.debug("Got response code #{response.code} from PuppetDB")
         if response.code != 200
           msg = "Failed to query PuppetDB: #{response.body}"
           if response.code == 400
@@ -92,6 +99,7 @@ module Bolt
         return @http if @http
         # lazy-load expensive gem code
         require 'httpclient'
+        @logger.trace("Creating HTTP Client")
         @http = HTTPClient.new
         @http.ssl_config.set_client_cert_file(@config.cert, @config.key) if @config.cert
         @http.ssl_config.add_trust_ca(@config.cacert)
