@@ -503,7 +503,7 @@ Now add the following step after the `start_apache` step:
 
 ```yaml
 - name: upload_homepage
-  source: $src
+  upload: $src
   destination: /var/www/html/index.html
   targets: $targets
   description: "Upload homepage"      
@@ -536,7 +536,7 @@ steps:
     description: "Start the Apache service"
 
   - name: upload_homepage
-    source: $src
+    upload: $src
     destination: /var/www/html/index.html
     targets: $targets
     description: "Upload site contents"                            
