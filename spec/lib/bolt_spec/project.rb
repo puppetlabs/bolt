@@ -3,6 +3,7 @@
 module BoltSpec
   module Project
     def with_project(name = 'project')
+      @project_name = name
       Dir.mktmpdir(nil, Dir.pwd) do |tmpdir|
         @tmpdir       = Pathname.new(tmpdir).expand_path
         @project_path = (@tmpdir + name).expand_path
@@ -43,7 +44,7 @@ module BoltSpec
     end
 
     def project_config
-      {}
+      { 'name' => @project_name }
     end
 
     def project

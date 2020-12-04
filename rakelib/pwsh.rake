@@ -41,16 +41,16 @@ namespace :pwsh do
       'apply'      => 'Invoke',
       'convert'    => 'Convert',
       'createkeys' => 'New',
-      'init'       => 'New',
-      'install'    => 'Install',
       'encrypt'    => 'Protect',
       'decrypt'    => 'Unprotect',
+      'download'   => 'Receive',
+      'init'       => 'New',
+      'install'    => 'Install',
       'migrate'    => 'Update',
+      'new'        => 'New',
       'run'        => 'Invoke',
       'show'       => 'Get',
-      'upload'     => 'Send', # deploy? publish?
-      'download'   => 'Receive',
-      'new'        => 'New'
+      'upload'     => 'Send' # deploy? publish?
     }
 
     @hardcoded_cmdlets = {

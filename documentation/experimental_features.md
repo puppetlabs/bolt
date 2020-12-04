@@ -8,6 +8,58 @@ API may change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
 around breaking behavior where possible. 
 
+## Plugin caching
+
+This feature was introduced in [Bolt TODO]()
+
+Bolt supports the use of plugins to dynamically load information during a Bolt run and change how
+Bolt executes certain actions. Bolt also loads all configuration plugins for most Bolt commands, and
+all inventory plugins for any action that requires the inventory, even if the action only uses a
+subset of targets from the inventory. Plugins can sometimes take a long time to execute, and several
+plugin invocations can add quite a bit of start up time to any Bolt command regardless of whether it
+uses the plugin results.
+
+To mitigate the time it takes for Bolt to load plugins, we've introduced plugin caching. Plugin
+caching is enabled by configuring a Time to Live (TTL) for the cache, either by setting a default
+TTL for all plugins with the `plugin-cache` project configuration option or by setting `ttl` under
+the `_cache` option for an individual plugin invocation. The TTL is always in seconds. Bolt caches
+plugin results inside the Bolt project, and removes all expired cache entries whenever it
+uses a cache result. This prevents cache entries from getting orphaned and never removed. Bolt
+identifies a cache result based on a hash (delightfully named 'bubblebabble') of the entire plugin
+invocation, minus the `_cache` key. If any element of the plugin invocation changes, Bolt reloads
+the plugin and updates the cache.
+
+You can set `ttl` to 0 to disable caching for a particular plugin. Caching is disabled by default,
+so this is mostly useful if you have a default cache `ttl` configured under `plugin-cache` in your
+`bolt-project.yaml` or `bolt-defaults.yaml` and want to disable caching for individual plugin
+invocations.
+
+> **NOTE**: Plugin results are currently cached in plaintext. Encrypted caching is planned for a
+future release.
+
+Users can clear all cache entries using the `--clear-cache` or `-ClearCache` command-line option
+with any Bolt command.
+
+This inventory sets a TTL of 1 hour, or 3600 seconds, for the PuppetDB plugin:
+```
+targets:
+  - _plugin: puppetdb
+    _cache:
+      ttl: 3600
+    query: "inventory[certname] { facts.osfamily = 'RedHat' }"
+    target_mapping:
+      name: certname
+```
+
+This config file sets a default TTL of 30 minutes, or 1800 seconds, for all plugins:
+```
+plugin-cache:
+  ttl: 1800
+```
+
+> **NOTE**: The same cache and cache configuration is used for the `resolve_reference()` plan
+function.
+
 ## `Parallelize()` function
 
 This feature was introduced in [Bolt

@@ -12,15 +12,11 @@ module Bolt
     end
 
     def data
-      @data ||= JSON.parse(File.read(@path))
+      @data ||= Bolt::Util.read_json_file(@path, 'rerun')
       unless @data.is_a?(Array) && @data.all? { |r| r['target'] && r['status'] }
         raise Bolt::FileError.new("Missing data in rerun file: #{@path}", @path)
       end
       @data
-    rescue JSON::ParserError
-      raise Bolt::FileError.new("Could not parse rerun file: #{@path}", @path)
-    rescue IOError, SystemCallError
-      raise Bolt::FileError.new("Could not read rerun file: #{@path}", @path)
     end
 
     def get_targets(filter)

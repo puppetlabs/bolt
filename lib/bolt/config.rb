@@ -529,6 +529,10 @@ module Bolt
       @data['modulepath'] = value
     end
 
+    def plugin_cache
+      @project.plugin_cache || @data['plugin-cache'] || {}
+    end
+
     def concurrency
       @data['concurrency']
     end

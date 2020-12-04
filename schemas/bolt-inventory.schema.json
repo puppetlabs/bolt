@@ -552,6 +552,20 @@
         "_plugin": {
           "description": "The name of the plugin.",
           "type": "string"
+        },
+        "_cache": {
+          "description": "This feature is experimental. Enable plugin caching and set a time-to-live.",
+          "type": "object",
+          "required": [
+            "ttl"
+          ],
+          "properties": {
+            "ttl": {
+              "description": "Time in seconds to keep the plugin cache.",
+              "type": "integer",
+              "minimum": 0
+            }
+          }
         }
       }
     }

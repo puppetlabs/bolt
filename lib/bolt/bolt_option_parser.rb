@@ -14,7 +14,7 @@ module Bolt
                 global_config_setters: PROJECT_PATHS + %w[modulepath],
                 transports: %w[transport connect-timeout tty native-ssh ssh-command copy-command],
                 display: %w[format color verbose trace],
-                global: %w[help version debug log-level] }.freeze
+                global: %w[help version debug log-level clear-cache] }.freeze
 
     ACTION_OPTS = OPTIONS.values.flatten.freeze
 
@@ -969,8 +969,8 @@ module Bolt
       end
 
       separator "\nPLAN OPTIONS"
-      define('--pp', 'Create a new Puppet language plan.') do |pp|
-        @options[:puppet] = pp
+      define('--pp', 'Create a new Puppet language plan.') do |_|
+        @options[:puppet] = true
       end
 
       separator "\nDISPLAY OPTIONS"
@@ -1024,6 +1024,10 @@ module Bolt
              "Set the log level for the console. Available options are",
              "trace, debug, info, warn, error, fatal, any.") do |level|
         @options[:log] = { 'console' => { 'level' => level } }
+      end
+      define('--clear-cache',
+             "Clear plugin cache before executing") do |_|
+        @options[:clear_cache] = true
       end
       define('--plugin PLUGIN', 'Select the plugin to use') do |plug|
         @options[:plugin] = plug
