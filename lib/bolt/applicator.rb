@@ -131,7 +131,7 @@ module Bolt
 
     def validate_hiera_config(hiera_config)
       if File.exist?(File.path(hiera_config))
-        data = File.open(File.path(hiera_config), "r:UTF-8") { |f| YAML.safe_load(f.read, [Symbol]) }
+        data = File.open(File.path(hiera_config), "r:UTF-8") { |f| YAML.safe_load(f.read, [Symbol], [], true) }
         if data.nil?
           return nil
         elsif data['version'] != 5

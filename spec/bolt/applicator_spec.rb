@@ -264,5 +264,42 @@ describe Bolt::Applicator do
       promises.each(&:execute)
       t.join
     end
+
+    context 'with hiera.yaml mocked' do
+      let(:hiera_yaml_string) do
+        <<~HIERA_YAML
+        ---
+        version: 5
+
+        defaults:
+          datadir: "data"
+
+        hierarchy:
+          - name: "YAML backend"
+            data_hash: yaml_data
+            paths: &lookup_paths
+              - "nodes/%{trusted.certname}.yaml"
+              - "%{facts.os.name}/%{facts.os.release.major}.yaml"
+              - "%{facts.os.name}.yaml"
+              - "common.yaml"
+          - name: "JSON backend"
+            data_hash: json_data
+            paths: *lookup_paths
+          - name: "HOCON backend"
+            data_hash: hocon_data
+            paths: *lookup_paths
+        HIERA_YAML
+      end
+
+      it 'validates hiera.yaml with YAML anchors' do
+        file_like_object = instance_double('File')
+        allow(file_like_object).to receive(:read).and_return(hiera_yaml_string)
+        allow(File).to receive(:path).with('hiera.yaml').and_return('/path/to/hiera.yaml')
+        allow(File).to receive(:exist?).with('/path/to/hiera.yaml').and_return(true)
+        allow(File).to receive(:open).with('/path/to/hiera.yaml', 'r:UTF-8').and_yield( file_like_object )
+        applicator = Bolt::Applicator.new(inventory, executor, modulepath, plugindirs, 'hiera.yaml', pdb_client, nil, 2, {})
+        expect{applicator.validate_hiera_config('hiera.yaml')}.not_to raise_error
+      end
+    end
   end
 end
