@@ -39,13 +39,9 @@ Bolt loads project-level configuration files from the root of your [Bolt project
 directory](projects.md). If it can't find a project directory,
 Bolt uses the default project directory: `~/.puppetlabs/bolt/`.
 
-You can set project-level configuration in three files: 
+You can set project-level configuration in two files: 
 - For Bolt configuration, use `bolt-project.yaml`.
 - For inventory configuration, use `inventory.yaml`.
-- You can set all configuration in a `bolt.yaml` file at the root of your
-  project directory. ⛔ **The project-level `bolt.yaml` file is deprecated and
-  will be removed in a future version of Bolt.** Use `bolt-project.yaml` and
-  `inventory.yaml` files instead.
 
 The preferred method for setting project-level configuration is to use a
 combination of `bolt-project.yaml` and `inventory.yaml` files. This maintains
@@ -93,7 +89,7 @@ fields](bolt_inventory_reference.md).
 
 ### ⛔ `bolt.yaml`
 
-⛔ The project-level `bolt.yaml` file is deprecated and will be removed in a
+⛔ The `bolt.yaml` file is deprecated and will be removed in a
 future version of Bolt. Use `bolt-project.yaml` and `inventory.yaml` files
 instead.
 

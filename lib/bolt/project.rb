@@ -27,23 +27,31 @@ module Bolt
     # directory called Boltdir or a file called bolt.yaml (for a control repo
     # type Project). Otherwise, repeat the check on each directory up the
     # hierarchy, falling back to the default if we reach the root.
-    def self.find_boltdir(dir, logs = [])
+    def self.find_boltdir(dir, logs = [], deprecations = [])
       dir = Pathname.new(dir)
 
       if (dir + BOLTDIR_NAME).directory?
         create_project(dir + BOLTDIR_NAME, 'embedded', logs)
-      elsif (dir + 'bolt.yaml').file? || (dir + CONFIG_NAME).file?
+      elsif (dir + 'bolt.yaml').file?
+        command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
+        msg = "Configuration file #{dir + 'bolt.yaml'} is deprecated and will be "\
+          "removed in Bolt 3.0.\nUpdate your Bolt project to the latest Bolt practices "\
+          "using #{command}"
+        deprecations << { type: "Project level bolt.yaml",
+                          msg: msg }
+        create_project(dir, 'local', logs, deprecations)
+      elsif (dir + CONFIG_NAME).file?
         create_project(dir, 'local', logs)
       elsif dir.root?
         default_project(logs)
       else
         logs << { debug: "Did not detect Boltdir, bolt.yaml, or bolt-project.yaml at '#{dir}'. "\
                   "This directory won't be loaded as a project." }
-        find_boltdir(dir.parent, logs)
+        find_boltdir(dir.parent, logs, deprecations)
       end
     end
 
-    def self.create_project(path, type = 'option', logs = [])
+    def self.create_project(path, type = 'option', logs = [], deprecations = [])
       fullpath = Pathname.new(path).expand_path
 
       if type == 'user'
@@ -72,7 +80,6 @@ module Bolt
       data         = Bolt::Util.read_optional_yaml_hash(File.expand_path(project_file), 'project')
       default      = type =~ /user|system/ ? 'default ' : ''
       exist        = File.exist?(File.expand_path(project_file))
-      deprecations = []
 
       logs << { info: "Loaded #{default}project from '#{fullpath}'" } if exist
 

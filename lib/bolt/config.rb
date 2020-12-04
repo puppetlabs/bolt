@@ -216,8 +216,8 @@ module Bolt
       data         = Bolt::Util.read_yaml_hash(filepath, 'config')
       logs         = [{ debug: "Loaded configuration from #{filepath}" }]
       deprecations = [{ type: 'Using bolt.yaml for system configuration',
-                        msg: "Configuration file #{filepath} is deprecated and will be removed in a future version "\
-                        "of Bolt. Use '#{dir + BOLT_DEFAULTS_NAME}' instead." }]
+                        msg: "Configuration file #{filepath} is deprecated and will be removed in Bolt 3.0. "\
+                        "See https://pup.pt/update-bolt-config for how to update to the latest Bolt practices." }]
 
       # Validate the config against the schema. This will raise a single error
       # with all validation errors.
