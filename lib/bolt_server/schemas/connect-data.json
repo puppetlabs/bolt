@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "project_inventory_targets connect plugin data",
+  "description": "POST project_inventory_targets connect plugin data",
+  "type": "object",
+  "properties": {
+    "puppet_connect_data": {
+      "type": "object",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "properties": {
+            "value": {}
+          },
+          "required": ["value"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["puppet_connect_data"]
+}

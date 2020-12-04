@@ -796,10 +796,15 @@ describe "BoltServer::TransportApp" do
       let(:targets) { %w[one two three] }
       let(:bolt_inventory) { { 'targets' => targets } }
 
+      def post_to_project_inventory_targets(project_ref, connect_data = { 'puppet_connect_data' => {} })
+        path = "/project_inventory_targets?project_ref=#{project_ref}"
+        post(path, JSON.generate(connect_data), 'CONTENT_TYPE' => 'text/json')
+      end
+
       it 'parses inventory' do
         with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
           project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-          post("/project_inventory_targets?project_ref=#{project_ref}")
+          post_to_project_inventory_targets(project_ref)
           expect(last_response.status).to eq(200)
           target_list = JSON.parse(last_response.body)
           target_names = target_list.map do |targ|
@@ -823,7 +828,7 @@ describe "BoltServer::TransportApp" do
         it 'sets transport independent from protocol' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
             project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post("/project_inventory_targets?project_ref=#{project_ref}")
+            post_to_project_inventory_targets(project_ref)
             expect(last_response.status).to eq(200)
             target_list = JSON.parse(last_response.body)
             expect(target_list.first['transport']).to eq('remote')
@@ -839,7 +844,7 @@ describe "BoltServer::TransportApp" do
         it 'responds with a 500 and error details' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
             project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post("/project_inventory_targets?project_ref=#{project_ref}")
+            post_to_project_inventory_targets(project_ref)
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt.inventory/validation-error')
@@ -851,7 +856,7 @@ describe "BoltServer::TransportApp" do
         it 'responds with a 500 and error details' do
           with_project(bolt_project, nil) do |path_to_tmp_project|
             project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post("/project_inventory_targets?project_ref=#{project_ref}")
+            post_to_project_inventory_targets(project_ref)
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt/file-error')
@@ -866,7 +871,7 @@ describe "BoltServer::TransportApp" do
         it 'responds with a 500 and error details' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
             project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post("/project_inventory_targets?project_ref=#{project_ref}")
+            post_to_project_inventory_targets(project_ref)
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt/unknown-plugin')
@@ -881,7 +886,7 @@ describe "BoltServer::TransportApp" do
         it 'responds with a 500 and error details' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
             project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post("/project_inventory_targets?project_ref=#{project_ref}")
+            post_to_project_inventory_targets(project_ref)
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt/plugin-not-supported')
@@ -897,11 +902,100 @@ describe "BoltServer::TransportApp" do
         it 'responds with a 500 and error details' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
             project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post("/project_inventory_targets?project_ref=#{project_ref}")
+            post_to_project_inventory_targets(project_ref)
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt/plugin-not-supported')
             expect(error_hash.dig('details', 'plugin_name')).to eq('prompt')
+          end
+        end
+      end
+
+      context 'with puppet_connect_data plugin' do
+        let(:targets) {
+          [
+            {
+              'name' => {
+                '_plugin' => 'puppet_connect_data',
+                'key' => 'target_name'
+              },
+              'config' => {
+                'ssh' => {
+                  'password' => {
+                    '_plugin' => 'puppet_connect_data',
+                    'key' => 'target_password'
+                  }
+                }
+              }
+            }
+          ]
+        }
+
+        it 'looks up data included in request' do
+          connect_data = {
+            'puppet_connect_data' => {
+              'target_name' => {
+                'value' => 'foo'
+              },
+              'target_password' => {
+                'value' => 'bar'
+              }
+            }
+          }
+          with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
+            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(project_ref, connect_data)
+            expect(last_response.status).to eq(200)
+            target_list = JSON.parse(last_response.body)
+            expect(target_list.count).to eq(1)
+            expect(target_list.first['name']).to eq('foo')
+            expect(target_list.first['password']).to eq('bar')
+          end
+        end
+
+        it 'connect plugin fails when "key" is not specified in inventoryfile' do
+          connect_data = {
+            'puppet_connect_data' => {
+              'target_name' => {
+                'value' => 'foo'
+              },
+              'target_password' => {
+                'value' => 'bar'
+              }
+            }
+          }
+          targets.first['name'].delete('key')
+          with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
+            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(project_ref, connect_data)
+            expect(last_response.status).to eq(500)
+            expect(last_response.body).to match(/puppet_connect_data plugin requires that 'key' be specified/)
+          end
+        end
+
+        it 'errors when connect_data is not included in the request' do
+          connect_data = {}
+          with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
+            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(project_ref, connect_data)
+            expect(last_response.status).to eq(400)
+            expect(last_response.body).to match(/did not contain a required property of 'puppet_connect_data'/)
+          end
+        end
+
+        it 'errors when connect_data entry does not have a "value"' do
+          connect_data = {
+            'puppet_connect_data' => {
+              'oops_missing_value' => {
+                'not_value' => 'foo'
+              }
+            }
+          }
+          with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
+            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(project_ref, connect_data)
+            expect(last_response.status).to eq(400)
+            expect(last_response.body).to match(/did not contain a required property of 'value'/)
           end
         end
       end
@@ -911,14 +1005,14 @@ describe "BoltServer::TransportApp" do
         non_default_inventoryfile_conf = bolt_project.merge({ 'inventoryfile' => non_default_inventoryfile })
         with_project(non_default_inventoryfile_conf, bolt_inventory, non_default_inventoryfile) do |path_to_tmp_project|
           project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-          post("/project_inventory_targets?project_ref=#{project_ref}")
+          post_to_project_inventory_targets(project_ref)
           expect(last_response.status).to eq(500)
           expect(last_response.body).to match(/Project inventory must be defined in .*inventory.yaml.*/)
         end
       end
 
       it 'errors when project_ref is invalid' do
-        post('/project_inventory_targets?project_ref=foo')
+        post_to_project_inventory_targets('foo')
         expect(last_response.status).to eq(500)
         expect(last_response.body).to match(/foo does not exist/)
       end

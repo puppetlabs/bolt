@@ -380,7 +380,25 @@ This endpoint behaves identically to the /ssh/check_node_connections endpoint, b
 
 This endpoint parses a project inventory and returns a list of target hashes. Note that the only accepetable inventoryfile location is the default `inventory.yaml` at the root of the project.
 
+#### Query parameters
+
 - `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
+
+#### POST body
+
+- `connect_data`: Hash, *required* - Data for the Connect plugin to look up. Keys are the lookup in the inventoryfile which points to a hash with a required "value" key that points to the value to look up.
+
+#### Request
+
+```
+{
+  "connect_data": {
+    "ssh_password": {
+      "value": "foo"
+    }
+  }
+}
+```
 
 #### Response
 
