@@ -5,7 +5,7 @@ require 'bolt/pal'
 module Bolt
   class Outputter
     class Rainbow < Bolt::Outputter::Human
-      def initialize(color, verbose, trace, stream = $stdout)
+      def initialize(color, verbose, trace, spin, stream = $stdout)
         begin
           require 'paint'
           if Bolt::Util.windows?
@@ -59,6 +59,17 @@ module Bolt
           end
         else
           string
+        end
+      end
+
+      def start_spin
+        return unless @spin
+        @spin = true
+        @spin_thread = Thread.new do
+          loop do
+            @stream.print(colorize(:rainbow, @pinwheel.rotate!.first + "\b"))
+            sleep(0.1)
+          end
         end
       end
 

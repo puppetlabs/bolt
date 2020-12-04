@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-
 require 'bolt/module_installer/installer'
 
 describe Bolt::ModuleInstaller::Installer do

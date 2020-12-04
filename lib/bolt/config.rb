@@ -303,6 +303,7 @@ module Bolt
         'puppetdb'            => {},
         'puppetfile'          => {},
         'save-rerun'          => true,
+        'spinner'             => true,
         'transport'           => 'ssh'
       }
 
@@ -596,6 +597,10 @@ module Bolt
 
     def save_rerun
       @data['save-rerun']
+    end
+
+    def spinner
+      @data['spinner']
     end
 
     def inventoryfile

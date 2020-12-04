@@ -538,12 +538,15 @@ module Bolt
               validate_file('script', script)
               executor.run_script(targets, script, options[:leftovers], executor_opts)
             when 'task'
-              pal.run_task(options[:object],
-                           targets,
-                           options[:task_options],
-                           executor,
-                           inventory,
-                           options[:description])
+              r = outputter.spin do
+                pal.run_task(options[:object],
+                             targets,
+                             options[:task_options],
+                             executor,
+                             inventory,
+                             options[:description])
+              end
+              r
             when 'file'
               src = options[:object]
               dest = options[:leftovers].first
@@ -678,7 +681,9 @@ module Bolt
 
       executor.subscribe(log_outputter)
       executor.start_plan(plan_context)
-      result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
+      result = outputter.spin do
+        pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
+      end
 
       # If a non-bolt exception bubbles up the plan won't get finished
       executor.finish_plan(result)
@@ -764,12 +769,15 @@ module Bolt
       modules   = project.modules || []
       installer = Bolt::ModuleInstaller.new(outputter, pal)
 
-      ok = installer.install(modules,
-                             project.puppetfile,
-                             project.managed_moduledir,
-                             config,
-                             force: force,
-                             resolve: resolve)
+      ok = outputter.spin do
+        installer.install(modules,
+                          project.puppetfile,
+                          project.managed_moduledir,
+                          config,
+                          force: force,
+                          resolve: resolve)
+      end
+
       ok ? 0 : 1
     end
 
@@ -790,12 +798,15 @@ module Bolt
       modules   = project.modules || []
       installer = Bolt::ModuleInstaller.new(outputter, pal)
 
-      ok = installer.add(name,
-                         modules,
-                         project.puppetfile,
-                         project.managed_moduledir,
-                         project.project_file,
-                         config)
+      ok = outputter.spin do
+        installer.add(name,
+                      modules,
+                      project.puppetfile,
+                      project.managed_moduledir,
+                      project.project_file,
+                      config)
+      end
+
       ok ? 0 : 1
     end
 
@@ -824,7 +835,10 @@ module Bolt
 
       outputter.print_message("Installing modules from Puppetfile")
       installer = Bolt::ModuleInstaller.new(outputter, pal)
-      ok = installer.install_puppetfile(puppetfile, moduledir, puppetfile_config)
+      ok = outputter.spin do
+        installer.install_puppetfile(puppetfile, moduledir, puppetfile_config)
+      end
+
       ok ? 0 : 1
     end
 
@@ -930,7 +944,11 @@ module Bolt
     end
 
     def outputter
-      @outputter ||= Bolt::Outputter.for_format(config.format, config.color, options[:verbose], config.trace)
+      @outputter ||= Bolt::Outputter.for_format(config.format,
+                                                config.color,
+                                                options[:verbose],
+                                                config.trace,
+                                                config.spinner)
     end
 
     def log_outputter

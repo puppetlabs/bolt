@@ -61,6 +61,7 @@ module Bolt
         # Create specs to resolve from
         specs = Bolt::ModuleInstaller::Specs.new(modules.map(&:to_hash))
 
+        @outputter.start_spin
         # Attempt to resolve dependencies
         begin
           @outputter.print_message('')
@@ -72,6 +73,7 @@ module Bolt
         end
 
         migrate_managed_modules(puppetfile, puppetfile_path, managed_moduledir)
+        @outputter.stop_spin
 
         # Move remaining modules to 'modules'
         consolidate_modules(modulepath)

@@ -434,6 +434,14 @@ module Bolt
           _example: false,
           _default: true
         },
+        "spinner" => {
+          description: "Whether to print a spinner to the console for long-running Bolt operations.",
+          type: [TrueClass, FalseClass],
+          _plugin: false,
+          _example: false,
+          _default: true
+        },
+
         "tasks" => {
           description: "A list of task names and glob patterns to filter the project's tasks by. This option is used "\
                        "to limit the visibility of tasks for users of the project. For example, project authors "\
@@ -529,6 +537,7 @@ module Bolt
         puppetdb
         puppetfile
         save-rerun
+        spinner
         trusted-external-command
       ].freeze
 
@@ -548,6 +557,7 @@ module Bolt
         puppetdb
         puppetfile
         save-rerun
+        spinner
       ].freeze
 
       # Options that are available in a bolt-project.yaml file
@@ -573,6 +583,7 @@ module Bolt
         puppetdb
         puppetfile
         save-rerun
+        spinner
         tasks
         trusted-external-command
       ].freeze

@@ -19,7 +19,7 @@ describe "Bolt::CLI" do
   let(:target) { inventory.get_target('foo') }
 
   before(:each) do
-    outputter = Bolt::Outputter::Human.new(false, false, false, StringIO.new)
+    outputter = Bolt::Outputter::Human.new(false, false, false, false, StringIO.new)
 
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
@@ -1244,7 +1244,7 @@ describe "Bolt::CLI" do
           plan.call_by_name_with_scope(scope, params, true)
         end
 
-        outputter = Bolt::Outputter::JSON.new(false, false, false, output)
+        outputter = Bolt::Outputter::JSON.new(false, false, false, false, output)
 
         allow(cli).to receive(:outputter).and_return(outputter)
       end
@@ -2274,7 +2274,7 @@ describe "Bolt::CLI" do
         plugins = Bolt::Plugin.setup(Bolt::Config.default, nil)
         allow(cli).to receive(:plugins).and_return(plugins)
 
-        outputter = Bolt::Outputter::JSON.new(false, false, false, output)
+        outputter = Bolt::Outputter::JSON.new(false, false, false, false, output)
         allow(cli).to receive(:outputter).and_return(outputter)
         allow(executor).to receive(:report_bundled_content)
         allow(cli).to receive(:config).and_return(Bolt::Config.default)
@@ -2337,7 +2337,8 @@ describe "Bolt::CLI" do
       let(:cli) { Bolt::CLI.new(%W[puppetfile install --project #{project_path} -m #{modulepath}]) }
 
       before :each do
-        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
+        allow(cli).to receive(:outputter)
+          .and_return(Bolt::Outputter::JSON.new(false, false, false, false, output))
         allow_any_instance_of(Bolt::PAL).to receive(:generate_types)
         allow(R10K::Action::Puppetfile::Install).to receive(:new).and_return(action_stub)
       end
@@ -2398,7 +2399,8 @@ describe "Bolt::CLI" do
       end
 
       it 'lists modules in the puppetfile' do
-        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::Human.new(false, false, false, output))
+        allow(cli).to receive(:outputter)
+          .and_return(Bolt::Outputter::Human.new(false, false, false, false, output))
         cli.parse
         modules = cli.list_modules
         expect(modules.keys.first).to match(/bolt-modules/)
@@ -2429,7 +2431,8 @@ describe "Bolt::CLI" do
       let(:cli) { Bolt::CLI.new([]) }
 
       before :each do
-        allow(cli).to receive(:outputter).and_return(Bolt::Outputter::JSON.new(false, false, false, output))
+        allow(cli).to receive(:outputter)
+          .and_return(Bolt::Outputter::JSON.new(false, false, false, false, output))
         allow(cli).to receive(:config).and_return(Bolt::Config.default)
       end
 

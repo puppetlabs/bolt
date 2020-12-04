@@ -7,7 +7,7 @@ require 'bolt/plan_result'
 
 describe "Bolt::Outputter::Human" do
   let(:output) { StringIO.new }
-  let(:outputter) { Bolt::Outputter::Human.new(false, false, false, output) }
+  let(:outputter) { Bolt::Outputter::Human.new(false, false, false, false, output) }
   let(:inventory) { Bolt::Inventory.empty }
   let(:target) { inventory.get_target('target1') }
   let(:target2) { inventory.get_target('target2') }
@@ -399,6 +399,31 @@ describe "Bolt::Outputter::Human" do
     guide = "The trials and tribulations of Bolty McBoltface\n"
     outputter.print_guide(guide, 'boltymcboltface')
     expect(output.string).to eq(guide)
+  end
+
+  it 'does not spin when spinner is set to false' do
+    outputter.start_spin
+    sleep(0.3)
+    expect(output.string).not_to include("\b\\\b|")
+    outputter.stop_spin
+  end
+
+  context 'with spinner enabled' do
+    let(:outputter) { Bolt::Outputter::Human.new(false, false, false, true, output) }
+
+    it 'spins while executing with a block' do
+      outputter.spin do
+        sleep(0.3)
+        expect(output.string).to include("\\\b|\b")
+      end
+    end
+
+    it 'spins between start and stop' do
+      outputter.start_spin
+      sleep(0.3)
+      expect(output.string).to include("\\\b|\b")
+      outputter.stop_spin
+    end
   end
 
   context '#print_targets' do

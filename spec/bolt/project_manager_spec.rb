@@ -17,6 +17,8 @@ describe Bolt::ProjectManager do
            print_message: nil,
            print_action_step: nil,
            print_prompt: nil,
+           start_spin: nil,
+           stop_spin: nil,
            print_error: nil)
   }
 

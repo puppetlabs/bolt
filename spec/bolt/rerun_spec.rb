@@ -47,7 +47,7 @@ describe 'rerun' do
     # Don't allow tests to override the captured log config
     allow(Bolt::Logger).to receive(:configure)
     allow_any_instance_of(Bolt::CLI).to receive(:warn)
-    outputter = Bolt::Outputter::JSON.new(false, false, false, output)
+    outputter = Bolt::Outputter::JSON.new(false, false, false, false, output)
     allow_any_instance_of(Bolt::CLI).to receive(:outputter).and_return(outputter)
   end
 
