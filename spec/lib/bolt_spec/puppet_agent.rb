@@ -19,6 +19,9 @@ module BoltSpec
       }
       inventory ||= {}
 
+      params = { 'name' => 'puppet', 'action' => 'stop' }
+      run_task('service', target, params, config: config, inventory: inventory)
+
       uninstall = '/opt/puppetlabs/bin/puppet resource package puppet-agent ensure=absent'
       run_command(uninstall, target, config: config, inventory: inventory)
     end

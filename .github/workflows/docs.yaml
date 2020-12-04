@@ -33,5 +33,8 @@ jobs:
       - name: Install gems
         if: steps.cache.outputs.cache-hit != 'true'
         run: bundle install --jobs 4 --retry 3
+      - name: Update gems
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: bundle update
       - name: Generate docs
         run: bundle exec rake docs:all
