@@ -26,6 +26,7 @@ gem "paint", "~> 2.2"
 group(:test) do
   gem "beaker-hostgenerator"
   gem "mocha", '~> 1.4.0'
+  gem "puma", '>= 3.12.0'
   gem "rack-test", '~> 1.0'
   gem "rubocop", require: false
 end
