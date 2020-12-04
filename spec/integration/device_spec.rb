@@ -4,103 +4,92 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
-require 'bolt_spec/puppet_agent'
+require 'bolt_spec/project'
 require 'bolt_spec/run'
 
 describe "devices" do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
-  include BoltSpec::PuppetAgent
+  include BoltSpec::Project
   include BoltSpec::Run
 
-  let(:modulepath) { fixtures_path('apply') }
-  let(:config_flags) { %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
-
   describe 'over ssh', ssh: true do
-    let(:uri) { conn_uri('ssh') }
-    let(:password) { conn_info('ssh')[:password] }
-    let(:tflags) { %W[--no-host-key-check --run-as root --sudo-password #{password}] }
-
+    let(:modulepath)  { fixtures_path('apply') }
     let(:device_path) { "/tmp/#{SecureRandom.uuid}.json" }
 
-    def agent_version_inventory
-      { 'groups' => [
-        { 'name' => 'agent_targets',
-          'targets' => [
-            { 'uri' => "ssh://#{conn_info('ssh')[:host]}",
-              'alias' => 'puppet_6',
-              'config' => { 'ssh' => { 'port' => 20024 } } }
-          ] }
-      ],
-        'config' => {
-          'ssh' => { 'user' => 'root',
-                     'host-key-check' => false,
-                     'password' => root_password }
-        } }
+    let(:device_group) do
+      {
+        'name' => 'device_targets',
+        'targets' => [
+          {
+            'uri' => 'fake_device1',
+            'config' => {
+              'transport' => 'remote',
+              'remote' => {
+                'remote-transport' => 'fake',
+                'run-on' => 'puppet_6_node',
+                'path' => device_path
+              }
+            }
+          }
+        ]
+      }
     end
 
-    let(:device_inventory) do
-      device_group = { 'name' => 'device_targets',
-                       'targets' => [
-                         { 'uri' => 'fake_device1',
-                           'config' => {
-                             'transport' => 'remote',
-                             'remote' => {
-                               'remote-transport' => 'fake',
-                               'run-on' => 'puppet_6',
-                               'path' => device_path
-                             }
-                           } }
-                       ] }
-      inv = agent_version_inventory
+    let(:inventory) do
+      inv = docker_inventory(root: true)
       inv['groups'] << device_group
       inv
     end
 
-    after(:all) do
-      uninstall('puppet_6', inventory: agent_version_inventory)
+    let(:config) do
+      {
+        'modulepath' => modulepath
+      }
+    end
+
+    around(:each) do |example|
+      with_project(config: config, inventory: inventory) do |project|
+        @project = project
+        example.run
+      end
     end
 
     context "when running against puppet 6" do
-      before(:all) do
-        install('puppet_6', inventory: agent_version_inventory)
-      end
-
       it 'runs a plan that collects facts' do
-        with_tempfile_containing('inventory', YAML.dump(device_inventory), '.yaml') do |inv|
-          results = run_cli_json(%W[plan run device_test::facts --targets device_targets
-                                    --modulepath #{modulepath} --inventoryfile #{inv.path}])
-          expect(results).not_to include("kind")
-          name, facts = results.first
-          expect(name).to eq('fake_device1')
-          expect(facts).to include("operatingsystem" => "FakeDevice",
-                                   "exists" => false,
-                                   "clientcert" => 'fake_device1')
-        end
+        results = run_cli_json(%w[plan run device_test::facts -t device_targets], project: @project)
+
+        expect(results).not_to include('kind')
+
+        name, facts = results.first
+        expect(name).to eq('fake_device1')
+        expect(facts).to include(
+          'operatingsystem' => 'FakeDevice',
+          'exists'          => false,
+          'clientcert'      => 'fake_device1'
+        )
       end
 
       it 'runs a plan that applies resources' do
-        with_tempfile_containing('inventory', YAML.dump(device_inventory), '.yaml') do |inv|
-          results = run_cli_json(%W[plan run device_test::set_a_val
-                                    --targets device_targets
-                                    --modulepath #{modulepath} --inventoryfile #{inv.path}])
-          expect(results).not_to include("kind")
+        results = run_cli_json(%w[plan run device_test::set_a_val -t device_targets], project: @project)
 
-          report = results[0]['value']['report']
-          expect(report['resource_statuses']).to include("Fake_device[key1]")
+        expect(results).not_to include('kind')
+        expect(results.dig(0, 'value', 'report', 'resource_statuses')).to include('Fake_device[key1]')
 
-          content = run_command("cat '#{device_path}'", 'puppet_6', inventory: device_inventory)[0]['value']['stdout']
-          expect(content).to eq({ key1: "val1" }.to_json)
+        content = run_cli_json(['command', 'run', "cat '#{device_path}'", '-t', 'puppet_6_node'], project: @project)
 
-          resources = run_cli_json(%W[plan run device_test::resources
-                                      --targets device_targets
-                                      --modulepath #{modulepath} --inventoryfile #{inv.path}])
-          expect(resources[0]['value']['resources'][0]).to eq("key1" =>
-                                                               { "content" => "val1",
-                                                                 "ensure" => "present",
-                                                                 "merge" => false })
-        end
+        expect(content.dig('items', 0, 'value', 'stdout')).to eq({ key1: 'val1' }.to_json)
+
+        resources = run_cli_json(%w[plan run device_test::resources -t device_targets], project: @project)
+
+        expect(resources.dig(0, 'value', 'resources', 0)).to eq(
+          'key1' => {
+            'content' => 'val1',
+            'ensure'  => 'present',
+            'merge'   => false
+          }
+        )
       end
     end
   end

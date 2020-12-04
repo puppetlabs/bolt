@@ -2,26 +2,34 @@ version: "3"
 services:
   ubuntu_node:
     build: .
-    image: bolt-spec
+    container_name: ubuntu_node
     ports:
       - "20022:22"
-    container_name: ubuntu_node
+
   puppet_5_node:
-    image:  bolt-spec
-    depends_on:
-      - ubuntu_node
+    build:
+      context: .
+      args:
+        PUPPET_COLLECTION: puppet5
+    container_name: puppet_5_node
     ports:
       - "20023:22"
+
   puppet_6_node:
-    image:  bolt-spec
-    depends_on:
-      - ubuntu_node
+    build:
+      context: .
+      args:
+        PUPPET_COLLECTION: puppet6
+    container_name: puppet_6_node
     ports:
       - "20024:22"
+
   puppet_7_node:
-    image: bolt-spec
-    depends_on:
-      - ubuntu_node
+    build:
+      context: .
+      args:
+        PUPPET_COLLECTION: puppet7
+    container_name: puppet_7_node
     ports:
       - "20025:22"
 
@@ -33,6 +41,7 @@ services:
       - POSTGRES_DB=puppetdb
     volumes:
       - ./fixtures/puppetdb/custom_source:/docker-entrypoint-initdb.d
+
   puppetdb:
     build:
       context: .
