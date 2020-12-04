@@ -80,7 +80,7 @@ begin
       end
     end
 
-    # Run RSpec tests for Bolt's bundled content
+    desc "Run RSpec tests for Bolt's bundled content"
     task :modules do
       success = true
       # Test core modules
