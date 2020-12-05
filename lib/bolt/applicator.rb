@@ -100,9 +100,9 @@ module Bolt
       print_logs = stat.success?
       result = begin
         JSON.parse(out)
-               rescue JSON::ParserError
-                 print_logs = true
-                 { 'message' => "Something's gone terribly wrong! STDERR is logged." }
+      rescue JSON::ParserError
+        print_logs = true
+        { 'message' => "Something's gone terribly wrong! STDERR is logged." }
       end
 
       # Any messages logged by Puppet will be on stderr as JSON hashes, so we
