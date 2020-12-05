@@ -168,7 +168,7 @@ describe Bolt::Applicator do
         expect(mock_logger).to_not receive(:trace).with(/Packing plugin/)
         expect(mock_logger).to receive(:debug).with('Syncing only required modules: just_a_module_name.')
 
-        applicator.apply_ast(:body, [target], { required_modules: ['just_a_module_name'] })
+        applicator.apply_ast(:body, [target], required_modules: ['just_a_module_name'])
       end
     end
 
@@ -296,9 +296,11 @@ describe Bolt::Applicator do
         allow(file_like_object).to receive(:read).and_return(hiera_yaml_string)
         allow(File).to receive(:path).with('hiera.yaml').and_return('/path/to/hiera.yaml')
         allow(File).to receive(:exist?).with('/path/to/hiera.yaml').and_return(true)
-        allow(File).to receive(:open).with('/path/to/hiera.yaml', 'r:UTF-8').and_yield( file_like_object )
-        applicator = Bolt::Applicator.new(inventory, executor, modulepath, plugindirs, 'hiera.yaml', pdb_client, nil, 2, {})
-        expect{applicator.validate_hiera_config('hiera.yaml')}.not_to raise_error
+        allow(File).to receive(:open).with('/path/to/hiera.yaml', 'r:UTF-8').and_yield(file_like_object)
+        applicator = Bolt::Applicator.new(
+          inventory, executor, modulepath, plugindirs, 'hiera.yaml', pdb_client, nil, 2, {}
+        )
+        expect { applicator.validate_hiera_config('hiera.yaml') }.not_to raise_error
       end
     end
   end
