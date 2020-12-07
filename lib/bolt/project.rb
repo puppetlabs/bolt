@@ -83,11 +83,7 @@ module Bolt
 
       logs << { info: "Loaded #{default}project from '#{fullpath}'" } if exist
 
-      # Validate the config against the schema. This will raise a single error
-      # with all validation errors.
-      schema = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_PROJECT_OPTIONS)
-
-      Bolt::Config::Validator.new.tap do |validator|
+      Bolt::Validator.new.tap do |validator|
         validator.validate(data, schema, project_file)
 
         validator.warnings.each { |warning| logs << { warn: warning } }
@@ -98,6 +94,16 @@ module Bolt
       end
 
       new(data, path, type, logs, deprecations)
+    end
+
+    # Builds the schema for bolt-project.yaml used by the validator.
+    #
+    def self.schema
+      {
+        type:        Hash,
+        properties:  Bolt::Config::BOLT_PROJECT_OPTIONS.map { |opt| [opt, _ref: opt] }.to_h,
+        definitions: Bolt::Config::OPTIONS
+      }
     end
 
     def initialize(raw_data, path, type = 'option', logs = [], deprecations = [])

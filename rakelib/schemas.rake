@@ -129,45 +129,21 @@ namespace :schemas do
   desc 'Generate inventory.yaml JSON schema'
   task :inventory do
     require 'bolt/config'
+    require 'bolt/inventory'
 
-    filepath          = File.expand_path('../schemas/bolt-inventory.schema.json', __dir__)
-    base              = JSON.parse(File.read(File.expand_path('../schemas/bolt-inventory-base.json', __dir__)))
-    inventory_options = Bolt::Config::INVENTORY_OPTIONS
-    transport_options = Bolt::Config::Transport::Options::TRANSPORT_OPTIONS
-    transports        = Bolt::Config::TRANSPORT_CONFIG
+    filepath = File.expand_path('../schemas/bolt-inventory.schema.json', __dir__)
 
-    # Add transport definition references to the 'config' option.
-    config_properties = inventory_options.keys.each_with_object({}) do |option, acc|
-      acc[option] = { "$ref" => "#/definitions/#{option}" }
-    end
+    schema = {
+      "$schema"              => "http://json-schema.org/draft-07/schema#",
+      "title"                => "Bolt Inventory",
+      "description"          => "Bolt Inventory inventory.yaml Schema",
+      "additionalProperties" => false,
+      "definitions"          => to_schema(Bolt::Config::PLUGIN)
+    }
 
-    # The base schema already includes the 'oneOf' key. These properties should
-    # be added to the first element of that array.
-    base['definitions']['config']['oneOf'][0]['properties'] = config_properties
+    schema = Bolt::Util.deep_merge(schema, to_schema(Bolt::Inventory.schema))
 
-    # Add transport option definitions references to the transport definitions
-    transports.each do |option, transport|
-      inventory_options[option][:properties] = transport.options.each_with_object({}) do |opt, acc|
-        acc[opt] = { "$ref" => "#/transport_definitions/#{opt}" }
-      end
-    end
-
-    # Add transport definitions
-    inventory_options.each do |option, definition|
-      base['definitions'][option] = to_schema(definition)
-    end
-
-    # Add transport option definitions
-    base['transport_definitions'] = transport_options.transform_values do |data|
-      to_schema(data)
-    end
-
-    # Add _plugin definition
-    base['definitions'] = base['definitions'].merge(Bolt::Config::PLUGIN)
-
-    json = JSON.pretty_generate(base)
-
-    File.write(filepath, json)
+    File.write(filepath, JSON.pretty_generate(schema))
 
     $stdout.puts "Generated inventory.yaml schema at:\n\t#{filepath}"
   end
@@ -250,27 +226,33 @@ end
 def to_schema(data)
   return data unless data.is_a?(Hash)
 
+  # Creates JSON references
+  if data.key?(:_ref)
+    data["$ref"] = "#/definitions/#{data.delete(:_ref)}"
+  end
+
   # Pull out all metadata since we don't want this in the schema.
   metadata, data = data.partition do |key, _|
     key.to_s.start_with?('_')
   end.map(&:to_h)
 
-  # Recurse through :items, :additionalProperties, and :properties,
-  # since each of these can have their own definitions.
-  %i[items additionalProperties].each do |key|
+  # Recurse through some properties, as each can have their own defintions.
+  %i[items additionalProperties propertyNames].each do |key|
     next unless data.key?(key)
     data[key] = to_schema(data[key])
   end
 
-  if data.key?(:properties)
-    data[:properties] = data[:properties].transform_values do |definition|
-      to_schema(definition)
-    end
+  %i[properties definitions].each do |key|
+    next unless data.key?(key)
+    data[key] = data[key].transform_values { |opt| to_schema(opt) }
   end
 
   # Turn Ruby types into JSON types.
   data[:type] = to_json_types(data[:type]) if data.key?(:type)
 
   # Add a plugin definition if supported by the option.
-  metadata[:_plugin] ? add_plugin_reference(data) : data
+  data = metadata[:_plugin] ? add_plugin_reference(data) : data
+
+  # Stringify keys
+  data.transform_keys(&:to_s)
 end
