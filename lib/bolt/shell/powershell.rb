@@ -193,7 +193,8 @@ module Bolt
       def run_command(command, options = {}, position = [])
         command = [*env_declarations(options[:env_vars]), command].join("\r\n") if options[:env_vars]
 
-        output = execute(command)
+        wrap_command = conn.is_a?(Bolt::Transport::Local::Connection)
+        output = execute(command, wrap_command)
         Bolt::Result.for_command(target,
                                  output.stdout.string,
                                  output.stderr.string,
@@ -284,8 +285,9 @@ module Bolt
         end
       end
 
-      def execute(command)
-        if conn.max_command_length && command.length > conn.max_command_length
+      def execute(command, wrap_command = false)
+        if (conn.max_command_length && command.length > conn.max_command_length) ||
+           wrap_command
           return with_tmpdir do |dir|
             command += "\r\nif (!$?) { if($LASTEXITCODE) { exit $LASTEXITCODE } else { exit 1 } }"
             script_file = File.join(dir, "#{SecureRandom.uuid}_wrapper.ps1")
