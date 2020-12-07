@@ -51,8 +51,8 @@ module BoltServer
     # See the `orchestrator.bolt.codedir` tk config setting.
     DEFAULT_BOLT_CODEDIR = '/opt/puppetlabs/server/data/orchestration-services/code'
 
-    MISSING_PROJECT_REF_RESPONSE = [
-      400, Bolt::ValidationError.new('`project_ref` is a required argument').to_json
+    MISSING_VERSIONED_PROJECT_RESPONSE = [
+      400, Bolt::ValidationError.new('`versioned_project` is a required argument').to_json
     ].freeze
 
     def initialize(config)
@@ -268,16 +268,16 @@ module BoltServer
       end
     end
 
-    def config_from_project(project_ref)
-      project_dir = File.join(@config['projects-dir'], project_ref)
-      raise Bolt::ValidationError, "`project_ref`: #{project_dir} does not exist" unless Dir.exist?(project_dir)
+    def config_from_project(versioned_project)
+      project_dir = File.join(@config['projects-dir'], versioned_project)
+      raise Bolt::ValidationError, "`versioned_project`: #{project_dir} does not exist" unless Dir.exist?(project_dir)
       project = Bolt::Project.create_project(project_dir)
       Bolt::Config.from_project(project, { log: { 'bolt-debug.log' => 'disable' } })
     end
 
-    def in_bolt_project(project_ref)
+    def in_bolt_project(versioned_project)
       @pal_mutex.synchronize do
-        bolt_config = config_from_project(project_ref)
+        bolt_config = config_from_project(versioned_project)
         modulepath_object = Bolt::Config::Modulepath.new(
           bolt_config.modulepath,
           boltlib_path: [PE_BOLTLIB_PATH, Bolt::Config::Modulepath::BOLTLIB_PATH]
@@ -514,10 +514,10 @@ module BoltServer
 
     # Fetches the metadata for a single plan
     #
-    # @param project_ref [String] the project to fetch the plan from
+    # @param versioned_project [String] the project to fetch the plan from
     get '/project_plans/:module_name/:plan_name' do
-      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
-      in_bolt_project(params['project_ref']) do |context|
+      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
+      in_bolt_project(params['versioned_project']) do |context|
         plan_info = pe_plan_info(context[:pal], params[:module_name], params[:plan_name])
         plan_info = allowed_helper(plan_info, context[:config].project.plans)
         [200, plan_info.to_json]
@@ -541,12 +541,12 @@ module BoltServer
 
     # Fetches the metadata for a single task
     #
-    # @param bolt_project_ref [String] the reference to the bolt-project directory to load task metadata from
+    # @param bolt_versioned_project [String] the reference to the bolt-project directory to load task metadata from
     get '/project_tasks/:module_name/:task_name' do
-      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
-      in_bolt_project(params['project_ref']) do |context|
+      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
+      in_bolt_project(params['versioned_project']) do |context|
         ps_parameters = {
-          'versioned_project' => params['project_ref']
+          'versioned_project' => params['versioned_project']
         }
         task_info = pe_task_info(context[:pal], params[:module_name], params[:task_name], ps_parameters)
         task_info = allowed_helper(task_info, context[:config].project.tasks)
@@ -582,10 +582,10 @@ module BoltServer
 
     # Fetches the list of plans for a project
     #
-    # @param project_ref [String] the project to fetch the list of plans from
+    # @param versioned_project [String] the project to fetch the list of plans from
     get '/project_plans' do
-      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
-      in_bolt_project(params['project_ref']) do |context|
+      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
+      in_bolt_project(params['versioned_project']) do |context|
         plans_response = plan_list(context[:pal])
 
         # Dig in context for the allowlist of plans from project object
@@ -618,10 +618,10 @@ module BoltServer
 
     # Fetches the list of tasks for a bolt-project
     #
-    # @param project_ref [String] the project to fetch the list of tasks from
+    # @param versioned_project [String] the project to fetch the list of tasks from
     get '/project_tasks' do
-      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
-      in_bolt_project(params['project_ref']) do |context|
+      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
+      in_bolt_project(params['versioned_project']) do |context|
         tasks_response = task_list(context[:pal])
 
         # Dig in context for the allowlist of tasks from project object
@@ -639,10 +639,10 @@ module BoltServer
 
     # Implements puppetserver's file_metadatas endpoint for projects.
     #
-    # @param project_ref [String] the project_ref to fetch the file metadatas from
+    # @param versioned_project [String] the versioned_project to fetch the file metadatas from
     get '/project_file_metadatas/:module_name/*' do
-      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
-      in_bolt_project(params['project_ref']) do |context|
+      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
+      in_bolt_project(params['versioned_project']) do |context|
         file = params[:splat].first
         metadatas = file_metadatas(context[:pal], params[:module_name], file)
         [200, metadatas.to_json]
@@ -655,14 +655,14 @@ module BoltServer
 
     # Returns a list of targets parsed from a Project inventory
     #
-    # @param project_ref [String] the project_ref to compute the inventory from
+    # @param versioned_project [String] the versioned_project to compute the inventory from
     post '/project_inventory_targets' do
-      return MISSING_PROJECT_REF_RESPONSE if params['project_ref'].nil?
+      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
       content_type :json
       body = JSON.parse(request.body.read)
       error = validate_schema(@schemas["connect-data"], body)
       return [400, error_result(error).to_json] unless error.nil?
-      in_bolt_project(params['project_ref']) do |context|
+      in_bolt_project(params['versioned_project']) do |context|
         if context[:config].inventoryfile &&
            context[:config].project.inventory_file.to_s !=
            context[:config].inventoryfile
