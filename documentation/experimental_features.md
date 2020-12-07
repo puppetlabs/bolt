@@ -10,7 +10,8 @@ around breaking behavior where possible.
 
 ## Plugin caching
 
-This feature was introduced in [Bolt TODO]()
+This feature was introduced in [Bolt
+2.37.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-2370-2020-12-07).
 
 Bolt supports the use of plugins to dynamically load information during a Bolt run and change how
 Bolt executes certain actions. Bolt also loads all configuration plugins for most Bolt commands, and
