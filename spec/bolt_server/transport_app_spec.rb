@@ -177,7 +177,7 @@ describe "BoltServer::TransportApp" do
 
     describe '/project_plans/:module_name/:plan_name' do
       context 'with module_name::plan_name' do
-        let(:path) { "/project_plans/bolt_server_test_project/simple_plan?project_ref=bolt_server_test_project" }
+        let(:path) { "/project_plans/bolt_server_test_project/simple_plan?versioned_project=bolt_server_test_project" }
         let(:expected_response) {
           {
             'name' => 'bolt_server_test_project::simple_plan',
@@ -194,7 +194,7 @@ describe "BoltServer::TransportApp" do
       end
 
       context 'with module_name' do
-        let(:init_plan) { "/project_plans/bolt_server_test_project/init?project_ref=bolt_server_test_project" }
+        let(:init_plan) { "/project_plans/bolt_server_test_project/init?versioned_project=bolt_server_test_project" }
         let(:expected_response) {
           {
             'name' => 'bolt_server_test_project',
@@ -211,7 +211,7 @@ describe "BoltServer::TransportApp" do
       end
 
       context 'with non-existant plan' do
-        let(:path) { "/project_plans/foo/bar?project_ref=not_a_real_project" }
+        let(:path) { "/project_plans/foo/bar?versioned_project=not_a_real_project" }
         it 'returns 400 if an unknown plan error is thrown' do
           get(path)
           expect(last_response.status).to eq(400)
@@ -222,7 +222,7 @@ describe "BoltServer::TransportApp" do
     describe '/project_plans' do
       describe 'when requesting plan list' do
         context 'with an existing project' do
-          let(:path) { "/project_plans?project_ref=bolt_server_test_project" }
+          let(:path) { "/project_plans?versioned_project=bolt_server_test_project" }
           it 'returns the plans and filters based on allowlist in bolt-project.yaml' do
             get(path)
             metadata = JSON.parse(last_response.body)
@@ -234,8 +234,8 @@ describe "BoltServer::TransportApp" do
         end
 
         context 'with a non existant project' do
-          let(:path) { "/project_plans/foo/bar?project_ref=not_a_real_project" }
-          it 'returns 400 if an project_ref not found error is thrown' do
+          let(:path) { "/project_plans/foo/bar?versioned_project=not_a_real_project" }
+          it 'returns 400 if an versioned_project not found error is thrown' do
             get(path)
             error = last_response.body
             expect(error).to include("#{project_dir}/not_a_real_project does not exist")
@@ -266,7 +266,7 @@ describe "BoltServer::TransportApp" do
 
     describe '/project_tasks' do
       context 'with an existing project' do
-        let(:path) { "/project_tasks?project_ref=bolt_server_test_project" }
+        let(:path) { "/project_tasks?versioned_project=bolt_server_test_project" }
         it 'returns the tasks and filters based on allowlist in bolt-project.yaml' do
           get(path)
           metadata = JSON.parse(last_response.body)
@@ -347,7 +347,7 @@ describe "BoltServer::TransportApp" do
 
     describe '/project_tasks/:module_name/:task_name' do
       context 'with module_name::task_name' do
-        let(:path) { "/project_tasks/bolt_server_test_project/hidden?project_ref=bolt_server_test_project" }
+        let(:path) { "/project_tasks/bolt_server_test_project/hidden?versioned_project=bolt_server_test_project" }
         let(:expected_response) {
           {
             "metadata" => { "description" => "Project task testing" },
@@ -380,7 +380,7 @@ describe "BoltServer::TransportApp" do
       end
 
       context 'with module_name' do
-        let(:path) { "/project_tasks/bolt_server_test_project/init?project_ref=bolt_server_test_project" }
+        let(:path) { "/project_tasks/bolt_server_test_project/init?versioned_project=bolt_server_test_project" }
         let(:expected_response) {
           {
             "metadata" => { "description" => "Project task testing" },
@@ -796,15 +796,15 @@ describe "BoltServer::TransportApp" do
       let(:targets) { %w[one two three] }
       let(:bolt_inventory) { { 'targets' => targets } }
 
-      def post_to_project_inventory_targets(project_ref, connect_data = { 'puppet_connect_data' => {} })
-        path = "/project_inventory_targets?project_ref=#{project_ref}"
+      def post_to_project_inventory_targets(versioned_project, connect_data = { 'puppet_connect_data' => {} })
+        path = "/project_inventory_targets?versioned_project=#{versioned_project}"
         post(path, JSON.generate(connect_data), 'CONTENT_TYPE' => 'text/json')
       end
 
       it 'parses inventory' do
         with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
-          project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-          post_to_project_inventory_targets(project_ref)
+          versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+          post_to_project_inventory_targets(versioned_project)
           expect(last_response.status).to eq(200)
           target_list = JSON.parse(last_response.body)
           target_names = target_list.map do |targ|
@@ -827,8 +827,8 @@ describe "BoltServer::TransportApp" do
         }
         it 'sets transport independent from protocol' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
-            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(project_ref)
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project)
             expect(last_response.status).to eq(200)
             target_list = JSON.parse(last_response.body)
             expect(target_list.first['transport']).to eq('remote')
@@ -843,8 +843,8 @@ describe "BoltServer::TransportApp" do
         }
         it 'responds with a 500 and error details' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
-            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(project_ref)
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project)
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt.inventory/validation-error')
@@ -855,8 +855,8 @@ describe "BoltServer::TransportApp" do
       context 'when inventory file is absent' do
         it 'responds with a 500 and error details' do
           with_project(bolt_project, nil) do |path_to_tmp_project|
-            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(project_ref)
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project)
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt/file-error')
@@ -870,8 +870,8 @@ describe "BoltServer::TransportApp" do
         }
         it 'responds with a 500 and error details' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
-            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(project_ref)
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project)
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt/unknown-plugin')
@@ -885,8 +885,8 @@ describe "BoltServer::TransportApp" do
         }
         it 'responds with a 500 and error details' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
-            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(project_ref)
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project)
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt/plugin-not-supported')
@@ -901,8 +901,8 @@ describe "BoltServer::TransportApp" do
         }
         it 'responds with a 500 and error details' do
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
-            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(project_ref)
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project)
             expect(last_response.status).to eq(500)
             error_hash = JSON.parse(last_response.body)
             expect(error_hash['kind']).to eq('bolt/plugin-not-supported')
@@ -943,8 +943,8 @@ describe "BoltServer::TransportApp" do
             }
           }
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
-            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(project_ref, connect_data)
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project, connect_data)
             expect(last_response.status).to eq(200)
             target_list = JSON.parse(last_response.body)
             expect(target_list.count).to eq(1)
@@ -966,8 +966,8 @@ describe "BoltServer::TransportApp" do
           }
           targets.first['name'].delete('key')
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
-            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(project_ref, connect_data)
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project, connect_data)
             expect(last_response.status).to eq(500)
             expect(last_response.body).to match(/puppet_connect_data plugin requires that 'key' be specified/)
           end
@@ -976,8 +976,8 @@ describe "BoltServer::TransportApp" do
         it 'errors when connect_data is not included in the request' do
           connect_data = {}
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
-            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(project_ref, connect_data)
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project, connect_data)
             expect(last_response.status).to eq(400)
             expect(last_response.body).to match(/did not contain a required property of 'puppet_connect_data'/)
           end
@@ -992,8 +992,8 @@ describe "BoltServer::TransportApp" do
             }
           }
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
-            project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(project_ref, connect_data)
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project, connect_data)
             expect(last_response.status).to eq(400)
             expect(last_response.body).to match(/did not contain a required property of 'value'/)
           end
@@ -1004,14 +1004,14 @@ describe "BoltServer::TransportApp" do
         non_default_inventoryfile = 'foo.yaml'
         non_default_inventoryfile_conf = bolt_project.merge({ 'inventoryfile' => non_default_inventoryfile })
         with_project(non_default_inventoryfile_conf, bolt_inventory, non_default_inventoryfile) do |path_to_tmp_project|
-          project_ref = path_to_tmp_project.split(File::SEPARATOR).last
-          post_to_project_inventory_targets(project_ref)
+          versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+          post_to_project_inventory_targets(versioned_project)
           expect(last_response.status).to eq(500)
           expect(last_response.body).to match(/Project inventory must be defined in .*inventory.yaml.*/)
         end
       end
 
-      it 'errors when project_ref is invalid' do
+      it 'errors when versioned_project is invalid' do
         post_to_project_inventory_targets('foo')
         expect(last_response.status).to eq(500)
         expect(last_response.body).to match(/foo does not exist/)
@@ -1019,31 +1019,31 @@ describe "BoltServer::TransportApp" do
     end
 
     describe '/project_file_metadatas/:module_name/:file' do
-      let(:project_ref) { 'bolt_server_test_project' }
+      let(:versioned_project) { 'bolt_server_test_project' }
 
-      it 'returns 400 if project_ref is not specified' do
+      it 'returns 400 if versioned_project is not specified' do
         get('/project_file_metadatas/foo_module/foo_file')
         error = last_response.body
-        expect(error).to include("`project_ref` is a required argument")
+        expect(error).to include("`versioned_project` is a required argument")
         expect(last_response.status).to eq(400)
       end
 
-      it 'returns 400 if project_ref does not exist' do
-        get("/project_file_metadatas/bar/foo?project_ref=not_a_real_project")
+      it 'returns 400 if versioned_project does not exist' do
+        get("/project_file_metadatas/bar/foo?versioned_project=not_a_real_project")
         error = last_response.body
         expect(error).to include("#{project_dir}/not_a_real_project does not exist")
         expect(last_response.status).to eq(400)
       end
 
       it 'returns 400 if module_name does not exist' do
-        get("/project_file_metadatas/bar/foo?project_ref=#{project_ref}")
+        get("/project_file_metadatas/bar/foo?versioned_project=#{versioned_project}")
         error = last_response.body
         expect(error).to include("bar does not exist")
         expect(last_response.status).to eq(400)
       end
 
       it 'returns 400 if file does not exist in the module' do
-        get("/project_file_metadatas/project_module/not_a_real_file?project_ref=#{project_ref}")
+        get("/project_file_metadatas/project_module/not_a_real_file?versioned_project=#{versioned_project}")
         error = last_response.body
         expect(error).to include("not_a_real_file does not exist")
         expect(last_response.status).to eq(400)
@@ -1052,7 +1052,7 @@ describe "BoltServer::TransportApp" do
       context "with a valid filepath to one file", ssh: true do
         let(:test_file) {
           Pathname.new(
-            File.join(project_dir, project_ref, 'modules', 'project_module', 'files', 'test_file')
+            File.join(project_dir, versioned_project, 'modules', 'project_module', 'files', 'test_file')
           ).cleanpath.to_s
         }
         let(:file_checksum) {
@@ -1078,7 +1078,7 @@ describe "BoltServer::TransportApp" do
           ]
         }
         it 'returns the file metadata of the file and all its children' do
-          get("/project_file_metadatas/project_module/test_file?project_ref=#{project_ref}")
+          get("/project_file_metadatas/project_module/test_file?versioned_project=#{versioned_project}")
           file_metadatas = JSON.parse(last_response.body)
           # I don't know why the mode returned by puppet is not the same as the mode returned
           # from ruby's File.stat(test_file) function. But these tests probably don't need to
@@ -1096,7 +1096,7 @@ describe "BoltServer::TransportApp" do
       context "when the file path contains '/'", ssh: true do
         let(:test_file) {
           Pathname.new(
-            File.join(project_dir, project_ref, 'modules', 'project_module', 'files', 'test_dir', 'test_dir_file')
+            File.join(project_dir, versioned_project, 'modules', 'project_module', 'files', 'test_dir', 'test_dir_file')
           ).cleanpath.to_s
         }
         let(:file_checksum) {
@@ -1122,7 +1122,7 @@ describe "BoltServer::TransportApp" do
           ]
         }
         it 'returns the file metadata of the file and all its children' do
-          get("/project_file_metadatas/project_module/test_dir/test_dir_file?project_ref=#{project_ref}")
+          get("/project_file_metadatas/project_module/test_dir/test_dir_file?versioned_project=#{versioned_project}")
           file_metadatas = JSON.parse(last_response.body)
           # I don't know why the mode returned by puppet is not the same as the mode returned
           # from ruby's File.stat(test_file) function. But these tests probably don't need to
@@ -1140,7 +1140,7 @@ describe "BoltServer::TransportApp" do
       context "with a directory", ssh: true do
         let(:test_dir) {
           Pathname.new(
-            File.join(project_dir, project_ref, 'modules', 'project_module', 'files', 'test_dir')
+            File.join(project_dir, versioned_project, 'modules', 'project_module', 'files', 'test_dir')
           ).cleanpath.to_s
         }
         let(:file_in_dir) {
@@ -1182,7 +1182,7 @@ describe "BoltServer::TransportApp" do
           ]
         }
         it 'returns the file metadata of the file and all its children' do
-          get("/project_file_metadatas/project_module/test_dir?project_ref=#{project_ref}")
+          get("/project_file_metadatas/project_module/test_dir?versioned_project=#{versioned_project}")
           file_metadatas = JSON.parse(last_response.body)
           # I don't know why the mode returned by puppet is not the same as the mode returned
           # from ruby's File.stat(test_file) function. But these tests probably don't need to

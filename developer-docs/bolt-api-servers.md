@@ -382,7 +382,7 @@ This endpoint parses a project inventory and returns a list of target hashes. No
 
 #### Query parameters
 
-- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
+- `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
 #### POST body
 
@@ -574,7 +574,7 @@ This returns a JSON object of this shape:
 ```
 
 ### GET /project_tasks
-- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
+- `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
 #### Response
 
@@ -592,7 +592,7 @@ This returns a JSON object of this shape:
 ```
 
 ### GET /project_tasks/:module_name/:task_name
-- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
+- `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
 #### Response
 
@@ -744,7 +744,7 @@ This returns a JSON object of this shape:
 ```
 
 ### GET /project_plans
-- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
+- `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
 #### Response
 
@@ -762,7 +762,7 @@ This returns a JSON object of this shape:
 ```
 
 ### GET /project_plans/:module_name/:plan_name
-- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
+- `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
 #### Response
 
@@ -782,7 +782,7 @@ This returns a JSON object of this shape:
 ```
 
 ### GET /project_file_metadatas/:module_name/path/to/file
-- `project_ref`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
+- `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
 #### Response
 
