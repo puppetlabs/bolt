@@ -1,5 +1,47 @@
 # Changelog
 
+## Bolt 2.37.0 (2020-12-07)
+
+### New features
+
+* **Plugin caching**
+  ([#2383](https://github.com/puppetlabs/bolt/pull/2383))
+
+  Bolt plugins can now be configured to cache their results. Users can either
+  configure a default cache time-to-live for all plugins, or configure each
+  plugin's TTL individually. See [the documentation](https://pup.pt/bolt-cache)
+  for more information.
+
+  _This feature is considered experimental._
+
+### Bug fixes
+
+* **Support `notice` log level**
+  ([#2410](https://github.com/puppetlabs/bolt/pull/2410))
+
+  Log levels can now be set to `notice`. Previously, Bolt would raise an
+  error saying that `notice` was not a supported log level.
+
+### Deprecations
+
+* **Deprecate Powershell 2 support**
+  ([#2365](https://github.com/puppetlabs/bolt/issues/2365))
+
+  Support for Powershell 2 on both Bolt targets and controllers is
+  deprecated, and will be dropped in Bolt 3.0.
+
+* **Deprecate bolt.yaml**
+  ([#2000](https://github.com/puppetlabs/issues/2000))
+
+  The `bolt.yaml` configuration file is now deprecated, both at
+  project-level and user/system-level.
+
+* **Deprecate `notice` log level**
+  ([#2410](https://github.com/puppetlabs/bolt/pull/2410))
+
+  The `notice` log level is deprecated and will be removed in Bolt 3.0.
+  Use the `info` log level instead.
+
 ## Bolt 2.36.0 (2020-11-30)
 
 ### New features
