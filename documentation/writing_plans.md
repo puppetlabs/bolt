@@ -1094,6 +1094,37 @@ MODULE:
 /Users/bolt/.puppetlabs/bolt
 ```
 
+## Making plans private
+
+As a plan author, you may not want users to run your plan directly or know it exists. This is useful
+for plans that are used by other plans 'under the hood', but aren't designed to be run by a human.
+You can hide plans from `bolt plan show` and `Get-BoltPlan` output by specifying the `# @private
+true` Puppet strings tag. Private plans are still viewable with `bolt plan show <PLAN NAME>` and
+`Get-BoltPlan -Name <PLAN NAME>`, and can still be run with Bolt.
+
+```
+# This plan isn't shown in plan list output
+# @private true
+# @param targets The list of targets to run the command on.
+plan single_command (
+  TargetSpec $targets,
+) {
+  run_command("echo 'Strawberry rhubarb pie sounds so good right now'", $targets)
+}
+```
+
+The `private` metadata is cached in your Bolt project. Bolt updates the cache:
+
+- When you update plans in the current Bolt project.
+- When you update modules in the `<PROJECT DIRECTORY>/modules/` directory.
+- When you install modules using a Bolt command that installs modules.
+- When you generate Puppet types using a `generate` command. 
+
+If you manually edit a plan that is located outside of the `<PROJECT DIRECTORY>/plans/` directory or
+`<PROJECT DIRECTORY>/modules/` path, Bolt might not pick up manual edits to metadata. If your plan
+still appears in the output of `bolt plan show` and `Get-BoltPlan`, clear the metadata cache by
+running with the `--clear-cache` flag.
+
 ## Example plans
 
 Check out some examples for inspiration on writing your own plans.

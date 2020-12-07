@@ -6,10 +6,10 @@ require 'bolt/pal/yaml_plan/step'
 module Bolt
   class PAL
     class YamlPlan
-      PLAN_KEYS = Set['parameters', 'steps', 'return', 'version', 'description']
+      PLAN_KEYS = Set['parameters', 'private', 'steps', 'return', 'version', 'description']
       VAR_NAME_PATTERN = /\A[a-z_][a-z0-9_]*\z/.freeze
 
-      attr_reader :name, :parameters, :steps, :return, :description
+      attr_reader :name, :parameters, :private, :steps, :return, :description
 
       def initialize(name, plan)
         # Top-level plan keys aren't allowed to be Puppet code, so force them
@@ -29,6 +29,12 @@ module Bolt
         @parameters = params_hash.map do |param, definition|
           Parameter.new(param, definition)
         end.freeze
+
+        @private = plan['private']
+        unless @private.nil? || @private.is_a?(TrueClass) || @private.is_a?(FalseClass)
+          msg = "Plan #{@name} key 'private' must be a boolean, received: #{@private.inspect}"
+          raise Bolt::Error.new(msg, "bolt/invalid-plan")
+        end
 
         # Validate top level plan keys
         top_level_keys = plan.keys.to_set

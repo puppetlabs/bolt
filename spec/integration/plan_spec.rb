@@ -98,6 +98,33 @@ describe 'plans' do
 
         include_examples 'registered types'
       end
+
+      it 'caches plan info when generating types', ssh: true do
+        fact_info = {
+          "facts" => {
+            "description" => /A plan that retrieves facts and stores/,
+            "module" => /.*/,
+            "name" => "facts",
+            "parameters" => {
+              "targets" => {
+                "description" => "List of targets to retrieve the facts for.",
+                "sensitive" => false,
+                "type" => "TargetSpec"
+              }
+            }
+          }
+        }
+
+        with_project(config: project_config) do |project|
+          config_flags = %W[-m #{modulepath} --project #{project.path} --no-host-key-check]
+          expect(Dir.children(project.path)).not_to include('.plan_cache.json')
+
+          run_cli(%w[module generate-types] + config_flags)
+          expect(Dir.children(project.path)).to include('.plan_cache.json')
+          cache = JSON.parse(File.read(project.plan_cache_file))
+          expect(cache).to include(fact_info)
+        end
+      end
     end
   end
 

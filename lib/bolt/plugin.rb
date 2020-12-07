@@ -297,7 +297,7 @@ module Bolt
     def resolve_single_reference(reference)
       plugin_cache = if cache?(reference)
                        cache = Bolt::Plugin::Cache.new(reference,
-                                                       @config.project.cache_file,
+                                                       @config.project.plugin_cache_file,
                                                        @config.plugin_cache)
                        entry = cache.read_and_clean_cache
                        return entry unless entry.nil?

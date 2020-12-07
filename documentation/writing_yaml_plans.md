@@ -351,8 +351,7 @@ Parameter values can be referenced from steps as variables.
 
 Parameters use these fields:
 
--   `type`: (Optional) A valid [Puppet data
-    type](https://puppet.com/docs/puppet/latest/lang_data.html#puppet-data-types).
+-   `type`: (Optional) A valid [Puppet data type](https://puppet.com/docs/puppet/latest/lang_data.html#puppet-data-types).
     The value supplied must match the type or the plan fails.
 -   `default`: (Optional) Used if no value is given for the parameter
 -   `description`: (Optional)
@@ -375,6 +374,38 @@ parameters:
     type: String
     description: "The new application version to deploy"
 ```
+
+### Private key
+
+As a plan author, you may not want users to run your plan directly or know it exists. This is useful
+for plans that are used by other plans 'under the hood', but aren't designed to be run by a human.
+Plans accept a `private` key. The value of `private` is a boolean that tells Bolt whether to display
+the plan in `bolt plan show` or `Get-BoltPlan` output. Private plans are still viewable with `bolt
+plan show <PLAN NAME>` and `Get-BoltPlan -Name <PLAN NAME>`, and can still be run with Bolt.
+
+```yaml
+private: true
+parameters:
+  targets:
+    type: TargetSpec
+    description: "The targets to run on"
+
+steps:
+  - command: hostname -f
+    targets: $targets
+```
+
+The `private` metadata is cached in your Bolt project. Bolt updates the cache:
+
+- When you update plans in the current Bolt project.
+- When you update modules in the `<PROJECT DIRECTORY>/modules/` directory.
+- When you install modules using a Bolt command that installs modules.
+- When you generate Puppet types using a `generate` command. 
+
+If you manually edit a plan that is located outside of the `<PROJECT DIRECTORY>/plans/` directory or
+`<PROJECT DIRECTORY>/modules/` path, Bolt might not pick up manual edits to metadata. If your plan
+still appears in the output of `bolt plan show` and `Get-BoltPlan`, clear the metadata cache by
+running with the `--clear-cache` flag.
 
 ### How strings are evaluated
 

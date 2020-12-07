@@ -10,6 +10,10 @@
       "description": "A description of the plan. This description will show in 'bolt plan show' and 'Get-BoltPlan' output.",
       "type": "string"
     },
+    "private": {
+      "description": "If true, do not display task by default when listing for UI.",
+      "type": "boolean"
+    },
     "parameters": {
       "descrption": "A map of parameters that the plan accepts. Each key is the name of the parameter and each value is a map describing the parameter.",
       "type": "object",
