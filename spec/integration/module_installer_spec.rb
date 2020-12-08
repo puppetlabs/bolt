@@ -20,6 +20,51 @@ describe 'installing modules' do
     allow($stderr).to receive(:puts)
   end
 
+  context 'with install configuration' do
+    let(:base_config) do
+      {
+        'module-install' => {
+          'forge' => {
+            'baseurl' => 'https://forge.example.com',
+            'proxy'   => 'https://myforgeproxy.example.com'
+          },
+          'proxy' => 'https://myproxy.example.com'
+        }
+      }
+    end
+
+    context 'with Forge modules' do
+      let(:project_config) { base_config.merge('modules' => ['puppetlabs-yaml']) }
+
+      xit 'uses the forge configuration' do
+        expect { run_cli(command, project: project) }.to raise_error(
+          Bolt::Error,
+          %r{on https://forge.example.com with proxy https://myforgeproxy.example.com}
+        )
+      end
+    end
+
+    context 'with git modules' do
+      let(:project_config) do
+        base_config.merge(
+          'modules' => [
+            {
+              'git' => 'https://github.com/puppetlabs/puppetlabs-yaml',
+              'ref' => '0.1.0'
+            }
+          ]
+        )
+      end
+
+      xit 'uses the global proxy' do
+        expect { run_cli(command, project: project) }.to raise_error(
+          Bolt::Error,
+          %r{with proxy https://myproxy.example.com}
+        )
+      end
+    end
+  end
+
   context 'with forge and git modules' do
     let(:project_config) do
       {

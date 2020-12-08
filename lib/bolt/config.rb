@@ -56,7 +56,6 @@ module Bolt
                logs << { debug: "Loaded configuration from #{project.config_file}" } if File.exist?(project.config_file)
                c
              end
-
       data = load_defaults(project).push(
         filepath:     project.config_file,
         data:         conf,
@@ -283,6 +282,7 @@ module Bolt
         'concurrency'         => default_concurrency,
         'format'              => 'human',
         'log'                 => { 'console' => {} },
+        'module-install'      => {},
         'plugin-hooks'        => {},
         'plugin_hooks'        => {},
         'plugins'             => {},
@@ -408,7 +408,7 @@ module Bolt
       end
 
       # Filter hashes to only include valid options
-      %w[apply-settings apply_settings puppetfile].each do |opt|
+      %w[apply-settings apply_settings module-install puppetfile].each do |opt|
         @data[opt] = @data[opt].slice(*OPTIONS.dig(opt, :properties).keys)
       end
     end
@@ -496,6 +496,25 @@ module Bolt
 
       unless TRANSPORT_CONFIG.include?(transport)
         raise UnknownTransportError, transport
+      end
+
+      # Warn the user how they should be using the 'puppetfile' or
+      # 'module-install' config options. We don't error here since these
+      # settings can be set at the user or system level.
+      if @project.modules && puppetfile_config.any? && module_install.empty?
+        command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
+        @logs << { warn: "Detected configuration for 'puppetfile'. This setting is not "\
+                         "used when 'modules' is configured. Use 'module-install' instead. "\
+                         "To automatically update your project configuration, run '#{command}'." }
+      elsif @project.modules.nil? && puppetfile_config.empty? && module_install.any?
+        @logs << { warn: "Detected configuration for 'module-install'. This setting is not "\
+                         "used when 'modules' is not configured. Use 'puppetfile' instead." }
+      elsif @project.modules && puppetfile_config.any? && module_install.any?
+        @logs << { warn: "Detected configuration for 'puppetfile' and 'module-install'. Using "\
+                         "configuration for 'module-install' because 'modules' is also configured." }
+      elsif @project.modules.nil? && puppetfile_config.any? && module_install.any?
+        @logs << { warn: "Detected configuration for 'puppetfile' and 'module-install'. Using "\
+                         "configuration for 'puppetfile' because 'modules' is not configured." }
       end
     end
 
@@ -617,6 +636,10 @@ module Bolt
 
     def transport
       @data['transport']
+    end
+
+    def module_install
+      @project.module_install || @data['module-install']
     end
 
     # Check if there is a case-insensitive match to the path

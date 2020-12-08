@@ -196,6 +196,10 @@ module Bolt
       @data['plugin-cache']
     end
 
+    def module_install
+      @data['module-install']
+    end
+
     def modules
       @modules ||= @data['modules']&.map do |mod|
         if mod.is_a?(String)

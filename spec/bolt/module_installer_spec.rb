@@ -7,13 +7,14 @@ require 'bolt_spec/project'
 describe Bolt::ModuleInstaller do
   include BoltSpec::Project
 
-  let(:puppetfile)           { project_path + 'Puppetfile' }
-  let(:moduledir)            { project_path + '.modules' }
-  let(:config)               { project_path + 'bolt-project.yaml' }
-  let(:new_module)           { 'puppetlabs/pkcs7' }
-  let(:project_config)       { [{ 'name' => 'puppetlabs/yaml' }] }
-  let(:pal)                  { double('pal', generate_types: nil) }
-  let(:installer)            { described_class.new(outputter, pal) }
+  let(:puppetfile)     { project.puppetfile }
+  let(:moduledir)      { project.managed_moduledir }
+  let(:project_file)   { project.project_file }
+  let(:new_module)     { 'puppetlabs/pkcs7' }
+  let(:install_config) { {} }
+  let(:specs)          { [{ 'name' => 'puppetlabs/yaml' }] }
+  let(:pal)            { double('pal', generate_types: nil) }
+  let(:installer)      { described_class.new(outputter, pal) }
 
   let(:outputter) do
     double('outputter', print_message: nil, print_puppetfile_result: nil, print_action_step: nil)
@@ -27,20 +28,22 @@ describe Bolt::ModuleInstaller do
 
   before(:each) do
     conf = { 'modules' => [] }
-    File.write(config, conf.to_yaml)
+    File.write(project_file, conf.to_yaml)
     allow(installer).to receive(:install_puppetfile).and_return(true)
   end
 
   context '#add' do
     it 'returns early if the module is already declared' do
-      result = installer.add('puppetlabs/yaml', project_config, puppetfile, moduledir, config)
+      result = installer.add('puppetlabs/yaml', specs, puppetfile, moduledir, project_file, install_config)
       expect(result).to eq(true)
       expect(puppetfile.exist?).to eq(false)
     end
 
     it 'errors if Puppetfile is not managed by Bolt' do
       File.write(puppetfile, '')
-      expect { installer.add(new_module, project_config, puppetfile, moduledir, config) }.to raise_error(
+      expect {
+        installer.add(new_module, specs, puppetfile, moduledir, project_file, install_config)
+      }.to raise_error(
         Bolt::Error,
         /managed by Bolt/
       )
@@ -48,19 +51,19 @@ describe Bolt::ModuleInstaller do
 
     it 'updates files and installs modules' do
       expect(installer).to receive(:install_puppetfile)
-      installer.add(new_module, project_config, puppetfile, moduledir, config)
+      installer.add(new_module, specs, puppetfile, moduledir, project_file, install_config)
 
       expect(puppetfile.exist?).to be(true)
       expect(File.read(puppetfile)).to match(%r{mod 'puppetlabs/pkcs7'})
 
-      conf = YAML.safe_load(File.read(config))
+      conf = YAML.safe_load(File.read(project_file))
       expect(conf['modules']).to match_array(['puppetlabs/pkcs7'])
     end
 
     it 'does not update version of installed modules' do
       spec = "mod 'puppetlabs/yaml', '0.1.0'"
       File.write(puppetfile, spec)
-      result = installer.add(new_module, project_config, puppetfile, moduledir, config)
+      result = installer.add(new_module, specs, puppetfile, moduledir, project_file, install_config)
 
       expect(result).to eq(true)
       expect(File.read(puppetfile)).to match(/#{spec}/)
@@ -69,7 +72,7 @@ describe Bolt::ModuleInstaller do
     it 'updates version of installed modules if unable to resolve with pinned versions' do
       spec = 'mod "puppetlabs/ruby_task_helper", "0.3.0"'
       File.write(puppetfile, spec)
-      result = installer.add(new_module, [], puppetfile, moduledir, config)
+      result = installer.add(new_module, [], puppetfile, moduledir, project_file, install_config)
 
       expect(result).to eq(true)
       expect(File.read(puppetfile)).not_to match(/#{spec}/)
@@ -79,7 +82,7 @@ describe Bolt::ModuleInstaller do
   context '#install' do
     it 'errors if Puppetfile is not managed by Bolt' do
       File.write(puppetfile, '')
-      expect { installer.install(project_config, puppetfile, moduledir) }.to raise_error(
+      expect { installer.install(specs, puppetfile, moduledir, install_config) }.to raise_error(
         Bolt::Error,
         /managed by Bolt/
       )
@@ -90,7 +93,7 @@ describe Bolt::ModuleInstaller do
       expect(installer).to receive(:install_puppetfile)
       expect(File.read(puppetfile)).not_to match(%r{puppetlabs/yaml})
 
-      installer.install(project_config, puppetfile, moduledir, force: true)
+      installer.install(specs, puppetfile, moduledir, install_config, force: true)
 
       expect(File.read(puppetfile)).to match(%r{puppetlabs/yaml})
     end
@@ -98,20 +101,20 @@ describe Bolt::ModuleInstaller do
     it 'installs modules without resolving configured modules' do
       File.write(puppetfile, 'mod "puppetlabs/apache", "5.5.0"')
       expect(installer).to receive(:install_puppetfile)
-      installer.install(project_config, puppetfile, moduledir, resolve: false)
+      installer.install(specs, puppetfile, moduledir, install_config, resolve: false)
 
       expect(File.read(puppetfile)).to match(%r{puppetlabs/apache})
       expect(File.read(puppetfile)).not_to match(%r{puppetlabs/yaml})
     end
 
     it 'writes a Puppetfile' do
-      installer.install(project_config, puppetfile, moduledir)
+      installer.install(specs, puppetfile, moduledir, install_config)
       expect(puppetfile.exist?).to be(true)
     end
 
     it 'installs a Puppetfile' do
       expect(installer).to receive(:install_puppetfile)
-      installer.install(project_config, puppetfile, moduledir)
+      installer.install(specs, puppetfile, moduledir, install_config)
     end
   end
 

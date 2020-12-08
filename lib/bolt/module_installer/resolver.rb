@@ -9,7 +9,7 @@ module Bolt
     class Resolver
       # Resolves module specs and returns a Puppetfile object.
       #
-      def resolve(specs)
+      def resolve(specs, _config = {})
         require 'puppetfile-resolver'
 
         # Build the document model from the specs.

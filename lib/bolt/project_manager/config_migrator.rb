@@ -72,7 +72,15 @@ module Bolt
         data     = Bolt::Util.read_yaml_hash(project_file, 'config')
         modified = false
 
-        [%w[apply_settings apply-settings], %w[plugin_hooks plugin-hooks]].each do |old, new|
+        # Keys to update. The first element is the old key, while the second is
+        # the key update it to.
+        to_update = [
+          %w[apply_settings apply-settings],
+          %w[puppetfile module-install],
+          %w[plugin_hooks plugin-hooks]
+        ]
+
+        to_update.each do |old, new|
           next unless data.key?(old)
 
           if data.key?(new)

@@ -281,7 +281,7 @@
       ]
     },
     "puppetfile": {
-      "description": "A map containing options for the `bolt puppetfile install` command.",
+      "description": "A map containing options for the `bolt puppetfile install` command and `Install-BoltPuppetfile` cmdlet.",
       "type": "object",
       "properties": {
         "forge": {
@@ -294,7 +294,7 @@
               "format": "uri"
             },
             "proxy": {
-              "description": "The HTTP proxy to use for Git and Forge operations.",
+              "description": "The HTTP proxy to use for Forge operations.",
               "type": "string",
               "format": "uri"
             }

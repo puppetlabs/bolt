@@ -22,6 +22,9 @@
     "log": {
       "$ref": "#/definitions/log"
     },
+    "module-install": {
+      "$ref": "#/definitions/module-install"
+    },
     "plugin-cache": {
       "$ref": "#/definitions/plugin-cache"
     },
@@ -157,6 +160,33 @@
         }
       }
     },
+    "module-install": {
+      "description": "Options that configure where Bolt downloads modules from. This option is only used when installing modules using the `bolt module add|install` commands and `Add|Install-BoltModule` cmdlets.",
+      "type": "object",
+      "properties": {
+        "forge": {
+          "description": "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations only, and a `baseurl` setting to specify a different Forge host.",
+          "type": "object",
+          "properties": {
+            "baseurl": {
+              "description": "The URL to the Forge host.",
+              "type": "string",
+              "format": "uri"
+            },
+            "proxy": {
+              "description": "The HTTP proxy to use for Forge operations.",
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "proxy": {
+          "description": "The HTTP proxy to use for Git and Forge operations.",
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
     "plugin-cache": {
       "description": "This feature is experimental. Enable plugin caching and set the time-to-live.",
       "type": "object",
@@ -251,7 +281,7 @@
       ]
     },
     "puppetfile": {
-      "description": "A map containing options for the `bolt puppetfile install` command.",
+      "description": "A map containing options for the `bolt puppetfile install` command and `Install-BoltPuppetfile` cmdlet.",
       "type": "object",
       "properties": {
         "forge": {
@@ -264,7 +294,7 @@
               "format": "uri"
             },
             "proxy": {
-              "description": "The HTTP proxy to use for Git and Forge operations.",
+              "description": "The HTTP proxy to use for Forge operations.",
               "type": "string",
               "format": "uri"
             }
