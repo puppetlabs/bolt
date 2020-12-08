@@ -45,6 +45,20 @@ describe "when running over the local transport" do
       expect(result['env']).to match(/somemessage/)
       expect(result['stdin']).to match(/somemessage/)
     end
+
+    context 'specifying transport on the CLI' do
+      let(:config_flags) { %W[--targets 127.0.0.1 -m #{modulepath} --transport local] }
+
+      it "applies bundled-ruby config" do
+        data = { 'config' => { 'local' => { 'bundled-ruby' => true } } }
+        with_tempfile_containing('inv', data.to_yaml) do |inv|
+          cmd = %W[task run sample::bolt_ruby message=somemessage --inventoryfile #{inv.path}]
+          result = run_one_node(cmd + config_flags)
+          expect(result['env']).to match(/somemessage/)
+          expect(result['stdin']).to match(/somemessage/)
+        end
+      end
+    end
   end
 
   context 'when using CLI options on POSIX OS', bash: true do

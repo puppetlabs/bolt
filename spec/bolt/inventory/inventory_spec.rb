@@ -1034,66 +1034,6 @@ describe Bolt::Inventory::Inventory do
     end
   end
 
-  context 'with localhost' do
-    context 'with no additional config' do
-      let(:data) {
-        { 'targets' => ['localhost'] }
-      }
-
-      let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
-
-      it 'adds magic config options' do
-        target = get_target(inventory, 'localhost')
-        expect(target.transport).to eq('local')
-        expect(target.options['interpreters']).to include('.rb' => RbConfig.ruby)
-        expect(target.features).to include('puppet-agent')
-      end
-    end
-
-    context 'with group-level config' do
-      let(:data) {
-        { 'name' => 'locomoco',
-          'targets' => ['localhost'],
-          'config' => {
-            'transport' => 'ssh',
-            'local' => {
-              'interpreters' => { '.rb' => '/foo/ruby' }
-            }
-          } }
-      }
-      let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
-
-      it 'prefers default options' do
-        target = get_target(inventory, 'localhost')
-        expect(target.transport).to eq('local')
-        expect(target.options['interpreters']).to include('.rb' => RbConfig.ruby)
-        expect(target.features).to include('puppet-agent')
-      end
-    end
-
-    context 'with target-level config' do
-      let(:data) {
-        { 'targets' => [{
-          'name' => 'localhost',
-          'config' => {
-            'transport' => 'ssh',
-            'ssh' => {
-              'interpreters' => { '.rb' => '/foo/ruby' }
-            }
-          }
-        }] } # This has so many brackets it might be March Madness
-      }
-      let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
-
-      it 'prefers user-defined target-level config over defaults' do
-        target = get_target(inventory, 'localhost')
-        expect(target.transport).to eq('ssh')
-        expect(target.options['interpreters']).to include('.rb' => '/foo/ruby')
-        expect(target.features).to include('puppet-agent')
-      end
-    end
-  end
-
   describe 'set_config' do
     context 'when updating existing values' do
       let(:data) {
@@ -1404,12 +1344,10 @@ describe Bolt::Inventory::Inventory do
       expect { inventory.create_target_from_hash(hash) }.not_to raise_error
     end
 
-    it 'picks up localhost default config' do
+    it 'picks up localhost default transport' do
       hash = { 'name' => 'localhost' }
       target = inventory.create_target_from_hash(hash)
       expect(target.transport).to eq('local')
-      expect(target.transport_config['interpreters']).to include('.rb' => RbConfig.ruby)
-      expect(target.features).to include('puppet-agent')
     end
   end
 end

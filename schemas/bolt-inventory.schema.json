@@ -309,6 +309,9 @@
         {
           "type": "object",
           "properties": {
+            "bundled-ruby": {
+              "$ref": "#/transport_definitions/bundled-ruby"
+            },
             "cleanup": {
               "$ref": "#/transport_definitions/cleanup"
             },
@@ -581,6 +584,10 @@
           "$ref": "#/definitions/_plugin"
         }
       ]
+    },
+    "bundled-ruby": {
+      "description": "Whether to use the Ruby bundled with Bolt packages for local targets.",
+      "type": "boolean"
     },
     "cacert": {
       "description": "The path to the CA certificate.",
