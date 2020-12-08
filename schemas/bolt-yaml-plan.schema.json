@@ -1,0 +1,294 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bolt YAML Plan",
+  "description": "Bolt YAML Plan Schema",
+  "type": "object",
+  "required": ["steps"],
+  "additionalProperties": false,
+  "properties": {
+    "description": {
+      "description": "A description of the plan. This description will show in 'bolt plan show' and 'Get-BoltPlan' output.",
+      "type": "string"
+    },
+    "parameters": {
+      "descrption": "A map of parameters that the plan accepts. Each key is the name of the parameter and each value is a map describing the parameter.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "default": {
+            "description": "The default value to use if no value is given for the parameter."
+          },
+          "description": {
+            "description": "A description of the parameter. This description will show in 'bolt plan show' and 'Get-BoltPlan' output.",
+            "type": "string"
+          },
+          "type": {
+            "description": "The type of the value supplied to the parameter. Must be a valid Puppet data type. If the value's type does not match the plan will fail.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "return": {
+      "description": "The plan's return value. When the plan finishes, the return key is evaluated and returned as the result of the plan. If the return key is not set, the plan returns Undef."
+    },
+    "steps": {
+      "description": "A list of steps that describe specific actions to take.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/steps/command"
+          },
+          {
+            "$ref": "#/steps/download"
+          },
+          {
+            "$ref": "#/steps/message"
+          },
+          {
+            "$ref": "#/steps/plan"
+          },
+          {
+            "$ref": "#/steps/resources"
+          },
+          {
+            "$ref": "#/steps/script"
+          },
+          {
+            "$ref": "#/steps/task"
+          },
+          {
+            "$ref": "#/steps/upload"
+          }
+        ]
+      }
+    }
+  },
+  "steps": {
+    "command": {
+      "description": "Runs a single command on a list of targets and returns the results. Results include output sent to standard out (stdout) and standard error (stderr), and the command's exit code.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "targets"],
+      "properties": {
+        "command": {
+          "description": "The command to run.",
+          "type": "string"
+        },
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "targets": {
+          "$ref": "#/definitions/targets"
+        }
+      }
+    },
+    "download": {
+      "description": "Downloads a file or directory from a target to a destination directory on the local host.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["destination", "download", "targets"],
+      "properties": {
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "destination": {
+          "description": "The destination directory to download the file to. Expands relative to the project's downloads directory <project>/downloads.",
+          "type": "string"
+        },
+        "download": {
+          "description": "The location of the remote file or directory to download.",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "targets": {
+          "$ref": "#/definitions/targets"
+        }
+      }
+    },
+    "message": {
+      "description": "Print a message. This will print a message to standard out (stdout) when using the 'human' output format or standard error (stderr) when using the 'json' output format.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["message"],
+      "properties": {
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "message": {
+          "description": "The message to print. Messages will be specially formatted if they are valid PlanResult objects, otherwise they will be stringified."
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        }
+      }
+    },
+    "plan": {
+      "description": "Runs a plan and returns the result.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan"],
+      "properties": {
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "parameters": {
+          "description": "A map of parameters to pass to the plan.",
+          "type": "object"
+        },
+        "plan": {
+          "description": "The name of the plan to run.",
+          "type": "string"
+        },
+        "targets": {
+          "$ref": "#/definitions/targets"
+        }
+      }
+    },
+    "resources": {
+      "description": "Applies Puppet resources to a list of targets. Bolt automatically runs the 'apply_prep' plan function on the targets before applying resources.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resources", "targets"],
+      "properties": {
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "resources": {
+          "description": "A list of Puppet resources to apply to a target. A resource defines the desired state for part of a target. Bolt ensures each resource is in its desired state. If any resource in the list fails, the rest are skipped.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "parameters": {
+                "description": "A map of parameters to pass to the resource.",
+                "type": "object"
+              },
+              "title": {
+                "description": "The title of the resource.",
+                "type": "string"
+              },
+              "type": {
+                "description": "The type of the resource.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "targets": {
+          "$ref": "#/definitions/targets"
+        }
+      }
+    },
+    "script": {
+      "description": "Runs a script on a list of targets and returns the results.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["script", "targets"],
+      "properties": {
+        "arguments": {
+          "description": "An array of command-line arguments to pass to the script.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "script": {
+          "description": "The script to run. Scripts must be in the files/ directory of a module, and the name of the script must be specified as <modulename>/path/to/script, ommitting the files/ directory from the path.",
+          "type": "string"
+        },
+        "targets": {
+          "$ref": "#/definitions/targets"
+        }
+      }
+    },
+    "task": {
+      "description": "Runs a single task on a list of targets and returns the results.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task", "targets"],
+      "properties": {
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "parameters": {
+          "description": "A map of parameters to pass to the task.",
+          "type": "object"
+        },
+        "task": {
+          "description": "The task to run.",
+          "type": "string"
+        },
+        "targets": {
+          "$ref": "#/definitions/targets"
+        }
+      }
+    },
+    "upload": {
+      "description": "Uploads a file or directory from the local host to a specific location on a list of targets.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["destination", "targets", "upload"],
+      "properties": {
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "destination": {
+          "description": "The path to upload the file to on the targets.",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "targets": {
+          "$ref": "#/definitions/targets"
+        },
+        "upload": {
+          "description": "The path to the file or directory on the local host to upload.",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "description": {
+      "description": "A description of the step. Used by Bolt to describe which step is being executed in plan output.",
+      "type": "string"
+    },
+    "name": {
+      "description": "A unique name that can be used to refer to the result of the step later in the plan.",
+      "type": "string"
+    },
+    "targets": {
+      "description": "A target, group, or list of targets and groups to run the step on.",
+      "type": ["array", "string"],
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

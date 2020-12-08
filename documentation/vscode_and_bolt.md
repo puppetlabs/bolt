@@ -21,6 +21,7 @@ Bolt offers the following JSON schemas:
 | [`bolt-defaults.yaml`](bolt_defaults_reference.md) | https://forgeapi.puppet.com/schemas/bolt-defaults.json  |
 | [`bolt-project.yaml`](bolt_project_reference.md)   | https://forgeapi.puppet.com/schemas/bolt-project.json   |
 | [`inventory.yaml`](bolt_inventory_reference.md)    | https://forgeapi.puppet.com/schemas/bolt-inventory.json |
+| [YAML plans](writing_yaml_plans.md)                | https://forgeapi.puppet.com/schemas/bolt-yaml-plan.json |
 
 ### Enabling schemas
 
@@ -44,6 +45,9 @@ To start using the JSON schemas with VS Code, follow these steps:
         ],
         "https://forgeapi.puppet.com/schemas/bolt-inventory.json": [
           "inventory.yaml"
+        ],
+        "https://forgeapi.puppet.com/schemas/bolt-yaml-plan.json": [
+          "plans/**/*.yaml"
         ]
       }
     }
