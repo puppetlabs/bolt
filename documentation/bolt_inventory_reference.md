@@ -192,6 +192,33 @@ groups:
   - name: linux
 ```
 
+### `plugin_hooks`
+
+A map of [plugin hooks](writing_plugins.md#plugin-hooks) and which plugins a
+hook should use for targets in the group. The only configurable plugin hook is
+`puppet_library`, which configures the plugin used to install the Puppet agent
+on targets when plans call [apply_prep](plan_functions.md#apply-prep) or the
+`bolt apply` command or `Invoke-BoltApply` PowerShell cmdlet are used.
+
+The `puppet_library` plugin hook can use one of two plugins: `puppet_agent` or
+`task`.
+
+- **Type:** Hash
+
+```yaml
+groups:
+  - name: agents
+    plugin_hooks:
+      puppet_library:
+        plugin: task
+        task: puppet_agent::install
+        parameters:
+          collection: puppet6
+    targets:
+      - linux.example.com
+      - windows.example.com
+```
+
 ### `targets`
 
 A [list of targets](#target-objects) and their associated configuration.
@@ -309,6 +336,30 @@ option is set.
 ```yaml
 targets:
   - name: database
+```
+
+### `plugin_hooks`
+
+A map of [plugin hooks](writing_plugins.md#plugin-hooks) and which plugins a
+hook should use for the target. The only configurable plugin hook is
+`puppet_library`, which configures the plugin used to install the Puppet agent
+on a target when plans call [apply_prep](plan_functions.md#apply-prep) or the
+`bolt apply` command or `Invoke-BoltApply` PowerShell cmdlet are used.
+
+The `puppet_library` plugin hook can use one of two plugins: `puppet_agent` or
+`task`.
+
+- **Type:** Hash
+
+```yaml
+targets:
+  - uri: linux.example.com
+    plugin_hooks:
+      puppet_library:
+        plugin: task
+        task: puppet_agent::install
+        parameters:
+          collection: puppet6
 ```
 
 ### `uri`
