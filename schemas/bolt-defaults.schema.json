@@ -313,14 +313,21 @@
     },
     "transport": {
       "description": "The default transport to use when the transport for a target is not specified in the URI.",
-      "type": "string",
-      "enum": [
-        "ssh",
-        "winrm",
-        "pcp",
-        "local",
-        "docker",
-        "remote"
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "ssh",
+            "winrm",
+            "pcp",
+            "local",
+            "docker",
+            "remote"
+          ]
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
       ]
     },
     "docker": {

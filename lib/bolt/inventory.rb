@@ -4,13 +4,17 @@ require 'set'
 require 'bolt/config'
 require 'bolt/inventory/group'
 require 'bolt/inventory/inventory'
+require 'bolt/inventory/options'
 require 'bolt/target'
 require 'bolt/util'
 require 'bolt/plugin'
+require 'bolt/validator'
 require 'yaml'
 
 module Bolt
   class Inventory
+    include Bolt::Inventory::Options
+
     ENVIRONMENT_VAR = 'BOLT_INVENTORY'
 
     class ValidationError < Bolt::Error
@@ -45,11 +49,25 @@ module Bolt
       end
     end
 
+    # Builds the schema used by the validator.
+    #
+    def self.schema
+      schema = {
+        type:        Hash,
+        properties:  OPTIONS.map { |opt| [opt, _ref: opt] }.to_h,
+        definitions: DEFINITIONS
+      }
+
+      schema[:definitions]['config'][:properties] = Bolt::Config.transport_definitions
+      schema
+    end
+
     def self.from_config(config, plugins)
       logger = Bolt::Logger.logger(self)
 
       if ENV.include?(ENVIRONMENT_VAR)
         begin
+          source = ENVIRONMENT_VAR
           data = YAML.safe_load(ENV[ENVIRONMENT_VAR])
           raise Bolt::ParseError, "Could not parse inventory from $#{ENVIRONMENT_VAR}" unless data.is_a?(Hash)
           logger.debug("Loaded inventory from environment variable #{ENVIRONMENT_VAR}")
@@ -57,9 +75,11 @@ module Bolt
           raise Bolt::ParseError, "Could not parse inventory from $#{ENVIRONMENT_VAR}"
         end
       elsif config.inventoryfile
+        source = config.inventoryfile
         data = Bolt::Util.read_yaml_hash(config.inventoryfile, 'inventory')
         logger.debug("Loaded inventory from #{config.inventoryfile}")
       else
+        source = config.default_inventoryfile
         data = Bolt::Util.read_optional_yaml_hash(config.default_inventoryfile, 'inventory')
 
         if config.default_inventoryfile.exist?
@@ -72,6 +92,11 @@ module Bolt
       # Resolve plugin references from transport config
       config.transports.each_value do |t|
         t.resolve(plugins) unless t.resolved?
+      end
+
+      Bolt::Validator.new.tap do |validator|
+        validator.validate(data, schema, source)
+        validator.warnings.each { |warning| logger.warn(warning) }
       end
 
       inventory = create_version(data, config.transport, config.transports, plugins)

@@ -6,73 +6,8 @@ module Bolt
       module Options
         LOGIN_SHELLS = %w[sh bash zsh dash ksh powershell].freeze
 
-        # The following constants define the various configuration options available to Bolt's
-        # transports. Each constant is a hash where keys are the configuration option and values
-        # are the option's definition. These options are used in multiple locations:
-        #
-        #   - Automatic type validation when loading and setting configuration
-        #   - Generating reference documentation for configuration files
-        #   - Generating JSON schemas for configuration files
-        #
-        # Data includes keys defined by JSON Schema Draft 07 as well as some metadata used
-        # by Bolt to generate documentation. The following keys are used:
-        #
-        #   :description    String      A detailed description of the option and what it does. This
-        #                               field is used in both documentation and the JSON schemas,
-        #                               and should provide as much detail as possible, including
-        #                               links to relevant documentation.
-        #
-        #   :type           Class       The expected type of a value. These should be Ruby classes,
-        #                               as this field is used to perform automatic type validation.
-        #                               If an option can accept more than one type, this should be
-        #                               an array of types. Boolean values should set :type to
-        #                               [TrueClass, FalseClass], as Ruby does not have a single
-        #                               Boolean class.
-        #
-        #   :items          Hash        A definition hash for items in an array. Similar to values
-        #                               for top-level options, items can have a :description, :type,
-        #                               or any other key in this list.
-        #
-        #   :uniqueItems    Boolean     Whether or not an array should contain only unique items.
-        #
-        #   :properties     Hash        A hash where keys are sub-options and values are definitions
-        #                               for the sub-option. Similar to values for top-level options,
-        #                               properties can have a :description, :type, or any other key
-        #                               in this list.
-        #
-        #   :additionalProperties       A variation of the :properties key, where the hash is a
-        #                   Hash        definition for any properties not specified in :properties.
-        #                               This can be used to permit arbitrary sub-options, such as
-        #                               logs for the 'log' option.
-        #
-        #   :propertyNames  Hash        A hash that defines the properties that an option's property
-        #                               names must adhere to.
-        #
-        #   :required       Array       An array of properties that are required for options that
-        #                               accept Hash values.
-        #
-        #   :minimum        Integer     The minimum integer value for an option.
-        #
-        #   :enum           Array       An array of values that the option recognizes.
-        #
-        #   :pattern        String      A JSON regex pattern that the option's vaue should match.
-        #
-        #   :format         String      Requires that a string value matches a format defined by the
-        #                               JSON Schema draft.
-        #
-        #   :_plugin        Boolean     Whether the option accepts a plugin reference. This is used
-        #                               when generating the JSON schemas to determine whether or not
-        #                               to include a reference to the _plugin definition. If :_plugin
-        #                               is set to true, the script that generates JSON schemas will
-        #                               automatically recurse through the :items and :properties keys
-        #                               and add plugin references if applicable.
-        #
-        #   :_example       Any         An example value for the option. This is used to generate
-        #                               reference documentation for configuration files.
-        #
-        #   :_default       Any         The documented default value for the option. This is only
-        #                               used to generate reference documentation for configuration
-        #                               files and is not used by Bolt to actually set default values.
+        # Definitions used to validate config options.
+        # https://github.com/puppetlabs/bolt/blob/main/schemas/README.md
         TRANSPORT_OPTIONS = {
           "basic-auth-only" => {
             type: [TrueClass, FalseClass],

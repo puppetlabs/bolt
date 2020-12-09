@@ -102,22 +102,36 @@ module Bolt
       new(project, data, overrides)
     end
 
-    def self.defaults_schema
-      base      = OPTIONS.slice(*BOLT_DEFAULTS_OPTIONS)
-      inventory = INVENTORY_OPTIONS.each_with_object({}) do |(option, definition), acc|
+    # Builds a hash of definitions for transport configuration.
+    #
+    def self.transport_definitions
+      INVENTORY_OPTIONS.each_with_object({}) do |(option, definition), acc|
         acc[option] = TRANSPORT_CONFIG.key?(option) ? definition.merge(TRANSPORT_CONFIG[option].schema) : definition
       end
-
-      base['inventory-config'][:properties] = inventory
-      base
     end
 
-    def self.bolt_schema
-      inventory = INVENTORY_OPTIONS.each_with_object({}) do |(option, definition), acc|
-        acc[option] = TRANSPORT_CONFIG.key?(option) ? definition.merge(TRANSPORT_CONFIG[option].schema) : definition
-      end
+    # Builds the schema for bolt-defaults.yaml used by the validator.
+    #
+    def self.defaults_schema
+      schema = {
+        type:        Hash,
+        properties:  BOLT_DEFAULTS_OPTIONS.map { |opt| [opt, _ref: opt] }.to_h,
+        definitions: OPTIONS.merge(transport_definitions)
+      }
 
-      OPTIONS.slice(*BOLT_OPTIONS).merge(inventory)
+      schema[:definitions]['inventory-config'][:properties] = transport_definitions
+
+      schema
+    end
+
+    # Builds the schema for bolt.yaml used by the validator.
+    #
+    def self.bolt_schema
+      {
+        type:        Hash,
+        properties:  (BOLT_OPTIONS + INVENTORY_OPTIONS.keys).map { |opt| [opt, _ref: opt] }.to_h,
+        definitions: OPTIONS.merge(transport_definitions)
+      }
     end
 
     def self.system_path
@@ -153,7 +167,7 @@ module Bolt
 
       # Validate the config against the schema. This will raise a single error
       # with all validation errors.
-      Validator.new.tap do |validator|
+      Bolt::Validator.new.tap do |validator|
         validator.validate(data, defaults_schema, filepath)
 
         validator.warnings.each { |warning| logs << { warn: warning } }
@@ -220,7 +234,7 @@ module Bolt
 
       # Validate the config against the schema. This will raise a single error
       # with all validation errors.
-      Validator.new.tap do |validator|
+      Bolt::Validator.new.tap do |validator|
         validator.validate(data, bolt_schema, filepath)
 
         validator.warnings.each { |warning| logs << { warn: warning } }

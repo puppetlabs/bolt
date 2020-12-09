@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'bolt/config/validator'
+require 'bolt/validator'
 
-describe Bolt::Config::Validator do
+describe Bolt::Validator do
   def validate
     described_class.new.tap do |validator|
       validator.validate(data, schema, location)
@@ -12,9 +12,16 @@ describe Bolt::Config::Validator do
   let(:location) { 'config' }
   let(:data)     { {} }
 
+  let(:schema) do
+    {
+      type:       Hash,
+      properties: properties
+    }
+  end
+
   context 'validating types' do
     context 'single type' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type: String
@@ -39,7 +46,7 @@ describe Bolt::Config::Validator do
     end
 
     context 'multiple types' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type: [String, Integer]
@@ -64,7 +71,7 @@ describe Bolt::Config::Validator do
     end
 
     context 'booleans' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type: [TrueClass, FalseClass]
@@ -83,7 +90,7 @@ describe Bolt::Config::Validator do
     end
 
     context 'without a type definition' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {}
         }
@@ -98,7 +105,7 @@ describe Bolt::Config::Validator do
   end
 
   context 'validating plugins' do
-    let(:schema) do
+    let(:properties) do
       {
         'option' => {
           type:    String,
@@ -120,7 +127,7 @@ describe Bolt::Config::Validator do
     end
 
     it 'errors when option does not accept plugin references' do
-      schema['option'][:_plugin] = false
+      properties['option'][:_plugin] = false
 
       expect { validate }.to raise_error(
         Bolt::ValidationError,
@@ -131,7 +138,7 @@ describe Bolt::Config::Validator do
 
   context 'validating hashes' do
     context ':required' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type:     Hash,
@@ -157,7 +164,7 @@ describe Bolt::Config::Validator do
     end
 
     context ':properties' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type: Hash,
@@ -187,7 +194,7 @@ describe Bolt::Config::Validator do
     end
 
     context ':additionalProperties' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type: Hash,
@@ -217,7 +224,7 @@ describe Bolt::Config::Validator do
 
   context 'validating arrays' do
     context ':uniqueItems' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type:        Array,
@@ -243,7 +250,7 @@ describe Bolt::Config::Validator do
     end
 
     context ':items' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type:  Array,
@@ -273,7 +280,7 @@ describe Bolt::Config::Validator do
 
   context 'validating strings' do
     context ':enum' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type: String,
@@ -298,8 +305,8 @@ describe Bolt::Config::Validator do
       end
 
       it 'errors with invalid value and suggest alternate type' do
-        schema['option'][:type] = [String, Hash]
-        data['option']          = 'bar'
+        properties['option'][:type] = [String, Hash]
+        data['option']              = 'bar'
 
         expect { validate }.to raise_error(
           Bolt::ValidationError,
@@ -311,7 +318,7 @@ describe Bolt::Config::Validator do
 
   context 'validating integers' do
     context ':minimum' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type:    Integer,
@@ -338,7 +345,7 @@ describe Bolt::Config::Validator do
   end
 
   context 'validating keys' do
-    let(:schema) do
+    let(:properties) do
       {
         'nested' => {
           type: Hash,
@@ -392,7 +399,7 @@ describe Bolt::Config::Validator do
 
   context 'adding deprecations' do
     context ':_deprecation' do
-      let(:schema) do
+      let(:properties) do
         {
           'option' => {
             type:         Integer,
@@ -410,6 +417,32 @@ describe Bolt::Config::Validator do
             option:  'option',
             message: /Option 'option' at config is deprecated. Donut use./
           )
+        end
+      end
+    end
+  end
+
+  context 'with references' do
+    let(:schema) do
+      {
+        type: Hash,
+        properties: {
+          "option" => { _ref: "option" }
+        },
+        definitions: {
+          "option" => {
+            type: Integer
+          }
+        }
+      }
+    end
+
+    it 'uses the referenced definition' do
+      data['option'] = 'foo'
+
+      described_class.new.tap do |validator|
+        expect { validator.validate(data, schema, location) }.to raise_error do |error|
+          expect(error.message.lines).to include(/Value at 'option' must be of type Integer/)
         end
       end
     end
