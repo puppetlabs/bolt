@@ -17,7 +17,11 @@ describe Bolt::ModuleInstaller do
   let(:installer)      { described_class.new(outputter, pal) }
 
   let(:outputter) do
-    double('outputter', print_message: nil, print_puppetfile_result: nil, print_action_step: nil)
+    double('outputter', print_message: nil,
+                        print_puppetfile_result: nil,
+                        start_spin: nil,
+                        stop_spin: nil,
+                        print_action_step: nil)
   end
 
   around(:each) do |example|

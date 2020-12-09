@@ -103,7 +103,9 @@ module Bolt
       # early here and not initialize the project if the modules cannot be
       # resolved and installed.
       if modules
+        @outputter.start_spin
         Bolt::ModuleInstaller.new(@outputter, @pal).install(modules, puppetfile, moduledir)
+        @outputter.stop_spin
       end
 
       data = { 'name' => project_name }

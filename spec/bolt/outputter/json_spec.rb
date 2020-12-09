@@ -6,7 +6,7 @@ require 'bolt/cli'
 
 describe "Bolt::Outputter::JSON" do
   let(:output) { StringIO.new }
-  let(:outputter) { Bolt::Outputter::JSON.new(false, false, false, output) }
+  let(:outputter) { Bolt::Outputter::JSON.new(false, false, false, false, output) }
   let(:inventory) { Bolt::Inventory.empty }
   let(:target1) { inventory.get_target('target1') }
   let(:target2) { inventory.get_target('target2') }

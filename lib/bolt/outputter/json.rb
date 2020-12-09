@@ -3,7 +3,7 @@
 module Bolt
   class Outputter
     class JSON < Bolt::Outputter
-      def initialize(color, verbose, trace, stream = $stdout)
+      def initialize(color, verbose, trace, spin, stream = $stdout)
         super
         @items_open = false
         @object_open = false

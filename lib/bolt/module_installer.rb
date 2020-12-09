@@ -47,6 +47,7 @@ module Bolt
       # a version conflict.
       @outputter.print_action_step("Resolving module dependencies, this may take a moment")
 
+      @outputter.start_spin
       begin
         resolve_specs.add_specs('name' => name)
         puppetfile = Resolver.new.resolve(resolve_specs, config)
@@ -54,6 +55,7 @@ module Bolt
         project_specs.add_specs('name' => name)
         puppetfile = Resolver.new.resolve(project_specs, config)
       end
+      @outputter.stop_spin
 
       # Display the diff between the existing Puppetfile and the new Puppetfile.
       print_puppetfile_diff(existing_puppetfile, puppetfile)
@@ -155,7 +157,11 @@ module Bolt
         # and write a Puppetfile.
         if force || !path.exist?
           @outputter.print_action_step("Resolving module dependencies, this may take a moment")
+
+          # This doesn't use the block as it's more testable to just mock *_spin
+          @outputter.start_spin
           puppetfile = Resolver.new.resolve(specs, config)
+          @outputter.stop_spin
 
           # We get here either through 'bolt module install' which uses the
           # managed modulepath (which isn't configurable) or through bolt
@@ -184,7 +190,9 @@ module Bolt
     #
     def install_puppetfile(path, moduledir, config = {})
       @outputter.print_action_step("Syncing modules from #{path} to #{moduledir}")
+      @outputter.start_spin
       ok = Installer.new(config).install(path, moduledir)
+      @outputter.stop_spin
 
       # Automatically generate types after installing modules
       @outputter.print_action_step("Generating type references")

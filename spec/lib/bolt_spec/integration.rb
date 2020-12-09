@@ -18,7 +18,7 @@ module BoltSpec
       allow(cli).to receive(:analytics).and_return(Bolt::Analytics::NoopClient.new)
 
       output =  StringIO.new
-      outputter = outputter.new(false, false, false, output)
+      outputter = outputter.new(false, false, false, false, output)
       allow(cli).to receive(:outputter).and_return(outputter)
       allow(Bolt::Logger).to receive(:configure)
 

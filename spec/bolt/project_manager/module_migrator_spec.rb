@@ -24,6 +24,7 @@ describe Bolt::ProjectManager::ModuleMigrator do
     double('outputter',
            print_message: nil,
            print_action_step: nil,
+           spin: nil,
            print_action_error: nil)
   }
   let(:project_config) { {} }
@@ -40,6 +41,8 @@ describe Bolt::ProjectManager::ModuleMigrator do
 
   before(:each) do
     File.write(project.project_file, project_config)
+    allow(outputter).to receive(:start_spin)
+    allow(outputter).to receive(:stop_spin)
   end
 
   context 'with modules configured' do

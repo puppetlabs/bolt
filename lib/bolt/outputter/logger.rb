@@ -6,7 +6,7 @@ module Bolt
   class Outputter
     class Logger < Bolt::Outputter
       def initialize(verbose, trace)
-        super(false, verbose, trace)
+        super(false, verbose, trace, false)
         @logger = Bolt::Logger.logger(self)
       end
 

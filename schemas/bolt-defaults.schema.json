@@ -45,6 +45,9 @@
     },
     "save-rerun": {
       "$ref": "#/definitions/save-rerun"
+    },
+    "spinner": {
+      "$ref": "#/definitions/spinner"
     }
   },
   "definitions": {
@@ -309,6 +312,10 @@
     },
     "save-rerun": {
       "description": "Whether to update `.rerun.json` in the Bolt project directory. If your target names include passwords, set this value to `false` to avoid writing passwords to disk.",
+      "type": "boolean"
+    },
+    "spinner": {
+      "description": "Whether to print a spinner to the console for long-running Bolt operations.",
       "type": "boolean"
     },
     "transport": {

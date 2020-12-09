@@ -14,12 +14,13 @@ module Bolt
 
       def print_head; end
 
-      def initialize(color, verbose, trace, stream = $stdout)
+      def initialize(color, verbose, trace, spin, stream = $stdout)
         super
         # Plans and without_default_logging() calls can both be nested, so we
         # track each of them with a "stack" consisting of an integer.
         @plan_depth = 0
         @disable_depth = 0
+        @pinwheel = %w[- \\ | /]
       end
 
       def colorize(color, string)
@@ -28,6 +29,24 @@ module Bolt
         else
           string
         end
+      end
+
+      def start_spin
+        return unless @spin
+        @spin = true
+        @spin_thread = Thread.new do
+          loop do
+            sleep(0.1)
+            @stream.print(colorize(:cyan, @pinwheel.rotate!.first + "\b"))
+          end
+        end
+      end
+
+      def stop_spin
+        return unless @spin
+        @spin_thread.terminate
+        @spin = false
+        @stream.print("\b")
       end
 
       def remove_trail(string)
