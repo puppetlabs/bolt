@@ -4,14 +4,16 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/project'
 
 describe "when runnning over the ssh transport", ssh: true do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::Project
 
   let(:whoami) { "whoami" }
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
+  let(:modulepath) { fixtures_path('modules') }
   let(:stdin_task) { "sample::stdin" }
   let(:uri) { conn_uri('ssh') }
   let(:user) { conn_info('ssh')[:user] }
@@ -81,94 +83,105 @@ describe "when runnning over the ssh transport", ssh: true do
     end
   end
 
-  context 'when using a configfile' do
+  context 'when using a project', :reset_puppet_settings do
     let(:config) do
       { 'format' => 'json',
-        'modulepath' => modulepath,
-        'ssh' => {
-          'user' => user,
-          'password' => password,
-          'host-key-check' => false
-        } }
+        'modulepath' => modulepath }
     end
-
-    let(:uri) { (1..2).map { |i| "#{conn_uri('ssh')}?id=#{i}" }.join(',') }
-    let(:config_flags) { %W[--targets #{uri}] }
-    let(:single_target_conf) { %W[--targets #{conn_uri('ssh')}] }
-    let(:interpreter_task) { 'sample::interpreter' }
+    let(:default_inv) do
+      { 'config' =>
+      { 'ssh' => {
+        'user' => user,
+        'password' => password,
+        'host-key-check' => false
+      } } }
+    end
+    let(:inv)                 { default_inv }
+    let(:uri)                 { (1..2).map { |i| "#{conn_uri('ssh')}?id=#{i}" }.join(',') }
+    let(:project)             { @project }
+    let(:config_flags)        { %W[--targets #{uri} --project #{project.path}] }
+    let(:single_target_conf)  { %W[--targets #{conn_uri('ssh')} --project #{project.path}] }
+    let(:interpreter_task)    { 'sample::interpreter' }
+    let(:run_as_conf) do
+      { 'config' => {
+        'ssh' => { 'run-as' => user }
+      } }
+    end
     let(:interpreter_ext) do
-      { 'interpreters' => {
-        '.py' => '/usr/bin/python3'
+      { 'config' => {
+        'ssh' => {
+          'interpreters' => {
+            '.py' => '/usr/bin/python3'
+          }
+        }
       } }
     end
     let(:interpreter_no_ext) do
-      { 'interpreters' => {
-        'py' => '/usr/bin/python3'
+      { 'config' => {
+        'ssh' => {
+          'interpreters' => {
+            'py' => '/usr/bin/python3'
+          }
+        }
       } }
     end
 
+    around :each do |example|
+      with_project(config: config, inventory: inv) do |project|
+        @project = project
+        example.run
+      end
+    end
+
     it 'runs multiple commands' do
-      with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_nodes(%W[command run #{whoami} --configfile #{conf.path}] + config_flags)
+      result = run_nodes(%W[command run #{whoami}] + config_flags)
+      expect(result.map { |r| r['stdout'].strip }).to eq([user, user])
+    end
+
+    it 'runs multiple tasks' do
+      result = run_nodes(%W[task run #{stdin_task} message=short] + config_flags)
+      expect(result.map { |r| r['message'].strip }).to eq(%w[short short])
+    end
+
+    context 'with run-as configured' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, run_as_conf) }
+
+      it 'runs multiple tasks as a specified user' do
+        result = run_nodes(%W[command run #{whoami} --sudo-password #{password}] + config_flags)
         expect(result.map { |r| r['stdout'].strip }).to eq([user, user])
       end
     end
 
-    it 'runs multiple tasks', :reset_puppet_settings do
-      with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_nodes(%W[task run #{stdin_task} message=somemessage --configfile #{conf.path}] + config_flags)
-        expect(result.map { |r| r['message'].strip }).to eq(%w[somemessage somemessage])
+    context 'with interpreters without dots configured' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_no_ext) }
+
+      it 'runs task with specified interpreter key py' do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
+      end
+
+      it 'runs task with specified interpreter that with run-as set' do
+        result = run_nodes(%W[task run #{interpreter_task} message=short
+                              --run-as root --sudo-password #{password}] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
       end
     end
 
-    it 'runs multiple tasks as a specified user', :reset_puppet_settings do
-      config['ssh']['run-as'] = user
+    context 'with interpreters with dots configured' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_ext) }
 
-      with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_nodes(%W[command run #{whoami} --configfile #{conf.path}
-                              --sudo-password #{password}] + config_flags)
-        expect(result.map { |r| r['stdout'].strip }).to eq([user, user])
+      it 'runs task with interpreter key .py' do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
       end
     end
 
-    it 'runs task with specified interpreter key py', :reset_puppet_settings do
-      ssh_conf = { 'ssh' => config['ssh'].merge(interpreter_no_ext) }
-      with_tempfile_containing('conf', YAML.dump(config.merge(ssh_conf))) do |conf|
-        result =
-          run_nodes(%W[task run #{interpreter_task} message=somemessage
-                       --configfile #{conf.path}] + config_flags)
-        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
-        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
-      end
-    end
-
-    it 'runs task with specified interpreter that with run-as set', :reset_puppet_settings do
-      ssh_conf = { 'ssh' => config['ssh'].merge(interpreter_no_ext) }
-      with_tempfile_containing('conf', YAML.dump(config.merge(ssh_conf))) do |conf|
-        result =
-          run_nodes(%W[task run #{interpreter_task} message=somemessage
-                       --configfile #{conf.path} --run-as root --sudo-password #{password}] + config_flags)
-        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
-        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
-      end
-    end
-
-    it 'runs task with interpreter key .py', :reset_puppet_settings do
-      ssh_conf = { 'ssh' => config['ssh'].merge(interpreter_ext) }
-      with_tempfile_containing('conf', YAML.dump(config.merge(ssh_conf))) do |conf|
-        result = run_nodes(%W[task run #{interpreter_task} message=somemessage
-                              --configfile #{conf.path}] + config_flags)
-        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
-        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
-      end
-    end
-
-    it 'task fails when bad shebang is not overriden', :reset_puppet_settings do
-      with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_failed_node(%W[task run #{interpreter_task} message=somemessage
-                                    --configfile #{conf.path}] + single_target_conf)
-        expect(result['_error']['msg']).to match(/interpreter.py: not found/)
-      end
+    it 'task fails when bad shebang is not overriden' do
+      result = run_failed_node(%W[task run #{interpreter_task} message=short] + single_target_conf)
+      expect(result['_error']['msg']).to match(/interpreter.py: not found/)
     end
   end
 end

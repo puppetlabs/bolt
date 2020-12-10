@@ -59,7 +59,7 @@ describe "installing puppetfiles" do
     mod 'tester-bar', git: 'file://#{@module_source}/bar', ref: 'master'
     PUPPETFILE
 
-    result = JSON.parse(run_cli(%W[puppetfile install --boltdir #{project}]))
+    result = JSON.parse(run_cli(%W[puppetfile install --project #{project}]))
 
     expect(result['success']).to eq(true)
     # Check that the files are identical instead of comparing the paths, since paths
@@ -68,11 +68,11 @@ describe "installing puppetfiles" do
     expect(File.identical?(result['moduledir'], File.join(project, 'modules'))).to be
     expect(Dir.exist?(File.join(project, '.resource_types')))
 
-    result = JSON.parse(run_cli(%W[task show --boltdir #{project}]))
+    result = JSON.parse(run_cli(%W[task show --project #{project}]))
     installed_tasks = Set.new(result['tasks'].map(&:first))
     expect(installed_tasks).to be_superset(Set.new(%w[foo::a foo::b bar::e bar::f]))
 
-    result = JSON.parse(run_cli(%W[plan show --boltdir #{project}]))
+    result = JSON.parse(run_cli(%W[plan show --project #{project}]))
     installed_plans = Set.new(result['plans'].map(&:first))
     expect(installed_plans).to be_superset(Set.new(%w[foo::c foo::d bar::g bar::h]))
   end

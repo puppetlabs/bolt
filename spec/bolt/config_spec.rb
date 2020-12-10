@@ -74,7 +74,7 @@ describe Bolt::Config do
 
     context "when loading user level config fails" do
       let(:user_path) do
-        Pathname.new(File.expand_path(['~', '.puppetlabs', 'etc', 'bolt', 'bolt.yaml'].join(File::SEPARATOR)))
+        Pathname.new(File.expand_path(['~', '.puppetlabs', 'etc', 'bolt', 'bolt-defaults.yaml'].join(File::SEPARATOR)))
       end
 
       it "doesn't load user level config and continues" do

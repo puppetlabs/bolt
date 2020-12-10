@@ -3,11 +3,13 @@
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/project'
 
 describe "when running a plan using run_as", ssh: true do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::Project
 
   let(:modulepath) { File.join(__dir__, '../fixtures/run_as') }
   let(:uri) { conn_uri('ssh', include_password: true) }
@@ -83,11 +85,11 @@ describe "when running a plan using run_as", ssh: true do
 
     it 'runs a plan containing run_* functions with user specified by _run_as taking priority' do
       run_as_config = { 'transport' => 'ssh', 'ssh' => { 'run-as' => non_existent_user.to_s } }
-      with_tempfile_containing('conf', YAML.dump(run_as_config)) do |conf|
+      with_project(config: run_as_config) do |project|
         non_root = 'test'
         params = { target: uri, user: non_root }
-        config_array = config_flags + %W[--configfile #{conf.path}]
-        output = run_cli(['plan', 'run', 'test::run_as_user', "--params", params.to_json] + config_array)
+        config_array = config_flags + %W[--project #{project.path} --params #{params.to_json}]
+        output = run_cli(%w[plan run test::run_as_user] + config_array)
         parsed = JSON.parse(output)[0]
         expect(parsed['value']['stdout']).to eq("#{non_root}\n")
         expect(parsed['status']).to eq('success')

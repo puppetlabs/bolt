@@ -16,18 +16,18 @@ TEST_VERSIONS = [
 
 describe 'apply', expensive: true do
   include BoltSpec::Conn
+  include BoltSpec::Files
   include BoltSpec::Integration
   include BoltSpec::Project
   include BoltSpec::PuppetAgent
   include BoltSpec::Run
 
   let(:project) { @project }
-
   let(:project_config) do
     {
       'apply_settings' => { 'show_diff' => true },
-      'hiera-config'   => File.join(__dir__, '../fixtures/configs/empty.yml'),
-      'modulepath'     => File.join(__dir__, '../fixtures/apply')
+      'hiera-config'   => fixtures_path('hiera', 'empty.yaml'),
+      'modulepath'     => fixtures_path('apply')
     }
   end
 

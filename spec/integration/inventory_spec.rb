@@ -64,7 +64,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   let(:config_flags) {
     ['--format', 'json',
      '--inventoryfile', @inventoryfile,
-     '--configfile', fixtures_path('configs', 'empty.yml'),
+     '--project', fixtures_path('configs', 'empty'),
      '--modulepath', modulepath,
      '--password', conn[:password]]
   }
@@ -373,7 +373,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     let(:config_flags) {
       ['--format', 'json',
        '--inventoryfile', @inventoryfile,
-       '--configfile', fixtures_path('configs', 'empty.yml'),
+       '--project', fixtures_path('configs', 'empty'),
        '--modulepath', modulepath]
     }
 

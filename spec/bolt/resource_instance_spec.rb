@@ -73,18 +73,18 @@ describe Bolt::ResourceInstance do
     it 'shallow merges with existing state' do
       resource_data['state'] = {
         'ensure' => 'present',
-        'source' => '/etc/puppetlabs/bolt/bolt.yaml',
+        'source' => '/etc/puppetlabs/bolt/bolt-defaults.yaml',
         'foo'    => { 'bar' => true }
       }
 
       resource.set_state(
-        'source' => '/Users/.puppetlabs/bolt/bolt.yaml',
+        'source' => '/Users/.puppetlabs/etc/bolt/bolt-defaults.yaml',
         'foo'    => { 'baz' => false }
       )
 
       expect(resource.state).to eq(
         'ensure' => 'present',
-        'source' => '/Users/.puppetlabs/bolt/bolt.yaml',
+        'source' => '/Users/.puppetlabs/etc/bolt/bolt-defaults.yaml',
         'foo'    => { 'baz' => false }
       )
     end
@@ -97,11 +97,11 @@ describe Bolt::ResourceInstance do
   context '#overwrite_state' do
     it 'overwrites existing state' do
       resource.overwrite_state(
-        'source' => '/Users/.puppetlabs/bolt/bolt.yaml'
+        'source' => '/Users/.puppetlabs/etc/bolt/bolt-defaults.yaml'
       )
 
       expect(resource.state).to eq(
-        'source' => '/Users/.puppetlabs/bolt/bolt.yaml'
+        'source' => '/Users/.puppetlabs/etc/bolt/bolt-defaults.yaml'
       )
     end
 
@@ -114,18 +114,18 @@ describe Bolt::ResourceInstance do
     it 'shallow merges with existing desired state' do
       resource_data['desired_state'] = {
         'ensure' => 'present',
-        'source' => '/etc/puppetlabs/bolt/bolt.yaml',
+        'source' => '/etc/puppetlabs/bolt/bolt-defaults.yaml',
         'foo'    => { 'bar' => true }
       }
 
       resource.set_desired_state(
-        'source' => '/Users/.puppetlabs/bolt/bolt.yaml',
+        'source' => '/Users/.puppetlabs/etc/bolt/bolt-defaults.yaml',
         'foo'    => { 'baz' => false }
       )
 
       expect(resource.desired_state).to eq(
         'ensure' => 'present',
-        'source' => '/Users/.puppetlabs/bolt/bolt.yaml',
+        'source' => '/Users/.puppetlabs/etc/bolt/bolt-defaults.yaml',
         'foo'    => { 'baz' => false }
       )
     end
@@ -138,11 +138,11 @@ describe Bolt::ResourceInstance do
   context '#overwrite_desired_state' do
     it 'overwrites existing desired state' do
       resource.overwrite_desired_state(
-        'source' => '/Users/.puppetlabs/bolt/bolt.yaml'
+        'source' => '/Users/.puppetlabs/etc/bolt/bolt-defaults.yaml'
       )
 
       expect(resource.desired_state).to eq(
-        'source' => '/Users/.puppetlabs/bolt/bolt.yaml'
+        'source' => '/Users/.puppetlabs/etc/bolt/bolt-defaults.yaml'
       )
     end
 

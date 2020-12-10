@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 require 'bolt_spec/files'
-require 'bolt_spec/task'
 require 'bolt_spec/project'
+require 'bolt_spec/task'
 require 'bolt/cli'
 require 'bolt/util'
 require 'concurrent/utility/processor_counter'
@@ -2474,12 +2474,12 @@ describe "Bolt::CLI" do
     end
   end
 
-  describe 'configfile' do
-    let(:configdir) { File.join(__dir__, '..', 'fixtures', 'configs') }
-    let(:modulepath) { [File.expand_path('/foo/bar'), File.expand_path('/baz/qux')] }
-    let(:complete_config) do
+  describe 'project' do
+    let(:configdir)     { fixtures_path('configs', 'default') }
+    let(:modulepath)    { [File.expand_path('/foo/bar'), File.expand_path('/baz/qux')] }
+    let(:config_flags)  { %w[--targets foo --no-ssl --no-host-key-check] }
+    let(:project_config) do
       { 'modulepath' => modulepath.join(File::PATH_SEPARATOR),
-        'inventoryfile' => File.join(__dir__, '..', 'fixtures', 'inventory', 'empty.yml'),
         'concurrency' => 14,
         'compile-concurrency' => 2,
         'format' => 'json',
@@ -2491,7 +2491,11 @@ describe "Bolt::CLI" do
             'level' => 'debug',
             'append' => false
           }
-        },
+        } }
+    end
+
+    let(:inventory) do
+      { 'config' => {
         'ssh' => {
           'private-key' => '/bar/foo',
           'host-key-check' => false,
@@ -2510,157 +2514,140 @@ describe "Bolt::CLI" do
           'service-url' => 'http://foo.org',
           'token-file' => '/path/to/token',
           'cacert' => '/path/to/cacert'
-        } }
+        }
+      } }
     end
 
     before(:each) do
       allow(Bolt::Util).to receive(:validate_file).and_return(true)
     end
 
-    it 'reads modulepath' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
-        cli.parse
-        expect(cli.config.modulepath).to eq(modulepath)
+    around :each do |example|
+      in_project(config: project_config, inventory: inventory) do
+        example.run
       end
+    end
+
+    it 'reads modulepath' do
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      expect(cli.config.modulepath).to eq(modulepath)
     end
 
     it 'reads concurrency' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
-        cli.parse
-        expect(cli.config.concurrency).to eq(14)
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      expect(cli.config.concurrency).to eq(14)
     end
 
     it 'reads compile-concurrency' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
-        cli.parse
-        expect(cli.config.compile_concurrency).to eq(2)
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      expect(cli.config.compile_concurrency).to eq(2)
     end
 
     it 'reads format' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
-        cli.parse
-        expect(cli.config.format).to eq('json')
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      expect(cli.config.format).to eq('json')
     end
 
     it 'reads log file' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
-        cli.parse
-        normalized_path = File.expand_path(File.join(configdir, 'debug.log'))
-        expect(cli.config.log).to include('console' => { level: 'warn' })
-        expect(cli.config.log).to include("file:#{normalized_path}" => { level: 'debug', append: false })
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      normalized_path = File.expand_path(File.join(configdir, 'debug.log'))
+      expect(cli.config.log).to include('console' => { level: 'warn' })
+      expect(cli.config.log).to include("file:#{normalized_path}" => { level: 'debug', append: false })
     end
 
     it 'reads private-key for ssh' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check])
-        cli.parse
-        expect(cli.config.transports['ssh']['private-key']).to match(%r{/bar/foo\z})
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['ssh']['private-key']).to match(%r{/bar/foo\z})
     end
 
     it 'reads host-key-check for ssh' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
-        cli.parse
-        expect(cli.config.transports['ssh']['host-key-check']).to eq(false)
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['ssh']['private-key']).to match(%r{/bar/foo\z})
+      expect(cli.options[:targets].first.config['ssh']['host-key-check']).to eq(false)
     end
 
     it 'reads run-as for ssh' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(
-          %W[command run r --configfile #{conf.path} --targets foo --password bar --no-host-key-check]
-        )
-        cli.parse
-        expect(cli.config.transports['ssh']['run-as']).to eq('Fakey McFakerson')
-      end
+      cli = Bolt::CLI.new(%w[command run r --password bar] + config_flags)
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['ssh']['run-as']).to eq('Fakey McFakerson')
     end
 
     it 'reads separate connect-timeout for ssh and winrm' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check --no-ssl])
-        cli.parse
-        expect(cli.config.transports['ssh']['connect-timeout']).to eq(4)
-        expect(cli.config.transports['winrm']['connect-timeout']).to eq(7)
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['ssh']['connect-timeout']).to eq(4)
+      expect(cli.options[:targets].first.config['winrm']['connect-timeout']).to eq(7)
     end
 
     it 'reads ssl for winrm' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
-        cli.parse
-        expect(cli.config.transports['winrm']['ssl']).to eq(false)
-      end
+      cli = Bolt::CLI.new(%w[command run uptime --targets foo])
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['winrm']['ssl']).to eq(false)
     end
 
     it 'reads ssl-verify for winrm' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
-        cli.parse
-        expect(cli.config.transports['winrm']['ssl-verify']).to eq(false)
-      end
+      cli = Bolt::CLI.new(%w[command run uptime --targets foo])
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['winrm']['ssl-verify']).to eq(false)
     end
 
     it 'reads extensions for winrm' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-ssl])
-        cli.parse
-        expect(cli.config.transports['winrm']['extensions']).to eq(['.py', '.bat'])
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['winrm']['extensions']).to eq(['.py', '.bat'])
     end
 
     it 'reads task environment for pcp' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
-        cli.parse
-        expect(cli.config.transports['pcp']['task-environment']).to eq('testenv')
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['pcp']['task-environment']).to eq('testenv')
     end
 
     it 'reads service url for pcp' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
-        cli.parse
-        expect(cli.config.transports['pcp']['service-url']).to eql('http://foo.org')
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['pcp']['service-url']).to eql('http://foo.org')
     end
 
     it 'reads token file for pcp' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo])
-        cli.parse
-        expect(cli.config.transports['pcp']['token-file']).to match(%r{/path/to/token\z})
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['pcp']['token-file']).to match(%r{/path/to/token\z})
     end
 
     it 'reads separate cacert file for pcp and winrm' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --no-host-key-check --no-ssl])
-        cli.parse
-        expect(cli.config.transports['pcp']['cacert']).to match(%r{/path/to/cacert\z})
-        expect(cli.config.transports['winrm']['cacert']).to match(%r{/path/to/winrm-cacert\z})
-      end
+      cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
+      cli.parse
+      cli.update_targets(cli.options)
+      expect(cli.options[:targets].first.config['pcp']['cacert']).to match(%r{/path/to/cacert\z})
+      expect(cli.options[:targets].first.config['winrm']['cacert']).to match(%r{/path/to/winrm-cacert\z})
     end
 
     it 'CLI flags override config' do
-      with_tempfile_containing('conf', YAML.dump(complete_config)) do |conf|
-        cli = Bolt::CLI.new(%W[command run uptime --configfile #{conf.path} --targets foo --concurrency 12])
-        cli.parse
-        expect(cli.config.concurrency).to eq(12)
-      end
+      cli = Bolt::CLI.new(%w[command run uptime --concurrency 12] + config_flags)
+      cli.parse
+      expect(cli.config.concurrency).to eq(12)
     end
 
     it 'raises an error if a config file is specified and invalid' do
-      cli = Bolt::CLI.new(%W[command run uptime --configfile #{File.join(configdir, 'invalid.yml')} --targets foo])
+      cli = Bolt::CLI.new(%W[command run uptime --project #{fixtures_path('configs', 'invalid')} --targets foo])
       expect {
         cli.parse
       }.to raise_error(Bolt::FileError, /Could not parse/)
@@ -2668,11 +2655,11 @@ describe "Bolt::CLI" do
   end
 
   describe 'inventoryfile' do
-    let(:inventorydir) { File.join(__dir__, '..', 'fixtures', 'configs') }
+    let(:invalid_inventory) { fixtures_path('inventory', 'invalid.yaml') }
 
     it 'raises an error if an inventory file is specified and invalid' do
       cli = Bolt::CLI.new(
-        %W[command run uptime --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --targets foo]
+        %W[command run uptime --inventoryfile #{invalid_inventory} --targets foo]
       )
       expect {
         cli.update_targets(cli.parse)
@@ -2702,7 +2689,7 @@ describe "Bolt::CLI" do
       after(:each) { ENV.delete('BOLT_INVENTORY') }
 
       it 'errors when BOLT_INVENTORY is set' do
-        cli = Bolt::CLI.new(%W[command run id --inventoryfile #{File.join(inventorydir, 'invalid.yml')} --targets foo])
+        cli = Bolt::CLI.new(%W[command run id --inventoryfile #{invalid_inventory} --targets foo])
         expect {
           cli.parse
         }.to raise_error(Bolt::Error, /BOLT_INVENTORY is set/)
@@ -2734,7 +2721,7 @@ describe "Bolt::CLI" do
     end
 
     context 'when inventory file is set' do
-      let(:inventoryfile) { File.join(__dir__, '..', 'fixtures', 'configs', 'empty.yml') }
+      let(:inventoryfile) { fixtures_path('inventory', 'empty.yaml') }
       it "warns when BOLT_INVENTORY data is detected and CLI option could be overridden" do
         cli = Bolt::CLI.new(%W[command run whoami -t foo --password bar --inventoryfile #{inventoryfile}])
         cli.parse
@@ -2751,7 +2738,7 @@ describe "Bolt::CLI" do
       FileUtils.touch(File.join(pwd, 'bolt.yaml'))
       File.write(File.join(pwd, 'bolt-project.yaml'), { 'format' => 'json' }.to_yaml)
 
-      cli = Bolt::CLI.new(%W[command run whoami -t foo --boltdir #{pwd}])
+      cli = Bolt::CLI.new(%W[command run whoami -t foo --project #{pwd}])
       cli.parse
 
       output = @log_output.readlines
