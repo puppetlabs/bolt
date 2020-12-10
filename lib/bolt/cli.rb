@@ -858,6 +858,10 @@ module Bolt
         raise Bolt::CLIError,
               "Unable to use command '#{old_command}' when 'modules' is configured in "\
               "bolt-project.yaml. Use '#{new_command}' instead."
+      elsif modules.nil? && options[:subcommand] == 'puppetfile'
+        msg = "Command '#{old_command}' is deprecated and will be removed in Bolt 3.0. Update your project to use "\
+              "the module management feature. For more information, see https://pup.pt/bolt-module-migrate."
+        Bolt::Logger.deprecation_warning('puppetfile command', msg)
       elsif modules.nil? && options[:subcommand] == 'module'
         msg  = "Unable to use command '#{new_command}' when 'modules' is not configured in "\
                "bolt-project.yaml. "
