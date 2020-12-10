@@ -10,6 +10,9 @@ describe 'caching plugins' do
   include BoltSpec::Integration
   include BoltSpec::Project
 
+  let(:project) { @project }
+  let(:project_path) { @project.path }
+  let(:inventory) { nil }
   let(:mpath) { fixture_path('plugin_modules') }
   let(:plan) do
     <<~PLAN
@@ -20,14 +23,15 @@ describe 'caching plugins' do
   end
 
   around(:each) do |example|
-    with_project('cache_test') do
+    with_project('cache_test', inventory: inventory) do |project|
+      @project = project
+
       ENV['BOLT_TEST_PLUGIN_VALUE'] = 'player_one'
       if plan
         FileUtils.mkdir_p(File.join(project_path, 'plans'))
         File.write(File.join(project_path, 'plans', 'init.pp'), plan)
       end
 
-      File.write(File.join(project_path, 'inventory.yaml'), inventory.to_yaml) if inventory
       example.run
     end
   end

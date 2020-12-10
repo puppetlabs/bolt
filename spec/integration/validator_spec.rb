@@ -8,14 +8,20 @@ describe 'validating config' do
   include BoltSpec::Project
 
   around(:each) do |example|
-    with_project do
-      File.write((@project_path + 'inventory.yaml'), inventory.to_yaml)
+    with_project_directory(config: project_config, inventory: inventory) do |project_path|
+      @project_path = project_path
       example.run
     end
   end
 
-  let(:command)   { %w[inventory show --targets all] }
-  let(:inventory) { {} }
+  before(:each) do
+    allow($stderr).to receive(:puts)
+    allow($stdout).to receive(:puts)
+  end
+
+  let(:command)        { %W[inventory show --targets all --project #{@project_path}] }
+  let(:inventory)      { nil }
+  let(:project_config) { nil }
 
   context 'with valid config' do
     let(:project_config) do
@@ -54,7 +60,7 @@ describe 'validating config' do
     end
 
     it 'does not error' do
-      expect { run_cli(command, project: project) }.not_to raise_error
+      expect { run_cli(command) }.not_to raise_error
     end
   end
 
@@ -96,7 +102,7 @@ describe 'validating config' do
     end
 
     it 'raises an error listing all errors in config' do
-      expect { run_cli(command, project: project) }.to raise_error do |error|
+      expect { run_cli(command) }.to raise_error do |error|
         expect(error.kind).to eq('bolt/validation-error')
 
         expect(error.message.lines).to include(
@@ -172,7 +178,7 @@ describe 'validating config' do
     end
 
     it 'does not error' do
-      expect { run_cli(command, project: project) }.not_to raise_error
+      expect { run_cli(command) }.not_to raise_error
     end
   end
 
@@ -229,7 +235,7 @@ describe 'validating config' do
     end
 
     it 'raises an error listing all errors in inventory' do
-      expect { run_cli(command, project: project) }.to raise_error do |error|
+      expect { run_cli(command) }.to raise_error do |error|
         expect(error.kind).to eq('bolt/validation-error')
 
         expect(error.message.lines).to include(
@@ -257,7 +263,7 @@ describe 'validating config' do
     end
 
     it 'warns about unknown options' do
-      run_cli(command, project: project)
+      run_cli(command)
 
       expect(@log_output.readlines).to include(
         /WARN.*Unknown option 'unknown' at.*bolt-project.yaml/,
@@ -291,7 +297,7 @@ describe 'validating config' do
     end
 
     it 'warns about unknown options' do
-      run_cli(command, project: project)
+      run_cli(command)
 
       expect(@log_output.readlines).to include(
         /WARN.*Unknown option 'alias' at 'groups.0' at.*inventory.yaml/,
@@ -370,7 +376,7 @@ describe 'validating config' do
     end
 
     it 'does not error' do
-      expect { run_cli(command, project: project) }.not_to raise_error
+      expect { run_cli(command) }.not_to raise_error
     end
   end
 end

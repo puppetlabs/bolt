@@ -1,58 +1,58 @@
 # frozen_string_literal: true
 
+require 'bolt/project'
+
 module BoltSpec
   module Project
-    def with_project(name = 'project')
-      @project_name = name
+    # Creates the project directory structure with config and inventory
+    # files. Yields the path to the project.
+    #
+    def with_project_directory(name = 'project', config: nil, inventory: nil, boltdir: false)
       Dir.mktmpdir(nil, Dir.pwd) do |tmpdir|
-        @tmpdir       = Pathname.new(tmpdir).expand_path
-        @project_path = (@tmpdir + name).expand_path
-        @config_path  = (@project_path + 'bolt-project.yaml').expand_path
+        # Build project paths
+        tmpdir         = Pathname.new(tmpdir).expand_path
+        project_path   = boltdir ? (tmpdir + name + 'Boltdir') : (tmpdir + name)
+        config_path    = project_path + 'bolt-project.yaml'
+        inventory_path = project_path + 'inventory.yaml'
 
-        FileUtils.mkdir_p(@project_path)
-        File.write(@config_path, project_config.to_yaml)
-        yield
+        # Set default config and inventory if not provided
+        config    ||= { 'name' => name }
+        inventory ||= {}
+
+        # Create project directory and files
+        FileUtils.mkdir_p(project_path)
+        File.write(config_path, config.to_yaml)
+        File.write(inventory_path, inventory.to_yaml)
+
+        yield(project_path)
       end
     end
 
-    def in_project(name = 'project')
-      with_project(name) do
-        Dir.chdir(@project_path) do
-          yield
+    # Creates a project directory structure and yields a Bolt::Project
+    # instance.
+    #
+    def with_project(name = 'project', **kwargs)
+      with_project_directory(name, kwargs) do |project_path|
+        project = Bolt::Project.create_project(project_path)
+        yield(project)
+      end
+    end
+
+    # Creates a project directory structure and changes the current
+    # working directory to the project. Yields a Bolt::Project instance.
+    #
+    def in_project(name = 'project', **kwargs)
+      with_project(name, kwargs) do |project|
+        Dir.chdir(project.path) do
+          yield(project)
         end
       end
     end
 
-    def with_boltdir
-      with_project do
-        @project_path += 'Boltdir'
-        FileUtils.mkdir_p(@project_path)
-        yield
-      end
-    end
-
-    def tmpdir
-      @tmpdir
-    end
-
-    def project_path
-      @project_path
-    end
-
-    def config_path
-      @config_path
-    end
-
-    def project_config
-      { 'name' => @project_name }
-    end
-
-    def project
-      @project ||= Bolt::Project.create_project(project_path)
-    end
-
-    def delete_config
-      FileUtils.rm(@config_path)
+    # Creates a Bolt::Project instance.
+    #
+    def make_project(project_path)
+      Bolt::Project.make_project(project_path)
     end
   end
 end

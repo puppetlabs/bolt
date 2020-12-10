@@ -7,14 +7,18 @@ require 'bolt_spec/project'
 describe Bolt::Config do
   include BoltSpec::Project
 
-  let(:system_path)   { Bolt::Config.system_path }
-  let(:user_path)     { Bolt::Config.user_path }
-  let(:config_name)   { Bolt::Config::BOLT_CONFIG_NAME }
-  let(:defaults_name) { Bolt::Config::BOLT_DEFAULTS_NAME }
-  let(:logfile)       { 'bolt.log' }
+  let(:system_path)    { Bolt::Config.system_path }
+  let(:user_path)      { Bolt::Config.user_path }
+  let(:config_name)    { Bolt::Config::BOLT_CONFIG_NAME }
+  let(:defaults_name)  { Bolt::Config::BOLT_DEFAULTS_NAME }
+  let(:logfile)        { 'bolt.log' }
+  let(:project_config) { nil }
+  let(:project)        { @project }
+  let(:tmpdir)         { project.path.parent }
 
   around(:each) do |example|
-    with_project do
+    with_project(config: project_config) do |project|
+      @project = project
       example.run
     end
   end
@@ -83,22 +87,22 @@ describe Bolt::Config do
     end
 
     it 'prefers bolt-project.yaml to bolt.yaml with config' do
-      File.write(File.join(@tmpdir, 'bolt.yaml'), { 'format' => 'json' }.to_yaml)
-      File.write(File.join(@tmpdir, 'bolt-project.yaml'), { 'format' => 'human' }.to_yaml)
+      File.write(File.join(tmpdir, 'bolt.yaml'), { 'format' => 'json' }.to_yaml)
+      File.write(File.join(tmpdir, 'bolt-project.yaml'), { 'format' => 'human' }.to_yaml)
 
-      config = Bolt::Config.from_project(Bolt::Project.create_project(@tmpdir))
+      config = Bolt::Config.from_project(Bolt::Project.create_project(tmpdir))
       expect(config.data['format']).to eq('human')
-      expect(config.project.config_file.to_s).to eq(File.join(@tmpdir, 'bolt-project.yaml'))
+      expect(config.project.config_file.to_s).to eq(File.join(tmpdir, 'bolt-project.yaml'))
     end
 
     # This should be removed when bolt.yaml deprecation is removed
     it 'prefers bolt.yaml to bolt-project.yaml with no config' do
-      File.write(File.join(@tmpdir, 'bolt.yaml'), { 'format' => 'json' }.to_yaml)
-      File.write(File.join(@tmpdir, 'bolt-project.yaml'), { 'name' => 'human' }.to_yaml)
+      File.write(File.join(tmpdir, 'bolt.yaml'), { 'format' => 'json' }.to_yaml)
+      File.write(File.join(tmpdir, 'bolt-project.yaml'), { 'name' => 'human' }.to_yaml)
 
-      config = Bolt::Config.from_project(Bolt::Project.create_project(@tmpdir))
+      config = Bolt::Config.from_project(Bolt::Project.create_project(tmpdir))
       expect(config.data['format']).to eq('json')
-      expect(config.project.config_file.to_s).to eq(File.join(@tmpdir, 'bolt.yaml'))
+      expect(config.project.config_file.to_s).to eq(File.join(tmpdir, 'bolt.yaml'))
     end
   end
 
@@ -495,14 +499,14 @@ describe Bolt::Config do
   end
 
   describe '#modulepath' do
-    let(:project_config)    { { 'modules' => [] } }
-    let(:config)            { Bolt::Config.from_project(project) }
-    let(:managed_moduledir) { (project_path + '.modules').to_s }
-    let(:overrides)         { { 'modulepath' => managed_moduledir } }
+    let(:config)    { Bolt::Config.from_project(project) }
+    let(:overrides) { { 'modulepath' => project.managed_moduledir.to_s } }
 
     context 'with modules configured' do
+      let(:project_config) { { 'modules' => [] } }
+
       it 'appends the managed moduledir to the modulepath' do
-        expect(config.modulepath[-1]).to eq(managed_moduledir)
+        expect(config.modulepath[-1]).to eq(project.managed_moduledir.to_s)
       end
 
       it 'errors if the user configures the managed moduledir' do
@@ -511,12 +515,10 @@ describe Bolt::Config do
     end
 
     context 'with modules not configured' do
-      before(:each) do
-        delete_config
-      end
+      let(:project_config) { nil }
 
       it 'does not append the managed moduledir to the modulepath' do
-        expect(config.modulepath).not_to include(managed_moduledir)
+        expect(config.modulepath).not_to include(project.managed_moduledir.to_s)
       end
 
       it 'does not error if the user configured the managed moduledir' do

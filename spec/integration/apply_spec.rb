@@ -21,6 +21,8 @@ describe 'apply', expensive: true do
   include BoltSpec::PuppetAgent
   include BoltSpec::Run
 
+  let(:project) { @project }
+
   let(:project_config) do
     {
       'apply_settings' => { 'show_diff' => true },
@@ -77,8 +79,8 @@ describe 'apply', expensive: true do
       # Set up a project directory for the tests. Include an inventory file so Bolt
       # can actually connect to the targets.
       around(:each) do |example|
-        with_project do
-          File.write(project.inventory_file, docker_inventory(root: true).to_yaml)
+        with_project(config: project_config, inventory: docker_inventory(root: true)) do |project|
+          @project = project
           example.run
         end
       end
@@ -170,7 +172,7 @@ describe 'apply', expensive: true do
 
       context 'with the apply command' do
         it "applies a manifest" do
-          manifest = project_path + 'manifest.pp'
+          manifest = project.path + 'manifest.pp'
           File.write(manifest, 'include basic')
 
           results = run_cli_json(%W[apply #{manifest} -t nix_agents], project: project)
@@ -184,7 +186,7 @@ describe 'apply', expensive: true do
         end
 
         it "applies with noop" do
-          manifest = project_path + 'manifest.pp'
+          manifest = project.path + 'manifest.pp'
           File.write(manifest, 'include basic')
 
           results = run_cli_json(%W[apply #{manifest} --noop -t nix_agents], project: project)
@@ -262,8 +264,8 @@ describe 'apply', expensive: true do
       # Set up a project directory for the tests. Include an inventory file so Bolt
       # can actually connect to the target.
       around(:each) do |example|
-        with_project do
-          File.write(project.inventory_file, inventory.to_yaml)
+        with_project(config: project_config, inventory: inventory) do |project|
+          @project = project
           example.run
         end
       end
@@ -439,8 +441,8 @@ describe 'apply', expensive: true do
 
   describe 'over winrm on Windows with Puppet Agents', windows_agents: true do
     around(:each) do |example|
-      with_project do
-        File.write(project.inventory_file, conn_inventory.to_yaml)
+      with_project(config: project_config, inventory: conn_inventory) do |project|
+        @project = project
         example.run
       end
     end

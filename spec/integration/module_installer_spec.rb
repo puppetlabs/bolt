@@ -8,9 +8,11 @@ describe 'installing modules' do
   include BoltSpec::Project
 
   let(:command) { %w[module install] }
+  let(:project) { @project }
 
   around(:each) do |example|
-    with_project do
+    with_project(config: project_config) do |project|
+      @project = project
       example.run
     end
   end

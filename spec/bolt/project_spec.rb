@@ -7,6 +7,19 @@ require 'bolt_spec/project'
 describe Bolt::Project do
   include BoltSpec::Project
 
+  let(:project)        { Bolt::Project.create_project(@project_path) }
+  let(:boltdir)        { false }
+  let(:project_config) { nil }
+  let(:project_path)   { @project_path }
+  let(:tmpdir)         { @project_path.parent }
+
+  around(:each) do |example|
+    with_project_directory(config: project_config, boltdir: boltdir) do |project_path|
+      @project_path = project_path
+      example.run
+    end
+  end
+
   it "loads from system-wide config path if homedir expansion fails" do
     allow(File).to receive(:expand_path).and_call_original
     allow(File)
@@ -20,12 +33,6 @@ describe Bolt::Project do
 
   describe "configuration" do
     let(:project_config) { { 'tasks' => ['facts'] } }
-
-    around(:each) do |example|
-      with_project do
-        example.run
-      end
-    end
 
     it "loads config with defaults" do
       expect(project.tasks).to eq(project_config['tasks'])
@@ -84,11 +91,8 @@ describe Bolt::Project do
   end
 
   describe "::find_boltdir" do
-    around(:each) do |example|
-      with_boltdir do
-        example.run
-      end
-    end
+    let(:boltdir) { true }
+    let(:tmpdir)  { project_path.parent.parent }
 
     describe "when the project directory is named Boltdir" do
       it 'finds project from inside project' do
@@ -132,8 +136,8 @@ describe Bolt::Project do
       end
 
       it 'prefers a directory called Boltdir over the local directory' do
-        FileUtils.touch(project_path.parent + 'bolt.yaml')
-        expect(Bolt::Project.find_boltdir(project_path.parent)).to eq(project)
+        FileUtils.touch(project.path.parent + 'bolt.yaml')
+        expect(Bolt::Project.find_boltdir(project.path.parent)).to eq(project)
       end
 
       it 'prefers a directory called Boltdir over the parent directory' do
@@ -199,25 +203,22 @@ describe Bolt::Project do
   end
 
   describe '#modulepath' do
-    let(:project_config) { { 'modules' => [] } }
+    context 'with modules set' do
+      let(:project_config) { { 'modules' => [] } }
 
-    around(:each) do |example|
-      with_project do
-        example.run
+      it 'returns the new default modulepath' do
+        expect(project.modulepath).to match_array([(project.path + 'modules').to_s])
       end
     end
 
-    it 'returns the new default modulepath if modules is set' do
-      expect(project.modulepath).to match_array([(project_path + 'modules').to_s])
-    end
-
-    it 'returns the old default modulepath if modules is not set' do
-      delete_config
-      expect(project.modulepath).to match_array([
-                                                  (project_path + 'modules').to_s,
-                                                  (project_path + 'site-modules').to_s,
-                                                  (project_path + 'site').to_s
-                                                ])
+    context 'without modules set' do
+      it 'returns the old default modulepath if modules is not set' do
+        expect(project.modulepath).to match_array([
+                                                    (project.path + 'modules').to_s,
+                                                    (project.path + 'site-modules').to_s,
+                                                    (project.path + 'site').to_s
+                                                  ])
+      end
     end
   end
 end

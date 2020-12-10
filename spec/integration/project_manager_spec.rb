@@ -9,11 +9,13 @@ describe 'managing a project' do
 
   context 'creating a project' do
     let(:command) { %w[project init myproject --modules puppetlabs-yaml] }
+    let(:project) { @project }
 
     # Execute from a temporary project directory.
     around(:each) do |example|
-      in_project do
-        delete_config
+      in_project do |project|
+        @project = project
+        FileUtils.rm(project.project_file)
         example.run
       end
     end
@@ -27,9 +29,9 @@ describe 'managing a project' do
     it 'creates a project and installs modules' do
       run_cli(command)
 
-      expect(config_path.exist?).to be
+      expect(project.project_file.exist?).to be
 
-      expect(YAML.load_file(config_path)).to include(
+      expect(YAML.load_file(project.project_file)).to include(
         'name'    => 'myproject',
         'modules' => [{ 'name' => 'puppetlabs-yaml' }]
       )

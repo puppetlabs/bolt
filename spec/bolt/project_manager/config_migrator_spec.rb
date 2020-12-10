@@ -20,7 +20,7 @@ describe Bolt::ProjectManager::ConfigMigrator do
   let(:backup_dir)     { project_dir + '.bolt-bak' }
 
   context "updating options" do
-    let(:project_dir) { project.path }
+    let(:project_dir) { @project.path }
 
     let(:old_config) do
       {
@@ -55,7 +55,8 @@ describe Bolt::ProjectManager::ConfigMigrator do
     end
 
     around :each do |example|
-      with_project do
+      with_project(config: project_config) do |project|
+        @project = project
         example.run
       end
     end
