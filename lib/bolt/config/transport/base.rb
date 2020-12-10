@@ -2,7 +2,7 @@
 
 require 'bolt/error'
 require 'bolt/util'
-require 'bolt/config/validator'
+require 'bolt/validator'
 require 'bolt/config/transport/options'
 
 module Bolt
@@ -125,7 +125,7 @@ module Bolt
 
         # Validation defaults to just asserting the option types
         private def validate
-          Bolt::Config::Validator.new.validate(@config.compact, self.class.schema.fetch(:properties))
+          Bolt::Validator.new.validate(@config.compact, self.class.schema)
         end
       end
     end

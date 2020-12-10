@@ -7,7 +7,7 @@ require 'bolt/project'
 require 'bolt/logger'
 require 'bolt/util'
 require 'bolt/config/options'
-require 'bolt/config/validator'
+require 'bolt/validator'
 
 module Bolt
   class UnknownTransportError < Bolt::Error
@@ -43,7 +43,7 @@ module Bolt
 
                # Validate the config against the schema. This will raise a single error
                # with all validation errors.
-               Validator.new.tap do |validator|
+               Bolt::Validator.new.tap do |validator|
                  validator.validate(c, bolt_schema, project.config_file.to_s)
 
                  validator.warnings.each { |warning| logs << { warn: warning } }
@@ -78,7 +78,7 @@ module Bolt
 
                # Validate the config against the schema. This will raise a single error
                # with all validation errors.
-               Validator.new.tap do |validator|
+               Bolt::Validator.new.tap do |validator|
                  validator.validate(c, bolt_schema, project.config_file.to_s)
 
                  validator.warnings.each { |warning| logs << { warn: warning } }
@@ -368,7 +368,7 @@ module Bolt
       overrides['trace'] = opts['trace'] if opts.key?('trace')
 
       # Validate the overrides
-      Validator.new.validate(overrides, OPTIONS, 'command line')
+      Bolt::Validator.new.validate(overrides, self.class.bolt_schema, 'command line')
 
       overrides
     end

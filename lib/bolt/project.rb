@@ -2,7 +2,7 @@
 
 require 'pathname'
 require 'bolt/config'
-require 'bolt/config/validator'
+require 'bolt/validator'
 require 'bolt/pal'
 require 'bolt/module'
 
