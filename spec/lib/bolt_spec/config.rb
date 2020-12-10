@@ -1,29 +1,13 @@
 # frozen_string_literal: true
 
 require 'bolt/config'
-require 'bolt_spec/conn'
-require 'bolt_spec/files'
 
 module BoltSpec
   module Config
-    def fixture_path(*parts)
-      File.join(__dir__, '..', '..', 'fixtures', *parts)
-    end
-
-    def config(overrides = {})
-      empty = {
-        'inventoryfile' => fixture_path('inventory', 'empty.yml')
-      }
-      Bolt::Config.new(Bolt::Project.new({}, '.'), empty.merge(overrides))
-    end
-
-    def conn_config(overrides = {})
-      conn = BoltSpec.conn.new
-      conn_conf = {
-        ssh: conn.conn_info('ssh'),
-        winrm: conn.conn_info('winrm')
-      }
-      config(conn_conf.merge(overrides))
+    def make_config(overrides = {})
+      overrides = Bolt::Util.walk_keys(overrides, &:to_s)
+      project = Bolt::Project.new({}, '.')
+      Bolt::Config.new(project, overrides)
     end
   end
 end

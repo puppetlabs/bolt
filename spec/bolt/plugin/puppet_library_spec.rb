@@ -2,14 +2,12 @@
 
 require 'spec_helper'
 require 'bolt_spec/files'
-require 'bolt_spec/config'
 require 'bolt/plugin'
 require 'bolt/analytics'
 require 'bolt_spec/plans'
 
 describe Bolt::Plugin::Module do
   include BoltSpec::Files
-  include BoltSpec::Config
   # These tests to not actually use the plan mocking just the executor/inventory setup
   include BoltSpec::Plans
 

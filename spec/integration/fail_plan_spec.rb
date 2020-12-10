@@ -7,16 +7,17 @@ require 'bolt_spec/files'
 require 'bolt_spec/integration'
 
 describe "When a plan fails" do
-  include BoltSpec::Integration
   include BoltSpec::Config
   include BoltSpec::Conn
+  include BoltSpec::Files
+  include BoltSpec::Integration
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:modulepath) { fixture_path('modules') }
-  let(:config_flags) {
+  let(:modulepath)    { fixtures_path('modules') }
+  let(:config_flags)  {
     ['--format', 'json',
-     '--configfile', fixture_path('configs', 'empty.yml'),
+     '--configfile', fixtures_path('configs', 'empty.yml'),
      '--modulepath', modulepath,
      '--no-host-key-check']
   }

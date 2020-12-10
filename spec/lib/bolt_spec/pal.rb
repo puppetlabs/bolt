@@ -1,21 +1,31 @@
 # frozen_string_literal: true
 
-require 'bolt_spec/files'
 require 'bolt/config'
+require 'bolt/inventory/inventory'
 require 'bolt/pal'
+require 'bolt/plugin'
+require 'bolt_spec/config'
+require 'bolt_spec/files'
 
 module BoltSpec
   module PAL
+    include BoltSpec::Config
     include BoltSpec::Files
 
-    def config
-      conf = Bolt::Config.new
-      conf[:modulepath] = modulepath
-      conf
+    def make_pal(modulepath = nil)
+      modulepath ||= fixtures_path('modules')
+      Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), nil, nil)
     end
 
-    def modulepath
-      [File.join(__FILE__, '..', '..', '..', 'fixtures', 'modules')]
+    def make_plugins(config = nil)
+      config ||= make_config
+      Bolt::Plugin.setup(config, nil)
+    end
+
+    def make_inventory(data = {})
+      config = make_config
+      plugins = make_plugins(config)
+      Bolt::Inventory::Inventory.new(data, config.transport, config.transports, plugins)
     end
 
     def peval(code, pal, executor = nil, inventory = nil, pdb_client = nil)

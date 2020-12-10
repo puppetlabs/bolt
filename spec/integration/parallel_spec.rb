@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
@@ -10,13 +9,13 @@ require 'bolt_spec/puppet_agent'
 
 describe 'plans' do
   include BoltSpec::Integration
-  include BoltSpec::Config
+  include BoltSpec::Files
   include BoltSpec::Conn
   include BoltSpec::Project
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:modulepath) { fixture_path('modules') }
+  let(:modulepath) { fixtures_path('modules') }
 
   shared_examples "parallelize plan function" do
     let(:return_value) {
@@ -68,7 +67,7 @@ describe 'plans' do
   end
 
   context "over ssh", ssh: true do
-    let(:inv_path) { fixture_path('inventory', 'docker.yml') }
+    let(:inv_path) { fixtures_path('inventory', 'docker.yml') }
     let(:config_flags) {
       ['-t all',
        '--modulepath', modulepath,

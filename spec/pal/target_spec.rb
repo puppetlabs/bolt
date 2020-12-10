@@ -1,32 +1,25 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/files'
-require 'bolt_spec/pal'
 require 'bolt_spec/config'
-
+require 'bolt_spec/pal'
 require 'bolt/pal'
-require 'bolt/inventory'
-require 'bolt/plugin'
 
 describe 'Target DataType' do
-  include BoltSpec::Files
-  include BoltSpec::PAL
   include BoltSpec::Config
+  include BoltSpec::PAL
 
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:pal)     { Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), nil, nil) }
-  let(:plugins) { Bolt::Plugin.setup(config, nil) }
-
-  let(:target_code) { "$target = Target('pcp://user1:pass1@example.com:33')\n" }
-
-  let(:default_config) { config.transports['pcp'].to_h }
+  let(:pal)             { make_pal }
+  let(:inventory)       { make_inventory }
+  let(:default_config)  { make_config.transports['pcp'].to_h }
+  let(:target_code)     { "$target = Target('pcp://user1:pass1@example.com:33')\n" }
 
   def target(attr)
     code = target_code + attr
-    peval(code, pal, nil, Bolt::Inventory::Inventory.new({}, config.transport, config.transports, plugins))
+    peval(code, pal, nil, inventory)
   end
 
   it 'should expose uri' do

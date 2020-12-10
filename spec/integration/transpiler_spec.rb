@@ -2,15 +2,15 @@
 
 require 'spec_helper'
 require 'bolt/pal/yaml_plan/transpiler'
-require 'bolt_spec/config'
+require 'bolt_spec/files'
 require 'bolt_spec/integration'
 
 describe "transpiling YAML plans" do
-  include BoltSpec::Config
+  include BoltSpec::Files
   include BoltSpec::Integration
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
-  let(:modulepath) { fixture_path('modules') }
+  let(:modulepath) { fixtures_path('modules') }
   let(:yaml_path) { File.join(modulepath, 'yaml', 'plans') }
   let(:plan_path) { File.join(yaml_path, 'conversion.yaml') }
   let(:output_plan) { <<~PLAN }

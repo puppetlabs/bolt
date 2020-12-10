@@ -11,10 +11,11 @@ require 'bolt_spec/plugins'
 describe Bolt::Inventory::Group do
   include BoltSpec::Config
 
-  let(:data) { { 'name' => 'all' } }
-  let(:pal) { nil } # Not used
+  let(:data)    { { 'name' => 'all' } }
+  let(:pal)     { nil } # Not used
+  let(:config)  { make_config }
   let(:plugins) { Bolt::Plugin.setup(config, nil) }
-  let(:group) {
+  let(:group)   {
     # Inventory always resolves unknown labels to names or aliases from the top-down when constructed,
     # passing the collection of all aliases in it. Do that manually here to ensure plain target strings
     # are included as targets.

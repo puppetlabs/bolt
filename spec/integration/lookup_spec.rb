@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/config'
+require 'bolt_spec/files'
 require 'bolt_spec/integration'
 
 describe "lookup() in plans" do
-  include BoltSpec::Config
+  include BoltSpec::Files
   include BoltSpec::Integration
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:boltdir)      { fixture_path('hiera') }
+  let(:boltdir)      { fixtures_path('hiera') }
   let(:hiera_config) { File.join(boltdir, 'hiera.yaml') }
   let(:plan)         { 'test::lookup' }
 

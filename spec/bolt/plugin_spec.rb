@@ -1,23 +1,25 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/files'
 require 'bolt_spec/config'
+require 'bolt_spec/files'
+require 'bolt_spec/pal'
 require 'bolt/pal'
 require 'bolt/plugin'
 require 'bolt/plugin/env_var'
 require 'bolt/analytics'
 
 describe Bolt::Plugin do
-  include BoltSpec::Files
   include BoltSpec::Config
+  include BoltSpec::Files
+  include BoltSpec::PAL
 
-  let(:modulepath) { [fixtures_path('plugin_modules')] }
   let(:plugin_config) { {} }
-  let(:config_data) { { 'modulepath' => modulepath, 'plugins' => plugin_config } }
-  let(:pal) { Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), nil, nil) }
-
-  let(:plugins) { Bolt::Plugin.setup(config(config_data), pal) }
+  let(:modulepath)    { [fixtures_path('plugin_modules')] }
+  let(:config_data)   { { 'modulepath' => modulepath, 'plugins' => plugin_config } }
+  let(:config)        { make_config(config_data) }
+  let(:pal)           { make_pal(modulepath) }
+  let(:plugins)       { Bolt::Plugin.setup(config, pal) }
 
   def identity(value, cache = nil)
     plugin = {
@@ -101,7 +103,7 @@ describe Bolt::Plugin do
   end
 
   context 'plugin loading is disabled' do
-    let(:plugins) { Bolt::Plugin.setup(config(config_data), pal, load_plugins: false) }
+    let(:plugins) { Bolt::Plugin.setup(config, pal, load_plugins: false) }
 
     it 'raises a plugin-loading-disabled error if it attempts to load a Ruby plugin' do
       expect { plugins.by_name('env_var') }.to raise_error(

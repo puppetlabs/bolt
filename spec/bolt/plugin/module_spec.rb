@@ -1,21 +1,21 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/files'
 require 'bolt_spec/config'
+require 'bolt_spec/files'
 require 'bolt/plugin'
 require 'bolt/analytics'
 
 describe Bolt::Plugin::Module do
-  include BoltSpec::Files
   include BoltSpec::Config
+  include BoltSpec::Files
 
   let(:modulepath) { [fixtures_path('plugin_modules')] }
   let(:plugin_config) { {} }
   let(:config_data) { { 'modulepath' => modulepath, 'plugins' => plugin_config } }
 
   let(:pal) { Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), {}, nil) }
-  let(:plugins) { Bolt::Plugin.setup(config(config_data), pal) }
+  let(:plugins) { Bolt::Plugin.setup(make_config(config_data), pal) }
 
   let(:module_name) { 'empty_plug' }
   let(:mod) { Bolt::Module.new(module_name, fixtures_path('plugin_modules', module_name)) }

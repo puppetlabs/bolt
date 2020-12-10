@@ -15,6 +15,7 @@ describe Bolt::Transport::Local do
   end
 
   let(:pal)          { nil }
+  let(:config)       { make_config }
   let(:plugins)      { Bolt::Plugin.setup(config, pal) }
   let(:transports)   { config.transports }
   let(:transport)    { config.transport }

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
@@ -9,25 +8,25 @@ require 'bolt_spec/logger'
 
 describe "running YAML plans", ssh: true do
   include BoltSpec::Integration
-  include BoltSpec::Config
   include BoltSpec::Conn
+  include BoltSpec::Files
   include BoltSpec::Logger
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
   # Don't print error messages to the console
   before(:each) { allow($stdout).to receive(:puts) }
 
-  let(:modulepath) { fixture_path('modules') }
-  let(:password) { conn_info('ssh')[:password] }
-  let(:config_flags) {
+  let(:modulepath)    { fixtures_path('modules') }
+  let(:password)      { conn_info('ssh')[:password] }
+  let(:target)        { conn_uri('ssh', include_password: true) }
+  let(:config_flags)  {
     ['--format', 'json',
-     '--project', fixture_path('configs', 'empty'),
+     '--project', fixtures_path('configs', 'empty'),
      '--modulepath', modulepath,
      '--run-as', 'root',
      '--sudo-password', password,
      '--no-host-key-check']
   }
-  let(:target) { conn_uri('ssh', include_password: true) }
 
   def run_plan(plan_name, params = {})
     result = run_cli(['plan', 'run', plan_name, '--params', params.to_json] + config_flags,

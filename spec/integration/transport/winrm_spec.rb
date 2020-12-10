@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/errors'
 require 'bolt_spec/files'
@@ -13,7 +12,6 @@ require 'bolt/inventory'
 require 'winrm'
 
 describe Bolt::Transport::WinRM do
-  include BoltSpec::Config
   include BoltSpec::Conn
   include BoltSpec::Errors
   include BoltSpec::Files
@@ -29,7 +27,7 @@ describe Bolt::Transport::WinRM do
   let(:password)    { conn_info('winrm')[:password] }
   let(:command)     { "[Environment]::UserName" }
   let(:config)      { mk_config(ssl: false, user: user, password: password) }
-  let(:cacert_path) { fixture_path('ssl', 'ca.pem') }
+  let(:cacert_path) { fixtures_path('ssl', 'ca.pem') }
   let(:ssl_config)  { mk_config(cacert: cacert_path, user: user, password: password) }
   let(:winrm)       { Bolt::Transport::WinRM.new }
   let(:winrm_ssl)   { Bolt::Transport::WinRM.new }
