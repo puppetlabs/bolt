@@ -33,7 +33,7 @@ jobs:
           contents: "gem 'bolt', require: false, git: 'https://github.com/${{ github.repository }}', branch: '${{ github.ref }}'"
       - name: Install bundler
         run: |
-          gem install bundler
+          gem install bundler -v 2.1.4
           bundle config path vendor/bundle
           bundle config with development
       - name: Install gems
