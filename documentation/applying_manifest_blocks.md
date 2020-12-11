@@ -490,32 +490,7 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 - [Specify targets](running_bolt_commands.md#adding-options-to-bolt-commands)
 - [Bolt projects](projects.md)
 
-## 🧪 Using Puppet device modules from an apply statement
-
-🧪 **Note:** Support for device modules is experimental and might change in
-future minor (y) releases.
-
-Puppet device modules based on remote transports allow network devices and other
-targets that can't run a Puppet agent to be managed from a proxy.
-
-To use device modules from an apply statement, the devices must be added to the
-Bolt inventory as remote targets. The `name` of the target will be used to
-auto-populate the `name`, `uri`, `user`, `password`, `host`, and `port` fields
-of the remote transport's connection info. You must set the `remote-transport`
-option and any other connection info under the `remote` section of config.
-
-```yaml
-targets:
-  - name: "https://username:password@panos-device.example.com"
-    config:
-      transport: remote
-      remote:
-        remote-transport: panos
-```
-
-When you set the `run-on` option with a device module, the `puppet-resource_api`
-Gem must be installed with the Puppet agent on the proxy target and it must be
-version 1.8.1 or later.
-
 📖 **Related information**
 - For information on how Bolt loads the modulepath, see [Modules overview](modules.md#modulepath).
+- To learn more about using Puppet device modules, see [Running Bolt on network
+  devices](running_bolt_networkd.md#-using-puppet-device-modules-from-an-apply-block)

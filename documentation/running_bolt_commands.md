@@ -1,6 +1,6 @@
-# Run commands on remote targets
+# Run Bolt
 
-You can use Bolt commands to connect to remote targets and perform actions on
+You can use Bolt commands to connect to targets and perform actions on
 them. These actions range in complexity from invoking a simple command to
 running a series of commands and tasks as part of an orchestration workflow. 
 
@@ -9,7 +9,7 @@ reference](bolt_command_reference.md).
 
 ## Run a command
 
-Bolt can run arbitrary commands on remote targets. To run a command, provide a
+Bolt can run arbitrary commands on targets. To run a command, provide a
 command and a list of targets to run the command on.
 
 _\*nix shell command_
@@ -298,15 +298,14 @@ Invoke-BoltCommand -Command 'Get-Location' -Targets windows.example.org -Transpo
 
 ## Run a script
 
-When you run a script on a remote target, Bolt copies the script from your
-workstation to a temporary directory on the target, runs the script, and then
-deletes the script from the target.
+When you run a script on a target Bolt copies the script from your
+Bolt controller to a temporary directory on the target, runs the script, and then
+deletes the script from the temporary directory.
 
 You can run scripts in any language, as long as the appropriate interpreter is
-installed on the remote system. This includes scripting languages such as Bash,
-PowerShell, Python, and Ruby.
+installed on the system. This includes any scripting language the system can run.
 
-To run a script, provide the path to the script on the workstation and a list of
+To run a script, provide the path to the script on the Bolt controller and a list of
 targets to run the script on.
 
 _\*nix shell command_
@@ -324,7 +323,7 @@ Invoke-BoltScript -Script ./scripts/configure.ps1 -Targets servers
 ### Pass arguments to a script
 
 Argument values are passed literally and are not interpolated by the shell on
-the remote host.
+the target.
 
 _\*nix shell command_
 
@@ -494,9 +493,9 @@ Invoke-BoltPlan -Name reboot -Targets servers
 
 ## Upload a file or directory
 
-Bolt can copy files and directories from your workstation to remote targets. To
-upload a file or directory, provide the `source` path on your workstation, the
-`destination` path on the remote target that it should be copied to, and a
+Bolt can copy files and directories from your Bolt controller to targets. To
+upload a file or directory, provide the `source` path on your Bolt controller, the
+`destination` path on the target that it should be copied to, and a
 list of targets.
 
 Both the `source` and `destination` accept absolute and relative paths. If you
@@ -518,10 +517,10 @@ Send-BoltFile -Source /path/to/source -Destination /path/to/destination -Targets
 
 ## Download a file or directory
 
-Bolt can copy files and directories from remote targets to a destination
-directory on your workstation. To download a file or directory, provide the
-`source` path on the remote target, the path to the `destination` directory on
-the workstation, and a list of targets.
+Bolt can copy files and directories from targets to a destination
+directory on your Bolt controller. To download a file or directory, provide the
+`source` path on the target, the path to the `destination` directory on
+the Bolt controller, and a list of targets.
 
 Both the `source` and `destination` accept absolute and relative paths. If you
 provide a relative path as the `source`, Bolt will copy the file relative to the
@@ -540,7 +539,7 @@ _PowerShell cmdlet_
 Receive-BoltFile -Source /path/to/source -Destination /path/to/destination -Targets servers
 ```
 
-The `destination` on the workstation is a path to a directory that the downloaded
+The `destination` on the Bolt controller is a path to a directory that the downloaded
 file or directory is copied to. If the `destination` directory does not exist,
 Bolt will create it for you.
 
