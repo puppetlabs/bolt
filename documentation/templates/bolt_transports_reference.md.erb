@@ -46,6 +46,61 @@ to targets. These options can be set in multiple locations:
 <% end %>
 <% end %>
 <% if option == 'ssh' -%>
+## OpenSSH Config
+
+Bolt's SSH transport uses the Ruby library `net-ssh`, which is a pure Ruby
+implementation of the SSH2 client protocol. The library reads and uses some,
+but not all, settings from the user's OpenSSH configuration file (typically
+`~/.ssh/config`). OpenSSH configuration takes the [lowest
+precedence](configuring_bolt.md#configuration-precedence), and any configurable
+settings that you've set through Bolt, such as `port`, override the OpenSSH
+settings. Bolt uses the following OpenSSH configuration options when using the
+SSH transport:
+
+### `Ciphers`
+
+Ciphers allowed in order of preference. Multiple ciphers must be comma-separated.
+
+### `Compression`
+
+Whether to use compression.
+
+### `CompressionLevel`
+
+Compression level to use if compression is enabled.
+
+### `GlobalKnownHostsFile`
+
+Path to global host key database.
+
+### `HostKeyAlgorithms`
+
+Host key algorithms that the client wants to use in order of preference.
+
+### `HostKeyAlias`
+
+Use alias instead of real hostname when looking up or saving the host key in the host key database file.
+
+### `HostName`
+
+Host name to log.
+
+### `IdentityFile`
+
+File in which user's identity key is stored.
+
+### `Port`
+
+SSH port.
+
+### `User`
+
+Login user.
+
+### `UserKnownHostsFile`
+
+Path to local user's host key database.
+
 ## Native `ssh`
 
 Bolt's SSH transport uses the Ruby library `net-ssh`, which is a pure Ruby
