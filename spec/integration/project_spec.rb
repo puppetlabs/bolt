@@ -13,7 +13,7 @@ describe "When loading content", ssh: true do
   include BoltSpec::Project
 
   let(:local) { Bolt::Project.create_project(fixtures_path('projects', 'local'), 'local') }
-  let(:embedded) { fixtures_path('projects/embedded') }
+  let(:embedded) { fixture_path('projects/embedded') }
   let(:target) { conn_uri('ssh') }
   let(:config_flags) { %W[--no-host-key-check --password #{conn_info('ssh')[:password]}] }
 
