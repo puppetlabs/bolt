@@ -22,7 +22,7 @@ jobs:
           ruby-version: 2.5.x
       - name: Install bundler
         run: |
-          gem install bundler
+          gem install bundler -v 2.1.4
           bundle config path vendor/bundle
       - name: Cache gems
         id: cache
