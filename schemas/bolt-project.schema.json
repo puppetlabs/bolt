@@ -337,33 +337,82 @@
           "properties": {
             "cacert": {
               "description": "The path to the ca certificate for PuppetDB.",
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "cert": {
               "description": "The path to the client certificate file to use for authentication.",
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "connect_timeout": {
               "description": "How long to wait in seconds when establishing connections with PuppetDB.",
-              "type": "integer",
-              "minimum": 1
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "key": {
               "description": "The private key for the certificate.",
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "read_timeout": {
               "description": "How long to wait in seconds for a response from PuppetDB.",
-              "type": "integer",
-              "minimum": 1
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "server_urls": {
               "description": "An array containing the PuppetDB host to connect to. Include the protocol `https` and the port, which is usually `8081`. For example, `https://my-puppetdb-server.com:8081`.",
-              "type": "array"
+              "oneOf": [
+                {
+                  "type": "array"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "token": {
               "description": "The path to the PE RBAC Token.",
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },
