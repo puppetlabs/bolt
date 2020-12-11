@@ -300,4 +300,77 @@ describe 'validating config' do
       )
     end
   end
+
+  context 'with plugins defined in puppetdb config' do
+    let(:project_config) do
+      {
+        'apply-settings' => {
+          'show_diff' => true
+        },
+        'color' => false,
+        'compile-concurrency' => 2,
+        'format' => 'json',
+        'log' => {
+          'warn.log' => {
+            'level' => 'warn',
+            'append' => true
+          },
+          'bolt-debug.log' => 'disable'
+        },
+        'modulepath' => %w[
+          modules
+          site-modules
+        ],
+        'plans' => [
+          'myproject::deploy'
+        ],
+        'puppetdb' => {
+          'cacert' => {
+            '_plugin' => 'envvar',
+            'var' => 'BOLT_PUPPETDB_CACERT',
+            'default' => '/path/to/cacert'
+          },
+          'cert' => {
+            '_plugin' => 'envvar',
+            'var' => 'BOLT_PUPPETDB_CERT',
+            'default' => '/path/to/cert'
+          },
+          'connect-timeout' => {
+            '_plugin' => 'envvar',
+            'var' => 'BOLT_PUPPETDB_CONNECT_TIMEOUT',
+            'default' => 20
+          },
+          'key' => {
+            '_plugin' => 'envvar',
+            'var' => 'BOLT_PUPPETDB_KEY',
+            'default' => '/path/to/key'
+          },
+          'read-timeout' => {
+            '_plugin' => 'envvar',
+            'var' => 'BOLT_PUPPETDB_READ_TIMEOUT',
+            'default' => 10
+          },
+          'server_urls' => {
+            '_plugin' => 'envvar',
+            'var' => 'BOLT_PUPPETDB_SERVER_URLS',
+            'default' => [
+              'https://example.com'
+            ]
+          },
+          'token' => {
+            '_plugin' => 'envvar',
+            'var' => 'BOLT_PUPPETDB_TOKEN',
+            'default' => '/path/to/token'
+          }
+        },
+        'tasks' => [
+          'myproject::install_server'
+        ]
+      }
+    end
+
+    it 'does not error' do
+      expect { run_cli(command, project: project) }.not_to raise_error
+    end
+  end
 end

@@ -350,43 +350,50 @@ module Bolt
             "cacert" => {
               description: "The path to the ca certificate for PuppetDB.",
               type: String,
-              _example: "/etc/puppetlabs/puppet/ssl/certs/ca.pem"
+              _example: "/etc/puppetlabs/puppet/ssl/certs/ca.pem",
+              _plugin: true
             },
             "cert" => {
               description: "The path to the client certificate file to use for authentication.",
               type: String,
-              _example: "/etc/puppetlabs/puppet/ssl/certs/my-host.example.com.pem"
+              _example: "/etc/puppetlabs/puppet/ssl/certs/my-host.example.com.pem",
+              _plugin: true
             },
             "connect_timeout" => {
               description: "How long to wait in seconds when establishing connections with PuppetDB.",
               type: Integer,
               minimum: 1,
               _default: 60,
-              _example: 120
+              _example: 120,
+              _plugin: true
             },
             "key" => {
               description: "The private key for the certificate.",
               type: String,
-              _example: "/etc/puppetlabs/puppet/ssl/private_keys/my-host.example.com.pem"
+              _example: "/etc/puppetlabs/puppet/ssl/private_keys/my-host.example.com.pem",
+              _plugin: true
             },
             "read_timeout" => {
               description: "How long to wait in seconds for a response from PuppetDB.",
               type: Integer,
               minimum: 1,
               _default: 60,
-              _example: 120
+              _example: 120,
+              _plugin: true
             },
             "server_urls" => {
               description: "An array containing the PuppetDB host to connect to. Include the protocol `https` "\
                            "and the port, which is usually `8081`. For example, "\
                            "`https://my-puppetdb-server.com:8081`.",
               type: Array,
-              _example: ["https://puppet.example.com:8081"]
+              _example: ["https://puppet.example.com:8081"],
+              _plugin: true
             },
             "token" => {
               description: "The path to the PE RBAC Token.",
               type: String,
-              _example: "~/.puppetlabs/token"
+              _example: "~/.puppetlabs/token",
+              _plugin: true
             }
           },
           _plugin: true
