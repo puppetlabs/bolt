@@ -227,7 +227,10 @@ module Bolt
           raise Bolt::ValidationError, "The project '#{name}' will not be loaded. The project name conflicts "\
             "with a built-in Bolt module of the same name."
         end
-      else
+      elsif name.nil? &&
+            (File.directory?(plans_path) ||
+            File.directory?(@path + 'tasks') ||
+            File.directory?(@path + 'files'))
         message = "No project name is specified in bolt-project.yaml. Project-level content will not be available."
         @logs << { warn: message }
       end
