@@ -90,6 +90,29 @@ describe Bolt::Project do
     end
   end
 
+  describe "with no name set" do
+    it "warns if content directories exist" do
+      Dir.mktmpdir(nil, Dir.pwd) do |tmpdir|
+        project_path = Pathname.new(tmpdir).expand_path + 'project'
+        allow(File).to receive(:directory?).and_call_original
+        allow(File).to receive(:directory?)
+          .with(project_path + 'plans').and_return(true)
+
+        FileUtils.mkdir_p(project_path)
+        project = Bolt::Project.create_project(project_path)
+        project.validate
+
+        expect(project.logs).to include({ warn: /No project name is specified in bolt-project.yaml/ })
+      end
+    end
+
+    it "does not warn when content directories don't exist" do
+      with_project do
+        expect(project.logs).not_to include({ warn: /No project name is specified in bolt-project.yaml/ })
+      end
+    end
+  end
+
   describe "::find_boltdir" do
     let(:boltdir) { true }
     let(:tmpdir)  { project_path.parent.parent }

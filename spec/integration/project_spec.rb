@@ -3,16 +3,18 @@
 require 'spec_helper'
 require 'bolt_spec/config'
 require 'bolt_spec/conn'
+require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt_spec/project'
 
 describe "When loading content", ssh: true do
   include BoltSpec::Config
   include BoltSpec::Conn
+  include BoltSpec::Files
   include BoltSpec::Integration
   include BoltSpec::Project
 
-  let(:local) { Bolt::Project.create_project(File.join(__dir__, '../fixtures/projects/local'), 'local') }
+  let(:local) { Bolt::Project.create_project(fixtures_path('projects', 'local'), 'local') }
   let(:embedded) { fixture_path('projects/embedded') }
   let(:target) { conn_uri('ssh') }
   let(:config_flags) { %W[--no-host-key-check --password #{conn_info('ssh')[:password]}] }
