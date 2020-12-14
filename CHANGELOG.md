@@ -1,5 +1,84 @@
 # Changelog
 
+## Bolt 2.38.0 (2020-12-14)
+
+### New features
+
+* **`bundled-ruby` local transport config option to enable local defaults**
+  ([#2400](https://github.com/puppetlabs/bolt/issues/2400))
+
+  Set `bundled-ruby` in the local transport config to enable or disable
+  the default config currently used for the `localhost` target.
+
+* **`module-install` configuration option**
+  ([#2303](https://github.com/puppetlabs/bolt/issues/2303))
+
+  Bolt now supports a `module-install` configuration option in
+  `bolt-project.yaml` and `bolt-defaults.yaml`. This option is used to
+  configure proxies and an alternate forge when installing modules using
+  the `bolt module add|install` commands or `Add|Install-BoltModule`
+  cmdlets.
+
+  _This option is not currently supported when resolving module
+  dependencies._
+
+* **Improved inventory validation**
+  ([#2413](https://github.com/puppetlabs/bolt/issues/2413))
+
+  Bolt now validates inventory against Bolt's inventory schema and
+  indicates where errors are found.
+
+* **CLI spinner for long running operations**
+  ([#2432](https://github.com/puppetlabs/bolt/pull/2432))
+
+  Bolt now has a spinner printed to the CLI for long-running operations,
+  so that users know the Bolt process has not hung. Disable the spinner
+  by setting `spinner: false` in any Bolt configuration file.
+
+* **JSON schema for YAML plans**
+  ([#2046](https://github.com/puppetlabs/bolt/issues/2046))
+
+  Bolt now offers a JSON schema for validating YAML plans.
+
+### Bug fixes
+
+* **Windows local transport returns correct exit codes and accepts pipes**
+  ([#2299](https://github.com/puppetlabs/bolt/issues/2299))
+
+  When running commands over the local transport on Windows machines,
+  Bolt now returns the exit code returned by the command as opposed to
+  just 0 or 1. It also accepts pipes as part of the command.
+
+* **Accept plugins in `puppetdb` config**
+  ([#2461](https://github.com/puppetlabs/bolt/issues/2461))
+
+  Fixes a regression to once again allow plugins to be used for defining
+  the values of the `puppetdb` config.
+
+  _Contributed by [Nick Maludy](https://github.com/nmaludy)_
+
+* **Only warn that project content won't be loaded if there's project content**
+  ([#2438](https://github.com/puppetlabs/bolt/pull/2468))
+
+  Bolt will now only warn that project content won't be loaded if the
+  proejct directory has a `tasks/`, `plans/`, or `files/` directory that
+  may contain content.
+
+* **Allow caching for PuppetDB plugin**
+  ([#2469](https://github.com/puppetlabs/bolt/pull/2469))
+
+  Previously, our configuration validation would raise an error if users
+  supplied `_cache` to the PuppetDB plugin. Cache is now configurable
+  for the plugin.
+
+* **`http_request` task converts header names to strings**
+  ([#4](https://github.com/puppetlabs/puppetlabs-http_request/pull/4)
+
+  Headers set under the `headers` parameter are now converted to strings before
+  making a request. Previously, headers were passed to the request as symbols.
+
+  _Contributed by [barskern](https://github.com/barskern)_
+
 ## Bolt 2.37.0 (2020-12-07)
 
 ### New features
