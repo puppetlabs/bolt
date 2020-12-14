@@ -12,7 +12,7 @@ module Bolt
       end
 
       TEMPLATE_OPTS = %w[alias config facts features name uri vars].freeze
-      PLUGIN_OPTS = %w[_plugin query target_mapping].freeze
+      PLUGIN_OPTS = %w[_plugin _cache query target_mapping].freeze
 
       attr_reader :puppetdb_client
 
