@@ -254,14 +254,6 @@ module Bolt
           msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in group #{@name}"
           @logger.warn(msg)
         end
-
-        Bolt::Util.walk_keys(input) do |key|
-          if @plugins.reference?(key)
-            raise ValidationError.new("Group keys cannot be specified as _plugin references", @name)
-          else
-            key
-          end
-        end
       end
 
       def validate(used_group_names = Set.new, used_target_names = Set.new, used_aliases = {})

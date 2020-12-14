@@ -111,11 +111,6 @@ module Bolt
             @config['interpreters'] = normalize_interpreters(@config['interpreters'])
           end
 
-          if @config['login-shell'] && !LOGIN_SHELLS.include?(@config['login-shell'])
-            raise Bolt::ValidationError,
-                  "Unsupported login-shell #{@config['login-shell']}. Supported shells are #{LOGIN_SHELLS.join(', ')}"
-          end
-
           if @config['login-shell'] == 'powershell'
             %w[tty run-as].each do |key|
               if @config[key]

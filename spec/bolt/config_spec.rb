@@ -256,30 +256,6 @@ describe Bolt::Config do
       expect(config.matching_paths(config.modulepath)).to include(modules)
     end
 
-    it "does not accept invalid log levels" do
-      config = {
-        'log' => {
-          "file:#{logfile}" => { 'level' => :foo }
-        }
-      }
-
-      expect { Bolt::Config.new(project, config) }.to raise_error(
-        /level of log file:.* must be one of .*; received foo/
-      )
-    end
-
-    it "does not accept invalid append flag values" do
-      config = {
-        'log' => {
-          "file:#{logfile}" => { 'append' => :foo }
-        }
-      }
-
-      expect { Bolt::Config.new(project, config) }.to raise_error(
-        /append flag of log file:.* must be a Boolean, received Symbol :foo/
-      )
-    end
-
     it "does not accept inventory files that don't exist" do
       config = {
         'inventoryfile' => 'fake.yaml'
