@@ -59,6 +59,18 @@ describe Bolt::Plugin::Puppetdb do
       end
     end
 
+    context 'with cache configured' do
+      let(:opts) do
+        { "query" => '',
+          '_cache' => { 'ttl' => 10 },
+          "target_mapping" => { "name" => 'facts.name_fact' } }
+      end
+
+      it "sets the cache" do
+        expect { plugin.resolve_reference(opts) }.not_to raise_error
+      end
+    end
+
     context "with a 'alias' configured" do
       let(:opts) do
         { "query" => '',
