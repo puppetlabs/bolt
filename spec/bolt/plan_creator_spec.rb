@@ -7,21 +7,15 @@ require 'bolt_spec/project'
 describe Bolt::PlanCreator do
   include BoltSpec::Project
 
-  let(:plan_name)    { 'project' }
-  let(:config)       { { 'name' => plan_name } }
-  let(:config_path)  { File.join(@project_path, 'bolt-project.yaml') }
-  let(:project)      { Bolt::Project.create_project(@project_path) }
-  let(:outputter)    { double('outputter', print_message: true) }
+  let(:project)   { @project }
+  let(:plan_name) { 'project' }
+  let(:outputter) { double('outputter', print_message: true) }
 
   around :each do |example|
-    with_project do
+    with_project(plan_name) do |project|
+      @project = project
       example.run
     end
-  end
-
-  before(:each) do
-    File.write(config_path, config.to_yaml)
-    allow(Bolt::Project).to receive(:create_project).and_return(project)
   end
 
   context "#validate_input" do
@@ -51,7 +45,7 @@ describe Bolt::PlanCreator do
 
     %w[pp yaml].each do |ext|
       it "errors if there is an existing #{ext} plan with the same name" do
-        plan_path = File.join(@project_path, 'plans', "init.#{ext}")
+        plan_path = File.join(project.path, 'plans', "init.#{ext}")
         FileUtils.mkdir(File.dirname(plan_path))
         FileUtils.touch(plan_path)
 
@@ -79,8 +73,8 @@ describe Bolt::PlanCreator do
 
     it 'catches existing file errors when creating directories' do
       plan_name = "#{project.name}::foo::bar"
-      FileUtils.mkdir(File.join(@project_path, 'plans'))
-      FileUtils.touch(File.join(@project_path, 'plans', 'foo'))
+      FileUtils.mkdir(project.plans_path)
+      FileUtils.touch(project.plans_path + 'foo')
 
       expect { subject.create_plan(project.plans_path, plan_name, outputter, nil) }
         .to raise_error(Bolt::Error, /unable to create plan directory/)

@@ -87,7 +87,7 @@ describe 'plans' do
       end
 
       it 'runs registers types defined in $project/.resource_types', ssh: true do
-        with_project do
+        with_project(config: project_config) do |project|
           config_flags = %W[--format json -m #{modulepath} --project #{project.path} --no-host-key-check]
 
           # generate types based and save in project (based on value of --configfile)

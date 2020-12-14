@@ -8,15 +8,17 @@ require 'bolt/module_installer/puppetfile'
 describe Bolt::ModuleInstaller::Puppetfile do
   include BoltSpec::Project
 
-  let(:path)       { project_path + 'Puppetfile' }
-  let(:moduledir)  { project_path + '.modules' }
+  let(:path)       { project.puppetfile }
+  let(:moduledir)  { project.managed_moduledir }
   let(:name)       { 'puppetlabs/yaml' }
   let(:version)    { '0.1.0' }
   let(:mod)        { [double('mod', name: name, version: version, to_spec: "mod '#{name}'")] }
   let(:puppetfile) { described_class.new(mod) }
+  let(:project)    { @project }
 
   around(:each) do |example|
-    with_project do
+    with_project do |project|
+      @project = project
       example.run
     end
   end

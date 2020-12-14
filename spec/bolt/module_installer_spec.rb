@@ -7,6 +7,7 @@ require 'bolt_spec/project'
 describe Bolt::ModuleInstaller do
   include BoltSpec::Project
 
+  let(:project)        { @project }
   let(:puppetfile)     { project.puppetfile }
   let(:moduledir)      { project.managed_moduledir }
   let(:project_file)   { project.project_file }
@@ -15,6 +16,7 @@ describe Bolt::ModuleInstaller do
   let(:specs)          { [{ 'name' => 'puppetlabs/yaml' }] }
   let(:pal)            { double('pal', generate_types: nil) }
   let(:installer)      { described_class.new(outputter, pal) }
+  let(:project_config) { { 'modules' => [] } }
 
   let(:outputter) do
     double('outputter', print_message: nil,
@@ -25,14 +27,13 @@ describe Bolt::ModuleInstaller do
   end
 
   around(:each) do |example|
-    with_project do
+    with_project(config: project_config) do |project|
+      @project = project
       example.run
     end
   end
 
   before(:each) do
-    conf = { 'modules' => [] }
-    File.write(project_file, conf.to_yaml)
     allow(installer).to receive(:install_puppetfile).and_return(true)
   end
 
