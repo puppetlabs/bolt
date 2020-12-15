@@ -857,7 +857,14 @@
         {
           "type": "object",
           "additionalProperties": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           },
           "propertyNames": {
             "pattern": "^.?[a-zA-Z0-9]+$"
@@ -993,7 +1000,14 @@
           "properties": {
             "key-data": {
               "description": "The contents of the private key.",
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },

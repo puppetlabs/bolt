@@ -244,11 +244,13 @@
             "properties": {
               "name": {
                 "description": "The name of the module.",
-                "type": "String"
+                "type": "String",
+                "_plugin": false
               },
               "version_requirement": {
                 "description": "The version requirement for the module. Accepts a specific version (1.2.3), version shorthand (1.2.x), or a version range (>= 1.2.0).",
-                "type": "String"
+                "type": "String",
+                "_plugin": false
               }
             }
           },
@@ -260,11 +262,13 @@
             "properties": {
               "git": {
                 "description": "The URL to the public git repository.",
-                "type": "String"
+                "type": "String",
+                "_plugin": false
               },
               "ref": {
                 "description": "The git reference to check out. Can be either a branch, tag, or commit SHA.",
-                "type": "String"
+                "type": "String",
+                "_plugin": false
               }
             }
           }

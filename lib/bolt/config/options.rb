@@ -61,6 +61,7 @@ module Bolt
             "show_diff" => {
               description: "Whether to log and report a contextual diff.",
               type: [TrueClass, FalseClass],
+              _plugin: false,
               _example: true,
               _default: false
             }
@@ -76,6 +77,7 @@ module Bolt
             "show_diff" => {
               description: "Whether to log and report a contextual diff.",
               type: [TrueClass, FalseClass],
+              _plugin: false,
               _example: true,
               _default: false
             }
@@ -148,7 +150,8 @@ module Bolt
             "ttl" => {
               description: "Time in seconds to keep the plugin cache.",
               type: Integer,
-              minimum: 0
+              minimum: 0,
+              _plugin: false
             }
           },
           _plugin: false,
@@ -172,7 +175,8 @@ module Bolt
                   description: "The type of information to log.",
                   type: String,
                   enum: %w[trace debug error info notice warn fatal any],
-                  _default: "warn"
+                  _default: "warn",
+                  _plugin: false
                 }
               }
             }
@@ -185,13 +189,15 @@ module Bolt
               "append" => {
                 description: "Whether to append output to an existing log file.",
                 type: [TrueClass, FalseClass],
-                _default: true
+                _default: true,
+                _plugin: false
               },
               "level" => {
                 description: "The type of information to log.",
                 type: String,
                 enum: %w[trace debug error info notice warn fatal any],
-                _default: "warn"
+                _default: "warn",
+                _plugin: false
               }
             }
           },
@@ -225,21 +231,25 @@ module Bolt
                   description: "The URL to the Forge host.",
                   type: String,
                   format: "uri",
+                  _plugin: false,
                   _example: "https://forge.example.com"
                 },
                 "proxy" => {
                   description: "The HTTP proxy to use for Forge operations.",
                   type: String,
                   format: "uri",
+                  _plugin: false,
                   _example: "https://my-forge-proxy.com:8080"
                 }
               },
+              _plugin: false,
               _example: { "baseurl" => "https://forge.example.com", "proxy" => "https://my-forge-proxy.com:8080" }
             },
             "proxy" => {
               description: "The HTTP proxy to use for Git and Forge operations.",
               type: String,
               format: "uri",
+              _plugin: false,
               _example: "https://my-proxy.com:8080"
             }
           },
@@ -258,12 +268,14 @@ module Bolt
                 properties: {
                   "name" => {
                     description: "The name of the module.",
-                    type: String
+                    type: String,
+                    _plugin: false
                   },
                   "version_requirement" => {
                     description: "The version requirement for the module. Accepts a specific version (1.2.3), version "\
                                  "shorthand (1.2.x), or a version range (>= 1.2.0).",
-                    type: String
+                    type: String,
+                    _plugin: false
                   }
                 }
               },
@@ -272,11 +284,13 @@ module Bolt
                 properties: {
                   "git" => {
                     description: "The URL to the public git repository.",
-                    type: String
+                    type: String,
+                    _plugin: false
                   },
                   "ref" => {
                     description: "The git reference to check out. Can be either a branch, tag, or commit SHA.",
-                    type: String
+                    type: String,
+                    _plugin: false
                   }
                 }
               }
@@ -412,21 +426,25 @@ module Bolt
                   description: "The URL to the Forge host.",
                   type: String,
                   format: "uri",
+                  _plugin: false,
                   _example: "https://forge.example.com"
                 },
                 "proxy" => {
                   description: "The HTTP proxy to use for Forge operations.",
                   type: String,
                   format: "uri",
+                  _plugin: false,
                   _example: "https://my-forge-proxy.com:8080"
                 }
               },
+              _plugin: false,
               _example: { "baseurl" => "https://forge.example.com", "proxy" => "https://my-forge-proxy.com:8080" }
             },
             "proxy" => {
               description: "The HTTP proxy to use for Git and Forge operations.",
               type: String,
               format: "uri",
+              _plugin: false,
               _example: "https://my-proxy.com:8080"
             }
           },
