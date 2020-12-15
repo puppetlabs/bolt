@@ -11,9 +11,10 @@ module Bolt
 
         def initialize(target)
           @target = target
+          puts "target: #{@target.config}"
           # TODO: if remote unset in config, default to globally-set remote
           #  might need to shell out for this info
-          @lxd_remote = @target.config["lxd"]["remote"]
+          @lxd_remote = @target.config["lxd"]["remote"] || default_remote
           @logger = Bolt::Logger.logger(target.safe_name)
           @logger.trace("")
         end
@@ -61,12 +62,18 @@ module Bolt
           remote = @lxd_remote
           # TODO: check dest is absolute path
           capture_options = { binmode: true }
-          out, err, status = Open3.capture3('lxc', 'file', 'push', source,
-            "#{remote}:#{container}#{destination}",  capture_options)
+          Open3.capture3('lxc', 'file', 'push', source,
+                         "#{remote}:#{container}#{destination}", capture_options)
         end
 
         def container_tmpdir
           '/tmp'
+        end
+
+        def default_remote
+          capture_options = { binmode: true }
+          out, _, _ = Open3.capture3('lxc', 'remote', 'get-default', capture_options)
+          out
         end
       end
     end

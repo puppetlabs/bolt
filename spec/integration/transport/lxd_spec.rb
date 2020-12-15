@@ -20,16 +20,17 @@ describe Bolt::Transport::LXD, lxd: true do
 
   let(:hostname)          { conn_info('ssh')[:host] }
   let(:port)              { conn_info('ssh')[:port] }
+  let(:safe_name)         { hostname.to_s }
 
   let(:config)            { make_config }
   let(:project)           { Bolt::Project.new({}, '.') }
   let(:plugins)           { Bolt::Plugin.setup(config, nil) }
   let(:inventory)         { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
   let(:project)           { Bolt::Project.new({}, '.') }
-  let(:lxd)               { Bolt::Transport::SSH.new }
+  let(:lxd)               { Bolt::Transport::LXD.new }
   let(:target)            { make_target }
 
-  let(:transport_config)  { {} }
+  let(:transport_config)  { { 'remote' => 'foo' } }
 
   def make_config(conf: transport_config)
     conf = Bolt::Util.walk_keys(conf, &:to_s)
@@ -38,6 +39,7 @@ describe Bolt::Transport::LXD, lxd: true do
   alias_method :mk_config, :make_config
 
   def make_target(host_: hostname, port_: port)
+    puts "HOSTNAME #{host_} PORT #{port_}"
     inventory.get_target("#{host_}:#{port_}")
   end
 
