@@ -393,25 +393,74 @@
           "type": "object",
           "properties": {
             "cleanup": {
-              "$ref": "#/transport_definitions/cleanup"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/cleanup"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "host": {
-              "$ref": "#/transport_definitions/host"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/host"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "interpreters": {
-              "$ref": "#/transport_definitions/interpreters"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/interpreters"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "service-url": {
-              "$ref": "#/transport_definitions/service-url"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/service-url"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "shell-command": {
-              "$ref": "#/transport_definitions/shell-command"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/shell-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "tmpdir": {
-              "$ref": "#/transport_definitions/tmpdir"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tmpdir"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "tty": {
-              "$ref": "#/transport_definitions/tty"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tty"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },
@@ -427,28 +476,84 @@
           "type": "object",
           "properties": {
             "bundled-ruby": {
-              "$ref": "#/transport_definitions/bundled-ruby"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/bundled-ruby"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "cleanup": {
-              "$ref": "#/transport_definitions/cleanup"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/cleanup"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "interpreters": {
-              "$ref": "#/transport_definitions/interpreters"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/interpreters"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "run-as": {
-              "$ref": "#/transport_definitions/run-as"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "run-as-command": {
-              "$ref": "#/transport_definitions/run-as-command"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "sudo-executable": {
-              "$ref": "#/transport_definitions/sudo-executable"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-executable"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "sudo-password": {
-              "$ref": "#/transport_definitions/sudo-password"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-password"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "tmpdir": {
-              "$ref": "#/transport_definitions/tmpdir"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tmpdir"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },
@@ -464,25 +569,74 @@
           "type": "object",
           "properties": {
             "cacert": {
-              "$ref": "#/transport_definitions/cacert"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/cacert"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "host": {
-              "$ref": "#/transport_definitions/host"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/host"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "job-poll-interval": {
-              "$ref": "#/transport_definitions/job-poll-interval"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/job-poll-interval"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "job-poll-timeout": {
-              "$ref": "#/transport_definitions/job-poll-timeout"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/job-poll-timeout"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "service-url": {
-              "$ref": "#/transport_definitions/service-url"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/service-url"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "task-environment": {
-              "$ref": "#/transport_definitions/task-environment"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/task-environment"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "token-file": {
-              "$ref": "#/transport_definitions/token-file"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/token-file"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },
@@ -499,7 +653,14 @@
           "additionalProperties": true,
           "properties": {
             "run-on": {
-              "$ref": "#/transport_definitions/run-on"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-on"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },
@@ -515,85 +676,274 @@
           "type": "object",
           "properties": {
             "ssh-command": {
-              "$ref": "#/transport_definitions/ssh-command"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/ssh-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "native-ssh": {
-              "$ref": "#/transport_definitions/native-ssh"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/native-ssh"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "cleanup": {
-              "$ref": "#/transport_definitions/cleanup"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/cleanup"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "connect-timeout": {
-              "$ref": "#/transport_definitions/connect-timeout"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/connect-timeout"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "disconnect-timeout": {
-              "$ref": "#/transport_definitions/disconnect-timeout"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/disconnect-timeout"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "encryption-algorithms": {
-              "$ref": "#/transport_definitions/encryption-algorithms"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/encryption-algorithms"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "extensions": {
-              "$ref": "#/transport_definitions/extensions"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/extensions"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "host": {
-              "$ref": "#/transport_definitions/host"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/host"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "host-key-algorithms": {
-              "$ref": "#/transport_definitions/host-key-algorithms"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/host-key-algorithms"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "host-key-check": {
-              "$ref": "#/transport_definitions/host-key-check"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/host-key-check"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "interpreters": {
-              "$ref": "#/transport_definitions/interpreters"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/interpreters"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "kex-algorithms": {
-              "$ref": "#/transport_definitions/kex-algorithms"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/kex-algorithms"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "load-config": {
-              "$ref": "#/transport_definitions/load-config"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/load-config"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "login-shell": {
-              "$ref": "#/transport_definitions/login-shell"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/login-shell"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "mac-algorithms": {
-              "$ref": "#/transport_definitions/mac-algorithms"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/mac-algorithms"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "password": {
-              "$ref": "#/transport_definitions/password"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/password"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "port": {
-              "$ref": "#/transport_definitions/port"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/port"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "private-key": {
-              "$ref": "#/transport_definitions/private-key"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/private-key"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "proxyjump": {
-              "$ref": "#/transport_definitions/proxyjump"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/proxyjump"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "run-as": {
-              "$ref": "#/transport_definitions/run-as"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "run-as-command": {
-              "$ref": "#/transport_definitions/run-as-command"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "script-dir": {
-              "$ref": "#/transport_definitions/script-dir"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/script-dir"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "sudo-executable": {
-              "$ref": "#/transport_definitions/sudo-executable"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-executable"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "sudo-password": {
-              "$ref": "#/transport_definitions/sudo-password"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-password"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "tmpdir": {
-              "$ref": "#/transport_definitions/tmpdir"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tmpdir"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "tty": {
-              "$ref": "#/transport_definitions/tty"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tty"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "user": {
-              "$ref": "#/transport_definitions/user"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/user"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },
@@ -609,52 +959,164 @@
           "type": "object",
           "properties": {
             "basic-auth-only": {
-              "$ref": "#/transport_definitions/basic-auth-only"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/basic-auth-only"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "cacert": {
-              "$ref": "#/transport_definitions/cacert"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/cacert"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "cleanup": {
-              "$ref": "#/transport_definitions/cleanup"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/cleanup"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "connect-timeout": {
-              "$ref": "#/transport_definitions/connect-timeout"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/connect-timeout"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "extensions": {
-              "$ref": "#/transport_definitions/extensions"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/extensions"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "file-protocol": {
-              "$ref": "#/transport_definitions/file-protocol"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/file-protocol"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "host": {
-              "$ref": "#/transport_definitions/host"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/host"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "interpreters": {
-              "$ref": "#/transport_definitions/interpreters"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/interpreters"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "password": {
-              "$ref": "#/transport_definitions/password"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/password"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "port": {
-              "$ref": "#/transport_definitions/port"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/port"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "realm": {
-              "$ref": "#/transport_definitions/realm"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/realm"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "smb-port": {
-              "$ref": "#/transport_definitions/smb-port"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/smb-port"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "ssl": {
-              "$ref": "#/transport_definitions/ssl"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/ssl"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "ssl-verify": {
-              "$ref": "#/transport_definitions/ssl-verify"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/ssl-verify"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "tmpdir": {
-              "$ref": "#/transport_definitions/tmpdir"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tmpdir"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             },
             "user": {
-              "$ref": "#/transport_definitions/user"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/user"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },
@@ -750,7 +1212,14 @@
             "string"
           ],
           "items": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           }
         },
         {
@@ -777,7 +1246,14 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           }
         },
         {
@@ -792,7 +1268,14 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           }
         },
         {
@@ -833,7 +1316,14 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           }
         },
         {
@@ -900,7 +1390,14 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           }
         },
         {
@@ -945,7 +1442,14 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           }
         },
         {
@@ -994,7 +1498,14 @@
           "properties": {
             "key-data": {
               "description": "The contents of the private key.",
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },
@@ -1043,7 +1554,14 @@
         {
           "type": "array",
           "items": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           }
         },
         {
@@ -1118,7 +1636,14 @@
             "string"
           ],
           "items": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           }
         },
         {

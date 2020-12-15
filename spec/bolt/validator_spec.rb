@@ -134,6 +134,83 @@ describe Bolt::Validator do
         /Value at 'option' is a plugin reference, which is unsupported at this location/
       )
     end
+
+    context 'with suboptions' do
+      let(:properties) do
+        {
+          'hash' => {
+            type:       Hash,
+            _plugin:    true,
+            properties: {
+              'suboption' => {
+                type: String
+              }
+            }
+          },
+          'array' => {
+            type: Array,
+            _plugin: true,
+            items: {
+              type: String
+            }
+          },
+          'nested' => {
+            type: Hash,
+            _plugin: true,
+            properties: {
+              'suboption' => {
+                type: Hash,
+                properties: {
+                  'subsuboption' => {
+                    type: String
+                  }
+                }
+              }
+            }
+          }
+        }
+      end
+
+      let(:data) do
+        {
+          'hash' => {
+            'suboption' => {
+              '_plugin' => 'myplugin'
+            }
+          },
+          'array' => [
+            { '_plugin' => 'myplugin' }
+          ],
+          'nested' => {
+            'suboption' => {
+              'subsuboption' => {
+                '_plugin' => 'myplugin'
+              }
+            }
+          }
+        }
+      end
+
+      it 'does not error when superoption sets :_plugin' do
+        expect { validate }.not_to raise_error
+      end
+
+      it 'errors when superoption does not set :_plugin' do
+        properties['hash'].delete(:_plugin)
+        properties['array'].delete(:_plugin)
+        properties['nested'].delete(:_plugin)
+
+        expect { validate }.to raise_error do |error|
+          expect(error).to be_a(Bolt::ValidationError)
+
+          expect(error.message.lines).to include(
+            /Value at 'hash.suboption' is a plugin reference, which is unsupported at this location/,
+            /Value at 'array.0' is a plugin reference, which is unsupported at this location/,
+            /Value at 'nested.suboption.subsuboption' is a plugin reference, which is unsupported at this location/
+          )
+        end
+      end
+    end
   end
 
   context 'validating hashes' do

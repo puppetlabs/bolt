@@ -206,7 +206,14 @@
                         {
                           "type": "array",
                           "items": {
-                            "type": "string"
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
                           }
                         },
                         {
@@ -421,7 +428,14 @@
                           "type": "array",
                           "uniqueItems": true,
                           "items": {
-                            "type": "string"
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
                           }
                         },
                         {
@@ -436,7 +450,14 @@
                           "type": "array",
                           "uniqueItems": true,
                           "items": {
-                            "type": "string"
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
                           }
                         },
                         {
@@ -462,7 +483,14 @@
                           "type": "array",
                           "uniqueItems": true,
                           "items": {
-                            "type": "string"
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
                           }
                         },
                         {
@@ -505,7 +533,14 @@
                           "type": "array",
                           "uniqueItems": true,
                           "items": {
-                            "type": "string"
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
                           }
                         },
                         {
@@ -550,7 +585,14 @@
                           "type": "array",
                           "uniqueItems": true,
                           "items": {
-                            "type": "string"
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
                           }
                         },
                         {
@@ -595,7 +637,14 @@
                           "properties": {
                             "key-data": {
                               "description": "The contents of the private key.",
-                              "type": "string"
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "$ref": "#/definitions/_plugin"
+                                }
+                              ]
                             }
                           }
                         },
@@ -633,7 +682,14 @@
                         {
                           "type": "array",
                           "items": {
-                            "type": "string"
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
                           }
                         },
                         {
@@ -716,7 +772,14 @@
                             "string"
                           ],
                           "items": {
-                            "type": "string"
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
                           }
                         },
                         {
@@ -725,8 +788,15 @@
                       ]
                     },
                     "native-ssh": {
-                      "type": "boolean",
-                      "description": "This enables the native SSH transport, which shells out to SSH instead of using the net-ssh Ruby library"
+                      "description": "This enables the native SSH transport, which shells out to SSH instead of using the net-ssh Ruby library",
+                      "oneOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
                     },
                     "ssh-command": {
                       "description": "The command and options to use when SSHing. This option is used when you need support for features or algorithms that are not supported by the net-ssh Ruby library. **This option is experimental.** You can read more about this  option in [Native SSH transport](experimental_features.md#native-ssh-transport).",
@@ -737,7 +807,14 @@
                             "string"
                           ],
                           "items": {
-                            "type": "string"
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
                           }
                         },
                         {
@@ -810,7 +887,14 @@
                           "type": "array",
                           "uniqueItems": true,
                           "items": {
-                            "type": "string"
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
                           }
                         },
                         {
@@ -1012,28 +1096,84 @@
                 ],
                 "properties": {
                   "config": {
-                    "$ref": "#/definitions/config"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/config"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "facts": {
-                    "$ref": "#/definitions/facts"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/facts"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "features": {
-                    "$ref": "#/definitions/features"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/features"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "groups": {
-                    "$ref": "#/definitions/groups"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/groups"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "name": {
-                    "$ref": "#/definitions/name"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/name"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "plugin_hooks": {
-                    "$ref": "#/definitions/plugin_hooks"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/plugin_hooks"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "targets": {
-                    "$ref": "#/definitions/targets"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/targets"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "vars": {
-                    "$ref": "#/definitions/vars"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/vars"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   }
                 }
               },
@@ -1097,28 +1237,84 @@
                 ],
                 "properties": {
                   "alias": {
-                    "$ref": "#/definitions/alias"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/alias"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "config": {
-                    "$ref": "#/definitions/config"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/config"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "facts": {
-                    "$ref": "#/definitions/facts"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/facts"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "features": {
-                    "$ref": "#/definitions/features"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/features"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "name": {
-                    "$ref": "#/definitions/name"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/name"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "plugin_hooks": {
-                    "$ref": "#/definitions/plugin_hooks"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/plugin_hooks"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "uri": {
-                    "$ref": "#/definitions/uri"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/uri"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   },
                   "vars": {
-                    "$ref": "#/definitions/vars"
+                    "oneOf": [
+                      {
+                        "$ref": "#/definitions/vars"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
                   }
                 }
               },
