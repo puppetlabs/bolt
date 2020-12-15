@@ -496,6 +496,7 @@
       "oneOf": [
         {
           "type": "object",
+          "additionalProperties": true,
           "properties": {
             "run-on": {
               "$ref": "#/transport_definitions/run-on"

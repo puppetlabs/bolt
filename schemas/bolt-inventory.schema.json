@@ -352,6 +352,7 @@
               "oneOf": [
                 {
                   "type": "object",
+                  "additionalProperties": true,
                   "properties": {
                     "run-on": {
                       "description": "The proxy target that the task executes on.",

@@ -509,6 +509,7 @@ module Bolt
         "remote" => {
           description: "A map of configuration options for the remote transport.",
           type: Hash,
+          additionalProperties: true,
           _plugin: true,
           _example: { "run-on" => "proxy_target" }
         },
