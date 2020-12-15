@@ -10,6 +10,7 @@ describe Bolt::Inventory do
   include BoltSpec::Config
 
   let(:pal)     { nil } # Not used
+  let(:config)  { make_config }
   let(:plugins) { Bolt::Plugin.setup(config, pal) }
 
   context 'with BOLT_INVENTORY set' do

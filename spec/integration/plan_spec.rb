@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
@@ -9,23 +8,23 @@ require 'bolt_spec/project'
 require 'bolt_spec/puppet_agent'
 
 describe 'plans' do
-  include BoltSpec::Integration
-  include BoltSpec::Config
   include BoltSpec::Conn
+  include BoltSpec::Integration
+  include BoltSpec::Files
   include BoltSpec::Project
   include BoltSpec::PuppetAgent
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:modulepath) { fixture_path('modules') }
-  let(:config_flags) {
+  let(:modulepath)      { fixtures_path('modules') }
+  let(:config_flags)    {
     ['--format', 'json',
-     '--configfile', fixture_path('configs', 'empty.yml'),
+     '--configfile', fixtures_path('configs', 'empty.yml'),
      '--modulepath', modulepath,
      '--no-host-key-check']
   }
-  let(:target) { conn_uri('ssh', include_password: true) }
-  let(:project_config) { { 'modules' => [] } }
+  let(:target)          { conn_uri('ssh', include_password: true) }
+  let(:project_config)  { { 'modules' => [] } }
 
   context "When a plan succeeds" do
     it 'prints the result', ssh: true do
@@ -75,7 +74,7 @@ describe 'plans' do
         install(conn_uri('ssh', include_password: true))
         example.run
       ensure
-        FileUtils.rm_rf(fixture_path('configs', '.resource_types'))
+        FileUtils.rm_rf(fixtures_path('configs', '.resource_types'))
         uninstall(conn_uri('ssh', include_password: true))
       end
 

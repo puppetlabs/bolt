@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
@@ -9,19 +8,19 @@ require 'bolt/util'
 
 describe "catch_errors", ssh: true do
   include BoltSpec::Integration
-  include BoltSpec::Config
+  include BoltSpec::Files
   include BoltSpec::Conn
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:modulepath) { [fixture_path('modules'), fixture_path('apply')].join(File::PATH_SEPARATOR) }
+  let(:modulepath) { [fixtures_path('modules'), fixtures_path('apply')].join(File::PATH_SEPARATOR) }
   let(:target) { conn_uri('ssh', include_password: true) }
 
   let(:transport_flags) { ['--no-host-key-check'] }
 
   let(:config_flags) {
     ['--format', 'json',
-     '--configfile', fixture_path('configs', 'empty.yml'),
+     '--configfile', fixtures_path('configs', 'empty.yml'),
      '--modulepath', modulepath,
      '--targets', target] + transport_flags
   }

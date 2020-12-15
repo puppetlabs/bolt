@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt/transport/local'
-require 'bolt/target'
 require 'bolt/inventory'
+require 'bolt/transport/local'
 require 'bolt/util'
+require 'bolt_spec/pal'
 require 'bolt_spec/transport'
-require 'bolt_spec/conn'
 
 require 'shared_examples/transport'
 
 describe Bolt::Transport::Local do
+  include BoltSpec::PAL
   include BoltSpec::Transport
 
   let(:transport)     { :local }
@@ -19,13 +19,11 @@ describe Bolt::Transport::Local do
   let(:user)          { 'runner' }
   let(:password)      { 'runner' }
   let(:os_context)    { Bolt::Util.windows? ? windows_context : posix_context }
-  let(:config)        { make_config }
-  let(:project)       { Bolt::Project.new({}, '.') }
-  let(:plugins)       { Bolt::Plugin.setup(config, nil) }
-  let(:inventory)     { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
-  let(:target)        { make_target }
-
   let(:transport_config) { {} }
+  let(:config)        { make_config({ local: transport_config }) }
+  let(:plugins)       { make_plugins(config) }
+  let(:inventory)     { Bolt::Inventory::Inventory.new({}, config.transport, config.transports, plugins) }
+  let(:target)        { make_target }
 
   def make_target
     inventory.get_target(host_and_port)

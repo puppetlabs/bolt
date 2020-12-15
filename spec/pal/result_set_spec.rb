@@ -1,24 +1,17 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/files'
 require 'bolt_spec/pal'
-require 'bolt_spec/config'
-
 require 'bolt/pal'
-require 'bolt/inventory/inventory'
-require 'bolt/plugin'
 
 describe 'ResultSet DataType' do
-  include BoltSpec::Files
   include BoltSpec::PAL
-  include BoltSpec::Config
 
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:pal)     { Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), nil, nil) }
-  let(:plugins) { Bolt::Plugin.setup(config, nil) }
+  let(:pal)       { make_pal }
+  let(:inventory) { make_inventory }
 
   let(:result_code) do
     <<~PUPPET
@@ -30,7 +23,7 @@ describe 'ResultSet DataType' do
 
   def result_set(attr)
     code = result_code + attr
-    peval(code, pal, nil, Bolt::Inventory::Inventory.new({}, config.transport, config.transports, plugins))
+    peval(code, pal, nil, inventory)
   end
 
   it 'should be ok' do

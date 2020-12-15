@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'net/ssh'
 require 'net/ssh/proxy/jump'
+require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/errors'
 require 'bolt_spec/logger'
@@ -15,6 +16,7 @@ require 'bolt/util'
 require 'shared_examples/transport'
 
 describe Bolt::Transport::SSH, ssh: true do
+  include BoltSpec::Config
   include BoltSpec::Conn
   include BoltSpec::Errors
   include BoltSpec::Files
@@ -48,19 +50,12 @@ describe Bolt::Transport::SSH, ssh: true do
   let(:stdin_task)        { "#!/bin/sh\ngrep data" }
   let(:env_task)          { "#!/bin/sh\necho $PT_data" }
 
-  let(:config)            { make_config }
-  let(:project)           { Bolt::Project.new({}, '.') }
+  let(:config)            { make_config({ ssh: transport_config }) }
   let(:plugins)           { Bolt::Plugin.setup(config, nil) }
   let(:inventory)         { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
   let(:target)            { make_target }
 
   let(:transport_config)  { {} }
-
-  def make_config(conf: transport_config)
-    conf = Bolt::Util.walk_keys(conf, &:to_s)
-    Bolt::Config.new(project, 'ssh' => conf)
-  end
-  alias_method :mk_config, :make_config
 
   def make_target(host_: hostname, port_: port)
     inventory.get_target("#{host_}:#{port_}")

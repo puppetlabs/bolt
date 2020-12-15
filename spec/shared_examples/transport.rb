@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'bolt_spec/config'
 require 'bolt_spec/files'
 require 'bolt_spec/task'
 require 'bolt_spec/sensitive'
@@ -69,11 +70,6 @@ def windows_context
   }
 end
 
-def make_config(conf: transport_config)
-  conf = Bolt::Util.walk_keys(conf, &:to_s)
-  Bolt::Config.new(project, transport.to_s => conf)
-end
-
 def make_target
   inventory.get_target(host_and_port)
 end
@@ -91,6 +87,7 @@ end
 # - os_context: posix_context above
 # - transport_conf: a hash that can be overridden to specify the 'tmpdir' transport option
 shared_examples 'transport api' do
+  include BoltSpec::Config
   include BoltSpec::Files
   include BoltSpec::Sensitive
   include BoltSpec::Task

@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/config'
+require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt_spec/project'
 
 describe 'caching plugins' do
-  include BoltSpec::Config
+  include BoltSpec::Files
   include BoltSpec::Integration
   include BoltSpec::Project
 
   let(:project) { @project }
   let(:project_path) { @project.path }
   let(:inventory) { nil }
-  let(:mpath) { fixture_path('plugin_modules') }
+  let(:mpath) { fixtures_path('plugin_modules') }
   let(:plan) do
     <<~PLAN
       plan cache_test() {

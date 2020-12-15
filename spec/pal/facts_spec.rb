@@ -1,17 +1,11 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/files'
 require 'bolt_spec/pal'
-require 'bolt_spec/config'
 require 'bolt/pal'
-require 'bolt/inventory/inventory'
-require 'bolt/plugin'
 
 describe 'Facts functions' do
-  include BoltSpec::Files
   include BoltSpec::PAL
-  include BoltSpec::Config
 
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
@@ -24,10 +18,8 @@ describe 'Facts functions' do
       'facts' => { 'hot' => 'chocolate' }
     }
   }
-  let(:pal)     { Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), nil, nil) }
-  let(:plugins) { Bolt::Plugin.setup(config, nil) }
-  let(:inv)     { Bolt::Inventory::Inventory.new(data, config.transport, config.transports, plugins) }
-
+  let(:pal)       { make_pal }
+  let(:inv)       { make_inventory(data) }
   let(:executor)  { Bolt::Executor.new }
 
   let(:target_string) { "$t = get_targets(#{target})[0]\n" }

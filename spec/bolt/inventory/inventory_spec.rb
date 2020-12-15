@@ -16,6 +16,7 @@ describe Bolt::Inventory::Inventory do
   end
 
   let(:pal)          { nil }
+  let(:config)       { make_config }
   let(:plugins)      { Bolt::Plugin.setup(config, pal) }
   let(:target_name)  { "example.com" }
   let(:target_entry) { target_name }
@@ -240,7 +241,7 @@ describe Bolt::Inventory::Inventory do
           }
         }
       end
-      let(:config)    { Bolt::Config.new(Bolt::Project.new({}, '.'), data) }
+      let(:config)    { make_config(data) }
       let(:inventory) { Bolt::Inventory::Inventory.new({}, config.transport, config.transports, plugins) }
       let(:target)    { inventory.get_targets('notarget')[0] }
 

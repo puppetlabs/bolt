@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt_spec/puppetdb'
 
 describe 'running with an inventory file', reset_puppet_settings: true do
-  include BoltSpec::Config
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
@@ -62,11 +60,11 @@ describe 'running with an inventory file', reset_puppet_settings: true do
   end
   let(:target) { conn[:host] }
 
-  let(:modulepath) { fixture_path('modules') }
+  let(:modulepath) { fixtures_path('modules') }
   let(:config_flags) {
     ['--format', 'json',
      '--inventoryfile', @inventoryfile,
-     '--configfile', fixture_path('configs', 'empty.yml'),
+     '--configfile', fixtures_path('configs', 'empty.yml'),
      '--modulepath', modulepath,
      '--password', conn[:password]]
   }
@@ -375,7 +373,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     let(:config_flags) {
       ['--format', 'json',
        '--inventoryfile', @inventoryfile,
-       '--configfile', fixture_path('configs', 'empty.yml'),
+       '--configfile', fixtures_path('configs', 'empty.yml'),
        '--modulepath', modulepath]
     }
 

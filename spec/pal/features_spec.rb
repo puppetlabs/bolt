@@ -1,26 +1,21 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/files'
 require 'bolt_spec/pal'
-require 'bolt_spec/config'
 require 'bolt/pal'
 require 'bolt/inventory/inventory'
 require 'bolt/plugin'
 
 describe 'set_features function' do
-  include BoltSpec::Files
   include BoltSpec::PAL
-  include BoltSpec::Config
 
   before(:all) { Bolt::PAL.load_puppet }
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:executor) { Bolt::Executor.new(1) }
-
-  let(:pal) { Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), nil, nil) }
+  let(:executor)  { Bolt::Executor.new(1) }
+  let(:pal)       { make_pal }
   let(:inventory) { Bolt::Inventory.empty }
-  let(:target) { inventory.get_targets('example')[0] }
+  let(:target)    { inventory.get_targets('example')[0] }
 
   it 'adds the feature to the target' do
     peval(<<-CODE, pal, executor, inventory)

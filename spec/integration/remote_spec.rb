@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/config'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
-require 'bolt_spec/integration'
 require 'bolt_spec/run'
 
 describe 'running with an inventory file', reset_puppet_settings: true, ssh: true do
-  include BoltSpec::Config
   include BoltSpec::Conn
+  include BoltSpec::Files
   include BoltSpec::Run
 
+  let(:modulepath) { fixtures_path('modules') }
   let(:conn) { conn_info('ssh') }
   let(:inventory) do
     { 'targets' => [
@@ -43,7 +42,6 @@ describe 'running with an inventory file', reset_puppet_settings: true, ssh: tru
       } }
   end
 
-  let(:modulepath) { fixture_path('modules') }
   let(:config) { { 'modulepath' => modulepath } }
 
   it 'runs a remote task' do
