@@ -144,8 +144,7 @@ describe 'validating config' do
             'targets' => [
               {
                 'name' => 'win1',
-                'uri' => 'win1-example.org',
-                'transport' => 'winrm'
+                'uri' => 'win1-example.org'
               }
             ],
             'groups' => [
@@ -169,6 +168,10 @@ describe 'validating config' do
           'ssh' => {
             'host-key-check' => false
           },
+          'remote' => {
+            'port' => 1234,
+            'token' => 5678
+          },
           'winrm' => {
             'user' => 'Administrator',
             'password' => 'bolt'
@@ -177,8 +180,9 @@ describe 'validating config' do
       }
     end
 
-    it 'does not error' do
+    it 'does not error or raise warnings' do
       expect { run_cli(command) }.not_to raise_error
+      expect(@log_output.readlines).not_to include(/Unknown option/)
     end
   end
 

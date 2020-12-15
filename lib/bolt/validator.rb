@@ -87,7 +87,7 @@ module Bolt
         if properties.include?(key)
           check_deprecated(key, definition[:properties][key])
           validate_value(val, definition[:properties][key])
-        elsif definition[:additionalProperties]
+        elsif definition[:additionalProperties].is_a?(Hash)
           validate_value(val, definition[:additionalProperties])
         end
       ensure
