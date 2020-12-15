@@ -43,6 +43,7 @@ describe Bolt::ProjectManager::ConfigMigrator do
         'apply-settings' => {
           'show_diff' => true
         },
+        'name' => 'project',
         'plugin-hooks' => {
           'puppet_library' => {
             'collection' => 'puppet6'

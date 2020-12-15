@@ -4,46 +4,38 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/project'
 
 describe 'using the task plugin' do
-  include BoltSpec::Integration
   include BoltSpec::Conn
+  include BoltSpec::Files
+  include BoltSpec::Integration
+  include BoltSpec::Project
 
-  def with_project(config: nil, inventory: nil, plan: nil)
-    Dir.mktmpdir do |tmpdir|
-      File.write(File.join(tmpdir, 'bolt-project.yaml'), config.to_yaml) if config
-      File.write(File.join(tmpdir, 'inventory.yaml'), inventory.to_yaml) if inventory
-      if plan
-        plan_dir = File.join(tmpdir, 'modules', 'test_plan', 'plans')
-        FileUtils.mkdir_p(plan_dir)
-        File.write(File.join(plan_dir, 'init.pp'), plan)
-      end
-      yield tmpdir
-    end
-  end
-
-  let(:plugin_hooks) { {} }
-
-  let(:config) {
+  let(:plugin_hooks)  { {} }
+  let(:project_name)  { 'task_test' }
+  let(:command)       { %W[plan run #{project_name} --project #{@project.path}] }
+  let(:config) do
     {
-      'modulepath' => ['modules', File.join(__dir__, '../../fixtures/modules')],
+      'modulepath' => [fixtures_path('modules')],
       'plugin-hooks' => plugin_hooks
     }
-  }
+  end
 
   let(:plan) do
     <<~PLAN
-      plan test_plan() {
+      plan #{project_name}() {
         return(get_targets('node1')[0].password)
       }
     PLAN
   end
 
-  attr_reader :project
-
   around(:each) do |example|
-    with_project(inventory: inventory, config: config, plan: plan) do |project|
+    with_project(project_name, inventory: inventory, config: config) do |project|
       @project = project
+      FileUtils.mkdir_p(project.plans_path)
+      File.write(File.join(project.plans_path, 'init.pp'), plan)
+
       example.run
     end
   end
@@ -54,7 +46,7 @@ describe 'using the task plugin' do
   end
 
   context 'with a config lookup' do
-    let(:plugin) {
+    let(:plugin) do
       {
         '_plugin' => 'task',
         'task' => 'identity',
@@ -62,9 +54,9 @@ describe 'using the task plugin' do
           'value' => 'ssshhh'
         }
       }
-    }
+    end
 
-    let(:inventory) {
+    let(:inventory) do
       { 'targets' => [
         { 'uri' => 'node1',
           'config' => {
@@ -74,10 +66,10 @@ describe 'using the task plugin' do
             }
           } }
       ] }
-    }
+    end
 
     it 'supports a config lookup' do
-      output = run_cli(['plan', 'run', 'test_plan', '--project', project])
+      output = run_cli(command)
       expect(output.strip).to eq('"ssshhh"')
     end
 
@@ -93,7 +85,7 @@ describe 'using the task plugin' do
       }
 
       it 'errors when the parameters dont match' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--project', project], rescue_exec: true)
+        result = run_cli_json(command, rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/validation-error")
         expect(result['msg']).to match(/expects a value for parameter/)
@@ -112,7 +104,7 @@ describe 'using the task plugin' do
       }
 
       it 'errors when the result is unexpected' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--project', project], rescue_exec: true)
+        result = run_cli_json(command, rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/plugin-error")
         expect(result['msg']).to match(/Task result did not return 'value'/)
@@ -145,7 +137,7 @@ describe 'using the task plugin' do
       { 'targets' => [plugin] }
     }
     it 'supports a target lookup' do
-      output = run_cli(['plan', 'run', 'test_plan', '--project', project])
+      output = run_cli(command)
 
       expect(output.strip).to eq('"ssshhh"')
     end
@@ -162,7 +154,7 @@ describe 'using the task plugin' do
       }
 
       it 'errors when the result is unexpected' do
-        expect { run_cli(%W[plan run test_plan --project #{project}]) }
+        expect { run_cli(command) }
           .to raise_error(Bolt::Plugin::PluginError, /Task result did not return 'value'/)
       end
 
@@ -170,7 +162,7 @@ describe 'using the task plugin' do
         let(:params) { { 'bad-key' => %w[foo bar] } }
 
         it 'errors' do
-          expect { run_cli(%W[plan run test_plan --project #{project}]) }
+          expect { run_cli(command) }
             .to raise_error(Bolt::ValidationError, /bad-key/)
         end
       end
@@ -184,7 +176,7 @@ describe 'using the task plugin' do
           }
         }
         it 'errors when the task fails' do
-          expect { run_cli(%W[plan run test_plan --project #{project}]) }
+          expect { run_cli(command) }
             .to raise_error(Bolt::Plugin::PluginError, /The task failed/)
         end
       end
@@ -210,7 +202,7 @@ describe 'using the task plugin' do
 
     let(:plan) do
       <<~PLAN
-        plan test_plan(TargetSpec $nodes) {
+        plan #{project_name}(TargetSpec $nodes) {
           apply_prep($nodes)
         }
       PLAN
@@ -218,9 +210,7 @@ describe 'using the task plugin' do
 
     context 'with a failing task' do
       it 'fails cleanly' do
-        result = run_cli_json(['plan', 'run',
-                               'test_plan', '--targets', 'agentless', '--project', project],
-                              rescue_exec: true)
+        result = run_cli_json(command + %w[--targets agentless], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
@@ -234,9 +224,7 @@ describe 'using the task plugin' do
       let(:task) { 'sample::params' }
 
       it 'fails cleanly' do
-        result = run_cli_json(['plan', 'run',
-                               'test_plan', '--targets', 'agentless', '--project', project],
-                              rescue_exec: true)
+        result = run_cli_json(command + %w[--targets agentless], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
@@ -250,9 +238,7 @@ describe 'using the task plugin' do
       let('task') { 'non_existent_task' }
 
       it 'fails cleanly' do
-        result = run_cli_json(['plan', 'run',
-                               'test_plan', '--targets', 'agentless', '--project', project],
-                              rescue_exec: true)
+        result = run_cli_json(command + %w[--targets agentless], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)

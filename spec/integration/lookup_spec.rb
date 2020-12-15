@@ -10,12 +10,12 @@ describe "lookup() in plans" do
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:boltdir)      { fixtures_path('hiera') }
-  let(:hiera_config) { File.join(boltdir, 'hiera.yaml') }
+  let(:project)      { fixtures_path('hiera') }
+  let(:hiera_config) { File.join(project, 'hiera.yaml') }
   let(:plan)         { 'test::lookup' }
 
   let(:cli_command) {
-    %W[plan run #{plan} --project #{boltdir} --hiera-config #{hiera_config}]
+    %W[plan run #{plan} --project #{project} --hiera-config #{hiera_config}]
   }
 
   it 'returns a value' do
@@ -87,7 +87,7 @@ describe "lookup() in plans" do
   end
 
   context 'with interpolations' do
-    let(:hiera_config) { File.join(boltdir, 'hiera_interpolations.yaml') }
+    let(:hiera_config) { File.join(project, 'hiera_interpolations.yaml') }
 
     it 'returns an error' do
       result = run_cli_json(cli_command + %w[key=test::interpolations])
@@ -101,8 +101,8 @@ describe "lookup() in plans" do
   context 'with a builtin backend' do
     # Load pkcs7 keys as environment variables
     before(:each) do
-      ENV['BOLT_PKCS7_PUBLIC_KEY']  = File.read(File.expand_path('../keys/public_key.pkcs7.pem', boltdir))
-      ENV['BOLT_PKCS7_PRIVATE_KEY'] = File.read(File.expand_path('../keys/private_key.pkcs7.pem', boltdir))
+      ENV['BOLT_PKCS7_PUBLIC_KEY']  = File.read(File.expand_path('../keys/public_key.pkcs7.pem', project))
+      ENV['BOLT_PKCS7_PRIVATE_KEY'] = File.read(File.expand_path('../keys/private_key.pkcs7.pem', project))
     end
 
     after(:each) do
@@ -124,7 +124,7 @@ describe "lookup() in plans" do
   end
 
   context 'with a missing backend' do
-    let(:hiera_config) { File.join(boltdir, 'hiera_missing_backend.yaml') }
+    let(:hiera_config) { File.join(project, 'hiera_missing_backend.yaml') }
 
     it 'returns an error' do
       result = run_cli_json(cli_command + %w[key=test::backends])
@@ -136,7 +136,7 @@ describe "lookup() in plans" do
   end
 
   context 'with plan_hiera' do
-    let(:hiera_config) { File.join(boltdir, 'plan_hiera.yaml') }
+    let(:hiera_config) { File.join(project, 'plan_hiera.yaml') }
     let(:plan)         { 'test::plan_lookup' }
     let(:uri)          { 'localhost' }
 
@@ -148,7 +148,7 @@ describe "lookup() in plans" do
   end
 
   context 'with invalid plan_hierarchy' do
-    let(:hiera_config) { File.join(boltdir, 'plan_hiera_interpolations.yaml') }
+    let(:hiera_config) { File.join(project, 'plan_hiera_interpolations.yaml') }
     let(:plan)         { 'test::plan_lookup' }
     let(:uri)          { 'localhost' }
 
