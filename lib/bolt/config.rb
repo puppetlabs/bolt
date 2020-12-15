@@ -448,39 +448,14 @@ module Bolt
         next if val == 'disable'
 
         name = normalize_log(key)
+        acc[name] = val.slice('append', 'level').transform_keys(&:to_sym)
 
-        # But otherwise it has to be a Hash
-        unless val.is_a?(Hash)
-          raise Bolt::ValidationError,
-                "config of log #{name} must be a Hash, received #{val.class} #{val.inspect}"
-        end
+        next unless acc[name][:level] == 'notice'
 
-        acc[name] = val.slice('append', 'level')
-                       .transform_keys(&:to_sym)
-
-        if (v = acc[name][:level])
-          unless v.is_a?(String) || v.is_a?(Symbol)
-            raise Bolt::ValidationError,
-                  "level of log #{name} must be a String or Symbol, received #{v.class} #{v.inspect}"
-          end
-
-          unless Bolt::Logger.valid_level?(v)
-            raise Bolt::ValidationError,
-                  "level of log #{name} must be one of #{Bolt::Logger.levels.join(', ')}; received #{v}"
-          end
-
-          if v == 'notice'
-            @deprecations << {
-              type: 'notice log level',
-              msg:  "Log level 'notice' is deprecated and will be removed in Bolt 3.0. Use 'info' instead."
-            }
-          end
-        end
-
-        if (v = acc[name][:append]) && v != true && v != false
-          raise Bolt::ValidationError,
-                "append flag of log #{name} must be a Boolean, received #{v.class} #{v.inspect}"
-        end
+        @deprecations << {
+          type: 'notice log level',
+          msg:  "Log level 'notice' is deprecated and will be removed in Bolt 3.0. Use 'info' instead."
+        }
       end
     end
 
@@ -507,10 +482,6 @@ module Bolt
 
       if File.exist?(default_inventoryfile)
         Bolt::Util.validate_file('inventory file', default_inventoryfile)
-      end
-
-      unless TRANSPORT_CONFIG.include?(transport)
-        raise UnknownTransportError, transport
       end
 
       # Warn the user how they should be using the 'puppetfile' or

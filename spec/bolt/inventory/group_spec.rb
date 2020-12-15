@@ -810,11 +810,6 @@ describe Bolt::Inventory::Group do
       { '_plugin' => 'constant', 'value' => value }
     end
 
-    it "fails if any keys are specified as plugins" do
-      data.replace('name' => 'testgroup', constant('groups') => [])
-      expect { group }.to raise_error(Bolt::Inventory::ValidationError, /keys cannot be specified as _plugin/)
-    end
-
     context "defining the entire group with a plugin" do
       it 'evaluates a single plugin' do
         data.replace(constant('name' => 'testgroup', 'config' => { 'transport' => 'ssh' }))
