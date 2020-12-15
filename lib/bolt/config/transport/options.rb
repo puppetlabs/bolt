@@ -239,7 +239,8 @@ module Bolt
             properties: {
               "key-data" => {
                 description: "The contents of the private key.",
-                type: String
+                type: String,
+                _plugin: true
               }
             },
             _plugin: true,

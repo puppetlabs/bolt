@@ -997,7 +997,14 @@
           "properties": {
             "key-data": {
               "description": "The contents of the private key.",
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },
