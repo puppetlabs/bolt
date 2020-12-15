@@ -861,7 +861,14 @@
         {
           "type": "object",
           "additionalProperties": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           },
           "propertyNames": {
             "pattern": "^.?[a-zA-Z0-9]+$"
