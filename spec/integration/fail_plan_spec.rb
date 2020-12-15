@@ -17,7 +17,7 @@ describe "When a plan fails" do
   let(:modulepath)    { fixtures_path('modules') }
   let(:config_flags)  {
     ['--format', 'json',
-     '--configfile', fixtures_path('configs', 'empty.yml'),
+     '--project', fixtures_path('configs', 'empty'),
      '--modulepath', modulepath,
      '--no-host-key-check']
   }

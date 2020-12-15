@@ -3,11 +3,13 @@
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/project'
 
 describe "when runnning over the winrm transport", winrm: true do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::Project
 
   let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
   let(:whoami) { "echo $env:UserName" }
@@ -86,81 +88,98 @@ describe "when runnning over the winrm transport", winrm: true do
     end
   end
 
-  context 'when using a configfile' do
-    let(:config) {
+  context 'when using an inventoryfile', :reset_puppet_settings do
+    let(:default_inv) do
       {
-        'format' => 'json',
-        'modulepath' => modulepath,
-        'winrm' => {
-          'user' => user,
-          'password' => password,
-          'ssl' => false,
-          'ssl-verify' => false
+        'config' => {
+          'winrm' => {
+            'user' => user,
+            'password' => password,
+            'ssl' => false,
+            'ssl-verify' => false
+          }
         }
       }
-    }
-    let(:uri) { (1..2).map { |i| "#{conn_uri('winrm')}?id=#{i}" }.join(',') }
-    let(:config_flags) { %W[--targets #{uri}] }
-    let(:single_target_conf) { %W[--targets #{conn_uri('winrm')}] }
-    let(:interpreter_task) { 'sample::bolt_ruby' }
+    end
+    let(:inv)               { default_inv }
+    let(:uri)               { (1..2).map { |i| "#{conn_uri('winrm')}?id=#{i}" }.join(',') }
+    let(:project)           { @project }
+    let(:common_flags)      { %W[--format json --modulepath #{modulepath} --project #{project.path}] }
+    let(:config_flags)      { %W[--targets #{uri}] + common_flags }
+    let(:single_target)     { %W[--targets #{conn_uri('winrm')}] + common_flags }
+    let(:interpreter_task)  { 'sample::bolt_ruby' }
     let(:interpreter_ext) do
-      { 'interpreters' => {
-        '.rb' => RbConfig.ruby
+      { 'config' => {
+        'winrm' => {
+          'interpreters' => {
+            '.rb' => RbConfig.ruby
+          }
+        }
       } }
     end
     let(:interpreter_no_ext) do
-      { 'interpreters' => {
-        'rb' => RbConfig.ruby
+      { 'config' => {
+        'winrm' => {
+          'interpreters' => {
+            'rb' => RbConfig.ruby
+          }
+        }
       } }
     end
     let(:bad_interpreter) do
-      { 'interpreters' => {
-        'rb' => 'C:\dev\null'
+      { 'config' => {
+        'winrm' => {
+          'interpreters' => {
+            'rb' => 'C:\dev\null'
+          }
+        }
       } }
     end
 
+    around :each do |example|
+      with_project(inventory: inv) do |project|
+        @project = project
+        example.run
+      end
+    end
+
     it 'runs multiple commands' do
-      with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_nodes(%W[command run #{whoami} --configfile #{conf.path}] + config_flags)
-        expect(result.map { |r| r['stdout'].strip }).to eq([user, user])
+      result = run_nodes(%W[command run #{whoami}] + config_flags)
+      expect(result.map { |r| r['stdout'].strip }).to eq([user, user])
+    end
+
+    it 'runs multiple tasks' do
+      results = run_nodes(%w[task run sample::winstdin message=short] + config_flags)
+      results.each do |result|
+        expect(result['_output'].strip).to match(/STDIN: {"messa/)
       end
     end
 
-    it 'runs multiple tasks', :reset_puppet_settings do
-      with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        results = run_nodes(%W[task run sample::winstdin message=somemessage --configfile #{conf.path}] + config_flags)
-        results.each do |result|
-          expect(result['_output'].strip).to match(/STDIN: {"messa/)
-        end
+    context 'with interpreters without dots configured' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_no_ext) }
+
+      it 'runs task with specified interpreter key rb', windows: true do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
       end
     end
 
-    it 'runs task with specified interpreter key rb', :reset_puppet_settings, windows: true do
-      winrm_conf = { 'winrm' => config['winrm'].merge(interpreter_no_ext) }
-      with_tempfile_containing('conf', YAML.dump(config.merge(winrm_conf))) do |conf|
-        result =
-          run_nodes(%W[task run #{interpreter_task} message=somemessage
-                       --configfile #{conf.path}] + config_flags)
-        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
-        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
+    context 'with interpreters with dots configured' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_ext) }
+
+      it 'runs task with interpreter key .rb', windows: true do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
       end
     end
 
-    it 'runs task with interpreter key .rb', :reset_puppet_settings, windows: true do
-      winrm_conf = { 'winrm' => config['winrm'].merge(interpreter_ext) }
-      with_tempfile_containing('conf', YAML.dump(config.merge(winrm_conf))) do |conf|
-        result = run_nodes(%W[task run #{interpreter_task} message=somemessage
-                              --configfile #{conf.path}] + config_flags)
-        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
-        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
-      end
-    end
+    context 'with a bad interpreter' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, bad_interpreter) }
 
-    it 'task fails with bad interpreter', :reset_puppet_settings, windows: true do
-      winrm_conf = { 'winrm' => config['winrm'].merge(bad_interpreter) }
-      with_tempfile_containing('conf', YAML.dump(config.merge(winrm_conf))) do |conf|
-        result = run_failed_node(%W[task run #{interpreter_task} message=somemessage
-                                    --configfile #{conf.path}] + single_target_conf)
+      it 'task fails with bad interpreter', windows: true do
+        result = run_failed_node(%W[task run #{interpreter_task} message=short] + single_target)
         expect(result['_error']['msg']).to match(/'C:\\dev\\null' is not recognized/)
       end
     end

@@ -19,7 +19,7 @@ describe 'plans' do
   let(:modulepath)      { fixtures_path('modules') }
   let(:config_flags)    {
     ['--format', 'json',
-     '--configfile', fixtures_path('configs', 'empty.yml'),
+     '--project', fixtures_path('configs', 'empty'),
      '--modulepath', modulepath,
      '--no-host-key-check']
   }
@@ -79,7 +79,6 @@ describe 'plans' do
       end
 
       it 'runs registers types defined in $project/.resource_types', ssh: true do
-        # generate types based and save in project (based on value of --configfile)
         run_cli(%w[puppetfile generate-types] + config_flags)
         result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)
         expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
@@ -89,7 +88,6 @@ describe 'plans' do
         with_project(config: project_config) do |project|
           config_flags = %W[--format json -m #{modulepath} --project #{project.path} --no-host-key-check]
 
-          # generate types based and save in project (based on value of --configfile)
           run_cli(%w[module generate-types] + config_flags)
           result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)
           expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')

@@ -76,13 +76,13 @@ describe 'using module based plugins' do
     }
 
     it 'supports a config lookup' do
-      output = run_cli(['plan', 'run', 'test_plan', '--boltdir', project])
+      output = run_cli(['plan', 'run', 'test_plan', '--project', project])
 
       expect(output.strip).to eq('"ssshhh"')
     end
 
     it 'logs task output at trace level' do
-      run_cli(['plan', 'run', 'test_plan', '--boltdir', project])
+      run_cli(['plan', 'run', 'test_plan', '--project', project])
       output = @log_output.readlines
       expect(output).to include(/TRACE.*"value":{"value":"ssshhh"/)
     end
@@ -97,7 +97,7 @@ describe 'using module based plugins' do
       }
 
       it 'errors when the parameters dont match' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
+        result = run_cli_json(['plan', 'run', 'test_plan', '--project', project], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/validation-error")
         expect(result['msg']).to match(/Task identity::resolve_reference:\s*has no param/)
@@ -113,7 +113,7 @@ describe 'using module based plugins' do
       }
 
       it 'errors when the result is unexpected' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
+        result = run_cli_json(['plan', 'run', 'test_plan', '--project', project], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/plugin-error")
         expect(result['msg']).to match(/did not include a value/)
@@ -128,7 +128,7 @@ describe 'using module based plugins' do
       }
 
       it 'errors when the task fails' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
+        result = run_cli_json(['plan', 'run', 'test_plan', '--project', project], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/plugin-error")
         expect(result['msg']).to match(/The task failed/)
@@ -165,7 +165,7 @@ describe 'using module based plugins' do
     end
 
     it 'fails when config key is present in bolt_plugin.json' do
-      result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
+      result = run_cli_json(['plan', 'run', 'test_plan', '--project', project], rescue_exec: true)
 
       expect(result).to include('kind' => "bolt/invalid-plugin-data")
       expect(result['msg']).to match(/Found unsupported key 'config'/)
@@ -177,7 +177,7 @@ describe 'using module based plugins' do
         let(:plugin_config) { { 'task_conf_plug' => { 'required_key' => 'foo', 'optional_key' => 'clobber' } } }
 
         it 'merges parameters set in config and does not pass _config' do
-          result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project])
+          result = run_cli_json(['plan', 'run', 'test_plan', '--project', project])
 
           expect(result['remote']['data']).not_to include('_config' => plugin_config['conf_plug'])
           expect(result['remote']['data']).to include('_boltdir' => project)
@@ -191,7 +191,7 @@ describe 'using module based plugins' do
         let(:plugin_config) { { 'task_conf_plug' => { 'optional_key' => 'bar' } } }
 
         it 'treats all required values from task paramter metadata as optional' do
-          result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project])
+          result = run_cli_json(['plan', 'run', 'test_plan', '--project', project])
 
           expect(result['remote']['data']).not_to include('_config' => plugin_config['conf_plug'])
           expect(result['remote']['data']).to include('_boltdir' => project)
@@ -205,7 +205,7 @@ describe 'using module based plugins' do
         let(:plugin_config) { { 'task_conf_plug' => { 'random_key' => 'bar' } } }
 
         it 'forbids config entries that do not match task metadata schema' do
-          expect { run_cli(%W[plan run test_plan --boltdir #{project}]) }
+          expect { run_cli(%W[plan run test_plan --project #{project}]) }
             .to raise_error(Bolt::ValidationError, /task_conf_plug plugin contains unexpected key random_key/)
         end
       end
@@ -223,7 +223,7 @@ describe 'using module based plugins' do
         let(:plugin_config) { { 'task_conf_plug' => { 'intersection_key' => 'String' } } }
 
         it 'allows valid type in bolt.yaml and expected value is overriden in inventory' do
-          result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project])
+          result = run_cli_json(['plan', 'run', 'test_plan', '--project', project])
           expect(result['remote']['data']).to include('_boltdir' => project)
           expect(result['remote']['data']).to include('required_key' => 'foo')
           expect(result['remote']['data']).to include('intersection_key' => 1)
@@ -234,14 +234,14 @@ describe 'using module based plugins' do
 
   context 'when handling secrets' do
     it 'calls the encrypt task' do
-      result = run_cli(['secret', 'encrypt', 'secret_msg', '--plugin', 'my_secret', '--boltdir', project],
+      result = run_cli(['secret', 'encrypt', 'secret_msg', '--plugin', 'my_secret', '--project', project],
                        outputter: Bolt::Outputter::Human)
       # This is kind of brittle and we look for plaintext_value because this is really the identity task
       expect(result).to match(/"plaintext_value"=>"secret_msg"/)
     end
 
     it 'calls the decrypt task' do
-      result = run_cli(['secret', 'decrypt', 'secret_msg', '--plugin', 'my_secret', '--boltdir', project],
+      result = run_cli(['secret', 'decrypt', 'secret_msg', '--plugin', 'my_secret', '--project', project],
                        outputter: Bolt::Outputter::Human)
       # This is kind of brittle and we look for "encrypted_value because this is really the identity task
       expect(result).to match(/"encrypted_value"=>"secret_msg"/)
@@ -273,7 +273,7 @@ describe 'using module based plugins' do
       }
 
       it 'fails cleanly' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
+        result = run_cli_json(['plan', 'run', 'test_plan', '--project', project], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
@@ -293,7 +293,7 @@ describe 'using module based plugins' do
       }
 
       it 'fails cleanly' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
+        result = run_cli_json(['plan', 'run', 'test_plan', '--project', project], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
@@ -311,7 +311,7 @@ describe 'using module based plugins' do
       }
 
       it 'fails cleanly' do
-        result = run_cli_json(['plan', 'run', 'test_plan', '--boltdir', project], rescue_exec: true)
+        result = run_cli_json(['plan', 'run', 'test_plan', '--project', project], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
         expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)

@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/project'
 require 'bolt_spec/puppetdb'
 require 'bolt/catalog'
 require 'bolt/task'
@@ -12,6 +13,7 @@ describe "passes parsed AST to the apply_catalog task" do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::Project
   include BoltSpec::PuppetDB
 
   let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
@@ -66,8 +68,9 @@ describe "passes parsed AST to the apply_catalog task" do
     end
 
     it 'uses trusted external facts' do
-      with_tempfile_containing('bolt', YAML.dump("trusted-external-command" => trusted_external), '.yaml') do |conf|
-        result = run_cli_json(%W[plan run basic::trusted --configfile #{conf.path}] + config_flags)
+      config = { "trusted-external-command" => trusted_external }
+      with_project(config: config) do |project|
+        result = run_cli_json(%W[plan run basic::trusted --project #{project.path}] + config_flags)
         notify = get_notifies(result)
         expect(notify.count).to eq(1)
         expect(notify[0]['title']).to eq(
@@ -78,8 +81,9 @@ describe "passes parsed AST to the apply_catalog task" do
     end
 
     it 'errors if trusted external facts path does not exist' do
-      with_tempfile_containing('bolt', YAML.dump("trusted-external-command" => '/absent.sh'), '.yaml') do |conf|
-        expect { run_cli_json(%W[plan run basic::trusted --configfile #{conf.path}] + config_flags) }
+      config = { "trusted-external-command" => '/absent.sh' }
+      with_project(config: config) do |project|
+        expect { run_cli_json(%W[plan run basic::trusted --project #{project.path}] + config_flags) }
           .to raise_error(Bolt::FileError, %r{The trusted-external-command '/absent.sh' does not exist})
       end
     end
@@ -259,16 +263,16 @@ describe "passes parsed AST to the apply_catalog task" do
       }
 
       it 'default datadir is accessible' do
-        with_tempfile_containing('conf', YAML.dump(default_datadir)) do |conf|
-          result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+        with_project(config: default_datadir) do |project|
+          result = run_cli_json(%W[plan run basic::hiera_lookup --project #{project.path}] + config_flags)
           notify = get_notifies(result)
           expect(notify[0]['title']).to eq("hello default datadir")
         end
       end
 
       it 'non-default datadir specified in hiera config is accessible' do
-        with_tempfile_containing('conf', YAML.dump(custom_datadir)) do |conf|
-          result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+        with_project(config: custom_datadir) do |project|
+          result = run_cli_json(%W[plan run basic::hiera_lookup --project #{project.path}] + config_flags)
           notify = get_notifies(result)
           expect(notify[0]['title']).to eq("hello custom datadir")
         end
@@ -277,8 +281,8 @@ describe "passes parsed AST to the apply_catalog task" do
       it 'hiera eyaml can be decoded' do
         with_tempfile_containing('yaml', YAML.dump(eyaml_config)) do |yaml_data|
           config = { 'hiera-config' => yaml_data.path.to_s }
-          with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-            result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+          with_project(config: config) do |project|
+            result = run_cli_json(%W[plan run basic::hiera_lookup --project #{project.path}] + config_flags)
             notify = get_notifies(result)
             expect(notify[0]['title']).to eq("hello encrypted value")
           end
@@ -286,8 +290,8 @@ describe "passes parsed AST to the apply_catalog task" do
       end
 
       it 'hiera 5 version not specified' do
-        with_tempfile_containing('conf', YAML.dump(bad_hiera_version)) do |conf|
-          result = run_cli_json(%W[plan run basic::hiera_lookup --configfile #{conf.path}] + config_flags)
+        with_project(config: bad_hiera_version) do |project|
+          result = run_cli_json(%W[plan run basic::hiera_lookup --project #{project.path}] + config_flags)
           expect(result['kind']).to eq('bolt/parse-error')
           expect(result['msg']).to match(/Hiera v5 is required, found v3/)
         end
@@ -295,33 +299,29 @@ describe "passes parsed AST to the apply_catalog task" do
     end
 
     context 'when using project-level content' do
-      let(:project) { File.join(__dir__, '../fixtures/projects/named') }
+      let(:project) { fixtures_path('projects', 'named') }
 
       it 'applies a class contained in a project-level manifest' do
-        result = run_cli_json(%W[plan run test_project::apply --boltdir #{project}] + config_flags)
+        result = run_cli_json(%W[plan run test_project::apply --project #{project}] + config_flags)
         notify = get_notifies(result)
         expect(notify[0]['title']).to eq('project notify')
       end
     end
 
     context 'with inventoryfile stubbed' do
-      let(:inventory) {
-        {
-          'inventoryfile' => File.join(__dir__, '../fixtures/apply/inventory.yaml').to_s
-        }
-      }
+      let(:inventory) { { 'inventoryfile' => fixtures_path('inventory', 'apply.yaml') } }
 
       it 'vars cannot be set on the target' do
-        with_tempfile_containing('conf', YAML.dump(inventory)) do |conf|
-          result = run_cli_json(%W[plan run basic::xfail_set_var --configfile #{conf.path}] + config_flags)
+        with_project(config: inventory) do |project|
+          result = run_cli_json(%W[plan run basic::xfail_set_var --project #{project.path}] + config_flags)
           expect(result['kind']).to eq('bolt/apply-failure')
           expect(result['msg']).to match(/Apply failed to compile for/)
         end
       end
 
       it 'features cannot be set on the target' do
-        with_tempfile_containing('conf', YAML.dump(inventory)) do |conf|
-          result = run_cli_json(%W[plan run basic::xfail_set_feature --configfile #{conf.path}] + config_flags)
+        with_project(config: inventory) do |project|
+          result = run_cli_json(%W[plan run basic::xfail_set_feature --project #{project.path}] + config_flags)
           expect(result['kind']).to eq('bolt/apply-failure')
           expect(result['msg']).to match(/Apply failed to compile for/)
         end
@@ -329,7 +329,7 @@ describe "passes parsed AST to the apply_catalog task" do
     end
 
     context 'with Bolt plan datatypes' do
-      let(:inventory) { File.join(__dir__, '../fixtures/apply/inventory.yaml') }
+      let(:inventory) { fixtures_path('inventory', 'apply.yaml') }
       let(:tflags) { %W[--no-host-key-check --inventoryfile #{inventory} --run-as root] }
 
       it 'serializes ResultSet objects in apply blocks' do

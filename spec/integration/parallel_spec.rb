@@ -67,7 +67,7 @@ describe 'plans' do
   end
 
   context "over ssh", ssh: true do
-    let(:inv_path) { fixtures_path('inventory', 'docker.yml') }
+    let(:inv_path) { fixtures_path('inventory', 'docker.yaml') }
     let(:config_flags) {
       ['-t all',
        '--modulepath', modulepath,

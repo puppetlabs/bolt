@@ -4,17 +4,19 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/project'
 
 describe "when running over the docker transport", docker: true do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::Project
 
-  let(:whoami) { "whoami" }
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
-  let(:stdin_task) { "sample::stdin" }
-  let(:uri) { (1..2).map { |i| "#{conn_uri('docker')}?id=#{i}" }.join(',') }
-  let(:user) { 'root' }
+  let(:whoami)      { "whoami" }
+  let(:modulepath)  { fixtures_path('modules') }
+  let(:stdin_task)  { "sample::stdin" }
+  let(:uri)         { (1..2).map { |i| "#{conn_uri('docker')}?id=#{i}" }.join(',') }
+  let(:user)        { 'root' }
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
@@ -44,57 +46,74 @@ describe "when running over the docker transport", docker: true do
     end
   end
 
-  context 'when using a configfile' do
+  context 'when using a project' do
     let(:config) do
       { 'format' => 'json',
-        'modulepath' => modulepath,
+        'modulepath' => modulepath }
+    end
+    let(:default_inv) do
+      { 'config' => {
         'transport' => 'docker',
         'docker' => {
           'user' => user
-        } }
+        }
+      } }
     end
-
-    let(:config_flags) { %W[--targets #{uri}] }
-    let(:single_target_conf) { %W[--targets #{conn_uri('docker')}] }
-    let(:interpreter_task) { 'sample::interpreter' }
+    let(:inv)                 { default_inv }
+    let(:project)             { @project }
+    let(:config_flags)        { %W[--targets #{uri} --project #{project.path}] }
+    let(:single_target_conf)  { %W[--targets #{conn_uri('docker')} --project #{project.path}] }
+    let(:interpreter_task)    { 'sample::interpreter' }
     let(:interpreter_ext) do
-      { 'interpreters' => {
-        '.py' => '/usr/bin/python3'
+      { 'config' => {
+        'docker' => {
+          'interpreters' => {
+            '.py' => '/usr/bin/python3'
+          }
+        }
       } }
     end
     let(:interpreter_no_ext) do
-      { 'interpreters' => {
-        'py' => '/usr/bin/python3'
+      { 'config' => {
+        'docker' => {
+          'interpreters' => {
+            '.py' => '/usr/bin/python3'
+          }
+        }
       } }
     end
 
-    it 'runs task with specified interpreter key py', :reset_puppet_settings do
-      docker_conf = { 'docker' => config['docker'].merge(interpreter_no_ext) }
-      with_tempfile_containing('conf', YAML.dump(config.merge(docker_conf))) do |conf|
-        result =
-          run_nodes(%W[task run #{interpreter_task} message=somemessage
-                       --configfile #{conf.path}] + config_flags)
-        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
-        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
+    around :each do |example|
+      with_project(config: config, inventory: inv) do |project|
+        @project = project
+        example.run
       end
     end
 
-    it 'runs task with interpreter key .py', :reset_puppet_settings do
-      docker_conf = { 'docker' => config['docker'].merge(interpreter_ext) }
-      with_tempfile_containing('conf', YAML.dump(config.merge(docker_conf))) do |conf|
-        result = run_nodes(%W[task run #{interpreter_task} message=somemessage
-                              --configfile #{conf.path}] + config_flags)
-        expect(result.map { |r| r['env'].strip }).to eq(%w[somemessage somemessage])
-        expect(result.map { |r| r['stdin'].strip }).to eq(%w[somemessage somemessage])
+    context 'with interpreters without dots configured' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_no_ext) }
+
+      it 'runs task with specified interpreter key py', :reset_puppet_settings do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
+      end
+    end
+
+    context 'with interpreters without dots configured' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_ext) }
+
+      it 'runs task with interpreter key .py', :reset_puppet_settings do
+        result = run_nodes(%W[task run #{interpreter_task} message=short
+                              --project #{project.path}] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
       end
     end
 
     it 'task fails when bad shebang is not overriden', :reset_puppet_settings do
-      with_tempfile_containing('conf', YAML.dump(config)) do |conf|
-        result = run_failed_node(%W[task run #{interpreter_task} message=somemessage
-                                    --configfile #{conf.path}] + single_target_conf)
-        expect(result['_error']['msg']).to be
-      end
+      result = run_failed_node(%W[task run #{interpreter_task} message=short] + single_target_conf)
+      expect(result['_error']['msg']).to be
     end
   end
 end

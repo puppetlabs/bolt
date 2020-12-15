@@ -20,7 +20,7 @@ describe "catch_errors", ssh: true do
 
   let(:config_flags) {
     ['--format', 'json',
-     '--configfile', fixtures_path('configs', 'empty.yml'),
+     '--project', fixtures_path('configs', 'empty'),
      '--modulepath', modulepath,
      '--targets', target] + transport_flags
   }

@@ -15,7 +15,7 @@ describe "lookup() in plans" do
   let(:plan)         { 'test::lookup' }
 
   let(:cli_command) {
-    %W[plan run #{plan} --boltdir #{boltdir} --hiera-config #{hiera_config}]
+    %W[plan run #{plan} --project #{boltdir} --hiera-config #{hiera_config}]
   }
 
   it 'returns a value' do
