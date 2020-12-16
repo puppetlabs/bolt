@@ -1,15 +1,6 @@
 # Changelog
 
-## Bolt 2.40.0 (2020-12-16)
-
-### New features
-
-* **Support `module-install` config when resolving modules**
-  ([#2478](https://github.com/puppetlabs/bolt/issues/2478))
-
-  The `bolt module add|install` commands and `Add|Install-BoltModule`
-  cmdlets now support the `module-install` config option when resolving
-  module dependencies.
+## Bolt 2.40.1 (2020-12-16)
 
 ### Bug fixes
 
