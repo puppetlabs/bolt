@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt 2.39.0 (2020-12-16)
+## Bolt 2.40.0 (2020-12-16)
 
 ### New features
 
