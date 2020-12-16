@@ -34,10 +34,11 @@ module Bolt
 
         }.freeze
 
-        # private def validate
-        #  super
-        #  # TODO
-        # end
+        private def validate
+          puts 'how in the world!!!?!?!?'
+          super
+          # TODO
+        end
       end
     end
   end
