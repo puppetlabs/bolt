@@ -47,17 +47,18 @@ module Bolt
     # the value's type, the value is passed off to an individual
     # validation method for the value's type.
     #
-    private def validate_value(value, definition)
-      definition = @schema.dig(:definitions, definition[:_ref]) if definition[:_ref]
+    private def validate_value(value, definition, plugin_supported = false)
+      definition       = @schema.dig(:definitions, definition[:_ref]) if definition[:_ref]
+      plugin_supported = definition[:_plugin] if definition.key?(:_plugin)
 
-      return if plugin_reference?(value, definition)
+      return if plugin_reference?(value, plugin_supported)
       return unless valid_type?(value, definition)
 
       case value
       when Hash
-        validate_hash(value, definition)
+        validate_hash(value, definition, plugin_supported)
       when Array
-        validate_array(value, definition)
+        validate_array(value, definition, plugin_supported)
       when String
         validate_string(value, definition)
       when Numeric
@@ -69,7 +70,7 @@ module Bolt
     # This will enumerate each key-value pair in the hash and validate each
     # value individually.
     #
-    private def validate_hash(value, definition)
+    private def validate_hash(value, definition, plugin_supported)
       properties = definition[:properties] ? definition[:properties].keys : []
 
       if definition[:properties] && definition[:additionalProperties].nil?
@@ -86,9 +87,9 @@ module Bolt
 
         if properties.include?(key)
           check_deprecated(key, definition[:properties][key])
-          validate_value(val, definition[:properties][key])
+          validate_value(val, definition[:properties][key], plugin_supported)
         elsif definition[:additionalProperties].is_a?(Hash)
-          validate_value(val, definition[:additionalProperties])
+          validate_value(val, definition[:additionalProperties], plugin_supported)
         end
       ensure
         @path.pop
@@ -99,7 +100,7 @@ module Bolt
     # This will enumerate the items in the array and validate each item
     # individually.
     #
-    private def validate_array(value, definition)
+    private def validate_array(value, definition, plugin_supported)
       if definition[:uniqueItems] && value.size != value.uniq.size
         @errors << "Value at '#{path}' must not include duplicate elements"
         return
@@ -109,7 +110,7 @@ module Bolt
 
       value.each_with_index do |item, index|
         @path.push(index)
-        validate_value(item, definition[:items])
+        validate_value(item, definition[:items], plugin_supported)
       ensure
         @path.pop
       end
@@ -168,9 +169,9 @@ module Bolt
     # plugin reference but cannot be one according to the schema, then this will
     # log an error.
     #
-    private def plugin_reference?(value, definition)
+    private def plugin_reference?(value, plugin_supported)
       if value.is_a?(Hash) && value.key?('_plugin')
-        unless definition[:_plugin]
+        unless plugin_supported
           @errors << "Value at '#{path}' is a plugin reference, which is unsupported at "\
                       "this location"
         end

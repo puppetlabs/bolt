@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt_spec/project'
 
 describe 'validating config' do
+  include BoltSpec::Files
   include BoltSpec::Integration
   include BoltSpec::Project
 
@@ -19,9 +21,115 @@ describe 'validating config' do
     allow($stdout).to receive(:puts)
   end
 
-  let(:command)        { %W[inventory show --targets all --project #{@project_path}] }
+  let(:command)        { %W[inventory show --targets all --project #{@project_path} --modulepath #{modulepath}] }
   let(:inventory)      { nil }
+  let(:modulepath)     { fixtures_path('plugin_modules') }
   let(:project_config) { nil }
+
+  context 'with plugin reference' do
+    context 'at plugins' do
+      let(:project_config) do
+        {
+          'plugins' => {
+            '_plugin' => 'identity',
+            'value' => 'foo'
+          }
+        }
+      end
+
+      it 'errors' do
+        expect { run_cli(command) }.to raise_error(
+          Bolt::ValidationError,
+          /Value at 'plugins' is a plugin reference, which is unsupported at this location/
+        )
+      end
+    end
+
+    context 'at plugins.*' do
+      let(:project_config) do
+        {
+          'plugins' => {
+            'pkcs7' => {
+              '_plugin' => 'identity',
+              'value' => {
+                'keysize' => 2048
+              }
+            }
+          }
+        }
+      end
+
+      it 'does not error' do
+        expect { run_cli(command) }.not_to raise_error
+      end
+    end
+
+    context 'at ssh.private-key.key-data' do
+      let(:inventory) do
+        {
+          'config' => {
+            'ssh' => {
+              'private-key' => {
+                'key-data' => {
+                  '_plugin' => 'identity',
+                  'value' => 'foo'
+                }
+              }
+            }
+          }
+        }
+      end
+
+      it 'does not error' do
+        expect { run_cli(command) }.not_to raise_error
+      end
+    end
+
+    context 'at ssh.interpreters' do
+      let(:inventory) do
+        {
+          'config' => {
+            'ssh' => {
+              'interpreters' => {
+                '_plugin' => 'identity',
+                'value' => {
+                  '.rb' => '/opt/puppetlabs/puppet/bin/ruby'
+                }
+              }
+            }
+          }
+        }
+      end
+
+      it 'does not error' do
+        expect { run_cli(command) }.not_to raise_error
+      end
+    end
+
+    context 'at ssh.interpreters.*' do
+      let(:inventory) do
+        {
+          'config' => {
+            'ssh' => {
+              'interpreters' => {
+                'rb' => {
+                  '_plugin' => 'identity',
+                  'value' => '/opt/puppetlabs/puppet/bin/ruby'
+                }
+              }
+            }
+          }
+        }
+      end
+
+      it 'errors' do
+        expect { run_cli(command) }.to raise_error(
+          Bolt::ValidationError,
+          /Value at 'config.ssh.interpreters.rb' is a plugin reference, which is unsupported at this location/
+        )
+      end
+    end
+  end
 
   context 'with valid config' do
     let(:project_config) do
@@ -314,26 +422,6 @@ describe 'validating config' do
   context 'with plugins defined in puppetdb config' do
     let(:project_config) do
       {
-        'apply-settings' => {
-          'show_diff' => true
-        },
-        'color' => false,
-        'compile-concurrency' => 2,
-        'format' => 'json',
-        'log' => {
-          'warn.log' => {
-            'level' => 'warn',
-            'append' => true
-          },
-          'bolt-debug.log' => 'disable'
-        },
-        'modulepath' => %w[
-          modules
-          site-modules
-        ],
-        'plans' => [
-          'myproject::deploy'
-        ],
         'puppetdb' => {
           'cacert' => {
             '_plugin' => 'envvar',
@@ -372,10 +460,7 @@ describe 'validating config' do
             'var' => 'BOLT_PUPPETDB_TOKEN',
             'default' => '/path/to/token'
           }
-        },
-        'tasks' => [
-          'myproject::install_server'
-        ]
+        }
       }
     end
 

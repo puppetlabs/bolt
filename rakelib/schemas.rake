@@ -223,7 +223,7 @@ def add_plugin_reference(definition)
 end
 
 # Recurses through a definition and JSON-ifies the data types.
-def to_schema(data)
+def to_schema(data, plugin = false)
   return data unless data.is_a?(Hash)
 
   # Creates JSON references
@@ -236,22 +236,26 @@ def to_schema(data)
     key.to_s.start_with?('_')
   end.map(&:to_h)
 
+  # Flip plugin to true if the definition allows a plugin reference.
+  # This will allow plugin references for all sub-options and items.
+  plugin = metadata[:_plugin] if metadata.key?(:_plugin)
+
   # Recurse through some properties, as each can have their own defintions.
-  %i[items additionalProperties propertyNames].each do |key|
+  %i[items additionalProperties].each do |key|
     next unless data.key?(key)
-    data[key] = to_schema(data[key])
+    data[key] = to_schema(data[key], plugin)
   end
 
   %i[properties definitions].each do |key|
     next unless data.key?(key)
-    data[key] = data[key].transform_values { |opt| to_schema(opt) }
+    data[key] = data[key].transform_values { |opt| to_schema(opt, plugin) }
   end
 
   # Turn Ruby types into JSON types.
   data[:type] = to_json_types(data[:type]) if data.key?(:type)
 
   # Add a plugin definition if supported by the option.
-  data = metadata[:_plugin] ? add_plugin_reference(data) : data
+  data = plugin ? add_plugin_reference(data) : data
 
   # Stringify keys
   data.transform_keys(&:to_s)
