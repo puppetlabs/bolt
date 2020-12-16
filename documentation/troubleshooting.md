@@ -26,15 +26,7 @@ You need to upgrade your project so Bolt can manage your modules and
 dependencies. For more information, see [migrate a Bolt
 project](./projects.md#migrate-a-bolt-project).
 
-## My task fails mysteriously
-
-Try running Bolt with `--log-level debug` to see the exact output from your task.
-
-Make sure your task executable starts with a shebang (`#!`) line indicating the
-interpreter to use and verify that the executable is present on the target
-system. For example, if you write a Python task and include the line:
-`#!/usr/bin/env python`, Bolt attempts to execute the script using the default
-`python` executable on the target system.
+## My task fails with a "permission denied" error (`noexec` issue)
 
 If your task fails with the following error, the issue may be that your temporary directory (tmpdir)
 is [mounted with noexec](https://superuser.com/questions/728127/what-does-noexec-flag-mean-when-mounting-directories-on-rhel).
@@ -47,6 +39,16 @@ The task failed with exit code 126 and no stdout but stderr contained:
 You can resolve this by [configuring an alternate tmpdir](bolt_transports_reference.md) for the
 transport you're using, or by talking to your administrator about updating permissions for the
 directory.
+
+## My task fails mysteriously
+
+Try running Bolt with `--log-level debug` to see the exact output from your task.
+
+Make sure your task executable starts with a shebang (`#!`) line indicating the
+interpreter to use and verify that the executable is present on the target
+system. For example, if you write a Python task and include the line:
+`#!/usr/bin/env python`, Bolt attempts to execute the script using the default
+`python` executable on the target system.
 
 ## Bolt can't connect to my hosts over SSH
 
