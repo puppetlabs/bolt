@@ -44,7 +44,7 @@ module Bolt
         Bolt::Result.for_download(target, source, destination)
       end
 
-      def run_command(target, command, options = {})
+      def run_command(target, command, options = {}, position)
         with_connection(target) do |conn|
           # TODO: what about
           # * environment variables
