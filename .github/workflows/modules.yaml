@@ -25,7 +25,7 @@ jobs:
           ruby-version: '2.5.x'
       - name: Install bundler
         run: |
-          gem install bundler -v 2.1.4
+          gem install bundler
           bundle config path vendor/bundle
       - name: Cache gems
         id: cache
@@ -56,7 +56,7 @@ jobs:
           ruby-version: 2.5.x
       - name: Install bundler
         run: |
-          gem install bundler -v 2.1.4
+          gem install bundler
           bundle config path vendor/bundle
       - name: Cache gems
         id: cache
