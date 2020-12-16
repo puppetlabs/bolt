@@ -1,5 +1,39 @@
 # Changelog
 
+## Bolt 2.39.0 (2020-12-16)
+
+### New features
+
+* **Support `module-install` config when resolving modules**
+  ([#2478](https://github.com/puppetlabs/bolt/issues/2478))
+
+  The `bolt module add|install` commands and `Add|Install-BoltModule`
+  cmdlets now support the `module-install` config option when resolving
+  module dependencies.
+
+### Bug fixes
+
+* **Fix bug warning about keys under 'remote' transport**
+  ([#2477](https://github.com/puppetlabs/bolt/issues/2477))
+
+  Bolt now will not warn when keys are configured for the `remote`
+  transport in inventory.
+
+* **Support plugins for suboptions under options that allow plugins**
+  ([#2483](https://github.com/puppetlabs/bolt/pull/2483))
+
+  All suboptions for config options that support plugins once again
+  support plugins. For example, the `key-data` suboption for the
+  `private-key` option can use plugins again.
+
+* **Load the correct data for plugin invocations**
+  ([#2487](https://github.com/puppetlabs/bolt/pull/2487))
+
+  Bolt now correctly loads data for the plugin invocation based on the
+  plugin data, not just cache `ttl`. Previously, any plugins with the
+  same cache configuration would collide in the cache data and overwrite
+  each other, causing the wrong data to be loaded.
+
 ## Bolt 2.38.0 (2020-12-14)
 
 ### New features
