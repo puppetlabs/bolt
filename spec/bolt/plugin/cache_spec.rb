@@ -4,11 +4,12 @@ require 'spec_helper'
 require 'bolt/plugin/cache'
 
 describe Bolt::Plugin::Cache do
-  let(:reference) {
-    { '_plugin' => 'task',
-      'task' => 'env_plugin::resolve_reference',
+  let(:env_var)   { 'BOLT_TEST_PLUGIN_VALUE' }
+  let(:reference) do
+    { '_plugin' => 'env_var',
+      'var' => env_var,
       '_cache' => { 'ttl' => 120 } }
-  }
+  end
   let(:plugin_cache) { Bolt::Plugin::Cache.new(reference, @tmpfile, {}) }
 
   around :each do |example|
@@ -21,8 +22,8 @@ describe Bolt::Plugin::Cache do
   context "#validate" do
     context "if _cache is not a Hash" do
       let(:reference) {
-        { '_plugin' => 'task',
-          'task' => 'env_plugin::resolve_reference',
+        { '_plugin' => 'env_var',
+          'var' => env_var,
           '_cache' => 120 }
       }
       it "fails" do
@@ -33,8 +34,8 @@ describe Bolt::Plugin::Cache do
 
     context "if _cache does not have a ttl key" do
       let(:reference) {
-        { '_plugin' => 'task',
-          'task' => 'env_plugin::resolve_reference',
+        { '_plugin' => 'env_var',
+          'var' => env_var,
           '_cache' => { 'tl' => 120 } }
       }
       it "fails" do
@@ -47,8 +48,8 @@ describe Bolt::Plugin::Cache do
   context "#read_and_clean_cache" do
     context "with ttl 0" do
       let(:reference) {
-        { '_plugin' => 'task',
-          'task' => 'env_plugin::resolve_reference',
+        { '_plugin' => 'env_var',
+          'var' => env_var,
           '_cache' => { 'ttl' => 0 } }
       }
 

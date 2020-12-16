@@ -1,3 +1,0 @@
-{
-  "description": "Bolt plugin that returns env var BOLT_TEST_PLUGIN_VALUE, used for testing"
-}
