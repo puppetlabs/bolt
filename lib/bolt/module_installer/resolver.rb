@@ -9,7 +9,7 @@ module Bolt
     class Resolver
       # Resolves module specs and returns a Puppetfile object.
       #
-      def resolve(specs, config = {})
+      def resolve(specs, _config = {})
         require 'puppetfile-resolver'
 
         # Build the document model from the specs.
@@ -38,10 +38,10 @@ module Bolt
         # raised by puppetfile-resolver and re-raising them as Bolt errors.
         begin
           result = resolver.resolve(
-            cache:                       nil,
-            ui:                          nil,
-            allow_missing_modules:       false,
-            spec_searcher_configuration: spec_searcher_config(config)
+            cache:                 nil,
+            ui:                    nil,
+            module_paths:          [],
+            allow_missing_modules: false
           )
         rescue StandardError => e
           raise Bolt::Error.new(e.message, 'bolt/module-resolver-error')
@@ -70,14 +70,6 @@ module Bolt
 
         # Create the Puppetfile object.
         Bolt::ModuleInstaller::Puppetfile.new(modules)
-      end
-
-      private def spec_searcher_config(config)
-        PuppetfileResolver::SpecSearchers::Configuration.new.tap do |obj|
-          obj.forge.proxy     = config.dig('forge', 'proxy') || config.dig('proxy')
-          obj.git.proxy       = config.dig('proxy')
-          obj.forge.forge_api = config.dig('forge', 'baseurl')
-        end
       end
     end
   end
