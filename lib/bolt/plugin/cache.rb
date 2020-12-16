@@ -21,7 +21,7 @@ module Bolt
 
         # Luckily we don't need to use a serious hash algorithm
         require 'digest/bubblebabble'
-        r = reference.select { |k, _| k == '_cache' }.sort.to_s
+        r = reference.reject { |k, _| k == '_cache' }.sort.to_s
         @id = Digest::SHA2.bubblebabble(r)[0..20]
 
         unmodified = true
