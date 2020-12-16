@@ -38,7 +38,7 @@ describe 'installing modules' do
     context 'with Forge modules' do
       let(:project_config) { base_config.merge('modules' => ['puppetlabs-yaml']) }
 
-      it 'uses the forge configuration' do
+      xit 'uses the forge configuration' do
         expect { run_cli(command, project: project) }.to raise_error(
           Bolt::Error,
           %r{on https://forge.example.com with proxy https://myforgeproxy.example.com}
@@ -58,7 +58,7 @@ describe 'installing modules' do
         )
       end
 
-      it 'uses the global proxy' do
+      xit 'uses the global proxy' do
         expect { run_cli(command, project: project) }.to raise_error(
           Bolt::Error,
           %r{with proxy https://myproxy.example.com}
