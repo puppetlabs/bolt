@@ -273,6 +273,62 @@ requirement.
 > documentation on [Specifying
 > versions](https://puppet.com/docs/puppet/latest/modules_metadata.html#specifying-versions).
 
+## Install Forge modules from an alternate Forge
+
+You can configure Bolt to use a Forge other than the [Puppet
+Forge](https://forge.puppet.com) when it installs Forge modules. To configure
+Bolt to use an alternate Forge, set the `module-install` configuration option in
+either your project configuration file, `bolt-project.yaml`, or the default
+configuration file, `bolt-defaults.yaml`.
+
+To use an alternate Forge for installing Forge modules, set the `baseurl` key
+under the `forge` section of the `module-install` option:
+
+```yaml
+# bolt-project.yaml
+module-install:
+  forge:
+    baseurl: https://forge.example.com
+```
+
+📖 **Related information**
+
+- [bolt-project.yaml options](bolt_project_reference.md#module-install)
+- [bolt-defaults.yaml options](bolt_defaults_reference.md#module-install)
+
+## Install modules using a proxy
+
+If your workstation cannot connect directly to the internet, you can configure
+Bolt to use a proxy when it installs modules. To configure Bolt to use a proxy
+when it installs modules, set the `module-install` configuration option in
+either your project configuration file, `bolt-project.yaml`, or the default
+configuration file, `bolt-defaults.yaml`.
+
+To set a global proxy that is used for installing Forge and git modules, set
+the `proxy` key under `module-install`:
+
+```yaml
+# bolt-project.yaml
+module-install:
+  proxy: https://proxy.com:8080
+```
+
+You can also set a proxy that is only used when installing Forge modules. To
+set a proxy for installing Forge modules, set the `proxy` key under the `forge`
+section of the `module-install` option:
+
+```yaml
+# bolt-project.yaml
+module-install:
+  forge:
+    proxy: https://forge-proxy.com:8080
+```
+
+📖 **Related information**
+
+- [bolt-project.yaml options](bolt_project_reference.md#module-install)
+- [bolt-defaults.yaml options](bolt_defaults_reference.md#module-install)
+
 ## ⛔ Manage modules with a Puppetfile
 
 ⛔ **DEPRECATED:** This method of installing and managing modules is deprecated.
