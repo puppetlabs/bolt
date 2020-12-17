@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt_spec/files'
 require 'bolt_spec/integration'
 
 describe "when sending an out::message event" do
+  include BoltSpec::Files
   include BoltSpec::Integration
 
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
+  let(:modulepath) { fixtures_path('modules') }
   let(:config_flags) { %W[--modulepath #{modulepath}] }
 
   it "prints to stdout when format is human" do

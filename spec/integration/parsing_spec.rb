@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/integration'
 require 'bolt_spec/conn'
+require 'bolt_spec/files'
+require 'bolt_spec/integration'
 
 describe "CLI parses input" do
-  include BoltSpec::Integration
   include BoltSpec::Conn
+  include BoltSpec::Files
+  include BoltSpec::Integration
 
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
-  let(:script_path) { File.join(__dir__, '../fixtures/scripts/success.sh') }
+  let(:modulepath) { fixtures_path('modules') }
+  let(:script_path) { fixtures_path('scripts', 'success.sh') }
   let(:config_flags) {
     %W[--format json
        --modulepath #{modulepath}
@@ -37,7 +39,7 @@ describe "CLI parses input" do
     expect(result).to eq(
       "name" => "parsing",
       "description" => nil,
-      "module_dir" => File.absolute_path(File.join(__dir__, '..', 'fixtures', 'modules', 'parsing')),
+      "module_dir" => fixtures_path('modules', 'parsing'),
       "parameters" => {
         "string" => { "type" => "String", "sensitive" => false },
         "string_bool" => { "type" => "Variant[String, Boolean]", "sensitive" => false },
@@ -109,7 +111,7 @@ describe "CLI parses input" do
   end
 
   it 'parses environment variables', ssh: true do
-    script = File.join(__dir__, '../fixtures/modules/env_var/tasks/get_var.sh')
+    script = fixtures_path('modules', 'env_var', 'tasks', 'get_var.sh')
     output = run_cli_json(%W[script run #{script} -t #{target} --env-var test_var=123] + config_flags)
     expect(output['items'][0]['value']['stdout'].strip).to eq('123')
   end

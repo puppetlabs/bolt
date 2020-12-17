@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt_spec/files'
 require 'bolt_spec/plans'
 
 # Requires targets, plan_name, return_expects to be set.
@@ -44,10 +45,11 @@ shared_examples 'action tests' do
 end
 
 describe "BoltSpec::Plans" do
+  include BoltSpec::Files
   include BoltSpec::Plans
 
   def modulepath
-    File.join(__dir__, '../fixtures/bolt_spec')
+    fixtures_path('bolt_spec')
   end
 
   let(:targets) { %w[foo bar] }

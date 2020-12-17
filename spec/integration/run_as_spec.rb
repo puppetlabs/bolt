@@ -11,7 +11,7 @@ describe "when running a plan using run_as", ssh: true do
   include BoltSpec::Integration
   include BoltSpec::Project
 
-  let(:modulepath) { File.join(__dir__, '../fixtures/run_as') }
+  let(:modulepath) { fixtures_path('run_as') }
   let(:uri) { conn_uri('ssh', include_password: true) }
   let(:user) { conn_info('ssh')[:user] }
   let(:password) { conn_info('ssh')[:password] }
@@ -30,7 +30,7 @@ describe "when running a plan using run_as", ssh: true do
   end
 
   context 'when passing environment variables' do
-    let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
+    let(:modulepath) { fixtures_path('modules') }
 
     it 'correctly passes environment variables to a task' do
       output = run_cli_json(%W[task run sample message=tacos -t #{uri}] + config_flags)

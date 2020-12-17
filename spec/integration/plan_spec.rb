@@ -16,13 +16,13 @@ describe 'plans' do
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
-  let(:modulepath)      { fixtures_path('modules') }
-  let(:config_flags)    {
+  let(:config_flags) {
     ['--format', 'json',
      '--project', fixtures_path('configs', 'empty'),
      '--modulepath', modulepath,
      '--no-host-key-check']
   }
+  let(:modulepath)      { fixtures_path('modules') }
   let(:target)          { conn_uri('ssh', include_password: true) }
   let(:project_config)  { { 'modules' => [] } }
 

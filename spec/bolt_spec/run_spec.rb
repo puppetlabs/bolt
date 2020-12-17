@@ -2,18 +2,18 @@
 
 require 'spec_helper'
 require 'bolt_spec/conn'
-require 'bolt_spec/run'
 require 'bolt_spec/files'
+require 'bolt_spec/run'
 
 # In order to speed up tests there are only ssh versions of these specs
 # While the target shouldn't matter this does mean this helper is not tested on
 # windows controllers.
 describe "BoltSpec::Run", ssh: true do
-  include BoltSpec::Run
   include BoltSpec::Conn
   include BoltSpec::Files
+  include BoltSpec::Run
 
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
+  let(:modulepath) { fixtures_path('modules') }
   let(:bolt_config) {
     { "modulepath" => modulepath,
       "ssh" => { "host-key-check" => false },
@@ -50,7 +50,7 @@ describe "BoltSpec::Run", ssh: true do
   end
 
   describe 'run_script' do
-    let(:script) { File.join(bolt_config['modulepath'], '..', 'scripts', 'success.sh') }
+    let(:script) { fixtures_path('scripts', 'success.sh') }
 
     it 'should run a command on a node with an argument', ssh: true do
       result = run_script(script, 'ssh', ['hi'])
@@ -67,7 +67,7 @@ describe "BoltSpec::Run", ssh: true do
   end
 
   describe 'upload_file' do
-    let(:file) { File.join(bolt_config['modulepath'], '..', 'scripts', 'success.sh') }
+    let(:file) { fixtures_path('scripts', 'success.sh') }
     let(:dest) { "/tmp/#{SecureRandom.hex}" }
 
     it 'should upload a file to a node', ssh: true do

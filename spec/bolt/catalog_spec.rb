@@ -7,8 +7,10 @@ require 'bolt/executor'
 require 'bolt/inventory'
 require 'bolt/puppetdb'
 require 'bolt/target'
+require 'bolt_spec/files'
 
 describe Bolt::Catalog do
+  include BoltSpec::Files
   let(:uri) { 'catalog' }
   let(:target) { inventory.get_target(uri) }
   let(:inventory) { Bolt::Inventory.empty }
@@ -34,7 +36,7 @@ describe Bolt::Catalog do
     CODE
   }
 
-  let(:plan) { File.join(__FILE__, '../../fixtures/apply/basic/plans/trusted.pp') }
+  let(:plan) { fixtures_path('apply', 'basic', 'plans', 'trusted.pp') }
   let(:project) { Struct.new(:name, :path, :load_as_module?).new('project', '', false) }
 
   let(:request) do

@@ -1,14 +1,16 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/integration'
 require 'bolt_spec/conn'
+require 'bolt_spec/files'
+require 'bolt_spec/integration'
 
 describe "resource instance in plans", ssh: true do
-  include BoltSpec::Integration
   include BoltSpec::Conn
+  include BoltSpec::Files
+  include BoltSpec::Integration
 
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
+  let(:modulepath) { fixtures_path('modules') }
   let(:config_flags) do
     %W[--format json --targets #{conn_uri('ssh')}] +
       %W[--password #{conn_info('ssh')[:password]}] +

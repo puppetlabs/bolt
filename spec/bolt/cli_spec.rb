@@ -1336,7 +1336,7 @@ describe "Bolt::CLI" do
 
       context "when showing available tasks", :reset_puppet_settings do
         before :each do
-          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.modulepath = fixtures_path('modules')
           cli.config.format = 'json'
         end
 
@@ -1391,7 +1391,7 @@ describe "Bolt::CLI" do
           }
           cli.execute(options)
           modulepath = JSON.parse(output.string)['modulepath']
-          expect(modulepath).to include(File.join(__FILE__, '../../fixtures/modules').to_s)
+          expect(modulepath).to include(fixtures_path('modules'))
         end
 
         it "does not list a private task" do
@@ -1419,7 +1419,7 @@ describe "Bolt::CLI" do
             "metadata" => { "name" => "Private Task",
                             "description" => "Do not list this task",
                             "private" => true },
-            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample"))
+            "module_dir" => fixtures_path('modules', 'sample')
           )
         end
 
@@ -1435,7 +1435,7 @@ describe "Bolt::CLI" do
           json.delete("files")
           expect(json).to eq(
             "name" => "sample::params",
-            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
+            "module_dir" => fixtures_path('modules', 'sample'),
             "metadata" => {
               "anything" => true,
               "description" => "Task with parameters",
@@ -1488,7 +1488,7 @@ describe "Bolt::CLI" do
 
       context "when available tasks include an error", :reset_puppet_settings do
         before :each do
-          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
+          cli.config.modulepath = fixtures_path('invalid_mods')
           cli.config.format = 'json'
         end
 
@@ -1513,7 +1513,7 @@ describe "Bolt::CLI" do
 
       context "when the task is not in the modulepath", :reset_puppet_settings do
         before :each do
-          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.modulepath = fixtures_path('modules')
         end
 
         it "task show displays an error" do
@@ -1533,7 +1533,7 @@ describe "Bolt::CLI" do
 
       context "when showing available plans", :reset_puppet_settings do
         before :each do
-          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.modulepath = fixtures_path('modules')
           cli.config.format = 'json'
         end
 
@@ -1562,7 +1562,7 @@ describe "Bolt::CLI" do
           }
           cli.execute(options)
           modulepath = JSON.parse(output.string)['modulepath']
-          expect(modulepath).to include(File.join(__FILE__, '../../fixtures/modules').to_s)
+          expect(modulepath).to include(fixtures_path('modules'))
         end
 
         it "shows an individual plan data" do
@@ -1577,7 +1577,7 @@ describe "Bolt::CLI" do
           expect(json).to eq(
             "name" => "sample::optional_params_task",
             "description" => "Demonstrates plans with optional parameters",
-            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
+            "module_dir" => fixtures_path('modules', 'sample'),
             "parameters" => {
               "param_mandatory" => {
                 "type" => "String",
@@ -1610,7 +1610,7 @@ describe "Bolt::CLI" do
           json = JSON.parse(output.string)
           expect(json).to eq(
             "name" => plan_name,
-            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
+            "module_dir" => fixtures_path('modules', 'sample'),
             "description" => nil,
             "parameters" => {
               "oops" => {
@@ -1636,7 +1636,7 @@ describe "Bolt::CLI" do
           expect(json).to eq(
             "name" => "sample::yaml",
             "description" => nil,
-            "module_dir" => File.absolute_path(File.join(__dir__, "..", "fixtures", "modules", "sample")),
+            "module_dir" => fixtures_path('modules', 'sample'),
             "parameters" => {
               "nodes" => {
                 "type" => "TargetSpec",
@@ -1670,7 +1670,7 @@ describe "Bolt::CLI" do
 
       context "when available plans include an error", :reset_puppet_settings do
         before :each do
-          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/invalid_mods')]
+          cli.config.modulepath = fixtures_path('invalid_mods')
           cli.config.format = 'json'
         end
 
@@ -1710,7 +1710,7 @@ describe "Bolt::CLI" do
 
       context "when the plan is not in the modulepath", :reset_puppet_settings do
         before :each do
-          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.modulepath = fixtures_path('modules')
         end
 
         it "plan show displays an error" do
@@ -1747,7 +1747,7 @@ describe "Bolt::CLI" do
 
         before :each do
           allow(executor).to receive(:report_bundled_content)
-          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.modulepath = fixtures_path('modules')
         end
 
         it "runs a task given a name" do
@@ -2004,7 +2004,7 @@ describe "Bolt::CLI" do
         before :each do
           allow(executor).to receive(:report_function_call)
           allow(executor).to receive(:report_bundled_content)
-          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.modulepath = fixtures_path('modules')
         end
 
         context 'with TargetSpec $nodes plan param' do
@@ -2295,7 +2295,7 @@ describe "Bolt::CLI" do
         let(:task_t) { task_type(task_name, %r{modules/sample/tasks/noop.sh$}, nil) }
 
         before :each do
-          cli.config.modulepath = [File.join(__FILE__, '../../fixtures/modules')]
+          cli.config.modulepath = fixtures_path('modules')
         end
 
         it "runs a task that supports noop" do

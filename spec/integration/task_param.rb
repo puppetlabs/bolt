@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'bolt_spec/integration'
 require 'bolt_spec/conn'
+require 'bolt_spec/files'
+require 'bolt_spec/integration'
 
 describe "Passes the _task metaparameter" do
-  include BoltSpec::Integration
   include BoltSpec::Conn
+  include BoltSpec::Files
+  include BoltSpec::Integration
 
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
-  let(:config_flags) { %W[--format json --targets #{target} --modulepath #{modulepath}] }
+  let(:modulepath)    { fixtures_path('modules') }
+  let(:config_flags)  { %W[--format json --targets #{target} --modulepath #{modulepath}] }
 
   describe 'over ssh', ssh: true do
     let(:target) { conn_uri('ssh', include_password: true) }
