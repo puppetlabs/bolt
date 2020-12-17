@@ -1,7 +1,7 @@
 #!/bin/bash
 
-mkdir -p ~/.puppetlabs/bolt
-rm -f ~/.puppetlabs/bolt/bolt.yaml
+mkdir -p ~/.puppetlabs/etc/bolt
+rm -f ~/.puppetlabs/etc/bolt/bolt-defaults.yaml
 
 cd ~/bolt
 
@@ -36,10 +36,11 @@ EOF
 # set default kerb realm for testing this way
 
 
-cat << EOF>~/.puppetlabs/bolt/bolt.yaml
+cat << EOF>~/.puppetlabs/etc/bolt/bolt-defaults.yaml
 ---
-winrm:
-  realm: BOLT.TEST
+inventory-config:
+  winrm:
+    realm: BOLT.TEST
 EOF
 
 cat << EOF

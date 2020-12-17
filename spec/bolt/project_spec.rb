@@ -146,27 +146,27 @@ describe Bolt::Project do
     end
 
     describe "when using a control repo-style project" do
-      it 'uses the current directory if it has a bolt.yaml' do
-        FileUtils.touch(tmpdir + 'bolt.yaml')
+      it 'uses the current directory if it has a bolt-project.yaml' do
+        FileUtils.touch(tmpdir + 'bolt-project.yaml')
         expect(Bolt::Project.find_boltdir(tmpdir)).to eq(Bolt::Project.new({}, tmpdir))
       end
 
-      it 'ignores non-project children with bolt.yaml' do
+      it 'ignores non-project children with bolt-project.yaml' do
         FileUtils.mkdir_p(tmpdir + 'bar')
-        FileUtils.touch(tmpdir + 'bar' + 'bolt.yaml')
+        FileUtils.touch(tmpdir + 'bar' + 'bolt-project.yaml')
 
         expect(Bolt::Project.find_boltdir(tmpdir)).to eq(Bolt::Project.default_project)
       end
 
       it 'prefers a directory called Boltdir over the local directory' do
-        FileUtils.touch(project.path.parent + 'bolt.yaml')
+        FileUtils.touch(project.path.parent + 'bolt-project.yaml')
         expect(Bolt::Project.find_boltdir(project.path.parent)).to eq(project)
       end
 
       it 'prefers a directory called Boltdir over the parent directory' do
         sibling = project_path.parent + 'bar'
         FileUtils.mkdir_p(sibling)
-        FileUtils.touch(project_path.parent + 'bolt.yaml')
+        FileUtils.touch(project_path.parent + 'bolt-project.yaml')
         expect(Bolt::Project.find_boltdir(sibling)).to eq(project)
       end
     end
@@ -176,8 +176,8 @@ describe Bolt::Project do
         expect(Bolt::Project.find_boltdir(project_path.parent).type).to eq('embedded')
       end
 
-      it 'sets type to local when a bolt.yaml is used' do
-        FileUtils.touch(tmpdir + 'bolt.yaml')
+      it 'sets type to local when a bolt-project.yaml is used' do
+        FileUtils.touch(tmpdir + 'bolt-project.yaml')
         expect(Bolt::Project.find_boltdir(tmpdir).type).to eq('local')
       end
 
