@@ -257,11 +257,11 @@ describe Bolt::Config do
     end
 
     it "does not accept inventory files that don't exist" do
-      config = {
+      overrides = {
         'inventoryfile' => 'fake.yaml'
       }
 
-      expect { Bolt::Config.new(project, config) }.to raise_error(
+      expect { Bolt::Config.new(project, [], overrides) }.to raise_error(
         Bolt::FileError,
         /The inventoryfile .* does not exist/
       )
@@ -319,13 +319,13 @@ describe Bolt::Config do
 
   describe 'expanding paths' do
     it "expands inventoryfile relative to project" do
-      data = {
+      overrides = {
         'inventoryfile' => 'targets.yml'
       }
       f = File.expand_path(File.join(project.path, 'targets.yml'))
       FileUtils.touch(f)
 
-      config = Bolt::Config.new(project, data)
+      config = Bolt::Config.new(project, [], overrides)
       expect(config.inventoryfile)
         .to eq(f)
     end

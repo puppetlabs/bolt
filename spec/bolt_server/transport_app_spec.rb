@@ -1000,6 +1000,8 @@ describe "BoltServer::TransportApp" do
         end
       end
 
+      # TODO: Remove this test for Bolt 3.0. 'inventoryfile' will no longer be configurable
+      # in bolt-project.yaml.
       it 'disallows non-default inventoryfiles' do
         non_default_inventoryfile = 'foo.yaml'
         non_default_inventoryfile_conf = bolt_project.merge({ 'inventoryfile' => non_default_inventoryfile })
