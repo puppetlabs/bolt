@@ -64,7 +64,7 @@ run_command(file::read('/path/to/configure-vap'), $target)
 future minor (y) releases.
 
 [Bolt plans](plans.md) can execute Puppet code from [apply
-blocks](applying_manifest_blocks#applying-manifest-blocks-from-a-puppet-plan), including applying
+blocks](applying_manifest_blocks.md#applying-manifest-blocks-from-a-puppet-plan), including applying
 classes from Puppet network device modules like the [PanOS
 module](https://forge.puppet.com/modules/puppetlabs/panos). Puppet device modules based on
 remote transports allow network devices and other targets that can't run a Puppet agent to be
