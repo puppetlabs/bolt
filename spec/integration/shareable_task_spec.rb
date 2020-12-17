@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt/util'
 
 describe "Shareable tasks with files", bash: true do
+  include BoltSpec::Files
   include BoltSpec::Integration
 
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
+  let(:modulepath) { fixtures_path('modules') }
   let(:config_flags) { %W[--format json --targets localhost --modulepath #{modulepath}] }
 
   it 'runs a task with multiple files' do

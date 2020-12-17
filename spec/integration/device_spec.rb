@@ -14,7 +14,7 @@ describe "devices" do
   include BoltSpec::PuppetAgent
   include BoltSpec::Run
 
-  let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
+  let(:modulepath) { fixtures_path('apply') }
   let(:config_flags) { %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
 
   describe 'over ssh', ssh: true do

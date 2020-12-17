@@ -16,16 +16,18 @@ describe "passes parsed AST to the apply_catalog task" do
   include BoltSpec::Project
   include BoltSpec::PuppetDB
 
-  let(:modulepath) { File.join(__dir__, '../fixtures/apply') }
-  let(:trusted_external) { File.join(__dir__, '../fixtures/scripts/trusted_external_facts.sh') }
-  let(:config_flags) { %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags }
+  let(:modulepath)        { fixtures_path('apply') }
+  let(:trusted_external)  { fixtures_path('scripts', 'trusted_external_facts.sh') }
+  let(:config_flags) do
+    %W[--format json --targets #{uri} --password #{password} --modulepath #{modulepath}] + tflags
+  end
 
   before(:each) do
     allow(Bolt::ApplyResult).to receive(:from_task_result) { |r| r }
     # Don't print warnings
     allow($stdout).to receive(:puts)
     allow_any_instance_of(Bolt::Applicator).to receive(:catalog_apply_task) {
-      path = File.join(__dir__, "../fixtures/apply/#{apply_task}")
+      path = fixtures_path('apply', apply_task)
       impl = { 'name' => apply_task, 'path' => path }
       metadata = { 'supports_noop' => true, 'input_method' => 'environment' }
       Bolt::Task.new('apply_catalog', metadata, [impl])
@@ -231,36 +233,25 @@ describe "passes parsed AST to the apply_catalog task" do
     end
 
     context 'with hiera config stubbed' do
-      let(:default_datadir) {
-        {
-          'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera.yaml').to_s
-        }
-      }
-      let(:custom_datadir) {
-        {
-          'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera_datadir.yaml').to_s
-        }
-      }
-      let(:bad_hiera_version) {
-        {
-          'hiera-config' => File.join(__dir__, '../fixtures/apply/hiera_invalid.yaml').to_s
-        }
-      }
-      let(:eyaml_config) {
+      let(:default_datadir)   { { 'hiera-config' => fixtures_path('apply', 'hiera.yaml') } }
+      let(:custom_datadir)    { { 'hiera-config' => fixtures_path('apply', 'hiera_datadir.yaml') } }
+      let(:bad_hiera_version) { { 'hiera-config' => fixtures_path('apply', 'hiera_invalid.yaml') } }
+      let(:eyaml_config) do
         {
           "version" => 5,
-          "defaults" => { "data_hash" => "yaml_data", "datadir" => File.join(__dir__, '../fixtures/apply/data').to_s },
+          "defaults" => { "data_hash" => "yaml_data",
+                          "datadir" => fixtures_path('apply', 'data') },
           "hierarchy" => [{
             "name" => "Encrypted Data",
             "lookup_key" => "eyaml_lookup_key",
             "paths" => ["secure.eyaml"],
             "options" => {
-              "pkcs7_private_key" => File.join(__dir__, '../fixtures/keys/private_key.pkcs7.pem').to_s,
-              "pkcs7_public_key" => File.join(__dir__, '../fixtures/keys/public_key.pkcs7.pem').to_s
+              "pkcs7_private_key" => fixtures_path('keys', 'private_key.pkcs7.pem'),
+              "pkcs7_public_key" => fixtures_path('keys', 'public_key.pkcs7.pem')
             }
           }]
         }
-      }
+      end
 
       it 'default datadir is accessible' do
         with_project(config: default_datadir) do |project|

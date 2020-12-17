@@ -65,13 +65,13 @@ describe "When loading content", ssh: true do
   end
 
   it "runs plans namespaced with embedded project type" do
-    embedded = Bolt::Project.create_project(File.join(__dir__, '../fixtures/projects/embedded/Boltdir'), 'embedded')
+    embedded = Bolt::Project.create_project(fixtures_path('projects', 'embedded', 'Boltdir'), 'embedded')
     result = run_cli_json(%W[plan run embedded -t #{target}] + config_flags, project: embedded)
     expect(result[0]['value']['stdout'].strip).to eq('polo')
   end
 
   it "runs plans namespaced to configured project name" do
-    named = Bolt::Project.create_project(File.join(__dir__, '../fixtures/projects/named'), 'local')
+    named = Bolt::Project.create_project(fixtures_path('projects', 'named'), 'local')
     result = run_cli_json(%W[plan run test_project -t #{target}] + config_flags, project: named)
     expect(result[0]['value']['stdout'].strip).to eq('polo')
   end
@@ -81,7 +81,7 @@ describe "When loading content", ssh: true do
 
     let(:project_config) do
       {
-        'modulepath' => File.join(__dir__, '../fixtures/modules'),
+        'modulepath' => fixtures_path('modules'),
         'plans' => [
           'sample',
           'error::catch*'

@@ -12,7 +12,7 @@ describe "when logging executor activity", ssh: true do
   include BoltSpec::Integration
 
   let(:whoami) { "whoami" }
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
+  let(:modulepath) { fixtures_path('modules') }
   let(:stdin_task) { "sample::stdin" }
   let(:echo_plan) { "sample::single_task" }
   let(:without_default_plan) { "logging::without_default" }

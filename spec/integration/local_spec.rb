@@ -8,7 +8,7 @@ describe "when running over the local transport" do
   include BoltSpec::Files
   include BoltSpec::Integration
 
-  let(:modulepath) { File.join(__dir__, '../fixtures/modules') }
+  let(:modulepath) { fixtures_path('modules') }
   let(:uri) { 'localhost,local://foo' }
   let(:user) { ENV['USER'] }
   let(:sudo_user) { 'root' }
@@ -180,8 +180,8 @@ describe "when running over the local transport" do
     end
 
     it 'runs a task with complex parameters', :reset_puppet_settings do
-      complex_input_file = File.join(__dir__, '../fixtures/complex_params/input.json')
-      expected = File.open(File.join(__dir__, '../fixtures/complex_params/output'), 'rb', &:read)
+      complex_input_file = fixtures_path('complex_params', 'input.json')
+      expected = File.open(fixtures_path('complex_params', 'output'), 'rb', &:read)
       result = run_one_node(%W[task run sample::complex_params --params @#{complex_input_file}] + config_flags)
       expect(result['_output']).to eq(expected)
     end
