@@ -493,4 +493,4 @@ Create a manifest that sets up a web server with IIS and run it as a plan.
 📖 **Related information**
 - For information on how Bolt loads the modulepath, see [Modules overview](modules.md#modulepath).
 - To learn more about using Puppet device modules, see [Running Bolt on network
-  devices](running_bolt_networkd.md#-using-puppet-device-modules-from-an-apply-block)
+  devices](running_bolt_network.md#-using-puppet-device-modules-from-an-apply-block)
