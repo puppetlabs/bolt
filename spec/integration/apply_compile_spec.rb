@@ -300,10 +300,10 @@ describe "passes parsed AST to the apply_catalog task" do
     end
 
     context 'with inventoryfile stubbed' do
-      let(:inventory) { { 'inventoryfile' => fixtures_path('inventory', 'apply.yaml') } }
+      let(:inventory) { YAML.load_file(fixtures_path('inventory', 'apply.yaml')) }
 
       it 'vars cannot be set on the target' do
-        with_project(config: inventory) do |project|
+        with_project(inventory: inventory) do |project|
           result = run_cli_json(%W[plan run basic::xfail_set_var --project #{project.path}] + config_flags)
           expect(result['kind']).to eq('bolt/apply-failure')
           expect(result['msg']).to match(/Apply failed to compile for/)
@@ -311,7 +311,7 @@ describe "passes parsed AST to the apply_catalog task" do
       end
 
       it 'features cannot be set on the target' do
-        with_project(config: inventory) do |project|
+        with_project(inventory: inventory) do |project|
           result = run_cli_json(%W[plan run basic::xfail_set_feature --project #{project.path}] + config_flags)
           expect(result['kind']).to eq('bolt/apply-failure')
           expect(result['msg']).to match(/Apply failed to compile for/)

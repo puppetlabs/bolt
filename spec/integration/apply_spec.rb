@@ -25,7 +25,7 @@ describe 'apply', expensive: true do
   let(:project) { @project }
   let(:project_config) do
     {
-      'apply_settings' => { 'show_diff' => true },
+      'apply-settings' => { 'show_diff' => true },
       'hiera-config'   => fixtures_path('hiera', 'empty.yaml'),
       'modulepath'     => fixtures_path('apply')
     }

@@ -68,8 +68,8 @@ describe Bolt::Plugin do
     end
   end
 
-  context 'loading plugin_hooks' do
-    it 'evaluates plugin references in the plugin_hooks configuration' do
+  context 'loading plugin hooks' do
+    it 'evaluates plugin references in the plugin hooks configuration' do
       config_data['plugin-hooks'] = {
         'puppet_library' => {
           'plugin' => 'my_hook',
@@ -79,7 +79,7 @@ describe Bolt::Plugin do
       expect(plugins.plugin_hooks['puppet_library']).to eq('plugin' => 'my_hook', 'param' => 'foobar')
     end
 
-    it 'allows the whole plugin_hooks value to be set with a reference' do
+    it 'allows the whole plugin hooks value to be set with a reference' do
       hooks = {
         'another_hook' => {
           'plugin' => 'my_hook',

@@ -368,7 +368,7 @@ describe 'validating config' do
     let(:project_config) do
       {
         'unknown' => 'unknown',
-        'puppetfile' => {
+        'module-install' => {
           'unknown' => 'unknown'
         }
       }
@@ -379,7 +379,7 @@ describe 'validating config' do
 
       expect(@log_output.readlines).to include(
         /WARN.*Unknown option 'unknown' at.*bolt-project.yaml/,
-        /WARN.*Unknown option 'unknown' at 'puppetfile' at.*bolt-project.yaml/
+        /WARN.*Unknown option 'unknown' at 'module-install' at.*bolt-project.yaml/
       )
     end
   end
