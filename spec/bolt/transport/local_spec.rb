@@ -44,8 +44,7 @@ describe Bolt::Transport::Local do
 
     context 'with group-level config' do
       let(:data) {
-        { 'name' => 'locomoco',
-          'targets' => [uri],
+        { 'targets' => [uri],
           'config' => {
             'transport' => 'ssh',
             'local' => {
@@ -100,8 +99,7 @@ describe Bolt::Transport::Local do
 
     context 'with group-level config' do
       let(:data) {
-        { 'name' => 'locomoco',
-          'targets' => [uri],
+        { 'targets' => [uri],
           'config' => {
             'local' => {
               'bundled-ruby' => true,

@@ -211,7 +211,7 @@ end
 
 def add_plugin_reference(definition)
   definition, data = definition.partition do |k, _|
-    k == :description
+    %i[definitions description].include?(k)
   end.map(&:to_h)
 
   definition[:oneOf] = [
