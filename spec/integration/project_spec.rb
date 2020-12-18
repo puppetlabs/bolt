@@ -13,7 +13,7 @@ describe "When loading content", ssh: true do
   include BoltSpec::Project
 
   let(:local) { Bolt::Project.create_project(fixtures_path('projects', 'local'), 'local') }
-  let(:embedded) { fixture_path('projects/embedded') }
+  let(:embedded) { fixtures_path('projects/embedded') }
   let(:target) { conn_uri('ssh') }
   let(:config_flags) { %W[--no-host-key-check --password #{conn_info('ssh')[:password]}] }
 
@@ -77,9 +77,11 @@ describe "When loading content", ssh: true do
   end
 
   context 'filtering project content' do
+    let(:project) { @project }
+
     let(:project_config) do
       {
-        'modulepath' => File.join(__dir__, '../fixtures/modules'),
+        'modulepath' => fixtures_path('modules'),
         'plans' => [
           'sample',
           'error::catch*'
@@ -92,7 +94,8 @@ describe "When loading content", ssh: true do
     end
 
     around(:each) do |example|
-      with_project do
+      with_project(config: project_config) do |project|
+        @project = project
         example.run
       end
     end
