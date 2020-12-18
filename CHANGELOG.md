@@ -1,5 +1,21 @@
 # Changelog
 
+## Bolt 2.40.2 (2020-12-18)
+
+### Bug fixes
+
+* **Only print spinner when stdout is a TTY** ([#2500](https://github.com/puppletabs/bolt/issues/2500))
+
+  We now only print the spinner when the STDOUT stream is a TTY.
+
+* **Do not add `localhost` target to the `all` group by default in
+  PowerShell**
+  ([#2505](https://github.com/puppetlabs/bolt/issues/2505))
+
+  Bolt no longer adds the `localhost` target to the `all` group by
+  default. Previously, when running Bolt in PowerShell, the `localhost`
+  target would be added to the `all` group unintentionally.
+
 ## Bolt 2.40.1 (2020-12-16)
 
 ### Bug fixes
