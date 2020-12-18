@@ -683,4 +683,13 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       expect(result.dig('targets', 0, 'plugin_hooks')).to eq(plugin_hooks)
     end
   end
+
+  context 'with empty inventory' do
+    let(:inventory) { nil }
+
+    it 'does not add localhost to the all group by default' do
+      result = run_cli_json(%W[inventory show -t all --project #{@project.path}])
+      expect(result['targets'].empty?).to be(true)
+    end
+  end
 end
