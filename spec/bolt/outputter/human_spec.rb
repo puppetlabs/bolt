@@ -412,6 +412,7 @@ describe "Bolt::Outputter::Human" do
     let(:outputter) { Bolt::Outputter::Human.new(false, false, false, true, output) }
 
     it 'spins while executing with a block' do
+      expect(output).to receive(:isatty).twice.and_return(true)
       outputter.spin do
         sleep(0.3)
         expect(output.string).to include("\\\b|\b")
@@ -419,9 +420,18 @@ describe "Bolt::Outputter::Human" do
     end
 
     it 'spins between start and stop' do
+      expect(output).to receive(:isatty).twice.and_return(true)
       outputter.start_spin
       sleep(0.3)
       expect(output.string).to include("\\\b|\b")
+      outputter.stop_spin
+    end
+
+    it 'does not spin when stdout is not a TTY' do
+      expect(output).to receive(:isatty).twice.and_return(false)
+      outputter.start_spin
+      sleep(0.3)
+      expect(output.string).not_to include("\b\\\b|")
       outputter.stop_spin
     end
   end

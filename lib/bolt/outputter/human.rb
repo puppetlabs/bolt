@@ -32,7 +32,7 @@ module Bolt
       end
 
       def start_spin
-        return unless @spin
+        return unless @spin && @stream.isatty
         @spin = true
         @spin_thread = Thread.new do
           loop do
@@ -43,7 +43,7 @@ module Bolt
       end
 
       def stop_spin
-        return unless @spin
+        return unless @spin && @stream.isatty
         @spin_thread.terminate
         @spin = false
         @stream.print("\b")
