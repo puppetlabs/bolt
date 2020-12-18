@@ -38,10 +38,13 @@ module Bolt
 
       def download(target, source, destination, _options = {})
         with_connection(target) do |conn|
-          # TODO
-          stdout, stderr, exitcode = conn.download_file(source, destination)
+          download = File.join(destination, Bolt::Util.unix_basename(source))
+          stdout_str, stderr_str, status = conn.download_file(source, destination)
+          unless status.exitstatus.zero?
+            raise "Error downloading content from container #{target}: #{stderr_str}"
+          end
+          Bolt::Result.for_download(target, source, destination, download)
         end
-        Bolt::Result.for_download(target, source, destination)
       end
 
       def run_command(target, command, options = {}, position)
@@ -50,7 +53,7 @@ module Bolt
           # * environment variables
           # * "run as" user (lxc supports this)
           execute_options = {}
-          stdout, stderr, exitcode = conn.execute(*Shellwords.split(command), execute_options)
+          stdout_str, stderr_str, exitcode = conn.execute(*Shellwords.split(command), execute_options)
           Bolt::Result.for_command(target, stdout, stderr, exitcode, 'command', command, position)
         end
       end
