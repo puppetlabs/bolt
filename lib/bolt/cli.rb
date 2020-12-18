@@ -212,12 +212,15 @@ module Bolt
 
     private def validate_ps_version
       if Bolt::Util.powershell?
-        target = inventory.get_target('localhost')
-        Bolt::Transport::Local.new.with_connection(target) do |conn|
-          # This will automatically validate the powershell version on the Bolt
-          # controller
-          Bolt::Shell::Powershell.new(target, conn)
-        end
+        command = "powershell.exe -NoProfile -NonInteractive -NoLogo -ExecutionPolicy "\
+                  "Bypass -Command $PSVersionTable.PSVersion.Major"
+        stdout, _stderr, _status = Open3.capture3(command)
+
+        return unless !stdout.empty? && stdout.to_i < 3
+
+        msg = "Detected PowerShell 2 on controller. PowerShell 2 is deprecated and "\
+              "support will be removed in Bolt 3.0."
+        Bolt::Logger.deprecation_warning("PowerShell 2 controller", msg)
       end
     end
 
