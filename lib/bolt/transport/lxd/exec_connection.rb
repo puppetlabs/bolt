@@ -14,7 +14,8 @@ module Bolt
           puts "target: #{@target.config}"
           # TODO: if remote unset in config, default to globally-set remote
           #  might need to shell out for this info
-          @lxd_remote = @target.config["lxd"]["remote"] || default_remote
+          @lxd_remote = default_remote
+          #@lxd_remote = @target.config["lxd"]["remote"] || default_remote
           @logger = Bolt::Logger.logger(target.safe_name)
           @logger.trace("")
         end
