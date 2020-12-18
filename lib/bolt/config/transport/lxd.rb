@@ -35,7 +35,6 @@ module Bolt
         }.freeze
 
         private def validate
-          puts 'how in the world!!!?!?!?'
           super
           # TODO
         end

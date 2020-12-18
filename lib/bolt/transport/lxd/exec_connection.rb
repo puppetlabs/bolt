@@ -55,7 +55,8 @@ module Bolt
           # TODO: check dest is absolute path
           capture_options = { binmode: true }
           out, err, status = Open3.capture3('lxc', 'file', 'push', source,
-            "#{remote}:#{container}#{destination}", "--recursive", capture_options)
+                                            "#{remote}:#{container}#{destination}",
+                                            "--recursive", capture_options)
         end
 
         def write_remote_file(source, destination)
@@ -74,7 +75,7 @@ module Bolt
         def default_remote
           capture_options = { binmode: true }
           out, _, _ = Open3.capture3('lxc', 'remote', 'get-default', capture_options)
-          out
+          out.strip
         end
       end
     end

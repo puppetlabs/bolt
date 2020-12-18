@@ -51,7 +51,7 @@ module Bolt
           # * "run as" user (lxc supports this)
           execute_options = {}
           stdout, stderr, exitcode = conn.execute(*Shellwords.split(command), execute_options)
-          Bolt::Result.for_command(target, stdout, stderr, exitcode, 'command', command)
+          Bolt::Result.for_command(target, stdout, stderr, exitcode, 'command', command, position)
         end
       end
 
