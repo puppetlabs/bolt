@@ -63,7 +63,7 @@ module Bolt
       end
 
       def start_spin
-        return unless @spin
+        return unless @spin && @stream.isatty
         @spin = true
         @spin_thread = Thread.new do
           loop do
