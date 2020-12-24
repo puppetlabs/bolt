@@ -42,7 +42,7 @@ module Bolt
           [out, err, status]
         end
 
-        def execute(*command, options)
+        def execute(*command, _options)
           container = @target.name
           remote = @lxd_remote
           capture_options = { binmode: true }
@@ -78,6 +78,60 @@ module Bolt
           capture_options = { binmode: true }
           out, _, _ = Open3.capture3('lxc', 'remote', 'get-default', capture_options)
           out.strip
+        end
+
+        def with_remote_tmpdir
+          # TODO
+          dir = make_tmpdir
+          yield dir
+        ensure
+          if dir
+            if @target.options['cleanup']
+              _, stderr, exitcode = execute('rm', '-rf', dir, {})
+              if exitcode != 0
+                @logger.warn("Failed to clean up tmpdir '#{dir}': #{stderr}")
+              end
+            else
+              @logger.warn("Skipping cleanup of tmpdir '#{dir}'")
+            end
+          end
+        end
+
+        def write_remote_executable(dir, file, filename = nil)
+          filename ||= File.basename(file)
+          remote_path = File.join(dir.to_s, filename)
+          write_remote_file(file, remote_path)
+          make_executable(remote_path)
+          remote_path
+        end
+
+        def make_executable(path)
+          _, stderr, exitcode = execute('chmod', 'u+x', path, {})
+          if exitcode != 0
+            message = "Could not make file '#{path}' executable: #{stderr}"
+            raise Bolt::Node::FileError.new(message, 'CHMOD_ERROR')
+          end
+        end
+
+        def mkdirs(dirs)
+          # TODO
+          _, stderr, exitcode = execute('mkdir', '-p', *dirs, {})
+          if exitcode != 0
+            message = "Could not create directories: #{stderr}"
+            raise Bolt::Node::FileError.new(message, 'MKDIR_ERROR')
+          end
+        end
+
+        def make_tmpdir
+          # TODO
+          tmpdir = @target.options.fetch('tmpdir', container_tmpdir)
+          tmppath = "#{tmpdir}/#{SecureRandom.uuid}"
+
+          stdout, stderr, exitcode = execute('mkdir', '-m', '700', tmppath, {})
+          if exitcode != 0
+            raise Bolt::Node::FileError.new("Could not make tmpdir: #{stderr}", 'TMPDIR_ERROR')
+          end
+          tmppath || stdout.first
         end
       end
     end
