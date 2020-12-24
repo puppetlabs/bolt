@@ -15,16 +15,15 @@ module Bolt
           # TODO: if remote unset in config, default to globally-set remote
           #  might need to shell out for this info
           @lxd_remote = default_remote
-          #@lxd_remote = @target.config["lxd"]["remote"] || default_remote
+          # @lxd_remote = @target.config["lxd"]["remote"] || default_remote
           @logger = Bolt::Logger.logger(target.safe_name)
           @logger.trace("")
         end
 
         def connect
-        # TODO: check container is running
-
-        # TODO: get info about container, store on self
-        # @container_info = get_info
+          # TODO: check container is running
+          # TODO: get info about container, store on self
+          # @container_info = get_info
           true
         rescue StandardError => e
           raise Bolt::Node::ConnectError.new(
@@ -38,15 +37,26 @@ module Bolt
           remote = @lxd_remote
           puts "DOWNLOAD #{remote}:#{container}#{source}"
           out, err, status = Open3.capture3('lxc', 'file', 'pull',
-            "#{remote}:#{container}#{source}", destination)
+                                            "#{remote}:#{container}#{source}", destination)
           [out, err, status]
         end
 
-        def execute(*command, _options)
+        def execute(*command, options)
           container = @target.name
           remote = @lxd_remote
+
+          envs = []
+          if options[:environment]
+            options[:environment].each { |env, val| envs.concat(['--env', "#{env}=#{val}"]) }
+          end
+
+          command_options = []
+          command_options.concat(envs) unless envs.empty?
+
+          @logger.info { "Executing: exec #{command_options}" }
           capture_options = { binmode: true }
-          out, err, status = Open3.capture3('lxc', 'exec', "#{remote}:#{container}",
+          capture_options[:stdin_data] = options[:stdin] unless options[:stdin].nil?
+          out, err, status = Open3.capture3('lxc', 'exec', *command_options, "#{remote}:#{container}",
                                             '--', *command, capture_options)
           [out, err, status]
         end
@@ -56,9 +66,9 @@ module Bolt
           remote = @lxd_remote
           # TODO: check dest is absolute path
           capture_options = { binmode: true }
-          out, err, status = Open3.capture3('lxc', 'file', 'push', source,
-                                            "#{remote}:#{container}#{destination}",
-                                            "--recursive", capture_options)
+          _out, _err, _status = Open3.capture3('lxc', 'file', 'push', source,
+                                               "#{remote}:#{container}#{destination}",
+                                               "--recursive", capture_options)
         end
 
         def write_remote_file(source, destination)
