@@ -69,7 +69,7 @@ describe Bolt::ModuleInstaller::Resolver do
     it 'errors' do
       expect { resolver.resolve(specs) }.to raise_error(
         Bolt::Error,
-        /could not find compatible versions for possibility named "dockerinstall"/
+        /could not find compatible versions for possibility named/
       )
     end
   end
