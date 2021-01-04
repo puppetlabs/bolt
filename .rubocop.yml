@@ -49,11 +49,17 @@ Layout/LineLength:
 Layout/SpaceAroundMethodCallOperator:
   Enabled: true
 
+Layout/SpaceBeforeBrackets:
+  Enabled: true
+
 Layout/TrailingWhitespace:
   AllowInHeredoc: true
 
 # Lint cops
 # https://docs.rubocop.org/rubocop/cops_lint.html
+
+Lint/AmbiguousAssignment:
+  Enabled: true
 
 Lint/BinaryOperatorWithIdenticalOperands:
   Enabled: true
@@ -245,6 +251,9 @@ Style/HashAsLastArrayItem:
   Enabled: false
 
 Style/HashEachMethods:
+  Enabled: true
+
+Style/HashExcept:
   Enabled: true
 
 Style/HashLikeCase:
