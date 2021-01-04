@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'bolt/config/options'
 require 'bolt/inventory/group'
 require 'bolt/inventory/inventory'
 require 'bolt/inventory/target'
@@ -315,7 +316,26 @@ module Bolt
           'features' => @plugins.resolve_references(data.fetch('features', [])),
           'plugin_hooks' => @plugins.resolve_references(data.fetch('plugin_hooks', {}))
         }
+
         validate_data_keys(result, target)
+
+        Bolt::Config::Options::TRANSPORT_CONFIG.each_key do |transport|
+          next unless result['config'].key?(transport)
+          transport_config = result['config'][transport]
+          next unless transport_config.is_a?(Hash)
+          transport_config = Bolt::Util.postwalk_vals(transport_config) do |val|
+            if val.is_a?(Hash)
+              val = val.compact
+              val = nil if val.empty?
+            end
+            val
+          end
+          # the transport config is user-specified data so we
+          # still want to preserve it even if it exclusively
+          # contains nil-resolved keys
+          result['config'][transport] = transport_config || {}
+        end
+
         result['features'] = Set.new(result['features'].flatten)
         result
       end

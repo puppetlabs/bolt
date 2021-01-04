@@ -588,8 +588,8 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
         it 'sets config to nil' do
           result = run_cli_json(run_command)
-          expect(result['items'][0]['value']['_error']['msg'])
-            .to include("Authentication failed for user #{conn[:system_user]}")
+          # should succeed because the inventory deletes nil config
+          expect(result['items'][0]['status']).to eql('success')
           expect(@log_output.readlines).to include(/Could not find fact/)
         end
       end

@@ -1351,4 +1351,90 @@ describe Bolt::Inventory::Inventory do
       expect(target.transport).to eq('local')
     end
   end
+
+  context 'when the transport config contains keys that resolved to nil' do
+    let(:transport_config) do
+      {
+        'transport' => 'ssh',
+        'ssh' => {
+          'user' => {
+            '_plugin' => 'mock_plugin'
+          },
+          'private-key' => {
+            'key-data' => {
+              '_plugin' => 'mock_plugin'
+            }
+          },
+          'password' => 'foo_password'
+        }
+      }
+    end
+
+    before(:each) do
+      mock_plugin = double('mock_plugin')
+      allow(mock_plugin).to receive(:name).and_return('mock_plugin')
+      allow(mock_plugin).to receive(:hooks).and_return([:resolve_reference])
+      allow(mock_plugin).to receive(:resolve_reference).and_return(nil)
+      plugins.add_plugin(mock_plugin)
+    end
+
+    context 'for a target' do
+      let(:targets) do
+        [
+          {
+            'name'   => 'test',
+            'config' => transport_config
+          }
+        ]
+      end
+
+      it 'deletes nil-resolved keys' do
+        target = inventory.get_targets('test').first
+        expect(target.config['ssh']).not_to include('user')
+        expect(target.config['ssh']).not_to include('private-key')
+        expect(target.config['ssh']['password']).to eql('foo_password')
+      end
+
+      context 'when the transport config exclusively contains nil-resolved keys' do
+        let(:transport_config) do
+          { 'transport' => 'ssh', 'ssh' => { 'user' => { '_plugin' => 'mock_plugin' } } }
+        end
+
+        it 'returns an empty hash instead of deleting the transport config' do
+          target = inventory.get_targets('test').first
+          expect(target.config['ssh']).to eql({})
+        end
+      end
+    end
+
+    context 'for a group' do
+      let(:groups) do
+        [
+          {
+            'name'    => 'test_group',
+            'config'  => transport_config,
+            'targets' => ['test_target']
+          }
+        ]
+      end
+
+      it 'deletes nil-resolved keys' do
+        target = inventory.get_targets('test_target').first
+        expect(target.config['ssh']).not_to include('user')
+        expect(target.config['ssh']).not_to include('private-key')
+        expect(target.config['ssh']['password']).to eql('foo_password')
+      end
+
+      context 'when the transport config exclusively contains nil-resolved keys' do
+        let(:transport_config) do
+          { 'transport' => 'ssh', 'ssh' => { 'user' => { '_plugin' => 'mock_plugin' } } }
+        end
+
+        it 'returns an empty hash instead of deleting the transport config' do
+          test_group = inventory.collect_groups['test_group']
+          expect(test_group.group_data['config']['ssh']).to eql({})
+        end
+      end
+    end
+  end
 end
