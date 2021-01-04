@@ -65,7 +65,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "winrm-fs", "~> 1.3"
 
   # there is a bug in puppetlabs_spec_helper for modules without fixtures
-  spec.add_development_dependency "bundler", ">= 1.14", "< 2.2.0"
+  spec.add_development_dependency "bundler", ">= 1.14"
   spec.add_development_dependency "octokit", "~> 4.0"
   spec.add_development_dependency "puppetlabs_spec_helper", "~> 2.7"
   spec.add_development_dependency "rake", "~> 12.0"
