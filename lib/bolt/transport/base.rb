@@ -74,15 +74,6 @@ module Bolt
         interpreters[Pathname(executable).extname] if interpreters
       end
 
-      # Transform a parameter map to an environment variable map, with parameter names prefixed
-      # with 'PT_' and values transformed to JSON unless they're strings.
-      def envify_params(params)
-        params.each_with_object({}) do |(k, v), h|
-          v = v.to_json unless v.is_a?(String)
-          h["PT_#{k}"] = v
-        end
-      end
-
       # Raises an error if more than one target was given in the batch.
       #
       # The default implementations of batch_* strictly assume the transport is
