@@ -64,7 +64,11 @@ module Bolt
             raise Bolt::FileError.new(msg, @plan_path)
           end
 
-          Bolt::PAL::YamlPlan::Loader.from_string(@modulename, file_contents, @plan_path)
+          begin
+            Bolt::PAL::YamlPlan::Loader.from_string(@modulename, file_contents, @plan_path)
+          rescue Puppet::PreformattedError, StandardError => e
+            raise PALError.from_preformatted_error(e)
+          end
         end
 
         def validate_path
