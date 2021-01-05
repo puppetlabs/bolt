@@ -5,14 +5,12 @@ require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt_spec/project'
-require 'bolt_spec/puppet_agent'
 
 describe 'plans' do
   include BoltSpec::Conn
   include BoltSpec::Integration
   include BoltSpec::Files
   include BoltSpec::Project
-  include BoltSpec::PuppetAgent
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
@@ -70,28 +68,35 @@ describe 'plans' do
     end
 
     context 'with puppet-agent installed for get_resources' do
+      let(:config_flags) { %W[--project #{@project.path} -m #{modulepath}] }
+
       around(:each) do |example|
-        install(conn_uri('ssh', include_password: true))
-        example.run
-      ensure
-        FileUtils.rm_rf(fixtures_path('configs', '.resource_types'))
-        uninstall(conn_uri('ssh', include_password: true))
-      end
-
-      it 'runs registers types defined in $project/.resource_types', ssh: true do
-        run_cli(%w[puppetfile generate-types] + config_flags)
-        result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)
-        expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
-      end
-
-      it 'runs registers types defined in $project/.resource_types', ssh: true do
-        with_project(config: project_config) do |project|
-          config_flags = %W[--format json -m #{modulepath} --project #{project.path} --no-host-key-check]
-
-          run_cli(%w[module generate-types] + config_flags)
-          result = run_cli(['plan', 'run', 'resource_types', '--targets', target] + config_flags)
-          expect(JSON.parse(result)).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
+        with_project(config: project_config, inventory: docker_inventory(root: true)) do |project|
+          @project = project
+          example.run
         end
+      end
+
+      shared_examples 'registered types' do
+        it 'runs registers types defined in $project/.resource_types', ssh: true do
+          run_cli(%W[#{subcommand} generate-types] + config_flags)
+          result = run_cli_json(%w[plan run resource_types -t nix_agents] + config_flags)
+          expect(result).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
+        end
+      end
+
+      context 'with puppetfile subcommand' do
+        let(:project_config) { {} }
+        let(:subcommand)     { 'puppetfile' }
+
+        include_examples 'registered types'
+      end
+
+      context 'with module subcommand' do
+        let(:project_config) { { 'modules' => [] } }
+        let(:subcommand)     { 'module' }
+
+        include_examples 'registered types'
       end
     end
   end

@@ -69,13 +69,6 @@ describe 'apply', expensive: true do
     # Run tests that require the puppet-agent package to be installed on the target.
     # Each test is run against all agent targets unless otherwise noted.
     context 'with puppet installed' do
-      # Install agents on the agent targets.
-      before(:all) do
-        TEST_VERSIONS.each do |version, collection|
-          install("puppet_#{version}_node", collection: collection, inventory: docker_inventory(root: true))
-        end
-      end
-
       # Set up a project directory for the tests. Include an inventory file so Bolt
       # can actually connect to the targets.
       around(:each) do |example|
