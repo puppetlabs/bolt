@@ -101,12 +101,27 @@ profile.
 
 ### Change execution policy restrictions
 
-Some Windows installations have security restrictions that do not allow Bolt to
-run. These restrictions are easy to change, but check with your security team
-first.
+PowerShell's execution policy is a safety feature that controls the conditions
+under which PowerShell loads configuration files and runs scripts. This feature
+helps prevent the execution of malicious scripts. The default policy is
+`Restricted` (allow no scripts to run) for Windows _clients_ and `RemoteSigned`
+(allow signed scripts and non-signed scripts not from the internet) for Windows
+_servers_. Some environments change this to `AllSigned`, which only allows
+scripts to run as long as they are signed by a trusted publisher.
+
+As of Bolt 2.21.0, we sign Bolt PowerShell module files with a Puppet code
+signing certificate. If your PowerShell environment uses an `AllSigned`
+execution policy and you add Puppet as a trusted publisher, the `bolt` command
+works without any further input. If you're using the `AllSigned` policy and you
+have not added Puppet as a trusted publisher, you can accept the publisher
+without having to change your execution policy.
+
+If your environment uses a `Restricted` policy, you must change your policy to
+`RemoteSigned` or `AllSigned`. Check with your security team before you make any
+policy changes.
 
 If you see this or a similar error when trying to run Bolt, you probably need to
-change your script execution policy restrictions, as described here.
+change your script execution policy restrictions:
 
 ```
 bolt : The 'bolt' command was found in the module 'PuppetBolt', but the module could not be loaded. 
@@ -118,8 +133,12 @@ For more information, run 'Import-Module PuppetBolt'.
                 n
                 + FullyQualifiedErrorId : CouldNotAutoloadMatchingModule
 ```
+
+To change your script execution policy:
+
 1.  Press **Windows+X**, **A** to run PowerShell as an administrator.
-2.  Set your script execution policy to at least `RemoteSigned`:
+
+1.  Set your script execution policy to at least `RemoteSigned`:
     ```
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
     ```
