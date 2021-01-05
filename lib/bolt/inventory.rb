@@ -55,7 +55,8 @@ module Bolt
       schema = {
         type:        Hash,
         properties:  OPTIONS.map { |opt| [opt, _ref: opt] }.to_h,
-        definitions: DEFINITIONS
+        definitions: DEFINITIONS,
+        _plugin:     true
       }
 
       schema[:definitions]['config'][:properties] = Bolt::Config.transport_definitions

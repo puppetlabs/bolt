@@ -366,7 +366,6 @@ describe Bolt::Inventory::Inventory do
       context 'with targets at the top level' do
         let(:data) {
           {
-            'name' => 'group1',
             'targets' => [
               'target1',
               { 'uri' => 'target2' },
@@ -791,7 +790,6 @@ describe Bolt::Inventory::Inventory do
       context 'with targets at the top level' do
         let(:data) {
           {
-            'name' => 'group1',
             'targets' => [
               'target1',
               { 'uri' => 'target2' },

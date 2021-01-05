@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'bolt_spec/conn'
+require 'bolt_spec/env_var'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt_spec/project'
@@ -9,6 +10,7 @@ require 'bolt_spec/puppetdb'
 
 describe 'running with an inventory file', reset_puppet_settings: true do
   include BoltSpec::Conn
+  include BoltSpec::EnvVar
   include BoltSpec::Files
   include BoltSpec::Integration
   include BoltSpec::Project
@@ -690,6 +692,76 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     it 'does not add localhost to the all group by default' do
       result = run_cli_json(%W[inventory show -t all --project #{@project.path}])
       expect(result['targets'].empty?).to be(true)
+    end
+  end
+
+  context 'top-level plugin' do
+    let(:command)      { %W[inventory show --targets all --project #{@project.path}] }
+    let(:env_var)      { 'BOLT_INVENTORY_PARTIAL' }
+    let(:partial_path) { 'partial.yaml' }
+
+    let(:inventory) do
+      {
+        '_plugin'  => 'yaml',
+        'filepath' => partial_path
+      }
+    end
+
+    let(:partial) do
+      {
+        'targets' => %w[foo bar baz]
+      }
+    end
+
+    around(:each) do |example|
+      with_env_vars(env_var => partial_path) do
+        with_project(inventory: inventory) do |project|
+          @project = project
+          File.write(project.path + partial_path, partial.to_yaml)
+          example.run
+        end
+      end
+    end
+
+    context 'with valid resolved data' do
+      it 'does not error' do
+        result = run_cli_json(command)
+        expect(result['targets']).to include(*partial['targets'])
+      end
+    end
+
+    context 'with resolved data with a name' do
+      let(:partial) do
+        {
+          'name'    => 'badname',
+          'targets' => %w[foo bar baz]
+        }
+      end
+
+      it 'warns' do
+        run_cli_json(command)
+
+        expect(@log_output.readlines).to include(
+          /WARN.*Top-level group 'badname' cannot specify a name, using 'all' instead/
+        )
+      end
+    end
+
+    context 'with nested plugins' do
+      let(:inventory) do
+        {
+          '_plugin'  => 'yaml',
+          'filepath' => {
+            '_plugin' => 'env_var',
+            'var'     => env_var
+          }
+        }
+      end
+
+      it 'resolves and does not error' do
+        result = run_cli_json(command)
+        expect(result['targets']).to include(*partial['targets'])
+      end
     end
   end
 end

@@ -18,11 +18,19 @@ module Bolt
       GROUP_KEYS = DATA_KEYS + %w[name groups targets]
       CONFIG_KEYS = Bolt::Config::INVENTORY_OPTIONS.keys
 
-      def initialize(input, plugins)
+      def initialize(input, plugins, all_group: false)
         @logger = Bolt::Logger.logger(self)
         @plugins = plugins
 
         input = @plugins.resolve_top_level_references(input) if @plugins.reference?(input)
+
+        if all_group
+          if input.key?('name') && input['name'] != 'all'
+            @logger.warn("Top-level group '#{input['name']}' cannot specify a name, using 'all' instead.")
+          end
+
+          input = input.merge('name' => 'all')
+        end
 
         raise ValidationError.new("Group does not have a name", nil) unless input.key?('name')
 

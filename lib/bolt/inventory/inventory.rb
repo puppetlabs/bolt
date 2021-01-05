@@ -21,7 +21,7 @@ module Bolt
         @transport    = transport
         @config       = transports
         @plugins      = plugins
-        @groups       = Group.new(@data.merge('name' => 'all'), plugins)
+        @groups       = Group.new(@data, plugins, all_group: true)
         @group_lookup = {}
         @targets      = {}
 

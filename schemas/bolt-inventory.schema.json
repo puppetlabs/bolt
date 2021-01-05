@@ -1353,25 +1353,74 @@
       ]
     }
   },
-  "type": "object",
-  "properties": {
-    "config": {
-      "$ref": "#/definitions/config"
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "config": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/config"
+            },
+            {
+              "$ref": "#/definitions/_plugin"
+            }
+          ]
+        },
+        "facts": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/facts"
+            },
+            {
+              "$ref": "#/definitions/_plugin"
+            }
+          ]
+        },
+        "features": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/features"
+            },
+            {
+              "$ref": "#/definitions/_plugin"
+            }
+          ]
+        },
+        "groups": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/groups"
+            },
+            {
+              "$ref": "#/definitions/_plugin"
+            }
+          ]
+        },
+        "targets": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/targets"
+            },
+            {
+              "$ref": "#/definitions/_plugin"
+            }
+          ]
+        },
+        "vars": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/vars"
+            },
+            {
+              "$ref": "#/definitions/_plugin"
+            }
+          ]
+        }
+      }
     },
-    "facts": {
-      "$ref": "#/definitions/facts"
-    },
-    "features": {
-      "$ref": "#/definitions/features"
-    },
-    "groups": {
-      "$ref": "#/definitions/groups"
-    },
-    "targets": {
-      "$ref": "#/definitions/targets"
-    },
-    "vars": {
-      "$ref": "#/definitions/vars"
+    {
+      "$ref": "#/definitions/_plugin"
     }
-  }
+  ]
 }
