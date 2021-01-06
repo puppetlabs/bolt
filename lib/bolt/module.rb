@@ -6,8 +6,14 @@ module Bolt
     CONTENT_NAME_REGEX = /\A[a-z][a-z0-9_]*(::[a-z][a-z0-9_]*)*\z/.freeze
     MODULE_NAME_REGEX  = /\A[a-z][a-z0-9_]*\z/.freeze
 
-    def self.discover(modulepath)
-      modulepath.each_with_object({}) do |path, mods|
+    def self.discover(modulepath, project)
+      mods = {}
+
+      if project.load_as_module?
+        mods[project.name] = Bolt::Module.new(project.name, project.path.to_s)
+      end
+
+      modulepath.each do |path|
         next unless File.exist?(path) && File.directory?(path)
         Dir.children(path)
            .map { |dir| File.join(path, dir) }
@@ -20,6 +26,8 @@ module Bolt
           end
         end
       end
+
+      mods
     end
 
     attr_reader :name, :path

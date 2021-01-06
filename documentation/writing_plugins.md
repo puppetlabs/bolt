@@ -37,7 +37,7 @@ my_plugin/
 
 Modules that include a plugin must have a plugin configuration file,
 `bolt_plugin.json`, in the module's root directory. Typically, the plugin
-configuration file is an empty JSON file:
+configuration file contains an empty JSON object:
 
 ```json
 {}
@@ -46,6 +46,35 @@ configuration file is an empty JSON file:
 📖 **Related information**
 
 - [Module structure](module_structure.md)
+
+### Project-level plugins
+
+You can also write plugins at the project level. To write a project-level
+plugin, you will first need to [create a Bolt
+project](https://puppet.com/docs/bolt/latest/projects.html#create-a-bolt-project).
+Project-level plugins are referred to by the project's name, similar to how
+module plugins are referred to by the module's name.
+
+A simple project named `my_project` with a plugin looks like this:
+
+```shell
+my_project/
+├── bolt_plugin.json
+├── bolt-project.yaml
+├── inventory.yaml
+└── tasks
+    ├── resolve_reference.py
+    └── resolve_reference.json
+```
+
+Similar to modules that include plugins, a project that includes plugins must
+include a plugin configuration file, `bolt_plugin.json`, in the project
+directory. Typically, the plugin configuration file contains an empty JSON
+object:
+
+```json
+{}
+```
 
 ## Plugin hooks
 

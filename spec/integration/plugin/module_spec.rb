@@ -311,4 +311,54 @@ describe 'using module based plugins' do
       end
     end
   end
+
+  context 'when using a project-level plugin' do
+    let(:command) { %w[inventory show --detail -t nix] }
+
+    let(:task) do
+      <<~PLUGIN
+      #!/usr/bin/env ruby
+      require 'json'
+      puts ({ value: 'foo' }).to_json
+      PLUGIN
+    end
+
+    let(:inventory) do
+      {
+        'targets' => [
+          {
+            'uri' => 'nix',
+            'config' => {
+              'ssh' => {
+                'password' => {
+                  '_plugin' => 'module_test'
+                }
+              }
+            }
+          }
+        ]
+      }
+    end
+
+    before(:each) do
+      FileUtils.mkdir_p(@project.path + 'tasks')
+      File.write(@project.path + 'tasks' + 'resolve_reference.rb', task)
+      File.write(@project.path + 'tasks' + 'resolve_reference.json', '{}')
+      File.write(@project.path + 'bolt_plugin.json', '{}')
+    end
+
+    it 'loads and uses the project-level plugin' do
+      result = run_cli_json(command, project: @project)
+      expect(result.dig('targets', 0, 'config', 'ssh', 'password')).to eq('foo')
+    end
+
+    it 'errors if the project does not have a bolt_plugin.json' do
+      FileUtils.rm(@project.path + 'bolt_plugin.json')
+
+      expect { run_cli_json(command, project: @project) }.to raise_error(
+        Bolt::Plugin::PluginError::Unknown,
+        /Unknown plugin: 'module_test'/
+      )
+    end
+  end
 end

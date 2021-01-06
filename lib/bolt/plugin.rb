@@ -170,7 +170,7 @@ module Bolt
     end
 
     def modules
-      @modules ||= Bolt::Module.discover(@pal.full_modulepath)
+      @modules ||= Bolt::Module.discover(@pal.full_modulepath, @config.project)
     end
 
     def add_plugin(plugin)
