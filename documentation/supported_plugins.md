@@ -21,7 +21,7 @@ files, and plans.
 | `task` | Run a task as a plugin. | [task](#task) |
 | `terraform` | Generate targets from local and remote Terraform state files. | [terraform](https://forge.puppet.com/puppetlabs/terraform) |
 | `vault` | Access secrets from a Key/Value engine on a Hashicorp Vault server. | [vault](https://forge.puppet.com/puppetlabs/vault) |
-| `yaml` | Compose multiple YAML files into a single file. | [yaml](#yaml) |
+| `yaml` | Compose multiple YAML files into a single file. | [yaml](https://forge.puppet.com/puppetlabs/yaml) |
 
 ## Secret plugins
 
