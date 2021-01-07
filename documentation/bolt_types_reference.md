@@ -2,7 +2,11 @@
 
 This page lists custom data types used in Bolt plans and their functions.
 
-## `ApplyResult`
+## Custom data types
+
+Bolt ships with several custom data types that can be used within a plan.
+
+### `ApplyResult`
 
 An [apply action](applying_manifest_blocks.md#return-value-of-apply-action)
 returns an `ApplyResult`. An `ApplyResult` is part of a `ResultSet` object and
@@ -24,7 +28,7 @@ The following functions are available to `ApplyResult` objects.
 | `to_data` | `Hash` | A serialized representation of `ApplyResult`. |
 | `value` | `Hash` | A hash including the Puppet report from the apply action under a `report` key. |
 
-## `ResourceInstance`
+### `ResourceInstance`
 
 `ResourceInstance` objects are used to store the observed and desired state of a
 target's resource and to track events for the resource. These objects do not
@@ -56,7 +60,7 @@ The following functions are available to `ResourceInstance` objects.
 | `title` | `String` | The [resource title](https://puppet.com/docs/puppet/latest/lang_resources.html#title).
 | `type` | `String` | The [resource type](https://puppet.com/docs/puppet/latest/lang_resources.html#resource-types). |
 
-## `Result`
+### `Result`
 
 For each target that you execute an action on, Bolt returns a `Result` object
 and adds the `Result` to a `ResultSet` object. A `Result` object contains
@@ -80,7 +84,7 @@ The following functions are available to `Result` objects.
 | `to_data` | `Hash` | A serialized representation of `Result`. |
 | `value` | `Hash` | The output or return of executing on the target. |
 
-## `ResultSet`
+### `ResultSet`
 
 For each target that you execute an action on, Bolt returns a `Result` object
 and adds the `Result` to a `ResultSet` object. In the case of [apply
@@ -106,9 +110,9 @@ The following functions are available to `ResultSet` objects:
 | `ok_set` || `ResultSet` | The set of successful results. |
 | `results` || `Array[Variant[Result, ApplyResult]]` | All results in the set. |
 | `targets` || `Array[Target]` | The list of targets that have results in the set. |
-| `to_data` || `Array[Hash` | An array of serialized representations of each result in the set. |
+| `to_data` || `Array[Hash]` | An array of serialized representations of each result in the set. |
 
-## `Target`
+### `Target`
 
 The `Target` object represents a target and its specific connection options.
 
@@ -136,3 +140,48 @@ The following functions are available to `Target` objects:
 | `uri` | `String` | The target's URI. ||
 | `user` | `String` | The user to connect to the target. ||
 | `vars` | `Hash[String, Data]` | The target's variables. ||
+
+## Type Aliases
+
+Bolt also ships with type aliases, which provide an alternate name for existing types or lists of
+types. These types can be used within a plan, and have all of the attributes and functions of
+whichever Puppet type they are set to in the plan.
+
+### `TargetSpec`
+
+A `TargetSpec` is an alias for any of the following types:
+* `String`
+* `Target` (defined above)
+* `Array[TargetSpec]` (yep, it's recursive!)
+
+You can pass `TargetSpec` objects to `get_targets()` to return an `Array[Target]`. Generally, you shouldn't
+need to worry about the distinction between `TargetSpec` and `Target`/`Array[Target]`, because most
+Bolt plan functions handle them automatically. But if your use case requires it,
+you can use `get_targets()` to return an exact list of targets.
+
+📖  **Related information**
+- For more information on how to use `TargetSpec` in a plan, see [Writing plans](https://puppet.com/docs/bolt/latest/writing_plans.html#targetspec).
+
+### `PlanResult`
+
+A `PlanResult` describes the supported return values of a plan. This is the type returned from the
+`run_plan()` plan function. Similarly, a `parallelize()` plan function returns an `Array[PlanResult]`.
+Plans can return just about any Puppet type, so the `PlanResult` can be any of the following types:
+* `Boolean`
+* `Numeric`
+* `String`
+* `Undef`
+* `Error`
+* `Result`
+* `ApplyResult`
+* `ResultSet`
+* `Target`
+* `ResourceInstance`
+* `Array[PlanResults]`
+* `Hash{String => PlanResult}`. In other words, a `Hash` where each key is a `String` and each
+  corresponding value is a `PlanResult`, which could be any of the above types, including another
+  Hash.
+
+📖  **Related information**
+- [`run_plan()` plan function](plan_functions.md#run-plan)
+- [`parallelize()` plan function](plan_functions.md#parallelize)
