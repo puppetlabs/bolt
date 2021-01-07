@@ -11,11 +11,11 @@ parameters:
 
 steps:
   - task: sample::echo
-    target: $nodes
+    targets: $nodes
     parameters:
       message: hello world
   - name: echo_message
     command: echo hello world
-    target: $nodes
+    targets: $nodes
 
 return: $echo_message.first.value

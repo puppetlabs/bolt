@@ -31,7 +31,7 @@ describe Bolt::PAL::YamlPlan::Loader do
       plan_body = <<-YAML
       steps:
         - command: $
-          target: foo
+          targets: foo
       YAML
 
       expect { described_class.create(loader, plan_name, 'test.yaml', plan_body) }.to raise_error do |error|

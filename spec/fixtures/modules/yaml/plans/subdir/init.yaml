@@ -5,6 +5,6 @@ parameters:
 steps:
   - name: run_command
     command: echo I am a yaml plan
-    target: $targets
+    targets: $targets
 
 return: $run_command
