@@ -75,7 +75,12 @@ module Bolt
             $allowedArgs = (Get-Command "#{path}").Parameters.Keys
             $private:taskArgs = @{}
             $private:tempArgs.Keys | ? { $allowedArgs -contains $_ } | % { $private:taskArgs[$_] = $private:tempArgs[$_] }
-            try { & "#{path}" @taskArgs } catch { Write-Error $_.Exception; exit 1 }
+            try {
+              & "#{path}" @taskArgs
+            } catch {
+              $Host.UI.WriteErrorLine("[$($_.FullyQualifiedErrorId)] Exception $($_.InvocationInfo.PositionMessage).`n$($_.Exception.Message)");
+              exit 1;
+            }
             PS
           end
 
