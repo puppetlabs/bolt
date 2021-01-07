@@ -21,6 +21,9 @@ _This option is deprecated. <%= data[:_deprecation] %>_
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
 <% end -%>
+<% if data[:_plugin] == true -%>
+- **Pluggable:** true
+<% end -%>
 
 <% if data.key?(:properties) -%>
 <% data[:properties].each do |option, data| -%>
@@ -34,6 +37,9 @@ _This option is deprecated. <%= data[:_deprecation] %>_
 <% end -%>
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
+<% end -%>
+<% if data[:_plugin] == true -%>
+- **Pluggable:** true
 <% end -%>
 <% end %>
 <% end -%>

@@ -78,6 +78,13 @@ soon as the inventory file is loaded, whereas reference plugins under data keys
 such as `config` or `facts` are resolved once Bolt starts running an action on
 that target.
 
+While plugins are supported for configuration files, they're disabled for some settings. You can see
+which options are available on configuration references pages for
+[bolt-project.yaml](bolt_project_reference.md) and [bolt-defaults.yaml](bolt_defaults_reference.md).
+If you'd like another setting to have plugins enabled, let us know [in #bolt in
+slack](https://slack.puppet.com) or by [making an
+issue](https://github.com/puppetlabs/bolt/issues/new/choose).
+
 📖 **Related information**
 
 - [Configuring Bolt](configuring_bolt.md)

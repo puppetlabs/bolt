@@ -21,6 +21,9 @@ _This option is deprecated. <%= data[:_deprecation] %>_
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
 <% end -%>
+<% if data[:_plugin] == true -%>
+- **Pluggable:** true
+<% end -%>
 
 <% if option == 'inventory-config' %>
 For a detailed description of each option, their default values, and any available
@@ -38,6 +41,9 @@ sub-options, see [Transport configuration reference](bolt_transports_reference.m
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
 <% end %>
+<% if data[:_plugin] == true -%>
+- **Pluggable:** true
+<% end -%>
 <% end -%>
 <% end -%>
 
