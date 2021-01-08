@@ -12,6 +12,7 @@ module Bolt
           host
           job-poll-interval
           job-poll-timeout
+          read-timeout
           service-url
           task-environment
           token-file

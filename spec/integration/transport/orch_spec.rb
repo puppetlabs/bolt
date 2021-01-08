@@ -66,6 +66,20 @@ describe Bolt::Transport::Orch, orchestrator: true do
       end
     end
 
+    it "bolt sets read-timeout" do
+      with_tempfile_containing('token', 'faketoken') do |conf|
+        config = {
+          'service-url' => 'https://foo.bar:8143',
+          'cacert' => conf.path,
+          'token-file' => conf.path,
+          'read-timeout' => 30
+        }
+        allow(OrchestratorClient).to receive(:new).and_call_original
+        c = Bolt::Transport::Orch::Connection.new(config, nil, orch.logger)
+        expect(c.instance_variable_get(:@client).config['read-timeout']).to eq(30)
+      end
+    end
+
     it "sets the port to 8143 if one is not specified" do
       with_tempfile_containing('token', 'faketoken') do |conf|
         config = {

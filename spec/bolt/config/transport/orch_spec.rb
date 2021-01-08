@@ -20,20 +20,6 @@ describe Bolt::Config::Transport::Orch do
   end
 
   context 'validating' do
-    %w[cacert host service-url task-environment token-file].each do |opt|
-      it "#{opt} errors with wrong type" do
-        data[opt] = 100
-        expect { transport.new(data) }.to raise_error(Bolt::ValidationError)
-      end
-    end
-
-    %w[job-poll-interval job-poll-timeout].each do |opt|
-      it "#{opt} errors with wrong type" do
-        data[opt] = '100'
-        expect { transport.new(data) }.to raise_error(Bolt::ValidationError)
-      end
-    end
-
     context 'cacert' do
       it 'expands path relative to project' do
         allow(Bolt::Util).to receive(:validate_file).and_return(true)
