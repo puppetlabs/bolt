@@ -67,6 +67,9 @@ Lint/BinaryOperatorWithIdenticalOperands:
 Lint/ConstantDefinitionInBlock:
   Enabled: true
 
+Lint/DeprecatedConstants:
+  Enabled: true
+
 Lint/DeprecatedOpenSSLConstant:
   Enabled: true
 
@@ -110,6 +113,9 @@ Lint/HashCompareByIdentity:
 Lint/IdentityComparison:
   Enabled: true
 
+Lint/LambdaWithoutLiteralBlock:
+  Enabled: true
+
 Lint/MissingSuper:
   Enabled: false
 
@@ -123,6 +129,9 @@ Lint/OutOfRangeRegexpRef:
   Enabled: true
 
 Lint/RaiseException:
+  Enabled: true
+
+Lint/RedundantDirGlobSort:
   Enabled: true
 
 Lint/RedundantSafeNavigation:
@@ -234,6 +243,9 @@ Style/DocumentDynamicEvalDefinition:
 
 Style/DoubleNegation:
   Enabled: false
+
+Style/EndlessMethod:
+  Enabled: true
 
 Style/ExplicitBlockArgument:
   Enabled: false
