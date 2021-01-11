@@ -33,8 +33,8 @@ Describe "test bolt module" {
     }
 
     it "has the correct number of exported functions" {
-      # should count of pwsh functions plus legacy `bolt` function
-      @($commands).Count | Should -Be 26
+      # should count of pwsh functions
+      @($commands).Count | Should -Be 25
     }
   }
 }
