@@ -329,44 +329,138 @@ module-install:
 - [bolt-project.yaml options](bolt_project_reference.md#module-install)
 - [bolt-defaults.yaml options](bolt_defaults_reference.md#module-install)
 
-## ⛔ Manage modules with a Puppetfile
+## Manually manage a project's modules
 
-⛔ **DEPRECATED:** This method of installing and managing modules is deprecated.
-Use the workflows outlined above and avoid editing your Puppetfile.
+If Bolt can't resolve your module dependencies, you must manage your project's
+Puppetfile manually and use Bolt to install the modules listed in the Puppetfile
+without resolving dependencies. The process for manually managing your modules
+uses the new `module` subcommand, and replaces the now deprecated `puppetfile`
+subcommand.
 
-If you want to install a module to an existing project, use a Puppetfile. This
-method does not automatically resolve module dependencies. If the module you're
-installing requires other modules, make sure you add the required modules to
-your Puppetfile together with the module you're installing.
+The most common scenario where Bolt can't resolve module dependencies is when
+a project includes git modules that are in a repository other than a public
+GitHub repository. If your project includes this type of module, you must
+manually manage your project's Puppetfile.
 
-> **Before you begin**
->
-> - In your Bolt project directory, create a file named `Puppetfile`. 
-> - Add any modules stored locally in `modules/` to the list. For example, 
->   ```puppet
->     mod 'my_awesome_module', local: true
->   ```
->
->   **Bolt deletes any content in `modules/` that is not listed in your
->   Puppetfile.** If you want to keep the content, but you don't want to manage
->   it with the Puppetfile, move the content to a `site-modules` directory in
->   your project.
+To manually manage a project's Puppetfile and install modules without resolving
+dependencies, follow these steps:
 
-To install a module:
-   1.  Open Puppetfile in a text editor and add the modules and versions that
-       you want to install. If the modules have dependencies, list those as
-       well. For example:
-       ```puppet
-       # Modules from the Puppet Forge.
-       mod 'puppetlabs-apache', '4.1.0'
-       mod 'puppetlabs-postgresql', '5.12.0'
-       mod 'puppetlabs-puppet_conf', '0.3.0'
+1. Set the `modules` configuration option in your `bolt-project.yaml` file to an
+   empty array. For example:
 
-       # Modules from a Git repository.
-       mod 'puppetlabs-haproxy', git: 'https://github.com/puppetlabs/puppetlabs-haproxy.git', ref: 'master'
-       ```   
-   1. Run the `bolt puppetfile install` command. Bolt installs modules to the
-      first directory in the `modulepath` setting. By default, this is the
-      `modules/` subdirectory inside the Bolt project directory. To override
-      this location, update the `modulepath` setting in your [project
-      configuration file](bolt_project_reference.md).
+   ```yaml
+   # bolt-project.yaml
+   name: myproject
+   modules: []
+   ```
+
+1. Create a file named `Puppetfile` in your project directory and add the
+   modules you want to install, including each module's dependencies, to
+   the Puppetfile. For example:
+
+   ```ruby
+   # Modules from a private git repository
+   mod 'private-module', git: 'https://github.com/bolt-user/private-module.git', ref: 'main'
+
+   # Modules from an alternate Forge
+   mod 'puppetlabs/apache', '5.7.0'
+   mod 'puppetlabs/stdlib', '6.5.0'
+   mod 'puppetlabs/concat', '6.3.0'
+   mod 'puppetlabs/translate', '2.2.0'
+   ```
+
+1. Install the modules in the Puppetfile without resolving dependencies:
+
+   _\*nix shell command_
+
+   ```shell
+   bolt module install --no-resolve
+   ```
+
+   _PowerShell cmdlet_
+
+   ```powershell
+   Install-BoltModule -NoResolve
+   ```
+
+Bolt installs modules in the Puppetfile to the `.modules/` directory in your
+project directory. If you need to add or remove modules to the project, update
+your Puppetfile and run the above command again.
+
+## Migrate a project to use module management
+
+If you created a Bolt project before module dependency management was
+introduced, you can use Bolt's built-in migration tool to [update your
+project](projects.md#migrate-a-bolt-project).
+
+### Manual migration
+
+In some cases, Bolt is unable to resolve module dependencies and manage your
+project's modules for you. If Bolt can't resolve your module dependencies, you
+must manage your project's Puppetfile manually and use Bolt to install the
+modules listed in the Puppetfile without resolving dependencies. The most common
+scenario where Bolt can't resolve module dependencies is when a project includes
+git modules that are in a repository other than a public GitHub repository.
+
+The module management feature makes changes to configuration files and changes
+the directory where modules are installed. To migrate your project, do the
+following:
+
+1. Rename the `puppetfile` key in your `bolt-defaults.yaml` and
+   `bolt-project.yaml` files to `module-install`. For example, the following
+   file:
+
+   ```yaml
+   # bolt-project.yaml
+   name: myproject
+   puppetfile:
+     forge:
+       baseurl: https://myforge.example.com
+     proxy: https://myproxy.example.com:8080
+   ```
+
+   Becomes:
+
+   ```yaml
+   # bolt-project.yaml
+   name: myproject
+   module-install:
+     forge:
+       baseurl: https://myforge.example.com
+     proxy: https://myproxy.example.com:8080
+   ```
+
+1. Set the `modules` option in your `bolt-project.yaml` file to an
+   empty array:
+
+   ```yaml
+   # bolt-project.yaml
+   name: myproject
+   modules: []
+   ```
+
+1. Delete all modules in the `modules/` directory of your project.
+
+1. Copy all modules from the `site-modules/` and `site/` directories of your
+   project to the `modules/` directory. If you have configured a `modulepath` for
+   your project you do not need to complete this step.
+
+1. If your project has a Puppetfile, install the modules in the Puppetfile
+   without resolving dependencies:
+
+   _\*nix shell command_
+
+   ```shell
+   bolt module install --no-resolve
+   ```
+
+   _PowerShell cmdlet_
+
+   ```powershell
+   Install-BoltModule -NoResolve
+   ```
+
+📖 **Related information**
+
+- For a list of modules that are shipped with Bolt, see [Packaged modules](packaged_modules.md).
+- For a list of plugins that Bolt maintains, see [Supported plugins](supported_plugins.md).

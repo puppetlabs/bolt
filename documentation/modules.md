@@ -142,9 +142,3 @@ modulepath = site:dist:modules:$basemodulepath:.modules
 
 You can learn more about the module changes introduced in Bolt 2.23.0 in the
 [September 2020 developer update](./developer_updates.md#september-2020).
- 
-
-📖 **Related information**
-
-- For a list of modules that are shipped with Bolt, see [Packaged modules](packaged_modules.md).
-- For a list of plugins that Bolt maintains, see [Supported plugins](supported_plugins.md).

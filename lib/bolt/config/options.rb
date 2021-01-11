@@ -430,6 +430,8 @@ module Bolt
               _example: "https://my-proxy.com:8080"
             }
           },
+          _deprecation: "This option will be removed in Bolt 3.0. Update your project to use the module "\
+                        "management feature. For more information, see https://pup.pt/bolt-module-migrate.",
           _plugin: false
         },
         "save-rerun" => {
