@@ -204,9 +204,8 @@ module Bolt
 
         return unless !stdout.empty? && stdout.to_i < 3
 
-        msg = "Detected PowerShell 2 on controller. PowerShell 2 is deprecated and "\
-              "support will be removed in Bolt 3.0."
-        Bolt::Logger.deprecate("powershell_2_controller", msg)
+        msg = "Detected PowerShell 2 on controller. PowerShell 2 is unsupported."
+        Bolt::Logger.deprecation_warning("powershell_2_controller", msg)
       end
     end
 
