@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt 2.41.0 (2021-01-11)
+## Bolt 2.42.0 (2021-01-11)
 
 ### New features
 
