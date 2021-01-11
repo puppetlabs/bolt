@@ -1,5 +1,83 @@
 # Changelog
 
+## Bolt 2.41.0 (2021-01-11)
+
+### New features
+
+* **Support `module-install` config when resolving modules**
+  ([#2478](#2478))
+
+  The `bolt module add|install` commands and `Add|Install-BoltModule`
+  cmdlets now support the `module-install` config option when resolving
+  module dependencies.
+
+* **Updated bundled modules to latest version**
+  ([#2514](https://github.com/puppetlabs/bolt/issues/2514))
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [facts 1.3.0](https://forge.puppet.com/puppetlabs/facts/1.3.0)
+  - [package 1.4.0](https://forge.puppet.com/puppetlabs/package/1.4.0)
+  - [puppet_agent 4.3.0](https://forge.puppet.com/puppetlabs/puppet_agent/4.3.0)
+  - [puppet_conf 0.8.0](https://forge.puppet.com/puppetlabs/puppet_conf/0.8.0)
+  - [reboot 3.1.0](https://forge.puppet.com/puppetlabs/reboot/3.1.0)
+  - [scheduled_task 2.3.1](https://forge.puppet.com/puppetlabs/scheduled_task/2.3.1)
+  - [service 1.4.0](https://forge.puppet.com/puppetlabs/service/1.4.0)
+
+* **Support for project-level plugins**
+  ([#2517](https://github.com/puppetlabs/bolt/issues/2517))
+
+  Bolt now supports project-level plugins. Similar to module plugins,
+  project-level plugins are implemented as tasks that use specific hooks
+  and are referred to using the name of the project.
+
+### Bug fixes
+
+* **Allow entire inventory to be specified with a plugin**
+  ([#2475](https://github.com/puppetlabs/bolt/issues/2475))
+
+  Inventory files can now be specified with a plugin. For example, the
+  following inventory file is now valid:
+
+  ```yaml
+  ---
+  _plugin: yaml
+  filepath: /path/to/inventory_partial.yaml
+  ```
+
+* **Delete transport config keys that resolved to `nil`**
+  ([#2512](https://github.com/puppetlabs/bolt/pull/2512))
+
+  Previously, if a plugin reference resolved a transport config key to `nil`
+  Bolt would still include that key in the target's transport config. This
+  change ensures that `nil`-resolved transport config keys are deleted during
+  inventory parsing.
+
+* **Don't stacktrace when converting YAML plans with errors**
+  ([#2515](https://github.com/puppetlabs/bolt/pull/2515))
+
+  Bolt will now error cleanly instead of stacktracing when users try to
+  convert a YAML plan that has type or syntax errors.
+
+### Deprecations
+
+* **Deprecate `puppetfile` in favor of `module-install`**
+  ([#2361](https://github.com/puppetlabs/bolt/issues/2361))
+
+  The `puppetfile` configuration option has been deprecated in favor of
+  `module-install` and will be removed in Bolt 3.0. Users should update
+  their projects to use the module management feature, which uses the
+  `module-install` option.
+
+* **Deprecate `puppetfile` commands**
+  ([#2361](https://github.com/puppetlabs/bolt/issues/2361))
+
+  The `bolt puppetfile *` commands and `*-BoltPuppetfile` cmdlets have
+  been deprecated and will be removed in Bolt 3.0. Users should update
+  their projects to use the module management feature, which uses the
+  `bolt module *` commands and `*-BoltModule` cmdlets.
+
 ## Bolt 2.40.2 (2020-12-18)
 
 ### Bug fixes
