@@ -8,7 +8,8 @@ describe Bolt::Module do
   include BoltSpec::Files
 
   let(:modulepath) { [fixtures_path('modules')] }
-  let(:mods) { Bolt::Module.discover(modulepath) }
+  let(:project)    { double('project', load_as_module?: false) }
+  let(:mods)       { Bolt::Module.discover(modulepath, project) }
 
   it 'returns the path' do
     expect(mods['vars'].name).to eq('vars')
