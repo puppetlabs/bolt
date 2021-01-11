@@ -50,6 +50,14 @@ system. For example, if you write a Python task and include the line:
 `#!/usr/bin/env python`, Bolt attempts to execute the script using the default
 `python` executable on the target system.
 
+## My task fails on Windows targets
+
+Bolt does not support PowerShell 2.0. If your task targets a Windows OS that has only PowerShell 2.0 installed, the task will fail.
+
+In 2017, Microsoft [deprecated PowerShell 2.0](https://docs.microsoft.com/en-US/windows/deployment/planning/windows-10-removed-features). For a more detailed explanation, see [Micosoft's blog post on the subject](https://devblogs.microsoft.com/powershell/windows-powershell-2-0-deprecation).
+
+Both Microsoft and Puppet recommend updating the target with Windows PowerShell 5.1, but versions 3.0 and 4.0 are also supported.
+
 ## Bolt can't connect to my hosts over SSH
 
 ### Host key verification failures
