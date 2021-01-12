@@ -258,7 +258,9 @@ module Bolt
 
     def with_node_logging(description, batch, log_level = :info)
       @logger.send(log_level, "#{description} on #{batch.map(&:safe_name)}")
+      publish_event(type: :start_spin)
       result = yield
+      publish_event(type: :stop_spin)
       @logger.send(log_level, result.to_json)
       result
     end
@@ -410,6 +412,7 @@ module Bolt
       subscribe(self, [:node_result])
       results = Array.new(skein.length)
       @in_parallel = true
+      publish_event(type: :start_spin)
 
       until skein.empty?
         @thread_completed = false
@@ -417,6 +420,7 @@ module Bolt
 
         skein.each do |yarn|
           if yarn.alive?
+            publish_event(type: :stop_spin)
             r = yarn.resume
           else
             results[yarn.index] = yarn.value
@@ -428,6 +432,7 @@ module Bolt
         sleep(0.1) until @thread_completed || skein.empty?
       end
 
+      publish_event(type: :stop_spin)
       @in_parallel = false
       unsubscribe(self, [:node_result])
       results
@@ -473,6 +478,7 @@ module Bolt
         raise Bolt::Error.new('STDIN is not a tty, unable to prompt', 'bolt/no-tty-error')
       end
 
+      sleep(0.1) if @in_parallel
       $stderr.print("#{prompt}: ")
 
       value = if options[:sensitive]

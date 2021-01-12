@@ -53,6 +53,12 @@ describe "Bolt::Executor" do
       executor.run_command(targets, command, {})
     end
 
+    it 'starts and stops the spinner' do
+      executor.run_command(targets, command, {})
+      expect(collector.events).to include({ type: :start_spin })
+      expect(collector.events).to include({ type: :stop_spin })
+    end
+
     it 'passes run_as' do
       executor.run_as = 'foo'
       node_results.each do |target, result|
@@ -531,7 +537,7 @@ describe "Bolt::Executor" do
       expect(result.error_hash['msg']).to eq('Authentication failed')
     end
 
-    expect(collector.events.count).to eq(6)
+    expect(collector.events.count).to eq(10)
     expect(results).to eq(Bolt::ResultSet.new(collector.results))
   end
 
@@ -552,7 +558,7 @@ describe "Bolt::Executor" do
       expect(result.error_hash['msg']).to eq('ed25519 is not supported')
     end
 
-    expect(collector.events.count).to eq(6)
+    expect(collector.events.count).to eq(10)
     expect(results).to eq(Bolt::ResultSet.new(collector.results))
   end
 
@@ -855,6 +861,19 @@ describe "Bolt::Executor" do
     it "subscribes to node_result messages" do
       expect(executor).to receive(:subscribe).with(executor, [:node_result])
       executor.round_robin([])
+    end
+
+    it "starts and stops the spinner" do
+      skein = %w[a b c d].each_with_index.map do |val, index|
+        fiber = Fiber.new do
+          sleep(rand(0.01..0.1))
+          val + 'e'
+        end
+        Bolt::Yarn.new(fiber, index)
+      end
+
+      executor.round_robin(skein)
+      expect(collector.events).to include({ type: :start_spin })
     end
 
     it "returns results in the same order they were originally" do

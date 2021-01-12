@@ -62,6 +62,24 @@ describe 'plans' do
       expect(json['value']).to eq("stdout" => "I am a yaml plan\n", "stderr" => "", "exit_code" => 0)
     end
 
+    context "using the human outputter" do
+      let(:config_flags) {
+        ['--project', fixtures_path('configs', 'empty'),
+         '--modulepath', modulepath,
+         '--no-host-key-check']
+      }
+
+      it "prints the spinner when running executor functions", ssh: true do
+        expect_any_instance_of(Bolt::Outputter::Human).to receive(:start_spin).at_least(:once)
+        run_cli(%w[plan run sample::noop --targets #{target}] + config_flags, outputter: Bolt::Outputter::Human)
+      end
+
+      it "doesn't print the spinner when running non-executor functions", ssh: true do
+        expect_any_instance_of(Bolt::Outputter::Human).not_to receive(:start_spin)
+        run_cli(%w[plan run output] + config_flags, outputter: Bolt::Outputter::Human)
+      end
+    end
+
     it 'runs a yaml plan', ssh: true do
       result = run_cli(['plan', 'run', 'sample::yaml', '--targets', target] + config_flags)
       expect(JSON.parse(result)).to eq('stdout' => "hello world\n", 'stderr' => '', 'exit_code' => 0)

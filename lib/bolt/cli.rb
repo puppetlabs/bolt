@@ -541,15 +541,12 @@ module Bolt
               validate_file('script', script)
               executor.run_script(targets, script, options[:leftovers], executor_opts)
             when 'task'
-              r = outputter.spin do
-                pal.run_task(options[:object],
-                             targets,
-                             options[:task_options],
-                             executor,
-                             inventory,
-                             options[:description])
-              end
-              r
+              pal.run_task(options[:object],
+                           targets,
+                           options[:task_options],
+                           executor,
+                           inventory,
+                           options[:description])
             when 'file'
               src = options[:object]
               dest = options[:leftovers].first
@@ -684,9 +681,7 @@ module Bolt
 
       executor.subscribe(log_outputter)
       executor.start_plan(plan_context)
-      result = outputter.spin do
-        pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
-      end
+      result = pal.run_plan(plan_name, plan_arguments, executor, inventory, puppetdb_client)
 
       # If a non-bolt exception bubbles up the plan won't get finished
       executor.finish_plan(result)
