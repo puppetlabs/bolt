@@ -9,7 +9,7 @@ module BoltServer
     def config_keys
       super + %w[concurrency cache-dir file-server-conn-timeout
                  file-server-uri projects-dir environments-codedir
-                 environmentpath basemodulepath]
+                 environmentpath basemodulepath builtin-content-dir]
     end
 
     def env_keys
