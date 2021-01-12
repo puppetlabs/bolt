@@ -79,12 +79,12 @@ describe Bolt::PAL::YamlPlan::Evaluator do
           type: TargetSpec
       steps:
         - task: package
-          target: $nodes
+          targets: $nodes
           parameters:
             action: status
             name: $package
         - command: hostname -f
-          target: $nodes
+          targets: $nodes
       YAML
 
       nodes = %w[foo.example.com bar.example.com]
@@ -102,7 +102,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
           type: TargetSpec
       steps:
         - command: hostname -f
-          target: $nodes
+          targets: $nodes
       YAML
 
       expect(scope).to receive(:call_function).with('run_command', ['hostname -f', ['foo.example.com']])
@@ -198,7 +198,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   describe "#task_step" do
     let(:step) do
       { 'task' => 'package',
-        'target' => 'foo.example.com',
+        'targets' => 'foo.example.com',
         'parameters' => { 'action' => 'status',
                           'name' => 'openssl' } }
     end
@@ -259,7 +259,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   describe "#command_step" do
     let(:step) do
       { 'command' => 'hostname -f',
-        'target' => 'foo.example.com' }
+        'targets' => 'foo.example.com' }
     end
 
     it 'supports a description' do
@@ -273,7 +273,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   describe "#script_step" do
     let(:step) do
       { 'script' => 'mymodule/myscript.sh',
-        'target' => 'foo.example.com',
+        'targets' => 'foo.example.com',
         'arguments' => %w[a b c] }
     end
 
@@ -327,7 +327,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
         let(:step) do
           { key => 'mymodule/file.txt',
             'destination' => '/path/to/file.txt',
-            'target' => 'foo.example.com' }
+            'targets' => 'foo.example.com' }
         end
 
         it 'uploads the file' do
@@ -358,7 +358,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       {
         'download'    => source,
         'destination' => destination,
-        'target'      => target
+        'targets'     => target
       }
     end
 
@@ -392,7 +392,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   describe "#resources_step" do
     let(:step) do
       { 'resources' => resources,
-        'target' => target }
+        'targets' => target }
     end
     let(:resources) do
       [{ 'package' => 'nginx' },
@@ -448,7 +448,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
           eval: $input + 5
         - name: bar
           command: "echo ${$foo*2}"
-          target: foo.example.com
+          targets: foo.example.com
       YAML
 
       expect(scope).to receive(:call_function).with('run_command', ['echo 34', 'foo.example.com'])

@@ -4,7 +4,7 @@ parameters:
 
 steps:
   - name: upload_file
-    source: 'yaml/test.sh'
+    upload: 'yaml/test.sh'
     destination: '/tmp/test_upload.sh'
     targets: $targets
   - name: cleanup

@@ -28,7 +28,7 @@ describe Bolt::PAL::YamlPlan::Step do
     context 'with command step' do
       let(:step_body) do
         { "command" => make_string("echo peanut butter"),
-          "target" => make_string("$bread") }
+          "targets" => make_string("$bread") }
       end
       let(:output) { "  run_command('echo peanut butter', $bread)\n" }
 
@@ -40,7 +40,7 @@ describe Bolt::PAL::YamlPlan::Step do
     context 'with script step' do
       let(:step_body) do
         { "script" => make_string("bananas.pb"),
-          "target" => make_string("$bread"),
+          "targets" => make_string("$bread"),
           "arguments" => [make_string("--with cinnamon"), make_string("--and honey")] }
       end
       let(:output) { "  run_script('bananas.pb', $bread, {'arguments' => ['--with cinnamon', '--and honey']})\n" }
@@ -53,7 +53,7 @@ describe Bolt::PAL::YamlPlan::Step do
     context 'with task step' do
       let(:step_body) do
         { "task" => make_string("jam::raspberry"),
-          "target" => make_string("$bread"),
+          "targets" => make_string("$bread"),
           "description" => 'delicious',
           "parameters" => { "butter" => "crunchy peanut" } }
       end
@@ -81,9 +81,9 @@ describe Bolt::PAL::YamlPlan::Step do
 
     context 'with upload step' do
       let(:step_body) do
-        { "source" => make_string("lucys/kitchen/counter"),
+        { "upload" => make_string("lucys/kitchen/counter"),
           "destination" => make_string("/lucys/stomach"),
-          "target" => make_string("$sandwich") }
+          "targets" => make_string("$sandwich") }
       end
       let(:output) { "  upload_file('lucys/kitchen/counter', '/lucys/stomach', $sandwich)\n" }
 
@@ -97,7 +97,7 @@ describe Bolt::PAL::YamlPlan::Step do
         {
           "download"    => make_string("/etc/ssh/ssh_config"),
           "destination" => make_string("downloads"),
-          "target"      => make_string("$foo")
+          "targets"     => make_string("$foo")
         }
       end
 
@@ -159,7 +159,7 @@ OUT
 
       let(:step_body) do
         { 'resources' => resources,
-          'target' => make_string('$bread') }
+          'targets' => make_string('$bread') }
       end
 
       context "#validate" do
@@ -276,7 +276,7 @@ OUT
     context "with string parameters key" do
       let(:step_body) do
         { "task" => make_string("jam::raspberry"),
-          "target" => make_string("$bread"),
+          "targets" => make_string("$bread"),
           "description" => 'delicious',
           "parameters" => "deceptive peanut butter" }
       end
