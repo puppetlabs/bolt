@@ -125,7 +125,16 @@ module Bolt
           @logger.send(bolt_level, "#{target.name}: #{message}")
         end
       end
-      raise ApplyError.new(target.name, result['message']) unless stat.success?
+
+      unless stat.success?
+        message = if @apply_settings['trace'] && result['backtrace']
+                    ([result['message']] + result['backtrace']).join("\n  ")
+                  else
+                    result['message']
+                  end
+        raise ApplyError.new(target.name, message)
+      end
+
       result
     end
 
@@ -236,6 +245,7 @@ module Bolt
                           else
                             Bolt::ApplyError.new(batch_target, future.reason.message)
                           end
+
                   result = Bolt::ApplyResult.new(batch_target, error: error.to_h)
                   @executor.publish_event(type: :node_result, result: result)
                   result
