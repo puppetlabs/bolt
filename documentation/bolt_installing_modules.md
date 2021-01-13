@@ -185,6 +185,7 @@ To specify a Forge module, use the following keys in the specification:
 | --- | --- | :-: |
 | `name` | The full name of the module. Can be either `<OWNER>-<NAME>` or `<OWNER>/<NAME>`. | ✓ |
 | `version_requirement` | The version requirement that the module must satisfy. Can be either a specific semantic version (`1.0.0`), a version range (`>= 1.0.0 < 3.0.0`), or version shorthand (`1.x`).  |
+| `resolve` | Boolean. Whether to resolve the module's dependencies when installing modules. | |
 
 After you've made changes to the module specification, [update your
 modules](#update-a-projects-modules).
@@ -214,7 +215,9 @@ To specify a git module, use the following keys in the specification:
 | Key | Description | Required |
 | --- | --- | :-: |
 | `git` | The URI to the GitHub repository. URI must begin with either `https://github.com`or `git@github.com`. | ✓ |
+| `name` | The name of the module. Bolt uses this name for the module in the Puppetfile, the directory that the module's contents are downloaded to, and as a namespace for the module's content. To avoid errors, make sure this name matches the name specified in the module's `metadata.json`. **Required if `resolve` is `false`.** | |
 | `ref` | The git reference to checkout. Can be either a branch, commit, or tag. | ✓ |
+| `resolve` | Boolean. Whether to resolve the module's dependencies when installing modules. | |
 
 After you've made changes to the module specification, [update your
 modules](#update-a-projects-modules).
@@ -329,9 +332,99 @@ module-install:
 - [bolt-project.yaml options](bolt_project_reference.md#module-install)
 - [bolt-defaults.yaml options](bolt_defaults_reference.md#module-install)
 
+## Skip dependency resolution for a module
+
+Skipping dependency resolution for a module allows you to take advantage of
+Bolt's module dependency resolution while still using modules that Bolt cannot
+resolve dependencies for.
+
+You might want to skip dependency resolution for a module if:
+
+- The module has outdated or incorrect metadata.
+- The module is a git module hosted in a repository other than a public GitHub
+  repository.
+- Bolt can't cleanly resolve the module's dependencies.
+
+You can configure Bolt to skip dependency resolution for a module by setting the
+`resolve` key for the module specification to `false`. This key is available for
+both Forge and git modules.
+
+When you install modules with Bolt, it only resolves module dependencies for
+module specifications that do not set `resolve: false`. After resolving
+dependencies, Bolt generates a Puppetfile with the resolved modules and
+dependencies, as well as the modules it did not resolve dependencies for.
+
+For example, if your project includes the `puppetlabs/ntp` Forge module and a
+git module named `private_module` hosted in a private GitHub repository, you can
+configure Bolt to skip dependency resolution for `private_module`:
+
+```yaml
+# bolt-project.yaml
+name: myproject
+modules:
+  - puppetlabs/ntp
+  - name: private_module
+    git: git@github.com:puppetlabs/private_module
+    ref: 1.0.0
+    resolve: false
+```
+
+> **Note:** When setting `resolve: false` for a git module, you must include
+> the `name` key.
+
+When you install the project's modules, Bolt resolves dependencies for the
+`puppetlabs/ntp` module, skips dependency resolution for `private_module`, and
+generates a Puppetfile similar to this:
+
+```ruby
+# This Puppetfile is managed by Bolt. Do not edit.
+# For more information, see https://pup.pt/bolt-modules
+
+# The following directive installs modules to the managed moduledir.
+moduledir '.modules'
+
+mod 'puppetlabs/ntp', '8.5.0'
+mod 'puppetlabs/stdlib', '6.5.0'
+mod 'private_module',
+  git: 'git@github.com:puppetlabs/private_module'
+  ref: '1.0.0'
+```
+
+Because Bolt skips dependency resolution for module specifications that set
+`resolve: false`, you'll need to include any dependencies for these modules
+in your project configuration. For example, if `private_module` included
+the following dependency in its `metadata.json` file:
+
+```json
+{
+  . . .
+  "dependencies": [
+    {
+      "name": "puppetlabs/docker",
+      "version_requirement": ">= 3.0.0"
+    }
+  ]
+}
+```
+
+You would add the dependency to your project configuration:
+
+```yaml
+# bolt-project.yaml
+name: myproject
+modules:
+  - puppetlabs/ntp
+  - name: private_module
+    git: git@github.com:puppetlabs/private_module
+    ref: 1.0.0
+    resolve: false
+  - name: puppetlabs/docker
+    version_requirement: '>= 3.0.0'
+```
+
 ## Manually manage a project's modules
 
-If Bolt can't resolve your module dependencies, you must manage your project's
+If Bolt can't resolve your module dependencies, you can manage your project's
 Puppetfile manually and use Bolt to install the modules listed in the Puppetfile
 without resolving dependencies. The process for manually managing your modules
 uses the new `module` subcommand, and replaces the now deprecated `puppetfile`
@@ -397,7 +490,7 @@ project](projects.md#migrate-a-bolt-project).
 
 In some cases, Bolt is unable to resolve module dependencies and manage your
 project's modules for you. If Bolt can't resolve your module dependencies, you
-must manage your project's Puppetfile manually and use Bolt to install the
+can manage your project's Puppetfile manually and use Bolt to install the
 modules listed in the Puppetfile without resolving dependencies. The most common
 scenario where Bolt can't resolve module dependencies is when a project includes
 git modules that are in a repository other than a public GitHub repository.

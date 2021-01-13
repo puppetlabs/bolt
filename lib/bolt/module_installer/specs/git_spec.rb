@@ -13,18 +13,31 @@ module Bolt
       class GitSpec
         NAME_REGEX    = %r{\A(?:[a-zA-Z0-9]+[-/])?(?<name>[a-z][a-z0-9_]*)\z}.freeze
         REQUIRED_KEYS = Set.new(%w[git ref]).freeze
+        KNOWN_KEYS    = Set.new(%w[git name ref resolve]).freeze
 
-        attr_reader :git, :ref, :type
+        attr_reader :git, :ref, :resolve, :type
 
         def initialize(init_hash)
+          @resolve    = init_hash.key?('resolve') ? init_hash['resolve'] : true
           @name       = parse_name(init_hash['name'])
           @git, @repo = parse_git(init_hash['git'])
           @ref        = init_hash['ref']
           @type       = :git
+
+          if @name.nil? && @resolve == false
+            raise Bolt::ValidationError,
+                  "Missing name for Git module specification: #{@git}. Git module specifications "\
+                  "must include a 'name' key when 'resolve' is false."
+          end
+
+          unless @resolve == true || @resolve == false
+            raise Bolt::ValidationError,
+                  "Option 'resolve' for module spec #{@git} must be a Boolean"
+          end
         end
 
         def self.implements?(hash)
-          REQUIRED_KEYS == hash.keys.to_set
+          KNOWN_KEYS.superset?(hash.keys.to_set) && REQUIRED_KEYS.subset?(hash.keys.to_set)
         end
 
         # Parses the name into owner and name segments, and formats the full
@@ -47,6 +60,8 @@ module Bolt
         # Gets the repo from the git URL.
         #
         private def parse_git(git)
+          return [git, nil] unless @resolve
+
           repo = if git.start_with?('git@github.com:')
                    git.split('git@github.com:').last.split('.git').first
                  elsif git.start_with?('https://github.com')

@@ -176,4 +176,99 @@ describe 'installing modules' do
       )
     end
   end
+
+  context 'with no-resolve modules' do
+    let(:project_config) do
+      {
+        'modules' => [
+          {
+            'name'    => 'puppetlabs/apt',
+            'resolve' => false
+          },
+          {
+            'name'    => 'yaml',
+            'git'     => 'https://github.com/puppetlabs/puppetlabs-yaml',
+            'ref'     => 'main',
+            'resolve' => false
+          }
+        ]
+      }
+    end
+
+    it 'does not resolve modules when installing' do
+      result = run_cli_json(command, project: project)
+
+      expect(result).to eq(
+        'success'    => true,
+        'puppetfile' => project.puppetfile.to_s,
+        'moduledir'  => project.managed_moduledir.to_s
+      )
+      expect(project.puppetfile.exist?).to be(true)
+      expect(project.managed_moduledir.exist?).to be(true)
+
+      puppetfile_content = File.read(project.puppetfile)
+
+      expect(puppetfile_content.lines).to include(
+        /mod 'yaml'/,
+        %r{mod 'puppetlabs/apt'}
+      )
+
+      expect(puppetfile_content.lines).not_to include(
+        /ruby_task_helper/,
+        /stdlib/,
+        /translate/
+      )
+    end
+
+    it 'does not resolve modules when adding' do
+      result = run_cli_json(%w[module add puppetlabs/ntp], project: project)
+
+      expect(result).to eq(
+        'success'    => true,
+        'puppetfile' => project.puppetfile.to_s,
+        'moduledir'  => project.managed_moduledir.to_s
+      )
+      expect(project.puppetfile.exist?).to be(true)
+      expect(project.managed_moduledir.exist?).to be(true)
+
+      puppetfile_content = File.read(project.puppetfile)
+
+      expect(puppetfile_content.lines).to include(
+        /mod 'yaml'/,
+        %r{mod 'puppetlabs/apt'},
+        %r{mod 'puppetlabs/ntp'},
+        %r{mod 'puppetlabs/stdlib'}
+      )
+
+      expect(puppetfile_content.lines).not_to include(
+        /ruby_task_helper/,
+        /translate/
+      )
+    end
+  end
+
+  context 'with name conflicts between unresolved modules and resolved dependencies' do
+    let(:project_config) do
+      {
+        'modules' => [
+          {
+            'name' => 'puppetlabs/ntp'
+          },
+          {
+            'name'    => 'stdlib',
+            'git'     => 'https://github.com/puppetlabs/puppetlabs-stdlib',
+            'ref'     => 'master',
+            'resolve' => false
+          }
+        ]
+      }
+    end
+
+    it 'errors' do
+      expect { run_cli_json(command, project: project) }.to raise_error(
+        Bolt::Error,
+        /Detected unresolved module specifications with the same name as a resolved module dependency: stdlib/
+      )
+    end
+  end
 end

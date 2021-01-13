@@ -195,8 +195,10 @@ module Bolt
       @outputter.stop_spin
 
       # Automatically generate types after installing modules
-      @outputter.print_action_step("Generating type references")
-      @pal.generate_types(cache: true)
+      if ok
+        @outputter.print_action_step("Generating type references")
+        @pal.generate_types(cache: true)
+      end
 
       @outputter.print_puppetfile_result(ok, path, moduledir)
 

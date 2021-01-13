@@ -303,6 +303,10 @@ module Bolt
                     description: "The name of the module.",
                     type: String
                   },
+                  "resolve" => {
+                    description: "Whether to resolve the module's dependencies when installing modules.",
+                    type: [TrueClass, FalseClass]
+                  },
                   "version_requirement" => {
                     description: "The version requirement for the module. Accepts a specific version (1.2.3), version "\
                                  "shorthand (1.2.x), or a version range (>= 1.2.0).",
@@ -317,9 +321,17 @@ module Bolt
                     description: "The URL to the public git repository.",
                     type: String
                   },
+                  "name" => {
+                    description: "The name of the module. Required when `resolve` is `false`.",
+                    type: String
+                  },
                   "ref" => {
                     description: "The git reference to check out. Can be either a branch, tag, or commit SHA.",
                     type: String
+                  },
+                  "resolve" => {
+                    description: "Whether to resolve the module's dependencies when installing modules.",
+                    type: [TrueClass, FalseClass]
                   }
                 }
               }

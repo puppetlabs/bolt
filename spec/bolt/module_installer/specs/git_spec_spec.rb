@@ -44,6 +44,23 @@ describe Bolt::ModuleInstaller::Specs::GitSpec do
         /Invalid git source/
       )
     end
+
+    it 'errors if resolve is false and missing a name' do
+      init_hash.delete('name')
+      init_hash['resolve'] = false
+      expect { spec }.to raise_error(
+        Bolt::ValidationError,
+        /Missing name.*when 'resolve' is false/
+      )
+    end
+
+    it 'errors with non-Boolean resolve value' do
+      init_hash['resolve'] = 'no'
+      expect { spec }.to raise_error(
+        Bolt::ValidationError,
+        /Option 'resolve'.*must be a Boolean/
+      )
+    end
   end
 
   context '#to_hash' do

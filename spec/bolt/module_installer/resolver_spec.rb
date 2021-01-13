@@ -11,9 +11,25 @@ describe Bolt::ModuleInstaller::Resolver do
   let(:git)       { "https://github.com/puppetlabs/puppetlabs-#{name}" }
   let(:ref)       { '0.1.0' }
   let(:mod)       { forge_module }
+  let(:resolve)   { true }
   let(:resolver)  { described_class.new }
-  let(:spec)      { double('spec', to_resolver_module: mod, name: name, git: git, sha: ref) }
   let(:specs)     { double('specs', specs: [spec]) }
+  let(:type)      { :forge }
+
+  let(:spec) do
+    double(
+      'spec',
+      to_resolver_module: mod,
+      full_name: name,
+      name: name,
+      git: git,
+      sha: ref,
+      ref: ref,
+      resolve: resolve,
+      type: type,
+      version_requirement: version
+    )
+  end
 
   let(:forge_module) do
     PuppetfileResolver::Puppetfile::ForgeModule.new(full_name).tap do |mod|
@@ -36,6 +52,18 @@ describe Bolt::ModuleInstaller::Resolver do
       expect(result.modules.count).to eq(2)
       expect(result.modules.map(&:name)).to match_array(%w[ruby_task_helper yaml])
     end
+
+    context 'with resolve set to false' do
+      let(:resolve) { false }
+
+      it 'does not resolve and returns a Puppetfile object' do
+        result = resolver.resolve(specs)
+
+        expect(result).to be_a(Bolt::ModuleInstaller::Puppetfile)
+        expect(result.modules.count).to eq(1)
+        expect(result.modules.map(&:name)).to match_array(%w[yaml])
+      end
+    end
   end
 
   context 'with git modules' do
@@ -47,6 +75,19 @@ describe Bolt::ModuleInstaller::Resolver do
       expect(result).to be_a(Bolt::ModuleInstaller::Puppetfile)
       expect(result.modules.count).to eq(2)
       expect(result.modules.map(&:name)).to match_array(%w[ruby_task_helper yaml])
+    end
+
+    context 'with resolve set to false' do
+      let(:resolve) { false }
+      let(:type)    { :git }
+
+      it 'does not resolve and returns a Puppetfile object' do
+        result = resolver.resolve(specs)
+
+        expect(result).to be_a(Bolt::ModuleInstaller::Puppetfile)
+        expect(result.modules.count).to eq(1)
+        expect(result.modules.map(&:name)).to match_array(%w[yaml])
+      end
     end
   end
 
