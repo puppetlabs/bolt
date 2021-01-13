@@ -280,7 +280,8 @@ module BoltServer
         bolt_config = config_from_project(versioned_project)
         modulepath_object = Bolt::Config::Modulepath.new(
           bolt_config.modulepath,
-          boltlib_path: [PE_BOLTLIB_PATH, Bolt::Config::Modulepath::BOLTLIB_PATH]
+          boltlib_path: [PE_BOLTLIB_PATH, Bolt::Config::Modulepath::BOLTLIB_PATH],
+          builtin_content_path: @config['builtin-content-dir']
         )
         pal = Bolt::PAL.new(modulepath_object, nil, nil, nil, nil, nil, bolt_config.project)
         context = {
