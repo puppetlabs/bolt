@@ -8,8 +8,7 @@ or the command line using
 Wherever possible, we recommend using PE tasks and plans instead of connecting
 Bolt to PE over PCP. 
 
-For more information on tasks and plans in PE, see [Tasks and
-plans](https://puppet.com/docs/pe/latest/running_tasks_and_plans_pe.html).
+For more information on tasks and plans in PE, see [Orchestrating tasks and plans](https://puppet.com/docs/pe/latest/orchestrating_puppet_and_tasks.html).
 
 For information on connecting Bolt to PE using the `bolt-shim` module, see
 [Connecting Bolt to
