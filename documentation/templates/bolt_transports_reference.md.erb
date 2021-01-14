@@ -37,6 +37,10 @@ to targets. These options can be set in multiple locations:
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
 <% end -%>
+<% if data[:_plugin] == true -%>
+- **Pluggable:** true
+<% end -%>
+
 
 <% if data.key?(:_example) -%>
 ```yaml
@@ -135,6 +139,9 @@ ssh:
 <% end -%>
 <% if data.key?(:_default) -%>
 - **Default:** <%= data[:_default] %>
+<% end -%>
+<% if data[:_plugin] == true -%>
+- **Pluggable:** true
 <% end -%>
 
 <% if data.key?(:_example) -%>
