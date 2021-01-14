@@ -21,7 +21,7 @@ module Bolt
 
           @logger = logger
           @key = self.class.get_key(opts)
-          client_opts = opts.slice('token-file', 'cacert', 'job-poll-interval', 'job-poll-timeout')
+          client_opts = opts.slice('token-file', 'cacert', 'job-poll-interval', 'job-poll-timeout', 'read-timeout')
 
           if opts['service-url']
             uri = Addressable::URI.parse(opts['service-url'])

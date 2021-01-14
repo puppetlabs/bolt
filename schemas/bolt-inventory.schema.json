@@ -313,6 +313,18 @@
                         }
                       ]
                     },
+                    "read-timeout": {
+                      "description": "How long to wait in seconds when making requests to the Orchestrator.",
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
                     "service-url": {
                       "description": "The URL of the host used for API requests.",
                       "oneOf": [

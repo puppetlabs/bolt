@@ -253,6 +253,13 @@ module Bolt
             _plugin: true,
             _example: "jump.example.com"
           },
+          "read-timeout" => {
+            type: Integer,
+            description: "How long to wait in seconds when making requests to the Orchestrator.",
+            minimum: 1,
+            _plugin: true,
+            _example: 15
+          },
           "realm" => {
             type: String,
             description: "The Kerberos realm (Active Directory domain) to authenticate against.",
