@@ -8,6 +8,8 @@ ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 # Disable warning that Bolt may be installed as a gem
 ENV['BOLT_GEM'] = 'true'
 
+gem 'puppet', git: 'https://github.com/joshcooper/puppet', branch: 'preserve_deferred_resolver_api'
+
 gemspec
 
 group(:bolt_server) do
