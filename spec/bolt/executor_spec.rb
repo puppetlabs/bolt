@@ -863,7 +863,7 @@ describe "Bolt::Executor" do
       executor.round_robin([])
     end
 
-    it "starts and stops the spinner" do
+    it "stops the spinner" do
       skein = %w[a b c d].each_with_index.map do |val, index|
         fiber = Fiber.new do
           sleep(rand(0.01..0.1))
@@ -873,7 +873,7 @@ describe "Bolt::Executor" do
       end
 
       executor.round_robin(skein)
-      expect(collector.events).to include({ type: :start_spin })
+      expect(collector.events).to include({ type: :stop_spin })
     end
 
     it "returns results in the same order they were originally" do

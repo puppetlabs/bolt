@@ -100,6 +100,8 @@ module Bolt
         # that type of event, publish the event
         next unless types.nil? || types.include?(event[:type])
         @publisher.post(subscriber) do |sub|
+          # Wait for user to input to prompt before printing anything
+          sleep(0.1) while @prompting
           sub.handle_event(event)
         end
       end
@@ -412,7 +414,7 @@ module Bolt
       subscribe(self, [:node_result])
       results = Array.new(skein.length)
       @in_parallel = true
-      publish_event(type: :start_spin)
+      publish_event(type: :stop_spin)
 
       until skein.empty?
         @thread_completed = false
@@ -474,11 +476,11 @@ module Bolt
     end
 
     def prompt(prompt, options)
+      @prompting = true
       unless $stdin.tty?
         raise Bolt::Error.new('STDIN is not a tty, unable to prompt', 'bolt/no-tty-error')
       end
 
-      sleep(0.1) if @in_parallel
       $stderr.print("#{prompt}: ")
 
       value = if options[:sensitive]
@@ -486,6 +488,7 @@ module Bolt
               else
                 $stdin.gets.to_s.chomp
               end
+      @prompting = false
 
       $stderr.puts if options[:sensitive]
 
