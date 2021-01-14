@@ -1,0 +1,7 @@
+description: A plan with a private key
+private: true
+
+steps:
+  - name: print
+    targets: localhost
+    command: echo Initializing

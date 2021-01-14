@@ -62,7 +62,7 @@ describe 'caching plugins' do
       run_cli(%W[plan run cache_test --project #{project_path} -m #{mpath}])
       # This should set a unique ID for each different `env_var`, but not
       # different `cache` values
-      expect(JSON.parse(File.read(project.cache_file)).keys)
+      expect(JSON.parse(File.read(project.plugin_cache_file)).keys)
         .to eq(%w[xihev-zaper-kerel-hyl])
     end
 
@@ -82,7 +82,7 @@ describe 'caching plugins' do
 
       it 'sets a unique ID based on the plugin hash minus the _cache' do
         run_cli(%W[plan run cache_test --project #{project_path} -m #{mpath}])
-        expect(JSON.parse(File.read(project.cache_file)).keys)
+        expect(JSON.parse(File.read(project.plugin_cache_file)).keys)
           .to eq(%w[xihev-zaper-kerel-hyl xekin-reryb-tacuf-dis])
       end
     end
@@ -102,7 +102,7 @@ describe 'caching plugins' do
 
     it 'removes the existing cache file with --clear-cache' do
       run_cli(%W[plan run cache_test --project #{project_path} -m #{mpath}])
-      expect(JSON.parse(File.read(project.cache_file)).values.first)
+      expect(JSON.parse(File.read(project.plugin_cache_file)).values.first)
         .to include({ 'result' => 'player_one' })
 
       ENV[user_env_var] = 'player_two'
@@ -113,7 +113,7 @@ describe 'caching plugins' do
 
     it 'caches results' do
       run_cli(%W[plan run cache_test --project #{project_path} -m #{mpath}])
-      expect(JSON.parse(File.read(project.cache_file)).values.first)
+      expect(JSON.parse(File.read(project.plugin_cache_file)).values.first)
         .to include({ 'result' => 'player_one' })
 
       ENV[user_env_var] = 'player_two'
@@ -136,7 +136,7 @@ describe 'caching plugins' do
 
       it 'removes cache entries once the ttl has expired' do
         run_cli(%W[plan run cache_test --project #{project_path} -m #{mpath}])
-        expect(JSON.parse(File.read(project.cache_file)).values.first)
+        expect(JSON.parse(File.read(project.plugin_cache_file)).values.first)
           .to include({ 'result' => 'player_one' })
         ENV[user_env_var] = 'player_two'
         result = run_cli(%W[plan run cache_test --project #{project_path} -m #{mpath}])
@@ -145,7 +145,7 @@ describe 'caching plugins' do
 
       it 'removes cache entries even if the calling plugin is removed' do
         run_cli(%W[plan run cache_test --project #{project_path} -m #{mpath}])
-        expect(JSON.parse(File.read(project.cache_file)).values.first)
+        expect(JSON.parse(File.read(project.plugin_cache_file)).values.first)
           .to include({ 'result' => 'player_one' })
         FileUtils.rm_f(File.join(project_path, 'inventory.yaml'))
         result = run_cli(%W[plan run cache_test --project #{project_path} -m #{mpath}])

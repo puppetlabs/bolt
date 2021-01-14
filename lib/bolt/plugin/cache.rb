@@ -7,11 +7,11 @@ require 'bolt/util'
 module Bolt
   class Plugin
     class Cache
-      attr_reader :reference, :cache_file, :default_config, :id
+      attr_reader :reference, :plugin_cache_file, :default_config, :id
 
-      def initialize(reference, cache_file, default_config)
+      def initialize(reference, plugin_cache_file, default_config)
         @reference = reference
-        @cache_file = cache_file
+        @plugin_cache_file = plugin_cache_file
         @default_config = default_config
       end
 
@@ -32,21 +32,21 @@ module Bolt
           unmodified = false if expired
           expired
         end
-        File.write(cache_file, cache.to_json) unless cache.empty? || unmodified
+        File.write(plugin_cache_file, cache.to_json) unless cache.empty? || unmodified
 
         cache.dig(id, 'result')
       end
 
       private def cache
-        @cache ||= Bolt::Util.read_optional_json_file(@cache_file, 'cache')
+        @cache ||= Bolt::Util.read_optional_json_file(@plugin_cache_file, 'cache')
       end
 
       def write_cache(result)
         cache.merge!({ id => { 'result' => result,
                                'mtime' => Time.now,
                                'ttl' => ttl } })
-        FileUtils.touch(cache_file)
-        File.write(cache_file, cache.to_json)
+        FileUtils.touch(plugin_cache_file)
+        File.write(plugin_cache_file, cache.to_json)
       end
 
       def validate

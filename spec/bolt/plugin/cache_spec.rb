@@ -70,9 +70,9 @@ describe Bolt::Plugin::Cache do
       }
 
       it "cleans expired cache entries" do
-        File.write(plugin_cache.cache_file, cache_content.to_json)
+        File.write(plugin_cache.plugin_cache_file, cache_content.to_json)
         plugin_cache.read_and_clean_cache
-        fresh_cash = JSON.parse(File.read(plugin_cache.cache_file))
+        fresh_cash = JSON.parse(File.read(plugin_cache.plugin_cache_file))
         expect(fresh_cash.key?('abcde')).to be false
         expect(fresh_cash['fghi']).to eq(cache_content['fghi'])
       end
@@ -86,11 +86,11 @@ describe Bolt::Plugin::Cache do
       }
 
       it "does not rewrite the cache file" do
-        File.write(plugin_cache.cache_file, cache_content.to_json)
+        File.write(plugin_cache.plugin_cache_file, cache_content.to_json)
 
         expect(File).not_to receive(:write)
         plugin_cache.read_and_clean_cache
-        same_cash = JSON.parse(File.read(plugin_cache.cache_file))
+        same_cash = JSON.parse(File.read(plugin_cache.plugin_cache_file))
         expect(same_cash).to eq(cache_content)
       end
     end

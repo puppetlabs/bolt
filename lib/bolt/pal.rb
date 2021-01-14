@@ -357,6 +357,39 @@ module Bolt
       Bolt::Task.from_task_signature(task)
     end
 
+    def list_plans_with_cache(filter_content: false)
+      # Don't filter content yet, so that if users update their plan filters
+      # we don't need to refresh the cache
+      plan_names = list_plans(filter_content: false).map(&:first)
+      plan_cache = if @project
+                     Bolt::Util.read_optional_json_file(@project.plan_cache_file, 'Plan cache file')
+                   else
+                     {}
+                   end
+      updated = false
+
+      plan_list = plan_names.each_with_object([]) do |plan_name, list|
+        info = plan_cache[plan_name] || get_plan_info(plan_name, with_mtime: true)
+
+        # If the plan is a 'local' plan (in the project itself, or the
+        # modules/ directory) then verify it hasn't been updated since we
+        # cached it. If it has been updated, refresh the cache and use the
+        # new data.
+        if info['file'] &&
+           (File.mtime(info.dig('file', 'path')) <=> info.dig('file', 'mtime')) != 0
+          info = get_plan_info(plan_name, with_mtime: true)
+          updated = true
+          plan_cache[plan_name] = info
+        end
+
+        list << [plan_name] unless info['private']
+      end
+
+      File.write(@project.plan_cache_file, plan_cache.to_json) if updated
+
+      filter_content ? filter_content(plan_list, @project&.plans) : plan_list
+    end
+
     def list_plans(filter_content: false)
       in_bolt_compiler do |compiler|
         errors = []
@@ -369,7 +402,7 @@ module Bolt
       end
     end
 
-    def get_plan_info(plan_name)
+    def get_plan_info(plan_name, with_mtime: false)
       plan_sig = in_bolt_compiler do |compiler|
         compiler.plan_signature(plan_name)
       end
@@ -416,12 +449,21 @@ module Bolt
           end
         end
 
-        {
-          'name' => plan_name,
+        privie = plan.tag(:private)&.text
+        unless privie.nil? || %w[true false].include?(privie.downcase)
+          msg = "Plan #{plan_name} key 'private' must be a boolean, received: #{privie}"
+          raise Bolt::Error.new(msg, 'bolt/invalid-plan')
+        end
+
+        pp_info = {
+          'name'        => plan_name,
           'description' => description,
-          'parameters' => parameters,
-          'module' => mod
+          'parameters'  => parameters,
+          'module'      => mod
         }
+        pp_info.merge!({ 'private' => privie&.downcase == 'true' }) unless privie.nil?
+        pp_info.merge!(get_plan_mtime(plan.file)) if with_mtime
+        pp_info
 
       # If it's a YAML plan, fall back to limited data
       else
@@ -444,12 +486,32 @@ module Bolt
           params[name]['default_value'] = param.value unless param.value.nil?
           params[name]['description'] = param.description if param.description
         end
-        {
-          'name' => plan_name,
+
+        yaml_info = {
+          'name'        => plan_name,
           'description' => plan.description,
-          'parameters' => parameters,
-          'module' => mod
+          'parameters'  => parameters,
+          'module'      => mod
         }
+        yaml_info.merge!({ 'private' => plan.private }) unless plan.private.nil?
+        yaml_info.merge!(get_plan_mtime(yaml_path)) if with_mtime
+        yaml_info
+      end
+    end
+
+    def get_plan_mtime(path)
+      # If the plan is from the project modules/ directory, or is in the
+      # project itself, include the last mtime of the file so we can compare
+      # if the plan has been updated since it was cached.
+      if @project &&
+         File.exist?(path) &&
+         (path.include?(File.join(@project.path, 'modules')) ||
+          path.include?(@project.plans_path.to_s))
+
+        { 'file' => { 'mtime' => File.mtime(path),
+                      'path' => path } }
+      else
+        {}
       end
     end
 
@@ -490,14 +552,26 @@ module Bolt
       end
     end
 
-    def generate_types
+    def generate_types(cache: false)
       require 'puppet/face/generate'
       in_bolt_compiler do
         generator = Puppet::Generate::Type
         inputs = generator.find_inputs(:pcore)
         FileUtils.mkdir_p(@resource_types)
+        cache_plan_info if @project && cache
         generator.generate(inputs, @resource_types, true)
       end
+    end
+
+    def cache_plan_info
+      # plan_name is an array here
+      plans_info = list_plans(filter_content: false).map do |plan_name,|
+        data = get_plan_info(plan_name, with_mtime: true)
+        { plan_name => data }
+      end.reduce({}, :merge)
+
+      FileUtils.touch(@project.plan_cache_file)
+      File.write(@project.plan_cache_file, plans_info.to_json)
     end
 
     def run_task(task_name, targets, params, executor, inventory, description = nil)

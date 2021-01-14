@@ -103,6 +103,30 @@ describe 'installing modules' do
         %r{mod 'puppetlabs/yaml', '0.1.0'}
       )
     end
+
+    it 'caches plan info when installing modules' do
+      fact_info = {
+        "facts" => {
+          "description" => /A plan that retrieves facts and stores/,
+          "module" => /.*/,
+          "name" => "facts",
+          "parameters" => {
+            "targets" => {
+              "description" => "List of targets to retrieve the facts for.",
+              "sensitive" => false,
+              "type" => "TargetSpec"
+            }
+          }
+        }
+      }
+
+      expect(Dir.children(project.path)).not_to include('.plan_cache.json')
+
+      run_cli(command, project: project)
+
+      expect(Dir.children(project.path)).to include('.plan_cache.json')
+      expect(JSON.parse(File.read(project.plan_cache_file))).to include(fact_info)
+    end
   end
 
   context 'with unresolvable modules' do

@@ -66,6 +66,15 @@ describe Bolt::PAL::YamlPlan do
       expect(plan.parameters).to eq([])
     end
 
+    it 'loads the private key' do
+      @plan_body = {
+        'private' => true,
+        'steps'   => []
+      }
+
+      expect(plan.private).to eq(true)
+    end
+
     describe "plan validation" do
       let(:plan) { described_class.new(plan_name, @plan_body) }
 
@@ -78,6 +87,15 @@ describe Bolt::PAL::YamlPlan do
         expect { plan }.to raise_error(Bolt::Error, /Invalid parameter name "foo-bar"/)
       end
 
+      it 'fails if private is not a boolean' do
+        @plan_body = {
+          'private' => 2,
+          'steps' => []
+        }
+
+        expect { plan }.to raise_error(Bolt::Error, /key 'private' must be a boolean, received/)
+      end
+
       it 'fails if a parameters is not a hash' do
         @plan_body = {
           'parameters' => nil,
@@ -85,6 +103,15 @@ describe Bolt::PAL::YamlPlan do
         }
 
         expect { plan }.to raise_error(Bolt::Error, /Plan parameters must be a Hash/)
+      end
+
+      it 'fails if private is not a boolean' do
+        @plan_body = {
+          'private' => 'hi',
+          'steps' => []
+        }
+
+        expect { plan }.to raise_error(Bolt::Error, /key 'private' must be a boolean/)
       end
 
       it 'fails if a step has the same name as a parameter' do

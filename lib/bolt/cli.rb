@@ -197,8 +197,8 @@ module Bolt
       @parser_deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
       config.deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
 
-      if options[:clear_cache] && File.exist?(config.project.cache_file)
-        FileUtils.rm(config.project.cache_file)
+      if options[:clear_cache] && File.exist?(config.project.plugin_cache_file)
+        FileUtils.rm(config.project.plugin_cache_file)
       end
 
       warn_inventory_overrides_cli(options)
@@ -610,7 +610,7 @@ module Bolt
     end
 
     def list_plans
-      plans = filter_content(pal.list_plans(filter_content: true), options[:filter])
+      plans = filter_content(pal.list_plans_with_cache(filter_content: true), options[:filter])
       outputter.print_plans(plans, pal.user_modulepath)
     end
 
@@ -745,7 +745,7 @@ module Bolt
     def generate_types
       assert_puppetfile_or_module_command(config.project.modules)
       # generate_types will surface a nice error with helpful message if it fails
-      pal.generate_types
+      pal.generate_types(cache: true)
       0
     end
 
