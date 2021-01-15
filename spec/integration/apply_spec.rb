@@ -22,10 +22,12 @@ describe 'apply', expensive: true do
   include BoltSpec::PuppetAgent
   include BoltSpec::Run
 
-  let(:project) { @project }
+  let(:apply_settings) { {} }
+  let(:project)        { @project }
+
   let(:project_config) do
     {
-      'apply-settings' => { 'show_diff' => true },
+      'apply-settings' => apply_settings,
       'hiera-config'   => fixtures_path('hiera', 'empty.yaml'),
       'modulepath'     => fixtures_path('apply')
     }
@@ -121,20 +123,49 @@ describe 'apply', expensive: true do
           expect(logs.first['message']).to eq(conn_info('ssh')[:user])
         end
 
-        it 'respects show_diff configuration' do
-          diff_string = <<~DIFF
-            @@ -1 +1 @@
-            -Silly string
-            \\ No newline at end of file
-            +Silly string (get it?)
-            \\ No newline at end of file
-          DIFF
+        context 'with show_diff configured' do
+          let(:apply_settings) { { 'show_diff' => true } }
 
-          results = run_cli_json(%w[plan run settings::show_diff -t nix_agents], project: project)
+          it 'respects show_diff configuration' do
+            diff_string = <<~DIFF
+              @@ -1 +1 @@
+              -Silly string
+              \\ No newline at end of file
+              +Silly string (get it?)
+              \\ No newline at end of file
+            DIFF
 
-          results.each do |result|
-            expect(result['status']).to eq('success')
-            expect(result['value']['report']['logs'][0]['message']).to include(diff_string)
+            results = run_cli_json(%w[plan run settings::show_diff -t nix_agents], project: project)
+
+            results.each do |result|
+              expect(result['status']).to eq('success')
+              expect(result['value']['report']['logs'][0]['message']).to include(diff_string)
+            end
+          end
+        end
+
+        context 'without trace configured' do
+          it 'does not include backtrace in an error message' do
+            results = run_cli_json(['apply', '-e', '1 < blue', '-t', 'nix_agents'], project: project)
+
+            results.each do |result|
+              expect(result['status']).to eq('failure')
+              expect(result.dig('value', '_error', 'msg').lines.count).to eq(1)
+            end
+          end
+        end
+
+        context 'with trace configured' do
+          let(:apply_settings) { { 'trace' => true } }
+
+          it 'includes backtrace in an error message' do
+            results = run_cli_json(['apply', '-e', '1 < blue', '-t', 'nix_agents'], project: project)
+
+            results.each do |result|
+              expect(result['status']).to eq('failure')
+              expect(result.dig('value', '_error', 'msg').lines.count).to be > 1
+              expect(result.dig('value', '_error', 'msg').lines).to include(/in `cmp_Numeric'/)
+            end
           end
         end
 

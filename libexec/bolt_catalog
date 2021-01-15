@@ -56,7 +56,7 @@ when "compile"
               else
                 e.message
               end
-    puts({ message: message }.to_json)
+    puts({ message: message, backtrace: e.backtrace }.to_json)
     exit 1
   rescue StandardError => e
     puts({ message: e.message }.to_json)

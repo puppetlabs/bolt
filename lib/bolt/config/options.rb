@@ -58,8 +58,29 @@ module Bolt
                        "plan function or the `bolt apply` command.",
           type: Hash,
           properties: {
+            "evaltrace" => {
+              description: "Whether each resource should log when it is being evaluated.",
+              type: [TrueClass, FalseClass],
+              _example: true,
+              _default: false
+            },
+            "log_level" => {
+              description: "The log level for logs in apply reports from Puppet. These can be seen "\
+                           "in ApplyResults.",
+              type: String,
+              enum: %w[debug info notice warning err alert emerg crit],
+              _example: "debug",
+              _default: "notice"
+            },
             "show_diff" => {
               description: "Whether to log and report a contextual diff.",
+              type: [TrueClass, FalseClass],
+              _example: true,
+              _default: false
+            },
+            "trace" => {
+              description: "Whether to print stack traces on some errors. Will print internal Ruby "\
+                           "stack trace interleaved with Puppet function frames.",
               type: [TrueClass, FalseClass],
               _example: true,
               _default: false
@@ -73,8 +94,30 @@ module Bolt
                        "plan function or the `bolt apply` command.",
           type: Hash,
           properties: {
+            "evaltrace" => {
+              description: "Whether each resource should log when it is being evaluated. This allows "\
+                           "you to interactively see exactly what is being done.",
+              type: [TrueClass, FalseClass],
+              _example: true,
+              _default: false
+            },
+            "log_level" => {
+              description: "The log level for logs in apply reports from Puppet. These can be seen "\
+                           "in ApplyResults.",
+              type: String,
+              enum: %w[debug info notice warning err alert emerg crit],
+              _example: "debug",
+              _default: "notice"
+            },
             "show_diff" => {
               description: "Whether to log and report a contextual diff.",
+              type: [TrueClass, FalseClass],
+              _example: true,
+              _default: false
+            },
+            "trace" => {
+              description: "Whether to print stack traces on some errors. Will print internal Ruby "\
+                           "stack trace interleaved with Puppet function frames.",
               type: [TrueClass, FalseClass],
               _example: true,
               _default: false

@@ -82,8 +82,30 @@
       "description": "A map of Puppet settings to use when applying Puppet code using the `apply` plan function or the `bolt apply` command.",
       "type": "object",
       "properties": {
+        "evaltrace": {
+          "description": "Whether each resource should log when it is being evaluated. This allows you to interactively see exactly what is being done.",
+          "type": "boolean"
+        },
+        "log_level": {
+          "description": "The log level for logs in apply reports from Puppet. These can be seen in ApplyResults.",
+          "type": "string",
+          "enum": [
+            "debug",
+            "info",
+            "notice",
+            "warning",
+            "err",
+            "alert",
+            "emerg",
+            "crit"
+          ]
+        },
         "show_diff": {
           "description": "Whether to log and report a contextual diff.",
+          "type": "boolean"
+        },
+        "trace": {
+          "description": "Whether to print stack traces on some errors. Will print internal Ruby stack trace interleaved with Puppet function frames.",
           "type": "boolean"
         }
       }
@@ -92,8 +114,30 @@
       "description": "A map of Puppet settings to use when applying Puppet code using the `apply` plan function or the `bolt apply` command.",
       "type": "object",
       "properties": {
+        "evaltrace": {
+          "description": "Whether each resource should log when it is being evaluated.",
+          "type": "boolean"
+        },
+        "log_level": {
+          "description": "The log level for logs in apply reports from Puppet. These can be seen in ApplyResults.",
+          "type": "string",
+          "enum": [
+            "debug",
+            "info",
+            "notice",
+            "warning",
+            "err",
+            "alert",
+            "emerg",
+            "crit"
+          ]
+        },
         "show_diff": {
           "description": "Whether to log and report a contextual diff.",
+          "type": "boolean"
+        },
+        "trace": {
+          "description": "Whether to print stack traces on some errors. Will print internal Ruby stack trace interleaved with Puppet function frames.",
           "type": "boolean"
         }
       }

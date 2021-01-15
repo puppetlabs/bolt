@@ -290,6 +290,9 @@ at the `info` level in Bolt. Log levels map as follows:
 | `notice` | `info` |
 | `warning` | `warn` |
 | `err` | `error` |
+| `alert` | `error` |
+| `emerg` | `fatal` |
+| `crit` | `fatal` |
 
 📖 **Related information**  
 
