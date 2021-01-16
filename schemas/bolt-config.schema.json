@@ -577,7 +577,14 @@
           "type": "object",
           "properties": {
             "remote": {
-              "$ref": "#/transport_definitions/remote"
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/remote"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
             }
           }
         },
