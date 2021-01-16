@@ -83,7 +83,7 @@ module Bolt
 
         def default_remote
           capture_options = { binmode: true }
-          out, _, _ = Open3.capture3('lxc', 'remote', 'get-default', capture_options)
+          out, _err, _status = Open3.capture3('lxc', 'remote', 'get-default', capture_options)
           out.strip
         end
 

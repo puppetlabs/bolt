@@ -7,7 +7,6 @@ module Bolt
   class Config
     module Transport
       class LXD < Base
-
         OPTIONS = %w[
           remote
         ].freeze
