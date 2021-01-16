@@ -11,13 +11,10 @@ module Bolt
 
         def initialize(target)
           @target = target
-          puts "target: #{@target.config}"
           # TODO: if remote unset in config, default to globally-set remote
           #  might need to shell out for this info
-          @lxd_remote = default_remote
-          # @lxd_remote = @target.config["lxd"]["remote"] || default_remote
+          @lxd_remote = @target.config.dig('lxd', 'remote') || default_remote
           @logger = Bolt::Logger.logger(target.safe_name)
-          @logger.trace("")
         end
 
         def connect
@@ -33,7 +30,7 @@ module Bolt
         end
 
         def download_file(source, destination)
-          container = @target.name
+          container = @target.uri
           remote = @lxd_remote
           puts "DOWNLOAD #{remote}:#{container}#{source}"
           out, err, status = Open3.capture3('lxc', 'file', 'pull',
@@ -42,7 +39,7 @@ module Bolt
         end
 
         def execute(*command, options)
-          container = @target.name
+          container = @target.uri
           remote = @lxd_remote
 
           envs = []
@@ -62,7 +59,7 @@ module Bolt
         end
 
         def write_remote_directory(source, destination)
-          container = @target.name
+          container = @target.uri
           remote = @lxd_remote
           # TODO: check dest is absolute path
           capture_options = { binmode: true }
@@ -72,7 +69,7 @@ module Bolt
         end
 
         def write_remote_file(source, destination)
-          container = @target.name
+          container = @target.uri
           remote = @lxd_remote
           # TODO: check dest is absolute path
           capture_options = { binmode: true }
