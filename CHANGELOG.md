@@ -1,11 +1,35 @@
 # Changelog
 
+## Bolt 2.43.0 (2021-01-19)
+
+### New features
+
+* **Hide private plans from `bolt plan show` and `Get-BoltPlan`**
+  ([#1549](https://github.com/puppetlabs/bolt/issues/1549))
+
+  Users can now set the top-level `private` key in YAML plans, or the
+  `@private` Puppet string, to mark a plan as private.
+
+* **Add read-timeout configuration option for PCP transport**
+  ([#2518](https://github.com/puppetlabs/bolt/issues/2518))
+
+  Users can now configure a `read-timeout` for HTTP requests to the
+  Orchestrator, which defines how long to wait for a response before
+  raising a Timeout error.
+
+* **Support additional Puppet settings in `apply-settings`**
+  ([#2516](https://github.com/puppetlabs/bolt/issues/2516))
+
+  The `log_level`, `trace`, and `evaltrace` Puppet settings can now be
+  configured under the `apply-settings` configuration option. These
+  settings will be applied when executing an apply block.
+
 ## Bolt 2.42.0 (2021-01-11)
 
 ### New features
 
 * **Support `module-install` config when resolving modules**
-  ([#2478](#2478))
+  ([#2478](https://github.com/puppetlabs/bolt/issues/2478))
 
   The `bolt module add|install` commands and `Add|Install-BoltModule`
   cmdlets now support the `module-install` config option when resolving
