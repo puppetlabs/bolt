@@ -3,9 +3,7 @@
 Bolt supports the use of plugins to dynamically load information during a Bolt
 run and change how Bolt executes certain actions. Bolt ships with some plugins,
 but you can also create your own plugins or install plugins created by other
-users. For information on how to write your own plugins, see [Writing
-plugins](writing_plugins.md). For information on how to install modules, which
-can include plugins, see [Installing modules](bolt_installing_modules.md).
+users.
 
 There are three types of plugins that you can use with Bolt:
 
@@ -228,4 +226,10 @@ plugins:
 
 📖 **Related information**
 
-- [Configuring Bolt](configuring_bolt.md)
+- For information on how to write your own plugins, see [Writing
+  plugins](writing_plugins.md).
+- For a list of supported plugins that ship with Bolt, see [Supported
+  plugins](supported_plugins.md).
+- For information on how to install modules, which can include plugins, see
+  [Installing modules](bolt_installing_modules.md).
+- [Configuring Bolt](configuring_bolt.md).

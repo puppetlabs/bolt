@@ -259,25 +259,12 @@ are implemented by plugin authors and called by Bolt.
 
 > **Note:** Plugins are only available in version 2 inventory files.
 
-For more information about plugins, see [Using plugins](./using_plugins.md).
+📖 **Related information**
 
-### Bundled plugins
-
-Bolt ships with several plugins.
-
-| Plugin | Description | Documentation |
-| ------ | ----------- | ---- |
-| `aws_inventory` | Generate targets from AWS EC2 instances. | [aws_inventory](https://forge.puppet.com/puppetlabs/aws_inventory) |
-| `azure_inventory` | Generate targets from Azure VMs and VM scale sets. | [azure_inventory](https://forge.puppet.com/puppetlabs/azure_inventory) |
-| `env_var` | Read a value from an environment variable. | [Using plugins](using_plugins.md#env_var) |
-| `gcloud_inventory` | Generate targets from Google Cloud compute engine instances. | [gcloud_inventory](https://forge.puppet.com/puppetlabs/gcloud_inventory) |
-| `pkcs7` | Use encrypted values for sensitive data. | [pkcs7](https://forge.puppet.com/puppetlabs/pkcs7) |
-| `prompt` | Prompt users to enter sensitive configuration information instead of storing it in a file. | [Using plugins](using_plugins.md#prompt) |
-| `puppetdb` | Query PuppetDB for a group of targets. | [Using plugins](using_plugins.md#puppetdb) |
-| `task` | Use a task to load targets, configuration, or other data. | [Using plugins](using_plugins.md#task) |
-| `terraform` | Generate targets from local and remote Terraform state files. | [terraform](https://forge.puppet.com/puppetlabs/terraform) |
-| `vault` | Set values by accessing secrets from a Key/Value engine on a Hashicorp Vault server. | [vault](https://forge.puppet.com/puppetlabs/vault) |
-| `yaml` | Compose multiple YAML files into a single file. | [yaml](https://forge.puppet.com/puppetlabs/yaml) |
+- For more information on plugins that ship with Bolt, see [Supported
+  plugins](supported_plugins.md).
+- For more information about how plugins work, see [Using
+  plugins](./using_plugins.md).
 
 ## Inventory file examples
 
@@ -388,7 +375,7 @@ groups:
         ssl: true
 ```
 
-### Using plugins
+### Inventory file with plugins
 
 The following inventory file uses several bundled plugins.
 
