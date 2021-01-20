@@ -24,6 +24,15 @@
   configured under the `apply-settings` configuration option. These
   settings will be applied when executing an apply block.
 
+* **Updated bundled modules to latest version**
+  ([#2566](https://github.com/puppetlabs/bolt/pull/2566))
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [puppet_agent 4.4.0](https://forge.puppet.com/puppetlabs/puppet_agent/4.4.0)
+  - [reboot 3.2.0](https://forge.puppet.com/puppetlabs/reboot/3.2.0)
+
 ## Bolt 2.42.0 (2021-01-11)
 
 ### New features
