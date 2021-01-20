@@ -760,13 +760,10 @@ module Bolt
             bolt task show canary
     HELP
 
-    attr_reader :deprecations
-
     def initialize(options)
       super()
 
       @options = options
-      @deprecations = []
 
       separator "\nINVENTORY OPTIONS"
       define('-t', '--targets TARGETS',
@@ -796,9 +793,11 @@ module Bolt
       end
       define('--description DESCRIPTION',
              'Deprecated. Description to use for the job') do |description|
-        msg = "Command line option '--description' is deprecated, and will be "\
+        Bolt::Logger.deprecate(
+          "description_cli_option",
+          "Command line option '--description' is deprecated, and will be "\
           "removed in Bolt 3.0."
-        @deprecations << { type: 'Using --description', msg: msg }
+        )
         @options[:description] = description
       end
       define('--params PARAMETERS',
@@ -881,8 +880,10 @@ module Bolt
       define('--boltdir PATH',
              'Deprecated. Specify what project to load config from (default:',
              'autodiscovered from current working dir)') do |path|
-        msg = "Command line option '--boltdir' is deprecated, use '--project' instead."
-        @deprecations << { type: 'Using --boltdir', msg: msg }
+        Bolt::Logger.deprecate(
+          "boltdir_cli_option",
+          "Command line option '--boltdir' is deprecated, use '--project' instead."
+        )
         @options[:boltdir] = path
       end
       define('--project PATH',
@@ -893,10 +894,12 @@ module Bolt
              'Deprecated. Specify where to load config from (default:',
              '~/.puppetlabs/bolt/bolt.yaml). Directory containing bolt.yaml will be',
              'used as the project directory.') do |path|
-        msg = "Command line option '--configfile' is deprecated, and " \
+        Bolt::Logger.deprecate(
+          "configfile_cli_option",
+          "Command line option '--configfile' is deprecated, and " \
           "will be removed in Bolt 3.0. Use '--project' and provide the "\
           "directory path instead."
-        @deprecations << { type: 'Using --configfile', msg: msg }
+        )
         @options[:configfile] = path
       end
       define('--hiera-config PATH',
@@ -915,10 +918,12 @@ module Bolt
              ' (default: ~/.puppetlabs/bolt/Puppetfile)',
              'Modules are installed in the current project.') do |path|
         command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
-        msg = "Command line option '--puppetfile' is deprecated, and will be removed "\
+        Bolt::Logger.deprecate(
+          "puppetfile_cli_option",
+          "Command line option '--puppetfile' is deprecated, and will be removed "\
           "in Bolt 3.0. You can migrate to using the new module management "\
           "workflow using '#{command}'."
-        @deprecations << { type: 'Using --puppetfile', msg: msg }
+        )
         @options[:puppetfile_path] = File.expand_path(path)
       end
       define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|
@@ -1017,8 +1022,10 @@ module Bolt
         @options[:debug] = true
         # We don't actually set '--log-level debug' here, but once the options are evaluated by
         # the config class the end result is the same.
-        msg = "Command line option '--debug' is deprecated, set '--log-level debug' instead."
-        @deprecations << { type: 'Using --debug instead of --log-level debug', msg: msg }
+        Bolt::Logger.deprecate(
+          "debug_cli_option",
+          "Command line option '--debug' is deprecated, set '--log-level debug' instead."
+        )
       end
       define('--log-level LEVEL',
              "Set the log level for the console. Available options are",

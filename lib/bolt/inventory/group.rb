@@ -27,7 +27,10 @@ module Bolt
 
         if all_group
           if input.key?('name') && input['name'] != 'all'
-            @logger.warn("Top-level group '#{input['name']}' cannot specify a name, using 'all' instead.")
+            Bolt::Logger.warn(
+              "top_level_group_name",
+              "Top-level group '#{input['name']}' cannot specify a name, using 'all' instead."
+            )
           end
 
           input = input.merge('name' => 'all')
@@ -134,7 +137,7 @@ module Bolt
 
         unless (unexpected_keys = target.keys - TARGET_KEYS).empty?
           msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in target #{t_name}"
-          @logger.warn(msg)
+          Bolt::Logger.warn("unknown_target_keys", msg)
         end
 
         validate_data_keys(target, t_name)
@@ -261,7 +264,7 @@ module Bolt
 
         unless (unexpected_keys = input.keys - GROUP_KEYS).empty?
           msg = "Found unexpected key(s) #{unexpected_keys.join(', ')} in group #{@name}"
-          @logger.warn(msg)
+          Bolt::Logger.warn("unknown_group_keys", msg)
         end
       end
 
@@ -368,7 +371,7 @@ module Bolt
             msg = +"Found unexpected key(s) #{unexpected_keys.join(', ')} in config for"
             msg << " target #{target} in" if target
             msg << " group #{@name}"
-            @logger.warn(msg)
+            Bolt::Logger.warn("unknown_config_keys", msg)
           end
         end
       end

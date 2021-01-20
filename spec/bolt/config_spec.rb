@@ -153,9 +153,9 @@ describe Bolt::Config do
         allow(File).to receive(:exist?).with(path + defaults_name).and_return(false)
         allow(File).to receive(:exist?).with(path + config_name).and_return(true)
 
-        deps = Bolt::Config.load_defaults(project).flat_map { |config| config[:deprecations] }
-        # All the deprecation messages + types
-        expect(deps.map(&:values).flatten).to include(/bolt.yaml is deprecated/)
+        expect(Bolt::Logger).to receive(:deprecate).with(anything, /bolt.yaml is deprecated/)
+
+        Bolt::Config.load_defaults(project)
       end
 
       it 'loads bolt-defaults.yaml if present' do
@@ -206,16 +206,19 @@ describe Bolt::Config do
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
       allow(File).to receive(:exist?).with(path + config_name).and_return(true)
 
-      logs = Bolt::Config.load_bolt_defaults_yaml(path)[:logs]
-      expect(logs).to include(warn: /Detected multiple configuration files/)
+      expect(Bolt::Logger).to receive(:warn).with(anything, /Detected multiple configuration files/)
+
+      Bolt::Config.load_bolt_defaults_yaml(path)
     end
 
     it 'warns when inventory config keys are present' do
       allow(File).to receive(:exist?)
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return(Bolt::Config::INVENTORY_OPTIONS.dup)
+      allow(Bolt::Logger).to receive(:warn)
 
-      logs = Bolt::Config.load_bolt_defaults_yaml(path)[:logs]
-      expect(logs).to include(warn: /Unsupported inventory configuration/)
+      expect(Bolt::Logger).to receive(:warn).with(anything, /Unsupported inventory configuration/)
+
+      Bolt::Config.load_bolt_defaults_yaml(path)
     end
 
     it 'warns when project config keys are present' do
@@ -223,9 +226,11 @@ describe Bolt::Config do
 
       allow(File).to receive(:exist?)
       allow(Bolt::Util).to receive(:read_yaml_hash).and_return(project_config)
+      allow(Bolt::Logger).to receive(:warn)
 
-      logs = Bolt::Config.load_bolt_defaults_yaml(path)[:logs]
-      expect(logs).to include(warn: /Unsupported project configuration/)
+      expect(Bolt::Logger).to receive(:warn).with(anything, /Unsupported project configuration/)
+
+      Bolt::Config.load_bolt_defaults_yaml(path)
     end
 
     it 'puts keys under inventory-config at the top level' do
@@ -287,15 +292,21 @@ describe Bolt::Config do
         it 'warns when puppetfile is configured but not module-install' do
           data.delete('module-install')
 
-          expect(config.logs).to include(
-            warn: /Detected configuration for 'puppetfile'.*'modules' is configured/
+          expect(Bolt::Logger).to receive(:warn).with(
+            anything,
+            /Detected configuration for 'puppetfile'.*'modules' is configured/
           )
+
+          config
         end
 
         it 'warns when both puppetfile and module-install are configured' do
-          expect(config.logs).to include(
-            warn: /Detected configuration for 'puppetfile' and 'module-install'.*'modules' is also configured/
+          expect(Bolt::Logger).to receive(:warn).with(
+            anything,
+            /Detected configuration for 'puppetfile' and 'module-install'.*'modules' is also configured/
           )
+
+          config
         end
       end
 
@@ -303,15 +314,21 @@ describe Bolt::Config do
         it 'warns when module-install is configured but not puppetfile' do
           data.delete('puppetfile')
 
-          expect(config.logs).to include(
-            warn: /Detected configuration for 'module-install'.*'modules' is not configured/
+          expect(Bolt::Logger).to receive(:warn).with(
+            anything,
+            /Detected configuration for 'module-install'.*'modules' is not configured/
           )
+
+          config
         end
 
         it 'warns when both puppetfile and module-install are configured' do
-          expect(config.logs).to include(
-            warn: /Detected configuration for 'puppetfile' and 'module-install'.*'modules' is not configured/
+          expect(Bolt::Logger).to receive(:warn).with(
+            anything,
+            /Detected configuration for 'puppetfile' and 'module-install'.*'modules' is not configured/
           )
+
+          config
         end
       end
     end
@@ -336,7 +353,12 @@ describe Bolt::Config do
     let(:config) { Bolt::Config.new(project, future_config) }
 
     it 'logs a warning' do
-      expect(config.logs).to include(warn: /Configuration option 'future'/)
+      expect(Bolt::Logger).to receive(:warn).with(
+        anything,
+        /Configuration option 'future'/
+      )
+
+      config
     end
   end
 
@@ -362,7 +384,8 @@ describe Bolt::Config do
             'plugin' => 'puppet_agent',
             '_run_as' => 'root'
           }
-        }
+        },
+        'disable-warnings' => ['foo']
       }
     }
 
@@ -387,7 +410,8 @@ describe Bolt::Config do
           'fake_hook' => {
             'plugin' => 'fake_plugin'
           }
-        }
+        },
+        'disable-warnings' => ['bar']
       }
     }
 
@@ -414,7 +438,8 @@ describe Bolt::Config do
             'level' => 'debug',
             'append' => false
           }
-        }
+        },
+        'disable-warnings' => ['baz']
       }
     }
 
@@ -466,6 +491,10 @@ describe Bolt::Config do
           'plugin' => 'fake_plugin'
         }
       )
+    end
+
+    it 'concatenates disable-warnings' do
+      expect(config.disable_warnings).to match_array(%w[foo bar baz])
     end
 
     it 'removes log files that are disabled' do

@@ -78,7 +78,7 @@ module Bolt
         Bolt::Util.read_optional_yaml_hash(filename, 'analytics')
       else
         unless ENV['BOLT_DISABLE_ANALYTICS']
-          Bolt::Logger.warn_once('analytics_opt_out', <<~ANALYTICS)
+          msg = <<~ANALYTICS
             Bolt collects data about how you use it. You can opt out of providing this data.
 
             To disable analytics data collection, add this line to ~/.puppetlabs/etc/bolt/analytics.yaml :
@@ -86,7 +86,8 @@ module Bolt
 
             Read more about what data Bolt collects and why here:
               https://puppet.com/docs/bolt/latest/bolt_installing.html#analytics-data-collection
-            ANALYTICS
+          ANALYTICS
+          Bolt::Logger.warn_once('analytics_opt_out', msg)
         end
 
         {}

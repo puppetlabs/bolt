@@ -27,7 +27,7 @@ module Bolt
             "bolt-debug.log or run with '--log-level debug' to see the full "\
             "list of targets with PowerShell 2."
 
-          Bolt::Logger.deprecation_warning("PowerShell 2", msg)
+          Bolt::Logger.deprecate_once("powershell_2", msg)
           @logger.debug("Detected PowerShell 2 on #{target}.")
         end
       end
@@ -163,7 +163,7 @@ module Bolt
           if target.options['cleanup']
             rmdir(@tmpdir)
           else
-            @logger.warn("Skipping cleanup of tmpdir '#{@tmpdir}'")
+            Bolt::Logger.warn("Skipping cleanup of tmpdir '#{@tmpdir}'", "skip_cleanup")
           end
         end
       end

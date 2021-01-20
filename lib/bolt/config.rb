@@ -20,7 +20,7 @@ module Bolt
   class Config
     include Bolt::Config::Options
 
-    attr_reader :config_files, :logs, :data, :transports, :project, :modified_concurrency, :deprecations
+    attr_reader :config_files, :data, :transports, :project, :modified_concurrency
 
     BOLT_CONFIG_NAME = 'bolt.yaml'
     BOLT_DEFAULTS_NAME = 'bolt-defaults.yaml'
@@ -33,9 +33,6 @@ module Bolt
     end
 
     def self.from_project(project, overrides = {})
-      logs         = []
-      deprecations = []
-
       conf = if project.project_file == project.config_file
                project.data
              else
@@ -45,31 +42,26 @@ module Bolt
                # with all validation errors.
                Bolt::Validator.new.tap do |validator|
                  validator.validate(c, bolt_schema, project.config_file.to_s)
-
-                 validator.warnings.each { |warning| logs << { warn: warning } }
-
-                 validator.deprecations.each do |dep|
-                   deprecations << { type: "#{BOLT_CONFIG_NAME} #{dep[:option]}", msg: dep[:message] }
-                 end
+                 validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
+                 validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
                end
 
-               logs << { debug: "Loaded configuration from #{project.config_file}" } if File.exist?(project.config_file)
+               if File.exist?(project.config_file)
+                 Bolt::Logger.debug("Loaded configuration from #{project.config_file}")
+               end
                c
              end
+
       data = load_defaults(project).push(
-        filepath:     project.config_file,
-        data:         conf,
-        logs:         logs,
-        deprecations: deprecations
+        filepath: project.config_file,
+        data: conf
       )
 
       new(project, data, overrides)
     end
 
     def self.from_file(configfile, overrides = {})
-      project      = Bolt::Project.create_project(Pathname.new(configfile).expand_path.dirname)
-      logs         = []
-      deprecations = []
+      project = Bolt::Project.create_project(Pathname.new(configfile).expand_path.dirname)
 
       conf = if project.project_file == project.config_file
                project.data
@@ -80,23 +72,18 @@ module Bolt
                # with all validation errors.
                Bolt::Validator.new.tap do |validator|
                  validator.validate(c, bolt_schema, project.config_file.to_s)
-
-                 validator.warnings.each { |warning| logs << { warn: warning } }
-
-                 validator.deprecations.each do |dep|
-                   deprecations << { type: "#{BOLT_CONFIG_NAME} #{dep[:option]}", msg: dep[:message] }
-                 end
+                 validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
+                 validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
                end
 
-               logs << { debug: "Loaded configuration from #{configfile}" }
+               Bolt::Logger.debug("Loaded configuration from #{configfile}")
+
                c
              end
 
       data = load_defaults(project).push(
-        filepath:     configfile,
-        data:         conf,
-        logs:         logs,
-        deprecations: deprecations
+        filepath: configfile,
+        data: conf
       )
 
       new(project, data, overrides)
@@ -154,13 +141,14 @@ module Bolt
     def self.load_bolt_defaults_yaml(dir)
       filepath     = dir + BOLT_DEFAULTS_NAME
       data         = Bolt::Util.read_yaml_hash(filepath, 'config')
-      logs         = [{ debug: "Loaded configuration from #{filepath}" }]
-      deprecations = []
+
+      Bolt::Logger.debug("Loaded configuration from #{filepath}")
 
       # Warn if 'bolt.yaml' detected in same directory.
       if File.exist?(bolt_yaml = dir + BOLT_CONFIG_NAME)
-        logs.push(
-          warn: "Detected multiple configuration files: ['#{bolt_yaml}', '#{filepath}']. '#{bolt_yaml}' "\
+        Bolt::Logger.warn(
+          "multiple_config_files",
+          "Detected multiple configuration files: ['#{bolt_yaml}', '#{filepath}']. '#{bolt_yaml}' "\
           "will be ignored."
         )
       end
@@ -169,12 +157,8 @@ module Bolt
       # with all validation errors.
       Bolt::Validator.new.tap do |validator|
         validator.validate(data, defaults_schema, filepath)
-
-        validator.warnings.each { |warning| logs << { warn: warning } }
-
-        validator.deprecations.each do |dep|
-          deprecations << { type: "#{BOLT_DEFAULTS_NAME} #{dep[:option]}", msg: dep[:message] }
-        end
+        validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
+        validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
       end
 
       # Remove project-specific config such as hiera-config, etc.
@@ -182,8 +166,10 @@ module Bolt
 
       if project_config.any?
         data.reject! { |key, _| project_config.include?(key) }
-        logs.push(
-          warn: "Unsupported project configuration detected in '#{filepath}': #{project_config.keys}. "\
+
+        Bolt::Logger.warn(
+          "unsupported_project_config",
+          "Unsupported project configuration detected in '#{filepath}': #{project_config.keys}. "\
           "Project configuration should be set in 'bolt-project.yaml'."
         )
       end
@@ -193,8 +179,10 @@ module Bolt
 
       if transport_config.any?
         data.reject! { |key, _| transport_config.include?(key) }
-        logs.push(
-          warn: "Unsupported inventory configuration detected in '#{filepath}': #{transport_config.keys}. "\
+
+        Bolt::Logger.warn(
+          "unsupported_inventory_config",
+          "Unsupported inventory configuration detected in '#{filepath}': #{transport_config.keys}. "\
           "Transport configuration should be set under the 'inventory-config' option or "\
           "in 'inventory.yaml'."
         )
@@ -219,7 +207,7 @@ module Bolt
         data = data.merge(data.delete('inventory-config'))
       end
 
-      { filepath: filepath, data: data, logs: logs, deprecations: deprecations }
+      { filepath: filepath, data: data }
     end
 
     # Loads a 'bolt.yaml' file, the legacy configuration file. There's no special munging needed
@@ -227,24 +215,24 @@ module Bolt
     def self.load_bolt_yaml(dir)
       filepath     = dir + BOLT_CONFIG_NAME
       data         = Bolt::Util.read_yaml_hash(filepath, 'config')
-      logs         = [{ debug: "Loaded configuration from #{filepath}" }]
-      deprecations = [{ type: 'Using bolt.yaml for system configuration',
-                        msg: "Configuration file #{filepath} is deprecated and will be removed in Bolt 3.0. "\
-                        "See https://pup.pt/update-bolt-config for how to update to the latest Bolt practices." }]
+
+      Bolt::Logger.debug("Loaded configuration from #{filepath}")
+
+      Bolt::Logger.deprecate(
+        "bolt_yaml",
+        "Configuration file #{filepath} is deprecated and will be removed in Bolt 3.0. "\
+        "See https://pup.pt/update-bolt-config for how to update to the latest Bolt practices."
+      )
 
       # Validate the config against the schema. This will raise a single error
       # with all validation errors.
       Bolt::Validator.new.tap do |validator|
         validator.validate(data, bolt_schema, filepath)
-
-        validator.warnings.each { |warning| logs << { warn: warning } }
-
-        validator.deprecations.each do |dep|
-          deprecations << { type: "#{BOLT_CONFIG_NAME} #{dep[:option]}", msg: dep[:message] }
-        end
+        validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
+        validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
       end
 
-      { filepath: filepath, data: data, logs: logs, deprecations: deprecations }
+      { filepath: filepath, data: data }
     end
 
     def self.load_defaults(project)
@@ -275,16 +263,11 @@ module Bolt
 
     def initialize(project, config_data, overrides = {})
       unless config_data.is_a?(Array)
-        config_data = [{ filepath: project.config_file,
-                         data: config_data,
-                         logs: [],
-                         deprecations: [] }]
+        config_data = [{ filepath: project.config_file, data: config_data }]
       end
 
       @logger       = Bolt::Logger.logger(self)
       @project      = project
-      @logs         = @project.logs.dup
-      @deprecations = @project.deprecations.dup
       @transports   = {}
       @config_files = []
 
@@ -294,6 +277,7 @@ module Bolt
         'color'               => true,
         'compile-concurrency' => Etc.nprocessors,
         'concurrency'         => default_concurrency,
+        'disable-warnings'    => [],
         'format'              => 'human',
         'log'                 => { 'console' => {} },
         'module-install'      => {},
@@ -315,9 +299,6 @@ module Bolt
       end
 
       loaded_data = config_data.each_with_object([]) do |data, acc|
-        @logs.concat(data[:logs]) if data[:logs].any?
-        @deprecations.concat(data[:deprecations]) if data[:deprecations].any?
-
         if data[:data].any?
           @config_files.push(data[:filepath])
           acc.push(data[:data])
@@ -388,6 +369,9 @@ module Bolt
           # Hash values are shallow merged
           when 'puppetdb', 'plugin-hooks', 'plugin_hooks', 'apply-settings', 'apply_settings', 'log'
             val1.merge(val2)
+          # Disabled warnings are concatenated
+          when 'disable-warnings'
+            val1.concat(val2)
           # All other values are overwritten
           else
             val2
@@ -452,17 +436,19 @@ module Bolt
 
         next unless acc[name][:level] == 'notice'
 
-        @deprecations << {
-          type: 'notice log level',
-          msg:  "Log level 'notice' is deprecated and will be removed in Bolt 3.0. Use 'info' instead."
-        }
+        Bolt::Logger.deprecate(
+          "notice_log_level",
+          "Log level 'notice' is deprecated and will be removed in Bolt 3.0. Use 'info' instead."
+        )
       end
     end
 
     def validate
       if @data['future']
-        msg = "Configuration option 'future' no longer exposes future behavior."
-        @logs << { warn: msg }
+        Bolt::Logger.warn(
+          "future_option",
+          "Configuration option 'future' no longer exposes future behavior."
+        )
       end
 
       if @project.modules && @data['modulepath']&.include?(@project.managed_moduledir.to_s)
@@ -489,18 +475,30 @@ module Bolt
       # settings can be set at the user or system level.
       if @project.modules && puppetfile_config.any? && module_install.empty?
         command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
-        @logs << { warn: "Detected configuration for 'puppetfile'. This setting is not "\
-                         "used when 'modules' is configured. Use 'module-install' instead. "\
-                         "To automatically update your project configuration, run '#{command}'." }
+        Bolt::Logger.warn(
+          "module_install_config",
+          "Detected configuration for 'puppetfile'. This setting is not "\
+          "used when 'modules' is configured. Use 'module-install' instead. "\
+          "To automatically update your project configuration, run '#{command}'."
+        )
       elsif @project.modules.nil? && puppetfile_config.empty? && module_install.any?
-        @logs << { warn: "Detected configuration for 'module-install'. This setting is not "\
-                         "used when 'modules' is not configured. Use 'puppetfile' instead." }
+        Bolt::Logger.warn(
+          "module_install_config",
+          "Detected configuration for 'module-install'. This setting is not "\
+          "used when 'modules' is not configured. Use 'puppetfile' instead."
+        )
       elsif @project.modules && puppetfile_config.any? && module_install.any?
-        @logs << { warn: "Detected configuration for 'puppetfile' and 'module-install'. Using "\
-                         "configuration for 'module-install' because 'modules' is also configured." }
+        Bolt::Logger.warn(
+          "module_install_config",
+          "Detected configuration for 'puppetfile' and 'module-install'. Using "\
+          "configuration for 'module-install' because 'modules' is also configured."
+        )
       elsif @project.modules.nil? && puppetfile_config.any? && module_install.any?
-        @logs << { warn: "Detected configuration for 'puppetfile' and 'module-install'. Using "\
-                         "configuration for 'puppetfile' because 'modules' is not configured." }
+        Bolt::Logger.warn(
+          "module_install_config",
+          "Detected configuration for 'puppetfile' and 'module-install'. Using "\
+          "configuration for 'puppetfile' because 'modules' is not configured."
+        )
       end
     end
 
@@ -593,7 +591,7 @@ module Bolt
     def plugin_hooks
       if @data['plugin-hooks'].any? && @data['plugin_hooks'].any?
         Bolt::Logger.warn_once(
-          "plugin-hooks and plugin_hooks set",
+          "plugin_hooks_conflict",
           "Detected configuration for 'plugin-hooks' and 'plugin_hooks'. Bolt will ignore 'plugin_hooks'."
         )
 
@@ -612,7 +610,7 @@ module Bolt
     def apply_settings
       if @data['apply-settings'].any? && @data['apply_settings'].any?
         Bolt::Logger.warn_once(
-          "apply-settings and apply_settings set",
+          "apply_settings_conflict",
           "Detected configuration for 'apply-settings' and 'apply_settings'. Bolt will ignore 'apply_settings'."
         )
 
@@ -632,6 +630,10 @@ module Bolt
       @project.module_install || @data['module-install']
     end
 
+    def disable_warnings
+      Set.new(@project.disable_warnings + @data['disable-warnings'])
+    end
+
     # Check if there is a case-insensitive match to the path
     def check_path_case(type, paths)
       return if paths.nil?
@@ -640,7 +642,7 @@ module Bolt
       if matches.any?
         msg = "WARNING: Bolt is case sensitive when specifying a #{type}. Did you mean:\n"
         matches.each { |path| msg += "         #{path}\n" }
-        @logger.warn msg
+        Bolt::Logger.warn("path_case", msg)
       end
     end
 

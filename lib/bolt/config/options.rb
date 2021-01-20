@@ -148,6 +148,17 @@ module Bolt
           _example: 50,
           _default: "100 or 1/7 the ulimit, whichever is lower."
         },
+        "disable-warnings" => {
+          description: "An array of IDs of warnings to suppress. Warnings with a matching ID will not be logged "\
+                       "by Bolt. If you are upgrading Bolt to a new major version, you should re-enable all warnings "\
+                       "until you have finished upgrading.",
+          type: Array,
+          items: {
+            type: String
+          },
+          _plugin: false,
+          _example: ["powershell_2"]
+        },
         "format" => {
           description: "The format to use when printing results.",
           type: String,
@@ -599,6 +610,7 @@ module Bolt
         color
         compile-concurrency
         concurrency
+        disable-warnings
         format
         inventory-config
         log
@@ -620,6 +632,7 @@ module Bolt
         color
         compile-concurrency
         concurrency
+        disable-warnings
         format
         hiera-config
         inventoryfile

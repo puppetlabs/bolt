@@ -178,6 +178,31 @@ Bolt to output additional information in a human-readable format. Verbose output
 useful for debugging your tasks and plans - if you're not sure why something is failing, try running
 it with `--verbose` to get more information.
 
+## Suppress warnings
+
+You can suppress warning messages from being logged by Bolt. To disable specific
+warnings, add a list of warning IDs to the `disable-warnings` configuration
+option in `bolt-project.yaml` or `bolt-defaults.yaml`. If defined in both files,
+the lists of warnings are concatenated per the [configuration merge
+strategy](configuring_bolt.md#merge-strategy). For example, if Bolt issues the
+following warning:
+
+```shell
+The configuration option 'apples' is deprecated. Use 'oranges' instead. [ID: fruit_option]
+```
+
+You could add the ID `fruit_option` under the `disable-warnings` configuration option:
+
+```
+# bolt-project.yaml
+---
+name: myproject
+disable-warnings:
+  - fruit_option
+```
+
+The next time you run Bolt, the warning message will not be logged.
+
 📖 **Related information**  
 
 - [Debugging tasks](writing_tasks.md#debugging-tasks)

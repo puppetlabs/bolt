@@ -12,46 +12,49 @@ module Bolt
     CONFIG_NAME  = 'bolt-project.yaml'
 
     attr_reader :path, :data, :config_file, :inventory_file, :hiera_config,
-                :puppetfile, :rerunfile, :type, :resource_types, :logs, :project_file,
-                :deprecations, :downloads, :plans_path, :modulepath, :managed_moduledir,
+                :puppetfile, :rerunfile, :type, :resource_types, :project_file,
+                :downloads, :plans_path, :modulepath, :managed_moduledir,
                 :backup_dir, :plugin_cache_file, :plan_cache_file
 
-    def self.default_project(logs = [])
-      create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user', logs)
+    def self.default_project
+      create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
     # If homedir isn't defined use the system config path
     rescue ArgumentError
-      create_project(Bolt::Config.system_path, 'system', logs)
+      create_project(Bolt::Config.system_path, 'system')
     end
 
     # Search recursively up the directory hierarchy for the Project. Look for a
     # directory called Boltdir or a file called bolt.yaml (for a control repo
     # type Project). Otherwise, repeat the check on each directory up the
     # hierarchy, falling back to the default if we reach the root.
-    def self.find_boltdir(dir, logs = [], deprecations = [])
+    def self.find_boltdir(dir)
       dir = Pathname.new(dir)
 
       if (dir + BOLTDIR_NAME).directory?
-        create_project(dir + BOLTDIR_NAME, 'embedded', logs)
+        create_project(dir + BOLTDIR_NAME, 'embedded')
       elsif (dir + 'bolt.yaml').file?
         command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
-        msg = "Configuration file #{dir + 'bolt.yaml'} is deprecated and will be "\
+        Bolt::Logger.deprecate(
+          "bolt_yaml",
+          "Configuration file #{dir + 'bolt.yaml'} is deprecated and will be "\
           "removed in Bolt 3.0.\nUpdate your Bolt project to the latest Bolt practices "\
-          "using #{command}"
-        deprecations << { type: "Project level bolt.yaml",
-                          msg: msg }
-        create_project(dir, 'local', logs, deprecations)
+          "using #{command}."
+        )
+        create_project(dir, 'local')
       elsif (dir + CONFIG_NAME).file?
-        create_project(dir, 'local', logs)
+        create_project(dir, 'local')
       elsif dir.root?
-        default_project(logs)
+        default_project
       else
-        logs << { debug: "Did not detect Boltdir, bolt.yaml, or bolt-project.yaml at '#{dir}'. "\
-                  "This directory won't be loaded as a project." }
-        find_boltdir(dir.parent, logs, deprecations)
+        Bolt::Logger.debug(
+          "Did not detect Boltdir, bolt.yaml, or bolt-project.yaml at '#{dir}'. "\
+          "This directory won't be loaded as a project."
+        )
+        find_boltdir(dir.parent)
       end
     end
 
-    def self.create_project(path, type = 'option', logs = [], deprecations = [])
+    def self.create_project(path, type = 'option')
       fullpath = Pathname.new(path).expand_path
 
       if type == 'user'
@@ -59,8 +62,11 @@ module Bolt
           # This is already expanded if the type is user
           FileUtils.mkdir_p(path)
         rescue StandardError
-          logs << { warn: "Could not create default project at #{path}. Continuing without a writeable project. "\
-                    "Log and rerun files will not be written." }
+          Bolt::Logger.warn(
+            "non_writeable_project",
+            "Could not create default project at #{path}. Continuing without a writeable project. "\
+            "Log and rerun files will not be written."
+          )
         end
       end
 
@@ -81,19 +87,17 @@ module Bolt
       default      = type =~ /user|system/ ? 'default ' : ''
       exist        = File.exist?(File.expand_path(project_file))
 
-      logs << { info: "Loaded #{default}project from '#{fullpath}'" } if exist
+      if exist
+        Bolt::Logger.info("Loaded #{default}project from '#{fullpath}'")
+      end
 
       Bolt::Validator.new.tap do |validator|
         validator.validate(data, schema, project_file)
-
-        validator.warnings.each { |warning| logs << { warn: warning } }
-
-        validator.deprecations.each do |dep|
-          deprecations << { type: "#{CONFIG_NAME} #{dep[:option]}", msg: dep[:message] }
-        end
+        validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
+        validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
       end
 
-      new(data, path, type, logs, deprecations)
+      new(data, path, type)
     end
 
     # Builds the schema for bolt-project.yaml used by the validator.
@@ -106,17 +110,17 @@ module Bolt
       }
     end
 
-    def initialize(raw_data, path, type = 'option', logs = [], deprecations = [])
+    def initialize(raw_data, path, type = 'option')
       @path         = Pathname.new(path).expand_path
       @project_file = @path + CONFIG_NAME
-      @logs         = logs
-      @deprecations = deprecations
 
       if (@path + 'bolt.yaml').file? && project_file?
-        msg = "Project-level configuration in bolt.yaml is deprecated if using bolt-project.yaml. "\
+        Bolt::Logger.deprecate(
+          "bolt_yaml",
+          "Project-level configuration in bolt.yaml is deprecated if using bolt-project.yaml. "\
           "Transport config should be set in inventory.yaml, all other config should be set in "\
           "bolt-project.yaml."
-        @deprecations << { type: 'Using bolt.yaml for project configuration', msg: msg }
+        )
       end
 
       @inventory_file    = @path + 'inventory.yaml'
@@ -132,10 +136,11 @@ module Bolt
       @plugin_cache_file = @path + '.plugin_cache.json'
       @plan_cache_file   = @path + '.plan_cache.json'
 
-      tc = Bolt::Config::INVENTORY_OPTIONS.keys & raw_data.keys
-      if tc.any?
-        msg = "Transport configuration isn't supported in bolt-project.yaml. Ignoring keys #{tc}"
-        @logs << { warn: msg }
+      if (tc = Bolt::Config::INVENTORY_OPTIONS.keys & raw_data.keys).any?
+        Bolt::Logger.warn(
+          "project_transport_config",
+          "Transport configuration isn't supported in bolt-project.yaml. Ignoring keys #{tc}."
+        )
       end
 
       @data = raw_data.reject { |k, _| Bolt::Config::INVENTORY_OPTIONS.include?(k) }
@@ -152,8 +157,10 @@ module Bolt
       # and replaced with .project_file in lib/bolt/config.rb
       @config_file = if (Bolt::Config::BOLT_OPTIONS & @data.keys).any?
                        if (@path + 'bolt.yaml').file?
-                         msg = "bolt-project.yaml contains valid config keys, bolt.yaml will be ignored"
-                         @logs << { warn: msg }
+                         Bolt::Logger.warn(
+                           "project_config_conflict",
+                           "bolt-project.yaml contains valid config keys, bolt.yaml will be ignored"
+                         )
                        end
                        @project_file
                      else
@@ -207,6 +214,10 @@ module Bolt
       @data['module-install']
     end
 
+    def disable_warnings
+      @data['disable-warnings'] || []
+    end
+
     def modules
       @modules ||= @data['modules']&.map do |mod|
         if mod.is_a?(String)
@@ -233,14 +244,15 @@ module Bolt
             File.directory?(@path + 'tasks') ||
             File.directory?(@path + 'files'))
         message = "No project name is specified in bolt-project.yaml. Project-level content will not be available."
-        @logs << { warn: message }
+
+        Bolt::Logger.warn("missing_project_name", message)
       end
     end
 
     def check_deprecated_file
       if (@path + 'project.yaml').file?
         msg = "Project configuration file 'project.yaml' is deprecated; use 'bolt-project.yaml' instead."
-        Bolt::Logger.deprecation_warning('Using project.yaml instead of bolt-project.yaml', msg)
+        Bolt::Logger.warn("project_yaml", msg)
       end
     end
   end

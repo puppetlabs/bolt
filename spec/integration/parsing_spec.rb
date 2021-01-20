@@ -101,7 +101,7 @@ describe "CLI parses input" do
     params = ['string="catdog"']
     run_cli(['task', 'run', 'sample::invalid', '--targets', target] + params + config_flags)
     logs = @log_output.readlines
-    expect(logs).to include(/WARN  Bolt::Task : Metadata for task 'sample::invalid' contains unknown keys: anything/)
+    expect(logs).to include(/WARN.*Metadata for task 'sample::invalid' contains unknown keys: anything/)
   end
 
   it 'parses script parameters without munging task parameters', ssh: true do

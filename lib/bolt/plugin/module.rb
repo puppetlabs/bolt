@@ -187,7 +187,7 @@ module Bolt
         if params.key?('private-key') || params.key?('public-key')
           message = "pkcs7 keys 'private-key' and 'public-key' have been deprecated and will be "\
                     "removed in a future version of Bolt; use 'private_key' and 'public_key' instead."
-          Bolt::Logger.deprecation_warning('PKCS7 keys using hyphens, not underscores', message)
+          Bolt::Logger.deprecate("pkcs7_params", message)
         end
 
         params['private_key'] = params.delete('private-key') if params.key?('private-key')

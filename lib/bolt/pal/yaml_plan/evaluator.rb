@@ -157,13 +157,13 @@ module Bolt
           if plan.steps.any? { |step| step.body.key?('target') }
             msg = "The 'target' parameter for YAML plan steps is deprecated and will be removed "\
                   "in a future version of Bolt. Use the 'targets' parameter instead."
-            Bolt::Logger.deprecation_warning("Using 'target' parameter for YAML plan steps, not 'targets'", msg)
+            Bolt::Logger.deprecate("yaml_plan_target", msg)
           end
 
           if plan.steps.any? { |step| step.body.key?('source') }
             msg = "The 'source' parameter for YAML plan upload steps is deprecated and will be removed "\
                   "in a future version of Bolt. Use the 'upload' parameter instead."
-            Bolt::Logger.deprecation_warning("Using 'source' parameter for YAML upload steps, not 'upload'", msg)
+            Bolt::Logger.deprecate("yaml_plan_source", msg)
           end
 
           plan_result = closure_scope.with_local_scope(args_hash) do |scope|

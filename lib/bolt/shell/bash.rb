@@ -299,7 +299,7 @@ module Bolt
           if target.options['cleanup']
             dir.delete
           else
-            @logger.warn("Skipping cleanup of tmpdir #{dir}")
+            Bolt::Logger.warn("skip_cleanup", "Skipping cleanup of tmpdir #{dir}")
           end
         end
       end

@@ -140,10 +140,10 @@ module Bolt
             if @target.options['cleanup']
               _, stderr, exitcode = execute('rm', '-rf', dir, {})
               if exitcode != 0
-                @logger.warn("Failed to clean up tmpdir '#{dir}': #{stderr}")
+                Bolt::Logger.warn("fail_cleanup", "Failed to clean up tmpdir '#{dir}': #{stderr}")
               end
             else
-              @logger.warn("Skipping cleanup of tmpdir '#{dir}'")
+              Bolt::Logger.warn("skip_cleanup", "Skipping cleanup of tmpdir '#{dir}'")
             end
           end
         end

@@ -97,7 +97,7 @@ module Bolt
 
       Bolt::Validator.new.tap do |validator|
         validator.validate(data, schema, source)
-        validator.warnings.each { |warning| logger.warn(warning) }
+        validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
       end
 
       inventory = create_version(data, config.transport, config.transports, plugins)

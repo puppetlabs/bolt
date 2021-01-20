@@ -221,12 +221,15 @@ from highest precedence to lowest:
 
 When merging configurations, Bolt's strategy is to shallow merge any options
 that accept hashes and to overwrite any options that do not accept hashes. There
-are two exceptions to this strategy:
+are a few exceptions to this strategy:
 
 - [Transport configuration](bolt_transports_reference.md) is deep-merged.
 
 - [Plugin configuration](using_plugins.md#configuring-plugins) is shallow-merged
   for _each individual plugin_.
+
+- All items under [disable-warnings](logs.md#suppress-warnings) are combined
+  into a single array.
 
 ### Transport configuration merge strategy
 
@@ -311,6 +314,37 @@ plugins:
       method: userpass
       user: bolt
       pass: bolt
+```
+
+### `disable-warnings` merge strategy
+
+The `disable-warnings` option accepts an array where each item in the array
+is the ID of a warning to suppress. When merging configurations, the
+array from each configuration layer is combined into a single array
+that includes all of the warning IDs.
+
+For example, given this configuration in a project configuration file:
+
+```yaml
+# ~/.puppetlabs/bolt/bolt-project.yaml
+disable-warnings:
+  - apples
+```
+
+And this plugin configuration in a system-wide configuration file:
+
+```yaml
+# /etc/puppetlabs/bolt/bolt-defaults.yaml
+disable-warnings:
+  - oranges
+```
+
+The merged Bolt configuration would look like this:
+
+```yaml
+disable-warnings:
+  - apples
+  - oranges
 ```
 
 📖 **Related information**
