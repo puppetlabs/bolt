@@ -468,5 +468,19 @@ describe "passes parsed AST to the apply_catalog task" do
         expect(lines).to include(/FATAL.*Roll/)
       end
     end
+
+    context 'with fact/variable collisions' do
+      let(:lines)  { @log_output.readlines }
+      after(:each) { @log_output.level = :all }
+
+      it 'warns about collisions' do
+        @log_output.level = :warn
+        run_cli(%w[plan run basic::collisions] + config_flags)
+
+        expect(lines).to include(/WARN.*Plan variable \$fact_plan will be overridden/)
+        expect(lines).to include(/WARN.*Target variable \$fact_target will be overridden/)
+        expect(lines).to include(/WARN.*Target variable \$plan_target will be overridden/)
+      end
+    end
   end
 end
