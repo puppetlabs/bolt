@@ -113,8 +113,8 @@ module Bolt
     end
 
     # Loads a 'bolt-defaults.yaml' file, which contains default configuration that applies to all
-    # projects. This file does not allow project-specific configuration such as 'hiera-config' and
-    # 'inventoryfile', and nests all default inventory configuration under an 'inventory-config' key.
+    # projects. This file does not allow project-specific configuration such as 'hiera-config'
+    # and nests all default inventory configuration under an 'inventory-config' key.
     def self.load_bolt_defaults_yaml(dir)
       filepath     = dir + BOLT_DEFAULTS_NAME
       data         = Bolt::Util.read_yaml_hash(filepath, 'config')
@@ -254,7 +254,6 @@ module Bolt
 
       default_data = {
         'apply-settings'      => {},
-        'apply_settings'      => {},
         'color'               => true,
         'compile-concurrency' => Etc.nprocessors,
         'concurrency'         => default_concurrency,
@@ -262,10 +261,8 @@ module Bolt
         'log'                 => { 'console' => {} },
         'module-install'      => {},
         'plugin-hooks'        => {},
-        'plugin_hooks'        => {},
         'plugins'             => {},
         'puppetdb'            => {},
-        'puppetfile'          => {},
         'save-rerun'          => true,
         'spinner'             => true,
         'transport'           => 'ssh'
@@ -311,9 +308,9 @@ module Bolt
     def normalize_overrides(options)
       opts = options.transform_keys(&:to_s)
 
-      # Pull out config options. We need to add 'transport' as it's not part of the
-      # OPTIONS hash but is a valid option that can be set with the --transport CLI option
-      overrides = opts.slice(*OPTIONS.keys, 'transport')
+      # Pull out config options. We need to add 'transport' and 'inventoryfile' as they're
+      # not part of the OPTIONS hash but are valid options that can be set with CLI options
+      overrides = opts.slice(*OPTIONS.keys, 'inventoryfile', 'transport')
 
       # Pull out transport config options
       TRANSPORT_CONFIG.each do |transport, config|
@@ -341,7 +338,7 @@ module Bolt
           when *TRANSPORT_CONFIG.keys
             Bolt::Util.deep_merge(val1, val2)
           # Hash values are shallow merged
-          when 'puppetdb', 'plugin-hooks', 'plugin_hooks', 'apply-settings', 'apply_settings', 'log'
+          when 'apply-settings', 'log', 'plugin-hooks', 'puppetdb'
             val1.merge(val2)
           # All other values are overwritten
           else
@@ -378,7 +375,7 @@ module Bolt
       end
 
       # Filter hashes to only include valid options
-      %w[apply-settings apply_settings module-install puppetfile].each do |opt|
+      %w[apply-settings module-install].each do |opt|
         @data[opt] = @data[opt].slice(*OPTIONS.dig(opt, :properties).keys)
       end
     end
@@ -437,25 +434,6 @@ module Bolt
 
       if File.exist?(default_inventoryfile)
         Bolt::Util.validate_file('inventory file', default_inventoryfile)
-      end
-
-      # Warn the user how they should be using the 'puppetfile' or
-      # 'module-install' config options. We don't error here since these
-      # settings can be set at the user or system level.
-      if @project.modules && puppetfile_config.any? && module_install.empty?
-        command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
-        @logs << { warn: "Detected configuration for 'puppetfile'. This setting is not "\
-                         "used when 'modules' is configured. Use 'module-install' instead. "\
-                         "To automatically update your project configuration, run '#{command}'." }
-      elsif @project.modules.nil? && puppetfile_config.empty? && module_install.any?
-        @logs << { warn: "Detected configuration for 'module-install'. This setting is not "\
-                         "used when 'modules' is not configured. Use 'puppetfile' instead." }
-      elsif @project.modules && puppetfile_config.any? && module_install.any?
-        @logs << { warn: "Detected configuration for 'puppetfile' and 'module-install'. Using "\
-                         "configuration for 'module-install' because 'modules' is also configured." }
-      elsif @project.modules.nil? && puppetfile_config.any? && module_install.any?
-        @logs << { warn: "Detected configuration for 'puppetfile' and 'module-install'. Using "\
-                         "configuration for 'puppetfile' because 'modules' is not configured." }
       end
     end
 
@@ -537,27 +515,12 @@ module Bolt
       @data['compile-concurrency']
     end
 
-    def puppetfile_config
-      @data['puppetfile']
-    end
-
     def plugins
       @data['plugins']
     end
 
     def plugin_hooks
-      if @data['plugin-hooks'].any? && @data['plugin_hooks'].any?
-        Bolt::Logger.warn_once(
-          "plugin-hooks and plugin_hooks set",
-          "Detected configuration for 'plugin-hooks' and 'plugin_hooks'. Bolt will ignore 'plugin_hooks'."
-        )
-
-        @data['plugin-hooks']
-      elsif @data['plugin-hooks'].any?
-        @data['plugin-hooks']
-      else
-        @data['plugin_hooks']
-      end
+      @data['plugin-hooks']
     end
 
     def trusted_external
@@ -565,18 +528,7 @@ module Bolt
     end
 
     def apply_settings
-      if @data['apply-settings'].any? && @data['apply_settings'].any?
-        Bolt::Logger.warn_once(
-          "apply-settings and apply_settings set",
-          "Detected configuration for 'apply-settings' and 'apply_settings'. Bolt will ignore 'apply_settings'."
-        )
-
-        @data['apply-settings']
-      elsif @data['apply-settings'].any?
-        @data['apply-settings']
-      else
-        @data['apply_settings']
-      end
+      @data['apply-settings']
     end
 
     def transport

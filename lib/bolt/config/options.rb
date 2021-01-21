@@ -53,42 +53,6 @@ module Bolt
       # Definitions used to validate config options.
       # https://github.com/puppetlabs/bolt/blob/main/schemas/README.md
       OPTIONS = {
-        "apply_settings" => {
-          description: "A map of Puppet settings to use when applying Puppet code using the `apply` "\
-                       "plan function or the `bolt apply` command.",
-          type: Hash,
-          properties: {
-            "evaltrace" => {
-              description: "Whether each resource should log when it is being evaluated.",
-              type: [TrueClass, FalseClass],
-              _example: true,
-              _default: false
-            },
-            "log_level" => {
-              description: "The log level for logs in apply reports from Puppet. These can be seen "\
-                           "in ApplyResults.",
-              type: String,
-              enum: %w[debug info notice warning err alert emerg crit],
-              _example: "debug",
-              _default: "notice"
-            },
-            "show_diff" => {
-              description: "Whether to log and report a contextual diff.",
-              type: [TrueClass, FalseClass],
-              _example: true,
-              _default: false
-            },
-            "trace" => {
-              description: "Whether to print stack traces on some errors. Will print internal Ruby "\
-                           "stack trace interleaved with Puppet function frames.",
-              type: [TrueClass, FalseClass],
-              _example: true,
-              _default: false
-            }
-          },
-          _plugin: false,
-          _deprecation: "This option will be removed in Bolt 3.0. Use `apply-settings` instead."
-        },
         "apply-settings" => {
           description: "A map of Puppet settings to use when applying Puppet code using the `apply` "\
                        "plan function or the `bolt apply` command.",
@@ -170,18 +134,6 @@ module Bolt
           type: Hash,
           _plugin: false,
           _example: {}
-        },
-        "inventoryfile" => {
-          description: "The path to a structured data inventory file used to refer to groups of targets on the "\
-                       "command line and from plans. Read more about using inventory files in [Inventory "\
-                       "files](inventory_file_v2.md).",
-          type: String,
-          _plugin: false,
-          _deprecation: "This option will be removed in Bolt 3.0. Use the `--inventoryfile` command-line option "\
-                        "to use a non-default inventory file or move the file contents to `inventory.yaml` in the "\
-                        "project directory.",
-          _example: "~/.puppetlabs/bolt/inventory.yaml",
-          _default: "project/inventory.yaml"
         },
         "plugin-cache" => {
           description: "This feature is experimental. Enable plugin caching and set the time-to-live.",
@@ -354,16 +306,6 @@ module Bolt
           _plugin: false,
           _example: ["myproject", "myproject::foo", "myproject::bar", "myproject::deploy::*"]
         },
-        "plugin_hooks" => {
-          description: "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. "\
-                       "The only configurable plugin hook is `puppet_library`, which can use two possible plugins: "\
-                       "[`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) "\
-                       "and [`task`](using_plugins.md#task).",
-          type: Hash,
-          _plugin: true,
-          _example: { "puppet_library" => { "plugin" => "puppet_agent", "version" => "6.15.0", "_run_as" => "root" } },
-          _deprecation: "This option will be removed in Bolt 3.0. Use `plugin-hooks` instead."
-        },
         "plugin-hooks" => {
           description: "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. "\
                        "The only configurable plugin hook is `puppet_library`, which can use two possible plugins: "\
@@ -440,42 +382,6 @@ module Bolt
             }
           },
           _plugin: true
-        },
-        "puppetfile" => {
-          description: "A map containing options for the `bolt puppetfile install` command and "\
-                       "`Install-BoltPuppetfile` cmdlet.",
-          type: Hash,
-          properties: {
-            "forge" => {
-              description: "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge "\
-                           "operations only, and a `baseurl` setting to specify a different Forge host.",
-              type: Hash,
-              properties: {
-                "baseurl" => {
-                  description: "The URL to the Forge host.",
-                  type: String,
-                  format: "uri",
-                  _example: "https://forge.example.com"
-                },
-                "proxy" => {
-                  description: "The HTTP proxy to use for Forge operations.",
-                  type: String,
-                  format: "uri",
-                  _example: "https://my-forge-proxy.com:8080"
-                }
-              },
-              _example: { "baseurl" => "https://forge.example.com", "proxy" => "https://my-forge-proxy.com:8080" }
-            },
-            "proxy" => {
-              description: "The HTTP proxy to use for Git and Forge operations.",
-              type: String,
-              format: "uri",
-              _example: "https://my-proxy.com:8080"
-            }
-          },
-          _deprecation: "This option will be removed in Bolt 3.0. Update your project to use the module "\
-                        "management feature. For more information, see https://pup.pt/bolt-module-migrate.",
-          _plugin: false
         },
         "save-rerun" => {
           description: "Whether to update `.rerun.json` in the Bolt project directory. If "\
@@ -575,20 +481,16 @@ module Bolt
       # Options that are available in a bolt.yaml file
       BOLT_OPTIONS = %w[
         apply-settings
-        apply_settings
         color
         compile-concurrency
         concurrency
         format
         hiera-config
-        inventoryfile
         log
         modulepath
         plugin-hooks
-        plugin_hooks
         plugins
         puppetdb
-        puppetfile
         save-rerun
         spinner
         trusted-external-command
@@ -605,10 +507,8 @@ module Bolt
         module-install
         plugin-cache
         plugin-hooks
-        plugin_hooks
         plugins
         puppetdb
-        puppetfile
         save-rerun
         spinner
       ].freeze
@@ -616,13 +516,11 @@ module Bolt
       # Options that are available in a bolt-project.yaml file
       BOLT_PROJECT_OPTIONS = %w[
         apply-settings
-        apply_settings
         color
         compile-concurrency
         concurrency
         format
         hiera-config
-        inventoryfile
         log
         modulepath
         module-install
@@ -631,10 +529,8 @@ module Bolt
         plans
         plugin-cache
         plugin-hooks
-        plugin_hooks
         plugins
         puppetdb
-        puppetfile
         save-rerun
         spinner
         tasks
