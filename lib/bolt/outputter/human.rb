@@ -32,8 +32,8 @@ module Bolt
       end
 
       def start_spin
-        return unless @spin && @stream.isatty
-        @spin = true
+        return unless @spin && @stream.isatty && !@spinning
+        @spinning = true
         @spin_thread = Thread.new do
           loop do
             sleep(0.1)
@@ -43,9 +43,9 @@ module Bolt
       end
 
       def stop_spin
-        return unless @spin && @stream.isatty
+        return unless @spin && @stream.isatty && @spinning
+        @spinning = false
         @spin_thread.terminate
-        @spin = false
         @stream.print("\b")
       end
 
@@ -81,6 +81,10 @@ module Bolt
             print_plan_start(event)
           when :plan_finish
             print_plan_finish(event)
+          when :start_spin
+            start_spin
+          when :stop_spin
+            stop_spin
           end
         end
       end

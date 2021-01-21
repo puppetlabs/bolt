@@ -12,14 +12,12 @@ Puppet::Functions.create_function(:parallelize, Puppet::Functions::InternalFunct
   # @param data The array to apply the block to.
   # @return [Array] An array of PlanResult objects. Each input from the input
   #   array returns a corresponding PlanResult object.
-  # @example Execute two tasks on multiple targets. Once the task finishes on one
-  #   target, that target can move to the next step without waiting for the task
-  #   to finish on the second target.
-  # $targets = get_targets(["host1", "host2"])
-  # $result = parallelize ($targets) |$t| {
-  #   run_task('a', $t)
-  #   run_task('b', $t)
-  # }
+  # @example Execute two tasks on two targets.
+  #   $targets = get_targets(["host1", "host2"])
+  #   $result = parallelize ($targets) |$t| {
+  #     run_task('a', $t)
+  #     run_task('b', $t)
+  #   }
   dispatch :parallelize do
     scope_param
     param 'Array[Any]', :data

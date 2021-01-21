@@ -63,12 +63,12 @@ module Bolt
       end
 
       def start_spin
-        return unless @spin && @stream.isatty
-        @spin = true
+        return unless @spin && @stream.isatty && !@spinning
+        @spinning = true
         @spin_thread = Thread.new do
           loop do
-            @stream.print(colorize(:rainbow, @pinwheel.rotate!.first + "\b"))
             sleep(0.1)
+            @stream.print(colorize(:rainbow, @pinwheel.rotate!.first + "\b"))
           end
         end
       end
