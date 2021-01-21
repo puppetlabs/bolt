@@ -765,20 +765,8 @@ describe "Bolt::CLI" do
       it "is not sensitive to ordering of debug and verbose" do
         expect(Bolt::Logger).to receive(:configure).with(include('console' => { level: 'debug' }), true, Set.new)
 
-        cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug --verbose])
+        cli = Bolt::CLI.new(%w[command run uptime --targets foo --log-level debug --verbose])
         cli.parse
-      end
-
-      it "errors when debug and log-level are both set" do
-        cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug --log-level notice])
-        expect { cli.parse }.to raise_error(Bolt::CLIError, /Only one of '--debug' or '--log-level' may be specified/)
-      end
-
-      it "warns when using debug" do
-        cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug])
-        cli.parse
-
-        expect(@log_output.readlines).to include(/Command line option '--debug' is deprecated/)
       end
 
       it "log-level sets the log option" do
@@ -850,19 +838,6 @@ describe "Bolt::CLI" do
           cli.parse
         }.to raise_error(Bolt::CLIError,
                          /Option '--modulepath' needs a parameter/)
-      end
-    end
-
-    describe "puppetfile" do
-      let(:puppetfile) { File.expand_path('/path/to/Puppetfile') }
-      let(:cli) { Bolt::CLI.new(%W[puppetfile install --puppetfile #{puppetfile}]) }
-
-      it 'uses a specified Puppetfile' do
-        cli.parse
-        expect(cli.config.puppetfile.to_s).to eq(puppetfile)
-        output = @log_output.readlines
-        # We'll have to remove this test soon anyway, may as well throw in a quick check
-        expect(output).to include(/Command line option '--puppetfile' is deprecated,/)
       end
     end
 
