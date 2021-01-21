@@ -132,7 +132,7 @@ describe Bolt::ModuleInstaller::Specs::GitSpec do
     end
 
     context 'with a valid branch' do
-      let(:ref) { 'master' }
+      let(:ref) { 'main' }
 
       it 'resolves and returns a SHA' do
         expect(spec.sha).to be_a(String)
