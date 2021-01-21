@@ -486,7 +486,7 @@ module Bolt
           code = generate_types
         when 'install'
           code = install_puppetfile(
-            config.puppetfile_config,
+            {},
             config.puppetfile,
             config.modulepath.first
           )

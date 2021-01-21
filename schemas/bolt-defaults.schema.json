@@ -34,17 +34,11 @@
     "plugin-hooks": {
       "$ref": "#/definitions/plugin-hooks"
     },
-    "plugin_hooks": {
-      "$ref": "#/definitions/plugin_hooks"
-    },
     "plugins": {
       "$ref": "#/definitions/plugins"
     },
     "puppetdb": {
       "$ref": "#/definitions/puppetdb"
-    },
-    "puppetfile": {
-      "$ref": "#/definitions/puppetfile"
     },
     "save-rerun": {
       "$ref": "#/definitions/save-rerun"
@@ -225,17 +219,6 @@
         }
       ]
     },
-    "plugin_hooks": {
-      "description": "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. The only configurable plugin hook is `puppet_library`, which can use two possible plugins: [`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) and [`task`](using_plugins.md#task).",
-      "oneOf": [
-        {
-          "type": "object"
-        },
-        {
-          "$ref": "#/definitions/_plugin"
-        }
-      ]
-    },
     "plugins": {
       "description": "A map of plugins and their configuration data, where each key is the name of a plugin and its value is a map of configuration data. Configurable options are specified by the plugin. Read more about configuring plugins in [Using plugins](using_plugins.md#configuring-plugins).",
       "type": "object",
@@ -341,33 +324,6 @@
           "$ref": "#/definitions/_plugin"
         }
       ]
-    },
-    "puppetfile": {
-      "description": "A map containing options for the `bolt puppetfile install` command and `Install-BoltPuppetfile` cmdlet.",
-      "type": "object",
-      "properties": {
-        "forge": {
-          "description": "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations only, and a `baseurl` setting to specify a different Forge host.",
-          "type": "object",
-          "properties": {
-            "baseurl": {
-              "description": "The URL to the Forge host.",
-              "type": "string",
-              "format": "uri"
-            },
-            "proxy": {
-              "description": "The HTTP proxy to use for Forge operations.",
-              "type": "string",
-              "format": "uri"
-            }
-          }
-        },
-        "proxy": {
-          "description": "The HTTP proxy to use for Git and Forge operations.",
-          "type": "string",
-          "format": "uri"
-        }
-      }
     },
     "save-rerun": {
       "description": "Whether to update `.rerun.json` in the Bolt project directory. If your target names include passwords, set this value to `false` to avoid writing passwords to disk.",
