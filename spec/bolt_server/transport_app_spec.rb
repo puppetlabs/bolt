@@ -1000,19 +1000,6 @@ describe "BoltServer::TransportApp" do
         end
       end
 
-      # TODO: Remove this test for Bolt 3.0. 'inventoryfile' will no longer be configurable
-      # in bolt-project.yaml.
-      it 'disallows non-default inventoryfiles' do
-        non_default_inventoryfile = 'foo.yaml'
-        non_default_inventoryfile_conf = bolt_project.merge({ 'inventoryfile' => non_default_inventoryfile })
-        with_project(non_default_inventoryfile_conf, bolt_inventory, non_default_inventoryfile) do |path_to_tmp_project|
-          versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
-          post_to_project_inventory_targets(versioned_project)
-          expect(last_response.status).to eq(500)
-          expect(last_response.body).to match(/Project inventory must be defined in .*inventory.yaml.*/)
-        end
-      end
-
       it 'errors when versioned_project is invalid' do
         post_to_project_inventory_targets('foo')
         expect(last_response.status).to eq(500)
