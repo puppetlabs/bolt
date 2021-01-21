@@ -6,15 +6,15 @@ require 'optparse'
 
 module Bolt
   class BoltOptionParser < OptionParser
-    PROJECT_PATHS = %w[project configfile boltdir].freeze
-    OPTIONS = { inventory: %w[targets query rerun description],
+    PROJECT_PATHS = %w[project].freeze
+    OPTIONS = { inventory: %w[targets query rerun],
                 authentication: %w[user password password-prompt private-key host-key-check ssl ssl-verify],
                 escalation: %w[run-as sudo-password sudo-password-prompt sudo-executable],
                 run_context: %w[concurrency inventoryfile save-rerun cleanup],
                 global_config_setters: PROJECT_PATHS + %w[modulepath],
                 transports: %w[transport connect-timeout tty native-ssh ssh-command copy-command],
                 display: %w[format color verbose trace],
-                global: %w[help version debug log-level clear-cache] }.freeze
+                global: %w[help version log-level clear-cache] }.freeze
 
     ACTION_OPTS = OPTIONS.values.flatten.freeze
 
@@ -117,7 +117,7 @@ module Bolt
       when 'puppetfile'
         case action
         when 'install'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[puppetfile],
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
             banner: PUPPETFILE_INSTALL_HELP }
         when 'show-modules'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
@@ -794,13 +794,6 @@ module Bolt
       define('--noop', 'See what changes Bolt will make without actually executing the changes') do |_|
         @options[:noop] = true
       end
-      define('--description DESCRIPTION',
-             'Deprecated. Description to use for the job') do |description|
-        msg = "Command line option '--description' is deprecated, and will be "\
-          "removed in Bolt 3.0."
-        @deprecations << { type: 'Using --description', msg: msg }
-        @options[:description] = description
-      end
       define('--params PARAMETERS',
              "Parameters to a task or plan as json, a json file '@<file>', or on stdin '-'") do |params|
         @options[:task_options] = parse_params(params)
@@ -878,26 +871,9 @@ module Bolt
           File.expand_path(moduledir)
         end
       end
-      define('--boltdir PATH',
-             'Deprecated. Specify what project to load config from (default:',
-             'autodiscovered from current working dir)') do |path|
-        msg = "Command line option '--boltdir' is deprecated, use '--project' instead."
-        @deprecations << { type: 'Using --boltdir', msg: msg }
-        @options[:boltdir] = path
-      end
       define('--project PATH',
              'Path to load the Bolt project from (default: autodiscovered from current dir)') do |path|
         @options[:project] = path
-      end
-      define('--configfile PATH',
-             'Deprecated. Specify where to load config from (default:',
-             '~/.puppetlabs/bolt/bolt.yaml). Directory containing bolt.yaml will be',
-             'used as the project directory.') do |path|
-        msg = "Command line option '--configfile' is deprecated, and " \
-          "will be removed in Bolt 3.0. Use '--project' and provide the "\
-          "directory path instead."
-        @deprecations << { type: 'Using --configfile', msg: msg }
-        @options[:configfile] = path
       end
       define('--hiera-config PATH',
              'Specify where to load Hiera config from (default: ~/.puppetlabs/bolt/hiera.yaml)') do |path|
@@ -909,17 +885,6 @@ module Bolt
           raise Bolt::CLIError, "Cannot pass inventory file when #{Bolt::Inventory::ENVIRONMENT_VAR} is set"
         end
         @options[:inventoryfile] = File.expand_path(path)
-      end
-      define('--puppetfile PATH',
-             'Deprecated. Specify a Puppetfile to use when installing modules.',
-             ' (default: ~/.puppetlabs/bolt/Puppetfile)',
-             'Modules are installed in the current project.') do |path|
-        command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
-        msg = "Command line option '--puppetfile' is deprecated, and will be removed "\
-          "in Bolt 3.0. You can migrate to using the new module management "\
-          "workflow using '#{command}'."
-        @deprecations << { type: 'Using --puppetfile', msg: msg }
-        @options[:puppetfile_path] = File.expand_path(path)
       end
       define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|
         @options[:'save-rerun'] = save
@@ -1012,13 +977,6 @@ module Bolt
       define('--version', 'Display the version') do |_|
         puts Bolt::VERSION
         raise Bolt::CLIExit
-      end
-      define('--debug', 'Display debug logging') do |_|
-        @options[:debug] = true
-        # We don't actually set '--log-level debug' here, but once the options are evaluated by
-        # the config class the end result is the same.
-        msg = "Command line option '--debug' is deprecated, set '--log-level debug' instead."
-        @deprecations << { type: 'Using --debug instead of --log-level debug', msg: msg }
       end
       define('--log-level LEVEL',
              "Set the log level for the console. Available options are",
