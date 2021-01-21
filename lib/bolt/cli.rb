@@ -155,25 +155,19 @@ module Bolt
     # Loads the project and configuration. All errors that are raised here are not
     # handled by the outputter, as it relies on config being loaded.
     def load_config
-      @config = if ENV['BOLT_PROJECT']
-                  project = Bolt::Project.create_project(ENV['BOLT_PROJECT'], 'environment')
-                  Bolt::Config.from_project(project, options)
-                elsif options[:configfile]
-                  Bolt::Config.from_file(options[:configfile], options)
+      project = if ENV['BOLT_PROJECT']
+                  Bolt::Project.create_project(ENV['BOLT_PROJECT'], 'environment')
+                elsif options[:project]
+                  dir = Pathname.new(options[:project])
+                  if (dir + Bolt::Project::BOLTDIR_NAME).directory?
+                    Bolt::Project.create_project(dir + Bolt::Project::BOLTDIR_NAME)
+                  else
+                    Bolt::Project.create_project(dir)
+                  end
                 else
-                  cli_flag = options[:project] || options[:boltdir]
-                  project = if cli_flag
-                              dir = Pathname.new(cli_flag)
-                              if (dir + Bolt::Project::BOLTDIR_NAME).directory?
-                                Bolt::Project.create_project(dir + Bolt::Project::BOLTDIR_NAME)
-                              else
-                                Bolt::Project.create_project(dir)
-                              end
-                            else
-                              Bolt::Project.find_boltdir(Dir.pwd)
-                            end
-                  Bolt::Config.from_project(project, options)
+                  Bolt::Project.find_boltdir(Dir.pwd)
                 end
+      @config = Bolt::Config.from_project(project, options)
     rescue Bolt::Error => e
       fatal_error(e)
       raise e
@@ -306,10 +300,6 @@ module Bolt
               "Unknown argument(s) #{options[:leftovers].join(', ')}"
       end
 
-      if options.slice(:boltdir, :configfile, :project).length > 1
-        raise Bolt::CLIError, "Only one of '--boltdir', '--project', or '--configfile' may be specified"
-      end
-
       if options[:noop] &&
          !(options[:subcommand] == 'task' && options[:action] == 'run') && options[:subcommand] != 'apply'
         raise Bolt::CLIError,
@@ -321,10 +311,6 @@ module Bolt
           raise Bolt::CLIError,
                 "Option '--env-var' may only be specified when running a command or script"
         end
-      end
-
-      if options.key?(:debug) && options.key?(:log)
-        raise Bolt::CLIError, "Only one of '--debug' or '--log-level' may be specified"
       end
     end
 
@@ -523,7 +509,6 @@ module Bolt
 
         elapsed_time = Benchmark.realtime do
           executor_opts = {}
-          executor_opts[:description] = options[:description] if options.key?(:description)
           executor_opts[:env_vars] = options[:env_vars] if options.key?(:env_vars)
           executor.subscribe(outputter)
           executor.subscribe(log_outputter)
@@ -540,8 +525,7 @@ module Bolt
                            targets,
                            options[:task_options],
                            executor,
-                           inventory,
-                           options[:description])
+                           inventory)
             when 'file'
               src = options[:object]
               dest = options[:leftovers].first
@@ -664,7 +648,6 @@ module Bolt
 
       plan_context = { plan_name: plan_name,
                        params: plan_arguments }
-      plan_context[:description] = options[:description] if options[:description]
 
       executor = Bolt::Executor.new(config.concurrency, analytics, options[:noop], config.modified_concurrency)
       if %w[human rainbow].include?(options.fetch(:format, 'human'))

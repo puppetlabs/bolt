@@ -60,35 +60,6 @@ module Bolt
       new(project, data, overrides)
     end
 
-    def self.from_file(configfile, overrides = {})
-      project = Bolt::Project.create_project(Pathname.new(configfile).expand_path.dirname)
-
-      conf = if project.project_file == project.config_file
-               project.data
-             else
-               c = Bolt::Util.read_yaml_hash(configfile, 'config')
-
-               # Validate the config against the schema. This will raise a single error
-               # with all validation errors.
-               Bolt::Validator.new.tap do |validator|
-                 validator.validate(c, bolt_schema, project.config_file.to_s)
-                 validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
-                 validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
-               end
-
-               Bolt::Logger.debug("Loaded configuration from #{configfile}")
-
-               c
-             end
-
-      data = load_defaults(project).push(
-        filepath: configfile,
-        data: conf
-      )
-
-      new(project, data, overrides)
-    end
-
     # Builds a hash of definitions for transport configuration.
     #
     def self.transport_definitions
@@ -337,15 +308,6 @@ module Bolt
         overrides[transport] = opts.slice(*config.options)
       end
 
-      # Set console log to debug if in debug mode
-      if options[:debug]
-        overrides['log'] = { 'console' => { 'level' => 'debug' } }
-      end
-
-      if options[:puppetfile_path]
-        @puppetfile = options[:puppetfile_path]
-      end
-
       overrides['trace'] = opts['trace'] if opts.key?('trace')
 
       # Validate the overrides
@@ -515,7 +477,7 @@ module Bolt
     end
 
     def puppetfile
-      @puppetfile || @project.puppetfile
+      @project.puppetfile
     end
 
     def modulepath
