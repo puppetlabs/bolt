@@ -259,6 +259,12 @@ module Bolt
             _plugin: true,
             _example: "BOLT.PRODUCTION"
           },
+          "remote" => {
+            type: String,
+            description: "The LXD remote where a target container is running",
+            _plugin: true,
+            _example: "myremote"
+          },
           "run-as" => {
             type: String,
             description: "The user to run commands as after login. The run-as user must be different than the "\
