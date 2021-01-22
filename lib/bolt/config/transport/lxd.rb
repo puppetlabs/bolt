@@ -8,11 +8,12 @@ module Bolt
     module Transport
       class LXD < Base
         OPTIONS = %w[
+          cleanup
           remote
         ].freeze
 
         DEFAULTS = {
-
+          'cleanup' => true
         }.freeze
 
         private def validate
