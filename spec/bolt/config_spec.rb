@@ -106,35 +106,6 @@ describe Bolt::Config do
     end
   end
 
-  describe "::from_file" do
-    let(:path) { File.expand_path('/path/to/config.yaml') }
-    let(:dir) { Bolt::Util.windows? ? "D:/path/to" : "/path/to" }
-    let(:proj_path) { File.join(dir, "bolt-project.yaml") }
-
-    it 'loads from the specified config file' do
-      allow(File).to receive(:directory?).with(Pathname.new(dir)).and_return(true)
-      allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return({})
-      allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
-      expect(Bolt::Util).to receive(:read_yaml_hash)
-        .with(path, 'config')
-        .and_return({})
-      expect(Bolt::Util).to receive(:read_optional_yaml_hash)
-        .with(proj_path, "project")
-        .and_return({})
-
-      Bolt::Config.from_file(path)
-    end
-
-    it "fails if the config file doesn't exist" do
-      allow(File).to receive(:directory?).with(Pathname.new(dir)).and_return(true)
-      expect(File).to receive(:open).with(path, anything).and_raise(Errno::ENOENT)
-
-      expect do
-        Bolt::Config.from_file(path)
-      end.to raise_error(Bolt::FileError)
-    end
-  end
-
   describe '::load_defaults' do
     shared_examples 'config defaults' do
       it 'defaults to bolt.yaml' do
