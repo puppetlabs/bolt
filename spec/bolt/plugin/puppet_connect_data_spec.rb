@@ -28,6 +28,11 @@ describe Bolt::Plugin::PuppetConnectData do
   end
 
   context 'when <project_root>/puppet_connect_data.yaml does not exist' do
+    it 'does not raise a validation error for a missing key' do
+      reference = { '_plugin' => 'puppet_connect_data', 'key' => 'missing_key' }
+      expect { subject.validate_resolve_reference(reference) }.not_to raise_error
+    end
+
     it 'resolves all references to nil' do
       reference = { '_plugin' => 'puppet_connect_data', 'key' => 'foo_key' }
       expect(subject.resolve_reference(reference)).to be_nil
@@ -61,6 +66,11 @@ describe Bolt::Plugin::PuppetConnectData do
             'message' => 'foo_message'
           }
         }
+      end
+
+      it 'does not raise a validation error for a missing key' do
+        reference = { '_plugin' => 'puppet_connect_data', 'key' => 'missing_key' }
+        expect { subject.validate_resolve_reference(reference) }.not_to raise_error
       end
 
       it "returns the key's value" do
