@@ -48,7 +48,7 @@ describe "with private plans" do
       end
 
       it 'does not update the cache if local plans have not been modified' do
-        run_cli(%w[puppetfile generate-types] + config_flags)
+        run_cli(%w[module generate-types] + config_flags)
         original_mtime = File.mtime(project.plan_cache_file)
         run_cli(%w[plan show] + config_flags)
         expect(original_mtime).to eq(File.mtime(project.plan_cache_file))
@@ -64,7 +64,7 @@ describe "with private plans" do
 
         it 'updates the cache for local plans if modified' do
           File.write(plan_path, yaml_plan.to_yaml)
-          run_cli(%w[puppetfile generate-types] + config_flags)
+          run_cli(%w[module generate-types] + config_flags)
           original_mtime = File.mtime(project.plan_cache_file)
 
           yaml_plan['private'] = false
@@ -91,7 +91,7 @@ describe "with private plans" do
         it 'does not update the cache if downloaded plans are modified' do
           FileUtils.touch(plan_path)
           File.write(plan_path, yaml_plan.to_yaml)
-          run_cli(%w[puppetfile generate-types] + config_flags)
+          run_cli(%w[module generate-types] + config_flags)
           original_mtime = File.mtime(cache_file)
 
           yaml_plan['private'] = false
@@ -132,14 +132,14 @@ describe "with private plans" do
       end
 
       it 'does not update the cache if local plans have not been modified' do
-        run_cli(%w[puppetfile generate-types] + config_flags)
+        run_cli(%w[module generate-types] + config_flags)
         original_mtime = File.mtime(project.plan_cache_file)
         run_cli(%w[plan show] + config_flags)
         expect(original_mtime).to eq(File.mtime(project.plan_cache_file))
       end
 
       it 'updates the cache for local plans if modified' do
-        run_cli(%w[puppetfile generate-types] + config_flags)
+        run_cli(%w[module generate-types] + config_flags)
         original_mtime = File.mtime(project.plan_cache_file)
         run_cli(%w[plan show] + config_flags)
         expect(original_mtime).to eq(File.mtime(project.plan_cache_file))

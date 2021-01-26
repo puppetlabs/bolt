@@ -350,7 +350,7 @@ describe Bolt::Config do
     let(:overrides) { { 'modulepath' => project.managed_moduledir.to_s } }
 
     context 'with modules configured' do
-      let(:project_config) { { 'modules' => [] } }
+      let(:project_config) { { 'modules' => ['puppetlabs-yaml'] } }
 
       it 'appends the managed moduledir to the modulepath' do
         expect(config.modulepath[-1]).to eq(project.managed_moduledir.to_s)
@@ -358,18 +358,6 @@ describe Bolt::Config do
 
       it 'errors if the user configures the managed moduledir' do
         expect { Bolt::Config.from_project(project, overrides) }.to raise_error(Bolt::ValidationError)
-      end
-    end
-
-    context 'with modules not configured' do
-      let(:project_config) { nil }
-
-      it 'does not append the managed moduledir to the modulepath' do
-        expect(config.modulepath).not_to include(project.managed_moduledir.to_s)
-      end
-
-      it 'does not error if the user configured the managed moduledir' do
-        expect { Bolt::Config.from_project(project, overrides) }.not_to raise_error
       end
     end
   end

@@ -33,19 +33,18 @@ module Bolt
 
   class CLI
     COMMANDS = {
-      'command'    => %w[run],
-      'script'     => %w[run],
-      'task'       => %w[show run],
-      'plan'       => %w[show run convert new],
-      'file'       => %w[download upload],
-      'puppetfile' => %w[install show-modules generate-types],
-      'secret'     => %w[encrypt decrypt createkeys],
-      'inventory'  => %w[show],
-      'group'      => %w[show],
-      'project'    => %w[init migrate],
-      'module'     => %w[add generate-types install show],
-      'apply'      => %w[],
-      'guide'      => %w[]
+      'command' => %w[run],
+      'script' => %w[run],
+      'task' => %w[show run],
+      'plan' => %w[show run convert new],
+      'file' => %w[download upload],
+      'secret' => %w[encrypt decrypt createkeys],
+      'inventory' => %w[show],
+      'group' => %w[show],
+      'project' => %w[init migrate],
+      'module' => %w[add generate-types install show],
+      'apply' => %w[],
+      'guide' => %w[]
     }.freeze
 
     attr_reader :config, :options
@@ -373,7 +372,7 @@ module Bolt
       # Initialize inventory and targets. Errors here are better to catch early.
       # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
       # options[:targets] will contain a resolved set of Target objects
-      unless %w[guide module project puppetfile secret].include?(options[:subcommand]) ||
+      unless %w[guide module project secret].include?(options[:subcommand]) ||
              %w[convert new show].include?(options[:action])
         update_targets(options)
       end
@@ -428,9 +427,6 @@ module Bolt
           list_modules
         end
         return 0
-      when 'show-modules'
-        list_modules
-        return 0
       when 'convert'
         pal.convert_plan(options[:object])
         return 0
@@ -479,17 +475,6 @@ module Bolt
           code = install_project_modules(config.project, config.module_install, options[:force], options[:resolve])
         when 'generate-types'
           code = generate_types
-        end
-      when 'puppetfile'
-        case options[:action]
-        when 'generate-types'
-          code = generate_types
-        when 'install'
-          code = install_puppetfile(
-            {},
-            config.puppetfile,
-            config.modulepath.first
-          )
         end
       when 'secret'
         code = Bolt::Secret.execute(plugins, outputter, options)
@@ -710,12 +695,10 @@ module Bolt
     end
 
     def list_modules
-      assert_puppetfile_or_module_command(config.project.modules)
       outputter.print_module_list(pal.list_modules)
     end
 
     def generate_types
-      assert_puppetfile_or_module_command(config.project.modules)
       # generate_types will surface a nice error with helpful message if it fails
       pal.generate_types(cache: true)
       0
@@ -725,19 +708,17 @@ module Bolt
     #
     def install_project_modules(project, config, force, resolve)
       assert_project_file(project)
-      assert_puppetfile_or_module_command(project.modules)
 
-      unless project.modules
+      unless project.modules.any?
         outputter.print_message "Project configuration file #{project.project_file} does not "\
                                 "specify any module dependencies. Nothing to do."
         return 0
       end
 
-      modules   = project.modules || []
       installer = Bolt::ModuleInstaller.new(outputter, pal)
 
       ok = outputter.spin do
-        installer.install(modules,
+        installer.install(project.modules,
                           project.puppetfile,
                           project.managed_moduledir,
                           config,
@@ -752,14 +733,12 @@ module Bolt
     #
     def add_project_module(name, project, config)
       assert_project_file(project)
-      assert_puppetfile_or_module_command(project.modules)
 
-      modules   = project.modules || []
       installer = Bolt::ModuleInstaller.new(outputter, pal)
 
       ok = outputter.spin do
         installer.add(name,
-                      modules,
+                      project.modules,
                       project.puppetfile,
                       project.managed_moduledir,
                       project.project_file,
@@ -790,8 +769,6 @@ module Bolt
     # Loads a Puppetfile and installs its modules.
     #
     def install_puppetfile(puppetfile_config, puppetfile, moduledir)
-      assert_puppetfile_or_module_command(config.project.modules)
-
       outputter.print_message("Installing modules from Puppetfile")
       installer = Bolt::ModuleInstaller.new(outputter, pal)
       ok = outputter.spin do
@@ -799,47 +776,6 @@ module Bolt
       end
 
       ok ? 0 : 1
-    end
-
-    # Raises an error if the 'puppetfile install' command is deprecated due to
-    # modules being configured.
-    #
-    def assert_puppetfile_or_module_command(modules)
-      if Bolt::Util.powershell?
-        case options[:action]
-        when 'generate-types'
-          old_command = 'Register-BoltPuppetfileTypes'
-          new_command = 'Register-BoltModuleTypes'
-        when 'install'
-          old_command = 'Install-BoltPuppetfile'
-          new_command = 'Install-BoltModule'
-        when 'show', 'show-modules'
-          old_command = 'Get-BoltPuppetfileModules'
-          new_command = 'Get-BoltModule'
-        end
-      else
-        old_command = "bolt puppetfile #{options[:action]}"
-        new_command = if options[:action] == 'show-modules'
-                        'bolt module show'
-                      else
-                        "bolt module #{options[:action]}"
-                      end
-      end
-
-      if modules && options[:subcommand] == 'puppetfile'
-        raise Bolt::CLIError,
-              "Unable to use command '#{old_command}' when 'modules' is configured in "\
-              "bolt-project.yaml. Use '#{new_command}' instead."
-      elsif modules.nil? && options[:subcommand] == 'puppetfile'
-        msg = "Command '#{old_command}' is deprecated and will be removed in Bolt 3.0. Update your project to use "\
-              "the module management feature. For more information, see https://pup.pt/bolt-module-migrate."
-        Bolt::Logger.deprecate("puppetfile_command", msg)
-      elsif modules.nil? && options[:subcommand] == 'module'
-        msg  = "Unable to use command '#{new_command}' when 'modules' is not configured in "\
-               "bolt-project.yaml. "
-        msg += "Use '#{old_command}' instead." if options[:action] != 'add'
-        raise Bolt::CLIError, msg
-      end
     end
 
     def pal
