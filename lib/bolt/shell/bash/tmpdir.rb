@@ -48,7 +48,10 @@ module Bolt
         def delete
           result = @shell.execute(['rm', '-rf', @path], sudoable: true, run_as: @owner)
           if result.exit_code != 0
-            @logger.warn("Failed to clean up tmpdir '#{@path}': #{result.stderr.string}")
+            Bolt::Logger.warn(
+              "fail_cleanup",
+              "Failed to clean up tmpdir '#{@path}': #{result.stderr.string}"
+            )
           end
           # For testing
           result.stderr.string

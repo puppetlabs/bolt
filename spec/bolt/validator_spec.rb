@@ -449,14 +449,20 @@ describe Bolt::Validator do
       data['unknown'] = 'unknown key'
       validator       = validate
 
-      expect(validator.warnings).to include(/Unknown option 'unknown' at config./)
+      expect(validator.warnings).to include(
+        id:  anything,
+        msg: /Unknown option 'unknown' at config./
+      )
     end
 
     it 'warns with nested uknown key' do
       data['nested'] = { 'unknown' => 'unknown key' }
       validator      = validate
 
-      expect(validator.warnings).to include(/Unknown option 'unknown' at 'nested' at config./)
+      expect(validator.warnings).to include(
+        id:  anything,
+        msg: /Unknown option 'unknown' at 'nested' at config./
+      )
     end
 
     it 'does not warn when :properties is not defined' do
@@ -491,8 +497,8 @@ describe Bolt::Validator do
         described_class.new.tap do |validator|
           validator.validate(data, schema, location)
           expect(validator.deprecations).to include(
-            option:  'option',
-            message: /Option 'option' at config is deprecated. Donut use./
+            id:  anything,
+            msg: /Option 'option' at config is deprecated. Donut use./
           )
         end
       end

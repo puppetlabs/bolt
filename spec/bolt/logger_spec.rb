@@ -39,13 +39,14 @@ describe Bolt::Logger do
     end
   end
 
-  describe '::deprecation_warning' do
+  describe '::deprecate' do
     let(:analytics) { Bolt::Analytics::NoopClient.new }
 
     it 'submits an analytics event' do
+      allow(Bolt::Logger).to receive(:configured?).and_return(true)
       expect(analytics).to receive(:event).with('Warn', 'deprecation', { label: "We've got clearance Clarence" })
       Bolt::Logger.analytics = analytics
-      Bolt::Logger.deprecation_warning("We've got clearance Clarence", 'Roger Roger')
+      Bolt::Logger.deprecate("We've got clearance Clarence", "Roger Roger")
     end
   end
 
@@ -143,6 +144,54 @@ describe Bolt::Logger do
       appenders = { 'file:/nonexistent/file' => {} }
 
       expect { Bolt::Logger.configure(appenders, true) }.to raise_error(%r{^Failed to open log file:/nonexistent/file})
+    end
+  end
+
+  describe '::flush_queue' do
+    let(:mock_logger) do
+      double('mock_logger', warn: nil)
+    end
+
+    it 'flushes the message queue and logs all queued messages' do
+      allow(Bolt::Logger).to receive(:configured?).and_return(false)
+      Bolt::Logger.warn("sarcasm", "May contain sarcasm")
+      Bolt::Logger.warn("caution", "Proceed with caution")
+
+      expect(Bolt::Logger.instance_variable_get(:@message_queue).size).to eq(2)
+
+      allow(Bolt::Logger).to receive(:configured?).and_return(true)
+      allow(Bolt::Logger).to receive(:logger).and_return(mock_logger)
+      expect(mock_logger).to receive(:warn).with(/May contain sarcasm/)
+      expect(mock_logger).to receive(:warn).with(/Proceed with caution/)
+      Bolt::Logger.flush_queue
+
+      expect(Bolt::Logger.instance_variable_get(:@message_queue).size).to eq(0)
+    end
+  end
+
+  describe 'message queue' do
+    it 'queues messages when not configured' do
+      allow(Bolt::Logger).to receive(:configured?).and_return(false)
+      expect(Bolt::Logger).not_to receive(:logger)
+      expect(Logging).not_to receive(:logger)
+
+      Bolt::Logger.warn("bolt_rating", "Comic mischief, Mild fantasy humor")
+      Bolt::Logger.warn_once("stroller_warning", "Remove child before folding")
+      Bolt::Logger.deprecate("deprecated_test", "This test has been deprecated")
+      Bolt::Logger.deprecate_once("another_deprecated_test", "Did I stutter?")
+      Bolt::Logger.info("A dog's noseprint is unique")
+      Bolt::Logger.debug("But have you met their siblings A, B, and C bug?")
+
+      expect(Bolt::Logger.instance_variable_get(:@message_queue)).to match_array(
+        [
+          { type: :warn, id: "bolt_rating", msg: "Comic mischief, Mild fantasy humor [ID: bolt_rating]" },
+          { type: :warn_once, id: "stroller_warning", msg: "Remove child before folding [ID: stroller_warning]" },
+          { type: :deprecate, id: "deprecated_test", msg: "This test has been deprecated [ID: deprecated_test]" },
+          { type: :deprecate_once, id: "another_deprecated_test", msg: "Did I stutter? [ID: another_deprecated_test]" },
+          { type: :info, id: nil, msg: "A dog's noseprint is unique" },
+          { type: :debug, id: nil, msg: "But have you met their siblings A, B, and C bug?" }
+        ]
+      )
     end
   end
 end

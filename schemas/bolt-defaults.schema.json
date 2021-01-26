@@ -13,6 +13,9 @@
     "concurrency": {
       "$ref": "#/definitions/concurrency"
     },
+    "disable-warnings": {
+      "$ref": "#/definitions/disable-warnings"
+    },
     "format": {
       "$ref": "#/definitions/format"
     },
@@ -64,6 +67,13 @@
       "description": "The number of threads to use when executing on remote targets.",
       "type": "integer",
       "minimum": 1
+    },
+    "disable-warnings": {
+      "description": "An array of IDs of warnings to suppress. Warnings with a matching ID will not be logged by Bolt. If you are upgrading Bolt to a new major version, you should re-enable all warnings until you have finished upgrading.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "format": {
       "description": "The format to use when printing results.",

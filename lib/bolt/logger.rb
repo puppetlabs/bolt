@@ -5,8 +5,14 @@ require 'logging'
 module Bolt
   module Logger
     LEVELS = %w[trace debug info notice warn error fatal].freeze
-    @mutex = Mutex.new
-    @warnings = Set.new
+
+    # This module is treated as a global singleton so that multiple classes
+    # in Bolt can log warnings with IDs. Access to the following variables
+    # are controlled by a mutex.
+    @mutex            = Mutex.new
+    @warnings         = Set.new
+    @disable_warnings = Set.new
+    @message_queue    = []
 
     # This method provides a single point-of-entry to setup logging for both
     # the CLI and for tests. This is necessary because we define custom log
@@ -36,7 +42,7 @@ module Bolt
       end
     end
 
-    def self.configure(destinations, color)
+    def self.configure(destinations, color, disable_warnings = nil)
       root_logger = Bolt::Logger.logger(:root)
 
       root_logger.add_appenders Logging.appenders.stderr(
@@ -73,6 +79,16 @@ module Bolt
 
         appender.level = params[:level] if params[:level]
       end
+
+      # Set the list of disabled warnings and mark the logger as configured.
+      # Log all messages in the message queue and flush the queue.
+      if disable_warnings
+        @mutex.synchronize { @disable_warnings = disable_warnings }
+      end
+    end
+
+    def self.configured?
+      Logging.logger[:root].appenders.any?
     end
 
     # A helper to ensure the Logging library is always initialized with our
@@ -123,18 +139,106 @@ module Bolt
       Logging.reset
     end
 
-    def self.warn_once(type, msg)
+    # The following methods are used in place of the Logging.logger
+    # methods of the same name when logging warning messages or logging
+    # any messages prior to the logger being configured. If the logger
+    # is not configured when any of these methods are called, the message
+    # will be added to a queue, otherwise they are logged immediately.
+    # The message queue is flushed by calling #flush_queue, which is
+    # called from Bolt::CLI after configuring the logger.
+    #
+    def self.warn(id, msg)
+      log(type: :warn, msg: "#{msg} [ID: #{id}]", id: id)
+    end
+
+    def self.warn_once(id, msg)
+      log(type: :warn_once, msg: "#{msg} [ID: #{id}]", id: id)
+    end
+
+    def self.deprecate(id, msg)
+      log(type: :deprecate, msg: "#{msg} [ID: #{id}]", id: id)
+    end
+
+    def self.deprecate_once(id, msg)
+      log(type: :deprecate_once, msg: "#{msg} [ID: #{id}]", id: id)
+    end
+
+    def self.debug(msg)
+      log(type: :debug, msg: msg)
+    end
+
+    def self.info(msg)
+      log(type: :info, msg: msg)
+    end
+
+    # Logs a message. If the logger has not been configured, this will queue
+    # the message to be logged later. Once the logger is configured, the
+    # queue will be flushed of all messages and new messages will be logged
+    # immediately.
+    #
+    # Logging with this method is controlled by a mutex, as the Bolt::Logger
+    # module is treated as a global singleton to allow multiple classes
+    # access to its methods.
+    #
+    private_class_method def self.log(type:, msg:, id: nil)
       @mutex.synchronize do
-        @logger ||= Bolt::Logger.logger(self)
-        if @warnings.add?(type)
-          @logger.warn(msg)
+        if configured?
+          log_message(type: type, msg: msg, id: id)
+        else
+          @message_queue << { type: type, msg: msg, id: id }
         end
       end
     end
 
-    def self.deprecation_warning(type, msg)
-      @analytics&.event('Warn', 'deprecation', label: type)
-      warn_once(type, msg)
+    # Logs all messages in the message queue and then flushes the queue.
+    #
+    def self.flush_queue
+      @mutex.synchronize do
+        @message_queue.each do |message|
+          log_message(message)
+        end
+
+        @message_queue.clear
+      end
+    end
+
+    # Handles the actual logging of a message.
+    #
+    private_class_method def self.log_message(type:, msg:, id: nil)
+      case type
+      when :warn
+        do_warn(msg, id)
+      when :warn_once
+        do_warn_once(msg, id)
+      when :deprecate
+        do_deprecate(msg, id)
+      when :deprecate_once
+        do_deprecate_once(msg, id)
+      else
+        logger(self).send(type, msg)
+      end
+    end
+
+    # The following methods do the actual warning.
+    #
+    private_class_method def self.do_warn(msg, id)
+      return if @disable_warnings.include?(id)
+      logger(self).warn(msg)
+    end
+
+    private_class_method def self.do_warn_once(msg, id)
+      return unless @warnings.add?(id)
+      do_warn(msg, id)
+    end
+
+    private_class_method def self.do_deprecate(msg, id)
+      @analytics&.event('Warn', 'deprecation', label: id)
+      do_warn(msg, id)
+    end
+
+    private_class_method def self.do_deprecate_once(msg, id)
+      @analytics&.event('Warn', 'deprecation', label: id)
+      do_warn_once(msg, id)
     end
   end
 end

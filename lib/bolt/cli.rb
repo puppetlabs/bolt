@@ -147,10 +147,6 @@ module Bolt
       end
 
       validate(options)
-
-      # Deprecation warnings can't be issued until after config is loaded, so
-      # store them for later.
-      @parser_deprecations = parser.deprecations
     rescue Bolt::Error => e
       fatal_error(e)
       raise e
@@ -185,17 +181,13 @@ module Bolt
 
     # Completes the setup process by configuring Bolt and log messages
     def finalize_setup
-      Bolt::Logger.configure(config.log, config.color)
+      Bolt::Logger.configure(config.log, config.color, config.disable_warnings)
       Bolt::Logger.analytics = analytics
+      Bolt::Logger.flush_queue
 
       # Logger must be configured before checking path case and project file, otherwise logs will not display
       config.check_path_case('modulepath', config.modulepath)
       config.project.check_deprecated_file
-
-      # Log messages created during parser and config initialization
-      config.logs.each { |log| @logger.send(log.keys[0], log.values[0]) }
-      @parser_deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
-      config.deprecations.each { |dep| Bolt::Logger.deprecation_warning(dep[:type], dep[:msg]) }
 
       if options[:clear_cache] && File.exist?(config.project.plugin_cache_file)
         FileUtils.rm(config.project.plugin_cache_file)
@@ -220,7 +212,7 @@ module Bolt
 
         msg = "Detected PowerShell 2 on controller. PowerShell 2 is deprecated and "\
               "support will be removed in Bolt 3.0."
-        Bolt::Logger.deprecation_warning("PowerShell 2 controller", msg)
+        Bolt::Logger.deprecate("powershell_2_controller", msg)
       end
     end
 
@@ -376,7 +368,10 @@ module Bolt
       conflicting_options = Set.new(opts.keys.map(&:to_s)).intersection(inventory_cli_opts)
 
       if inventory_source && conflicting_options.any?
-        @logger.warn("CLI arguments #{conflicting_options.to_a} may be overridden by Inventory: #{inventory_source}")
+        Bolt::Logger.warn(
+          "cli_overrides",
+          "CLI arguments #{conflicting_options.to_a} may be overridden by Inventory: #{inventory_source}"
+        )
       end
     end
 
@@ -659,7 +654,7 @@ module Bolt
         if node_param && target_param
           msg = "Plan parameters include both 'nodes' and 'targets' with type 'TargetSpec', " \
                 "neither will populated with the value for --nodes or --targets."
-          @logger.warn(msg)
+          Bolt::Logger.warn("nodes_targets_parameters", msg)
         elsif node_param
           plan_arguments['nodes'] = nodes.join(',')
         elsif target_param
@@ -704,7 +699,7 @@ module Bolt
                   "about defining and declaring classes and types in the Puppet documentation at "\
                   "https://puppet.com/docs/puppet/latest/lang_classes.html and "\
                   "https://puppet.com/docs/puppet/latest/lang_defined_types.html"
-        @logger.warn(message)
+        Bolt::Logger.warn("empty_manifest", message)
       end
 
       executor = Bolt::Executor.new(config.concurrency, analytics, noop, config.modified_concurrency)
@@ -856,7 +851,7 @@ module Bolt
       elsif modules.nil? && options[:subcommand] == 'puppetfile'
         msg = "Command '#{old_command}' is deprecated and will be removed in Bolt 3.0. Update your project to use "\
               "the module management feature. For more information, see https://pup.pt/bolt-module-migrate."
-        Bolt::Logger.deprecation_warning('puppetfile command', msg)
+        Bolt::Logger.deprecate("puppetfile_command", msg)
       elsif modules.nil? && options[:subcommand] == 'module'
         msg  = "Unable to use command '#{new_command}' when 'modules' is not configured in "\
                "bolt-project.yaml. "
@@ -961,7 +956,7 @@ module Bolt
           set the BOLT_GEM environment variable.
         MSG
 
-        @logger.warn(msg)
+        Bolt::Logger.warn("gem_install", msg)
       end
 
       # We only need to enumerate bundled content when running a task or plan

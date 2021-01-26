@@ -147,7 +147,7 @@ module Bolt
         message += " at '#{path}'" if @path.any?
         message += " at #{@location}" if @location
         message += "."
-        @warnings << message
+        @warnings << { id: 'unknown_option', msg: message }
       end
     end
 
@@ -160,7 +160,7 @@ module Bolt
         message  = "Option '#{path}' "
         message += "at #{@location} " if @location
         message += "is deprecated. #{definition[:_deprecation]}"
-        @deprecations << { option: key, message: message }
+        @deprecations << { id: "#{key}_option", msg: message }
       end
     end
 

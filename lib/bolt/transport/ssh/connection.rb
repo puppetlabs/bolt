@@ -34,7 +34,7 @@ module Bolt
             begin
               Bolt::Util.validate_file('ssh key', target.options['private-key'])
             rescue Bolt::FileError => e
-              @logger.warn(e.msg)
+              Bolt::Logger.warn("invalid_ssh_key", e.msg)
             end
           end
         end

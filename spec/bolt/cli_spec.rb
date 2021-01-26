@@ -763,7 +763,7 @@ describe "Bolt::CLI" do
 
     describe "console log level" do
       it "is not sensitive to ordering of debug and verbose" do
-        expect(Bolt::Logger).to receive(:configure).with(include('console' => { level: 'debug' }), true)
+        expect(Bolt::Logger).to receive(:configure).with(include('console' => { level: 'debug' }), true, Set.new)
 
         cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug --verbose])
         cli.parse
@@ -775,14 +775,14 @@ describe "Bolt::CLI" do
       end
 
       it "warns when using debug" do
-        expect(Bolt::Logger).to receive(:deprecation_warning)
-          .with(anything, /Command line option '--debug' is deprecated/)
         cli = Bolt::CLI.new(%w[command run uptime --targets foo --debug])
         cli.parse
+
+        expect(@log_output.readlines).to include(/Command line option '--debug' is deprecated/)
       end
 
       it "log-level sets the log option" do
-        expect(Bolt::Logger).to receive(:configure).with(include('console' => { level: 'debug' }), true)
+        expect(Bolt::Logger).to receive(:configure).with(include('console' => { level: 'debug' }), true, Set.new)
 
         cli = Bolt::CLI.new(%w[command run uptime --targets foo --log-level debug])
         cli.parse

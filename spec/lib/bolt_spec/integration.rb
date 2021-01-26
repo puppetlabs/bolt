@@ -20,6 +20,8 @@ module BoltSpec
       output =  StringIO.new
       outputter = outputter.new(false, false, false, false, output)
       allow(cli).to receive(:outputter).and_return(outputter)
+
+      # Don't allow tests to override the captured log config
       allow(Bolt::Logger).to receive(:configure)
 
       if rescue_exec

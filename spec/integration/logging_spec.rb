@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/project'
 require 'logging'
 
 describe "when logging executor activity", ssh: true do
@@ -59,7 +60,7 @@ describe "when logging executor activity", ssh: true do
       Dir.mktmpdir do |tmpdir|
         allow(Bolt::Config).to receive(:user_path).and_return(Pathname.new(File.join(tmpdir, 'bolt')))
         run_cli_json(%W[command run #{whoami}] + config_flags)
-        expect(lines).to eq(["  WARN  Bolt::Logger : native-ssh must be true to use ssh-command\n"])
+        expect(lines.count { |line| /WARN.*native-ssh must be true to use ssh-command/ =~ line }).to eq(1)
       end
     end
   end
@@ -101,5 +102,50 @@ describe "when logging executor activity", ssh: true do
     expect(lines).to include(match(/hi there/))
     expect(lines).to include(match(/Finished: task logging::echo/))
     expect(lines).to include(match(/INFO.*Finished: plan #{without_default_plan}/))
+  end
+end
+
+describe 'suppressing warnings' do
+  include BoltSpec::Integration
+  include BoltSpec::Project
+
+  let(:base_config) { { 'log' => { 'bolt-debug.log' => 'disable' } } }
+  let(:name)        { 'bolt' }
+
+  around(:each) do |example|
+    with_project(name, config: config) do |project|
+      @project = project
+      example.run
+    end
+  end
+
+  context 'with disable-warnings configured' do
+    before(:each) do
+      FileUtils.mkdir_p(@project.path + 'modules' + name)
+    end
+
+    context 'without matching ID' do
+      let(:config) { base_config.merge('disable-warnings' => ['foobar']) }
+
+      it 'does not suppress warnings' do
+        run_cli_json(%w[task show], project: @project)
+
+        expect(@log_output.readlines).to include(
+          /WARN.*The project 'bolt' shadows an existing module of the same name/
+        )
+      end
+    end
+
+    context 'with matching ID' do
+      let(:config) { base_config.merge('disable-warnings' => ['project_shadows_module']) }
+
+      it 'suppresses warnings' do
+        run_cli_json(%w[task show], project: @project)
+
+        expect(@log_output.readlines).not_to include(
+          /WARN.*The project 'bolt' shadows an existing module of the same name/
+        )
+      end
+    end
   end
 end

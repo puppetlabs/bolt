@@ -23,8 +23,7 @@ module Bolt
 
       def with_connection(target)
         if target.transport_config['ssh-command'] && !target.transport_config['native-ssh']
-          Bolt::Logger.warn_once("ssh-command and native-ssh conflict",
-                                 "native-ssh must be true to use ssh-command")
+          Bolt::Logger.warn_once("native_ssh_disabled", "native-ssh must be true to use ssh-command")
         end
 
         conn = if target.transport_config['native-ssh']

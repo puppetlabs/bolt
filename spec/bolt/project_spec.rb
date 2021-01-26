@@ -99,16 +99,25 @@ describe Bolt::Project do
           .with(project_path + 'plans').and_return(true)
 
         FileUtils.mkdir_p(project_path)
+
+        expect(Bolt::Logger).to receive(:warn).with(
+          anything,
+          /No project name is specified in bolt-project.yaml/
+        )
+
         project = Bolt::Project.create_project(project_path)
         project.validate
-
-        expect(project.logs).to include({ warn: /No project name is specified in bolt-project.yaml/ })
       end
     end
 
     it "does not warn when content directories don't exist" do
       with_project do
-        expect(project.logs).not_to include({ warn: /No project name is specified in bolt-project.yaml/ })
+        expect(Bolt::Logger).not_to receive(:warn).with(
+          anything,
+          /No project name is specified in bolt-project.yaml/
+        )
+
+        project
       end
     end
   end
@@ -219,8 +228,7 @@ describe Bolt::Project do
     it 'warns and continues if project creation fails' do
       expect(FileUtils).to receive(:mkdir_p).with('myproject').and_raise(Errno::EACCES)
       # Ensure execution continues
-      expect(Bolt::Project).to receive(:new)
-        .with(anything, 'myproject', 'user', [{ warn: /Could not create default project / }], [])
+      expect(Bolt::Project).to receive(:new).with(anything, 'myproject', 'user')
       Bolt::Project.create_project('myproject', 'user')
     end
   end

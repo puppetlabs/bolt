@@ -153,8 +153,10 @@ module Bolt
         Dir.children(path).select { |name| Puppet::Module.is_module_directory?(name, path) }
       end
       if modules.include?(project.name)
-        Bolt::Logger.warn_once("project shadows module",
-                               "The project '#{project.name}' shadows an existing module of the same name")
+        Bolt::Logger.warn_once(
+          "project_shadows_module",
+          "The project '#{project.name}' shadows an existing module of the same name"
+        )
       end
     end
 
@@ -395,7 +397,7 @@ module Bolt
         errors = []
         plans = compiler.list_plans(nil, errors).map { |plan| [plan.name] }.sort
         errors.each do |error|
-          @logger.warn(error.details['original_error'])
+          Bolt::Logger.warn("plan_load_error", error.details['original_error'])
         end
 
         filter_content ? filter_content(plans, @project&.plans) : plans
@@ -445,7 +447,10 @@ module Bolt
             params[name]['default_value'] = defaults[name] if defaults.key?(name)
             params[name]['description'] = param.text unless param.text.empty?
           else
-            @logger.warn("The documented parameter '#{name}' does not exist in plan signature")
+            Bolt::Logger.warn(
+              "missing_plan_parameter",
+              "The documented parameter '#{name}' does not exist in plan signature"
+            )
           end
         end
 

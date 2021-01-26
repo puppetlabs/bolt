@@ -31,7 +31,7 @@ module Bolt
       end
 
       def warn_missing_fact(certname, fact)
-        @logger.warn("Could not find fact #{fact} for node #{certname}")
+        Bolt::Logger.warn("puppetdb_missing_fact", "Could not find fact #{fact} for node #{certname}")
       end
 
       def fact_path(raw_fact)

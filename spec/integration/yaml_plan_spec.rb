@@ -165,16 +165,12 @@ describe "running YAML plans", ssh: true do
   # TODO: Remove when 'target' parameter is removed
   it "warns when using deprecated 'target' parameter" do
     stub_logger
-    allow(Logging).to receive(:logger).and_return(mock_logger)
     allow(Puppet::Util::Log).to receive(:newdestination).with(mock_logger)
     allow(mock_logger).to receive(:notice)
     allow(mock_logger).to receive(:info)
     allow(mock_logger).to receive(:warn)
-      .with("No project name is specified in bolt-project.yaml. Project-level content will not be available.")
-    allow(mock_logger).to receive(:warn)
-      .with("bolt-project.yaml contains valid config keys, bolt.yaml will be ignored")
 
-    expect(Bolt::Logger).to receive(:deprecation_warning).with(anything, /Use the 'targets' parameter instead./)
+    expect(Bolt::Logger).to receive(:deprecate).with(anything, /Use the 'targets' parameter instead./)
 
     run_plan('yaml::target_param', targets: target)
   end

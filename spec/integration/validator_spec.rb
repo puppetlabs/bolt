@@ -290,7 +290,7 @@ describe 'validating config' do
 
     it 'does not error or raise warnings' do
       expect { run_cli(command) }.not_to raise_error
-      expect(@log_output.readlines).not_to include(/Unknown option/)
+      expect(@log_output.readlines).not_to include(/Unknown option.*inventory/)
     end
   end
 
