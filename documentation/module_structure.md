@@ -65,12 +65,12 @@ After you've published the module to the Forge, you can add it to a Bolt project
 using the Bolt command line. For more information, see [Installing
 modules](./bolt_installing_modules.md).
 
-Follow these tips for managing standalone modules:
+Follow these tips and best practices for managing standalone modules:
 -   If you're testing a standalone module inside a project, add `modules/*` to
     the project's `.gitignore` file to prevent accidentally committing the
     module.
--   As a best practice, write automated tests for the tasks and plans in your
-    module, if possible. For information about automated testing patterns, check
+-   Wherever possible, write automated tests for the tasks and plans in your
+    module. For information about automated testing patterns, check
     out these resources: [Example of unit testing plans and integration
     \(acceptance\) testing
     tasks](https://github.com/puppetlabs/puppetlabs-facts) (GitHub) and [Writing
