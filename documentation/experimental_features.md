@@ -325,7 +325,7 @@ ensure that a file is present on each target:
 ```ruby
 $resource = {
   'type'  => File,
-  'title' => '/etc/puppetlabs/bolt.yaml',
+  'title' => '/etc/puppetlabs/bolt/bolt-defaults.yaml',
   'desired_state' => {
     'ensure'  => 'present',
     'content' => "..."
@@ -399,21 +399,24 @@ specified instead of using `net-ssh`. Essentially, using the native SSH
 transport is the same as running SSH on your command line, but with Bolt
 managing the connections.
 
-To use the native SSH transport, set `ssh-command: <SSH>` in
-[bolt.yaml](configuring_bolt.md), where `<SSH>` is the SSH command to run. For
-example:
+To use the native SSH transport, under the `config` option in your inventory
+file, set `native-ssh: true` and `ssh-command: <SSH COMMAND>`, where
+`<SSH COMMAND>` is your native SSH executable.
 
-```
+For example:
+
+```yaml
 ssh:
-  ssh-command: 'ssh'
+  native-ssh: true
+  ssh-command: 'ssh' 
 ```
 
 The value of `ssh-command` can be either a string or an array, and you can
-provide any command-line options to the command. Bolt will append
+provide any command-line options to the command. Bolt appends
 Bolt-configuration settings to the command, as well as the specified target,
 when connecting. Not all Bolt configuration options are supported using the
 native SSH transport, but you can configure most options in your OpenSSH Config.
-See [bolt configuration reference](bolt_configuration_reference.md) for the list
+See [Transport configuration options](bolt_transports_reference.md#ssh) for a list
 of supported Bolt SSH options.
 
 Bolt transports have two main functions: executing remotely, and copying files

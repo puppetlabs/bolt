@@ -24,7 +24,7 @@ file:
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
-| `config` | The configuration for the `all` group. Optional. For more information see [Bolt configuration options](bolt_configuration_reference.md).  | `Hash` |
+| `config` | The configuration for the `all` group. Optional. For more information see [Configuring Bolt](configuring_bolt.md#inventoryyaml).  | `Hash` |
 | `facts` | The facts for the `all` group. Optional. | `Hash` |
 | `features` | The features for the `all` group. Optional. | `Array[String]`
 | `groups` | A list of targets and groups and their associated configuration. Optional. | `Array[Group]` |
@@ -38,7 +38,7 @@ configuration. Each group is a map that can contain any of the following fields:
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
-| `config` | The configuration for the group. Optional. For more information see [Bolt configuration options](bolt_configuration_reference.md). | `Hash` |
+| `config` | The configuration for the group. Optional. For more information see [Configuring Bolt](configuring_bolt.md#inventoryyaml). | `Hash` |
 | `facts` | The facts for the group. Optional. | `Hash` |
 | `features` | The features for the group. Optional. | `Array[String]`
 | `groups` | A list of groups and their associated configuration. Optional. | `Array[Group]` |
@@ -451,5 +451,4 @@ plugins:
 
 📖 **Related information**
 
-- For more information on configuration options, see [Bolt configuration
-  options](bolt_configuration_reference.md).
+- For more information on configuration options, see [Configuring Bolt](configuring_bolt.md).
