@@ -34,7 +34,7 @@ _bolt() {
 
 	case $prev in
 	*bolt)
-		next="command file task plan project group inventory puppetfile secret script apply"
+		next="command file task plan project group inventory secret script apply"
 		;;
 	command | script)
 		next="run"
@@ -58,8 +58,8 @@ _bolt() {
 		next="-m --modulepath --plugin ${project_config_opts}"
 		[[ $prev == "createkeys" ]] && next="${next} --force"
 		;;
-	puppetfile)
-		next="install show-modules generate-types"
+	module)
+		next="install show generate-types"
 		;;
 	install)
 		next="--log-level -m --modulepath ${project_config_opts}"

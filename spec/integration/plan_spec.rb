@@ -95,26 +95,14 @@ describe 'plans' do
         end
       end
 
-      shared_examples 'registered types' do
+      context 'with module subcommand' do
+        let(:project_config) { { 'modules' => [] } }
+
         it 'runs registers types defined in $project/.resource_types', ssh: true do
-          run_cli(%W[#{subcommand} generate-types] + config_flags)
+          run_cli(%w[module generate-types] + config_flags)
           result = run_cli_json(%w[plan run resource_types -t nix_agents] + config_flags)
           expect(result).to eq('built-in' => 'success', 'core' => 'success', 'custom' => 'success')
         end
-      end
-
-      context 'with puppetfile subcommand' do
-        let(:project_config) { {} }
-        let(:subcommand)     { 'puppetfile' }
-
-        include_examples 'registered types'
-      end
-
-      context 'with module subcommand' do
-        let(:project_config) { { 'modules' => [] } }
-        let(:subcommand)     { 'module' }
-
-        include_examples 'registered types'
       end
 
       it 'caches plan info when generating types', ssh: true do

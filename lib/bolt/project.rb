@@ -185,7 +185,8 @@ module Bolt
     end
 
     def modules
-      @modules ||= @data['modules']&.map do |mod|
+      mod_data = @data['modules'] || []
+      @modules ||= mod_data.map do |mod|
         if mod.is_a?(String)
           { 'name' => mod }
         else

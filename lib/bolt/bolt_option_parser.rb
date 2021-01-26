@@ -114,21 +114,6 @@ module Bolt
           { flags: OPTIONS[:global],
             banner: PROJECT_HELP }
         end
-      when 'puppetfile'
-        case action
-        when 'install'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: PUPPETFILE_INSTALL_HELP }
-        when 'show-modules'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: PUPPETFILE_SHOWMODULES_HELP }
-        when 'generate-types'
-          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters],
-            banner: PUPPETFILE_GENERATETYPES_HELP }
-        else
-          { flags: OPTIONS[:global],
-            banner: PUPPETFILE_HELP }
-        end
       when 'script'
         case action
         when 'run'
@@ -192,7 +177,6 @@ module Bolt
           module            Manage Bolt project modules
           plan              Convert, create, show, and run Bolt plans
           project           Create and migrate Bolt projects
-          puppetfile        Install and list modules and generate type references
           script            Upload a local script and run it remotely
           secret            Create encryption keys and encrypt and decrypt values
           task              Show and run Bolt tasks
@@ -574,55 +558,6 @@ module Bolt
 
       DESCRIPTION
           Migrate a Bolt project to use current best practices and the latest version of configuration files.
-    HELP
-
-    PUPPETFILE_HELP = <<~HELP
-      NAME
-          puppetfile
-
-      USAGE
-          bolt puppetfile <action> [options]
-
-      DESCRIPTION
-          Install and list modules and generate type references
-
-      ACTIONS
-          generate-types        Generate type references to register in plans
-          install               Install modules from a Puppetfile into a project
-          show-modules          List modules available to the Bolt project
-    HELP
-
-    PUPPETFILE_GENERATETYPES_HELP = <<~HELP
-      NAME
-          generate-types
-
-      USAGE
-          bolt puppetfile generate-types [options]
-
-      DESCRIPTION
-          Generate type references to register in plans.
-    HELP
-
-    PUPPETFILE_INSTALL_HELP = <<~HELP
-      NAME
-          install
-
-      USAGE
-          bolt puppetfile install [options]
-
-      DESCRIPTION
-          Install modules from a Puppetfile into a project
-    HELP
-
-    PUPPETFILE_SHOWMODULES_HELP = <<~HELP
-      NAME
-          show-modules
-
-      USAGE
-          bolt puppetfile show-modules [options]
-
-      DESCRIPTION
-          List modules available to the Bolt project.
     HELP
 
     SCRIPT_HELP = <<~HELP
