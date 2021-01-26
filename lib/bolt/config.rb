@@ -449,7 +449,7 @@ module Bolt
     def modulepath
       path = @data['modulepath'] || @project.modulepath
 
-      if @project.modules
+      if @project.modules.any?
         path + [@project.managed_moduledir.to_s]
       else
         path
