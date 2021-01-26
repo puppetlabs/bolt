@@ -56,6 +56,14 @@ describe Bolt::ModuleInstaller::Specs::ForgeSpec do
         /Invalid version requirement for Forge module specification/
       )
     end
+
+    it 'errors with non-Boolean resolve value' do
+      init_hash['resolve'] = 'no'
+      expect { spec }.to raise_error(
+        Bolt::ValidationError,
+        /Option 'resolve'.*must be a Boolean/
+      )
+    end
   end
 
   context '#implements?' do

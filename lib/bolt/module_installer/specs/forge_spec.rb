@@ -13,14 +13,20 @@ module Bolt
       class ForgeSpec
         NAME_REGEX    = %r{\A[a-zA-Z0-9]+[-/](?<name>[a-z][a-z0-9_]*)\z}.freeze
         REQUIRED_KEYS = Set.new(%w[name]).freeze
-        KNOWN_KEYS    = Set.new(%w[name version_requirement]).freeze
+        KNOWN_KEYS    = Set.new(%w[name resolve version_requirement]).freeze
 
-        attr_reader :full_name, :name, :semantic_version, :type
+        attr_reader :full_name, :name, :resolve, :semantic_version, :type, :version_requirement
 
         def initialize(init_hash)
+          @resolve                                = init_hash.key?('resolve') ? init_hash['resolve'] : true
           @full_name, @name                       = parse_name(init_hash['name'])
           @version_requirement, @semantic_version = parse_version_requirement(init_hash['version_requirement'])
           @type                                   = :forge
+
+          unless @resolve == true || @resolve == false
+            raise Bolt::ValidationError,
+                  "Option 'resolve' for module spec #{@full_name} must be a Boolean"
+          end
         end
 
         def self.implements?(hash)
