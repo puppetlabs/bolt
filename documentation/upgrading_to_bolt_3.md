@@ -1,10 +1,11 @@
 # Upgrading to Bolt 3.0
 
-It's almost time for Bolt 3.0! This page contains a list of things you can do to prepare for the
-upcoming release. We'll add to this page as we near the release and implement more of the expected
-changes and deprecations, so if you're making the changes ahead of time, be sure to check in every
-couple weeks to see if we've added anything else to the instructions below. For an exhaustive list
-of the things we're changing, see [Changes coming in Bolt 3.0](developer_updates.md#changes-coming-in-bolt-30).
+Welcome to Bolt 3.0! This page contains a list of the most important things you
+need to know if you've just upgraded.
+
+For an exhaustive list of the things we've changed, see: 
+- [Changes coming in Bolt 3.0](developer_updates.md#changes-coming-in-bolt-30).
+- [Bolt 3.0 Changelog](TODO:insert-link-here)
 
 ## Migrating configuration files
 

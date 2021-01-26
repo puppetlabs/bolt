@@ -102,7 +102,7 @@ $ bolt plan show
 myproject::myplan
 
 MODULEPATH:
-/PATH/TO/BOLT_PROJECT/site
+/PATH/TO/BOLT_PROJECT/.modules
 
 Use `bolt plan show <plan-name>` to view details and parameters for a specific plan.
 ```
@@ -151,7 +151,6 @@ The following are common files and directories found in a Bolt project.
 |`hiera.yaml`|Contains the Hiera config to use for target-specific data when using `apply`.|
 |`data/`|The standard path to store static Hiera data files.|
 |`bolt-debug.log`|Contains debug log output for the most recent Bolt command.|
-|[`bolt.yaml`](bolt_configuration_reference.md)|Contains configuration options for Bolt. ⛔ **`bolt.yaml` is deprecated; use `bolt-project.yaml` instead.**|
 | `.modules/` |The directory where Bolt installs modules. Avoid committing this directory to source control.| 
 
 > **Remember:** A directory must have a `bolt-project.yaml` file before Bolt
