@@ -77,7 +77,7 @@ If you can connect to the host over SSH outside Bolt, you can store the SSH host
 key fingerprint with `ssh-keyscan hostname.example.com >> ~/.ssh/known_hosts`.
 
 You can disable this check entirely with `--no-host-key-check` on the CLI or the
-`host-key-check: false` option under the `config: ssh` section of [inventory.yaml](inventory_file_v2.md).
+`host-key-check: false` option under the `config: ssh` section of [inventory.yaml](inventory_files.md).
 Note that doing so will reduce the security of your SSH connection.
 
 ```yaml

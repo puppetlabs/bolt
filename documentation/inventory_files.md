@@ -7,10 +7,13 @@ instead of having to reference each target individually.
 An inventory file is part of a Bolt project and must exist alongside a
 `bolt-project.yaml` file. For more information, see [Bolt projects](projects.md).
 
-> **Note**: Version 1 inventory files are deprecated. If you're using version 1
-> inventory files, make sure to migrate them to version 2. For more information
-> on migrating to version 2, see [Migrating your inventory files to version
-> 2](./migrating_inventory_files.md).
+## Inventory file versioning
+
+This page documents version 2 inventory files. Version 1 inventory files are
+deprecated and lack features like plugins. If you're using Bolt 2.0 or later,
+use version 2 inventory files. If you need to migrate your inventory files from
+version 1, you can use the `migrate` command documented at [Migrate a Bolt
+project](projects.md#migrate-a-bolt-project).
 
 ## Inventory file structure
 
@@ -19,8 +22,7 @@ An inventory file is part of a Bolt project and must exist alongside a
 The top level of an inventory file acts as the implicit `all` group and has
 similar fields as a `groups` object.
 
-The following fields are available at the top level of a version 2 inventory
-file:
+The following fields are available at the top level of an inventory file:
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
@@ -256,8 +258,6 @@ Use plugins to dynamically load information into the inventory file. Plugins
 either ship with Bolt, or are installed as Puppet modules that have the same
 name as the plugin. The plugin framework is based on a set of plugin hooks that
 are implemented by plugin authors and called by Bolt.
-
-> **Note:** Plugins are only available in version 2 inventory files.
 
 📖 **Related information**
 

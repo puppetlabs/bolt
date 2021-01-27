@@ -109,7 +109,7 @@ Bolt compiles the code in your manifest block into a catalog. Bolt compiles code
 in the following order:
 
 - Facts gathered from the targets or set in your inventory.
-- [`vars`](inventory_file_v2.md#title-1541705359297) set in your inventory.
+- [`vars`](inventory_files.md) set in your inventory.
 
 Like the code compiled with the `puppet apply` command, all of the variables are
 generated. As a result, you can reuse code between Bolt and Puppet. Bolt then
@@ -198,7 +198,7 @@ in the following order:
 
 - Facts gathered from the targets or set in your inventory.
 - Local variables from the plan.
-- [`vars`](inventory_file_v2.md#title-1541705359297) set in your inventory.
+- [`vars`](inventory_files.md) set in your inventory.
 
 Like the code compiled with the `puppet apply` command, all the variables are
 generated. As a result, you can reuse code between Bolt and Puppet. Bolt then
