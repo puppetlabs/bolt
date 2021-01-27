@@ -335,7 +335,7 @@ module Bolt
         )
       end
 
-      if @project.modules && @data['modulepath']&.include?(@project.managed_moduledir.to_s)
+      if @data['modulepath']&.include?(@project.managed_moduledir.to_s)
         raise Bolt::ValidationError,
               "Found invalid path in modulepath: #{@project.managed_moduledir}. This path "\
               "is automatically appended to the modulepath and cannot be configured."
@@ -372,17 +372,11 @@ module Bolt
     end
 
     def modulepath
-      path = @data['modulepath'] || @project.modulepath
-
-      if @project.modules.any?
-        path + [@project.managed_moduledir.to_s]
-      else
-        path
-      end
+      (@data['modulepath'] || @project.modulepath) + [@project.managed_moduledir.to_s]
     end
 
     def modulepath=(value)
-      @data['modulepath'] = value
+      @data['modulepath'] = Array(value)
     end
 
     def plugin_cache

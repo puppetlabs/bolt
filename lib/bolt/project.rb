@@ -114,6 +114,7 @@ module Bolt
       @backup_dir        = @path + '.bolt-bak'
       @plugin_cache_file = @path + '.plugin_cache.json'
       @plan_cache_file   = @path + '.plan_cache.json'
+      @modulepath        = [(@path + 'modules').to_s]
 
       if (tc = Bolt::Config::INVENTORY_OPTIONS.keys & data.keys).any?
         Bolt::Logger.warn(
@@ -123,14 +124,6 @@ module Bolt
       end
 
       @data = data.slice(*Bolt::Config::PROJECT_OPTIONS)
-
-      # If the 'modules' key is present in the project configuration file,
-      # use the new, shorter modulepath.
-      @modulepath = if @data.key?('modules')
-                      [(@path + 'modules').to_s]
-                    else
-                      [(@path + 'modules').to_s, (@path + 'site-modules').to_s, (@path + 'site').to_s]
-                    end
 
       validate if project_file?
     end
