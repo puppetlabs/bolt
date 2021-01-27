@@ -30,10 +30,6 @@ module Bolt
         @module = mod
         @config = config
         @context = context
-
-        if @module.name == 'pkcs7'
-          @config = handle_deprecated_pkcs7_keys(@config)
-        end
       end
 
       # This method interacts with the module on disk so it's separate from initialize
@@ -160,10 +156,6 @@ module Bolt
         # out now.
         meta, params = opts.partition { |key, _val| key.start_with?('_') }.map(&:to_h)
 
-        if task.module_name == 'pkcs7'
-          params = handle_deprecated_pkcs7_keys(params)
-        end
-
         # Reject parameters from config that are not accepted by the task and
         # merge in parameter defaults
         params = if task.parameters
@@ -179,21 +171,6 @@ module Bolt
         meta['_boltdir'] = @context.boltdir.to_s
 
         [params, meta]
-      end
-
-      # Raises a deprecation warning if the pkcs7 plugin is using deprecated keys and
-      # modifies the keys so they are the correct format
-      def handle_deprecated_pkcs7_keys(params)
-        if params.key?('private-key') || params.key?('public-key')
-          message = "pkcs7 keys 'private-key' and 'public-key' have been deprecated and will be "\
-                    "removed in a future version of Bolt; use 'private_key' and 'public_key' instead."
-          Bolt::Logger.deprecate("pkcs7_params", message)
-        end
-
-        params['private_key'] = params.delete('private-key') if params.key?('private-key')
-        params['public_key'] = params.delete('public-key') if params.key?('public-key')
-
-        params
       end
 
       def extract_task_parameter_schema
