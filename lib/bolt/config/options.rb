@@ -214,7 +214,7 @@ module Bolt
           },
           _plugin: false,
           _example: ["~/.puppetlabs/bolt/modules", "~/.puppetlabs/bolt/site-modules"],
-          _default: ["project/modules", "project/site-modules", "project/site"]
+          _default: ["project/modules"]
         },
         "module-install" => {
           description: "Options that configure where Bolt downloads modules from. This option is only used when "\

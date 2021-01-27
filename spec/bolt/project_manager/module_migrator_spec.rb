@@ -45,17 +45,15 @@ describe Bolt::ProjectManager::ModuleMigrator do
     allow(outputter).to receive(:stop_spin)
   end
 
-  context 'with modules configured' do
-    let(:project_config) { { 'modules' => [] } }
-
+  context 'with a managed moduledir' do
     it 'does not migrate' do
+      FileUtils.mkdir(@tmpdir + '.modules')
       expect(migrate).to be(true)
-      expect(File.exist?(project.managed_moduledir)).to be(false)
     end
   end
 
   context 'with a non-default modulepath' do
-    let(:modulepath) { [(@tmpdir + 'modules').to_s] }
+    let(:modulepath) { [(@tmpdir + 'mymodules').to_s] }
 
     it 'does not migrate' do
       migrate

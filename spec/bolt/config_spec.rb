@@ -41,13 +41,13 @@ describe Bolt::Config do
     it "treats relative modulepath as relative to project" do
       module_dirs = %w[site modules]
       config = Bolt::Config.new(project, 'modulepath' => module_dirs.join(File::PATH_SEPARATOR))
-      expect(config.modulepath).to eq(module_dirs.map { |dir| (project.path + dir).to_s })
+      expect(config.modulepath).to include(*module_dirs.map { |dir| (project.path + dir).to_s })
     end
 
     it "accepts an array for modulepath" do
       module_dirs = %w[site modules]
       config = Bolt::Config.new(project, 'modulepath' => module_dirs)
-      expect(config.modulepath).to eq(module_dirs.map { |dir| (project.path + dir).to_s })
+      expect(config.modulepath).to include(*module_dirs.map { |dir| (project.path + dir).to_s })
     end
 
     it 'modifies concurrency if ulimit is low', :ssh do
