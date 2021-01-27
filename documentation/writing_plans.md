@@ -210,14 +210,14 @@ compiles Puppet catalogs in a per-target context, and has unfettered access to H
 use the same Hiera config and data you would for Puppet, and look up data as you would expect
 inside apply blocks. Outside apply blocks, Bolt is essentially executing a script. It doesn't have a
 concept of a target or context, and thus cannot load per-target data. This breaks common Hiera
-features like interpolations.
+features like interpolating target facts.
 
 To look up static data outside of apply blocks, you can add a `plan_hierarchy` key to your Hiera
 configuration. The `plan_hierarchy` key is specified at the same level as the `hierarchy` key and is
 used whenever you look up data outside an apply block. By specifying both keys in the same Hiera
 configuration, you can look up data inside and outside apply blocks in the same plan. This allows
 you to use your existing Hiera configuration in Bolt plans without encountering an error if
-interpolations exist and your plan tries to look up data outside an apply block.
+per-target interpolations exist and your plan tries to look up data outside an apply block.
 
 Using static Hiera data is particularly useful for user-specific data that you want the plan to look
 up using Hiera (for example, to take advantage of Hiera eyaml). For example, with this Hiera
@@ -267,6 +267,69 @@ plan plan_lookup(
   }
 }
 ```
+
+### Using interpolations in the `plan_hierarchy` hierarchy
+
+Interpolations are not well supported in the `plan_hierarchy` hierarchy. Bolt runs Puppet plans in a
+custom, temporary Puppet environment, and does not run the plans in the context of a particular
+target. Target level data such as facts are not available to lookups outside of apply blocks, so
+the normal hierarchy interpolation does not work. The `lookup()` function only interpolates based on
+the variables currently in scope.
+
+The following example demonstrates interpolating the `$application` variable into a `plan_hierarchy`
+hierarchy:
+
+Using this `hiera.yaml`:
+```yaml
+version: 5
+
+plan_hierarchy:
+  - name: Application Data
+    path: %{application}.yaml
+```
+
+With this data at `<PROJECT DIRECTORY>/data/kittycats.yaml`:
+```
+site_path: /var/www/kittycats.tld/public_html
+```
+
+And this data at `<PROJECT DIRECTORY/data/doggos.yaml`:
+```
+site_path: /var/www/doggos.tld/public_html
+```
+
+Bolt looks up the site path and passes the value to a task to deploy the site.
+```
+plan plan_lookup(
+  TargetSpec $targets,
+  String $application = 'doggos'
+) {
+  $site_path = lookup('site_path')
+  run_task("deploy_site", $targets, 'path' => $site_path)
+}
+```
+
+Note that if you tried to call `lookup('site_path')` from a subplan of `plan_lookup`, like so:
+```
+plan plan_lookup(
+  TargetSpec $targets,
+  String $application = 'doggos'
+) {
+  $site_path = lookup('site_path')
+  run_task("deploy_site", $targets, 'path' => $site_path)
+}
+```
+
+```
+plan other_plan(
+  TargetSpec $targets
+) {
+  lookup('site_path')
+  ...
+}
+```
+
+This would error, because `$application` is not in scope in `other_plan`.
 
 ## Returning results from plans
 
