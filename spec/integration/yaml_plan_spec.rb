@@ -162,24 +162,6 @@ describe "running YAML plans", ssh: true do
     expect(result).to eq([24, 36, 60, "60"])
   end
 
-  # TODO: Remove when 'target' parameter is removed
-  it "warns when using deprecated 'target' parameter" do
-    stub_logger
-    allow(Puppet::Util::Log).to receive(:newdestination).with(mock_logger)
-    allow(mock_logger).to receive(:info)
-    allow(mock_logger).to receive(:warn)
-
-    expect(Bolt::Logger).to receive(:deprecate).with(anything, /Use the 'targets' parameter instead./)
-
-    run_plan('yaml::target_param', targets: target)
-  end
-
-  # TODO: Remove when 'target' parameter is removed
-  it "prefers 'targets' parameter over 'target'" do
-    result = run_plan('yaml::target_preference', targets: target)
-    expect(result.first['target']).to eq(target)
-  end
-
   context 'evaluating Puppet code' do
     it 'includes file and line number for errors in bare strings' do
       result = run_plan('yaml::eval_error_bare_string')
