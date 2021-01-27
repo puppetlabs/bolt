@@ -1,37 +1,72 @@
 # Changelog
 
-## Bolt 2.43.0 (2021-01-19)
+## Bolt 2.44.0 (2021-01-27)
 
 ### New features
 
 * **Hide private plans from `bolt plan show` and `Get-BoltPlan`**
   ([#1549](https://github.com/puppetlabs/bolt/issues/1549))
 
-  Users can now set the top-level `private` key in YAML plans, or the
-  `@private` Puppet string, to mark a plan as private.
+  Users can now set the top-level `private` key in YAML plans, or the `@private`
+  Puppet string, to mark a plan as private.
 
-* **Add read-timeout configuration option for PCP transport**
+* **Add `read-timeout` configuration option for PCP transport**
   ([#2518](https://github.com/puppetlabs/bolt/issues/2518))
 
   Users can now configure a `read-timeout` for HTTP requests to the
-  Orchestrator, which defines how long to wait for a response before
-  raising a Timeout error.
+  Orchestrator, which defines how long to wait for a response before raising a
+  Timeout error.
 
 * **Support additional Puppet settings in `apply-settings`**
   ([#2516](https://github.com/puppetlabs/bolt/issues/2516))
 
   The `log_level`, `trace`, and `evaltrace` Puppet settings can now be
-  configured under the `apply-settings` configuration option. These
-  settings will be applied when executing an apply block.
+  configured under the `apply-settings` configuration option. These settings
+  will be applied when executing an apply block.
 
-* **Updated bundled modules to latest version**
-  ([#2566](https://github.com/puppetlabs/bolt/pull/2566))
+* **Add `resolve` key for Forge and git module specifications**
+  ([#2522](https://github.com/puppetlabs/bolt/issues/2522))
 
-  The following bundled modules have been updated to their latest
-  versions:
+  Forge and git module specifications in `bolt-project.yaml` now support a
+  `resolve` key. When setting `resolve: false`, Bolt will skip dependency
+  resolution for the module, allowing users to include modules with broken
+  metadata or modules hosted in a repository other than a public GitHub
+  repository in their project configuration.
 
-  - [puppet_agent 4.4.0](https://forge.puppet.com/puppetlabs/puppet_agent/4.4.0)
-  - [reboot 3.2.0](https://forge.puppet.com/puppetlabs/reboot/3.2.0)
+* **Bolt modules usable with Puppet 7**
+
+  Modules owned by the Bolt team now have a maximum Puppet version of 8, so are
+  usable with Puppet 7 on the Bolt controller.
+
+* **Suppress warnings with `disable-warnings` config option**
+  ([#2542](https://github.com/puppetlabs/bolt/issues/2542))
+
+  The `disable-warnings` configuration option accepts an array of warning IDs
+  that are used to suppress warnings in both the CLI and log files. This
+  configuration option is supported in both `bolt-project.yaml` and
+  `bolt-defaults.yaml`.
+
+### Bug fixes
+
+* **Only spin while executing `run_*` plan functions**
+  ([#2511](https://github.com/puppetlabs/bolt/issues/2511))
+
+  Bolt will now only print the spinner while executing `run_*`, `file_upload`,
+  `file_download`, and`wait_until_available` plan functions. It also now spins
+  while running those functions equivalent commandline commands. This prevents
+  the spinner from spinning while prompting for output from a plan.
+
+* **Correctly shadow fact/variable collisions in apply blocks**
+  ([#2111](https://github.com/puppetlabs/bolt/issues/2111))
+
+  Bolt now correctly shadows target and plan variables that collide with facts
+  of the same name when running apply blocks.
+
+* **Don't continue executing parallel block when prompting**
+  ([#2543](https://github.com/puppetlabs/bolt/issues/2543))
+
+  Bolt will now pause printing messages from parallel blocks when prompting the
+  user for input, to avoid confusing printing to the screen.
 
 ## Bolt 2.42.0 (2021-01-11)
 
