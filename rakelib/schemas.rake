@@ -9,72 +9,19 @@ namespace :schemas do
   task all: %i[
     project
     defaults
-    config
     inventory
   ]
-
-  desc 'Generate bolt.yaml JSON schema'
-  task :config do
-    require 'bolt/config'
-
-    filepath          = File.expand_path('../schemas/bolt-config.schema.json', __dir__)
-    options           = Bolt::Config::Options::BOLT_OPTIONS.dup
-    inventory_options = Bolt::Config::Options::INVENTORY_OPTIONS
-    transport_options = Bolt::Config::Transport::Options::TRANSPORT_OPTIONS
-    transports        = Bolt::Config::TRANSPORT_CONFIG
-    definitions       = Bolt::Config::Options::OPTIONS.slice(*options)
-
-    properties = options.concat(inventory_options.keys).each_with_object({}) do |option, acc|
-      acc[option] = { "$ref" => "#/definitions/#{option}" }
-    end
-
-    # Add transport definitions to the definitions hash
-    definitions = definitions.merge(inventory_options)
-
-    # Add transport option definition references to each transport definition
-    transports.each do |option, transport|
-      definitions[option][:properties] = transport.options.each_with_object({}) do |opt, acc|
-        acc[opt] = { "$ref" => "#/transport_definitions/#{opt}" }
-      end
-    end
-
-    definitions = definitions.transform_values do |data|
-      to_schema(data)
-    end
-
-    transport_definitions = transport_options.transform_values do |data|
-      to_schema(data)
-    end
-
-    definitions = definitions.merge(Bolt::Config::Options::PLUGIN)
-
-    schema = {
-      "$schema"               => "http://json-schema.org/draft-07/schema#",
-      "title"                 => "Bolt Configuration",
-      "description"           => "Bolt Configuration bolt.yaml Schema",
-      "type"                  => "object",
-      "properties"            => properties,
-      "definitions"           => definitions,
-      "transport_definitions" => transport_definitions
-    }
-
-    json = JSON.pretty_generate(schema)
-
-    File.write(filepath, json)
-
-    $stdout.puts "Generated bolt.yaml schema at:\n\t#{filepath}"
-  end
 
   desc 'Generate bolt-defaults.yaml JSON schema'
   task :defaults do
     require 'bolt/config'
 
     filepath          = File.expand_path('../schemas/bolt-defaults.schema.json', __dir__)
-    options           = Bolt::Config::Options::BOLT_DEFAULTS_OPTIONS
-    inventory_options = Bolt::Config::Options::INVENTORY_OPTIONS
+    options           = Bolt::Config::DEFAULTS_OPTIONS
+    inventory_options = Bolt::Config::INVENTORY_OPTIONS
     transport_options = Bolt::Config::Transport::Options::TRANSPORT_OPTIONS
     transports        = Bolt::Config::TRANSPORT_CONFIG
-    definitions       = Bolt::Config::Options::OPTIONS.slice(*options)
+    definitions       = Bolt::Config::OPTIONS.slice(*options)
 
     properties = options.each_with_object({}) do |option, acc|
       acc[option] = { "$ref" => "#/definitions/#{option}" }
@@ -153,8 +100,8 @@ namespace :schemas do
     require 'bolt/config'
 
     filepath    = File.expand_path('../schemas/bolt-project.schema.json', __dir__)
-    options     = Bolt::Config::BOLT_PROJECT_OPTIONS
-    definitions = Bolt::Config::Options::OPTIONS.slice(*options)
+    options     = Bolt::Config::PROJECT_OPTIONS
+    definitions = Bolt::Config::OPTIONS.slice(*options)
 
     properties = options.each_with_object({}) do |option, acc|
       acc[option] = { "$ref" => "#/definitions/#{option}" }
