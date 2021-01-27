@@ -220,24 +220,17 @@ Use one of the supported *nix installation methods to install Bolt.
 
 ### Install Bolt on Debian or Ubuntu
 
-Packaged versions of Bolt are available for Debian 8-10 and Ubuntu 16.04 and
+Packaged versions of Bolt are available for Debian 9-10 and Ubuntu 16.04 and
 18.04.
 
 The Puppet Tools repository for the APT package management system is
 [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the
 convention `puppet-tools-release-<VERSION CODE NAME>.deb`. For example, the
-release package for Puppet Tools on Debian 8 “Jessie” is
-`puppet-tools-release-jessie.deb`.
+release package for Puppet Tools on Debian 9 “Stretch” is
+`puppet-tools-release-stretch.deb`.
 
 1.  Download and install the software and its dependencies. Use the commands
     appropriate to your system:
-    -   Debian 8
-        ```shell script
-        wget https://apt.puppet.com/puppet-tools-release-jessie.deb
-        sudo dpkg -i puppet-tools-release-jessie.deb
-        sudo apt-get update 
-        sudo apt-get install puppet-bolt
-        ```
     -   Debian 9
         ```shell script
         wget https://apt.puppet.com/puppet-tools-release-stretch.deb
