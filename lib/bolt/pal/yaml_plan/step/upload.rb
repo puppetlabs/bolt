@@ -6,7 +6,7 @@ module Bolt
       class Step
         class Upload < Step
           def self.allowed_keys
-            super + Set['source', 'destination', 'upload']
+            super + Set['destination', 'upload']
           end
 
           def self.required_keys
@@ -15,7 +15,7 @@ module Bolt
 
           def initialize(step_body)
             super
-            @source = step_body['upload'] || step_body['source']
+            @source = step_body['upload']
             @destination = step_body['destination']
           end
 

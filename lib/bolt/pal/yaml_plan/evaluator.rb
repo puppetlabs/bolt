@@ -24,7 +24,7 @@ module Bolt
 
         def task_step(scope, step)
           task = step['task']
-          targets = step['targets'] || step['target']
+          targets = step['targets']
           description = step['description']
           params = step['parameters'] || {}
 
@@ -48,7 +48,7 @@ module Bolt
 
         def script_step(scope, step)
           script = step['script']
-          targets = step['targets'] || step['target']
+          targets = step['targets']
           description = step['description']
           arguments = step['arguments'] || []
 
@@ -64,7 +64,7 @@ module Bolt
 
         def command_step(scope, step)
           command = step['command']
-          targets = step['targets'] || step['target']
+          targets = step['targets']
           description = step['description']
 
           args = [command, targets]
@@ -73,9 +73,9 @@ module Bolt
         end
 
         def upload_step(scope, step)
-          source = step['upload'] || step['source']
+          source = step['upload']
           destination = step['destination']
-          targets = step['targets'] || step['target']
+          targets = step['targets']
           description = step['description']
 
           args = [source, destination, targets]
@@ -86,7 +86,7 @@ module Bolt
         def download_step(scope, step)
           source = step['download']
           destination = step['destination']
-          targets = step['targets'] || step['target']
+          targets = step['targets']
           description = step['description']
 
           args = [source, destination, targets]
@@ -99,7 +99,7 @@ module Bolt
         end
 
         def resources_step(scope, step)
-          targets = step['targets'] || step['target']
+          targets = step['targets']
 
           # TODO: Only call apply_prep when needed
           scope.call_function('apply_prep', targets)
@@ -154,18 +154,6 @@ module Bolt
         # This is the method that Puppet calls to evaluate the plan. The name
         # makes more sense for .pp plans.
         def evaluate_block_with_bindings(closure_scope, args_hash, plan)
-          if plan.steps.any? { |step| step.body.key?('target') }
-            msg = "The 'target' parameter for YAML plan steps is deprecated and will be removed "\
-                  "in a future version of Bolt. Use the 'targets' parameter instead."
-            Bolt::Logger.deprecate("yaml_plan_target", msg)
-          end
-
-          if plan.steps.any? { |step| step.body.key?('source') }
-            msg = "The 'source' parameter for YAML plan upload steps is deprecated and will be removed "\
-                  "in a future version of Bolt. Use the 'upload' parameter instead."
-            Bolt::Logger.deprecate("yaml_plan_source", msg)
-          end
-
           plan_result = closure_scope.with_local_scope(args_hash) do |scope|
             plan.steps.each do |step|
               step_result = dispatch_step(scope, step)
