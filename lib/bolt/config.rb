@@ -324,13 +324,6 @@ module Bolt
 
         name = normalize_log(key)
         acc[name] = val.slice('append', 'level').transform_keys(&:to_sym)
-
-        next unless acc[name][:level] == 'notice'
-
-        Bolt::Logger.deprecate(
-          "notice_log_level",
-          "Log level 'notice' is deprecated and will be removed in Bolt 3.0. Use 'info' instead."
-        )
       end
     end
 

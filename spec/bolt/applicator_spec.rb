@@ -87,10 +87,10 @@ describe Bolt::Applicator do
     expect(applicator.compile(target, input)).to eq({})
     expect(@log_output.readlines).to eq(
       [
-        " DEBUG  Bolt::Executor : Started with 1 max thread(s)\n",
-        " DEBUG  Bolt::Inventory::Inventory : Did not find config for #{target.uri} in inventory\n",
-        " TRACE  Bolt::Applicator : #{target.uri}: A message\n",
-        " DEBUG  Bolt::Applicator : #{target.uri}: Stuff happened\n"
+        "DEBUG  Bolt::Executor : Started with 1 max thread(s)\n",
+        "DEBUG  Bolt::Inventory::Inventory : Did not find config for #{target.uri} in inventory\n",
+        "TRACE  Bolt::Applicator : #{target.uri}: A message\n",
+        "DEBUG  Bolt::Applicator : #{target.uri}: Stuff happened\n"
       ]
     )
   end

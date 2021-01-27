@@ -4,7 +4,7 @@ require 'logging'
 
 module Bolt
   module Logger
-    LEVELS = %w[trace debug info notice warn error fatal].freeze
+    LEVELS = %w[trace debug info warn error fatal].freeze
 
     # This module is treated as a global singleton so that multiple classes
     # in Bolt can log warnings with IDs. Access to the following variables

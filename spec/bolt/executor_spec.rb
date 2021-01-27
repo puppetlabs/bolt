@@ -749,7 +749,7 @@ describe "Bolt::Executor" do
     let(:plan_context) { { name: 'foo' } }
 
     before :all do
-      @log_output.level = :notice
+      @log_output.level = :info
     end
     after :all do
       @log_output.level = :all
