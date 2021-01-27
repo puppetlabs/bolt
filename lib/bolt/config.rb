@@ -22,8 +22,7 @@ module Bolt
 
     attr_reader :config_files, :data, :transports, :project, :modified_concurrency
 
-    BOLT_CONFIG_NAME = 'bolt.yaml'
-    BOLT_DEFAULTS_NAME = 'bolt-defaults.yaml'
+    DEFAULTS_NAME = 'bolt-defaults.yaml'
 
     # The default concurrency value that is used when the ulimit is not low (i.e. < 700)
     DEFAULT_DEFAULT_CONCURRENCY = 100
@@ -33,28 +32,9 @@ module Bolt
     end
 
     def self.from_project(project, overrides = {})
-      conf = if project.project_file == project.config_file
-               project.data
-             else
-               c = Bolt::Util.read_optional_yaml_hash(project.config_file, 'config')
-
-               # Validate the config against the schema. This will raise a single error
-               # with all validation errors.
-               Bolt::Validator.new.tap do |validator|
-                 validator.validate(c, bolt_schema, project.config_file.to_s)
-                 validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
-                 validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
-               end
-
-               if File.exist?(project.config_file)
-                 Bolt::Logger.debug("Loaded configuration from #{project.config_file}")
-               end
-               c
-             end
-
-      data = load_defaults(project).push(
-        filepath: project.config_file,
-        data: conf
+      data = load_defaults.push(
+        filepath: project.project_file,
+        data: project.data
       )
 
       new(project, data, overrides)
@@ -73,23 +53,13 @@ module Bolt
     def self.defaults_schema
       schema = {
         type:        Hash,
-        properties:  BOLT_DEFAULTS_OPTIONS.map { |opt| [opt, _ref: opt] }.to_h,
+        properties:  DEFAULTS_OPTIONS.map { |opt| [opt, _ref: opt] }.to_h,
         definitions: OPTIONS.merge(transport_definitions)
       }
 
       schema[:definitions]['inventory-config'][:properties] = transport_definitions
 
       schema
-    end
-
-    # Builds the schema for bolt.yaml used by the validator.
-    #
-    def self.bolt_schema
-      {
-        type:        Hash,
-        properties:  (BOLT_OPTIONS + INVENTORY_OPTIONS.keys).map { |opt| [opt, _ref: opt] }.to_h,
-        definitions: OPTIONS.merge(transport_definitions)
-      }
     end
 
     def self.system_path
@@ -110,19 +80,10 @@ module Bolt
     # projects. This file does not allow project-specific configuration such as 'hiera-config'
     # and nests all default inventory configuration under an 'inventory-config' key.
     def self.load_bolt_defaults_yaml(dir)
-      filepath     = dir + BOLT_DEFAULTS_NAME
+      filepath     = dir + DEFAULTS_NAME
       data         = Bolt::Util.read_yaml_hash(filepath, 'config')
 
       Bolt::Logger.debug("Loaded configuration from #{filepath}")
-
-      # Warn if 'bolt.yaml' detected in same directory.
-      if File.exist?(bolt_yaml = dir + BOLT_CONFIG_NAME)
-        Bolt::Logger.warn(
-          "multiple_config_files",
-          "Detected multiple configuration files: ['#{bolt_yaml}', '#{filepath}']. '#{bolt_yaml}' "\
-          "will be ignored."
-        )
-      end
 
       # Validate the config against the schema. This will raise a single error
       # with all validation errors.
@@ -133,7 +94,7 @@ module Bolt
       end
 
       # Remove project-specific config such as hiera-config, etc.
-      project_config = data.slice(*(BOLT_PROJECT_OPTIONS - BOLT_DEFAULTS_OPTIONS))
+      project_config = data.slice(*(PROJECT_OPTIONS - DEFAULTS_OPTIONS))
 
       if project_config.any?
         data.reject! { |key, _| project_config.include?(key) }
@@ -181,52 +142,17 @@ module Bolt
       { filepath: filepath, data: data }
     end
 
-    # Loads a 'bolt.yaml' file, the legacy configuration file. There's no special munging needed
-    # here since Bolt::Config will just ignore any invalid keys.
-    def self.load_bolt_yaml(dir)
-      filepath     = dir + BOLT_CONFIG_NAME
-      data         = Bolt::Util.read_yaml_hash(filepath, 'config')
-
-      Bolt::Logger.debug("Loaded configuration from #{filepath}")
-
-      Bolt::Logger.deprecate(
-        "bolt_yaml",
-        "Configuration file #{filepath} is deprecated and will be removed in Bolt 3.0. "\
-        "See https://pup.pt/update-bolt-config for how to update to the latest Bolt practices."
-      )
-
-      # Validate the config against the schema. This will raise a single error
-      # with all validation errors.
-      Bolt::Validator.new.tap do |validator|
-        validator.validate(data, bolt_schema, filepath)
-        validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
-        validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
-      end
-
-      { filepath: filepath, data: data }
-    end
-
-    def self.load_defaults(project)
+    def self.load_defaults
       confs = []
 
-      # Load system-level config. Prefer a 'bolt-defaults.yaml' file, but fall back to the
-      # legacy 'bolt.yaml' file. If the project-level config file is also the system-level
-      # config file, don't load it a second time.
-      if File.exist?(system_path + BOLT_DEFAULTS_NAME)
+      # Load system-level config.
+      if File.exist?(system_path + DEFAULTS_NAME)
         confs << load_bolt_defaults_yaml(system_path)
-      elsif File.exist?(system_path + BOLT_CONFIG_NAME) &&
-            (system_path + BOLT_CONFIG_NAME) != project.config_file
-        confs << load_bolt_yaml(system_path)
       end
 
-      # Load user-level config if there is a homedir. Prefer a 'bolt-defaults.yaml' file, but
-      # fall back to the legacy 'bolt.yaml' file.
-      if user_path
-        if File.exist?(user_path + BOLT_DEFAULTS_NAME)
-          confs << load_bolt_defaults_yaml(user_path)
-        elsif File.exist?(user_path + BOLT_CONFIG_NAME)
-          confs << load_bolt_yaml(user_path)
-        end
+      # Load user-level config if there is a homedir.
+      if user_path && File.exist?(user_path + DEFAULTS_NAME)
+        confs << load_bolt_defaults_yaml(user_path)
       end
 
       confs
@@ -234,7 +160,7 @@ module Bolt
 
     def initialize(project, config_data, overrides = {})
       unless config_data.is_a?(Array)
-        config_data = [{ filepath: project.config_file, data: config_data }]
+        config_data = [{ filepath: project.project_file, data: config_data }]
       end
 
       @logger       = Bolt::Logger.logger(self)
@@ -307,8 +233,14 @@ module Bolt
 
       overrides['trace'] = opts['trace'] if opts.key?('trace')
 
-      # Validate the overrides
-      Bolt::Validator.new.validate(overrides, self.class.bolt_schema, 'command line')
+      # Validate the overrides that can have arbitrary values
+      schema = {
+        type:        Hash,
+        properties:  CLI_OPTIONS.map { |opt| [opt, _ref: opt] }.to_h,
+        definitions: OPTIONS.merge(INVENTORY_OPTIONS)
+      }
+
+      Bolt::Validator.new.validate(overrides.slice(*CLI_OPTIONS), schema, 'command line')
 
       overrides
     end

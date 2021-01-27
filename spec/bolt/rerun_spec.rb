@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'bolt_spec/files'
+require 'bolt_spec/project'
 require 'bolt_spec/task'
 require 'bolt/cli'
 require 'bolt/util'
@@ -9,18 +10,20 @@ require 'bolt/util'
 # This is primarily a test of the cli but cli_spec is over 2k lines so I'm
 # keeping this separate.
 describe 'rerun' do
+  include BoltSpec::Project
+
   around(:each) do |example|
-    Dir.mktmpdir do |project|
-      @project = Bolt::Project.new({}, project)
+    with_project(config: config) do |project|
+      @project = project
       example.run
     end
   end
 
-  let(:executor) { double('executor', noop: false, subscribe: nil, shutdown: nil, publish_event: nil) }
-  let(:pal) { double('pal') }
-
+  let(:config)      { {} }
+  let(:executor)    { double('executor', noop: false, subscribe: nil, shutdown: nil, publish_event: nil) }
+  let(:pal)         { double('pal') }
   let(:target_spec) { %w[node1 node2] }
-  let(:targets) { target_spec.map { |uri| Bolt::Target.new(uri) } }
+  let(:targets)     { target_spec.map { |uri| Bolt::Target.new(uri) } }
   let(:result_vals) { [{}, { '_error' => {} }] }
 
   let(:result_set) do
@@ -145,15 +148,17 @@ describe 'rerun' do
       expect(read_rerun).to eq(['original result'])
     end
 
-    it 'does not update the file with save-rerun: false' do
-      File.write(@project.config_file, { 'save-rerun' => false }.to_yaml)
+    context 'with save-run: false' do
+      let(:config) { { 'save-rerun' => false } }
 
-      allow(executor).to receive(:run_command)
-        .with(targets, 'whoami', kind_of(Hash))
-        .and_return(result_set)
-      run_cli(['command', 'run', 'whoami', '--targets', target_spec.join(',')])
+      it 'does not update the file with save-rerun: false' do
+        allow(executor).to receive(:run_command)
+          .with(targets, 'whoami', kind_of(Hash))
+          .and_return(result_set)
+        run_cli(['command', 'run', 'whoami', '--targets', target_spec.join(',')])
 
-      expect(read_rerun).to eq(['original result'])
+        expect(read_rerun).to eq(['original result'])
+      end
     end
 
     it 'updates the file when a plan returns a failing ResultSet' do

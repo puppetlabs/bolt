@@ -449,8 +449,8 @@ module Bolt
 
       # Options that configure the inventory, specifically the default transport
       # used by targets and the transports themselves. These options are used in
-      # bolt.yaml, under a 'config' key in inventory.yaml, and under the
-      # 'inventory-config' key in bolt-defaults.yaml.
+      # bolt-defaults.yaml under 'inventory-config' and in inventory.yaml under
+      # 'config'.
       INVENTORY_OPTIONS = {
         "transport" => {
           description: "The default transport to use when the transport for a target is not "\
@@ -501,26 +501,20 @@ module Bolt
         }
       }.freeze
 
-      # Options that are available in a bolt.yaml file
-      BOLT_OPTIONS = %w[
-        apply-settings
-        color
+      # Options that are available on the command line
+      # This only includes options where users can provide arbitrary
+      # values from the command-line, allowing the validator to check them
+      CLI_OPTIONS = %w[
         compile-concurrency
         concurrency
         format
-        hiera-config
         log
         modulepath
-        plugin-hooks
-        plugins
-        puppetdb
-        save-rerun
-        spinner
-        trusted-external-command
+        transport
       ].freeze
 
       # Options that are available in a bolt-defaults.yaml file
-      BOLT_DEFAULTS_OPTIONS = %w[
+      DEFAULTS_OPTIONS = %w[
         color
         compile-concurrency
         concurrency
@@ -538,7 +532,7 @@ module Bolt
       ].freeze
 
       # Options that are available in a bolt-project.yaml file
-      BOLT_PROJECT_OPTIONS = %w[
+      PROJECT_OPTIONS = %w[
         apply-settings
         color
         compile-concurrency

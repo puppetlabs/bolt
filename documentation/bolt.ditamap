@@ -109,7 +109,6 @@
         <topicref href="bolt_defaults_reference.md" format="markdown"/>
         <topicref href="bolt_project_reference.md" format="markdown"/>
         <topicref href="bolt_inventory_reference.md" format="markdown"/>
-        <topicref href="bolt_configuration_reference.md" format="markdown"/>
     </topichead>
     <topicref href="troubleshooting.md" format="markdown"/>
 </map>

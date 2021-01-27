@@ -2676,20 +2676,4 @@ describe "Bolt::CLI" do
       end
     end
   end
-
-  it 'with bolt-project with config, warns and ignores bolt.yaml' do
-    Dir.mktmpdir do |dir|
-      pwd = File.join(dir, 'validname')
-      FileUtils.mkdir_p(pwd)
-      FileUtils.touch(File.join(pwd, 'bolt.yaml'))
-      File.write(File.join(pwd, 'bolt-project.yaml'), { 'format' => 'json' }.to_yaml)
-
-      cli = Bolt::CLI.new(%W[command run whoami -t foo --project #{pwd}])
-      cli.parse
-
-      output = @log_output.readlines
-      expect(output).to include(/Project-level configuration in bolt.yaml is deprecated/)
-      expect(output).to include(/bolt-project.yaml contains valid config keys/)
-    end
-  end
 end

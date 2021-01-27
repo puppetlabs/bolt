@@ -57,7 +57,6 @@ begin
       function_reference
       cmdlet_reference
       command_reference
-      config_reference
       defaults_reference
       privilege_escalation
       project_reference
@@ -163,44 +162,13 @@ begin
       $stdout.puts "Generated shell command reference at:\n\t#{filepath}"
     end
 
-    desc 'Generate markdown docs for bolt.yaml'
-    task :config_reference do
-      require 'bolt/config'
-
-      filepath   = File.expand_path('../documentation/bolt_configuration_reference.md', __dir__)
-      template   = File.expand_path('../documentation/templates/bolt_configuration_reference.md.erb', __dir__)
-      @opts      = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_OPTIONS)
-      @inventory = Bolt::Config::INVENTORY_OPTIONS.dup
-
-      # Move sub-options for 'log' option up one level, as they're nested under
-      # 'console' and filepath
-      @opts['log'][:properties] = @opts['log'][:additionalProperties][:properties]
-
-      # Remove 'notice' log level. This is soft-deprecated and shouldn't appear
-      # in documentation.
-      @opts['log'][:properties]['level'][:enum].delete('notice')
-
-      # Stringify data types
-      @opts.transform_values! { |data| stringify_types(data) }
-      @inventory.transform_values! { |data| stringify_types(data) }
-
-      # Generate YAML file examples
-      @yaml           = generate_yaml_file(@opts)
-      @inventory_yaml = generate_yaml_file(@inventory)
-
-      renderer = ERB.new(File.read(template), nil, '-')
-      File.write(filepath, renderer.result)
-
-      $stdout.puts "Generated bolt.yaml reference at:\n\t#{filepath}"
-    end
-
     desc 'Generate markdown docs for bolt-defaults.yaml'
     task :defaults_reference do
       require 'bolt/config'
 
       filepath    = File.expand_path('../documentation/bolt_defaults_reference.md', __dir__)
       template    = File.expand_path('../documentation/templates/bolt_defaults_reference.md.erb', __dir__)
-      @opts       = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_DEFAULTS_OPTIONS)
+      @opts       = Bolt::Config::OPTIONS.slice(*Bolt::Config::DEFAULTS_OPTIONS)
       inventory   = Bolt::Config::INVENTORY_OPTIONS.dup
       @transports = Bolt::Config::TRANSPORT_CONFIG.keys
 
@@ -417,7 +385,7 @@ begin
 
       filepath = File.expand_path('../documentation/bolt_project_reference.md', __dir__)
       template = File.expand_path('../documentation/templates/bolt_project_reference.md.erb', __dir__)
-      @opts    = Bolt::Config::OPTIONS.slice(*Bolt::Config::BOLT_PROJECT_OPTIONS)
+      @opts    = Bolt::Config::OPTIONS.slice(*Bolt::Config::PROJECT_OPTIONS)
 
       # Move sub-options for 'log' option up one level, as they're nested under
       # 'console' and filepath
