@@ -56,7 +56,7 @@ To start using the JSON schemas with VS Code, follow these steps:
 📖 **Related information**
 
 - [Configuring Bolt](configuring_bolt.md)
-- [Inventory files](inventory_file_v2.md)
+- [Inventory files](inventory_files.md)
 - [VS Code settings
   file](https://code.visualstudio.com/docs/getstarted/settings)
 - [VS Code YAML

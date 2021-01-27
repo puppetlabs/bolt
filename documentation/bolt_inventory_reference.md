@@ -1,6 +1,6 @@
 # `inventory.yaml` fields
 
-Use an [inventory file](inventory_file_v2.md) to store information about
+Use an [inventory file](inventory_files.md) to store information about
 your targets and arrange them into groups. Both targets and groups can
 include data such as facts or vars and can configure the transports Bolt uses
 to establish connections with targets.
@@ -10,7 +10,7 @@ to establish connections with targets.
 The top level of your inventory file contains fields that configure the
 implicit `all` group. These fields apply to all of the groups and targets in
 the inventory file. For more information on inventory files, such as
-precedence, see [Inventory files](inventory_file_v2.md)
+precedence, see [Inventory files](inventory_files.md)
 
 ### `config`
 

@@ -706,7 +706,7 @@ to set configuration options on the targets.
 Use `Target.new()` to create a target that clobbers an existing target with the
 same name. `Target.new()` takes a data hash with the same keys as [inventory
 target
-definitions](https://puppet.com/docs/bolt/latest/inventory_file_v2.html#target-object).
+definitions](inventory_files.md#target-object).
 You can use this to configure more options for the target than are available in
 the URI alone, but it is a destructive action: if you try to create a target
 with the same name as a target that already exists in the inventory (either from

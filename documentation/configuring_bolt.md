@@ -142,7 +142,7 @@ from highest precedence to lowest:
 
   - Configuration specifications from the target's URI. For example, `ssh://user:password@hostname:port`.
   - [Plan function](plan_functions.md) options that modify configuration, such as `_run_as`.
-  - [Inventory file](inventory_file_v2.md) configuration options.
+  - [Inventory file](inventory_files.md) configuration options.
   - [Command-line options](bolt_command_reference.md) that modify configuration.
   - Options from the project-level configuration file, `bolt-project.yaml`. 
   - Options from the user-level configuration file, `~/.puppetlabs/etc/bolt/bolt-defaults.yaml`.

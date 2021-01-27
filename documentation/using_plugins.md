@@ -86,7 +86,7 @@ issue](https://github.com/puppetlabs/bolt/issues/new/choose).
 📖 **Related information**
 
 - [Configuring Bolt](configuring_bolt.md)
-- [Inventory files](inventory_file_v2.md)
+- [Inventory files](inventory_files.md)
 
 ### Using reference plugins in plans
 
