@@ -9,19 +9,17 @@ module Bolt
         attr_reader :name, :type, :body, :targets
 
         def self.allowed_keys
-          Set['name', 'description', 'target', 'targets']
+          Set['name', 'description', 'targets']
         end
 
         STEP_KEYS = %w[
           command
-          destination
           download
           eval
           message
           plan
           resources
           script
-          source
           task
           upload
         ].freeze
@@ -34,13 +32,7 @@ module Bolt
           when 1
             type = type_keys.first
           else
-            if [Set['source', 'destination'], Set['upload', 'destination']].include?(type_keys.to_set)
-              type = 'upload'
-            elsif type_keys.to_set == Set['download', 'destination']
-              type = 'download'
-            else
-              raise step_error("Multiple action keys detected: #{type_keys.inspect}", step_body['name'], step_number)
-            end
+            raise step_error("Multiple action keys detected: #{type_keys.inspect}", step_body['name'], step_number)
           end
 
           step_class = const_get("Bolt::PAL::YamlPlan::Step::#{type.capitalize}")
@@ -51,7 +43,7 @@ module Bolt
         def initialize(step_body)
           @name = step_body['name']
           @description = step_body['description']
-          @targets = step_body['targets'] || step_body['target']
+          @targets = step_body['targets']
           @body = step_body
         end
 
@@ -95,19 +87,6 @@ module Bolt
 
           # Ensure all required keys are present
           missing_keys = required_keys - body.keys
-
-          # Handle cases where steps with a required 'targets' key are using the deprecated
-          # 'target' key instead.
-          # TODO: Remove this when 'target' is removed
-          if body.include?('target')
-            missing_keys -= ['targets']
-          end
-
-          # Handle cases where upload step uses deprecated 'source' key instead of 'upload'
-          # TODO: Remove when 'source' is removed
-          if body.include?('source')
-            missing_keys -= ['upload']
-          end
 
           if missing_keys.any?
             error_message = "The #{step_type.inspect} step requires: #{missing_keys.to_a.inspect} key(s)"
