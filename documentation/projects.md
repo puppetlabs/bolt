@@ -141,7 +141,7 @@ The following are common files and directories found in a Bolt project.
 |Directory/File|Description|
 |---------|-----------|
 |[`bolt-project.yaml`](bolt_project_reference.md)|Contains configuration options for Bolt and  Bolt projects. This file must exist for Bolt to find any of the other files or directories in this list.|
-|[`inventory.yaml`](inventory_file_v2.md)|Contains a list of known targets and target specific data.|
+|[`inventory.yaml`](inventory_files.md)|Contains a list of known targets and target specific data.|
 |[`plans/`](plans.md)|A directory for storing your plans.|
 |[`tasks/`](tasks.md)|A directory for storing your tasks.|
 |`files/`|A directory for storing content consumed by your tasks and plans, such as scripts.|
@@ -283,7 +283,7 @@ allows you to update old Bolt projects so that you can use them with the latest
 Bolt release.
 
 Currently, the `migrate` command:
-- Updates inventory files from Bolt version 1.
+- Updates inventory files from version 1.
 - Updates projects to use `bolt-project.yaml` and `inventory.yaml` instead of `bolt.yaml`.
 - Updates projects to implement module dependency management. Dependency
   management was introduced in Bolt 2.30.0.
@@ -454,4 +454,4 @@ following:
 📖 **Related information**
 
 - [Modules overview](modules.md)
-- [Inventory files](inventory_file_v2.md)
+- [Inventory files](inventory_files.md)

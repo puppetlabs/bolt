@@ -129,7 +129,7 @@ The following functions are available to `Target` objects:
 | `host` | `String` | The target's hostname. ||
 | `name` | `String` | The target's human-readable name, or its URI if a name was not given. ||
 | `password` | `String` | The password to use when connecting to the target. ||
-| `plugin_hooks` | `Hash[String, Data]` | The target's `plugin_hooks` [configuration options](bolt_configuration_reference.md#plugin-hooks-configuration-options). ||
+| `plugin_hooks` | `Hash[String, Data]` | The target's `plugin_hooks` [configuration options](bolt_project_reference.md#plugin-hooks). ||
 | `port` | `Integer` | The target's connection port. ||
 | `protocol` | `String` | The protocol used to connect to the target. | This is equivalent to the target's `transport`, except for targets using the `remote` transport. For example, a target with the URI `http://example.com` using the `remote` transport would return `http` for the `protocol`. |
 | `resources` | `Hash[String, ResourceInstance]` | The target's resources. | This function does not look up resources for a target and only returns resources set on a target during a plan run. |

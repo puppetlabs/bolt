@@ -25,11 +25,7 @@ you are not required to install any agent software.
             <li><a class="xref" href="bolt_installing.md">Installing Bolt</a> - Follow the installation instructions for your operating system: *nix, macOS, or Windows.</li>
         </ul>
     </p>
-    <p><a class="xref" href="migrating_inventory_files.md">Upgrading to Bolt 2.0</a>
-        <ul>
-            <li><a class="xref" href="migrating_inventory_files.md#migrating-inventory-files-from-version-1-to-version-2">Migrating inventory files from version 1 to version 2</a></li>
-        </ul>
-    </p>
+    <p><a class="xref" href="upgrading_to_bolt_3.md">Upgrading to Bolt 3.0</a></p>
     <p>Make one-time changes to your remote targets
         <ul>
             <li><a class="xref" href="running_bolt_commands.md">Run a command</a></li>
