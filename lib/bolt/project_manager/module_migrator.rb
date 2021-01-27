@@ -6,7 +6,7 @@ module Bolt
   class ProjectManager
     class ModuleMigrator < Migrator
       def migrate(project, configured_modulepath)
-        return true unless project.modules.nil?
+        return true unless project.modules.empty?
 
         @outputter.print_message "Migrating project modules\n\n"
 

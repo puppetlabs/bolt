@@ -301,6 +301,7 @@ module Bolt
             ]
           },
           _plugin: false,
+          _default: [],
           _example: [
             "puppetlabs-facts",
             { "name" => "puppetlabs-mysql" },
