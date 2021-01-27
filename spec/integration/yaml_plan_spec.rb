@@ -166,7 +166,6 @@ describe "running YAML plans", ssh: true do
   it "warns when using deprecated 'target' parameter" do
     stub_logger
     allow(Puppet::Util::Log).to receive(:newdestination).with(mock_logger)
-    allow(mock_logger).to receive(:notice)
     allow(mock_logger).to receive(:info)
     allow(mock_logger).to receive(:warn)
 
